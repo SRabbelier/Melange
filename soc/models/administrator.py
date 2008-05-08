@@ -30,7 +30,8 @@ import soc.models.author
 class Administrator(db.Model):
   """Administrator details for a specific Program.
 
-  An Administrator entity participates in a number of relationships:
+  An Administrator entity participates in the following relationships
+  implemented as a db.ReferenceProperty elsewhere in another db.Model:
 
    host)  an optional 1:1 relationship associating generic Administrator
      details and capabilities with a specific Host.  This relation is

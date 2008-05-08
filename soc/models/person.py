@@ -41,7 +41,8 @@ class Person(db.Model):
   other Persons in roles that "need to know" this information.  How these
   fields are revealed is usually covered by Program terms of service.
 
-  A Person entity participates in a number of relationships:
+  A Person entity participates in the following relationships implemented
+  as a db.ReferenceProperty elsewhere in another db.Model:
      
    author)  a 1:1 relationship of Person details for a specific Author.
      This relation is implemented as the 'author' back-reference Query of
@@ -59,8 +60,7 @@ class Person(db.Model):
   #: exist unassociated from a login identity and credentials.  The
   #: back-reference in the User model is a Query named 'persons'.
   user = db.ReferenceProperty(reference_class=models.user.User,
-                              required=True, 
-                              collection_name="persons")
+                              required=True, collection_name="persons")
 
   #====================================================================
   #  (public) name information

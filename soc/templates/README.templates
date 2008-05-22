@@ -1,10 +1,12 @@
+TEMPLATE NAMESPACES
+
 Templates are placed in a "namespace" subdirectory in the templates directory,
 since the templates directory will be added to the Django templates search
 path.  This allows other packages to extend existing templates without "hiding"
 the original template.  For example, a template in another Melange application
 can extend a template in the SoC framework like this:
 
-  {% extends 'soc/some_existing_template.html %}
+  {% extends 'soc/some_existing_template.html' %}
 
 without "hiding" the some_existing_template.html for other uses, even if the
 derived template is also named some_existing_template.html.
@@ -15,4 +17,12 @@ place them in the soc/templates/soc "namespace" subdirectory.
 Different Melange applications should also follow this pattern, to promote
 sharing of templates between applications as well.  For exmample, the GSoC
 Melange application should place its templates in gsoc/templates/gsoc.
+
+MODEL/VIEW TEMPLATE NAMING
+
+View templates are usually named some_view.html for a corresponding someView()
+function and SomeViewForm form class.  Since SomeView is likely to be a common
+View name for multiple Models, Model-specific templates should be placed in
+soc/<model> sub-directories.  For example, the template used by the Profile
+view for the Person Model belongs in soc/person/profile.html.
 

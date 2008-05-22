@@ -23,5 +23,5 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns(
     '',
     (r'^person/profile/$', 'soc.views.person.profile',
-     {'template': 'proto/profile.html'}),
+     {'template': 'proto/person/profile.html'}),
 )

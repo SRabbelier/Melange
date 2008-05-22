@@ -42,7 +42,7 @@ class ProfileForm(djangoforms.ModelForm):
     exclude = ['user', ]
 
 
-def profile(request, template='soc/profile.html'):
+def profile(request, template='soc/person/profile.html'):
   """View for a Person to modify the properties of a PersonModel.
 
   Args:

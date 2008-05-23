@@ -16,15 +16,9 @@
 
 """Tests for the scripts.settings module.
 
-These tests can be run from the root of the SoC svn working copy with:
 
-  nosetests trunk/scripts/tests
-
-To see specifically which tests are being run, add the -v (--verbosity) option.
-
-This test module is explicitly *not* an executable script so that it can use
-explicit relative references to "reach back" to the module to be tested from
-the tests/ sub-directory (which do not work if __name__ == '__main__').
+For details on running the tests, see:
+  http://code.google.com/p/soc/wiki/TestingGuidelines#Running_the_smoke_tests
 """
 
 __authors__ = [

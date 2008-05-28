@@ -23,23 +23,26 @@ __authors__ = [
 
 
 from google.appengine.api import users
-from google.appengine.ext.db import djangoforms
 from django import http
 from django import shortcuts
 from django import newforms as forms
 
 from soc.models import person
+from soc.views.helpers import forms_helpers
 
 
-class ProfileForm(djangoforms.ModelForm):
+class ProfileForm(forms_helpers.DbModelForm):
+  """Django form displayed when creating or editing a Person.
+  """
+
   class Meta:
     """Inner Meta class that defines some behavior for the form.
-
     """
-    #: the db.Model subclass for which the form will gather information.
+    #: db.Model subclass for which the form will gather information
     model = person.Person
-    #: the list of model fields which will *not* be gathered by the form.
-    exclude = ['user', ]
+
+    #: list of model fields which will *not* be gathered by the form
+    exclude = ['user']
 
 
 def profile(request, template='soc/person/profile.html'):
@@ -56,10 +59,13 @@ def profile(request, template='soc/person/profile.html'):
   user = users.get_current_user()
   if not user:
     return http.HttpResponseRedirect(users.create_login_url(request.path))
+
   form = ProfileForm()
   if request.method=='POST':
     form = ProfileForm(request.POST)
+
     if not form.errors:
       return http.HttpResponse('This would update the model')
+
   return shortcuts.render_to_response(
       template, dictionary={'template': template, 'form': form, 'user': user})

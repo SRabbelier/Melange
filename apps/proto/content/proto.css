@@ -18,3 +18,19 @@ body {
   font-family: Verdana, Helvetica, sans-serif;
   background-color: #DDDDDD;
 }
+
+td.formfieldrequired {
+ font-style: italic;
+}
+
+td.formfieldhelptext {
+ font-style: italic;
+}
+
+td.formfielderror {
+ color: #FF0000;
+}
+
+td.formfieldheading {
+ font-weight: bold;
+}

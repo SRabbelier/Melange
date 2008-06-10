@@ -46,11 +46,16 @@ PYSVN_ALL_NODE_KINDS = set([pysvn.node_kind.none, pysvn.node_kind.dir,
 PYSVN_FILE_DIR_NODE_KINDS = set([pysvn.node_kind.dir, pysvn.node_kind.file])
 
 
+# pysvn Client object initialized lazily the first time getPySvnClient()
+# is called.
 _client = None
 
 
 def getPySvnClient():
   """Returns the module-global pysvn Client object (creating one if needed).
+
+  Lazily initializes a global pysvn Client object, returning the same one
+  once it exists.
   """
   global _client
 
@@ -95,6 +100,10 @@ def getCanonicalSvnPath(path):
 
 def useLocalOsSep(path):
   """Return path with all / characters replaced with os.sep, to be OS-agnostic.
+
+  Args:
+    path: an SVN path (either working copy path or relative path, but not a
+      full repository URL) that uses the canonical / separators
   """
   return path.replace('/', os.sep)
 

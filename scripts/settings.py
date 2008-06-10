@@ -236,16 +236,13 @@ def readPythonSettings(defaults={},  # {} OK since defaults is always copied
   return defaults
 
 
-def readPythonSettingsOrDie(parser=None,
-                            defaults={},  # {} OK since defaults is always copied
-                            settings_dir=DEF_SETTINGS_FILE_DIR,
-                            settings_file=DEF_SETTINGS_FILE_NAME):
+def readPythonSettingsOrDie(parser=None, **kwargs):
   """Calls readPythonSettings(), calling sys.exit() on any errors.
 
   Args:
     parser: if supplied, an OptionParser instance used to call print_help()
       to print usage information if errors occur
-    defaults, settings_dir, settings_file: see readPythonSettings()
+    **kwargs: see readPythonSettings()
 
   Returns:
     On success, returns results of readPythonSettings().
@@ -255,8 +252,7 @@ def readPythonSettingsOrDie(parser=None,
     possibly prints usage information, and calls sys.exit(1).
   """
   try:
-    return readPythonSettings(defaults=defaults, settings_dir=settings_dir,
-                              settings_file=settings_file)
+    return readPythonSettings(**kwargs)
   except Error, error:
     if parser:
       sys.exit(printErrorsAndUsage(error.args, parser))
@@ -305,7 +301,9 @@ def parseOptionsOrDie(parser, args):
 def checkCommonSvnOptions(options):
   """Checks a common subset of command-line options.
 
-  Multiple scripts accept a subset of common command-line options.
+  Multiple scripts accept a subset of common command-line options.  This
+  function does some sanity checks on these flags.  These checks are collected
+  here because they were being duplicated in multiple scripts.
 
   Args:
     options: OptionParser.parse_args() options instance to check

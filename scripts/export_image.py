@@ -39,18 +39,19 @@ from trunk.scripts import settings
 from trunk.scripts import svn_helper
 
 
-def buildOptionList(defaults):
+def buildOptionList(defaults={}):
   """Returns a list of command-line settings.Options for this script.
 
   Args:
-    defaults: dict of possible pre-loaded default values (may be empty)
+    defaults: dict of possible pre-loaded default values; default is empty
+      dict (which is safe because it is not altered)
   """
   def_repo = defaults.get('repo')
 
   if def_repo:
     repo_help_msg = 'SVN repository; default is %s' % def_repo
   else:
-    repo_help_msg = 'SVN repository; REQUIRED if default unavailable'
+    repo_help_msg = 'SVN repository; REQUIRED if a default is missing'
 
   return [
       settings.Option(
@@ -69,9 +70,11 @@ def buildOptionList(defaults):
 
 
 def main(args):
+  # create parser just for usage info before settings file is read successfully
+  usage_parser = settings.OptionParser(option_list=buildOptionList())
+
   # attempt to read the common trunk/scripts settings file
-  defaults = settings.readPythonSettingsOrDie(
-      parser=settings.OptionParser(option_list=buildOptionList({})))
+  defaults = settings.readPythonSettingsOrDie(parser=usage_parser)
 
   # create the command-line options parser
   parser = settings.makeOptionParserOrDie(
@@ -90,13 +93,14 @@ def main(args):
 
   setup_errors = []
 
-  # dirname() called twice because image always ends with os.sep
-  parent_dir = os.path.dirname(os.path.dirname(image))
-
-  if os.path.isdir(image):
+  if os.path.exists(image):
     setup_errors.extend(
         ['--image destination directory must not already exist:',
          '  %s' % image])
+
+  # dirname() called twice because image always ends with os.sep as a result
+  # of svn_helper.getExpandedWorkingCopyPath()
+  parent_dir = os.path.dirname(os.path.dirname(image))
 
   if not os.path.isdir(parent_dir):
     try:

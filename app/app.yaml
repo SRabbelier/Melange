@@ -19,8 +19,14 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /content
-  static_dir: content
+- url: /soc/content
+  static_dir: soc/content
+
+- url: /gsoc/content
+  static_dir: gsoc/content
+
+- url: /ghop/content
+  static_dir: ghop/content
 
 - url: /.*
   script: main.py

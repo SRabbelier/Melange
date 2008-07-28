@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <link rel="stylesheet" href="/svn/trunk/mockups/content/css/mockups.css" type="text/css"/>
+  <title>User Profile</title>
+ </head>
+
+ <body>
+
+  <div id="login">
+   <b>logged.in.user@gmail.com</b>
+   <span title=" Google Account displayed once user signs in " class="popup">
+<small>*</small>
+   </span>
+   | <a href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 
+   <a href="/">Sign out</a>
+  </div>
+
+  <div id="header">
+   <div id="logo">
+<a href="/"><img src="/svn/trunk/mockups/content/images/logo-custom.gif" alt="Google Open Source Programs"/></a>
+   <span title=" TODO: logo updated in site sponsor interface " class="popup">
+<small>*</small>
+   </span>
+   </div>
+
+   <div id="title">
+User Profile for <i>Givenname Surname</i>
+   <span title=" Display name not shown until entered and saved the first time " class="popup">
+<small>*</small>
+   </span>
+<a href="mailto:logged.in.user@gmail.com">&lt;logged.in.user@gmail.com&gt;</a>
+   </div>
+   <div id="breadcrumbs">
+    <span class="item">
+<a href="/svn/trunk/mockups/sitehome.html">Google Open Source Programs</a>
+    </span>
+&gt;
+    <span class="item">
+<a href="/svn/trunk/mockups/user/profile/linkname/profile.html">User (Sign in)</a>
+    </span>
+&gt;
+    <span class="item">
+<a class="selected" href="/svn/trunk/mockups/user/profile/linkname/profile.html">Profile</a>
+    </span>
+   </div>
+  </div>
+
+  <div id="side" dir="ltr">
+   <div id="menu">
+    <ul>
+     <li>
+<a href="/svn/trunk/mockups/sitehome.html">Google Open Source Programs</a>
+      <ul>
+       <li>
+<a href="/svn/trunk/mockups/user/profile/linkname/profile.html">User (Sign out)</a>
+   <span title=" changes to (Sign out) after user signs in " class="popup">
+<small>*</small>
+   </span>
+        <ul>
+         <li>
+<a class="selected" href="/svn/trunk/mockups/user/profile/linkname/profile.html">Profile</a>
+   <span title=" Profile sidebar menu item present after user signs in " class="popup">
+<small>*</small>
+   </span>
+         </li>
+         <li>
+<a href="/svn/trunk/mockups/user/roles/linkname/roles.html">Roles</a>
+   <span title=" Roles sidebar menu item present after user signs in " class="popup">
+<small>*</small>
+   </span>
+         </li>
+        </ul>
+       </li>
+      </ul>
+      <ul>
+       <li>
+<a href="/svn/trunk/mockups/program/home/gsoc2009/gsoc2009home.html">Google Summer of Code</a>
+        <ul>
+         <li>
+<a href="/svn/trunk/mockups/program/community/gsoc2009/gsoc2009comm.html">Community</a>
+         </li>
+         <li>
+<a href="/svn/trunk/mockups/program/docs/faqs/gsoc2009/gsoc2009faqs.html">Program FAQs</a>
+         </li>
+         <li>
+<a href="/svn/trunk/mockups/program/docs/tos/gsoc2009/gsoc2009tos.html">Terms of Service</a>
+         </li>
+        </ul>
+       </li>
+       <li>
+<a href="/svn/trunk/mockups/program/home/ghop2008/ghop2008home.html">Google Highly Open Participation</a>
+        <ul>
+         <li>
+<a href="/svn/trunk/mockups/program/community/ghop2008/">Community</a>
+         </li>
+         <li>
+<a href="/svn/trunk/mockups/program/docs/faqs/ghop2008/">Program FAQs</a>
+         </li>
+         <li>
+<a href="/svn/trunk/mockups/program/docs/rules/ghop2008/ghop2008rules.html">Contest Rules</a>
+         </li>
+        </ul>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </div>
+
+   <div id="search">
+    <form id="searchbox_015986126177484454297:pfmwlvdl42y" action="http://www.google.com/cse">
+     <input type="hidden" name="cx" value="015986126177484454297:pfmwlvdl42y" />
+     <input type="hidden" name="cof" value="FORID:0" />
+     <div class="header">
+Search Google Open Source:
+     </div>
+     <input name="q" type="text" size="20" />
+     <input type="submit" name="sa" value="Search" />
+     <br/>
+    </form>
+    <script type="text/javascript" src="http://google.com/coop/cse/brand?form=searchbox_015986126177484454297:pfmwlvdl42y">
+    </script></form>
+   </div>
+
+   <div id="badge">
+<a href="http://code.google.com/p/soc/" target="_blank">Powered by Melange</a>
+   <span title=" TODO: need a Melange logo " class="popup">
+<small>*</small>
+   </span>
+   </div>
+  </div>
+
+  <div id="body">
+   <div style="line-height: 140%;">
+<p class="todo">
+This is the landing page after a user signs in using the
+<a href="http://code.google.com/appengine/docs/users/loginurls.html">Google
+Account login facility provided by Google App Engine</a>.
+</p>
+
+Please use this form to set basic site-wide settings for your participation
+in Google Open Source Programs.
+   </div>
+<br>
+   <div style="line-height: 140%;">
+    <form method="post" action="profile_save.html" name="user_profile">
+     <table class="profile">
+      <tbody>
+       <tr>
+        <th>
+Display name:
+        </th>
+        <td>
+<input size="40" name="displayname" value="Givenname Surname">
+        </td>
+        <td class="explain">
+Human-readable name displayed throughout the site for this user.  UTF-8
+characters are permitted.
+        </td>
+       </tr>
+       <tr>
+        <th class="error">
+Linkname:
+        </th>
+        <td class="error_outline">
+<input size="40" name="linkname" value="logged_dot_in_dot_user_at_gmail_dot_com">
+<br>
+Please select another linkname: <i>(list of potential error messages)</i>
+         <ul>
+          <li>
+<i>logged_dot_in_dot_user_at_gmail_dot_com</i> is already in use.
+          </li>
+          <li>
+<i>logged_dot_in_dot_user_at_gmail_dot_com</i> is too long.
+          </li>
+          <li>
+<i>logged_dot_in_dot_user_at_gmail_dot_com</i> contains invalid characters.
+          </li>
+          <li>
+Etc.
+          </li>
+         </ul>
+        </td>
+        <td class="explain">
+Short nickname, used in site URLs referring to this user's content.  This
+linkname is must only contain alphanumeric <code>[A-Za-z0-9]</code>
+characters or the underscore <code>_</code> (no spaces or other punctuation).
+Also, it must be unique.  If some other user is already using a given linkname,
+it will be unavailable and a different linkname will need to be selected.
+        </td>
+       </tr>
+       <tr>
+        <td colspan="3">
+<b><i>TODO</i></b>: site-wide privacy settings go here...
+        </td>
+       </tr>
+       <tr>
+        <td colspan="3">
+ <input type="checkbox" name="agreetoterms" value="agree" checked>
+ I have read and agree to the <i>Google Open Source Programs</i>
+ <a href="/svn/trunk/mockups/site/docs/tos/tos.html">Terms of Service</a>.
+        </td>
+       </tr>
+       <tr>
+        <td></td>
+        <td class="submit">
+<br>
+<input type="submit" name="save_changes" value="Save Changes" />
+<br>
+        </td>
+        <td></td>
+       </tr>
+      </tbody>
+     </table>
+    </form>
+   </div>
+ </div>
+
+  <div id="footer" dir="ltr">
+   <div class="text">
+&copy;2008 Google -
+<a href="http://www.google.com/">Google Home</a> -
+<a href="http://www.google.com/privacy.html">Privacy Policy</a>
+   </div>
+  </div>
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+
+  <script type="text/javascript">
+_uacct="UA-4291635-1"; // code.google.com site-wide tracking
+_uanchor=1;
+_uff=0;
+urchinTracker();
+  </script>
+
+ </body>
+</html>

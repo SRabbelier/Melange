@@ -32,7 +32,7 @@ import os
 import sys
 import unittest
 
-from .. import settings
+from ..scripts import settings
 
 
 class SettingsTests(unittest.TestCase):

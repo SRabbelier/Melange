@@ -23,6 +23,8 @@ exists(): returns True if repo_path exists in the svn repository
 
 PYSVN_ALL_NODE_KINDS: all directory entry node_kinds supported by pysvn
 PYSVN_FILE_DIR_NODE_KINDS: actual file and directory node_kinds
+
+This module requires that the pysvn module be installed.
 """
 
 __authors__ = [

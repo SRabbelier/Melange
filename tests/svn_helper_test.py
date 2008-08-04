@@ -18,6 +18,8 @@
 
 For details on running the tests, see:
   http://code.google.com/p/soc/wiki/TestingGuidelines#Running_the_smoke_tests
+
+This test (and the svn_helper module that it tests) requires the pysvn module.
 """
 
 __authors__ = [
@@ -31,7 +33,7 @@ import pysvn
 import sys
 import unittest
 
-from .. import svn_helper
+from ..scripts import svn_helper
 
 
 class SvnHelperTests(unittest.TestCase):
@@ -46,30 +48,30 @@ class SvnHelperTests(unittest.TestCase):
     """
     self.assert_(
         'svn_helper_test.py' in svn_helper.lsFiles(
-            self.client, '%strunk/scripts/tests' % svn_helper.DEF_SVN_REPO))
+            'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
 
     self.assert_(
         'tests/' not in svn_helper.lsFiles(
-            self.client, '%strunk/scripts' % svn_helper.DEF_SVN_REPO))
+            'http://soc.googlecode.com/svn/trunk', client=self.client))
 
   def testLsDirs(self):
     """Test if lsDirs() contains only dir entries, using the SoC SVN repo.
     """
     self.assert_(
         'tests/' in svn_helper.lsDirs(
-            self.client, '%strunk/scripts' % svn_helper.DEF_SVN_REPO))
+            'http://soc.googlecode.com/svn/trunk', client=self.client))
 
     self.assert_(
         'svn_helper_test.py' not in svn_helper.lsDirs(
-            self.client, '%strunk/scripts' % svn_helper.DEF_SVN_REPO))
+            'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
 
   def testExists(self):
     """Test if exists() works on the the SoC SVN repo.
     """
     self.assertEqual(
-        True, svn_helper.exists(self.client,
-                                svn_helper.DEF_SVN_REPO + 'trunk'))
+        True, svn_helper.exists(
+            'http://soc.googlecode.com/svn/trunk', client=self.client))
 
     self.assertEqual(
-        False, svn_helper.exists(self.client,
-                                 svn_helper.DEF_SVN_REPO + 'does_not_exist'))
+        False, svn_helper.exists(
+            'http://soc.googlecode.com/svn/does_not_exist', client=self.client))

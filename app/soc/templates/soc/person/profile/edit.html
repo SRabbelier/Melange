@@ -20,9 +20,19 @@ limitations under the License.
  </head>
  <body>
   <p>
-   {% block 'logo' %}{% endblock %}
+   {% block 'logo' %}
+   <img src="/soc/content/images/dune.jpg" alt="Melange" />
+   {% endblock %}
+   <p>
+   {% block 'greeting' %}
    Welcome, {{user.nickname}}.
-   {% block 'instructions' %}Please update your profile:{% endblock %}
+   {% endblock %}
+   </p>
+   <p>
+   {% block 'instructions' %}
+   Please update your profile:
+   {% endblock %}
+   </p>
    <form method="POST">
     <table>
      <tr>

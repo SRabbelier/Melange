@@ -22,6 +22,9 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns(
     '',
-    (r'^person/profile/$', 'soc.views.person.profile',
-     {'template': 'proto/person/profile.html'}),
+    (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
+     'soc.views.person.profile.edit',
+     {'template': 'ghop/person/profile/edit.html'}),
+    (r'^org/profile/(?P<program>[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
+     'soc.views.person.profile.edit'),
 )

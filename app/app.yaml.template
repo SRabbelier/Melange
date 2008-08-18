@@ -19,6 +19,10 @@ runtime: python
 api_version: 1
 
 handlers:
+- url: /(robots.txt|favicon.ico)
+  static_files: soc/content/\1
+  upload: soc/content/(robots.txt|favicon.ico)  
+  
 - url: /soc/content
   static_dir: soc/content
 
@@ -30,4 +34,5 @@ handlers:
 
 - url: /.*
   script: main.py
+
 

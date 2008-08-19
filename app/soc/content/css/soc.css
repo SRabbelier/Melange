@@ -113,23 +113,23 @@ th, td {
   text-align: left;
 }
 
-        /* FORM FIELDS DEFINITION */ 
+    /* FORM FIELDS DEFINITION */ 
 
-        td.formfieldrequired {
-         font-style: italic;
-        }
+    td.formfieldrequired {
+     font-style: italic;
+    }
 
-        td.formfieldhelptext {
-         font-style: italic;
-        }
+    td.formfieldhelptext {
+     font-style: italic;
+    }
 
-        td.formfielderror {
-         color: #FF0000;
-        }
+    td.formfielderror {
+     color: #FF0000;
+    }
 
-        td.formfieldheading {
-         font-weight: bold;
-        }
+    td.formfieldheading {
+     font-weight: bold;
+    }
 
 
 /* ---------------------------- */ 
@@ -199,9 +199,9 @@ th, td {
   background-position: left center;
 }
 
-        #footer .text {
-          padding-top: 20px;
-        }
+    #footer .text {
+      padding-top: 20px;
+    }
 
 /* SIDE BAR MENU DEFINITION */
 
@@ -242,19 +242,19 @@ th, td {
   margin-top: 2em;
 }
 
-        #search .header {
-          font-weight: bold;
-          font-size: 90%;
-          margin-bottom: 1px;
-        }
+    #search .header {
+      font-weight: bold;
+      font-size: 90%;
+      margin-bottom: 1px;
+    }
 
-        #search .button {
-          margin-top: 1px;
-        }
+    #search .button {
+      margin-top: 1px;
+    }
 
-        #search .input input {
-          width: 125px;
-        }
+    #search .input input {
+      width: 125px;
+    }
 
 /* ---------------------------- */ 
 /* BLOG FEED DEFINITION */ 

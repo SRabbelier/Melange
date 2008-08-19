@@ -25,8 +25,9 @@ __authors__ = [
 from google.appengine.api import users
 from django import http
 from django import shortcuts
+from soc.views.helpers import response_helpers
 
-def public(request, template='soc/site/home.html'):
+def public(request, template='soc/site/home/public.html'):
   """Home site view of Melange.
 
   Args:
@@ -36,8 +37,5 @@ def public(request, template='soc/site/home.html'):
   Returns:
     A subclass of django.http.HttpResponse with generated template.
   """
-	
-  user = users.get_current_user()
-
-  return shortcuts.render_to_response(
-      template, dictionary={'template': template, 'user': user})
+  return response_helpers.respond(request,
+      template, {'template': template})

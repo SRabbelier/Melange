@@ -24,6 +24,8 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns(
     '',
     (r'^$', 'soc.views.site.home.public'),
+    (r'^user/profile$','soc.views.user.profile'),
+    (r'^user/profile/(?P<linkname>[_0-9a-z]+)$','soc.views.user.profile'),
     (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
      'soc.views.person.profile.edit',
      {'template': 'ghop/person/profile/edit.html'}),

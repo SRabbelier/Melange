@@ -108,7 +108,8 @@ table {
 }
 
 th, td {
-  padding: 0;
+  /*padding: 0;*/
+  padding:2px 5px;
   vertical-align: top;
   text-align: left;
 }
@@ -129,6 +130,10 @@ th, td {
 
     td.formfieldheading {
      font-weight: bold;
+    }
+    
+    td.formfieldlabel {
+      font-weight: bold;
     }
 
 
@@ -187,6 +192,29 @@ th, td {
   padding-left: 18px;
   padding-bottom: 25px;
 }
+
+    #body .buttons {
+      margin-right: 4px;
+      margin-top: 20px;
+    }
+    
+    #body a.button, input[type^="submit"], input[type^="button"] {
+      margin: 0;
+      padding: 2px 5px 2px 5px;
+      font-family: Arial, Sans-serif;
+      font-size: 12px;
+      text-decoration: none;
+      color: #222;
+      cursor: default;
+      background: #ddd url("/soc/content/images/button-background.gif") repeat-x 0 0;
+      border: 1px solid #aaa;
+    }
+
+    #body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
+      border-color: #9cf #69e #69e #7af;
+    }
+    
+
 
 #footer {
   clear: both;

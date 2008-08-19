@@ -27,8 +27,18 @@ limitations under the License.
 
   <div id="login">
 	{% block login_links %}
-   <a href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 
-   <a href="/">Sign in</a>
+	{% if user %}
+	<b>{{ user.email }} ({{ user.nickname }})</b> | 
+	{% endif %}
+	{% if is_dev %}
+	<a class="novisit" target="_blank" href="/_ah/admin">Admin</a> | 
+	{% endif %}
+	<a class="novisit" href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 
+	{% if user %}
+	<a class="novisit" href="{{sign_out}}">Sign out</a>
+	{% else %}
+	<a class="novisit" href="{{sign_in}}">Sign in</a>
+	{% endif %}
 	{% endblock %}
   </div>
 
@@ -45,6 +55,9 @@ limitations under the License.
    <div id="title">
 	{% block header_title %}Google Open Source Programs{% endblock %}
    </div>
+	<div id="breadcrumbs">
+	{% block breadcrumbs %}{% endblock %}
+	</div>
   </div>
 
   <div id="side" dir="ltr">

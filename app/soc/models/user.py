@@ -61,5 +61,5 @@ class User(db.Model):
   link_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link name'))
   link_name.help_text = ugettext_lazy(
-      'Required field used in URLs to identify user.'
-      'Lower ASCII characters only')
+      'Field used in URLs to identify user. '
+      'Lower ASCII characters only.')

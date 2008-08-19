@@ -14,6 +14,7 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -22,6 +23,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns(
     '',
+    (r'^$', 'soc.views.site.home.public'),
     (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
      'soc.views.person.profile.edit',
      {'template': 'ghop/person/profile/edit.html'}),

@@ -13,24 +13,296 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+ 
+/* ---------------------------- */ 
+/* STANDARD HTML TAG DEFINITION */ 
+/* ---------------------------- */ 
 
 body {
-  font-family: Verdana, Helvetica, sans-serif;
-  background-color: #DDDDDD;
+  background-color: white;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-size: small;
+  margin: 8px;
+  margin-top: 3px;
 }
 
-td.formfieldrequired {
- font-style: italic;
+img {
+  border: 0;
 }
 
-td.formfieldhelptext {
- font-style: italic;
+h1 {
+  font-size: x-large;
+  margin-top: 0px;
 }
 
-td.formfielderror {
- color: #FF0000;
+h2 {
+  font-size: large;
 }
 
-td.formfieldheading {
- font-weight: bold;
+h3 {
+  font-size: medium;
+}
+
+h4 {
+  font-size: small;
+}
+
+form {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 0.25em;
+}
+
+pre, code {
+  color: #007000;
+  font-family: "bogus font here", monospace;
+  font-size: 100%;
+}
+
+pre {
+  border: 1px solid silver;
+  background-color: #f5f5f5;
+  padding: 0.5em;
+  overflow: auto;
+  margin: 2em;
+}
+
+pre ins {
+  color: #cc0000;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* LINKS DEFINITION  */ 
+
+a:link {
+  color: #0000cc;
+}
+
+a:active {
+  color: #cc0000;
+}
+
+a:visited {
+  color: #551a8b;
+}
+
+a.selected, .selected a, .selected {
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a.selected:visited, .selected a:visited {
+  color: black;
+}
+
+/* TABLE DEFINITION */
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0;
+  vertical-align: top;
+  text-align: left;
+}
+
+        /* FORM FIELDS DEFINITION */ 
+
+        td.formfieldrequired {
+         font-style: italic;
+        }
+
+        td.formfieldhelptext {
+         font-style: italic;
+        }
+
+        td.formfielderror {
+         color: #FF0000;
+        }
+
+        td.formfieldheading {
+         font-weight: bold;
+        }
+
+
+/* ---------------------------- */ 
+/* PAGE ELEMENTS DEFINITION */ 
+/* ---------------------------- */
+
+#login {
+  text-align: right;
+}
+
+#header {
+  height: 50px;
+  margin-bottom: 11px;
+  position: relative;
+}
+
+#logo {
+  padding-right: 18px;
+  position: absolute;
+  left: 0;
+  top: -5px;
+}
+
+        #logo img {
+          width: 143px;
+          height: 59px;
+        }
+
+#title {
+  border-top: 1px solid #3366cc;
+  background-color: #e5ecf9;
+  font-size: large;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  margin-top: 5px;
+  margin-left: 200px;
+  padding-left: 3px;
+}
+
+#badge {
+  clear: both;
+  margin-top: 3.5em;
+  margin-bottom: 1em;
+  height: 53px;
+  font-style: italic;
+}
+
+#body {
+  border-left: 1px dotted silver;
+  margin-left: 200px;
+  margin-right: 25px;
+  padding-left: 18px;
+  padding-bottom: 25px;
+}
+
+#footer {
+  clear: both;
+  text-align: center;
+  margin-top: 3.5em;
+  margin-bottom: 1em;
+  background-image: url("http://www.google.com/images/art.gif");
+  height: 53px;
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+        #footer .text {
+          padding-top: 20px;
+        }
+
+/* SIDE BAR MENU DEFINITION */
+
+#side {
+  width: 200px;
+  margin-bottom: 3em;
+  float: left;
+}
+
+#menu ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  margin-bottom: 1em;
+  font-size: 95%;
+}
+
+#menu ul ul {
+  margin-left: 10px;
+  margin-bottom: 0;
+}
+
+#menu li {
+  margin-top: 4px;
+}
+
+#menu h4 {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 1em;
+}
+
+/* ---------------------------- */ 
+/* SEARCH FIELD DEFINITION */ 
+/* ---------------------------- */
+
+#search {
+  margin-top: 2em;
+}
+
+        #search .header {
+          font-weight: bold;
+          font-size: 90%;
+          margin-bottom: 1px;
+        }
+
+        #search .button {
+          margin-top: 1px;
+        }
+
+        #search .input input {
+          width: 125px;
+        }
+
+/* ---------------------------- */ 
+/* BLOG FEED DEFINITION */ 
+/* ---------------------------- */
+
+.blog {
+  border: 10px solid #e5ecf9;
+  border-top: 1px solid #3366cc;
+}
+
+.blog h2 {
+  margin-top: 0.1em;
+  background-color: #e5ecf9;
+}
+
+.blog h2 a, .blog h2 a:visited {
+  text-decoration: none;
+  color: black;
+}
+
+.blog .entry {
+  margin-bottom: 1em;
+}
+
+.blog .title {
+   font-size: medium;
+}
+
+.blog .author {
+  color: gray;
+  margin-bottom: 0.5em;
+}
+
+.blog .snippet {
+  background-color: white;
+}
+
+/* ---------------------------- */ 
+/* CUSTOM CLASSES DEFINITION */ 
+/* ---------------------------- */
+
+.todo {
+  color: #cc0000;
+  font-size: 80%;
+}
+
+.newmark {
+  color: red;
+  font-size: 80%;
+  vertical-align: top;
 }

@@ -24,8 +24,16 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns(
     '',
     (r'^$', 'soc.views.site.home.public'),
+
+    # attempt to send User to their dashboard
+    # (will display soc.views.user.roles.public() if "linkname" is not
+    # current logged-in User)    
+    (r'^user/roles/(?P<linkname>[_0-9a-z]+)$',
+     'soc.views.user.roles.dashboard'),
+
     (r'^user/profile$','soc.views.user.profile'),
     (r'^user/profile/(?P<linkname>[_0-9a-z]+)$','soc.views.user.profile'),
+
     (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
      'soc.views.person.profile.edit',
      {'template': 'ghop/person/profile/edit.html'}),

@@ -14,13 +14,14 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+	'"Pawel Solyga" <pawel.solyga@gmail.com',
   ]
-
 
 import os
 
-
-DEBUG = True
+# Debug flag True only on App Engine development environment (dev_appserver.py)
+# dev_appserver sets SERVER_SOFTWARE to 'Development/1.0'
+DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (

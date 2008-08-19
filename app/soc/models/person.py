@@ -85,11 +85,6 @@ class Person(db.Model):
       verbose_name=ugettext_lazy('Last (family) name'))
   surname.help_text = ugettext_lazy('lower ASCII characters only')
 
-  #: Optional field storing a nickname; displayed publicly.
-  #: Nicknames can be any valid UTF-8 text.
-  nickname = db.StringProperty(
-      verbose_name=ugettext_lazy('Nick name'))
-
   #: Optional field used as a display name, such as for awards
   #: certificates. Should be the entire display name in the format
   #: the Person would like it displayed (could be surname followed by

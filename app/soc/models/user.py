@@ -19,9 +19,11 @@
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
 from google.appengine.ext import db
+from django.utils.translation import ugettext_lazy
 
 
 class User(db.Model):
@@ -49,3 +51,15 @@ class User(db.Model):
   #: of any Melange application.
   id = db.UserProperty(required=True)
 
+  #: Required field storing a nickname; displayed publicly.
+  #: Nicknames can be any valid UTF-8 text.
+  nick_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Nick name'))
+      
+  #: Required field storing linkname used in URLs to identify user.
+  #: Lower ASCII characters only.
+  link_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Link name'))
+  link_name.help_text = ugettext_lazy(
+      'Required field used in URLs to identify user.'
+      'Lower ASCII characters only')

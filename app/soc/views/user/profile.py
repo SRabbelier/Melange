@@ -46,7 +46,7 @@ class UserForm(forms_helpers.DbModelForm):
     exclude = ['id']
 
 
-def profile(request, linkname=None, template='soc/user/profile.html'):
+def edit(request, linkname=None, template='soc/user/profile/edit.html'):
   """View for a User to modify the properties of a UserModel.
 
   Args:

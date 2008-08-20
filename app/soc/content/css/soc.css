@@ -132,14 +132,14 @@ th, td {
   td.formfieldheading {
     font-weight: bold;
   }
-
+  
+  td.formfieldlabel {
+    font-weight: bold;
+  }
+  
 /* 
  * PAGE ELEMENTS 
  */
-    
-    td.formfieldlabel {
-      font-weight: bold;
-    }
 
 #title {
   border-top: 1px solid #3366cc;

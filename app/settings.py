@@ -14,7 +14,7 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
-	'"Pawel Solyga" <pawel.solyga@gmail.com',
+  '"Pawel Solyga" <pawel.solyga@gmail.com',
   ]
 
 import os

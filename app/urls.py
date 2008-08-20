@@ -31,8 +31,9 @@ urlpatterns = patterns(
     (r'^user/roles/(?P<linkname>[_0-9a-z]+)$',
      'soc.views.user.roles.dashboard'),
 
-    (r'^user/profile$','soc.views.user.profile'),
-    (r'^user/profile/(?P<linkname>[_0-9a-z]+)$','soc.views.user.profile'),
+    (r'^user/profile$', 'soc.views.user.profile.edit'),
+    (r'^user/profile/(?P<linkname>[_0-9a-z]+)$',
+     'soc.views.user.profile.edit'),
 
     (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<linkname>[_0-9a-z]+)/$',
      'soc.views.person.profile.edit',

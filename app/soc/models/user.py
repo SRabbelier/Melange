@@ -63,3 +63,36 @@ class User(db.Model):
   link_name.help_text = ugettext_lazy(
       'Field used in URLs to identify user. '
       'Lower ASCII characters only.')
+
+  @staticmethod
+  def doesUserExist(user=None):
+    """Returns if user already exists in the Datastore.
+    
+    Args:
+      user: a Google Account object,
+    """
+    #: let's do a gql query and check if user exists in datastore
+    data = self.getUser(user)
+    if data:
+      return True
+    else:
+      return False
+
+  @staticmethod
+  def getUser(user=None):
+    """Returns User entity from datastore, or None if not found.  
+    
+    Args:
+      user: a Google Account object,
+    """
+    return User.gql('WHERE id = :1', user).get()
+
+  @staticmethod
+  def getUserForLinkname(link_name=None):
+    """Returns User entity for linkname or None if not found.
+    
+    Args:
+      link_name: linkname used in URLs to identify user,
+    """
+    return User.gql('WHERE link_name = :1', link_name).get()
+    

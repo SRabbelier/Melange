@@ -14,7 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Melange home page
+"""Site-wide Melange home page views.
+
+public: how the general public sees the site home page of a Melange
+  site
+  
+There may (eventually) be different views of the site home page for
+logged-in Users (such as a debug() view for logged-in Developers). 
 """
 
 __authors__ = [
@@ -23,12 +29,11 @@ __authors__ = [
 
 
 from google.appengine.api import users
-from django import http
-from django import shortcuts
 from soc.views.helpers import response_helpers
 
+
 def public(request, template='soc/site/home/public.html'):
-  """Home site view of Melange.
+  """How the "general public" sees the Melange site home page.
 
   Args:
     request: the standard django request object.

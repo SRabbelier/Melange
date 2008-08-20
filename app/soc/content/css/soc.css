@@ -14,15 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
  
-/* ---------------------------- */ 
-/* STANDARD HTML TAG DEFINITION */ 
-/* ---------------------------- */ 
+/* 
+ * STANDARD HTML TAGS 
+ */ 
 
 body {
   background-color: white;
   color: black;
+
   font-family: Arial, sans-serif;
   font-size: small;
+
   margin: 8px;
   margin-top: 3px;
 }
@@ -31,6 +33,16 @@ img {
   border: 0;
 }
 
+form {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 0.25em;
+}
+
+/* HEADERS */
 h1 {
   font-size: x-large;
   margin-top: 0px;
@@ -48,15 +60,7 @@ h4 {
   font-size: small;
 }
 
-form {
-  margin: 0;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 0.25em;
-}
-
+/* PRE-FORMATTED TEXT */
 pre, code {
   color: #007000;
   font-family: "bogus font here", monospace;
@@ -77,8 +81,7 @@ pre ins {
   text-decoration: none;
 }
 
-/* LINKS DEFINITION  */ 
-
+/* LINKS AND ANCHORS */ 
 a:link {
   color: #0000cc;
 }
@@ -101,8 +104,7 @@ a.selected:visited, .selected a:visited {
   color: black;
 }
 
-/* TABLE DEFINITION */
-
+/* TABLES */
 table {
   border-collapse: collapse;
 }
@@ -114,54 +116,30 @@ th, td {
   text-align: left;
 }
 
-    /* FORM FIELDS DEFINITION */ 
+  /* FORM TABLE FIELDS */ 
+  td.formfieldrequired {
+    font-style: italic;
+  }
 
-    td.formfieldrequired {
-     font-style: italic;
-    }
+  td.formfieldhelptext {
+    font-style: italic;
+  }
 
-    td.formfieldhelptext {
-     font-style: italic;
-    }
+  td.formfielderror {
+    color: #FF0000;
+  }
 
-    td.formfielderror {
-     color: #FF0000;
-    }
+  td.formfieldheading {
+    font-weight: bold;
+  }
 
-    td.formfieldheading {
-     font-weight: bold;
-    }
+/* 
+ * PAGE ELEMENTS 
+ */
     
     td.formfieldlabel {
       font-weight: bold;
     }
-
-
-/* ---------------------------- */ 
-/* PAGE ELEMENTS DEFINITION */ 
-/* ---------------------------- */
-
-#login {
-  text-align: right;
-}
-
-#header {
-  height: 50px;
-  margin-bottom: 11px;
-  position: relative;
-}
-
-#logo {
-  padding-right: 18px;
-  position: absolute;
-  left: 0;
-  top: -5px;
-}
-
-        #logo img {
-          width: 143px;
-          height: 59px;
-        }
 
 #title {
   border-top: 1px solid #3366cc;
@@ -175,6 +153,22 @@ th, td {
   margin-top: 5px;
   margin-left: 200px;
   padding-left: 3px;
+}
+
+#logo {
+  padding-right: 18px;
+  position: absolute;
+  left: 0;
+  top: -5px;
+}
+
+  #logo img {
+    width: 143px;
+    height: 59px;
+  }
+
+#login {
+  text-align: right;
 }
 
 #badge {
@@ -193,28 +187,32 @@ th, td {
   padding-bottom: 25px;
 }
 
-    #body .buttons {
-      margin-right: 4px;
-      margin-top: 20px;
-    }
+  #body .buttons {
+    margin-right: 4px;
+    margin-top: 20px;
+  }
     
-    #body a.button, input[type^="submit"], input[type^="button"] {
-      margin: 0;
-      padding: 2px 5px 2px 5px;
-      font-family: Arial, Sans-serif;
-      font-size: 12px;
-      text-decoration: none;
-      color: #222;
-      cursor: default;
-      background: #ddd url("/soc/content/images/button-background.gif") repeat-x 0 0;
-      border: 1px solid #aaa;
-    }
+  #body a.button, input[type^="submit"], input[type^="button"] {
+    margin: 0;
+    padding: 2px 5px 2px 5px;
+    font-family: Arial, Sans-serif;
+    font-size: 12px;
+    text-decoration: none;
+    color: #222;
+    cursor: default;
+    background: #ddd url("/soc/content/images/button-background.gif") repeat-x 0 0;
+    border: 1px solid #aaa;
+  }
 
-    #body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
-      border-color: #9cf #69e #69e #7af;
-    }
-    
+  #body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
+    border-color: #9cf #69e #69e #7af;
+  }
 
+#header {
+  height: 50px;
+  margin-bottom: 11px;
+  position: relative;
+}
 
 #footer {
   clear: both;
@@ -227,12 +225,11 @@ th, td {
   background-position: left center;
 }
 
-    #footer .text {
-      padding-top: 20px;
-    }
+  #footer .text {
+    padding-top: 20px;
+  }
 
-/* SIDE BAR MENU DEFINITION */
-
+/* SIDEBAR MENU */
 #side {
   width: 200px;
   margin-bottom: 3em;
@@ -247,10 +244,10 @@ th, td {
   font-size: 95%;
 }
 
-#menu ul ul {
-  margin-left: 10px;
-  margin-bottom: 0;
-}
+  #menu ul ul {
+    margin-left: 10px;
+    margin-bottom: 0;
+  }
 
 #menu li {
   margin-top: 4px;
@@ -262,31 +259,29 @@ th, td {
   margin-bottom: 1em;
 }
 
-/* ---------------------------- */ 
-/* SEARCH FIELD DEFINITION */ 
-/* ---------------------------- */
-
+ 
+/* SEARCH FIELD */ 
 #search {
   margin-top: 2em;
 }
 
-    #search .header {
-      font-weight: bold;
-      font-size: 90%;
-      margin-bottom: 1px;
-    }
+  #search .header {
+    font-weight: bold;
+    font-size: 90%;
+    margin-bottom: 1px;
+  }
 
-    #search .button {
-      margin-top: 1px;
-    }
+  #search .button {
+    margin-top: 1px;
+  }
 
-    #search .input input {
-      width: 125px;
-    }
+  #search .input input {
+    width: 125px;
+  }
 
-/* ---------------------------- */ 
-/* BLOG FEED DEFINITION */ 
-/* ---------------------------- */
+/* 
+ * BLOG FEEDS
+ */
 
 .blog {
   border: 10px solid #e5ecf9;
@@ -298,10 +293,16 @@ th, td {
   background-color: #e5ecf9;
 }
 
-.blog h2 a, .blog h2 a:visited {
-  text-decoration: none;
-  color: black;
-}
+  .blog h2 a {
+    text-decoration: none;
+    color: black;
+  }
+
+  .blog h2 a:visited {
+    text-decoration: none;
+    color: black;
+  }
+
 
 .blog .entry {
   margin-bottom: 1em;
@@ -320,9 +321,9 @@ th, td {
   background-color: white;
 }
 
-/* ---------------------------- */ 
-/* CUSTOM CLASSES DEFINITION */ 
-/* ---------------------------- */
+/* 
+ * CUSTOM CLASSES 
+ */
 
 .todo {
   color: #cc0000;

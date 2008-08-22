@@ -55,7 +55,7 @@ def respond(request, template, params=None):
     params = {}
   
   params['request'] = request
-  params['user'] = users.get_current_user()
+  params['id'] = users.get_current_user()
   params['is_admin'] = users.is_current_user_admin()
   params['is_dev'] = IS_DEV
   params['sign_in'] = users.create_login_url(request.path)

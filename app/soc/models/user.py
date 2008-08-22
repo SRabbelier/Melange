@@ -65,27 +65,27 @@ class User(db.Model):
       'Lower ASCII characters only.')
 
   @staticmethod
-  def doesUserExist(user=None):
+  def doesUserExist(id=None):
     """Returns if user already exists in the Datastore.
     
     Args:
       user: a Google Account object,
     """
     #: let's do a gql query and check if user exists in datastore
-    data = self.getUser(user)
+    data = self.getUserForId(id)
     if data:
       return True
     else:
       return False
 
   @staticmethod
-  def getUser(user=None):
+  def getUserForId(id=None):
     """Returns User entity from datastore, or None if not found.  
     
     Args:
       user: a Google Account object,
     """
-    return User.gql('WHERE id = :1', user).get()
+    return User.gql('WHERE id = :1', id).get()
 
   @staticmethod
   def getUserForLinkname(link_name=None):

@@ -53,16 +53,16 @@ class UserForm(forms_helpers.DbModelForm):
     """
     #: db.Model subclass for which the form will gather information
     model = soc.models.user.User
-
+    
     #: list of model fields which will *not* be gathered by the form
     exclude = ['id']
   
   def clean_link_name(self):
     linkname = self.cleaned_data.get('link_name')
     linkname_user = soc.models.user.User.getUserForLinkname(linkname)
-    user = users.get_current_user()
+    current_id = users.get_current_user()
     # if linkname exist in datastore and doesn't belong to current user
-    if linkname_user and (linkname_user.id != user):
+    if linkname_user and (linkname_user.id != current_id):
       raise forms.ValidationError("This link name is already in use.")
     elif not self.LINKNAME_REGEX.match(linkname):
       raise forms.ValidationError("This link name is in wrong format.")
@@ -83,28 +83,42 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
   """
   #TODO(solydzajs): create controller for User and cleanup code in this handler
   
-  #: If user not signed in redirect to sign-in page
-  user = users.get_current_user()
-  if not user:
-    return http.HttpResponseRedirect(users.create_login_url(request.path))
-
-  soc_user = soc.models.user.User.getUser(user)
+  #TODO(solydzajs): use makeSiblingTemplatePath from templates_helpers and pass
+  #                 result to public view
   
-  #: Show custom 404 page when linkname in url doesn't match current user
+  # TODO: use something like the code below, define global public tmpl 
+  # template_choices = [makeSiblingTemplatePath(template, 'public.html'),
+  # DEF_USER_PROFILE_PUBLIC_TMPL])
+  # public(request, linkname=linkname, template=template_choices)
+  
+  #: If user not signed and there is no linkname redirect to sign-in page
+  #: otherwise show public profile for linkname user
+  current_id = users.get_current_user()
+  if not current_id and not linkname:
+    return http.HttpResponseRedirect(users.create_login_url(request.path))
+  elif not current_id and linkname:
+    return public(request, linkname)
+    
+  user = soc.models.user.User.getUserForId(current_id)
+  
+  #: Show custom 404 page when linkname doesn't exist in datastore
+  #: or show public view for linkname user
   if linkname:
     linkname_user = soc.models.user.User.getUserForLinkname(linkname)
-    if (linkname_user and linkname_user.id != user) or not linkname_user:
+    if not linkname_user:
       return http.HttpResponseNotFound('No user exists with that link name "%s"' %
                                 linkname)
+    elif linkname_user and (linkname_user.id != current_id):
+      return public(request, linkname)
 
   #: GET method
-  if (request.method != 'POST') and soc_user:
-    form = UserForm(initial={'nick_name': soc_user.nick_name,
-                             'link_name': soc_user.link_name})
+  if (request.method != 'POST') and user:
+    form = UserForm(initial={'nick_name': user.nick_name,
+                             'link_name': user.link_name})
     return response_helpers.respond(request,
         template, {'template': template, 
                    'form': form, 
-                   'soc_nick_name': soc_user.nick_name})
+                   'user': user})
   
   #: POST method
   form = UserForm()
@@ -114,18 +128,46 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
     if form.is_valid():
       linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get("nick_name")
-      if not soc_user:
-        soc_user = soc.models.user.User(id = user,link_name = linkname,
+      if not user:
+        user = soc.models.user.User(id = user,link_name = linkname,
                                         nick_name = nickname)
       else:
-        soc_user.nick_name = nickname
-        soc_user.link_name = linkname
-      soc_user.put()
+        user.nick_name = nickname
+        user.link_name = linkname
+      user.put()
       return response_helpers.respond(request,
               template, {'template': template, 
-                        'form': form, 
-                        'soc_nick_name': nickname,
-                        'submit_message': 'Profile saved.'})
+                         'form': form, 
+                         'user': user,
+                         'submit_message': 'Profile saved.'})
 
   return response_helpers.respond(request,
       template, {'template': template, 'form': form})
+
+
+def public(request, linkname=None,
+           template='soc/user/profile/public.html'):
+  """A "general public" view of a User on the site.
+
+  Args:
+    request: the standard django request object.
+    linkname: the User's site-unique "linkname" extracted from the URL
+    template: the template path to use for rendering the template.
+
+  Returns:
+    A subclass of django.http.HttpResponse with generated template.
+  """
+  #: If linkname is empty or not a valid linkname on the site, display
+  #: "user does not exist", otherwise render public view for linkname user
+  if linkname:
+    linkname_user = soc.models.user.User.getUserForLinkname(linkname)
+    if not linkname_user:
+      return http.HttpResponseNotFound('No user exists with that link name "%s"' %
+                                linkname)
+    else:
+      return response_helpers.respond(request, 
+          template, {'template': template,
+                     'user': linkname_user})
+      
+  return http.HttpResponseNotFound('No user exists with that link name "%s"' %
+                            linkname)

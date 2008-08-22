@@ -27,14 +27,14 @@ limitations under the License.
 
   <div id="login">
 	{% block login_links %}
-	{% if user %}
-	<b>{{ user.email }} ({{ user.nickname }})</b> | 
+	{% if id %}
+	<b>{{ id.email }} ({{ id.nickname }})</b> | 
 	{% endif %}
 	{% if is_dev %}
 	<a class="novisit" target="_blank" href="/_ah/admin">Admin</a> | 
 	{% endif %}
 	<a class="novisit" href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 
-	{% if user %}
+	{% if id %}
 	<a class="novisit" href="{{sign_out}}">Sign out</a>
 	{% else %}
 	<a class="novisit" href="{{sign_in}}">Sign in</a>

@@ -26,7 +26,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import http
-from django import shortcuts
+from django.template import loader
 
 # DeadlineExceededError can live in two different places
 try:
@@ -40,24 +40,33 @@ from soc.logic import system
 from soc.logic.site import id_user
 
 
-def respond(request, template, context=None):
+def respond(request, template, context=None, response_args=None):
   """Helper to render a response, passing standard stuff to the response.
 
   Args:
     request: the Django HTTP request object
     template: the template (or search list of templates) to render
     context: the context supplied to the template (implements dict)
+    response_args: keyword arguments passed to http.HttpResponse()
+      (response_args['content'] is created with
+      render_to_string(template, dictionary=context) if it is not present)
 
   Returns:
     django.shortcuts.render_to_response(template, context) results
 
   Raises:
-    Whatever django.shortcuts.render_to_response(template, context) raises.
+    Any exceptions that django.template.loader.render_to_string() or
+    django.http.HttpResponse() might raise.
   """
   context = getUniversalContext(request, context=context)
 
+  if response_args is None:
+    response_args = {}
+
   try:
-    return shortcuts.render_to_response(template, context)
+    response_args['content'] = response_args.get(
+        'content', loader.render_to_string(template, dictionary=context))
+    return http.HttpResponse(**response_args)
   except DeadlineExceededError:
     logging.exception('DeadlineExceededError')
     return http.HttpResponse('DeadlineExceededError')

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views relevant to the User role.
+"""Views for editing and examining User profiles.
 """
 
 __authors__ = [
@@ -28,10 +28,12 @@ from django import http
 from django import shortcuts
 from django import newforms as forms
 
+from soc.logic.site import id_user
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 
 import soc.models.user
+
 
 class UserForm(forms_helpers.DbModelForm):
   """Django form displayed when creating or editing a User.
@@ -46,7 +48,6 @@ class UserForm(forms_helpers.DbModelForm):
       )*        # zero or more of OR group
       $'''
   LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
-
   
   class Meta:
     """Inner Meta class that defines some behavior for the form.
@@ -59,10 +60,10 @@ class UserForm(forms_helpers.DbModelForm):
   
   def clean_link_name(self):
     linkname = self.cleaned_data.get('link_name')
-    linkname_user = soc.models.user.User.getUserForLinkname(linkname)
-    current_id = users.get_current_user()
+    linkname_user = id_user.getUserFromLinkName(linkname)
+    id = users.get_current_user()
     # if linkname exist in datastore and doesn't belong to current user
-    if linkname_user and (linkname_user.id != current_id):
+    if linkname_user and (linkname_user.id != id):
       raise forms.ValidationError("This link name is already in use.")
     elif not self.LINKNAME_REGEX.match(linkname):
       raise forms.ValidationError("This link name is in wrong format.")
@@ -99,15 +100,15 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
   elif not current_id and linkname:
     return public(request, linkname)
     
-  user = soc.models.user.User.getUserForId(current_id)
+  user = id_user.getUserFromId(current_id)
   
   #: Show custom 404 page when linkname doesn't exist in datastore
   #: or show public view for linkname user
   if linkname:
-    linkname_user = soc.models.user.User.getUserForLinkname(linkname)
+    linkname_user = id_user.getUserFromLinkName(linkname)
     if not linkname_user:
       return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                                linkname)
+                                       linkname)
     elif linkname_user and (linkname_user.id != current_id):
       return public(request, linkname)
 
@@ -117,8 +118,7 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
                              'link_name': user.link_name})
     return response_helpers.respond(request,
         template, {'template': template, 
-                   'form': form, 
-                   'user': user})
+                   'form': form})
   
   #: POST method
   form = UserForm()
@@ -129,16 +129,15 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
       linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get("nick_name")
       if not user:
-        user = soc.models.user.User(id = user,link_name = linkname,
-                                        nick_name = nickname)
+        user = soc.models.user.User(id=id,link_name=linkname,
+                                    nick_name=nickname)
       else:
         user.nick_name = nickname
         user.link_name = linkname
       user.put()
       return response_helpers.respond(request,
               template, {'template': template, 
-                         'form': form, 
-                         'user': user,
+                         'form': form,
                          'submit_message': 'Profile saved.'})
 
   return response_helpers.respond(request,
@@ -160,14 +159,14 @@ def public(request, linkname=None,
   #: If linkname is empty or not a valid linkname on the site, display
   #: "user does not exist", otherwise render public view for linkname user
   if linkname:
-    linkname_user = soc.models.user.User.getUserForLinkname(linkname)
+    linkname_user = id_user.getUserFromLinkName(linkname)
     if not linkname_user:
       return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                                linkname)
+                                       linkname)
     else:
       return response_helpers.respond(request, 
           template, {'template': template,
                      'user': linkname_user})
       
   return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                            linkname)
+                                   linkname)

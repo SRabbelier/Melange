@@ -22,11 +22,17 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
+import logging
+
 from google.appengine.ext import db
 from django.utils.translation import ugettext_lazy
 
+from soc.models import base
+from soc.views.helpers import forms_helpers
 
-class User(db.Model):
+
+class User(base.ModelWithFieldAttributes):
   """A user and associated login credentials, the fundamental identity entity.
 
   User is a separate Model class from Person because the same login 
@@ -63,36 +69,3 @@ class User(db.Model):
   link_name.help_text = ugettext_lazy(
       'Field used in URLs to identify user. '
       'Lower ASCII characters only.')
-
-  @staticmethod
-  def doesUserExist(id=None):
-    """Returns if user already exists in the Datastore.
-    
-    Args:
-      user: a Google Account object,
-    """
-    #: let's do a gql query and check if user exists in datastore
-    data = self.getUserForId(id)
-    if data:
-      return True
-    else:
-      return False
-
-  @staticmethod
-  def getUserForId(id=None):
-    """Returns User entity from datastore, or None if not found.  
-    
-    Args:
-      user: a Google Account object,
-    """
-    return User.gql('WHERE id = :1', id).get()
-
-  @staticmethod
-  def getUserForLinkname(link_name=None):
-    """Returns User entity for linkname or None if not found.
-    
-    Args:
-      link_name: linkname used in URLs to identify user,
-    """
-    return User.gql('WHERE link_name = :1', link_name).get()
-    

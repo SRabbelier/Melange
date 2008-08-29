@@ -28,9 +28,12 @@ from django import http
 from django import shortcuts
 from django import newforms as forms
 
+from soc.logic import out_of_band
 from soc.logic.site import id_user
+from soc.views import simple
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
+from soc.views.helpers import template_helpers
 
 import soc.models.user
 
@@ -70,8 +73,10 @@ class UserForm(forms_helpers.DbModelForm):
     return linkname
 
 
-def edit(request, linkname=None, template='soc/user/profile/edit.html'):
-  """View for a User to modify the properties of a UserModel.
+DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/profile/edit.html'
+
+def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
+  """View for a User to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object.
@@ -82,91 +87,65 @@ def edit(request, linkname=None, template='soc/user/profile/edit.html'):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
-  #TODO(solydzajs): create controller for User and cleanup code in this handler
-  
-  #TODO(solydzajs): use makeSiblingTemplatePath from templates_helpers and pass
-  #                 result to public view
-  
-  # TODO: use something like the code below, define global public tmpl 
-  # template_choices = [makeSiblingTemplatePath(template, 'public.html'),
-  # DEF_USER_PROFILE_PUBLIC_TMPL])
-  # public(request, linkname=linkname, template=template_choices)
-  
-  #: If user not signed and there is no linkname redirect to sign-in page
-  #: otherwise show public profile for linkname user
-  current_id = users.get_current_user()
-  if not current_id and not linkname:
-    return http.HttpResponseRedirect(users.create_login_url(request.path))
-  elif not current_id and linkname:
-    return public(request, linkname)
-    
-  user = id_user.getUserFromId(current_id)
-  
-  #: Show custom 404 page when linkname doesn't exist in datastore
-  #: or show public view for linkname user
-  if linkname:
-    linkname_user = id_user.getUserFromLinkName(linkname)
-    if not linkname_user:
-      return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                                       linkname)
-    elif linkname_user and (linkname_user.id != current_id):
-      return public(request, linkname)
+  id = users.get_current_user()
 
-  #: GET method
-  if (request.method != 'POST') and user:
-    form = UserForm(initial={'nick_name': user.nick_name,
-                             'link_name': user.link_name})
-    return response_helpers.respond(request,
-        template, {'template': template, 
-                   'form': form})
+  # create default template context for use with any templates
+  context = response_helpers.getUniversalContext(request)
+
+  if (not id) and (not linkname):
+    # not logged in, and no link name, so request that the user sign in 
+    return simple.requestLogin(request, template, context,
+        # TODO(tlarsen): /user/profile could be a link to a help page instead
+        login_message_fmt='To create a new'
+                          ' <a href="/user/profile">User Profile</a>'
+                          ' or modify an existing one, you must first'
+                          ' <a href="%(sign_in)s">sign in</a>.')
+
+  if (not id) and linkname:
+    # not logged in, so show read-only public profile for linkname user
+    return simple.public(request, template, linkname, context)
+
+  # try to fetch User entity corresponding to linkname if one exists    
+  try:
+    linkname_user = id_user.getUserIfLinkName(linkname)
+  except out_of_band.ErrorResponse, error:
+    # show custom 404 page when linkname doesn't exist in Datastore
+    return simple.errorResponse(request, error, template, context)
   
-  #: POST method
-  form = UserForm()
+  # linkname_user will be None here if linkname was already None...
+  if linkname_user and (linkname_user.id != id):
+    # linkname_user exists but is not the currently logged in Google Account,
+    # so show public view for that (other) User entity
+    return simple.public(request, template, linkname, context)
+
+  user = id_user.getUserFromId(id)
+  
   if request.method == 'POST':
     form = UserForm(request.POST)
 
     if form.is_valid():
       linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get("nick_name")
+
       if not user:
-        user = soc.models.user.User(id=id,link_name=linkname,
+        user = soc.models.user.User(id=id, link_name=linkname,
                                     nick_name=nickname)
       else:
         user.nick_name = nickname
         user.link_name = linkname
+
       user.put()
-      return response_helpers.respond(request,
-              template, {'template': template, 
-                         'form': form,
-                         'submit_message': 'Profile saved.'})
-
-  return response_helpers.respond(request,
-      template, {'template': template, 'form': form})
-
-
-def public(request, linkname=None,
-           template='soc/user/profile/public.html'):
-  """A "general public" view of a User on the site.
-
-  Args:
-    request: the standard django request object.
-    linkname: the User's site-unique "linkname" extracted from the URL
-    template: the template path to use for rendering the template.
-
-  Returns:
-    A subclass of django.http.HttpResponse with generated template.
-  """
-  #: If linkname is empty or not a valid linkname on the site, display
-  #: "user does not exist", otherwise render public view for linkname user
-  if linkname:
-    linkname_user = id_user.getUserFromLinkName(linkname)
-    if not linkname_user:
-      return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                                       linkname)
+      # TODO(tlarsen):
+      # if old_linkname:  redirect to new /user/profile/new_linkname
+      #   (how to preserve displaying the "Profile saved" message?)
+      context.update({'submit_message': 'Profile saved.'})
+  else: # request.method == 'GET'
+    if user:
+      # populate form with the existing User entity
+      form = UserForm(instance=user)
     else:
-      return response_helpers.respond(request, 
-          template, {'template': template,
-                     'user': linkname_user})
-      
-  return http.HttpResponseNotFound('No user exists with that link name "%s"' %
-                                   linkname)
+      # no User entity exists for this Google Account, so show a blank form
+      form = UserForm()
+
+  context.update({'form': form})
+  return response_helpers.respond(request, template, context)

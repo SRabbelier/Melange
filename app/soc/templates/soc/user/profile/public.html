@@ -15,13 +15,13 @@ limitations under the License.
 {% load forms_helpers %}
 {% block page_title %}User Public Profile{% endblock %}
 {% block header_title %}
-User Public Profile for {{ user.nick_name }}
+User Public Profile for {{ linkname_user.nick_name }}
 {% endblock %}
 {% block body %}
 <p>
  <table>
-  {% readonly_field_as_table_row "Nick name:" user.nick_name %}
-  {% readonly_field_as_table_row "Link name:" user.link_name %}
+  {% readonly_field_as_table_row "Nick name:" linkname_user.nick_name %}
+  {% readonly_field_as_table_row "Link name:" linkname_user.link_name %}
  </table>
 </p>
 {% endblock %}

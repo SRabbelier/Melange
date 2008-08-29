@@ -65,6 +65,23 @@ def templateWithLinkName(request,
   return response_helpers.respond(request, template, context)
 
 
+def public(request, template, linkname, context):
+  """A convenience wrapper around templateWithLinkName() using 'public.html'.
+
+  Args:
+    request, linkname, context: see templateWithLinkName()
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse containing the generated page.
+  """
+  return simple.templateWithLinkName(
+      request, linkname=linkname, context=context,
+      template=template_helpers.makeSiblingTemplatesList(
+          template, 'public.html'))
+
+
 DEF_ERROR_TMPL = 'soc/error.html'
 
 def errorResponse(request, error, template, context):
@@ -93,3 +110,37 @@ def errorResponse(request, error, template, context):
 
   return response_helpers.respond(request, error_templates, context=context,
                                   response_args=error.response_args)
+
+
+DEF_LOGIN_TMPL = 'soc/login.html'
+DEF_LOGIN_MSG_FMT = 'Please <a href="%(sign_in)s">sign in</a> to continue.'
+
+def requestLogin(request, template, context, login_message_fmt=None):
+  """Displays a login request page with custom message and login link.
+  
+  Args:
+    request: the standard Django HTTP request object
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the login.html template name (or names)
+    login_message_fmt: a custom message format string used to create a
+      message displayed on the login page; the format string can contain
+      named format specifiers for any of the keys in context, but should at
+      least contain %(sign_in)s
+    context: the context dict supplied to the template, which is modified
+        (so supply a copy if such modification is not acceptable); 
+      login_message: the caller can completely construct the message supplied
+        to the login template in lieu of using login_message_fmt
+  """
+  context = response_helpers.getUniversalContext(request, context=context)
+  
+  # make a list of possible "sibling" templates, then append a default
+  login_templates = template_helpers.makeSiblingTemplatesList(template,
+                                                              'login.html')
+  login_templates.append(DEF_LOGIN_TMPL)
+  
+  if not context.get('login_message'):
+    if not login_message_fmt:
+      login_message_fmt = DEF_LOGIN_MSG_FMT
+    context['login_message'] = login_message_fmt % context  
+  
+  return response_helpers.respond(request, login_templates, context=context)

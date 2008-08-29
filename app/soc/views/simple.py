@@ -76,7 +76,7 @@ def public(request, template, linkname, context):
   Returns:
     A subclass of django.http.HttpResponse containing the generated page.
   """
-  return simple.templateWithLinkName(
+  return templateWithLinkName(
       request, linkname=linkname, context=context,
       template=template_helpers.makeSiblingTemplatesList(
           template, 'public.html'))

@@ -101,9 +101,8 @@ def errorResponse(request, error, template, context):
   context = response_helpers.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
-  error_templates = template_helpers.makeSiblingTemplatesList(template,
-                                                              'error.html')
-  error_templates.append(DEF_ERROR_TMPL)
+  error_templates = template_helpers.makeSiblingTemplatesList(
+      template, 'error.html', default_template=DEF_ERROR_TMPL)
 
   context['error_status'] = error.response_args.get('status')
   context['error_message'] = error.message
@@ -134,9 +133,8 @@ def requestLogin(request, template, context, login_message_fmt=None):
   context = response_helpers.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
-  login_templates = template_helpers.makeSiblingTemplatesList(template,
-                                                              'login.html')
-  login_templates.append(DEF_LOGIN_TMPL)
+  login_templates = template_helpers.makeSiblingTemplatesList(
+      template, 'login.html', default_template=DEF_LOGIN_TMPL)
   
   if not context.get('login_message'):
     if not login_message_fmt:

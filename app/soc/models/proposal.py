@@ -36,7 +36,8 @@ class Proposal(db.Model):
     Proposal as their foundation.  This relation is implemented as the
     'tasks' back-reference Query of the Task model 'proposal' reference.
 
-   """"
+  """
+
 	#: Required 1:1 relationship with a Work entity that contains the
 	#: general "work" properties of the Proposal.  The back-reference in the Work
 	#: model is a Query named 'proposal'.

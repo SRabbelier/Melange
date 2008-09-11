@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers used to display various views that are forms.
+"""Helpers used to render response.
 """
 
 __authors__ = [

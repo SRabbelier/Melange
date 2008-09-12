@@ -217,36 +217,30 @@ def getUserIfLinkName(link_name):
   raise out_of_band.ErrorResponse(
       'There is no user with a "link name" of "%s".' % link_name, status=404)
 
-def checkLinkNameForId(link_name=None, id=None):
-  """Returns True if link name is correct and can be stored.
 
+def isLinkNameAvailableForId(link_name, id=None):
+  """Indicates if link name is available for the given Google Account.
+  
   Args:
     link_name: link name used in URLs to identify user
     id: a Google Account object; optional, current logged-in user will
       be used (or False will be returned if no user is logged in)
+      
+  Returns:
+    True: the link name does not exist in the Datastore,
+      so it is currently "available" to any User
+    True: the link name exists and already belongs to the User entity
+      associated with the specified Google Account
+    False: the link name exists and belongs to a User entity other than
+      that associated with the supplied Google Account
   """
-  id = getIdIfMissing(id)
-    
-  if not id:
-    # id not supplied and no Google Account logged in, so link name cannot
-    # belong to an unspecified User
-    return False
-
-  user = getUserFromId(id)
-  link_name_exist = doesLinkNameExist(link_name)
-  
-  # New user with not existing link_name
-  if not user and not link_name_exist:
+  link_name_exists = doesLinkNameExist(link_name)
+ 
+  if not link_name_exists:
+    # if the link name does not exist, it is clearly available for any User
     return True
-  # New user with existing link_name
-  elif not user and link_name_exist:
-    return False
-  
-  # Existing user with link_name that exists and doesn't belond to him     
-  if user and link_name_exist and (user.link_name != link_name):
-    return False
-    
-  return True
+
+  return doesLinkNameBelongToId(link_name, id=id)
 
 
 def doesLinkNameExist(link_name=None):

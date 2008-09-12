@@ -139,7 +139,14 @@ def doesUserExist(id):
 def isIdDeveloper(id=None):
   """Returns True if Google Account is a Developer with special privileges.
   
-  using the App Engine Users API.
+  Since it only works on the current logged-in user, if id matches the
+  current logged-in Google Account, the App Engine Users API function
+  user.is_current_user_admin() is checked.  If that returns False, or
+  id is not the currently logged-in user, the is_developer property of
+  the User entity corresponding to the id Google Account is checked next.
+  
+  This solves the "chicken-and-egg" problem of no User entity having its
+  is_developer property set, but no one being able to set it.
   
   Args:
     id: a Google Account (users.User) object; if id is not supplied,

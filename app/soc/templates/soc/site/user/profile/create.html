@@ -1,0 +1,68 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+{% block page_title %}
+ {% if linkname_user %}
+  Developer: Modify Existing User Profile
+ {% else %}
+  Developer: Create New User Profile
+ {% endif %}
+{% endblock %}
+{% block header_title %}
+ {% if linkname_user %}
+  Modify Existing User Profile for {{ linkname_user.nick_name }}
+   <a href="mailto:{{ linkname_user.id }} ">&lt;{{ linkname_user.id }}&gt;</a>
+ {% else %}
+  Create a New User Profile
+ {% endif %}
+{% endblock %}
+{% block body %}
+<p>
+<p>
+{% block instructions %}
+Please use this form to alter basic site-wide settings for a User in Google Open Source Programs.
+{% endblock %}
+</p>
+<form method="POST">
+ <table>
+  {% field_as_table_row form.id %}
+  {% field_as_table_row form.link_name %}
+  <tr>
+   <td> 
+    <input type="submit" style="font-weight: bold" name="lookup" value="Look up User"/></span>
+   </td>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+   <td>
+    {% if lookup_message %}<b><i>{{ lookup_message }}</i></b>{% endif %}
+   </td>
+  <tr><td colspan="4">&nbsp;</td></tr>
+  </tr>
+  {% field_as_table_row form.nick_name %}
+  <tr>
+   <td> 
+    <input type="submit" style="font-weight: bold" name="save" value="Save Changes"/></span>
+   </td>
+   <td>
+    <input type="button" onclick="location.href='/'" value="Cancel"/>
+   </td>
+   <td>
+    {% if submit_message %}<b><i>{{ submit_message }}</i></b>{% endif %}
+   </td>
+  </tr>
+ </table>
+</form>
+</p>
+{% endblock %}

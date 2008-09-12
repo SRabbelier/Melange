@@ -1,0 +1,72 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+{% block page_title %}
+Developer: Look Up an Existing User Profile
+{% endblock %}
+{% block header_title %}
+Look Up an Existing User Profile
+{% endblock %}
+{% block body %}
+<p>
+<p>
+{% block instructions %}
+Please use this form to look up an existing User in Google Open Source Programs.
+{% endblock %}
+</p>
+<form method="POST">
+ <table>
+  {% field_as_table_row form.id %}
+  {% field_as_table_row form.link_name %}
+{% if found_user %}
+ <tr>
+  <td class="formfieldlabel">Nick name</td>
+  <td class="formfieldrequired">&nbsp;</td>
+  <td>{{ found_user.nick_name }}</td>
+  <td class="formfieldhelptext">&nbsp;</td>
+ </tr>
+{% endif %}
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td> 
+    <input type="submit" style="font-weight: bold" name="lookup" value="Look up User"/></span>
+   </td>
+   <td>&nbsp;</td>
+{% if lookup_error %}
+   <td colspan="2" class="formfielderror">
+    {{ lookup_error }}
+   </td>
+{% else %}
+   <td colspan="2">
+    {% if lookup_message %}<b><i>{{ lookup_message }}</i></b>{% else %}%nbsp;{% endif %}
+   </td>
+{% endif %}
+  </tr>
+{% if edit_link %}
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td colspan="4">
+    <a href="{{ edit_link }}">Edit the User profile of {{ user.nick_name }}.</a>
+   </td>
+  </tr>
+{% endif %}
+ </table>
+</form>
+</p>
+{% endblock %}

@@ -26,8 +26,7 @@ __authors__ = [
   ]
 
 
-from django import http
-from django.template import loader
+from django.utils.translation import ugettext_lazy
 
 from soc.logic import out_of_band
 from soc.logic.site import id_user
@@ -112,7 +111,8 @@ def errorResponse(request, error, template, context):
 
 
 DEF_LOGIN_TMPL = 'soc/login.html'
-DEF_LOGIN_MSG_FMT = 'Please <a href="%(sign_in)s">sign in</a> to continue.'
+DEF_LOGIN_MSG_FMT = ugettext_lazy(
+  'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
 def requestLogin(request, template, context, login_message_fmt=None):
   """Displays a login request page with custom message and login link.
@@ -142,3 +142,77 @@ def requestLogin(request, template, context, login_message_fmt=None):
     context['login_message'] = login_message_fmt % context  
   
   return response_helpers.respond(request, login_templates, context=context)
+
+
+def getAltResponseIfNotLoggedIn(request, context=None,
+                                template=DEF_LOGIN_TMPL, id=None,
+                                login_message_fmt=DEF_LOGIN_MSG_FMT):
+  """Returns an alternate HTTP response if Google Account is not logged in.
+
+  Args:
+    request: the standard django request object
+    context: the context supplied to the template (implements dict)
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+    id: a Google Account (users.User) object, or None, in which case
+      the current logged-in user is used
+
+  Returns:
+    None if id is logged in, or a subclass of django.http.HttpResponse
+    which contains the alternate response that should be returned by the
+    calling view.
+  """
+  id = id_user.getIdIfMissing(id)
+
+  if id:
+    # a Google Account is logged in, so no need to ask user to sign in  
+    return None
+
+  # if missing, create default template context for use with any templates
+  context = response_helpers.getUniversalContext(request, context=context)
+
+  return requestLogin(request, template, context,
+                      login_message_fmt=login_message_fmt)
+
+
+DEF_DEV_LOGIN_MSG_FMT = ugettext_lazy(
+    'Please <a href="%(sign_in)s">sign in</a>'
+    ' as a site developer to view this page.')
+
+DEF_DEF_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
+    'Please <a href="%(sign_out)s">sign out</a>'
+    ' and <a href="%(sign_in)s">sign in</a>'
+    ' again as a site developer to view this page.')
+
+def getAltResponseIfNotDeveloper(request, context=None,
+                                 template=DEF_LOGIN_TMPL, id=None):
+  """Returns an alternate HTTP response if Google Account is not a Developer.
+
+  Args:
+    request: the standard django request object
+    context: the context supplied to the template (implements dict)
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+    id: a Google Account (users.User) object, or None, in which case
+      the current logged-in user is used
+
+  Returns:
+    None if id is logged in and logged-in user is a Developer, or a
+    subclass of django.http.HttpResponse which contains the alternate
+    response that should be returned by the calling view.
+  """
+  id = id_user.getIdIfMissing(id)
+
+  # if missing, create default template context for use with any templates
+  context = response_helpers.getUniversalContext(request, context=context)
+
+  if not id:
+    return requestLogin(request, template, context,
+        login_message_fmt=DEF_DEV_LOGIN_MSG_FMT)
+
+  if not id_user.isIdDeveloper(id=id):
+    return requestLogin(request, template, context,
+        login_message_fmt=DEF_DEF_LOGOUT_LOGIN_MSG_FMT)
+
+  # Google Account is logged in and is a Developer, so no need for sign in
+  return None

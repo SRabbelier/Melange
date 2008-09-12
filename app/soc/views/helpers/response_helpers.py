@@ -112,7 +112,7 @@ def getUniversalContext(request, context=None):
   context['user'] = id_user.getUserIfMissing(context.get('user', None),
                                              context['id'])
   context['is_admin'] = context.get(
-      'is_admin', id_user.isIdDeveloper(id=context['id'])),
+      'is_admin', id_user.isIdDeveloper(id=context['id']))
   context['is_debug'] = context.get('is_debug', system.isDebug())
   context['sign_in'] = context.get(
       'sign_in', users.create_login_url(request.path))

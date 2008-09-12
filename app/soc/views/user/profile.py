@@ -55,8 +55,7 @@ class UserForm(forms_helpers.DbModelForm):
     link_name = self.cleaned_data.get('link_name')
     if not id_user.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    elif not id_user.doesLinkNameBelongToId(link_name):
-      # link_name exists in Datastore but doesn't belong to current user
+    elif not id_user.checkLinkNameForId(link_name):
       raise forms.ValidationError("This link name is already in use.")
     return link_name
 

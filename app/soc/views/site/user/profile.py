@@ -158,7 +158,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
     # else: URL is not one that was expected, so do not display edit link
   elif not form:
     # no pre-populated form was constructed, so show the empty look-up form
-    form = DeveloperForm()
+    form = LookupForm()
 
   context.update({'form': form,
                   'edit_link': edit_link,

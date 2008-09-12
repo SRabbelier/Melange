@@ -25,7 +25,9 @@ __authors__ = [
 
 import logging
 
+from google.appengine.api import users
 from google.appengine.ext import db
+
 from django.utils.translation import ugettext_lazy
 
 from soc.models import base
@@ -56,6 +58,10 @@ class User(base.ModelWithFieldAttributes):
   #: Melange web applications and is not made visible to other users 
   #: of any Melange application.
   id = db.UserProperty(required=True)
+
+  #: A list (possibly empty) of former Google Accounts associated with
+  #: this User.
+  former_ids = db.ListProperty(users.User)
 
   #: Required field storing a nickname; displayed publicly.
   #: Nicknames can be any valid UTF-8 text.

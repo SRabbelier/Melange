@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 import re
+import logging
 
 from google.appengine.api import users
 from django import http
@@ -41,17 +42,6 @@ import soc.models.user
 class UserForm(forms_helpers.DbModelForm):
   """Django form displayed when creating or editing a User.
   """
-  LINKNAME_PATTERN = r'''(?x)
-      ^
-      [0-9a-z]  # start with ASCII digit or lowercase
-      (
-      [0-9a-z]  # additional ASCII digit or lowercase
-      |         # -OR-
-      _[0-9a-z] # underscore and ASCII digit or lowercase
-      )*        # zero or more of OR group
-      $'''
-  LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
-  
   class Meta:
     """Inner Meta class that defines some behavior for the form.
     """
@@ -59,18 +49,16 @@ class UserForm(forms_helpers.DbModelForm):
     model = soc.models.user.User
     
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['id']
+    exclude = ['id', 'former_ids']
   
   def clean_link_name(self):
-    linkname = self.cleaned_data.get('link_name')
-    linkname_user = id_user.getUserFromLinkName(linkname)
-    id = users.get_current_user()
-    # if linkname exist in datastore and doesn't belong to current user
-    if linkname_user and (linkname_user.id != id):
-      raise forms.ValidationError("This link name is already in use.")
-    elif not self.LINKNAME_REGEX.match(linkname):
+    link_name = self.cleaned_data.get('link_name')
+    if not id_user.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    return linkname
+    elif not id_user.doesLinkNameBelongToId(link_name):
+      # link_name exists in Datastore but doesn't belong to current user
+      raise forms.ValidationError("This link name is already in use.")
+    return link_name
 
 
 DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/profile/edit.html'
@@ -79,9 +67,9 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
 
   Args:
-    request: the standard django request object.
+    request: the standard django request object
     linkname: the User's site-unique "linkname" extracted from the URL
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse which either contains the form to
@@ -118,8 +106,6 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
     # so show public view for that (other) User entity
     return simple.public(request, template, linkname, context)
 
-  user = id_user.getUserFromId(id)
-  
   if request.method == 'POST':
     form = UserForm(request.POST)
 
@@ -127,19 +113,17 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get("nick_name")
 
-      if not user:
-        user = soc.models.user.User(id=id, link_name=linkname,
-                                    nick_name=nickname)
-      else:
-        user.nick_name = nickname
-        user.link_name = linkname
+      user = id_user.updateOrCreateUserFromId(
+          id, link_name=linkname, nick_name=nickname)
 
-      user.put()
       # TODO(tlarsen):
       # if old_linkname:  redirect to new /user/profile/new_linkname
       #   (how to preserve displaying the "Profile saved" message?)
       context.update({'submit_message': 'Profile saved.'})
   else: # request.method == 'GET'
+    # try to fetch User entity corresponding to Google Account if one exists    
+    user = id_user.getUserFromId(id)
+
     if user:
       # populate form with the existing User entity
       form = UserForm(instance=user)

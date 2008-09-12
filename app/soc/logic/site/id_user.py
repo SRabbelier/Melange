@@ -22,11 +22,26 @@ __authors__ = [
   ]
 
 
+import re
+
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from soc.logic import out_of_band
 
 import soc.models.user
+
+
+def getUserKeyNameFromId(id):
+  """Return a Datastore key_name for a User derived from a Google Account.
+  
+  Args:
+    id: a Google Account (users.User) object
+  """
+  if not id:
+    return None
+
+  return 'User:%s' % id.email()
 
 
 def getIdIfMissing(id):
@@ -38,7 +53,7 @@ def getIdIfMissing(id):
   other view).
 
   Args:
-    id: a Google Account object, or None
+    id: a Google Account (users.User) object, or None
     
   Returns:
     If id is non-false, it is simply returned; otherwise, the Google Account
@@ -51,16 +66,36 @@ def getIdIfMissing(id):
 
   return id
 
-  
+
 def getUserFromId(id):
   """Returns User entity for a Google Account, or None if not found.  
     
   Args:
-    id: a Google Account object
+    id: a Google Account (users.User) object
   """
-  return soc.models.user.User.gql('WHERE id = :1', id).get()
+  # first, attempt a lookup by User:id key name
+  key_name = getUserKeyNameFromId(id)
+  
+  if key_name:
+    user = soc.models.user.User.get_by_key_name(key_name)
+  else:
+    user = None
+  
+  if user:
+    return user
 
+  # email address may have changed, so query the id property
+  user = soc.models.user.User.gql('WHERE id = :1', id).get()
 
+  if user:
+    return user
+
+  # last chance: perhaps the User changed their email address at some point
+  user = soc.models.user.User.gql('WHERE former_ids = :1', id).get()
+
+  return user
+
+  
 def getUserIfMissing(user, id):
   """Conditionally returns User entity for a Google Account.
   
@@ -74,7 +109,7 @@ def getUserIfMissing(user, id):
 
   Args:
     user: None (usually), or an existing User entity
-    id: a Google Account object
+    id: a Google Account (users.User) object
     
   Returns:
     * user (which may have already been None if passed in that way by the
@@ -98,6 +133,50 @@ def doesUserExist(id):
     return True
   else:
     return False
+
+
+def isIdDeveloper(id=None):
+  """Returns True if Google Account is a Developer with special privileges.
+  
+  Args:
+    id: a Google Account (users.User) object; if id is not supplied,
+      the current logged-in user is checked using the App Engine Users API.
+      THIS ARGUMENT IS CURRENTLY IGNORED AND ONLY THE CURRENTLY LOGGED-IN
+      USER IS CHECKED!
+
+  See the TODO in the code below...
+  """
+  if not id:
+    return users.is_current_user_admin()
+
+  # TODO(tlarsen): this Google App Engine function only checks the currently
+  #   logged in user.  There needs to be another way to do this, such as a
+  #   field in the User Model...
+  return users.is_current_user_admin()
+
+
+LINKNAME_PATTERN = r'''(?x)
+    ^
+    [0-9a-z]   # start with ASCII digit or lowercase
+    (
+     [0-9a-z]  # additional ASCII digit or lowercase
+     |         # -OR-
+     _[0-9a-z] # underscore and ASCII digit or lowercase
+    )*         # zero or more of OR group
+    $
+'''
+
+LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
+
+def isLinkNameFormatValid(link_name):
+  """Returns True if link_name is in a valid format.
+  
+  Args:
+    link_name: link name used in URLs to identify user
+  """
+  if LINKNAME_REGEX.match(link_name):
+    return True
+  return False
 
 
 def getUserFromLinkName(link_name):
@@ -136,3 +215,103 @@ def getUserIfLinkName(link_name):
   # else: a link name was supplied, but there is no User that has it
   raise out_of_band.ErrorResponse(
       'There is no user with a "link name" of "%s".' % link_name, status=404)
+
+
+def doesLinkNameBelongToId(link_name, id=None):
+  """Returns True if supplied link name belongs to supplied Google Account.
+  
+  Args:
+    link_name: link name used in URLs to identify user
+    id: a Google Account object; optional, current logged-in user will
+      be used (or False will be returned if no user is logged in)
+  """
+  id = getIdIfMissing(id)
+    
+  if not id:
+    # id not supplied and no Google Account logged in, so link name cannot
+    # belong to an unspecified User
+    return False
+
+  user = getUserFromId(id)
+
+  if not user:
+    # no User corresponding to id Google Account, so no link name at all 
+    return False
+
+  if user.link_name != link_name:
+    # User exists for id, but does not have this link name
+    return False
+
+  return True  # link_name does actually belong to this Google Account
+
+
+def updateOrCreateUserFromId(id, **user_properties):
+  """Update existing User entity, or create new one with supplied properties.
+
+  Args:
+    id: a Google Account object
+    **user_properties: keyword arguments that correspond to User entity
+      properties and their values
+      
+  Returns:
+    the User entity corresponding to the Google Account, with any supplied
+    properties changed, or a new User entity now associated with the Google
+    Account and with the supplied properties
+  """
+  # attempt to retrieve the existing User
+  user = getUserFromId(id)
+  
+  if not user:
+    # user did not exist, so create one in a transaction
+    key_name = getUserKeyNameFromId(id)
+    user = soc.models.user.User.get_or_insert(
+      key_name, id=id, **user_properties)
+
+  # there is no way to be sure if get_or_insert() returned a new User or
+  # got an existing one due to a race, so update with user_properties anyway,
+  # in a transaction
+  return updateUserProperties(user, **user_properties)
+
+
+def updateUserProperties(user, **user_properties):
+  """Update existing User entity using supplied User properties.
+
+  Args:
+    user: a User entity
+    **user_properties: keyword arguments that correspond to User entity
+      properties and their values
+      
+  Returns:
+    the original User entity with any supplied properties changed 
+  """
+  def update():
+    return _unsafeUpdateUserProperties(user, **user_properties)
+
+  return db.run_in_transaction(update)
+
+  
+def _unsafeUpdateUserProperties(user, **user_properties):
+  """(see updateUserProperties)
+  
+  Like updateUserProperties(), but not run within a transaction. 
+  """
+  properties = user.properties()
+  
+  for prop in properties.values():
+    if prop.name in user_properties:
+      if prop.name == 'former_ids':
+        # former_ids cannot be overwritten directly
+        continue
+
+      value = user_properties[prop.name]
+
+      if prop.name == 'id':
+        old_id = user.id
+
+        if value != old_id:
+          user.former_ids.append(old_id)
+
+      prop.__set__(user, value)
+        
+  user.put()
+  return user

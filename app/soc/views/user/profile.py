@@ -49,7 +49,7 @@ class UserForm(forms_helpers.DbModelForm):
     model = soc.models.user.User
     
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['id', 'former_ids']
+    exclude = ['id', 'former_ids', 'is_developer']
   
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')

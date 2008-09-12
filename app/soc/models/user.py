@@ -75,3 +75,9 @@ class User(base.ModelWithFieldAttributes):
   link_name.help_text = ugettext_lazy(
       'Field used in URLs to identify user. '
       'Lower ASCII characters only.')
+
+  #: field storing whether User is a Developer with site-wide access.
+  is_developer = db.BooleanProperty(
+      verbose_name=ugettext_lazy('Is Developer'))
+  is_developer.help_text = ugettext_lazy(
+      'Field used to indicate user with site-wide "Developer" access.')

@@ -139,21 +139,34 @@ def doesUserExist(id):
 def isIdDeveloper(id=None):
   """Returns True if Google Account is a Developer with special privileges.
   
+  using the App Engine Users API.
+  
   Args:
     id: a Google Account (users.User) object; if id is not supplied,
-      the current logged-in user is checked using the App Engine Users API.
-      THIS ARGUMENT IS CURRENTLY IGNORED AND ONLY THE CURRENTLY LOGGED-IN
-      USER IS CHECKED!
-
-  See the TODO in the code below...
+      the current logged-in user is checked
   """
+  id = getIdIfMissing(id)
+ 
   if not id:
-    return users.is_current_user_admin()
+    # no Google Account was supplied or is logged in, so an unspecified
+    # User is definitely *not* a Developer
+    return False
 
-  # TODO(tlarsen): this Google App Engine function only checks the currently
-  #   logged in user.  There needs to be another way to do this, such as a
-  #   field in the User Model...
-  return users.is_current_user_admin()
+  if id == users.get_current_user():
+    if users.is_current_user_admin():
+      # supplied id is current logged-in user, and that user is in the
+      # Administration->Developers list in the App Engine console
+      return True
+  
+  user = getUserFromId(id)
+
+  if not user:
+    # no User entity for this Google Account, and id is not the currently
+    # logged-in user, so there is no conclusive way to check the
+    # Administration->Developers list in the App Engine console
+    return False
+  
+  return user.is_developer
 
 
 LINKNAME_PATTERN = r'''(?x)

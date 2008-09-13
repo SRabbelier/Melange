@@ -24,6 +24,8 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns(
     '',
     (r'^$', 'soc.views.site.home.public'),
+    (r'^site/home$', 'soc.views.site.home.public'),
+    (r'^site/home/edit$', 'soc.views.site.home.edit'),
 
     # TODO(tlarsen): uncomment these when the view functions are committed
     # attempt to send User to their dashboard
@@ -35,7 +37,9 @@ urlpatterns = patterns(
     #  'soc.views.user.roles.dashboard'),
 
     (r'^site/user/lookup$', 'soc.views.site.user.profile.lookup'),
-
+    (r'^site/user/profile/(?P<linkname>[_0-9a-z]+)$',
+     'soc.views.site.user.profile.edit'),
+     
     # TODO(tlarsen): uncomment these when the view functions are committed
     # (r'^site/user/profile$', 'soc.views.site.user.profile.create'),
     # (r'^site/user/profile/(?P<linkname>[_0-9a-z]+)$',

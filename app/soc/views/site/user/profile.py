@@ -92,16 +92,17 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
   logged_in_id = users.get_current_user()
 
-  if not logged_in_id:
-    return simple.requestLogin(request, template, context,
-        login_message_fmt='Please <a href="%(sign_in)s">sign in</a>'
-                           ' as a site developer to view this page.')
-
-  if not id_user.isIdDeveloper(id=logged_in_id):
-    return simple.requestLogin(request, template, context,
-        login_message_fmt='Please <a href="%(sign_out)s">sign out</a>'
-                         ' and <a href="%(sign_in)s">sign in</a>'
-                         ' again as a site developer to view this page.')
+  alt_response = simple.getAltResponseIfNotDeveloper(request, context, 
+                                                        id = logged_in_id)
+  if alt_response:
+    # not a developer
+    return alt_response
+  
+  alt_response = simple.getAltResponseIfNotLoggedIn(request, context, 
+                                                        id = logged_in_id)
+  if alt_response:
+    # not logged in
+    return alt_response
 
   user = None  # assume that no User entity will be found
   form = None  # assume blank form needs to be displayed

@@ -134,7 +134,27 @@ def doesUserExist(id):
     return True
   else:
     return False
+    
+def isIdUser(id=None):
+  """Returns True if Google Account has it's soc.models.user.User entity in datastore.
 
+  Args:
+    id: a Google Account (users.User) object; if id is not supplied,
+      the current logged-in user is checked
+  """
+  id = getIdIfMissing(id)
+
+  if not id:
+    # no Google Account was supplied or is logged in
+    return False
+
+  user = getUserFromId(id)
+
+  if not user:
+    # no User entity for this Google Account
+    return False
+  
+  return True
 
 def isIdDeveloper(id=None):
   """Returns True if Google Account is a Developer with special privileges.

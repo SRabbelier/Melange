@@ -21,14 +21,14 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-import django.newforms as forms
+from django import newforms as forms
 from django.newforms.widgets import flatatt
 from django.newforms.util import smart_unicode
 from django.utils.html import escape
 from django.utils import simplejson
 from django.utils.safestring import mark_safe
 
-class TinyMCE(forms.Textarea):
+class TinyMCE(forms.widgets.Textarea):
     """
     TinyMCE widget. requires you include tiny_mce_src.js in your template
     you can customize the mce_settings by overwriting instance mce_settings,

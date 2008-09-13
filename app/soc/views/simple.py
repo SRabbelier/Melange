@@ -15,14 +15,11 @@
 # limitations under the License.
 
 """Simple views that depend entirely on the template and context.
-
-simpleWithLinkName: a simple template view for URLs with a linkname
-
-errorResponse: renders an out_of_band.ErrorResponse page
 """
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -174,12 +171,44 @@ def getAltResponseIfNotLoggedIn(request, context=None,
   return requestLogin(request, template, context,
                       login_message_fmt=login_message_fmt)
 
+DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
+    'Please create <a href="/user/profile">User Profile</a>'
+    ' in order to view this page.')
+
+def getAltResponseIfNotUser(request, context=None,
+                                template=DEF_LOGIN_TMPL, id=None,
+                                login_message_fmt=DEF_LOGIN_MSG_FMT):
+  """Returns an alternate HTTP response if Google Account has no User entity.
+
+  Args:
+    request: the standard django request object
+    context: the context supplied to the template (implements dict)
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+    id: a Google Account (users.User) object, or None, in which case
+      the current logged-in user is used
+
+  Returns:
+    None if User exists for id, or a subclass of django.http.HttpResponse
+    which contains the alternate response that should be returned by the
+    calling view.
+  """
+  user_exist = id_user.isIdUser(id)
+
+  if user_exist:
+    return None
+
+  # if missing, create default template context for use with any templates
+  context = response_helpers.getUniversalContext(request, context=context)
+
+  return requestLogin(request, template, context,
+                      login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
 DEF_DEV_LOGIN_MSG_FMT = ugettext_lazy(
     'Please <a href="%(sign_in)s">sign in</a>'
     ' as a site developer to view this page.')
 
-DEF_DEF_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
+DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
     'Please <a href="%(sign_out)s">sign out</a>'
     ' and <a href="%(sign_in)s">sign in</a>'
     ' again as a site developer to view this page.')
@@ -212,7 +241,7 @@ def getAltResponseIfNotDeveloper(request, context=None,
 
   if not id_user.isIdDeveloper(id=id):
     return requestLogin(request, template, context,
-        login_message_fmt=DEF_DEF_LOGOUT_LOGIN_MSG_FMT)
+        login_message_fmt=DEF_DEV_LOGOUT_LOGIN_MSG_FMT)
 
   # Google Account is logged in and is a Developer, so no need for sign in
   return None

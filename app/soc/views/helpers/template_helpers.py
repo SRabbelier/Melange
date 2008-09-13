@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>'
   ]
 
 
@@ -55,3 +56,13 @@ def makeSiblingTemplatesList(templates, new_template_file,
     '%s/%s' % (t.rsplit('/', 1)[0], new_template_file) for t in templates]
 
   return sibling_templates + default_template
+
+def unescape(html): 
+  "Returns the given HTML with ampersands, quotes and carets decoded" 
+
+  if not isinstance(html, basestring): 
+    html = str(html) 
+  
+  html.replace('&amp;', '&').replace('&lt;', '<')
+  html.replace('&gt;', '>').replace('&quot;', '"').replace('&#39;',"'")
+  return html

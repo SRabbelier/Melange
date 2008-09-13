@@ -65,7 +65,11 @@ limitations under the License.
 {% block sidebar_menu %}	
     <ul>
      <li>
-<a class="selected" href="/">Google Open Source Programs</a>
+<a class="selected" href="/">
+    {% block sidebar_menu_title %}
+    Google Open Source Programs
+    {% endblock %}
+    </a>
       <ul>
        <li>
 <a href="/user/profile">User (Sign In)</a>
@@ -75,6 +79,20 @@ limitations under the License.
 
        </li>
       </ul>
+{% if is_admin %}
+	  <ul>
+	      <li>Developer
+                    <ul>
+                        <li>
+              <a href="/site/home/edit">Site Settings</a>
+                       </li>
+                       <li>
+            <a href="/site/user/lookup">Look Up User</a>
+                        </li>
+                    </ul>	          
+	      </li>
+	  </ul>
+{% endif %}
       <ul>
        <li>
 <a href="/program/gsoc2009/home">Google Summer of Code</a>

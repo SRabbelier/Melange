@@ -41,7 +41,7 @@ from soc.views import simple
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 from soc.views.helpers import template_helpers
-from soc.views.helpers import widgets
+from soc.views.helpers import custom_widgets
 
 import soc.models.site_settings
 import soc.models.document
@@ -50,7 +50,7 @@ import soc.logic.site.settings
 
 
 class DocumentForm(forms_helpers.DbModelForm):
-  content = forms.fields.CharField(widget=widgets.TinyMCE())
+  content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
   #link_name = forms.CharField(widget=forms.TextInput(
   #                                attrs={'readonly':'true'}))
   class Meta:

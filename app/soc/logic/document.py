@@ -30,7 +30,7 @@ def getDocumentFromPath(path):
   """Returns Document entity for a given path, or None if not found.  
     
   Args:
-    id: a Google Account (users.User) object
+    path: a request path of the Document that uniquely identifies it
   """
   # lookup by Doc:path key name
   key_name = getDocumentKeyNameForPath(path)

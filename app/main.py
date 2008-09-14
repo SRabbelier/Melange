@@ -35,6 +35,8 @@ for k in [k for k in sys.modules if k.startswith('django')]:
 # from it. This lets us replace the built-in Django
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+sys.path.insert(0, os.path.abspath('django.zip'))
+
 # Force Django to reload its settings.
 from django.conf import settings
 settings._target = None

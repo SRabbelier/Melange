@@ -1,0 +1,31 @@
+trunk/app should contain only the files needed for the actual Google App
+Engine application "image".  Support code that is not part of the application
+image belongs elsewhere, such as in trunk/scripts, for example.
+
+= THIRD PARTY CODE =
+
+Third-party code that is *not* part of the application image (the Google App
+Engine SDK in trunk/thirdparty/google_appengine, for example) belongs in
+trunk/thirdparty (see also trunk/thirdparty/README).
+
+Third-party code that is part of the application image is placed in a package
+subdirectory in trunk/app, such as trunk/app/django, for example.
+
+If the third-party package is a single Python source file, place the code in
+trunk/app/<package>/__init__.py, so that it can simply be imported using,
+for example:
+
+import feedparser
+
+(The trunk/app/feedparser package is a good example of this approach.)
+
+== THIRD PARTY LICENSES ==
+
+Third-party code must also include a license text file, named LICENSE or
+COPYING, in the package subdirectory.  If the third-party package subdirectory
+is maintained automatically with a tool such as svn_load_dirs.pl (which
+removes files, such as license text files, that were added later to the
+"target" directory), place the license text file in the trunk/app directory
+and add the package name as a suffix (LICENSE.django is an example of this
+case).
+

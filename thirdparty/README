@@ -1,0 +1,14 @@
+Third-party code that is *not* part of the application image (the Google App
+Engine SDK in trunk/thirdparty/google_appengine, for example) belongs in
+trunk/thirdparty.  For third-party code that *is* part of the application
+image, see the notes in trunk/app/README.
+
+== THIRD PARTY LICENSES ==
+
+Third-party code must also include a license text file, named LICENSE or
+COPYING, in the package subdirectory.  If the third-party package subdirectory
+is maintained automatically with a tool such as svn_load_dirs.pl (which
+removes files, such as license text files, that were added later to the
+"target" directory), place the license text file in the trunk/app directory
+and add the package name as a suffix.
+

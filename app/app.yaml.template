@@ -23,6 +23,9 @@ handlers:
   static_files: soc/content/\1
   upload: soc/content/(robots.txt|favicon.ico)  
   
+- url: /tiny_mce
+  static_dir: tiny_mce
+
 - url: /soc/content
   static_dir: soc/content
 

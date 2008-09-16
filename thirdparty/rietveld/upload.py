@@ -156,7 +156,7 @@ class AbstractRpcServer(object):
             "Passwd": password,
             "service": "ah",
             "source": "rietveld-codereview-upload",
-            "accountType": "GOOGLE",
+            "accountType": "HOSTED_OR_GOOGLE",
         })
     )
     try:
@@ -367,10 +367,10 @@ group.add_option("--noisy", action="store_const", const=3,
 # Review server
 group = parser.add_option_group("Review server options")
 group.add_option("-s", "--server", action="store", dest="server",
-                 default="codereview.appspot.com",
+                 default="codereviews.googleopensourceprograms.com",
                  metavar="SERVER",
                  help=("The server to upload to. The format is host[:port]. "
-                       "Defaults to 'codereview.appspot.com'."))
+                       "Defaults to 'codereviews.googleopensourceprograms.com'."))
 group.add_option("-e", "--email", action="store", dest="email",
                  metavar="EMAIL", default=None,
                  help="The username to use. Will prompt if omitted.")

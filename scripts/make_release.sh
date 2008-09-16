@@ -49,6 +49,7 @@ zip -q django.zip `find django \
 # We prune:
 # - .svn subdirectories for obvious reasons.
 
+# zipserve requires tiny_mce/* to be in root of zip file
 pushd tiny_mce > /dev/null
 zip -q ../tiny_mce.zip `find . \
     -name .svn -prune -o \

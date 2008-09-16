@@ -22,7 +22,7 @@ __authors__ = [
   ]
 
 from google.appengine.api import urlfetch
-from soc.utils import feedparser
+import feedparser
 
 def isFeedURLValid(feed_url=None):
   """Returns True if provided url is valid ATOM or RSS.
@@ -37,3 +37,4 @@ def isFeedURLValid(feed_url=None):
       if parsed_feed.version and (parsed_feed.version != ''):
         return True
   return False
+

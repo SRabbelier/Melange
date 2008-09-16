@@ -8,14 +8,15 @@
 # actually need to be uploaded, they still add to the work done for
 # each update.
 
-ZIPFILE=django.zip
+DJANGO_ZIPFILE=django.zip
 RELEASE=../release
 APP_FOLDER="../app"
 APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
 APP_DIRS="soc ghop gsoc"
 
+cd $APP_FOLDER
 # Remove old $ZIPFILE file.
-rm -rf $ZIPFILE
+rm -rf $DJANGO_ZIPFILE
 
 # Create new $ZIPFILE file.
 # We prune:
@@ -23,8 +24,9 @@ rm -rf $ZIPFILE
 # - contrib/gis/ and related files because it's huge and unneeded.
 # - *.po and *.mo files because they are bulky and unneeded.
 # - *.pyc and *.pyo because they aren't used by App Engine anyway.
-DJANGO_DIR=$APP_FOLDER"/django"
-zip -q $APP_FOLDER/$ZIPFILE `find $DJANGO_DIR \
+DJANGO_DIR="django"
+
+zip -q $DJANGO_ZIPFILE `find $DJANGO_DIR \
     -name .svn -prune -o \
     -name gis -prune -o \
     -name admin -prune -o \
@@ -36,7 +38,7 @@ zip -q $APP_FOLDER/$ZIPFILE `find $DJANGO_DIR \
     -name postgresql_psycopg2 -prune -o \
     -name sqlite3 -prune -o \
     -name test -prune -o \
-    -type f ! -name \*.py[co] ! -name \*.[pm]o -print`
+    -type f ! -name \*.py[co] ! -name *.[pm]o -print`
 
 # Remove old $RELEASE directory.
 rm -rf $RELEASE
@@ -45,7 +47,8 @@ rm -rf $RELEASE
 mkdir $RELEASE
 
 # Create symbolic links.
-for x in $APP_FILES $APP_DIRS $ZIPFILE
+for x in $APP_FILES $APP_DIRS $DJANGO_ZIPFILE
 do
+    echo $APP_FOLDER/$x $RELEASE/$x
     ln -s $APP_FOLDER/$x $RELEASE/$x
 done

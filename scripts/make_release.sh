@@ -12,7 +12,7 @@ DJANGO_ZIPFILE=django.zip
 RELEASE=../release
 APP_FOLDER="../app"
 APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
-APP_DIRS="soc ghop gsoc"
+APP_DIRS="soc ghop gsoc feedparser tiny_mce"
 
 cd $APP_FOLDER
 # Remove old $ZIPFILE file.

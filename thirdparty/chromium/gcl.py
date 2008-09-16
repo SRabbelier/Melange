@@ -16,9 +16,9 @@ import urllib2
 
 CODEREVIEW_SETTINGS = {
   # Default values.
-  "CODE_REVIEW_SERVER": "codereview.chromium.org",
-  "CC_LIST": "chromium-reviews@googlegroups.com",
-  "VIEW_VC": "http://src.chromium.org/viewvc/chrome?view=rev&revision=",
+  "CODE_REVIEW_SERVER": "codereviews.googleopensourceprograms.com",
+  "CC_LIST": "melange-soc-dev@googlegroups.com",
+  "VIEW_VC": "http://code.google.com/p/soc/source/detail?r=",
 }
 
 # Use a shell for subcommands on Windows to get a PATH search, and because svn

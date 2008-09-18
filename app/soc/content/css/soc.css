@@ -137,6 +137,11 @@ th, td {
     font-weight: bold;
   }
   
+  td.formfielderrorlabel {
+    font-weight: bold;
+    color: #FF0000;
+  }
+  
 /* 
  * PAGE ELEMENTS 
  */

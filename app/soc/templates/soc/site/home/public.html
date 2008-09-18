@@ -35,7 +35,7 @@ limitations under the License.
 {% if site_document %}
 {{ site_document.title }}
 {% else %}
-Google Open Source Programs
+Default Title
 {% endif %}
 {% endblock %}
 
@@ -43,7 +43,7 @@ Google Open Source Programs
 {% if site_document %}
 {{ site_document.title }}
 {% else %}
-Google Open Source Programs
+Default Header
 {% endif %}
 {% endblock %}
 
@@ -51,7 +51,9 @@ Google Open Source Programs
     {% if site_document %}
     {{ site_document.content|safe }}
     {% else %}
-	{{ block.super }}
+This is the default site home page that can be configured via the <a href="/site/home/edit">Site Settings</a> interface.  
+The <a href="/site/home/edit">Site Settings</a> interface also provides a mechanism to select a feed to be displayed here.
+You need to sign in as site Developer in order to change <a href="/site/home/edit">Site Settings</a>.
     {% endif %}
     {% if site_settings.feed_url %}
     <div id="blog"></div>

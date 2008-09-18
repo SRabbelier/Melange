@@ -14,22 +14,25 @@ limitations under the License.
 {% if field.errors %}
 <tr>
  <td>&nbsp;</td>
- <td>&nbsp;</td>
- <td colspan="2" class="formfielderror">
+ <td colspan="3" class="formfielderror">
   {{ field.errors|join:"<br />" }}
  </td>
 </tr>
 {% endif %}
 <tr>
+{% if field.errors %}
+ <td class="formfielderrorlabel">
+{% else %} 
  <td class="formfieldlabel">
+{% endif %}
   <label for="{{ field.auto_id }}">{{ field.label }}
   </label> 
  </td>
- <td class="formfieldrequired">
-   {% if field.field.required %}(required){% endif %}
- </td>
  <td>
   {{ field }}
+ </td>
+ <td class="formfieldrequired">
+   {% if field.field.required %}(required){% endif %}
  </td>
  <td class="formfieldhelptext">
   {{ field.help_text }}

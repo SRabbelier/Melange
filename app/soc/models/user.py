@@ -57,7 +57,10 @@ class User(base.ModelWithFieldAttributes):
   #: This email address is only used in an automated fashion by 
   #: Melange web applications and is not made visible to other users 
   #: of any Melange application.
-  id = db.UserProperty(required=True)
+  id = db.UserProperty(required=True,
+      verbose_name=ugettext_lazy('User account'))
+  id.help_text = ugettext_lazy(
+      'Email address of a valid user (Google Account).')
 
   #: A list (possibly empty) of former Google Accounts associated with
   #: this User.

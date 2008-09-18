@@ -136,7 +136,7 @@ def doesUserExist(id):
     return False
     
 def isIdUser(id=None):
-  """Returns True if Google Account has it's soc.models.user.User entity in datastore.
+  """Returns True if a Google Account has it's soc.models.user.User entity in datastore.
 
   Args:
     id: a Google Account (users.User) object; if id is not supplied,
@@ -157,7 +157,7 @@ def isIdUser(id=None):
   return True
 
 def isIdDeveloper(id=None):
-  """Returns True if Google Account is a Developer with special privileges.
+  """Returns True if a Google Account is a Developer with special privileges.
   
   Since it only works on the current logged-in user, if id matches the
   current logged-in Google Account, the App Engine Users API function

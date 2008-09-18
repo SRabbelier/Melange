@@ -19,8 +19,7 @@
 public: how the general public sees the site home page of a Melange
   site
   
-There may (eventually) be different views of the site home page for
-logged-in Users (such as a edit() view for logged-in Developers). 
+edit: site settings view for logged-in Developers
 """
 
 __authors__ = [

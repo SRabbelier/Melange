@@ -23,7 +23,6 @@ __authors__ = [
 
 
 import re
-import logging
 
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -136,7 +135,7 @@ def doesUserExist(id):
     return False
     
 def isIdUser(id=None):
-  """Returns True if a Google Account has it's soc.models.user.User entity in datastore.
+  """Returns True if a Google Account has it's User entity in datastore.
 
   Args:
     id: a Google Account (users.User) object; if id is not supplied,

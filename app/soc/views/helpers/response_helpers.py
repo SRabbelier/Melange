@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+import logging
 import urlparse
 
 from google.appengine.api import users
@@ -202,7 +203,7 @@ def isReferrerSelf(request,
        
   """
   http_from = request.META.get('HTTP_REFERER')
-        
+      
   if not http_from:
     # no HTTP referrer, so cannot possibly start with expected prefix
     return False
@@ -215,7 +216,12 @@ def isReferrerSelf(request,
 
   if suffix:
     # remove suffix (such as a link name) before comparison
-    expected_prefix = expected_prefix[:-len(suffix)+1]
+    chars_to_remove = len(suffix)
+    
+    if not suffix.startswith('/'):
+      chars_to_remove = chars_to_remove + 1
+
+    expected_prefix = expected_prefix[:-chars_to_remove]
 
   if not from_path.startswith(expected_prefix):
     # expected prefix did not match first part of HTTP referrer path

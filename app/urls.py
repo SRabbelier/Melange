@@ -37,13 +37,9 @@ urlpatterns = patterns(
     #  'soc.views.user.roles.dashboard'),
 
     (r'^site/user/lookup$', 'soc.views.site.user.profile.lookup'),
+    (r'^site/user/profile$', 'soc.views.site.user.profile.edit'),
     (r'^site/user/profile/(?P<linkname>[_0-9a-z]+)$',
      'soc.views.site.user.profile.edit'),
-     
-    # TODO(tlarsen): uncomment these when the view functions are committed
-    # (r'^site/user/profile$', 'soc.views.site.user.profile.create'),
-    # (r'^site/user/profile/(?P<linkname>[_0-9a-z]+)$',
-    #  'soc.views.site.user.profile.edit'),
 
     (r'^user/profile$', 'soc.views.user.profile.edit'),
     (r'^user/profile/(?P<linkname>[_0-9a-z]+)$',

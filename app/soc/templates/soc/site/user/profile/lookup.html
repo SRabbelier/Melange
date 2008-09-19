@@ -28,19 +28,35 @@ Please use this form to look up an existing User in Google Open Source Programs.
 </p>
 <form method="POST">
  <table>
+{% if email_error %}
+<tr>
+ <td>&nbsp;</td>
+ <td colspan="3" class="formfielderror">
+  {{ email_error }}
+ </td>
+</tr>
+{% endif %}
   {% field_as_table_row form.id %}
+{% if linkname_error %}
+<tr>
+ <td>&nbsp;</td>
+ <td colspan="3" class="formfielderror">
+  {{ linkname_error }}
+ </td>
+</tr>
+{% endif %}
   {% field_as_table_row form.link_name %}
 {% if found_user %}
  <tr>
   <td class="formfieldlabel">Nick name</td>
-  <td class="formfieldrequired">&nbsp;</td>
   <td>{{ found_user.nick_name }}</td>
+  <td class="formfieldrequired">&nbsp;</td>
   <td class="formfieldhelptext">&nbsp;</td>
  </tr>
  <tr>
   <td class="formfieldlabel">Is Developer</td>
-  <td class="formfieldrequired">&nbsp;</td>
   <td>{{ found_user.is_developer }}</td>
+  <td class="formfieldrequired">&nbsp;</td>
   <td class="formfieldhelptext">&nbsp;</td>
  </tr>
 {% endif %}
@@ -51,16 +67,10 @@ Please use this form to look up an existing User in Google Open Source Programs.
    <td> 
     <input type="submit" style="font-weight: bold" name="lookup" value="Look up User"/></span>
    </td>
-   <td>&nbsp;</td>
-{% if lookup_error %}
-   <td colspan="2" class="formfielderror">
-    {{ lookup_error }}
+   <td colspan="2">&nbsp;</td>
+   <td>
+    {% if lookup_message %}<b><i>{{ lookup_message }}</i></b>{% else %}&nbsp;{% endif %}
    </td>
-{% else %}
-   <td colspan="2">
-    {% if lookup_message %}<b><i>{{ lookup_message }}</i></b>{% else %}%nbsp;{% endif %}
-   </td>
-{% endif %}
   </tr>
 {% if edit_link %}
   <tr>

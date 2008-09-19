@@ -21,13 +21,12 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-import re
-import logging
 
 from google.appengine.api import users
 from django import http
 from django import shortcuts
 from django import newforms as forms
+from django.utils.translation import ugettext_lazy
 
 from soc.logic import out_of_band
 from soc.logic.site import id_user
@@ -61,6 +60,18 @@ class UserForm(forms_helpers.DbModelForm):
 
 
 DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/profile/edit.html'
+
+SUBMIT_MSG_PARAM_NAME = 's'
+
+SUBMIT_MESSAGES = (
+  ugettext_lazy('Profile saved.'),
+)
+
+SUBMIT_MSG_PROFILE_SAVED = 0
+
+SUBMIT_PROFILE_SAVED_PARAMS = {
+  SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
+}
 
 def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
@@ -96,10 +107,10 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   try:
     linkname_user = id_user.getUserIfLinkName(linkname)
   except out_of_band.ErrorResponse, error:
-    # show custom 404 page when linkname doesn't exist in Datastore
+    # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)
   
-  # linkname_user will be None here if linkname was already None...
+  # linkname_user will be None here if link name was already None...
   if linkname_user and (linkname_user.id != id):
     # linkname_user exists but is not the currently logged in Google Account,
     # so show public view for that (other) User entity
@@ -109,24 +120,42 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
     form = UserForm(request.POST)
 
     if form.is_valid():
-      linkname = form.cleaned_data.get('link_name')
+      new_linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get("nick_name")
 
       user = id_user.updateOrCreateUserFromId(
-          id, link_name=linkname, nick_name=nickname)
+          id, link_name=new_linkname, nick_name=nickname)
 
-      # TODO(tlarsen):
-      # if old_linkname:  redirect to new /user/profile/new_linkname
-      #   (how to preserve displaying the "Profile saved" message?)
-      context.update({'submit_message': 'Profile saved.'})
+      # redirect to new /user/profile/new_linkname&s=0
+      # (causes 'Profile saved' message to be displayed)
+      return response_helpers.redirectToChangedSuffix(
+          request, linkname, new_linkname, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists    
     user = id_user.getUserFromId(id)
 
     if user:
+      # is 'Profile saved' parameter present, but referrer was not ourself?
+      # (e.g. someone bookmarked the GET that followed the POST submit) 
+      if (request.GET.get(SUBMIT_MSG_PARAM_NAME)
+          and (not response_helpers.isReferrerSelf(request,
+                                                   suffix=linkname))):
+        # redirect to aggressively remove 'Profile saved' query parameter
+        return http.HttpResponseRedirect(request.path)
+    
+      # referrer was us, so select which submit message to display
+      # (may display no message if ?s=0 parameter is not present)
+      context['submit_message'] = (
+          template_helpers.getSingleIndexedParamValue(
+              request, SUBMIT_MSG_PARAM_NAME, values=SUBMIT_MESSAGES))
+
       # populate form with the existing User entity
       form = UserForm(instance=user)
     else:
+      if request.GET.get(SUBMIT_MSG_PARAM_NAME):
+        # redirect to aggressively remove 'Profile saved' query parameter
+        return http.HttpResponseRedirect(request.path)
+
       # no User entity exists for this Google Account, so show a blank form
       form = UserForm()
 

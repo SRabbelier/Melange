@@ -148,7 +148,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   if user:
     # User entity found, so populate form with existing User information            
     # context['found_user'] = user
-    form = LookupForm(initial={'id': user.id,
+    form = LookupForm(initial={'id': user.id.email,
                                'link_name': user.link_name})
 
     if request.path.endswith('lookup'):
@@ -236,6 +236,13 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
   user = None  # assume that no User entity will be found
 
+  # try to fetch User entity corresponding to linkname if one exists    
+  try:
+    user = id_user.getUserIfLinkName(linkname)
+  except out_of_band.ErrorResponse, error:
+    # show custom 404 page when link name doesn't exist in Datastore
+    return simple.errorResponse(request, error, template, context)
+
   if request.method == 'POST':
     form = EditForm(request.POST)
 
@@ -249,7 +256,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         form_id, link_name=new_linkname, nick_name=nickname,
         is_developer=is_developer)
 
-      # redirect to new /site/user/profile/new_linkname&s=0
+      # redirect to new /site/user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
       return response_helpers.redirectToChangedSuffix(
           request, linkname, new_linkname,
@@ -257,8 +264,6 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   else: # method == 'GET':
     # try to fetch User entity corresponding to link name if one exists
     if linkname:
-      user = id_user.getUserFromLinkName(linkname)
-
       if user:
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit) 
@@ -277,7 +282,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
         # populate form with the existing User entity
         form = EditForm(initial={
-            'id': user.id, 'link_name': user.link_name,
+            'id': user.id.email, 'link_name': user.link_name,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})       
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):

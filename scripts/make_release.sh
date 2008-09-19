@@ -12,7 +12,7 @@ DEFAULT_APP_RELEASE=../release
 DEFAULT_APP_FOLDER="../app"
 DEFAULT_APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
 DEFAULT_APP_DIRS="soc ghop gsoc feedparser"
-DEFAULT_ZIP_FILES="django.zip tiny_mce.zip"
+DEFAULT_ZIP_FILES="tiny_mce.zip"
 
 APP_RELEASE=${APP_RELEASE:-"${DEFAULT_APP_RELEASE}"}
 APP_FOLDER=${APP_FOLDER:-"${DEFAULT_APP_FOLDER}"}
@@ -21,17 +21,28 @@ APP_DIRS=${APP_DIRS:-"${DEFAULT_APP_DIRS}"}
 ZIP_FILES=${ZIP_FILES:-"${DEFAULT_ZIP_FILES}"}
 
 cd $APP_FOLDER
-# Remove old zip files
-rm -rf $ZIP_FILES
 
-# Create new django.zip file.
+# Remove old zip files (and django.zip in its old location)
+rm -rf $ZIP_FILES django.zip
+
+# Remove old $APP_RELEASE directory.
+rm -rf $APP_RELEASE
+
+# Create new $APP_RELEASE directory.
+mkdir $APP_RELEASE
+
+# Create new django.zip file, but directly in the $APP_RELEASE directory,
+# rather than in $APP_FOLDER and creating a symlink in $APP_RELEASE.  This
+# keeps the presence of a django.zip file in the app/ folder from breaking
+# debugging into app/django.
+#
 # We prune:
 # - .svn subdirectories for obvious reasons.
 # - contrib/gis/ and related files because it's huge and unneeded.
 # - *.po and *.mo files because they are bulky and unneeded.
 # - *.pyc and *.pyo because they aren't used by App Engine anyway.
 
-zip -q django.zip `find django \
+zip -q "$APP_RELEASE/django.zip" `find django \
     -name .svn -prune -o \
     -name gis -prune -o \
     -name admin -prune -o \
@@ -46,6 +57,7 @@ zip -q django.zip `find django \
     -type f ! -name \*.py[co] ! -name *.[pm]o -print`
 
 # Create new tiny_mce.zip file.
+#
 # We prune:
 # - .svn subdirectories for obvious reasons.
 
@@ -55,12 +67,6 @@ zip -q ../tiny_mce.zip `find . \
     -name .svn -prune -o \
     -type f -print`
 popd > /dev/null
-
-# Remove old $APP_RELEASE directory.
-rm -rf $APP_RELEASE
-
-# Create new $APP_RELEASE directory.
-mkdir $APP_RELEASE
 
 # Create symbolic links.
 for x in $APP_FILES $APP_DIRS $ZIP_FILES

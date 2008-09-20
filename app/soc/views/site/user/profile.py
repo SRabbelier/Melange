@@ -212,6 +212,9 @@ class EditForm(forms_helpers.DbModelForm):
     
 
 DEF_SITE_USER_PROFILE_EDIT_TMPL = 'soc/site/user/profile/edit.html'
+DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
+                          ' <a href="/site/user/profile">Create ' \
+                          'a New User</a> page.'
 
 def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
@@ -241,6 +244,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
     user = id_user.getUserIfLinkName(linkname)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
+    error.message = error.message + DEF_CREATE_NEW_USER_MSG
     return simple.errorResponse(request, error, template, context)
 
   if request.method == 'POST':

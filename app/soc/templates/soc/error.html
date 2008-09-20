@@ -15,5 +15,5 @@ limitations under the License.
 {% block page_title %}Error{%if error_status %} {{ error_status }}{% endif %}{% endblock %}
 {% block header_title %}Error{%if error_status %} {{ error_status }}{% endif %}{% endblock %}
 {% block body %}
-<div class="error">{%if error_status %}Error {{ error_status }}: {% endif %}{{ error_message }}</div>
+<div class="error">{%if error_status %}Error {{ error_status }}: {% endif %}{{ error_message|safe }}</div>
 {% endblock %}

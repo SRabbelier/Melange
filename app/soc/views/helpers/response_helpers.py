@@ -125,7 +125,7 @@ def getUniversalContext(request, context=None):
   return context
 
 
-def replaceSuffix(path, old_suffix, new_suffix, params=None):
+def replaceSuffix(path, old_suffix, new_suffix=None, params=None):
   """Replace the last part of a URL path with something else.
 
   Also appends an optional list of query parameters.  Used for
@@ -166,7 +166,7 @@ def replaceSuffix(path, old_suffix, new_suffix, params=None):
 
 
 def redirectToChangedSuffix(
-    request, old_suffix, new_suffix, params=None):
+    request, old_suffix, new_suffix=None, params=None):
   """Changes suffix of URL path and returns an HTTP redirect response.
   
   Args:

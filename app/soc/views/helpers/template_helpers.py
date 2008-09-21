@@ -64,8 +64,8 @@ def unescape(html):
   if not isinstance(html, basestring): 
     html = str(html) 
   
-  html.replace('&amp;', '&').replace('&lt;', '<')
-  html.replace('&gt;', '>').replace('&quot;', '"').replace('&#39;',"'")
+  html.replace('&#39;',"'").replace('&lt;', '<')
+  html.replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&')
   return html
 
 

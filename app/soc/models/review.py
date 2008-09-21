@@ -69,7 +69,7 @@ class Review(db.Model):
   #: back-reference in the Survey model is a Query named 'reviews'
   #: which represents all of the Reviews that contains Answers to the
   #: Questions in that particular Survey.
-  survey = db.ReferenceProperty(reference_class=models.survey.Survey,
+  survey = db.ReferenceProperty(reference_class=soc.models.survey.Survey,
                                 required=True, collection_name="reviews")
 
   #: A required many:1 relationship with a Work, where the Review
@@ -79,7 +79,7 @@ class Review(db.Model):
   #: back-reference in the Work model is a Query named 'reviews'
   #: which represents all of the annotations attached to that
   #: particular work.
-  reviewed = db.ReferenceProperty(reference_class=models.work.Work, 
+  reviewed = db.ReferenceProperty(reference_class=soc.models.work.Work, 
                                   required=True, collection_name="reviews")
                                   
   #: A required many:1 relationship with a Reviewer entity indicating
@@ -87,6 +87,6 @@ class Review(db.Model):
   #: instance. The back-reference in the Reviewer model is a Query
   #: named 'reviews' which represents all of the Reviews by that
   #: particular Reviewer.
-  reviewer = db.ReferenceProperty(reference_class=models.reviewer.Reviewer,
+  reviewer = db.ReferenceProperty(reference_class=soc.models.reviewer.Reviewer,
                                   required=True, collection_name="reviews")
 

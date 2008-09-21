@@ -23,16 +23,24 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.models import base
 from soc import models
-import soc.models.administrator
+import soc.models.person
+import soc.models.sponsor
 
 
-class Host(db.Model):
+class Host(base.ModelWithFieldAttributes):
   """Host details for a specific Program."""
 
-  #: A 1:1 relationship associating a Host with more generic
-  #: Administrator details and capabilities.  The back-reference in
-  #: the Administrator model is a Query named 'host'.
-  admin = db.ReferenceProperty(reference_class=models.administrator.Administrator, 
+  #: A 1:1 relationship associating a Host with specific
+  #: Person details and capabilities.  The back-reference in
+  #: the Person model is a Query named 'host'.
+  person = db.ReferenceProperty(reference_class=models.person.Person, 
                                required=True, collection_name="host")
+
+  #: A 1:1 relationship associating a Host with specific
+  #: Sponsor details and capabilities. The back-reference in
+  #: the Sponsor model is a Query named 'host'.  
+  sponsor = db.ReferenceProperty(reference_class=models.sponsor.Sponsor,
+                                 required=True, collection_name="host")
 

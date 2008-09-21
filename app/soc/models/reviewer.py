@@ -38,9 +38,9 @@ class Reviewer(db.Model):
      back-reference Query of the Review model 'reviewer' reference.
   """
   
-  #: A 1:1 relationship associating a Contributor with generic Author
-  #: details and capabilities. The back-reference in the Author model
-  #: is a Query named 'contributor'.
-  author = db.ReferenceProperty(reference_class=models.author.Author,
+  #: A 1:1 relationship associating a Contributor with Person
+  #: details and capabilities. The back-reference in the Person model
+  #: is a Query named 'reviewer'.
+  person = db.ReferenceProperty(reference_class=models.person.Person,
                                 required=True, collection_name="reviewer")
 

@@ -23,15 +23,12 @@ __authors__ = [
 ]
 
 
-import logging
-
 from google.appengine.api import users
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 from soc.models import base
-from soc.views.helpers import forms_helpers
 
 
 class User(base.ModelWithFieldAttributes):
@@ -50,6 +47,10 @@ class User(base.ModelWithFieldAttributes):
    persons)  a 1:many relationship of Person entities identified by the
      User.  This relation is implemented as the 'persons' back-reference
      Query of the Person model 'user' reference.
+     
+   documents)  a 1:many relationship of Document entities identified by the
+     User.  This relation is implemented as the 'user' back-reference
+     Query of the Document model 'user' reference.
 
   """
 

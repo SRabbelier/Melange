@@ -25,12 +25,12 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext_lazy
 
 from soc import models
+from soc.models import base
+from soc.models import countries
 import soc.models.user
 
-from soc.models import countries
 
-
-class Person(db.Model):
+class Person(base.ModelWithFieldAttributes):
   """Common data fields for all Roles.
 
   A Person can only participate in a single Program.  To avoid duplication of
@@ -47,14 +47,31 @@ class Person(db.Model):
   A Person entity participates in the following relationships implemented
   as a db.ReferenceProperty elsewhere in another db.Model:
 
-   author)  a 1:1 relationship of Person details for a specific Author.
-     This relation is implemented as the 'author' back-reference Query of
-     the Author model 'person' reference.
-
-   docs)  a 1:many relationship of documents (Documentation) associated
+   docs) a 1:many relationship of documents (Documentation) associated
      with the Person by Administrators.  This relation is implemented as
      the 'docs' back-reference Query of the Documentation model 'person'
      reference.
+
+   works) a many:many relationship with Works, stored in a separate
+     WorksPersons model.  See the WorksPersons model class for details.
+
+   contributor) a 1:1 relationship associating a Contributor with generic
+     Person details and capabilities.  This relation is implemented as the
+     'contributor' back-reference Query of the Contributor model 'person'
+     reference.
+
+   reviewer) a 1:1 relationship associating a Reviewer with generic
+     Person details and capabilities.  This relation is implemented as the
+     'reviewer' back-reference Query of the Reviewer model 'person' reference.
+
+   admin) a 1:1 relationship associating an Administrator with specific
+     Person details and capabilities.  This relation is implemented as the
+     'admin' back-reference Query of the Administrator model 'person'
+     reference.
+
+   host) a 1:1 relationship accociating a Host with specific Person
+     Person details and capabilities. This relation is implemented as the
+     'host' back-reference Query of the Host model 'person' reference.
   """
 
   #: A required many:1 relationship that ties (possibly multiple

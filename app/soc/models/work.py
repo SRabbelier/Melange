@@ -22,12 +22,12 @@ __authors__ = [
 ]
 
 from google.appengine.ext import db
+from soc.models import base
 
-
-class Work(db.Model):
+class Work(base.ModelWithFieldAttributes):
   """Model of a Work created by one or more Authors.
 
-  Work is a "base entity" of other more specific "works" created by "authors".
+  Work is a "base entity" of other more specific "works" created by "persons".
 
   A Work entity participates in the following relationships implemented
   as a db.ReferenceProperty elsewhere in another db.Model:
@@ -43,8 +43,8 @@ class Work(db.Model):
      The relationships listed here are mutually exclusive.  For example,
      a Work cannot be both a Proposal and a Survey at the same time.
 
-   authors)  a many:many relationship with Authors, stored in a separate
-     WorksAuthors model.  See the WorksAuthors model class for details.
+   persons)  a many:many relationship with Persons, stored in a separate
+     WorksPersons model.  See the WorksPersons model class for details.
 
    reviews)  a 1:many relationship between a Work and the zero or more
      Reviews of that Work.  This relation is implemented as the 'reviews'

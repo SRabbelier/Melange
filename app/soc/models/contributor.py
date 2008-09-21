@@ -24,16 +24,17 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
-import soc.models.author
+from soc.models import base
+import soc.models.person
 
 
-class Contributor(db.Model):
+class Contributor(base.ModelWithFieldAttributes):
   """Contributor details for a specific Program.
 
-  Some Contributor workflows have the Contributor (acting as an Author)
+  Some Contributor workflows have the Contributor (acting as an author)
   creating Proposals and desiring for one (or more?) of them to be
   converted into Tasks by Reviewers and Hosts.  Other workflows have the
-  Reviewers (acting as an Author) proposing Proposals, that Contributors
+  Reviewers (acting as an author) proposing Proposals, that Contributors
   claim to convert them into Tasks.
 
   A Contributor entity participates in the following relationships implemented 
@@ -47,6 +48,6 @@ class Contributor(db.Model):
   #: a 1:1 relationship associating a Contributor with generic Author
   #: details and capabilities. The back-reference in the Author
   #: model is a Query named 'contributor'.
-  author = db.ReferenceProperty(reference_class=models.author.Author, 
+  person = db.ReferenceProperty(reference_class=models.person.Person, 
                                 required=True, 
                                 collection_name="contributor")

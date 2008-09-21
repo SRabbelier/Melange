@@ -24,10 +24,11 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
+from soc.models import base
 import soc.models.proposal
 
 
-class Task(db.Model):
+class Task(base.ModelWithFieldAttributes):
   """Model of a Task, which is a Proposal to be completed by Contributors.
 
   A Task brings along a Proposal that was used to initiate the Task.  A Task
@@ -48,5 +49,5 @@ class Task(db.Model):
   #: back-reference in the Proposal model is a Query named 'tasks'.  
   proposal = db.ReferenceProperty(reference_class=models.proposal.Proposal,
                                   required=True,
-				  collection_name="tasks")
+                                  collection_name="tasks")
 

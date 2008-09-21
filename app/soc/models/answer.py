@@ -24,11 +24,12 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
+from soc.models import base
 import soc.models.question
 import soc.models.review
 
 
-class Answer(db.Model):
+class Answer(base.ModelWithFieldAttributes):
   """Model of a specific Answer to a Question in a specific Review."""
 
   #: A required many:1 relationship, where each of many Answers is

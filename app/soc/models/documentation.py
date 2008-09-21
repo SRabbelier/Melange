@@ -25,7 +25,7 @@ from google.appengine.ext import db
 
 from soc import models
 import soc.models.person
-
+import soc.models.work
 
 class Documentation(db.Model):
   """Model of Documentation, which is a Work authored by Administrators."""
@@ -48,13 +48,13 @@ class Documentation(db.Model):
   #:
   #:   work.reviews: Annotations to the Documentation made by other
   #:     Administrators.
-  work = db.ReferenceProperty(reference_class=soc.models.work.Work, required=True,
+  work = db.ReferenceProperty(reference_class=models.work.Work, required=True,
                               collection_name="proposal")
 
   #: a many:1 relationship of Documentation entities that pertain
   #: to a single Person.  The back-reference in the Person model is a
   #: Query named 'docs'.
-  person = db.ReferenceProperty(reference_class=soc.models.person.Person,
+  person = db.ReferenceProperty(reference_class=models.person.Person,
                                 collection_name="docs")
 
   #: An optional db.BlobProperty containing the documentation

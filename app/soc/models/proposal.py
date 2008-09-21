@@ -24,9 +24,10 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
+from soc.models import base
 import soc.models.work
 
-class Proposal(db.Model):
+class Proposal(base.ModelWithFieldAttributes):
   """Model of a Proposal, which is a specific form of a Work.
 
   A Proposal entity participates in the following relationships implemented 
@@ -47,7 +48,7 @@ class Proposal(db.Model):
 	#: work.title:  the title of the Proposal.
 	#: work.abstract:  publicly displayed as a proposal abstract or summary.
 	#: work.reviews:  reviews of the Proposal by Reviewers.
-  work = db.ReferenceProperty(reference_class=soc.models.work.Work, required=True,
+  work = db.ReferenceProperty(reference_class=models.work.Work, required=True,
                               collection_name="proposal")
 
   #: Required db.TextProperty describing the proposal in detail.

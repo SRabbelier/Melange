@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the SiteSettings Model."""
+"""This module contains the Sponsor Model."""
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
@@ -22,19 +22,17 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
-
+from soc import models
 from soc.models import base
+import soc.models.group
 
-class SiteSettings(base.ModelWithFieldAttributes):
-  """Model of a SiteSettings, which stores per site configuration."""
-  
-  #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
-  #: on the site page using Google's JavaScript blog widget  
-  feed_url = db.LinkProperty(
-      verbose_name=ugettext_lazy('Feed URL'))
-  feed_url.help_text = ugettext_lazy(
-      'The URL should be a valid ATOM or RSS feed. '
-      'Feed entries are shown on the site page.')
-  
 
+class Sponsor(base.ModelWithFieldAttributes):
+  """Sponsor details."""
+
+  #: A 1:1 relationship associating a Sponsor with more generic
+  #: Group details and capabilities.  The back-reference in
+  #: the Group model is a Query named 'sponsor'.
+  group = db.ReferenceProperty(reference_class=models.group.Group, 
+                               required=True, collection_name="sponsor")
+                               

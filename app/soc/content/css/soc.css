@@ -344,3 +344,13 @@ th, td {
 .error {
   color: red;
 }
+
+.notice { 
+  background:#fad163; 
+  font-weight: bold;
+}
+
+.rounded_ul { background: url(/soc/content/images/ul.gif) no-repeat top left; }
+.rounded_ur { background: url(/soc/content/images/ur.gif) no-repeat top right; }
+.rounded_ll { background: url(/soc/content/images/ll.gif) no-repeat bottom left; }
+.rounded_lr { background: url(/soc/content/images/lr.gif) no-repeat bottom right; }

@@ -29,49 +29,53 @@ __authors__ = [
 
 
 import os
-import pysvn
+try:
+  import pysvn
+except:
+  pysvn = None
 import sys
 import unittest
 
-from ..scripts import svn_helper
+if pysvn is not None:
+  from ..scripts import svn_helper
 
 
-class SvnHelperTests(unittest.TestCase):
-  """pysvn wrapper tests for the svn_helper.py module.
-  """
-
-  def setUp(self):
-    self.client = pysvn.Client()
-
-  def testLsFiles(self):
-    """Test if lsFiles() contains only file entries, using the SoC SVN repo.
+  class SvnHelperTests(unittest.TestCase):
+    """pysvn wrapper tests for the svn_helper.py module.
     """
-    self.assert_(
-        'svn_helper_test.py' in svn_helper.lsFiles(
-            'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
 
-    self.assert_(
-        'tests/' not in svn_helper.lsFiles(
-            'http://soc.googlecode.com/svn/trunk', client=self.client))
+    def setUp(self):
+      self.client = pysvn.Client()
 
-  def testLsDirs(self):
-    """Test if lsDirs() contains only dir entries, using the SoC SVN repo.
-    """
-    self.assert_(
-        'tests/' in svn_helper.lsDirs(
-            'http://soc.googlecode.com/svn/trunk', client=self.client))
+    def testLsFiles(self):
+      """Test if lsFiles() contains only file entries, using the SoC SVN repo.
+      """
+      self.assert_(
+          'svn_helper_test.py' in svn_helper.lsFiles(
+              'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
 
-    self.assert_(
-        'svn_helper_test.py' not in svn_helper.lsDirs(
-            'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
+      self.assert_(
+          'tests/' not in svn_helper.lsFiles(
+              'http://soc.googlecode.com/svn/trunk', client=self.client))
 
-  def testExists(self):
-    """Test if exists() works on the the SoC SVN repo.
-    """
-    self.assertEqual(
-        True, svn_helper.exists(
-            'http://soc.googlecode.com/svn/trunk', client=self.client))
+    def testLsDirs(self):
+      """Test if lsDirs() contains only dir entries, using the SoC SVN repo.
+      """
+      self.assert_(
+          'tests/' in svn_helper.lsDirs(
+              'http://soc.googlecode.com/svn/trunk', client=self.client))
 
-    self.assertEqual(
-        False, svn_helper.exists(
-            'http://soc.googlecode.com/svn/does_not_exist', client=self.client))
+      self.assert_(
+          'svn_helper_test.py' not in svn_helper.lsDirs(
+              'http://soc.googlecode.com/svn/trunk/tests', client=self.client))
+
+    def testExists(self):
+      """Test if exists() works on the the SoC SVN repo.
+      """
+      self.assertEqual(
+          True, svn_helper.exists(
+              'http://soc.googlecode.com/svn/trunk', client=self.client))
+
+      self.assertEqual(
+          False, svn_helper.exists(
+              'http://soc.googlecode.com/svn/does_not_exist', client=self.client))

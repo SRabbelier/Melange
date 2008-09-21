@@ -36,7 +36,8 @@ __authors__ = [
 import os
 import pysvn
 
-from trunk.scripts import settings
+# top level script needs to use a relative import
+import settings
 
 
 #: all of the directory entry node_kinds supported py pysvn

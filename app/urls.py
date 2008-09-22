@@ -40,7 +40,12 @@ urlpatterns = patterns(
     (r'^site/user/profile$', 'soc.views.site.user.profile.edit'),
     (r'^site/user/profile/(?P<linkname>[_0-9a-z]+)$',
      'soc.views.site.user.profile.edit'),
-
+    (r'^site/user/list$', 'soc.views.site.user.list.all'),
+    
+    # TODO(pawel.solyga): uncomment when the view functions are committed
+    #(r'^site/sponsor/profile$', 'soc.views.site.sponsor.profile.edit'),
+    #(r'^site/sponsor/list$', 'soc.views.site.sponsor.list.all'),
+    
     (r'^user/profile$', 'soc.views.user.profile.edit'),
     (r'^user/profile/(?P<linkname>[_0-9a-z]+)$',
      'soc.views.user.profile.edit'),

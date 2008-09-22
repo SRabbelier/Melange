@@ -100,8 +100,21 @@ a.selected, .selected a, .selected {
   text-decoration: none;
 }
 
-a.selected:visited, .selected a:visited {
-  color: black;
+a.novisit {
+  color: #2a55a3;
+}
+
+a.noul, a.noulv {
+  color: #4182fa; /* #93b7fa; */
+  text-decoration: none;
+}
+
+a:hover.noul {
+  text-decoration: underline;
+}
+
+a:visited.noul {
+  color: #a32a91; /* #2a55a3; */
 }
 
 /* TABLES */
@@ -141,7 +154,21 @@ th, td {
     font-weight: bold;
     color: #FF0000;
   }
-  
+
+/* TABLE QUEUES (used with .list) */
+table#queues {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+  table#queues tr {
+    border-bottom: thin solid lightgray;
+  }
+
+  table#queues td {
+    padding: 2px;
+  }  
+
 /* 
  * PAGE ELEMENTS 
  */
@@ -284,10 +311,7 @@ th, td {
     width: 125px;
   }
 
-/* 
- * BLOG FEEDS
- */
-
+/* BLOG FEEDS */
 .blog {
   border: 10px solid #e5ecf9;
   border-top: 1px solid #3366cc;
@@ -326,6 +350,46 @@ th, td {
   background-color: white;
 }
 
+/* LIST */
+.list {
+  background-color: #E5ECF9;
+  border: 1px solid  #93b7fa;
+  border-bottom: 2px solid #93b7fa;
+  padding: 3px;
+  -moz-border-radius: 5px 5px 0px 0px;
+}
+
+  .list .pagination {
+    text-align: right;
+    padding: 3px;
+  }
+  
+  .list table{
+    background-color: white;
+  }
+  
+    .list table th {
+      background-color: #eeeeec;
+      border-right: 1px solid lightgray;
+      border-top: 1px solid lightgray;
+    }
+
+    .list table tr.on {
+      background-color: #ff9;
+    }
+
+    .list table tr.off {
+      background-color: #fff;
+    }
+
+    .list table td.last {
+      border-right: 1px solid lightgray;
+    }
+
+    .list table .first {
+      border-left: 1px solid lightgray;
+    }
+
 /* 
  * CUSTOM CLASSES 
  */
@@ -354,3 +418,9 @@ th, td {
 .rounded_ur { background: url(/soc/content/images/ur.gif) no-repeat top right; }
 .rounded_ll { background: url(/soc/content/images/ll.gif) no-repeat bottom left; }
 .rounded_lr { background: url(/soc/content/images/lr.gif) no-repeat bottom right; }
+
+/* Disabled text. */
+.disabled {
+  color: gray;
+}
+

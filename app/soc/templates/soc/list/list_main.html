@@ -1,0 +1,17 @@
+<div class="list">
+  {% include list_pagination %}
+
+  <table id="queues">
+    {% if not list_data %}
+      <tr><td colspan="9"><span class="disabled">(None)</span></td></tr>
+    {% else %}
+      {% include list_heading %}
+      {% for data_element in list_data %}
+        {% include list_row %}
+      {% endfor %}
+    {% endif %}
+  </table>
+
+  {% include list_pagination %}
+
+</div>

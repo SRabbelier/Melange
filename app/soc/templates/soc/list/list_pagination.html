@@ -1,0 +1,11 @@
+<div class="pagination">
+  {% if newest %}
+    <a class="novisit" href="{{newest}}">&laquo; First</a>
+  {% endif %}
+  {% if prev %}
+    <a class="novisit" href="{{prev}}">&lsaquo; Previous</a>
+  {% endif %}
+  <b>{{ first }}{% if last %} - {{ last }}{% endif %}</b>
+  {% if next %}<a class="novisit" href="{{next}}">Next &rsaquo;</a>
+  {% else %}<span style="color:gray">Next &rsaquo;</span>{% endif %}
+</div>

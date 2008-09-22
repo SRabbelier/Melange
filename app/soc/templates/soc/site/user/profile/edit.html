@@ -36,6 +36,7 @@ Please use this form to alter basic site-wide settings for a User in Google Open
 {% endblock %}
 </p>
 <form method="POST">
+  {{ form.key_name }}
  <table>
   {% field_as_table_row form.id %}
 {% if lookup_error %}
@@ -49,6 +50,18 @@ Please use this form to alter basic site-wide settings for a User in Google Open
   {% field_as_table_row form.link_name %}
   {% field_as_table_row form.nick_name %}
   {% field_as_table_row form.is_developer %}
+  {% if existing_user.former_ids %}
+  <tr>
+   <td class="formfieldlabel">Former ids</td>
+   <td>
+       {% for former_id in existing_user.former_ids %}
+       {{ former_id }}<br />
+       {% endfor %}
+   </td>
+   <td class="formfieldrequired">&nbsp;</td>
+   <td class="formfieldhelptext">&nbsp;</td>
+  </tr>
+  {% endif %}
   <tr>
    <td colspan="4">&nbsp;</td>
   </tr>

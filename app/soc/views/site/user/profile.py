@@ -191,6 +191,8 @@ class EditForm(forms_helpers.DbModelForm):
       label=soc.models.user.User.is_developer.verbose_name,
       help_text=soc.models.user.User.is_developer.help_text)
 
+  key_name = forms.CharField(widget=forms.HiddenInput)
+  
   class Meta:
     model = None
  
@@ -199,17 +201,22 @@ class EditForm(forms_helpers.DbModelForm):
     if not id_user.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
+      key_name = self.data.get('key_name')
       if not id_user.isLinkNameAvailableForId(
-          link_name, id=self.cleaned_data.get('id')):
+          link_name, id=id_user.getUserFromKeyName(key_name).id) :
         raise forms.ValidationError("This link name is already in use.")
     return link_name
 
   def clean_id(self):
-    try:
-      return users.User(email=self.cleaned_data.get('id'))
-    except users.UserNotFoundError:
-      raise forms.ValidationError('Account not found.')
-    
+    new_email = self.cleaned_data.get('id')
+    form_id = users.User(email=new_email)
+    key_name = self.data.get('key_name')
+    old_email = id_user.getUserFromKeyName(key_name).id.email()
+    if new_email != old_email:
+      if id_user.isIdUser(form_id):
+        raise forms.ValidationError("This account is already in use.")
+    return form_id
+
 
 DEF_SITE_USER_PROFILE_EDIT_TMPL = 'soc/site/user/profile/edit.html'
 DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
@@ -255,11 +262,15 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
       new_linkname = form.cleaned_data.get('link_name')
       nickname = form.cleaned_data.get('nick_name')
       is_developer = form.cleaned_data.get('is_developer')
+      key_name = form.cleaned_data.get('key_name')
       
-      user = id_user.updateOrCreateUserFromId(
-        form_id, link_name=new_linkname, nick_name=nickname,
-        is_developer=is_developer)
+      user = id_user.updateUserForKeyName(key_name=key_name, id=form_id, 
+          link_name=new_linkname, nick_name=nickname, 
+          is_developer=is_developer)
 
+      if not user:
+        return http.HttpResponseRedirect('/')
+        
       # redirect to new /site/user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
       return response_helpers.redirectToChangedSuffix(
@@ -285,7 +296,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
                 values=profile.SUBMIT_MESSAGES))
 
         # populate form with the existing User entity
-        form = EditForm(initial={
+        form = EditForm(initial={ 'key_name': user.key().name(),
             'id': user.id.email, 'link_name': user.link_name,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})       
       else:

@@ -44,7 +44,7 @@ def getUserKeyNameFromId(id):
   return 'User:%s' % id.email()
 
 
-def getIdIfMissing(id):
+def getIdIfMissing(id=None):
   """Gets Google Account of logged-in user (possibly None) if id is false.
   
   This is a convenience function that simplifies a lot of view code that
@@ -66,6 +66,17 @@ def getIdIfMissing(id):
 
   return id
 
+def getUsersForOffsetAndLimit(offset=0, limit=0):
+  """Returns Users entities for given offset and limit or None if not found.
+    
+  Args:
+    offset: offset in entities list which defines first entity to return
+    limit: max amount of entities to return
+  """
+  query = db.GqlQuery('SELECT * FROM User ORDER BY id')
+
+  # Fetch one more to see if there should be a 'next' link
+  return query.fetch(limit+1, offset)  
 
 def getUserFromId(id):
   """Returns User entity for a Google Account, or None if not found.  
@@ -73,29 +84,8 @@ def getUserFromId(id):
   Args:
     id: a Google Account (users.User) object
   """
-  # first, attempt a lookup by User:id key name
-  key_name = getUserKeyNameFromId(id)
-  
-  if key_name:
-    user = soc.models.user.User.get_by_key_name(key_name)
-  else:
-    user = None
-  
-  if user:
-    return user
+  return soc.models.user.User.gql('WHERE id = :1', id).get()
 
-  # email address may have changed, so query the id property
-  user = soc.models.user.User.gql('WHERE id = :1', id).get()
-
-  if user:
-    return user
-
-  # last chance: perhaps the User changed their email address at some point
-  user = soc.models.user.User.gql('WHERE former_ids = :1', id).get()
-
-  return user
-
-  
 def getUserIfMissing(user, id):
   """Conditionally returns User entity for a Google Account.
   
@@ -227,6 +217,13 @@ def getUserFromLinkName(link_name):
   """
   return soc.models.user.User.gql('WHERE link_name = :1', link_name).get()
 
+def getUserFromKeyName(key_name):
+  """Returns User entity for key_name or None if not found.
+    
+  Args:
+    key_name: key name of User entity
+  """
+  return soc.models.user.User.get_by_key_name(key_name)
 
 def getUserIfLinkName(link_name):
   """Returns User entity for supplied link_name if one exists.
@@ -349,6 +346,29 @@ def updateOrCreateUserFromId(id, **user_properties):
   # in a transaction
   return updateUserProperties(user, **user_properties)
 
+def updateUserForKeyName(key_name, **user_properties):
+  """Update existing User entity for keyname with supplied properties.
+
+  Args:
+    key_name: key name of User entity
+    **user_properties: keyword arguments that correspond to User entity
+      properties and their values
+
+  Returns:
+    the User entity corresponding to the Google Account, with any supplied
+    properties changed, or a new User entity now associated with the Google
+    Account and with the supplied properties
+  """
+  # attempt to retrieve the existing User
+  user = getUserFromKeyName(key_name)
+
+  if not user:
+    return None
+  
+  # there is no way to be sure if get_or_insert() returned a new User or
+  # got an existing one due to a race, so update with user_properties anyway,
+  # in a transaction
+  return updateUserProperties(user, **user_properties)
 
 def updateUserProperties(user, **user_properties):
   """Update existing User entity using supplied User properties.

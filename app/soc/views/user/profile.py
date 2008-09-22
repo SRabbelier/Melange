@@ -126,7 +126,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       user = id_user.updateOrCreateUserFromId(
           id, link_name=new_linkname, nick_name=nickname)
 
-      # redirect to new /user/profile/new_linkname&s=0
+      # redirect to new /user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
       return response_helpers.redirectToChangedSuffix(
           request, linkname, new_linkname, params=SUBMIT_PROFILE_SAVED_PARAMS)

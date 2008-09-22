@@ -59,6 +59,19 @@ Please use this form to look up an existing User in Google Open Source Programs.
   <td class="formfieldrequired">&nbsp;</td>
   <td class="formfieldhelptext">&nbsp;</td>
  </tr>
+ 
+ {% if found_user.former_ids %}
+ <tr>
+  <td class="formfieldlabel">Former ids</td>
+  <td>
+      {% for former_id in found_user.former_ids %}
+      {{ former_id }}<br />
+      {% endfor %}
+  </td>
+  <td class="formfieldrequired">&nbsp;</td>
+  <td class="formfieldhelptext">&nbsp;</td>
+ </tr>
+ {% endif %}
 {% endif %}
   <tr>
    <td colspan="4">&nbsp;</td>

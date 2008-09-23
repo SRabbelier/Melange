@@ -153,7 +153,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
     if request.path.endswith('lookup'):
       # convert /lookup path into /profile/link_name path
-      context['edit_link'] = response_helpers.replaceSuffix(
+      context['edit_link'] = request_helpers.replaceSuffix(
           request.path, 'lookup', 'profile/%s' % user.link_name)
     # else: URL is not one that was expected, so do not display edit link
   elif not form:
@@ -283,7 +283,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit) 
         if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
-            and (not response_helpers.isReferrerSelf(request,
+            and (not request_helpers.isReferrerSelf(request,
                                                     suffix=linkname))):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)

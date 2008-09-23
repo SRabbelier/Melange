@@ -32,8 +32,8 @@ from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views.helpers import forms_helpers
+from soc.views.helpers import request_helpers
 from soc.views.helpers import response_helpers
-from soc.views.helpers import template_helpers
 
 import soc.models.user
 
@@ -146,7 +146,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # referrer was us, so select which submit message to display
       # (may display no message if ?s=0 parameter is not present)
       context['submit_message'] = (
-          template_helpers.getSingleIndexedParamValue(
+          url_helpers.getSingleIndexedParamValue(
               request, SUBMIT_MSG_PARAM_NAME, values=SUBMIT_MESSAGES))
 
       # populate form with the existing User entity

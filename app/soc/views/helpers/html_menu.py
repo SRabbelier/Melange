@@ -25,14 +25,27 @@ __authors__ = [
 from soc.logic import menu
 
 
-class UlMenu(menu.Menu):
-  """Ordered collection of MenuItem objects as a <ul> list.
+class HtmlMenu:
+  """Ordered collection of MenuItem objects as <p>...</p> paragraphs.
   """
+  ITEM_PREFIX_FMT = '%(indent)s<p>'
+  ITEM_SUFFIX_FMT = '%(indent)s</p>'
 
-  def __init__(self, items=None):
-    """Passes the menu items to the base class __init__().
+  def __init__(self, menu, item_class=None):
+    """Wraps an soc.logic.menu.Menu in order to render it as HTML.
+    
+    Args:
+      menu: an soc.logic.menu.Menu object
+      item_class: style used to render the MenuItems contained in menu;
+        default is None, which causes AHrefMenuItem to be used  
     """
-    menu.Menu.__init__(self, items=items)
+    self._menu = menu
+
+    # workaround for circular dependency between AHrefMenuItem and this class
+    if not item_class:
+      item_class = AHrefMenuItem
+
+    self._item_class = item_class
 
   def getHtmlTags(self, indent):
     """Returns list of HTML tags for arbitrarily nested items in the menu.
@@ -47,13 +60,14 @@ class UlMenu(menu.Menu):
     """
     tags = []
 
-    if self.items:
-      tags.append('%s<ul>' % indent)
+    if self._menu.items:
+      tags.append(self.ITEM_PREFIX_FMT % {'indent': indent})
 
-      for item in self.items:
-        tags.extend(item.getHtmlTags(indent + ' '))
+      for item in self._menu.items:
+        tags.extend(self._item_class(
+            item, menu_class=self.__class__).getHtmlTags(indent + ' '))
     
-      tags.append('%s</ul>' % indent)
+      tags.append(self.ITEM_SUFFIX_FMT % {'indent': indent})
 
     return tags
 
@@ -61,25 +75,88 @@ class UlMenu(menu.Menu):
     return '\n'.join(self.getHtmlTags(''))
 
 
-class AHrefMenuItem(menu.MenuItem):
-  """Provides HTML menu item properties as attributes as an <a href> link. 
+class UlMenu(HtmlMenu):
+  """Ordered collection of MenuItem objects as a <ul> list.
   """
-  
-  def __init__(self, text, value=None, selected=False, annotation=None,
-               sub_menu=None):
-    """Initializes the menu item attributes from supplied arguments.
+  ITEM_PREFIX_FMT = '%(indent)s<ul>'
+  ITEM_SUFFIX_FMT = '%(indent)s</ul>'
+
+  def __init__(self, menu, item_class=None):
+    """Wraps an soc.logic.menu.Menu in order to render it as HTML.
     
     Args:
-      text: text displayed for the menu item link anchor
-      value: optional URL to be placed in the menu item link href;
-        default is None
-      selected: Boolean indicating if this menu item is selected;
-        default is False
-      annotation: optional help text associated with the menu item
-      sub_menu: see menu.MenuItem.__init__() 
+      menu: an soc.logic.menu.Menu object
+      item_class: style used to render the MenuItems contained in menu;
+        default is None, which causes LiMenuItem to be used  
     """
-    menu.MenuItem.__init__(self, text, value=value, selected=selected,
-                           annotation=annotation, sub_menu=sub_menu)
+    # workaround for circular dependency between LiMenuItem and this class
+    if not item_class:
+      item_class = LiMenuItem
+
+    HtmlMenu.__init__(self, menu, item_class=item_class)
+
+
+class HtmlMenuItem:
+  """Base class for specific MenuItem wrappers used by HtmlMenu sub-classes.
+  """
+  
+  def __init__(self, item, menu_class=HtmlMenu):
+    """Wraps an soc.logic.menu.MenuItem in order to render it as HTML.
+    
+    Args:
+      item: an soc.logic.menu.MenuItem object to wrap, in order to produce
+        a representation of it as HTML tags later
+      menu_class: a class derived from HtmlMenu, used to style any sub-menu
+        of the MenuItem; default is HtmlMenu
+    """
+    self._item = self.escapeItem(item)
+    self._menu_class = menu_class
+
+  def getItemHtmlTags(self, indent):
+    """Returns list of HTML tags for the menu item itself.
+    
+    This method is intended to be overridden by sub-classes.
+    
+    Args:
+      indent: string prepended to the beginning of each line of output
+        (usually consists entirely of spaces)
+        
+    Returns:
+      a list of strings that can be joined with '\n' into a single string
+      to produce:
+        <b>name</b> value <i>(annotation)</i>
+      with value and/or <i>(annotation)</i> omitted if either is missing
+    """
+    # TODO(tlarsen): implement "selected" style
+
+    tags = ['%s<b>%s</b>' % (indent, self._item.name)]
+    
+    if self._item.value:
+      tags.append('%s%s' % (indent, self._item.value))
+
+    if self._item.annotation:
+      tags.append('%s<i>(%s)</i>' % (indent, self._item.annotation))
+      
+    return tags
+
+  def getSubMenuHtmlTags(self, indent):
+    """Returns list of HTML tags for any sub-menu, if one exists.
+    
+    Args:
+      indent: string prepended to the beginning of each line of output
+        (usually consists entirely of spaces)
+        
+    Returns:
+      an empty list if there is no sub-menu
+        -OR-
+      the list of HTML tags that render the entire sub-menu (depends on the
+      menu_class that was provided to __init__()
+    """
+    if not self._item.sub_menu:
+      return []
+  
+    return self._menu_class(self._item.sub_menu,
+        item_class=self.__class__).getHtmlTags(indent)
 
   def getHtmlTags(self, indent):
     """Returns list of HTML tags for a menu item (and possibly its sub-menus).
@@ -90,48 +167,80 @@ class AHrefMenuItem(menu.MenuItem):
         
     Returns:
       a list of strings that can be joined with '\n' into a single string
-      to produce an <a href="...">...</a> link, or just the MenuItem.name
-      as plain text if there was no AHrefMenuItem.value URL; may also append
-      arbitrarily nested sub-menus
+      to produce an HTML representation of the wrapped MenuItem, with
+      arbitrarily nested sub-menus possibly appended
     """
-    tags = []
+    return self.getItemHtmlTags(indent) + self.getSubMenuHtmlTags(indent)
 
+  def escapeItem(self, item):
+    """HTML-escapes possibly user-supplied fields to prevent XSS.
+    
+    Args:
+      item: an soc.logic.menu.MenuItem that is altered in-place; the
+        fields that are potentially user-provided (name, value, annotation)
+        are escaped using self.escapeText()
+        
+    Returns:
+      the originally supplied item, for convenience, so that this method can
+      be combined with an assignment
+    """
+    item.name = self.escapeText(item.name)
+    item.value = self.escapeText(item.value)
+    item.annotation = self.escapeText(item.annotation)
+    return item
+
+  def escapeText(self, text):
+    """
+    """
     # TODO(tlarsen): user-supplied content *must* be escaped to prevent XSS
-
-    # TODO(tlarsen): implement "selected" style
-    if self.value:
-      # URL supplied, so make an <a href="self.value">self.name</a> link
-      tags.append('%s<a href=' % indent)
-      tags.append('"%s">%s</a>' % (self.value, self.name))
-    else:
-      # if no URL, then not a link, so just display self.name as text
-      tags.append(self.name)
-
-    # TODO(tlarsen): implement the mouse-over support for item.annotation
-
-    if self.sub_menu:
-      tags.extend(self.sub_menu.getHtmlTags(indent + ' '))
-          
-    return tags
+    return text
 
   def __str__(self):
     return '\n'.join(self.getHtmlTags(''))
 
 
+class AHrefMenuItem(HtmlMenuItem):
+  """Provides HTML menu item properties as attributes as an <a href> link. 
+  """
+  
+  def getItemHtmlTags(self, indent):
+    """Returns list of HTML tags for the menu item itself.
+    
+    Args:
+      indent: string prepended to the beginning of each line of output
+        (usually consists entirely of spaces)
+        
+    Returns:
+      a list of strings that can be joined with '\n' into a single string
+      to produce an <a href="...">...</a> link, or just the MenuItem.name
+      as plain text if there was no AHrefMenuItem.value URL
+    """
+    # TODO(tlarsen): implement "selected" style
+
+    if not self._item.value:
+      # if no URL, then not a link, so just display item.name as text
+      return [self._item.name]
+  
+    # URL supplied, so make an <a href="item.value">item.name</a> link
+    return ['%s<a href=' % indent,
+            '%s "%s"' % (indent, self._item.value),
+            '%s>%s</a>' % (indent, self._item.name)]
+
+
 class LiMenuItem(AHrefMenuItem):
   """Provides HTML menu item properties as attributes as an <li> list item.
   """
-  
-  def __init__(self, text, value=None, selected=False, annotation=None,
-               sub_menu=None):
-    """Initializes the menu item attributes from supplied arguments.
+
+  def __init__(self, item, menu_class=UlMenu):
+    """Wraps an soc.logic.menu.MenuItem in order to render it as HTML.
     
     Args:
-      text, value, selected, annotation, sub_menu:
-        see AHrefMenuItem.__init__() 
+      item: an soc.logic.menu.MenuItem object to wrap, in order to produce
+        a representation of it as HTML tags later
+      menu_class: a class derived from HtmlMenu, used to style any sub-menu
+        of the MenuItem; default is UlMenu
     """
-    AHrefMenuItem.__init__(self, text, value=value, selected=selected,
-                           annotation=annotation, sub_menu=sub_menu)
+    AHrefMenuItem.__init__(self, item, menu_class=menu_class)
 
   def getHtmlTags(self, indent):
     """Returns <a href> link wrapped as an <li> list item.

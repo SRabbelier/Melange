@@ -41,7 +41,9 @@ except ImportError:
 
 from soc.logic import system
 from soc.logic.site import id_user
+from soc.logic.site import sidebar
 
+from soc.views.helpers import html_menu
 from soc.views.helpers import request_helpers
 from soc.views.helpers import template_helpers
 
@@ -107,6 +109,7 @@ def getUniversalContext(request, context=None):
       'is_debug': True if system.isDebug() is True
       'sign_in': a Google Account login URL
       'sign_out': a Google Account logout URL
+      'sidebar_menu_html': an HTML string that renders the sidebar menu
     }
   """
   if context is None:
@@ -124,6 +127,12 @@ def getUniversalContext(request, context=None):
       'sign_in', users.create_login_url(request.path))
   context['sign_out'] = context.get(
       'sign_out', users.create_logout_url(request.path))
+
+  if not context.get('sidebar_menu_html'):
+    # pass the currently constructed context as keyword arguments to
+    # all of the sidebar builder functions
+    context['sidebar_menu_html'] = str(html_menu.UlMenu(
+      sidebar.buildSidebar(**context)))
 
   return context
 

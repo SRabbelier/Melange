@@ -70,65 +70,9 @@ limitations under the License.
     Google Open Source Programs
     {% endblock %}
     </a>
-      <ul>
-       <li>
-<a href="/user/profile">User (Sign In)</a>
-   <span title=" No Profile or Roles sidebar menu items until user signs in " class="popup">
-<small>*</small>
-   </span>
-
-       </li>
-      </ul>
-{% if is_admin %}
-	  <ul>
-	      <li>Developer
-                    <ul>
-                        <li>
-              <a href="/site/home/edit">Site Settings</a>
-                       </li>
-                       <li>
-            <a href="/site/user/lookup">Look Up User</a>
-                        </li>
-                       <li>
-            <a href="/site/user/profile">Create New User</a>
-                        </li>
-                       <li>
-            <a href="/site/user/list">Users List</a>
-                        </li>
-                    </ul>
-	      </li>
-	  </ul>
+{% if sidebar_menu_html %}
+{{ sidebar_menu_html|safe }}
 {% endif %}
-      <ul>
-       <li>
-<a href="/program/gsoc2009/home">Google Summer of Code</a>
-        <ul>
-         <li>
-<a href="/program/gsoc2009/community">Community</a>
-         </li>
-         <li>
-<a href="/program/gsoc2009/docs/faqs">Program FAQs</a>
-         </li>
-         <li>
-<a href="/program/gsoc2009/docs/tos">Terms of Service</a>
-         </li>
-        </ul>
-       </li>
-       <li>
-<a href="/program/ghop2008/home">Google Highly Open Participation</a>
-        <ul>
-         <li>
-<a href="/program/ghop2008/community">Community</a>
-         </li>
-         <li>
-<a href="/program/ghop2008/docs/faqs">Program FAQs</a>
-         </li>
-         <li>
-<a href="/program/ghop2008/docs/rules">Contest Rules</a>
-         </li>
-        </ul>
-       </li>
-      </ul>
      </li>
     </ul>
 {% endblock %}

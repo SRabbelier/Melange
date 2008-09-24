@@ -92,13 +92,13 @@ def buildSiteSidebar(is_admin=None, **ignored):
       value='/site/home/edit',
       sub_menu=menu.Menu(items=[
         menu.MenuItem(
-          'Search for a User',
+          'Search Site for a User',
           value='/site/user/lookup'),
         menu.MenuItem(
-          'List Users',
+          'List Users of Site',
           value='/site/user/list'),
         menu.MenuItem(
-          'Create a new User',
+          'Create a new Site User',
           value='/site/user/profile'),
         ]
       )

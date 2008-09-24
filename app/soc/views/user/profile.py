@@ -138,15 +138,15 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # is 'Profile saved' parameter present, but referrer was not ourself?
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(SUBMIT_MSG_PARAM_NAME)
-          and (not response_helpers.isReferrerSelf(request,
-                                                   suffix=linkname))):
+          and (not request_helpers.isReferrerSelf(request,
+                                                  suffix=linkname))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
     
       # referrer was us, so select which submit message to display
       # (may display no message if ?s=0 parameter is not present)
       context['submit_message'] = (
-          url_helpers.getSingleIndexedParamValue(
+          request_helpers.getSingleIndexedParamValue(
               request, SUBMIT_MSG_PARAM_NAME, values=SUBMIT_MESSAGES))
 
       # populate form with the existing User entity

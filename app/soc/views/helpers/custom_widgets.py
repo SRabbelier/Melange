@@ -44,31 +44,33 @@ class TinyMCE(forms.widgets.Textarea):
     	  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
       {% endblock %}
     """ 
-    MCE_DEF_SETTINGS = { 'mode': "exact",
+    DEF_MCE_SETTINGS = { 'mode': "exact",
                          'theme': "simple",
                          'theme_advanced_toolbar_location': "top",
                          'theme_advanced_toolbar_align': "center"}
 
-    mce_settings = MCE_DEF_SETTINGS
+    mce_settings = DEF_MCE_SETTINGS
 
-    TINY_MCE_HTML_FMT = u'''<textarea %(attrs)s>%(value)s</textarea>
-                <script type="text/javascript">
-                tinyMCE.init(%(settings_json)s)</script>'''
+    TINY_MCE_HTML_FMT = u'''\
+<textarea %(attrs)s>%(value)s</textarea>
+<script type="text/javascript">
+ tinyMCE.init(%(settings_json)s)
+</script>'''
     
     def render(self, name, value, attrs=None):
-        """Render TinyMCE widget as HTML.
-        """
-        if value is None:
-          value = ''
-        value = smart_unicode(value)
-        final_attrs = self.build_attrs(attrs, name=name)
+      """Render TinyMCE widget as HTML.
+      """
+      if value is None:
+        value = ''
+      value = smart_unicode(value)
+      final_attrs = self.build_attrs(attrs, name=name)
 
-        self.mce_settings['elements'] = "id_%s" % name
+      self.mce_settings['elements'] = "id_%s" % name
         
-        # convert mce_settings from dict to JSON
-        mce_json = simplejson.JSONEncoder().encode(self.mce_settings)
+      # convert mce_settings from dict to JSON
+      mce_json = simplejson.JSONEncoder().encode(self.mce_settings)
 
-        return mark_safe( self.TINY_MCE_HTML_FMT % 
-            { 'attrs': flatatt(final_attrs),
-              'value': escape(value), 
-              'settings_json':  mce_json})
+      return mark_safe(self.TINY_MCE_HTML_FMT % 
+          {'attrs': flatatt(final_attrs),
+           'value': escape(value), 
+           'settings_json':  mce_json})

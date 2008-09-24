@@ -65,22 +65,21 @@ class AHrefMenuItem(menu.MenuItem):
   """Provides HTML menu item properties as attributes as an <a href> link. 
   """
   
-  def __init__(self, text, url=None, selected=False, help_text=None,
+  def __init__(self, text, value=None, selected=False, annotation=None,
                sub_menu=None):
     """Initializes the menu item attributes from supplied arguments.
     
     Args:
       text: text displayed for the menu item link anchor
-      url: optional URL to be placed in the menu item link href;
+      value: optional URL to be placed in the menu item link href;
         default is None
       selected: Boolean indicating if this menu item is selected;
         default is False
-      help_text: optional help text associated with the menu item
+      annotation: optional help text associated with the menu item
       sub_menu: see menu.MenuItem.__init__() 
     """
-    menu.MenuItem.__init__(self, text, selected=selected, sub_menu=sub_menu)
-    self.url = url
-    self.help_text = help_text
+    menu.MenuItem.__init__(self, text, value=value, selected=selected,
+                           annotation=annotation, sub_menu=sub_menu)
 
   def getHtmlTags(self, indent):
     """Returns list of HTML tags for a menu item (and possibly its sub-menus).
@@ -92,7 +91,7 @@ class AHrefMenuItem(menu.MenuItem):
     Returns:
       a list of strings that can be joined with '\n' into a single string
       to produce an <a href="...">...</a> link, or just the MenuItem.name
-      as plain text if there was no AHrefMenuItem.url; may also append
+      as plain text if there was no AHrefMenuItem.value URL; may also append
       arbitrarily nested sub-menus
     """
     tags = []
@@ -100,14 +99,15 @@ class AHrefMenuItem(menu.MenuItem):
     # TODO(tlarsen): user-supplied content *must* be escaped to prevent XSS
 
     # TODO(tlarsen): implement "selected" style
-    if self.url:
+    if self.value:
+      # URL supplied, so make an <a href="self.value">self.name</a> link
       tags.append('%s<a href=' % indent)
-      tags.append('"%s">%s</a>' % (self.url, self.name))
+      tags.append('"%s">%s</a>' % (self.value, self.name))
     else:
-      # if no URL, then not a link, so just display text
-      tags.append(item.name)
+      # if no URL, then not a link, so just display self.name as text
+      tags.append(self.name)
 
-    # TODO(tlarsen): implement the mouse-over support for item.help_text
+    # TODO(tlarsen): implement the mouse-over support for item.annotation
 
     if self.sub_menu:
       tags.extend(self.sub_menu.getHtmlTags(indent + ' '))
@@ -122,16 +122,16 @@ class LiMenuItem(AHrefMenuItem):
   """Provides HTML menu item properties as attributes as an <li> list item.
   """
   
-  def __init__(self, text, url=None, selected=False, help_text=None,
+  def __init__(self, text, value=None, selected=False, annotation=None,
                sub_menu=None):
     """Initializes the menu item attributes from supplied arguments.
     
     Args:
-      text, url, selected, help_text, sub_menu:
+      text, value, selected, annotation, sub_menu:
         see AHrefMenuItem.__init__() 
     """
-    AHrefMenuItem.__init__(self, text, url=url, selected=selected,
-                           help_text=help_text, sub_menu=sub_menu)
+    AHrefMenuItem.__init__(self, text, value=value, selected=selected,
+                           annotation=annotation, sub_menu=sub_menu)
 
   def getHtmlTags(self, indent):
     """Returns <a href> link wrapped as an <li> list item.

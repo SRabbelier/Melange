@@ -70,16 +70,23 @@ class MenuItem:
   """Provides menu item properties as easily-accessible attributes.
   """
   
-  def __init__(self, name, selected=False, sub_menu=None):
+  def __init__(self, name, value=None, selected=False, annotation=None,
+                sub_menu=None):
     """Initializes the menu item attributes from supplied arguments.
     
     Args:
       name: name of the menu item
+      value: optional value associated with the menu item;
+        default is None
       selected: Boolean indicating if this menu item is selected;
         default is False
+      annotation: optional annotation associated with the menu item;
+        default is None
       sub_menu: a Menu of sub-items to display below this menu item;
         default is None, indicating no sub-menu
     """
     self.name = name
+    self.value = value
     self.selected = selected
+    self.annotation = annotation
     self.sub_menu = sub_menu

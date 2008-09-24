@@ -21,6 +21,8 @@ __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   ]
 
+import urlparse
+
 
 def getSingleIndexedParamValue(request, param_name, values=()):
   """Returns a value indexed by a query parameter in the HTTP request.

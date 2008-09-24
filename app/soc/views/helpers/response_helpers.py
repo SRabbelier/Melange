@@ -24,7 +24,6 @@ __authors__ = [
 
 
 import logging
-import urlparse
 
 from google.appengine.api import users
 
@@ -45,7 +44,6 @@ from soc.logic.site import sidebar
 
 from soc.views.helpers import html_menu
 from soc.views.helpers import request_helpers
-from soc.views.helpers import template_helpers
 
 
 def respond(request, template, context=None, response_args=None):

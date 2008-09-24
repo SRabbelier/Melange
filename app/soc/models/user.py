@@ -52,6 +52,9 @@ class User(base.ModelWithFieldAttributes):
      User.  This relation is implemented as the 'user' back-reference
      Query of the Document model 'user' reference.
 
+   groups)  a 1:many relationship of Group entities "founded" by the User.
+     This relation is implemented as the 'groups' back-reference Query of
+     the Group model 'founder' reference.
   """
 
   #: A Google Account, which also provides a "private" email address.

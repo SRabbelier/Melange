@@ -27,6 +27,7 @@ import re
 from google.appengine.api import users
 from google.appengine.ext import db
 
+from soc.logic import key_name
 from soc.logic import out_of_band
 
 import soc.models.user
@@ -41,7 +42,7 @@ def getUserKeyNameFromId(id):
   if not id:
     return None
 
-  return 'User:%s' % id.email()
+  return key_name.nameUser(id.email())
 
 
 def getIdIfMissing(id=None):

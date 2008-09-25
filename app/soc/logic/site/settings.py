@@ -23,8 +23,11 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.logic import key_name
+
 import soc.models.site_settings
 import soc.logic.model
+
 
 def getSiteSettingsFromPath(path):
   """Returns SiteSettings entity for a given path, or None if not found.  
@@ -42,6 +45,7 @@ def getSiteSettingsFromPath(path):
   
   return site_settings
 
+
 def getSiteSettingsKeyNameForPath(path):
   """Return a Datastore key_name for a SiteSettings from the path.
   
@@ -51,7 +55,7 @@ def getSiteSettingsKeyNameForPath(path):
   if not path:
     return None
 
-  return 'Settings:%s' % path
+  return key_name.nameSiteSettings(path)
 
 
 def updateOrCreateSiteSettingsFromPath(path, **site_settings_properties):

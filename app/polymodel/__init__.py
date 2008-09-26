@@ -12,11 +12,15 @@ from google.appengine.ext import db
 
 import sys
 
+# Add ModelWithFieldAttributes *before* PolyModel, so that everything does
+# not become a "ModelWithFieldAttributes" in the Datastore.
+from soc.models import base
+
 class Error(Exception):
     """Base of all exceptions in the blixt.data module."""
     pass
 
-class PolyModel(db.Model):
+class PolyModel(base.ModelWithFieldAttributes):
     """An extension to Google App Engine models that improves the support for
     inheritance.
 

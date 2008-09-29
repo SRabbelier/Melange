@@ -20,21 +20,17 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-from soc.models import base
+import soc.models.home_settings
 
-class SiteSettings(base.ModelWithFieldAttributes):
+
+class SiteSettings(soc.models.home_settings.HomeSettings):
   """Model of a SiteSettings, which stores per site configuration."""
-  
-  #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
-  #: on the site page using Google's JavaScript blog widget  
-  feed_url = db.LinkProperty(
-      verbose_name=ugettext_lazy('Feed URL'))
-  feed_url.help_text = ugettext_lazy(
-      'The URL should be a valid ATOM or RSS feed. '
-      'Feed entries are shown on the site page.')
-  
+  # there is currently no site-specific configuration that is different from
+  # other /home page configuration (but this will change...)
+  pass 
 

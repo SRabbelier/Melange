@@ -59,7 +59,8 @@ class DocumentForm(forms_helpers.DbModelForm):
     model = soc.models.document.Document
     
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['user','modified','created','link_name']
+    exclude = ['user','modified','created','link_name', 'inheritance_line']
+
 
 class SiteSettingsForm(forms_helpers.DbModelForm):
   """Django form displayed when creating or editing Site Settings.
@@ -69,6 +70,9 @@ class SiteSettingsForm(forms_helpers.DbModelForm):
     """
     #: db.Model subclass for which the form will gather information
     model = soc.models.site_settings.SiteSettings
+
+    #: list of model fields which will *not* be gathered by the form
+    exclude = ['inheritance_line', 'home']
 
   def clean_feed_url(self):
     feed_url = self.cleaned_data.get('feed_url')
@@ -82,7 +86,10 @@ class SiteSettingsForm(forms_helpers.DbModelForm):
 
     return feed_url
 
-DEF_SITE_HOME_PATH = 'site/home'
+
+DEF_SITE_SETTINGS_PATH = 'site'
+DEF_SITE_HOME_DOC_LINK_NAME = 'home'
+
 DEF_SITE_HOME_PUBLIC_TMPL = 'soc/site/home/public.html'
 
 def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
@@ -98,16 +105,16 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   # create default template context for use with any templates
   context = response_helpers.getUniversalContext(request)
   
-  document = soc.logic.document.getDocumentFromPath(DEF_SITE_HOME_PATH)
-  site_settings = soc.logic.site.settings.getSiteSettingsFromPath(DEF_SITE_HOME_PATH)
-  
-  if document:
-    document.content = template_helpers.unescape(document.content)
-    context.update({'site_document': document})
-  
+  site_settings = soc.logic.site.settings.getSiteSettings(DEF_SITE_SETTINGS_PATH)
+
   if site_settings:
     context.update({'site_settings': site_settings})
-    
+    site_doc = site_settings.home
+  
+    if site_doc:
+      site_doc.content = template_helpers.unescape(site_doc.content)
+      context.update({'site_document': site_doc})
+
   return response_helpers.respond(request, template, context)
 
 
@@ -129,13 +136,13 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
   logged_in_id = users.get_current_user()
   
   alt_response = simple.getAltResponseIfNotDeveloper(request, context, 
-                                                        id = logged_in_id)
+                                                     id=logged_in_id)
   if alt_response:
     # not a developer
     return alt_response
   
   alt_response = simple.getAltResponseIfNotLoggedIn(request, context, 
-                                                        id = logged_in_id)
+                                                    id=logged_in_id)
   if alt_response:
     # not logged in
     return alt_response
@@ -156,47 +163,43 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
 
     if document_form.is_valid() and settings_form.is_valid():
       title = document_form.cleaned_data.get('title')
-      link_name = DEF_SITE_HOME_PATH
+      link_name = DEF_SITE_HOME_DOC_LINK_NAME
       short_name = document_form.cleaned_data.get('short_name')
+      abstract = document_form.cleaned_data.get('abstract')
       content = document_form.cleaned_data.get('content')
       
-      feed_url = settings_form.cleaned_data.get('feed_url')
+      site_doc = soc.logic.document.updateOrCreateDocument(
+          DEF_SITE_SETTINGS_PATH, link_name=link_name, title=title,
+          short_name=short_name, abstract=abstract, content=content,
+          user=id_user.getUserFromId(logged_in_id))
       
-      document = soc.logic.document.updateOrCreateDocumentFromPath(
-                                  DEF_SITE_HOME_PATH,
-                                  link_name = link_name,
-                                  title = title,
-                                  short_name = short_name,
-                                  content = content,
-                                  user = id_user.getUserFromId(logged_in_id))
+      feed_url = settings_form.cleaned_data.get('feed_url')
 
-      site_settings = soc.logic.site.settings.updateOrCreateSiteSettingsFromPath(
-                                  DEF_SITE_HOME_PATH,
-                                  feed_url = feed_url)
+      site_settings = soc.logic.site.settings.updateOrCreateSiteSettings(
+          DEF_SITE_SETTINGS_PATH, home=site_doc, feed_url=feed_url)
       
       context.update({'submit_message': 'Site Settings saved.'})
   else: # request.method == 'GET'
-    # try to fetch Document entity by unique key_name   
-    document = soc.logic.document.getDocumentFromPath(DEF_SITE_HOME_PATH)
-
-    if document:
-      # populate form with the existing Document entity
-      document_form = DocumentForm(instance=document)
-    else:
-      # no Document entity exists for this key_name, so show a blank form
-      document_form = DocumentForm()
-      
-    # try to fetch SiteSettings entity by unique key_name   
-    site_settings = soc.logic.site.settings.getSiteSettingsFromPath(
-                                                        DEF_SITE_HOME_PATH)
+    # try to fetch SiteSettings entity by unique key_name
+    site_settings = soc.logic.site.settings.getSiteSettings(
+        DEF_SITE_SETTINGS_PATH)
 
     if site_settings:
       # populate form with the existing SiteSettings entity
       settings_form = SiteSettingsForm(instance=site_settings)
+      site_doc = site_settings.home
     else:
       # no SiteSettings entity exists for this key_name, so show a blank form
       settings_form = SiteSettingsForm()
-    
+      site_doc = None
+
+    if site_doc:
+      # populate form with the existing Document entity
+      document_form = DocumentForm(instance=site_doc)
+    else:
+      # no Document entity exists for this key_name, so show a blank form
+      document_form = DocumentForm()
+      
   context.update({'document_form': document_form,
                   'settings_form': settings_form })
   

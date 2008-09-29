@@ -22,29 +22,21 @@ __authors__ = [
 ]
 
 from google.appengine.ext import db
-from soc.models import base
 
-class Work(base.ModelWithFieldAttributes):
-  """Model of a Work created by one or more Authors.
+from django.utils.translation import ugettext_lazy
 
-  Work is a "base entity" of other more specific "works" created by "persons".
+import polymodel
 
-  A Work entity participates in the following relationships implemented
-  as a db.ReferenceProperty elsewhere in another db.Model:
 
-   proposal), survey), documentation)
-     a 1:1 relationship with each entity containing a more specific type of
-     "work".  These relationships are represented explicitly in the other
-     "work" models by a db.ReferenceProperty named 'work'.  The
-     collection_name argument to db.ReferenceProperty should be set to the
-     singular of the entity model name of the other "work" class.  The above
-     relationship names correspond, respectively to these Models:
-       Proposal, Survey, Documentation
-     The relationships listed here are mutually exclusive.  For example,
-     a Work cannot be both a Proposal and a Survey at the same time.
+class Work(polymodel.PolyModel):
+  """Model of a Work created by one or more Persons in Roles.
 
-   persons)  a many:many relationship with Persons, stored in a separate
-     WorksPersons model.  See the WorksPersons model class for details.
+  Work is a "base entity" of other more specific "works" created by Persons
+  serving in "roles".
+
+   authors)  a many:many relationship with Roles, stored in a separate
+     WorksAuthors model, used to represent authorship of the Work.  See
+     the WorksAuthors model class for details.
 
    reviews)  a 1:many relationship between a Work and the zero or more
      Reviews of that Work.  This relation is implemented as the 'reviews'
@@ -54,8 +46,34 @@ class Work(base.ModelWithFieldAttributes):
   #: Required field indicating the "title" of the work, which may have
   #: different uses depending on the specific type of the work. Works
   #: can be indexed, filtered, and sorted by 'title'.
-  title = db.StringProperty(required=True)
+  title = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Title'))
+  title.help_text = ugettext_lazy(
+      'title of the document; often used in the window title')
 
-  #: large, non-indexed text field used for different purposes, depending
-  #: on the specific type of the work.
-  abstract = db.TextProperty()
+  #: optional, indexed plain text field used for different purposes,
+  #: depending on the specific type of the work
+  abstract = db.StringProperty(multiline=True)
+  abstract.help_text = ugettext_lazy(
+      'short abstract, summary, or snippet;'
+      ' 500 characters or less, plain text displayed publicly')
+
+  #: Required link name, appended to a "path" to form the document URL.
+  #: The combined "path" and link name must be globally unique on the
+  #: site (but, unlike some link names, a Work link name can be reused,
+  #: as long as the combination with the preceding path is unique).
+  link_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Link name'))
+  link_name.help_text = ugettext_lazy('link name used in URLs')
+
+  #: short name used in places such as the sidebar menu and breadcrumb trail
+  #: (optional: title will be used if short_name is not present)
+  short_name = db.StringProperty(verbose_name=ugettext_lazy('Short name'))
+  short_name.help_text = ugettext_lazy(
+      'short name used, for example, in the sidebar menu')
+  
+  #: date when the work was created
+  created = db.DateTimeProperty(auto_now_add=True)
+  
+  #: date when the work was last modified
+  modified = db.DateTimeProperty(auto_now=True)

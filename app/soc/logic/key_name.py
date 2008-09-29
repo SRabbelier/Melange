@@ -22,15 +22,32 @@ __authors__ = [
   ]
 
 
+import soc.models.document
 import soc.models.site_settings
 import soc.models.user
 
 
 def nameSiteSettings(path):
   """Returns a SiteSettings key name constructed from a supplied path."""
-  return '%s:%s' % (soc.models.site_settings.SiteSettings.__name__, path)
+  return '%(type)s:%(path)s' % {
+      'type': soc.models.site_settings.SiteSettings.__name__,
+      'path': path,
+      }
+
+
+def nameDocument(path, link_name):
+  """Returns a Document key name constructed from a path and link name."""
+  return '%(type)s:%(path)s/%(link_name)s' % {
+      'type': soc.models.document.Document.__name__,
+      'path': path,
+      'link_name': link_name,
+      }
 
 
 def nameUser(email):
   """Returns a User key name constructed from a supplied email address."""
-  return '%s:%s' % (soc.models.user.User.__name__, email)
+  return '%(type)s:%(email)s' % {
+      'type': soc.models.user.User.__name__,
+      'email': email,
+      }
+

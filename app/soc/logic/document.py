@@ -21,40 +21,33 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+
 from google.appengine.ext import db
+
+from soc.logic import key_name
 
 import soc.models.document
 import soc.logic.model
 
-def getDocumentFromPath(path):
+
+def getDocument(path, link_name):
   """Returns Document entity for a given path, or None if not found.  
     
   Args:
     path: a request path of the Document that uniquely identifies it
   """
   # lookup by Doc:path key name
-  key_name = getDocumentKeyNameForPath(path)
+  name = key_name.nameDocument(path, link_name)
   
-  if key_name:
-    document = soc.models.document.Document.get_by_key_name(key_name)
+  if name:
+    document = soc.models.document.Document.get_by_key_name(name)
   else:
     document = None
   
   return document
 
-def getDocumentKeyNameForPath(path):
-  """Return a Datastore key_name for a Document from the path.
-  
-  Args:
-    path: a request path of the Document that uniquely identifies it
-  """
-  if not path:
-    return None
 
-  return 'Doc:%s' % path
-
-
-def updateOrCreateDocumentFromPath(path, **document_properties):
+def updateOrCreateDocument(path, **document_properties):
   """Update existing Document entity, or create new one with supplied properties.
 
   Args:
@@ -68,13 +61,13 @@ def updateOrCreateDocumentFromPath(path, **document_properties):
     supplied path and properties.
   """
   # attempt to retrieve the existing Document
-  document = getDocumentFromPath(path)
+  document = getDocument(path, document_properties['link_name'])
 
   if not document:
     # document did not exist, so create one in a transaction
-    key_name = getDocumentKeyNameForPath(path)
+    name = key_name.nameDocument(path, document_properties['link_name'])
     document = soc.models.document.Document.get_or_insert(
-      key_name, **document_properties)
+        name, **document_properties)
 
   # there is no way to be sure if get_or_insert() returned a new Document or
   # got an existing one due to a race, so update with document_properties anyway,

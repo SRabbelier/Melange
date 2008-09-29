@@ -20,50 +20,44 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
+
+import polymodel
 
 from django.utils.translation import ugettext_lazy
 
-from soc.models import base
 import soc.models.user
+import soc.models.work
 
 
-class Document(base.ModelWithFieldAttributes):
+class Document(soc.models.work.Work):
   """Model of a Document.
   
-  Document is used for things like FAQs, front page text etc.
+  Document is used for things like FAQs, front page text, etc.
+
+  The specific way that the properties and relations inherited from Work
+  are used with a Document are described below.
+
+    work.title:  the title of the Document
+
+    work.abstract:  document summary displayed as a snippet in Document
+      list views
+
+    work.authors:  the Authors of the Work referred to by this relation
+      are the authors of the Document
+
+    work.reviews:  reviews of the Document by Reviewers
   """
 
-  #: Document title displayed on the top of the page
-  title = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Title'))
-  title.help_text = ugettext_lazy(
-      'Document title displayed on the top of the page')
-
-  #: Document link name used in URLs
-  link_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link name'))
-  link_name.help_text = ugettext_lazy('Document link name used in URLs')
-
-  #: Document short name used for sidebar menu
-  short_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Short name'))
-  short_name.help_text = ugettext_lazy(
-      'Document short name used for sidebar menu')
-  
-  #: Content of the document
-  content = db.TextProperty(
-      verbose_name=ugettext_lazy('Content'))
-  
-  #: Date when the document was created.
-  created = db.DateTimeProperty(auto_now_add=True)
-  
-  #: Date when the document was modified.
-  modified = db.DateTimeProperty(auto_now=True)
+  #: Required db.TextProperty containing the Document contents.
+  #: Unlike the work.abstract, which is considered "public" information,
+  #: the content is only to be displayed to Persons in Roles eligible to
+  #: view them (which may be anyone, for example, with the site front page).
+  content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
   
   #: User who created this document.
+  #: TODO(pawel.solyga): replace this with WorkAuthors relation
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name='documents')
-
-
 

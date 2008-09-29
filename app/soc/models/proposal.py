@@ -21,14 +21,26 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
 
-from soc import models
-from soc.models import base
 import soc.models.work
 
-class Proposal(base.ModelWithFieldAttributes):
+
+class Proposal(soc.models.work.Work):
   """Model of a Proposal, which is a specific form of a Work.
+
+  The specific way that the properties and relations inherited from Work
+  are used with a Proposal are described below.
+
+  work.title:  the title of the Proposal
+
+  work.abstract:  publicly displayed as a proposal abstract or summary
+
+  work.authors:  the Authors of the Work referred to by this relation
+    are the authors of the Proposal
+
+  work.reviews:  reviews of the Proposal by Reviewers
 
   A Proposal entity participates in the following relationships implemented 
   as a db.ReferenceProperty elsewhere in another db.Model:
@@ -36,23 +48,11 @@ class Proposal(base.ModelWithFieldAttributes):
   tasks)  an optional 1:many relationship of Task entities using the
     Proposal as their foundation.  This relation is implemented as the
     'tasks' back-reference Query of the Task model 'proposal' reference.
-
   """
-
-	#: Required 1:1 relationship with a Work entity that contains the
-	#: general "work" properties of the Proposal.  The back-reference in the Work
-	#: model is a Query named 'proposal'.
-	#: 
-	#: work.authors:  the Authors of the Work referred to by this relation
-	#: are the authors of the Proposal.
-	#: work.title:  the title of the Proposal.
-	#: work.abstract:  publicly displayed as a proposal abstract or summary.
-	#: work.reviews:  reviews of the Proposal by Reviewers.
-  work = db.ReferenceProperty(reference_class=models.work.Work, required=True,
-                              collection_name="proposal")
 
   #: Required db.TextProperty describing the proposal in detail.
   #: Unlike the work.abstract, which is considered "public" information,
-	#: the contents of 'details' is only to be displayed to Persons in roles
+  #: the contents of 'details' is only to be displayed to Persons in Roles
   #: that have a "need to know" the details.
   details = db.TextProperty(required=True)
+

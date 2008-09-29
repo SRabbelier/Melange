@@ -21,41 +21,43 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
 from google.appengine.ext import db
 
-from soc import models
-import soc.models.person
+import soc.models.role
 import soc.models.work
 
-class Documentation(db.Model):
-  """Model of Documentation, which is a Work authored by Administrators."""
-    
-  #: A required 1:1 relationship with a Work entity that contains the
-  #: general "work" properties of the Documentation. The 
-  #: back-reference in the Work model is a Query named 
-  #: 'documentation'.
-  #:
-  #:   work.authors: The Authors of the Work referred to by this 
-  #:     relation are the Administrators (or Hosts) creating the
-  #:     Documentation.
-  #:
-  #:   work.title: The title of the Documentation (e.g. "Verification
-  #:     of Eligibility").
-  #:
-  #:   work.abstract: Summary of the contents of the 'attachment', or
-  #:     just an indication that the required documentation was 
-  #:     supplied but is not actually attached.
-  #:
-  #:   work.reviews: Annotations to the Documentation made by other
-  #:     Administrators.
-  work = db.ReferenceProperty(reference_class=models.work.Work, required=True,
-                              collection_name="proposal")
+
+class Documentation(soc.models.work.Work):
+  """Model of Documentation, which is a Work authored by Administrators.
+
+  Documentation is items like tax forms, letters from schools confirming
+  enrollment, etc., (often scanned in) that are attached to a Role as
+  documentation related to that Role.
+
+  The specific way that some properties and relations inherited from Work
+  are used with a piece of Documentation are described below.
+
+  work.title: The title of the Documentation (e.g. "Verification
+    of Eligibility").
+
+  work.abstract: Summary of the contents of the 'attachment', or
+    just an indication that the required documentation was 
+    supplied but is not actually attached.
+
+  work.authors: The Authors of the Work referred to by this 
+    relation are the Administrators (or Hosts) creating the
+    Documentation.
+
+  work.reviews: Annotations to the Documentation made by other
+    Administrators.
+  """
 
   #: a many:1 relationship of Documentation entities that pertain
-  #: to a single Person.  The back-reference in the Person model is a
-  #: Query named 'docs'.
-  person = db.ReferenceProperty(reference_class=models.person.Person,
-                                collection_name="docs")
+  #: to a single Role.  The back-reference in the Role model is a
+  #: Query named 'documentation'.
+  role = db.ReferenceProperty(reference_class=soc.models.role.Role,
+                              collection_name='documentation')
 
   #: An optional db.BlobProperty containing the documentation
   #: (usually a scanned image of a paper document or a PDF file).

@@ -29,36 +29,24 @@ import soc.models.site_settings
 import soc.logic.model
 
 
-def getSiteSettingsFromPath(path):
+def getSiteSettings(path):
   """Returns SiteSettings entity for a given path, or None if not found.  
     
   Args:
     path: a request path of the SiteSettings that uniquely identifies it
   """
   # lookup by Settings:path key name
-  key_name = getSiteSettingsKeyNameForPath(path)
+  name = key_name.nameSiteSettings(path)
   
-  if key_name:
-    site_settings = soc.models.site_settings.SiteSettings.get_by_key_name(key_name)
+  if name:
+    site_settings = soc.models.site_settings.SiteSettings.get_by_key_name(name)
   else:
     site_settings = None
   
   return site_settings
 
 
-def getSiteSettingsKeyNameForPath(path):
-  """Return a Datastore key_name for a SiteSettings from the path.
-  
-  Args:
-    path: a request path of the SiteSettings that uniquely identifies it
-  """
-  if not path:
-    return None
-
-  return key_name.nameSiteSettings(path)
-
-
-def updateOrCreateSiteSettingsFromPath(path, **site_settings_properties):
+def updateOrCreateSiteSettings(path, **site_settings_properties):
   """Update existing SiteSettings entity, or create new one with supplied properties.
 
   Args:
@@ -72,13 +60,13 @@ def updateOrCreateSiteSettingsFromPath(path, **site_settings_properties):
     supplied path and properties.
   """
   # attempt to retrieve the existing Site Settings
-  site_settings = getSiteSettingsFromPath(path)
+  site_settings = getSiteSettings(path)
 
   if not site_settings:
     # site settings did not exist, so create one in a transaction
-    key_name = getSiteSettingsKeyNameForPath(path)
+    name = key_name.nameSiteSettings(path)
     site_settings = soc.models.site_settings.SiteSettings.get_or_insert(
-      key_name, **site_settings_properties)
+      name, **site_settings_properties)
 
   # there is no way to be sure if get_or_insert() returned a new SiteSettings or
   # got an existing one due to a race, so update with site_settings_properties anyway,

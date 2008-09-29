@@ -18,16 +18,16 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
+
 
 from google.appengine.ext import db
 
-from soc import models
-import soc.models.author
+import soc.models.role
+import soc.models.organization
 
 
-class Reviewer(db.Model):
+class Reviewer(soc.models.role.Role):
   """Reviewer details for a specific Program.
 
   A Reviewer entity participates in the following relationships implemented 
@@ -37,10 +37,11 @@ class Reviewer(db.Model):
      Reviewer.  This relation is implemented as the 'reviews'
      back-reference Query of the Review model 'reviewer' reference.
   """
-  
-  #: A 1:1 relationship associating a Contributor with Person
-  #: details and capabilities. The back-reference in the Person model
-  #: is a Query named 'reviewer'.
-  person = db.ReferenceProperty(reference_class=models.person.Person,
-                                required=True, collection_name="reviewer")
+
+  #: A many:1 relationship associating Reviewers with specific Organization
+  #: details and capabilities. The back-reference in the Organization model
+  #: is a Query named 'reviewers'.
+  org = db.ReferenceProperty(
+      reference_class=soc.models.organization.Organization, 
+      required=True, collection_name='reviewers')
 

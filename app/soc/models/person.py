@@ -21,64 +21,32 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
 from google.appengine.ext import db
+
+import polymodel
+
 from django.utils.translation import ugettext_lazy
 
-from soc import models
-from soc.models import base
 from soc.models import countries
 import soc.models.user
 
 
-class Person(base.ModelWithFieldAttributes):
-  """Common data fields for all Roles.
-
-  A Person can only participate in a single Program.  To avoid duplication of
-  data entry, facilities will be available for selecting an existing Person
-  associated with a particular User to be duplicated for participation in a
-  new Program.
+class Person(polymodel.PolyModel):
+  """Common data fields for all persons on the site.
 
   Some details of a Person are considered "public" information, and nearly
   all of these are optional (except for given_name, surname, and email).
   Other details of a Person are kept "private" and are only provided to
   other Persons in roles that "need to know" this information.  How these
   fields are revealed is usually covered by Program terms of service.
-
-  A Person entity participates in the following relationships implemented
-  as a db.ReferenceProperty elsewhere in another db.Model:
-
-   docs) a 1:many relationship of documents (Documentation) associated
-     with the Person by Administrators.  This relation is implemented as
-     the 'docs' back-reference Query of the Documentation model 'person'
-     reference.
-
-   works) a many:many relationship with Works, stored in a separate
-     WorksPersons model.  See the WorksPersons model class for details.
-
-   contributor) a 1:1 relationship associating a Contributor with generic
-     Person details and capabilities.  This relation is implemented as the
-     'contributor' back-reference Query of the Contributor model 'person'
-     reference.
-
-   reviewer) a 1:1 relationship associating a Reviewer with generic
-     Person details and capabilities.  This relation is implemented as the
-     'reviewer' back-reference Query of the Reviewer model 'person' reference.
-
-   admin) a 1:1 relationship associating an Administrator with specific
-     Person details and capabilities.  This relation is implemented as the
-     'admin' back-reference Query of the Administrator model 'person'
-     reference.
-
-   host) a 1:1 relationship accociating a Host with specific Person
-     Person details and capabilities. This relation is implemented as the
-     'host' back-reference Query of the Host model 'person' reference.
   """
 
   #: A required many:1 relationship that ties (possibly multiple
   #: entities of) Person details to a unique User.  A Person cannot
   #: exist unassociated from a login identity and credentials.  The
   #: back-reference in the User model is a Query named 'persons'.
-  user = db.ReferenceProperty(reference_class=models.user.User,
+  user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name='persons')
 
   #====================================================================

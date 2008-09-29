@@ -14,27 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Host Model."""
+"""This module contains the Contributor Model."""
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
 
 from google.appengine.ext import db
 
 import soc.models.role
-import soc.models.sponsor
+import soc.models.club
 
 
-class Host(soc.models.role.Role):
-  """Host details for a specific Program.
+class Member(soc.models.role.Role):
+  """Club member details.
   """
 
-  #: A 1:1 relationship associating a Host with specific
-  #: Sponsor details and capabilities. The back-reference in
-  #: the Sponsor model is a Query named 'host'.  
-  sponsor = db.ReferenceProperty(reference_class=models.sponsor.Sponsor,
-                                 required=True, collection_name='hosts')
+  #: A required many:1 relationship that ties multiple Members to the
+  #: Club in which they participate.  A Member cannot exist unassociated
+  #: with a Club.  The back-reference in the Club model is a Query
+  #: named 'members'.
+  club = db.ReferenceProperty(reference_class=soc.models.club.Club,
+                              required=True, collection_name='members')
 

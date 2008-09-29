@@ -21,26 +21,14 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
 from google.appengine.ext import db
 
-from soc import models
-from soc.models import base
-import soc.models.org
-import soc.models.person
+import soc.models.reviewer
 
 
-class Administrator(base.ModelWithFieldAttributes):
+class Administrator(soc.models.reviewer.Reviewer):
   """Administrator details for a specific Program.
   """
-  
-  #: A 1:1 relationship associating an Administrator with specific
-  #: Person details and capabilities. The back-reference in the
-  #: Person model is a Query named 'admin'.
-  person = db.ReferenceProperty(reference_class=soc.models.person.Person,
-          required=True, collection_name="admin")
+  pass
 
-  #: A many:1 relationship associating Administrators with specific
-  #: Organization details and capabilities. The back-reference in the
-  #: Organization model is a Query named 'admins'.
-  org = db.ReferenceProperty(reference_class=soc.models.org.Organization, 
-          required=True, collection_name="admins")

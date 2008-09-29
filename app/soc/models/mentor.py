@@ -14,27 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Host Model."""
+"""This module contains the Reviewer Model."""
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
 
 from google.appengine.ext import db
 
-import soc.models.role
-import soc.models.sponsor
+import soc.models.reviewer
 
 
-class Host(soc.models.role.Role):
-  """Host details for a specific Program.
+class Mentor(soc.models.reviewer.Reviewer):
+  """Organization Mentor.
   """
-
-  #: A 1:1 relationship associating a Host with specific
-  #: Sponsor details and capabilities. The back-reference in
-  #: the Sponsor model is a Query named 'host'.  
-  sponsor = db.ReferenceProperty(reference_class=models.sponsor.Sponsor,
-                                 required=True, collection_name='hosts')
+  pass
 

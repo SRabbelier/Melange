@@ -21,14 +21,13 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
 from google.appengine.ext import db
 
-from soc import models
-from soc.models import base
-import soc.models.person
+import soc.models.role
 
 
-class Contributor(base.ModelWithFieldAttributes):
+class Contributor(soc.models.role.Role):
   """Contributor details for a specific Program.
 
   Some Contributor workflows have the Contributor (acting as an author)
@@ -44,10 +43,5 @@ class Contributor(base.ModelWithFieldAttributes):
      a specific Contributor has contributed with that Contributor.  See
      the TasksContributors model for details.
   """
-  
-  #: a 1:1 relationship associating a Contributor with generic Author
-  #: details and capabilities. The back-reference in the Author
-  #: model is a Query named 'contributor'.
-  person = db.ReferenceProperty(reference_class=models.person.Person, 
-                                required=True, 
-                                collection_name="contributor")
+  pass 
+

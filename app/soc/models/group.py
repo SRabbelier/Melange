@@ -21,30 +21,18 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
+
+import polymodel
 
 from django.utils.translation import ugettext_lazy
 
-from soc.models import base
 from soc.models import countries
 import soc.models.user
 
-class Group(base.ModelWithFieldAttributes):
+class Group(polymodel.PolyModel):
   """Common data fields for all groups.
-
-  A Group entity participates in the following relationships
-  implemented as a db.ReferenceProperty elsewhere in another db.Model:
-
-   school), club), sponsor), org)
-     a 1:1 relationship with each entity containing a more specific type of
-     Group.  These relationships are represented explicitly in the other
-     "group" models by a db.ReferenceProperty named 'group'.  The
-     collection_name argument to db.ReferenceProperty should be set to the
-     singular of the entity model name of the other "group" class.  The
-     above relationship names correspond, respectively to these Models:
-       School, Club, Sponsor, Organization
-     The relationships listed here are mutually exclusive.  For example,
-     a Group cannot be both a School and a Club at the same time.  
   """
 
   #: Required field storing name of the group.

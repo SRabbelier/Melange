@@ -23,16 +23,10 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
-from soc.models import base
 import soc.models.group
 
 
-class Sponsor(base.ModelWithFieldAttributes):
+class Sponsor(soc.models.group.Group):
   """Sponsor details."""
+  pass
 
-  #: A 1:1 relationship associating a Sponsor with more generic
-  #: Group details and capabilities.  The back-reference in
-  #: the Group model is a Query named 'sponsor'.
-  group = db.ReferenceProperty(reference_class=models.group.Group, 
-                               required=True, collection_name="sponsor")
-                               

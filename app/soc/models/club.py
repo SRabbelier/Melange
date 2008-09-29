@@ -27,7 +27,7 @@ from soc.models import base
 import soc.models.group
 
 
-class Club(base.ModelWithFieldAttributes):
+class Club(soc.models.group.Group):
   """Details specific to a Club.
 
   A Club is a generic type of Group that gathers Members into a community.
@@ -39,9 +39,5 @@ class Club(base.ModelWithFieldAttributes):
      relation is implemented as the 'members' back-reference Query of the
      Member model 'club' reference.
   """
+  pass
 
-  #: Required 1:1 relationship that ties Club details to the more generic
-  #: Group details.  The back-reference in the Group model is a Query
-  #: named 'club'.
-  group = db.ReferenceProperty(reference_class=soc.models.org.Group,
-                               required=True, collection_name="club")

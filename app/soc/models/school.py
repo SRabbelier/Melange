@@ -27,7 +27,7 @@ from soc.models import base
 import soc.models.group
 
 
-class School(base.ModelWithFieldAttributes):
+class School(soc.models.group.Group):
   """Details specific to a School.
 
   A School is a specific type of Group that gathers Students together.
@@ -39,9 +39,5 @@ class School(base.ModelWithFieldAttributes):
      belonging to) a School.  This relation is implemented as the 'students'
      back-reference Query of the Student model 'school' reference.
   """
+  pass
 
-  #: Required 1:1 relationship that ties School details to the more
-  #: generic Group details.  The back-reference in the Group model is a
-  #: Query named 'school'.
-  group = db.ReferenceProperty(reference_class=soc.models.group.Group,
-                               required=True, collection_name="school")

@@ -169,7 +169,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
 
 class EditForm(forms_helpers.DbModelForm):
-  """Django form displayed when Developer creates or edits a User.
+  """Django form displayed when Developer edits a User.
   
   This form is manually specified, instead of using
     model = soc.models.user.User
@@ -317,5 +317,101 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
   context.update({'form': form,
                   'existing_user': user})
+
+  return response_helpers.respond(request, template, context)
+
+
+class CreateForm(forms_helpers.DbModelForm):
+  """Django form displayed when Developer creates a User.
+
+  This form is manually specified, instead of using
+    model = soc.models.user.User
+  in the Meta class, because the form behavior is unusual and normally
+  required Properties of the User model need to sometimes be omitted.
+  """
+  id = forms.EmailField(
+      label=soc.models.user.User.id.verbose_name,
+      help_text=soc.models.user.User.id.help_text)
+
+  link_name = forms.CharField(
+      label=soc.models.user.User.link_name.verbose_name,
+      help_text=soc.models.user.User.link_name.help_text)
+
+  nick_name = forms.CharField(
+      label=soc.models.user.User.nick_name.verbose_name)
+
+  is_developer = forms.BooleanField(required=False,
+      label=soc.models.user.User.is_developer.verbose_name,
+      help_text=soc.models.user.User.is_developer.help_text)
+  
+  class Meta:
+    model = None
+  
+  
+  def clean_link_name(self):
+    link_name = self.cleaned_data.get('link_name')
+    if not id_user.isLinkNameFormatValid(link_name):
+      raise forms.ValidationError("This link name is in wrong format.")
+    else:
+      if id_user.doesLinkNameExist(link_name):
+        raise forms.ValidationError("This link name is already in use.")
+    return link_name
+
+  def clean_id(self):
+    new_email = self.cleaned_data.get('id')
+    form_id = users.User(email=new_email)
+    if id_user.isIdUser(form_id):
+        raise forms.ValidationError("This account is already in use.")
+    return form_id
+
+
+DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/site/user/profile/edit.html'
+
+def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
+  """View for a Developer to modify the properties of a User Model entity.
+
+  Args:
+    request: the standard django request object
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which either contains the form to
+    be filled out, or a redirect to the correct view in the interface.
+  """
+  # create default template context for use with any templates
+  context = response_helpers.getUniversalContext(request)
+
+  alt_response = simple.getAltResponseIfNotDeveloper(request,
+                                                     context=context)
+  if alt_response:
+    return alt_response
+
+  if request.method == 'POST':
+    form = CreateForm(request.POST)
+
+    if form.is_valid():
+      form_id = form.cleaned_data.get('id')
+      new_linkname = form.cleaned_data.get('link_name')
+      nickname = form.cleaned_data.get('nick_name')
+      is_developer = form.cleaned_data.get('is_developer')
+
+      user = id_user.updateOrCreateUserFromId(id=form_id, 
+          link_name=new_linkname, nick_name=nickname, 
+          is_developer=is_developer)
+
+      if not user:
+        return http.HttpResponseRedirect('/')
+
+      # redirect to new /site/user/profile/new_linkname?s=0
+      # (causes 'Profile saved' message to be displayed)
+      return response_helpers.redirectToChangedSuffix(
+          request, None, new_linkname,
+          params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
+  else: # method == 'GET':
+    # no link name specified, so start with an empty form
+    form = CreateForm()
+
+  context.update({'form': form})
 
   return response_helpers.respond(request, template, context)

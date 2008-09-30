@@ -146,7 +146,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   # else:  # method == 'GET'
 
   if user:
-    # User entity found, so populate form with existing User information            
+    # User entity found, so populate form with existing User information
     # context['found_user'] = user
     form = LookupForm(initial={'id': user.id.email,
                                'link_name': user.link_name})
@@ -298,7 +298,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         # populate form with the existing User entity
         form = EditForm(initial={ 'key_name': user.key().name(),
             'id': user.id.email, 'link_name': user.link_name,
-            'nick_name': user.nick_name, 'is_developer': user.is_developer})       
+            'nick_name': user.nick_name, 'is_developer': user.is_developer})
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
           # redirect to aggressively remove 'Profile saved' query parameter

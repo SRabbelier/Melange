@@ -28,6 +28,9 @@ Please use this form to look up an existing User in Google Open Source Programs.
 </p>
 <form method="POST">
  <table>
+{% if found_user %}
+{% readonly_field_as_table_row "Id" found_user.id %}
+{% endif %}
 {% if email_error %}
 <tr>
  <td>&nbsp;</td>

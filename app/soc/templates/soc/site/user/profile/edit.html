@@ -38,6 +38,9 @@ Please use this form to alter basic site-wide settings for a User in Google Open
 <form method="POST">
   {{ form.key_name }}
  <table>
+  {% if existing_user %}
+  {% readonly_field_as_table_row "Id" existing_user.id %}
+  {% endif %}
   {% field_as_table_row form.id %}
 {% if lookup_error %}
 <tr>

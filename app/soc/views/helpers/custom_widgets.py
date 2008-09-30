@@ -28,49 +28,62 @@ from django.utils.html import escape
 from django.utils import simplejson
 from django.utils.safestring import mark_safe
 
+
+class ReadOnlyInput(forms.widgets.Input):
+  """Read only input widget.
+  """
+  input_type = 'text'
+
+  def render(self, name, value, attrs=None):
+    """Render ReadOnlyInput widget as HTML.
+    """
+    attrs['readonly'] = 'readonly'
+    return super(ReadOnlyInput, self).render(name, value, attrs)
+
+
 class TinyMCE(forms.widgets.Textarea):
-    """TinyMCE widget. 
-    
-    Requires to include tiny_mce_src.js in your template. Widget can be
-    customized by overwriting or adding extra options to mce_settings
-    dictionary
+  """TinyMCE widget. 
+  
+  Requires to include tiny_mce_src.js in your template. Widget can be
+  customized by overwriting or adding extra options to mce_settings
+  dictionary
 
-    You can set TinyMCE widget for particular form field using code below:
-      class ExampleForm(forms_helpers.DbModelForm):
-        content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
-    
-    You can include tiny_mce_src.js in your template using:
-      {% block scripts %}
-    	  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
-      {% endblock %}
-    """ 
-    DEF_MCE_SETTINGS = { 'mode': "exact",
-                         'theme': "simple",
-                         'theme_advanced_toolbar_location': "top",
-                         'theme_advanced_toolbar_align': "center"}
+  You can set TinyMCE widget for particular form field using code below:
+    class ExampleForm(forms_helpers.DbModelForm):
+      content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
+  
+  You can include tiny_mce_src.js in your template using:
+    {% block scripts %}
+  	  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+    {% endblock %}
+  """ 
+  DEF_MCE_SETTINGS = { 'mode': "exact",
+                       'theme': "simple",
+                       'theme_advanced_toolbar_location': "top",
+                       'theme_advanced_toolbar_align': "center"}
 
-    mce_settings = DEF_MCE_SETTINGS.copy()
+  mce_settings = DEF_MCE_SETTINGS.copy()
 
-    TINY_MCE_HTML_FMT = u'''\
+  TINY_MCE_HTML_FMT = u'''\
 <textarea %(attrs)s>%(value)s</textarea>
 <script type="text/javascript">
- tinyMCE.init(%(settings_json)s)
+tinyMCE.init(%(settings_json)s)
 </script>'''
+  
+  def render(self, name, value, attrs=None):
+    """Render TinyMCE widget as HTML.
+    """
+    if value is None:
+      value = ''
+    value = smart_unicode(value)
+    final_attrs = self.build_attrs(attrs, name=name)
     
-    def render(self, name, value, attrs=None):
-      """Render TinyMCE widget as HTML.
-      """
-      if value is None:
-        value = ''
-      value = smart_unicode(value)
-      final_attrs = self.build_attrs(attrs, name=name)
+    self.mce_settings['elements'] = "id_%s" % name
       
-      self.mce_settings['elements'] = "id_%s" % name
-        
-      # convert mce_settings from dict to JSON
-      mce_json = simplejson.JSONEncoder().encode(self.mce_settings)
+    # convert mce_settings from dict to JSON
+    mce_json = simplejson.JSONEncoder().encode(self.mce_settings)
 
-      return mark_safe(self.TINY_MCE_HTML_FMT % 
-          {'attrs': flatatt(final_attrs),
-           'value': escape(value), 
-           'settings_json':  mce_json})
+    return mark_safe(self.TINY_MCE_HTML_FMT % 
+        {'attrs': flatatt(final_attrs),
+         'value': escape(value), 
+         'settings_json':  mce_json})

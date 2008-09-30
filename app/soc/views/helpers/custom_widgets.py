@@ -49,7 +49,7 @@ class TinyMCE(forms.widgets.Textarea):
                          'theme_advanced_toolbar_location': "top",
                          'theme_advanced_toolbar_align': "center"}
 
-    mce_settings = DEF_MCE_SETTINGS
+    mce_settings = DEF_MCE_SETTINGS.copy()
 
     TINY_MCE_HTML_FMT = u'''\
 <textarea %(attrs)s>%(value)s</textarea>
@@ -64,7 +64,7 @@ class TinyMCE(forms.widgets.Textarea):
         value = ''
       value = smart_unicode(value)
       final_attrs = self.build_attrs(attrs, name=name)
-
+      
       self.mce_settings['elements'] = "id_%s" % name
         
       # convert mce_settings from dict to JSON

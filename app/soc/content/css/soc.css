@@ -23,7 +23,7 @@ body {
   color: black;
 
   font-family: Arial, sans-serif;
-  font-size: small;
+  font-size: medium;
 
   margin: 8px;
   margin-top: 3px;
@@ -260,6 +260,11 @@ table#queues {
   #footer .text {
     padding-top: 20px;
   }
+
+#lastmodified {
+  text-align: right;
+  font-size: small;
+}
 
 /* SIDEBAR MENU */
 #side {

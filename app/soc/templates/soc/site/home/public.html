@@ -48,14 +48,15 @@ Default Header
 {% endblock %}
 
 {% block body %}
-    {% if site_document %}
-    {{ site_document.content|safe }}
-    {% else %}
+ {% if site_document %}
+  {{ site_document.content|safe }}
+  <div id="lastmodified">Last updated on: {{ site_document.modified }}</div>
+ {% else %}
 This is the default site home page that can be configured via the <a href="/site/home/edit">Site Settings</a> interface.  
 The <a href="/site/home/edit">Site Settings</a> interface also provides a mechanism to select a feed to be displayed here.
 You need to sign in as site Developer in order to change <a href="/site/home/edit">Site Settings</a>.
-    {% endif %}
-    {% if site_settings.feed_url %}
+ {% endif %}
+ {% if site_settings.feed_url %}
     <div id="blog"></div>
-    {% endif %}
+ {% endif %}
 {% endblock %}

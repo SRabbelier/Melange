@@ -19,9 +19,15 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
+import soc.models.club
+import soc.models.group
+import soc.models.organization
+import soc.models.school
+import soc.models.sponsor
 import soc.models.document
 import soc.models.site_settings
 import soc.models.user
@@ -51,3 +57,47 @@ def nameUser(email):
       'email': email,
       }
 
+
+def nameSponsor(link_name):
+  """Returns a Sponsor key name constructed from a supplied link name."""
+  return '%(group)s/%(type)s:%(link_name)s' % {
+      'group': soc.models.group.Group.__name__,
+      'type': soc.models.sponsor.Sponsor.__name__,
+      'link_name': link_name,
+      }
+
+
+def nameSchool(sponsor_ln, program_ln, link_name):
+  """Returns a School key name constructed from a supplied sponsor,
+     program and school link names.
+  """
+  return '%(group)s/%(type)s:%(sponsor)s/%(program)s/%(link_name)s' % {
+      'group': soc.models.group.Group.__name__,
+      'type': soc.models.school.School.__name__,
+      'sponsor': sponsor_ln,
+      'program': program_ln,
+      'link_name': link_name,
+      }
+
+
+def nameOrganization(sponsor_ln, program_ln, link_name):
+  """Returns a Organization key name constructed from a supplied sponsor,
+     program and organization link names.
+  """
+  return '%(group)s/%(type)s:%(sponsor)s/%(program)s/%(link_name)s' % {
+      'group': soc.models.group.Group.__name__,
+      'type': soc.models.organization.Organization.__name__,
+      'sponsor': sponsor_ln,
+      'program': program_ln,
+      'link_name': link_name,
+      }
+
+
+def nameClub(link_name):
+  """Returns a Club key name constructed from a supplied link name."""
+  return '%(group)s/%(type)s:%(link_name)s' % {
+      'group': soc.models.group.Group.__name__,
+      'type': soc.models.sponsor.Sponsor.__name__,
+      'link_name': link_name,
+      }
+  

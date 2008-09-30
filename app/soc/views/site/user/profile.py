@@ -412,6 +412,6 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
     # no link name specified, so start with an empty form
     form = CreateForm()
 
-  context.update({'form': form})
+  context['form'] = form
 
   return response_helpers.respond(request, template, context)

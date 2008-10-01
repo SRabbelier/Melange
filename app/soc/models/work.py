@@ -58,8 +58,18 @@ class Work(polymodel.PolyModel):
       'short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')
 
+  #: Required path, prepended to a "link name" to form the document URL.
+  #: The combined path and link name must be globally unique on the
+  #: site.  Except in /site/docs (Developer) forms, this field is not
+  #: usually directly editable by the User, but is instead set by controller
+  #: logic to match the "scope" of the document.
+  partial_path = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Partial path'))
+  partial_path.help_text = ugettext_lazy(
+    'path portion of URLs, prepended to link name')
+
   #: Required link name, appended to a "path" to form the document URL.
-  #: The combined "path" and link name must be globally unique on the
+  #: The combined path and link name must be globally unique on the
   #: site (but, unlike some link names, a Work link name can be reused,
   #: as long as the combination with the preceding path is unique).
   link_name = db.StringProperty(required=True,

@@ -106,6 +106,12 @@ def buildSiteSidebar(is_admin=None, **ignored):
         menu.MenuItem(
           'Create a new Site Document',
           value='/site/docs/edit'),
+        menu.MenuItem(
+          'List Sponsors',
+          value='/site/sponsor/list'),
+        menu.MenuItem(
+          'Create a new Sponsor',
+          value='/site/sponsor/profile'),
         ]
       )
     ),

@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Todd Larsen" <tlarsen@google.com>',
   ]
 
 
@@ -34,24 +35,6 @@ import soc.logic.model
 
 import soc.models.document
 import soc.models.work
-
-
-WORK_PATH_LINKNAME_REGEX = re.compile(key_name.WORK_PATH_LINKNAME_PATTERN)
-
-def getPartsFromPath(path):
-  """Splits path string into partial_path and link_name.
-  
-  Returns:
-    {'partial_path': 'everything/but',
-     'link_name': 'link_name'}
-    or {} (empty dict) if string did not match WORK_PATH_LINKNAME_PATTERN.
-  """
-  path_linkname_match = WORK_PATH_LINKNAME_REGEX.match(path)
-  
-  if not path_linkname_match:
-    return {}
-
-  return path_linkname_match.groupdict()
 
 
 def getDocument(path, link_name=None):

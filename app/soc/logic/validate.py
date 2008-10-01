@@ -28,6 +28,8 @@ from google.appengine.api import urlfetch
 
 import feedparser
 
+from soc.logic import path_linkname
+
 
 def isFeedURLValid(feed_url=None):
   """Returns True if provided url is valid ATOM or RSS.
@@ -44,25 +46,12 @@ def isFeedURLValid(feed_url=None):
   return False
 
 
-LINKNAME_PATTERN = r'''(?x)
-    ^
-    [0-9a-z]   # start with ASCII digit or lowercase
-    (
-     [0-9a-z]  # additional ASCII digit or lowercase
-     |         # -OR-
-     _[0-9a-z] # underscore and ASCII digit or lowercase
-    )*         # zero or more of OR group
-    $
-'''
-
-LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
-
 def isLinkNameFormatValid(link_name):
   """Returns True if link_name is in a valid format.
 
   Args:
     link_name: link name used in URLs for identification
   """
-  if LINKNAME_REGEX.match(link_name):
+  if path_linkname.LINKNAME_REGEX.match(link_name):
     return True
   return False

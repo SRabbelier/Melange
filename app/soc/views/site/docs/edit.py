@@ -29,8 +29,8 @@ from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import document
-from soc.logic import key_name
 from soc.logic import out_of_band
+from soc.logic import path_linkname
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views.helpers import custom_widgets
@@ -76,7 +76,10 @@ def edit(request, partial_path=None, linkname=None,
 
   Args:
     request: the standard django request object
-    path: the Document's site-unique "path" extracted from the URL
+    partial_path: the Document's site-unique "path" extracted from the URL,
+      minus the trailing link_name
+    link_name: the last portion of the Document's site-unique "path"
+      extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -115,7 +118,7 @@ def edit(request, partial_path=None, linkname=None,
 
   doc = None  # assume that no Document entity will be found
 
-  path = key_name.combinePath([partial_path, linkname])
+  path = path_linkname.combinePath([partial_path, linkname])
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
@@ -145,7 +148,7 @@ def edit(request, partial_path=None, linkname=None,
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = key_name.combinePath([new_partial_path, new_linkname])
+      new_path = path_linkname.combinePath([new_partial_path, new_linkname])
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -263,8 +266,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = key_name.combinePathAndLinkName(
-          new_partial_path, new_linkname)
+      new_path = path_linkname.combinePath([new_partial_path, new_linkname])
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)

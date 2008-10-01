@@ -28,6 +28,7 @@ from django import shortcuts
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import common
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
@@ -52,7 +53,7 @@ class UserForm(forms_helpers.DbModelForm):
   
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
-    if not id_user.isLinkNameFormatValid(link_name):
+    if not common.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     elif not id_user.isLinkNameAvailableForId(link_name):
       raise forms.ValidationError("This link name is already in use.")

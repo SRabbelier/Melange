@@ -201,7 +201,8 @@ def doesUserExist(id):
     return True
   else:
     return False
-    
+
+
 def isIdUser(id=None):
   """Returns True if a Google Account has it's User entity in datastore.
 
@@ -222,6 +223,7 @@ def isIdUser(id=None):
     return False
   
   return True
+
 
 def isIdDeveloper(id=None):
   """Returns True if a Google Account is a Developer with special privileges.
@@ -263,19 +265,6 @@ def isIdDeveloper(id=None):
   return user.is_developer
 
 
-LINKNAME_REGEX = re.compile(key_name.LINKNAME_PATTERN)
-
-def isLinkNameFormatValid(link_name):
-  """Returns True if link_name is in a valid format.
-  
-  Args:
-    link_name: link name used in URLs to identify user
-  """
-  if LINKNAME_REGEX.match(link_name):
-    return True
-  return False
-
-
 def getUserFromLinkName(link_name):
   """Returns User entity for link_name or None if not found.
     
@@ -284,6 +273,7 @@ def getUserFromLinkName(link_name):
   """
   return soc.models.user.User.gql('WHERE link_name = :1', link_name).get()
 
+
 def getUserFromKeyName(key_name):
   """Returns User entity for key_name or None if not found.
     
@@ -291,6 +281,7 @@ def getUserFromKeyName(key_name):
     key_name: key name of User entity
   """
   return soc.models.user.User.get_by_key_name(key_name)
+
 
 def getUserIfLinkName(link_name):
   """Returns User entity for supplied link_name if one exists.
@@ -413,6 +404,7 @@ def updateOrCreateUserFromId(id, **user_properties):
   # in a transaction
   return updateUserProperties(user, **user_properties)
 
+
 def updateUserForKeyName(key_name, **user_properties):
   """Update existing User entity for keyname with supplied properties.
 
@@ -437,6 +429,7 @@ def updateUserForKeyName(key_name, **user_properties):
   # in a transaction
   return updateUserProperties(user, **user_properties)
 
+
 def updateUserProperties(user, **user_properties):
   """Update existing User entity using supplied User properties.
 
@@ -453,7 +446,7 @@ def updateUserProperties(user, **user_properties):
 
   return db.run_in_transaction(update)
 
-  
+
 def _unsafeUpdateUserProperties(user, **user_properties):
   """(see updateUserProperties)
   

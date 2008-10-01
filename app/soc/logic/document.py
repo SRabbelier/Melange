@@ -35,7 +35,7 @@ import soc.logic.model
 import soc.models.document
 import soc.models.work
 
- 
+
 WORK_PATH_LINKNAME_REGEX = re.compile(key_name.WORK_PATH_LINKNAME_PATTERN)
 
 def getPartsFromPath(path):

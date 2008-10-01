@@ -1,0 +1,14 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+onclick="document.location.href='/site/docs/edit/{{ data_element.partial_path }}/{{ data_element.link_name }}'" name="name">
+  <td align="right">
+   <div class="title">
+    <a class="noul"
+     href="/site/docs/edit/{{ data_element.partial_path }}/{{ data_element.link_name }}">{{ data_element.partial_path}}/{{ data_element.link_name }}</a>
+   </div>
+  </td>
+  <td><div class="title">{{ data_element.title }}</div></td>
+  <td><div class="partialpath">{{ data_element.partial_path }}</div></td>
+  <td><div class="linkname">{{ data_element.link_name }}</div></td>
+  <td><div class="created">{{ data_element.created }}</div></td>
+  <td><div class="modified">{{ data_element.modified }}</div></td>
+</tr>

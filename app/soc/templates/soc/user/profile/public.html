@@ -20,8 +20,8 @@ User Public Profile for {{ linkname_user.nick_name }}
 {% block body %}
 <p>
  <table>
-  {% readonly_field_as_table_row "Nick name:" linkname_user.nick_name %}
-  {% readonly_field_as_table_row "Link name:" linkname_user.link_name %}
+  {% readonly_field_as_table_row linkname_user.fields.nick_name.label linkname_user.nick_name %}
+  {% readonly_field_as_table_row linkname_user.fields.link_name.label linkname_user.link_name %}
  </table>
 </p>
 {% endblock %}

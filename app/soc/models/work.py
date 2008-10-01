@@ -87,3 +87,14 @@ class Work(polymodel.PolyModel):
   
   #: date when the work was last modified
   modified = db.DateTimeProperty(auto_now=True)
+
+  # TODO: some sort of access control preferences are needed at this basic
+  #   level.  Works need to be restrict-able to:
+  #    * the authors only
+  #    * the administrators of the Groups that the authors are in
+  #    * any member of the authors' Groups
+  #    * logged-in User with a profile
+  #    * logged-in Users, but no profile is necessary
+  #    * anyone, even those not logged in
+  #  (and possibly others)
+

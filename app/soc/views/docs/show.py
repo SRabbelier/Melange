@@ -55,6 +55,13 @@ def public(request, partial_path=None, linkname=None,
   # create default template context for use with any templates
   context = response_helpers.getUniversalContext(request)
 
+  # TODO: there eventually needs to be a call to some controller logic that
+  #   implements some sort of access controls, based on the currently
+  #   logged-in User's Roles, etc.
+
+  # TODO: based on the User's Roles, Documents that the User can edit
+  #   should display a link to a document edit form
+
   # try to fetch User entity corresponding to linkname if one exists    
   try:
     doc = document.getDocumentIfPath(partial_path, link_name=linkname)

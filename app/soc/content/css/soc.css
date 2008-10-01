@@ -286,6 +286,7 @@ table#queues {
   width: 200px;
   margin-bottom: 3em;
   float: left;
+  font-size: small;
 }
 
 #menu ul {

@@ -34,7 +34,7 @@ from django import shortcuts
 from django import newforms as forms
 
 from soc.logic import out_of_band
-from soc.logic import feed
+from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views.helpers import custom_widgets
@@ -82,7 +82,7 @@ class SiteSettingsForm(forms_helpers.DbModelForm):
       # feed url not supplied (which is OK), so do not try to validate it
       return None
     
-    if not feed.isFeedURLValid(feed_url):
+    if not validate.isFeedURLValid(feed_url):
       raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
     return feed_url

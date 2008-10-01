@@ -28,7 +28,7 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
-from soc.logic import common
+from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
@@ -70,7 +70,7 @@ class LookupForm(forms_helpers.DbModelForm):
       # link name not supplied (which is OK), so do not try to validate it
       return None
 
-    if not common.isLinkNameFormatValid(link_name):
+    if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError('This link name is in wrong format.')
     
     return link_name
@@ -213,7 +213,7 @@ class EditForm(forms_helpers.DbModelForm):
  
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
-    if not common.isLinkNameFormatValid(link_name):
+    if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
       key_name = self.data.get('key_name')
@@ -365,7 +365,7 @@ class CreateForm(forms_helpers.DbModelForm):
   
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
-    if not common.isLinkNameFormatValid(link_name):
+    if not validate.LinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
       if id_user.doesLinkNameExist(link_name):

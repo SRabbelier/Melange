@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Common helper functions.
+"""Common validation helper functions.
 """
 
 __authors__ = [
@@ -23,6 +23,25 @@ __authors__ = [
 
 
 import re
+
+from google.appengine.api import urlfetch
+
+import feedparser
+
+
+def isFeedURLValid(feed_url=None):
+  """Returns True if provided url is valid ATOM or RSS.
+
+  Args:
+    feed_url: ATOM or RSS feed url
+  """
+  if feed_url:
+    result = urlfetch.fetch(feed_url)
+    if result.status_code == 200:
+      parsed_feed = feedparser.parse(result.content)
+      if parsed_feed.version and (parsed_feed.version != ''):
+        return True
+  return False
 
 
 LINKNAME_PATTERN = r'''(?x)

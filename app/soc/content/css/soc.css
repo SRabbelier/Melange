@@ -132,27 +132,33 @@ th, td {
   /* FORM TABLE FIELDS */ 
   td.formfieldrequired {
     font-style: italic;
+    font-size: small;
   }
 
   td.formfieldhelptext {
     font-style: italic;
+    font-size: small;
   }
 
   td.formfielderror {
     color: #FF0000;
+    font-size: small;
   }
 
   td.formfieldheading {
     font-weight: bold;
+    font-size: small;
   }
   
   td.formfieldlabel {
     font-weight: bold;
+    font-size: small;
   }
   
   td.formfielderrorlabel {
     font-weight: bold;
     color: #FF0000;
+    font-size: small;
   }
 
 /* TABLE QUEUES (used with .list) */

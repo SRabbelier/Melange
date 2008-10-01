@@ -66,7 +66,7 @@ class EditForm(forms_helpers.DbModelForm):
 
 
 DEF_SITE_DOCS_EDIT_TMPL = 'soc/site/docs/edit.html'
-DEF_CREATE_NEW_DOC_MSG = ' You can create a new user by visiting the' \
+DEF_CREATE_NEW_DOC_MSG = ' You can create a new document by visiting the' \
                          ' <a href="/site/docs/edit">Create ' \
                          'a New Document</a> page.'
 

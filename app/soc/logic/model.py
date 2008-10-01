@@ -23,6 +23,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+
 def updateModelProperties(model, **model_properties):
   """Update existing model entity using supplied model properties.
 

@@ -266,6 +266,21 @@ table#queues {
   font-size: small;
 }
 
+#createdon {
+  text-align: right;
+  font-size: small;
+}
+
+#docsummary {
+  border: 10px solid #e5ecf9;
+  border-top: 1px solid #3366cc;
+}
+
+#docsummary h2 {
+  margin-top: 0.1em;
+  background-color: #e5ecf9;
+}
+
 /* SIDEBAR MENU */
 #side {
   width: 200px;

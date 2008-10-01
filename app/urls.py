@@ -20,12 +20,15 @@ __authors__ = [
 
 from django.conf.urls.defaults import *
 
-from soc.logic import key_name
+from soc.logic import path_linkname
 
 
 urlpatterns = patterns(
+    # Home Page view
     '',
     (r'^$', 'soc.views.site.home.public'),
+    
+    # Home Page Site views
     (r'^site/home$', 'soc.views.site.home.public'),
     (r'^site/home/edit$', 'soc.views.site.home.edit'),
 
@@ -37,27 +40,37 @@ urlpatterns = patterns(
     #  'soc.views.user.roles.dashboard'),
     # (r'^user/roles/(?P<linkname>[_0-9a-z]+)$',
     #  'soc.views.user.roles.dashboard'),
-
+    
+    # User Profile Site views
     (r'^site/user/lookup$', 'soc.views.site.user.profile.lookup'),
     (r'^site/user/profile$', 'soc.views.site.user.profile.create'),
-    (r'^site/user/profile/%s$' % key_name.LINKNAME_ARG_PATTERN,
+    (r'^site/user/profile/%s$' % path_linkname.LINKNAME_ARG_PATTERN,
      'soc.views.site.user.profile.edit'),
     (r'^site/user/list$', 'soc.views.site.user.list.all'),
 
-    (r'^docs/show/%s$' % key_name.WORK_PATH_LINKNAME_ARGS_PATTERN,
+    # Document views
+    (r'^docs/show/%s$' % path_linkname.PATH_LINKNAME_ARGS_PATTERN,
      'soc.views.docs.show.public'),
-
+    
+    # Document Site views
     (r'^site/docs/edit$', 'soc.views.site.docs.edit.create'),
-    (r'^site/docs/edit/%s$' % key_name.WORK_PATH_LINKNAME_ARGS_PATTERN,
+    (r'^site/docs/edit/%s$' % path_linkname.PATH_LINKNAME_ARGS_PATTERN,
      'soc.views.site.docs.edit.edit'),
     (r'^site/docs/list$', 'soc.views.site.docs.list.all'),
     
-    # TODO(pawel.solyga): uncomment when the view functions are committed
-    #(r'^site/sponsor/profile$', 'soc.views.site.sponsor.profile.edit'),
-    #(r'^site/sponsor/list$', 'soc.views.site.sponsor.list.all'),
+    # Sponsor Group public view
+    (r'^sponsor/profile/%s' % path_linkname.LINKNAME_ARG_PATTERN,
+     'soc.views.sponsor.profile.public'),
     
+    # Sponsor Group Site views
+    (r'^site/sponsor/profile$', 'soc.views.site.sponsor.profile.edit'),
+    (r'^site/sponsor/profile/%s' % path_linkname.LINKNAME_ARG_PATTERN,
+     'soc.views.site.sponsor.profile.edit'),
+    (r'^site/sponsor/list$', 'soc.views.site.sponsor.list.all'),
+    
+    # User Profile views
     (r'^user/profile$', 'soc.views.user.profile.edit'),
-    (r'^user/profile/%s$' % key_name.LINKNAME_ARG_PATTERN,
+    (r'^user/profile/%s$' % path_linkname.LINKNAME_ARG_PATTERN,
      'soc.views.user.profile.edit'),
 
     # these are not really used...

@@ -100,6 +100,12 @@ def buildSiteSidebar(is_admin=None, **ignored):
         menu.MenuItem(
           'Create a new Site User',
           value='/site/user/profile'),
+        menu.MenuItem(
+          'List Documents on Site',
+          value='/site/docs/list'),
+        menu.MenuItem(
+          'Create a new Site Document',
+          value='/site/docs/edit'),
         ]
       )
     ),

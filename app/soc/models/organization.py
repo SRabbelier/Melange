@@ -35,9 +35,6 @@ class Organization(soc.models.group.Group):
      a specific Organization. This relation is implemented as the
      'reviewers' back-reference Query of the Organization model 'org'
      reference.
-   admins)  a many:1 relationship associating Administrators with a specific
-     Organization. This relation is implemented as the 'admins' back-reference
-     Query of the Organization model 'org' reference.
   """
   pass
 

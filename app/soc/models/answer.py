@@ -38,9 +38,10 @@ class Answer(base.ModelWithFieldAttributes):
   #: It is currently unclear how useful this back-reference will be,
   #: since the same question could be used in multiple different
   #: Review "templates". Given this, 'answers' currently only exists
-  #: for completeness. 
-  question = db.ReferenceProperty(reference_class=models.question.Question,
-                                  required=True, collection_name="answers")
+  #: for completeness.
+  # TODO: Uncomment when Question model is committed
+  #question = db.ReferenceProperty(reference_class=models.question.Question,
+  #                                required=True, collection_name="answers")
 
   #: A required many:1 relationship, where each of many Answers to
   #: different Questions represents the answer set of a specific

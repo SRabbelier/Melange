@@ -69,8 +69,9 @@ class Review(db.Model):
   #: back-reference in the Survey model is a Query named 'reviews'
   #: which represents all of the Reviews that contains Answers to the
   #: Questions in that particular Survey.
-  survey = db.ReferenceProperty(reference_class=soc.models.survey.Survey,
-                                required=True, collection_name="reviews")
+  # TODO: Uncomment when Survey model is committed
+  #survey = db.ReferenceProperty(reference_class=soc.models.survey.Survey,
+  #                              required=True, collection_name="reviews")
 
   #: A required many:1 relationship with a Work, where the Review
   #: answers are attached to the Work as a comment, evaluation,

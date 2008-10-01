@@ -32,9 +32,4 @@ import soc.models.reviewer
 class Administrator(soc.models.reviewer.Reviewer):
   """Administrator details for a specific Program.
   """
-  #: A many:1 relationship associating Administrators with specific
-  #: Organization details and capabilities. The back-reference in the
-  #: Organization model is a Query named 'admins'.
-  org = db.ReferenceProperty(reference_class=organization.Organization,
-          required=True, collection_name="admins")
-
+  pass

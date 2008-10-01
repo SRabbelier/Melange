@@ -35,6 +35,6 @@ class Host(soc.models.role.Role):
   #: A 1:1 relationship associating a Host with specific
   #: Sponsor details and capabilities. The back-reference in
   #: the Sponsor model is a Query named 'host'.  
-  sponsor = db.ReferenceProperty(reference_class=models.sponsor.Sponsor,
+  sponsor = db.ReferenceProperty(reference_class=soc.models.sponsor.Sponsor,
                                  required=True, collection_name='hosts')
 

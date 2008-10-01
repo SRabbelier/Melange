@@ -45,17 +45,18 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
   offset = request.GET.get('offset')
   limit = request.GET.get('limit')
 
-  offset, limit = list_helpers.getListParemeters(offset, limit)
+  offset, limit = list_helpers.getListParemeters(offset=offset, limit=limit)
   
-  users = id_user.getUsersForOffsetAndLimit(offset, limit)
+  users = id_user.getUsersForOffsetAndLimit(offset=offset, limit=limit)
   
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',
                     'list_row': 'soc/site/user/list/user_row.html',
                     'list_heading': 'soc/site/user/list/user_heading.html'}
                       
-  context = list_helpers.setList(request, context, users, 
-                                 offset, limit, list_templates)
+  context = list_helpers.setList(
+      request, context, users,
+      offset=offset, limit=limit, list_templates=list_templates)
 
   return response_helpers.respond(request, template, context)
                  

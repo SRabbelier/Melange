@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   ]
 
@@ -115,6 +116,79 @@ def getUserIfMissing(user, id):
     user = getUserFromId(id)
     
   return user
+
+
+def getNearestUsers(id=None, link_name=None):
+  """Get User entities just before and just after the specified User.
+    
+  Args:
+    id: a Google Account (users.User) object; default is None (not supplied)
+    link_name: link name string; default is None (not supplied)
+
+  Returns:
+    User entities being those just before and just after the (possibly
+    non-existent) User for given id or link_name,
+      OR
+    possibly None if query had no results or neither id or link_name were
+    supplied.
+  """
+  if id:
+    query = db.GqlQuery("SELECT * FROM User WHERE id > :1", id)
+    return query.fetch(1)
+
+  #if id not supplied, try link name.
+  if link_name:
+    query = db.GqlQuery("SELECT * FROM User WHERE link_name > :1", link_name)
+    return query.fetch(1)
+
+  return None
+
+
+def findNearestUsersOffset(width, id=None, link_name=None):
+  """Finds offset of beginning of a range of Users around the nearest User.
+  
+  Args:
+    limit: the width of the "found" window around the nearest User found 
+    id: a Google Account (users.User) object, or None
+    link_name: link name input in the Lookup form or None if not supplied.
+    
+  Returns:
+    an offset into the list of Users that is width/2 less than the
+    offset of the first User returned by getNearestUsers(), or zero if
+    that offset would be less than zero
+      OR
+    None if there are no nearest Users or the offset of the beginning of
+    the range cannot be found for some reason 
+  """
+  # find User "nearest" to supplied id (Google Account) or link_name
+  nearest_users = getNearestUsers(id=id, link_name=link_name)
+  
+  if not nearest_users:
+    # no "nearest" User, so indicate that with None
+    return None
+
+  nearest_user = nearest_users[0]
+
+  # start search for beginning of nearest Users range at offset zero
+  offset = 0
+  users = getUsersForOffsetAndLimit(offset=offset, limit=width)
+  
+  while True:
+    for user in users:
+      if nearest_user.id == user.id:
+        # nearest User found in current search range, so return a range start
+        return max(0, (offset - (width/2)))
+
+      offset = offset + 1
+
+    # nearest User was not in the current search range, so fetch the next set
+    users = getUsersForOffsetAndLimit(offset=offset, limit=width)
+
+    if not users:
+      # nearest User never found, so indicate that with None
+      break
+
+  return None
 
 
 def doesUserExist(id):

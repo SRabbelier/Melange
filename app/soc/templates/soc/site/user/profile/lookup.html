@@ -98,6 +98,17 @@ Please use this form to look up an existing User in Google Open Source Programs.
    </td>
   </tr>
 {% endif %}
+{% if lookup_link %}
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td colspan="4">
+    <a href="{{ lookup_link }}">The specified User was not found, but similar
+     Users are listed here.</a>
+   </td>
+  </tr>
+{% endif %} 
  </table>
 </form>
 </p>

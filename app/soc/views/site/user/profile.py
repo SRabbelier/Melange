@@ -32,6 +32,7 @@ from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views.helpers import forms_helpers
+from soc.views.helpers import list_helpers
 from soc.views.helpers import request_helpers
 from soc.views.helpers import response_helpers
 from soc.views.user import profile
@@ -127,7 +128,13 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
           lookup_message = ugettext_lazy('User found by email.')
         else:
           email_error = ugettext_lazy('User with that email not found.')
-
+          range_width = list_helpers.getPreferredListPagination()
+          nearest_user_range_start = id_user.findNearestUsersOffset(
+              range_width, id=form_id)
+            
+          if nearest_user_range_start is not None:            
+            context['lookup_link'] = './list?offset=%s&limit=%s' % (
+                nearest_user_range_start, range_width)
       if not user:
         # user not found yet, so see if link name was provided
         linkname = form.cleaned_data.get('link_name')
@@ -141,7 +148,14 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
             email_error = None  # clear previous error, since User was found
           else:
             context['linkname_error'] = ugettext_lazy(
-                'User with that link name not found.')            
+                'User with that link name not found.')
+            range_width = list_helpers.getPreferredListPagination()
+            nearest_user_range_start = id_user.findNearestUsersOffset(
+                range_width, link_name=linkname)
+            
+            if nearest_user_range_start is not None:            
+              context['lookup_link'] = './list?offset=%s&limit=%s' % (
+                  nearest_user_range_start, range_width)
     # else: form was not valid
   # else:  # method == 'GET'
 
@@ -296,7 +310,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
                 values=profile.SUBMIT_MESSAGES))
 
         # populate form with the existing User entity
-        form = EditForm(initial={ 'key_name': user.key().name(),
+        form = EditForm(initial={'key_name': user.key().name(),
             'id': user.id.email, 'link_name': user.link_name,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})
       else:
@@ -368,7 +382,7 @@ class CreateForm(forms_helpers.DbModelForm):
 DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/site/user/profile/edit.html'
 
 def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
-  """View for a Developer to modify the properties of a User Model entity.
+  """View for a Developer to create a new User Model entity.
 
   Args:
     request: the standard django request object

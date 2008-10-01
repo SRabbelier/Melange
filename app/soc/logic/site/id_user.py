@@ -67,6 +67,7 @@ def getIdIfMissing(id=None):
 
   return id
 
+
 def getUsersForOffsetAndLimit(offset=0, limit=0):
   """Returns Users entities for given offset and limit or None if not found.
     
@@ -79,6 +80,7 @@ def getUsersForOffsetAndLimit(offset=0, limit=0):
   # Fetch one more to see if there should be a 'next' link
   return query.fetch(limit+1, offset)  
 
+
 def getUserFromId(id):
   """Returns User entity for a Google Account, or None if not found.  
     
@@ -86,6 +88,7 @@ def getUserFromId(id):
     id: a Google Account (users.User) object
   """
   return soc.models.user.User.gql('WHERE id = :1', id).get()
+
 
 def getUserIfMissing(user, id):
   """Conditionally returns User entity for a Google Account.
@@ -186,18 +189,7 @@ def isIdDeveloper(id=None):
   return user.is_developer
 
 
-LINKNAME_PATTERN = r'''(?x)
-    ^
-    [0-9a-z]   # start with ASCII digit or lowercase
-    (
-     [0-9a-z]  # additional ASCII digit or lowercase
-     |         # -OR-
-     _[0-9a-z] # underscore and ASCII digit or lowercase
-    )*         # zero or more of OR group
-    $
-'''
-
-LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
+LINKNAME_REGEX = re.compile(key_name.LINKNAME_PATTERN)
 
 def isLinkNameFormatValid(link_name):
   """Returns True if link_name is in a valid format.

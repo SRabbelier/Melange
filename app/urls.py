@@ -44,7 +44,9 @@ urlpatterns = patterns(
      'soc.views.site.user.profile.edit'),
     (r'^site/user/list$', 'soc.views.site.user.list.all'),
 
-    (r'^docs/show$', 'soc.views.docs.show.public'),
+    (r'^docs/%s$' % key_name.WORK_PATH_LINKNAME_ARGS_PATTERN,
+     'soc.views.docs.show.public'),
+
     (r'^site/docs/edit$', 'soc.views.site.docs.edit.create'),
     (r'^site/docs/edit/%s$' % key_name.WORK_PATH_LINKNAME_ARGS_PATTERN,
      'soc.views.site.docs.edit.edit'),

@@ -1,0 +1,34 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+{% block page_title %}{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile{% endblock %}
+{% block header_title %}
+{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile for {{ linkname_group.name }}
+{% endblock %}
+{% block body %}
+<p>
+ <table>
+  {% readonly_field_as_table_row linkname_group.fields.name.label linkname_group.name %}
+  {% readonly_field_as_table_row linkname_group.fields.home_page.label linkname_group.home_page %}
+  {% readonly_field_as_table_row linkname_group.fields.description.label linkname_group.description %}
+  {% readonly_field_as_table_row linkname_group.fields.street.label linkname_group.street %}
+  {% readonly_field_as_table_row linkname_group.fields.city.label linkname_group.city %}
+  {% readonly_field_as_table_row linkname_group.fields.state.label linkname_group.state %}
+  {% readonly_field_as_table_row linkname_group.fields.country.label linkname_group.country %}
+  {% readonly_field_as_table_row linkname_group.fields.postalcode.label linkname_group.postalcode %}
+  {% readonly_field_as_table_row linkname_group.fields.phone.label linkname_group.phone %}
+ </table>
+</p>
+{% endblock %}

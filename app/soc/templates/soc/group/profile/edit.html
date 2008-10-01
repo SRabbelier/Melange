@@ -1,0 +1,74 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+{% block scripts %}
+	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+{% endblock %}
+
+{% block page_title %}
+{% if existing_group %}
+Site: Modify Existing {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+{% else %}
+Site: Create New {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+{% endif %}
+{% endblock %}
+{% block header_title %}
+{% if existing_group %}
+Modify Existing {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+{% else %}
+Create a New {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<p>
+<p>
+{% block instructions %}
+Please use this form to alter {% if group_type %}{{ group_type }}{% else %}Group{% endif %} details.
+{% endblock %}
+</p>
+<form method="POST">
+ <table>
+    {% field_as_table_row form.name %}
+    {% field_as_table_row form.link_name %}
+    {% field_as_table_row form.short_name %}
+    {% field_as_table_row form.home_page %}
+    {% field_as_table_row form.email %}
+    {% field_as_table_row form.description %}
+    {% field_as_table_row form.street %}
+    {% field_as_table_row form.city %}
+    {% field_as_table_row form.state %}
+    {% field_as_table_row form.country %}
+    {% field_as_table_row form.postalcode %}
+    {% field_as_table_row form.phone %}
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td> 
+    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
+   </td>
+   <td>
+    <input type="button" onclick="location.href='/'" value="Cancel"/>
+   </td>
+   <td>&nbsp;</td>
+   <td>
+    {% if submit_message %}<b><i>{{ submit_message }}</i></b>{% endif %}
+   </td>
+  </tr>
+ </table>
+</form>
+</p>
+{% endblock %}

@@ -37,10 +37,10 @@ from soc.logic import out_of_band
 from soc.logic import feed
 from soc.logic.site import id_user
 from soc.views import simple
+from soc.views.helpers import custom_widgets
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 from soc.views.helpers import template_helpers
-from soc.views.helpers import custom_widgets
 
 import soc.models.site_settings
 import soc.models.document
@@ -59,7 +59,8 @@ class DocumentForm(forms_helpers.DbModelForm):
     model = soc.models.document.Document
     
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['user','modified','created','link_name', 'inheritance_line']
+    exclude = ['partial_path', 'link_name',
+               'user', 'modified', 'created', 'inheritance_line']
 
 
 class SiteSettingsForm(forms_helpers.DbModelForm):
@@ -169,9 +170,9 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       content = document_form.cleaned_data.get('content')
       
       site_doc = soc.logic.document.updateOrCreateDocument(
-          DEF_SITE_SETTINGS_PATH, link_name=link_name, title=title,
-          short_name=short_name, abstract=abstract, content=content,
-          user=id_user.getUserFromId(logged_in_id))
+          partial_path=DEF_SITE_SETTINGS_PATH, link_name=link_name,
+          title=title, short_name=short_name, abstract=abstract,
+          content=content, user=id_user.getUserFromId(logged_in_id))
       
       feed_url = settings_form.cleaned_data.get('feed_url')
 

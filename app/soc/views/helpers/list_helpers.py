@@ -24,6 +24,19 @@ __authors__ = [
 
 DEF_LIMIT = 10
 
+
+def getPreferredListPagination(user=None):
+    """Returns User's preferred list pagination limit.
+    
+    Args:
+      user: User entity containing the list pagination preference;
+        default is None, to use the current logged-in User
+    """
+    # TODO: eventually this limit should be a User profile preference
+    #   (stored in the site-wide User Model) preference 
+    return DEF_LIMIT
+
+
 def getListParemeters(offset=None, limit=None):
   """Updates and validates offset and limit values of the list.
 

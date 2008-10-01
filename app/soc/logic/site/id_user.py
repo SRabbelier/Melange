@@ -148,7 +148,7 @@ def findNearestUsersOffset(width, id=None, link_name=None):
   """Finds offset of beginning of a range of Users around the nearest User.
   
   Args:
-    limit: the width of the "found" window around the nearest User found 
+    width: the width of the "found" window around the nearest User found 
     id: a Google Account (users.User) object, or None
     link_name: link name input in the Lookup form or None if not supplied.
     

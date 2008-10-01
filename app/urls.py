@@ -46,7 +46,6 @@ urlpatterns = patterns(
 
     (r'^docs/show$', 'soc.views.docs.show.public'),
     (r'^site/docs/edit$', 'soc.views.site.docs.edit.create'),
-    # TODO(tlarsen): need a better path regex pattern than this
     (r'^site/docs/edit/%s$' % key_name.WORK_PATH_LINKNAME_ARGS_PATTERN,
      'soc.views.site.docs.edit.edit'),
     (r'^site/docs/list$', 'soc.views.site.docs.list.all'),

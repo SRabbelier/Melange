@@ -33,6 +33,15 @@ DEF_SITE_USER_LIST_ALL_TMPL = 'soc/site/user/list/all.html'
 
 def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
   """Show a list of all Users (limit rows per page).
+  
+  Args:
+    request: the standard Django HTTP request object
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct an alternate template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which either contains the form to
+    be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
   context = response_helpers.getUniversalContext(request)

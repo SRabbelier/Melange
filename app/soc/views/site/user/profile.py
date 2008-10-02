@@ -362,10 +362,9 @@ class CreateForm(forms_helpers.DbModelForm):
   class Meta:
     model = None
   
-  
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
-    if not validate.LinkNameFormatValid(link_name):
+    if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
       if id_user.doesLinkNameExist(link_name):

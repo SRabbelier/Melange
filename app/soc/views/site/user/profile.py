@@ -223,13 +223,10 @@ class EditForm(forms_helpers.DbModelForm):
     return link_name
 
   def clean_id(self):
-    new_email = self.cleaned_data.get('id')
-    form_id = users.User(email=new_email)
-    key_name = self.data.get('key_name')
-    old_email = id_user.getUserFromKeyName(key_name).id.email()
-    if new_email != old_email:
-      if id_user.isIdUser(form_id):
-        raise forms.ValidationError("This account is already in use.")
+    form_id = users.User(email=self.cleaned_data.get('id'))
+    if not id_user.isIdAvailable(
+        form_id, existing_key_name=self.data.get('key_name')):
+      raise forms.ValidationError("This account is already in use.")
     return form_id
 
 

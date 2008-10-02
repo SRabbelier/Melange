@@ -265,6 +265,38 @@ def isIdDeveloper(id=None):
   return user.is_developer
 
 
+def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
+  """Returns True if Google Account is available for use by existing User.
+  
+  Args:
+    new_id: a Google Account (users.User) object with a (possibly) new email
+    existing_user: an existing User entity; default is None, in which case
+      existing_key_name is used to look up the User entity
+    existing_key_name: the key_name of an existing User entity, used
+      when existing_user is not supplied; default is None
+  """
+  if not existing_user:
+    existing_user = getUserFromKeyName(existing_key_name)
+
+  if existing_user:
+    old_email = existing_user.id.email()
+  else:
+    old_email = None
+
+  if new_id.email() == old_email:
+    # "new" email is same as existing User wanting it, so it is "available"
+    return True
+  # else: "new" email truly is new to the existing User, so keep checking
+
+  if not isIdUser(new_id):
+    # new email address also does not belong to any other User,
+    # so it is available
+    return True
+
+  # email does not already belong to this User, but to some other User
+  return False
+
+
 def getUserFromLinkName(link_name):
   """Returns User entity for link_name or None if not found.
     

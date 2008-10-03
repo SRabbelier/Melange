@@ -100,7 +100,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'soc.views.helpers',
+    'soc.views.helper',
 #    'django.contrib.auth',
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',

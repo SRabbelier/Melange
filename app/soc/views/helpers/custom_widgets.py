@@ -21,12 +21,15 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+
+import copy
+
 from django import newforms as forms
-from django.newforms.widgets import flatatt
-from django.newforms.util import smart_unicode
-from django.utils.html import escape
+from django.newforms import util
+from django.newforms import widgets
+from django.utils import html
 from django.utils import simplejson
-from django.utils.safestring import mark_safe
+from django.utils import safestring
 
 
 class ReadOnlyInput(forms.widgets.Input):
@@ -75,7 +78,7 @@ tinyMCE.init(%(settings_json)s)
     """
     if value is None:
       value = ''
-    value = smart_unicode(value)
+    value = util.smart_unicode(value)
     final_attrs = self.build_attrs(attrs, name=name)
     
     self.mce_settings['elements'] = "id_%s" % name
@@ -83,7 +86,7 @@ tinyMCE.init(%(settings_json)s)
     # convert mce_settings from dict to JSON
     mce_json = simplejson.JSONEncoder().encode(self.mce_settings)
 
-    return mark_safe(self.TINY_MCE_HTML_FMT % 
-        {'attrs': flatatt(final_attrs),
-         'value': escape(value), 
+    return safestring.mark_safe(self.TINY_MCE_HTML_FMT % 
+        {'attrs': widgets.flatatt(final_attrs),
+         'value': html.escape(value), 
          'settings_json':  mce_json})

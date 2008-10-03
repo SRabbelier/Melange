@@ -38,10 +38,10 @@ from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
+import soc.views.helper.forms
 import soc.views.helper.responses
 import soc.views.helper.templates
 import soc.views.helper.widgets
-from soc.views.helpers import forms_helpers
 
 import soc.models.site_settings
 import soc.models.document
@@ -49,7 +49,7 @@ import soc.logic.document
 import soc.logic.site.settings
 
 
-class DocumentForm(forms_helpers.DbModelForm):
+class DocumentForm(helper.forms.DbModelForm):
   content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
 
   class Meta:
@@ -63,7 +63,7 @@ class DocumentForm(forms_helpers.DbModelForm):
                'user', 'modified', 'created', 'inheritance_line']
 
 
-class SiteSettingsForm(forms_helpers.DbModelForm):
+class SiteSettingsForm(helper.forms.DbModelForm):
   """Django form displayed when creating or editing Site Settings.
   """
   class Meta:

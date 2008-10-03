@@ -27,7 +27,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc.views.helpers import forms_helpers
+from soc.views import helper
+import soc.views.helper.forms
 
 
 class ModelWithFieldAttributes(db.Model):
@@ -69,7 +70,7 @@ class ModelWithFieldAttributes(db.Model):
       Property itself via the Model entity.
     """
     if not cls._fields_cache or (cls != cls._fields_cache.__class__.Meta.model):
-      class FieldsProxy(forms_helpers.DbModelForm):
+      class FieldsProxy(helper.forms.DbModelForm):
         """Form used as a proxy to access User model properties attributes.
         """
       

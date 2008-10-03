@@ -33,16 +33,16 @@ from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
+import soc.views.helper.forms
 import soc.views.helper.lists
 import soc.views.helper.requests
 import soc.views.helper.responses
-from soc.views.helpers import forms_helpers
 from soc.views.user import profile
 
 import soc.models.user
 
 
-class LookupForm(forms_helpers.DbModelForm):
+class LookupForm(helper.forms.DbModelForm):
   """Django form displayed for a Developer to look up a User.
   
   This form is manually specified, instead of using
@@ -184,7 +184,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-class EditForm(forms_helpers.DbModelForm):
+class EditForm(helper.forms.DbModelForm):
   """Django form displayed when Developer edits a User.
   
   This form is manually specified, instead of using
@@ -334,7 +334,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-class CreateForm(forms_helpers.DbModelForm):
+class CreateForm(helper.forms.DbModelForm):
   """Django form displayed when Developer creates a User.
 
   This form is manually specified, instead of using

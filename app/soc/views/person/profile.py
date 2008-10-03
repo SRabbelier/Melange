@@ -34,10 +34,11 @@ from django import shortcuts
 from django import newforms as forms
 
 from soc.models import person
-from soc.views.helpers import forms_helpers
+from soc.views import helper
+import soc.views.helper.forms
 
 
-class EditForm(forms_helpers.DbModelForm):
+class EditForm(helper.forms.DbModelForm):
   """Django form displayed when creating or editing a Person.
   """
 

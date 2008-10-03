@@ -33,17 +33,17 @@ from soc.logic import out_of_band
 from soc.logic import path_linkname
 from soc.logic.site import id_user
 from soc.views import helper
+import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 import soc.views.helper.widgets
 from soc.views import simple
-from soc.views.helpers import forms_helpers
 from soc.views.user import profile
 
 import soc.models.document
 
 
-class EditForm(forms_helpers.DbModelForm):
+class EditForm(helper.forms.DbModelForm):
   """Django form displayed when Developer edits a Document.
   """
   doc_key_name = forms.CharField(widget=forms.HiddenInput)
@@ -202,7 +202,7 @@ def edit(request, partial_path=None, linkname=None,
   return helper.responses.respond(request, template, context)
 
 
-class CreateForm(forms_helpers.DbModelForm):
+class CreateForm(helper.forms.DbModelForm):
   """Django form displayed when Developer creates a Document.
   """
   doc_key_name = forms.CharField(widget=forms.HiddenInput)

@@ -32,15 +32,15 @@ from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import helper
+import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 from soc.views import simple
-from soc.views.helpers import forms_helpers
 
 import soc.models.user
 
 
-class UserForm(forms_helpers.DbModelForm):
+class UserForm(helper.forms.DbModelForm):
   """Django form displayed when creating or editing a User.
   """
   class Meta:

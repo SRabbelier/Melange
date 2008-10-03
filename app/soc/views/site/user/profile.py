@@ -32,8 +32,9 @@ from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import simple
+from soc.views import helper
+import soc.views.helper.lists
 from soc.views import helpers
-import soc.views.helpers.list
 import soc.views.helpers.request
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
@@ -130,7 +131,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
           lookup_message = ugettext_lazy('User found by email.')
         else:
           email_error = ugettext_lazy('User with that email not found.')
-          range_width = helpers.list.getPreferredListPagination()
+          range_width = helper.lists.getPreferredListPagination()
           nearest_user_range_start = id_user.findNearestUsersOffset(
               range_width, id=form_id)
             
@@ -151,7 +152,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
           else:
             context['linkname_error'] = ugettext_lazy(
                 'User with that link name not found.')
-            range_width = helpers.list.getPreferredListPagination()
+            range_width = helper.lists.getPreferredListPagination()
             nearest_user_range_start = id_user.findNearestUsersOffset(
                 range_width, link_name=linkname)
             

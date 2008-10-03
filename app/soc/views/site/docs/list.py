@@ -24,8 +24,8 @@ __authors__ = [
 
 from soc.logic import works
 from soc.views import simple
-from soc.views import helpers
-import soc.views.helpers.list
+from soc.views import helper
+import soc.views.helper.lists
 from soc.views.helpers import response_helpers
 
 import soc.models.document
@@ -53,21 +53,21 @@ def all(request, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
   if alt_response:
     return alt_response  
   
-  offset, limit = helpers.list.cleanListParameters(
+  offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
   # Fetch one more to see if there should be a 'next' link
   docs = works.getWorksForLimitAndOffset(
       limit + 1, offset=offset, cls=soc.models.document.Document)
 
-  context['pagination_form'] = helpers.list.makePaginationForm(request, limit)
+  context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',
                     'list_row': 'soc/site/docs/list/docs_row.html',
                     'list_heading': 'soc/site/docs/list/docs_heading.html'}
                       
-  context = helpers.list.setList(
+  context = helper.lists.setList(
       request, context, docs, 
       offset=offset, limit=limit, list_templates=list_templates)
 

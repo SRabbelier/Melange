@@ -34,8 +34,8 @@ from soc.logic import path_linkname
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.requests
+import soc.views.helper.widgets
 from soc.views import simple
-from soc.views.helpers import custom_widgets
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 from soc.views.user import profile
@@ -47,7 +47,7 @@ class EditForm(forms_helpers.DbModelForm):
   """Django form displayed when Developer edits a Document.
   """
   doc_key_name = forms.CharField(widget=forms.HiddenInput)
-  content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
+  content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
   class Meta:
     model = soc.models.document.Document
@@ -206,7 +206,7 @@ class CreateForm(forms_helpers.DbModelForm):
   """Django form displayed when Developer creates a Document.
   """
   doc_key_name = forms.CharField(widget=forms.HiddenInput)
-  content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
+  content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
   class Meta:
     model = soc.models.document.Document

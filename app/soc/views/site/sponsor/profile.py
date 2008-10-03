@@ -33,8 +33,8 @@ from soc.logic import sponsor
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.requests
+import soc.views.helper.widgets
 from soc.views import simple
-from soc.views.helpers import custom_widgets
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 from soc.views.user import profile
@@ -67,7 +67,7 @@ class CreateForm(forms_helpers.DbModelForm):
 class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.
   """
-  link_name = forms.CharField(widget=custom_widgets.ReadOnlyInput())
+  link_name = forms.CharField(widget=helper.widgets.ReadOnlyInput())
 
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')

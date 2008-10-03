@@ -53,7 +53,7 @@ class TinyMCE(forms.widgets.Textarea):
 
   You can set TinyMCE widget for particular form field using code below:
     class ExampleForm(forms_helpers.DbModelForm):
-      content = forms.fields.CharField(widget=custom_widgets.TinyMCE())
+      content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
   You can include tiny_mce_src.js in your template using:
     {% block scripts %}

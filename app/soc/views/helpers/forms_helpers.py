@@ -18,11 +18,15 @@
 """
 
 __authors__ = [
+  '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   ]
 
 
 from google.appengine.ext.db import djangoforms
+
+from django import newforms as forms
+from django.utils import safestring
 
 
 class DbModelForm(djangoforms.ModelForm):
@@ -68,3 +72,101 @@ class DbModelForm(djangoforms.ModelForm):
         # to the corresponding field help_text.
         if hasattr(model_prop, 'help_text'):
           self.fields[field_name].help_text = model_prop.help_text
+
+
+class SelectQueryArgForm(forms.Form):
+  """URL query argument change control implemented as a Django form.
+  """
+
+  ONCHANGE_JAVASCRIPT_FMT = '''
+<script type="text/javascript"> 
+  function changeArg_%(arg_name)s(item) 
+  {
+    var idx=item.selectedIndex;
+    item.selected=true;
+    var value=item.value 
+    var url = location.href 
+    var reg = /%(arg_name)s=\d+/ 
+    url = url.replace(reg, "%(arg_name)s="+value) 
+    if(url.match(reg))
+      document.location.href = url 
+   else
+      document.location.href = "%(page_path)s?%(arg_name)s="+value; 
+  }
+</script>
+'''
+
+  def __init__(self, page_path, arg_name, choices, field_name,
+               *form_args, **form_kwargs):
+    """
+    Args:
+      page_path: (usually request.path)
+      arg_name: the URL query parameter that determines which choice is
+        selected in the selection control
+      choices: list (or tuple) of value/label string two-tuples, for example:
+        (('10', '10 items per page'), ('25', '25 items per page'))
+      field_name: name of the selection field in the form
+      *form_args: positional arguments passed on to the Form base
+        class __init__()
+      *form_kwargs: keyword arguments passed on to the Form base
+        class __init__()
+    """
+    super(SelectQueryArgForm, self).__init__(*form_args, **form_kwargs)
+    
+    self._script = safestring.mark_safe(self.ONCHANGE_JAVASCRIPT_FMT % {
+        'arg_name': arg_name, 'page_path': page_path,})
+ 
+    onchange_js_call = 'changeArg_%s(this)' % arg_name
+    
+    self.fields[field_name] = forms.ChoiceField(
+        label='', choices=choices,
+        widget=forms.widgets.Select(attrs={'onchange': onchange_js_call}))
+      
+  def as_table(self):
+    """Returns form rendered as HTML <tr> rows -- with no <table></table>.
+    
+    Prepends <script> section with onchange function included.
+    """
+    return self._script + super(SelectQueryArgForm, self).as_table()
+
+  def as_ul(self):
+    """Returns form rendered as HTML <li> list items -- with no <ul></ul>.
+    
+    Prepends <script> section with onchange function included.
+    """
+    return self._script + super(SelectQueryArgForm, self).as_ul()
+
+  def as_p(self):
+    """Returns form rendered as HTML <p> paragraphs.
+    
+    Prepends <script> section with onchange function included.
+    """
+    return self._script + super(SelectQueryArgForm, self).as_p()
+
+
+DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT = 'select_query_arg_%(arg_name)s'
+
+def makeSelectQueryArgForm(
+    request, arg_name, initial_value, choices,
+    field_name_fmt=DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
+  """Wrapper that creates a customized SelectQueryArgForm.
+
+  Args:
+    request: the standard Django HTTP request object
+    arg_name: the URL query parameter that determines which choice is
+      selected in the selection control
+    initial_value: the initial value of the selection control
+    choices: list (or tuple) of value/label string two-tuples, for example:
+      (('10', '10 items per page'), ('25', '25 items per page'))
+    field_name_fmt: optional form field name format string; default is
+      DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT; contains these named format
+      specifiers:
+        arg_name: replaced with the arg_name argument
+
+  Returns:
+    a Django form implementing a query argument selection control, for
+    insertion into a template
+  """
+  field_name = field_name_fmt % {'arg_name': arg_name}
+  return SelectQueryArgForm(request.path, arg_name, choices, field_name,
+                            initial={field_name: initial_value})

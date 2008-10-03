@@ -1,4 +1,7 @@
 <div class="pagination">
+
+  {{ pagination_form.as_table }}
+ 
   {% if newest %}
     <a class="novisit" href="{{newest}}">&laquo; First</a>
   {% endif %}

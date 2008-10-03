@@ -18,11 +18,23 @@
 """
 
 __authors__ = [
+  '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
-DEF_LIMIT = 10
+from soc.views.helpers import forms_helpers
+
+
+DEF_PAGINATION = 10
+MAX_PAGINATION = 100
+
+DEF_PAGINATION_CHOICES = (
+  ('10', '10 items per page'),
+  ('25', '25 items per page'),
+  ('50', '50 items per page'),
+  ('100', '100 items per page'),
+)
 
 
 def getPreferredListPagination(user=None):
@@ -34,11 +46,11 @@ def getPreferredListPagination(user=None):
     """
     # TODO: eventually this limit should be a User profile preference
     #   (stored in the site-wide User Model) preference 
-    return DEF_LIMIT
+    return DEF_PAGINATION
 
 
-def getListParemeters(offset=None, limit=None):
-  """Updates and validates offset and limit values of the list.
+def cleanListParameters(offset=None, limit=None):
+  """Converts and validates offset and limit values of the list.
 
   Args:
     offset: offset in list which defines first item to return
@@ -47,29 +59,22 @@ def getListParemeters(offset=None, limit=None):
   Returns:
     updated offset and limit values
   """
-  # update offset value 
-  if offset:
-    try:
-      offset = int(offset)
-    except:
-      offset = 0
-    else:
-      offset = max(0, offset)
-  else:
+  # update offset value
+  try:
+    offset = int(offset)
+  except:
+    # also catches offset=None case where offset not supplied
     offset = 0
-  
+
   # update limit value
-  if limit:
-    try:
-      limit = int(limit)
-    except:
-      limit = DEF_LIMIT
-    else:
-      limit = max(1, min(limit, 100))
-  else:
-    limit = DEF_LIMIT
-  
-  return offset, limit
+  try:
+    limit = int(limit)
+  except:
+    # also catches limit=None case where limit not supplied
+    limit = getPreferredListPagination()
+
+  return max(0, offset), max(1, min(limit, MAX_PAGINATION))
+
 
 DEF_LIST_TEMPLATES = {'list_main': 'soc/list/list_main.html',
                       'list_pagination': 'soc/list/list_pagination.html',
@@ -144,3 +149,65 @@ def setList(request, context, list_data,
      'last': len(list_data) > 1 and offset+len(list_data) or None})
   
   return context
+
+
+def makePaginationForm(
+  request, limit, arg_name='limit', choices=DEF_PAGINATION_CHOICES,
+  field_name_fmt=forms_helpers.DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
+  """Returns a customized pagination limit selection form.
+  
+  Args:
+    request: the standard Django HTTP request object
+    limit: the initial value of the selection control
+    arg_name: see forms_helpers.makeSelectQueryArgForm(); default is 'limit'
+    choices: see forms_helpers.makeSelectQueryArgForm(); default is
+      DEF_PAGINATION_CHOICES
+    field_name_fmt: see forms_helpers.makeSelectQueryArgForm()
+  """
+  choices = makeNewPaginationChoices(limit=limit, choices=choices)
+  
+  return forms_helpers.makeSelectQueryArgForm(
+      request, arg_name, limit, choices)
+
+
+def makeNewPaginationChoices(limit=DEF_PAGINATION,
+                             choices=DEF_PAGINATION_CHOICES):
+  """Updates the pagination limit selection form.
+
+  Args:
+    limit: the initial value of the selection control;
+      default is DEF_PAGINATION
+    choices: see forms_helpers.makeSelectQueryArgForm();
+      default is DEF_PAGINATION_CHOICES
+
+  Returns:
+    a new pagination choices list if limit is not in
+    DEF_PAGINATION_CHOICES, or DEF_PAGINATION_CHOICES otherwise
+  """
+  # determine where to insert the new limit into choices
+  new_choices = []
+  inserted = False
+  
+  for pagination, label in choices:
+    items = int(pagination)
+
+    if limit == items:
+      # limit is already present, so just return existing choices
+      return choices
+
+    if (not inserted) and (limit < items):
+      # limit needs to be inserted before the current pagination,
+      # so assemble a new choice tuple and append it 
+      choice = (str(limit), '%s items per page' % limit)
+      new_choices.append(choice)
+      inserted = True
+      
+    # append the existing choice
+    new_choices.append((pagination, label))
+
+  if not inserted:
+    # new choice must go last, past all other existing choices
+    choice = (str(limit), '%s items per page' % limit)
+    new_choices.append(choice)
+      
+  return new_choices

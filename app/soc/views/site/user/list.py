@@ -52,17 +52,13 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
   if alt_response:
     return alt_response  
   
-  offset = request.GET.get('offset')
-  limit = request.GET.get('limit')
-
-  offset, limit = list_helpers.getListParemeters(offset=offset, limit=limit)
+  offset, limit = list_helpers.cleanListParameters(
+      offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
   # Fetch one more to see if there should be a 'next' link
   users = id_user.getUsersForLimitAndOffset(limit + 1, offset=offset)
 
-  # TODO(tlarsen): uncomment when pagination select control is working.
-  # form = list_helpers.makeSelectNumItemsForm(request, limit)
-  # context['form'] = form
+  context['pagination_form'] = list_helpers.makePaginationForm(request, limit)
   
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',

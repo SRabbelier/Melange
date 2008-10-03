@@ -34,8 +34,7 @@ from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
 import soc.views.helper.lists
-from soc.views import helpers
-import soc.views.helpers.request
+import soc.views.helper.requests
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
 from soc.views.user import profile
@@ -170,7 +169,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
     if request.path.endswith('lookup'):
       # convert /lookup path into /profile/link_name path
-      context['edit_link'] = helpers.request.replaceSuffix(
+      context['edit_link'] = helper.requests.replaceSuffix(
           request.path, 'lookup', 'profile/%s' % user.link_name)
     # else: URL is not one that was expected, so do not display edit link
   elif not form:
@@ -297,7 +296,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit) 
         if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
-            and (not helpers.request.isReferrerSelf(request,
+            and (not helper.requests.isReferrerSelf(request,
                                                     suffix=linkname))):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)
@@ -305,7 +304,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         # referrer was us, so select which submit message to display
         # (may display no message if ?s=0 parameter is not present)
         context['submit_message'] = (
-            helpers.request.getSingleIndexedParamValue(
+            helper.requests.getSingleIndexedParamValue(
                 request, profile.SUBMIT_MSG_PARAM_NAME,
                 values=profile.SUBMIT_MESSAGES))
 

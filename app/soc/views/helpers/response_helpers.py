@@ -41,8 +41,8 @@ except ImportError:
 from soc.logic import system
 from soc.logic.site import id_user
 from soc.logic.site import sidebar
-from soc.views import helpers 
-import soc.views.helpers.request
+from soc.views import helper
+import soc.views.helper.requests
 from soc.views.helpers import html_menu
 
 
@@ -142,11 +142,11 @@ def redirectToChangedSuffix(
   Args:
     request: the Django HTTP request object; redirect path is derived from
       request.path
-    old_suffix, new_suffix, params:  see helpers.request.replaceSuffix()
+    old_suffix, new_suffix, params:  see helper.requests.replaceSuffix()
       
   Returns:
     a Django HTTP redirect response pointing to the altered path
   """
-  path = helpers.request.replaceSuffix(request.path, old_suffix, new_suffix,
+  path = helper.requests.replaceSuffix(request.path, old_suffix, new_suffix,
                                        params=params)
   return http.HttpResponseRedirect(path)

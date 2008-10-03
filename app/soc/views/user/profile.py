@@ -31,8 +31,8 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
-from soc.views import helpers
-import soc.views.helpers.request
+from soc.views import helper
+import soc.views.helper.requests
 from soc.views import simple
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
@@ -140,7 +140,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # is 'Profile saved' parameter present, but referrer was not ourself?
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(SUBMIT_MSG_PARAM_NAME)
-          and (not helpers.request.isReferrerSelf(request,
+          and (not helper.requests.isReferrerSelf(request,
                                                   suffix=linkname))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
@@ -148,7 +148,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # referrer was us, so select which submit message to display
       # (may display no message if ?s=0 parameter is not present)
       context['submit_message'] = (
-          helpers.request.getSingleIndexedParamValue(
+          helper.requests.getSingleIndexedParamValue(
               request, SUBMIT_MSG_PARAM_NAME, values=SUBMIT_MESSAGES))
 
       # populate form with the existing User entity

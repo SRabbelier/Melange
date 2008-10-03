@@ -29,8 +29,9 @@ from google.appengine.api import users
 from soc.logic import document
 from soc.logic import out_of_band
 from soc.views import simple
+from soc.views import helper
+import soc.views.helper.templates
 from soc.views.helpers import response_helpers
-from soc.views.helpers import template_helpers
 
 
 DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
@@ -69,7 +70,7 @@ def public(request, partial_path=None, linkname=None,
     # show custom 404 page when Document path doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)
 
-  doc.content = template_helpers.unescape(doc.content)
+  doc.content = helper.templates.unescape(doc.content)
   context['document'] = doc
 
   return response_helpers.respond(request, template, context)

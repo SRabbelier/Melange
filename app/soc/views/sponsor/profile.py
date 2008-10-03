@@ -25,8 +25,9 @@ __authors__ = [
 from soc.logic import out_of_band
 from soc.logic import sponsor
 from soc.views import simple
+from soc.views import helper
+import soc.views.helper.templates
 from soc.views.helpers import response_helpers
-from soc.views.helpers import template_helpers
 
 
 DEF_SPONSOR_PUBLIC_TMPL = 'soc/group/profile/public.html'
@@ -52,7 +53,7 @@ def public(request, linkname=None, template=DEF_SPONSOR_PUBLIC_TMPL):
     return simple.errorResponse(request, error, template, context)
 
   linkname_sponsor.description = \
-      template_helpers.unescape(linkname_sponsor.description)
+      helper.templates.unescape(linkname_sponsor.description)
   
   context.update({'linkname_group': linkname_sponsor,
                   'group_type': 'Sponsor'})

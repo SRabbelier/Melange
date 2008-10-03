@@ -27,8 +27,9 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import out_of_band
 from soc.logic.site import id_user
+from soc.views import helper
+import soc.views.helper.templates
 from soc.views.helpers import response_helpers
-from soc.views.helpers import template_helpers
 
 
 def templateWithLinkName(request,
@@ -74,7 +75,7 @@ def public(request, template, linkname, context):
   """
   return templateWithLinkName(
       request, linkname=linkname, context=context,
-      template=template_helpers.makeSiblingTemplatesList(
+      template=helper.templates.makeSiblingTemplatesList(
           template, 'public.html'))
 
 
@@ -97,7 +98,7 @@ def errorResponse(request, error, template, context):
   context = response_helpers.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
-  error_templates = template_helpers.makeSiblingTemplatesList(
+  error_templates = helper.templates.makeSiblingTemplatesList(
       template, 'error.html', default_template=DEF_ERROR_TMPL)
 
   context['error_status'] = error.response_args.get('status')
@@ -130,7 +131,7 @@ def requestLogin(request, template, context, login_message_fmt=None):
   context = response_helpers.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
-  login_templates = template_helpers.makeSiblingTemplatesList(
+  login_templates = helper.templates.makeSiblingTemplatesList(
       template, 'login.html', default_template=DEF_LOGIN_TMPL)
   
   if not context.get('login_message'):

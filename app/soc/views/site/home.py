@@ -37,10 +37,11 @@ from soc.logic import out_of_band
 from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import simple
+from soc.views import helper
+import soc.views.helper.templates
 from soc.views.helpers import custom_widgets
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
-from soc.views.helpers import template_helpers
 
 import soc.models.site_settings
 import soc.models.document
@@ -113,7 +114,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
     site_doc = site_settings.home
   
     if site_doc:
-      site_doc.content = template_helpers.unescape(site_doc.content)
+      site_doc.content = helper.templates.unescape(site_doc.content)
       context.update({'site_document': site_doc})
 
   return response_helpers.respond(request, template, context)

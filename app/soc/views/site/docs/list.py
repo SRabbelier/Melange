@@ -26,7 +26,7 @@ from soc.logic import works
 from soc.views import simple
 from soc.views import helper
 import soc.views.helper.lists
-from soc.views.helpers import response_helpers
+import soc.views.helper.responses
 
 import soc.models.document
 
@@ -46,7 +46,7 @@ def all(request, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -71,4 +71,4 @@ def all(request, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
       request, context, docs, 
       offset=offset, limit=limit, list_templates=list_templates)
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

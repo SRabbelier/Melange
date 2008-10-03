@@ -28,8 +28,8 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import helper
+import soc.views.helper.responses
 import soc.views.helper.templates
-from soc.views.helpers import response_helpers
 
 
 def templateWithLinkName(request,
@@ -52,14 +52,14 @@ def templateWithLinkName(request,
     A subclass of django.http.HttpResponse containing the generated page.
   """
   context['linkname'] = linkname
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
 
   try:
     context['linkname_user'] = id_user.getUserIfLinkName(linkname)
   except out_of_band.ErrorResponse, error:
     return errorResponse(request, error, template, context)
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)
 
 
 def public(request, template, linkname, context):
@@ -95,7 +95,7 @@ def errorResponse(request, error, template, context):
       error_status: error.response_args['status'], or None if a status code
         was not supplied to the ErrorResponse
   """
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
   error_templates = helper.templates.makeSiblingTemplatesList(
@@ -104,7 +104,7 @@ def errorResponse(request, error, template, context):
   context['error_status'] = error.response_args.get('status')
   context['error_message'] = error.message
 
-  return response_helpers.respond(request, error_templates, context=context,
+  return helper.responses.respond(request, error_templates, context=context,
                                   response_args=error.response_args)
 
 
@@ -128,7 +128,7 @@ def requestLogin(request, template, context, login_message_fmt=None):
       login_message: the caller can completely construct the message supplied
         to the login template in lieu of using login_message_fmt
   """
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
   
   # make a list of possible "sibling" templates, then append a default
   login_templates = helper.templates.makeSiblingTemplatesList(
@@ -139,7 +139,7 @@ def requestLogin(request, template, context, login_message_fmt=None):
       login_message_fmt = DEF_LOGIN_MSG_FMT
     context['login_message'] = login_message_fmt % context  
   
-  return response_helpers.respond(request, login_templates, context=context)
+  return helper.responses.respond(request, login_templates, context=context)
 
 
 def getAltResponseIfNotLoggedIn(request, context=None,
@@ -167,7 +167,7 @@ def getAltResponseIfNotLoggedIn(request, context=None,
     return None
 
   # if missing, create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
 
   return requestLogin(request, template, context,
                       login_message_fmt=login_message_fmt)
@@ -200,7 +200,7 @@ def getAltResponseIfNotUser(request, context=None,
     return None
 
   # if missing, create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
 
   return requestLogin(request, template, context,
                       login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
@@ -234,7 +234,7 @@ def getAltResponseIfNotDeveloper(request, context=None,
   id = id_user.getIdIfMissing(id)
 
   # if missing, create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request, context=context)
+  context = helper.responses.getUniversalContext(request, context=context)
 
   if not id:
     return requestLogin(request, template, context,

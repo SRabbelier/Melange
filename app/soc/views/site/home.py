@@ -38,10 +38,10 @@ from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
+import soc.views.helper.responses
 import soc.views.helper.templates
 import soc.views.helper.widgets
 from soc.views.helpers import forms_helpers
-from soc.views.helpers import response_helpers
 
 import soc.models.site_settings
 import soc.models.document
@@ -104,7 +104,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
     A subclass of django.http.HttpResponse with generated template.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
   
   site_settings = soc.logic.site.settings.getSiteSettings(DEF_SITE_SETTINGS_PATH)
 
@@ -116,7 +116,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
       site_doc.content = helper.templates.unescape(site_doc.content)
       context.update({'site_document': site_doc})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)
 
 
 DEF_SITE_HOME_EDIT_TMPL = 'soc/site/home/edit.html'
@@ -132,7 +132,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
     A subclass of django.http.HttpResponse with generated template.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
   
   logged_in_id = users.get_current_user()
   
@@ -204,4 +204,4 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
   context.update({'document_form': document_form,
                   'settings_form': settings_form })
   
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

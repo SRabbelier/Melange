@@ -30,8 +30,8 @@ from soc.logic import document
 from soc.logic import out_of_band
 from soc.views import simple
 from soc.views import helper
+import soc.views.helper.responses
 import soc.views.helper.templates
-from soc.views.helpers import response_helpers
 
 
 DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
@@ -54,7 +54,7 @@ def public(request, partial_path=None, linkname=None,
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   # TODO: there eventually needs to be a call to some controller logic that
   #   implements some sort of access controls, based on the currently
@@ -73,4 +73,4 @@ def public(request, partial_path=None, linkname=None,
   doc.content = helper.templates.unescape(doc.content)
   context['document'] = doc
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

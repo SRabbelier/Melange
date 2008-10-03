@@ -33,9 +33,9 @@ from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.requests
+import soc.views.helper.responses
 from soc.views import simple
 from soc.views.helpers import forms_helpers
-from soc.views.helpers import response_helpers
 
 import soc.models.user
 
@@ -90,7 +90,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   id = users.get_current_user()
 
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   if (not id) and (not linkname):
     # not logged in, and no link name, so request that the user sign in 
@@ -130,7 +130,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
       # redirect to new /user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, linkname, new_linkname, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists    
@@ -161,5 +161,5 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # no User entity exists for this Google Account, so show a blank form
       form = UserForm()
 
-  context.update({'form': form})
-  return response_helpers.respond(request, template, context)
+  context['form'] = form
+  return helper.responses.respond(request, template, context)

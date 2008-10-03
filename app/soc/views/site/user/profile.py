@@ -35,8 +35,8 @@ from soc.views import simple
 from soc.views import helper
 import soc.views.helper.lists
 import soc.views.helper.requests
+import soc.views.helper.responses
 from soc.views.helpers import forms_helpers
-from soc.views.helpers import response_helpers
 from soc.views.user import profile
 
 import soc.models.user
@@ -104,7 +104,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -181,7 +181,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
                   'email_error': email_error,
                   'lookup_message': lookup_message})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)
 
 
 class EditForm(forms_helpers.DbModelForm):
@@ -250,7 +250,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -286,7 +286,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
         
       # redirect to new /site/user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, linkname, new_linkname,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
@@ -331,7 +331,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   context.update({'form': form,
                   'existing_user': user})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)
 
 
 class CreateForm(forms_helpers.DbModelForm):
@@ -392,7 +392,7 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -417,7 +417,7 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
       # redirect to new /site/user/profile/new_linkname?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, None, new_linkname,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
@@ -426,4 +426,4 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
   context['form'] = form
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

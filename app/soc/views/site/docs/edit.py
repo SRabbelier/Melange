@@ -34,10 +34,10 @@ from soc.logic import path_linkname
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.requests
+import soc.views.helper.responses
 import soc.views.helper.widgets
 from soc.views import simple
 from soc.views.helpers import forms_helpers
-from soc.views.helpers import response_helpers
 from soc.views.user import profile
 
 import soc.models.document
@@ -89,7 +89,7 @@ def edit(request, partial_path=None, linkname=None,
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   logged_in_id = users.get_current_user()
   
@@ -153,7 +153,7 @@ def edit(request, partial_path=None, linkname=None,
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, path, new_path,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
@@ -199,7 +199,7 @@ def edit(request, partial_path=None, linkname=None,
   context.update({'form': form,
                   'existing_doc': doc})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)
 
 
 class CreateForm(forms_helpers.DbModelForm):
@@ -240,7 +240,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -271,7 +271,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, None, new_path,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
@@ -280,4 +280,4 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
 
   context.update({'form': form})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

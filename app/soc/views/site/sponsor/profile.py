@@ -33,10 +33,10 @@ from soc.logic import sponsor
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.requests
+import soc.views.helper.responses
 import soc.views.helper.widgets
 from soc.views import simple
 from soc.views.helpers import forms_helpers
-from soc.views.helpers import response_helpers
 from soc.views.user import profile
 
 import soc.models.sponsor
@@ -96,7 +96,7 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
     be filled out, or a redirect to the correct view in the interface.
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -150,7 +150,7 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
         
       # redirect to new /site/sponsor/profile/form_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
-      return response_helpers.redirectToChangedSuffix(
+      return helper.responses.redirectToChangedSuffix(
           request, None, form_ln,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
 
@@ -184,4 +184,4 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
                   'existing_group':  existing_sponsor,
                   'group_type': 'Sponsor'})
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

@@ -27,7 +27,7 @@ from soc.views import simple
 
 from soc.views import helper
 import soc.views.helper.lists
-from soc.views.helpers import response_helpers
+import soc.views.helper.responses
 
 
 DEF_SITE_SPONSOR_LIST_ALL_TMPL = 'soc/group/list/all.html'
@@ -36,7 +36,7 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
   """Show a list of all Sponsors (limit rows per page).
   """
   # create default template context for use with any templates
-  context = response_helpers.getUniversalContext(request)
+  context = helper.responses.getUniversalContext(request)
 
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
@@ -61,4 +61,4 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
                                  
   context['group_type'] = 'Sponsor'
 
-  return response_helpers.respond(request, template, context)
+  return helper.responses.respond(request, template, context)

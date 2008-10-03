@@ -24,6 +24,7 @@ __authors__ = [
 
 from soc.logic import sponsor
 from soc.views import simple
+
 from soc.views import helpers
 import soc.views.helpers.list
 from soc.views.helpers import response_helpers

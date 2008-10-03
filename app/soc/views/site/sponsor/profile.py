@@ -31,11 +31,12 @@ from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic import sponsor
 from soc.logic.site import id_user
+from soc.views import helpers
+import soc.views.helpers.request
 from soc.views import simple
 from soc.views.helpers import custom_widgets
 from soc.views.helpers import forms_helpers
 from soc.views.helpers import response_helpers
-from soc.views.helpers import request_helpers
 from soc.views.user import profile
 
 import soc.models.sponsor
@@ -158,14 +159,14 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       # is 'Profile saved' parameter present, but referrer was not ourself?
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
-          and (not request_helpers.isReferrerSelf(request, suffix=linkname))):
+          and (not helpers.request.isReferrerSelf(request, suffix=linkname))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
       
       # referrer was us, so select which submit message to display
       # (may display no message if ?s=0 parameter is not present)
       context['submit_message'] = (
-          request_helpers.getSingleIndexedParamValue(
+          helpers.request.getSingleIndexedParamValue(
               request, profile.SUBMIT_MSG_PARAM_NAME,
               values=profile.SUBMIT_MESSAGES))    
               

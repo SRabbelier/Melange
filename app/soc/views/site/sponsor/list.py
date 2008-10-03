@@ -24,7 +24,8 @@ __authors__ = [
 
 from soc.logic import sponsor
 from soc.views import simple
-from soc.views.helpers import list_helpers
+from soc.views import helpers
+import soc.views.helpers.list
 from soc.views.helpers import response_helpers
 
 
@@ -41,20 +42,20 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
   if alt_response:
     return alt_response  
   
-  offset, limit = list_helpers.cleanListParameters(
+  offset, limit = helpers.list.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
   
   # Fetch one more to see if there should be a 'next' link
   sponsors = sponsor.getSponsorsForLimitAndOffset(limit + 1, offset=offset)
 
-  context['pagination_form'] = list_helpers.makePaginationForm(request, limit)
+  context['pagination_form'] = helpers.list.makePaginationForm(request, limit)
   
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',
                     'list_row': 'soc/group/list/group_row.html',
                     'list_heading': 'soc/group/list/group_heading.html'}
                       
-  context = list_helpers.setList(request, context, sponsors, 
+  context = helpers.list.setList(request, context, sponsors, 
                                  offset, limit, list_templates)
                                  
   context['group_type'] = 'Sponsor'

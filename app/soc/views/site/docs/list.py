@@ -22,7 +22,7 @@ __authors__ = [
   ]
 
 
-from soc.logic import document
+from soc.logic import works
 from soc.views import simple
 from soc.views.helpers import list_helpers
 from soc.views.helpers import response_helpers
@@ -56,9 +56,14 @@ def all(request, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
   limit = request.GET.get('limit')
 
   offset, limit = list_helpers.getListParemeters(offset=offset, limit=limit)
-  
-  docs = document.getWorksForOffsetAndLimit(
-      offset=offset, limit=limit, cls=soc.models.document.Document)
+
+  # Fetch one more to see if there should be a 'next' link
+  docs = works.getWorksForLimitAndOffset(
+      limit + 1, offset=offset, cls=soc.models.document.Document)
+
+  # TODO(tlarsen): uncomment when pagination select control is working.
+  # form = list_helpers.makeSelectNumItemsForm(request, limit)
+  # context['form'] = form
 
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',

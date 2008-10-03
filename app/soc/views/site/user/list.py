@@ -29,6 +29,7 @@ from soc.views.helpers import response_helpers
 
 import soc.models.user
 
+
 DEF_SITE_USER_LIST_ALL_TMPL = 'soc/site/user/list/all.html'
 
 def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
@@ -55,8 +56,13 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
   limit = request.GET.get('limit')
 
   offset, limit = list_helpers.getListParemeters(offset=offset, limit=limit)
-  
-  users = id_user.getUsersForOffsetAndLimit(offset=offset, limit=limit)
+
+  # Fetch one more to see if there should be a 'next' link
+  users = id_user.getUsersForLimitAndOffset(limit + 1, offset=offset)
+
+  # TODO(tlarsen): uncomment when pagination select control is working.
+  # form = list_helpers.makeSelectNumItemsForm(request, limit)
+  # context['form'] = form
   
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',

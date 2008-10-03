@@ -31,10 +31,9 @@ from soc.logic import key_name
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 
-import soc.logic.model
+from soc.logic import model
 
 import soc.models.document
-import soc.models.work
 
 
 def getDocument(path, link_name=None):
@@ -114,20 +113,3 @@ def updateOrCreateDocument(**document_properties):
   # got an existing one due to a race, so update with document_properties anyway,
   # in a transaction
   return soc.logic.model.updateModelProperties(document, **document_properties)
-
-
-def getWorksForOffsetAndLimit(offset=0, limit=0, cls=soc.models.work.Work):
-  """Returns Works for given offset and limit or None if not found.
-    
-  Args:
-    offset: offset in entities list which defines first entity to return
-    limit: max amount of entities to return
-    cls: Model class of items to return (including sub-classes of that type);
-      default is Work
-  """
-  query = db.GqlQuery(
-      'SELECT * FROM Work WHERE inheritance_line = :1 ORDER BY title',
-      key_name.getFullClassName(cls))
-
-  # Fetch one more to see if there should be a 'next' link
-  return query.fetch(limit+1, offset)  

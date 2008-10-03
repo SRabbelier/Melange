@@ -31,11 +31,6 @@ class Error(Exception):
   pass
 
 
-def getFullClassName(cls):
-  """Returns fully-qualified module.class name string.""" 
-  return '%s.%s' % (cls.__module__, cls.__name__) 
-
-
 def nameDocument(partial_path, link_name=None):
   """Returns a Document key name constructed from a path and link name.
     

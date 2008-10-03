@@ -46,7 +46,12 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
 
   offset, limit = list_helpers.getListParemeters(offset, limit)
   
-  sponsors = sponsor.getSponsorsForOffsetAndLimit(offset, limit)
+  # Fetch one more to see if there should be a 'next' link
+  sponsors = sponsor.getSponsorsForLimitAndOffset(limit + 1, offset=offset)
+
+  # TODO(tlarsen): uncomment when pagination select control is working.
+  # form = list_helpers.makeSelectNumItemsForm(request, limit)
+  # context['form'] = form
   
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',

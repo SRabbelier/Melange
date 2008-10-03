@@ -29,6 +29,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 
 from soc.logic import key_name
+from soc.logic import model
 from soc.logic import out_of_band
 
 import soc.models.user
@@ -69,17 +70,16 @@ def getIdIfMissing(id=None):
   return id
 
 
-def getUsersForOffsetAndLimit(offset=0, limit=0):
+def getUsersForLimitAndOffset(limit, offset=0):
   """Returns Users entities for given offset and limit or None if not found.
     
   Args:
-    offset: offset in entities list which defines first entity to return
     limit: max amount of entities to return
+    offset: optional offset in entities list which defines first entity to
+      return; default is zero (first entity)
   """
-  query = db.GqlQuery('SELECT * FROM User ORDER BY id')
-
-  # Fetch one more to see if there should be a 'next' link
-  return query.fetch(limit+1, offset)  
+  return model.getEntitiesForLimitAndOffset(
+      soc.models.user.User, limit, offset=offset, order_by='id')
 
 
 def getUserFromId(id):
@@ -132,16 +132,8 @@ def getNearestUsers(id=None, link_name=None):
     possibly None if query had no results or neither id or link_name were
     supplied.
   """
-  if id:
-    query = db.GqlQuery("SELECT * FROM User WHERE id > :1", id)
-    return query.fetch(1)
-
-  #if id not supplied, try link name.
-  if link_name:
-    query = db.GqlQuery("SELECT * FROM User WHERE link_name > :1", link_name)
-    return query.fetch(1)
-
-  return None
+  return model.getNearestEntities(
+      soc.models.user.User, [('id', id), ('link_name', link_name)])
 
 
 def findNearestUsersOffset(width, id=None, link_name=None):
@@ -160,35 +152,8 @@ def findNearestUsersOffset(width, id=None, link_name=None):
     None if there are no nearest Users or the offset of the beginning of
     the range cannot be found for some reason 
   """
-  # find User "nearest" to supplied id (Google Account) or link_name
-  nearest_users = getNearestUsers(id=id, link_name=link_name)
-  
-  if not nearest_users:
-    # no "nearest" User, so indicate that with None
-    return None
-
-  nearest_user = nearest_users[0]
-
-  # start search for beginning of nearest Users range at offset zero
-  offset = 0
-  users = getUsersForOffsetAndLimit(offset=offset, limit=width)
-  
-  while True:
-    for user in users:
-      if nearest_user.id == user.id:
-        # nearest User found in current search range, so return a range start
-        return max(0, (offset - (width/2)))
-
-      offset = offset + 1
-
-    # nearest User was not in the current search range, so fetch the next set
-    users = getUsersForOffsetAndLimit(offset=offset, limit=width)
-
-    if not users:
-      # nearest User never found, so indicate that with None
-      break
-
-  return None
+  return model.findNearestEntitiesOffset(
+    width, soc.models.user.User, [('id', id), ('link_name', link_name)])
 
 
 def doesUserExist(id):

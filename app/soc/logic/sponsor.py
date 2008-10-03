@@ -99,17 +99,16 @@ def getSponsorKeyNameForLinkName(link_name):
   return key_name.nameSponsor(link_name)
 
 
-def getSponsorsForOffsetAndLimit(offset=0, limit=0):
+def getSponsorsForLimitAndOffset(limit, offset=0):
   """Returns Sponsors entities for given offset and limit or None if not found.
 
   Args:
-    offset: offset in entities list which defines first entity to return
     limit: max amount of entities to return
+    offset: optional offset in entities list which defines first entity to
+      return; default is zero (first entity)
   """
   query = soc.models.sponsor.Sponsor.all()
-  
-  # Fetch one more to see if there should be a 'next' link
-  return query.fetch(limit+1, offset)
+  return query.fetch(limit, offset)
 
 
 def updateOrCreateSponsorFromLinkName(sponsor_link_name, **sponsor_properties):

@@ -29,15 +29,15 @@ from django.utils import datastructures
 
 from soc.logic import menu
 from soc.logic.site import id_user
+from soc.logic.site import map
 
 
 def buildUserSidebar(id=None, **ignored):
   """Returns a list of menu items for the User portion of the sidebar.
   
   Args:
-    is_admin: Boolean indicating that current user is a "Developer"
-      (site super-user); default is None, in which case
-      id_user.isIdDeveloper() is called 
+    id: a Google Account (users.User) object; default is None, in which
+      case users.get_current_user() is called 
     **ignored: other keyword arguments supplied to other sidebar builder
       functions, but ignored by this one
   """
@@ -45,27 +45,9 @@ def buildUserSidebar(id=None, **ignored):
     id = users.get_current_user()
 
   if not id:
-    return [
-      # user is logged out, so User top-level menu doubles as a sign-in link
-      menu.MenuItem(
-        'User (sign in)',
-        value=users.create_login_url('/')),
-    ]
-    
-  return [
-    # user is logged in, so User top-level menu doubles as a sign-out link
-    menu.MenuItem(
-      'User (sign out)',
-      value=users.create_logout_url('/'),
-      sub_menu=menu.Menu(items=[
-        # edit existing (or create new) site-wide User profile
-        menu.MenuItem(
-          'Site-wide Profile',
-          value='/user/profile'),
-        ]
-      )
-    ),
-  ]
+    return [map.user_signin.makeMenuItem()]
+
+  return [map.user_signout.makeMenuItem()]
 
 
 def buildSiteSidebar(is_admin=None, **ignored):
@@ -85,37 +67,7 @@ def buildSiteSidebar(is_admin=None, **ignored):
     # user is either not logged in or not a "Developer", so return no menu
     return None
 
-  return [
-    menu.MenuItem(
-      # Site top-level menu doubles as link for editing site-wide settings
-      'Site',
-      value='/site/home/edit',
-      sub_menu=menu.Menu(items=[
-        menu.MenuItem(
-          'Search Site for a User',
-          value='/site/user/lookup'),
-        menu.MenuItem(
-          'List Users of Site',
-          value='/site/user/list'),
-        menu.MenuItem(
-          'Create a new Site User',
-          value='/site/user/profile'),
-        menu.MenuItem(
-          'List Documents on Site',
-          value='/site/docs/list'),
-        menu.MenuItem(
-          'Create a new Site Document',
-          value='/site/docs/edit'),
-        menu.MenuItem(
-          'List Sponsors',
-          value='/site/sponsor/list'),
-        menu.MenuItem(
-          'Create a new Sponsor',
-          value='/site/sponsor/profile'),
-        ]
-      )
-    ),
-  ]
+  return [map.site_home_edit.makeMenuItem()]
 
 
 def buildProgramsSidebar(**unused):

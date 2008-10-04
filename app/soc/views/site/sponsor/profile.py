@@ -185,3 +185,9 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
                   'group_type': 'Sponsor'})
 
   return helper.responses.respond(request, template, context)
+
+
+def create(request, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+  """create() view is same as edit() view, but with no linkname supplied.
+  """
+  return edit(request, linkname=None, template=template)

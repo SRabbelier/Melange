@@ -163,3 +163,9 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
   context['form'] = form
   return helper.responses.respond(request, template, context)
+
+
+def create(request, template=DEF_USER_PROFILE_EDIT_TMPL):
+  """create() view is same as edit() view, but with no linkname supplied.
+  """
+  return edit(request, linkname=None, template=template)

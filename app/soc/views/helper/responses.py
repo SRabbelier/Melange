@@ -43,7 +43,7 @@ from soc.logic.site import id_user
 from soc.logic.site import sidebar
 from soc.views import helper
 import soc.views.helper.requests
-from soc.views.helpers import html_menu
+from soc.views.helper import html_menu
 
 
 def respond(request, template, context=None, response_args=None):

@@ -187,28 +187,30 @@ def makeNewPaginationChoices(limit=DEF_PAGINATION,
   """
   # determine where to insert the new limit into choices
   new_choices = []
-  inserted = False
   
-  for pagination, label in choices:
+  for index, (pagination, label) in enumerate(choices):
     items = int(pagination)
 
     if limit == items:
       # limit is already present, so just return existing choices
       return choices
 
-    if (not inserted) and (limit < items):
+    if limit < items:
       # limit needs to be inserted before the current pagination,
       # so assemble a new choice tuple and append it 
       choice = (str(limit), '%s items per page' % limit)
       new_choices.append(choice)
-      inserted = True
       
+      # append the remainder of the original list and exit early
+      # (avoiding unnecessary remaining type conversions, etc.)
+      new_choices.extend(choices[index:])
+      return new_choices
+
     # append the existing choice
     new_choices.append((pagination, label))
 
-  if not inserted:
-    # new choice must go last, past all other existing choices
-    choice = (str(limit), '%s items per page' % limit)
-    new_choices.append(choice)
+  # new choice must go last, past all other existing choices
+  choice = (str(limit), '%s items per page' % limit)
+  new_choices.append(choice)
       
   return new_choices

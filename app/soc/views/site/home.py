@@ -109,12 +109,12 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   site_settings = soc.logic.site.settings.getSiteSettings(DEF_SITE_SETTINGS_PATH)
 
   if site_settings:
-    context.update({'site_settings': site_settings})
+    context['site_settings'] = site_settings
     site_doc = site_settings.home
   
     if site_doc:
       site_doc.content = helper.templates.unescape(site_doc.content)
-      context.update({'site_document': site_doc})
+      context['site_document'] = site_doc
 
   return helper.responses.respond(request, template, context)
 
@@ -179,7 +179,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       site_settings = soc.logic.site.settings.updateOrCreateSiteSettings(
           DEF_SITE_SETTINGS_PATH, home=site_doc, feed_url=feed_url)
       
-      context.update({'submit_message': 'Site Settings saved.'})
+      context['submit_message'] = 'Site Settings saved.'
   else: # request.method == 'GET'
     # try to fetch SiteSettings entity by unique key_name
     site_settings = soc.logic.site.settings.getSiteSettings(

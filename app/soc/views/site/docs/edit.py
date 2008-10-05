@@ -278,6 +278,6 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
     # no link name specified, so start with an empty form
     form = CreateForm()
 
-  context.update({'form': form})
+  context['form'] = form
 
   return helper.responses.respond(request, template, context)

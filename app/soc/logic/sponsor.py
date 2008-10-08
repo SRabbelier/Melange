@@ -50,7 +50,7 @@ def getSponsorFromLinkName(link_name):
   # lookup by Sponsor key name
   sponsor_key_name = getSponsorKeyNameForLinkName(link_name)
   
-  if key_name:
+  if sponsor_key_name:
     sponsor = soc.models.sponsor.Sponsor.get_by_key_name(sponsor_key_name)
   else:
     sponsor = None
@@ -137,3 +137,14 @@ def updateOrCreateSponsorFromLinkName(sponsor_link_name, **sponsor_properties):
   # got an existing one due to a race, so update with sponsor_properties anyway,
   # in a transaction
   return soc.logic.model.updateModelProperties(sponsor, **sponsor_properties)
+  
+  
+def deleteSponsor(sponsor):
+  """Delete Sponsor entity.
+  
+  Args:
+    sponsor: existing Sponsor entity
+  """
+  # TODO(pawel.solyga): check if Sponsor can be deleted
+  # If Sponsor has Hosts or Programs it cannot be deleted
+  sponsor.delete()

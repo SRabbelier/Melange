@@ -165,7 +165,7 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       
       # referrer was us, so select which submit message to display
       # (may display no message if ?s=0 parameter is not present)
-      context['submit_message'] = (
+      context['notice'] = (
           helper.requests.getSingleIndexedParamValue(
               request, profile.SUBMIT_MSG_PARAM_NAME,
               values=profile.SUBMIT_MESSAGES))    
@@ -191,3 +191,40 @@ def create(request, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """create() view is same as edit() view, but with no linkname supplied.
   """
   return edit(request, linkname=None, template=template)
+
+
+def delete(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+  """Request handler for a Developer to delete Sponsor Model entity.
+
+  Args:
+    request: the standard django request object
+    linkname: the Sponsor's site-unique "linkname" extracted from the URL
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which redirects 
+    to /site/sponsor/list.
+  """
+  # create default template context for use with any templates
+  context = helper.responses.getUniversalContext(request)
+
+  alt_response = simple.getAltResponseIfNotDeveloper(request,
+                                                     context=context)
+  if alt_response:
+    return alt_response
+
+  existing_sponsor = None
+
+  # try to fetch Sponsor entity corresponding to linkname if one exists    
+  try:
+    existing_sponsor = soc.logic.sponsor.getSponsorIfLinkName(linkname)
+  except out_of_band.ErrorResponse, error:
+    # show custom 404 page when link name doesn't exist in Datastore
+    error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
+    return simple.errorResponse(request, error, template, context)
+
+  if existing_sponsor:
+    sponsor.deleteSponsor(existing_sponsor)
+
+  return http.HttpResponseRedirect('/site/sponsor/list')

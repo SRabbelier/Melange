@@ -57,16 +57,14 @@ Please use this form to alter {% if group_type %}{{ group_type }}{% else %}Group
    <td colspan="4">&nbsp;</td>
   </tr>
   <tr>
+    {% block submit_buttons %}
    <td> 
     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
    </td>
    <td>
     <input type="button" onclick="location.href='/'" value="Cancel"/>
    </td>
-   <td>&nbsp;</td>
-   <td>
-    {% if submit_message %}<b><i>{{ submit_message }}</i></b>{% endif %}
-   </td>
+    {% endblock %}
   </tr>
  </table>
 </form>

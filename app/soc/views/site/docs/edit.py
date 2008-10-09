@@ -71,6 +71,10 @@ DEF_CREATE_NEW_DOC_MSG = ' You can create a new document by visiting the' \
                          ' <a href="/site/docs/edit">Create ' \
                          'a New Document</a> page.'
 
+SUBMIT_MESSAGES = (
+ ugettext_lazy('Document saved.'),
+)
+
 def edit(request, partial_path=None, linkname=None,
          template=DEF_SITE_DOCS_EDIT_TMPL):
   """View for a Developer to modify the properties of a Document Model entity.
@@ -139,7 +143,6 @@ def edit(request, partial_path=None, linkname=None,
       short_name = form.cleaned_data.get('short_name')
       abstract = form.cleaned_data.get('abstract')
       content = form.cleaned_data.get('content')
-      doc_key_name = form.cleaned_data.get('doc_key_name')
       
       doc = soc.logic.document.updateOrCreateDocument(
           partial_path=new_partial_path, link_name=new_linkname,
@@ -169,10 +172,10 @@ def edit(request, partial_path=None, linkname=None,
     
         # referrer was us, so select which submit message to display
         # (may display no message if ?s=0 parameter is not present)
-        context['submit_message'] = (
+        context['notice'] = (
             helper.requests.getSingleIndexedParamValue(
                 request, profile.SUBMIT_MSG_PARAM_NAME,
-                values=profile.SUBMIT_MESSAGES))
+                values=SUBMIT_MESSAGES))
 
         # populate form with the existing User entity
         form = EditForm(initial={'doc_key_name': doc.key().name(),
@@ -205,7 +208,6 @@ def edit(request, partial_path=None, linkname=None,
 class CreateForm(helper.forms.DbModelForm):
   """Django form displayed when Developer creates a Document.
   """
-  doc_key_name = forms.CharField(widget=forms.HiddenInput)
   content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
   class Meta:
@@ -242,11 +244,18 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
+  logged_in_id = users.get_current_user()
+
+  alt_response = simple.getAltResponseIfNotDeveloper(request,
+                                                     context=context,
+                                                     id=logged_in_id)
+  if alt_response:
+    return alt_response
+
   alt_response = simple.getAltResponseIfNotDeveloper(request,
                                                      context=context)
   if alt_response:
     return alt_response
-
   if request.method == 'POST':
     form = CreateForm(request.POST)
 
@@ -257,7 +266,6 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
       short_name = form.cleaned_data.get('short_name')
       abstract = form.cleaned_data.get('abstract')
       content = form.cleaned_data.get('content')
-      doc_key_name = form.cleaned_data.get('doc_key_name')
       
       doc = soc.logic.document.updateOrCreateDocument(
           partial_path=new_partial_path, link_name=new_linkname,

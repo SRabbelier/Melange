@@ -75,14 +75,9 @@ Please use this form to alter basic site-wide settings for a User in Google Open
    <td>
     <input type="button" onclick="location.href='/'" value="Cancel"/>
    </td>
-   <td>&nbsp;</td>
 {% if submit_error %}
    <td class="formfielderror">
     {{ submit_error }}
-   </td>
-{% else %}
-   <td>
-    {% if submit_message %}<b><i>{{ submit_message }}</i></b>{% else %}&nbsp;{% endif %}
    </td>
 {% endif %}
   </tr>

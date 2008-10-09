@@ -179,7 +179,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       site_settings = soc.logic.site.settings.updateOrCreateSiteSettings(
           DEF_SITE_SETTINGS_PATH, home=site_doc, feed_url=feed_url)
       
-      context['submit_message'] = 'Site Settings saved.'
+      context['notice'] = 'Site Settings saved.'
   else: # request.method == 'GET'
     # try to fetch SiteSettings entity by unique key_name
     site_settings = soc.logic.site.settings.getSiteSettings(

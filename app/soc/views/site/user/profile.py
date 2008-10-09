@@ -303,7 +303,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
     
         # referrer was us, so select which submit message to display
         # (may display no message if ?s=0 parameter is not present)
-        context['submit_message'] = (
+        context['notice'] = (
             helper.requests.getSingleIndexedParamValue(
                 request, profile.SUBMIT_MSG_PARAM_NAME,
                 values=profile.SUBMIT_MESSAGES))

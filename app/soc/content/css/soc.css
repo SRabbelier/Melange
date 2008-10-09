@@ -193,6 +193,11 @@ table#queues {
   padding-left: 3px;
 }
 
+#notice {
+  margin-left: 200px;
+  padding: 3px;
+}
+
 #logo {
   padding-right: 18px;
   position: absolute;
@@ -438,6 +443,7 @@ table#queues {
 
 .notice { 
   background:#fad163; 
+  font-size: small;
   font-weight: bold;
 }
 

@@ -112,7 +112,7 @@ DEF_LOGIN_TMPL = 'soc/login.html'
 DEF_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
-def requestLogin(request, template, context, login_message_fmt=None):
+def requestLogin(request, template, context=None, login_message_fmt=None):
   """Displays a login request page with custom message and login link.
   
   Args:

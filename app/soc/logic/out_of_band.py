@@ -44,3 +44,22 @@ class ErrorResponse(OutOfBandResponse):
     self.message = message
     self.response_args = response_args
 
+
+class AccessViolationResponse(OutOfBandResponse):
+  """"Out of band response when an access requirement was not met.
+  """
+
+  def __init__(self, response):
+    """Constructor used to set response message \.
+
+    Args:
+      response: The response that should be returned to the user.
+    """
+
+    self._response = response
+
+  def response(self):
+    """Returns the response that was set in the constructor.
+    """
+
+    return self._response

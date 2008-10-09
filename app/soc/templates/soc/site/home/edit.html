@@ -36,15 +36,18 @@ Please use this form to set basic site settings.
   <tr>
    <td colspan="4">&nbsp;</td>
   </tr>
-  <tr>
-   <td> 
-    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
-   </td>
-   <td>
-    <input type="button" onclick="location.href='/'" value="Cancel"/>
-   </td>
-  </tr>
- </table>
+   <table>
+   <tr>
+     {% block submit_buttons %}
+    <td> 
+     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
+    </td>
+    <td>
+     <input type="button" onclick="location.href='/'" value="Cancel"/>
+    </td>
+    {% endblock %}
+   </tr>
+  </table>
 </form>
 </p>
 {% endblock %}

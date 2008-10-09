@@ -76,7 +76,7 @@ class EditForm(CreateForm):
     return link_name
 
 
-DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL = 'soc/group/profile/edit.html'
+DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL = 'soc/site/sponsor/profile/edit.html'
 DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG = 'Sponsor link name cannot be changed.'
 DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           ' <a href="/site/sponsor/profile">Create ' \
@@ -187,7 +187,9 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-def create(request, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
+
+def create(request, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
   """create() view is same as edit() view, but with no linkname supplied.
   """
   return edit(request, linkname=None, template=template)

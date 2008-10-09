@@ -187,6 +187,14 @@ site_sponsor_create = page.Page(
   short_name='Create New Site Sponsor',
   parent=site_home_edit)
 
+site_sponsor_delete = page.Page(
+  page.Url(
+    r'^site/sponsor/profile/%s/delete$' % path_linkname.LINKNAME_ARG_PATTERN,
+    'soc.views.site.sponsor.profile.delete'),
+  'Site: Delete Existing Sponsor',
+  short_name='Delete Site Sponsor',
+  parent=site_home_edit)
+
 site_sponsor_edit = page.Page(
   page.Url(
     r'^site/sponsor/profile/%s' % path_linkname.LINKNAME_ARG_PATTERN,
@@ -194,7 +202,7 @@ site_sponsor_edit = page.Page(
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
   parent=site_home_edit)
-     
+
 site_sponsor_list = page.Page(
   page.Url(
     r'^site/sponsor/list$',

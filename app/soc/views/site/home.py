@@ -36,6 +36,7 @@ from django import newforms as forms
 from soc.logic import out_of_band
 from soc.logic import validate
 from soc.logic.site import id_user
+from soc.logic.helper import access
 from soc.views import simple
 from soc.views import helper
 import soc.views.helper.forms
@@ -131,30 +132,15 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
   Returns:
     A subclass of django.http.HttpResponse with generated template.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  
-  logged_in_id = users.get_current_user()
-  
-  alt_response = simple.getAltResponseIfNotDeveloper(request, context, 
-                                                     id=logged_in_id)
-  if alt_response:
-    # not a developer
-    return alt_response
-  
-  alt_response = simple.getAltResponseIfNotLoggedIn(request, context, 
-                                                    id=logged_in_id)
-  if alt_response:
-    # not logged in
-    return alt_response
-  
-  alt_response = simple.getAltResponseIfNotUser(request, context, 
-                                                        id = logged_in_id)
-  if alt_response:
-    # no existing User entity for logged in Google Account. User entity is 
-    # required for creating Documents
-    return alt_response
-                             
+
   settings_form = None
   document_form = None
 
@@ -169,6 +155,8 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       abstract = document_form.cleaned_data.get('abstract')
       content = document_form.cleaned_data.get('content')
       
+      logged_in_id = users.get_current_user()
+
       site_doc = soc.logic.document.updateOrCreateDocument(
           partial_path=DEF_SITE_SETTINGS_PATH, link_name=link_name,
           title=title, short_name=short_name, abstract=abstract,

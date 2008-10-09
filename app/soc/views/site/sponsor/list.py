@@ -23,8 +23,8 @@ __authors__ = [
 
 
 from soc.logic import sponsor
+from soc.logic.helper import access
 from soc.views import simple
-
 from soc.views import helper
 import soc.views.helper.lists
 import soc.views.helper.responses
@@ -35,14 +35,15 @@ DEF_SITE_SPONSOR_LIST_ALL_TMPL = 'soc/group/list/all.html'
 def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
   """Show a list of all Sponsors (limit rows per page).
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response  
-  
   offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
   

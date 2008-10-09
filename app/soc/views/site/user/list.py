@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
@@ -45,14 +46,15 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response  
-  
   offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 

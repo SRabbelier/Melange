@@ -30,6 +30,7 @@ from django import newforms as forms
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic import sponsor
+from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import helper
 import soc.views.helper.forms
@@ -95,13 +96,14 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response
 
   logged_in_id = users.get_current_user()
   user = id_user.getUserFromId(logged_in_id)
@@ -208,13 +210,14 @@ def delete(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
     A subclass of django.http.HttpResponse which redirects 
     to /site/sponsor/list.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response
 
   existing_sponsor = None
 

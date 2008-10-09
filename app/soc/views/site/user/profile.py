@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import validate
 from soc.logic import out_of_band
+from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
@@ -103,13 +104,14 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response
 
   user = None  # assume that no User entity will be found
   form = None  # assume blank form needs to be displayed
@@ -249,13 +251,14 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response
 
   user = None  # assume that no User entity will be found
 
@@ -391,13 +394,14 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
     A subclass of django.http.HttpResponse which either contains the form to
     be filled out, or a redirect to the correct view in the interface.
   """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-
-  alt_response = simple.getAltResponseIfNotDeveloper(request,
-                                                     context=context)
-  if alt_response:
-    return alt_response
 
   if request.method == 'POST':
     form = CreateForm(request.POST)

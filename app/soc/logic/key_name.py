@@ -144,3 +144,13 @@ def nameClub(link_name):
     raise Error('"link_name" must be non-False: "%s"' % link_name)
 
   return 'Group/Club:%s' % link_name
+
+
+def nameWork(link_name):
+  """Placeholder for work namer"""
+
+  if not link_name:
+    raise Error('"link_name" must be non-False: "%s"' % link_name)
+
+  return 'Work:%s' % link_name
+

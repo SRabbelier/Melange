@@ -72,7 +72,7 @@ def public(request, link_name=None,
   """
   #TODO(tlarsen): this module is currently a placeholder for future work
   
-  # TODO: if linkname is empty or not a valid linkname on the site, display
+  # TODO: if link_name is empty or not a valid link_name on the site, display
   # some sort of "user does not exist" page (a custom 404 page, maybe?).
   
   return response_helpers.respond(request,

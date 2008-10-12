@@ -52,7 +52,7 @@ class EditForm(helper.forms.DbModelForm):
     exclude = ['user']
 
 
-def edit(request, program=None, linkname=None,
+def edit(request, program=None, link_name=None,
          template='soc/person/profile/edit.html'):
   """View for a Person to modify the properties of a Person Model.
 

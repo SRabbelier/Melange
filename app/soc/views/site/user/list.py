@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+import soc.logic
 from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import simple
@@ -59,7 +60,7 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
   # Fetch one more to see if there should be a 'next' link
-  users = id_user.getUsersForLimitAndOffset(limit + 1, offset=offset)
+  users = soc.logic.user_logic.getForLimitAndOffset(limit + 1, offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
   

@@ -27,9 +27,9 @@ from google.appengine.api import users
 from django import http
 from django import newforms as forms
 
+import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
-from soc.logic import sponsor
 from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import helper
@@ -60,7 +60,7 @@ class CreateForm(helper.forms.DbModelForm):
     link_name = self.cleaned_data.get('link_name')
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    if sponsor.doesLinkNameExist(link_name):
+    if soc.logic.sponsor_logic.getFromFields(link_name=link_name):
       raise forms.ValidationError("This link name is already in use.")
     return link_name
 
@@ -106,13 +106,13 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   context = helper.responses.getUniversalContext(request)
 
   logged_in_id = users.get_current_user()
-  user = id_user.getUserFromId(logged_in_id)
+  user = soc.logic.user_logic.getFromFields(email=logged_in_id)
   sponsor_form = None
   existing_sponsor = None
 
   # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
-    existing_sponsor = soc.logic.sponsor.getSponsorIfLinkName(linkname)
+    existing_sponsor = soc.logic.sponsor_logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
@@ -144,8 +144,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       fields['founder'] = user
       
       form_ln = fields['link_name']
-      form_sponsor = sponsor.updateOrCreateSponsorFromLinkName(form_ln, 
-                                                               **fields)
+      form_sponsor = soc.logic.sponsor_logic.updateOrCreateFromFields(fields, link_name=form_ln)
       
       if not form_sponsor:
         return http.HttpResponseRedirect('/')

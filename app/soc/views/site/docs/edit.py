@@ -28,7 +28,7 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
-from soc.logic import document
+import soc.logic
 from soc.logic import out_of_band
 from soc.logic import path_link_name
 from soc.logic.helper import access
@@ -76,7 +76,34 @@ SUBMIT_MESSAGES = (
  ugettext_lazy('Document saved.'),
 )
 
-def edit(request, partial_path=None, linkname=None,
+def getDocForForm(form):
+  """Extracts doc fields from a form and creates a new doc from it
+  """
+
+  user = users.get_current_user()
+  if user:
+    email = user.email()
+  else:
+    email = None
+
+  partial_path = form.cleaned_data.get('partial_path')
+  link_name = form.cleaned_data.get('link_name')
+
+  properties = {}
+  properties['partial_path'] = partial_path
+  properties['link_name'] = link_name
+  properties['title'] = form.cleaned_data.get('title')
+  properties['short_name'] = form.cleaned_data.get('short_name')
+  properties['abstract'] = form.cleaned_data.get('abstract')
+  properties['content'] = form.cleaned_data.get('content')
+  properties['user'] = soc.logic.user_logic.getFromFields(email=email)
+
+  doc = soc.logic.document_logic.updateOrCreateFromFields(properties,
+            partial_path=partial_path, link_name=link_name)
+
+  return doc
+
+def edit(request, partial_path=None, link_name=None,
          template=DEF_SITE_DOCS_EDIT_TMPL):
   """View for a Developer to modify the properties of a Document Model entity.
 
@@ -109,7 +136,9 @@ def edit(request, partial_path=None, linkname=None,
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
-    doc = document.getDocumentIfPath(path)
+    if path:
+      doc = soc.logic.document_logic.getFromFields(partial_path=partial_path,
+                                                   link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
@@ -119,22 +148,12 @@ def edit(request, partial_path=None, linkname=None,
     form = EditForm(request.POST)
 
     if form.is_valid():
-      new_partial_path = form.cleaned_data.get('partial_path')
-      new_linkname = form.cleaned_data.get('link_name')
-      title = form.cleaned_data.get('title')
-      short_name = form.cleaned_data.get('short_name')
-      abstract = form.cleaned_data.get('abstract')
-      content = form.cleaned_data.get('content')
-      
-      doc = soc.logic.document.updateOrCreateDocument(
-          partial_path=new_partial_path, link_name=new_linkname,
-          title=title, short_name=short_name, abstract=abstract,
-          content=content, user=id_user.getUserFromId(logged_in_id))
+      doc = getDocForForm(form)
       
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = path_link_name.combinePath([new_partial_path, new_link_name])
+      new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -237,17 +256,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
     form = CreateForm(request.POST)
 
     if form.is_valid():
-      new_partial_path = form.cleaned_data.get('partial_path')
-      new_linkname = form.cleaned_data.get('link_name')
-      title = form.cleaned_data.get('title')
-      short_name = form.cleaned_data.get('short_name')
-      abstract = form.cleaned_data.get('abstract')
-      content = form.cleaned_data.get('content')
-      
-      doc = soc.logic.document.updateOrCreateDocument(
-          partial_path=new_partial_path, link_name=new_linkname,
-          title=title, short_name=short_name, abstract=abstract,
-          content=content, user=id_user.getUserFromId(logged_in_id))
+      doc = getDocForForm(form)
 
       if not doc:
         return http.HttpResponseRedirect('/')

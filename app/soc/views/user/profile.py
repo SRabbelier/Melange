@@ -28,6 +28,7 @@ from django import shortcuts
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
+import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
@@ -56,8 +57,12 @@ class UserForm(helper.forms.DbModelForm):
     link_name = self.cleaned_data.get('link_name')
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    elif not id_user.isLinkNameAvailableForId(link_name):
+
+    user = id_user.getUserFromLinkName(link_name)
+
+    if user and not id_user.doesLinkNameBelongToId(link_name, user.id):
       raise forms.ValidationError("This link name is already in use.")
+
     return link_name
 
 
@@ -109,7 +114,8 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
   # try to fetch User entity corresponding to link_name if one exists
   try:
-    linkname_user = id_user.getUserIfLinkName(linkname)
+      if link_name:
+        link_name_user = id_user.getUserFromLinkNameOrDie(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)
@@ -124,19 +130,21 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
     form = UserForm(request.POST)
 
     if form.is_valid():
-      new_linkname = form.cleaned_data.get('link_name')
-      nickname = form.cleaned_data.get("nick_name")
+      new_link_name = form.cleaned_data.get('link_name')
+      properties = {}
+      properties['link_name'] = new_link_name
+      properties['nick_name'] = form.cleaned_data.get("nick_name")
+      properties['id'] = id
 
-      user = id_user.updateOrCreateUserFromId(
-          id, link_name=new_linkname, nick_name=nickname)
+      user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=id)
 
       # redirect to new /user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, link_name, new_link_name, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
-    # try to fetch User entity corresponding to Google Account if one exists    
-    user = id_user.getUserFromId(id)
+    # try to fetch User entity corresponding to Google Account if one exists
+    user = soc.logic.user_logic.getFromFields(email=id)
 
     if user:
       # is 'Profile saved' parameter present, but referrer was not ourself?

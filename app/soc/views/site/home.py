@@ -33,6 +33,7 @@ from django import http
 from django import shortcuts
 from django import newforms as forms
 
+import soc.logic
 from soc.logic import out_of_band
 from soc.logic import validate
 from soc.logic.site import id_user
@@ -46,8 +47,6 @@ import soc.views.helper.widgets
 
 import soc.models.site_settings
 import soc.models.document
-import soc.logic.document
-import soc.logic.site.settings
 
 
 class DocumentForm(helper.forms.DbModelForm):
@@ -107,7 +106,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
   
-  site_settings = soc.logic.site.settings.getSiteSettings(DEF_SITE_SETTINGS_PATH)
+  site_settings = soc.logic.settings_logic.getFromFields(path=DEF_SITE_SETTINGS_PATH)
 
   if site_settings:
     context['site_settings'] = site_settings
@@ -117,7 +116,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
       site_doc.content = helper.templates.unescape(site_doc.content)
       context['site_document'] = site_doc
 
-  return helper.responses.respond(request, template, context)
+  return helper.responses.respond(request, template, context=context)
 
 
 DEF_SITE_HOME_EDIT_TMPL = 'soc/site/home/edit.html'
@@ -149,29 +148,37 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
     settings_form = SiteSettingsForm(request.POST)
 
     if document_form.is_valid() and settings_form.is_valid():
-      title = document_form.cleaned_data.get('title')
       link_name = DEF_SITE_HOME_DOC_LINK_NAME
-      short_name = document_form.cleaned_data.get('short_name')
-      abstract = document_form.cleaned_data.get('abstract')
-      content = document_form.cleaned_data.get('content')
-      
+      partial_path=DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
+      user = soc.logic.user_logic.getFromFields(email=logged_in_id)
 
-      site_doc = soc.logic.document.updateOrCreateDocument(
-          partial_path=DEF_SITE_SETTINGS_PATH, link_name=link_name,
-          title=title, short_name=short_name, abstract=abstract,
-          content=content, user=id_user.getUserFromId(logged_in_id))
+      properties = {}
+      properties['title'] = document_form.cleaned_data.get('title')
+      properties['short_name'] = document_form.cleaned_data.get('short_name')
+      properties['abstract'] = document_form.cleaned_data.get('abstract')
+      properties['content'] = document_form.cleaned_data.get('content')
+      properties['link_name'] = link_name
+      properties['partial_path'] = partial_path
+      properties['id'] = logged_in_id
+      properties['user'] = user
+
+      #bla =  dir(logged_in_id)
+      #raise self
+
+      site_doc = soc.logic.document_logic.updateOrCreateFromFields(
+          properties, partial_path=partial_path, link_name=link_name)
       
       feed_url = settings_form.cleaned_data.get('feed_url')
 
-      site_settings = soc.logic.site.settings.updateOrCreateSiteSettings(
-          DEF_SITE_SETTINGS_PATH, home=site_doc, feed_url=feed_url)
+      site_settings = soc.logic.settings_logic.updateOrCreateFromFields(
+          {'feed_url' : feed_url, 'home' : site_doc}, path=DEF_SITE_SETTINGS_PATH)
       
       context['notice'] = 'Site Settings saved.'
   else: # request.method == 'GET'
     # try to fetch SiteSettings entity by unique key_name
-    site_settings = soc.logic.site.settings.getSiteSettings(
-        DEF_SITE_SETTINGS_PATH)
+    site_settings = soc.logic.settings_logic.getFromFields(
+        path=DEF_SITE_SETTINGS_PATH)
 
     if site_settings:
       # populate form with the existing SiteSettings entity

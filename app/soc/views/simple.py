@@ -22,6 +22,7 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
 
@@ -32,54 +33,44 @@ import soc.views.helper.responses
 import soc.views.helper.templates
 
 
-def templateWithLinkName(request,
-                         template='soc/base.html', linkname=None,
+def public(request, template='soc/base.html', link_name=None,
                          context=None):
-  """A simple template view that expects a linkname extracted from the URL. 
+  """A simple template view that expects a link_name extracted from the URL.
 
   Args:
     request: the standard Django HTTP request object
     template: the template to use for rendering the view (or a search list
       of templates)
-    linkname: a site-unique "linkname" (usually extracted from the URL)
+    link_name: a site-unique "link_name" (usually extracted from the URL)
     context: the context dict supplied to the template, which is modified
         (so supply a copy if such modification is not acceptable)
-      linkname: the linkname parameter is added to the context
-      linkname_user: if the linkname exists for a User, that User
+      link_name: the link_name parameter is added to the context
+      link_name_user: if the link_name exists for a User, that User
         is added to the context
 
   Returns:
     A subclass of django.http.HttpResponse containing the generated page.
   """
-  context['linkname'] = linkname
-  context = helper.responses.getUniversalContext(request, context=context)
+
+  template = helper.templates.makeSiblingTemplatesList(template, 'public.html')
+
+  if not context:
+    context = helper.responses.getUniversalContext(request)
 
   try:
-    context['linkname_user'] = id_user.getUserIfLinkName(linkname)
+    if link_name:
+      user = id_user.getUserFromLinkNameOrDie(link_name)
   except out_of_band.ErrorResponse, error:
     return errorResponse(request, error, template, context)
+
+  context['link_name'] = link_name
+  context['link_name_user'] = user
 
   return helper.responses.respond(request, template, context)
 
 
-def public(request, template, linkname, context):
-  """A convenience wrapper around templateWithLinkName() using 'public.html'.
-
-  Args:
-    request, linkname, context: see templateWithLinkName()
-    template: the "sibling" template (or a search list of such templates)
-      from which to construct the public.html template name (or names)
-
-  Returns:
-    A subclass of django.http.HttpResponse containing the generated page.
-  """
-  return templateWithLinkName(
-      request, linkname=linkname, context=context,
-      template=helper.templates.makeSiblingTemplatesList(
-          template, 'public.html'))
-
-
 DEF_ERROR_TMPL = 'soc/error.html'
+
 
 def errorResponse(request, error, template, context):
   """Displays an error page for an out_of_band.ErrorResponse exception.
@@ -95,8 +86,10 @@ def errorResponse(request, error, template, context):
       error_status: error.response_args['status'], or None if a status code
         was not supplied to the ErrorResponse
   """
-  context = helper.responses.getUniversalContext(request, context=context)
-  
+
+  if not context:
+    context = helper.responses.getUniversalContext(request)
+
   # make a list of possible "sibling" templates, then append a default
   error_templates = helper.templates.makeSiblingTemplatesList(
       template, 'error.html', default_template=DEF_ERROR_TMPL)
@@ -128,7 +121,9 @@ def requestLogin(request, template, context=None, login_message_fmt=None):
       login_message: the caller can completely construct the message supplied
         to the login template in lieu of using login_message_fmt
   """
-  context = helper.responses.getUniversalContext(request, context=context)
+
+  if not context:
+    context = helper.responses.getUniversalContext(request)
   
   # make a list of possible "sibling" templates, then append a default
   login_templates = helper.templates.makeSiblingTemplatesList(

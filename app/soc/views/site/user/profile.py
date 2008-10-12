@@ -28,6 +28,7 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
+import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.helper import access
@@ -126,7 +127,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
       
       if form_id:
         # email provided, so attempt to look up user by email
-        user = id_user.getUserFromId(form_id)
+        user = soc.logic.user_logic.getFromFields(id=form_id)
 
         if user:
           lookup_message = ugettext_lazy('User found by email.')
@@ -166,7 +167,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   if user:
     # User entity found, so populate form with existing User information
     # context['found_user'] = user
-    form = LookupForm(initial={'id': user.id.email,
+    form = LookupForm(initial={'id': user.id.email(),
                                'link_name': user.link_name})
 
     if request.path.endswith('lookup'):
@@ -218,11 +219,12 @@ class EditForm(helper.forms.DbModelForm):
     link_name = self.cleaned_data.get('link_name')
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    else:
-      key_name = self.data.get('key_name')
-      if not id_user.isLinkNameAvailableForId(
-          link_name, id=id_user.getUserFromKeyName(key_name).id) :
-        raise forms.ValidationError("This link name is already in use.")
+
+    user = soc.logic.user_logic.getFromKeyName(link_name)
+
+    if user and user.link_name != link_name:
+      raise forms.ValidationError("This link name is already in use.")
+
     return link_name
 
   def clean_id(self):
@@ -312,7 +314,7 @@ def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
         # populate form with the existing User entity
         form = EditForm(initial={'key_name': user.key().name(),
-            'id': user.id.email, 'link_name': user.link_name,
+            'id': user.id.email(), 'link_name': user.link_name,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
@@ -367,14 +369,14 @@ class CreateForm(helper.forms.DbModelForm):
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
-      if id_user.doesLinkNameExist(link_name):
+      if id_user.getUserFromLinkName(link_name):
         raise forms.ValidationError("This link name is already in use.")
     return link_name
 
   def clean_id(self):
     new_email = self.cleaned_data.get('id')
     form_id = users.User(email=new_email)
-    if id_user.isIdUser(form_id):
+    if soc.logic.user_logic.getFromFields(email=form_id):
         raise forms.ValidationError("This account is already in use.")
     return form_id
 
@@ -407,21 +409,23 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
     if form.is_valid():
       form_id = form.cleaned_data.get('id')
-      new_linkname = form.cleaned_data.get('link_name')
-      nickname = form.cleaned_data.get('nick_name')
-      is_developer = form.cleaned_data.get('is_developer')
+      link_name = form.cleaned_data.get('link_name')
 
-      user = id_user.updateOrCreateUserFromId(id=form_id, 
-          link_name=new_linkname, nick_name=nickname, 
-          is_developer=is_developer)
+      properties = {}
+      properties['id'] = form_id
+      properties['link_name'] = link_name
+      properties['nick_name'] = form.cleaned_data.get('nick_name')
+      properties['is_developer'] = form.cleaned_data.get('is_developer')
+
+      user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=form_id)
 
       if not user:
         return http.HttpResponseRedirect('/')
 
-      # redirect to new /site/user/profile/new_linkname?s=0
+      # redirect to new /site/user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, None, new_linkname,
+          request, None, link_name,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
     # no link name specified, so start with an empty form

@@ -97,7 +97,7 @@ def checkIsUser(request):
   checkIsLoggedIn(request)
 
   id = users.get_current_user()
-  user = id_user.getUserFromId(id)
+  user = soc.logic.user_logic.getFromFields(email=id)
 
   if user:
     return

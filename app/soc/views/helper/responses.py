@@ -38,6 +38,7 @@ except ImportError:
   # In the development server
   from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 
+import soc.logic
 from soc.logic import system
 from soc.logic.site import id_user
 from soc.logic.site import sidebar
@@ -64,7 +65,9 @@ def respond(request, template, context=None, response_args=None):
     Any exceptions that django.template.loader.render_to_string() or
     django.http.HttpResponse() might raise.
   """
-  context = getUniversalContext(request, context=context)
+
+  if not context:
+    context = getUniversalContext(request)
 
   if response_args is None:
     response_args = {}
@@ -84,19 +87,14 @@ def respond(request, template, context=None, response_args=None):
     return http.HttpResponse('AssertionError')
 
 
-def getUniversalContext(request, context=None):
+def getUniversalContext(request):
   """Constructs a template context dict will many common variables defined.
   
   Args:
     request: the Django HTTP request object
-    context: the template context dict to be updated in-place (pass in a copy
-      if the original must not be modified), or None if a new one is to be
-      created; any existing fields already present in the context dict passed
-      in by the caller are left unaltered 
-      
+
   Returns:
-    updated template context dict supplied by the caller, or a new context
-    dict if the caller supplied None
+    a new context dict containing:
     
     {
       'request': the Django HTTP request object passed in by the caller
@@ -110,26 +108,21 @@ def getUniversalContext(request, context=None):
       'sidebar_menu_html': an HTML string that renders the sidebar menu
     }
   """
-  if context is None:
-    context = {}
 
-  # set some universal values if caller did not already set them  
-  context['request'] = context.get('request', request)
-  context['id'] = id_user.getIdIfMissing(context.get('id', None))
-  context['user'] = id_user.getUserIfMissing(context.get('user', None),
-                                             context['id'])
-  context['is_admin'] = context.get(
-      'is_admin', id_user.isIdDeveloper(id=context['id']))
-  context['is_debug'] = context.get('is_debug', system.isDebug())
-  context['sign_in'] = context.get(
-      'sign_in', users.create_login_url(request.path))
-  context['sign_out'] = context.get(
-      'sign_out', users.create_logout_url(request.path))
+  id = users.get_current_user()
 
-  if not context.get('sidebar_menu_html'):
-    # pass the currently constructed context as keyword arguments to
-    # all of the sidebar builder functions
-    context['sidebar_menu_html'] = str(html_menu.UlMenu(
+  context = {}
+  context['request'] = request
+
+  if id:
+    context['id'] = id
+    context['user'] = soc.logic.user_logic.getFromFields(email=id.email())
+    context['is_admin'] = id_user.isIdDeveloper(id=id)
+
+  context['is_debug'] = system.isDebug()
+  context['sign_in'] = users.create_login_url(request.path)
+  context['sign_out'] = users.create_logout_url(request.path)
+  context['sidebar_menu_html'] = str(html_menu.UlMenu(
       sidebar.buildSidebar(**context)))
 
   return context

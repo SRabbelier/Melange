@@ -30,7 +30,9 @@ from google.appengine.api import users
 from django.conf.urls import defaults
 from django.utils import datastructures
 
-from soc.logic import path_link_name
+import soc.logic
+import soc.logic.path_link_name
+
 from soc.logic.site import page
 
 
@@ -82,7 +84,7 @@ user_create = page.Page(
 
 user_edit = page.Page(
   page.Url(
-    r'^user/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^user/profile/%s$' % soc.logic.path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.user.profile.edit'),
   'User: Modify Existing User Profile',
   parent=user_signout)
@@ -123,7 +125,7 @@ site_user_create = page.Page(
 
 site_user_edit = page.Page(
   page.Url(
-    r'^site/user/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^site/user/profile/%s$' % soc.logic.path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.user.profile.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
@@ -140,7 +142,7 @@ site_user_list = page.Page(
 # Document views
 docs_show = page.Page(
   page.Url(
-    r'^docs/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^docs/show/%s$' % soc.logic.path_link_name.PATH_LINKNAME_ARGS_PATTERN,
     'soc.views.docs.show.public'),
   'Show Document',
   parent=home)
@@ -156,7 +158,7 @@ site_docs_create = page.Page(
 
 site_docs_edit = page.Page(
   page.Url(
-    r'^site/docs/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^site/docs/edit/%s$' % soc.logic.path_link_name.PATH_LINKNAME_ARGS_PATTERN,
     'soc.views.site.docs.edit.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
@@ -173,7 +175,7 @@ site_docs_list = page.Page(
 # Sponsor Group public view
 sponsor_profile = page.Page(
   page.Url(
-    r'^sponsor/profile/%s' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/profile/%s' % soc.logic.path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.sponsor.profile.public'),
   'Public Profile',
   parent=home)
@@ -189,7 +191,7 @@ site_sponsor_create = page.Page(
 
 site_sponsor_delete = page.Page(
   page.Url(
-    r'^site/sponsor/profile/%s/delete$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^site/sponsor/profile/%s/delete$' % soc.logic.path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.sponsor.profile.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
@@ -197,7 +199,7 @@ site_sponsor_delete = page.Page(
 
 site_sponsor_edit = page.Page(
   page.Url(
-    r'^site/sponsor/profile/%s' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^site/sponsor/profile/%s' % soc.logic.path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.sponsor.profile.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',

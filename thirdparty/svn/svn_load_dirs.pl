@@ -23,7 +23,7 @@ use English;
 $Text::Wrap::columns = 72;
 
 # Specify the location of the svn command.
-my $svn = '/usr/bin/svn';
+my $svn = 'svn';
 
 # Process the command line options.
 

@@ -29,6 +29,7 @@ from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
+from soc.logic import models
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
@@ -127,7 +128,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
       
       if form_id:
         # email provided, so attempt to look up user by email
-        user = soc.logic.user_logic.getFromFields(id=form_id)
+        user = models.user.logic.getFromFields(id=form_id)
 
         if user:
           lookup_message = ugettext_lazy('User found by email.')
@@ -221,7 +222,7 @@ class EditForm(helper.forms.DbModelForm):
       raise forms.ValidationError("This link name is in wrong format.")
 
     key_name = self.data.get('key_name')
-    user = soc.logic.user_logic.getFromKeyName(key_name)
+    user = models.user.logic.getFromKeyName(key_name)
 
     if user and user.link_name != link_name:
       raise forms.ValidationError("This link name is already in use.")
@@ -282,7 +283,7 @@ def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
       properties['nick_name']  = form.cleaned_data.get('nick_name')
       properties['is_developer'] = form.cleaned_data.get('is_developer')
       
-      user = soc.logic.user_logic.updateOrCreateFromKeyName(properties, key_name)
+      user = models.user.logic.updateOrCreateFromKeyName(properties, key_name)
 
       #raise forms.ValidationError("lesseee: " + new_link_name + " " +  user.link_name)
 
@@ -377,7 +378,7 @@ class CreateForm(helper.forms.DbModelForm):
   def clean_id(self):
     new_email = self.cleaned_data.get('id')
     form_id = users.User(email=new_email)
-    if soc.logic.user_logic.getFromFields(email=form_id):
+    if models.user.logic.getFromFields(email=form_id):
         raise forms.ValidationError("This account is already in use.")
     return form_id
 
@@ -419,7 +420,7 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
         is_developer : form.cleaned_data.get('is_developer'),
       }
 
-      user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=form_id)
+      user = models.user.logic.updateOrCreateFromFields(properties, email=form_id)
 
       if not user:
         return http.HttpResponseRedirect('/')

@@ -29,6 +29,7 @@ from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
+from soc.logic import models
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
@@ -137,7 +138,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
         id : id,
       }
 
-      user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=id)
+      user = models.user.logic.updateOrCreateFromFields(properties, email=id.email())
 
       # redirect to new /user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -145,7 +146,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
           request, link_name, new_link_name, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists
-    user = soc.logic.user_logic.getFromFields(email=id)
+    user = models.user.logic.getFromFields(email=id)
 
     if user:
       # is 'Profile saved' parameter present, but referrer was not ourself?

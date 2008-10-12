@@ -33,7 +33,7 @@ __authors__ = [
 from google.appengine.api import users
 from django.utils.translation import ugettext_lazy
 
-import soc.logic.host
+from soc.logic import models
 from soc.logic.site import id_user
 from soc.views.simple import requestLogin
 import soc.views.out_of_band
@@ -96,7 +96,7 @@ def checkIsUser(request):
   checkIsLoggedIn(request)
 
   id = users.get_current_user()
-  user = soc.logic.user_logic.getFromFields(email=id)
+  user = models.user.logic.getFromFields(email=id)
 
   if user:
     return

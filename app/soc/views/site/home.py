@@ -33,9 +33,12 @@ from django import http
 from django import shortcuts
 from django import newforms as forms
 
-import soc.logic
+
+import soc.logic.models.settings
+from soc.logic import models
 from soc.logic import out_of_band
 from soc.logic import validate
+from soc.logic.models import document
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
@@ -107,7 +110,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
   
-  site_settings = soc.logic.settings_logic.getFromFields(path=DEF_SITE_SETTINGS_PATH)
+  site_settings = soc.logic.models.settings.logic.getFromFields(path=DEF_SITE_SETTINGS_PATH)
 
   if site_settings:
     context['site_settings'] = site_settings
@@ -152,7 +155,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       link_name = DEF_SITE_HOME_DOC_LINK_NAME
       partial_path=DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
-      user = soc.logic.user_logic.getFromFields(email=logged_in_id)
+      user = models.user.logic.getFromFields(email=logged_in_id)
 
       properties = {
         title : document_form.cleaned_data.get('title'),
@@ -165,18 +168,18 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
         user : user,
       }
 
-      site_doc = soc.logic.document_logic.updateOrCreateFromFields(
+      site_doc = document.logic.updateOrCreateFromFields(
           properties, partial_path=partial_path, link_name=link_name)
       
       feed_url = settings_form.cleaned_data.get('feed_url')
 
-      site_settings = soc.logic.settings_logic.updateOrCreateFromFields(
+      site_settings = models.settings.logic.updateOrCreateFromFields(
           {'feed_url' : feed_url, 'home' : site_doc}, path=DEF_SITE_SETTINGS_PATH)
       
       context['notice'] = 'Site Settings saved.'
   else: # request.method == 'GET'
     # try to fetch SiteSettings entity by unique key_name
-    site_settings = soc.logic.settings_logic.getFromFields(
+    site_settings = models.settings.logic.getFromFields(
         path=DEF_SITE_SETTINGS_PATH)
 
     if site_settings:

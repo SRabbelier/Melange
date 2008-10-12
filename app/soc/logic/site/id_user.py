@@ -28,9 +28,9 @@ import re
 from google.appengine.api import users
 from google.appengine.ext import db
 
-import soc.logic
 from soc.logic import key_name
 from soc.logic import model
+from soc.logic import models
 from soc.logic import out_of_band
 
 import soc.models.user
@@ -89,7 +89,7 @@ def isIdDeveloper(id=None):
   if not id:
     id = current_id
 
-  user = soc.logic.user_logic.getFromFields(email=id)
+  user = models.user.logic.getFromFields(email=id)
 
   if not user:
     # no User entity for this Google Account, and id is not the currently
@@ -111,7 +111,7 @@ def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
       when existing_user is not supplied; default is None
   """
   if not existing_user:
-    existing_user = soc.logic.user_logic.getFromKeyName(existing_key_name)
+    existing_user = models.user.logic.getFromKeyName(existing_key_name)
 
   if existing_user:
     old_email = existing_user.id.email()
@@ -123,7 +123,7 @@ def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
     return True
   # else: "new" email truly is new to the existing User, so keep checking
 
-  if not soc.logic.user_logic.getFromFields(id=new_id):
+  if not models.user.logic.getFromFields(id=new_id):
     # new email address also does not belong to any other User,
     # so it is available
     return True
@@ -169,7 +169,7 @@ def doesLinkNameBelongToId(link_name, id):
     # link name cannot belong to an unspecified User
     return False
 
-  user = soc.logic.user_logic.getFromFields(email=id.email())
+  user = models.user.logic.getFromFields(email=id.email())
 
   if not user:
     # no User corresponding to id Google Account, so no link name at all 

@@ -28,7 +28,7 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
-import soc.logic
+from soc.logic.models import document
 from soc.logic import out_of_band
 from soc.logic import path_link_name
 from soc.logic.site import id_user
@@ -97,9 +97,9 @@ def getDocForForm(form):
   properties['short_name'] = form.cleaned_data.get('short_name')
   properties['abstract'] = form.cleaned_data.get('abstract')
   properties['content'] = form.cleaned_data.get('content')
-  properties['user'] = soc.logic.user_logic.getFromFields(email=email)
+  properties['user'] = models.user.logic.getFromFields(email=email)
 
-  doc = soc.logic.document_logic.updateOrCreateFromFields(properties,
+  doc = document.logic.updateOrCreateFromFields(properties,
             partial_path=partial_path, link_name=link_name)
 
   return doc
@@ -139,7 +139,7 @@ def edit(request, partial_path=None, link_name=None,
   # try to fetch Document entity corresponding to path if one exists    
   try:
     if path:
-      doc = soc.logic.document_logic.getFromFields(partial_path=partial_path,
+      doc = document.logic.getFromFields(partial_path=partial_path,
                                                    link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore

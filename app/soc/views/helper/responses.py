@@ -30,6 +30,8 @@ from google.appengine.api import users
 from django import http
 from django.template import loader
 
+import soc.logic.models.user
+
 # DeadlineExceededError can live in two different places
 try:
   # When deployed
@@ -116,7 +118,7 @@ def getUniversalContext(request):
 
   if id:
     context['id'] = id
-    context['user'] = soc.logic.user_logic.getFromFields(email=id.email())
+    context['user'] = soc.logic.models.user.logic.getFromFields(email=id.email())
     context['is_admin'] = id_user.isIdDeveloper(id=id)
 
   context['is_debug'] = system.isDebug()

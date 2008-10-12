@@ -31,6 +31,7 @@ import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
+from soc.logic import models
 import soc.models.sponsor
 from soc.views import helper
 from soc.views.helper import access
@@ -59,7 +60,7 @@ class CreateForm(helper.forms.DbModelForm):
     link_name = self.cleaned_data.get('link_name')
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
-    if soc.logic.sponsor_logic.getFromFields(link_name=link_name):
+    if models.sponsor.logic.getFromFields(link_name=link_name):
       raise forms.ValidationError("This link name is already in use.")
     return link_name
 
@@ -105,13 +106,13 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   context = helper.responses.getUniversalContext(request)
 
   logged_in_id = users.get_current_user()
-  user = soc.logic.user_logic.getFromFields(email=logged_in_id)
+  user = models.user.logic.getFromFields(email=logged_in_id)
   sponsor_form = None
   existing_sponsor = None
 
   # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
-    existing_sponsor = soc.logic.sponsor_logic.getIfFields(link_name=link_name)
+    existing_sponsor = models.sponsor.logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
@@ -143,7 +144,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       fields['founder'] = user
       
       form_ln = fields['link_name']
-      form_sponsor = soc.logic.sponsor_logic.updateOrCreateFromFields(fields, link_name=form_ln)
+      form_sponsor = models.sponsor.logic.updateOrCreateFromFields(fields, link_name=form_ln)
       
       if not form_sponsor:
         return http.HttpResponseRedirect('/')
@@ -221,7 +222,7 @@ def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL)
 
   # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
-    existing_sponsor = soc.logic.sponsor_logic.getIfFields(link_name=link_name)
+    existing_sponsor = models.sponsor.logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
@@ -230,6 +231,6 @@ def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL)
   if existing_sponsor:
     # TODO(pawel.solyga): Create specific delete method for Sponsor model
     # Check if Sponsor can be deleted (has no Hosts and Programs)
-    soc.logic.sponsor_logic.delete(existing_sponsor)
+    models.sponsor.logic.delete(existing_sponsor)
 
   return http.HttpResponseRedirect('/site/sponsor/list')

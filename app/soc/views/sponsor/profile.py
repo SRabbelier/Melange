@@ -22,8 +22,8 @@ __authors__ = [
   ]
 
 
+import soc.logic.models.sponsor
 from soc.logic import out_of_band
-from soc.logic import sponsor
 from soc.views import simple
 from soc.views import helper
 import soc.views.helper.responses
@@ -47,7 +47,7 @@ def public(request, link_name=None, template=DEF_SPONSOR_PUBLIC_TMPL):
   context = helper.responses.getUniversalContext(request)
 
   try:
-    link_name_sponsor = sponsor.sponsor_logic.getIfFields(link_name=link_name)
+    link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)

@@ -158,14 +158,14 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       user = models.user.logic.getFromFields(email=logged_in_id)
 
       properties = {
-        title : document_form.cleaned_data.get('title'),
-        short_name : document_form.cleaned_data.get('short_name'),
-        abstract : document_form.cleaned_data.get('abstract'),
-        content : document_form.cleaned_data.get('content'),
-        link_name : link_name,
-        partial_path : partial_path,
-        id : logged_in_id,
-        user : user,
+        'title' : document_form.cleaned_data.get('title'),
+        'short_name' : document_form.cleaned_data.get('short_name'),
+        'abstract' : document_form.cleaned_data.get('abstract'),
+        'content' : document_form.cleaned_data.get('content'),
+        'link_name' : link_name,
+        'partial_path' : partial_path,
+        'id' : logged_in_id,
+        'user' : user,
       }
 
       site_doc = document.logic.updateOrCreateFromFields(

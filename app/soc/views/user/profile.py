@@ -133,9 +133,9 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
     if form.is_valid():
       new_link_name = form.cleaned_data.get('link_name')
       properties = {
-        link_name : new_link_name,
-        nick_name : form.cleaned_data.get("nick_name"),
-        id : id,
+        'link_name' : new_link_name,
+        'nick_name' : form.cleaned_data.get("nick_name"),
+        'id' : id,
       }
 
       user = models.user.logic.updateOrCreateFromFields(properties, email=id.email())

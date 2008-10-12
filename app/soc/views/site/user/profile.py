@@ -141,21 +141,21 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
                 nearest_user_range_start, range_width)
       if not user:
         # user not found yet, so see if link name was provided
-        linkname = form.cleaned_data.get('link_name')
+        link_name = form.cleaned_data.get('link_name')
         
-        if linkname:
+        if link_name:
           # link name provided, so try to look up by link name 
-          user = id_user.getUserFromLinkName(linkname)
+          user = id_user.getUserFromLinkName(link_name)
         
           if user:
             lookup_message = ugettext_lazy('User found by link name.')
             email_error = None  # clear previous error, since User was found
           else:
-            context['linkname_error'] = ugettext_lazy(
+            context['link_name_error'] = ugettext_lazy(
                 'User with that link name not found.')
             range_width = helper.lists.getPreferredListPagination()
             nearest_user_range_start = id_user.findNearestUsersOffset(
-                range_width, link_name=linkname)
+                range_width, link_name=link_name)
             
             if nearest_user_range_start is not None:
               context['lookup_link'] = './list?offset=%s&limit=%s' % (
@@ -238,12 +238,12 @@ DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           ' <a href="/site/user/profile">Create ' \
                           'a New User</a> page.'
 
-def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
+def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
-    linkname: the User's site-unique "linkname" extracted from the URL
+    link_name: the User's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -262,45 +262,44 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
   user = None  # assume that no User entity will be found
 
-  # try to fetch User entity corresponding to linkname if one exists    
-  try:
-    user = id_user.getUserIfLinkName(linkname)
-  except out_of_band.ErrorResponse, error:
-    # show custom 404 page when link name doesn't exist in Datastore
-    error.message = error.message + DEF_CREATE_NEW_USER_MSG
-    return simple.errorResponse(request, error, template, context)
+  # try to fetch User entity corresponding to link_name if one exists
+  if link_name:
+    user = id_user.getUserFromLinkName(link_name)
 
   if request.method == 'POST':
     form = EditForm(request.POST)
 
     if form.is_valid():
-      form_id = form.cleaned_data.get('id')
-      new_linkname = form.cleaned_data.get('link_name')
-      nickname = form.cleaned_data.get('nick_name')
-      is_developer = form.cleaned_data.get('is_developer')
       key_name = form.cleaned_data.get('key_name')
+      new_link_name = form.cleaned_data.get('link_name')
+
+      properties = {}
+      properties['id'] = form.cleaned_data.get('id')
+      properties['link_name']  = new_link_name
+      properties['nick_name']  = form.cleaned_data.get('nick_name')
+      properties['is_developer'] = form.cleaned_data.get('is_developer')
       
-      user = id_user.updateUserForKeyName(key_name=key_name, id=form_id, 
-          link_name=new_linkname, nick_name=nickname, 
-          is_developer=is_developer)
+      user = soc.logic.user_logic.updateOrCreateFromKeyName(properties, key_name)
+
+      #raise forms.ValidationError("lesseee: " + new_link_name + " " +  user.link_name)
 
       if not user:
         return http.HttpResponseRedirect('/')
         
-      # redirect to new /site/user/profile/new_linkname?s=0
+      # redirect to new /site/user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, linkname, new_linkname,
+          request, link_name, new_link_name,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
     # try to fetch User entity corresponding to link name if one exists
-    if linkname:
+    if link_name:
       if user:
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit) 
         if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
             and (not helper.requests.isReferrerSelf(request,
-                                                    suffix=linkname))):
+                                                    suffix=link_name))):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)
     
@@ -322,7 +321,7 @@ def edit(request, linkname=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
           
         context['lookup_error'] = ugettext_lazy(
             'User with that link name not found.')
-        form = EditForm(initial={'link_name': linkname})
+        form = EditForm(initial={'link_name': link_name})
     else:  # no link name specified in the URL
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter

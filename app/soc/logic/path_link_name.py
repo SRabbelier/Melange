@@ -31,18 +31,18 @@ import re
 #   underscore and ASCII digit or lowercase)
 #     zero or more of OR group
 LINKNAME_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
-LINKNAME_ARG_PATTERN = r'(?P<linkname>%s)' % LINKNAME_PATTERN_CORE
+LINKNAME_ARG_PATTERN = r'(?P<link_name>%s)' % LINKNAME_PATTERN_CORE
 LINKNAME_PATTERN = r'^%s$' % LINKNAME_PATTERN_CORE
 LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
 
-# partial path is multiple linkname chunks,
+# partial path is multiple link_name chunks,
 #   each separated by a trailing /
 #     (at least 1)
-# followed by a single linkname with no trailing /
+# followed by a single link_name with no trailing /
 PATH_LINKNAME_ARGS_PATTERN = (
-    r'(?P<partial_path>%(linkname)s(?:/%(linkname)s)*)/'
-     '(?P<linkname>%(linkname)s)' % {
-        'linkname': LINKNAME_PATTERN_CORE})
+    r'(?P<partial_path>%(link_name)s(?:/%(link_name)s)*)/'
+     '(?P<link_name>%(link_name)s)' % {
+        'link_name': LINKNAME_PATTERN_CORE})
 
 PATH_LINKNAME_PATTERN = r'^%s$' % PATH_LINKNAME_ARGS_PATTERN
 PATH_LINKNAME_REGEX = re.compile(PATH_LINKNAME_PATTERN)
@@ -56,12 +56,12 @@ def getPartsFromPath(path):
      'link_name': 'link_name'}
     or {} (empty dict) if string did not match PATH_LINKNAME_PATTERN.
   """
-  path_linkname_match = PATH_LINKNAME_REGEX.match(path)
+  path_link_name_match = PATH_LINKNAME_REGEX.match(path)
   
-  if not path_linkname_match:
+  if not path_link_name_match:
     return {}
 
-  return path_linkname_match.groupdict()
+  return path_link_name_match.groupdict()
 
 
 def combinePath(path_parts):

@@ -75,12 +75,12 @@ SUBMIT_PROFILE_SAVED_PARAMS = {
   SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
 }
 
-def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
+def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
-    linkname: the User's site-unique "linkname" extracted from the URL
+    link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template
 
   Returns:
@@ -92,7 +92,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
-  if (not id) and (not linkname):
+  if (not id) and (not link_name):
     # not logged in, and no link name, so request that the user sign in 
     return simple.requestLogin(request, template, context,
         # TODO(tlarsen): /user/profile could be a link to a help page instead
@@ -101,22 +101,24 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
                           ' or modify an existing one, you must first'
                           ' <a href="%(sign_in)s">sign in</a>.')
 
-  if (not id) and linkname:
-    # not logged in, so show read-only public profile for linkname user
-    return simple.public(request, template, linkname, context)
+  if (not id) and link_name:
+    # not logged in, so show read-only public profile for link_name user
+    return simple.public(request, template, link_name, context)
 
-  # try to fetch User entity corresponding to linkname if one exists    
+  link_name_user = None
+
+  # try to fetch User entity corresponding to link_name if one exists
   try:
     linkname_user = id_user.getUserIfLinkName(linkname)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)
   
-  # linkname_user will be None here if link name was already None...
-  if linkname_user and (linkname_user.id != id):
-    # linkname_user exists but is not the currently logged in Google Account,
+  # link_name_user will be None here if link name was already None...
+  if link_name_user and (link_name_user.id != id):
+    # link_name_user exists but is not the currently logged in Google Account,
     # so show public view for that (other) User entity
-    return simple.public(request, template, linkname, context)
+    return simple.public(request, template, link_name, context)
 
   if request.method == 'POST':
     form = UserForm(request.POST)
@@ -128,10 +130,10 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       user = id_user.updateOrCreateUserFromId(
           id, link_name=new_linkname, nick_name=nickname)
 
-      # redirect to new /user/profile/new_linkname?s=0
+      # redirect to new /user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, linkname, new_linkname, params=SUBMIT_PROFILE_SAVED_PARAMS)
+          request, link_name, new_link_name, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists    
     user = id_user.getUserFromId(id)
@@ -141,7 +143,7 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(SUBMIT_MSG_PARAM_NAME)
           and (not helper.requests.isReferrerSelf(request,
-                                                  suffix=linkname))):
+                                                  suffix=link_name))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
     
@@ -166,6 +168,6 @@ def edit(request, linkname=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
 
 def create(request, template=DEF_USER_PROFILE_EDIT_TMPL):
-  """create() view is same as edit() view, but with no linkname supplied.
+  """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, linkname=None, template=template)
+  return edit(request, link_name=None, template=template)

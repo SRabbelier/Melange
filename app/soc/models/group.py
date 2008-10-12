@@ -40,7 +40,7 @@ class Group(polymodel.PolyModel):
       verbose_name=ugettext_lazy('Name'))
   name.help_text = ugettext_lazy('Complete, formal name of the group.')  
   
-  #: Required field storing linkname used in URLs to identify group.
+  #: Required field storing link_name used in URLs to identify group.
   #: Lower ASCII characters only.
   link_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link name'))

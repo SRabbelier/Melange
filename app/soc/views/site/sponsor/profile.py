@@ -83,12 +83,12 @@ DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           ' <a href="/site/sponsor/profile">Create ' \
                           'a New Sponsor</a> page.'
 
-def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a Sponsor Model entity.
 
   Args:
     request: the standard django request object
-    linkname: the Sponsor's site-unique "linkname" extracted from the URL
+    link_name: the Sponsor's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -110,7 +110,7 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   sponsor_form = None
   existing_sponsor = None
 
-  # try to fetch Sponsor entity corresponding to linkname if one exists    
+  # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
     existing_sponsor = soc.logic.sponsor.getSponsorIfLinkName(linkname)
   except out_of_band.ErrorResponse, error:
@@ -125,11 +125,11 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       sponsor_form = CreateForm(request.POST)
 
     if sponsor_form.is_valid():
-      if linkname:
-        # Form doesn't allow to change linkname but somebody might want to 
-        # abuse that manually, so we check if form linkname is the same as 
-        # url linkname
-        if sponsor_form.cleaned_data.get('link_name') != linkname:
+      if link_name:
+        # Form doesn't allow to change link_name but somebody might want to
+        # abuse that manually, so we check if form link_name is the same as
+        # url link_name
+        if sponsor_form.cleaned_data.get('link_name') != link_name:
           msg = DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG
           error = out_of_band.ErrorResponse(msg)
           return simple.errorResponse(request, error, template, context)
@@ -161,7 +161,7 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       # is 'Profile saved' parameter present, but referrer was not ourself?
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
-          and (not helper.requests.isReferrerSelf(request, suffix=linkname))):
+          and (not helper.requests.isReferrerSelf(request, suffix=link_name))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
       
@@ -192,17 +192,17 @@ def edit(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
 DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 
 def create(request, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
-  """create() view is same as edit() view, but with no linkname supplied.
+  """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, linkname=None, template=template)
+  return edit(request, link_name=None, template=template)
 
 
-def delete(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """Request handler for a Developer to delete Sponsor Model entity.
 
   Args:
     request: the standard django request object
-    linkname: the Sponsor's site-unique "linkname" extracted from the URL
+    link_name: the Sponsor's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -221,9 +221,9 @@ def delete(request, linkname=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
 
   existing_sponsor = None
 
-  # try to fetch Sponsor entity corresponding to linkname if one exists    
+  # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
-    existing_sponsor = soc.logic.sponsor.getSponsorIfLinkName(linkname)
+    existing_sponsor = soc.logic.sponsor.getSponsorIfLinkName(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG

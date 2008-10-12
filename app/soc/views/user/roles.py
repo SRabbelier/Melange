@@ -31,13 +31,13 @@ from django import http
 from soc.views.helpers import response_helpers
 
 
-def dashboard(request, linkname=None,
+def dashboard(request, link_name=None,
               template='soc/user/roles/dashboard.html'):
   """A per-User dashboard of that User's Roles on the site.
 
   Args:
     request: the standard django request object.
-    linkname: the User's site-unique "linkname" extracted from the URL
+    link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template.
 
   Returns:
@@ -45,7 +45,7 @@ def dashboard(request, linkname=None,
   """
   #TODO(tlarsen): this module is currently a placeholder for future work
   
-  # TODO: check that user is logged in and "owns" the linkname;
+  # TODO: check that user is logged in and "owns" the link_name;
   #   if not, call public() view instead
   #   This might be tricky, since we want to use the same style
   #   of template that was passed to us, but how do we figure out
@@ -58,13 +58,13 @@ def dashboard(request, linkname=None,
       template, {'template': template})
 
 
-def public(request, linkname=None,
+def public(request, link_name=None,
            template='soc/user/roles/public.html'):
   """A "general public" view of a User's Roles on the site.
 
   Args:
     request: the standard django request object.
-    linkname: the User's site-unique "linkname" extracted from the URL
+    link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template.
 
   Returns:

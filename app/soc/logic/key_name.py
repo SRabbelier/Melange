@@ -23,7 +23,7 @@ __authors__ = [
   ]
 
 
-from soc.logic import path_linkname
+from soc.logic import path_link_name
 
 
 class Error(Exception):
@@ -50,7 +50,7 @@ def nameDocument(partial_path, link_name=None):
   if link_name:
     path.append(link_name)
 
-  path = path_linkname.combinePath(path)
+  path = path_link_name.combinePath(path)
 
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
@@ -106,7 +106,7 @@ def nameSchool(sponsor_ln, program_ln, link_name):
     Error if sponsor_ln, program_ln, and link_Name combine to produce
     a "False" path (None, empty string, etc.)
   """
-  path = path_linkname.combinePath([[sponsor_ln, program_ln], link_name])
+  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_name])
   
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
@@ -126,7 +126,7 @@ def nameOrganization(sponsor_ln, program_ln, link_name):
     Error if sponsor_ln, program_ln, and link_Name combine to produce
     a "False" path (None, empty string, etc.)
   """
-  path = path_linkname.combinePath([[sponsor_ln, program_ln], link_name])
+  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_name])
   
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)

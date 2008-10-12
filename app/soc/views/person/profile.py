@@ -73,7 +73,7 @@ def edit(request, program=None, linkname=None,
   #   query for the human-readable program name and pass that to the form
   
   # TODO(tlarsen)
-  # if linkname:
+  # if link_name:
   #   query for a site-wide user profile for a friendly display name
   #      to use in the greeting
   # else:
@@ -89,4 +89,4 @@ def edit(request, program=None, linkname=None,
 
   return shortcuts.render_to_response(
       template, dictionary={'template': template, 'form': form, 'user': user,
-                            'program': program, 'linkname': linkname})
+                            'program': program, 'link_name': link_name})

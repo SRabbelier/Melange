@@ -32,12 +32,12 @@ import soc.views.helper.templates
 
 DEF_SPONSOR_PUBLIC_TMPL = 'soc/group/profile/public.html'
 
-def public(request, linkname=None, template=DEF_SPONSOR_PUBLIC_TMPL):
+def public(request, link_name=None, template=DEF_SPONSOR_PUBLIC_TMPL):
   """How the "general public" sees the Sponsor profile.
 
   Args:
     request: the standard django request object.
-    linkname: the Sponsor's site-unique "linkname" extracted from the URL
+    link_name: the Sponsor's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template.
 
   Returns:
@@ -47,15 +47,15 @@ def public(request, linkname=None, template=DEF_SPONSOR_PUBLIC_TMPL):
   context = helper.responses.getUniversalContext(request)
 
   try:
-    linkname_sponsor = sponsor.getSponsorIfLinkName(linkname)
+    link_name_sponsor = sponsor.sponsor_logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)
 
-  linkname_sponsor.description = \
-      helper.templates.unescape(linkname_sponsor.description)
+  link_name_sponsor.description = \
+      helper.templates.unescape(link_name_sponsor.description)
   
-  context.update({'linkname_group': linkname_sponsor,
+  context.update({'link_name_group': link_name_sponsor,
                   'group_type': 'Sponsor'})
 
   return helper.responses.respond(request, template, context)

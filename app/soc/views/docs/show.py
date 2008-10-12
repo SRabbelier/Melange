@@ -36,7 +36,7 @@ import soc.views.helper.templates
 
 DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
 
-def public(request, partial_path=None, linkname=None,
+def public(request, partial_path=None, link_name=None,
            template=DEF_DOCS_PUBLIC_TMPL):
   """How the "general public" sees a Document.
 
@@ -63,9 +63,9 @@ def public(request, partial_path=None, linkname=None,
   # TODO: based on the User's Roles, Documents that the User can edit
   #   should display a link to a document edit form
 
-  # try to fetch User entity corresponding to linkname if one exists    
+  # try to fetch User entity corresponding to link_name if one exists
   try:
-    doc = document.getDocumentIfPath(partial_path, link_name=linkname)
+    doc = document.getDocumentIfPath(partial_path, link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when Document path doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)

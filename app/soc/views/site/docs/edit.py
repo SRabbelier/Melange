@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import document
 from soc.logic import out_of_band
-from soc.logic import path_linkname
+from soc.logic import path_link_name
 from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import helper
@@ -105,7 +105,7 @@ def edit(request, partial_path=None, linkname=None,
 
   doc = None  # assume that no Document entity will be found
 
-  path = path_linkname.combinePath([partial_path, linkname])
+  path = path_link_name.combinePath([partial_path, link_name])
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
@@ -134,7 +134,7 @@ def edit(request, partial_path=None, linkname=None,
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = path_linkname.combinePath([new_partial_path, new_linkname])
+      new_path = path_link_name.combinePath([new_partial_path, new_link_name])
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -172,7 +172,7 @@ def edit(request, partial_path=None, linkname=None,
           
         context['lookup_error'] = ugettext_lazy(
             'Document with that path not found.')
-        form = EditForm(initial={'link_name': linkname})
+        form = EditForm(initial={'link_name': link_name})
     else:  # no link name specified in the URL
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter
@@ -252,7 +252,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = path_linkname.combinePath([new_partial_path, new_linkname])
+      new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
         
       # redirect to new /site/docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)

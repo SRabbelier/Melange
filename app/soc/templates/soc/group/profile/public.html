@@ -15,20 +15,20 @@ limitations under the License.
 {% load forms_helpers %}
 {% block page_title %}{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile{% endblock %}
 {% block header_title %}
-{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile for {{ linkname_group.name }}
+{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile for {{ link_name_group.name }}
 {% endblock %}
 {% block body %}
 <p>
  <table>
-  {% readonly_field_as_table_row linkname_group.fields.name.label linkname_group.name %}
-  {% readonly_field_as_table_row linkname_group.fields.home_page.label linkname_group.home_page %}
-  {% readonly_field_as_table_row linkname_group.fields.description.label linkname_group.description %}
-  {% readonly_field_as_table_row linkname_group.fields.street.label linkname_group.street %}
-  {% readonly_field_as_table_row linkname_group.fields.city.label linkname_group.city %}
-  {% readonly_field_as_table_row linkname_group.fields.state.label linkname_group.state %}
-  {% readonly_field_as_table_row linkname_group.fields.country.label linkname_group.country %}
-  {% readonly_field_as_table_row linkname_group.fields.postalcode.label linkname_group.postalcode %}
-  {% readonly_field_as_table_row linkname_group.fields.phone.label linkname_group.phone %}
+  {% readonly_field_as_table_row link_name_group.fields.name.label link_name_group.name %}
+  {% readonly_field_as_table_row link_name_group.fields.home_page.label link_name_group.home_page %}
+  {% readonly_field_as_table_row link_name_group.fields.description.label link_name_group.description %}
+  {% readonly_field_as_table_row link_name_group.fields.street.label link_name_group.street %}
+  {% readonly_field_as_table_row link_name_group.fields.city.label link_name_group.city %}
+  {% readonly_field_as_table_row link_name_group.fields.state.label link_name_group.state %}
+  {% readonly_field_as_table_row link_name_group.fields.country.label link_name_group.country %}
+  {% readonly_field_as_table_row link_name_group.fields.postalcode.label link_name_group.postalcode %}
+  {% readonly_field_as_table_row link_name_group.fields.phone.label link_name_group.phone %}
  </table>
 </p>
 {% endblock %}

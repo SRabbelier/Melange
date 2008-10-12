@@ -344,3 +344,12 @@ class BaseLogic():
     key_name  = self.getKeyNameForFields(**kwargs)
 
     return self.updateOrCreateFromKeyName(properties, key_name)
+  
+  def delete(self, entity):
+    """Delete existing entity from datastore.
+    
+    Args:
+      entity: an existing entity in datastore
+    """
+    entity.delete()
+  

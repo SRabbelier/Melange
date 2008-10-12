@@ -90,7 +90,7 @@ def isIdDeveloper(id=None):
   if not id:
     id = current_id
 
-  user = soc.logic.user_logic.getFromFields(id=id)
+  user = soc.logic.user_logic.getFromFields(email=id)
 
   if not user:
     # no User entity for this Google Account, and id is not the currently

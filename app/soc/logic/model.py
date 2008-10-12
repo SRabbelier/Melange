@@ -42,7 +42,7 @@ def buildTypedQueryString(base_class, derived_class=None):
     base_class: Model class that inherits directly from
       polymodel.PolyModel, such as soc.models.work.Work
     derived_class: optional more-specific Model class that
-      derives from base_class, such as soc.model.document.Document;
+      derives from base_class, such as soc.models.document.Document;
       default is None, in which case the inheritance_line
       property is *not* tested by the returned query string
   """

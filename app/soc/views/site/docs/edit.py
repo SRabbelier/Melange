@@ -31,17 +31,17 @@ from django.utils.translation import ugettext_lazy
 import soc.logic
 from soc.logic import out_of_band
 from soc.logic import path_link_name
-from soc.logic.helper import access
 from soc.logic.site import id_user
+import soc.models.document
 from soc.views import helper
+from soc.views.helper import access
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 import soc.views.helper.widgets
 from soc.views import simple
 from soc.views.user import profile
-
-import soc.models.document
+import soc.views.out_of_band
 
 
 class EditForm(helper.forms.DbModelForm):
@@ -123,7 +123,7 @@ def edit(request, partial_path=None, link_name=None,
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
 # create default template context for use with any templates
@@ -245,7 +245,7 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates

@@ -30,18 +30,17 @@ from django import newforms as forms
 import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
-from soc.logic.helper import access
 from soc.logic.site import id_user
+import soc.models.sponsor
 from soc.views import helper
+from soc.views.helper import access
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 import soc.views.helper.widgets
 from soc.views import simple
 from soc.views.user import profile
-
-import soc.models.sponsor
-
+import soc.views.out_of_band
 
 class CreateForm(helper.forms.DbModelForm):
   """Django form displayed when creating a Sponsor.
@@ -99,7 +98,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates
@@ -212,7 +211,7 @@ def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL)
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates

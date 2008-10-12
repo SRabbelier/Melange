@@ -18,30 +18,32 @@
 """
 
 __authors__ = [
-  '"Todd Larsen" <tlarsen@google.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
 class OutOfBandResponse(Exception):
-  """Base exception for out-of-band responses raised by controller logic.
+  """Base exception for out-of-band responses raised by views.
   """
 
   pass
 
 
-class ErrorResponse(OutOfBandResponse):
-  """Out-of-band response when controller logic needs a special error page.
+class AccessViolationResponse(OutOfBandResponse):
+  """"Out of band response when an access requirement was not met.
   """
 
-  def __init__(self, message, **response_args):
-    """Constructor used to set error message and HTTP response arguments.
-  
+  def __init__(self, response):
+    """Constructor used to set response message.
+
     Args:
-      message: error message to display on the error page
-      **response_args: keyword arguments that are supplied directly to
-        django.http.HttpResponse; the most commonly used is 'status' to
-        set the HTTP status code for the response
+      response: The response that should be returned to the user.
     """
 
-    self.message = message
-    self.response_args = response_args
+    self._response = response
+
+  def response(self):
+    """Returns the response that was set in the constructor.
+    """
+
+    return self._response

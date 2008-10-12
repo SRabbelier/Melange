@@ -31,10 +31,10 @@ from django.utils.translation import ugettext_lazy
 import soc.logic
 from soc.logic import validate
 from soc.logic import out_of_band
-from soc.logic.helper import access
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
+from soc.views.helper import access
 import soc.views.helper.forms
 import soc.views.helper.lists
 import soc.views.helper.requests
@@ -108,7 +108,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates
@@ -256,7 +256,7 @@ def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates
@@ -398,7 +398,7 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates

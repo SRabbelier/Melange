@@ -23,17 +23,18 @@ __authors__ = [
 
 
 import soc.logic
-from soc.logic.helper import access
 from soc.logic.site import id_user
+import soc.models.user
 from soc.views import simple
 from soc.views import helper
+from soc.views.helper import access
 import soc.views.helper.lists
 import soc.views.helper.responses
-
-import soc.models.user
+import soc.views.out_of_band
 
 
 DEF_SITE_USER_LIST_ALL_TMPL = 'soc/site/user/list/all.html'
+
 
 def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
   """Show a list of all Users (limit rows per page).
@@ -50,7 +51,7 @@ def all(request, template=DEF_SITE_USER_LIST_ALL_TMPL):
 
   try:
     access.checkIsDeveloper(request)
-  except  soc.logic.out_of_band.AccessViolationResponse, alt_response:
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
   # create default template context for use with any templates

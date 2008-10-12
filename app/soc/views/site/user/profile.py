@@ -220,7 +220,8 @@ class EditForm(helper.forms.DbModelForm):
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
 
-    user = soc.logic.user_logic.getFromKeyName(link_name)
+    key_name = self.data.get('key_name')
+    user = soc.logic.user_logic.getFromKeyName(key_name)
 
     if user and user.link_name != link_name:
       raise forms.ValidationError("This link name is already in use.")
@@ -411,11 +412,12 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
       form_id = form.cleaned_data.get('id')
       link_name = form.cleaned_data.get('link_name')
 
-      properties = {}
-      properties['id'] = form_id
-      properties['link_name'] = link_name
-      properties['nick_name'] = form.cleaned_data.get('nick_name')
-      properties['is_developer'] = form.cleaned_data.get('is_developer')
+      properties = {
+        id : form_id,
+        link_name : link_name,
+        nick_name : form.cleaned_data.get('nick_name'),
+        is_developer : form.cleaned_data.get('is_developer'),
+      }
 
       user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=form_id)
 

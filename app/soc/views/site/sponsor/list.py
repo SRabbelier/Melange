@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+import soc.logic
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access

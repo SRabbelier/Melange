@@ -32,6 +32,7 @@ from soc.logic import out_of_band
 
 def getFullClassName(cls):
   """Returns fully-qualified module.class name string.""" 
+
   return '%s.%s' % (cls.__module__, cls.__name__) 
 
 
@@ -46,6 +47,7 @@ def buildTypedQueryString(base_class, derived_class=None):
       default is None, in which case the inheritance_line
       property is *not* tested by the returned query string
   """
+
   query_str_parts = ['SELECT * FROM ', base_class.__name__]
 
   if derived_class:
@@ -64,6 +66,7 @@ def buildOrderedQueryString(base_class, derived_class=None, order_by=None):
       default is None, in which case no ORDER BY clause is placed in
       the query string
   """
+
   query_str_parts = [
     buildTypedQueryString(base_class, derived_class=derived_class)]
 
@@ -82,6 +85,7 @@ def getEntitiesForLimitAndOffset(base_class, limit, offset=0,
     offset: optional offset in entities list which defines first entity to
       return; default is zero (first entity)
   """
+
   query_string = buildOrderedQueryString(
       base_class, derived_class=derived_class, order_by=order_by)
 
@@ -109,6 +113,7 @@ def getNearestEntities(base_class, fields_to_try, derived_class=None):
       possibly None if query had no results for the supplied field
       that was used.
   """
+
   # SELECT * FROM base_class WHERE inheritance_line = 'derived_class'
   typed_query_str = buildTypedQueryString(
     base_class, derived_class=derived_class)
@@ -146,6 +151,7 @@ def findNearestEntitiesOffset(width, base_class, fields_to_try,
     None if there are no nearest entities or the offset of the beginning of
     the range cannot be found for some reason 
   """
+
   # find entity "nearest" to supplied fields
   nearest_entities, field = getNearestEntities(
       base_class, fields_to_try, derived_class=derived_class)
@@ -203,15 +209,16 @@ class BaseLogic():
 -    Args:
 -      key_name: key name of entity
     """
+
     return self._model.get_by_key_name(key_name)
 
   def getFromFields(self, **kwargs):
     """Returns the entity for a given link name, or None if not found.
 
     Args:
-      link_name: a link name of the entity that uniquely identifies it
+      **kwargs: the fields of the entity that uniquely identifies it
     """
-    # lookup by Sponsor key name
+
     key_name = self.getKeyNameForFields(**kwargs)
 
     if key_name:
@@ -222,19 +229,20 @@ class BaseLogic():
     return entity
 
   def getIfFields(self, **kwargs):
-    """Returns Sponsor entity for supplied link name if one exists.
+    """Returns entity for supplied link name if one exists.
 
     Args:
-      link_name: a link name of the Sponsor that uniquely identifies it
+      **kwargs: the fields of the entity that uniquely identifies it
 
     Returns:
-      * None if link name is false.
-      * Sponsor entity for supplied link_name
+      * None if a field is false.
+      * Eentity for supplied fields
 
     Raises:
       out_of_band.ErrorResponse if link name is not false, but no Sponsor entity
       with the supplied link name exists in the Datastore
     """
+
     if not all(kwargs.values()):
       # exit without error, to let view know that link_name was not supplied
       return None
@@ -248,18 +256,19 @@ class BaseLogic():
     fields = []
 
     for key, value in kwargs.iteritems():
-      fields.extend('"%s" is "%s"' % (key, value))
+      fields.extend('"%s" is "%s" ' % (key, value))
 
     # else: fields were supplied, but there is no Entity that has it
     raise out_of_band.ErrorResponse(
         'There is no %s with %s.' % (self._name, ''.join(fields)), status=404)
 
   def getKeyNameForFields(self, **kwargs):
-    """Return a Datastore key_name for a Sponsor from the link name.
+    """Return a Datastore key_name for a Entity from the specified fields.
 
     Args:
-      link_name: a link name of the entity that uniquely identifies it
+      **kwargs: the fields of the entity that uniquely identifies it
     """
+
     if not all(kwargs.values()):
       return None
 
@@ -273,6 +282,7 @@ class BaseLogic():
       offset: optional offset in entities list which defines first entity to
         return; default is zero (first entity)
     """
+
     query = self._model.all()
     return query.fetch(limit, offset)
 
@@ -287,6 +297,7 @@ class BaseLogic():
     Returns:
       the original model entity with any supplied properties changed
     """
+
     def update():
       return self._unsafeUpdateModelProperties(model, **model_properties)
 
@@ -297,6 +308,7 @@ class BaseLogic():
 
     Like updateModelProperties(), but not run within a transaction.
     """
+
     properties = model.properties()
 
     for prop in properties.values():
@@ -315,9 +327,8 @@ class BaseLogic():
     """Update existing entity, or create new one with supplied properties.
 
     Args:
-      link_name: a link_name of the entity that uniquely identifies it
-      **properties: keyword arguments that correspond to entity
-        properties and their values
+      properties: dictionairy with entity properties and their values
+      key_name: the key_name of the entity that uniquely identifies it
 
     Returns:
       the entity corresponding to the key_name, with any supplied
@@ -351,5 +362,6 @@ class BaseLogic():
     Args:
       entity: an existing entity in datastore
     """
+
     entity.delete()
-  
+

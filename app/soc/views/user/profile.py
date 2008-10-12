@@ -131,10 +131,11 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
     if form.is_valid():
       new_link_name = form.cleaned_data.get('link_name')
-      properties = {}
-      properties['link_name'] = new_link_name
-      properties['nick_name'] = form.cleaned_data.get("nick_name")
-      properties['id'] = id
+      properties = {
+        link_name : new_link_name,
+        nick_name : form.cleaned_data.get("nick_name"),
+        id : id,
+      }
 
       user = soc.logic.user_logic.updateOrCreateFromFields(properties, email=id)
 

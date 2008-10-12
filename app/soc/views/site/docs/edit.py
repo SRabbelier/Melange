@@ -76,6 +76,7 @@ SUBMIT_MESSAGES = (
  ugettext_lazy('Document saved.'),
 )
 
+
 def getDocForForm(form):
   """Extracts doc fields from a form and creates a new doc from it
   """
@@ -102,6 +103,7 @@ def getDocForForm(form):
             partial_path=partial_path, link_name=link_name)
 
   return doc
+
 
 def edit(request, partial_path=None, link_name=None,
          template=DEF_SITE_DOCS_EDIT_TMPL):

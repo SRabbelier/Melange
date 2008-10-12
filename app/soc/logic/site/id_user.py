@@ -81,12 +81,11 @@ def isIdDeveloper(id=None):
     # User is definitely *not* a Developer
     return False
 
-  if (not id or id == current_id) and users.is_current_user_admin():
+  if ((not id) or (id == current_id)) and users.is_current_user_admin():
     # no id supplied, or current logged-in user, and that user is in the
     # Administration->Developers list in the App Engine console
     return True
 
-  # If no id is specified, default to logged in user
   if not id:
     id = current_id
 

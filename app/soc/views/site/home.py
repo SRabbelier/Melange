@@ -154,18 +154,16 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       logged_in_id = users.get_current_user()
       user = soc.logic.user_logic.getFromFields(email=logged_in_id)
 
-      properties = {}
-      properties['title'] = document_form.cleaned_data.get('title')
-      properties['short_name'] = document_form.cleaned_data.get('short_name')
-      properties['abstract'] = document_form.cleaned_data.get('abstract')
-      properties['content'] = document_form.cleaned_data.get('content')
-      properties['link_name'] = link_name
-      properties['partial_path'] = partial_path
-      properties['id'] = logged_in_id
-      properties['user'] = user
-
-      #bla =  dir(logged_in_id)
-      #raise self
+      properties = {
+        title : document_form.cleaned_data.get('title'),
+        short_name : document_form.cleaned_data.get('short_name'),
+        abstract : document_form.cleaned_data.get('abstract'),
+        content : document_form.cleaned_data.get('content'),
+        link_name : link_name,
+        partial_path : partial_path,
+        id : logged_in_id,
+        user : user,
+      }
 
       site_doc = soc.logic.document_logic.updateOrCreateFromFields(
           properties, partial_path=partial_path, link_name=link_name)

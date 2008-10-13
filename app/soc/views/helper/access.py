@@ -31,11 +31,13 @@ __authors__ = [
 
 
 from google.appengine.api import users
+
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import models
 from soc.logic.site import id_user
 from soc.views.simple import requestLogin
+
 import soc.views.out_of_band
 
 

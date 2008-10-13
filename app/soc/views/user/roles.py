@@ -27,7 +27,9 @@ __authors__ = [
 
 
 from google.appengine.api import users
+
 from django import http
+
 from soc.views.helpers import response_helpers
 
 

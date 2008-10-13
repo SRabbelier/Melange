@@ -27,22 +27,24 @@ from google.appengine.api import users
 from django import http
 from django import newforms as forms
 
-import soc.logic
-from soc.logic import validate
-from soc.logic import out_of_band
-from soc.logic.site import id_user
 from soc.logic import models
+from soc.logic import out_of_band
+from soc.logic import validate
 from soc.logic.models import sponsor
-import soc.models.sponsor
+from soc.logic.site import id_user
 from soc.views import helper
+from soc.views import simple
 from soc.views.helper import access
+from soc.views.user import profile
+
+import soc.logic
+import soc.models.sponsor
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 import soc.views.helper.widgets
-from soc.views import simple
-from soc.views.user import profile
 import soc.views.out_of_band
+
 
 class CreateForm(helper.forms.DbModelForm):
   """Django form displayed when creating a Sponsor.

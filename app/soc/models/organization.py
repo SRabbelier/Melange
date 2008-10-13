@@ -20,10 +20,13 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
 
 from soc import models
+
 import soc.models.group
+
 
 class Organization(soc.models.group.Group):
   """Organization details.
@@ -37,4 +40,3 @@ class Organization(soc.models.group.Group):
      reference.
   """
   pass
-

@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import helper
+
 import soc.views.helper.responses
 import soc.views.helper.templates
 

@@ -22,10 +22,11 @@ __authors__ = [
   ]
 
 
-import soc.logic.models.sponsor
 from soc.logic import out_of_band
-from soc.views import simple
 from soc.views import helper
+from soc.views import simple
+
+import soc.logic.models.sponsor
 import soc.views.helper.responses
 import soc.views.helper.templates
 

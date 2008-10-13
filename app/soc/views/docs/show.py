@@ -28,8 +28,9 @@ from google.appengine.api import users
 
 from soc.logic import document
 from soc.logic import out_of_band
-from soc.views import simple
 from soc.views import helper
+from soc.views import simple
+
 import soc.views.helper.responses
 import soc.views.helper.templates
 

@@ -26,9 +26,9 @@ import re
 
 from google.appengine.api import urlfetch
 
-import feedparser
-
 from soc.logic import path_link_name
+
+import feedparser
 
 
 def isFeedURLValid(feed_url=None):

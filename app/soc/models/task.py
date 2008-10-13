@@ -25,6 +25,7 @@ from google.appengine.ext import db
 
 from soc import models
 from soc.models import base
+
 import soc.models.proposal
 
 

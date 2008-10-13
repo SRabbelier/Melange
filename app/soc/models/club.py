@@ -24,6 +24,7 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc.models import base
+
 import soc.models.group
 
 

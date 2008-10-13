@@ -28,21 +28,21 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
-import soc.logic
 from soc.logic import models
-from soc.logic import validate
 from soc.logic import out_of_band
+from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.user import profile
+
+import soc.logic
+import soc.models.user
 import soc.views.helper.forms
 import soc.views.helper.lists
 import soc.views.helper.requests
 import soc.views.helper.responses
-from soc.views.user import profile
-
-import soc.models.user
 
 
 class LookupForm(helper.forms.DbModelForm):

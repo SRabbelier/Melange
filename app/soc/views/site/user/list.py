@@ -22,13 +22,14 @@ __authors__ = [
   ]
 
 
-import soc.logic
 from soc.logic import models
 from soc.logic.site import id_user
-import soc.models.user
-from soc.views import simple
 from soc.views import helper
+from soc.views import simple
 from soc.views.helper import access
+
+import soc.logic
+import soc.models.user
 import soc.views.helper.lists
 import soc.views.helper.responses
 import soc.views.out_of_band

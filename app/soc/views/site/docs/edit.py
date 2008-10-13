@@ -29,19 +29,21 @@ from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import models
-from soc.logic.models import document
 from soc.logic import out_of_band
 from soc.logic import path_link_name
+from soc.logic.models import document
 from soc.logic.site import id_user
-import soc.models.document
+
 from soc.views import helper
+from soc.views import simple
 from soc.views.helper import access
+from soc.views.user import profile
+
+import soc.models.document
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
 import soc.views.helper.widgets
-from soc.views import simple
-from soc.views.user import profile
 import soc.views.out_of_band
 
 

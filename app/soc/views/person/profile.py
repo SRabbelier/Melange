@@ -29,12 +29,14 @@ __authors__ = [
 
 
 from google.appengine.api import users
+
 from django import http
 from django import shortcuts
 from django import newforms as forms
 
 from soc.models import person
 from soc.views import helper
+
 import soc.views.helper.forms
 
 

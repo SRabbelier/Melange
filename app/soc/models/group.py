@@ -24,12 +24,13 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import polymodel
-
 from django.utils.translation import ugettext_lazy
 
 from soc.models import countries
+
+import polymodel
 import soc.models.user
+
 
 class Group(polymodel.PolyModel):
   """Common data fields for all groups.

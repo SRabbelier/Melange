@@ -23,23 +23,24 @@ __authors__ = [
 
 
 from google.appengine.api import users
+
 from django import http
-from django import shortcuts
 from django import newforms as forms
+from django import shortcuts
 from django.utils.translation import ugettext_lazy
 
-import soc.logic
 from soc.logic import models
-from soc.logic import validate
 from soc.logic import out_of_band
+from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import helper
+from soc.views import simple
+
+import soc.logic
+import soc.models.user
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
-from soc.views import simple
-
-import soc.models.user
 
 
 class UserForm(helper.forms.DbModelForm):

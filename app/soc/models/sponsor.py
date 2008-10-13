@@ -23,6 +23,7 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc import models
+
 import soc.models.group
 
 

@@ -30,7 +30,15 @@ from google.appengine.api import users
 from django import http
 from django.template import loader
 
+from soc.logic import system
+from soc.logic.site import id_user
+from soc.logic.site import sidebar
+from soc.views import helper
+from soc.views.helper import html_menu
+
+import soc.logic
 import soc.logic.models.user
+import soc.views.helper.requests
 
 # DeadlineExceededError can live in two different places
 try:
@@ -39,14 +47,6 @@ try:
 except ImportError:
   # In the development server
   from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
-
-import soc.logic
-from soc.logic import system
-from soc.logic.site import id_user
-from soc.logic.site import sidebar
-from soc.views import helper
-import soc.views.helper.requests
-from soc.views.helper import html_menu
 
 
 def respond(request, template, context=None, response_args=None):

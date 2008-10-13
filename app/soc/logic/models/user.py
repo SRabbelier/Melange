@@ -24,6 +24,7 @@ __authors__ = [
 
 from soc.logic import key_name
 from soc.logic.models import base
+
 import soc.models.user
 
 

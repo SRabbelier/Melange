@@ -24,10 +24,10 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import polymodel
 
 from django.utils.translation import ugettext_lazy
 
+import polymodel
 import soc.models.document
 
 

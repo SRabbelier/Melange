@@ -50,7 +50,7 @@ DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
   'Please create <a href="/user/profile">User Profile</a>'
   ' in order to view this page.')
 
-DEF_DEV_LOGOUT_LOGIN_MSG_FMT = (
+DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%%(sign_out)s">sign out</a>'
   ' and <a href="%%(sign_in)s">sign in</a>'
   ' again as %(role)s to view this page.')
@@ -75,7 +75,7 @@ def checkIsLoggedIn(request):
     return
 
   login_request = requestLogin(request, DEF_LOGIN_TMPL,
-                      login_message_fmt=DEF_LOGIN_MSG_FMT)
+                               login_message_fmt=DEF_LOGIN_MSG_FMT)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_request)
 
@@ -104,7 +104,7 @@ def checkIsUser(request):
     return
 
   login_request = requestLogin(request, DEF_LOGIN_TMPL,
-                      login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
+                               login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_request)
 
@@ -136,7 +136,7 @@ def checkIsDeveloper(request):
       }
 
   login_request = requestLogin(request, DEF_LOGIN_TMPL,
-                      login_message_fmt=login_message_fmt)
+                               login_message_fmt=login_message_fmt)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_request)
 
@@ -169,6 +169,6 @@ def checkIsHost(request, program):
       }
 
   login_request = requestLogin(request, DEF_LOGIN_TMPL,
-                      login_message_fmt=login_message_fmt)
+                               login_message_fmt=login_message_fmt)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_request)

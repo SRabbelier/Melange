@@ -80,7 +80,7 @@ class Logic():
 
     Returns:
       * None if a field is false.
-      * Eentity for supplied fields
+      * Entity for supplied fields
 
     Raises:
       out_of_band.ErrorResponse if link name is not false, but no Sponsor entity
@@ -171,7 +171,7 @@ class Logic():
     """Update existing entity, or create new one with supplied properties.
 
     Args:
-      properties: dictionairy with entity properties and their values
+      properties: dict with entity properties and their values
       key_name: the key_name of the entity that uniquely identifies it
 
     Returns:

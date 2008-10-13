@@ -414,10 +414,10 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
       link_name = form.cleaned_data.get('link_name')
 
       properties = {
-        'id' : form_id,
-        'link_name' : link_name,
-        'nick_name' : form.cleaned_data.get('nick_name'),
-        'is_developer' : form.cleaned_data.get('is_developer'),
+        'id': form_id,
+        'link_name': link_name,
+        'nick_name': form.cleaned_data.get('nick_name'),
+        'is_developer': form.cleaned_data.get('is_developer'),
       }
 
       user = models.user.logic.updateOrCreateFromFields(properties, email=form_id)

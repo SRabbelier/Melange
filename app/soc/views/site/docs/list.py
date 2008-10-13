@@ -23,7 +23,7 @@ __authors__ = [
 
 
 import soc.logic
-from soc.logic import models
+from soc.logic.models import work
 import soc.models.document
 from soc.views import simple
 from soc.views import helper
@@ -61,7 +61,7 @@ def all(request, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
   # Fetch one more to see if there should be a 'next' link
-  docs = models.work.logic.getForLimitAndOffset(limit + 1, offset=offset)
+  docs = work.logic.getForLimitAndOffset(limit + 1, offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 

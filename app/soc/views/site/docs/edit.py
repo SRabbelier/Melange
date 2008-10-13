@@ -28,6 +28,7 @@ from django import http
 from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import models
 from soc.logic.models import document
 from soc.logic import out_of_band
 from soc.logic import path_link_name

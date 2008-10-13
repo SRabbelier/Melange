@@ -32,6 +32,7 @@ from soc.logic import validate
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.logic import models
+from soc.logic.models import sponsor
 import soc.models.sponsor
 from soc.views import helper
 from soc.views.helper import access
@@ -112,7 +113,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
 
   # try to fetch Sponsor entity corresponding to link_name if one exists
   try:
-    existing_sponsor = models.sponsor.logic.getIfFields(link_name=link_name)
+    existing_sponsor = sponsor.logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG

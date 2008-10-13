@@ -162,6 +162,14 @@ site_docs_edit = page.Page(
   short_name='Modify Site Document',
   parent=site_home_edit)
 
+site_docs_delete = page.Page(
+  page.Url(
+    r'^site/docs/%s/delete$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.site.docs.edit.delete'),
+  'Site: Delete Existing Document',
+  short_name='Delete Site Document',
+  parent=site_home_edit)
+
 site_docs_list = page.Page(
   page.Url(
     r'^site/docs/list$',

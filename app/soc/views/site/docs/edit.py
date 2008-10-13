@@ -278,3 +278,48 @@ def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
   context['form'] = form
 
   return helper.responses.respond(request, template, context)
+
+
+def delete(request, partial_path=None, link_name=None,
+           template=DEF_SITE_DOCS_EDIT_TMPL):
+  """Request handler for a Developer to delete Document Model entity.
+
+  Args:
+    request: the standard django request object
+    partial_path: the Document's site-unique "path" extracted from the URL,
+      minus the trailing link_name
+    link_name: the last portion of the Document's site-unique "path"
+      extracted from the URL
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which redirects 
+    to /site/docs/list.
+  """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
+  # create default template context for use with any templates
+  context = helper.responses.getUniversalContext(request)
+
+  existing_doc = None
+  path = path_link_name.combinePath([partial_path, link_name])
+
+  # try to fetch Document entity corresponding to path if one exists    
+  try:
+    if path:
+      existing_doc = document.logic.getFromFields(partial_path=partial_path,
+                                                  link_name=link_name)
+  except out_of_band.ErrorResponse, error:
+    # show custom 404 page when path doesn't exist in Datastore
+    error.message = error.message + DEF_CREATE_NEW_DOC_MSG
+    return simple.errorResponse(request, error, template, context)
+
+  if existing_doc:
+    document.logic.delete(existing_doc)
+
+  return http.HttpResponseRedirect('/site/docs/list')

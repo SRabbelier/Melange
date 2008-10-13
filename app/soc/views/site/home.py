@@ -28,13 +28,12 @@ __authors__ = [
 
 
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from django import http
 from django import shortcuts
 from django import newforms as forms
 
-
-import soc.logic.models.settings
 from soc.logic import models
 from soc.logic import out_of_band
 from soc.logic import validate
@@ -43,14 +42,15 @@ from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
-import soc.views.out_of_band
+
+import soc.logic.models.settings
+import soc.models.document
+import soc.models.site_settings
 import soc.views.helper.forms
 import soc.views.helper.responses
 import soc.views.helper.templates
 import soc.views.helper.widgets
-
-import soc.models.site_settings
-import soc.models.document
+import soc.views.out_of_band
 
 
 class DocumentForm(helper.forms.DbModelForm):
@@ -114,7 +114,12 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
 
   if site_settings:
     context['site_settings'] = site_settings
-    site_doc = site_settings.home
+    
+    # check if ReferenceProperty to home Document is valid
+    try:
+      site_doc = site_settings.home
+    except db.Error:
+      site_doc = None
   
     if site_doc:
       site_doc.content = helper.templates.unescape(site_doc.content)
@@ -185,7 +190,13 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
     if site_settings:
       # populate form with the existing SiteSettings entity
       settings_form = SiteSettingsForm(instance=site_settings)
-      site_doc = site_settings.home
+      
+      # check if ReferenceProperty to home Document is valid
+      try:
+        site_doc = site_settings.home
+      except db.Error:
+        site_doc = None
+    
     else:
       # no SiteSettings entity exists for this key_name, so show a blank form
       settings_form = SiteSettingsForm()

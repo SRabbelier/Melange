@@ -43,7 +43,7 @@ from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
 
-import soc.logic.models.settings
+import soc.logic.models.site_settings
 import soc.models.document
 import soc.models.site_settings
 import soc.views.helper.forms
@@ -110,7 +110,8 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
   
-  site_settings = soc.logic.models.settings.logic.getFromFields(path=DEF_SITE_SETTINGS_PATH)
+  site_settings = soc.logic.models.site_settings.logic.getFromFields(
+                                                  path=DEF_SITE_SETTINGS_PATH)
 
   if site_settings:
     context['site_settings'] = site_settings
@@ -178,13 +179,13 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       
       feed_url = settings_form.cleaned_data.get('feed_url')
 
-      site_settings = models.settings.logic.updateOrCreateFromFields(
+      site_settings = models.site_settings.logic.updateOrCreateFromFields(
           {'feed_url': feed_url, 'home': site_doc}, path=DEF_SITE_SETTINGS_PATH)
       
       context['notice'] = 'Site Settings saved.'
   else: # request.method == 'GET'
     # try to fetch SiteSettings entity by unique key_name
-    site_settings = models.settings.logic.getFromFields(
+    site_settings = models.site_settings.logic.getFromFields(
         path=DEF_SITE_SETTINGS_PATH)
 
     if site_settings:

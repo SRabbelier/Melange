@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Settings (Model) query functions.
+"""SiteSettings (Model) query functions.
 """
 
 __authors__ = [
@@ -29,14 +29,14 @@ import soc.models.site_settings
 
 
 class Logic(base.Logic):
-  """Logic methods for the Settings model
+  """Logic methods for the SiteSettings model
   """
 
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "settings"
+    self._name = "site_settings"
     self._model = soc.models.site_settings.SiteSettings
     self._keyName = key_name.nameSiteSettings
     self._skip_properties = []

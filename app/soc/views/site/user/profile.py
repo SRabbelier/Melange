@@ -273,8 +273,14 @@ def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   user = None  # assume that no User entity will be found
 
   # try to fetch User entity corresponding to link_name if one exists
-  if link_name:
-    user = id_user.getUserFromLinkName(link_name)
+  try:
+    if link_name:
+      user = id_user.getUserFromLinkNameOrDie(link_name)
+  except out_of_band.ErrorResponse, error:
+    # show custom 404 page when link name doesn't exist in Datastore
+    error.message = error.message + DEF_CREATE_NEW_USER_MSG
+    return simple.errorResponse(request, error, template, context)
+
 
   if request.method == 'POST':
     form = EditForm(request.POST)

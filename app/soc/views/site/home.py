@@ -111,7 +111,7 @@ def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
   context = helper.responses.getUniversalContext(request)
   
   site_settings = soc.logic.models.site_settings.logic.getFromFields(
-                                                  path=DEF_SITE_SETTINGS_PATH)
+      path=DEF_SITE_SETTINGS_PATH)
 
   if site_settings:
     context['site_settings'] = site_settings
@@ -161,7 +161,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       link_name = DEF_SITE_HOME_DOC_LINK_NAME
       partial_path=DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
-      user = models.user.logic.getFromFields(email=logged_in_id)
+      user = models.user.logic.getFromFields(email=logged_in_id.email())
 
       properties = {
         'title': document_form.cleaned_data.get('title'),

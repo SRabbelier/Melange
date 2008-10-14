@@ -378,7 +378,7 @@ class CreateForm(helper.forms.DbModelForm):
   def clean_id(self):
     new_email = self.cleaned_data.get('id')
     form_id = users.User(email=new_email)
-    if models.user.logic.getFromFields(email=form_id):
+    if models.user.logic.getFromFields(email=form_id.email()):
         raise forms.ValidationError("This account is already in use.")
     return form_id
 
@@ -420,7 +420,7 @@ def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
         'is_developer': form.cleaned_data.get('is_developer'),
       }
 
-      user = models.user.logic.updateOrCreateFromFields(properties, email=form_id)
+      user = models.user.logic.updateOrCreateFromFields(properties, email=form_id.email())
 
       if not user:
         return http.HttpResponseRedirect('/')

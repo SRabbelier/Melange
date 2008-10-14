@@ -109,7 +109,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   context = helper.responses.getUniversalContext(request)
 
   logged_in_id = users.get_current_user()
-  user = models.user.logic.getFromFields(email=logged_in_id)
+  user = models.user.logic.getFromFields(email=logged_in_id.email())
   sponsor_form = None
   existing_sponsor = None
 

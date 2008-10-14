@@ -103,8 +103,8 @@ def getDocForForm(form):
   properties['user'] = models.user.logic.getFromFields(email=email)
 
   doc = document.logic.updateOrCreateFromFields(properties,
-            partial_path=partial_path, link_name=link_name)
-
+                                                partial_path=partial_path,
+                                                link_name=link_name)
   return doc
 
 
@@ -143,7 +143,7 @@ def edit(request, partial_path=None, link_name=None,
   try:
     if path:
       doc = document.logic.getFromFields(partial_path=partial_path,
-                                                   link_name=link_name)
+                                         link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG

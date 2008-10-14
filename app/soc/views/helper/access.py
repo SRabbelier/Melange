@@ -98,7 +98,7 @@ def checkIsUser(request):
   checkIsLoggedIn(request)
 
   id = users.get_current_user()
-  user = models.user.logic.getFromFields(email=id)
+  user = models.user.logic.getFromFields(email=id.email())
 
   if user:
     return

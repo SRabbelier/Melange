@@ -147,7 +147,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
           request, link_name, new_link_name, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists
-    user = models.user.logic.getFromFields(email=id)
+    user = models.user.logic.getFromFields(email=id.email())
 
     if user:
       # is 'Profile saved' parameter present, but referrer was not ourself?

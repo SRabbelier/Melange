@@ -89,7 +89,7 @@ def isIdDeveloper(id=None):
   if not id:
     id = current_id
 
-  user = models.user.logic.getFromFields(email=id)
+  user = models.user.logic.getFromFields(email=id.email())
 
   if not user:
     # no User entity for this Google Account, and id is not the currently

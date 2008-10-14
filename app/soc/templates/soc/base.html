@@ -58,9 +58,24 @@ limitations under the License.
 	<div id="breadcrumbs">
 	{% block breadcrumbs %}{% endblock %}
 	</div>
+
+	{% block notice %}
 	<div id="notice">
-	{% block notice %}{% if notice %}<table align="center"><tr><td><div class="notice"><div class="rounded_ul"><div class="rounded_ur"><div class="rounded_ll"><div class="rounded_lr"> <div style="padding: 5px 10px;"><b>{{ notice }}</b></div></div></div></div></div></div><td></tr></table>{% endif %}
-	{% endblock %}</div>
+	{% if notice %}
+	<table align="center">
+	    <tr>
+	        <td>
+	        <div class="notice">
+	        <div class="rounded_ul"><div class="rounded_ur"><div class="rounded_ll"><div class="rounded_lr">
+	        <div style="padding: 5px 10px;"><b>{{ notice }}</b></div>
+	        </div></div></div></div>
+	        </div>
+	        <td>
+	    </tr>
+	</table>
+	{% endif %}
+	</div>
+	{% endblock %}
   </div>
 
   <div id="side" dir="ltr">

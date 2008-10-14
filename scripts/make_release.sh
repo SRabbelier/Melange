@@ -11,7 +11,7 @@
 DEFAULT_APP_RELEASE=../release
 DEFAULT_APP_FOLDER="../app"
 DEFAULT_APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
-DEFAULT_APP_DIRS="soc ghop gsoc feedparser polymodel python25src"
+DEFAULT_APP_DIRS="soc ghop gsoc feedparser polymodel python25src reflistprop"
 DEFAULT_ZIP_FILES="tiny_mce.zip"
 
 APP_RELEASE=${APP_RELEASE:-"${DEFAULT_APP_RELEASE}"}

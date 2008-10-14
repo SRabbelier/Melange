@@ -129,7 +129,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
       
       if form_id:
         # email provided, so attempt to look up user by email
-        user = models.user.logic.getFromFields(id=form_id)
+        user = models.user.logic.getFromFields(email=form_id.email())
 
         if user:
           lookup_message = ugettext_lazy('User found by email.')

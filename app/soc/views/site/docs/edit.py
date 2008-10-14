@@ -101,6 +101,7 @@ def getDocForForm(form):
   properties['abstract'] = form.cleaned_data.get('abstract')
   properties['content'] = form.cleaned_data.get('content')
   properties['user'] = models.user.logic.getFromFields(email=email)
+  properties['is_featured'] = form.cleaned_data.get('is_featured')
 
   doc = document.logic.updateOrCreateFromFields(properties,
                                                 partial_path=partial_path,
@@ -188,7 +189,7 @@ def edit(request, partial_path=None, link_name=None,
             'title': doc.title, 'partial_path': doc.partial_path,
             'link_name': doc.link_name, 'short_name': doc.short_name,
             'abstract': doc.abstract, 'content': doc.content,
-            'user': doc.user})       
+            'user': doc.user, 'is_featured': doc.is_featured})       
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
           # redirect to aggressively remove 'Profile saved' query parameter

@@ -62,20 +62,24 @@ def capfirst(value):
 capfirst.is_safe=True
 capfirst = stringfilter(capfirst)
 
-_js_escapes = (
-    ('\\', '\\\\'),
-    ('"', '\\"'),
-    ("'", "\\'"),
-    ('\n', '\\n'),
-    ('\r', '\\r'),
-    ('\b', '\\b'),
-    ('\f', '\\f'),
-    ('\t', '\\t'),
-    ('\v', '\\v'),
-    ('</', '<\\/'),
+_base_js_escapes = (
+    ('\\', r'\x5C'),
+    ('\'', r'\x27'),
+    ('"', r'\x22'),
+    ('>', r'\x3E'),
+    ('<', r'\x3C'),
+    ('&', r'\x26'),
+    ('=', r'\x3D'),
+    ('-', r'\x2D'),
+    (';', r'\x3B')
 )
+
+# Escape every ASCII character with a value less than 32.
+_js_escapes = (_base_js_escapes +
+               tuple([('%c' % z, '\\x%02X' % z) for z in range(32)]))
+
 def escapejs(value):
-    """Backslash-escapes characters for use in JavaScript strings."""
+    """Hex encodes characters for use in JavaScript strings."""
     for bad, good in _js_escapes:
         value = value.replace(bad, good)
     return value
@@ -642,20 +646,24 @@ def timesince(value, arg=None):
     from django.utils.timesince import timesince
     if not value:
         return u''
-    if arg:
-        return timesince(arg, value)
-    return timesince(value)
+    try:
+        if arg:
+            return timesince(value, arg)
+        return timesince(value)
+    except (ValueError, TypeError):
+        return u''
 timesince.is_safe = False
 
 def timeuntil(value, arg=None):
     """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
-    from django.utils.timesince import timesince
+    from django.utils.timesince import timeuntil
     from datetime import datetime
     if not value:
         return u''
-    if arg:
-        return timesince(arg, value)
-    return timesince(datetime.now(), value)
+    try:
+        return timeuntil(value, arg)
+    except (ValueError, TypeError):
+        return u''
 timeuntil.is_safe = False
 
 ###################

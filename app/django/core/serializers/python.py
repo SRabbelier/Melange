@@ -49,8 +49,9 @@ class Serializer(base.Serializer):
         self._current[field.name] = smart_unicode(related, strings_only=True)
 
     def handle_m2m_field(self, obj, field):
-        self._current[field.name] = [smart_unicode(related._get_pk_val(), strings_only=True)
-                           for related in getattr(obj, field.name).iterator()]
+        if field.creates_table:
+            self._current[field.name] = [smart_unicode(related._get_pk_val(), strings_only=True)
+                               for related in getattr(obj, field.name).iterator()]
 
     def getvalue(self):
         return self.objects
@@ -83,7 +84,7 @@ def Deserializer(object_list, **options):
 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                if field_value:
+                if field_value is not None:
                     data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
                 else:
                     data[field.attname] = None

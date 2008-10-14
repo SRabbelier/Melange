@@ -2,12 +2,16 @@ import sys
 
 from django import http
 from django.core import signals
-from django.dispatch import dispatcher
+from django.utils.encoding import force_unicode
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).
-    response_fixes = [http.fix_location_header,
-            http.conditional_content_removal]
+    response_fixes = [
+        http.fix_location_header,
+        http.conditional_content_removal,
+        http.fix_IE_for_attach,
+        http.fix_IE_for_vary,
+    ]
 
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
@@ -56,7 +60,6 @@ class BaseHandler(object):
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         from django.core import exceptions, urlresolvers
-        from django.core.mail import mail_admins
         from django.conf import settings
 
         # Apply request middleware
@@ -70,7 +73,8 @@ class BaseHandler(object):
 
         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
         try:
-            callback, callback_args, callback_kwargs = resolver.resolve(request.path)
+            callback, callback_args, callback_kwargs = resolver.resolve(
+                    request.path_info)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
@@ -104,8 +108,14 @@ class BaseHandler(object):
                 from django.views import debug
                 return debug.technical_404_response(request, e)
             else:
-                callback, param_dict = resolver.resolve404()
-                return callback(request, **param_dict)
+                try:
+                    callback, param_dict = resolver.resolve404()
+                    return callback(request, **param_dict)
+                except:
+                    try:
+                        return self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                    finally:
+                        receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
@@ -114,25 +124,40 @@ class BaseHandler(object):
         except: # Handle everything else, including SuspiciousOperation, etc.
             # Get the exception info now, in case another exception is thrown later.
             exc_info = sys.exc_info()
-            receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
+            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+            return self.handle_uncaught_exception(request, resolver, exc_info)
 
-            if settings.DEBUG_PROPAGATE_EXCEPTIONS:
-                raise
-            elif settings.DEBUG:
-                from django.views import debug
-                return debug.technical_500_response(request, *exc_info)
-            else:
-                # When DEBUG is False, send an error message to the admins.
-                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
-                try:
-                    request_repr = repr(request)
-                except:
-                    request_repr = "Request repr() unavailable"
-                message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
-                mail_admins(subject, message, fail_silently=True)
-                # Return an HttpResponse that displays a friendly error message.
-                callback, param_dict = resolver.resolve500()
-                return callback(request, **param_dict)
+    def handle_uncaught_exception(self, request, resolver, exc_info):
+        """
+        Processing for any otherwise uncaught exceptions (those that will
+        generate HTTP 500 responses). Can be overridden by subclasses who want
+        customised 500 handling.
+
+        Be *very* careful when overriding this because the error could be
+        caused by anything, so assuming something like the database is always
+        available would be an error.
+        """
+        from django.conf import settings
+        from django.core.mail import mail_admins
+
+        if settings.DEBUG_PROPAGATE_EXCEPTIONS:
+            raise
+
+        if settings.DEBUG:
+            from django.views import debug
+            return debug.technical_500_response(request, *exc_info)
+
+        # When DEBUG is False, send an error message to the admins.
+        subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
+        try:
+            request_repr = repr(request)
+        except:
+            request_repr = "Request repr() unavailable"
+        message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
+        mail_admins(subject, message, fail_silently=True)
+        # Return an HttpResponse that displays a friendly error message.
+        callback, param_dict = resolver.resolve500()
+        return callback(request, **param_dict)
 
     def _get_traceback(self, exc_info=None):
         "Helper function to return the traceback as a string"
@@ -148,4 +173,28 @@ class BaseHandler(object):
         for func in self.response_fixes:
             response = func(request, response)
         return response
+
+def get_script_name(environ):
+    """
+    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite has been used, returns what would have been
+    the script name prior to any rewriting (so it's the script name as seen
+    from the client's perspective), unless DJANGO_USE_POST_REWRITE is set (to
+    anything).
+    """
+    from django.conf import settings
+    if settings.FORCE_SCRIPT_NAME is not None:
+        return force_unicode(settings.FORCE_SCRIPT_NAME)
+
+    # If Apache's mod_rewrite had a whack at the URL, Apache set either
+    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
+    # rewrites. Unfortunately not every webserver (lighttpd!) passes this
+    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
+    # needed.
+    script_url = environ.get('SCRIPT_URL', u'')
+    if not script_url:
+        script_url = environ.get('REDIRECT_URL', u'')
+    if script_url:
+        return force_unicode(script_url[:-len(environ.get('PATH_INFO', ''))])
+    return force_unicode(environ.get('SCRIPT_NAME', u''))
 

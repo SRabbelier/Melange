@@ -71,10 +71,11 @@ class BadHeaderError(ValueError):
 
 def forbid_multi_line_headers(name, val):
     """Forbids multi-line headers, to prevent header injection."""
+    val = force_unicode(val)
     if '\n' in val or '\r' in val:
         raise BadHeaderError("Header values can't contain newlines (got %r for header %r)" % (val, name))
     try:
-        val = force_unicode(val).encode('ascii')
+        val = val.encode('ascii')
     except UnicodeEncodeError:
         if name.lower() in ('to', 'from', 'cc'):
             result = []
@@ -84,7 +85,10 @@ def forbid_multi_line_headers(name, val):
                 result.append(formataddr((nm, str(addr))))
             val = ', '.join(result)
         else:
-            val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
+            val = Header(val, settings.DEFAULT_CHARSET)
+    else:
+        if name.lower() == 'subject':
+            val = Header(val)
     return name, val
 
 class SafeMIMEText(MIMEText):
@@ -174,7 +178,7 @@ class SMTPConnection(object):
 
     def _send(self, email_message):
         """A helper method that does the actual sending."""
-        if not email_message.to:
+        if not email_message.recipients():
             return False
         try:
             self.connection.sendmail(email_message.from_email,
@@ -205,10 +209,12 @@ class EmailMessage(object):
         conversions.
         """
         if to:
+            assert not isinstance(to, basestring), '"to" argument must be a list or tuple'
             self.to = list(to)
         else:
             self.to = []
         if bcc:
+            assert not isinstance(bcc, basestring), '"bcc" argument must be a list or tuple'
             self.bcc = list(bcc)
         else:
             self.bcc = []
@@ -241,8 +247,14 @@ class EmailMessage(object):
         msg['Subject'] = self.subject
         msg['From'] = self.from_email
         msg['To'] = ', '.join(self.to)
-        msg['Date'] = formatdate()
-        msg['Message-ID'] = make_msgid()
+
+        # Email header names are case-insensitive (RFC 2045), so we have to
+        # accommodate that when doing comparisons.
+        header_names = [key.lower() for key in self.extra_headers]
+        if 'date' not in header_names:
+            msg['Date'] = formatdate()
+        if 'message-id' not in header_names:
+            msg['Message-ID'] = make_msgid()
         for name, value in self.extra_headers.items():
             msg[name] = value
         return msg

@@ -7,8 +7,8 @@ except ImportError:
 
 from django import http
 from django.core import signals
-from django.core.handlers.base import BaseHandler
-from django.dispatch import dispatcher
+from django.core.handlers import base
+from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
 
@@ -74,10 +74,25 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
 
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
+        script_name = base.get_script_name(environ)
+        path_info = force_unicode(environ.get('PATH_INFO', u'/'))
+        if not path_info or path_info == script_name:
+            # Sometimes PATH_INFO exists, but is empty (e.g. accessing
+            # the SCRIPT_NAME URL without a trailing slash). We really need to
+            # operate as if they'd requested '/'. Not amazingly nice to force
+            # the path like this, but should be harmless.
+            #
+            # (The comparison of path_info to script_name is to work around an
+            # apparent bug in flup 1.0.1. Se Django ticket #8490).
+            path_info = u'/'
         self.environ = environ
-        self.path = force_unicode(environ['PATH_INFO'])
+        self.path_info = path_info
+        self.path = '%s%s' % (script_name, path_info)
         self.META = environ
+        self.META['PATH_INFO'] = path_info
+        self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
+        self._post_parse_error = False
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -86,10 +101,13 @@ class WSGIRequest(http.HttpRequest):
             get = pformat(self.GET)
         except:
             get = '<could not parse>'
-        try:
-            post = pformat(self.POST)
-        except:
+        if self._post_parse_error:
             post = '<could not parse>'
+        else:
+            try:
+                post = pformat(self.POST)
+            except:
+                post = '<could not parse>'
         try:
             cookies = pformat(self.COOKIES)
         except:
@@ -112,9 +130,21 @@ class WSGIRequest(http.HttpRequest):
         # Populates self._post and self._files
         if self.method == 'POST':
             if self.environ.get('CONTENT_TYPE', '').startswith('multipart'):
-                header_dict = dict([(k, v) for k, v in self.environ.items() if k.startswith('HTTP_')])
-                header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
-                self._post, self._files = http.parse_file_upload(header_dict, self.raw_post_data)
+                self._raw_post_data = ''
+                try:
+                    self._post, self._files = self.parse_file_upload(self.META, self.environ['wsgi.input'])
+                except:
+                    # An error occured while parsing POST data.  Since when
+                    # formatting the error the request handler might access
+                    # self.POST, set self._post and self._file to prevent
+                    # attempts to parse POST data again.
+                    self._post = http.QueryDict('')
+                    self._files = datastructures.MultiValueDict()
+                    # Mark that an error occured.  This allows self.__repr__ to
+                    # be explicit about it instead of simply representing an
+                    # empty POST
+                    self._post_parse_error = True
+                    raise
             else:
                 self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
         else:
@@ -163,7 +193,10 @@ class WSGIRequest(http.HttpRequest):
             try:
                 # CONTENT_LENGTH might be absent if POST doesn't have content at all (lighttpd)
                 content_length = int(self.environ.get('CONTENT_LENGTH', 0))
-            except ValueError: # if CONTENT_LENGTH was empty string or not an integer
+            except (ValueError, TypeError):
+                # If CONTENT_LENGTH was empty string or not an integer, don't
+                # error out. We've also seen None passed in here (against all
+                # specs, but see ticket #8259), so we handle TypeError as well.
                 content_length = 0
             if content_length > 0:
                 safe_copyfileobj(self.environ['wsgi.input'], buf,
@@ -179,7 +212,7 @@ class WSGIRequest(http.HttpRequest):
     REQUEST = property(_get_request)
     raw_post_data = property(_get_raw_post_data)
 
-class WSGIHandler(BaseHandler):
+class WSGIHandler(base.BaseHandler):
     initLock = Lock()
     request_class = WSGIRequest
 
@@ -195,7 +228,8 @@ class WSGIHandler(BaseHandler):
                 self.load_middleware()
             self.initLock.release()
 
-        dispatcher.send(signal=signals.request_started)
+        set_script_prefix(base.get_script_name(environ))
+        signals.request_started.send(sender=self.__class__)
         try:
             try:
                 request = self.request_class(environ)
@@ -209,7 +243,7 @@ class WSGIHandler(BaseHandler):
                     response = middleware_method(request, response)
                 response = self.apply_response_fixes(request, response)
         finally:
-            dispatcher.send(signal=signals.request_finished)
+            signals.request_finished.send(sender=self.__class__)
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]

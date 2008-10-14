@@ -38,14 +38,11 @@ def debug(request):
     return context_extras
 
 def i18n(request):
+    from django.utils import translation
+
     context_extras = {}
     context_extras['LANGUAGES'] = settings.LANGUAGES
-    if hasattr(request, 'LANGUAGE_CODE'):
-        context_extras['LANGUAGE_CODE'] = request.LANGUAGE_CODE
-    else:
-        context_extras['LANGUAGE_CODE'] = settings.LANGUAGE_CODE
-
-    from django.utils import translation
+    context_extras['LANGUAGE_CODE'] = translation.get_language()
     context_extras['LANGUAGE_BIDI'] = translation.get_language_bidi()
 
     return context_extras
@@ -82,3 +79,7 @@ class PermWrapper(object):
 
     def __getitem__(self, module_name):
         return PermLookupDict(self.user, module_name)
+        
+    def __iter__(self):
+        # I am large, I contain multitudes.
+        raise TypeError("PermWrapper is not iterable.")

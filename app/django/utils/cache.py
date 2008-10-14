@@ -17,7 +17,6 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 
-import md5
 import re
 import time
 try:
@@ -29,6 +28,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import smart_str, iri_to_uri
 from django.utils.http import http_date
+from django.utils.hashcompat import md5_constructor
 
 cc_delim_re = re.compile(r'\s*,\s*')
 
@@ -64,7 +64,7 @@ def patch_cache_control(response, **kwargs):
         cc = {}
 
     # If there's already a max-age header but we're being asked to set a new
-    # max-age, use the minumum of the two ages. In practice this happens when
+    # max-age, use the minimum of the two ages. In practice this happens when
     # a decorator and a piece of middleware both operate on a given view.
     if 'max-age' in cc and 'max_age' in kwargs:
         kwargs['max_age'] = min(cc['max-age'], kwargs['max_age'])
@@ -104,7 +104,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0 # Can't have max-age negative
     if not response.has_header('ETag'):
-        response['ETag'] = md5.new(response.content).hexdigest()
+        response['ETag'] = '"%s"' % md5_constructor(response.content).hexdigest()
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
@@ -138,7 +138,7 @@ def patch_vary_headers(response, newheaders):
 
 def _generate_cache_key(request, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
-    ctx = md5.new()
+    ctx = md5_constructor()
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:

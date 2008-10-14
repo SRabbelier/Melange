@@ -35,6 +35,20 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def lookup_cast(self, lookup_type):
+        lookup = '%s'
+
+        # Cast text lookups to text to allow things like filter(x__contains=4)
+        if lookup_type in ('iexact', 'contains', 'icontains', 'startswith',
+                           'istartswith', 'endswith', 'iendswith'):
+            lookup = "%s::text"
+
+        # Use UPPER(x) for case-insensitive lookups; it's faster.
+        if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
+            lookup = 'UPPER(%s)' % lookup
+
+        return lookup
+
     def field_cast_sql(self, db_type):
         if db_type == 'inet':
             return 'HOST(%s)'
@@ -97,7 +111,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Use `coalesce` to set the sequence for each model to the max pk value if there are records,
             # or 1 if there are none. Set the `is_called` property (the third argument to `setval`) to true
             # if there are records (as the max pk value is already in use), otherwise set it to false.
-            for f in model._meta.fields:
+            for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
                     output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
@@ -118,3 +132,15 @@ class DatabaseOperations(BaseDatabaseOperations):
                     style.SQL_KEYWORD('FROM'),
                     style.SQL_TABLE(qn(f.m2m_db_table()))))
         return output
+
+    def savepoint_create_sql(self, sid):
+        return "SAVEPOINT %s" % sid
+
+    def savepoint_commit_sql(self, sid):
+        return "RELEASE SAVEPOINT %s" % sid
+
+    def savepoint_rollback_sql(self, sid):
+        return "ROLLBACK TO SAVEPOINT %s" % sid
+
+    def prep_for_iexact_query(self, x):
+        return x

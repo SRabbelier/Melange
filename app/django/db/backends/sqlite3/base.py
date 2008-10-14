@@ -6,20 +6,25 @@ Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
 Python 2.5 and later use the sqlite3 module in the standard library.
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
+from django.db.backends import *
+from django.db.backends.sqlite3.client import DatabaseClient
+from django.db.backends.sqlite3.creation import DatabaseCreation
+from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+
 try:
     try:
         from sqlite3 import dbapi2 as Database
-    except ImportError:
+    except ImportError, e1:
         from pysqlite2 import dbapi2 as Database
-except ImportError, e:
+except ImportError, exc:
     import sys
     from django.core.exceptions import ImproperlyConfigured
     if sys.version_info < (2, 5, 0):
         module = 'pysqlite2'
     else:
         module = 'sqlite3'
-    raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
+        exc = e1
+    raise ImproperlyConfigured, "Error loading %s module: %s" % (module, exc)
 
 try:
     import decimal
@@ -37,9 +42,20 @@ Database.register_converter("timestamp", util.typecast_timestamp)
 Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
+if Database.version_info >= (2,4,1):
+    # Starting in 2.4.1, the str type is not accepted anymore, therefore,
+    # we convert all str objects to Unicode
+    # As registering a adapter for a primitive type causes a small
+    # slow-down, this adapter is only registered for sqlite3 versions
+    # needing it.
+    Database.register_adapter(str, lambda s:s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    supports_constraints = False
+    # SQLite cannot handle us only partially reading from a cursor's result set
+    # and then writing the same rows to the database in another cursor. This
+    # setting ensures we always read result sets fully into memory all in one
+    # go.
+    can_use_chunked_reads = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -79,10 +95,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         # sql_flush() implementations). Just return SQL at this point
         return sql
 
-class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
+    def year_lookup_bounds(self, value):
+        first = '%s-01-01'
+        second = '%s-12-31 23:59:59.999999'
+        return [first % value, second % value]
 
+class DatabaseWrapper(BaseDatabaseWrapper):
+    
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
     # See http://www.sqlite.org/lang_expr.html for an explanation.
@@ -103,8 +122,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        
+        self.features = DatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation()
+
     def _cursor(self, settings):
         if self.connection is None:
+            if not settings.DATABASE_NAME:
+                from django.core.exceptions import ImproperlyConfigured
+                raise ImproperlyConfigured, "Please fill out DATABASE_NAME in the settings module before using the database."
             kwargs = {
                 'database': settings.DATABASE_NAME,
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
@@ -151,7 +183,7 @@ def _sqlite_extract(lookup_type, dt):
         dt = util.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
-    return str(getattr(dt, lookup_type))
+    return unicode(getattr(dt, lookup_type))
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:

@@ -4,9 +4,9 @@ from pprint import pformat
 from django import http
 from django.core import signals
 from django.core.handlers.base import BaseHandler
-from django.dispatch import dispatcher
+from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import force_unicode, smart_str, iri_to_uri
 
 # NOTE: do *not* import settings (or any module which eventually imports
 # settings) until after ModPythonHandler has been called; otherwise os.environ
@@ -15,7 +15,27 @@ from django.utils.encoding import force_unicode, smart_str
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
+        # FIXME: This isn't ideal. The request URI may be encoded (it's
+        # non-normalized) slightly differently to the "real" SCRIPT_NAME
+        # and PATH_INFO values. This causes problems when we compute path_info,
+        # below. For now, don't use script names that will be subject to
+        # encoding/decoding.
         self.path = force_unicode(req.uri)
+        root = req.get_options().get('django.root', '')
+        self.django_root = root
+        # req.path_info isn't necessarily computed correctly in all
+        # circumstances (it's out of mod_python's control a bit), so we use
+        # req.uri and some string manipulations to get the right value.
+        if root and req.uri.startswith(root):
+            self.path_info = force_unicode(req.uri[len(root):])
+        else:
+            self.path_info = self.path
+        if not self.path_info:
+            # Django prefers empty paths to be '/', rather than '', to give us
+            # a common start character for URL patterns. So this is a little
+            # naughty, but also pretty harmless.
+            self.path_info = u'/'
+        self._post_parse_error = False
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -24,10 +44,13 @@ class ModPythonRequest(http.HttpRequest):
             get = pformat(self.GET)
         except:
             get = '<could not parse>'
-        try:
-            post = pformat(self.POST)
-        except:
+        if self._post_parse_error:
             post = '<could not parse>'
+        else:
+            try:
+                post = pformat(self.POST)
+            except:
+                post = '<could not parse>'
         try:
             cookies = pformat(self.COOKIES)
         except:
@@ -41,7 +64,9 @@ class ModPythonRequest(http.HttpRequest):
                           unicode(cookies), unicode(meta)))
 
     def get_full_path(self):
-        return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
+        # RFC 3986 requires self._req.args to be in the ASCII range, but this
+        # doesn't always happen, so rather than crash, we defensively encode it.
+        return '%s%s' % (self.path, self._req.args and ('?' + iri_to_uri(self._req.args)) or '')
 
     def is_secure(self):
         try:
@@ -52,8 +77,21 @@ class ModPythonRequest(http.HttpRequest):
 
     def _load_post_and_files(self):
         "Populates self._post and self._files"
+        if self.method != 'POST':
+            self._post, self._files = http.QueryDict('', encoding=self._encoding), datastructures.MultiValueDict()
+            return
+
         if 'content-type' in self._req.headers_in and self._req.headers_in['content-type'].startswith('multipart'):
-            self._post, self._files = http.parse_file_upload(self._req.headers_in, self.raw_post_data)
+            self._raw_post_data = ''
+            try:
+                self._post, self._files = self.parse_file_upload(self.META, self._req)
+            except:
+                # See django.core.handlers.wsgi.WSGIHandler for an explanation
+                # of what's going on here.
+                self._post = http.QueryDict('')
+                self._files = datastructures.MultiValueDict()
+                self._post_parse_error = True
+                raise
         else:
             self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
 
@@ -99,7 +137,7 @@ class ModPythonRequest(http.HttpRequest):
                 'CONTENT_LENGTH':    self._req.clength, # This may be wrong
                 'CONTENT_TYPE':      self._req.content_type, # This may be wrong
                 'GATEWAY_INTERFACE': 'CGI/1.1',
-                'PATH_INFO':         self._req.path_info,
+                'PATH_INFO':         self.path_info,
                 'PATH_TRANSLATED':   None, # Not supported
                 'QUERY_STRING':      self._req.args,
                 'REMOTE_ADDR':       self._req.connection.remote_ip,
@@ -107,7 +145,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REMOTE_IDENT':      self._req.connection.remote_logname,
                 'REMOTE_USER':       self._req.user,
                 'REQUEST_METHOD':    self._req.method,
-                'SCRIPT_NAME':       None, # Not supported
+                'SCRIPT_NAME':       self.django_root,
                 'SERVER_NAME':       self._req.server.server_hostname,
                 'SERVER_PORT':       self._req.server.port,
                 'SERVER_PROTOCOL':   self._req.protocol,
@@ -152,7 +190,8 @@ class ModPythonHandler(BaseHandler):
         if self._request_middleware is None:
             self.load_middleware()
 
-        dispatcher.send(signal=signals.request_started)
+        set_script_prefix(req.get_options().get('django.root', ''))
+        signals.request_started.send(sender=self.__class__)
         try:
             try:
                 request = self.request_class(req)
@@ -166,7 +205,7 @@ class ModPythonHandler(BaseHandler):
                     response = middleware_method(request, response)
                 response = self.apply_response_fixes(request, response)
         finally:
-            dispatcher.send(signal=signals.request_finished)
+            signals.request_finished.send(sender=self.__class__)
 
         # Convert our custom HttpResponse object back into the mod_python req.
         req.content_type = response['Content-Type']

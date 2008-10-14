@@ -4,10 +4,10 @@ from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.views.generic import date_based
+from django.utils import datetime_safe
 
 class CalendarPlugin(DatabrowsePlugin):
     def __init__(self, field_names=None):
@@ -33,12 +33,13 @@ class CalendarPlugin(DatabrowsePlugin):
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
+            d = easy_instance_field.raw_value
             return [mark_safe(u'%s%s/%s/%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                easy_instance_field.raw_value.year,
-                easy_instance_field.raw_value.strftime('%b').lower(),
-                easy_instance_field.raw_value.day))]
+                d.year,
+                datetime_safe.new_date(d).strftime('%b').lower(),
+                d.day))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

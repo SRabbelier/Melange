@@ -36,8 +36,10 @@ class CacheClass(BaseCache):
             if exp is None or exp <= time.time():
                 try:
                     self._set(key, pickle.dumps(value), timeout)
+                    return True
                 except pickle.PickleError:
                     pass
+            return False
         finally:
             self._lock.writer_leaves()
 
@@ -107,7 +109,7 @@ class CacheClass(BaseCache):
         else:
             doomed = [k for (i, k) in enumerate(self._cache) if i % self._cull_frequency == 0]
             for k in doomed:
-                self.delete(k)
+                self._delete(k)
 
     def _delete(self, key):
         try:

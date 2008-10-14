@@ -1,4 +1,5 @@
 import os
+import re
 from Cookie import SimpleCookie, CookieError
 from pprint import pformat
 from urllib import urlencode
@@ -9,13 +10,16 @@ try:
 except ImportError:
     from cgi import parse_qsl
 
-from django.utils.datastructures import MultiValueDict, FileDict
+from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
-
+from django.http.multipartparser import MultiPartParser
+from django.conf import settings
+from django.core.files import uploadhandler
 from utils import *
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
+absolute_http_url_re = re.compile(r"^https?://", re.I)
 
 class Http404(Exception):
     pass
@@ -25,27 +29,18 @@ class HttpRequest(object):
 
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
+    _upload_handlers = []
 
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
+        self.path_info = ''
         self.method = None
 
     def __repr__(self):
         return '<HttpRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
             (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
             pformat(self.META))
-
-    def __getitem__(self, key):
-        for d in (self.POST, self.GET):
-            if key in d:
-                return d[key]
-        raise KeyError, "%s not found in either POST or GET" % key
-
-    def has_key(self, key):
-        return key in self.GET or key in self.POST
-
-    __contains__ = has_key
 
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
@@ -57,8 +52,8 @@ class HttpRequest(object):
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
-            server_port = self.META['SERVER_PORT']
-            if server_port != (self.is_secure() and 443 or 80):
+            server_port = str(self.META['SERVER_PORT'])
+            if server_port != (self.is_secure() and '443' or '80'):
                 host = '%s:%s' % (host, server_port)
         return host
 
@@ -73,7 +68,7 @@ class HttpRequest(object):
         """
         if not location:
             location = self.get_full_path()
-        if not ':' in location:
+        if not absolute_http_url_re.match(location):
             current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
                                          self.get_host(), self.path)
             location = urljoin(current_uri, location)
@@ -102,39 +97,31 @@ class HttpRequest(object):
 
     encoding = property(_get_encoding, _set_encoding)
 
-def parse_file_upload(header_dict, post_data):
-    """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
-    import email, email.Message
-    from cgi import parse_header
-    raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
-    raw_message += '\r\n\r\n' + post_data
-    msg = email.message_from_string(raw_message)
-    POST = QueryDict('', mutable=True)
-    FILES = MultiValueDict()
-    for submessage in msg.get_payload():
-        if submessage and isinstance(submessage, email.Message.Message):
-            name_dict = parse_header(submessage['Content-Disposition'])[1]
-            # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
-            # or {'name': 'blah'} for POST fields
-            # We assume all uploaded files have a 'filename' set.
-            if 'filename' in name_dict:
-                assert type([]) != type(submessage.get_payload()), "Nested MIME messages are not supported"
-                if not name_dict['filename'].strip():
-                    continue
-                # IE submits the full path, so trim everything but the basename.
-                # (We can't use os.path.basename because that uses the server's
-                # directory separator, which may not be the same as the
-                # client's one.)
-                filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
-                FILES.appendlist(name_dict['name'], FileDict({
-                    'filename': filename,
-                    'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
-                    'content': submessage.get_payload(),
-                }))
-            else:
-                POST.appendlist(name_dict['name'], submessage.get_payload())
-    return POST, FILES
+    def _initialize_handlers(self):
+        self._upload_handlers = [uploadhandler.load_handler(handler, self)
+                                 for handler in settings.FILE_UPLOAD_HANDLERS]
 
+    def _set_upload_handlers(self, upload_handlers):
+        if hasattr(self, '_files'):
+            raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
+        self._upload_handlers = upload_handlers
+
+    def _get_upload_handlers(self):
+        if not self._upload_handlers:
+            # If thre are no upload handlers defined, initialize them from settings.
+            self._initialize_handlers()
+        return self._upload_handlers
+
+    upload_handlers = property(_get_upload_handlers, _set_upload_handlers)
+
+    def parse_file_upload(self, META, post_data):
+        """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
+        self.upload_handlers = ImmutableList(
+            self.upload_handlers,
+            warning = "You cannot alter upload handlers after the upload has been processed."
+        )
+        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        return parser.parse()
 
 class QueryDict(MultiValueDict):
     """
@@ -144,6 +131,11 @@ class QueryDict(MultiValueDict):
     Values retrieved from this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+    # These are both reset in __init__, but is specified here at the class
+    # level so that unpickling will have valid values
+    _mutable = True
+    _encoding = None
+
     def __init__(self, query_string, mutable=False, encoding=None):
         MultiValueDict.__init__(self)
         if not encoding:
@@ -152,11 +144,23 @@ class QueryDict(MultiValueDict):
             from django.conf import settings
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
-        self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
             self.appendlist(force_unicode(key, encoding, errors='replace'),
                             force_unicode(value, encoding, errors='replace'))
         self._mutable = mutable
+
+    def _get_encoding(self):
+        if self._encoding is None:
+            # *Important*: do not import settings at the module level because
+            # of the note in core.handlers.modpython.
+            from django.conf import settings
+            self._encoding = settings.DEFAULT_CHARSET
+        return self._encoding
+
+    def _set_encoding(self, value):
+        self._encoding = value
+
+    encoding = property(_get_encoding, _set_encoding)
 
     def _assert_mutable(self):
         if not self._mutable:
@@ -207,8 +211,13 @@ class QueryDict(MultiValueDict):
     def update(self, other_dict):
         self._assert_mutable()
         f = lambda s: str_to_unicode(s, self.encoding)
-        d = dict([(f(k), f(v)) for k, v in other_dict.items()])
-        MultiValueDict.update(self, d)
+        if hasattr(other_dict, 'lists'):
+            for key, valuelist in other_dict.lists():
+                for value in valuelist:
+                    MultiValueDict.update(self, {f(key): f(value)})
+        else:
+            d = dict([(f(k), f(v)) for k, v in other_dict.items()])
+            MultiValueDict.update(self, d)
 
     def pop(self, key, *args):
         self._assert_mutable()
@@ -448,3 +457,4 @@ def str_to_unicode(s, encoding):
         return unicode(s, encoding, 'replace')
     else:
         return s
+

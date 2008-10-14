@@ -2,12 +2,11 @@
 Module for abstract serializer/unserializer base classes.
 """
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from StringIO import StringIO
+
 from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
+from django.utils import datetime_safe
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
@@ -38,7 +37,7 @@ class Serializer(object):
         self.start_serialization()
         for obj in queryset:
             self.start_object(obj)
-            for field in obj._meta.fields:
+            for field in obj._meta.local_fields:
                 if field.serialize:
                     if field.rel is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
@@ -58,11 +57,7 @@ class Serializer(object):
         """
         Convert a field's value to a string.
         """
-        if isinstance(field, models.DateTimeField):
-            value = getattr(obj, field.name).strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            value = field.flatten_data(follow=None, obj=obj).get(field.name, "")
-        return smart_unicode(value)
+        return smart_unicode(field.value_to_string(obj))
 
     def start_serialization(self):
         """

@@ -4,10 +4,7 @@ from optparse import make_option
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
-        make_option('--addrport', action='store', dest='addrport', 
+        make_option('--addrport', action='store', dest='addrport',
             type='string', default='',
             help='port number or ipaddr:port to run the server on'),
     )
@@ -17,15 +14,14 @@ class Command(BaseCommand):
     requires_model_validation = False
 
     def handle(self, *fixture_labels, **options):
-        from django.conf import settings
         from django.core.management import call_command
-        from django.test.utils import create_test_db
+        from django.db import connection
 
         verbosity = int(options.get('verbosity', 1))
         addrport = options.get('addrport')
 
         # Create a test database.
-        db_name = create_test_db(verbosity=verbosity)
+        db_name = connection.creation.create_test_db(verbosity=verbosity)
 
         # Import the fixture data into the test database.
         call_command('loaddata', *fixture_labels, **{'verbosity': verbosity})

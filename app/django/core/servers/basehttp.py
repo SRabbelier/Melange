@@ -11,13 +11,14 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import mimetypes
 import os
 import re
+import stat
 import sys
 import urllib
 
 from django.utils.http import http_date
 
 __version__ = "0.1"
-__all__ = ['WSGIServer','WSGIRequestHandler','demo_app']
+__all__ = ['WSGIServer','WSGIRequestHandler']
 
 server_version = "WSGIServer/" + __version__
 sys_version = "Python/" + sys.version.split()[0]
@@ -551,6 +552,9 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         from django.conf import settings
         self.admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
+        # We set self.path to avoid crashes in log_message() on unsupported
+        # requests (like "OPTIONS").
+        self.path = ''
         BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def get_environ(self):
@@ -645,13 +649,23 @@ class AdminMediaHandler(object):
                 headers = {'Content-type': 'text/plain'}
                 output = ['Permission denied: %s' % file_path]
             else:
-                status = '200 OK'
-                headers = {}
-                mime_type = mimetypes.guess_type(file_path)[0]
-                if mime_type:
-                    headers['Content-Type'] = mime_type
-                output = [fp.read()]
-                fp.close()
+                # This is a very simple implementation of conditional GET with
+                # the Last-Modified header. It makes media files a bit speedier
+                # because the files are only read off disk for the first
+                # request (assuming the browser/client supports conditional
+                # GET).
+                mtime = http_date(os.stat(file_path)[stat.ST_MTIME])
+                headers = {'Last-Modified': mtime}
+                if environ.get('HTTP_IF_MODIFIED_SINCE', None) == mtime:
+                    status = '304 NOT MODIFIED'
+                    output = []
+                else:
+                    status = '200 OK'
+                    mime_type = mimetypes.guess_type(file_path)[0]
+                    if mime_type:
+                        headers['Content-Type'] = mime_type
+                    output = [fp.read()]
+                    fp.close()
         start_response(status, headers.items())
         return output
 

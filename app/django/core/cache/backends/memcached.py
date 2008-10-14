@@ -17,7 +17,9 @@ class CacheClass(BaseCache):
         self._cache = memcache.Client(server.split(';'))
 
     def add(self, key, value, timeout=0):
-        self._cache.add(key.encode('ascii', 'ignore'), value, timeout or self.default_timeout)
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+        return self._cache.add(smart_str(key), value, timeout or self.default_timeout)
 
     def get(self, key, default=None):
         val = self._cache.get(smart_str(key))
@@ -39,3 +41,7 @@ class CacheClass(BaseCache):
 
     def get_many(self, keys):
         return self._cache.get_multi(map(smart_str,keys))
+
+    def close(self, **kwargs):
+        self._cache.disconnect_all()
+

@@ -1,7 +1,7 @@
 import os
 import sys
 from optparse import OptionParser
-from imp import find_module
+import imp
 
 import django
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
@@ -37,10 +37,24 @@ def find_management_module(app_name):
     parts = app_name.split('.')
     parts.append('management')
     parts.reverse()
+    part = parts.pop()
     path = None
+
+    # When using manage.py, the project module is added to the path,
+    # loaded, then removed from the path. This means that
+    # testproject.testapp.models can be loaded in future, even if
+    # testproject isn't in the path. When looking for the management
+    # module, we need look for the case where the project name is part
+    # of the app_name but the project directory itself isn't on the path.
+    try:
+        f, path, descr = imp.find_module(part,path)
+    except ImportError,e:
+        if os.path.basename(os.getcwd()) != part:
+            raise e
+
     while parts:
         part = parts.pop()
-        f, path, descr = find_module(part, path and [path] or None)
+        f, path, descr = imp.find_module(part, path and [path] or None)
     return path
 
 def load_command_class(app_name, name):
@@ -52,7 +66,7 @@ def load_command_class(app_name, name):
     return getattr(__import__('%s.management.commands.%s' % (app_name, name),
                    {}, {}, ['Command']), 'Command')()
 
-def get_commands(load_user_commands=True, project_directory=None):
+def get_commands():
     """
     Returns a dictionary mapping command names to their callback applications.
 
@@ -63,7 +77,7 @@ def get_commands(load_user_commands=True, project_directory=None):
     Core commands are always included. If a settings module has been
     specified, user-defined commands will also be included, the
     startproject command will be disabled, and the startapp command
-    will be modified to use the directory in which that module appears.
+    will be modified to use the directory in which the settings module appears.
 
     The dictionary is in the format {command_name: app_name}. Key-value
     pairs from this dictionary can then be used in calls to
@@ -80,15 +94,33 @@ def get_commands(load_user_commands=True, project_directory=None):
     if _commands is None:
         _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
 
-        if load_user_commands:
-            # Get commands from all installed apps.
+        # Find the installed apps
+        try:
             from django.conf import settings
-            for app_name in settings.INSTALLED_APPS:
-                try:
-                    path = find_management_module(app_name)
-                    _commands.update(dict([(name, app_name) for name in find_commands(path)]))
-                except ImportError:
-                    pass # No management module -- ignore this app.
+            apps = settings.INSTALLED_APPS
+        except (AttributeError, EnvironmentError, ImportError):
+            apps = []
+
+        # Find the project directory
+        try:
+            from django.conf import settings
+            project_directory = setup_environ(
+                __import__(
+                    settings.SETTINGS_MODULE, {}, {},
+                    (settings.SETTINGS_MODULE.split(".")[-1],)
+                ), settings.SETTINGS_MODULE
+            )
+        except (AttributeError, EnvironmentError, ImportError):
+            project_directory = None
+
+        # Find and load the management module for each installed app.
+        for app_name in apps:
+            try:
+                path = find_management_module(app_name)
+                _commands.update(dict([(name, app_name)
+                                       for name in find_commands(path)]))
+            except ImportError:
+                pass # No management module - ignore this app
 
         if project_directory:
             # Remove the "startproject" command from self.commands, because
@@ -135,6 +167,50 @@ class LaxOptionParser(OptionParser):
     def error(self, msg):
         pass
 
+    def print_help(self):
+        """Output nothing.
+
+        The lax options are included in the normal option parser, so under
+        normal usage, we don't need to print the lax options.
+        """
+        pass
+
+    def print_lax_help(self):
+        """Output the basic options available to every command.
+
+        This just redirects to the default print_help() behaviour.
+        """
+        OptionParser.print_help(self)
+
+    def _process_args(self, largs, rargs, values):
+        """
+        Overrides OptionParser._process_args to exclusively handle default
+        options and ignore args and other options.
+
+        This overrides the behavior of the super class, which stop parsing
+        at the first unrecognized option.
+        """
+        while rargs:
+            arg = rargs[0]
+            try:
+                if arg[0:2] == "--" and len(arg) > 2:
+                    # process a single long option (possibly with value(s))
+                    # the superclass code pops the arg off rargs
+                    self._process_long_opt(rargs, values)
+                elif arg[:1] == "-" and len(arg) > 1:
+                    # process a cluster of short options (possibly with
+                    # value(s) for the last one only)
+                    # the superclass code pops the arg off rargs
+                    self._process_short_opts(rargs, values)
+                else:
+                    # it's either a non-default option or an arg
+                    # either way, add it to the args list so we can keep
+                    # dealing with options
+                    del rargs[0]
+                    raise error
+            except:
+                largs.append(arg)
+
 class ManagementUtility(object):
     """
     Encapsulates the logic of the django-admin.py and manage.py utilities.
@@ -145,18 +221,14 @@ class ManagementUtility(object):
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
-        self.project_directory = None
-        self.user_commands = False
 
     def main_help_text(self):
         """
         Returns the script's main help text, as a string.
         """
-        usage = ['%s <subcommand> [options] [args]' % self.prog_name]
-        usage.append('Django command line tool, version %s' % django.get_version())
-        usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
+        usage = ['',"Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name,'']
         usage.append('Available subcommands:')
-        commands = get_commands(self.user_commands, self.project_directory).keys()
+        commands = get_commands().keys()
         commands.sort()
         for cmd in commands:
             usage.append('  %s' % cmd)
@@ -169,7 +241,7 @@ class ManagementUtility(object):
         "django-admin.py" or "manage.py") if it can't be found.
         """
         try:
-            app_name = get_commands(self.user_commands, self.project_directory)[subcommand]
+            app_name = get_commands()[subcommand]
             if isinstance(app_name, BaseCommand):
                 # If the command is already loaded, use it directly.
                 klass = app_name
@@ -189,7 +261,9 @@ class ManagementUtility(object):
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = LaxOptionParser(version=get_version(), option_list=BaseCommand.option_list)
+        parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
+                                 version=get_version(),
+                                 option_list=BaseCommand.option_list)
         try:
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
@@ -206,6 +280,7 @@ class ManagementUtility(object):
             if len(args) > 2:
                 self.fetch_command(args[2]).print_help(self.prog_name, args[2])
             else:
+                parser.print_lax_help()
                 sys.stderr.write(self.main_help_text() + '\n')
                 sys.exit(1)
         # Special-cases: We want 'django-admin.py --version' and
@@ -214,30 +289,20 @@ class ManagementUtility(object):
             # LaxOptionParser already takes care of printing the version.
             pass
         elif self.argv[1:] == ['--help']:
+            parser.print_lax_help()
             sys.stderr.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
-class ProjectManagementUtility(ManagementUtility):
-    """
-    A ManagementUtility that is specific to a particular Django project.
-    As such, its commands are slightly different than those of its parent
-    class.
-
-    In practice, this class represents manage.py, whereas ManagementUtility
-    represents django-admin.py.
-    """
-    def __init__(self, argv, project_directory):
-        super(ProjectManagementUtility, self).__init__(argv)
-        self.project_directory = project_directory
-        self.user_commands = True
-
-def setup_environ(settings_mod):
+def setup_environ(settings_mod, original_settings_path=None):
     """
     Configures the runtime environment. This can also be used by external
     scripts wanting to set up a similar environment to manage.py.
     Returns the project directory (assuming the passed settings module is
     directly in the project directory).
+
+    The "original_settings_path" parameter is optional, but recommended, since
+    trying to work out the original path from the module can be problematic.
     """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
@@ -252,7 +317,10 @@ def setup_environ(settings_mod):
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
-    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
+    if original_settings_path:
+        os.environ['DJANGO_SETTINGS_MODULE'] = original_settings_path
+    else:
+        os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
     return project_directory
 
 def execute_from_command_line(argv=None):
@@ -267,6 +335,6 @@ def execute_manager(settings_mod, argv=None):
     Like execute_from_command_line(), but for use by manage.py, a
     project-specific django-admin.py utility.
     """
-    project_directory = setup_environ(settings_mod)
-    utility = ProjectManagementUtility(argv, project_directory)
+    setup_environ(settings_mod)
+    utility = ManagementUtility(argv)
     utility.execute()

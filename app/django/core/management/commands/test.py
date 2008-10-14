@@ -4,9 +4,6 @@ import sys
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
     )
@@ -17,11 +14,10 @@ class Command(BaseCommand):
 
     def handle(self, *test_labels, **options):
         from django.conf import settings
-        from django.db.models import get_app, get_apps
 
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
-    
+
         test_path = settings.TEST_RUNNER.split('.')
         # Allow for Python 2.5 relative paths
         if len(test_path) > 1:

@@ -71,6 +71,13 @@ class LazySettings(object):
             setattr(holder, name, value)
         self._target = holder
 
+    def configured(self):
+        """
+        Returns True if the settings have already been configured.
+        """
+        return bool(self._target)
+    configured = property(configured)
+
 class Settings(object):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
@@ -103,7 +110,9 @@ class Settings(object):
         for app in self.INSTALLED_APPS:
             if app.endswith('.*'):
                 appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
-                for d in os.listdir(appdir):
+                app_subdirs = os.listdir(appdir)
+                app_subdirs.sort()
+                for d in app_subdirs:
                     if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))
             else:

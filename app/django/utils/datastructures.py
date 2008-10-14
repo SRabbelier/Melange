@@ -54,6 +54,11 @@ class SortedDict(dict):
     """
     A dictionary that keeps its keys in the order in which they're inserted.
     """
+    def __new__(cls, *args, **kwargs):
+        instance = super(SortedDict, cls).__new__(cls, *args, **kwargs)
+        instance.keyOrder = []
+        return instance
+
     def __init__(self, data=None):
         if data is None:
             data = {}
@@ -266,6 +271,14 @@ class MultiValueDict(dict):
         """
         return [(key, self[key]) for key in self.keys()]
 
+    def iteritems(self):
+        """
+        Yields (key, value) pairs, where value is the last item in the list
+        associated with the key.
+        """
+        for key in self.keys():
+            yield (key, self[key])
+
     def lists(self):
         """Returns a list of (key, list) pairs."""
         return super(MultiValueDict, self).items()
@@ -332,14 +345,77 @@ class DotExpandedDict(dict):
             except TypeError: # Special-case if current isn't a dict.
                 current = {bits[-1]: v}
 
-class FileDict(dict):
+class ImmutableList(tuple):
     """
-    A dictionary used to hold uploaded file contents. The only special feature
-    here is that repr() of this object won't dump the entire contents of the
-    file to the output. A handy safeguard for a large file upload.
+    A tuple-like object that raises useful errors when it is asked to mutate.
+
+    Example::
+
+        >>> a = ImmutableList(range(5), warning="You cannot mutate this.")
+        >>> a[3] = '4'
+        Traceback (most recent call last):
+            ...
+        AttributeError: You cannot mutate this.
     """
-    def __repr__(self):
-        if 'content' in self:
-            d = dict(self, content='<omitted>')
-            return dict.__repr__(d)
-        return dict.__repr__(self)
+
+    def __new__(cls, *args, **kwargs):
+        if 'warning' in kwargs:
+            warning = kwargs['warning']
+            del kwargs['warning']
+        else:
+            warning = 'ImmutableList object is immutable.'
+        self = tuple.__new__(cls, *args, **kwargs)
+        self.warning = warning
+        return self
+
+    def complain(self, *wargs, **kwargs):
+        if isinstance(self.warning, Exception):
+            raise self.warning
+        else:
+            raise AttributeError, self.warning
+
+    # All list mutation functions complain.
+    __delitem__  = complain
+    __delslice__ = complain
+    __iadd__     = complain
+    __imul__     = complain
+    __setitem__  = complain
+    __setslice__ = complain
+    append       = complain
+    extend       = complain
+    insert       = complain
+    pop          = complain
+    remove       = complain
+    sort         = complain
+    reverse      = complain
+
+class DictWrapper(dict):
+    """
+    Wraps accesses to a dictionary so that certain values (those starting with
+    the specified prefix) are passed through a function before being returned.
+    The prefix is removed before looking up the real value.
+
+    Used by the SQL construction code to ensure that values are correctly
+    quoted before being used.
+    """
+    def __init__(self, data, func, prefix):
+        super(DictWrapper, self).__init__(data)
+        self.func = func
+        self.prefix = prefix
+
+    def __getitem__(self, key):
+        """
+        Retrieves the real value after stripping the prefix string (if
+        present). If the prefix is present, pass the value through self.func
+        before returning, otherwise return the raw value.
+        """
+        if key.startswith(self.prefix):
+            use_func = True
+            key = key[len(self.prefix):]
+        else:
+            use_func = False
+        value = super(DictWrapper, self).__getitem__(key)
+        if use_func:
+            return self.func(value)
+        return value
+

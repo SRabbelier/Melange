@@ -14,8 +14,13 @@ except:
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."
     def __init__(self, offset):
-        self.__offset = timedelta(minutes=offset)
-        self.__name = u"%+03d%02d" % (offset // 60, offset % 60)
+        if isinstance(offset, timedelta):
+            self.__offset = offset
+            offset = self.__offset.seconds // 60
+        else:
+            self.__offset = timedelta(minutes=offset)
+
+        self.__name = u"%+03d%02d" % (offset / 60, offset % 60)
 
     def __repr__(self):
         return self.__name
@@ -32,7 +37,7 @@ class FixedOffset(tzinfo):
 class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
     def __init__(self, dt):
-        tzinfo.__init__(self, dt)
+        tzinfo.__init__(self)
         self._tzname = self.tzname(dt)
 
     def __repr__(self):
@@ -60,9 +65,17 @@ class LocalTimezone(tzinfo):
         tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.weekday(), 0, -1)
         try:
             stamp = time.mktime(tt)
-        except OverflowError:
-            # 32 bit systems can't handle dates after Jan 2038, so we fake it
-            # in that case (since we only care about the DST flag here).
+        except (OverflowError, ValueError):
+            # 32 bit systems can't handle dates after Jan 2038, and certain
+            # systems can't handle dates before ~1901-12-01:
+            #
+            # >>> time.mktime((1900, 1, 13, 0, 0, 0, 0, 0, 0))
+            # OverflowError: mktime argument out of range
+            # >>> time.mktime((1850, 1, 13, 0, 0, 0, 0, 0, 0))
+            # ValueError: year out of range
+            #
+            # In this case, we fake the date, because we only care about the
+            # DST flag.
             tt = (2037,) + tt[1:]
             stamp = time.mktime(tt)
         tt = time.localtime(stamp)

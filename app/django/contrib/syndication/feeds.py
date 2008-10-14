@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
+
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.template import Context, loader, Template, TemplateDoesNotExist
+from django.template import loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
+from django.utils.tzinfo import FixedOffset
 from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings         
 from django.template import RequestContext
@@ -56,6 +59,20 @@ class Feed(object):
                 return attr()
         return attr
 
+    def feed_extra_kwargs(self, obj):
+        """
+        Returns an extra keyword arguments dictionary that is used when
+        initializing the feed generator.
+        """
+        return {}
+
+    def item_extra_kwargs(self, item):
+        """
+        Returns an extra keyword arguments dictionary that is used with
+        the `add_item` call of the feed generator.
+        """
+        return {}
+
     def get_object(self, bits):
         return None
 
@@ -78,7 +95,7 @@ class Feed(object):
             current_site = Site.objects.get_current()
         else:
             current_site = RequestSite(self.request)
-
+        
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
@@ -97,6 +114,7 @@ class Feed(object):
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
             feed_guid = self.__get_dynamic_attr('feed_guid', obj),
             ttl = self.__get_dynamic_attr('ttl', obj),
+            **self.feed_extra_kwargs(obj)
         )
 
         try:
@@ -124,17 +142,37 @@ class Feed(object):
                 author_link = self.__get_dynamic_attr('item_author_link', item)
             else:
                 author_email = author_link = None
+
+            pubdate = self.__get_dynamic_attr('item_pubdate', item)
+            if pubdate:
+                now = datetime.now()
+                utcnow = datetime.utcnow()
+
+                # Must always subtract smaller time from larger time here.
+                if utcnow > now:
+                    sign = -1
+                    tzDifference = (utcnow - now)
+                else:
+                    sign = 1
+                    tzDifference = (now - utcnow)
+
+                # Round the timezone offset to the nearest half hour.
+                tzOffsetMinutes = sign * ((tzDifference.seconds / 60 + 15) / 30) * 30
+                tzOffset = timedelta(minutes=tzOffsetMinutes)
+                pubdate = pubdate.replace(tzinfo=FixedOffset(tzOffset))
+
             feed.add_item(
                 title = title_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 link = link,
                 description = description_tmp.render(RequestContext(self.request, {'obj': item, 'site': current_site})),
                 unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
-                pubdate = self.__get_dynamic_attr('item_pubdate', item),
+                pubdate = pubdate,
                 author_name = author_name,
                 author_email = author_email,
                 author_link = author_link,
                 categories = self.__get_dynamic_attr('item_categories', item),
                 item_copyright = self.__get_dynamic_attr('item_copyright', item),
+                **self.item_extra_kwargs(item)
             )
         return feed

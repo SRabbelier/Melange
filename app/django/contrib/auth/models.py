@@ -1,13 +1,14 @@
+import datetime
+import urllib
+
 from django.contrib import auth
-from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
+from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.utils.translation import ugettext_lazy as _
-import datetime
-import urllib
 
 UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
@@ -28,22 +29,11 @@ def get_hexdigest(algorithm, salt, raw_password):
         except ImportError:
             raise ValueError('"crypt" password algorithm not supported in this environment')
         return crypt.crypt(raw_password, salt)
-    # The rest of the supported algorithms are supported by hashlib, but
-    # hashlib is only available in Python 2.5.
-    try:
-        import hashlib
-    except ImportError:
-        if algorithm == 'md5':
-            import md5
-            return md5.new(salt + raw_password).hexdigest()
-        elif algorithm == 'sha1':
-            import sha
-            return sha.new(salt + raw_password).hexdigest()
-    else:
-        if algorithm == 'md5':
-            return hashlib.md5(salt + raw_password).hexdigest()
-        elif algorithm == 'sha1':
-            return hashlib.sha1(salt + raw_password).hexdigest()
+
+    if algorithm == 'md5':
+        return md5_constructor(salt + raw_password).hexdigest()
+    elif algorithm == 'sha1':
+        return sha_constructor(salt + raw_password).hexdigest()
     raise ValueError("Got unknown password algorithm type in password.")
 
 def check_password(raw_password, enc_password):
@@ -78,10 +68,13 @@ class Permission(models.Model):
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
         unique_together = (('content_type', 'codename'),)
-        ordering = ('content_type', 'codename')
+        ordering = ('content_type__app_label', 'codename')
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
+        return u"%s | %s | %s" % (
+            unicode(self.content_type.app_label),
+            unicode(self.content_type),
+            unicode(self.name))
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -91,15 +84,11 @@ class Group(models.Model):
     Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only e-mail messages.
     """
     name = models.CharField(_('name'), max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
 
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
-        ordering = ('name',)
-
-    class Admin:
-        search_fields = ('name',)
 
     def __unicode__(self):
         return self.name
@@ -116,6 +105,13 @@ class UserManager(models.Manager):
         user.save()
         return user
 
+    def create_superuser(self, username, email, password):
+        u = self.create_user(username, email, password)
+        u.is_staff = True
+        u.is_active = True
+        u.is_superuser = True
+        u.save()
+
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
         "Generates a random password with the given length and given allowed_chars"
         # Note that default value of allowed_chars does not have "I" or letters
@@ -128,7 +124,7 @@ class User(models.Model):
 
     Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
+    username = models.CharField(_('username'), max_length=30, unique=True, help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
@@ -140,25 +136,12 @@ class User(models.Model):
     date_joined = models.DateTimeField(_('date joined'), default=datetime.datetime.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
-    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
+    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True)
     objects = UserManager()
 
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        ordering = ('username',)
-
-    class Admin:
-        fields = (
-            (None, {'fields': ('username', 'password')}),
-            (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-            (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
-            (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-            (_('Groups'), {'fields': ('groups',)}),
-        )
-        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-        list_filter = ('is_staff', 'is_superuser')
-        search_fields = ('username', 'first_name', 'last_name', 'email')
 
     def __unicode__(self):
         return self.username
@@ -293,12 +276,13 @@ class User(models.Model):
         """
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
-            if not settings.AUTH_PROFILE_MODULE:
+            if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
                 raise SiteProfileNotAvailable
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
                 model = models.get_model(app_label, model_name)
                 self._profile_cache = model._default_manager.get(user__id__exact=self.id)
+                self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
@@ -366,6 +350,9 @@ class AnonymousUser(object):
     user_permissions = property(_get_user_permissions)
 
     def has_perm(self, perm):
+        return False
+
+    def has_perms(self, perm_list):
         return False
 
     def has_module_perms(self, module):

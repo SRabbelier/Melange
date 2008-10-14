@@ -70,8 +70,9 @@ pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
-
-    for i, field_name in enumerate(lookup_opts.admin.list_display):
+    
+    for i, field_name in enumerate(cl.list_display):
+        attr = None
         try:
             f = lookup_opts.get_field(field_name)
             admin_order_field = None
@@ -84,14 +85,30 @@ def result_headers(cl):
             elif field_name == '__str__':
                 header = smart_str(lookup_opts.verbose_name)
             else:
-                attr = getattr(cl.model, field_name) # Let AttributeErrors propagate.
+                if callable(field_name):
+                    attr = field_name # field_name can be a callable
+                else:
+                    try:
+                        attr = getattr(cl.model_admin, field_name)
+                    except AttributeError:
+                        try:
+                            attr = getattr(cl.model, field_name)
+                        except AttributeError:
+                            raise AttributeError, \
+                                "'%s' model or '%s' objects have no attribute '%s'" % \
+                                    (lookup_opts.object_name, cl.model_admin.__class__, field_name)
+                
                 try:
                     header = attr.short_description
                 except AttributeError:
-                    header = field_name.replace('_', ' ')
+                    if callable(field_name):
+                        header = field_name.__name__
+                    else:
+                        header = field_name
+                    header = header.replace('_', ' ')
 
             # It is a non-field, but perhaps one that is sortable
-            admin_order_field = getattr(getattr(cl.model, field_name), "admin_order_field", None)
+            admin_order_field = getattr(attr, "admin_order_field", None)
             if not admin_order_field:
                 yield {"text": header}
                 continue
@@ -99,11 +116,7 @@ def result_headers(cl):
             # So this _is_ a sortable non-field.  Go to the yield
             # after the else clause.
         else:
-            if isinstance(f.rel, models.ManyToOneRel) and f.null:
-                yield {"text": f.verbose_name}
-                continue
-            else:
-                header = f.verbose_name
+            header = f.verbose_name
 
         th_classes = []
         new_order_type = 'asc'
@@ -123,24 +136,34 @@ def _boolean_icon(field_val):
 def items_for_result(cl, result):
     first = True
     pk = cl.lookup_opts.pk.attname
-    for field_name in cl.lookup_opts.admin.list_display:
+    for field_name in cl.list_display:
         row_class = ''
         try:
             f = cl.lookup_opts.get_field(field_name)
         except models.FieldDoesNotExist:
-            # For non-field list_display values, the value is either a method
-            # or a property.
+            # For non-field list_display values, the value is either a method,
+            # property or returned via a callable.
             try:
-                attr = getattr(result, field_name)
+                if callable(field_name):
+                    attr = field_name
+                    value = attr(result)
+                elif hasattr(cl.model_admin, field_name) and \
+                   not field_name == '__str__' and not field_name == '__unicode__':
+                    attr = getattr(cl.model_admin, field_name)
+                    value = attr(result)
+                else:
+                    attr = getattr(result, field_name)
+                    if callable(attr):
+                        value = attr()
+                    else:
+                        value = attr
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if callable(attr):
-                    attr = attr()
                 if boolean:
                     allow_tags = True
-                    result_repr = _boolean_icon(attr)
+                    result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_unicode(attr)
+                    result_repr = smart_unicode(value)
             except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
@@ -189,13 +212,17 @@ def items_for_result(cl, result):
         if force_unicode(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:
+        if (first and not cl.list_display_links) or field_name in cl.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
             # Convert the pk to something that can be used in Javascript.
             # Problem cases are long ints (23L) and non-ASCII strings.
-            result_id = repr(force_unicode(getattr(result, pk)))[1:]
+            if cl.to_field:
+                attr = str(cl.to_field)
+            else:
+                attr = pk
+            result_id = repr(force_unicode(getattr(result, attr)))[1:]
             yield mark_safe(u'<%s%s><a href="%s"%s>%s</a></%s>' % \
                 (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %s); return false;"' % result_id or ''), conditional_escape(result_repr), table_tag))
         else:
@@ -212,8 +239,8 @@ def result_list(cl):
 result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
 
 def date_hierarchy(cl):
-    if cl.lookup_opts.admin.date_hierarchy:
-        field_name = cl.lookup_opts.admin.date_hierarchy
+    if cl.date_hierarchy:
+        field_name = cl.date_hierarchy
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -275,15 +302,11 @@ date_hierarchy = register.inclusion_tag('admin/date_hierarchy.html')(date_hierar
 def search_form(cl):
     return {
         'cl': cl,
-        'show_result_count': cl.result_count != cl.full_result_count and not cl.opts.one_to_one_field,
+        'show_result_count': cl.result_count != cl.full_result_count,
         'search_var': SEARCH_VAR
     }
 search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 
-def filter(cl, spec):
+def admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-filter = register.inclusion_tag('admin/filter.html')(filter)
-
-def filters(cl):
-    return {'cl': cl}
-filters = register.inclusion_tag('admin/filters.html')(filters)
+admin_list_filter = register.inclusion_tag('admin/filter.html')(admin_list_filter)

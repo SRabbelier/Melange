@@ -11,9 +11,10 @@ gettext_noop = lambda s: s
 
 DEBUG = False
 TEMPLATE_DEBUG = False
-# True if BaseHandler.get_response() should propagate raw exceptions
-# rather than catching them.  This is useful under some testing siutations,
-# and should never be used on a live site.
+
+# Whether the framework should propagate raw exceptions rather than catching
+# them. This is useful under some testing siutations and should never be used
+# on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
 # Whether to use the "Etag" header. This saves bandwidth but slows down performance.
@@ -51,6 +52,7 @@ LANGUAGES = (
     ('el', gettext_noop('Greek')),
     ('en', gettext_noop('English')),
     ('es', gettext_noop('Spanish')),
+    ('et', gettext_noop('Estonian')), 
     ('es-ar', gettext_noop('Argentinean Spanish')),
     ('eu', gettext_noop('Basque')),
     ('fa', gettext_noop('Persian')),
@@ -69,6 +71,7 @@ LANGUAGES = (
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('lv', gettext_noop('Latvian')),
+    ('lt', gettext_noop('Lithuanian')),
     ('mk', gettext_noop('Macedonian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
@@ -185,6 +188,9 @@ APPEND_SLASH = True
 # Whether to prepend the "www." subdomain to URLs that don't have it.
 PREPEND_WWW = False
 
+# Override the server-derived value of SCRIPT_NAME
+FORCE_SCRIPT_NAME = None
+
 # List of compiled regular expression objects representing User-Agent strings
 # that are not allowed to visit any page, systemwide. Use this for bad
 # robots/crawlers. Here are a few examples:
@@ -220,6 +226,9 @@ SECRET_KEY = ''
 # Path to the "jing" executable -- needed to validate XMLFields
 JING_PATH = "/usr/bin/jing"
 
+# Default file storage mechanism that holds media.
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ''
@@ -228,26 +237,45 @@ MEDIA_ROOT = ''
 # Example: "http://media.lawrence.com"
 MEDIA_URL = ''
 
+# List of upload handler classes to be applied in order.
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
+
+# Maximum size, in bytes, of a request before it will be streamed to the
+# file system instead of into memory.
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440 # i.e. 2.5 MB
+
+# Directory in which upload streamed files will be temporarily saved. A value of
+# `None` will make Django use the operating system's default temporary directory
+# (i.e. "/tmp" on *nix systems).
+FILE_UPLOAD_TEMP_DIR = None
+
+# The numeric mode to set newly-uploaded files to. The value should be a mode
+# you'd pass directly to os.chmod; see http://docs.python.org/lib/os-file-dir.html.
+FILE_UPLOAD_PERMISSIONS = None
+
 # Default formatting for date objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 DATE_FORMAT = 'N j, Y'
 
 # Default formatting for datetime objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 DATETIME_FORMAT = 'N j, Y, P'
 
 # Default formatting for time objects. See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 TIME_FORMAT = 'P'
 
 # Default formatting for date objects when only the year and month are relevant.
 # See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 YEAR_MONTH_FORMAT = 'F Y'
 
 # Default formatting for date objects when only the month and day are relevant.
 # See all available format strings here:
-# http://www.djangoproject.com/documentation/templates/#now
+# http://docs.djangoproject.com/en/dev/ref/templates/builtins/#now
 MONTH_DAY_FORMAT = 'F j'
 
 # Do you want to manage transactions manually?
@@ -276,7 +304,6 @@ MIDDLEWARE_CLASSES = (
 #     'django.middleware.http.ConditionalGetMiddleware',
 #     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.doc.XViewMiddleware',
 )
 
 ############
@@ -289,7 +316,7 @@ SESSION_COOKIE_DOMAIN = None                            # A string like ".lawren
 SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
 SESSION_COOKIE_PATH = '/'                               # The path of the session cookie.
 SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether sessions expire when a user closes his browser.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
 SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
 
@@ -344,6 +371,9 @@ LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
 
 LOGIN_REDIRECT_URL = '/accounts/profile/'
+
+# The number of days a password reset link is valid for
+PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 ###########
 # TESTING #

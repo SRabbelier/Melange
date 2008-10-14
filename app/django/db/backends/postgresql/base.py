@@ -4,9 +4,14 @@ PostgreSQL database backend for Django.
 Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
-from django.utils.encoding import smart_str, smart_unicode
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, util
+from django.db.backends import *
+from django.db.backends.postgresql.client import DatabaseClient
+from django.db.backends.postgresql.creation import DatabaseCreation
+from django.db.backends.postgresql.introspection import DatabaseIntrospection
 from django.db.backends.postgresql.operations import DatabaseOperations
+from django.db.backends.postgresql.version import get_version
+from django.utils.encoding import smart_str, smart_unicode
+
 try:
     import psycopg as Database
 except ImportError, e:
@@ -60,16 +65,14 @@ class UnicodeCursorWrapper(object):
         return iter(self.cursor)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    pass # This backend uses all the defaults.
+    uses_savepoints = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    features = DatabaseFeatures()
-    ops = DatabaseOperations()
     operators = {
         'exact': '= %s',
-        'iexact': 'ILIKE %s',
+        'iexact': '= UPPER(%s)',
         'contains': 'LIKE %s',
-        'icontains': 'ILIKE %s',
+        'icontains': 'LIKE UPPER(%s)',
         'regex': '~ %s',
         'iregex': '~* %s',
         'gt': '> %s',
@@ -78,9 +81,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'lte': '<= %s',
         'startswith': 'LIKE %s',
         'endswith': 'LIKE %s',
-        'istartswith': 'ILIKE %s',
-        'iendswith': 'ILIKE %s',
+        'istartswith': 'LIKE UPPER(%s)',
+        'iendswith': 'LIKE UPPER(%s)',
     }
+
+    def __init__(self, *args, **kwargs):
+        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+
+        self.features = DatabaseFeatures()
+        self.ops = DatabaseOperations()
+        self.client = DatabaseClient()
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation()
 
     def _cursor(self, settings):
         set_tz = False
@@ -103,6 +116,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor = self.connection.cursor()
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+            if not hasattr(self, '_version'):
+                self.__class__._version = get_version(cursor)
+            if self._version < (8, 0):
+                # No savepoint support for earlier version of PostgreSQL.
+                self.features.uses_savepoints = False
         cursor.execute("SET client_encoding to 'UNICODE'")
         cursor = UnicodeCursorWrapper(cursor, 'utf-8')
         return cursor

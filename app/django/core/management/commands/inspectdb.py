@@ -13,12 +13,10 @@ class Command(NoArgsCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self):
-        from django.db import connection, get_introspection_module
+        from django.db import connection
         import keyword
 
-        introspection_module = get_introspection_module()
-
-        table2model = lambda table_name: table_name.title().replace('_', '')
+        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
 
         cursor = connection.cursor()
         yield "# This is an auto-generated Django model module."
@@ -32,29 +30,39 @@ class Command(NoArgsCommand):
         yield ''
         yield 'from django.db import models'
         yield ''
-        for table_name in introspection_module.get_table_list(cursor):
+        for table_name in connection.introspection.get_table_list(cursor):
             yield 'class %s(models.Model):' % table2model(table_name)
             try:
-                relations = introspection_module.get_relations(cursor, table_name)
+                relations = connection.introspection.get_relations(cursor, table_name)
             except NotImplementedError:
                 relations = {}
             try:
-                indexes = introspection_module.get_indexes(cursor, table_name)
+                indexes = connection.introspection.get_indexes(cursor, table_name)
             except NotImplementedError:
                 indexes = {}
-            for i, row in enumerate(introspection_module.get_table_description(cursor, table_name)):
-                att_name = row[0].lower()
+            for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
+                column_name = row[0]
+                att_name = column_name.lower()
                 comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
                 extra_params = {}  # Holds Field parameters such as 'db_column'.
 
+                # If the column name can't be used verbatim as a Python
+                # attribute, set the "db_column" for this Field.
+                if ' ' in att_name or '-' in att_name or keyword.iskeyword(att_name) or column_name != att_name:
+                    extra_params['db_column'] = column_name
+
+                # Modify the field name to make it Python-compatible.
                 if ' ' in att_name:
-                    extra_params['db_column'] = att_name
-                    att_name = att_name.replace(' ', '')
+                    att_name = att_name.replace(' ', '_')
                     comment_notes.append('Field renamed to remove spaces.')
+                if '-' in att_name:
+                    att_name = att_name.replace('-', '_')
+                    comment_notes.append('Field renamed to remove dashes.')
                 if keyword.iskeyword(att_name):
-                    extra_params['db_column'] = att_name
                     att_name += '_field'
                     comment_notes.append('Field renamed because it was a Python reserved word.')
+                if column_name != att_name:
+                    comment_notes.append('Field name made lowercase.')
 
                 if i in relations:
                     rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
@@ -62,10 +70,10 @@ class Command(NoArgsCommand):
                     if att_name.endswith('_id'):
                         att_name = att_name[:-3]
                     else:
-                        extra_params['db_column'] = att_name
+                        extra_params['db_column'] = column_name
                 else:
                     try:
-                        field_type = introspection_module.DATA_TYPES_REVERSE[row[1]]
+                        field_type = connection.introspection.data_types_reverse[row[1]]
                     except KeyError:
                         field_type = 'TextField'
                         comment_notes.append('This field type is a guess.')
@@ -85,7 +93,6 @@ class Command(NoArgsCommand):
                         extra_params['decimal_places'] = row[5]
 
                     # Add primary_key and unique, if necessary.
-                    column_name = extra_params.get('db_column', att_name)
                     if column_name in indexes:
                         if indexes[column_name]['primary_key']:
                             extra_params['primary_key'] = True

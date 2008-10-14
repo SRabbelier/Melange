@@ -19,6 +19,8 @@ class BaseCache(object):
         Set a value in the cache if the key does not already exist. If
         timeout is given, that timeout will be used for the key; otherwise
         the default cache timeout will be used.
+
+        Returns True if the value was stored, False otherwise.
         """
         raise NotImplementedError
 
@@ -63,4 +65,11 @@ class BaseCache(object):
         """
         return self.get(key) is not None
 
-    __contains__ = has_key
+    def __contains__(self, key):
+        """
+        Returns True if the key is in the cache and has not expired.
+        """
+        # This is a separate method, rather than just a copy of has_key(),
+        # so that it always has the same functionality as has_key(), even
+        # if a subclass overrides it.
+        return self.has_key(key)

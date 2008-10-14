@@ -4,13 +4,16 @@ step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
 
-from django import newforms as forms
+import cPickle as pickle
+
+from django import forms
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-import cPickle as pickle
-import md5
+from django.utils.hashcompat import md5_constructor
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.formtools.utils import security_hash
 
 class FormWizard(object):
     # Dictionary of extra template context variables.
@@ -90,7 +93,7 @@ class FormWizard(object):
             # Otherwise, move along to the next step.
             else:
                 form = self.get_form(next_step)
-                current_step = next_step
+                self.step = current_step = next_step
 
         return self.render(form, request, current_step)
 
@@ -124,7 +127,7 @@ class FormWizard(object):
         This default implementation simply renders the form for the given step,
         but subclasses may want to display an error message, etc.
         """
-        return self.render(self.get_form(step), request, step, context={'wizard_error': 'We apologize, but your form has expired. Please continue filling out the form from this page.'})
+        return self.render(self.get_form(step), request, step, context={'wizard_error': _('We apologize, but your form has expired. Please continue filling out the form from this page.')})
 
     def render_revalidation_failure(self, request, step, form):
         """
@@ -139,18 +142,10 @@ class FormWizard(object):
         """
         Calculates the security hash for the given HttpRequest and Form instances.
 
-        This creates a list of the form field names/values in a deterministic
-        order, pickles the result with the SECRET_KEY setting and takes an md5
-        hash of that.
-
         Subclasses may want to take into account request-specific information,
         such as the IP address.
         """
-        data = [(bf.name, bf.data or '') for bf in form] + [settings.SECRET_KEY]
-        # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
-        # Python 2.3, but Django requires 2.3 anyway, so that's OK.
-        pickled = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
-        return md5.new(pickled).hexdigest()
+        return security_hash(request, form)
 
     def determine_step(self, request, *args, **kwargs):
         """
@@ -209,7 +204,7 @@ class FormWizard(object):
         """
         context = context or {}
         context.update(self.extra_context)
-        return render_to_response(self.get_template(self.step), dict(context,
+        return render_to_response(self.get_template(step), dict(context,
             step_field=self.step_field_name,
             step0=step,
             step=step + 1,

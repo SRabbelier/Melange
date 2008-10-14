@@ -4,9 +4,6 @@ from optparse import make_option
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
-        make_option('--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
     )
@@ -15,7 +12,6 @@ class Command(NoArgsCommand):
     def handle_noargs(self, **options):
         from django.conf import settings
         from django.db import connection, transaction, models
-        from django.dispatch import dispatcher
         from django.core.management.sql import sql_flush, emit_post_sync_signal
 
         verbosity = int(options.get('verbosity', 1))

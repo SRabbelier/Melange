@@ -30,9 +30,9 @@ __authors__ = [
 from google.appengine.api import users
 from google.appengine.ext import db
 
+from django import forms
 from django import http
 from django import shortcuts
-from django import newforms as forms
 
 from soc.logic import models
 from soc.logic import out_of_band

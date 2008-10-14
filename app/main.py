@@ -47,20 +47,17 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 import django.core.handlers.wsgi
 import django.core.signals
 import django.db
-import django.dispatch.dispatcher
-
 
 # Log errors.
 def log_exception(*args, **kwds):
   logging.exception('Exception in request:')
 
-django.dispatch.dispatcher.connect(
-   log_exception, django.core.signals.got_request_exception)
+# Log all exceptions detected by Django.
+django.core.signals.got_request_exception.connect(log_exception)
 
 # Unregister the rollback event handler.
-django.dispatch.dispatcher.disconnect(
-    django.db._rollback_on_exception,
-    django.core.signals.got_request_exception)
+django.core.signals.got_request_exception.disconnect(
+    django.db._rollback_on_exception)
 
 
 def main():

@@ -24,8 +24,8 @@ __authors__ = [
 
 from google.appengine.api import users
 
+from django import forms
 from django import http
-from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import models

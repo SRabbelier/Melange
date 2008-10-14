@@ -24,9 +24,9 @@ __authors__ = [
 
 import copy
 
-from django import newforms as forms
-from django.newforms import util
-from django.newforms import widgets
+from django import forms
+from django.forms import util
+from django.forms import widgets
 from django.utils import html
 from django.utils import simplejson
 from django.utils import safestring

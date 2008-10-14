@@ -24,8 +24,8 @@ __authors__ = [
 
 from google.appengine.api import users
 
+from django import forms
 from django import http
-from django import newforms as forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import models
@@ -50,7 +50,7 @@ import soc.views.out_of_band
 class EditForm(helper.forms.DbModelForm):
   """Django form displayed when Developer edits a Document.
   """
-  doc_key_name = forms.CharField(widget=forms.HiddenInput)
+  doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
   content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
   class Meta:

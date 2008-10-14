@@ -25,7 +25,7 @@ __authors__ = [
 
 from google.appengine.ext.db import djangoforms
 
-from django import newforms as forms
+from django import forms
 from django.utils import safestring
 
 

@@ -25,6 +25,7 @@ __authors__ = [
 
 from django import template
 
+
 register = template.Library()
 
 

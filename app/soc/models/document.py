@@ -21,11 +21,12 @@ __authors__ = [
 ]
 
 
+import polymodel
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-import polymodel
 import soc.models.user
 import soc.models.work
 

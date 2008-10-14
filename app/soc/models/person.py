@@ -22,13 +22,14 @@ __authors__ = [
 ]
 
 
+import polymodel
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 from soc.models import countries
 
-import polymodel
 import soc.models.user
 
 

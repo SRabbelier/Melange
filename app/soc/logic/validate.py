@@ -23,12 +23,11 @@ __authors__ = [
 
 
 import re
+import feedparser
 
 from google.appengine.api import urlfetch
 
 from soc.logic import path_link_name
-
-import feedparser
 
 
 def isFeedURLValid(feed_url=None):

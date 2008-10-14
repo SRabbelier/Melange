@@ -119,6 +119,7 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   form = None  # assume blank form needs to be displayed
   lookup_message = ugettext_lazy('Enter information to look up a User.')
   email_error = None  # assume no email look-up errors
+  context['lookup_link'] = None
 
   if request.method == 'POST':
     form = LookupForm(request.POST)
@@ -151,17 +152,22 @@ def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
         
           if user:
             lookup_message = ugettext_lazy('User found by link name.')
-            email_error = None  # clear previous error, since User was found
+            # clear previous error, since User was found
+            email_error = None
+            # clear previous lookup_link, since User was found, the lookup_link
+            # is not needed to display.
+            context['lookup_link'] = None
           else:
             context['link_name_error'] = ugettext_lazy(
                 'User with that link name not found.')
-            range_width = helper.lists.getPreferredListPagination()
-            nearest_user_range_start = id_user.findNearestUsersOffset(
-                range_width, link_name=link_name)
+            if context['lookup_link'] is None:
+              range_width = helper.lists.getPreferredListPagination()
+              nearest_user_range_start = id_user.findNearestUsersOffset(
+                  range_width, link_name=link_name)
             
-            if nearest_user_range_start is not None:
-              context['lookup_link'] = './list?offset=%s&limit=%s' % (
-                  nearest_user_range_start, range_width)
+              if nearest_user_range_start is not None:
+                context['lookup_link'] = './list?offset=%s&limit=%s' % (
+                    nearest_user_range_start, range_width)
     # else: form was not valid
   # else:  # method == 'GET'
 

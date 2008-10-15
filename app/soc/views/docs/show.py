@@ -24,10 +24,9 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
-from soc.logic import document
 from soc.logic import out_of_band
+from soc.logic import path_link_name
+from soc.logic.models import document
 from soc.views import helper
 from soc.views import simple
 
@@ -63,10 +62,17 @@ def public(request, partial_path=None, link_name=None,
 
   # TODO: based on the User's Roles, Documents that the User can edit
   #   should display a link to a document edit form
+  
+  doc = None
 
   # try to fetch User entity corresponding to link_name if one exists
+  path = path_link_name.combinePath([partial_path, link_name])
+
+  # try to fetch Document entity corresponding to path if one exists    
   try:
-    doc = document.getDocumentIfPath(partial_path, link_name=link_name)
+    if path:
+      doc = document.logic.getFromFields(partial_path=partial_path,
+                                         link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when Document path doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)

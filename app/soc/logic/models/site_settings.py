@@ -32,6 +32,9 @@ class Logic(base.Logic):
   """Logic methods for the SiteSettings model
   """
 
+  DEF_SITE_SETTINGS_PATH = 'site'
+  DEF_SITE_HOME_DOC_LINK_NAME = 'home'
+
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """

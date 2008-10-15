@@ -96,10 +96,10 @@ site_home = page.Page(
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
 
-site_home_edit = page.Page(
+site_settings_edit = page.Page(
   page.Url(
-    r'^site/home/edit$',
-    'soc.views.site.home.edit'),
+    r'^site/settings/edit$',
+    'soc.views.site.settings.edit'),
   'Site: Settings',
   short_name='Site Settings',
   parent=home)
@@ -111,7 +111,7 @@ site_user_lookup = page.Page(
     'soc.views.site.user.profile.lookup'),
   'Site: Look Up an Existing User',
   short_name='Look Up Site User',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_user_create = page.Page(
   page.Url(
@@ -119,7 +119,7 @@ site_user_create = page.Page(
     'soc.views.site.user.profile.create'),
   'Site: Create New User Profile',
   short_name='Create Site User',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_user_edit = page.Page(
   page.Url(
@@ -127,7 +127,7 @@ site_user_edit = page.Page(
     'soc.views.site.user.profile.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_user_list = page.Page(
   page.Url(
@@ -135,7 +135,7 @@ site_user_list = page.Page(
     'soc.views.site.user.list.all'),
   'Site: List of Users',
   short_name='List Site Users',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 # Document views
 docs_show = page.Page(
@@ -152,7 +152,7 @@ site_docs_create = page.Page(
     'soc.views.site.docs.edit.create'),
   'Site: Create New Document',
   'Create new Site Document',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_docs_edit = page.Page(
   page.Url(
@@ -160,7 +160,7 @@ site_docs_edit = page.Page(
     'soc.views.site.docs.edit.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_docs_delete = page.Page(
   page.Url(
@@ -168,7 +168,7 @@ site_docs_delete = page.Page(
     'soc.views.site.docs.edit.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_docs_list = page.Page(
   page.Url(
@@ -176,7 +176,7 @@ site_docs_list = page.Page(
     'soc.views.site.docs.list.all'),
   'Site: List of Documents',
   short_name='List Site Documents',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 # Sponsor Group public view
 sponsor_profile = page.Page(
@@ -193,7 +193,7 @@ site_sponsor_create = page.Page(
     'soc.views.site.sponsor.profile.create'),
   'Site: Create New Sponsor',
   short_name='Create New Site Sponsor',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_sponsor_delete = page.Page(
   page.Url(
@@ -201,7 +201,7 @@ site_sponsor_delete = page.Page(
     'soc.views.site.sponsor.profile.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_sponsor_edit = page.Page(
   page.Url(
@@ -209,7 +209,7 @@ site_sponsor_edit = page.Page(
     'soc.views.site.sponsor.profile.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 site_sponsor_list = page.Page(
   page.Url(
@@ -217,7 +217,7 @@ site_sponsor_list = page.Page(
     'soc.views.site.sponsor.list.all'),
   'Site: List of Sponsors',
   short_name='List Site Sponsors',
-  parent=site_home_edit)
+  parent=site_settings_edit)
 
 
 # these are not really used...

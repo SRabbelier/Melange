@@ -61,10 +61,10 @@ class TinyMCE(forms.widgets.Textarea):
     {% endblock %}
   """ 
 
-  mce_settings = {'mode': "exact",
-                  'theme': "simple",
-                  'theme_advanced_toolbar_location': "top",
-                  'theme_advanced_toolbar_align': "center"}
+  DEF_MCE_SETTINGS = {'mode': "exact",
+                      'theme': "simple",
+                      'theme_advanced_toolbar_location': "top",
+                      'theme_advanced_toolbar_align': "center"}
 
   TINY_MCE_HTML_FMT = u'''\
 <textarea %(attrs)s>%(value)s</textarea>
@@ -81,7 +81,11 @@ tinyMCE.init(%(settings_json)s)
     """
     super(forms.widgets.Textarea, self).__init__(*args, **kwargs)
     
+    # copy the class defaults to an instance data member
+    self.mce_settings = copy.deepcopy(self.DEF_MCE_SETTINGS)
+    
     if mce_settings:
+      # modify the per-instance settings if called supplied customizations
       self.mce_settings.update(mce_settings)
   
   def render(self, name, value, attrs=None):

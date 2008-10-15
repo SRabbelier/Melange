@@ -52,7 +52,8 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
   
   # Fetch one more to see if there should be a 'next' link
-  sponsors = models.sponsor.logic.getForLimitAndOffset(limit + 1, offset=offset)
+  sponsors = models.sponsor.logic.getForLimitAndOffset(limit=limit + 1,
+                                                       offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
   
@@ -62,7 +63,8 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
                     'list_heading': 'soc/group/list/group_heading.html'}
                       
   context = helper.lists.setList(request, context, sponsors, 
-                                 offset, limit, list_templates)
+                                 offset=offset, limit=limit, 
+                                 list_templates=list_templates)
                                  
   context['group_type'] = 'Sponsor'
 

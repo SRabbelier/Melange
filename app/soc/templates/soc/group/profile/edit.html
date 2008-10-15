@@ -44,6 +44,9 @@ Please use this form to alter {% if group_type %}{{ group_type }}{% else %}Group
     {% field_as_table_row form.name %}
     {% field_as_table_row form.link_name %}
     {% field_as_table_row form.short_name %}
+    {% if form.created_by %}
+    {% field_as_table_row form.created_by %}
+    {% endif %}
     {% field_as_table_row form.home_page %}
     {% field_as_table_row form.email %}
     {% field_as_table_row form.description %}

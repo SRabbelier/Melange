@@ -72,6 +72,8 @@ class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.
   """
   link_name = forms.CharField(widget=helper.widgets.ReadOnlyInput())
+  created_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
+                               required=False)
 
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
@@ -144,7 +146,8 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
         value = sponsor_form.cleaned_data.get(field)
         fields[field] = value
       
-      fields['founder'] = user
+      if not existing_sponsor:
+        fields['founder'] = user
       
       form_ln = fields['link_name']
       form_sponsor = models.sponsor.logic.updateOrCreateFromFields(fields, link_name=form_ln)
@@ -175,7 +178,9 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
               values=profile.SUBMIT_MESSAGES))    
               
       # populate form with the existing Sponsor entity
-      sponsor_form = EditForm(instance=existing_sponsor)
+      founder_link_name = existing_sponsor.founder.link_name
+      sponsor_form = EditForm(instance=existing_sponsor, 
+                              initial={'created_by': founder_link_name})
     else:
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter

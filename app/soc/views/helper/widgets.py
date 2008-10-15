@@ -60,18 +60,29 @@ class TinyMCE(forms.widgets.Textarea):
   	  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
     {% endblock %}
   """ 
-  DEF_MCE_SETTINGS = { 'mode': "exact",
-                       'theme': "simple",
-                       'theme_advanced_toolbar_location': "top",
-                       'theme_advanced_toolbar_align': "center"}
 
-  mce_settings = DEF_MCE_SETTINGS.copy()
+  mce_settings = {'mode': "exact",
+                  'theme': "simple",
+                  'theme_advanced_toolbar_location': "top",
+                  'theme_advanced_toolbar_align': "center"}
 
   TINY_MCE_HTML_FMT = u'''\
 <textarea %(attrs)s>%(value)s</textarea>
 <script type="text/javascript">
 tinyMCE.init(%(settings_json)s)
 </script>'''
+
+  def __init__(self, mce_settings=None, *args, **kwargs):
+    """Initialize TinyMCE widget with default or customized settings
+    
+    Args:
+      mce_settings: dict with TinyMCE widget settings
+      *args, **kwargs:  passed through to parent __init__() constructor
+    """
+    super(forms.widgets.Textarea, self).__init__(*args, **kwargs)
+    
+    if mce_settings:
+      self.mce_settings.update(mce_settings)
   
   def render(self, name, value, attrs=None):
     """Render TinyMCE widget as HTML.

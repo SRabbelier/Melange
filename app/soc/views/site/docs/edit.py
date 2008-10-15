@@ -1,4 +1,4 @@
-#founder!/usr/bin/python2.5
+#!/usr/bin/python2.5
 #
 # Copyright 2008 the Melange authors.
 #

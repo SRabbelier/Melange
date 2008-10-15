@@ -54,7 +54,8 @@ import soc.views.out_of_band
 
 
 class DocumentForm(helper.forms.DbModelForm):
-  content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
+  content = forms.fields.CharField(widget=helper.widgets.TinyMCE(
+      attrs={'rows':10, 'cols':40}))
 
   class Meta:
     """Inner Meta class that defines some behavior for the form.
@@ -64,7 +65,7 @@ class DocumentForm(helper.forms.DbModelForm):
     
     #: list of model fields which will *not* be gathered by the form
     exclude = ['partial_path', 'link_name',
-               'user', 'modified', 'created', 'inheritance_line']
+               'founder', 'modified', 'created', 'inheritance_line']
 
 
 class SiteSettingsForm(helper.forms.DbModelForm):
@@ -161,7 +162,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       link_name = DEF_SITE_HOME_DOC_LINK_NAME
       partial_path=DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
-      user = models.user.logic.getFromFields(email=logged_in_id.email())
+      founder = models.user.logic.getFromFields(email=logged_in_id.email())
 
       properties = {
         'title': document_form.cleaned_data.get('title'),
@@ -171,7 +172,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
         'link_name': link_name,
         'partial_path': partial_path,
         'id': logged_in_id,
-        'user': user,
+        'founder': founder,
       }
 
       site_doc = document.logic.updateOrCreateFromFields(

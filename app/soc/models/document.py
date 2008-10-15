@@ -56,8 +56,11 @@ class Document(soc.models.work.Work):
   #: view them (which may be anyone, for example, with the site front page).
   content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
   
-  #: User who created this document.
   #: TODO(pawel.solyga): replace this with WorkAuthors relation
-  user = db.ReferenceProperty(reference_class=soc.models.user.User,
-                              required=True, collection_name='documents')
+  #: Required many:1 relationship indicating the founding User of the
+  #: Document (this relationship is needed to keep track of lifetime document
+  #: creation limits, used to prevent spamming, etc.).
+  founder = db.ReferenceProperty(reference_class=soc.models.user.User,
+                                 required=True, collection_name="documents",
+                                 verbose_name=ugettext_lazy('Created by'))
 

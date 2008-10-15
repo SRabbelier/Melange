@@ -32,7 +32,6 @@ from soc.logic import models
 from soc.logic import out_of_band
 from soc.logic import path_link_name
 from soc.logic.models import document
-from soc.logic.site import id_user
 
 from soc.views import helper
 from soc.views import simple
@@ -47,30 +46,6 @@ import soc.views.helper.widgets
 import soc.views.out_of_band
 
 
-class EditForm(helper.forms.DbModelForm):
-  """Django form displayed when Developer edits a Document.
-  """
-  doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
-  content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
-  
-  class Meta:
-    model = soc.models.document.Document
-    
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'user', 'created', 'modified']
- 
-  def clean_partial_path(self):
-    partial_path = self.cleaned_data.get('partial_path')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
-    return partial_path
-
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
-    return link_name
-
-
-DEF_SITE_DOCS_EDIT_TMPL = 'soc/site/docs/edit.html'
 DEF_CREATE_NEW_DOC_MSG = ' You can create a new document by visiting the' \
                          ' <a href="/site/docs/edit">Create ' \
                          'a New Document</a> page.'
@@ -100,13 +75,94 @@ def getDocForForm(form):
   properties['short_name'] = form.cleaned_data.get('short_name')
   properties['abstract'] = form.cleaned_data.get('abstract')
   properties['content'] = form.cleaned_data.get('content')
-  properties['user'] = models.user.logic.getFromFields(email=email)
+  properties['founder'] = models.user.logic.getFromFields(email=email)
   properties['is_featured'] = form.cleaned_data.get('is_featured')
 
   doc = document.logic.updateOrCreateFromFields(properties,
                                                 partial_path=partial_path,
                                                 link_name=link_name)
   return doc
+
+
+class CreateForm(helper.forms.DbModelForm):
+  """Django form displayed when Developer creates a Document.
+  """
+  content = forms.fields.CharField(widget=helper.widgets.TinyMCE(
+      attrs={'rows':10, 'cols':40}))
+
+  class Meta:
+    model = soc.models.document.Document
+
+    #: list of model fields which will *not* be gathered by the form
+    exclude = ['inheritance_line', 'founder', 'created', 'modified']
+
+  def clean_partial_path(self):
+    partial_path = self.cleaned_data.get('partial_path')
+    # TODO(tlarsen): combine path and link_name and check for uniqueness
+    return partial_path
+
+  def clean_link_name(self):
+    link_name = self.cleaned_data.get('link_name')
+    # TODO(tlarsen): combine path and link_name and check for uniqueness
+    return link_name
+
+
+DEF_SITE_DOCS_CREATE_TMPL = 'soc/site/docs/edit.html'
+
+def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
+  """View for a Developer to create a new Document entity.
+
+  Args:
+    request: the standard django request object
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the public.html template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which either contains the form to
+    be filled out, or a redirect to the correct view in the interface.
+  """
+
+  try:
+    access.checkIsDeveloper(request)
+  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
+    return alt_response.response()
+
+  # create default template context for use with any templates
+  context = helper.responses.getUniversalContext(request)
+
+  if request.method == 'POST':
+    form = CreateForm(request.POST)
+
+    if form.is_valid():
+      doc = getDocForForm(form)
+
+      if not doc:
+        return http.HttpResponseRedirect('/')
+
+      new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
+
+      # redirect to new /site/docs/edit/new_path?s=0
+      # (causes 'Profile saved' message to be displayed)
+      return helper.responses.redirectToChangedSuffix(
+          request, None, new_path,
+          params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
+  else: # method == 'GET':
+    # no link name specified, so start with an empty form
+    form = CreateForm()
+
+  context['form'] = form
+
+  return helper.responses.respond(request, template, context)
+
+
+DEF_SITE_DOCS_EDIT_TMPL = 'soc/site/docs/edit.html'
+
+class EditForm(CreateForm):
+  """Django form displayed when Developer edits a Document.
+  """
+  doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
+  created_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
+                                      required=False)
 
 
 def edit(request, partial_path=None, link_name=None,
@@ -134,7 +190,6 @@ def edit(request, partial_path=None, link_name=None,
 
 # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  logged_in_id = users.get_current_user()
 
   doc = None  # assume that no Document entity will be found
 
@@ -184,12 +239,14 @@ def edit(request, partial_path=None, link_name=None,
                 request, profile.SUBMIT_MSG_PARAM_NAME,
                 values=SUBMIT_MESSAGES))
 
-        # populate form with the existing User entity
+        # populate form with the existing Document entity
+        founder_link_name = doc.founder.link_name
         form = EditForm(initial={'doc_key_name': doc.key().name(),
             'title': doc.title, 'partial_path': doc.partial_path,
             'link_name': doc.link_name, 'short_name': doc.short_name,
             'abstract': doc.abstract, 'content': doc.content,
-            'user': doc.user, 'is_featured': doc.is_featured})       
+            'founder': doc.founder, 'is_featured': doc.is_featured,
+            'created_by': founder_link_name})       
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
           # redirect to aggressively remove 'Profile saved' query parameter
@@ -208,77 +265,6 @@ def edit(request, partial_path=None, link_name=None,
 
   context.update({'form': form,
                   'existing_doc': doc})
-
-  return helper.responses.respond(request, template, context)
-
-
-class CreateForm(helper.forms.DbModelForm):
-  """Django form displayed when Developer creates a Document.
-  """
-  content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
-  
-  class Meta:
-    model = soc.models.document.Document
-    
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'user', 'created', 'modified']
- 
-  def clean_partial_path(self):
-    partial_path = self.cleaned_data.get('partial_path')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
-    return partial_path
-
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
-    return link_name
-
-
-DEF_SITE_DOCS_CREATE_TMPL = 'soc/site/docs/edit.html'
-
-def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
-  """View for a Developer to create a new Document entity.
-
-  Args:
-    request: the standard django request object
-    template: the "sibling" template (or a search list of such templates)
-      from which to construct the public.html template name (or names)
-
-  Returns:
-    A subclass of django.http.HttpResponse which either contains the form to
-    be filled out, or a redirect to the correct view in the interface.
-  """
-
-  try:
-    access.checkIsDeveloper(request)
-  except  soc.views.out_of_band.AccessViolationResponse, alt_response:
-    return alt_response.response()
-
-  # create default template context for use with any templates
-  context = helper.responses.getUniversalContext(request)
-  logged_in_id = users.get_current_user()
-
-  if request.method == 'POST':
-    form = CreateForm(request.POST)
-
-    if form.is_valid():
-      doc = getDocForForm(form)
-
-      if not doc:
-        return http.HttpResponseRedirect('/')
-
-      new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
-        
-      # redirect to new /site/docs/edit/new_path?s=0
-      # (causes 'Profile saved' message to be displayed)
-      return helper.responses.redirectToChangedSuffix(
-          request, None, new_path,
-          params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
-  else: # method == 'GET':
-    # no link name specified, so start with an empty form
-    form = CreateForm()
-
-  context['form'] = form
 
   return helper.responses.respond(request, template, context)
 

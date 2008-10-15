@@ -55,6 +55,10 @@ class User(base.ModelWithFieldAttributes):
    groups)  a 1:many relationship of Group entities "founded" by the User.
      This relation is implemented as the 'groups' back-reference Query of
      the Group model 'founder' reference.
+
+   responses)  a 1:many relationship of Reponse entities submitted by the
+     User.  This relation is implemented as the 'responses' back-reference
+     Query of the Response model 'respondent' reference.
   """
 
   #: A Google Account, which also provides a "private" email address.

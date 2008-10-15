@@ -39,4 +39,8 @@ class Organization(soc.models.group.Group):
      'reviewers' back-reference Query of the Organization model 'org'
      reference.
   """
-  pass
+
+  #: Group type short name used for example in urls
+  GROUP_TYPE_SHORT = 'org'
+  #: Group type plural name used in Group templates
+  GROUP_TYPE_PLURAL = 'Organizations'

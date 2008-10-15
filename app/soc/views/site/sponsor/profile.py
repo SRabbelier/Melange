@@ -38,7 +38,7 @@ from soc.views.helper import access
 from soc.views.user import profile
 
 import soc.logic
-import soc.models.sponsor
+import soc.models.sponsor as sponsor_model
 import soc.views.helper.forms
 import soc.views.helper.requests
 import soc.views.helper.responses
@@ -53,7 +53,7 @@ class CreateForm(helper.forms.DbModelForm):
     """Inner Meta class that defines some behavior for the form.
     """
     #: db.Model subclass for which the form will gather information
-    model = soc.models.sponsor.Sponsor
+    model = sponsor_model.Sponsor
     
     #: list of model fields which will *not* be gathered by the form
     exclude = ['founder', 'inheritance_line']
@@ -72,7 +72,7 @@ class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.
   """
   link_name = forms.CharField(widget=helper.widgets.ReadOnlyInput())
-  created_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
+  founded_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
                                required=False)
 
   def clean_link_name(self):
@@ -180,7 +180,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
       # populate form with the existing Sponsor entity
       founder_link_name = existing_sponsor.founder.link_name
       sponsor_form = EditForm(instance=existing_sponsor, 
-                              initial={'created_by': founder_link_name})
+                              initial={'founded_by': founder_link_name})
     else:
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter
@@ -191,7 +191,8 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
     
   context.update({'form': sponsor_form,
                   'existing_group':  existing_sponsor,
-                  'group_type': 'Sponsor'})
+                  'group_type': 'Sponsor',
+                  'group_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
 
   return helper.responses.respond(request, template, context)
 

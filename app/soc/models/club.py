@@ -40,5 +40,9 @@ class Club(soc.models.group.Group):
      relation is implemented as the 'members' back-reference Query of the
      Member model 'club' reference.
   """
-  pass
+
+  #: Group type short name used for example in urls
+  GROUP_TYPE_SHORT = 'club'
+  #: Group type plural name used in Group templates
+  GROUP_TYPE_PLURAL = 'Clubs'
 

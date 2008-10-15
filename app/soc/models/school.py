@@ -40,5 +40,9 @@ class School(soc.models.group.Group):
      belonging to) a School.  This relation is implemented as the 'students'
      back-reference Query of the Student model 'school' reference.
   """
-  pass
+
+  #: Group type short name used for example in urls
+  GROUP_TYPE_SHORT = 'school'
+  #: Group type plural name used in Group templates
+  GROUP_TYPE_PLURAL = 'Schools'
 

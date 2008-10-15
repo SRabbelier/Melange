@@ -29,5 +29,9 @@ import soc.models.group
 
 class Sponsor(soc.models.group.Group):
   """Sponsor details."""
-  pass
+
+  #: Group type short name used for example in urls
+  GROUP_TYPE_SHORT = 'sponsor'
+  #: Group type plural name used in Group templates
+  GROUP_TYPE_PLURAL = 'Sponsors'
 

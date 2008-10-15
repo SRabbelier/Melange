@@ -14,16 +14,16 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 {% block page_title %}
-Site: {% if group_type %}{{ group_type }}{% else %}Group{% endif %}s List
+Site: {{ group_type_plural }} List
 {% endblock %}
 {% block header_title %}
-{% if group_type %}{{ group_type }}{% else %}Group{% endif %}s List
+{{ group_type_plural }} List
 {% endblock %}
 {% block body %}
 <p>
 <p>
 {% block instructions %}
-List of {% if group_type %}{{ group_type }}{% else %}Group{% endif %}s in Google Open Source Programs.
+List of {{ group_type_plural }} in Google Open Source Programs.
 {% endblock %}
 </p>
 {% include list_main %}

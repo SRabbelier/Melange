@@ -19,16 +19,16 @@ limitations under the License.
 
 {% block page_title %}
 {% if existing_group %}
-Site: Modify Existing {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+Site: Modify Existing {{ group_type }}
 {% else %}
-Site: Create New {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+Site: Create New {{ group_type }}
 {% endif %}
 {% endblock %}
 {% block header_title %}
 {% if existing_group %}
-Modify Existing {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+Modify Existing {{ group_type }}
 {% else %}
-Create a New {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
+Create a New {{ group_type }}
 {% endif %}
 {% endblock %}
 
@@ -36,7 +36,7 @@ Create a New {% if group_type %}{{ group_type }}{% else %}Group{% endif %}
 <p>
 <p>
 {% block instructions %}
-Please use this form to alter {% if group_type %}{{ group_type }}{% else %}Group{% endif %} details.
+Please use this form to alter {{ group_type }} details.
 {% endblock %}
 </p>
 <form method="POST">

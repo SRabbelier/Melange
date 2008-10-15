@@ -29,6 +29,7 @@ from soc.views import simple
 from soc.views.helper import access
 
 import soc.logic
+import soc.models.sponsor as sponsor_model
 import soc.views.helper.lists
 import soc.views.helper.responses
 import soc.views.out_of_band
@@ -66,6 +67,8 @@ def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
                                  offset=offset, limit=limit, 
                                  list_templates=list_templates)
                                  
-  context['group_type'] = 'Sponsor'
+  context.update({'group_type': 'Sponsor',
+                  'group_type_plural': sponsor_model.Sponsor.GROUP_TYPE_PLURAL,
+                  'group_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
 
   return helper.responses.respond(request, template, context)

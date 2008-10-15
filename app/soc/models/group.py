@@ -61,7 +61,8 @@ class Group(polymodel.PolyModel):
   #: creation limits, used to prevent spamming, etc.).
   founder = db.ReferenceProperty(reference_class=soc.models.user.User,
                                  required=True, collection_name="groups",
-                                 verbose_name=ugettext_lazy('Created by'))
+                                 verbose_name=ugettext_lazy('Founded by'))
+
   #: Required field storing a home page URL of the group.
   home_page = db.LinkProperty(required=True,
       verbose_name=ugettext_lazy('Home Page URL'))

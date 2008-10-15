@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
-{% block page_title %}{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile{% endblock %}
+{% block page_title %}{{ group_type }} Public Profile{% endblock %}
 {% block header_title %}
-{% if group_type %}{{ group_type }}{% else %}Group{% endif %} Public Profile for {{ link_name_group.name }}
+{{ group_type }} Public Profile for {{ link_name_group.name }}
 {% endblock %}
 {% block body %}
 <p>

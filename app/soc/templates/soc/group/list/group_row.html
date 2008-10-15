@@ -1,7 +1,7 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/site/{{ group_type|lower }}/profile/{{ data_element.link_name }}'" name="name">
+onclick="document.location.href='/site/{{ group_type_short|lower }}/profile/{{ data_element.link_name }}'" name="name">
   <td align="right"><div class="name"><a class="noul"
-         href="/site/{{ group_type|lower }}/profile/{{ data_element.link_name }}">{{ data_element.name }}</a>
+         href="/site/{{ group_type_short|lower }}/profile/{{ data_element.link_name }}">{{ data_element.name }}</a>
      </div>
   </td>
   <td><div class="link_name">{{ data_element.link_name }}</a></div></td>

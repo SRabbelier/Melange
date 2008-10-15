@@ -67,7 +67,7 @@ def buildSiteSidebar(is_admin=None, **ignored):
     # user is either not logged in or not a "Developer", so return no menu
     return None
 
-  return [map.site_home_edit.makeMenuItem()]
+  return [map.site_settings_edit.makeMenuItem()]
 
 
 def buildProgramsSidebar(**unused):

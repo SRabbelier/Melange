@@ -70,6 +70,18 @@ def nameSiteSettings(path):
   return 'SiteSettings:%s' % path
 
 
+def nameHomeSettings(path):
+  """Returns a HomeSettings key name constructed from a supplied path.
+
+  Raises:
+    Error if path is "False" (None, empty string, etc.)
+  """
+  if not path:
+    raise Error('"path" must be non-False: "%s"' % path)
+
+  return 'HomeSettings:%s' % path
+
+
 def nameUser(email):
   """Returns a User key name constructed from a supplied email address.
   

@@ -51,8 +51,8 @@ class Quiz(soc.models.document.Document):
 
     work.abstract:  summary displayed as a snippet in Quiz list views
 
-    work.authors:  the Authors of the Work referred to by this relation
-      are the authors of the Quiz (but not necessarily the individual
+    work.author:  the author of the Work referred to by this relation
+      is the author of the Quiz (but not necessarily the individual
       Questions themselves, see the Question Model)
 
     work.reviews:  even Quizzes can be "reviewed" (possibly commented
@@ -85,6 +85,11 @@ class Quiz(soc.models.document.Document):
       logic could check if a survey "passed" by querying for these
       "solution" Answers and seeing if the survey Response had the "right"
       Answers (to the one Question that matters in this case...).
+
+    proposals)  a 1:many relationship where each Quiz can produce all of
+      the Proposals that make use of the Quiz as part of the Proposal.
+      This relation is implemented as the 'proposals' back-reference Query
+      of the Proposal Model 'quiz' reference.
   """
   
   #: a many:many relationship (many:many because a given Question can be

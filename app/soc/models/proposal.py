@@ -24,10 +24,12 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.work
+import soc.models.document
+import soc.models.quiz
+import soc.models.response
 
 
-class Proposal(soc.models.work.Work):
+class Proposal(soc.models.document.Document):
   """Model of a Proposal, which is a specific form of a Work.
 
   The specific way that the properties and relations inherited from Work
@@ -37,10 +39,11 @@ class Proposal(soc.models.work.Work):
 
   work.abstract:  publicly displayed as a proposal abstract or summary
 
-  work.authors:  the Authors of the Work referred to by this relation
-    are the authors of the Proposal
-
   work.reviews:  reviews of the Proposal by Reviewers
+
+  document.content:  the details of the Proposal; which, unlike work.abstract
+    is considered "public" information, the contents of a Proposal are only
+    displayed to Persons in Roles that have a "need to know" those details.
 
   A Proposal entity participates in the following relationships implemented 
   as a db.ReferenceProperty elsewhere in another db.Model:
@@ -49,10 +52,15 @@ class Proposal(soc.models.work.Work):
     Proposal as their foundation.  This relation is implemented as the
     'tasks' back-reference Query of the Task model 'proposal' reference.
   """
+  #: an optional many:1 relationship between Proposal and a Quiz that
+  #: defines what Questions were added by the prospective Proposal Reviewer
+  #: for the Proposal author to answer.
+  quiz = db.ReferenceProperty(reference_class=soc.models.quiz.Quiz,
+                              required=False, collection_name="proposals")
 
-  #: Required db.TextProperty describing the proposal in detail.
-  #: Unlike the work.abstract, which is considered "public" information,
-  #: the contents of 'details' is only to be displayed to Persons in Roles
-  #: that have a "need to know" the details.
-  details = db.TextProperty(required=True)
-
+  #: an optional 1:1 relationship where a Proposal author's Answers to
+  #: a Quiz attached to the Proposal template by the Proposal Reviewer
+  #; are collected. 
+  response = db.ReferenceProperty(
+      reference_class=soc.models.response.Response, required=False,
+      collection_name="proposal")

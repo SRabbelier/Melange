@@ -39,17 +39,18 @@ class Question(soc.models.work.Work):
 
     work.abstract:  the Question text, asked to the respondent
 
-    work.authors:  the Authors of the Work referred to by this relation
-      are the authors of the Question
+    work.author:  the author of the Work referred to by this relation
+      is the original author of the actual Question, regardless of
+      which Quizzes might incorporate the Question
 
     work.reviews:  even Questions can be "reviewed" (possibly commented
       on during creation or annotated once put into use).
 
-    work.partial_path: used to scope (and, when combined with
+    work.partial_path:  used to scope (and, when combined with
       work.link_name, uniquely identify) a Question in the same way the
       property are used with Documents, etc.
 
-    work.link_name: used to identify (and, when combined with
+    work.link_name:  used to identify (and, when combined with
       work.partial_path, *uniquely* identify) a Question in the same way
       these properties are used with Documents, etc.
       

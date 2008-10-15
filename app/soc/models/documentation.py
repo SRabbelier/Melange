@@ -45,8 +45,8 @@ class Documentation(soc.models.work.Work):
     just an indication that the required documentation was 
     supplied but is not actually attached.
 
-  work.authors: The Authors of the Work referred to by this 
-    relation are the Administrators (or Hosts) creating the
+  work.author: The author of the Work referred to by this 
+    relation is the Administrator (or Host) creating the
     Documentation.
 
   work.reviews: Annotations to the Documentation made by other

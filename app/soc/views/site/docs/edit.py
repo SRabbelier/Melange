@@ -1,4 +1,4 @@
-#!/usr/bin/python2.5
+#founder!/usr/bin/python2.5
 #
 # Copyright 2008 the Melange authors.
 #
@@ -75,7 +75,7 @@ def getDocForForm(form):
   properties['short_name'] = form.cleaned_data.get('short_name')
   properties['abstract'] = form.cleaned_data.get('abstract')
   properties['content'] = form.cleaned_data.get('content')
-  properties['founder'] = models.user.logic.getFromFields(email=email)
+  properties['author'] = models.user.logic.getFromFields(email=email)
   properties['is_featured'] = form.cleaned_data.get('is_featured')
 
   doc = document.logic.updateOrCreateFromFields(properties,
@@ -94,7 +94,7 @@ class CreateForm(helper.forms.DbModelForm):
     model = soc.models.document.Document
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'founder', 'created', 'modified']
+    exclude = ['inheritance_line', 'author', 'created', 'modified']
 
   def clean_partial_path(self):
     partial_path = self.cleaned_data.get('partial_path')
@@ -240,13 +240,13 @@ def edit(request, partial_path=None, link_name=None,
                 values=SUBMIT_MESSAGES))
 
         # populate form with the existing Document entity
-        founder_link_name = doc.founder.link_name
+        author_link_name = doc.author.link_name
         form = EditForm(initial={'doc_key_name': doc.key().name(),
             'title': doc.title, 'partial_path': doc.partial_path,
             'link_name': doc.link_name, 'short_name': doc.short_name,
             'abstract': doc.abstract, 'content': doc.content,
-            'founder': doc.founder, 'is_featured': doc.is_featured,
-            'created_by': founder_link_name})       
+            'author': doc.author, 'is_featured': doc.is_featured,
+            'created_by': author_link_name})       
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
           # redirect to aggressively remove 'Profile saved' query parameter

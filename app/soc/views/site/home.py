@@ -65,7 +65,7 @@ class DocumentForm(helper.forms.DbModelForm):
     
     #: list of model fields which will *not* be gathered by the form
     exclude = ['partial_path', 'link_name',
-               'founder', 'modified', 'created', 'inheritance_line']
+               'author', 'modified', 'created', 'inheritance_line']
 
 
 class SiteSettingsForm(helper.forms.DbModelForm):
@@ -162,7 +162,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
       link_name = DEF_SITE_HOME_DOC_LINK_NAME
       partial_path=DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
-      founder = models.user.logic.getFromFields(email=logged_in_id.email())
+      author = models.user.logic.getFromFields(email=logged_in_id.email())
 
       properties = {
         'title': document_form.cleaned_data.get('title'),
@@ -172,7 +172,7 @@ def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
         'link_name': link_name,
         'partial_path': partial_path,
         'id': logged_in_id,
-        'founder': founder,
+        'author': author,
       }
 
       site_doc = document.logic.updateOrCreateFromFields(

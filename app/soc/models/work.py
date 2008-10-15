@@ -21,11 +21,14 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
+import polymodel
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-import polymodel
+import soc.models.user
 
 
 class Work(polymodel.PolyModel):
@@ -34,14 +37,16 @@ class Work(polymodel.PolyModel):
   Work is a "base entity" of other more specific "works" created by Persons
   serving in "roles".
 
-   authors)  a many:many relationship with Roles, stored in a separate
-     WorksAuthors model, used to represent authorship of the Work.  See
-     the WorksAuthors model class for details.
-
-   reviews)  a 1:many relationship between a Work and the zero or more
-     Reviews of that Work.  This relation is implemented as the 'reviews'
-     back-reference Query of the Review model 'reviewed' reference.
+    reviews)  a 1:many relationship between a Work and the zero or more
+      Reviews of that Work.  This relation is implemented as the 'reviews'
+      back-reference Query of the Review model 'reviewed' reference.
   """
+  #: Required 1:1 relationship indicating the User who initially authored the
+  #: Work (this relationship is needed to keep track of lifetime document
+  #: creation limits, used to prevent spamming, etc.).
+  author = db.ReferenceProperty(reference_class=soc.models.user.User,
+                                 required=True, collection_name="documents",
+                                 verbose_name=ugettext_lazy('Created by'))
 
   #: Required field indicating the "title" of the work, which may have
   #: different uses depending on the specific type of the work. Works

@@ -21,13 +21,10 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-import soc.models.user
 import soc.models.work
 
 
@@ -44,9 +41,6 @@ class Document(soc.models.work.Work):
     work.abstract:  document summary displayed as a snippet in Document
       list views
 
-    work.authors:  the Authors of the Work referred to by this relation
-      are the authors of the Document
-
     work.reviews:  reviews of the Document by Reviewers
   """
 
@@ -55,12 +49,3 @@ class Document(soc.models.work.Work):
   #: the content is only to be displayed to Persons in Roles eligible to
   #: view them (which may be anyone, for example, with the site front page).
   content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
-  
-  #: TODO(pawel.solyga): replace this with WorkAuthors relation
-  #: Required many:1 relationship indicating the founding User of the
-  #: Document (this relationship is needed to keep track of lifetime document
-  #: creation limits, used to prevent spamming, etc.).
-  founder = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                 required=True, collection_name="documents",
-                                 verbose_name=ugettext_lazy('Created by'))
-

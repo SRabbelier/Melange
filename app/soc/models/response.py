@@ -45,6 +45,11 @@ class Response(polymodel.PolyModel):
       The collection of Answers that make up a Response is implemented as
       the 'answers' back-reference Query of the Answer model 'response'
       reference.
+
+    proposal)  an optional 1:1 relationship where a Proposal placed its
+      Answers to a Quiz associated with the Proposal.  This relation is
+      implemented as the 'proposal' back-reference Query of the Proposal
+      Model 'response' reference.
   """
 
   #: a required many:1 relationship between Responses and a Quiz that

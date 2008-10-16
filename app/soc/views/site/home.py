@@ -25,11 +25,11 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
 from google.appengine.ext import db
 
 from soc.logic import models
 from soc.views import helper
+from soc.views.helper import decorators
 
 import soc.logic.models.site_settings
 import soc.views.helper.responses
@@ -38,6 +38,7 @@ import soc.views.helper.templates
 
 DEF_SITE_HOME_PUBLIC_TMPL = 'soc/site/home/public.html'
 
+@decorators.view
 def public(request, page=None, template=DEF_SITE_HOME_PUBLIC_TMPL):
   """How the "general public" sees the Melange site home page.
 

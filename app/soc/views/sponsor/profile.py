@@ -25,6 +25,7 @@ __authors__ = [
 from soc.logic import out_of_band
 from soc.views import helper
 from soc.views import simple
+from soc.views.helper import decorators
 
 import soc.logic.models.sponsor
 import soc.views.helper.responses
@@ -33,6 +34,7 @@ import soc.views.helper.templates
 
 DEF_SPONSOR_PUBLIC_TMPL = 'soc/group/profile/public.html'
 
+@decorators.view
 def public(request, page=None, link_name=None, 
            template=DEF_SPONSOR_PUBLIC_TMPL):
   """How the "general public" sees the Sponsor profile.
@@ -51,7 +53,8 @@ def public(request, page=None, link_name=None,
   context = helper.responses.getUniversalContext(request)
 
   try:
-    link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(link_name=link_name)
+    link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(
+        link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, page, error, template, context)

@@ -23,10 +23,9 @@ __authors__ = [
 
 
 from soc.logic import models
-from soc.logic.site import id_user
 from soc.views import helper
-from soc.views import simple
 from soc.views.helper import access
+from soc.views.helper import decorators
 
 import soc.logic
 import soc.models.user
@@ -37,7 +36,7 @@ import soc.views.out_of_band
 
 DEF_SITE_USER_LIST_ALL_TMPL = 'soc/site/user/list/all.html'
 
-
+@decorators.view
 def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
   """Show a list of all Users (limit rows per page).
   
@@ -79,4 +78,3 @@ def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
       offset=offset, limit=limit, list_templates=list_templates)
 
   return helper.responses.respond(request, template, context)
-                 

@@ -29,6 +29,7 @@ from soc.logic import path_link_name
 from soc.logic.models import document
 from soc.views import helper
 from soc.views import simple
+from soc.views.helper import decorators
 
 import soc.views.helper.responses
 import soc.views.helper.templates
@@ -36,6 +37,7 @@ import soc.views.helper.templates
 
 DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
 
+@decorators.view
 def public(request, page=None, partial_path=None, link_name=None,
            template=DEF_DOCS_PUBLIC_TMPL):
   """How the "general public" sees a Document.

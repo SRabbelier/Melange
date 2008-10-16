@@ -35,6 +35,7 @@ from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.user import profile
 
 import soc.logic
@@ -94,6 +95,7 @@ class LookupForm(helper.forms.DbModelForm):
 
 DEF_SITE_USER_PROFILE_LOOKUP_TMPL = 'soc/site/user/profile/lookup.html'
 
+@decorators.view
 def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   """View for a Developer to look up a User Model entity.
 
@@ -250,7 +252,9 @@ DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           ' <a href="/site/user/profile">Create ' \
                           'a New User</a> page.'
 
-def edit(request, page=None, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
+@decorators.view
+def edit(request, page=None, link_name=None,
+         template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
 
   Args:
@@ -300,8 +304,6 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT
       properties['is_developer'] = form.cleaned_data.get('is_developer')
       
       user = models.user.logic.updateOrCreateFromKeyName(properties, key_name)
-
-      #raise forms.ValidationError("lesseee: " + new_link_name + " " +  user.link_name)
 
       if not user:
         return http.HttpResponseRedirect('/')
@@ -401,6 +403,7 @@ class CreateForm(helper.forms.DbModelForm):
 
 DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/site/user/profile/edit.html'
 
+@decorators.view
 def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
   """View for a Developer to create a new User Model entity.
 
@@ -438,7 +441,8 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
         'is_developer': form.cleaned_data.get('is_developer'),
       }
 
-      user = models.user.logic.updateOrCreateFromFields(properties, email=form_id.email())
+      user = models.user.logic.updateOrCreateFromFields(properties, 
+                                                        email=form_id.email())
 
       if not user:
         return http.HttpResponseRedirect('/')

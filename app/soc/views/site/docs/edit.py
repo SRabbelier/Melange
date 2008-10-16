@@ -36,6 +36,7 @@ from soc.logic.models import document
 from soc.views import helper
 from soc.views import simple
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.user import profile
 
 import soc.models.document
@@ -108,6 +109,7 @@ class CreateForm(helper.forms.DbModelForm):
 
 DEF_SITE_DOCS_CREATE_TMPL = 'soc/site/docs/edit.html'
 
+@decorators.view
 def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
   """View for a Developer to create a new Document entity.
 
@@ -166,6 +168,7 @@ class EditForm(CreateForm):
                                       required=False)
 
 
+@decorators.view
 def edit(request, page=None, partial_path=None, link_name=None,
          template=DEF_SITE_DOCS_EDIT_TMPL):
   """View for a Developer to modify the properties of a Document Model entity.
@@ -248,7 +251,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
             'title': doc.title, 'partial_path': doc.partial_path,
             'link_name': doc.link_name, 'short_name': doc.short_name,
             'content': doc.content, 'author': doc.author,
-            'is_featured': doc.is_featured, 'created_by': author_link_name})       
+            'is_featured': doc.is_featured, 'created_by': author_link_name})
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
           # redirect to aggressively remove 'Profile saved' query parameter
@@ -271,6 +274,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
   return helper.responses.respond(request, template, context)
 
 
+@decorators.view
 def delete(request, page=None, partial_path=None, link_name=None,
            template=DEF_SITE_DOCS_EDIT_TMPL):
   """Request handler for a Developer to delete Document Model entity.

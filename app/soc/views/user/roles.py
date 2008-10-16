@@ -26,13 +26,11 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
-from django import http
-
-from soc.views.helpers import response_helpers
+from soc.views.helper import decorators
+from soc.views.helper import responses
 
 
+@decorators.view
 def dashboard(request, page=None, link_name=None,
               template='soc/user/roles/dashboard.html'):
   """A per-User dashboard of that User's Roles on the site.
@@ -58,10 +56,11 @@ def dashboard(request, page=None, link_name=None,
   #   template, a corresponding foo/bar/public.html template must
   #   also exist...
 
-  return response_helpers.respond(request,
+  return responses.respond(request,
       template, {'template': template})
 
 
+@decorators.view
 def public(request, page=None, link_name=None,
            template='soc/user/roles/public.html'):
   """A "general public" view of a User's Roles on the site.
@@ -81,6 +80,5 @@ def public(request, page=None, link_name=None,
   # TODO: if link_name is empty or not a valid link_name on the site, display
   # some sort of "user does not exist" page (a custom 404 page, maybe?).
   
-  return response_helpers.respond(request,
+  return responses.respond(request,
       template, {'template': template})
-

@@ -22,13 +22,13 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import out_of_band
 from soc.logic.site import id_user
 from soc.views import helper
+from soc.views.helper import decorators
 
 import soc.views.helper.responses
 import soc.views.helper.templates
@@ -36,6 +36,7 @@ import soc.views.helper.templates
 
 DEF_PUBLIC_TMPL = 'soc/base.html'
 
+@decorators.view
 def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
            context=None):
   """A simple template view that expects a link_name extracted from the URL.

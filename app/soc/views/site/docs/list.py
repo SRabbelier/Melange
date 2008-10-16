@@ -23,9 +23,9 @@ __authors__ = [
 
 
 from soc.logic.models import work
-from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
 
 import soc.logic
 import soc.models.document
@@ -37,6 +37,7 @@ import soc.views.out_of_band
 DEF_SITE_DOCS_LIST_ALL_TMPL = 'soc/site/docs/list/all.html'
 
 
+@decorators.view
 def all(request, page=None, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
   """Show a list of all Documents (limit rows per page).
   

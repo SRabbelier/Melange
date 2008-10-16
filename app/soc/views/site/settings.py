@@ -27,21 +27,16 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
 from google.appengine.ext import db
 
 from django import forms
-from django import http
-from django import shortcuts
 
 from soc.logic import models
-from soc.logic import out_of_band
 from soc.logic import validate
 from soc.logic.models import document
-from soc.logic.site import id_user
-from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
 
 import soc.logic.models.site_settings
 import soc.models.document
@@ -95,6 +90,7 @@ class SiteSettingsForm(helper.forms.DbModelForm):
 
 DEF_SITE_HOME_EDIT_TMPL = 'soc/site/settings/edit.html'
 
+@decorators.view
 def edit(request, page=None, template=DEF_SITE_HOME_EDIT_TMPL):
   """View for Developer to edit content of Melange site home page.
 
@@ -125,7 +121,7 @@ def edit(request, page=None, template=DEF_SITE_HOME_EDIT_TMPL):
 
     if document_form.is_valid() and settings_form.is_valid():
       link_name = models.site_settings.logic.DEF_SITE_HOME_DOC_LINK_NAME
-      partial_path=models.site_settings.logic.DEF_SITE_SETTINGS_PATH
+      partial_path = models.site_settings.logic.DEF_SITE_SETTINGS_PATH
       logged_in_id = users.get_current_user()
       author = models.user.logic.getFromFields(email=logged_in_id.email())
 

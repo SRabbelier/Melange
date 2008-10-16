@@ -31,10 +31,10 @@ from soc.logic import models
 from soc.logic import out_of_band
 from soc.logic import validate
 from soc.logic.models import sponsor
-from soc.logic.site import id_user
 from soc.views import helper
 from soc.views import simple
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.user import profile
 
 import soc.logic
@@ -88,7 +88,9 @@ DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           ' <a href="/site/sponsor/profile">Create ' \
                           'a New Sponsor</a> page.'
 
-def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+@decorators.view
+def edit(request, page=None, link_name=None,
+         template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a Sponsor Model entity.
 
   Args:
@@ -152,7 +154,8 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_E
         fields['founder'] = user
       
       form_ln = fields['link_name']
-      form_sponsor = models.sponsor.logic.updateOrCreateFromFields(fields, link_name=form_ln)
+      form_sponsor = models.sponsor.logic.updateOrCreateFromFields(
+          fields, link_name=form_ln)
       
       if not form_sponsor:
         return http.HttpResponseRedirect('/')
@@ -201,13 +204,16 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_E
 
 DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 
+@decorators.view
 def create(request, page=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
   return edit(request, page, link_name=None, template=template)
 
 
-def delete(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+@decorators.view
+def delete(request, page=None, link_name=None,
+           template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """Request handler for a Developer to delete Sponsor Model entity.
 
   Args:

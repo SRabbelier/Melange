@@ -30,12 +30,12 @@ __authors__ = [
 
 from google.appengine.api import users
 
-from django import forms
 from django import http
 from django import shortcuts
 
 from soc.models import person
 from soc.views import helper
+from soc.views.helper import decorators
 
 import soc.views.helper.forms
 
@@ -54,6 +54,7 @@ class EditForm(helper.forms.DbModelForm):
     exclude = ['user']
 
 
+@decorators.view
 def edit(request, page=None, program=None, link_name=None,
          template='soc/person/profile/edit.html'):
   """View for a Person to modify the properties of a Person Model.
@@ -85,7 +86,7 @@ def edit(request, page=None, program=None, link_name=None,
   #      display name to use in the greeting
 
   form = EditForm()
-  if request.method=='POST':
+  if request.method == 'POST':
     form = EditForm(request.POST)
 
     if not form.errors:

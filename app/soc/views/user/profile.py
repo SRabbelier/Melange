@@ -26,7 +26,6 @@ from google.appengine.api import users
 
 from django import forms
 from django import http
-from django import shortcuts
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import models
@@ -35,6 +34,7 @@ from soc.logic import validate
 from soc.logic.site import id_user
 from soc.views import helper
 from soc.views import simple
+from soc.views.helper import decorators
 
 import soc.logic
 import soc.models.user
@@ -82,6 +82,7 @@ SUBMIT_PROFILE_SAVED_PARAMS = {
   SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
 }
 
+@decorators.view
 def edit(request, page=None, link_name=None, 
          template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
@@ -144,7 +145,8 @@ def edit(request, page=None, link_name=None,
         'id': id,
       }
 
-      user = models.user.logic.updateOrCreateFromFields(properties, email=id.email())
+      user = models.user.logic.updateOrCreateFromFields(properties, 
+                                                        email=id.email())
 
       # redirect to new /user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -183,6 +185,7 @@ def edit(request, page=None, link_name=None,
   return helper.responses.respond(request, template, context)
 
 
+@decorators.view
 def create(request, page=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """

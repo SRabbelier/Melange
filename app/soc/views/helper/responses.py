@@ -23,10 +23,7 @@ __authors__ = [
   ]
 
 
-import logging
-
 from google.appengine.api import users
-from google.appengine.runtime import DeadlineExceededError
 
 from django import http
 from django.template import loader
@@ -67,19 +64,9 @@ def respond(request, template, context=None, response_args=None):
   if response_args is None:
     response_args = {}
 
-  try:
-    response_args['content'] = response_args.get(
-        'content', loader.render_to_string(template, dictionary=context))
-    return http.HttpResponse(**response_args)
-  except DeadlineExceededError:
-    logging.exception('DeadlineExceededError')
-    return http.HttpResponse('DeadlineExceededError')
-  except MemoryError:
-    logging.exception('MemoryError')
-    return http.HttpResponse('MemoryError')
-  except AssertionError:
-    logging.exception('AssertionError')
-    return http.HttpResponse('AssertionError')
+  response_args['content'] = response_args.get(
+      'content', loader.render_to_string(template, dictionary=context))
+  return http.HttpResponse(**response_args)
 
 
 def getUniversalContext(request):
@@ -111,7 +98,8 @@ def getUniversalContext(request):
 
   if id:
     context['id'] = id
-    context['user'] = soc.logic.models.user.logic.getFromFields(email=id.email())
+    context['user'] = soc.logic.models.user.logic.getFromFields(
+        email=id.email())
     context['is_admin'] = id_user.isIdDeveloper(id=id)
 
   context['is_debug'] = system.isDebug()

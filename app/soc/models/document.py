@@ -38,14 +38,8 @@ class Document(soc.models.work.Work):
 
     work.title:  the title of the Document
 
-    work.abstract:  document summary displayed as a snippet in Document
-      list views
-
     work.reviews:  reviews of the Document by Reviewers
-  """
 
-  #: Required db.TextProperty containing the Document contents.
-  #: Unlike the work.abstract, which is considered "public" information,
-  #: the content is only to be displayed to Persons in Roles eligible to
-  #: view them (which may be anyone, for example, with the site front page).
-  content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
+    work.content:  the rich-text contents of the Document
+  """
+  pass

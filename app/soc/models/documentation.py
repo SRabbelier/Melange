@@ -38,19 +38,19 @@ class Documentation(soc.models.work.Work):
   The specific way that some properties and relations inherited from Work
   are used with a piece of Documentation are described below.
 
-  work.title: The title of the Documentation (e.g. "Verification
-    of Eligibility").
+    work.title: The title of the Documentation (e.g. "Verification
+      of Eligibility").
 
-  work.abstract: Summary of the contents of the 'attachment', or
-    just an indication that the required documentation was 
-    supplied but is not actually attached.
+    work.author: The author of the Work referred to by this 
+      relation is the Administrator (or Host) creating the
+      Documentation.
 
-  work.author: The author of the Work referred to by this 
-    relation is the Administrator (or Host) creating the
-    Documentation.
+    work.reviews: Annotations to the Documentation made by other
+      Administrators.
 
-  work.reviews: Annotations to the Documentation made by other
-    Administrators.
+    work.content: Summary of the contents of the 'attachment', or
+      just an indication that the required documentation was 
+      supplied but is not actually attached.
   """
 
   #: a many:1 relationship of Documentation entities that pertain

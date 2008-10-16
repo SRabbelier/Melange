@@ -24,26 +24,24 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.document
+import soc.models.work
 import soc.models.quiz
 import soc.models.response
 
 
-class Proposal(soc.models.document.Document):
+class Proposal(soc.models.work.Work):
   """Model of a Proposal, which is a specific form of a Work.
 
   The specific way that the properties and relations inherited from Work
   are used with a Proposal are described below.
 
-  work.title:  the title of the Proposal
+    work.title:  the title of the Proposal
 
-  work.abstract:  publicly displayed as a proposal abstract or summary
+    work.reviews:  reviews of the Proposal by Reviewers
 
-  work.reviews:  reviews of the Proposal by Reviewers
-
-  document.content:  the details of the Proposal; which, unlike work.abstract
-    is considered "public" information, the contents of a Proposal are only
-    displayed to Persons in Roles that have a "need to know" those details.
+    work.content:  the details of the Proposal; which, unlike work.abstract
+      is considered "public" information, the contents of a Proposal are only
+      displayed to Persons in Roles that have a "need to know" those details.
 
   A Proposal entity participates in the following relationships implemented 
   as a db.ReferenceProperty elsewhere in another db.Model:
@@ -52,6 +50,13 @@ class Proposal(soc.models.document.Document):
     Proposal as their foundation.  This relation is implemented as the
     'tasks' back-reference Query of the Task model 'proposal' reference.
   """
+  #: optional, indexed plain text field used for different purposes,
+  #: depending on the specific type of the work
+  abstract = db.StringProperty(multiline=True)
+  abstract.help_text = ugettext_lazy(
+      'short abstract, summary, or snippet;'
+      ' 500 characters or less, plain text displayed publicly')
+
   #: an optional many:1 relationship between Proposal and a Quiz that
   #: defines what Questions were added by the prospective Proposal Reviewer
   #: for the Proposal author to answer.

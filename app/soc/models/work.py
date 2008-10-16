@@ -56,13 +56,6 @@ class Work(polymodel.PolyModel):
   title.help_text = ugettext_lazy(
       'title of the document; often used in the window title')
 
-  #: optional, indexed plain text field used for different purposes,
-  #: depending on the specific type of the work
-  abstract = db.StringProperty(multiline=True)
-  abstract.help_text = ugettext_lazy(
-      'short abstract, summary, or snippet;'
-      ' 500 characters or less, plain text displayed publicly')
-
   #: Required path, prepended to a "link name" to form the document URL.
   #: The combined path and link name must be globally unique on the
   #: site.  Except in /site/docs (Developer) forms, this field is not
@@ -86,6 +79,11 @@ class Work(polymodel.PolyModel):
   short_name = db.StringProperty(verbose_name=ugettext_lazy('Short name'))
   short_name.help_text = ugettext_lazy(
       'short name used, for example, in the sidebar menu')
+
+  #: Required db.TextProperty containing the contents of the Work.
+  #: The content is only to be displayed to Persons in Roles eligible to
+  #: view them (which may be anyone, for example, with the site front page).
+  content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
   
   #: date when the work was created
   created = db.DateTimeProperty(auto_now_add=True)

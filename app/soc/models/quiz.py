@@ -27,11 +27,11 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext_lazy
 
 import soc.models.answer
-import soc.models.document
 import soc.models.question
+import soc.models.work
 
 
-class Quiz(soc.models.document.Document):
+class Quiz(soc.models.work.Work):
   """Model of a Quiz, a collection of Questions to be asked.
   
   (named Quiz because Questionnaire was too much to type...)
@@ -49,8 +49,6 @@ class Quiz(soc.models.document.Document):
 
     work.title:  the title of the Quiz
 
-    work.abstract:  summary displayed as a snippet in Quiz list views
-
     work.author:  the author of the Work referred to by this relation
       is the author of the Quiz (but not necessarily the individual
       Questions themselves, see the Question Model)
@@ -61,7 +59,7 @@ class Quiz(soc.models.document.Document):
     work.partial_path/work.link_name: used to scope and uniquely identify
       a Quiz in the same way these properties are used with Documents, etc.
 
-    document.content:  the "preface" of the Quiz, displayed before any
+    work.content:  the "preface" of the Quiz, displayed before any
       of the Questions, usually containing instructions for the Quiz
 
   In addition to any explicit ReferenceProperties in the Quiz Model and

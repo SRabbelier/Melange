@@ -23,12 +23,7 @@ limitations under the License.
 
 {% block body %}
 <div id="createdon">Created on: {{ document.created }}</div>
-{% if document.abstract %}
-<div id="docsummary">
-<h2>Summary</h2>
-{{ document.abstract }}
-</div>
-{% endif %}
+<div id="createdby">Created on: {{ document.author.nick_name }}</div>
 {{ document.content|safe }}
 <div id="lastmodified">Last updated on: {{ document.modified }}</div>
 {% endblock %}

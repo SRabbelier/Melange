@@ -37,8 +37,6 @@ class Question(soc.models.work.Work):
     work.title:  the title of the Question, used for finding the
       Question in a list of Questions
 
-    work.abstract:  the Question text, asked to the respondent
-
     work.author:  the author of the Work referred to by this relation
       is the original author of the actual Question, regardless of
       which Quizzes might incorporate the Question
@@ -54,6 +52,8 @@ class Question(soc.models.work.Work):
       work.partial_path, *uniquely* identify) a Question in the same way
       these properties are used with Documents, etc.
       
+    work.content:  the Question text, asked to the respondent
+
   In addition to any explicit ReferenceProperties in the Question Model
   and those inherited as described above, a Question entity participates
   in these relationships:

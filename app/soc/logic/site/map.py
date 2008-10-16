@@ -187,7 +187,7 @@ site_docs_create = page.Page(
     r'^site/docs/edit$',
     'soc.views.site.docs.edit.create'),
   'Site: Create New Document',
-  'Create new Site Document',
+  'Create Site Document',
   parent=site_docs_sub_menu)
 
 site_docs_edit = page.Page(
@@ -240,7 +240,7 @@ site_sponsor_create = page.Page(
     r'^site/sponsor/profile$',
     'soc.views.site.sponsor.profile.create'),
   'Site: Create New Sponsor',
-  short_name='Create New Site Sponsor',
+  short_name='Create Site Sponsor',
   parent=site_sponsor_sub_menu)
 
 site_sponsor_delete = page.Page(

@@ -54,12 +54,14 @@ class EditForm(helper.forms.DbModelForm):
     exclude = ['user']
 
 
-def edit(request, program=None, link_name=None,
+def edit(request, page=None, program=None, link_name=None,
          template='soc/person/profile/edit.html'):
   """View for a Person to modify the properties of a Person Model.
 
   Args:
     request: the standard django request object.
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the template path to use for rendering the template.
 
   Returns:

@@ -82,11 +82,14 @@ SUBMIT_PROFILE_SAVED_PARAMS = {
   SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
 }
 
-def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
+def edit(request, page=None, link_name=None, 
+         template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template
 
@@ -101,7 +104,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
   if (not id) and (not link_name):
     # not logged in, and no link name, so request that the user sign in 
-    return simple.requestLogin(request, template, context,
+    return simple.requestLogin(request, template, context, page=page,
         # TODO(tlarsen): /user/profile could be a link to a help page instead
         login_message_fmt='To create a new'
                           ' <a href="/user/profile">User Profile</a>'
@@ -110,7 +113,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
 
   if (not id) and link_name:
     # not logged in, so show read-only public profile for link_name user
-    return simple.public(request, template, link_name, context)
+    return simple.public(request, template, link_name, context, page)
 
   link_name_user = None
 
@@ -120,13 +123,13 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
         link_name_user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
   
   # link_name_user will be None here if link name was already None...
   if link_name_user and (link_name_user.id != id):
     # link_name_user exists but is not the currently logged in Google Account,
     # so show public view for that (other) User entity
-    return simple.public(request, template, link_name, context)
+    return simple.public(request, template, link_name, context, page)
 
   if request.method == 'POST':
     form = UserForm(request.POST)
@@ -178,7 +181,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-def create(request, template=DEF_USER_PROFILE_EDIT_TMPL):
+def create(request, page=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, link_name=None, template=template)
+  return edit(request, page, link_name=None, template=template)

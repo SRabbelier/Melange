@@ -108,11 +108,13 @@ class CreateForm(helper.forms.DbModelForm):
 
 DEF_SITE_DOCS_CREATE_TMPL = 'soc/site/docs/edit.html'
 
-def create(request, template=DEF_SITE_DOCS_CREATE_TMPL):
+def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
   """View for a Developer to create a new Document entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -164,12 +166,14 @@ class EditForm(CreateForm):
                                       required=False)
 
 
-def edit(request, partial_path=None, link_name=None,
+def edit(request, page=None, partial_path=None, link_name=None,
          template=DEF_SITE_DOCS_EDIT_TMPL):
   """View for a Developer to modify the properties of a Document Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     partial_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_name
     link_name: the last portion of the Document's site-unique "path"
@@ -202,7 +206,7 @@ def edit(request, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
 
   if request.method == 'POST':
     form = EditForm(request.POST)
@@ -267,12 +271,14 @@ def edit(request, partial_path=None, link_name=None,
   return helper.responses.respond(request, template, context)
 
 
-def delete(request, partial_path=None, link_name=None,
+def delete(request, page=None, partial_path=None, link_name=None,
            template=DEF_SITE_DOCS_EDIT_TMPL):
   """Request handler for a Developer to delete Document Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     partial_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_name
     link_name: the last portion of the Document's site-unique "path"
@@ -304,7 +310,7 @@ def delete(request, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
 
   if existing_doc:
     document.logic.delete(existing_doc)

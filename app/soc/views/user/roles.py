@@ -33,12 +33,14 @@ from django import http
 from soc.views.helpers import response_helpers
 
 
-def dashboard(request, link_name=None,
+def dashboard(request, page=None, link_name=None,
               template='soc/user/roles/dashboard.html'):
   """A per-User dashboard of that User's Roles on the site.
 
   Args:
     request: the standard django request object.
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template.
 
@@ -60,12 +62,14 @@ def dashboard(request, link_name=None,
       template, {'template': template})
 
 
-def public(request, link_name=None,
+def public(request, page=None, link_name=None,
            template='soc/user/roles/public.html'):
   """A "general public" view of a User's Roles on the site.
 
   Args:
     request: the standard django request object.
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
     template: the template path to use for rendering the template.
 

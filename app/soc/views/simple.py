@@ -35,7 +35,7 @@ import soc.views.helper.templates
 
 
 def public(request, template='soc/base.html', link_name=None,
-                         context=None):
+           context=None, page=None):
   """A simple template view that expects a link_name extracted from the URL.
 
   Args:
@@ -44,10 +44,12 @@ def public(request, template='soc/base.html', link_name=None,
       of templates)
     link_name: a site-unique "link_name" (usually extracted from the URL)
     context: the context dict supplied to the template, which is modified
-        (so supply a copy if such modification is not acceptable)
-      link_name: the link_name parameter is added to the context
-      link_name_user: if the link_name exists for a User, that User
-        is added to the context
+      (so supply a copy if such modification is not acceptable)
+    link_name: the link_name parameter is added to the context
+    link_name_user: if the link_name exists for a User, that User
+      is added to the context
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
 
   Returns:
     A subclass of django.http.HttpResponse containing the generated page.
@@ -62,7 +64,7 @@ def public(request, template='soc/base.html', link_name=None,
     if link_name:
       user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
-    return errorResponse(request, error, template, context)
+    return errorResponse(request, error, template, context, page)
 
   context['link_name'] = link_name
   context['link_name_user'] = user
@@ -73,7 +75,7 @@ def public(request, template='soc/base.html', link_name=None,
 DEF_ERROR_TMPL = 'soc/error.html'
 
 
-def errorResponse(request, error, template, context):
+def errorResponse(request, error, template, context, page=None):
   """Displays an error page for an out_of_band.ErrorResponse exception.
   
   Args:
@@ -82,10 +84,12 @@ def errorResponse(request, error, template, context):
     template: the "sibling" template (or a search list of such templates)
       from which to construct the error.html template name (or names)
     context: the context dict supplied to the template, which is modified
-        (so supply a copy if such modification is not acceptable)
-      error_message: the error message string from error.message
-      error_status: error.response_args['status'], or None if a status code
-        was not supplied to the ErrorResponse
+      (so supply a copy if such modification is not acceptable)
+    error_message: the error message string from error.message
+    error_status: error.response_args['status'], or None if a status code
+      was not supplied to the ErrorResponse
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
   """
 
   if not context:
@@ -106,7 +110,8 @@ DEF_LOGIN_TMPL = 'soc/login.html'
 DEF_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
-def requestLogin(request, template, context=None, login_message_fmt=None):
+def requestLogin(request, template, context=None, login_message_fmt=None,
+                 page=None):
   """Displays a login request page with custom message and login link.
   
   Args:
@@ -118,9 +123,11 @@ def requestLogin(request, template, context=None, login_message_fmt=None):
       named format specifiers for any of the keys in context, but should at
       least contain %(sign_in)s
     context: the context dict supplied to the template, which is modified
-        (so supply a copy if such modification is not acceptable); 
-      login_message: the caller can completely construct the message supplied
-        to the login template in lieu of using login_message_fmt
+      (so supply a copy if such modification is not acceptable)
+    login_message: the caller can completely construct the message supplied
+      to the login template in lieu of using login_message_fmt
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
   """
 
   if not context:

@@ -38,11 +38,13 @@ import soc.views.helper.templates
 
 DEF_SITE_HOME_PUBLIC_TMPL = 'soc/site/home/public.html'
 
-def public(request, template=DEF_SITE_HOME_PUBLIC_TMPL):
+def public(request, page=None, template=DEF_SITE_HOME_PUBLIC_TMPL):
   """How the "general public" sees the Melange site home page.
 
   Args:
     request: the standard django request object.
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the template path to use for rendering the template.
 
   Returns:

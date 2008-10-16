@@ -94,11 +94,13 @@ class LookupForm(helper.forms.DbModelForm):
 
 DEF_SITE_USER_PROFILE_LOOKUP_TMPL = 'soc/site/user/profile/lookup.html'
 
-def lookup(request, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
+def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   """View for a Developer to look up a User Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -248,11 +250,13 @@ DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           ' <a href="/site/user/profile">Create ' \
                           'a New User</a> page.'
 
-def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
+def edit(request, page=None, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
@@ -279,7 +283,7 @@ def edit(request, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_USER_MSG
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
 
 
   if request.method == 'POST':
@@ -397,11 +401,13 @@ class CreateForm(helper.forms.DbModelForm):
 
 DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/site/user/profile/edit.html'
 
-def create(request, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
+def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
   """View for a Developer to create a new User Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 

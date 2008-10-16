@@ -37,8 +37,19 @@ import soc.views.out_of_band
 
 DEF_SITE_SPONSOR_LIST_ALL_TMPL = 'soc/group/list/all.html'
 
-def all(request, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
+def all(request, page=None, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
   """Show a list of all Sponsors (limit rows per page).
+  
+  Args:
+    request: the standard Django HTTP request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct an alternate template name (or names)
+
+  Returns:
+    A subclass of django.http.HttpResponse which either contains the form to
+    be filled out, or a redirect to the correct view in the interface.
   """
 
   try:

@@ -95,11 +95,13 @@ class SiteSettingsForm(helper.forms.DbModelForm):
 
 DEF_SITE_HOME_EDIT_TMPL = 'soc/site/settings/edit.html'
 
-def edit(request, template=DEF_SITE_HOME_EDIT_TMPL):
+def edit(request, page=None, template=DEF_SITE_HOME_EDIT_TMPL):
   """View for Developer to edit content of Melange site home page.
 
   Args:
     request: the standard django request object.
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the template path to use for rendering the template.
 
   Returns:

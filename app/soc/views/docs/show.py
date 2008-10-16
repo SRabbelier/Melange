@@ -36,12 +36,14 @@ import soc.views.helper.templates
 
 DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
 
-def public(request, partial_path=None, link_name=None,
+def public(request, page=None, partial_path=None, link_name=None,
            template=DEF_DOCS_PUBLIC_TMPL):
   """How the "general public" sees a Document.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     partial_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_name
     link_name: the last portion of the Document's site-unique "path"
@@ -75,7 +77,7 @@ def public(request, partial_path=None, link_name=None,
                                          link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when Document path doesn't exist in Datastore
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
 
   doc.content = helper.templates.unescape(doc.content)
   context['document'] = doc

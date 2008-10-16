@@ -88,11 +88,13 @@ DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           ' <a href="/site/sponsor/profile">Create ' \
                           'a New Sponsor</a> page.'
 
-def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a Sponsor Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the Sponsor's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
@@ -121,7 +123,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
      
   if request.method == 'POST':
     if existing_sponsor:
@@ -137,7 +139,7 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
         if sponsor_form.cleaned_data.get('link_name') != link_name:
           msg = DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG
           error = out_of_band.ErrorResponse(msg)
-          return simple.errorResponse(request, error, template, context)
+          return simple.errorResponse(request, error, template, context, page)
       
       fields = {}      
       
@@ -199,17 +201,19 @@ def edit(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
 
 DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 
-def create(request, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
+def create(request, page=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, link_name=None, template=template)
+  return edit(request, page, link_name=None, template=template)
 
 
-def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
+def delete(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """Request handler for a Developer to delete Sponsor Model entity.
 
   Args:
     request: the standard django request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     link_name: the Sponsor's site-unique "link_name" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
@@ -235,7 +239,7 @@ def delete(request, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, error, template, context)
+    return simple.errorResponse(request, error, template, context, page)
 
   if existing_sponsor:
     # TODO(pawel.solyga): Create specific delete method for Sponsor model

@@ -18,17 +18,17 @@ limitations under the License.
 {% endblock %}
 
 {% block page_title %}
-{% if existing_group %}
-Site: Modify Existing {{ group_type }}
+{% if existing_entity %}
+Site: Modify Existing {{ entity_type }}
 {% else %}
-Site: Create New {{ group_type }}
+Site: Create New {{ entity_type }}
 {% endif %}
 {% endblock %}
 {% block header_title %}
-{% if existing_group %}
-Modify Existing {{ group_type }}
+{% if entity %}
+Modify Existing {{ entity_type }}
 {% else %}
-Create a New {{ group_type }}
+Create a New {{ entity_type }}
 {% endif %}
 {% endblock %}
 
@@ -36,7 +36,7 @@ Create a New {{ group_type }}
 <p>
 <p>
 {% block instructions %}
-Please use this form to alter {{ group_type }} details.
+Please use this form to alter {{ entity_type }} details.
 {% endblock %}
 </p>
 <form method="POST">

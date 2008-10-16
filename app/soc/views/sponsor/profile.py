@@ -59,7 +59,7 @@ def public(request, page=None, link_name=None,
   link_name_sponsor.description = \
       helper.templates.unescape(link_name_sponsor.description)
   
-  context.update({'link_name_group': link_name_sponsor,
-                  'group_type': 'Sponsor'})
+  context.update({'entity': link_name_sponsor,
+                  'entity_type': 'Sponsor'})
 
   return helper.responses.respond(request, template, context)

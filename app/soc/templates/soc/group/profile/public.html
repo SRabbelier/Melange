@@ -13,22 +13,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
-{% block page_title %}{{ group_type }} Public Profile{% endblock %}
+{% block page_title %}{{ entity_type }} Public Profile{% endblock %}
 {% block header_title %}
-{{ group_type }} Public Profile for {{ link_name_group.name }}
+{{ entity_type }} Public Profile for {{ entity.name }}
 {% endblock %}
 {% block body %}
 <p>
  <table>
-  {% readonly_field_as_table_row link_name_group.fields.name.label link_name_group.name %}
-  {% readonly_field_as_table_row link_name_group.fields.home_page.label link_name_group.home_page %}
-  {% readonly_field_as_table_row link_name_group.fields.description.label link_name_group.description %}
-  {% readonly_field_as_table_row link_name_group.fields.street.label link_name_group.street %}
-  {% readonly_field_as_table_row link_name_group.fields.city.label link_name_group.city %}
-  {% readonly_field_as_table_row link_name_group.fields.state.label link_name_group.state %}
-  {% readonly_field_as_table_row link_name_group.fields.country.label link_name_group.country %}
-  {% readonly_field_as_table_row link_name_group.fields.postalcode.label link_name_group.postalcode %}
-  {% readonly_field_as_table_row link_name_group.fields.phone.label link_name_group.phone %}
+  {% readonly_field_as_table_row entity.fields.name.label entity.name %}
+  {% readonly_field_as_table_row entity.fields.home_page.label entity.home_page %}
+  {% readonly_field_as_table_row entity.fields.description.label entity.description %}
+  {% readonly_field_as_table_row entity.fields.street.label entity.street %}
+  {% readonly_field_as_table_row entity.fields.city.label entity.city %}
+  {% readonly_field_as_table_row entity.fields.state.label entity.state %}
+  {% readonly_field_as_table_row entity.fields.country.label entity.country %}
+  {% readonly_field_as_table_row entity.fields.postalcode.label entity.postalcode %}
+  {% readonly_field_as_table_row entity.fields.phone.label entity.phone %}
  </table>
 </p>
 {% endblock %}

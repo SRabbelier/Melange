@@ -192,9 +192,9 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_E
       sponsor_form = CreateForm()
     
   context.update({'form': sponsor_form,
-                  'existing_group':  existing_sponsor,
-                  'group_type': 'Sponsor',
-                  'group_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
+                  'entity':  existing_sponsor,
+                  'entity_type': 'Sponsor',
+                  'entity_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
 
   return helper.responses.respond(request, template, context)
 

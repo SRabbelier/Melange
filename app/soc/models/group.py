@@ -37,6 +37,9 @@ class Group(polymodel.PolyModel):
   """Common data fields for all groups.
   """
 
+  #: Defines which fields are uses as the key_name
+  key_fields = ['link_name']
+
   #: Required field storing name of the group.
   name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Name'))

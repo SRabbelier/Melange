@@ -118,6 +118,22 @@ class Logic():
 
     return self._keyName(**kwargs)
 
+  def extractKeyFields(self, fields):
+    """Extracts all the fields from that are in the mode's key_fields property
+
+    Args:
+      fields: A dict from which the fields should be extracted
+    """
+
+    key_fields = {}
+    keys = fields.keys()
+
+    for key in keys[:]:
+      if key in self._model.key_fields:
+        key_fields[key] = fields[key]
+
+    return key_fields
+
   def getForLimitAndOffset(self, limit, offset=0):
     """Returns entities for given offset and limit or None if not found.
 
@@ -199,7 +215,15 @@ class Logic():
     key_name  = self.getKeyNameForFields(**kwargs)
 
     return self.updateOrCreateFromKeyName(properties, key_name)
-  
+
+  def isDeletable(self, entity):
+    """Returns whether the specified entity can be deleted
+    """
+
+    # TODO(pawel.solyga): Create specific delete method for Sponsor model
+    # Check if Sponsor can be deleted (has no Hosts and Programs)
+    return True
+
   def delete(self, entity):
     """Delete existing entity from datastore.
     

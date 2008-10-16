@@ -83,7 +83,7 @@ class Logic():
       * Entity for supplied fields
 
     Raises:
-      out_of_band.ErrorResponse if link name is not false, but no Sponsor entity
+      out_of_band.ErrorResponse if link name is not false, but no entity
       with the supplied link name exists in the Datastore
     """
 
@@ -94,7 +94,7 @@ class Logic():
     entity = self.getFromFields(**kwargs)
 
     if entity:
-      # a Sponsor exist for this link_name, so return that Sponsor entity
+      # an entity exist for this link_name, so return that entity
       return entity
 
     fields = []
@@ -187,7 +187,7 @@ class Logic():
       entity = self._model.get_or_insert(key_name, **properties)
 
     # there is no way to be sure if get_or_insert() returned a new entity or
-    # got an existing one due to a race, so update with sponsor_properties anyway,
+    # got an existing one due to a race, so update with properties anyway,
     # in a transaction
     return self.updateModelProperties(entity, **properties)
 

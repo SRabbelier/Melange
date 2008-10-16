@@ -23,7 +23,7 @@ limitations under the License.
 
 {% block body %}
 <div id="createdon">Created on: {{ document.created }}</div>
-<div id="createdby">Created on: {{ document.author.nick_name }}</div>
-{{ document.content|safe }}
+<div id="createdby">Created by: {{ document.author.nick_name }}</div>
+<div id="content">{{ document.content|safe }}</div>
 <div id="lastmodified">Last updated on: {{ document.modified }}</div>
 {% endblock %}

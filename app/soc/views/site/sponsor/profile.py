@@ -123,7 +123,7 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_E
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
      
   if request.method == 'POST':
     if existing_sponsor:
@@ -139,7 +139,7 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE_E
         if sponsor_form.cleaned_data.get('link_name') != link_name:
           msg = DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG
           error = out_of_band.ErrorResponse(msg)
-          return simple.errorResponse(request, error, template, context, page)
+          return simple.errorResponse(request, page, error, template, context)
       
       fields = {}      
       
@@ -239,7 +239,7 @@ def delete(request, page=None, link_name=None, template=DEF_SITE_SPONSOR_PROFILE
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
 
   if existing_sponsor:
     # TODO(pawel.solyga): Create specific delete method for Sponsor model

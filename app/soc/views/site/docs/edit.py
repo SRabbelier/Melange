@@ -206,7 +206,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
 
   if request.method == 'POST':
     form = EditForm(request.POST)
@@ -310,7 +310,7 @@ def delete(request, page=None, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
 
   if existing_doc:
     document.logic.delete(existing_doc)

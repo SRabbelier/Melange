@@ -283,7 +283,7 @@ def edit(request, page=None, link_name=None, template=DEF_SITE_USER_PROFILE_EDIT
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_USER_MSG
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
 
 
   if request.method == 'POST':

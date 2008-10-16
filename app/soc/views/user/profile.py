@@ -104,7 +104,7 @@ def edit(request, page=None, link_name=None,
 
   if (not id) and (not link_name):
     # not logged in, and no link name, so request that the user sign in 
-    return simple.requestLogin(request, template, context, page=page,
+    return simple.requestLogin(request, page, template, context,
         # TODO(tlarsen): /user/profile could be a link to a help page instead
         login_message_fmt='To create a new'
                           ' <a href="/user/profile">User Profile</a>'
@@ -113,7 +113,8 @@ def edit(request, page=None, link_name=None,
 
   if (not id) and link_name:
     # not logged in, so show read-only public profile for link_name user
-    return simple.public(request, template, link_name, context, page)
+    return simple.public(request, page=page, template=template, 
+                         link_name=link_name, context=context)
 
   link_name_user = None
 
@@ -123,13 +124,14 @@ def edit(request, page=None, link_name=None,
         link_name_user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
   
   # link_name_user will be None here if link name was already None...
   if link_name_user and (link_name_user.id != id):
     # link_name_user exists but is not the currently logged in Google Account,
     # so show public view for that (other) User entity
-    return simple.public(request, template, link_name, context, page)
+    return simple.public(request, page=page, template=template, 
+                         link_name=link_name, context=context)
 
   if request.method == 'POST':
     form = UserForm(request.POST)

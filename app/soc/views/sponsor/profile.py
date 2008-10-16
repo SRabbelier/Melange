@@ -54,7 +54,7 @@ def public(request, page=None, link_name=None,
     link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
-    return simple.errorResponse(request, error, template, context, page)
+    return simple.errorResponse(request, page, error, template, context)
 
   link_name_sponsor.description = \
       helper.templates.unescape(link_name_sponsor.description)

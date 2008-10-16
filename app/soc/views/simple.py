@@ -34,12 +34,16 @@ import soc.views.helper.responses
 import soc.views.helper.templates
 
 
-def public(request, template='soc/base.html', link_name=None,
-           context=None, page=None):
+DEF_PUBLIC_TMPL = 'soc/base.html'
+
+def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
+           context=None):
   """A simple template view that expects a link_name extracted from the URL.
 
   Args:
     request: the standard Django HTTP request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the template to use for rendering the view (or a search list
       of templates)
     link_name: a site-unique "link_name" (usually extracted from the URL)
@@ -48,8 +52,7 @@ def public(request, template='soc/base.html', link_name=None,
     link_name: the link_name parameter is added to the context
     link_name_user: if the link_name exists for a User, that User
       is added to the context
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+
 
   Returns:
     A subclass of django.http.HttpResponse containing the generated page.
@@ -64,7 +67,7 @@ def public(request, template='soc/base.html', link_name=None,
     if link_name:
       user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
-    return errorResponse(request, error, template, context, page)
+    return errorResponse(request, page, error, template, context)
 
   context['link_name'] = link_name
   context['link_name_user'] = user
@@ -74,12 +77,13 @@ def public(request, template='soc/base.html', link_name=None,
 
 DEF_ERROR_TMPL = 'soc/error.html'
 
-
-def errorResponse(request, error, template, context, page=None):
+def errorResponse(request, page, error, template, context):
   """Displays an error page for an out_of_band.ErrorResponse exception.
   
   Args:
     request: the standard Django HTTP request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     error: an out_of_band.ErrorResponse exception
     template: the "sibling" template (or a search list of such templates)
       from which to construct the error.html template name (or names)
@@ -88,8 +92,7 @@ def errorResponse(request, error, template, context, page=None):
     error_message: the error message string from error.message
     error_status: error.response_args['status'], or None if a status code
       was not supplied to the ErrorResponse
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+
   """
 
   if not context:
@@ -110,12 +113,13 @@ DEF_LOGIN_TMPL = 'soc/login.html'
 DEF_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
-def requestLogin(request, template, context=None, login_message_fmt=None,
-                 page=None):
+def requestLogin(request, page, template, context=None, login_message_fmt=None):
   """Displays a login request page with custom message and login link.
   
   Args:
     request: the standard Django HTTP request object
+    page: a soc.logic.site.page.Page object which is abstraction that combines 
+      a Django view with sidebar menu info
     template: the "sibling" template (or a search list of such templates)
       from which to construct the login.html template name (or names)
     login_message_fmt: a custom message format string used to create a
@@ -126,8 +130,7 @@ def requestLogin(request, template, context=None, login_message_fmt=None,
       (so supply a copy if such modification is not acceptable)
     login_message: the caller can completely construct the message supplied
       to the login template in lieu of using login_message_fmt
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+
   """
 
   if not context:

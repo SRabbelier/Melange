@@ -117,7 +117,7 @@ def edit(request, link_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   # try to fetch User entity corresponding to link_name if one exists
   try:
       if link_name:
-        link_name_user = id_user.getUserFromLinkNameOrDie(link_name)
+        link_name_user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     return simple.errorResponse(request, error, template, context)

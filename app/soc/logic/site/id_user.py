@@ -141,7 +141,7 @@ def getUserFromLinkName(link_name):
   return soc.models.user.User.gql('WHERE link_name = :1', link_name).get()
 
 
-def getUserFromLinkNameOrDie(link_name):
+def getUserFromLinkNameOr404(link_name):
   """Like getUserFromLinkName but expects to find a user
 
   Raises:

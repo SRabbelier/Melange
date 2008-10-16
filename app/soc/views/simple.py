@@ -60,7 +60,7 @@ def public(request, template='soc/base.html', link_name=None,
 
   try:
     if link_name:
-      user = id_user.getUserFromLinkNameOrDie(link_name)
+      user = id_user.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     return errorResponse(request, error, template, context)
 

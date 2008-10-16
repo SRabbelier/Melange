@@ -105,13 +105,37 @@ site_settings_edit = page.Page(
   parent=home)
 
 # Site User Profile views
+site_user_sub_menu = page.Page(
+  page.Url(
+    # not a real Django URL regex, just a unique placeholder
+    # (this can be any unique string that re.compile() will not reject, but
+    # that also contains characters that would be escaped, causing
+    # soc.logic.site.page.Page.makeLinkUrl() to reject it and not make the
+    # menu item into an <A HREF> link; this seems a bit hacky...)
+    #
+    # TODO(tlarsen): formalize this hack by subclassing Page (maybe calling
+    #   it something like NonPage) to add a non-linkable form of page for
+    #   use in dividers just like this
+    # TODO(tlarsen): add an optional keyword parameter that can be used to
+    #   control where the collapsible sub-menus are and whether they are
+    #   collapsed or not by default in the sidebar menu 
+    'site*user*sub*menu',
+    # no view, since this is just a link-less menu divider
+    # (this page will not be placed in urlpatterns)
+    None,
+    # name is alternate string for view when it is not unique
+    name='site-user-sub-menu'),
+  '',
+  short_name='Site Users',
+  parent=site_settings_edit)
+
 site_user_lookup = page.Page(
   page.Url(
     r'^site/user/lookup$',
     'soc.views.site.user.profile.lookup'),
   'Site: Look Up an Existing User',
   short_name='Look Up Site User',
-  parent=site_settings_edit)
+  parent=site_user_sub_menu)
 
 site_user_create = page.Page(
   page.Url(
@@ -119,7 +143,7 @@ site_user_create = page.Page(
     'soc.views.site.user.profile.create'),
   'Site: Create New User Profile',
   short_name='Create Site User',
-  parent=site_settings_edit)
+  parent=site_user_sub_menu)
 
 site_user_edit = page.Page(
   page.Url(
@@ -127,7 +151,7 @@ site_user_edit = page.Page(
     'soc.views.site.user.profile.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
-  parent=site_settings_edit)
+  parent=site_user_sub_menu)
 
 site_user_list = page.Page(
   page.Url(
@@ -135,7 +159,7 @@ site_user_list = page.Page(
     'soc.views.site.user.list.all'),
   'Site: List of Users',
   short_name='List Site Users',
-  parent=site_settings_edit)
+  parent=site_user_sub_menu)
 
 # Document views
 docs_show = page.Page(
@@ -146,13 +170,25 @@ docs_show = page.Page(
   parent=home)
  
 # Site Document views
+site_docs_sub_menu = page.Page(
+  page.Url(
+    # (see site_user_sub_menu above for how this works...) 
+    'site*docs*sub*menu',
+    # no view, since this is just a link-less menu divider
+    None,
+    # name is alternate string for view when it is not unique
+    name='site-docs-sub-menu'),
+  '',
+  short_name='Site Documents',
+  parent=site_settings_edit)
+
 site_docs_create = page.Page(
   page.Url(
     r'^site/docs/edit$',
     'soc.views.site.docs.edit.create'),
   'Site: Create New Document',
   'Create new Site Document',
-  parent=site_settings_edit)
+  parent=site_docs_sub_menu)
 
 site_docs_edit = page.Page(
   page.Url(
@@ -160,7 +196,7 @@ site_docs_edit = page.Page(
     'soc.views.site.docs.edit.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
-  parent=site_settings_edit)
+  parent=site_docs_sub_menu)
 
 site_docs_delete = page.Page(
   page.Url(
@@ -168,7 +204,7 @@ site_docs_delete = page.Page(
     'soc.views.site.docs.edit.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
-  parent=site_settings_edit)
+  parent=site_docs_sub_menu)
 
 site_docs_list = page.Page(
   page.Url(
@@ -176,7 +212,7 @@ site_docs_list = page.Page(
     'soc.views.site.docs.list.all'),
   'Site: List of Documents',
   short_name='List Site Documents',
-  parent=site_settings_edit)
+  parent=site_docs_sub_menu)
 
 # Sponsor Group public view
 sponsor_profile = page.Page(
@@ -187,13 +223,25 @@ sponsor_profile = page.Page(
   parent=home)
     
 # Sponsor Group Site views
+site_sponsor_sub_menu = page.Page(
+  page.Url(
+    # (see site_user_sub_menu above for how this works...) 
+    'site*sponsor*sub*menu',
+    # no view, since this is just a link-less menu divider
+    None,
+    # name is alternate string for view when it is not unique
+    name='site-sponsor-sub-menu'),
+  '',
+  short_name='Site Sponsors',
+  parent=site_settings_edit)
+
 site_sponsor_create = page.Page(
   page.Url(
     r'^site/sponsor/profile$',
     'soc.views.site.sponsor.profile.create'),
   'Site: Create New Sponsor',
   short_name='Create New Site Sponsor',
-  parent=site_settings_edit)
+  parent=site_sponsor_sub_menu)
 
 site_sponsor_delete = page.Page(
   page.Url(
@@ -201,7 +249,7 @@ site_sponsor_delete = page.Page(
     'soc.views.site.sponsor.profile.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
-  parent=site_settings_edit)
+  parent=site_sponsor_sub_menu)
 
 site_sponsor_edit = page.Page(
   page.Url(
@@ -209,7 +257,7 @@ site_sponsor_edit = page.Page(
     'soc.views.site.sponsor.profile.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
-  parent=site_settings_edit)
+  parent=site_sponsor_sub_menu)
 
 site_sponsor_list = page.Page(
   page.Url(
@@ -217,7 +265,7 @@ site_sponsor_list = page.Page(
     'soc.views.site.sponsor.list.all'),
   'Site: List of Sponsors',
   short_name='List Site Sponsors',
-  parent=site_settings_edit)
+  parent=site_sponsor_sub_menu)
 
 
 # these are not really used...

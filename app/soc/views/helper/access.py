@@ -74,10 +74,10 @@ def checkIsLoggedIn(request):
   if users.get_current_user():
     return
 
-  login_request = requestLogin(request, DEF_LOGIN_TMPL,
+  login_response = requestLogin(request, DEF_LOGIN_TMPL,
                                login_message_fmt=DEF_LOGIN_MSG_FMT)
 
-  raise soc.views.out_of_band.AccessViolationResponse(login_request)
+  raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
 
 def checkIsUser(request):
@@ -103,10 +103,10 @@ def checkIsUser(request):
   if user:
     return
 
-  login_request = requestLogin(request, DEF_LOGIN_TMPL,
+  login_response = requestLogin(request, DEF_LOGIN_TMPL,
                                login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
-  raise soc.views.out_of_band.AccessViolationResponse(login_request)
+  raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
 
 def checkIsDeveloper(request):
@@ -135,10 +135,10 @@ def checkIsDeveloper(request):
       'role' : 'a site developer ',
       }
 
-  login_request = requestLogin(request, DEF_LOGIN_TMPL,
+  login_response = requestLogin(request, DEF_LOGIN_TMPL,
                                login_message_fmt=login_message_fmt)
 
-  raise soc.views.out_of_band.AccessViolationResponse(login_request)
+  raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
 
 def checkIsHost(request, program):
@@ -168,7 +168,7 @@ def checkIsHost(request, program):
       'role' : 'a host for this program',
       }
 
-  login_request = requestLogin(request, DEF_LOGIN_TMPL,
+  login_response = requestLogin(request, DEF_LOGIN_TMPL,
                                login_message_fmt=login_message_fmt)
 
-  raise soc.views.out_of_band.AccessViolationResponse(login_request)
+  raise soc.views.out_of_band.AccessViolationResponse(login_response)

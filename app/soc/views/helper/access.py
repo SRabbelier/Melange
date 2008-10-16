@@ -75,7 +75,7 @@ def checkIsLoggedIn(request):
     return
 
   login_response = requestLogin(request, DEF_LOGIN_TMPL,
-                               login_message_fmt=DEF_LOGIN_MSG_FMT)
+                                login_message_fmt=DEF_LOGIN_MSG_FMT)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
@@ -104,7 +104,7 @@ def checkIsUser(request):
     return
 
   login_response = requestLogin(request, DEF_LOGIN_TMPL,
-                               login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
+                                login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
@@ -136,7 +136,7 @@ def checkIsDeveloper(request):
       }
 
   login_response = requestLogin(request, DEF_LOGIN_TMPL,
-                               login_message_fmt=login_message_fmt)
+                                login_message_fmt=login_message_fmt)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
@@ -169,6 +169,6 @@ def checkIsHost(request, program):
       }
 
   login_response = requestLogin(request, DEF_LOGIN_TMPL,
-                               login_message_fmt=login_message_fmt)
+                                login_message_fmt=login_message_fmt)
 
   raise soc.views.out_of_band.AccessViolationResponse(login_response)

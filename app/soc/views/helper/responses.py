@@ -26,6 +26,7 @@ __authors__ = [
 import logging
 
 from google.appengine.api import users
+from google.appengine.runtime import DeadlineExceededError
 
 from django import http
 from django.template import loader
@@ -39,15 +40,6 @@ from soc.views.helper import html_menu
 import soc.logic
 import soc.logic.models.user
 import soc.views.helper.requests
-
-
-# DeadlineExceededError can live in two different places
-try:
-  # When deployed
-  from google.appengine.runtime import DeadlineExceededError
-except ImportError:
-  # In the development server
-  from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 
 
 def respond(request, template, context=None, response_args=None):

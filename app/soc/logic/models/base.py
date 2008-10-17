@@ -208,7 +208,7 @@ class Logic():
     return self.updateModelProperties(entity, **properties)
 
   def updateOrCreateFromFields(self, properties, **kwargs):
-    """Like updateOrCreateFromKeyName, but resolves **kwargs to a key_name first
+    """Like updateOrCreateFromKeyName, but resolves **kwargs to a key_name first.
     """
 
     # attempt to retrieve the existing entity
@@ -217,11 +217,12 @@ class Logic():
     return self.updateOrCreateFromKeyName(properties, key_name)
 
   def isDeletable(self, entity):
-    """Returns whether the specified entity can be deleted
+    """Returns whether the specified entity can be deleted.
+    
+    Args:
+      entity: an existing entity in datastore
     """
-
-    # TODO(pawel.solyga): Create specific delete method for Sponsor model
-    # Check if Sponsor can be deleted (has no Hosts and Programs)
+    
     return True
 
   def delete(self, entity):

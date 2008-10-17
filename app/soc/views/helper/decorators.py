@@ -34,9 +34,9 @@ from django import http
 def view(func):
   """Decorator that insists that exceptions are handled by view."""
   @wraps(func)
-  def view_wrapper(request, *args, **kwds):
+  def view_wrapper(*args, **kwds):
     try:
-      return func(request, *args, **kwds)
+      return func(*args, **kwds)
     except DeadlineExceededError:
       logging.exception('DeadlineExceededError')
       return http.HttpResponse('DeadlineExceededError')

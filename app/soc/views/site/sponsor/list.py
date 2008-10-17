@@ -22,8 +22,8 @@ __authors__ = [
   ]
 
 
-from soc.logic import models
 from soc.views import helper
+from soc.logic.models import sponsor
 from soc.views.helper import access
 from soc.views.helper import decorators
 
@@ -64,7 +64,7 @@ def all(request, page=None, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
   
   # Fetch one more to see if there should be a 'next' link
-  sponsors = models.sponsor.logic.getForLimitAndOffset(limit=limit + 1,
+  sponsors = sponsor.logic.getForLimitAndOffset(limit=limit + 1,
                                                        offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)

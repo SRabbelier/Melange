@@ -21,6 +21,8 @@ __authors__ = [
 ]
 
 
+from django.utils.translation import ugettext_lazy
+
 from google.appengine.ext import db
 
 from soc.models import base
@@ -40,9 +42,10 @@ class School(soc.models.group.Group):
      belonging to) a School.  This relation is implemented as the 'students'
      back-reference Query of the Student model 'school' reference.
   """
-
-  #: Group type short name used for example in urls
-  GROUP_TYPE_SHORT = 'school'
-  #: Group type plural name used in Group templates
-  GROUP_TYPE_PLURAL = 'Schools'
-
+  
+  #: Type name used in templates
+  TYPE_NAME = ugettext_lazy('School')
+  #: Type short name used for example in urls
+  TYPE_NAME_SHORT = 'school'
+  #: Type plural name used in templates
+  TYPE_NAME_PLURAL = ugettext_lazy('Schools')

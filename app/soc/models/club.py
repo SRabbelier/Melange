@@ -21,6 +21,8 @@ __authors__ = [
 ]
 
 
+from django.utils.translation import ugettext_lazy
+
 from google.appengine.ext import db
 
 from soc.models import base
@@ -41,8 +43,9 @@ class Club(soc.models.group.Group):
      Member model 'club' reference.
   """
 
-  #: Group type short name used for example in urls
-  GROUP_TYPE_SHORT = 'club'
-  #: Group type plural name used in Group templates
-  GROUP_TYPE_PLURAL = 'Clubs'
-
+  #: Type name used in templates
+  TYPE_NAME = ugettext_lazy('Club')
+  #: Type short name used for example in urls
+  TYPE_NAME_SHORT = 'club'
+  #: Type plural name used in templates
+  TYPE_NAME_PLURAL = ugettext_lazy('Clubs')

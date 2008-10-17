@@ -196,8 +196,8 @@ def edit(request, page=None, link_name=None,
     
   context.update({'form': sponsor_form,
                   'entity':  existing_sponsor,
-                  'entity_type': 'Sponsor',
-                  'entity_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
+                  'entity_type': sponsor_model.Sponsor.TYPE_NAME,
+                  'entity_type_short': sponsor_model.Sponsor.TYPE_NAME_SHORT})
 
   return helper.responses.respond(request, template, context)
 

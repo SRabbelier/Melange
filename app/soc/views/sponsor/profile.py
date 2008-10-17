@@ -28,6 +28,7 @@ from soc.views import simple
 from soc.views.helper import decorators
 
 import soc.logic.models.sponsor
+import soc.models.sponsor as sponsor_model
 import soc.views.helper.responses
 import soc.views.helper.templates
 
@@ -63,6 +64,6 @@ def public(request, page=None, link_name=None,
       helper.templates.unescape(link_name_sponsor.description)
   
   context.update({'entity': link_name_sponsor,
-                  'entity_type': 'Sponsor'})
+                  'entity_type': sponsor_model.Sponsor.TYPE_NAME})
 
   return helper.responses.respond(request, template, context)

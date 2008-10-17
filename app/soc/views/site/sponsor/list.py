@@ -78,8 +78,8 @@ def all(request, page=None, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):
                                  offset=offset, limit=limit, 
                                  list_templates=list_templates)
                                  
-  context.update({'entity_type': 'Sponsor',
-                  'entity_type_plural': sponsor_model.Sponsor.GROUP_TYPE_PLURAL,
-                  'entity_type_short': sponsor_model.Sponsor.GROUP_TYPE_SHORT})
+  context.update({'entity_type': sponsor_model.Sponsor.TYPE_NAME,
+                  'entity_type_plural': sponsor_model.Sponsor.TYPE_NAME_PLURAL,
+                  'entity_type_short': sponsor_model.Sponsor.TYPE_NAME_SHORT})
 
   return helper.responses.respond(request, template, context)

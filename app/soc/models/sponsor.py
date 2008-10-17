@@ -20,6 +20,9 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
+from django.utils.translation import ugettext_lazy
+
 from google.appengine.ext import db
 
 from soc import models
@@ -29,9 +32,11 @@ import soc.models.group
 
 class Sponsor(soc.models.group.Group):
   """Sponsor details."""
-
-  #: Group type short name used for example in urls
-  GROUP_TYPE_SHORT = 'sponsor'
-  #: Group type plural name used in Group templates
-  GROUP_TYPE_PLURAL = 'Sponsors'
+  
+  #: Type name used in templates
+  TYPE_NAME = ugettext_lazy('Sponsor')
+  #: Type short name used for example in urls
+  TYPE_NAME_SHORT = 'sponsor'
+  #: Type plural name used in templates
+  TYPE_NAME_PLURAL = ugettext_lazy('Sponsors')
 

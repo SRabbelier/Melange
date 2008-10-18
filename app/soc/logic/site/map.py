@@ -105,27 +105,9 @@ site_settings_edit = page.Page(
   parent=home)
 
 # Site User Profile views
-site_user_sub_menu = page.Page(
-  page.Url(
-    # not a real Django URL regex, just a unique placeholder
-    # (this can be any unique string that re.compile() will not reject, but
-    # that also contains characters that would be escaped, causing
-    # soc.logic.site.page.Page.makeLinkUrl() to reject it and not make the
-    # menu item into an <A HREF> link; this seems a bit hacky...)
-    #
-    # TODO(tlarsen): formalize this hack by subclassing Page (maybe calling
-    #   it something like NonPage) to add a non-linkable form of page for
-    #   use in dividers just like this
-    # TODO(tlarsen): add an optional keyword parameter that can be used to
-    #   control where the collapsible sub-menus are and whether they are
-    #   collapsed or not by default in the sidebar menu 
-    'site*user*sub*menu',
-    # no view, since this is just a link-less menu divider
-    # (this page will not be placed in urlpatterns)
-    None,
-    # name is alternate string for view when it is not unique
-    name='site-user-sub-menu'),
-  '',
+site_user_sub_menu = page.NonPage(
+  'site-user-sub-menu',
+  'Site: Users Sub-Menu',
   short_name='Site Users',
   parent=site_settings_edit)
 
@@ -170,15 +152,9 @@ docs_show = page.Page(
   parent=home)
  
 # Site Document views
-site_docs_sub_menu = page.Page(
-  page.Url(
-    # (see site_user_sub_menu above for how this works...) 
-    'site*docs*sub*menu',
-    # no view, since this is just a link-less menu divider
-    None,
-    # name is alternate string for view when it is not unique
-    name='site-docs-sub-menu'),
-  '',
+site_docs_sub_menu = page.NonPage(
+  'site-docs-sub-menu',
+  'Site: Documents Sub-Menu',
   short_name='Site Documents',
   parent=site_settings_edit)
 
@@ -219,19 +195,13 @@ sponsor_profile = page.Page(
   page.Url(
     r'^sponsor/profile/%s' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.sponsor.profile.public'),
-  'Public Profile',
+  'Sponsor Public Profile',
   parent=home)
     
 # Sponsor Group Site views
-site_sponsor_sub_menu = page.Page(
-  page.Url(
-    # (see site_user_sub_menu above for how this works...) 
-    'site*sponsor*sub*menu',
-    # no view, since this is just a link-less menu divider
-    None,
-    # name is alternate string for view when it is not unique
-    name='site-sponsor-sub-menu'),
-  '',
+site_sponsor_sub_menu = page.NonPage(
+  'site-sponsor-sub-menu',
+  'Site: Sponsors Sub-Menu',
   short_name='Site Sponsors',
   parent=site_settings_edit)
 

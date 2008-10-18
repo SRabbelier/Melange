@@ -66,10 +66,15 @@ class Url:
     self.name = name
     self.prefix = prefix
 
-  def makeDjangoUrl(self):
-    """Returns a Django url() used by urlpatterns.
+  def makeDjangoUrl(self, **extra_kwargs):
+    """Returns a Django url() used by urlpatterns, or None if not a view.
     """
-    return defaults.url(self.regex, self.view, kwargs=self.kwargs,
+    if not self.view:
+      return None
+
+    kwargs = copy.deepcopy(self.kwargs)
+    kwargs.update(extra_kwargs)
+    return defaults.url(self.regex, self.view, kwargs=kwargs,
                         name=self.name, prefix=self.prefix)
 
   _STR_FMT = '''%(indent)sregex: %(regex)s
@@ -154,7 +159,7 @@ class Page:
   def getChildren(self):
     """Returns an iterator over any child Pages 
     """
-    for page, _ in self.child_by_urls.itervalues():
+    for page in self.child_by_views.itervalues():
       yield page
 
   children = property(getChildren)
@@ -224,15 +229,17 @@ class Page:
 
     url = page.url
     
-    if not isinstance(url.regex, basestring):
-      raise ValueError('"regex" must be a string, not a compiled regex')
+    if url.regex:
+      if not isinstance(url.regex, basestring):
+        raise ValueError('"regex" must be a string, not a compiled regex')
 
-    # TODO(tlarsen): see if Django has some way exposed in its API to get
-    #   the view name from the request path matched against urlpatterns;
-    #   if so, there would be no need for child_by_urls, because the
-    #   request path could be converted for us by Django into a view/name,
-    #   and we could just use child_by_views with that string instead
-    self.child_by_urls[url.regex] = (page, re.compile(url.regex))
+      # TODO(tlarsen): see if Django has some way exposed in its API to get
+      #   the view name from the request path matched against urlpatterns;
+      #   if so, there would be no need for child_by_urls, because the
+      #   request path could be converted for us by Django into a view/name,
+      #   and we could just use child_by_views with that string instead
+      self.child_by_urls[url.regex] = (page, re.compile(url.regex))
+    # else: NonUrl does not get indexed by regex, because it has none
 
     # TODO(tlarsen): make this work correctly if url has a prefix
     #   (not sure how to make this work with include() views...)
@@ -289,8 +296,9 @@ class Page:
     elif name in self.child_views:
       regex = self.child_by_views[name].url.regex
 
-    # regex must refer to an existing Page at this point
-    del self.child_urls[regex]
+    if regex:
+      # regex must refer to an existing Page at this point
+      del self.child_urls[regex]
 
     if not isinstance(view, basestring):
       # use name if view is callable() or None, etc.
@@ -318,6 +326,9 @@ class Page:
 
     link = self.url.regex
     
+    if not link:
+      return None
+
     if link.startswith('^'):
       link = link[1:]
     
@@ -360,7 +371,7 @@ class Page:
   def makeDjangoUrl(self):
     """Returns the Django url() for the underlying self.url.
     """
-    return self.url.makeDjangoUrl()
+    return self.url.makeDjangoUrl(page=self)
 
   def makeDjangoUrls(self):
     """Returns an ordered mapping of unique Django url() objects.
@@ -379,9 +390,11 @@ class Page:
     Used to implement makeDjangoUrls().  See that method for details.
     """
     urlpatterns = NoOverwriteSortedDict()
+
+    django_url = self.makeDjangoUrl()
     
-    if self.url.view:
-      urlpatterns[self.url.regex] = self.makeDjangoUrl()
+    if django_url:
+      urlpatterns[self.url.regex] = django_url
     
     for child in self.children:
       urlpatterns.update(child._makeDjangoUrlsDict())
@@ -418,3 +431,32 @@ class Page:
     """Returns a string representation useful for logging.
     """
     return self.asIndentedStr()
+
+
+class NonUrl(Url):
+  """Placeholder for when a site-map entry is not a linkable URL.
+  """
+   
+  def __init__(self, name):
+    """Creates a non-linkable Url placeholder.
+    
+    Args:
+      name: name of the non-view placeholder
+    """
+    Url.__init__(self, None, None, name=name)
+
+  def makeDjangoUrl(self, **extra_kwargs):
+    """Always returns None, since NonUrl is never a Django view.
+    """
+    return None
+
+
+class NonPage(Page):
+  """Placeholder for when a site-map entry is not a displayable page.
+  """
+
+  def __init__(self, non_url_name, long_name, **page_kwargs):
+    """
+    """
+    non_url = NonUrl(non_url_name)
+    Page.__init__(self, non_url, long_name, **page_kwargs)

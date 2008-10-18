@@ -47,17 +47,16 @@ class View:
   on the the child-classes to define the following fields:
 
   self._logic: the logic singleton for this entity
-
-  Args:
-    rights: This dictionary should be filled with the access check
-            functions that should be called
-
-    params: This dictionary should be filled with the parameters
-            specific to this entity.
   """
 
   def __init__(self, params=None, rights=None):
     """
+
+    Args:
+      rights: This dictionary should be filled with the access check
+        functions that should be called
+      params: This dictionary should be filled with the parameters
+        specific to this entity.
     """
 
     new_rights = {}
@@ -73,11 +72,13 @@ class View:
         ' <a href="%(create)s">Create '
         'a New %(Type)s</a> page.')
 
-  def public(self, request, **kwargs):
+  def public(self, request, page=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
 
     Args:
-      request: the Django request object
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
       kwargs: the Key Fields for the specified entity
     """
 
@@ -88,6 +89,7 @@ class View:
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
+    context['page'] = page
     entity = None
 
     try:
@@ -109,22 +111,27 @@ class View:
 
     return helper.responses.respond(request, template, context)
 
-  def create(self, request, **kwargs):
+  def create(self, request, page=None, **kwargs):
     """Displays the create page for this entity type
 
-    request: the django request object
-    kwargs: not used
+    Args:
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
+      kwargs: not used for create()
     """
 
     # Create page is an edit page with no key fields
     kwargs = {}
-    return self.edit(request, **kwargs)
+    return self.edit(request, page=page, **kwargs)
 
-  def edit(self, request, **kwargs):
+  def edit(self, request, page=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
 
     Args:
-      request: The Django request object
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
       kwargs: The Key Fields for the specified entity
     """
 
@@ -133,6 +140,8 @@ class View:
     except soc.views.out_of_band.AccessViolationResponse, alt_response:
       return alt_response.response()
 
+    context = helper.responses.getUniversalContext(request)
+    context['page'] = page
     entity = None
 
     try:
@@ -147,16 +156,13 @@ class View:
       return simple.errorResponse(request, error, template, context)
 
     if request.method == 'POST':
-      return self.editPost(request, entity)
+      return self.editPost(request, entity, context)
     else:
-      return self.editGet(request, entity)
+      return self.editGet(request, entity, context)
 
-  def editPost(self, request, entity):
+  def editPost(self, request, entity, context):
     """Same as edit, but on POST
     """
-
-    context = helper.responses.getUniversalContext(request)
-
     if entity:
       form = self._params['edit_form'](request.POST)
     else:
@@ -185,11 +191,9 @@ class View:
         request, None, suffix,
         params=params)
 
-  def editGet(self, request, entity):
+  def editGet(self, request, entity, context):
     """Same as edit, but on GET
     """
-
-    context = helper.responses.getUniversalContext(request)
     #TODO(SRabbelier) Construct a suffix
     suffix = None
     is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
@@ -221,8 +225,13 @@ class View:
 
     return helper.responses.respond(request, template, context)
 
-  def list(self, request):
+  def list(self, request, page=None):
     """Displays the list page for the entity type
+    
+    Args:
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
     """
 
     try:
@@ -231,6 +240,7 @@ class View:
       return alt_response.response()
 
     context = helper.responses.getUniversalContext(request)
+    context['page'] = page
 
     offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
@@ -252,11 +262,13 @@ class View:
 
     return helper.responses.respond(request, template, context)
 
-  def delete(self, request, **kwargs):
+  def delete(self, request, page=None, **kwargs):
     """Shows the delete page for the entity specified by kwargs
 
     Args:
-      request: The Django request object
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
       kwargs: The Key Fields for the specified entity
     """
 
@@ -267,6 +279,7 @@ class View:
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
+    context['page'] = page
     entity = None
 
     try:

@@ -16,19 +16,10 @@ limitations under the License.
 {% block scripts %}
 	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
 {% endblock %}
-{% block page_title %}
- {% if existing_doc %}
-  Site: Modify Existing Document
- {% else %}
-  Site: Create New Document
- {% endif %}
-{% endblock %}
 {% block header_title %}
+{{ page.short_name }}
  {% if existing_doc %}
-  Modify Existing Document
    <a href="/docs/show/{{ existing_doc.partial_path }}/{{ existing_doc.link_name }}">"{{ existing_doc.title }}"</a>
- {% else %}
-  Create a New Document
  {% endif %}
 {% endblock %}
 

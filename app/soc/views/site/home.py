@@ -53,7 +53,8 @@ def public(request, page=None, template=DEF_SITE_HOME_PUBLIC_TMPL):
   """
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  
+  context['page'] = page
+
   site_settings = models.site_settings.logic.getFromFields(
       path=models.site_settings.logic.DEF_SITE_SETTINGS_PATH)
 

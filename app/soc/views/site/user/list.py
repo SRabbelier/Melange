@@ -59,6 +59,7 @@ def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
@@ -67,7 +68,7 @@ def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
   users = models.user.logic.getForLimitAndOffset(limit + 1, offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
-  
+
   list_templates = {'list_main': 'soc/list/list_main.html',
                     'list_pagination': 'soc/list/list_pagination.html',
                     'list_row': 'soc/site/user/list/user_row.html',

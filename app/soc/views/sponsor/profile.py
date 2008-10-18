@@ -52,6 +52,7 @@ def public(request, page=None, link_name=None,
   """
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   try:
     link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(

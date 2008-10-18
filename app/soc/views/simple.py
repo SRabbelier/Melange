@@ -61,8 +61,13 @@ def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
 
   template = helper.templates.makeSiblingTemplatesList(template, 'public.html')
 
+  # TODO(tlarsen): fix getUniversalContext() so that it is back to being a
+  #   dict merge of missing defaults (as discussed at length in recent code
+  #   reviews)
   if not context:
     context = helper.responses.getUniversalContext(request)
+
+  context['page'] = page
 
   try:
     if link_name:

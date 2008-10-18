@@ -118,6 +118,7 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   user = None  # assume that no User entity will be found
   form = None  # assume blank form needs to be displayed
@@ -277,6 +278,7 @@ def edit(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   user = None  # assume that no User entity will be found
 
@@ -426,6 +428,7 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   if request.method == 'POST':
     form = CreateForm(request.POST)

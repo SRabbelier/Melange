@@ -113,6 +113,7 @@ def edit(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   logged_in_id = users.get_current_user()
   user = models.user.logic.getFromFields(email=logged_in_id.email())
@@ -208,7 +209,7 @@ DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 def create(request, page=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, page, link_name=None, template=template)
+  return edit(request, page=page, link_name=None, template=template)
 
 
 @decorators.view
@@ -236,6 +237,7 @@ def delete(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   existing_sponsor = None
 

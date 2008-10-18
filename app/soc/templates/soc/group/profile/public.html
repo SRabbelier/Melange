@@ -13,9 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
-{% block page_title %}{{ entity_type }} Public Profile{% endblock %}
 {% block header_title %}
-{{ entity_type }} Public Profile for {{ entity.name }}
+{{ page.short_name }} for {{ entity.name }}
 {% endblock %}
 {% block body %}
 <p>

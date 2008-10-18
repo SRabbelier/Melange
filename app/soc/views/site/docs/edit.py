@@ -132,6 +132,7 @@ def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   if request.method == 'POST':
     form = CreateForm(request.POST)
@@ -194,8 +195,9 @@ def edit(request, page=None, partial_path=None, link_name=None,
   except  soc.views.out_of_band.AccessViolationResponse, alt_response:
     return alt_response.response()
 
-# create default template context for use with any templates
+  # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   doc = None  # assume that no Document entity will be found
 

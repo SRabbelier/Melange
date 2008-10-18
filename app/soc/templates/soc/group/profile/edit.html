@@ -17,21 +17,6 @@ limitations under the License.
 	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
 {% endblock %}
 
-{% block page_title %}
-{% if existing_entity %}
-Site: Modify Existing {{ entity_type }}
-{% else %}
-Site: Create New {{ entity_type }}
-{% endif %}
-{% endblock %}
-{% block header_title %}
-{% if entity %}
-Modify Existing {{ entity_type }}
-{% else %}
-Create a New {{ entity_type }}
-{% endif %}
-{% endblock %}
-
 {% block body %}
 <p>
 <p>

@@ -60,6 +60,7 @@ def all(request, page=None, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))

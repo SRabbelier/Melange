@@ -18,9 +18,16 @@ limitations under the License.
 	{% block stylesheet %}
   <link rel="stylesheet" href="/soc/content/css/soc.css" type="text/css"/>
 	{% endblock %}
-  <title>{% block page_title %}Google Open Source Programs{% endblock %}</title>
+  <title>
+    {% block page_title %}
+      {% if page %}
+{{ page.long_name }}
+      {% else %}
+&lt;Missing Page Object&gt;
+      {% endif %}
+    {% endblock %}
+  </title>
 	{% block scripts %}{% endblock %}
-
  </head>
 
  <body>
@@ -53,7 +60,16 @@ limitations under the License.
    </div>
 
    <div id="title">
-	{% block header_title %}Google Open Source Programs{% endblock %}
+	{% block header_title %}
+	  {% if page %}
+{% comment %}
+TODO(tlarsen): replace this with breadcrumbs
+{% endcomment %}
+	    {{ page.short_name }}
+	  {% else %}
+&lt;Missing Page Object&gt;
+      {% endif %}
+    {% endblock %}
    </div>
 	<div id="breadcrumbs">
 	{% block breadcrumbs %}{% endblock %}

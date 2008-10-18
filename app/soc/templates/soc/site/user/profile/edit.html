@@ -13,19 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
-{% block page_title %}
- {% if existing_user %}
-  Site: Modify Existing User Profile
- {% else %}
-  Site: Create New User Profile
- {% endif %}
-{% endblock %}
 {% block header_title %}
+ {{ page.short_name }}
  {% if existing_user %}
-  Modify Existing User Profile for {{ existing_user.nick_name }}
-   <a href="mailto:{{ existing_user.id.email }} ">&lt;{{ existing_user.id.email }}&gt;</a>
- {% else %}
-  Create a New User Profile
+for {{ existing_user.nick_name }}
+<a href="mailto:{{ existing_user.id.email }} ">&lt;{{ existing_user.id.email }}&gt;</a>
  {% endif %}
 {% endblock %}
 {% block body %}

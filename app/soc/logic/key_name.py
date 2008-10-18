@@ -67,10 +67,10 @@ def nameSiteSettings(path):
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
 
-  return 'SiteSettings:%s' % path
+  return nameHomeSettings(path, entity_type='SiteSettings')
 
 
-def nameHomeSettings(path):
+def nameHomeSettings(path, entity_type='HomeSettings'):
   """Returns a HomeSettings key name constructed from a supplied path.
 
   Raises:
@@ -79,7 +79,7 @@ def nameHomeSettings(path):
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
 
-  return 'HomeSettings:%s' % path
+  return '%s:%s' % (entity_type, path)
 
 
 def nameUser(email):

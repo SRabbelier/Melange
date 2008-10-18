@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Developer views for editing and examining Documents.
+"""Views for editing and examining Documents.
 """
 
 __authors__ = [
@@ -48,7 +48,7 @@ import soc.views.out_of_band
 
 
 DEF_CREATE_NEW_DOC_MSG = ' You can create a new document by visiting the' \
-                         ' <a href="/site/docs/edit">Create ' \
+                         ' <a href="/docs/edit">Create ' \
                          'a New Document</a> page.'
 
 SUBMIT_MESSAGES = (
@@ -107,11 +107,11 @@ class CreateForm(helper.forms.DbModelForm):
     return link_name
 
 
-DEF_SITE_DOCS_CREATE_TMPL = 'soc/site/docs/edit.html'
+DEF_DOCS_CREATE_TMPL = 'soc/docs/edit.html'
 
 @decorators.view
-def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
-  """View for a Developer to create a new Document entity.
+def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
+  """View to create a new Document entity.
 
   Args:
     request: the standard django request object
@@ -128,6 +128,8 @@ def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
   try:
     access.checkIsDeveloper(request)
   except  soc.views.out_of_band.AccessViolationResponse, alt_response:
+    # TODO(tlarsen): change this to just limit the Documents that can be
+    #   created by the User in their current Role
     return alt_response.response()
 
   # create default template context for use with any templates
@@ -145,7 +147,7 @@ def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
 
       new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
 
-      # redirect to new /site/docs/edit/new_path?s=0
+      # redirect to new /docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, None, new_path,
@@ -159,10 +161,10 @@ def create(request, page=None, template=DEF_SITE_DOCS_CREATE_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-DEF_SITE_DOCS_EDIT_TMPL = 'soc/site/docs/edit.html'
+DEF_DOCS_EDIT_TMPL = 'soc/docs/edit.html'
 
 class EditForm(CreateForm):
-  """Django form displayed when Developer edits a Document.
+  """Django form displayed a Document is edited.
   """
   doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
   created_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
@@ -171,8 +173,8 @@ class EditForm(CreateForm):
 
 @decorators.view
 def edit(request, page=None, partial_path=None, link_name=None,
-         template=DEF_SITE_DOCS_EDIT_TMPL):
-  """View for a Developer to modify the properties of a Document Model entity.
+         template=DEF_DOCS_EDIT_TMPL):
+  """View to modify the properties of a Document Model entity.
 
   Args:
     request: the standard django request object
@@ -193,6 +195,8 @@ def edit(request, page=None, partial_path=None, link_name=None,
   try:
     access.checkIsDeveloper(request)
   except  soc.views.out_of_band.AccessViolationResponse, alt_response:
+    # TODO(tlarsen): change this to just limit the Documents that can be
+    #   edited by the User in their current Role
     return alt_response.response()
 
   # create default template context for use with any templates
@@ -224,7 +228,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
       new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
         
-      # redirect to new /site/docs/edit/new_path?s=0
+      # redirect to new /docs/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, path, new_path,
@@ -278,8 +282,8 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
 @decorators.view
 def delete(request, page=None, partial_path=None, link_name=None,
-           template=DEF_SITE_DOCS_EDIT_TMPL):
-  """Request handler for a Developer to delete Document Model entity.
+           template=DEF_DOCS_EDIT_TMPL):
+  """Request handler to delete Document Model entity.
 
   Args:
     request: the standard django request object
@@ -300,10 +304,13 @@ def delete(request, page=None, partial_path=None, link_name=None,
   try:
     access.checkIsDeveloper(request)
   except  soc.views.out_of_band.AccessViolationResponse, alt_response:
+    # TODO(tlarsen): change this to just limit the Documents that can be
+    #   deleted by the User in their current Role
     return alt_response.response()
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
+  context['page'] = page
 
   existing_doc = None
   path = path_link_name.combinePath([partial_path, link_name])
@@ -321,4 +328,4 @@ def delete(request, page=None, partial_path=None, link_name=None,
   if existing_doc:
     document.logic.delete(existing_doc)
 
-  return http.HttpResponseRedirect('/site/docs/list')
+  return http.HttpResponseRedirect('/docs/list')

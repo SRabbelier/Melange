@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Developer views for listing Documents.
+"""Views for listing Documents.
 """
 
 __authors__ = [
@@ -34,11 +34,11 @@ import soc.views.helper.responses
 import soc.views.out_of_band
 
 
-DEF_SITE_DOCS_LIST_ALL_TMPL = 'soc/site/docs/list/all.html'
+DEF_DOCS_LIST_ALL_TMPL = 'soc/docs/list/all.html'
 
 
 @decorators.view
-def all(request, page=None, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
+def all(request, page=None, templates={}):
   """Show a list of all Documents (limit rows per page).
   
   Args:
@@ -70,13 +70,20 @@ def all(request, page=None, template=DEF_SITE_DOCS_LIST_ALL_TMPL):
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
-  list_templates = {'list_main': 'soc/list/list_main.html',
-                    'list_pagination': 'soc/list/list_pagination.html',
-                    'list_row': 'soc/site/docs/list/docs_row.html',
-                    'list_heading': 'soc/site/docs/list/docs_heading.html'}
+  list_templates = {
+    'list_main': templates.get('list_main',
+                               'soc/list/list_main.html'),
+    'list_pagination': templates.get('list_pagination',
+                                     'soc/list/list_pagination.html'),
+    'list_row': templates.get('list_row',
+                              'soc/docs/list/docs_row.html'),
+    'list_heading': templates.get('list_heading',
+                                  'soc/docs/list/docs_heading.html'),
+    }
                       
   context = helper.lists.setList(
       request, context, docs, 
       offset=offset, limit=limit, list_templates=list_templates)
 
+  template = templates.get('all', DEF_DOCS_LIST_ALL_TMPL)
   return helper.responses.respond(request, template, context)

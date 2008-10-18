@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/home/public.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,50 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% block scripts %}
-{% if site_settings.feed_url %}
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="/soc/content/js/blog.js"></script>
-    <script type="text/javascript">
-
-    google.load("feeds", "1");
-
-    function initialize() {
-      var blog = new BlogPreview(document.getElementById("blog"));
-      blog.show("{{ site_settings.feed_url }}");
-    }
-    google.setOnLoadCallback(initialize);
-
-    </script>
-{% endif %}
-{% endblock %}
-
-{% block page_title %}
-{% if site_document %}
-{{ site_document.title }}
-{% else %}
-Default Title
-{% endif %}
-{% endblock %}
-
-{% block header_title %}
-{% if site_document %}
-{{ site_document.title }}
-{% else %}
-Default Header
-{% endif %}
-{% endblock %}
-
-{% block body %}
- {% if site_document %}
-  {{ site_document.content|safe }}
-  <div id="lastmodified">Last updated on: {{ site_document.modified }}</div>
- {% else %}
-This is the default site home page that can be configured via the <a href="/site/settings/edit">Site Settings</a> interface.  
-The <a href="/site/settings/edit">Site Settings</a> interface also provides a mechanism to select a feed to be displayed here.
+{% block missing_doc %}
+The contents of this default Site home page can be changed by editing the
+<a href="/site/docs/edit/site/home"><code>site/home</code> Document</a>.
+Other elements of this page, such as a feed to be displayed below this
+content, can be set using the <a href="/site/settings/edit">Site Settings</a> interface.
 You need to sign in as site Developer in order to change <a href="/site/settings/edit">Site Settings</a>.
- {% endif %}
- {% if site_settings.feed_url %}
-    <div id="blog"></div>
- {% endif %}
 {% endblock %}

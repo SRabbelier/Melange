@@ -30,15 +30,23 @@ from google.appengine.api import users
 from django.conf.urls import defaults
 from django.utils import datastructures
 
+from soc.logic import models
 from soc.logic import path_link_name
 from soc.logic.site import page
+
+import soc.logic.models.site_settings
 
 
 # Home Page view
 home = page.Page(
   page.Url(
     r'^$',
-    'soc.views.site.home.public'),
+    'soc.views.home.public',
+    kwargs={
+      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'entity_type': 'SiteSettings',
+      'template': 'soc/site/home/public.html',
+    }),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
@@ -91,7 +99,12 @@ user_edit = page.Page(
 site_home = page.Page(
   page.Url(
     r'^site/home$',
-    'soc.views.site.home.public'),
+    'soc.views.home.public',
+    kwargs={
+      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'entity_type': 'SiteSettings',
+      'template': 'soc/site/home/public.html',
+    }),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
@@ -99,7 +112,11 @@ site_home = page.Page(
 site_settings_edit = page.Page(
   page.Url(
     r'^site/settings/edit$',
-    'soc.views.site.settings.edit'),
+    'soc.views.settings.edit',
+    kwargs={
+      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'logic': models.site_settings.logic,
+    }),
   'Site: Settings',
   short_name='Site Settings',
   parent=home)
@@ -160,32 +177,32 @@ site_docs_sub_menu = page.NonPage(
 
 site_docs_create = page.Page(
   page.Url(
-    r'^site/docs/edit$',
-    'soc.views.site.docs.edit.create'),
+    r'^docs/edit$',
+    'soc.views.docs.edit.create'),
   'Site: Create New Document',
   'Create Site Document',
   parent=site_docs_sub_menu)
 
 site_docs_edit = page.Page(
   page.Url(
-    r'^site/docs/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.site.docs.edit.edit'),
+    r'^docs/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.docs.edit.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
   parent=site_docs_sub_menu)
 
 site_docs_delete = page.Page(
   page.Url(
-    r'^site/docs/%s/delete$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.site.docs.edit.delete'),
+    r'^docs/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.docs.edit.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
   parent=site_docs_sub_menu)
 
 site_docs_list = page.Page(
   page.Url(
-    r'^site/docs/list$',
-    'soc.views.site.docs.list.all'),
+    r'^docs/list$',
+    'soc.views.docs.list.all'),
   'Site: List of Documents',
   short_name='List Site Documents',
   parent=site_docs_sub_menu)

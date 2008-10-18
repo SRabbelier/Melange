@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Site-wide Melange home page views.
+"""Base for all (Site, Group, etc.) home page views.
 
-public: how the general public sees the site home page of a Melange
-  site
+public: how the general public sees a "home" page
 """
 
 __authors__ = [
+  '"Todd Larsen" <tlarsen@google.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -31,21 +31,24 @@ from soc.logic import models
 from soc.views import helper
 from soc.views.helper import decorators
 
-import soc.logic.models.site_settings
+import soc.logic.models.home_settings
 import soc.views.helper.responses
 import soc.views.helper.templates
 
 
-DEF_SITE_HOME_PUBLIC_TMPL = 'soc/site/home/public.html'
+DEF_HOME_PUBLIC_TMPL = 'soc/home/public.html'
 
 @decorators.view
-def public(request, page=None, template=DEF_SITE_HOME_PUBLIC_TMPL):
-  """How the "general public" sees the Melange site home page.
+def public(request, page=None, path=None, entity_type='HomeSettings',
+           template=DEF_HOME_PUBLIC_TMPL):
+  """How the "general public" sees a "home" page.
 
   Args:
     request: the standard django request object.
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+    page: a soc.logic.site.page.Page object which is abstraction that
+      combines a Django view with sidebar menu info
+    path: path (entire "scoped" portion combined with the link_name)
+      used to retrieve the Group's "home" settings
     template: the template path to use for rendering the template.
 
   Returns:
@@ -53,22 +56,21 @@ def public(request, page=None, template=DEF_SITE_HOME_PUBLIC_TMPL):
   """
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  
+  settings = models.home_settings.logic.getFromFields(
+      path=path, entity_type=entity_type)
 
-  site_settings = models.site_settings.logic.getFromFields(
-      path=models.site_settings.logic.DEF_SITE_SETTINGS_PATH)
-
-  if site_settings:
-    context['site_settings'] = site_settings
+  if settings:
+    context['home_settings'] = settings
     
     # check if ReferenceProperty to home Document is valid
     try:
-      site_doc = site_settings.home
+      home_doc = settings.home
     except db.Error:
-      site_doc = None
-  
-    if site_doc:
-      site_doc.content = helper.templates.unescape(site_doc.content)
-      context['site_document'] = site_doc
+      home_doc = None
+
+    if home_doc:
+      home_doc.content = helper.templates.unescape(home_doc.content)
+      context['home_document'] = home_doc
 
   return helper.responses.respond(request, template, context=context)

@@ -121,9 +121,9 @@ class ReferenceListProperty(db.Property):
                                self.name)
       for item in value:
         if not isinstance(item, self.item_type):
-            raise db.BadValueError(
-                'Items in the %s list must all be %s instances' %
-                (self.name, self.item_type.__name__))
+          raise db.BadValueError(
+            'Items in the %s list must all be %s instances' %
+            (self.name, self.item_type.__name__))
     return value
 
   def empty(self, value):
@@ -165,9 +165,9 @@ class ReferenceListProperty(db.Property):
     value = self.__get__(model_instance, model_instance.__class__)
     self.validate(value)
     if value is None:
-        return None
+      return None
     else:
-        return [v.key() for v in value]
+      return [v.key() for v in value]
  
   def make_value_from_datastore(self, value):
     """Recreates the list of Models from the list of keys.
@@ -179,6 +179,6 @@ class ReferenceListProperty(db.Property):
       None or a list of Models.
     """ 
     if value is None:
-        return None
+      return None
     else:
-        return [db.get(v) for v in value]
+      return [db.get(v) for v in value]

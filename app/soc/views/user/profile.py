@@ -107,10 +107,10 @@ def edit(request, page=None, link_name=None,
     # not logged in, and no link name, so request that the user sign in 
     return simple.requestLogin(request, page, template, context,
         # TODO(tlarsen): /user/profile could be a link to a help page instead
-        login_message_fmt='To create a new'
+        login_message_fmt=ugettext_lazy('To create a new'
                           ' <a href="/user/profile">User Profile</a>'
                           ' or modify an existing one, you must first'
-                          ' <a href="%(sign_in)s">sign in</a>.')
+                          ' <a href="%(sign_in)s">sign in</a>.'))
 
   if (not id) and link_name:
     # not logged in, so show read-only public profile for link_name user

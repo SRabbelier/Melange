@@ -117,6 +117,14 @@ a:visited.noul {
   color: #a32a91; /* #2a55a3; */
 }
 
+
+/* Styles used by Django Forms */
+ul.errorlist {
+  color: #FF0000;
+  font-size: small;
+}
+
+
 /* TABLES */
 table {
   border-collapse: collapse;

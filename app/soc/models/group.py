@@ -114,7 +114,7 @@ class Group(polymodel.PolyModel):
   #: text, because, if supplied, it is used as a shipping address.
   postalcode = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('ZIP/Postal Code'))
-  postalcode.help_text=ugettext_lazy('lower ASCII characters only')
+  postalcode.help_text = ugettext_lazy('lower ASCII characters only')
 
   #: Required contact phone number that will be, amongst other uses,
   #: supplied to shippers along with the shipping address; kept private.

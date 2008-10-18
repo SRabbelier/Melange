@@ -25,8 +25,6 @@ import polymodel
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
-
 import soc.models.quiz
 import soc.models.user
 

@@ -23,10 +23,6 @@ __authors__ = [
 
 from django.utils.translation import ugettext_lazy
 
-from google.appengine.ext import db
-
-from soc import models
-
 import soc.models.group
 
 

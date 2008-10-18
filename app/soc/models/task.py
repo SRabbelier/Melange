@@ -23,7 +23,6 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc import models
 from soc.models import base
 
 import soc.models.proposal
@@ -48,7 +47,7 @@ class Task(base.ModelWithFieldAttributes):
   #: Task is based.  A Task may be based on only a single Proposal, 
   #: but a Proposal can be the foundation for multiple Tasks. The
   #: back-reference in the Proposal model is a Query named 'tasks'.  
-  proposal = db.ReferenceProperty(reference_class=models.proposal.Proposal,
+  proposal = db.ReferenceProperty(reference_class=soc.models.proposal.Proposal,
                                   required=True,
                                   collection_name="tasks")
 

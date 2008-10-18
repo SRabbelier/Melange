@@ -23,9 +23,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc import models
-
-import soc.models.survey
+# TODO: Uncomment when Survey model is committed
+#import soc.models.survey
 import soc.models.work
 import soc.models.reviewer
 

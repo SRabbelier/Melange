@@ -22,8 +22,6 @@ __authors__ = [
 ]
 
 
-from google.appengine.ext import db
-
 import soc.models.role
 
 

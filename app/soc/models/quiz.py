@@ -22,10 +22,6 @@ __authors__ = [
 
 import reflistprop
 
-from google.appengine.ext import db
-
-from django.utils.translation import ugettext_lazy
-
 import soc.models.answer
 import soc.models.question
 import soc.models.work

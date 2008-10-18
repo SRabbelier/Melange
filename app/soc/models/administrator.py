@@ -22,10 +22,6 @@ __authors__ = [
 ]
 
 
-from google.appengine.ext import db
-
-from soc.models import organization
-
 import soc.models.reviewer
 
 

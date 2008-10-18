@@ -21,10 +21,6 @@ __authors__ = [
 ]
 
 
-from google.appengine.ext import db
-
-from django.utils.translation import ugettext_lazy
-
 import soc.models.home_settings
 
 

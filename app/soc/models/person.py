@@ -99,13 +99,13 @@ class Person(polymodel.PolyModel):
   #: Optional field storing Instant Messaging network; displayed publicly.
   im_network = db.StringProperty(
       verbose_name=ugettext_lazy('IM Network'))
-  im_network.help_text=ugettext_lazy(
+  im_network.help_text = ugettext_lazy(
       'examples: irc:irc.freenode.org xmpp:gmail.com/Home')
 
   #: Optional field storing Instant Messaging handle; displayed publicly.
   im_handle = db.StringProperty(
       verbose_name=ugettext_lazy('IM Handle'))
-  im_handle.help_text=ugettext_lazy(
+  im_handle.help_text = ugettext_lazy(
       'personal identifier, such as: screen name, IRC nick, user name')
 
   #: Optional field storing a home page URL; displayed publicly.
@@ -176,7 +176,7 @@ class Person(polymodel.PolyModel):
   #: lower ASCII, not UTF-8 text, because it may be used as a shipping address.
   res_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('ZIP/Postal Code'))
-  res_postalcode.help_text=ugettext_lazy('lower ASCII characters only')
+  res_postalcode.help_text = ugettext_lazy('lower ASCII characters only')
 
   #: Optional field containing a separate shipping street address; kept
   #: private.  If shipping address is not present in its entirety, the
@@ -216,7 +216,7 @@ class Person(polymodel.PolyModel):
   #: shipping address.
   ship_postalcode = db.StringProperty(
       verbose_name=ugettext_lazy('ZIP/Postal Code'))
-  ship_postalcode.help_text=ugettext_lazy('lower ASCII characters only')
+  ship_postalcode.help_text = ugettext_lazy('lower ASCII characters only')
 
   #: Required field containing a phone number that will be supplied
   #: to shippers; kept private.

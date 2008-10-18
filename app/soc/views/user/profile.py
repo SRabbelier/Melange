@@ -189,4 +189,4 @@ def edit(request, page=None, link_name=None,
 def create(request, page=None, template=DEF_USER_PROFILE_EDIT_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, page, link_name=None, template=template)
+  return edit(request, page=page, link_name=None, template=template)

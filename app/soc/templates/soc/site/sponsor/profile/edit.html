@@ -15,6 +15,6 @@ limitations under the License.
  {% block submit_buttons %}
  {{ block.super }}
 <td>
- <input type="button" onclick="location.href='/site/{{ entity_type_short|lower }}/profile/{{ entity.link_name }}/delete'" value="Delete"/>
+ <input type="button" onclick="location.href='/site/{{ entity_type_short|lower }}/profile/delete/{{ entity.link_name }}'" value="Delete"/>
 </td>
  {% endblock %}

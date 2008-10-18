@@ -232,7 +232,7 @@ site_sponsor_create = page.Page(
 
 site_sponsor_delete = page.Page(
   page.Url(
-    r'^site/sponsor/profile/%s/delete$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^site/sponsor/profile/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.sponsor.profile.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',

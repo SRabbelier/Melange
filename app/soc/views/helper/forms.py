@@ -74,6 +74,38 @@ class DbModelForm(djangoforms.ModelForm):
           self.fields[field_name].help_text = model_prop.help_text
 
 
+class BaseForm(DbModelForm):
+  """Subclass of DbModelForm that extends as_table HTML output.
+  
+  BaseForm has additional class names in HTML tags for label and help text
+  and those can be used in CSS files for look customization. The way the Form
+  prints itself also has changed. Help text is displayed in the same row as 
+  label and input.
+  """
+  # TODO(pawel.solyga): Add class names for form errors and required fields.
+  
+  DEF_NORMAL_ROW = u'<tr><td class="formfieldlabel">%(label)s</td>' \
+      '<td>%(errors)s%(field)s%(help_text)s</td></tr>'
+  DEF_ERROR_ROW = u'<tr><td colspan="2">%s</td></tr>'
+  DEF_ROW_ENDER = '</td></tr>'
+  DEF_HELP_TEXT_HTML = u'<td class="formfieldhelptext">%s</td>'
+  
+  def __init__(self, *args, **kwargs):
+    """Parent class initialization.
+
+    Args:
+      *args, **kwargs:  passed through to parent __init__() constructor
+    """
+    super(BaseForm, self).__init__(*args, **kwargs)
+
+  def as_table(self):
+    """Returns form rendered as HTML <tr> rows -- with no <table></table>."""
+    return self._html_output(self.DEF_NORMAL_ROW, 
+                             self.DEF_ERROR_ROW, 
+                             self.DEF_ROW_ENDER, 
+                             self.DEF_HELP_TEXT_HTML, False)
+
+
 class SelectQueryArgForm(forms.Form):
   """URL query argument change control implemented as a Django form.
   """

@@ -22,9 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.logic import menu
-
-
 class HtmlMenu:
   """Ordered collection of MenuItem objects as <p>...</p> paragraphs.
   """

@@ -22,13 +22,9 @@ __authors__ = [
   ]
 
 
-import copy
-import re
-
 from google.appengine.api import users
 
 from django.conf.urls import defaults
-from django.utils import datastructures
 
 from soc.logic import models
 from soc.logic import path_link_name

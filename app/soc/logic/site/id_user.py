@@ -23,12 +23,8 @@ __authors__ = [
   ]
 
 
-import re
-
 from google.appengine.api import users
-from google.appengine.ext import db
 
-from soc.logic import key_name
 from soc.logic import model
 from soc.logic import models
 from soc.logic import out_of_band

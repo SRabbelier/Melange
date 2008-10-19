@@ -26,9 +26,6 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc.logic import key_name
-from soc.logic import out_of_band
-
 
 def getFullClassName(cls):
   """Returns fully-qualified module.class name string.""" 

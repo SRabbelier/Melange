@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django.utils import datastructures
 
 

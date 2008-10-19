@@ -25,7 +25,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
 from google.appengine.ext import db
 
 from django import forms
@@ -144,7 +143,9 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
         fields['home'] = home_doc
         context['notice'] = ugettext_lazy('Settings saved.')
       else:
-        context['notice'] = ugettext_lazy('Document not specified or could not be found; other Settings saved.')
+        context['notice'] = ugettext_lazy(
+            'Document not specified or could not be found; ' \
+            'other Settings saved.')
 
       settings = logic.updateOrCreateFromFields(fields, path=path)
       

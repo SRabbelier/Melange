@@ -25,8 +25,6 @@ __authors__ = [
 import copy
 import re
 
-from google.appengine.api import users
-
 from django.conf.urls import defaults
 
 from python25src import urllib

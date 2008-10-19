@@ -28,6 +28,7 @@ from google.appengine.api import users
 from django import forms
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import dicts
 from soc.logic import validate 
 from soc.views import helper
 from soc.views.helper import widgets
@@ -80,6 +81,8 @@ class View(base.View):
   """View methods for the Sponsor model
   """
 
+  SUBMIT_MSG_PROFILE_SAVED = 0
+
   def __init__(self, original_params=None, original_rights=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -87,27 +90,23 @@ class View(base.View):
     Params:
       original_params: a dict with params for this View 
       original_rights: a dict with right definitions for this View
-    """
+    """    
 
-    self.DEF_SUBMIT_MSG_PARAM_NAME = 's'
-    self.SUBMIT_MSG_PROFILE_SAVED = 0
-    #TODO(TLarsen) Better way to do this?
-    
     self._logic = soc.logic.models.sponsor.logic
     
     params = {}
     rights = {}
 
     params['name'] = "Sponsor"
+    params['name_short'] = "Sponsor"
     params['name_plural'] = "Sponsors"
        
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    # TODO(SRabbelier) Add support for Django style template lookup
-    params['create_template'] = 'soc/site/sponsor/profile/edit.html'
+    # TODO(tlarsen) Add support for Django style template lookup
+    params['edit_template'] = 'soc/site/sponsor/profile/edit.html'
     params['public_template'] = 'soc/group/profile/public.html'
-
     params['list_template'] = 'soc/group/list/all.html'
 
     params['lists_template'] = {
@@ -120,17 +119,17 @@ class View(base.View):
     params['delete_redirect'] = '/site/sponsor/list'
     params['create_redirect'] = '/site/sponsor/profile'
     
-    params['save_message'] = [ ugettext_lazy('Profile saved.') ]
+    params['save_message'] = [ugettext_lazy('Profile saved.')]
     
     params['edit_params'] = {
-        self.DEF_SUBMIT_MSG_PARAM_NAME:self.SUBMIT_MSG_PROFILE_SAVED,
+        DEF_SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
         }
     
     rights['list'] = [helper.access.checkIsDeveloper]
     rights['delete'] = [helper.access.checkIsDeveloper]
 
-    params = soc.logic.dicts.mergeDicts(original_params, params)
-    rights = soc.logic.dicts.mergeDicts(original_rights, rights)
+    params = dicts.merge(original_params, params)
+    rights = dicts.merge(original_rights, rights)
     
     base.View.__init__(self, rights=rights, params=params)
 

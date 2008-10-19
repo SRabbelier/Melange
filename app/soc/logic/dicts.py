@@ -22,14 +22,15 @@ __authors__ = [
   ]
 
 
-def mergeDicts(target, updates):
+def merge(target, updates):
   """Like the builtin 'update' method but does not overwrite existing values
 
   Args:
     target: The dictionary that is to be updated, may be None
     updates: A dictionary containing new values for the original dict
 
-  Returns: the target dictionary 
+  Returns:
+    the target dict, with any missing values from updates merged in, in-place 
   """
 
   if not target:

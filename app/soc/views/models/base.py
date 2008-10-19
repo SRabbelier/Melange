@@ -18,9 +18,7 @@
 """
 
 __authors__ = [
-  '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverer@rabbelier.nl>',
-  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -33,6 +31,7 @@ import soc.views.helper.lists
 import soc.views.helper.responses
 import soc.views.out_of_band
 
+from soc.logic import dicts
 from soc.logic import models
 from soc.logic import validate
 from soc.views import simple
@@ -49,28 +48,41 @@ class View:
   self._logic: the logic singleton for this entity
   """
 
+  DEF_SUBMIT_MSG_PARAM_NAME = 's'
+
+  DEF_CREATE_NEW_ENTITY_MSG = ugettext_lazy(
+      ' You can create a new %(model_type)s by visiting'
+      ' <a href="%(create)s">Create '
+      'a New %(Type)s</a> page.')
+
   def __init__(self, params=None, rights=None):
     """
 
     Args:
       rights: This dictionary should be filled with the access check
-        functions that should be called
+        functions that should be called, it will be modified in-place.
       params: This dictionary should be filled with the parameters
-        specific to this entity.
+        specific to this entity, required fields are:
+        name: the name of the entity (names should have sentence-style caps) 
+        name_short: the short form name of the name ('org' vs 'organization')
+        name_plural: the plural form of the name
+        edit_form: the class of the Django form to be used when editing
+        create_form: the class of the Django form to be used when creating
+        edit_template: the Django template to be used for editing
+        public_template: the Django template to be used as public page 
+        list_template: the Django template to be used as list page
+        lists_template: the Django templates to search for the list page
+        delete_redirect: the Django template to redirect to on delete
+        create_redirect: the Django template to redirect to after creation
+        save_message: the message to display when the entity is saved
+        edit_params: the params to use when editing
     """
 
     new_rights = {}
-    new_rights['base'] = [access.checkIsLoggedIn]
+    new_rights['any_access'] = [access.checkIsLoggedIn]
 
-    self._rights = soc.logic.dicts.mergeDicts(rights, new_rights)
+    self._rights = dicts.merge(rights, new_rights)
     self._params = params
-
-    self.DEF_SUBMIT_MSG_PARAM_NAME = 's'
-
-    self.DEF_CREATE_NEW_ENTITY_MSG = ugettext_lazy(
-        ' You can create a new %(model_type)s by visiting'
-        ' <a href="%(create)s">Create '
-        'a New %(Type)s</a> page.')
 
   def public(self, request, page=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
@@ -195,21 +207,20 @@ class View:
     """Same as edit, but on GET
     """
     #TODO(SRabbelier) Construct a suffix
-    suffix = None
-    is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
+    suffix = None    
 
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
-    if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
+    is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
+    if request.GET.get(DEF_SUBMIT_MSG_PARAM_NAME):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
-              request,
-              self.DEF_SUBMIT_MSG_PARAM_NAME,
-              values=self._params['save_message'])
+          request, DEF_SUBMIT_MSG_PARAM_NAME,
+          values=self._params['save_message'])
 
       # populate form with the existing entity
       form = self._params['edit_form'](instance=entity)
@@ -221,7 +232,7 @@ class View:
     context['entity_type'] = self._params['name']
     context['entity_type_plural'] = self._params['name_plural']
 
-    template = self._params['create_template']
+    template = self._params['edit_template']
 
     return helper.responses.respond(request, template, context)
 
@@ -298,7 +309,7 @@ class View:
       return http.HttpResponseRedirect('/')
 
     if not self._logic.isDeletable(entity):
-      # TODO: Direct user to page telling them they can't delete that entity, and why
+      # TODO: Update the notice area telling the user they can't delete the entity
       pass
 
     self._logic.delete(entity)
@@ -315,7 +326,7 @@ class View:
       fields: The new field values
     """
 
-    pass
+    raise NotImplementedError
 
   def checkUnspecified(self, access_type, request):
     """Checks whether an unspecified access_type should be allowed
@@ -341,18 +352,16 @@ class View:
     """
 
     if access_type not in self._rights:
+       # No checks defined, so do the 'generic check' and bail out
       self.checkUnspecified(access_type, request)
       return
 
     # Call each access checker
-    for check in self._rights['base']:
+    for check in self._rights['any_access']:
       check(request)
 
     for check in self._rights[access_type]:
       check(request)
-
-    # All checks were successfull
-    return
 
   def collectCleanedFields(self, form):
     """Collects all cleaned fields from form and returns them 

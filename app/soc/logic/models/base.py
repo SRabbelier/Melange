@@ -126,11 +126,10 @@ class Logic():
     """
 
     key_fields = {}
-    keys = fields.keys()
 
-    for key in keys[:]:
+    for key, value in fields.iteritems():
       if key in self._model.key_fields:
-        key_fields[key] = fields[key]
+        key_fields[key] = value
 
     return key_fields
 

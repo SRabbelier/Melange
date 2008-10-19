@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-import re
 import feedparser
 
 from google.appengine.api import urlfetch

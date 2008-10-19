@@ -30,7 +30,7 @@ from soc.logic import key_name
 from soc.logic import out_of_band
 
 
-class Logic():
+class Logic:
   """Base logic for entity classes.
 
   The BaseLogic class functions specific to Entity classes by relying

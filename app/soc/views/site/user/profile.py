@@ -399,7 +399,7 @@ class CreateForm(helper.forms.DbModelForm):
     new_email = self.cleaned_data.get('id')
     form_id = users.User(email=new_email)
     if models.user.logic.getFromFields(email=form_id.email()):
-        raise forms.ValidationError("This account is already in use.")
+      raise forms.ValidationError("This account is already in use.")
     return form_id
 
 

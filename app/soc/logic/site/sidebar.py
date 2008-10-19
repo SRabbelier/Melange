@@ -25,8 +25,6 @@ __authors__ = [
 
 from google.appengine.api import users
 
-from django.utils import datastructures
-
 from soc.logic import menu
 from soc.logic.site import id_user
 from soc.logic.site import map
@@ -154,7 +152,8 @@ def buildSidebar(path=None, builders=DEF_SIDEBAR_BUILDERS, **builder_args):
       path = request.path
 
   if path:
-    # TODO(tlarsen): scan through list and mark current request.path as "selected"
+    # TODO(tlarsen): scan through list and mark current request.path 
+    # as "selected"
     pass
 
   return menu.Menu(items=menu_items)    

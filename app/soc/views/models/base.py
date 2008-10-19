@@ -33,7 +33,6 @@ import soc.views.out_of_band
 
 from soc.logic import dicts
 from soc.logic import models
-from soc.logic import validate
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
@@ -107,7 +106,7 @@ class View:
     try:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = soc._params['public_template']
+      template = _params['public_template']
       return simple.errorResponse(request, error, template, context)
 
     if not entity:
@@ -193,8 +192,8 @@ class View:
     if not entity:
       return http.HttpResponseRedirect('/')
 
-    params=self._params['edit_params']
-    #TODO(SRabbelier) Construct a suffix
+    params = self._params['edit_params']
+    # TODO(SRabbelier): Construct a suffix
     suffix = None
 
     # redirect to (possibly new) location of the entity
@@ -206,20 +205,20 @@ class View:
   def editGet(self, request, entity, context):
     """Same as edit, but on GET
     """
-    #TODO(SRabbelier) Construct a suffix
+    # TODO(SRabbelier): Construct a suffix
     suffix = None    
 
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
     is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
-    if request.GET.get(DEF_SUBMIT_MSG_PARAM_NAME):
+    if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
-          request, DEF_SUBMIT_MSG_PARAM_NAME,
+          request, self.DEF_SUBMIT_MSG_PARAM_NAME,
           values=self._params['save_message'])
 
       # populate form with the existing entity
@@ -297,7 +296,7 @@ class View:
       entity = models.sponsor.logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._templates['create']
-      error.message = error.message + DEF_CREATE_NEW_ENTITY_MSG % {
+      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
           'entity_type_lower' : self._name,
           'entity_type_upper' : self._Name,
            'create' : self._redirects['create']
@@ -309,7 +308,8 @@ class View:
       return http.HttpResponseRedirect('/')
 
     if not self._logic.isDeletable(entity):
-      # TODO: Update the notice area telling the user they can't delete the entity
+      # TODO: Update the notice area telling the user that they
+      # can't delete the entity
       pass
 
     self._logic.delete(entity)

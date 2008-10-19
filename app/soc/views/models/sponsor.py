@@ -29,7 +29,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import validate 
+from soc.logic import validate
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base

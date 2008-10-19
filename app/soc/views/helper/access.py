@@ -142,7 +142,8 @@ def checkIsDeveloper(request):
 
 
 def checkIsHost(request, program):
-  """Returns an alternate HTTP response if Google Account has no Host entity for the specified program.
+  """Returns an alternate HTTP response if Google Account has no Host entity
+     for the specified program.
 
   Args:
     request: A Django HTTP request

@@ -44,9 +44,9 @@ class Task(base.ModelWithFieldAttributes):
   """
  
   #: A required many:1 relationship with the Proposal on which the
-  #: Task is based.  A Task may be based on only a single Proposal, 
+  #: Task is based.  A Task may be based on only a single Proposal,
   #: but a Proposal can be the foundation for multiple Tasks. The
-  #: back-reference in the Proposal model is a Query named 'tasks'.  
+  #: back-reference in the Proposal model is a Query named 'tasks'.
   proposal = db.ReferenceProperty(reference_class=soc.models.proposal.Proposal,
                                   required=True,
                                   collection_name="tasks")

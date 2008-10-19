@@ -12,9 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
- {% block submit_buttons %}
- {{ block.super }}
+{% block submit_buttons %}
+{{ block.super }}
 <td>
  <input type="button" onclick="location.href='/site/{{ entity_type_short|lower }}/profile/delete/{{ entity.link_name }}'" value="Delete"/>
 </td>
- {% endblock %}
+{% endblock %}
+{% block body %}
+{{ block.super }}
+<p><a href="/{{ entity_type_short|lower }}/profile/{{ entity.link_name }}">View Sponsor Public Profile</a></p>
+{% endblock %}

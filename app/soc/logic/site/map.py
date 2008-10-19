@@ -206,7 +206,7 @@ site_docs_list = page.Page(
 # Sponsor Group public view
 sponsor_profile = page.Page(
   page.Url(
-    r'^sponsor/profile/%s' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.sponsor.profile.public'),
   'Sponsor Public Profile',
   parent=home)
@@ -236,7 +236,7 @@ site_sponsor_delete = page.Page(
 
 site_sponsor_edit = page.Page(
   page.Url(
-    r'^site/sponsor/profile/%s' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^site/sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.sponsor.profile.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',

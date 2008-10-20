@@ -43,14 +43,18 @@ class Url:
     The arguments to this constructor correspond directly to the items in
     the urlpatterns tuple, which also correspond to the parameters of
     django.conf.urls.defaults.url().
-
+    
     Args:
-      regex: a Django URL regex pattern
-      view: a Django view, either a string or a callable
+      regex: a Django URL regex pattern, which, for obvious reason, must
+        be unique
+      view: a Django view, either a string or a callable; if a callable,
+        a unique 'name' string must be supplied
       kwargs: optional dict of extra arguments passed to the view
         function as keyword arguments, which is copy.deepcopy()'d;
         default is None, which supplies an empty dict {}
-      name: optional name of the view
+      name: optional name of the view; used instead of 'view' if supplied;
+        the 'name' or 'view' string, whichever is used, must be unique
+        amongst *all* Url objects supplied to a Page object
       prefix: optional view prefix
     """
     self.regex = regex
@@ -439,7 +443,7 @@ class NonUrl(Url):
     """Creates a non-linkable Url placeholder.
     
     Args:
-      name: name of the non-view placeholder
+      name: name of the non-view placeholder; see Url.__init__()
     """
     Url.__init__(self, None, None, name=name)
 
@@ -454,7 +458,15 @@ class NonPage(Page):
   """
 
   def __init__(self, non_url_name, long_name, **page_kwargs):
-    """
+    """Constructs a NonUrl and passes it to base Page class __init__().
+    
+    Args:
+      non_url_name:  unique (it *must* be) string that does not match
+        the 'name' or 'view' of any other Url or NonUrl object;
+        see Url.__init__() for details
+      long_name:  see Page.__init__()
+      **page_kwargs:  keyword arguments passed directly to the base
+        Page class __init__()
     """
     non_url = NonUrl(non_url_name)
     Page.__init__(self, non_url, long_name, **page_kwargs)

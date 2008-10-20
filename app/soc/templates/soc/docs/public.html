@@ -14,16 +14,16 @@ limitations under the License.
 {% endcomment %}
 
 {% block page_title %}
-{{ document.title }}
+{{ entity.title }}
 {% endblock %}
 
 {% block header_title %}
-{{ document.title }}
+{{ entity.title }}
 {% endblock %}
 
 {% block body %}
-<div id="createdon">Created on: {{ document.created }}</div>
-<div id="createdby">Created by: {{ document.author.nick_name }}</div>
-<div id="content">{{ document.content|safe }}</div>
-<div id="lastmodified">Last updated on: {{ document.modified }}</div>
+<div id="createdon">Created on: {{ entity.created }}</div>
+<div id="createdby">Created by: {{ entity.author.nick_name }}</div>
+<div id="content">{{ entity.content|safe }}</div>
+<div id="lastmodified">Last updated on: {{ entity.modified }}</div>
 {% endblock %}

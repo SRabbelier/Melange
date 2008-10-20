@@ -82,6 +82,6 @@ def public(request, page=None, partial_path=None, link_name=None,
     return simple.errorResponse(request, page, error, template, context)
 
   doc.content = helper.templates.unescape(doc.content)
-  context['document'] = doc
+  context['entity'] = doc
 
   return helper.responses.respond(request, template, context)

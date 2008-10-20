@@ -275,7 +275,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
       form = EditForm()
 
   context.update({'form': form,
-                  'existing_doc': doc})
+                  'entity': doc})
 
   return helper.responses.respond(request, template, context)
 

@@ -98,12 +98,18 @@ class Logic:
 
     fields = []
 
-    for key, value in kwargs.iteritems():
-      fields.extend('"%s" is "%s" ' % (key, value))
+    msg = 'There is no %s where ' % self._name
+
+    for index, pair in enumerate(kwargs.iteritems()):
+      if index != 0:
+        msg += ' and '
+
+      msg += '"%s" is "%s"' % pair
+
+    msg += '.'
 
     # else: fields were supplied, but there is no Entity that has it
-    raise out_of_band.ErrorResponse(
-        'There is no %s with %s.' % (self._name, ''.join(fields)), status=404)
+    raise out_of_band.ErrorResponse(msg, status=404)
 
   def getKeyNameForFields(self, **kwargs):
     """Return a Datastore key_name for a Entity from the specified fields.

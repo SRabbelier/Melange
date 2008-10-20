@@ -160,7 +160,7 @@ site_user_list = page.Page(
 docs_show = page.Page(
   page.Url(
     r'^docs/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.docs.show.public'),
+    'soc.views.models.docs.public'),
   'Show Document',
   parent=home)
  
@@ -174,7 +174,7 @@ site_docs_sub_menu = page.NonPage(
 site_docs_create = page.Page(
   page.Url(
     r'^docs/edit$',
-    'soc.views.docs.edit.create'),
+    'soc.views.models.docs.create'),
   'Site: Create New Document',
   'Create Site Document',
   parent=site_docs_sub_menu)
@@ -182,7 +182,7 @@ site_docs_create = page.Page(
 site_docs_edit = page.Page(
   page.Url(
     r'^docs/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.docs.edit.edit'),
+    'soc.views.models.docs.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
   parent=site_docs_sub_menu)
@@ -190,7 +190,7 @@ site_docs_edit = page.Page(
 site_docs_delete = page.Page(
   page.Url(
     r'^docs/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.docs.edit.delete'),
+    'soc.views.models.docs.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
   parent=site_docs_sub_menu)
@@ -198,7 +198,7 @@ site_docs_delete = page.Page(
 site_docs_list = page.Page(
   page.Url(
     r'^docs/list$',
-    'soc.views.docs.list.all'),
+    'soc.views.models.docs.list'),
   'Site: List of Documents',
   short_name='List Site Documents',
   parent=site_docs_sub_menu)
@@ -207,7 +207,7 @@ site_docs_list = page.Page(
 sponsor_profile = page.Page(
   page.Url(
     r'^sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
-    'soc.views.sponsor.profile.public'),
+    'soc.views.models.sponsor.public'),
   'Sponsor Public Profile',
   parent=home)
     
@@ -221,7 +221,7 @@ site_sponsor_sub_menu = page.NonPage(
 site_sponsor_create = page.Page(
   page.Url(
     r'^site/sponsor/profile$',
-    'soc.views.site.sponsor.profile.create'),
+    'soc.views.models.sponsor.create'),
   'Site: Create New Sponsor',
   short_name='Create Site Sponsor',
   parent=site_sponsor_sub_menu)
@@ -229,7 +229,7 @@ site_sponsor_create = page.Page(
 site_sponsor_delete = page.Page(
   page.Url(
     r'^site/sponsor/profile/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
-    'soc.views.site.sponsor.profile.delete'),
+    'soc.views.models.sponsor.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
   parent=site_sponsor_sub_menu)
@@ -237,7 +237,7 @@ site_sponsor_delete = page.Page(
 site_sponsor_edit = page.Page(
   page.Url(
     r'^site/sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
-    'soc.views.site.sponsor.profile.edit'),
+    'soc.views.models.sponsor.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
   parent=site_sponsor_sub_menu)
@@ -245,7 +245,7 @@ site_sponsor_edit = page.Page(
 site_sponsor_list = page.Page(
   page.Url(
     r'^site/sponsor/list$',
-    'soc.views.site.sponsor.list.all'),
+    'soc.views.models.sponsor.list'),
   'Site: List of Sponsors',
   short_name='List Site Sponsors',
   parent=site_sponsor_sub_menu)

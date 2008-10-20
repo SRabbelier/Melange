@@ -112,23 +112,6 @@ TODO(tlarsen): replace this with breadcrumbs
 {% endblock %}
    </div>
 
-   <div id="search">
-	{% block sidebar_search_field %}
-    <form id="searchbox_015986126177484454297:pfmwlvdl42y" action="http://www.google.com/cse">
-     <input type="hidden" name="cx" value="015986126177484454297:pfmwlvdl42y" />
-     <input type="hidden" name="cof" value="FORID:0" />
-     <div class="header">
-Search Google Open Source:
-     </div>
-     <input name="q" type="text" size="20" />
-     <input type="submit" name="sa" value="Search" />
-     <br/>
-    </form>
-    <script type="text/javascript" src="http://google.com/coop/cse/brand?form=searchbox_015986126177484454297:pfmwlvdl42y">
-    </script></form>
-	{% endblock %}
-   </div>
-
    <div id="badge">
 	{% block badge %}
 <a href="http://code.google.com/p/soc/" target="_blank">Powered by Melange</a>
@@ -175,17 +158,5 @@ be displayed here.
     </div>
    </div>
   </div>
-
-{% block google_analytics %}
-  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-  </script>
-
-  <script type="text/javascript">
-_uacct="UA-4291635-1"; // code.google.com site-wide tracking
-_uanchor=1;
-_uff=0;
-urchinTracker();
-  </script>
-{% endblock %}
  </body>
 </html>

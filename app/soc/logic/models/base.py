@@ -123,6 +123,41 @@ class Logic:
 
     return self._keyName(**kwargs)
 
+  def constructKeyNameSuffix(self, fields):
+    """Constructs a suffix from the specified fields
+
+    The resulting suffix is constructed by adding a '/' after all
+    key fields. The suffix is constructed in the order as specified
+    in the model's key_fields property. The suffix will not have a
+    trailing '/'.
+
+    Args:
+      fields: a dictionary with the values for all the key_fields
+          of this entity.
+    """
+
+    suffix = ''
+
+    for field in self._model.key_fields:
+      suffix += fields[field]
+      suffix += '/'
+
+    if suffix.endswith('/'):
+      suffix = suffix[:-1]
+
+    return suffix
+
+  def getEmptyKeyFields(self):
+    """Returns an dict with all the entities key_fields set to None
+    """
+
+    kwargs = {}
+
+    for field in self._model.key_fields:
+      kwargs[field] = None
+
+    return kwargs
+
   def extractKeyFields(self, fields):
     """Extracts all the fields from that are in the mode's key_fields property
 

@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
+from soc.logic import models
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
@@ -81,8 +82,6 @@ class View(base.View):
   """View methods for the Sponsor model
   """
 
-  SUBMIT_MSG_PROFILE_SAVED = 0
-
   def __init__(self, original_params=None, original_rights=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -122,7 +121,7 @@ class View(base.View):
     params['save_message'] = [ugettext_lazy('Profile saved.')]
     
     params['edit_params'] = {
-        DEF_SUBMIT_MSG_PARAM_NAME: SUBMIT_MSG_PROFILE_SAVED,
+        base.View.DEF_SUBMIT_MSG_PARAM_NAME: base.View.DEF_SUBMIT_MSG_PROFILE_SAVED,
         }
     
     rights['list'] = [helper.access.checkIsDeveloper]
@@ -143,7 +142,9 @@ class View(base.View):
 
 
 view = View()
-public = view.public
-list = view.list
+
+create = view.create
 delete = view.delete
 edit = view.edit
+list = view.list
+public = view.public

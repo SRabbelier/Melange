@@ -48,11 +48,12 @@ class View:
   """
 
   DEF_SUBMIT_MSG_PARAM_NAME = 's'
+  DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
   DEF_CREATE_NEW_ENTITY_MSG = ugettext_lazy(
-      ' You can create a new %(model_type)s by visiting'
+      ' You can create a new %(entity_type_lower)s by visiting'
       ' <a href="%(create)s">Create '
-      'a New %(Type)s</a> page.')
+      'a New %(entity_type)s</a> page.')
 
   def __init__(self, params=None, rights=None):
     """
@@ -106,14 +107,12 @@ class View:
     try:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = _params['public_template']
-      return simple.errorResponse(request, error, template, context)
+      template = self._params['public_template']
+      return simple.errorResponse(request, page, error, template, context)
 
     if not entity:
       #TODO: Change this into a proper redirect
       return http.HttpResponseRedirect('/')
-
-    self._makePublic(entity)
 
     context['entity'] = entity
     context['entity_type'] = self._params['name']
@@ -133,7 +132,7 @@ class View:
     """
 
     # Create page is an edit page with no key fields
-    kwargs = {}
+    kwargs = self._logic.getEmptyKeyFields()
     return self.edit(request, page=page, **kwargs)
 
   def edit(self, request, page=None, **kwargs):
@@ -158,13 +157,13 @@ class View:
     try:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = soc._params['public_template']
-      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
-          'entity_type_lower' : self._params['name_lower'],
-          'entity_type_upper' : self._parmas['name_upper'],
-          'create' : self._redirects['create']
+      template = self._params['public_template']
+      error.message = error.message + View.DEF_CREATE_NEW_ENTITY_MSG % {
+          'entity_type_lower' : self._params['name'].lower(),
+          'entity_type' : self._params['name'],
+          'create' : self._params['create_redirect']
           }
-      return simple.errorResponse(request, error, template, context)
+      return simple.errorResponse(request, page, error, template, context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context)
@@ -174,13 +173,14 @@ class View:
   def editPost(self, request, entity, context):
     """Same as edit, but on POST
     """
+
     if entity:
       form = self._params['edit_form'](request.POST)
     else:
       form = self._params['create_form'](request.POST)
 
     if not form.is_valid():
-      return
+      return self._constructResponse(request, entity, context, form)
 
     fields = self.collectCleanedFields(form)
 
@@ -193,13 +193,12 @@ class View:
       return http.HttpResponseRedirect('/')
 
     params = self._params['edit_params']
-    # TODO(SRabbelier): Construct a suffix
-    suffix = None
+    suffix = self._logic.constructKeyNameSuffix(fields)
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
-        request, None, suffix,
+        request, suffix, suffix,
         params=params)
 
   def editGet(self, request, entity, context):
@@ -211,29 +210,23 @@ class View:
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
     is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
-    if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
+    if request.GET.get(View.DEF_SUBMIT_MSG_PARAM_NAME):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
-          request, self.DEF_SUBMIT_MSG_PARAM_NAME,
+          request, View.DEF_SUBMIT_MSG_PARAM_NAME,
           values=self._params['save_message'])
 
       # populate form with the existing entity
       form = self._params['edit_form'](instance=entity)
+      self._editGet(request, entity, form)
     else:
       form = self._params['create_form']()
 
-    context['form'] = form
-    context['entity'] = entity
-    context['entity_type'] = self._params['name']
-    context['entity_type_plural'] = self._params['name_plural']
-
-    template = self._params['edit_template']
-
-    return helper.responses.respond(request, template, context)
+    return self._constructResponse(request, entity, context, form)
 
   def list(self, request, page=None):
     """Displays the list page for the entity type
@@ -293,15 +286,15 @@ class View:
     entity = None
 
     try:
-      entity = models.sponsor.logic.getIfFields(**kwargs)
+      entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = self._templates['create']
-      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
-          'entity_type_lower' : self._name,
-          'entity_type_upper' : self._Name,
-           'create' : self._redirects['create']
-           }
-      return simple.errorResponse(request, error, template, context)
+      template = self._params['create_template']
+      error.message = error.message + View.DEF_CREATE_NEW_ENTITY_MSG % {
+          'entity_type_lower' : self._params['name'].lower(),
+          'entity_type' : self._params['name'],
+          'create' : self._params['create_redirect']
+          }
+      return simple.errorResponse(request, page, error, template, context)
 
     if not entity:
       #TODO: Create a proper error page for this
@@ -321,12 +314,23 @@ class View:
     """Performs any required processing on the entity to post its edit page
 
     Args:
-      request: The django request object
-      entity: the entity to make public
-      fields: The new field values
+      request: the django request object
+      entity: the entity to post
+      fields: the new field values
     """
 
     raise NotImplementedError
+
+  def _editGet(self, request, entity, form):
+    """Performs any required processing on the form to get its edit page
+
+    Args:
+      request: the django request object
+      entity: the entity to get
+      form: the django form that will be used for the page
+    """
+
+    pass
 
   def checkUnspecified(self, access_type, request):
     """Checks whether an unspecified access_type should be allowed
@@ -337,6 +341,25 @@ class View:
     """
 
     pass
+
+  def _constructResponse(self, request, entity, context, form):
+    """Updates the context and returns a response for the specified arguments
+
+    Args:
+      request: the django request object
+      entity: the entity that is used
+      context: the context to be used
+      form: the form that will be used
+    """
+
+    context['form'] = form
+    context['entity'] = entity
+    context['entity_type'] = self._params['name']
+    context['entity_type_plural'] = self._params['name_plural']
+
+    template = self._params['edit_template']
+
+    return helper.responses.respond(request, template, context)
 
   def checkAccess(self, access_type, request):
     """Runs all the defined checks for the specified type

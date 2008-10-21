@@ -38,7 +38,7 @@ class Group(polymodel.PolyModel):
   """
 
   #: Defines which fields are uses as the key_name
-  key_fields = ['link_name']
+  KEY_FIELDS = ['link_name']
 
   #: Required field storing name of the group.
   name = db.StringProperty(required=True,

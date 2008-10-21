@@ -158,7 +158,7 @@ class View:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['public_template']
-      error.message = error.message + View.DEF_CREATE_NEW_ENTITY_MSG % {
+      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
           'entity_type_lower' : self._params['name'].lower(),
           'entity_type' : self._params['name'],
           'create' : self._params['create_redirect']
@@ -210,14 +210,14 @@ class View:
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
     is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
-    if request.GET.get(View.DEF_SUBMIT_MSG_PARAM_NAME):
+    if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
-          request, View.DEF_SUBMIT_MSG_PARAM_NAME,
+          request, self.DEF_SUBMIT_MSG_PARAM_NAME,
           values=self._params['save_message'])
 
       # populate form with the existing entity
@@ -289,7 +289,7 @@ class View:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['create_template']
-      error.message = error.message + View.DEF_CREATE_NEW_ENTITY_MSG % {
+      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
           'entity_type_lower' : self._params['name'].lower(),
           'entity_type' : self._params['name'],
           'create' : self._params['create_redirect']
@@ -315,7 +315,7 @@ class View:
 
     Args:
       request: the django request object
-      entity: the entity to post
+      entity:  the entity to create or update from POST contents
       fields: the new field values
     """
 

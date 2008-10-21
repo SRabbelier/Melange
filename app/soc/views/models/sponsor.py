@@ -121,7 +121,7 @@ class View(base.View):
     params['save_message'] = [ugettext_lazy('Profile saved.')]
     
     params['edit_params'] = {
-        base.View.DEF_SUBMIT_MSG_PARAM_NAME: base.View.DEF_SUBMIT_MSG_PROFILE_SAVED,
+        self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
         }
     
     rights['list'] = [helper.access.checkIsDeveloper]
@@ -133,7 +133,7 @@ class View(base.View):
     base.View.__init__(self, rights=rights, params=params)
 
   def _editPost(self, request, entity, fields):
-    """
+    """See base.View._editPost().
     """
 
     id = users.get_current_user()

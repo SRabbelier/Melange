@@ -26,6 +26,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from django.utils.translation import ugettext_lazy
+
 from soc.logic import out_of_band
 
 
@@ -98,15 +100,17 @@ class Logic:
 
     fields = []
 
-    msg = 'There is no %s where ' % self._name
+    format_text = ugettext_lazy('"%(key)s" is "%(value)s"')
 
-    for index, pair in enumerate(kwargs.iteritems()):
-      if index != 0:
-        msg += ' and '
+    msg_pairs = [format_text % {'key': key, 'value': value}
+      for key, value in kwargs.iteritems()]
 
-      msg += '"%s" is "%s"' % pair
+    joined_pairs = ' and '.join(msg_pairs)
 
-    msg += '.'
+    msg = ugettext_lazy(
+      'There is no "%(name)s" where %(pairs)s.') % {
+        'name': self._name, 'pairs': joined_pairs}
+
 
     # else: fields were supplied, but there is no Entity that has it
     raise out_of_band.ErrorResponse(msg, status=404)
@@ -136,16 +140,12 @@ class Logic:
           of this entity.
     """
 
-    suffix = ''
+    suffix = []
 
-    for field in self._model.key_fields:
-      suffix += fields[field]
-      suffix += '/'
+    for field in self._model.KEY_FIELDS:
+      suffix.append(fields[field])
 
-    if suffix.endswith('/'):
-      suffix = suffix[:-1]
-
-    return suffix
+    return '/'.join(suffix)
 
   def getEmptyKeyFields(self):
     """Returns an dict with all the entities key_fields set to None
@@ -153,7 +153,7 @@ class Logic:
 
     kwargs = {}
 
-    for field in self._model.key_fields:
+    for field in self._model.KEY_FIELDS:
       kwargs[field] = None
 
     return kwargs
@@ -168,7 +168,7 @@ class Logic:
     key_fields = {}
 
     for key, value in fields.iteritems():
-      if key in self._model.key_fields:
+      if key in self._model.KEY_FIELDS:
         key_fields[key] = value
 
     return key_fields

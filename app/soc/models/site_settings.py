@@ -21,12 +21,22 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import db
+
+from django.utils.translation import ugettext_lazy
+
 import soc.models.home_settings
 
 
 class SiteSettings(soc.models.home_settings.HomeSettings):
   """Model of a SiteSettings, which stores per site configuration."""
-  # there is currently no site-specific configuration that is different from
-  # other /home page configuration (but this will change...)
-  pass 
+
+  #: Valid Google Analytics tracking number, if entered every page
+  #: is going to have Google Analytics JS initialization code in 
+  #: the footer with the given tracking number.
+  ga_tracking_no = db.StringProperty(verbose_name=ugettext_lazy('Google Analytics'))
+  ga_tracking_no.help_text = ugettext_lazy(
+      'Valid Google Analytics tracking number. If the number is '
+      'entered every page is going to have Google Analytics '
+      'initialization code in footer.')
 

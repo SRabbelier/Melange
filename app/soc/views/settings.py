@@ -48,18 +48,11 @@ import soc.views.helper.widgets
 import soc.views.out_of_band
 
 
-class SettingsForm(helper.forms.DbModelForm):
+class SettingsValidationForm(helper.forms.DbModelForm):
   """Django form displayed when creating or editing Settings.
+  
+  This form includes validation functions for Settings fields.
   """
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    #: db.Model subclass for which the form will gather information
-    model = soc.models.home_settings.HomeSettings
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home']
 
   def clean_feed_url(self):
     feed_url = self.cleaned_data.get('feed_url')
@@ -72,6 +65,20 @@ class SettingsForm(helper.forms.DbModelForm):
       raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
     return feed_url
+
+
+class SettingsForm(SettingsValidationForm):
+  """Django form displayed when creating or editing Settings.
+  """
+
+  class Meta:
+    """Inner Meta class that defines some behavior for the form.
+    """
+    #: db.Model subclass for which the form will gather information
+    model = soc.models.home_settings.HomeSettings
+
+    #: list of model fields which will *not* be gathered by the form
+    exclude = ['inheritance_line', 'home']
 
 
 class DocSelectForm(helper.forms.DbModelForm):
@@ -99,6 +106,7 @@ DEF_HOME_EDIT_TMPL = 'soc/settings/edit.html'
 
 @decorators.view
 def edit(request, page=None, path=None, logic=models.home_settings.logic,
+         settings_form_class=SettingsForm,
          template=DEF_HOME_EDIT_TMPL):
   """View for authorized User to edit contents of a home page.
 
@@ -106,6 +114,9 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
     request: the standard django request object.
     page: a soc.logic.site.page.Page object which is abstraction that
       combines a Django view with sidebar menu info
+    path: path that is used to uniquely identify settings
+    logic: settings logic object
+    settings_form_class:
     template: the template path to use for rendering the template.
 
   Returns:
@@ -128,11 +139,17 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
   home_doc = None
 
   if request.method == 'POST':
-    settings_form = SettingsForm(request.POST)
+    settings_form = settings_form_class(request.POST)
     doc_select_form = DocSelectForm(request.POST)
     
     if doc_select_form.is_valid() and settings_form.is_valid():
-      fields = {'feed_url': settings_form.cleaned_data.get('feed_url')}
+      fields = {}      
+      
+      # Ask for all the fields and pull them out 
+      for field in settings_form.cleaned_data:
+        value = settings_form.cleaned_data.get(field)
+        fields[field] = value
+
       partial_path = doc_select_form.cleaned_data.get('partial_path')
       link_name = doc_select_form.cleaned_data.get('link_name')
 
@@ -157,7 +174,7 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
 
     if settings:
       # populate form with the existing HomeSettings entity
-      settings_form = SettingsForm(instance=settings)
+      settings_form = settings_form_class(instance=settings)
 
       # check if ReferenceProperty to home Document is valid
       try:
@@ -173,7 +190,7 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
         doc_select_form = DocSelectForm()
     else:
       # no SiteSettings entity exists for this key_name, so show a blank form
-      settings_form = SettingsForm()
+      settings_form = settings_form_class()
       doc_select_form = DocSelectForm()
 
   context.update({'settings_form': settings_form,

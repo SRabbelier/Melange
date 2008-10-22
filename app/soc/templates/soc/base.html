@@ -146,9 +146,10 @@ be displayed here.
 </p>
 	{% endblock %}
    </div>
-
-	
    <div id="footer" dir="ltr">
+    {% if ga_tracking_no %}
+    {% include 'soc/site/ga.html' %}
+    {% endif %}
     <div class="text">
 	{% block footer %}
 &copy;2008 Google -

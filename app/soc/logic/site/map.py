@@ -108,7 +108,7 @@ site_home = page.Page(
 site_settings_edit = page.Page(
   page.Url(
     r'^site/settings/edit$',
-    'soc.views.settings.edit',
+    'soc.views.site.settings.edit',
     kwargs={
       'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
       'logic': models.site_settings.logic,

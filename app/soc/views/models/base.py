@@ -352,10 +352,7 @@ class View:
       form: the form that will be used
     """
 
-    if entity:
-      suffix = self._logic.constructKeyNameSuffix(entity)
-    else:
-      suffix = None
+    suffix = self._logic.constructKeyNameSuffix(entity)
 
     context['form'] = form
     context['entity'] = entity

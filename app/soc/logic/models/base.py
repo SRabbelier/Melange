@@ -151,6 +151,9 @@ class Logic:
           of this entity.
     """
 
+    if not entity:
+      return None
+    
     suffix = []
 
     for field in entity.KEY_FIELDS:

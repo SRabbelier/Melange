@@ -193,7 +193,7 @@ class View:
       return http.HttpResponseRedirect('/')
 
     params = self._params['edit_params']
-    suffix = self._logic.constructKeyNameSuffix(fields)
+    suffix = self._logic.constructKeyNameSuffix(entity)
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
@@ -204,8 +204,8 @@ class View:
   def editGet(self, request, entity, context):
     """Same as edit, but on GET
     """
-    # TODO(SRabbelier): Construct a suffix
-    suffix = None    
+
+    suffix = self._logic.constructKeyNameSuffix(entity)
 
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
@@ -352,10 +352,17 @@ class View:
       form: the form that will be used
     """
 
+    if entity:
+      suffix = self._logic.constructKeyNameSuffix(entity)
+    else:
+      suffix = None
+
     context['form'] = form
     context['entity'] = entity
+    context['entity_suffix'] = suffix
     context['entity_type'] = self._params['name']
     context['entity_type_plural'] = self._params['name_plural']
+    context['entity_type_short'] = self._params['name_short']
 
     template = self._params['edit_template']
 

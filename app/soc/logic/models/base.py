@@ -127,7 +127,18 @@ class Logic:
 
     return self._keyName(**kwargs)
 
-  def constructKeyNameSuffix(self, fields):
+  def getEmptyKeyFields(self):
+    """Returns an dict with all the entities key_fields set to None
+    """
+
+    kwargs = {}
+
+    for field in self._model.KEY_FIELDS:
+      kwargs[field] = None
+
+    return kwargs
+
+  def constructKeyNameSuffix(self, entity):
     """Constructs a suffix from the specified fields
 
     The resulting suffix is constructed by adding a '/' after all
@@ -142,21 +153,14 @@ class Logic:
 
     suffix = []
 
-    for field in self._model.KEY_FIELDS:
-      suffix.append(fields[field])
+    for field in entity.KEY_FIELDS:
+      # Four hours wasted on this line, because apparently passing in a dict
+      # one time, and a db.Model the next time, things get rather hard to debug
+      value = entity.__getattribute__(field)
+      suffix.append(value)
 
-    return '/'.join(suffix)
-
-  def getEmptyKeyFields(self):
-    """Returns an dict with all the entities key_fields set to None
-    """
-
-    kwargs = {}
-
-    for field in self._model.KEY_FIELDS:
-      kwargs[field] = None
-
-    return kwargs
+    res = '/'.join(suffix)
+    return res
 
   def extractKeyFields(self, fields):
     """Extracts all the fields from that are in the mode's key_fields property

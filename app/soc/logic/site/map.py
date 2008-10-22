@@ -163,7 +163,7 @@ docs_show = page.Page(
     'soc.views.models.docs.public'),
   'Show Document',
   parent=home)
- 
+
 # Site Document views
 site_docs_sub_menu = page.NonPage(
   'site-docs-sub-menu',
@@ -210,7 +210,7 @@ sponsor_profile = page.Page(
     'soc.views.models.sponsor.public'),
   'Sponsor Public Profile',
   parent=home)
-    
+
 # Sponsor Group Site views
 site_sponsor_sub_menu = page.NonPage(
   'site-sponsor-sub-menu',
@@ -258,11 +258,11 @@ site_sponsor_list = page.Page(
 #    (r'^org/profile/(?P<program>[_0-9a-z]+)/(?P<link_name>[_0-9a-z]+)/$',
 #     'soc.views.person.profile.edit'),
 
-    
+
 ROOT_PAGES = [
   # /, first level of the sidebar menu, excluded from breadcrumbs
   home,
-  
+
   # alternate view of /, no menu presence
   site_home,
 ]
@@ -270,14 +270,14 @@ ROOT_PAGES = [
 
 def getDjangoUrlPatterns(pages=ROOT_PAGES):
   """Returns Django urlpatterns derived from the site map Pages.
-  
+
   Args:
     pages: a list of page.Page objects from which to generate urlpatterns
       (from them and from their child Pages); default is ROOT_PAGES
 
   Raises:
     KeyError if more than one Page has the same urlpattern.
-    
+
     TODO(tlarsen): this probably does not work correctly, currently, since
     page.Page.makeDjangoUrls() returns a list, and this routine is
     combining lists from potentially multiple page hierarchies.  Each list
@@ -286,7 +286,7 @@ def getDjangoUrlPatterns(pages=ROOT_PAGES):
     needs to be detected earlier via a global Page dictionary.
   """
   urlpatterns = ['']
-  
+
   for page in pages:
     urlpatterns.extend(page.makeDjangoUrls())
 

@@ -32,6 +32,7 @@ import re
 #     zero or more of OR group
 LINKNAME_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
 LINKNAME_ARG_PATTERN = r'(?P<link_name>%s)' % LINKNAME_PATTERN_CORE
+GENERIC_ARG_PATTERN = r'(?P<%%s>%s)' % LINKNAME_PATTERN_CORE 
 LINKNAME_PATTERN = r'^%s$' % LINKNAME_PATTERN_CORE
 LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
 

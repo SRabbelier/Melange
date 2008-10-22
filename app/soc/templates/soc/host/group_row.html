@@ -1,0 +1,9 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+onclick="document.location.href='/site/{{ entity_type|lower }}/profile/{{ data_element.sponsor_ln }}/{{ data_element.user_ln }}'" name="name">
+  <td align="right"><div class="name"><a class="noul"
+         href="/site/{{ entity_type|lower }}/profile/{{ data_element.sponsor_ln }}/{{ data_element.user_ln }}">{{ data_element.given_name }} {{ data_element.surname}}</a>
+     </div>
+  </td>
+  <td><div class="sponsor">{{ data_element.sponsor.link_name }}</div></td>
+  <td><div class="link_name">{{ data_element.user.link_name }}</div></td>
+</tr>

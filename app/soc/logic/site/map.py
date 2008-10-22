@@ -250,6 +250,58 @@ site_sponsor_list = page.Page(
   short_name='List Site Sponsors',
   parent=site_sponsor_sub_menu)
 
+# Host Group public view
+host_profile = page.Page(
+  page.Url(
+    r'^host/profile/%s/%s$' %
+        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
+         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+    'soc.views.models.host.public'),
+  'Host Public Profile',
+  parent=home)
+
+# Host Group Site views
+site_host_sub_menu = page.NonPage(
+  'site-host-sub-menu',
+  'Site: Host Sub-Menu',
+  short_name='Site Hosts',
+  parent=site_settings_edit)
+
+site_host_create = page.Page(
+  page.Url(
+    r'^site/host/profile$',
+    'soc.views.models.host.create'),
+  'Site: Create New Host',
+  short_name='Create Site Host',
+  parent=site_host_sub_menu)
+
+site_host_delete = page.Page(
+  page.Url(
+    r'^site/host/delete/%s/%s$' %
+        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
+         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+    'soc.views.models.host.delete'),
+  'Site: Delete Existing Host',
+  short_name='Delete Site Host',
+  parent=site_host_sub_menu)
+
+site_host_edit = page.Page(
+  page.Url(
+    r'^site/host/profile/%s/%s$' %
+        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
+         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+    'soc.views.models.host.edit'),
+  'Site: Modify Existing Host',
+  short_name='Modify Site Host',
+  parent=site_host_sub_menu)
+
+site_host_list = page.Page(
+  page.Url(
+    r'^site/host/list$',
+    'soc.views.models.host.list'),
+  'Site: List of Hosts',
+  short_name='List Site Hosts',
+  parent=site_host_sub_menu)
 
 # these are not really used...
 #    (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<link_name>[_0-9a-z]+)/$',

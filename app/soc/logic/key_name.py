@@ -166,3 +166,14 @@ def nameWork(link_name):
 
   return 'Work:%s' % link_name
 
+
+def nameHost(sponsor_ln, user_ln):
+  """Placeholder for host namer"""
+
+  if not sponsor_ln:
+    raise Error('"sponsor_ln" must be non-False: "%s"' % sponsor_ln)
+
+  if not user_ln:
+    raise Error('"user_ln" must be non-False: "%s"' % user_ln)
+
+  return 'Host:%s:%s' % (sponsor_ln, user_ln)

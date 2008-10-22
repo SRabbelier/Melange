@@ -32,9 +32,19 @@ class Host(soc.models.role.Role):
   """Host details for a specific Program.
   """
 
+  KEY_FIELDS = ['sponsor_ln', 'user_ln']
+
   #: A 1:1 relationship associating a Host with specific
   #: Sponsor details and capabilities. The back-reference in
   #: the Sponsor model is a Query named 'host'.  
   sponsor = db.ReferenceProperty(reference_class=soc.models.sponsor.Sponsor,
                                  required=True, collection_name='hosts')
+
+  def _get_link_name(self):
+    return self.sponsor.link_name
+
+  def _set_link_name(self, value):
+    self.sponsor.link_name = value
+
+  sponsor_ln = property(_get_link_name, _set_link_name)
 

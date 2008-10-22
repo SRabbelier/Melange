@@ -80,5 +80,5 @@ class ModelWithFieldAttributes(db.Model):
           model = cls
       
       cls._fields_cache = FieldsProxy()
-
+    raise
     return cls._fields_cache

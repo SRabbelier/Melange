@@ -46,7 +46,7 @@ import soc.views.helper.requests
 import soc.views.helper.responses
 
 
-class LookupForm(helper.forms.DbModelForm):
+class LookupForm(helper.forms.BaseForm):
   """Django form displayed for a Developer to look up a User.
   
   This form is manually specified, instead of using
@@ -199,7 +199,7 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-class EditForm(helper.forms.DbModelForm):
+class EditForm(helper.forms.BaseForm):
   """Django form displayed when Developer edits a User.
   
   This form is manually specified, instead of using
@@ -360,7 +360,7 @@ def edit(request, page=None, link_name=None,
   return helper.responses.respond(request, template, context)
 
 
-class CreateForm(helper.forms.DbModelForm):
+class CreateForm(helper.forms.BaseForm):
   """Django form displayed when Developer creates a User.
 
   This form is manually specified, instead of using

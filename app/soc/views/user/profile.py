@@ -43,7 +43,7 @@ import soc.views.helper.requests
 import soc.views.helper.responses
 
 
-class UserForm(helper.forms.DbModelForm):
+class UserForm(helper.forms.BaseForm):
   """Django form displayed when creating or editing a User.
   """
   class Meta:

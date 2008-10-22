@@ -84,7 +84,7 @@ def getDocForForm(form):
   return doc
 
 
-class CreateForm(helper.forms.DbModelForm):
+class CreateForm(helper.forms.BaseForm):
   """Django form displayed when Developer creates a Document.
   """
   content = forms.fields.CharField(widget=helper.widgets.TinyMCE(

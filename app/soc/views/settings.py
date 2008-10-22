@@ -48,7 +48,7 @@ import soc.views.helper.widgets
 import soc.views.out_of_band
 
 
-class SettingsValidationForm(helper.forms.DbModelForm):
+class SettingsValidationForm(helper.forms.BaseForm):
   """Django form displayed when creating or editing Settings.
   
   This form includes validation functions for Settings fields.
@@ -81,7 +81,7 @@ class SettingsForm(SettingsValidationForm):
     exclude = ['inheritance_line', 'home']
 
 
-class DocSelectForm(helper.forms.DbModelForm):
+class DocSelectForm(helper.forms.BaseForm):
   """Django form displayed to select a Document.
   """
 

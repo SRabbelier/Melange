@@ -46,7 +46,7 @@ import soc.views.helper.widgets
 import soc.views.out_of_band
 
 
-class CreateForm(helper.forms.DbModelForm):
+class CreateForm(helper.forms.BaseForm):
   """Django form displayed when creating a Sponsor.
   """
   class Meta:

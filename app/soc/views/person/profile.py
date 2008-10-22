@@ -40,7 +40,7 @@ from soc.views.helper import decorators
 import soc.views.helper.forms
 
 
-class EditForm(helper.forms.DbModelForm):
+class EditForm(helper.forms.BaseForm):
   """Django form displayed when creating or editing a Person.
   """
 

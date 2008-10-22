@@ -40,7 +40,7 @@ import soc.views.helper
 import soc.views.helper.widgets
 
 
-class CreateForm(helper.forms.DbModelForm):
+class CreateForm(helper.forms.BaseForm):
   """Django form displayed when creating a Host.
   """
 

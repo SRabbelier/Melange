@@ -14,12 +14,8 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
-{% block page_title %}
-{{ entity.user.link_name }}
-{% endblock %}
-
 {% block header_title %}
-{{ entity.user.link_name }}
+{{ page.short_name }} for {{ entity.user.nick_name }} ({{ entity.given_name }} {{ entity.surname }})
 {% endblock %}
 
 {% block body %}
@@ -28,9 +24,6 @@ limitations under the License.
   {% readonly_field_as_table_row entity.fields.given_name.label entity.given_name %}
   {% readonly_field_as_table_row entity.fields.surname.label entity.surname %}
   {% readonly_field_as_table_row entity.fields.display_name.label entity.display_name %}
-  {% readonly_field_as_table_row entity.fields.surname.label entity.surname %}
-  {% readonly_field_as_table_row entity.fields.display_name.label entity.display_name %}
-  {% readonly_field_as_table_row entity.fields.email.label entity.email %}
   <!-- TODO(pawel.solyga) make this generic -->
  </table>
 </p>

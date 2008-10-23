@@ -136,7 +136,9 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    pass
+    id = users.get_current_user()
+    user = soc.logic.models.user.logic.getFromFields(email=id.email())
+    fields['founder'] = user
 
 
 view = View()

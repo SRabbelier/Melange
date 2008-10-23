@@ -26,6 +26,7 @@ from django import http
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
+import soc.logic.dicts
 import soc.logic.out_of_band
 import soc.views.helper.lists
 import soc.views.helper.responses
@@ -288,7 +289,7 @@ class View:
     try:
       entity = self._logic.getIfFields(**kwargs)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = self._params['create_template']
+      template = self._params['edit_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
           'entity_type_lower' : self._params['name'].lower(),
           'entity_type' : self._params['name'],

@@ -250,17 +250,16 @@ site_sponsor_list = page.Page(
   short_name='List Site Sponsors',
   parent=site_sponsor_sub_menu)
 
-# Host Group public view
+# Host public view
 host_profile = page.Page(
   page.Url(
-    r'^host/profile/%s/%s$' %
-        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
-         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+      r'^host/profile/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.public'),
   'Host Public Profile',
   parent=home)
 
-# Host Group Site views
+# Host Site views
 site_host_sub_menu = page.NonPage(
   'site-host-sub-menu',
   'Site: Host Sub-Menu',
@@ -277,9 +276,8 @@ site_host_create = page.Page(
 
 site_host_delete = page.Page(
   page.Url(
-    r'^site/host/delete/%s/%s$' %
-        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
-         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+    r'^site/host/delete/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.delete'),
   'Site: Delete Existing Host',
   short_name='Delete Site Host',
@@ -287,9 +285,8 @@ site_host_delete = page.Page(
 
 site_host_edit = page.Page(
   page.Url(
-    r'^site/host/profile/%s/%s$' %
-        (path_link_name.GENERIC_ARG_PATTERN % 'sponsor_ln',
-         path_link_name.GENERIC_ARG_PATTERN % 'user_ln'),
+    r'^site/host/profile/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.edit'),
   'Site: Modify Existing Host',
   short_name='Modify Site Host',

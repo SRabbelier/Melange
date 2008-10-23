@@ -12,18 +12,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
 {% block page_title %}
-{{ entity.title }}
+{{ entity.user.link_name }}
 {% endblock %}
 
 {% block header_title %}
-{{ entity.title }}
+{{ entity.user.link_name }}
 {% endblock %}
 
 {% block body %}
-<div id="createdon">Created on: {{ entity.created }}</div>
-<div id="createdby">Created by: {{ entity.author.nick_name }}</div>
-<div id="content">{{ entity.content|safe }}</div>
-<div id="lastmodified">Last updated on: {{ entity.modified }}</div>
+<p>
+ <table>
+  {% readonly_field_as_table_row entity.fields.given_name.label entity.given_name %}
+  {% readonly_field_as_table_row entity.fields.surname.label entity.surname %}
+  {% readonly_field_as_table_row entity.fields.display_name.label entity.display_name %}
+  {% readonly_field_as_table_row entity.fields.surname.label entity.surname %}
+  {% readonly_field_as_table_row entity.fields.display_name.label entity.display_name %}
+  {% readonly_field_as_table_row entity.fields.email.label entity.email %}
+  <!-- TODO(pawel.solyga) make this generic -->
+ </table>
+</p>
 {% endblock %}

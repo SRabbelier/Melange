@@ -29,7 +29,7 @@ import soc.models.host
 
 
 class Logic(base.Logic):
-  """Logic methods for the Work model
+  """Logic methods for the Host model
   """
 
   def __init__(self):

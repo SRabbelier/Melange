@@ -22,22 +22,15 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
-from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import validate
 from soc.views import helper
-from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.host
 import soc.logic.models.host
-import soc.logic.dicts
 import soc.views.helper
-import soc.views.helper.widgets
 
 
 class CreateForm(helper.forms.BaseForm):
@@ -102,7 +95,7 @@ class View(base.View):
 
     # TODO(tlarsen) Add support for Django style template lookup
     params['edit_template'] = 'soc/models/edit.html'
-    params['public_template'] = 'soc/models/public.html'
+    params['public_template'] = 'soc/host/public.html'
     params['list_template'] = 'soc/list/all.html'
 
     params['lists_template'] = {
@@ -130,7 +123,7 @@ class View(base.View):
     base.View.__init__(self, rights=rights, params=params)
 
   def _editPost(self, request, entity, fields):
-    """
+    """See base.View._editPost().
     """
 
     fields['sponsor_ln'] = fields['sponsor'].link_name

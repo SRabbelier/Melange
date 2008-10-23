@@ -41,5 +41,22 @@ class Logic(base.Logic):
     self._keyName = key_name.nameHost
     self._skip_properties = []
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.sponsor.link_name, entity.user.link_name]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['sponsor'].link_name, fields['user'].link_name]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames
+    """
+
+    return ['sponsor_ln', 'user_ln']
 
 logic = Logic()

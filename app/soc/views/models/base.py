@@ -133,7 +133,11 @@ class View:
     """
 
     # Create page is an edit page with no key fields
-    kwargs = self._logic.getEmptyKeyFields()
+    kwargs = {}
+    fields = self._logic.getKeyFieldNames()
+    for field in fields:
+      kwargs[field] = None
+
     return self.edit(request, page=page, **kwargs)
 
   def edit(self, request, page=None, **kwargs):
@@ -187,14 +191,16 @@ class View:
 
     self._editPost(request, entity, fields)
 
-    keys = self._logic.extractKeyFields(fields)
-    entity = self._logic.updateOrCreateFromFields(fields, **keys)
+    keys = self._logic.getKeyFieldNames()
+    values = self._logic.getKeyValuesFromFields(fields)
+    kwargs = dicts.zip(keys, values)
+    entity = self._logic.updateOrCreateFromFields(fields, **kwargs)
 
     if not entity:
       return http.HttpResponseRedirect('/')
 
     params = self._params['edit_params']
-    suffix = self._logic.constructKeyNameSuffix(entity)
+    suffix = self._logic.getKeySuffix(entity)
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
@@ -206,7 +212,7 @@ class View:
     """Same as edit, but on GET
     """
 
-    suffix = self._logic.constructKeyNameSuffix(entity)
+    suffix = self._logic.getKeySuffix(entity)
 
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
@@ -353,7 +359,7 @@ class View:
       form: the form that will be used
     """
 
-    suffix = self._logic.constructKeyNameSuffix(entity)
+    suffix = self._logic.getKeySuffix(entity)
 
     context['form'] = form
     context['entity'] = entity

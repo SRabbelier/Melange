@@ -41,5 +41,23 @@ class Logic(base.Logic):
     self._keyName = key_name.nameDocument
     self._skip_properties = []
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.partial_path, entity.link_name]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['partial_path'], fields['link_name']]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames
+    """
+
+    return ['partial_path', 'link_name']
+
 
 logic = Logic()

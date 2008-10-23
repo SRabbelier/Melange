@@ -43,16 +43,6 @@ class Person(polymodel.PolyModel):
   fields are revealed is usually covered by Program terms of service.
   """
 
-  KEY_FIELDS = ['user_ln']
-
-  def _get_link_name(self):
-    return self.user.link_name
-
-  def _set_link_name(self, value):
-    self.user.link_name = value
-
-  user_ln = property(_get_link_name, _set_link_name)
-
   #: A required many:1 relationship that ties (possibly multiple
   #: entities of) Person details to a unique User.  A Person cannot
   #: exist unassociated from a login identity and credentials.  The

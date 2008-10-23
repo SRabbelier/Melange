@@ -48,6 +48,45 @@ class Logic:
 
     return True
 
+  def getKeyValues(self, entity):
+    """Exctracts the key values from entity and returns them
+
+    Args:
+      entity: the entity from which to extract the key values
+    """
+
+    raise NotImplementedError
+
+  def getKeyValuesFromFields(self, fields):
+    """Exctracts the key values from a dict and returns them
+
+    Args:
+      fields: the dict from which to extract the key values
+    """
+
+    raise NotImplementedError
+
+  def getKeyFieldNames(self):
+    """Returns an array with the names of the Key Fields 
+    """
+
+    raise NotImplementedError
+
+  def getKeySuffix(self, entity):
+    """Returns a suffix for the specified entity or None if no entity specified
+
+    Args:
+      entity: the entity for which to get the suffix
+    """
+
+    if not entity:
+      return None
+
+    key_values = self.getKeyValues(entity)
+    suffix = '/'.join(key_values)
+
+    return suffix
+
   def getFromKeyName(self, key_name):
     """"Returns User entity for key_name or None if not found.
 -
@@ -126,59 +165,6 @@ class Logic:
       return None
 
     return self._keyName(**kwargs)
-
-  def getEmptyKeyFields(self):
-    """Returns an dict with all the entities key_fields set to None
-    """
-
-    kwargs = {}
-
-    for field in self._model.KEY_FIELDS:
-      kwargs[field] = None
-
-    return kwargs
-
-  def constructKeyNameSuffix(self, entity):
-    """Constructs a suffix from the specified fields
-
-    The resulting suffix is constructed by adding a '/' after all
-    key fields. The suffix is constructed in the order as specified
-    in the model's key_fields property. The suffix will not have a
-    trailing '/'.
-
-    Args:
-      fields: a dictionary with the values for all the key_fields
-          of this entity.
-    """
-
-    if not entity:
-      return None
-    
-    suffix = []
-
-    for field in entity.KEY_FIELDS:
-      # Four hours wasted on this line, because apparently passing in a dict
-      # one time, and a db.Model the next time, things get rather hard to debug
-      value = entity.__getattribute__(field)
-      suffix.append(value)
-
-    res = '/'.join(suffix)
-    return res
-
-  def extractKeyFields(self, fields):
-    """Extracts all the fields from that are in the mode's key_fields property
-
-    Args:
-      fields: A dict from which the fields should be extracted
-    """
-
-    key_fields = {}
-
-    for key, value in fields.iteritems():
-      if key in self._model.KEY_FIELDS:
-        key_fields[key] = value
-
-    return key_fields
 
   def getForLimitAndOffset(self, limit, offset=0):
     """Returns entities for given offset and limit or None if not found.

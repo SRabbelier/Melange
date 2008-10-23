@@ -42,8 +42,6 @@ class Work(polymodel.PolyModel):
       back-reference Query of the Review model 'reviewed' reference.
   """
 
-  KEY_FIELDS = ['partial_path', 'link_name']
-
   #: Required 1:1 relationship indicating the User who initially authored the
   #: Work (this relationship is needed to keep track of lifetime document
   #: creation limits, used to prevent spamming, etc.).

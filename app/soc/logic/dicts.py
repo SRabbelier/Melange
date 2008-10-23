@@ -41,3 +41,28 @@ def merge(target, updates):
       target[key] = value
 
   return target
+
+def zip(keys, values):
+  """Returns a dict containing keys with values
+
+  If there are more items in keys than in values, None will be used.
+  If there are more items in values than in keys, they will be ignored.
+
+  Args:
+    keys: the keys for the dictionary
+    values: the values for the dictionary
+  """
+
+  result = {}
+
+  size = len(keys)
+
+  for i in range(size):
+    if i < len(values):
+      value = values[i]
+    else:
+      value = None
+    key = keys[i]
+    result[key] = value
+
+  return result

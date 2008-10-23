@@ -41,6 +41,25 @@ class Logic(base.Logic):
     self._keyName = key_name.nameSponsor
     self._skip_properties = []
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.link_name]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['link_name']] 
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames
+    """
+
+    return ['link_name']
+
+
   def isDeletable(self, entity):
     """Returns whether the specified Sponsor entity can be deleted.
     

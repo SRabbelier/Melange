@@ -65,5 +65,5 @@ def edit(request, page=None, path=None, logic=models.site_settings.logic,
     A subclass of django.http.HttpResponse with generated template.
   """
   return settings_views.edit(request, page=page, path=path, logic=logic,
-                             settings_form_class=SiteSettingsForm,
+                             settings_form_class=settings_form_class,
                              template=template)

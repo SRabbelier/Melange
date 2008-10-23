@@ -34,8 +34,8 @@ class SiteSettings(soc.models.home_settings.HomeSettings):
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.
-  ga_tracking_no = db.StringProperty(verbose_name=ugettext_lazy('Google Analytics'))
-  ga_tracking_no.help_text = ugettext_lazy(
+  ga_tracking_num = db.StringProperty(verbose_name=ugettext_lazy('Google Analytics'))
+  ga_tracking_num.help_text = ugettext_lazy(
       'Valid Google Analytics tracking number. If the number is '
       'entered every page is going to have Google Analytics '
       'initialization code in footer.')

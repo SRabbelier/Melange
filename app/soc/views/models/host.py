@@ -101,8 +101,8 @@ class View(base.View):
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
       'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/host/group_row.html',
-      'list_heading': 'soc/host/group_heading.html',
+      'list_row': 'soc/host/list/host_row.html',
+      'list_heading': 'soc/host/list/host_heading.html',
     }
 
     params['delete_redirect'] = '/site/host/list'

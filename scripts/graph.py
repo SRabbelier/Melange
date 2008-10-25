@@ -62,6 +62,7 @@ def main(argv):
         if not isinstance(klass, TypeType):
           continue
 
+        # Create arrows to the parent classes
         for parent in klass.__bases__:
           G.add_edge(klassname, parent.__name__)
           edge = G.get_edge(klassname, parent.__name__)
@@ -71,7 +72,10 @@ def main(argv):
         attrs = ""
         for attrname in dir(klass):
           attr = getattr(klass, attrname)
+
+          # Is it an appengine datastore type?
           if type(attr) in google.appengine.ext.db.__dict__.values():
+            # References get arrows to the other class
             if isinstance(attr, google.appengine.ext.db.ReferenceProperty):
               hasa = attr.reference_class.__name__
               G.add_edge(hasa, klassname)
@@ -79,13 +83,20 @@ def main(argv):
               edge.attr['arrowhead'] = 'inv'
 
               refs += "+ %s: %s\l" % (attrname, type(attr).__name__[:-8])
+            
+            # Ignore back references
             elif isinstance(attr, google.appengine.ext.db._ReverseReferenceProperty):
               pass
             else:
-              attrs += "+ %s: %s\l" % (attrname, type(attr).__name__[:-8])
-        label = "{%s|%s|%s}" % (klassname, attrs, refs)
+              # Check that the property is not inherited for a parent class
+              local = True
+              for parent in klass.__bases__:
+                if hasattr(parent, attrname):
+                  local = False
 
-        print label
+              if local:
+                attrs += "+ %s: %s\l" % (attrname, type(attr).__name__[:-8])
+        label = "{%s|%s|%s}" % (klassname, attrs, refs)
 
         G.add_node(klassname)
         node = G.get_node(klassname)

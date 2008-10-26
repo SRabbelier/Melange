@@ -14,7 +14,6 @@ extra_paths = [HERE,
               ]
 
 import nose
-import nosegae
 from nose import config
 from nose.plugins import manager
 

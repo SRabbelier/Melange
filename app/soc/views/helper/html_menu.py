@@ -219,10 +219,7 @@ class AHrefMenuItem(HtmlMenuItem):
       return [self._item.name]
   
     # URL supplied, so make an <a href="item.value">item.name</a> link
-    return ['%s<a href=' % indent,
-            '%s "%s"' % (indent, self._item.value),
-            '%s>%s</a>' % (indent, self._item.name)]
-
+    return ['%s<a href="%s">%s</a>' % (indent, self._item.value, self._item.name)]
 
 class LiMenuItem(AHrefMenuItem):
   """Provides HTML menu item properties as attributes as an <li> list item.

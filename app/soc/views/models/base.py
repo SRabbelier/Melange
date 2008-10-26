@@ -80,7 +80,7 @@ class View:
     """
 
     new_rights = {}
-    new_rights['any_access'] = [access.checkIsLoggedIn]
+    new_rights['any_access'] = [access.checkIsUser]
 
     self._rights = dicts.merge(rights, new_rights)
     self._params = params
@@ -385,14 +385,14 @@ class View:
              the response provided by the failed access check.
     """
 
+    # Call each access checker
+    for check in self._rights['any_access']:
+      check(request)
+
     if access_type not in self._rights:
        # No checks defined, so do the 'generic check' and bail out
       self.checkUnspecified(access_type, request)
       return
-
-    # Call each access checker
-    for check in self._rights['any_access']:
-      check(request)
 
     for check in self._rights[access_type]:
       check(request)

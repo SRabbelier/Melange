@@ -216,10 +216,10 @@ class AHrefMenuItem(HtmlMenuItem):
 
     if not self._item.value:
       # if no URL, then not a link, so just display item.name as text
-      return [self._item.name]
+      return ['%s<span>%s</span>' % (indent, self._item.name)]
   
     # URL supplied, so make an <a href="item.value">item.name</a> link
-    return ['%s<a href="%s">%s</a>' % (indent, self._item.value, self._item.name)]
+    return ['%s<a href="%s"><span>%s</span></a>' % (indent, self._item.value, self._item.name)]
 
 class LiMenuItem(AHrefMenuItem):
   """Provides HTML menu item properties as attributes as an <li> list item.
@@ -241,6 +241,11 @@ class LiMenuItem(AHrefMenuItem):
     
     See also AHrefMenuItem.getHtmlTags().
     """
-    return (['%s<li>' % indent]
+    if self._item.sub_menu:
+      css_class = 'expandable'
+    else:
+      css_class = 'leaf'
+    
+    return (['%s<li class="%s">' % (indent, css_class)]
             + AHrefMenuItem.getHtmlTags(self, indent + ' ')
             + ['%s</li>' % indent])

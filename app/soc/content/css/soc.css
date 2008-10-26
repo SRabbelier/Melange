@@ -137,37 +137,37 @@ th, td {
   text-align: left;
 }
 
-  /* FORM TABLE FIELDS */ 
-  td.formfieldrequired {
-    font-style: italic;
-    font-size: small;
-  }
+/* FORM TABLE FIELDS */ 
+td.formfieldrequired {
+  font-style: italic;
+  font-size: small;
+}
 
-  td.formfieldhelptext {
-    font-style: italic;
-    font-size: small;
-  }
+td.formfieldhelptext {
+  font-style: italic;
+  font-size: small;
+}
 
-  td.formfielderror {
-    color: #FF0000;
-    font-size: small;
-  }
+td.formfielderror {
+  color: #FF0000;
+  font-size: small;
+}
 
-  td.formfieldheading {
-    font-weight: bold;
-    font-size: small;
-  }
-  
-  td.formfieldlabel {
-    font-weight: bold;
-    font-size: small;
-  }
-  
-  td.formfielderrorlabel {
-    font-weight: bold;
-    color: #FF0000;
-    font-size: small;
-  }
+td.formfieldheading {
+  font-weight: bold;
+  font-size: small;
+}
+
+td.formfieldlabel {
+  font-weight: bold;
+  font-size: small;
+}
+
+td.formfielderrorlabel {
+  font-weight: bold;
+  color: #FF0000;
+  font-size: small;
+}
 
 /* TABLE QUEUES (used with .list) */
 table#queues {
@@ -175,13 +175,13 @@ table#queues {
   width: 100%;
 }
 
-  table#queues tr {
-    border-bottom: thin solid lightgray;
-  }
+table#queues tr {
+  border-bottom: thin solid lightgray;
+}
 
-  table#queues td {
-    padding: 2px;
-  }  
+table#queues td {
+  padding: 2px;
+}  
 
 /* 
  * PAGE ELEMENTS 
@@ -233,26 +233,26 @@ table#queues {
   padding-bottom: 25px;
 }
 
-  #body .buttons {
-    margin-right: 4px;
-    margin-top: 20px;
-  }
-    
-  #body a.button, input[type^="submit"], input[type^="button"] {
-    margin: 0;
-    padding: 2px 5px 2px 5px;
-    font-family: Arial, Sans-serif;
-    font-size: 12px;
-    text-decoration: none;
-    color: #222;
-    cursor: default;
-    background: #ddd url("/soc/content/images/button-background.gif") repeat-x 0 0;
-    border: 1px solid #aaa;
-  }
+#body .buttons {
+  margin-right: 4px;
+  margin-top: 20px;
+}
+  
+#body a.button, input[type^="submit"], input[type^="button"] {
+  margin: 0;
+  padding: 2px 5px 2px 5px;
+  font-family: Arial, Sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  color: #222;
+  cursor: default;
+  background: #ddd url("/soc/content/images/button-background.gif") repeat-x 0 0;
+  border: 1px solid #aaa;
+}
 
-  #body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
-    border-color: #9cf #69e #69e #7af;
-  }
+#body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
+  border-color: #9cf #69e #69e #7af;
+}
 
 #header {
   height: 50px;
@@ -271,9 +271,9 @@ table#queues {
   background-position: left center;
 }
 
-  #footer .text {
-    padding-top: 20px;
-  }
+#footer .text {
+  padding-top: 20px;
+}
 
 #lastmodified {
   text-align: right;
@@ -306,13 +306,27 @@ table#queues {
   font-size: 95%;
 }
 
-  #menu ul ul {
-    margin-left: 10px;
-    margin-bottom: 0;
-  }
+#menu ul ul {
+  margin-left: 10px;
+  margin-bottom: 0;
+}
 
 #menu li {
   margin-top: 4px;
+}
+
+#menu li.leaf {
+  list-style-type: none;
+  list-style-image: none;
+}
+
+#menu li.expandable {
+  list-style-type: disc;
+  list-style-image: url(../images/opentriangle.gif);
+}
+
+#menu li.closed {
+  list-style-image: url(../images/triangle.gif);
 }
 
 #menu h4 {
@@ -327,19 +341,19 @@ table#queues {
   margin-top: 2em;
 }
 
-  #search .header {
-    font-weight: bold;
-    font-size: 90%;
-    margin-bottom: 1px;
-  }
+#search .header {
+  font-weight: bold;
+  font-size: 90%;
+  margin-bottom: 1px;
+}
 
-  #search .button {
-    margin-top: 1px;
-  }
+#search .button {
+  margin-top: 1px;
+}
 
-  #search .input input {
-    width: 125px;
-  }
+#search .input input {
+  width: 125px;
+}
 
 /* BLOG FEEDS */
 .blog {
@@ -352,15 +366,15 @@ table#queues {
   background-color: #e5ecf9;
 }
 
-  .blog h2 a {
-    text-decoration: none;
-    color: black;
-  }
+.blog h2 a {
+  text-decoration: none;
+  color: black;
+}
 
-  .blog h2 a:visited {
-    text-decoration: none;
-    color: black;
-  }
+.blog h2 a:visited {
+  text-decoration: none;
+  color: black;
+}
 
 
 .blog .entry {
@@ -389,36 +403,36 @@ table#queues {
   -moz-border-radius: 5px 5px 0px 0px;
 }
 
-  .list .pagination {
-    text-align: right;
-    padding: 3px;
-  }
+.list .pagination {
+  text-align: right;
+  padding: 3px;
+}
+
+.list table{
+  background-color: white;
+}
   
-  .list table{
-    background-color: white;
-  }
-  
-    .list table th {
-      background-color: #eeeeec;
-      border-right: 1px solid lightgray;
-      border-top: 1px solid lightgray;
-    }
+.list table th {
+  background-color: #eeeeec;
+  border-right: 1px solid lightgray;
+  border-top: 1px solid lightgray;
+}
 
-    .list table tr.on {
-      background-color: #ff9;
-    }
+.list table tr.on {
+  background-color: #ff9;
+}
 
-    .list table tr.off {
-      background-color: #fff;
-    }
+.list table tr.off {
+  background-color: #fff;
+}
 
-    .list table td.last {
-      border-right: 1px solid lightgray;
-    }
+.list table td.last {
+  border-right: 1px solid lightgray;
+}
 
-    .list table .first {
-      border-left: 1px solid lightgray;
-    }
+.list table .first {
+  border-left: 1px solid lightgray;
+}
 
 /* 
  * CUSTOM CLASSES 
@@ -454,4 +468,5 @@ table#queues {
 .disabled {
   color: gray;
 }
+
 

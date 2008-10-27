@@ -322,11 +322,11 @@ table#queues td {
 
 #menu li.expandable {
   list-style-type: disc;
-  list-style-image: url(../images/opentriangle.gif);
+  list-style-image: url(../images/minus.gif);
 }
 
 #menu li.closed {
-  list-style-image: url(../images/triangle.gif);
+  list-style-image: url(../images/plus.gif);
 }
 
 #menu h4 {

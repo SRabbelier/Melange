@@ -47,6 +47,17 @@ home = page.Page(
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
 
+# User sub-menu, changes depending on if User is signed-in or not
+user_signin_sub_menu = page.NonPage(
+  'user-sign-in-sub-menu',
+  'User',
+  parent=home)
+
+user_signout_sub_menu = page.NonPage(
+  'user-sign-out-sub-menu',
+  'User',
+  parent=home)
+
 # User authentication view placeholders
 # (these are not real Django views, but need to appear in menus, etc.)
 user_signin = page.Page(
@@ -60,7 +71,7 @@ user_signin = page.Page(
     name='user-sign-in'),
   'User (sign in)',
   link_url=users.create_login_url('/'),
-  parent=home)
+  parent=user_signin_sub_menu)
 
 user_signout = page.Page(
   page.Url(
@@ -73,7 +84,7 @@ user_signout = page.Page(
     name='user-sign-out'),
   'User (sign out)',
   link_url=users.create_logout_url('/'),
-  parent=home)
+  parent=user_signout_sub_menu)
 
 # User Profile views
 user_create = page.Page(
@@ -82,7 +93,7 @@ user_create = page.Page(
     'soc.views.user.profile.create'),
   'User: Create a New Profile',
   short_name='Site-wide User Profile',
-  parent=user_signout)
+  parent=user_signout_sub_menu)
 
 user_edit = page.Page(
   page.Url(
@@ -105,6 +116,12 @@ site_home = page.Page(
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
 
+site_sub_menu = page.NonPage(
+  'site-sub-menu',
+  'Site',
+  parent=home)
+
+# Site User Profile views
 site_settings_edit = page.Page(
   page.Url(
     r'^site/settings/edit$',
@@ -115,14 +132,14 @@ site_settings_edit = page.Page(
     }),
   'Site: Settings',
   short_name='Site Settings',
-  parent=home)
+  parent=site_sub_menu)
 
 # Site User Profile views
 site_user_sub_menu = page.NonPage(
   'site-user-sub-menu',
   'Site: Users Sub-Menu',
   short_name='Site Users',
-  parent=site_settings_edit)
+  parent=site_sub_menu)
 
 site_user_lookup = page.Page(
   page.Url(
@@ -169,7 +186,7 @@ site_docs_sub_menu = page.NonPage(
   'site-docs-sub-menu',
   'Site: Documents Sub-Menu',
   short_name='Site Documents',
-  parent=site_settings_edit)
+  parent=site_sub_menu)
 
 site_docs_create = page.Page(
   page.Url(
@@ -216,7 +233,7 @@ site_sponsor_sub_menu = page.NonPage(
   'site-sponsor-sub-menu',
   'Site: Sponsors Sub-Menu',
   short_name='Site Sponsors',
-  parent=site_settings_edit)
+  parent=site_sub_menu)
 
 site_sponsor_create = page.Page(
   page.Url(
@@ -264,7 +281,7 @@ site_host_sub_menu = page.NonPage(
   'site-host-sub-menu',
   'Site: Host Sub-Menu',
   short_name='Site Hosts',
-  parent=site_settings_edit)
+  parent=site_sub_menu)
 
 site_host_create = page.Page(
   page.Url(

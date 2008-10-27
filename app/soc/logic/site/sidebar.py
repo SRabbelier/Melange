@@ -43,9 +43,9 @@ def buildUserSidebar(id=None, **ignored):
     id = users.get_current_user()
 
   if not id:
-    return [map.user_signin.makeMenuItem()]
+    return [map.user_signin_sub_menu.makeMenuItem()]
 
-  return [map.user_signout.makeMenuItem()]
+  return [map.user_signout_sub_menu.makeMenuItem()]
 
 
 def buildSiteSidebar(is_admin=None, **ignored):
@@ -65,7 +65,7 @@ def buildSiteSidebar(is_admin=None, **ignored):
     # user is either not logged in or not a "Developer", so return no menu
     return None
 
-  return [map.site_settings_edit.makeMenuItem()]
+  return [map.site_sub_menu.makeMenuItem()]
 
 
 def buildProgramsSidebar(**unused):

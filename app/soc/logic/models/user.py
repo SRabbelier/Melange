@@ -40,6 +40,29 @@ class Logic(base.Logic):
     self._model = soc.models.user.User
     self._skip_properties = ['former_ids']
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.link_name]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    properties = {
+        'link_name': fields['link_name']
+        }
+
+    entity = self.getForFields(properties, unique=True)
+    return [entity.id.email()]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames
+    """
+
+    return ['email']
+
   def _updateField(self, model, name, value):
     """Special case logic for id.
 

@@ -68,6 +68,8 @@ class EditForm(CreateForm):
   """Django form displayed when editing a Host.
   """
 
+  pass
+
 class View(base.View):
   """View methods for the Host model
   """

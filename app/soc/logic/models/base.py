@@ -210,6 +210,32 @@ class Logic:
     query = self._model.all()
     return query.fetch(limit, offset)
 
+  def getForFields(self, properties, unique=False, limit=1000, offset=0):
+    """Returns all entities that have the specified properties
+
+    Args:
+      properties: the properties that the entity should have
+      unique: if set, only the first item from the resultset will be returned
+      limit: max amount of entities to return
+      offset: optional number of results to skip first; default zero.
+    """
+
+    if not properties:
+      raise Error("Properties did not contain any values")
+
+    format_text = '%(key)s = :%(key)s'
+    msg_pairs = [format_text % {'key': key} for key in properties.iterkeys()]
+    joined_pairs = ' AND '.join(msg_pairs)
+    condition = 'WHERE %s' % joined_pairs
+
+    query = self._model.gql(condition, **properties)
+
+    if unique:
+      return query.get()
+
+    result = query.fetch(limit, offset)
+    return result
+
   def updateModelProperties(self, model, **model_properties):
     """Update existing model entity using supplied model properties.
 

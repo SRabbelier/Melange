@@ -78,9 +78,9 @@ def getDocForForm(form):
   properties['author'] = models.user.logic.getFromFields(email=email)
   properties['is_featured'] = form.cleaned_data.get('is_featured')
 
-  doc = document.logic.updateOrCreateFromFields(properties,
-                                                partial_path=partial_path,
-                                                link_name=link_name)
+  key_fields = document.logic.getKeyFieldsFromDict(properties)
+
+  doc = document.logic.updateOrCreateFromFields(properties, key_fields)
   return doc
 
 

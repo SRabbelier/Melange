@@ -444,8 +444,9 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
         'is_developer': form.cleaned_data.get('is_developer'),
       }
 
-      user = models.user.logic.updateOrCreateFromFields(properties, 
-                                                        email=form_id.email())
+      key_fields = {'email': form_id.email()}
+      user = models.user.logic.updateOrCreateFromFields(properties,
+                                                        key_fields)
 
       if not user:
         return http.HttpResponseRedirect('/')

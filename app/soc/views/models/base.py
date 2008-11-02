@@ -26,7 +26,6 @@ from django import http
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
-import soc.logic.dicts
 import soc.logic.out_of_band
 import soc.views.helper.lists
 import soc.views.helper.responses
@@ -106,7 +105,8 @@ class View:
     entity = None
 
     try:
-      entity = self._logic.getIfFields(**kwargs)
+      key_fields = self._logic.getKeyFieldsFromDict(kwargs)
+      entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['public_template']
       return simple.errorResponse(request, page, error, template, context)
@@ -160,7 +160,8 @@ class View:
     entity = None
 
     try:
-      entity = self._logic.getIfFields(**kwargs)
+      key_fields = self._logic.getKeyFieldsFromDict(kwargs)
+      entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['public_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
@@ -191,10 +192,8 @@ class View:
 
     self._editPost(request, entity, fields)
 
-    keys = self._logic.getKeyFieldNames()
-    values = self._logic.getKeyValuesFromFields(fields)
-    kwargs = dicts.zip(keys, values)
-    entity = self._logic.updateOrCreateFromFields(fields, **kwargs)
+    key_fields = self._logic.getKeyFieldsFromDict(fields)
+    entity = self._logic.updateOrCreateFromFields(fields, key_fields)
 
     if not entity:
       return http.HttpResponseRedirect('/')
@@ -293,7 +292,8 @@ class View:
     entity = None
 
     try:
-      entity = self._logic.getIfFields(**kwargs)
+      key_fields = self._logic.getKeyFieldsFromKwargs(kwargs)
+      entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['edit_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {

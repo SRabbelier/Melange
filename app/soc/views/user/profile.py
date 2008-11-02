@@ -145,8 +145,9 @@ def edit(request, page=None, link_name=None,
         'id': id,
       }
 
+      key_fields = models.user.logic.getKeyFieldsFromDict(properties)
       user = models.user.logic.updateOrCreateFromFields(properties, 
-                                                        email=id.email())
+                                                        key_fields)
 
       # redirect to new /user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)

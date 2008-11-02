@@ -143,7 +143,7 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
     doc_select_form = DocSelectForm(request.POST)
     
     if doc_select_form.is_valid() and settings_form.is_valid():
-      fields = {}      
+      fields = {}
       
       # Ask for all the fields and pull them out 
       for field in settings_form.cleaned_data:
@@ -164,7 +164,8 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
             'Document not specified or could not be found; ' \
             'other Settings saved.')
 
-      settings = logic.updateOrCreateFromFields(fields, path=path)
+      key_fields = logic.getKeyFieldsFromDict(fields)
+      settings = logic.updateOrCreateFromFields(fields, key_fields)
       
       if settings.home:
         home_doc = settings.home

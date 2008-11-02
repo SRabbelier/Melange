@@ -29,6 +29,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import dicts
 from soc.logic import out_of_band
 
 
@@ -119,6 +120,22 @@ class Logic:
 
     return suffix
 
+  def getKeyFieldsFromDict(self, dictionary):
+    """Does any required massaging and filtering of dictionary
+
+    The resulting dictionary contains just the key names, and has any
+    required translations/modifications performed.
+
+    Args:
+      dictionary: The arguments to massage
+    """
+
+    keys = self.getKeyFieldNames()
+    values = self.getKeyValuesFromFields(dictionary)
+    key_fields = dicts.zip(keys, values)
+
+    return key_fields
+
   def getFromKeyName(self, key_name):
     """"Returns User entity for key_name or None if not found.
 -
@@ -129,13 +146,13 @@ class Logic:
     return self._model.get_by_key_name(key_name)
 
   def getFromFields(self, **kwargs):
-    """Returns the entity for a given link name, or None if not found.
+    """Returns the entity for the specified key names, or None if not found.
 
     Args:
       **kwargs: the fields of the entity that uniquely identifies it
     """
 
-    key_name = self.getKeyNameForFields(**kwargs)
+    key_name = self.getKeyNameForFields(kwargs)
 
     if key_name:
       entity = self._model.get_by_key_name(key_name)
@@ -144,11 +161,11 @@ class Logic:
 
     return entity
 
-  def getIfFields(self, **kwargs):
+  def getIfFields(self, fields):
     """Returns entity for supplied link name if one exists.
 
     Args:
-      **kwargs: the fields of the entity that uniquely identifies it
+      fields: the fields of the entity that uniquely identifies it
 
     Returns:
       * None if a field is false.
@@ -159,11 +176,11 @@ class Logic:
       with the supplied link name exists in the Datastore
     """
 
-    if not all(kwargs.values()):
+    if not all(fields.values()):
       # exit without error, to let view know that link_name was not supplied
       return None
 
-    entity = self.getFromFields(**kwargs)
+    entity = self.getFromFields(**fields)
 
     if entity:
       # an entity exist for this link_name, so return that entity
@@ -174,7 +191,7 @@ class Logic:
     format_text = ugettext_lazy('"%(key)s" is "%(value)s"')
 
     msg_pairs = [format_text % {'key': key, 'value': value}
-      for key, value in kwargs.iteritems()]
+      for key, value in fields.iteritems()]
 
     joined_pairs = ' and '.join(msg_pairs)
 
@@ -186,25 +203,24 @@ class Logic:
     # else: fields were supplied, but there is no Entity that has it
     raise out_of_band.ErrorResponse(msg, status=404)
 
-  def getKeyNameForFields(self, **kwargs):
+  def getKeyNameForFields(self, fields):
     """Return a Datastore key_name for a Entity from the specified fields.
 
     Args:
-      **kwargs: the fields of the entity that uniquely identifies it
+      fields: the fields of the entity that uniquely identifies it
     """
 
-    if not all(kwargs.values()):
+    if not all(fields.values()):
       return None
 
-    return self._keyName(**kwargs)
+    return self._keyName(**fields)
 
   def getForLimitAndOffset(self, limit, offset=0):
     """Returns entities for given offset and limit or None if not found.
 
     Args:
       limit: max amount of entities to return
-      offset: optional offset in entities list which defines first entity to
-        return; default is zero (first entity)
+      offset: optional number of results to skip first; default zero.
     """
 
     query = self._model.all()
@@ -236,12 +252,12 @@ class Logic:
     result = query.fetch(limit, offset)
     return result
 
-  def updateModelProperties(self, model, **model_properties):
+  def updateModelProperties(self, model, model_properties):
     """Update existing model entity using supplied model properties.
 
     Args:
       model: a model entity
-      **model_properties: keyword arguments that correspond to model entity
+      model_properties: keyword arguments that correspond to model entity
         properties and their values
 
     Returns:
@@ -249,11 +265,11 @@ class Logic:
     """
 
     def update():
-      return self._unsafeUpdateModelProperties(model, **model_properties)
+      return self._unsafeUpdateModelProperties(model, model_properties)
 
     return db.run_in_transaction(update)
 
-  def _unsafeUpdateModelProperties(self, model, **model_properties):
+  def _unsafeUpdateModelProperties(self, model, model_properties):
     """(see updateModelProperties)
 
     Like updateModelProperties(), but not run within a transaction.
@@ -295,14 +311,14 @@ class Logic:
     # there is no way to be sure if get_or_insert() returned a new entity or
     # got an existing one due to a race, so update with properties anyway,
     # in a transaction
-    return self.updateModelProperties(entity, **properties)
+    return self.updateModelProperties(entity, properties)
 
-  def updateOrCreateFromFields(self, properties, **kwargs):
-    """Like updateOrCreateFromKeyName, but resolves **kwargs to a key_name first.
+  def updateOrCreateFromFields(self, properties, fields):
+    """Like updateOrCreateFromKeyName, but resolves fields to a key_name first.
     """
 
     # attempt to retrieve the existing entity
-    key_name  = self.getKeyNameForFields(**kwargs)
+    key_name  = self.getKeyNameForFields(fields)
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 

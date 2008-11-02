@@ -155,8 +155,9 @@ def edit(request, page=None, link_name=None,
         fields['founder'] = user
       
       form_ln = fields['link_name']
+      key_fields = models.sponsor.logic.getKeyFieldsFromKwargs(fields)
       form_sponsor = models.sponsor.logic.updateOrCreateFromFields(
-          fields, link_name=form_ln)
+          fields, key_fields)
       
       if not form_sponsor:
         return http.HttpResponseRedirect('/')

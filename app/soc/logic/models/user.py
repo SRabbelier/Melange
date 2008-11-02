@@ -36,9 +36,8 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "user"
+    self._name = "User"
     self._model = soc.models.user.User
-    self._keyName = key_name.nameUser
     self._skip_properties = ['former_ids']
 
   def _updateField(self, model, name, value):

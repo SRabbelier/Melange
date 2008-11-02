@@ -39,7 +39,7 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "site_settings"
+    self._name = "SiteSettings"
     self._model = soc.models.site_settings.SiteSettings
     self._keyName = key_name.nameSiteSettings
     self._skip_properties = []

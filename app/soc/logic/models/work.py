@@ -36,7 +36,7 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "work"
+    self._name = "Work"
     self._model = soc.models.work.Work
     self._keyName = key_name.nameWork
     self._skip_properties = []

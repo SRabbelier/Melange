@@ -36,9 +36,8 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "sponsor"
+    self._name = "Sponsor"
     self._model = soc.models.sponsor.Sponsor
-    self._keyName = key_name.nameSponsor
     self._skip_properties = []
 
   def getKeyValues(self, entity):

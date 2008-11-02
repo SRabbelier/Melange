@@ -36,9 +36,8 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self._name = "document"
+    self._name = "Document"
     self._model = soc.models.document.Document
-    self._keyName = key_name.nameDocument
     self._skip_properties = []
 
   def getKeyValues(self, entity):

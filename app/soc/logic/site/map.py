@@ -121,6 +121,11 @@ site_sub_menu = page.NonPage(
   'Site',
   parent=home)
 
+site_settings_sub_menu = page.NonPage(
+  'site-settings-sub-menu',
+  'Site Settings',
+  parent=site_sub_menu)
+
 # Site User Profile views
 site_settings_edit = page.Page(
   page.Url(
@@ -131,8 +136,8 @@ site_settings_edit = page.Page(
       'logic': models.site_settings.logic,
     }),
   'Site: Settings',
-  short_name='Site Settings',
-  parent=site_sub_menu)
+  short_name='Edit Site Settings',
+  parent=site_settings_sub_menu)
 
 # Site User Profile views
 site_user_sub_menu = page.NonPage(

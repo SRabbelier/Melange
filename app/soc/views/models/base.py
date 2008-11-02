@@ -96,7 +96,7 @@ class View:
     """
 
     try:
-      self.checkAccess('edit', request)
+      self.checkAccess('public', request)
     except soc.views.out_of_band.AccessViolationResponse, alt_response:
       return alt_response.response()
 

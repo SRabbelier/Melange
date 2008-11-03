@@ -145,7 +145,7 @@ def edit(request, page=None, link_name=None,
         'id': id,
       }
 
-      key_fields = models.user.logic.getKeyFieldsFromDict(properties)
+      key_fields = {'email': id.email()}
       user = models.user.logic.updateOrCreateFromFields(properties, 
                                                         key_fields)
 

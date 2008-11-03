@@ -292,7 +292,7 @@ class View:
     entity = None
 
     try:
-      key_fields = self._logic.getKeyFieldsFromKwargs(kwargs)
+      key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['edit_template']

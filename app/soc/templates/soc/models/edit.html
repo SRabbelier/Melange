@@ -49,7 +49,7 @@ Please use this form to edit the {{ entity_type }}.
    </td>
    {% if entity %}
    <td>
-    <input type="button" onclick="location.href='{{ entity_name_short }}/delete/{{ entity_suffix }}'" value="Delete"/>
+    <input type="button" onclick="location.href='/{{ entity_type_short|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
    </td>
    {% endif %}
    {% endblock %}

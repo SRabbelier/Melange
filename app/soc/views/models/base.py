@@ -160,8 +160,9 @@ class View:
     entity = None
 
     try:
-      key_fields = self._logic.getKeyFieldsFromDict(kwargs)
-      entity = self._logic.getIfFields(key_fields)
+      if all(kwargs.values()):
+        key_fields = self._logic.getKeyFieldsFromDict(kwargs)
+        entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = self._params['public_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {

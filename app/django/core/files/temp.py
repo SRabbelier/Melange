@@ -14,7 +14,7 @@ import tempfile
 
 __all__ = ('NamedTemporaryFile', 'gettempdir',)
 
-if os.name == 'nt':
+if os.name == 'nt' and hasattr(os, 'unlink') and hasattr(os, 'fdopen'):
     class TemporaryFile(object):
         """
         Temporary file object constructor that works in Windows and supports

@@ -51,34 +51,33 @@ class Logic:
     return True
 
   def _keyName(self, **kwargs):
-    """
-    Returns the KeyName constructed from kwargs for this type of entity
+    """Returns the KeyName constructed from kwargs for this type of entity
 
-    The Keyname is in the following format:
+    The KeyName is in the following format:
     entity.name:<key_value1>:<key_value2>:...:<key_valueN>
     """
 
-    #Get the KeyFieldNames for this entity
+    # get the KeyFieldNames for this entity
     key_field_names = self.getKeyFieldNames()
 
-    #Check if all given KeyFieldNames are valid for this entity
+    # check if all given KeyFieldNames are valid for this entity
     if not all(key in key_field_names for key in kwargs.keys()):
       raise Error("Some of the provided arguments are not key fields")
 
-    #Check if all key_field_names for this entity are present in kwargs
+    # check if all key_field_names for this entity are present in kwargs
     if not all(field in kwargs.keys() for field in key_field_names):
         raise Error("Not all the required key fields are present")
 
-    #Check if all kwargs.values() are non-false
+    # check if all kwargs.values() are non-false
     if not all(kwargs.values()):
         raise Error("Not all KeyValues are non-false")
 
-    #Construct the KeyValues in the order given by getKeyFieldNames()
+    # construct the KeyValues in the order given by getKeyFieldNames()
     keyvalues = []
     for key_field_name in key_field_names:
         keyvalues.append(kwargs[key_field_name])
 
-    #Construct the KeyName in the appropriate format
+    # construct the KeyName in the appropriate format
     return ":".join([self._name] + keyvalues)
 
   def getKeyValues(self, entity):

@@ -41,6 +41,8 @@ class Logic(base.Logic):
 
     self._name = "SiteSettings"
     self._model = soc.models.site_settings.SiteSettings
+    # TODO: remove line below when SiteSettings is implemented using 
+    # views.models.base.View approach
     self._keyName = key_name.nameSiteSettings
     self._skip_properties = []
 

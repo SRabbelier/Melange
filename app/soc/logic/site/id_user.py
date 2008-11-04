@@ -119,7 +119,7 @@ def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
     return True
   # else: "new" email truly is new to the existing User, so keep checking
 
-  if not models.user.logic.getFromFields(id=new_id):
+  if not models.user.logic.getFromFields(email=new_id.email()):
     # new email address also does not belong to any other User,
     # so it is available
     return True

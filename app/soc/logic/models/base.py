@@ -33,6 +33,11 @@ from soc.logic import dicts
 from soc.logic import out_of_band
 
 
+class Error(Exception):
+  """Base class for all exceptions raised by this module."""
+  pass
+
+
 class Logic:
   """Base logic for entity classes.
 

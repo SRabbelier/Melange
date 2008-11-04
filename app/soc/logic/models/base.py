@@ -190,8 +190,6 @@ class Logic:
       # an entity exist for this link_name, so return that entity
       return entity
 
-    fields = []
-
     format_text = ugettext_lazy('"%(key)s" is "%(value)s"')
 
     msg_pairs = [format_text % {'key': key, 'value': value}

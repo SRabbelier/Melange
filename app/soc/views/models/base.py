@@ -191,6 +191,9 @@ class View:
 
     fields = self.collectCleanedFields(form)
 
+    # get the old_suffix before editing
+    old_suffix = self._logic.getKeySuffix(entity)
+
     self._editPost(request, entity, fields)
 
     key_fields = self._logic.getKeyFieldsFromDict(fields)
@@ -205,7 +208,7 @@ class View:
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
-        request, suffix, suffix,
+        request, old_suffix, suffix,
         params=params)
 
   def editGet(self, request, entity, context):

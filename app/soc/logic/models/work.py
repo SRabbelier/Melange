@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
 
@@ -44,5 +45,22 @@ class Logic(base.Logic):
     self._skip_properties = []
     # TODO(tlarsen): write a nameWork method
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.link_name]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['link_name']]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames
+    """
+
+    return ['link_name']
 
 logic = Logic()

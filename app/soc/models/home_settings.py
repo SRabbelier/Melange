@@ -37,19 +37,35 @@ class HomeSettings(polymodel.PolyModel):
   This Model is the basis for more specific "/home" view settings, such as
   SiteSettings, ProgramSettings, etc.
   """
-  
+
   #: Reference to Document containing the contents of the "/home" page
   home = db.ReferenceProperty(
     reference_class=soc.models.document.Document,
     collection_name='home')
   home.help_text = ugettext_lazy(
       'Document to be used as the "/home" page static contents.')
-  
+
   #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
   #: on the site page using Google's JavaScript blog widget  
   feed_url = db.LinkProperty(verbose_name=ugettext_lazy('Feed URL'))
   feed_url.help_text = ugettext_lazy(
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
-  
 
+#: Required path, prepended to a "link name" to form the document URL.
+  #: The combined path and link name must be globally unique on the
+  #: site.  Except in /site/docs (Developer) forms, this field is not
+  #: usually directly editable by the User, but is instead set by controller
+  #: logic to match the "scope" of the document.
+  partial_path = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Partial path'))
+  partial_path.help_text = ugettext_lazy(
+    'path portion of URLs, prepended to link name')
+
+  #: Required link name, appended to a "path" to form the document URL.
+  #: The combined path and link name must be globally unique on the
+  #: site (but, unlike some link names, a Work link name can be reused,
+  #: as long as the combination with the preceding path is unique).
+  link_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Link name'))
+  link_name.help_text = ugettext_lazy('link name used in URLs')

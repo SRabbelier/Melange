@@ -24,11 +24,12 @@ __authors__ = [
 
 from soc.logic import key_name
 from soc.logic.models import base
+from soc.logic.models import home_settings
 
 import soc.models.site_settings
 
 
-class Logic(base.Logic):
+class Logic(home_settings.Logic):
   """Logic methods for the SiteSettings model
   """
 

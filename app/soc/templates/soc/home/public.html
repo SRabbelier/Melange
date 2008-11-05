@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/home_settings/public.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,50 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% block scripts %}
-{% if home_settings.feed_url %}
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="/soc/content/js/blog-080819.js"></script>
-    <script type="text/javascript">
-
-    google.load("feeds", "1");
-
-    function initialize() {
-      var blog = new BlogPreview(document.getElementById("blog"));
-      blog.show("{{ home_settings.feed_url }}");
-    }
-    google.setOnLoadCallback(initialize);
-
-    </script>
-{% endif %}
-{% endblock %}
-
-{% block page_title %}
-{% if home_document %}
-{{ home_document.title }}
-{% else %}
-{{ page.long_name }}
-{% endif %}
-{% endblock %}
-
-{% block header_title %}
-{% if home_document %}
-{{ home_document.short_name }}
-{% else %}
-{{ page.short_name }}
-{% endif %}
-{% endblock %}
-
-{% block body %}
- {% if home_document %}
-  {{ home_document.content|safe }}
-  <div id="lastmodified">Last updated on: {{ home_document.modified }}</div>
- {% else %}
 {% block missing_doc %}
-This is the default home page can be edited via Settings.
-{% endblock %}
- {% endif %}
- {% if home_settings.feed_url %}
-    <div id="blog"></div>
- {% endif %}
+The contents of this default Site home page can be changed by
+<a href="/docs/edit">creating a new Document</a> or
+<a href="/docs/list">editing an existing Document</a> and then selecting
+that Document in the
+<a href="/settings/edit">Site Settings</a> interface.
+Other elements of this page, such as a feed to be displayed below this
+content, can also be set using the
+<a href="/settings/edit">Site Settings</a> interface.
+You need to sign in as site Developer in order to change
+<a href="/settings/edit">Site Settings</a>.
 {% endblock %}

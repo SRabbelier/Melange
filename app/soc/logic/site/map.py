@@ -39,9 +39,10 @@ home = page.Page(
     r'^$',
     'soc.views.home.public',
     kwargs={
-      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
+      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
       'entity_type': 'SiteSettings',
-      'template': 'soc/site/home/public.html',
+      'template': 'soc/home/public.html',
     }),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
@@ -87,20 +88,13 @@ user_signout = page.Page(
   parent=user_signout_sub_menu)
 
 # User Profile views
-user_create = page.Page(
+user_self = page.Page(
   page.Url(
-    r'^user/profile$',
+    r'^user/edit$',
     'soc.views.user.profile.create'),
-  'User: Create a New Profile',
+  'User: Edit own User Profile',
   short_name='Site-wide User Profile',
   parent=user_signout_sub_menu)
-
-user_edit = page.Page(
-  page.Url(
-    r'^user/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
-    'soc.views.user.profile.edit'),
-  'User: Modify Existing User Profile',
-  parent=user_signout)
 
 # Site Home Page views
 site_home = page.Page(
@@ -108,9 +102,10 @@ site_home = page.Page(
     r'^site/home$',
     'soc.views.home.public',
     kwargs={
-      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
+      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
       'entity_type': 'SiteSettings',
-      'template': 'soc/site/home/public.html',
+      'template': 'soc/home/public.html',
     }),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
@@ -129,10 +124,11 @@ site_settings_sub_menu = page.NonPage(
 # Site User Profile views
 site_settings_edit = page.Page(
   page.Url(
-    r'^site/settings/edit$',
+    r'^settings/edit$',
     'soc.views.site.settings.edit',
     kwargs={
-      'path': models.site_settings.logic.DEF_SITE_SETTINGS_PATH,
+      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
+      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
       'logic': models.site_settings.logic,
     }),
   'Site: Settings',
@@ -148,7 +144,7 @@ site_user_sub_menu = page.NonPage(
 
 site_user_lookup = page.Page(
   page.Url(
-    r'^site/user/lookup$',
+    r'^user/lookup$',
     'soc.views.site.user.profile.lookup'),
   'Site: Look Up an Existing User',
   short_name='Look Up Site User',
@@ -156,7 +152,7 @@ site_user_lookup = page.Page(
 
 site_user_create = page.Page(
   page.Url(
-    r'^site/user/profile$',
+    r'^user/create$',
     'soc.views.site.user.profile.create'),
   'Site: Create New User Profile',
   short_name='Create Site User',
@@ -164,7 +160,7 @@ site_user_create = page.Page(
 
 site_user_edit = page.Page(
   page.Url(
-    r'^site/user/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^user/edit/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.site.user.profile.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
@@ -172,7 +168,7 @@ site_user_edit = page.Page(
 
 site_user_list = page.Page(
   page.Url(
-    r'^site/user/list$',
+    r'^user/list$',
     'soc.views.site.user.list.all'),
   'Site: List of Users',
   short_name='List Site Users',
@@ -228,7 +224,7 @@ site_docs_list = page.Page(
 # Sponsor Group public view
 sponsor_profile = page.Page(
   page.Url(
-    r'^sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/show/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.models.sponsor.public'),
   'Sponsor Public Profile',
   parent=home)
@@ -242,7 +238,7 @@ site_sponsor_sub_menu = page.NonPage(
 
 site_sponsor_create = page.Page(
   page.Url(
-    r'^site/sponsor/profile$',
+    r'^sponsor/create$',
     'soc.views.models.sponsor.create'),
   'Site: Create New Sponsor',
   short_name='Create Site Sponsor',
@@ -250,7 +246,7 @@ site_sponsor_create = page.Page(
 
 site_sponsor_delete = page.Page(
   page.Url(
-    r'^site/sponsor/profile/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.models.sponsor.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
@@ -258,7 +254,7 @@ site_sponsor_delete = page.Page(
 
 site_sponsor_edit = page.Page(
   page.Url(
-    r'^site/sponsor/profile/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/edit/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
     'soc.views.models.sponsor.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
@@ -266,7 +262,7 @@ site_sponsor_edit = page.Page(
 
 site_sponsor_list = page.Page(
   page.Url(
-    r'^site/sponsor/list$',
+    r'^sponsor/list$',
     'soc.views.models.sponsor.list'),
   'Site: List of Sponsors',
   short_name='List Site Sponsors',
@@ -275,7 +271,7 @@ site_sponsor_list = page.Page(
 # Host public view
 host_profile = page.Page(
   page.Url(
-      r'^host/profile/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+      r'^host/show/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
           'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.public'),
   'Host Public Profile',
@@ -290,7 +286,7 @@ site_host_sub_menu = page.NonPage(
 
 site_host_create = page.Page(
   page.Url(
-    r'^site/host/profile$',
+    r'^host/create$',
     'soc.views.models.host.create'),
   'Site: Create New Host',
   short_name='Create Site Host',
@@ -298,7 +294,7 @@ site_host_create = page.Page(
 
 site_host_delete = page.Page(
   page.Url(
-    r'^site/host/delete/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+    r'^host/delete/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
           'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.delete'),
   'Site: Delete Existing Host',
@@ -307,7 +303,7 @@ site_host_delete = page.Page(
 
 site_host_edit = page.Page(
   page.Url(
-    r'^site/host/profile/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
+    r'^host/edit/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
           'lnp': path_link_name.LINKNAME_PATTERN_CORE},
     'soc.views.models.host.edit'),
   'Site: Modify Existing Host',
@@ -316,7 +312,7 @@ site_host_edit = page.Page(
 
 site_host_list = page.Page(
   page.Url(
-    r'^site/host/list$',
+    r'^host/list$',
     'soc.views.models.host.list'),
   'Site: List of Hosts',
   short_name='List Site Hosts',

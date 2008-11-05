@@ -93,7 +93,7 @@ class LookupForm(helper.forms.BaseForm):
       raise forms.ValidationError('Account not found.')
     
 
-DEF_SITE_USER_PROFILE_LOOKUP_TMPL = 'soc/site/user/profile/lookup.html'
+DEF_SITE_USER_PROFILE_LOOKUP_TMPL = 'soc/user/lookup.html'
 
 @decorators.view
 def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
@@ -248,7 +248,7 @@ class EditForm(helper.forms.BaseForm):
     return form_id
 
 
-DEF_SITE_USER_PROFILE_EDIT_TMPL = 'soc/site/user/profile/edit.html'
+DEF_SITE_USER_PROFILE_EDIT_TMPL = 'soc/user/edit.html'
 DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           ' <a href="/site/user/profile">Create ' \
                           'a New User</a> page.'
@@ -403,7 +403,7 @@ class CreateForm(helper.forms.BaseForm):
     return form_id
 
 
-DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/site/user/profile/edit.html'
+DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/user/edit.html'
 
 @decorators.view
 def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
@@ -454,7 +454,7 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
       # redirect to new /site/user/profile/new_link_name?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, None, link_name,
+          request, 'create', 'edit/' + link_name,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
     # no link name specified, so start with an empty form

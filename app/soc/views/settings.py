@@ -87,14 +87,14 @@ class DocSelectForm(helper.forms.BaseForm):
 
   # TODO(tlarsen): partial_path will be a hard-coded read-only
   #   field for some (most?) User Roles
-  partial_path = forms.CharField(required=False,
+  doc_partial_path = forms.CharField(required=False,
       label=soc.models.work.Work.partial_path.verbose_name,
       help_text=soc.models.work.Work.partial_path.help_text)
 
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
   #   Role-scoped Document selector that we don't have yet
-  link_name = forms.CharField(required=False,
+  doc_link_name = forms.CharField(required=False,
       label=soc.models.work.Work.link_name.verbose_name,
       help_text=soc.models.work.Work.link_name.help_text)
 
@@ -102,10 +102,11 @@ class DocSelectForm(helper.forms.BaseForm):
     model = None
 
 
-DEF_HOME_EDIT_TMPL = 'soc/settings/edit.html'
+DEF_HOME_EDIT_TMPL = 'soc/site_settings/edit.html'
 
 @decorators.view
-def edit(request, page=None, path=None, logic=models.home_settings.logic,
+def edit(request, page=None, partial_path=None, link_name=None, 
+         logic=models.home_settings.logic,
          settings_form_class=SettingsForm,
          template=DEF_HOME_EDIT_TMPL):
   """View for authorized User to edit contents of a home page.
@@ -150,11 +151,11 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
         value = settings_form.cleaned_data.get(field)
         fields[field] = value
 
-      partial_path = doc_select_form.cleaned_data.get('partial_path')
-      link_name = doc_select_form.cleaned_data.get('link_name')
+      doc_partial_path = doc_select_form.cleaned_data.get('doc_partial_path')
+      doc_link_name = doc_select_form.cleaned_data.get('doc_link_name')
 
       home_doc = document.logic.getFromFields(
-          partial_path=partial_path, link_name=link_name)
+          partial_path=doc_partial_path, link_name=doc_link_name)
 
       if home_doc:
         fields['home'] = home_doc
@@ -171,7 +172,8 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
         home_doc = settings.home
   else: # request.method == 'GET'
     # try to fetch HomeSettings entity by unique key_name
-    settings = logic.getFromFields(path=path)
+    settings = logic.getFromFields(partial_path=partial_path, 
+                                   link_name=link_name)
 
     if settings:
       # populate form with the existing HomeSettings entity
@@ -185,8 +187,8 @@ def edit(request, page=None, path=None, logic=models.home_settings.logic,
     
       if home_doc:
         doc_select_form = DocSelectForm(initial={
-            'partial_path': home_doc.partial_path,
-            'link_name': home_doc.link_name})
+            'doc_partial_path': home_doc.partial_path,
+            'doc_link_name': home_doc.link_name})
       else:
         doc_select_form = DocSelectForm()
     else:

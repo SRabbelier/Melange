@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/group/edit.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,14 +12,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
-{% block body %}
-<p>
-<p>
-{% block instructions %}
-List of {{ entity_type_plural }} in Google Open Source Programs.
+{% block submit_buttons %}
+{{ block.super }}
+{% if entity %}
+<td>
+ <input type="button" onclick="location.href='/{{ entity_type_short|lower }}/delete/{{ entity.link_name }}'" value="Delete"/>
+</td>
+{% endif %}
 {% endblock %}
-</p>
-{% include list_main %}
-</p>
+{% block body %}
+{{ block.super }}
+{% if entity %}
+<p><a href="/{{ entity_type_short|lower }}/show/{{ entity.link_name }}">View Sponsor Public Profile</a></p>
+{% endif %}
 {% endblock %}

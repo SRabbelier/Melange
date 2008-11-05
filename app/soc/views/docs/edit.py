@@ -107,7 +107,7 @@ class CreateForm(helper.forms.BaseForm):
     return link_name
 
 
-DEF_DOCS_CREATE_TMPL = 'soc/docs/edit.html'
+DEF_DOCS_CREATE_TMPL = 'soc/models/edit.html'
 
 @decorators.view
 def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
@@ -161,7 +161,7 @@ def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
   return helper.responses.respond(request, template, context)
 
 
-DEF_DOCS_EDIT_TMPL = 'soc/docs/edit.html'
+DEF_DOCS_EDIT_TMPL = 'soc/models/edit.html'
 
 class EditForm(CreateForm):
   """Django form displayed a Document is edited.

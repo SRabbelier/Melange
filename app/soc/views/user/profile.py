@@ -149,10 +149,10 @@ def edit(request, page=None, link_name=None,
       user = models.user.logic.updateOrCreateFromFields(properties, 
                                                         key_fields)
 
-      # redirect to new /user/profile/new_link_name?s=0
+      # redirect to /user/profile?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, link_name, new_link_name, params=SUBMIT_PROFILE_SAVED_PARAMS)
+          request, None, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists
     user = models.user.logic.getFromFields(email=id.email())

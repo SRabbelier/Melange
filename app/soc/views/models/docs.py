@@ -99,9 +99,9 @@ class View(base.View):
     params['create_form'] = CreateForm
 
     # TODO(tlarsen) Add support for Django style template lookup
-    params['edit_template'] = 'soc/docs/edit.html'
+    params['edit_template'] = 'soc/models/edit.html'
     params['public_template'] = 'soc/docs/public.html'
-    params['list_template'] = 'soc/list/all.html'
+    params['list_template'] = 'soc/models/list.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
@@ -111,7 +111,7 @@ class View(base.View):
     }
 
     params['delete_redirect'] = '/docs/list'
-    params['create_redirect'] = 'soc/docs/edit.html'
+    params['create_redirect'] = 'soc/models/edit.html'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

@@ -138,6 +138,7 @@ class View:
     for field in fields:
       kwargs[field] = None
 
+    # TODO(SRabbelier): make edit strip off 'create' if present and replace with 'edit'
     return self.edit(request, page=page, **kwargs)
 
   def edit(self, request, page=None, **kwargs):

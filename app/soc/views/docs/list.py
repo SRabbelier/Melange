@@ -34,7 +34,7 @@ import soc.views.helper.responses
 import soc.views.out_of_band
 
 
-DEF_DOCS_LIST_ALL_TMPL = 'soc/docs/list/all.html'
+DEF_DOCS_LIST_ALL_TMPL = 'soc/models/list.html'
 
 
 @decorators.view

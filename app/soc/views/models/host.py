@@ -98,7 +98,7 @@ class View(base.View):
     # TODO(tlarsen) Add support for Django style template lookup
     params['edit_template'] = 'soc/models/edit.html'
     params['public_template'] = 'soc/host/public.html'
-    params['list_template'] = 'soc/list/all.html'
+    params['list_template'] = 'soc/models/list.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',

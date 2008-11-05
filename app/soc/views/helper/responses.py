@@ -110,7 +110,8 @@ def getUniversalContext(request):
       sidebar.buildSidebar(**context)))
       
   settings = site_settings.logic.getFromFields(
-      path=site_settings.logic.DEF_SITE_SETTINGS_PATH)
+      partial_path=site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
+      link_name=site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME)
   
   if settings:
     context['ga_tracking_num'] = settings.ga_tracking_num

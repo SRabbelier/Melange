@@ -58,28 +58,36 @@ def nameDocument(partial_path, link_name=None):
   return 'Document:%s' % path
 
 
-def nameSiteSettings(path):
+def nameSiteSettings(partial_path, link_name):
   """Returns a SiteSettings key name constructed from a supplied path.
   
   Raises:
     Error if path is "False" (None, empty string, etc.)
   """
-  if not path:
-    raise Error('"path" must be non-False: "%s"' % path)
 
-  return nameHomeSettings(path, entity_type='SiteSettings')
+  if not partial_path:
+    raise Error('"partial_path" must be non-False: "%s"' % partial_path)
+
+  if not link_name:
+    raise Error('"link_name" must be non-False: "%s"' % link_name)
+
+  return 'SiteSettings:%s:%s' % (partial_path, link_name)
 
 
-def nameHomeSettings(path, entity_type='HomeSettings'):
+def nameHomeSettings(partial_path, link_name):
   """Returns a HomeSettings key name constructed from a supplied path.
 
   Raises:
     Error if path is "False" (None, empty string, etc.)
   """
-  if not path:
-    raise Error('"path" must be non-False: "%s"' % path)
 
-  return '%s:%s' % (entity_type, path)
+  if not partial_path:
+    raise Error('"partial_path" must be non-False: "%s"' % partial_path)
+
+  if not link_name:
+    raise Error('"link_name" must be non-False: "%s"' % link_name)
+
+  return 'HomeSettings:%s:%s' % (partial_path, link_name)
 
 
 def nameUser(email):

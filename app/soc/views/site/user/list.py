@@ -34,7 +34,7 @@ import soc.views.helper.responses
 import soc.views.out_of_band
 
 
-DEF_SITE_USER_LIST_ALL_TMPL = 'soc/site/user/list/all.html'
+DEF_SITE_USER_LIST_ALL_TMPL = 'soc/models/list.html'
 
 @decorators.view
 def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
@@ -69,11 +69,13 @@ def all(request, page=None, template=DEF_SITE_USER_LIST_ALL_TMPL):
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
-  list_templates = {'list_main': 'soc/list/list_main.html',
-                    'list_pagination': 'soc/list/list_pagination.html',
-                    'list_row': 'soc/site/user/list/user_row.html',
-                    'list_heading': 'soc/site/user/list/user_heading.html'}
-                      
+  list_templates = {
+      'list_main': 'soc/list/list_main.html',
+      'list_pagination': 'soc/list/list_pagination.html',
+      'list_row': 'soc/user/list/user_row.html',
+      'list_heading': 'soc/user/list/user_heading.html'
+      }
+
   context = helper.lists.setList(
       request, context, users,
       offset=offset, limit=limit, list_templates=list_templates)

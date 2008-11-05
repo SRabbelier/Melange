@@ -104,9 +104,9 @@ class View(base.View):
     params['create_form'] = CreateForm
 
     # TODO(tlarsen) Add support for Django style template lookup
-    params['edit_template'] = 'soc/site/sponsor/profile/edit.html'
-    params['public_template'] = 'soc/group/profile/public.html'
-    params['list_template'] = 'soc/group/list/all.html'
+    params['edit_template'] = 'soc/sponsor/edit.html'
+    params['public_template'] = 'soc/group/public.html'
+    params['list_template'] = 'soc/models/list.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',

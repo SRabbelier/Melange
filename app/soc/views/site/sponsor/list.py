@@ -34,7 +34,7 @@ import soc.views.helper.responses
 import soc.views.out_of_band
 
 
-DEF_SITE_SPONSOR_LIST_ALL_TMPL = 'soc/group/list/all.html'
+DEF_SITE_SPONSOR_LIST_ALL_TMPL = 'soc/models/list.html'
 
 @decorators.view
 def all(request, page=None, template=DEF_SITE_SPONSOR_LIST_ALL_TMPL):

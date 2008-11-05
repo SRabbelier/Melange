@@ -50,7 +50,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    return [fields['sponsor'].link_name, fields['user'].link_name]
+    return [fields['sponsor_ln'], fields['user_ln']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames

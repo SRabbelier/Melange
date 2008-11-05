@@ -68,7 +68,7 @@ class UserForm(helper.forms.BaseForm):
     return link_name
 
 
-DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/profile/edit.html'
+DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/edit_self.html'
 
 SUBMIT_MSG_PARAM_NAME = 's'
 

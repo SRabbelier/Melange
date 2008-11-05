@@ -37,13 +37,7 @@ import soc.logic.models.site_settings
 home = page.Page(
   page.Url(
     r'^$',
-    'soc.views.home.public',
-    kwargs={
-      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
-      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
-      'entity_type': 'SiteSettings',
-      'template': 'soc/home/public.html',
-    }),
+    'soc.views.models.site_settings.main_public'),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
@@ -99,41 +93,101 @@ user_self = page.Page(
 # Site Home Page views
 site_home = page.Page(
   page.Url(
-    r'^site/home$',
-    'soc.views.home.public',
-    kwargs={
-      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
-      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
-      'entity_type': 'SiteSettings',
-      'template': 'soc/home/public.html',
-    }),
+    r'^home$',
+    'soc.views.models.site_settings.main_public'),
   'Google Open Source Programs',
   # it should be obvious that every page comes from the home page
   in_breadcrumb=False)
+
 
 site_sub_menu = page.NonPage(
   'site-sub-menu',
   'Site',
   parent=home)
 
+home_settings_sub_menu = page.NonPage(
+  'home-settings-sub-menu',
+  'Home Settings',
+  parent=site_sub_menu)
+
+# Site Home Settings views
+home_settings_list = page.Page(
+  page.Url(
+    r'^home/list$',
+    'soc.views.models.home_settings.list'),
+  'Site: List Home Settings',
+  short_name='List Home Settings',
+  parent=home_settings_sub_menu)
+
+home_settings_create = page.Page(
+  page.Url(
+    r'^home/create$',
+    'soc.views.models.home_settings.create'),
+  'Site: Create New Home Settings',
+  short_name='Create Home Settings',
+  parent=home_settings_sub_menu)
+
+home_settings_edit = page.Page(
+  page.Url(
+    r'^home/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.home_settings.edit'),
+  'Site: Settings',
+  short_name='Edit Site Settings',
+  parent=home_settings_sub_menu)
+
+home_settings_show = page.Page(
+  page.Url(
+    r'^home/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.home_settings.public'),
+  'Show Document',
+  parent=home)
+
+
 site_settings_sub_menu = page.NonPage(
   'site-settings-sub-menu',
   'Site Settings',
   parent=site_sub_menu)
 
-# Site User Profile views
+# Site Home Settings views
+site_settings_list = page.Page(
+  page.Url(
+    r'^site/list$',
+    'soc.views.models.site_settings.list'),
+  'Site: List Site Settings',
+  short_name='List Site Settings',
+  parent=site_settings_sub_menu)
+
+site_settings_create = page.Page(
+  page.Url(
+    r'^site/create$',
+    'soc.views.models.site_settings.create'),
+  'Site: Create New Site Settings',
+  short_name='Create Site Settings',
+  parent=site_settings_sub_menu)
+
 site_settings_edit = page.Page(
   page.Url(
-    r'^settings/edit$',
-    'soc.views.site.settings.edit',
-    kwargs={
-      'partial_path': models.site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
-      'link_name': models.site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME,
-      'logic': models.site_settings.logic,
-    }),
+    r'^site/edit$',
+    'soc.views.models.site_settings.main_edit'),
+  'Site: Settings',
+  short_name='Edit Main Site Settings',
+  parent=site_settings_sub_menu)
+
+site_settings_edit = page.Page(
+  page.Url(
+    r'^site/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.site_settings.edit'),
   'Site: Settings',
   short_name='Edit Site Settings',
   parent=site_settings_sub_menu)
+
+site_settings_show = page.Page(
+  page.Url(
+    r'^site/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.site_settings.public'),
+  'Show Document',
+  parent=home)
+
 
 # Site User Profile views
 site_user_sub_menu = page.NonPage(

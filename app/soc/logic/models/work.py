@@ -39,11 +39,7 @@ class Logic(base.Logic):
 
     self._name = "Work"
     self._model = soc.models.work.Work
-    # TODO: remove line below when Work is implemented using 
-    # views.models.base.View approach
-    self._keyName = key_name.nameWork
     self._skip_properties = []
-    # TODO(tlarsen): write a nameWork method
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.
@@ -62,5 +58,6 @@ class Logic(base.Logic):
     """
 
     return ['link_name']
+
 
 logic = Logic()

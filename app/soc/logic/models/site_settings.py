@@ -43,10 +43,13 @@ class Logic(home_settings.Logic):
 
     self._name = "SiteSettings"
     self._model = soc.models.site_settings.SiteSettings
-    # TODO: remove line below when SiteSettings is implemented using 
-    # views.models.base.View approach
-    self._keyName = key_name.nameSiteSettings
     self._skip_properties = []
+
+  def getMainKeyValues(self):
+    """Returns the default key values for the site settings"""
+
+    return [self.DEF_SITE_SETTINGS_PARTIAL_PATH, 
+            self.DEF_SITE_SETTINGS_LINK_NAME]
 
 
 logic = Logic()

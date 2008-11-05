@@ -131,9 +131,9 @@ class RegexURLPattern(object):
         except ImportError, e:
             mod_name, _ = get_mod_func(self._callback_str)
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
-        except AttributeError, e:
-            mod_name, func_name = get_mod_func(self._callback_str)
-            raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
+        #except AttributeError, e:
+            #mod_name, func_name = get_mod_func(self._callback_str)
+            #raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
         return self._callback
     callback = property(_get_callback)
 

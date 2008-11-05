@@ -39,9 +39,6 @@ class Logic(base.Logic):
 
     self._name = "HomeSettings"
     self._model = soc.models.home_settings.HomeSettings
-    # TODO: remove line below when HomeSettings is implemented using 
-    # views.models.base.View approach
-    self._keyName = key_name.nameHomeSettings
     self._skip_properties = []
   
   def getKeyValues(self, entity):
@@ -61,6 +58,5 @@ class Logic(base.Logic):
     """
 
     return ['partial_path', 'link_name']
-
 
 logic = Logic()

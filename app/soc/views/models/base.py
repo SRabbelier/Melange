@@ -55,7 +55,7 @@ class View:
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
-  def __init__(self, params=None, rights=None):
+  def __init__(self, params=None, rights=None, stop=False):
     """
 
     Args:
@@ -104,6 +104,10 @@ class View:
     context['page'] = page
     entity = None
 
+    if not all(kwargs.values()):
+      #TODO: Change this into a proper redirect
+      return http.HttpResponseRedirect('/')
+
     try:
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
@@ -111,9 +115,7 @@ class View:
       template = self._params['public_template']
       return simple.errorResponse(request, page, error, template, context)
 
-    if not entity:
-      #TODO: Change this into a proper redirect
-      return http.HttpResponseRedirect('/')
+    self._public(request, entity, context)
 
     context['entity'] = entity
     context['entity_type'] = self._params['name']
@@ -331,7 +333,18 @@ class View:
       fields: the new field values
     """
 
-    raise NotImplementedError
+    pass
+
+  def _public(self, request, entity, context):
+    """Performs any required processing to get an entities public page
+
+    Args:
+      request: the django request object
+      entity: the entity to make public
+      context: the context object
+    """
+
+    pass
 
   def _editGet(self, request, entity, form):
     """Performs any required processing on the form to get its edit page

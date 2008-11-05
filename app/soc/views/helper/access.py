@@ -47,7 +47,7 @@ DEF_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
 DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
-  'Please create <a href="/user/profile">User Profile</a>'
+  'Please create <a href="/user/edit">User Profile</a>'
   ' in order to view this page.')
 
 DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(

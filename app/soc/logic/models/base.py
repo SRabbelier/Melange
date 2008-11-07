@@ -71,16 +71,16 @@ class Logic:
 
     # check if all key_field_names for this entity are present in kwargs
     if not all(field in kwargs.keys() for field in key_field_names):
-        raise Error("Not all the required key fields are present")
+      raise Error("Not all the required key fields are present")
 
     # check if all kwargs.values() are non-false
     if not all(kwargs.values()):
-        raise Error("Not all KeyValues are non-false")
+      raise Error("Not all KeyValues are non-false")
 
     # construct the KeyValues in the order given by getKeyFieldNames()
     keyvalues = []
     for key_field_name in key_field_names:
-        keyvalues.append(kwargs[key_field_name])
+      keyvalues.append(kwargs[key_field_name])
 
     # construct the KeyName in the appropriate format
     return ":".join([self._name] + keyvalues)
@@ -251,8 +251,7 @@ class Logic:
     if unique:
       return query.get()
 
-    result = query.fetch(limit, offset)
-    return result
+    return query.fetch(limit, offset)
 
   def updateModelProperties(self, model, model_properties):
     """Update existing model entity using supplied model properties.

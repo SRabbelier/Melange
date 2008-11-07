@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.logic import key_name
 from soc.logic.models import base
 
 import soc.models.user
@@ -40,11 +39,22 @@ class Logic(base.Logic):
     self._model = soc.models.user.User
     self._skip_properties = ['former_ids']
 
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
+  def isFormerId(self, id):
+    """Returns true if id is in former ids"""
+    # TODO(pawel.solyga): replace 1000 with solution that works for any number of queries
+    users_with_former_ids = soc.models.user.User.gql('WHERE former_ids != :1', None).fetch(1000)
+    
+    for former_id_user in users_with_former_ids: 
+      if id in former_id_user.former_ids:
+        return True
+    
+    return False
 
-    return [entity.link_name]
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyValues.
+    """
+    
+    return [entity.id.email()]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.
@@ -62,6 +72,20 @@ class Logic(base.Logic):
     """
 
     return ['email']
+
+  def updateOrCreateFromId(self, properties, id):
+    """Like updateOrCreateFromKeyName, but resolves id to a key_name first.
+    """
+
+    # attempt to retrieve the existing entity
+    user = soc.models.user.User.gql('WHERE id = :1', id).get()
+    
+    if user:
+      key_name = user.key().name()
+    else:
+      key_name  = self.getKeyNameForFields({'email': id.email()})
+
+    return self.updateOrCreateFromKeyName(properties, key_name)
 
   def _updateField(self, model, name, value):
     """Special case logic for id.

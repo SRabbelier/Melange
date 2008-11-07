@@ -85,7 +85,7 @@ def isIdDeveloper(id=None):
   if not id:
     id = current_id
 
-  user = models.user.logic.getFromFields(email=id.email())
+  user = models.user.logic.getForFields({'id': id}, unique=True)
 
   if not user:
     # no User entity for this Google Account, and id is not the currently
@@ -114,12 +114,12 @@ def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
   else:
     old_email = None
 
-  if new_id.email() == old_email:
+  if new_id.email().lower == old_email.lower:
     # "new" email is same as existing User wanting it, so it is "available"
     return True
   # else: "new" email truly is new to the existing User, so keep checking
 
-  if not models.user.logic.getFromFields(email=new_id.email()):
+  if not models.user.logic.getForFields({'id': new_id}, unique=True):
     # new email address also does not belong to any other User,
     # so it is available
     return True
@@ -165,7 +165,7 @@ def doesLinkNameBelongToId(link_name, id):
     # link name cannot belong to an unspecified User
     return False
 
-  user = models.user.logic.getFromFields(email=id.email())
+  user = models.user.logic.getForFields({'id': id}, unique=True)
 
   if not user:
     # no User corresponding to id Google Account, so no link name at all 

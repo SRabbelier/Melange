@@ -61,10 +61,6 @@ def getDocForForm(form):
   """
 
   user = users.get_current_user()
-  if user:
-    email = user.email()
-  else:
-    email = None
 
   partial_path = form.cleaned_data.get('partial_path')
   link_name = form.cleaned_data.get('link_name')
@@ -75,7 +71,7 @@ def getDocForForm(form):
   properties['title'] = form.cleaned_data.get('title')
   properties['short_name'] = form.cleaned_data.get('short_name')
   properties['content'] = form.cleaned_data.get('content')
-  properties['author'] = models.user.logic.getFromFields(email=email)
+  properties['author'] = models.user.logic.getForFields({'id': user}, unique=True)
   properties['is_featured'] = form.cleaned_data.get('is_featured')
 
   key_fields = document.logic.getKeyFieldsFromDict(properties)

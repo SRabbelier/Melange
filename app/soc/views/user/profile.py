@@ -69,6 +69,7 @@ class UserForm(helper.forms.BaseForm):
 
 
 DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/edit_self.html'
+DEF_USER_ACCOUNT_INVALID_MSG = 'This account is invalid.'
 
 SUBMIT_MSG_PARAM_NAME = 's'
 
@@ -99,7 +100,7 @@ def edit(request, page=None, link_name=None,
     be filled out, or a redirect to the correct view in the interface.
   """
   id = users.get_current_user()
-
+  
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
@@ -145,17 +146,22 @@ def edit(request, page=None, link_name=None,
         'id': id,
       }
 
-      key_fields = {'email': id.email()}
-      user = models.user.logic.updateOrCreateFromFields(properties, 
-                                                        key_fields)
-
+      # check if user account is not in former_ids
+      # if it is show error message that account is invalid
+      if models.user.logic.isFormerId(id):
+        msg = DEF_USER_ACCOUNT_INVALID_MSG
+        error = out_of_band.ErrorResponse(msg)
+        return simple.errorResponse(request, page, error, template, context)
+      
+      user = models.user.logic.updateOrCreateFromId(properties, id)
+      
       # redirect to /user/profile?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, None, params=SUBMIT_PROFILE_SAVED_PARAMS)
   else: # request.method == 'GET'
     # try to fetch User entity corresponding to Google Account if one exists
-    user = models.user.logic.getFromFields(email=id.email())
+    user = models.user.logic.getForFields({'id': id}, unique=True)
 
     if user:
       # is 'Profile saved' parameter present, but referrer was not ourself?

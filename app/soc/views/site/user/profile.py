@@ -134,7 +134,7 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
       
       if form_id:
         # email provided, so attempt to look up user by email
-        user = models.user.logic.getFromFields(email=form_id.email())
+        user = models.user.logic.getForFields({'id': form_id}, unique=True)
 
         if user:
           lookup_message = ugettext_lazy('User found by email.')
@@ -234,8 +234,9 @@ class EditForm(helper.forms.BaseForm):
 
     key_name = self.data.get('key_name')
     user = models.user.logic.getFromKeyName(key_name)
-
-    if user and user.link_name != link_name:
+    
+    linkname_user_exist = id_user.getUserFromLinkName(link_name)
+    if (user and user.link_name != link_name) and linkname_user_exist:
       raise forms.ValidationError("This link name is already in use.")
 
     return link_name
@@ -245,6 +246,9 @@ class EditForm(helper.forms.BaseForm):
     if not id_user.isIdAvailable(
         form_id, existing_key_name=self.data.get('key_name')):
       raise forms.ValidationError("This account is already in use.")
+    if models.user.logic.isFormerId(form_id):
+      raise forms.ValidationError("This account is invalid. "
+          "It exists as former id.")
     return form_id
 
 
@@ -398,8 +402,11 @@ class CreateForm(helper.forms.BaseForm):
   def clean_id(self):
     new_email = self.cleaned_data.get('id')
     form_id = users.User(email=new_email)
-    if models.user.logic.getFromFields(email=form_id.email()):
+    if models.user.logic.getForFields({'id': form_id}, unique=True):
       raise forms.ValidationError("This account is already in use.")
+    if models.user.logic.isFormerId(form_id):
+      raise forms.ValidationError("This account is invalid. "
+          "It exists as former id.")
     return form_id
 
 

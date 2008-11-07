@@ -99,8 +99,8 @@ def getUniversalContext(request):
 
   if id:
     context['id'] = id
-    context['user'] = soc.logic.models.user.logic.getFromFields(
-        email=id.email())
+    context['user'] = soc.logic.models.user.logic.getForFields(
+        {'id': id}, unique=True)
     context['is_admin'] = id_user.isIdDeveloper(id=id)
 
   context['is_debug'] = system.isDebug()

@@ -132,7 +132,7 @@ class View(base.View):
     """
 
     id = users.get_current_user()
-    user = soc.logic.models.user.logic.getFromFields(email=id.email())
+    user = soc.logic.models.user.logic.getForFields({'id': id}, unique=True)
     fields['author'] = user
 
   def _editGet(self, request, entity, form):

@@ -275,18 +275,7 @@ table#queues td {
   padding-top: 20px;
 }
 
-#lastmodified {
-  text-align: right;
-  font-size: small;
-}
-
-#createdon {
-  text-align: right;
-  font-size: small;
-}
-
-#createdby {
-  text-align: right;
+#created {
   font-size: small;
 }
 

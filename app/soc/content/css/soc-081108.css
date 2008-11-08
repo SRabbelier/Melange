@@ -313,20 +313,16 @@ table#queues td {
 
 #menu li {
   margin-top: 4px;
-}
-
-#menu li.leaf {
   list-style-type: none;
   list-style-image: none;
 }
 
-#menu li.expandable {
-  list-style-type: disc;
-  list-style-image: url(../images/minus.gif);
+#menu img {
+  margin-right: 4px;
 }
 
-#menu li.closed {
-  list-style-image: url(../images/plus.gif);
+#menu li.leaf {
+  padding-left: 14px;
 }
 
 #menu h4 {

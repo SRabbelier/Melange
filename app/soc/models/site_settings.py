@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
 
@@ -40,3 +41,8 @@ class SiteSettings(soc.models.home_settings.HomeSettings):
       'entered every page is going to have Google Analytics '
       'initialization code in footer.')
 
+  # valid Google Maps API Key. Used to embed Google Maps.
+  gm_api_key = db.StringProperty(verbose_name=ugettext_lazy('Google Maps'))
+  gm_api_key.help_text = ugettext_lazy(
+      'Valid Google Maps API Key. This key is used for '
+      'embedding Google Maps into the website.')

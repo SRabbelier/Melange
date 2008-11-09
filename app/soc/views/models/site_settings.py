@@ -92,8 +92,8 @@ class View(home_settings.View):
       'list_heading': 'soc/site_settings/list/site_heading.html',
     }
 
-    params['delete_redirect'] = 'site/list'
-    params['create_redirect'] = 'site/edit'
+    params['delete_redirect'] = '/site/list'
+    params['create_redirect'] = '/site/edit'
 
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)

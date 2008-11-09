@@ -185,7 +185,14 @@ site_settings_show = page.Page(
   page.Url(
     r'^site/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
     'soc.views.models.site_settings.public'),
-  'Show Document',
+  'Show Site Settings',
+  parent=home)
+
+site_settings_delete = page.Page(
+  page.Url(
+    r'^site/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.site_settings.delete'),
+  'Delete Site Settings',
   parent=home)
 
 

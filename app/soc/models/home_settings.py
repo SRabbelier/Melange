@@ -52,20 +52,13 @@ class HomeSettings(polymodel.PolyModel):
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
 
-#: Required path, prepended to a "link name" to form the document URL.
-  #: The combined path and link name must be globally unique on the
-  #: site.  Except in /site/docs (Developer) forms, this field is not
-  #: usually directly editable by the User, but is instead set by controller
-  #: logic to match the "scope" of the document.
+  #: Required path, prepended to a "link name" to form the Setting URL.
   partial_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Partial path'))
+      verbose_name=ugettext_lazy('Partial path for Settings'))
   partial_path.help_text = ugettext_lazy(
-    'path portion of URLs, prepended to link name')
+    'path portion of URLs for Settings, prepended to link name')
 
-  #: Required link name, appended to a "path" to form the document URL.
-  #: The combined path and link name must be globally unique on the
-  #: site (but, unlike some link names, a Work link name can be reused,
-  #: as long as the combination with the preceding path is unique).
+  #: Required link name, appended to a "path" to form the Setting URL.
   link_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link name'))
-  link_name.help_text = ugettext_lazy('link name used in URLs')
+      verbose_name=ugettext_lazy('Link name for Settings'))
+  link_name.help_text = ugettext_lazy('link name for Settings used in URLs')

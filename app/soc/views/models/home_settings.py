@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
+from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
@@ -129,8 +130,8 @@ class View(base.View):
       'list_heading': 'soc/home_settings/list/home_heading.html',
     }
 
-    params['delete_redirect'] = 'home/list'
-    params['create_redirect'] = 'home/edit'
+    params['delete_redirect'] = '/home/list'
+    params['create_redirect'] = '/home/edit'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 
@@ -169,10 +170,24 @@ class View(base.View):
     """
 
     try:
-      form.fields['doc_partial_path'].initial = entity.home.partial_path
-      form.fields['doc_link_name'].initial = entity.home.link_name
+      if entity.home:
+        form.fields['doc_partial_path'].initial = entity.home.partial_path
+        form.fields['doc_link_name'].initial = entity.home.link_name
     except db.Error:
       pass
+
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+
+    doc_partial_path = fields['doc_partial_path']
+    doc_link_name = fields['doc_link_name']
+
+    # TODO notify the user if home_doc is not found
+    home_doc = document_logic.logic.getFromFields(
+    partial_path=doc_partial_path, link_name=doc_link_name)
+
+    fields['home'] = home_doc
 
 
 view = View()

@@ -115,8 +115,8 @@ class View(base.View):
       'list_heading': 'soc/group/list/group_heading.html',
     }
     
-    params['delete_redirect'] = '/site/sponsor/list'
-    params['create_redirect'] = '/site/sponsor/profile'
+    params['delete_redirect'] = '/sponsor/list'
+    params['create_redirect'] = '/sponsor/profile'
     
     params['save_message'] = [ugettext_lazy('Profile saved.')]
     

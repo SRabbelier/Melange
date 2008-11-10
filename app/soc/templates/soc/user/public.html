@@ -13,15 +13,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
-{% block page_title %}User Public Profile{% endblock %}
+
 {% block header_title %}
-User Public Profile for {{ link_name_user.nick_name }}
+{{ page.short_name }} for {{ entity.nick_name }}
 {% endblock %}
+
 {% block body %}
 <p>
  <table>
-  {% readonly_field_as_table_row link_name_user.fields.nick_name.label link_name_user.nick_name %}
-  {% readonly_field_as_table_row link_name_user.fields.link_name.label link_name_user.link_name %}
+  {% readonly_field_as_table_row entity.fields.link_name.label entity.link_name %}
+  {% readonly_field_as_table_row entity.fields.nick_name.label entity.nick_name %}
+  <!-- TODO(pawel.solyga) make this generic -->
  </table>
 </p>
 {% endblock %}

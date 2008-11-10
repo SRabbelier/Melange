@@ -89,7 +89,7 @@ class BaseForm(DbModelForm):
   DEF_ERROR_ROW = u'<tr><td colspan="2">%s</td></tr>'
   DEF_ROW_ENDER = '</td></tr>'
   DEF_HELP_TEXT_HTML = u'<td class="formfieldhelptext">%s</td>'
-  
+
   def __init__(self, *args, **kwargs):
     """Parent class initialization.
 

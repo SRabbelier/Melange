@@ -203,15 +203,18 @@ class View:
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    fields = self.collectCleanedFields(form)
+    key_name, fields = self.collectCleanedFields(form)
 
     # get the old_suffix before editing
     old_suffix = self._logic.getKeySuffix(entity)
 
     self._editPost(request, entity, fields)
 
-    key_fields = self._logic.getKeyFieldsFromDict(fields)
-    entity = self._logic.updateOrCreateFromFields(fields, key_fields)
+    if not key_name:
+      key_fields =  self._logic.getKeyFieldsFromDict(fields)
+      key_name = self._logic.getKeyNameForFields(key_fields)
+
+    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     if not entity:
       return http.HttpResponseRedirect('/')
@@ -247,6 +250,8 @@ class View:
 
       # populate form with the existing entity
       form = params['edit_form'](instance=entity)
+      if 'key_name' in form.fields:
+        form.fields['key_name'].initial = entity.key().name()
       self._editGet(request, entity, form)
     else:
       form = params['create_form']()
@@ -432,7 +437,7 @@ class View:
       check(request)
 
   def collectCleanedFields(self, form):
-    """Collects all cleaned fields from form and returns them 
+    """Collects all cleaned fields and returns them with the key_name
 
     Args:
       form: The form from which the cleaned fields should be collected
@@ -440,7 +445,11 @@ class View:
 
     fields = {}
 
+    key_name = None
+    if 'key_name' in form.cleaned_data:
+      key_name = form.cleaned_data.pop('key_name')
+
     for field, value in form.cleaned_data.iteritems():
       fields[field] = value
 
-    return fields
+    return key_name, fields

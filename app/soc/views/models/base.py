@@ -84,7 +84,7 @@ class View:
     self._rights = dicts.merge(rights, new_rights)
     self._params = params
 
-  def public(self, request, page=None, **kwargs):
+  def public(self, request, page=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
 
     Args:
@@ -93,6 +93,8 @@ class View:
         that combines a Django view with sidebar menu info
       kwargs: the Key Fields for the specified entity
     """
+
+    params = dicts.merge(params, self._params)
 
     try:
       self.checkAccess('public', request)
@@ -112,19 +114,19 @@ class View:
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = self._params['public_template']
+      template = params['public_template']
       return simple.errorResponse(request, page, error, template, context)
 
     self._public(request, entity, context)
 
     context['entity'] = entity
-    context['entity_type'] = self._params['name']
+    context['entity_type'] = params['name']
 
-    template = self._params['public_template']
+    template = params['public_template']
 
     return helper.responses.respond(request, template, context)
 
-  def create(self, request, page=None, **kwargs):
+  def create(self, request, page=None, params=None, **kwargs):
     """Displays the create page for this entity type
 
     Args:
@@ -141,9 +143,9 @@ class View:
       kwargs[field] = None
 
     # TODO(SRabbelier): make edit strip off 'create' if present and replace with 'edit'
-    return self.edit(request, page=page, **kwargs)
+    return self.edit(request, page=page, params=params, **kwargs)
 
-  def edit(self, request, page=None, **kwargs):
+  def edit(self, request, page=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
 
     Args:
@@ -152,6 +154,8 @@ class View:
         that combines a Django view with sidebar menu info
       kwargs: The Key Fields for the specified entity
     """
+
+    params = dicts.merge(params, self._params)
 
     try:
       self.checkAccess('edit', request)
@@ -167,30 +171,32 @@ class View:
         key_fields = self._logic.getKeyFieldsFromDict(kwargs)
         entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = self._params['public_template']
+      template = params['public_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
-          'entity_type_lower' : self._params['name'].lower(),
-          'entity_type' : self._params['name'],
-          'create' : self._params['create_redirect']
+          'entity_type_lower' : params['name'].lower(),
+          'entity_type' : params['name'],
+          'create' : params['create_redirect']
           }
       return simple.errorResponse(request, page, error, template, context)
 
     if request.method == 'POST':
-      return self.editPost(request, entity, context)
+      return self.editPost(request, entity, context, params=params)
     else:
-      return self.editGet(request, entity, context)
+      return self.editGet(request, entity, context, params=params)
 
-  def editPost(self, request, entity, context):
+  def editPost(self, request, entity, context, params=None):
     """Same as edit, but on POST
     """
 
+    params = dicts.merge(params, self._params)
+
     if entity:
-      form = self._params['edit_form'](request.POST)
+      form = params['edit_form'](request.POST)
     else:
-      form = self._params['create_form'](request.POST)
+      form = params['create_form'](request.POST)
 
     if not form.is_valid():
-      return self._constructResponse(request, entity, context, form)
+      return self._constructResponse(request, entity, context, form, params)
 
     fields = self.collectCleanedFields(form)
 
@@ -205,19 +211,20 @@ class View:
     if not entity:
       return http.HttpResponseRedirect('/')
 
-    params = self._params['edit_params']
+    page_params = params['edit_params']
     suffix = self._logic.getKeySuffix(entity)
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
         request, old_suffix, suffix,
-        params=params)
+        params=page_params)
 
-  def editGet(self, request, entity, context):
+  def editGet(self, request, entity, context, params=None):
     """Same as edit, but on GET
     """
 
+    params = dicts.merge(params, self._params)
     suffix = self._logic.getKeySuffix(entity)
 
     # Remove the params from the request, this is relevant only if
@@ -231,17 +238,17 @@ class View:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
           request, self.DEF_SUBMIT_MSG_PARAM_NAME,
-          values=self._params['save_message'])
+          values=params['save_message'])
 
       # populate form with the existing entity
-      form = self._params['edit_form'](instance=entity)
+      form = params['edit_form'](instance=entity)
       self._editGet(request, entity, form)
     else:
-      form = self._params['create_form']()
+      form = params['create_form']()
 
-    return self._constructResponse(request, entity, context, form)
+    return self._constructResponse(request, entity, context, form, params)
 
-  def list(self, request, page=None):
+  def list(self, request, page=None, params=None):
     """Displays the list page for the entity type
     
     Args:
@@ -249,6 +256,8 @@ class View:
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
     """
+
+    params = dicts.merge(params, self._params)
 
     try:
       self.checkAccess('list', request)
@@ -266,19 +275,19 @@ class View:
 
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
-    templates = self._params['lists_template']
+    templates = params['lists_template']
 
     context = helper.lists.setList(request, context, entities, 
                                  offset, limit, templates)
 
-    context['entity_type'] = self._params['name']
-    context['entity_type_plural'] = self._params['name_plural']
+    context['entity_type'] = params['name']
+    context['entity_type_plural'] = params['name_plural']
 
-    template = self._params['list_template']
+    template = params['list_template']
 
     return helper.responses.respond(request, template, context)
 
-  def delete(self, request, page=None, **kwargs):
+  def delete(self, request, page=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by kwargs
 
     Args:
@@ -287,6 +296,8 @@ class View:
         that combines a Django view with sidebar menu info
       kwargs: The Key Fields for the specified entity
     """
+
+    params = dicts.merge(params, self._params)
 
     try:
       self.checkAccess('delete', request)
@@ -302,11 +313,11 @@ class View:
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = self._params['edit_template']
+      template = params['edit_template']
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
-          'entity_type_lower' : self._params['name'].lower(),
-          'entity_type' : self._params['name'],
-          'create' : self._params['create_redirect']
+          'entity_type_lower' : params['name'].lower(),
+          'entity_type' : params['name'],
+          'create' : params['create_redirect']
           }
       return simple.errorResponse(request, page, error, template, context)
 
@@ -320,7 +331,7 @@ class View:
       pass
 
     self._logic.delete(entity)
-    redirect = self._params['delete_redirect']
+    redirect = params['delete_redirect']
 
     return http.HttpResponseRedirect(redirect)
 
@@ -367,7 +378,7 @@ class View:
 
     pass
 
-  def _constructResponse(self, request, entity, context, form):
+  def _constructResponse(self, request, entity, context, form, params):
     """Updates the context and returns a response for the specified arguments
 
     Args:
@@ -382,11 +393,11 @@ class View:
     context['form'] = form
     context['entity'] = entity
     context['entity_suffix'] = suffix
-    context['entity_type'] = self._params['name']
-    context['entity_type_plural'] = self._params['name_plural']
-    context['entity_type_short'] = self._params['name_short']
+    context['entity_type'] = params['name']
+    context['entity_type_plural'] = params['name_plural']
+    context['entity_type_short'] = params['name_short']
 
-    template = self._params['edit_template']
+    template = params['edit_template']
 
     return helper.responses.respond(request, template, context)
 

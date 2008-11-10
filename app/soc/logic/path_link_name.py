@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -36,14 +37,23 @@ LINKNAME_PATTERN = r'^%s$' % LINKNAME_PATTERN_CORE
 LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
 
 # partial path is multiple link_name chunks,
+# each separated by a trailing /
+# (at least 1)
+PARTIAL_PATH_ARG_PATTERN = (r'(?P<partial_path>%(link_name)s'
+                             '(?:/%(link_name)s)*)' % {
+                               'link_name': LINKNAME_PATTERN_CORE})
+PARTIAL_PATH_PATTERN = r'^%s$' % PARTIAL_PATH_ARG_PATTERN
+PARTIAL_PATH_REGEX = re.compile(PARTIAL_PATH_PATTERN)
+
+# path is multiple link_name chunks,
 #   each separated by a trailing /
 #     (at least 1)
 # followed by a single link_name with no trailing /
 PATH_LINKNAME_ARGS_PATTERN = (
-    r'(?P<partial_path>%(link_name)s(?:/%(link_name)s)*)/'
+    r'%(partial_path)s/'
      '(?P<link_name>%(link_name)s)' % {
-        'link_name': LINKNAME_PATTERN_CORE})
-
+       'partial_path' : PARTIAL_PATH_ARG_PATTERN,
+       'link_name': LINKNAME_PATTERN_CORE})
 PATH_LINKNAME_PATTERN = r'^%s$' % PATH_LINKNAME_ARGS_PATTERN
 PATH_LINKNAME_REGEX = re.compile(PATH_LINKNAME_PATTERN)
 

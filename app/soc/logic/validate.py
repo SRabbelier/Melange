@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -52,4 +53,18 @@ def isLinkNameFormatValid(link_name):
   """
   if path_link_name.LINKNAME_REGEX.match(link_name):
     return True
+  return False
+
+
+def isPartialPathFormatValid(partial_path):
+  """Returns True if partial_path is in a valid format.
+  
+  Args:
+    partial_path: partial path prepended to link name
+      used for identification.
+  """
+   
+  if path_link_name.PARTIAL_PATH_REGEX.match(partial_path):
+    return True
+  
   return False

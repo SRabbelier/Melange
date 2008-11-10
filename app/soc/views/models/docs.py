@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -56,11 +57,15 @@ class CreateForm(helper.forms.BaseForm):
   def clean_partial_path(self):
     partial_path = self.cleaned_data.get('partial_path')
     # TODO(tlarsen): combine path and link_name and check for uniqueness
+    if not validate.isPartialPathFormatValid(partial_path):
+      raise forms.ValidationError("This partial path is in wrong format.")
     return partial_path
 
   def clean_link_name(self):
     link_name = self.cleaned_data.get('link_name')
     # TODO(tlarsen): combine path and link_name and check for uniqueness
+    if not validate.isLinkNameFormatValid(link_name):
+      raise forms.ValidationError("This link name is in wrong format.")
     return link_name
 
 

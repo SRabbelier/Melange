@@ -196,8 +196,8 @@ site_settings_delete = page.Page(
   parent=home)
 
 
-# Site User Profile views
-site_user_sub_menu = page.NonPage(
+# User views
+user_sub_menu = page.NonPage(
   'site-user-sub-menu',
   'Site: Users Sub-Menu',
   short_name='Site Users',
@@ -209,31 +209,47 @@ site_user_lookup = page.Page(
     'soc.views.site.user.profile.lookup'),
   'Site: Look Up an Existing User',
   short_name='Look Up Site User',
-  parent=site_user_sub_menu)
+  parent=user_sub_menu)
 
-site_user_create = page.Page(
+user_create = page.Page(
   page.Url(
     r'^user/create$',
-    'soc.views.site.user.profile.create'),
+    'soc.views.models.user.create'),
   'Site: Create New User Profile',
   short_name='Create Site User',
-  parent=site_user_sub_menu)
+  parent=user_sub_menu)
 
 site_user_edit = page.Page(
   page.Url(
     r'^user/edit/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
-    'soc.views.site.user.profile.edit'),
+    'soc.views.models.user.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
-  parent=site_user_sub_menu)
+  parent=user_sub_menu)
 
-site_user_list = page.Page(
+user_show = page.Page(
+  page.Url(
+    r'^user/show/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    'soc.views.models.user.public'),
+  'User: Show Existing User Profile',
+  parent=user_signout)
+
+user_list = page.Page(
   page.Url(
     r'^user/list$',
-    'soc.views.site.user.list.all'),
+    'soc.views.models.user.list'),
   'Site: List of Users',
   short_name='List Site Users',
-  parent=site_user_sub_menu)
+  parent=user_sub_menu)
+
+user_delete = page.Page(
+  page.Url(
+    r'^user/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    'soc.views.models.user.delete'),
+  'Site: Delete Existing User',
+  short_name='Delete Site User',
+  parent=user_sub_menu)
+
 
 # Document views
 docs_show = page.Page(

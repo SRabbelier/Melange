@@ -82,11 +82,11 @@ user_signout = page.Page(
   parent=user_signout_sub_menu)
 
 # User Profile views
-user_self = page.Page(
+user_edit_self = page.Page(
   page.Url(
     r'^user/edit$',
     'soc.views.user.profile.create'),
-  'User: Edit own User Profile',
+  'User: Edit Your User Profile',
   short_name='Site-wide User Profile',
   parent=user_signout_sub_menu)
 

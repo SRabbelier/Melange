@@ -142,8 +142,13 @@ class View:
     for field in fields:
       kwargs[field] = None
 
-    # TODO(SRabbelier): make edit strip off 'create' if present and replace with 'edit'
-    return self.edit(request, page=page, params=params, **kwargs)
+    request.path = helper.requests.replaceSuffix(request.path,
+                                                 old_suffix='create')
+    request.path = helper.requests.replaceSuffix(request.path,
+                                                 old_suffix='edit',
+                                                 new_suffix='edit')
+
+    return self.edit(request, page=page, **kwargs)
 
   def edit(self, request, page=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs

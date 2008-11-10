@@ -54,11 +54,11 @@ class HomeSettings(polymodel.PolyModel):
 
   #: Required path, prepended to a "link name" to form the Setting URL.
   partial_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Partial path for Settings'))
+      verbose_name=ugettext_lazy('Settings partial path'))
   partial_path.help_text = ugettext_lazy(
     'path portion of URLs for Settings, prepended to link name')
 
   #: Required link name, appended to a "path" to form the Setting URL.
   link_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link name for Settings'))
+      verbose_name=ugettext_lazy('Setttings link name'))
   link_name.help_text = ugettext_lazy('link name for Settings used in URLs')

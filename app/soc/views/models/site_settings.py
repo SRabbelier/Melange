@@ -78,9 +78,9 @@ class View(home_settings.View):
     params = {}
     rights = {}
 
-    params['name'] = "SiteSetting"
+    params['name'] = "Site Settings"
     params['name_short'] = "Site"
-    params['name_plural'] = "SiteSettings"
+    params['name_plural'] = "Site Settings"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm

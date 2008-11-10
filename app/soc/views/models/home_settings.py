@@ -111,9 +111,9 @@ class View(base.View):
     params = {}
     rights = {}
 
-    params['name'] = "HomeSetting"
+    params['name'] = "Home Settings"
     params['name_short'] = "Home"
-    params['name_plural'] = "HomeSettings"
+    params['name_plural'] = "Home Settings"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm

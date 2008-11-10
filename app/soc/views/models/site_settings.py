@@ -98,7 +98,7 @@ class View(home_settings.View):
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)
 
-    home_settings.View.__init__(self, original_rights=rights, original_params=params, stop=True)
+    home_settings.View.__init__(self, original_rights=rights, original_params=params)
 
     self._logic = soc.logic.models.site_settings.logic
 

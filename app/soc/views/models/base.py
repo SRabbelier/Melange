@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -55,7 +56,7 @@ class View:
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
-  def __init__(self, params=None, rights=None, stop=False):
+  def __init__(self, params=None, rights=None):
     """
 
     Args:
@@ -91,6 +92,7 @@ class View:
       request: the standard Django HTTP request object
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
+      params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
 
@@ -133,6 +135,7 @@ class View:
       request: the standard Django HTTP request object
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
+      params: a dict with params for this View
       kwargs: not used for create()
     """
 
@@ -151,12 +154,13 @@ class View:
     return self.edit(request, page=page, params=params, **kwargs)
 
   def edit(self, request, page=None, params=None, **kwargs):
-    """Displays the public page for the entity specified by **kwargs
+    """Displays the edit page for the entity specified by **kwargs
 
     Args:
       request: the standard Django HTTP request object
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
+      params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """
 
@@ -265,6 +269,7 @@ class View:
       request: the standard Django HTTP request object
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
+      params: a dict with params for this View
     """
 
     params = dicts.merge(params, self._params)
@@ -304,6 +309,7 @@ class View:
       request: the standard Django HTTP request object
       page: a soc.logic.site.page.Page object which is abstraction
         that combines a Django view with sidebar menu info
+      params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """
 
@@ -396,6 +402,7 @@ class View:
       entity: the entity that is used
       context: the context to be used
       form: the form that will be used
+      params: a dict with params for this View
     """
 
     suffix = self._logic.getKeySuffix(entity)

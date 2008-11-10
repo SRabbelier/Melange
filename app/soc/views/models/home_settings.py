@@ -99,7 +99,7 @@ class View(base.View):
   """View methods for the Docs model
   """
 
-  def __init__(self, original_params=None, original_rights=None, stop=False):
+  def __init__(self, original_params=None, original_rights=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
@@ -145,7 +145,7 @@ class View(base.View):
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)
 
-    base.View.__init__(self, rights=rights, params=params, stop=stop)
+    base.View.__init__(self, rights=rights, params=params)
 
     self._logic = soc.logic.models.home_settings.logic
 

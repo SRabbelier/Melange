@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 from google.appengine.api import users
@@ -83,7 +84,8 @@ class CreateForm(helper.forms.BaseForm):
 
     new_email = form_id.email()
 
-    if new_email != old_email and user_logic.logic.getFromFields(email=new_email):
+    if new_email != old_email \
+        and user_logic.logic.getFromFields(email=new_email):
       raise forms.ValidationError("This account is already in use.")
 
     return form_id
@@ -149,14 +151,20 @@ class View(base.View):
 
     base.View.__init__(self, rights=rights, params=params)
 
-  def self(self, request, page=None, params=None, **kwargs):
-    """
+  def editSelf(self, request, page=None, params=None, **kwargs):
+    """Displays User self edit page for the entity specified by **kwargs.
+
+    Args:
+      request: the standard Django HTTP request object
+      page: a soc.logic.site.page.Page object which is abstraction
+        that combines a Django view with sidebar menu info
+      params: a dict with params for this View
+      kwargs: The Key Fields for the specified entity
     """
 
     params = dicts.merge(params, {'edit_template': 'soc/user/edit_self.html'})
 
     id = users.get_current_user()
-    email = id.email()
     properties = {'id': id}
 
     entity = self._logic.getForFields(properties, unique=True)
@@ -180,4 +188,4 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
-self = view.self
+edit_self = view.editSelf

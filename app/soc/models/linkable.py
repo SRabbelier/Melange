@@ -49,8 +49,8 @@ class Linkable(base.ModelWithFieldAttributes):
   path, this ID, which must be unique within the scope defined by the link
   path, is *not* determined by context and *is* supplied by the user.
   
-  For example, a Document containing containing the FAQs for the
-  Apache Software Foundation participation in GSoC 2009 program sponsored
+  For example, a Document containing the FAQs for the Apache Software 
+  Foundation participation in GSoC 2009 program sponsored
   by Google could be given a link ID by the Apache organization
   administrator of "faqs", but the rest of the link path would be
   determined by the transitive closure of the scopes of the Document:
@@ -70,13 +70,17 @@ class Linkable(base.ModelWithFieldAttributes):
   "leaf" entities (such as the Document in the example above) could
   be allowed. 
   """
-  
+  #: Required field storing "ID" used in URLS. Lower ASCII characters,
+  #: digits and underscores only.
   id = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link ID'))
   id.help_text = ugettext_lazy(
       '"ID" used in URLs.'
-      ' Lower ASCII characters, digits, and underscores only.')
+      ' Lower ASCII characters, digits and underscores only.')
 
+  #: Optional Self Reference property to another Linkable entity which defines
+  #: the "scope" of this Linkable entity. The back-reference in the Linkable 
+  #: model is a Query named 'links'.
   scope = db.SelfReferenceProperty(required=False,
       collection_name='links', verbose_name=ugettext_lazy('Link Scope'))
   scope.help_text = ugettext_lazy(

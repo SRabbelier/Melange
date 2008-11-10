@@ -42,7 +42,7 @@ class SiteSettings(soc.models.home_settings.HomeSettings):
       'initialization code in footer.')
 
   #: Valid Google Maps API Key. Used to embed Google Maps.
-  gm_api_key = db.StringProperty(verbose_name=ugettext_lazy('Google Maps'))
-  gm_api_key.help_text = ugettext_lazy(
+  gmaps_api_key = db.StringProperty(verbose_name=ugettext_lazy('Google Maps'))
+  gmaps_api_key.help_text = ugettext_lazy(
       'Valid Google Maps API Key. This key is used for '
       'embedding Google Maps into the website.')

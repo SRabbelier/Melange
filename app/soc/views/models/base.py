@@ -148,7 +148,7 @@ class View:
                                                  old_suffix='edit',
                                                  new_suffix='edit')
 
-    return self.edit(request, page=page, **kwargs)
+    return self.edit(request, page=page, params=params, **kwargs)
 
   def edit(self, request, page=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs

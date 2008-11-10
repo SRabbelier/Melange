@@ -114,7 +114,7 @@ def isIdAvailable(new_id, existing_user=None, existing_key_name=None):
   else:
     old_email = None
 
-  if new_id.email().lower == old_email.lower:
+  if new_id.email().lower() == old_email.lower():
     # "new" email is same as existing User wanting it, so it is "available"
     return True
   # else: "new" email truly is new to the existing User, so keep checking

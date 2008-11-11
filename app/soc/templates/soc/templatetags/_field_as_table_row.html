@@ -28,11 +28,11 @@ limitations under the License.
   <label for="{{ field.auto_id }}">{{ field.label }}:
   </label> 
  </td>
- <td class="formfieldrequired">
-   {% if field.field.required %}(required){% endif %}
- </td>
  <td>
   {{ field }}
+ </td>
+ <td class="formfieldrequired">
+   {% if field.field.required %}(required){% endif %}
  </td>
 </tr>
 

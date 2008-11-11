@@ -20,13 +20,38 @@
 __authors__ = [
   '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
 from google.appengine.ext.db import djangoforms
 
 from django import forms
+from django.forms import forms as forms_in
+from django.forms import util
+from django.utils import encoding
 from django.utils import safestring
+from django.utils.encoding import force_unicode
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
+
+class CustomErrorList(util.ErrorList):
+  """A collection of errors that knows how to display itself in various formats.
+  
+  This class has customized as_text method output which puts errors inside <span>
+  with formfielderrorlabel class.
+  """
+  def __unicode__(self):
+    return self.as_text()
+  
+  def as_text(self):
+    """Returns error list rendered as text inside <span>."""
+    if not self:
+      return u''
+    errors_text = u'\n'.join([u'%s' % encoding.force_unicode(e) for e in self])
+    return u'<span class="formfielderrorlabel">%(errors)s</span><br />' % \
+        {'errors': errors_text}
 
 
 class DbModelForm(djangoforms.ModelForm):
@@ -82,13 +107,14 @@ class BaseForm(DbModelForm):
   prints itself also has changed. Help text is displayed in the same row as 
   label and input.
   """
-  # TODO(pawel.solyga): Add class names for form errors and required fields.
   
-  DEF_NORMAL_ROW = u'<tr><td class="formfieldlabel">%(label)s</td>' \
-      '<td>%(errors)s%(field)s%(help_text)s</td></tr>'
-  DEF_ERROR_ROW = u'<tr><td colspan="2">%s</td></tr>'
+  DEF_NORMAL_ROW = u'<tr title="%(help_text)s"><td class=' \
+      '"%(field_class_type)s">%(label)s</td><td>' \
+      '%(errors)s%(field)s%(required)s</td></tr>'
+  DEF_ERROR_ROW = u'<tr><td>&nbsp;</td><td class="formfielderror">%s</td></tr>'
   DEF_ROW_ENDER = '</td></tr>'
-  DEF_HELP_TEXT_HTML = u'<td class="formfieldhelptext">%s</td>'
+  DEF_REQUIRED_HTML = u'<td class="formfieldrequired">(required)</td>'
+  DEF_HELP_TEXT_HTML = u'%s'
 
   def __init__(self, *args, **kwargs):
     """Parent class initialization.
@@ -96,14 +122,98 @@ class BaseForm(DbModelForm):
     Args:
       *args, **kwargs:  passed through to parent __init__() constructor
     """
-    super(BaseForm, self).__init__(*args, **kwargs)
+    super(BaseForm, self).__init__(error_class=CustomErrorList, *args, **kwargs)
+  
+  def _html_output_with_required(self, normal_row, error_row, row_ender, 
+          help_text_html, required_html, errors_on_separate_row):
+    """Helper function for outputting HTML.
+    
+    Used by as_table(), as_ul(), as_p(). Displays information
+    about required fields.
+    """
+    # Errors that should be displayed above all fields.
+    top_errors = self.non_field_errors()
+    output, hidden_fields = [], []
+    for name, field in self.fields.items():
+      bf = forms_in.BoundField(self, field, name)
+      # Escape and cache in local variable.
+      bf_errors = self.error_class([escape(error) for error in bf.errors])
+      if bf.is_hidden:
+        if bf_errors:
+          top_errors.extend([u'(Hidden field %s) %s' % \
+              (name, force_unicode(e)) for e in bf_errors])
+        hidden_fields.append(unicode(bf))
+      else:
+        if errors_on_separate_row and bf_errors:
+          output.append(error_row % force_unicode(bf_errors))
+
+        if bf.label:
+          label = escape(force_unicode(bf.label))
+          # Only add the suffix if the label does not end in
+          # punctuation.
+          if self.label_suffix:
+            if label[-1] not in ':?.!':
+              label += self.label_suffix
+          label = bf.label_tag(label) or ''
+        else:
+          label = ''
+        if field.help_text:
+          help_text = help_text_html % force_unicode(field.help_text)
+        else:
+          help_text = u''
+
+        if bf_errors:
+          field_class_type = u'formfielderrorlabel'
+        else:
+          field_class_type = u'formfieldlabel'
+
+        if field.required:
+          required = required_html
+        else:
+          required = u''
+        
+        if errors_on_separate_row and bf_errors:
+          errors = u''
+        else:
+          errors = force_unicode(bf_errors)
+        
+        output.append(normal_row % {'field_class_type': field_class_type,
+                                    'errors': errors, 
+                                    'label': force_unicode(label), 
+                                    'field': unicode(bf),
+                                    'required': required,
+                                    'help_text': help_text})
+    if top_errors:
+      output.insert(0, error_row % force_unicode(top_errors))
+    if hidden_fields: # Insert any hidden fields in the last row.
+      str_hidden = u''.join(hidden_fields)
+      if output:
+        last_row = output[-1]
+        # Chop off the trailing row_ender (e.g. '</td></tr>') and
+        # insert the hidden fields.
+        if not last_row.endswith(row_ender):
+          # This can happen in the as_p() case (and possibly others
+          # that users write): if there are only top errors, we may
+          # not be able to conscript the last row for our purposes,
+          # so insert a new, empty row.
+          last_row = normal_row % {'errors': '', 'label': '',
+                                   'field': '', 'help_text': ''}
+          output.append(last_row)
+        output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
+      else:
+        # If there aren't any rows in the output, just append the
+        # hidden fields.
+        output.append(str_hidden)
+    return mark_safe(u'\n'.join(output))
 
   def as_table(self):
     """Returns form rendered as HTML <tr> rows -- with no <table></table>."""
-    return self._html_output(self.DEF_NORMAL_ROW, 
-                             self.DEF_ERROR_ROW, 
-                             self.DEF_ROW_ENDER, 
-                             self.DEF_HELP_TEXT_HTML, False)
+    
+    return self._html_output_with_required(self.DEF_NORMAL_ROW,
+                                           self.DEF_ERROR_ROW,
+                                           self.DEF_ROW_ENDER,
+                                           self.DEF_HELP_TEXT_HTML,
+                                           self.DEF_REQUIRED_HTML, True)
 
 
 class SelectQueryArgForm(forms.Form):

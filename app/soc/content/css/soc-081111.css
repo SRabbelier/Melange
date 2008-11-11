@@ -137,7 +137,7 @@ th, td {
   text-align: left;
 }
 
-/* FORM TABLE FIELDS */ 
+/* FORM FIELDS */ 
 td.formfieldrequired {
   font-style: italic;
   font-size: small;
@@ -163,7 +163,7 @@ td.formfieldlabel {
   font-size: small;
 }
 
-td.formfielderrorlabel {
+td.formfielderrorlabel, span.formfielderrorlabel {
   font-weight: bold;
   color: #FF0000;
   font-size: small;

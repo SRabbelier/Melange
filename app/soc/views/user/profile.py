@@ -62,7 +62,7 @@ class UserForm(helper.forms.BaseForm):
 
     user = id_user.getUserFromLinkName(link_name)
 
-    if user and not id_user.doesLinkNameBelongToId(link_name, user.id):
+    if user:
       raise forms.ValidationError("This link name is already in use.")
 
     return link_name

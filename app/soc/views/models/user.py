@@ -68,7 +68,7 @@ class CreateForm(helper.forms.BaseForm):
     properties = {'link_name': link_name}
     user = soc.logic.models.user.logic.getForFields(properties, unique=True)
 
-    if user and user.link_name != link_name:
+    if user and user.link_name == link_name:
       raise forms.ValidationError("This link name is already in use.")
 
     return link_name

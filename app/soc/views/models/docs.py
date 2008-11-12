@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views for Sponsor profiles.
+"""Views for Documents.
 """
 
 __authors__ = [

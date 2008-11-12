@@ -21,11 +21,28 @@ __authors__ = [
 ]
 
 
+import re
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 from soc.models import base
+
+
+# start with ASCII digit or lowercase
+#   (additional ASCII digit or lowercase
+#     -OR-
+#   underscore and ASCII digit or lowercase)
+#     zero or more of OR group
+#
+# * starting or ending underscores are *not* permitted
+# * double internal underscores are *not* permitted
+#
+LINK_ID_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
+LINK_ID_ARG_PATTERN = r'(?P<link_id>%s)' % LINK_ID_PATTERN_CORE
+LINK_ID_PATTERN = r'^%s$' % LINK_ID_PATTERN_CORE
+LINK_ID_REGEX = re.compile(LINK_ID_PATTERN)
 
 
 class Linkable(base.ModelWithFieldAttributes):
@@ -71,12 +88,13 @@ class Linkable(base.ModelWithFieldAttributes):
   be allowed. 
   """
   #: Required field storing "ID" used in URLS. Lower ASCII characters,
-  #: digits and underscores only.
+  #: digits and underscores only.  Valid link IDs successfully match
+  #: the LINK_ID_REGEX.
   id = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link ID'))
   id.help_text = ugettext_lazy(
       '"ID" used in URLs.'
-      ' Lower ASCII characters, digits and underscores only.')
+      ' Lower ASCII characters, digits, and underscores only.')
 
   #: Optional Self Reference property to another Linkable entity which defines
   #: the "scope" of this Linkable entity. The back-reference in the Linkable 

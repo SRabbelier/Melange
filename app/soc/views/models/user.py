@@ -42,7 +42,7 @@ class CreateForm(helper.forms.BaseForm):
   """Django form displayed when creating a User.
   """
 
-  id = forms.EmailField(
+  email = forms.EmailField(
       label=soc.models.user.User.id.verbose_name,
       help_text=soc.models.user.User.id.help_text)
 
@@ -73,8 +73,8 @@ class CreateForm(helper.forms.BaseForm):
 
     return link_name
 
-  def clean_id(self):
-    form_id = users.User(email=self.cleaned_data.get('id'))
+  def clean_email(self):
+    form_id = users.User(email=self.cleaned_data.get('email'))
     key_name = self.data.get('key_name')
     if key_name:
       user = user_logic.logic.getFromKeyName(key_name)
@@ -88,7 +88,7 @@ class CreateForm(helper.forms.BaseForm):
         and user_logic.logic.getFromFields(email=new_email):
       raise forms.ValidationError("This account is already in use.")
 
-    return form_id
+    return self.cleaned_data.get('email')
 
 
 class EditForm(CreateForm):
@@ -173,12 +173,19 @@ class View(base.View):
     key_fields = dicts.zip(keys, values)
 
     return self.edit(request, page, params=params, **key_fields)
+  
+  def _editGet(self, request, entity, form):
+    """See base.View._editGet().
+    """
+    # fill in the email field with the data from the entity
+    form.fields['email'].initial = entity.id.email()
+    
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
-
-    fields['email'] = fields['id'].email()
+    # fill in the id field with the user created from email
+    fields['id'] = users.User(fields['email'])
 
 
 view = View()

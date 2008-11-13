@@ -87,10 +87,10 @@ def buildProgramsSidebar(**unused):
           value='/program/gsoc2009/community'),
         menu.MenuItem(
           'FAQs',
-          value='/program/gsoc2009/docs/faqs'),
+          value='/program/gsoc2009/document/faqs'),
         menu.MenuItem(
           'Terms of Service',
-          value='/program/gsoc2009/docs/tos'),
+          value='/program/gsoc2009/document/tos'),
         ]
       )
     ),
@@ -103,10 +103,10 @@ def buildProgramsSidebar(**unused):
           value='/program/ghop2008/community'),
         menu.MenuItem(
           'FAQs',
-          value='/program/ghop2008/docs/faqs'),
+          value='/program/ghop2008/document/faqs'),
         menu.MenuItem(
           'Contest Rules',
-          value='/program/ghop2008/docs/rules'),
+          value='/program/ghop2008/document/rules'),
         ]
       )
     ),

@@ -48,7 +48,7 @@ import soc.views.out_of_band
 
 
 DEF_CREATE_NEW_DOC_MSG = ' You can create a new document by visiting the' \
-                         ' <a href="/docs/edit">Create ' \
+                         ' <a href="/document/edit">Create ' \
                          'a New Document</a> page.'
 
 SUBMIT_MESSAGES = (
@@ -143,7 +143,7 @@ def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
 
       new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
 
-      # redirect to new /docs/edit/new_path?s=0
+      # redirect to new /document/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, None, new_path,
@@ -224,7 +224,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
       new_path = path_link_name.combinePath([doc.partial_path, doc.link_name])
         
-      # redirect to new /docs/edit/new_path?s=0
+      # redirect to new /document/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, path, new_path,
@@ -294,7 +294,7 @@ def delete(request, page=None, partial_path=None, link_name=None,
 
   Returns:
     A subclass of django.http.HttpResponse which redirects 
-    to /site/docs/list.
+    to /site/document/list.
   """
 
   try:
@@ -324,4 +324,4 @@ def delete(request, page=None, partial_path=None, link_name=None,
   if existing_doc:
     document.logic.delete(existing_doc)
 
-  return http.HttpResponseRedirect('/docs/list')
+  return http.HttpResponseRedirect('/document/list')

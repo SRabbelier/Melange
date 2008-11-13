@@ -252,51 +252,51 @@ user_delete = page.Page(
 
 
 # Document views
-docs_show = page.Page(
+document_show = page.Page(
   page.Url(
-    r'^docs/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.models.docs.public'),
+    r'^document/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.document.public'),
   'Show Document',
   parent=home)
 
 # Site Document views
-site_docs_sub_menu = page.NonPage(
-  'site-docs-sub-menu',
+site_document_sub_menu = page.NonPage(
+  'site-document-sub-menu',
   'Site: Documents Sub-Menu',
   short_name='Site Documents',
   parent=site_sub_menu)
 
-site_docs_create = page.Page(
+site_document_create = page.Page(
   page.Url(
-    r'^docs/edit$',
-    'soc.views.models.docs.create'),
+    r'^document/edit$',
+    'soc.views.models.document.create'),
   'Site: Create New Document',
   'Create Site Document',
-  parent=site_docs_sub_menu)
+  parent=site_document_sub_menu)
 
-site_docs_edit = page.Page(
+site_document_edit = page.Page(
   page.Url(
-    r'^docs/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.models.docs.edit'),
+    r'^document/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.document.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
-  parent=site_docs_sub_menu)
+  parent=site_document_sub_menu)
 
-site_docs_delete = page.Page(
+site_document_delete = page.Page(
   page.Url(
-    r'^docs/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
-    'soc.views.models.docs.delete'),
+    r'^document/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    'soc.views.models.document.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
-  parent=site_docs_sub_menu)
+  parent=site_document_sub_menu)
 
-site_docs_list = page.Page(
+site_document_list = page.Page(
   page.Url(
-    r'^docs/list$',
-    'soc.views.models.docs.list'),
+    r'^document/list$',
+    'soc.views.models.document.list'),
   'Site: List of Documents',
   short_name='List Site Documents',
-  parent=site_docs_sub_menu)
+  parent=site_document_sub_menu)
 
 # Sponsor Group public view
 sponsor_profile = page.Page(

@@ -63,7 +63,7 @@ class EditForm(CreateForm):
 
 
 class View(home_settings.View):
-  """View methods for the Docs model
+  """View methods for the Document model
   """
 
   def __init__(self, original_params=None, original_rights=None):

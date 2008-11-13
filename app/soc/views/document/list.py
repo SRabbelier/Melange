@@ -66,7 +66,7 @@ def all(request, page=None, templates={}):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
   # Fetch one more to see if there should be a 'next' link
-  docs = work.logic.getForLimitAndOffset(limit + 1, offset=offset)
+  document = work.logic.getForLimitAndOffset(limit + 1, offset=offset)
 
   context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
@@ -76,13 +76,13 @@ def all(request, page=None, templates={}):
     'list_pagination': templates.get('list_pagination',
                                      'soc/list/list_pagination.html'),
     'list_row': templates.get('list_row',
-                              'soc/docs/list/docs_row.html'),
+                              'soc/document/list/docs_row.html'),
     'list_heading': templates.get('list_heading',
-                                  'soc/docs/list/docs_heading.html'),
+                                  'soc/document/list/docs_heading.html'),
     }
                       
   context = helper.lists.setList(
-      request, context, docs, 
+      request, context, document, 
       offset=offset, limit=limit, list_templates=list_templates)
 
   template = templates.get('all', DEF_DOCS_LIST_ALL_TMPL)

@@ -79,7 +79,7 @@ class EditForm(CreateForm):
 
 
 class View(base.View):
-  """View methods for the Docs model
+  """View methods for the Document model
   """
 
   def __init__(self, original_params=None, original_rights=None):
@@ -97,7 +97,7 @@ class View(base.View):
     rights = {}
 
     params['name'] = "Document"
-    params['name_short'] = "Docs"
+    params['name_short'] = "Document"
     params['name_plural'] = "Documents"
 
     params['edit_form'] = EditForm
@@ -105,17 +105,17 @@ class View(base.View):
 
     # TODO(tlarsen) Add support for Django style template lookup
     params['edit_template'] = 'soc/models/edit.html'
-    params['public_template'] = 'soc/docs/public.html'
+    params['public_template'] = 'soc/document/public.html'
     params['list_template'] = 'soc/models/list.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
       'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/docs/list/docs_row.html',
-      'list_heading': 'soc/docs/list/docs_heading.html',
+      'list_row': 'soc/document/list/docs_row.html',
+      'list_heading': 'soc/document/list/docs_heading.html',
     }
 
-    params['delete_redirect'] = '/docs/list'
+    params['delete_redirect'] = '/document/list'
     params['create_redirect'] = 'soc/models/edit.html'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]

@@ -35,7 +35,7 @@ import soc.views.helper.responses
 import soc.views.helper.templates
 
 
-DEF_DOCS_PUBLIC_TMPL = 'soc/docs/public.html'
+DEF_DOCS_PUBLIC_TMPL = 'soc/document/public.html'
 
 @decorators.view
 def public(request, page=None, partial_path=None, link_name=None,

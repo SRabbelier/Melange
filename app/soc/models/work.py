@@ -59,7 +59,7 @@ class Work(polymodel.PolyModel):
 
   #: Required path, prepended to a "link name" to form the document URL.
   #: The combined path and link name must be globally unique on the
-  #: site.  Except in /site/docs (Developer) forms, this field is not
+  #: site.  Except in /site/document (Developer) forms, this field is not
   #: usually directly editable by the User, but is instead set by controller
   #: logic to match the "scope" of the document.
   partial_path = db.StringProperty(required=True,

@@ -115,8 +115,8 @@ def edit(request, page=None, link_name=None,
   context = helper.responses.getUniversalContext(request)
   context['page'] = page
 
-  logged_in_id = users.get_current_user()
-  user = models.user.logic.getForFields({'id': logged_in_id}, unique=True)
+  user = models.user.logic.getForFields(
+      {'account': users.get_current_user()}, unique=True)
   sponsor_form = None
   existing_sponsor = None
 

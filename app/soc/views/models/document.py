@@ -136,8 +136,9 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    id = users.get_current_user()
-    user = soc.logic.models.user.logic.getForFields({'id': id}, unique=True)
+    account = users.get_current_user()
+    user = soc.logic.models.user.logic.getForFields({'account': account},
+                                                    unique=True)
     fields['author'] = user
 
   def _editGet(self, request, entity, form):

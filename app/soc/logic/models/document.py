@@ -26,6 +26,7 @@ from soc.logic import key_name
 from soc.logic.models import base
 
 import soc.models.document
+import soc.models.work
 
 
 class Logic(base.Logic):
@@ -35,10 +36,8 @@ class Logic(base.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-
-    self._name = "Document"
-    self._model = soc.models.document.Document
-    self._skip_properties = []
+    base.Logic.__init__(self, soc.models.document.Document,
+                        base_model=soc.models.work.Work)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.

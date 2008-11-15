@@ -36,10 +36,7 @@ class Logic(base.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-
-    self._name = "Work"
-    self._model = soc.models.work.Work
-    self._skip_properties = []
+    base.Logic.__init__(self, soc.models.work.Work)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.

@@ -25,8 +25,8 @@ __authors__ = [
 
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import accounts
 from soc.logic import out_of_band
-from soc.logic.site import id_user
 from soc.views import helper
 from soc.views.helper import decorators
 
@@ -71,7 +71,7 @@ def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
 
   try:
     if link_name:
-      user = id_user.getUserFromLinkNameOr404(link_name)
+      user = accounts.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     return errorResponse(request, page, error, template, context)
 

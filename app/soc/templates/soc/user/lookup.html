@@ -23,7 +23,7 @@ Please use this form to look up an existing User in Google Open Source Programs.
 <form method="POST">
  <table>
 {% if found_user %}
-{% readonly_field_as_table_row "Id" found_user.id %}
+{% readonly_field_as_table_row "Account" found_user.account %}
 {% endif %}
 {% if email_error %}
 <tr>
@@ -33,7 +33,7 @@ Please use this form to look up an existing User in Google Open Source Programs.
  </td>
 </tr>
 {% endif %}
-  {% field_as_table_row form.id %}
+  {% field_as_table_row form.account %}
 {% if link_name_error %}
 <tr>
  <td>&nbsp;</td>
@@ -57,12 +57,12 @@ Please use this form to look up an existing User in Google Open Source Programs.
   <td class="formfieldhelptext">&nbsp;</td>
  </tr>
  
- {% if found_user.former_ids %}
+ {% if found_user.former_accounts %}
  <tr>
-  <td class="formfieldlabel">Former ids</td>
+  <td class="formfieldlabel">Former Accounts</td>
   <td>
-      {% for former_id in found_user.former_ids %}
-      {{ former_id }}<br />
+      {% for former_account in found_user.former_accounts %}
+      {{ former_account }}<br />
       {% endfor %}
   </td>
   <td class="formfieldrequired">&nbsp;</td>

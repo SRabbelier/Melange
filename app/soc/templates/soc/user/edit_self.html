@@ -16,9 +16,9 @@ limitations under the License.
 {% block page_title %}User Profile{% endblock %}
 {% block header_title %}
 {% if user %}
-Modify Existing User Profile for {{ user.nick_name }} <a href="mailto:{{ id.email }} ">&lt;{{ id.email }}&gt;</a>
+Modify Existing User Profile for {{ user.nick_name }} <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
 {% else %}
-Create a New User Profile for <a href="mailto:{{ id.email }} ">&lt;{{ id.email }}&gt;</a>
+Create a New User Profile for <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
 {% endif %}
 {% endblock %}
 {% block body %}

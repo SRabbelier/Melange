@@ -34,8 +34,8 @@ from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import accounts
 from soc.logic import models
-from soc.logic.site import id_user
 from soc.views.simple import requestLogin
 
 import soc.views.out_of_band
@@ -90,15 +90,15 @@ def checkIsUser(request):
      AccessViolationResponse: If the required authorization is not met.
 
   Returns:
-    None if User exists for id, or a subclass of
+    None if User exists for a Google Account, or a subclass of
     django.http.HttpResponse which contains the alternate response
     should be returned by the calling view.
   """
 
   checkIsLoggedIn(request)
 
-  id = users.get_current_user()
-  user = models.user.logic.getForFields({'id': id}, unique=True)
+  user = models.user.logic.getForFields(
+      {'account': users.get_current_user()}, unique=True)
 
   if user:
     return
@@ -119,16 +119,14 @@ def checkIsDeveloper(request):
      AccessViolationResponse: If the required authorization is not met.
 
   Returns:
-    None if id is logged in and logged-in user is a Developer, or a
-    subclass of django.http.HttpResponse which contains the alternate
+    None if Google Account is logged in and logged-in user is a Developer,
+    or a subclass of django.http.HttpResponse which contains the alternate
     response should be returned by the calling view.
   """
 
   checkIsUser(request)
 
-  id = users.get_current_user()
-
-  if id_user.isIdDeveloper(id=id):
+  if accounts.isDeveloper(account=users.get_current_user()):
     return None
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
@@ -159,8 +157,9 @@ def checkIsHost(request, program):
 
   checkIsUser(request)
 
-  id = users.get_current_user()
-  host = soc.logic.host.getHostFromProgram(id, program)
+  # TODO(alturin): the soc.logic.host module does not seem to exist...
+  host = soc.logic.host.getHostFromProgram(
+      users.get_current_user(), program)
 
   if host:
     return

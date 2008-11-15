@@ -25,24 +25,24 @@ __authors__ = [
 
 from google.appengine.api import users
 
+from soc.logic import accounts
 from soc.logic import menu
-from soc.logic.site import id_user
 from soc.logic.site import map
 
 
-def buildUserSidebar(id=None, **ignored):
+def buildUserSidebar(account=None, **ignored):
   """Returns a list of menu items for the User portion of the sidebar.
   
   Args:
-    id: a Google Account (users.User) object; default is None, in which
+    account: a Google Account (users.User) object; default is None, in which
       case users.get_current_user() is called 
     **ignored: other keyword arguments supplied to other sidebar builder
       functions, but ignored by this one
   """
-  if id is None:
-    id = users.get_current_user()
+  if account is None:
+    account = users.get_current_user()
 
-  if not id:
+  if not account:
     return [map.user_signin_sub_menu.makeMenuItem()]
 
   return [map.user_signout_sub_menu.makeMenuItem()]
@@ -54,12 +54,12 @@ def buildSiteSidebar(is_admin=None, **ignored):
   Args:
     is_admin: Boolean indicating that current user is a "Developer"
       (site super-user); default is None, in which case
-      id_user.isIdDeveloper() is called 
+      accounts.isDeveloper() is called 
     **ignored: other keyword arguments supplied to other sidebar builder
       functions, but ignored by this one
   """
   if is_admin is None:
-    is_admin = id_user.isIdDeveloper()
+    is_admin = accounts.isDeveloper()
 
   if not is_admin:
     # user is either not logged in or not a "Developer", so return no menu

@@ -1,10 +1,10 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
 onclick="document.location.href='/user/edit/{{ data_element.link_name }}'" name="name">
-  <td align="right"><div class="id"><a class="noul"
-         href="/user/edit/{{ data_element.link_name }}">{{ data_element.id }}</a>
+  <td align="right"><div class="account"><a class="noul"
+         href="/user/edit/{{ data_element.link_name }}">{{ data_element.account }}</a>
      </div>
   </td>
-  <td><div class="email">{{ data_element.id.email }}</a></div></td>
+  <td><div class="email">{{ data_element.account.email }}</a></div></td>
   <td><div class="nick_name">{{ data_element.nick_name }}</div></td>
   <td><div class="link_name">{{ data_element.link_name }}</div></td>
 </tr>

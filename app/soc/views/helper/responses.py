@@ -28,9 +28,9 @@ from google.appengine.api import users
 from django import http
 from django.template import loader
 
+from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site_settings
-from soc.logic.site import id_user
 from soc.logic.site import sidebar
 from soc.views import helper
 from soc.views.helper import html_menu
@@ -81,9 +81,9 @@ def getUniversalContext(request):
     
     {
       'request': the Django HTTP request object passed in by the caller
-      'id': the logged-in Google Account if there is one
+      'account': the logged-in Google Account if there is one
       'user': the User entity corresponding to the Google Account in
-        context['id']
+        context['account']
       'is_admin': True if users.is_current_user_admin() is True
       'is_debug': True if system.isDebug() is True
       'sign_in': a Google Account login URL
@@ -92,16 +92,16 @@ def getUniversalContext(request):
     }
   """
 
-  id = users.get_current_user()
+  account = users.get_current_user()
 
   context = {}
   context['request'] = request
 
-  if id:
-    context['id'] = id
+  if account:
+    context['account'] = account
     context['user'] = soc.logic.models.user.logic.getForFields(
-        {'id': id}, unique=True)
-    context['is_admin'] = id_user.isIdDeveloper(id=id)
+        {'account': account}, unique=True)
+    context['is_admin'] = accounts.isDeveloper(account=account)
 
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)

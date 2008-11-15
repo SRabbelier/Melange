@@ -25,6 +25,7 @@ __authors__ = [
 from soc.logic import key_name
 from soc.logic.models import base
 
+import soc.models.group
 import soc.models.sponsor
 
 
@@ -35,10 +36,8 @@ class Logic(base.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-
-    self._name = "Sponsor"
-    self._model = soc.models.sponsor.Sponsor
-    self._skip_properties = []
+    base.Logic.__init__(self, soc.models.sponsor.Sponsor,
+                        base_model=soc.models.group.Group)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.

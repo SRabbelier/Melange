@@ -28,10 +28,10 @@ from django import forms
 from django import http
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import accounts
 from soc.logic import models
 from soc.logic import out_of_band
 from soc.logic import validate
-from soc.logic.site import id_user
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
@@ -57,9 +57,9 @@ class LookupForm(helper.forms.BaseForm):
   Also, this form only permits entry and editing  of some of the User entity
   Properties, not all of them.
   """
-  id = forms.EmailField(required=False,
-      label=soc.models.user.User.id.verbose_name,
-      help_text=soc.models.user.User.id.help_text)
+  account = forms.EmailField(required=False,
+      label=soc.models.user.User.account.verbose_name,
+      help_text=soc.models.user.User.account.help_text)
 
   link_name = forms.CharField(required=False,
       label=soc.models.user.User.link_name.verbose_name,
@@ -80,8 +80,8 @@ class LookupForm(helper.forms.BaseForm):
     
     return link_name
 
-  def clean_id(self):
-    email = self.cleaned_data.get('id')
+  def clean_account(self):
+    email = self.cleaned_data.get('account')
     
     if not email:
       # email not supplied (which is OK), so do not try to convert it
@@ -130,19 +130,21 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
     form = LookupForm(request.POST)
 
     if form.is_valid():
-      form_id = form.cleaned_data.get('id')
+      form_account = form.cleaned_data.get('account')
       
-      if form_id:
+      if form_account:
         # email provided, so attempt to look up user by email
-        user = models.user.logic.getForFields({'id': form_id}, unique=True)
+        user = models.user.logic.getForFields(
+            {'account': form_account}, unique=True)
 
         if user:
           lookup_message = ugettext_lazy('User found by email.')
         else:
           email_error = ugettext_lazy('User with that email not found.')
           range_width = helper.lists.getPreferredListPagination()
-          nearest_user_range_start = id_user.findNearestUsersOffset(
-              range_width, id=form_id)
+          nearest_user_range_start = (
+              models.user.logic.findNearestEntitiesOffset(
+                  width, [('account', form_account)]))
             
           if nearest_user_range_start is not None:            
             context['lookup_link'] = './list?offset=%s&limit=%s' % (
@@ -153,8 +155,8 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
         
         if link_name:
           # link name provided, so try to look up by link name 
-          user = id_user.getUserFromLinkName(link_name)
-        
+          user = models.user.logic.getForFields({'link_name': link_name},
+                                                unique=True)        
           if user:
             lookup_message = ugettext_lazy('User found by link name.')
             # clear previous error, since User was found
@@ -167,8 +169,9 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
                 'User with that link name not found.')
             if context['lookup_link'] is None:
               range_width = helper.lists.getPreferredListPagination()
-              nearest_user_range_start = id_user.findNearestUsersOffset(
-                  range_width, link_name=link_name)
+              nearest_user_range_start = (
+                models.user.logic.findNearestEntitiesOffset(
+                    width, [('link_name', link_name)]))
             
               if nearest_user_range_start is not None:
                 context['lookup_link'] = './list?offset=%s&limit=%s' % (
@@ -179,7 +182,7 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   if user:
     # User entity found, so populate form with existing User information
     # context['found_user'] = user
-    form = LookupForm(initial={'id': user.id.email(),
+    form = LookupForm(initial={'account': user.account.email(),
                                'link_name': user.link_name})
 
     if request.path.endswith('lookup'):
@@ -207,9 +210,9 @@ class EditForm(helper.forms.BaseForm):
   in the Meta class, because the form behavior is unusual and normally
   required Properties of the User model need to sometimes be omitted.
   """
-  id = forms.EmailField(
-      label=soc.models.user.User.id.verbose_name,
-      help_text=soc.models.user.User.id.help_text)
+  account = forms.EmailField(
+      label=soc.models.user.User.account.verbose_name,
+      help_text=soc.models.user.User.account.help_text)
 
   link_name = forms.CharField(
       label=soc.models.user.User.link_name.verbose_name,
@@ -235,21 +238,23 @@ class EditForm(helper.forms.BaseForm):
     key_name = self.data.get('key_name')
     user = models.user.logic.getFromKeyName(key_name)
     
-    linkname_user_exist = id_user.getUserFromLinkName(link_name)
+    linkname_user_exist = models.user.logic.getForFields(
+        {'link_name': link_name}, unique=True)
+        
     if (user and user.link_name != link_name) and linkname_user_exist:
       raise forms.ValidationError("This link name is already in use.")
 
     return link_name
 
-  def clean_id(self):
-    form_id = users.User(email=self.cleaned_data.get('id'))
-    if not id_user.isIdAvailable(
-        form_id, existing_key_name=self.data.get('key_name')):
+  def clean_account(self):
+    form_account = users.User(email=self.cleaned_data.get('account'))
+    if not accounts.isAccountAvailable(
+        form_account, existing_key_name=self.data.get('key_name')):
       raise forms.ValidationError("This account is already in use.")
-    if models.user.logic.isFormerId(form_id):
+    if models.user.logic.isFormerAccount(form_account):
       raise forms.ValidationError("This account is invalid. "
-          "It exists as former id.")
-    return form_id
+          "It exists as a former account.")
+    return form_account
 
 
 DEF_SITE_USER_PROFILE_EDIT_TMPL = 'soc/user/edit.html'
@@ -289,7 +294,7 @@ def edit(request, page=None, link_name=None,
   # try to fetch User entity corresponding to link_name if one exists
   try:
     if link_name:
-      user = id_user.getUserFromLinkNameOr404(link_name)
+      user = accounts.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_USER_MSG
@@ -304,7 +309,7 @@ def edit(request, page=None, link_name=None,
       new_link_name = form.cleaned_data.get('link_name')
 
       properties = {}
-      properties['id'] = form.cleaned_data.get('id')
+      properties['account'] = form.cleaned_data.get('account')
       properties['link_name']  = new_link_name
       properties['nick_name']  = form.cleaned_data.get('nick_name')
       properties['is_developer'] = form.cleaned_data.get('is_developer')
@@ -340,7 +345,7 @@ def edit(request, page=None, link_name=None,
 
         # populate form with the existing User entity
         form = EditForm(initial={'key_name': user.key().name(),
-            'id': user.id.email(), 'link_name': user.link_name,
+            'account': user.account.email(), 'link_name': user.link_name,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
@@ -372,9 +377,9 @@ class CreateForm(helper.forms.BaseForm):
   in the Meta class, because the form behavior is unusual and normally
   required Properties of the User model need to sometimes be omitted.
   """
-  id = forms.EmailField(
-      label=soc.models.user.User.id.verbose_name,
-      help_text=soc.models.user.User.id.help_text)
+  account = forms.EmailField(
+      label=soc.models.user.User.account.verbose_name,
+      help_text=soc.models.user.User.account.help_text)
 
   link_name = forms.CharField(
       label=soc.models.user.User.link_name.verbose_name,
@@ -395,19 +400,20 @@ class CreateForm(helper.forms.BaseForm):
     if not validate.isLinkNameFormatValid(link_name):
       raise forms.ValidationError("This link name is in wrong format.")
     else:
-      if id_user.getUserFromLinkName(link_name):
+      if models.user.logic.getForFields({'link_name': link_name},
+                                        unique=True):
         raise forms.ValidationError("This link name is already in use.")
     return link_name
 
-  def clean_id(self):
-    new_email = self.cleaned_data.get('id')
-    form_id = users.User(email=new_email)
-    if models.user.logic.getForFields({'id': form_id}, unique=True):
+  def clean_account(self):
+    new_email = self.cleaned_data.get('account')
+    form_account = users.User(email=new_email)
+    if models.user.logic.getForFields({'account': form_account}, unique=True):
       raise forms.ValidationError("This account is already in use.")
-    if models.user.logic.isFormerId(form_id):
+    if models.user.logic.isFormerAccount(form_account):
       raise forms.ValidationError("This account is invalid. "
-          "It exists as former id.")
-    return form_id
+          "It exists as a former account.")
+    return form_account
 
 
 DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/user/edit.html'
@@ -441,17 +447,17 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
     form = CreateForm(request.POST)
 
     if form.is_valid():
-      form_id = form.cleaned_data.get('id')
+      form_account = form.cleaned_data.get('account')
       link_name = form.cleaned_data.get('link_name')
 
       properties = {
-        'id': form_id,
+        'account': form_account,
         'link_name': link_name,
         'nick_name': form.cleaned_data.get('nick_name'),
         'is_developer': form.cleaned_data.get('is_developer'),
       }
 
-      key_fields = {'email': form_id.email()}
+      key_fields = {'email': form_account.email()}
       user = models.user.logic.updateOrCreateFromFields(properties,
                                                         key_fields)
 

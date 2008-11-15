@@ -34,18 +34,18 @@ class Logic(base.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
+    base.Logic.__init__(self, soc.models.user.User,
+                        skip_properties=['former_accounts'])
 
-    self._name = "User"
-    self._model = soc.models.user.User
-    self._skip_properties = ['former_ids']
-
-  def isFormerId(self, id):
-    """Returns true if id is in former ids"""
+  def isFormerAccount(self, account):
+    """Returns true if account is a former account of some User.
+    """
     # TODO(pawel.solyga): replace 1000 with solution that works for any number of queries
-    users_with_former_ids = soc.models.user.User.gql('WHERE former_ids != :1', None).fetch(1000)
+    users_with_former_accounts = soc.models.user.User.gql(
+        'WHERE former_accounts != :1', None).fetch(1000)
     
-    for former_id_user in users_with_former_ids: 
-      if id in former_id_user.former_ids:
+    for former_account_user in users_with_former_accounts: 
+      if account in former_account_user.former_accounts:
         return True
     
     return False
@@ -54,7 +54,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValues.
     """
 
-    return [entity.id.email()]
+    return [entity.account.email()]
 
   def getSuffixValues(self, entity):
     """See base.Logic.getSuffixValues
@@ -74,7 +74,7 @@ class Logic(base.Logic):
         }
 
     entity = self.getForFields(properties, unique=True)
-    return [entity.id.email()]
+    return [entity.account.email()]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames
@@ -82,28 +82,28 @@ class Logic(base.Logic):
 
     return ['email']
 
-  def updateOrCreateFromId(self, properties, id):
-    """Like updateOrCreateFromKeyName, but resolves id to a key_name first.
+  def updateOrCreateFromAccount(self, properties, account):
+    """Like updateOrCreateFromKeyName, but resolves account to key_name first.
     """
 
     # attempt to retrieve the existing entity
-    user = soc.models.user.User.gql('WHERE id = :1', id).get()
+    user = soc.models.user.User.gql('WHERE account = :1', account).get()
     
     if user:
       key_name = user.key().name()
     else:
-      key_name  = self.getKeyNameForFields({'email': id.email()})
+      key_name  = self.getKeyNameForFields({'email': account.email()})
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 
   def _updateField(self, model, name, value):
-    """Special case logic for id.
+    """Special case logic for account.
 
-    When the id is changed, the former_ids field should be appended
-    with the old id.
+    When the account is changed, the former_accounts field should be appended
+    with the old account.
     """
-    if name == 'id' and model.id != value:
-      model.former_ids.append(model.id)
+    if name == 'account' and model.account != value:
+      model.former_accounts.append(model.account)
 
     return True
 

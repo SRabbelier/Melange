@@ -26,6 +26,7 @@ from soc.logic import key_name
 from soc.logic.models import base
 from soc.logic.models import home_settings
 
+import soc.models.home_settings
 import soc.models.site_settings
 
 
@@ -40,10 +41,8 @@ class Logic(home_settings.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-
-    self._name = "SiteSettings"
-    self._model = soc.models.site_settings.SiteSettings
-    self._skip_properties = []
+    base.Logic.__init__(self, soc.models.site_settings.SiteSettings,
+                        base_model=soc.models.home_settings.HomeSettings)
 
   def getMainKeyValues(self):
     """Returns the default key values for the site settings"""

@@ -116,7 +116,7 @@ class Role(polymodel.PolyModel):
   #====================================================================
 
   #: Required field used as the 'public' contact mechanism for the
-  #: Role (as opposed to the user.id email address which is
+  #: Role (as opposed to the user.account email address which is
   #: kept secret).
   email = db.EmailProperty(
       required=True,

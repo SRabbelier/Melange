@@ -43,8 +43,8 @@ class CreateForm(helper.forms.BaseForm):
   """
 
   email = forms.EmailField(
-      label=soc.models.user.User.id.verbose_name,
-      help_text=soc.models.user.User.id.help_text)
+      label=soc.models.user.User.account.verbose_name,
+      help_text=soc.models.user.User.account.help_text)
 
   link_name = forms.CharField(
       label=soc.models.user.User.link_name.verbose_name,
@@ -74,15 +74,15 @@ class CreateForm(helper.forms.BaseForm):
     return link_name
 
   def clean_email(self):
-    form_id = users.User(email=self.cleaned_data.get('email'))
+    form_account = users.User(email=self.cleaned_data.get('email'))
     key_name = self.data.get('key_name')
     if key_name:
       user = user_logic.logic.getFromKeyName(key_name)
-      old_email = user.id.email()
+      old_email = user.account.email()
     else:
       old_email = None
 
-    new_email = form_id.email()
+    new_email = form_account.email()
 
     if new_email != old_email \
         and user_logic.logic.getFromFields(email=new_email):
@@ -164,8 +164,7 @@ class View(base.View):
 
     params = dicts.merge(params, {'edit_template': 'soc/user/edit_self.html'})
 
-    id = users.get_current_user()
-    properties = {'id': id}
+    properties = {'account': users.get_current_user()}
 
     entity = self._logic.getForFields(properties, unique=True)
     keys = self._logic.getKeyFieldNames()
@@ -178,14 +177,14 @@ class View(base.View):
     """See base.View._editGet().
     """
     # fill in the email field with the data from the entity
-    form.fields['email'].initial = entity.id.email()
+    form.fields['email'].initial = entity.account.email()
     
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
-    # fill in the id field with the user created from email
-    fields['id'] = users.User(fields['email'])
+    # fill in the account field with the user created from email
+    fields['account'] = users.User(fields['email'])
 
 
 view = View()

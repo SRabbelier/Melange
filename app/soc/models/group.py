@@ -68,8 +68,8 @@ class Group(polymodel.PolyModel):
       verbose_name=ugettext_lazy('Home Page URL'))
   
   #: Required email address used as the "public" contact mechanism for
-  #: the Group (as opposed to the founder.id email address which is kept
-  #: secret, revealed only to Developers).
+  #: the Group (as opposed to the founder.account email address which is
+  #: kept secret, revealed only to Developers).
   email = db.EmailProperty(required=True,
       verbose_name=ugettext_lazy('Email'))  
   

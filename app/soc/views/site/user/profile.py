@@ -96,7 +96,7 @@ class LookupForm(helper.forms.BaseForm):
 DEF_SITE_USER_PROFILE_LOOKUP_TMPL = 'soc/user/lookup.html'
 
 @decorators.view
-def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
+def lookup(request, page_name=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
   """View for a Developer to look up a User Model entity.
 
   Args:
@@ -118,7 +118,7 @@ def lookup(request, page=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   user = None  # assume that no User entity will be found
   form = None  # assume blank form needs to be displayed
@@ -263,7 +263,7 @@ DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           'a New User</a> page.'
 
 @decorators.view
-def edit(request, page=None, link_name=None,
+def edit(request, page_name=None, link_name=None,
          template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
 
@@ -287,7 +287,7 @@ def edit(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   user = None  # assume that no User entity will be found
 
@@ -298,7 +298,7 @@ def edit(request, page=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_USER_MSG
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
 
   if request.method == 'POST':
@@ -419,7 +419,7 @@ class CreateForm(helper.forms.BaseForm):
 DEF_SITE_CREATE_USER_PROFILE_TMPL = 'soc/user/edit.html'
 
 @decorators.view
-def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
+def create(request, page_name=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
   """View for a Developer to create a new User Model entity.
 
   Args:
@@ -441,7 +441,7 @@ def create(request, page=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   if request.method == 'POST':
     form = CreateForm(request.POST)

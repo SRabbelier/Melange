@@ -39,7 +39,7 @@ import soc.views.helper.templates
 DEF_HOME_PUBLIC_TMPL = 'soc/home/public.html'
 
 @decorators.view
-def public(request, page=None, partial_path=None, link_name=None, 
+def public(request, page_name=None, partial_path=None, link_name=None, 
            entity_type='HomeSettings',
            template=DEF_HOME_PUBLIC_TMPL):
   """How the "general public" sees a "home" page.

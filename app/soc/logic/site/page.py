@@ -373,7 +373,7 @@ class Page:
   def makeDjangoUrl(self):
     """Returns the Django url() for the underlying self.url.
     """
-    return self.url.makeDjangoUrl(page=self)
+    return self.url.makeDjangoUrl(page_name=self.short_name)
 
   def makeDjangoUrls(self):
     """Returns an ordered mapping of unique Django url() objects.

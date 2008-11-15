@@ -38,7 +38,7 @@ DEF_DOCS_LIST_ALL_TMPL = 'soc/models/list.html'
 
 
 @decorators.view
-def all(request, page=None, templates={}):
+def all(request, page_name=None, templates={}):
   """Show a list of all Documents (limit rows per page).
   
   Args:
@@ -60,7 +60,7 @@ def all(request, page=None, templates={}):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))

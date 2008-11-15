@@ -14,7 +14,7 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 {% block header_title %}
- {{ page.short_name }}
+ {{ page_name }}
  {% if existing_user %}
 for {{ existing_user.nick_name }}
 <a href="mailto:{{ existing_user.account.email }} ">&lt;{{ existing_user.account.email }}&gt;</a>

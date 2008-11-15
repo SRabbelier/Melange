@@ -38,7 +38,7 @@ import soc.views.helper.templates
 DEF_DOCS_PUBLIC_TMPL = 'soc/document/public.html'
 
 @decorators.view
-def public(request, page=None, partial_path=None, link_name=None,
+def public(request, page_name=None, partial_path=None, link_name=None,
            template=DEF_DOCS_PUBLIC_TMPL):
   """How the "general public" sees a Document.
 
@@ -79,7 +79,7 @@ def public(request, page=None, partial_path=None, link_name=None,
                                          link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when Document path doesn't exist in Datastore
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
   doc.content = helper.templates.unescape(doc.content)
   context['entity'] = doc

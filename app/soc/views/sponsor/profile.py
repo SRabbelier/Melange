@@ -36,7 +36,7 @@ import soc.views.helper.templates
 DEF_SPONSOR_PUBLIC_TMPL = 'soc/group/profile/public.html'
 
 @decorators.view
-def public(request, page=None, link_name=None, 
+def public(request, page_name=None, link_name=None, 
            template=DEF_SPONSOR_PUBLIC_TMPL):
   """How the "general public" sees the Sponsor profile.
 
@@ -52,14 +52,14 @@ def public(request, page=None, link_name=None,
   """
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   try:
     link_name_sponsor = soc.logic.models.sponsor.logic.getIfFields(
         link_name=link_name)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
   link_name_sponsor.description = \
       helper.templates.unescape(link_name_sponsor.description)

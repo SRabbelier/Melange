@@ -35,7 +35,7 @@ limitations under the License.
 {% if home_document %}
 {{ home_document.title }}
 {% else %}
-{{ page.long_name }}
+{{ page_name }}
 {% endif %}
 {% endblock %}
 
@@ -43,7 +43,7 @@ limitations under the License.
 {% if home_document %}
 {{ home_document.short_name }}
 {% else %}
-{{ page.short_name }}
+{{ page_name }}
 {% endif %}
 {% endblock %}
 

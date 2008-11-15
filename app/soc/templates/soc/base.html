@@ -20,10 +20,10 @@ limitations under the License.
 	{% endblock %}
   <title>
     {% block page_title %}
-      {% if page %}
-{{ page.long_name }}
+      {% if page_name %}
+{{ page_name }}
       {% else %}
-&lt;Missing Page Object&gt;
+&lt;Missing Page Name&gt;
       {% endif %}
     {% endblock %}
   </title>
@@ -65,13 +65,13 @@ limitations under the License.
 
    <div id="title">
 	{% block header_title %}
-	  {% if page %}
+	  {% if page_name %}
 {% comment %}
 TODO(tlarsen): replace this with breadcrumbs
 {% endcomment %}
-	    {{ page.short_name }}
+	    {{ page_name }}
 	  {% else %}
-&lt;Missing Page Object&gt;
+&lt;Missing Page Name&gt;
       {% endif %}
     {% endblock %}
    </div>

@@ -55,7 +55,7 @@ class EditForm(helper.forms.BaseForm):
 
 
 @decorators.view
-def edit(request, page=None, program=None, link_name=None,
+def edit(request, page_name=None, program=None, link_name=None,
          template='soc/person/profile/edit.html'):
   """View for a Person to modify the properties of a Person Model.
 

@@ -106,7 +106,7 @@ class CreateForm(helper.forms.BaseForm):
 DEF_DOCS_CREATE_TMPL = 'soc/models/edit.html'
 
 @decorators.view
-def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
+def create(request, page_name=None, template=DEF_DOCS_CREATE_TMPL):
   """View to create a new Document entity.
 
   Args:
@@ -130,7 +130,7 @@ def create(request, page=None, template=DEF_DOCS_CREATE_TMPL):
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   if request.method == 'POST':
     form = CreateForm(request.POST)
@@ -168,7 +168,7 @@ class EditForm(CreateForm):
 
 
 @decorators.view
-def edit(request, page=None, partial_path=None, link_name=None,
+def edit(request, page_name=None, partial_path=None, link_name=None,
          template=DEF_DOCS_EDIT_TMPL):
   """View to modify the properties of a Document Model entity.
 
@@ -197,7 +197,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   doc = None  # assume that no Document entity will be found
 
@@ -211,7 +211,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
   if request.method == 'POST':
     form = EditForm(request.POST)
@@ -277,7 +277,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
 
 @decorators.view
-def delete(request, page=None, partial_path=None, link_name=None,
+def delete(request, page_name=None, partial_path=None, link_name=None,
            template=DEF_DOCS_EDIT_TMPL):
   """Request handler to delete Document Model entity.
 
@@ -306,7 +306,7 @@ def delete(request, page=None, partial_path=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   existing_doc = None
   path = path_link_name.combinePath([partial_path, link_name])
@@ -319,7 +319,7 @@ def delete(request, page=None, partial_path=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_DOC_MSG
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
   if existing_doc:
     document.logic.delete(existing_doc)

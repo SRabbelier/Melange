@@ -31,7 +31,7 @@ from soc.views.helper import responses
 
 
 @decorators.view
-def dashboard(request, page=None, link_name=None,
+def dashboard(request, page_name=None, link_name=None,
               template='soc/user/roles/dashboard.html'):
   """A per-User dashboard of that User's Roles on the site.
 
@@ -61,7 +61,7 @@ def dashboard(request, page=None, link_name=None,
 
 
 @decorators.view
-def public(request, page=None, link_name=None,
+def public(request, page_name=None, link_name=None,
            template='soc/user/roles/public.html'):
   """A "general public" view of a User's Roles on the site.
 

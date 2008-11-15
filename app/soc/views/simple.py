@@ -37,7 +37,7 @@ import soc.views.helper.templates
 DEF_PUBLIC_TMPL = 'soc/base.html'
 
 @decorators.view
-def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
+def public(request, page_name=None, template=DEF_PUBLIC_TMPL, link_name=None,
            context=None):
   """A simple template view that expects a link_name extracted from the URL.
 
@@ -67,13 +67,13 @@ def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
   if not context:
     context = helper.responses.getUniversalContext(request)
 
-  context['page'] = page
+  context['page_name'] = page_name
 
   try:
     if link_name:
       user = accounts.getUserFromLinkNameOr404(link_name)
   except out_of_band.ErrorResponse, error:
-    return errorResponse(request, page, error, template, context)
+    return errorResponse(request, page_name, error, template, context)
 
   context['link_name'] = link_name
   context['link_name_user'] = user
@@ -83,7 +83,7 @@ def public(request, page=None, template=DEF_PUBLIC_TMPL, link_name=None,
 
 DEF_ERROR_TMPL = 'soc/error.html'
 
-def errorResponse(request, page, error, template, context):
+def errorResponse(request, page_name, error, template, context):
   """Displays an error page for an out_of_band.ErrorResponse exception.
   
   Args:
@@ -119,7 +119,7 @@ DEF_LOGIN_TMPL = 'soc/login.html'
 DEF_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
-def requestLogin(request, page, template, context=None, login_message_fmt=None):
+def requestLogin(request, page_name, template, context=None, login_message_fmt=None):
   """Displays a login request page with custom message and login link.
   
   Args:

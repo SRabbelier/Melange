@@ -85,7 +85,7 @@ class View:
     self._rights = dicts.merge(rights, new_rights)
     self._params = params
 
-  def public(self, request, page=None, params=None, **kwargs):
+  def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
 
     Args:
@@ -105,7 +105,7 @@ class View:
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
-    context['page'] = page
+    context['page_name'] = page_name
     entity = None
 
     if not all(kwargs.values()):
@@ -117,7 +117,7 @@ class View:
       entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = params['public_template']
-      return simple.errorResponse(request, page, error, template, context)
+      return simple.errorResponse(request, page_name, error, template, context)
 
     self._public(request, entity, context)
 
@@ -128,7 +128,7 @@ class View:
 
     return helper.responses.respond(request, template, context)
 
-  def create(self, request, page=None, params=None, **kwargs):
+  def create(self, request, page_name=None, params=None, **kwargs):
     """Displays the create page for this entity type
 
     Args:
@@ -151,9 +151,9 @@ class View:
                                                  old_suffix='edit',
                                                  new_suffix='edit')
 
-    return self.edit(request, page=page, params=params, **kwargs)
+    return self.edit(request, page_name=page_name, params=params, **kwargs)
 
-  def edit(self, request, page=None, params=None, **kwargs):
+  def edit(self, request, page_name=None, params=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs
 
     Args:
@@ -172,7 +172,7 @@ class View:
       return alt_response.response()
 
     context = helper.responses.getUniversalContext(request)
-    context['page'] = page
+    context['page_name'] = page_name
     entity = None
 
     try:
@@ -186,7 +186,7 @@ class View:
           'entity_type' : params['name'],
           'create' : params['create_redirect']
           }
-      return simple.errorResponse(request, page, error, template, context)
+      return simple.errorResponse(request, page_name, error, template, context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
@@ -262,7 +262,7 @@ class View:
 
     return self._constructResponse(request, entity, context, form, params)
 
-  def list(self, request, page=None, params=None):
+  def list(self, request, page_name=None, params=None):
     """Displays the list page for the entity type
     
     Args:
@@ -280,7 +280,7 @@ class View:
       return alt_response.response()
 
     context = helper.responses.getUniversalContext(request)
-    context['page'] = page
+    context['page_name'] = page_name
 
     offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
@@ -302,7 +302,7 @@ class View:
 
     return helper.responses.respond(request, template, context)
 
-  def delete(self, request, page=None, params=None, **kwargs):
+  def delete(self, request, page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by kwargs
 
     Args:
@@ -322,7 +322,7 @@ class View:
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
-    context['page'] = page
+    context['page_name'] = page_name
     entity = None
 
     try:
@@ -335,7 +335,7 @@ class View:
           'entity_type' : params['name'],
           'create' : params['create_redirect']
           }
-      return simple.errorResponse(request, page, error, template, context)
+      return simple.errorResponse(request, page_name, error, template, context)
 
     if not entity:
       #TODO: Create a proper error page for this

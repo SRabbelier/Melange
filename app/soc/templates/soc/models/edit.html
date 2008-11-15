@@ -17,7 +17,7 @@ limitations under the License.
 	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
 {% endblock %}
 {% block header_title %}
-{{ page.short_name }}
+{{ page_name }}
  {% if entity %}
    <!-- TODO(srabbelier) use a generic entity name as link -->
    <a href="/{{ entity_type_short|lower }}/show/{{ entity_suffix }}">"{{ entity_type }}"</a>

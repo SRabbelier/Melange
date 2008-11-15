@@ -89,7 +89,7 @@ DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           'a New Sponsor</a> page.'
 
 @decorators.view
-def edit(request, page=None, link_name=None,
+def edit(request, page_name=None, link_name=None,
          template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a Sponsor Model entity.
 
@@ -113,7 +113,7 @@ def edit(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   user = models.user.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)
@@ -126,7 +126,7 @@ def edit(request, page=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
      
   if request.method == 'POST':
     if existing_sponsor:
@@ -142,7 +142,7 @@ def edit(request, page=None, link_name=None,
         if sponsor_form.cleaned_data.get('link_name') != link_name:
           msg = DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG
           error = out_of_band.ErrorResponse(msg)
-          return simple.errorResponse(request, page, error, template, context)
+          return simple.errorResponse(request, page_name, error, template, context)
       
       fields = {}      
       
@@ -207,14 +207,14 @@ def edit(request, page=None, link_name=None,
 DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 
 @decorators.view
-def create(request, page=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
+def create(request, page_name=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
   """create() view is same as edit() view, but with no link_name supplied.
   """
-  return edit(request, page=page, link_name=None, template=template)
+  return edit(request, page_name=page_name, link_name=None, template=template)
 
 
 @decorators.view
-def delete(request, page=None, link_name=None,
+def delete(request, page_name=None, link_name=None,
            template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """Request handler for a Developer to delete Sponsor Model entity.
 
@@ -238,7 +238,7 @@ def delete(request, page=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   existing_sponsor = None
 
@@ -248,7 +248,7 @@ def delete(request, page=None, link_name=None,
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when link name doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
-    return simple.errorResponse(request, page, error, template, context)
+    return simple.errorResponse(request, page_name, error, template, context)
 
   if existing_sponsor:
     # TODO(pawel.solyga): Create specific delete method for Sponsor model

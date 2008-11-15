@@ -47,7 +47,7 @@ class SiteSettingsForm(settings_views.SettingsValidationForm):
 
 
 @decorators.view
-def edit(request, page=None, partial_path=None, link_name=None, 
+def edit(request, page_name=None, partial_path=None, link_name=None, 
          logic=models.site_settings.logic,
          settings_form_class=SiteSettingsForm,
          template=settings_views.DEF_HOME_EDIT_TMPL):
@@ -65,7 +65,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
   Returns:
     A subclass of django.http.HttpResponse with generated template.
   """
-  return settings_views.edit(request, page=page, partial_path=partial_path, 
+  return settings_views.edit(request, page_name=page_name, partial_path=partial_path, 
                              link_name=link_name, logic=logic,
                              settings_form_class=settings_form_class,
                              template=template)

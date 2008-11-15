@@ -102,7 +102,7 @@ class View(home_settings.View):
 
     self._logic = soc.logic.models.site_settings.logic
 
-  def main_public(self, request, page=None, **kwargs):
+  def main_public(self, request, page_name=None, **kwargs):
     """Displays the main site settings page
 
     Args:
@@ -115,9 +115,9 @@ class View(home_settings.View):
     values = self._logic.getMainKeyValues()
     key_values = dicts.zip(keys, values)
 
-    return self.public(request, page, **key_values)
+    return self.public(request, page_name, **key_values)
 
-  def main_edit(self, request, page=None, **kwargs):
+  def main_edit(self, request, page_name=None, **kwargs):
     """Displays the edit page for the main site settings page
 
     Args:
@@ -130,7 +130,7 @@ class View(home_settings.View):
     values = self._logic.getMainKeyValues()
     key_values = dicts.zip(keys, values)
 
-    return self.edit(request, page, **key_values)
+    return self.edit(request, page_name, **key_values)
 
 
 view = View()

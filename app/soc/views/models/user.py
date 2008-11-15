@@ -151,7 +151,7 @@ class View(base.View):
 
     base.View.__init__(self, rights=rights, params=params)
 
-  def editSelf(self, request, page=None, params=None, **kwargs):
+  def editSelf(self, request, page_name=None, params=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.
 
     Args:
@@ -171,7 +171,7 @@ class View(base.View):
     values = self._logic.getKeyValues(entity)
     key_fields = dicts.zip(keys, values)
 
-    return self.edit(request, page, params=params, **key_fields)
+    return self.edit(request, page_name, params=params, **key_fields)
   
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

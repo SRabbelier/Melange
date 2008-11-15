@@ -105,7 +105,7 @@ class DocSelectForm(helper.forms.BaseForm):
 DEF_HOME_EDIT_TMPL = 'soc/site_settings/edit.html'
 
 @decorators.view
-def edit(request, page=None, partial_path=None, link_name=None, 
+def edit(request, page_name=None, partial_path=None, link_name=None, 
          logic=models.home_settings.logic,
          settings_form_class=SettingsForm,
          template=DEF_HOME_EDIT_TMPL):
@@ -133,7 +133,7 @@ def edit(request, page=None, partial_path=None, link_name=None,
 
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
-  context['page'] = page
+  context['page_name'] = page_name
 
   settings_form = None
   doc_select_form = None

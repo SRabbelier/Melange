@@ -236,13 +236,12 @@ class EditForm(helper.forms.BaseForm):
       raise forms.ValidationError("This link name is in wrong format.")
 
     key_name = self.data.get('key_name')
-    user = models.user.logic.getFromKeyName(key_name)
-    
-    linkname_user_exist = models.user.logic.getForFields(
-        {'link_name': link_name}, unique=True)
-        
-    if (user and user.link_name != link_name) and linkname_user_exist:
-      raise forms.ValidationError("This link name is already in use.")
+    if key_name:
+      key_name_user = user_logic.logic.getFromKeyName(key_name)
+
+      if link_name_user and key_name_user and \
+          link_name_user.account != key_name_user.account:
+        raise forms.ValidationError("This link name is already in use.")
 
     return link_name
 

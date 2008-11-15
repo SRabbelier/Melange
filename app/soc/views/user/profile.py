@@ -62,8 +62,13 @@ class UserForm(helper.forms.BaseForm):
 
     user = models.user.logic.getForFields({'link_name': link_name},
                                           unique=True)
+    
+    # Get the currently logged in user account
+    current_account = users.get_current_user()
+    
     if user:
-      raise forms.ValidationError("This link name is already in use.")
+      if current_account != user.account:
+        raise forms.ValidationError("This link name is already in use.")
 
     return link_name
 

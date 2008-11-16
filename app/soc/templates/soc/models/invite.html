@@ -13,9 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+{% block instructions %}
+Hit 'Send Invitation' to send the invite. 
+{% endblock %}
+
 {% block submit_buttons %}
-{{ block.super }}
-<td>
- <input type="button" onclick="location.href='/host/invite/{{ entity.link_name }}'" value="Invite Host"/>
-</td>
+ <td> 
+  <input style="font-weight: bold" type="submit" value="Send Invitation"/></span>
+ </td>
+ <td>
+  <input type="button" onclick="location.href='/'" value="Cancel"/>
+ </td>
 {% endblock %}

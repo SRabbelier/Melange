@@ -1,4 +1,4 @@
-{% extends "soc/models/edit.html" %}
+{% extends "soc/models/list.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% block submit_buttons %}
-{{ block.super }}
-<td>
- <input type="button" onclick="location.href='/host/invite/{{ entity.link_name }}'" value="Invite Host"/>
-</td>
+{% block instructions %}
+Please use this form to invite someone to become a {{ entity_type }}.
 {% endblock %}

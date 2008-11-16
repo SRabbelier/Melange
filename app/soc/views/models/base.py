@@ -105,6 +105,8 @@ class View(object):
             'soc.views.models.%s.public', 'Show %(name)s'),
         (r'^%(name_lower)s/create$',
             'soc.views.models.%s.create', 'Create %(name)s'),
+        (r'^%(name_lower)s/create/%(key_fields)s$',
+            'soc.views.models.%s.create', 'Create %(name)s'),
         (r'^%(name_lower)s/delete/%(key_fields)s$',
             'soc.views.models.%s.delete', 'Delete %(name)s'),
         (r'^%(name_lower)s/edit/%(key_fields)s$',
@@ -112,6 +114,8 @@ class View(object):
         (r'^%(name_lower)s/list$',
             'soc.views.models.%s.list', 'List %(name_plural)s'),
         ]
+
+    new_params['list_redirect_action'] = params['name_short'] + '/edit'
 
     self._rights = dicts.merge(rights, new_rights)
     self._params = dicts.merge(params, new_params)
@@ -186,7 +190,7 @@ class View(object):
     if not kwargs:
       return self.edit(request, page_name=page_name, params=params, **empty_kwargs)
     else:
-      return self.edit(request, page_name=page_name, params=params, seed=kwargs)
+      return self.edit(request, page_name=page_name, params=params, seed=kwargs, **empty_kwargs)
 
   def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs
@@ -295,6 +299,7 @@ class View(object):
       self._editGet(request, entity, form)
     else:
       if seed:
+        self._editSeed(request, seed)
         form = params['create_form'](initial=seed)
       else:
         form = params['create_form']()
@@ -336,6 +341,7 @@ class View(object):
 
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']
+    context['redirect_action'] = params['list_redirect_action']
 
     template = params['list_template']
 

@@ -1,0 +1,11 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ data_element.role|lower }}/{{ data_element.to.link_name }}/{{ data_element.requester.link_name }}'" name="name">
+  <td align="right"><div class="user_link_name"><a class="noul"
+         href="/{{ entity_type|lower }}/edit/{{ data_element.role|lower }}/{{ data_element.to.link_name }}/{{ data_element.requester.link_name }}">{{ data_element.requester.link_name }}</a>
+     </div>
+  </td>
+  <td><div class="role">{{ data_element.role }}</div></td>
+  <td><div class="to">{{ data_element.to.link_name }}</div></td>
+  <td><div class="accepted">{{ data_element.accepted }}</div></td>
+  <td><div class="declined">{{ data_element.declined }}</div></td>
+</tr>

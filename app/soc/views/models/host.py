@@ -31,6 +31,7 @@ from soc.views.models import role
 
 import soc.models.host
 import soc.logic.models.host
+import soc.logic.models.sponsor
 import soc.views.helper
 
 
@@ -71,7 +72,7 @@ class EditForm(CreateForm):
 
   pass
 
-class View(base.View):
+class View(role.RoleView):
   """View methods for the Host model
   """
 
@@ -89,6 +90,10 @@ class View(base.View):
     params = {}
     rights = {}
 
+    params['logic'] = soc.logic.models.host.logic
+    params['group_logic'] = soc.logic.models.sponsor.logic
+    params['invite_filter'] = {'group_ln': 'link_name'}
+
     params['name'] = "Host"
     params['name_short'] = "Host"
     params['name_plural'] = "Hosts"
@@ -100,6 +105,7 @@ class View(base.View):
     params['edit_template'] = 'soc/models/edit.html'
     params['public_template'] = 'soc/host/public.html'
     params['list_template'] = 'soc/models/list.html'
+    params['invite_template'] = 'soc/models/invite.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
@@ -109,7 +115,7 @@ class View(base.View):
     }
 
     params['delete_redirect'] = '/host/list'
-    params['invite_redirect'] = '/host/list'
+    params['invite_redirect'] = '/request/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 
@@ -123,14 +129,7 @@ class View(base.View):
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)
 
-    base.View.__init__(self, rights=rights, params=params)
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    fields['sponsor_ln'] = fields['sponsor'].link_name
-    fields['user_ln'] = fields['user'].link_name
+    role.RoleView.__init__(self, original_rights=rights, original_params=params)
 
 
 view = View()

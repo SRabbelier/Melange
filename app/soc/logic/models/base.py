@@ -182,7 +182,7 @@ class Logic:
     return key_fields
 
   def getFromKeyName(self, key_name):
-    """"Returns User entity for key_name or None if not found.
+    """"Returns entity for key_name or None if not found.
 -
 -    Args:
 -      key_name: key name of entity

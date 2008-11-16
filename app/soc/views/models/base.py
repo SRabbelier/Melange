@@ -24,6 +24,7 @@ __authors__ = [
 
 
 from django import http
+from django.conf.urls import defaults
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
@@ -34,6 +35,7 @@ import soc.views.out_of_band
 
 from soc.logic import dicts
 from soc.logic import models
+from soc.logic import path_link_name
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
@@ -94,6 +96,22 @@ class View(object):
      ('/%s/list', 'List %(plural)s'),
     ]
     new_params['sidebar_additional'] = []
+
+    new_params['key_fields_prefix'] = []
+
+    new_params['django_patterns'] = None
+    new_params['django_patterns_defaults'] = [
+        (r'^%(name_lower)s/show/%(key_fields)s$', 
+            'soc.views.models.%s.public', 'Show %(name)s'),
+        (r'^%(name_lower)s/create$',
+            'soc.views.models.%s.create', 'Create %(name)s'),
+        (r'^%(name_lower)s/delete/%(key_fields)s$',
+            'soc.views.models.%s.delete', 'Delete %(name)s'),
+        (r'^%(name_lower)s/edit/%(key_fields)s$',
+            'soc.views.models.%s.edit', 'Edit %(name)s'),
+        (r'^%(name_lower)s/list$',
+            'soc.views.models.%s.list', 'List %(name_plural)s'),
+        ]
 
     self._rights = dicts.merge(rights, new_rights)
     self._params = dicts.merge(params, new_params)
@@ -482,6 +500,20 @@ class View(object):
 
     return key_name, fields
 
+  def getKeyFieldsPattern(self, params):
+    """
+    """
+
+    names = self._logic.getKeyFieldNames()
+    patterns = params['key_fields_prefix']
+
+    for name in names:
+      pattern = r'(?P<%s>%s)' % (name, path_link_name.LINKNAME_PATTERN_CORE)
+      patterns.append(pattern)
+
+    result = '/'.join(patterns)
+    return result
+
   def _getSidebarItems(self, params):
     """Retrieves a list of sidebar entries for this view from self._params
 
@@ -532,3 +564,46 @@ class View(object):
     res['items'] = items
 
     return res
+
+  def getDjangoURLPatterns(self, params=None):
+    """Retrieves a list of sidebar entries for this view from self._params
+
+    If self._params['django_patterns'] is None default entries will be constructed 
+    """
+
+    params = dicts.merge(params, self._params)
+
+    # Return the found result
+    if params['django_patterns']:
+      return params['django_patterns']
+
+    # Construct defaults manualy
+    default_patterns = params['django_patterns_defaults']
+    key_fields_pattern = self.getKeyFieldsPattern(params)
+
+    patterns = []
+
+    for url, module, name in default_patterns:
+      name_short_lower = params['name_short'].lower()
+      name_plural_lower = params['name_plural'].lower() 
+
+      name = name % {
+          'name': name_short_lower, 
+          'name_plural': name_plural_lower,
+          }
+
+      module = module % name_short_lower
+
+      url = url % {
+          'name_lower': name_short_lower,
+          'lnp': path_link_name.LINKNAME_ARG_PATTERN,
+          'ulnp': path_link_name.LINKNAME_PATTERN_CORE,
+          'key_fields': key_fields_pattern,
+          }
+
+      kwargs = {'page_name': name}
+
+      item = (url, module, kwargs, name)
+      patterns.append(item)
+
+    return patterns

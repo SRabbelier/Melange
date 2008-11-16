@@ -80,7 +80,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyFieldNames
     """
 
-    return ['email']
+    return ['link_name']
 
   def updateOrCreateFromAccount(self, properties, account):
     """Like updateOrCreateFromKeyName, but resolves account to key_name first.

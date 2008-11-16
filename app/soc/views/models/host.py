@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import dicts
 from soc.views import helper
 from soc.views.models import base
-from soc.views.sitemap import sidebar
+from soc.views.models import role
 
 import soc.models.host
 import soc.logic.models.host
@@ -140,5 +140,3 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
-
-sidebar.SIDEBAR.append(view.getSidebarLinks())

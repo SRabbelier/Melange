@@ -32,7 +32,6 @@ from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views.models import base
-from soc.views.sitemap import sidebar
 
 import soc.models.user
 import soc.logic.models.user
@@ -93,7 +92,7 @@ class CreateForm(helper.forms.BaseForm):
     new_email = form_account.email()
 
     if new_email != old_email \
-        and user_logic.logic.getFromFields(email=new_email):
+        and user_logic.logic.getForFields({'email': new_email}, unique=True):
       raise forms.ValidationError("This account is already in use.")
 
     return self.cleaned_data.get('email')
@@ -205,6 +204,14 @@ class View(base.View):
         ]
     return self.getSidebarLinks(params)
 
+  def getDjangoURLPatterns(self):
+    """see base.View.getDjangoURLPatterns()
+    """
+
+    patterns = super(View, self).getDjangoURLPatterns()
+    patterns += [(r'^user/edit$','soc.views.user.profile.create')]
+    return patterns
+
 
 view = View()
 
@@ -214,5 +221,3 @@ edit = view.edit
 list = view.list
 public = view.public
 edit_self = view.editSelf
-
-sidebar.SIDEBAR.append(view.getSidebarLinks())

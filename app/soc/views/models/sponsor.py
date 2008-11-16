@@ -34,7 +34,6 @@ from soc.logic import models
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
-from soc.views.sitemap import sidebar
 
 import soc.models.sponsor
 import soc.logic.models.sponsor
@@ -149,5 +148,3 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
-
-sidebar.SIDEBAR.append(view.getSidebarLinks())

@@ -33,7 +33,6 @@ from soc.logic import validate
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import home_settings
-from soc.views.sitemap import sidebar
 
 import soc.models.site_settings
 import soc.logic.models.site_settings
@@ -138,6 +137,14 @@ class View(home_settings.View):
 
     return self.edit(request, page_name, seed=key_values, **key_values)
 
+  def getDjangoURLPatterns(self):
+    """see base.View.getDjangoURLPatterns()
+    """
+
+    patterns = super(View, self).getDjangoURLPatterns()
+    patterns += [(r'^$','soc.views.models.site_settings.main_public')]
+    patterns += [(r'^site_settings/edit$', 'soc.views.models.site_settings.main_edit')]
+    return patterns
 
 view = View()
 
@@ -148,5 +155,3 @@ list = view.list
 public = view.public
 main_public = view.main_public
 main_edit = view.main_edit
-
-sidebar.SIDEBAR.append(view.getSidebarLinks())

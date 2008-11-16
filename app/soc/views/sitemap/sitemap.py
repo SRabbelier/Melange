@@ -1,10 +1,12 @@
+#!/usr/bin/python2.5
+#
 # Copyright 2008 the Melange authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,14 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Sidebar
+"""
+
 __authors__ = [
-  '"Augie Fackler" <durin42@gmail.com>',
-  '"Todd Larsen" <tlarsen@google.com>',
-  '"Pawel Solyga" <pawel.solyga@gmail.com>',
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
-from soc.views.sitemap import build
+SITEMAP = []
 
 
-urlpatterns = build.getPatterns()
+def addPages(pages):
+  global SITEMAP
+  SITEMAP += pages

@@ -107,8 +107,9 @@ class View(base.View):
       'list_heading': 'soc/host/list/host_heading.html',
     }
 
-    params['delete_redirect'] = '/site/host/list'
-    params['create_redirect'] = '/site/host/profile'
+    params['delete_redirect'] = '/host/list'
+    params['create_redirect'] = '/host/profile'
+    params['invite_redirect'] = '/host/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

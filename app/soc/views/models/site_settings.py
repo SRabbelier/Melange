@@ -52,7 +52,11 @@ class CreateForm(home_settings.SettingsValidationForm):
     model = soc.models.site_settings.SiteSettings
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home']
+    exclude = ['inheritance_line', 'home', 'partial_path', 'link_name']
+
+  partial_path = forms.CharField(widget=forms.HiddenInput)
+
+  link_name = forms.CharField(widget=forms.HiddenInput)
 
 
 class EditForm(CreateForm):
@@ -130,7 +134,7 @@ class View(home_settings.View):
     values = self._logic.getMainKeyValues()
     key_values = dicts.zip(keys, values)
 
-    return self.edit(request, page_name, **key_values)
+    return self.edit(request, page_name, seed=key_values, **key_values)
 
 
 view = View()

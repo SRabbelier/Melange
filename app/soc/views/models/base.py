@@ -140,10 +140,10 @@ class View:
     """
 
     # Create page is an edit page with no key fields
-    kwargs = {}
+    empty_kwargs = {}
     fields = self._logic.getKeyFieldNames()
     for field in fields:
-      kwargs[field] = None
+      empty_kwargs[field] = None
 
     request.path = helper.requests.replaceSuffix(request.path,
                                                  old_suffix='create')
@@ -151,9 +151,12 @@ class View:
                                                  old_suffix='edit',
                                                  new_suffix='edit')
 
-    return self.edit(request, page_name=page_name, params=params, **kwargs)
+    if not kwargs:
+      return self.edit(request, page_name=page_name, params=params, **empty_kwargs)
+    else:
+      return self.edit(request, page_name=page_name, params=params, seed=kwargs)
 
-  def edit(self, request, page_name=None, params=None, **kwargs):
+  def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs
 
     Args:
@@ -180,20 +183,21 @@ class View:
         key_fields = self._logic.getKeyFieldsFromDict(kwargs)
         entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
-      template = params['public_template']
-      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
-          'entity_type_lower' : params['name'].lower(),
-          'entity_type' : params['name'],
-          'create' : params['create_redirect']
-          }
-      return simple.errorResponse(request, page_name, error, template, context)
+      if not seed:
+        template = params['public_template']
+        error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
+            'entity_type_lower' : params['name'].lower(),
+            'entity_type' : params['name'],
+            'create' : params['create_redirect']
+            }
+        return simple.errorResponse(request, page_name, error, template, context)
 
     if request.method == 'POST':
-      return self.editPost(request, entity, context, params=params)
+      return self.editPost(request, entity, context, params)
     else:
-      return self.editGet(request, entity, context, params=params)
+      return self.editGet(request, entity, context, seed, params)
 
-  def editPost(self, request, entity, context, params=None):
+  def editPost(self, request, entity, context, params):
     """Same as edit, but on POST
     """
 
@@ -232,7 +236,7 @@ class View:
         request, old_suffix, suffix,
         params=page_params)
 
-  def editGet(self, request, entity, context, params=None):
+  def editGet(self, request, entity, context, seed, params):
     """Same as edit, but on GET
     """
 
@@ -258,7 +262,10 @@ class View:
         form.fields['key_name'].initial = entity.key().name()
       self._editGet(request, entity, form)
     else:
-      form = params['create_form']()
+      if seed:
+        form = params['create_form'](initial=seed)
+      else:
+        form = params['create_form']()
 
     return self._constructResponse(request, entity, context, form, params)
 

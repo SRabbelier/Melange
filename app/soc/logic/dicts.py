@@ -19,11 +19,31 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+def filter(target, keys):
+  """Filters a dictonary to only allow items with the given keys.
+  
+  Args:
+    target: The dictionary that is to be filtered
+    keys: The list with keys to filter the dictionary on
+  
+  Returns:
+    A dictionary that only contains the (key,value) from target that have their key in keys
+  """
+  result = {}
+  
+  for key, value in target.iteritems():
+    if key in keys:
+      result[key] = value
+  
+  return result
+
+
 def merge(target, updates):
-  """Like the builtin 'update' method but does not overwrite existing values
+  """Like the builtin 'update' method but does not overwrite existing values.
 
   Args:
     target: The dictionary that is to be updated, may be None
@@ -42,8 +62,9 @@ def merge(target, updates):
 
   return target
 
+
 def zip(keys, values):
-  """Returns a dict containing keys with values
+  """Returns a dict containing keys with values.
 
   If there are more items in keys than in values, None will be used.
   If there are more items in values than in keys, they will be ignored.

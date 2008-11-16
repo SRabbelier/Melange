@@ -87,3 +87,23 @@ def zip(keys, values):
     result[key] = value
 
   return result
+
+def rename(target, keys):
+  """Returns a dict containing only the key/value pairs from keys
+
+  The keys from target will be looked up in keys, and the corresponding
+  value from keys will be used instead. If a key is not found, it is skipped.
+
+  Args:
+    target: the dictionary to filter
+    keys: the fields to filter
+  """
+
+  result = {}
+
+  for key, value in target.iteritems():
+    if key in keys:
+      new_key = keys[key]
+      result[new_key] = value
+
+  return result

@@ -116,7 +116,6 @@ class View(base.View):
     }
 
     params['delete_redirect'] = '/document/list'
-    params['create_redirect'] = 'soc/models/edit.html'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

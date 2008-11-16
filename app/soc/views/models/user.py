@@ -142,7 +142,6 @@ class View(base.View):
     }
 
     params['delete_redirect'] = '/user/list'
-    params['create_redirect'] = '/user/create'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

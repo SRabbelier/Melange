@@ -82,8 +82,12 @@ class View:
     new_rights = {}
     new_rights['any_access'] = [access.checkIsUser]
 
+    new_params = {}
+    new_params['create_redirect'] = '/%s' % params['name_short'].lower()
+    new_params['missing_redirect'] = '/%s/create' % params['name_short'].lower()
+
     self._rights = dicts.merge(rights, new_rights)
-    self._params = params
+    self._params = dicts.merge(params, new_params)
 
   def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs
@@ -139,14 +143,15 @@ class View:
       kwargs: not used for create()
     """
 
+    params = dicts.merge(params, self._params)
+
     # Create page is an edit page with no key fields
     empty_kwargs = {}
     fields = self._logic.getKeyFieldNames()
     for field in fields:
       empty_kwargs[field] = None
 
-    request.path = helper.requests.replaceSuffix(request.path,
-                                                 old_suffix='create')
+    request.path = params['create_redirect']
     request.path = helper.requests.replaceSuffix(request.path,
                                                  old_suffix='edit',
                                                  new_suffix='edit')
@@ -188,7 +193,7 @@ class View:
         error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
             'entity_type_lower' : params['name'].lower(),
             'entity_type' : params['name'],
-            'create' : params['create_redirect']
+            'create' : params['missing_redirect']
             }
         return simple.errorResponse(request, page_name, error, template, context)
 
@@ -340,7 +345,7 @@ class View:
       error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
-          'create' : params['create_redirect']
+          'create' : params['missing_redirect']
           }
       return simple.errorResponse(request, page_name, error, template, context)
 

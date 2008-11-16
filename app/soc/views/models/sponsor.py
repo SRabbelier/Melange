@@ -116,7 +116,6 @@ class View(base.View):
     }
     
     params['delete_redirect'] = '/sponsor/list'
-    params['create_redirect'] = '/sponsor/profile'
     
     params['save_message'] = [ugettext_lazy('Profile saved.')]
     

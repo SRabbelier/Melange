@@ -268,7 +268,7 @@ site_document_sub_menu = page.NonPage(
 
 site_document_create = page.Page(
   page.Url(
-    r'^document/edit$',
+    r'^document/create$',
     'soc.views.models.document.create'),
   'Site: Create New Document',
   'Create Site Document',

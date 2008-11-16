@@ -108,8 +108,8 @@ TODO(tlarsen): replace this with breadcrumbs
     Google Open Source Programs
     {% endblock %}
     </a>
-{% if sidebar_menu_html %}
-{{ sidebar_menu_html|safe }}
+{% if sidebar_menu_items %}
+{% include 'soc/sidebar/sidebar.html' %}
 {% endif %}
      </li>
     </ul>

@@ -39,7 +39,7 @@ from soc.views import helper
 from soc.views.helper import access
 
 
-class View:
+class View(object):
   """Views for entity classes.
 
   The View class functions specific to Entity classes by relying
@@ -77,6 +77,8 @@ class View:
         create_redirect: the Django template to redirect to after creation
         save_message: the message to display when the entity is saved
         edit_params: the params to use when editing
+        sidebar: the sidebar menu items for this view
+        sidebar_defaults: a dictionary with defaults for the sidebar 
     """
 
     new_rights = {}
@@ -85,6 +87,13 @@ class View:
     new_params = {}
     new_params['create_redirect'] = '/%s' % params['name_short'].lower()
     new_params['missing_redirect'] = '/%s/create' % params['name_short'].lower()
+
+    new_params['sidebar'] = None
+    new_params['sidebar_defaults'] = [
+     ('/%s/create', 'New %(name)s'),
+     ('/%s/list', 'List %(plural)s'),
+    ]
+    new_params['sidebar_additional'] = []
 
     self._rights = dicts.merge(rights, new_rights)
     self._params = dicts.merge(params, new_params)
@@ -472,3 +481,54 @@ class View:
       fields[field] = value
 
     return key_name, fields
+
+  def _getSidebarItems(self, params):
+    """Retrieves a list of sidebar entries for this view from self._params
+
+    If params['sidebar'] is None default entries will be constructed 
+    """
+
+    # Return the found result
+    if params['sidebar']:
+      return params['sidebar']
+
+    # Construct defaults manualy
+    defaults = params['sidebar_defaults']
+
+    result = []
+
+    for url, title in defaults:
+      url = url % params['name_short'].lower()
+
+      title = title % {
+          'name': params['name'],
+          'plural': params['name_plural']
+          }
+
+      item = (url, title)
+      result.append(item)
+
+    for item in params['sidebar_additional']:
+      result.append(item)
+
+    return result
+
+  def getSidebarLinks(self, params=None):
+    """Returns an dictionary with one sidebar entry
+
+    Args:
+      params: see __init__
+    """
+
+    params = dicts.merge(params, self._params)
+
+    items = []
+
+    for url, title in self._getSidebarItems(params):
+      items.append({'url': url, 'title': title})
+
+    res = {}
+    res['heading'] = params['name']
+    res['items'] = items
+
+    return res

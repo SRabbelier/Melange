@@ -33,6 +33,7 @@ from soc.logic import validate
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import home_settings
+from soc.views.sitemap import sidebar
 
 import soc.models.site_settings
 import soc.logic.models.site_settings
@@ -83,7 +84,7 @@ class View(home_settings.View):
     rights = {}
 
     params['name'] = "Site Settings"
-    params['name_short'] = "Site"
+    params['name_short'] = "site_settings"
     params['name_plural'] = "Site Settings"
 
     params['edit_form'] = EditForm
@@ -97,6 +98,8 @@ class View(home_settings.View):
     }
 
     params['delete_redirect'] = '/site/list'
+
+    params['sidebar_additional'] = [('/site_settings/edit','Edit Main Site Settings')]
 
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)
@@ -145,3 +148,5 @@ list = view.list
 public = view.public
 main_public = view.main_public
 main_edit = view.main_edit
+
+sidebar.SIDEBAR.append(view.getSidebarLinks())

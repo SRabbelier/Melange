@@ -32,6 +32,7 @@ from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views.models import base
+from soc.views.sitemap import sidebar
 
 import soc.models.user
 import soc.logic.models.user
@@ -192,6 +193,18 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['account'] = users.User(fields['email'])
 
+  def getUserSidebar(self):
+    """Returns an dictionary with the user sidebar entry
+    """
+
+    params = {}
+    params['name'] = "User (self)"
+    params['sidebar'] = [
+        ('/user/edit', 'Profile'),
+        ('/roles/list', 'Roles'),
+        ]
+    return self.getSidebarLinks(params)
+
 
 view = View()
 
@@ -201,3 +214,5 @@ edit = view.edit
 list = view.list
 public = view.public
 edit_self = view.editSelf
+
+sidebar.SIDEBAR.append(view.getSidebarLinks())

@@ -31,9 +31,8 @@ from django.template import loader
 from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site_settings
-from soc.logic.site import sidebar
 from soc.views import helper
-from soc.views.helper import html_menu
+from soc.views.sitemap import sidebar
 
 import soc.logic
 import soc.logic.models.user
@@ -106,9 +105,8 @@ def getUniversalContext(request):
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
-  context['sidebar_menu_html'] = str(html_menu.UlMenu(
-      sidebar.buildSidebar(**context)))
-      
+  context['sidebar_menu_items'] = sidebar.SIDEBAR
+
   settings = site_settings.logic.getFromFields(
       partial_path=site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
       link_name=site_settings.logic.DEF_SITE_SETTINGS_LINK_NAME)

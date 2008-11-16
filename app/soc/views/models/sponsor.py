@@ -34,6 +34,7 @@ from soc.logic import models
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
+from soc.views.sitemap import sidebar
 
 import soc.models.sponsor
 import soc.logic.models.sponsor
@@ -122,7 +123,7 @@ class View(base.View):
     params['edit_params'] = {
         self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
         }
-    
+
     rights['list'] = [helper.access.checkIsDeveloper]
     rights['delete'] = [helper.access.checkIsDeveloper]
 
@@ -148,3 +149,5 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
+
+sidebar.SIDEBAR.append(view.getSidebarLinks())

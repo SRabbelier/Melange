@@ -34,6 +34,7 @@ from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
+from soc.views.sitemap import sidebar
 
 import soc.models.home_settings
 import soc.logic.models.home_settings
@@ -112,7 +113,7 @@ class View(base.View):
     rights = {}
 
     params['name'] = "Home Settings"
-    params['name_short'] = "Home"
+    params['name_short'] = "home_settings"
     params['name_plural'] = "Home Settings"
 
     params['edit_form'] = EditForm
@@ -196,3 +197,5 @@ edit = view.edit
 delete = view.delete
 list = view.list
 public = view.public
+
+sidebar.SIDEBAR.append(view.getSidebarLinks())

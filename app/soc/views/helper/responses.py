@@ -127,7 +127,7 @@ def redirectToChangedSuffix(
     old_suffix, new_suffix, params:  see helper.requests.replaceSuffix()
       
   Returns:
-    a Django HTTP redirect response pointing to the altered path
+    a Django HTTP redirect response pointing to the altered path.
   """
   path = helper.requests.replaceSuffix(request.path, old_suffix, new_suffix,
                                        params=params)

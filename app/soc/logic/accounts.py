@@ -114,7 +114,7 @@ def isAccountAvailable(new_account,
 
 # TODO(tlarsen): make this generic for any Linkable and move elsewhere
 def getUserFromLinkNameOr404(link_name):
-  """Like getUserFromLinkName but expects to find a user
+  """Like getUserFromLinkName but expects to find a user.
 
   Raises:
     out_of_band.ErrorResponse if no User entity is found

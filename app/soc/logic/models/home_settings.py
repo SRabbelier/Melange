@@ -30,7 +30,7 @@ import soc.models.home_settings
 
 
 class Logic(base.Logic):
-  """Logic methods for the HomeSettings model
+  """Logic methods for the HomeSettings model.
   """
 
   def __init__(self):
@@ -51,7 +51,7 @@ class Logic(base.Logic):
     return [fields['partial_path'], fields['link_name']]
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['partial_path', 'link_name']

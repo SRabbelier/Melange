@@ -117,8 +117,8 @@ def edit(request, page_name=None, partial_path=None, link_name=None,
       combines a Django view with sidebar menu info
     path: path that is used to uniquely identify settings
     logic: settings logic object
-    settings_form_class:
-    template: the template path to use for rendering the template.
+    settings_form_class: 
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.

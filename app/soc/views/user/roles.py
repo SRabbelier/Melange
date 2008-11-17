@@ -36,11 +36,11 @@ def dashboard(request, page_name=None, link_name=None,
   """A per-User dashboard of that User's Roles on the site.
 
   Args:
-    request: the standard django request object.
+    request: the standard django request object
     page: a soc.logic.site.page.Page object which is abstraction that combines 
       a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.
@@ -66,11 +66,11 @@ def public(request, page_name=None, link_name=None,
   """A "general public" view of a User's Roles on the site.
 
   Args:
-    request: the standard django request object.
+    request: the standard django request object
     page: a soc.logic.site.page.Page object which is abstraction that combines 
       a Django view with sidebar menu info
     link_name: the User's site-unique "link_name" extracted from the URL
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.

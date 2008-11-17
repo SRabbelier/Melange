@@ -45,7 +45,7 @@ def public(request, page_name=None, link_name=None,
     page: a soc.logic.site.page.Page object which is abstraction that combines 
       a Django view with sidebar menu info
     link_name: the Sponsor's site-unique "link_name" extracted from the URL
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.

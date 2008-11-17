@@ -30,7 +30,7 @@ import soc.models.role
 
 
 class Logic(base.Logic):
-  """Logic methods for the Host model
+  """Logic methods for the Host model.
   """
 
   def __init__(self):
@@ -52,7 +52,7 @@ class Logic(base.Logic):
     return [fields['sponsor_ln'], fields['user_ln']]
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['sponsor_ln', 'user_ln']

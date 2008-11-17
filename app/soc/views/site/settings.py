@@ -60,7 +60,7 @@ def edit(request, page_name=None, partial_path=None, link_name=None,
     path: path that is used to uniquely identify settings
     logic: settings logic object
     settings_form_class: class which should be used as Site Settings Form
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.

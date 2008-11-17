@@ -79,7 +79,7 @@ class EditForm(CreateForm):
 
 
 class View(base.View):
-  """View methods for the Sponsor model
+  """View methods for the Sponsor model.
   """
 
   def __init__(self, original_params=None, original_rights=None):

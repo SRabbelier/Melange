@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Logic related to handling dictionaries
+"""Logic related to handling dictionaries.
 """
 
 __authors__ = [
@@ -31,7 +31,8 @@ def filter(target, keys):
     keys: The list with keys to filter the dictionary on
   
   Returns:
-    A dictionary that only contains the (key,value) from target that have their key in keys
+    A dictionary that only contains the (key,value) from target that 
+    have their key in keys.
   """
   result = {}
   
@@ -50,7 +51,7 @@ def merge(target, updates):
     updates: A dictionary containing new values for the original dict
 
   Returns:
-    the target dict, with any missing values from updates merged in, in-place 
+    the target dict, with any missing values from updates merged in, in-place.
   """
 
   if not target:
@@ -89,7 +90,7 @@ def zip(keys, values):
   return result
 
 def rename(target, keys):
-  """Returns a dict containing only the key/value pairs from keys
+  """Returns a dict containing only the key/value pairs from keys.
 
   The keys from target will be looked up in keys, and the corresponding
   value from keys will be used instead. If a key is not found, it is skipped.

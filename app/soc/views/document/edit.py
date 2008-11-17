@@ -57,7 +57,7 @@ SUBMIT_MESSAGES = (
 
 
 def getDocForForm(form):
-  """Extracts doc fields from a form and creates a new doc from it
+  """Extracts doc fields from a form and creates a new doc from it.
   """
 
   user = users.get_current_user()

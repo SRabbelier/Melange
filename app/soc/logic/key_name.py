@@ -167,7 +167,8 @@ def nameClub(link_name):
 
 
 def nameWork(link_name):
-  """Placeholder for work namer"""
+  """Placeholder for work namer.
+  """
 
   if not link_name:
     raise Error('"link_name" must be non-False: "%s"' % link_name)
@@ -176,7 +177,8 @@ def nameWork(link_name):
 
 
 def nameHost(sponsor_ln, user_ln):
-  """Placeholder for host namer"""
+  """Placeholder for host namer.
+  """
 
   if not sponsor_ln:
     raise Error('"sponsor_ln" must be non-False: "%s"' % sponsor_ln)

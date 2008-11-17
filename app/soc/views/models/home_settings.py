@@ -96,7 +96,7 @@ class EditForm(CreateForm):
 
 
 class View(base.View):
-  """View methods for the Document model
+  """View methods for the Document model.
   """
 
   def __init__(self, original_params=None, original_rights=None):

@@ -29,7 +29,7 @@ import soc.models.request
 
 
 class Logic(base.Logic):
-  """Logic methods for the Request model
+  """Logic methods for the Request model.
   """
 
   def __init__(self):
@@ -51,7 +51,7 @@ class Logic(base.Logic):
     return [fields['role'], fields['group_ln'], fields['user_ln']]
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['role', 'group_ln', 'user_ln']

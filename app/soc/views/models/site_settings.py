@@ -67,7 +67,7 @@ class EditForm(CreateForm):
 
 
 class View(home_settings.View):
-  """View methods for the Document model
+  """View methods for the Document model.
   """
 
   def __init__(self, original_params=None, original_rights=None):
@@ -108,7 +108,7 @@ class View(home_settings.View):
     self._logic = soc.logic.models.site_settings.logic
 
   def main_public(self, request, page_name=None, **kwargs):
-    """Displays the main site settings page
+    """Displays the main site settings page.
 
     Args:
       request: the standard Django HTTP request object
@@ -123,7 +123,7 @@ class View(home_settings.View):
     return self.public(request, page_name, **key_values)
 
   def main_edit(self, request, page_name=None, **kwargs):
-    """Displays the edit page for the main site settings page
+    """Displays the edit page for the main site settings page.
 
     Args:
       request: the standard Django HTTP request object
@@ -138,7 +138,7 @@ class View(home_settings.View):
     return self.edit(request, page_name, seed=key_values, **key_values)
 
   def getDjangoURLPatterns(self):
-    """see base.View.getDjangoURLPatterns()
+    """See base.View.getDjangoURLPatterns().
     """
 
     patterns = super(View, self).getDjangoURLPatterns()

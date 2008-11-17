@@ -28,7 +28,7 @@ import soc.models.user
 
 
 class Logic(base.Logic):
-  """Logic methods for the User model
+  """Logic methods for the User model.
   """
 
   def __init__(self):
@@ -57,7 +57,7 @@ class Logic(base.Logic):
     return [entity.account.email()]
 
   def getSuffixValues(self, entity):
-    """See base.Logic.getSuffixValues
+    """See base.Logic.getSuffixValues.
     """
 
     return [entity.link_name]
@@ -77,7 +77,7 @@ class Logic(base.Logic):
     return [entity.link_name]
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['link_name']

@@ -50,7 +50,7 @@ def public(request, page_name=None, partial_path=None, link_name=None,
       combines a Django view with sidebar menu info
     path: path (entire "scoped" portion combined with the link_name)
       used to retrieve the Group's "home" settings
-    template: the template path to use for rendering the template.
+    template: the template path to use for rendering the template
 
   Returns:
     A subclass of django.http.HttpResponse with generated template.

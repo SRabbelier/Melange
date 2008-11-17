@@ -43,6 +43,7 @@ import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
 
+
 class CreateForm(helper.forms.BaseForm):
   """Django form displayed when Developer creates a Request.
   """
@@ -75,6 +76,7 @@ class CreateForm(helper.forms.BaseForm):
         link_name=self.cleaned_data['group'])
     return self.cleaned_data['group']
 
+
 class EditForm(CreateForm):
   """Django form displayed when Developer edits a Request.
   """
@@ -83,7 +85,7 @@ class EditForm(CreateForm):
 
 
 class View(base.View):
-  """View methods for the Docs model
+  """View methods for the Docs model.
   """
 
   def __init__(self, original_params=None, original_rights=None):

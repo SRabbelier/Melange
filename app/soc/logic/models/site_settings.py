@@ -31,7 +31,7 @@ import soc.models.site_settings
 
 
 class Logic(home_settings.Logic):
-  """Logic methods for the SiteSettings model
+  """Logic methods for the SiteSettings model.
   """
 
   DEF_SITE_SETTINGS_PARTIAL_PATH = 'site'
@@ -45,7 +45,8 @@ class Logic(home_settings.Logic):
                         base_model=soc.models.home_settings.HomeSettings)
 
   def getMainKeyValues(self):
-    """Returns the default key values for the site settings"""
+    """Returns the default key values for the site settings.
+    """
 
     return [self.DEF_SITE_SETTINGS_PARTIAL_PATH, 
             self.DEF_SITE_SETTINGS_LINK_NAME]

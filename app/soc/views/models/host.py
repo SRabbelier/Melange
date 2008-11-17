@@ -73,7 +73,7 @@ class EditForm(CreateForm):
   pass
 
 class View(role.RoleView):
-  """View methods for the Host model
+  """View methods for the Host model.
   """
 
   def __init__(self, original_params=None, original_rights=None):

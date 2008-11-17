@@ -41,7 +41,7 @@ import soc.views.helper.widgets
 
 
 class RequestForm(helper.forms.BaseForm):
-  """Django form displayed when creating a new Invite
+  """Django form displayed when creating a new invititation/request.
   """
 
   class Meta:
@@ -62,7 +62,7 @@ class RequestForm(helper.forms.BaseForm):
 
 
 class RoleView(base.View):
-  """Views for all entities that inherit from Role
+  """Views for all entities that inherit from Role.
 
   All views that only Role entities have are defined in this subclass.
   """
@@ -186,7 +186,7 @@ class RoleView(base.View):
         request, suffix, suffix)
 
   def getDjangoURLPatterns(self):
-    """see base.View.getDjangoURLPatterns()
+    """See base.View.getDjangoURLPatterns().
     """
 
     params = {}

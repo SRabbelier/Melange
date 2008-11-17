@@ -30,7 +30,7 @@ import soc.models.work
 
 
 class Logic(base.Logic):
-  """Logic methods for the Work model
+  """Logic methods for the Work model.
   """
 
   def __init__(self):
@@ -51,7 +51,7 @@ class Logic(base.Logic):
     return [fields['link_name']]
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['link_name']

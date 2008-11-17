@@ -22,6 +22,7 @@ __authors__ = [
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+
 from google.appengine.api import users
 
 from django import forms
@@ -104,8 +105,9 @@ class EditForm(CreateForm):
 
   key_name = forms.CharField(widget=forms.HiddenInput)
 
+
 class View(base.View):
-  """View methods for the User model
+  """View methods for the User model.
   """
 
   def __init__(self, original_params=None, original_rights=None):
@@ -192,7 +194,7 @@ class View(base.View):
     fields['account'] = users.User(fields['email'])
 
   def getUserSidebar(self):
-    """Returns an dictionary with the user sidebar entry
+    """Returns an dictionary with the user sidebar entry.
     """
 
     params = {}
@@ -204,7 +206,7 @@ class View(base.View):
     return self.getSidebarLinks(params)
 
   def getDjangoURLPatterns(self):
-    """see base.View.getDjangoURLPatterns()
+    """See base.View.getDjangoURLPatterns().
     """
 
     patterns = super(View, self).getDjangoURLPatterns()

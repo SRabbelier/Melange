@@ -73,7 +73,7 @@ tinyMCE.init(%(settings_json)s)
 </script>'''
 
   def __init__(self, mce_settings=None, *args, **kwargs):
-    """Initialize TinyMCE widget with default or customized settings
+    """Initialize TinyMCE widget with default or customized settings.
     
     Args:
       mce_settings: dict with TinyMCE widget settings

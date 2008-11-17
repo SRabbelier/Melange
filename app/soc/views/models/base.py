@@ -121,7 +121,7 @@ class View(object):
     self._params = dicts.merge(params, new_params)
 
   def public(self, request, page_name=None, params=None, **kwargs):
-    """Displays the public page for the entity specified by **kwargs
+    """Displays the public page for the entity specified by **kwargs.
 
     Args:
       request: the standard Django HTTP request object
@@ -164,7 +164,7 @@ class View(object):
     return helper.responses.respond(request, template, context)
 
   def create(self, request, page_name=None, params=None, **kwargs):
-    """Displays the create page for this entity type
+    """Displays the create page for this entity type.
 
     Args:
       request: the standard Django HTTP request object
@@ -193,7 +193,7 @@ class View(object):
       return self.edit(request, page_name=page_name, params=params, seed=kwargs, **empty_kwargs)
 
   def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
-    """Displays the edit page for the entity specified by **kwargs
+    """Displays the edit page for the entity specified by **kwargs.
 
     Args:
       request: the standard Django HTTP request object
@@ -234,7 +234,7 @@ class View(object):
       return self.editGet(request, entity, context, seed, params)
 
   def editPost(self, request, entity, context, params):
-    """Same as edit, but on POST
+    """Same as edit, but on POST.
     """
 
     params = dicts.merge(params, self._params)
@@ -273,7 +273,7 @@ class View(object):
         params=page_params)
 
   def editGet(self, request, entity, context, seed, params):
-    """Same as edit, but on GET
+    """Same as edit, but on GET.
     """
 
     params = dicts.merge(params, self._params)
@@ -307,7 +307,7 @@ class View(object):
     return self._constructResponse(request, entity, context, form, params)
 
   def list(self, request, page_name=None, params=None):
-    """Displays the list page for the entity type
+    """Displays the list page for the entity type.
     
     Args:
       request: the standard Django HTTP request object
@@ -348,7 +348,7 @@ class View(object):
     return helper.responses.respond(request, template, context)
 
   def delete(self, request, page_name=None, params=None, **kwargs):
-    """Shows the delete page for the entity specified by kwargs
+    """Shows the delete page for the entity specified by **kwargs.
 
     Args:
       request: the standard Django HTTP request object
@@ -397,7 +397,7 @@ class View(object):
     return http.HttpResponseRedirect(redirect)
 
   def _editPost(self, request, entity, fields):
-    """Performs any required processing on the entity to post its edit page
+    """Performs any required processing on the entity to post its edit page.
 
     Args:
       request: the django request object
@@ -408,7 +408,7 @@ class View(object):
     pass
 
   def _public(self, request, entity, context):
-    """Performs any required processing to get an entities public page
+    """Performs any required processing to get an entities public page.
 
     Args:
       request: the django request object
@@ -419,7 +419,7 @@ class View(object):
     pass
 
   def _editGet(self, request, entity, form):
-    """Performs any required processing on the form to get its edit page
+    """Performs any required processing on the form to get its edit page.
 
     Args:
       request: the django request object
@@ -430,7 +430,7 @@ class View(object):
     pass
 
   def _editSeed(self, request, seed):
-    """Performs any required processing on the form to get its edit page
+    """Performs any required processing on the form to get its edit page.
 
     Args:
       request: the django request object
@@ -440,7 +440,7 @@ class View(object):
     pass
 
   def checkUnspecified(self, access_type, request):
-    """Checks whether an unspecified access_type should be allowed
+    """Checks whether an unspecified access_type should be allowed.
 
     Args:
       access_type: the access type (such as 'list' or 'edit') that was
@@ -450,7 +450,7 @@ class View(object):
     pass
 
   def _constructResponse(self, request, entity, context, form, params):
-    """Updates the context and returns a response for the specified arguments
+    """Updates the context and returns a response for the specified arguments.
 
     Args:
       request: the django request object
@@ -499,7 +499,7 @@ class View(object):
       check(request)
 
   def collectCleanedFields(self, form):
-    """Collects all cleaned fields and returns them with the key_name
+    """Collects all cleaned fields and returns them with the key_name.
 
     Args:
       form: The form from which the cleaned fields should be collected
@@ -531,7 +531,7 @@ class View(object):
     return result
 
   def _getSidebarItems(self, params):
-    """Retrieves a list of sidebar entries for this view from self._params
+    """Retrieves a list of sidebar entries for this view from self._params.
 
     If params['sidebar'] is None default entries will be constructed 
     """
@@ -562,7 +562,7 @@ class View(object):
     return result
 
   def getSidebarLinks(self, params=None):
-    """Returns an dictionary with one sidebar entry
+    """Returns an dictionary with one sidebar entry.
 
     Args:
       params: see __init__
@@ -582,9 +582,9 @@ class View(object):
     return res
 
   def getDjangoURLPatterns(self, params=None):
-    """Retrieves a list of sidebar entries for this view from self._params
+    """Retrieves a list of sidebar entries for this view from self._params.
 
-    If self._params['django_patterns'] is None default entries will be constructed 
+    If self._params['django_patterns'] is None default entries will be constructed.
     """
 
     params = dicts.merge(params, self._params)

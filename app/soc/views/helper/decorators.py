@@ -32,7 +32,8 @@ from django import http
 
 
 def view(func):
-  """Decorator that insists that exceptions are handled by view."""
+  """Decorator that insists that exceptions are handled by view.
+  """
   @wraps(func)
   def view_wrapper(*args, **kwds):
     try:

@@ -30,7 +30,7 @@ import soc.models.sponsor
 
 
 class Logic(base.Logic):
-  """Logic methods for the Sponsor model
+  """Logic methods for the Sponsor model.
   """
 
   def __init__(self):
@@ -52,7 +52,7 @@ class Logic(base.Logic):
     return [fields['link_name']] 
 
   def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames
+    """See base.Logic.getKeyFieldNames.
     """
 
     return ['link_name']

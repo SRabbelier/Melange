@@ -100,7 +100,7 @@ def setList(request, context, list_data,
 
   Returns:
     updated template context dict supplied by the caller or a new context
-    dict if the caller supplied None
+    dict if the caller supplied None.
 
     {
       'list_data': list data to be displayed 

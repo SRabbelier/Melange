@@ -34,7 +34,8 @@ from soc.logic import out_of_band
 
 
 class Error(Exception):
-  """Base class for all exceptions raised by this module."""
+  """Base class for all exceptions raised by this module.
+  """
   pass
 
 
@@ -73,7 +74,7 @@ class Logic:
     return True
 
   def _keyName(self, **kwargs):
-    """Returns the KeyName constructed from kwargs for this type of entity
+    """Returns the KeyName constructed from kwargs for this type of entity.
 
     The KeyName is in the following format:
     entity.name:<key_value1>:<key_value2>:...:<key_valueN>
@@ -114,7 +115,7 @@ class Logic:
                       self.getModelClassName()) 
 
   def getKeyValues(self, entity):
-    """Exctracts the key values from entity and returns them
+    """Exctracts the key values from entity and returns them.
 
     Args:
       entity: the entity from which to extract the key values
@@ -123,7 +124,7 @@ class Logic:
     raise NotImplementedError
 
   def getSuffixValues(self, entity):
-    """Returns an array with the public values of the Key Fields
+    """Returns an array with the public values of the Key Fields.
 
     Defaults to getKeyValues
     If any of the Key Fields should not be made public, this method
@@ -136,7 +137,7 @@ class Logic:
     return self.getKeyValues(entity)
 
   def getKeyValuesFromFields(self, fields):
-    """Exctracts the key values from a dict and returns them
+    """Exctracts the key values from a dict and returns them.
 
     Args:
       fields: the dict from which to extract the key values
@@ -145,13 +146,13 @@ class Logic:
     raise NotImplementedError
 
   def getKeyFieldNames(self):
-    """Returns an array with the names of the Key Fields 
+    """Returns an array with the names of the Key Fields.
     """
 
     raise NotImplementedError
 
   def getKeySuffix(self, entity):
-    """Returns a suffix for the specified entity or None if no entity specified
+    """Returns a suffix for the specified entity or None if no entity specified.
 
     Args:
       entity: the entity for which to get the suffix
@@ -166,7 +167,7 @@ class Logic:
     return suffix
 
   def getKeyFieldsFromDict(self, dictionary):
-    """Does any required massaging and filtering of dictionary
+    """Does any required massaging and filtering of dictionary.
 
     The resulting dictionary contains just the key names, and has any
     required translations/modifications performed.
@@ -218,7 +219,7 @@ class Logic:
 
     Raises:
       out_of_band.ErrorResponse if link name is not false, but no entity
-      with the supplied link name exists in the Datastore
+      with the supplied link name exists in the Datastore.
     """
 
     if not all(fields.values()):
@@ -270,7 +271,7 @@ class Logic:
     return query.fetch(limit, offset)
 
   def getForFields(self, properties, unique=False, limit=1000, offset=0):
-    """Returns all entities that have the specified properties
+    """Returns all entities that have the specified properties.
 
     Args:
       properties: the properties that the entity should have
@@ -432,7 +433,7 @@ class Logic:
         properties and their values
 
     Returns:
-      the original model entity with any supplied properties changed
+      The original model entity with any supplied properties changed.
     """
 
     def update():
@@ -441,7 +442,7 @@ class Logic:
     return db.run_in_transaction(update)
 
   def _unsafeUpdateModelProperties(self, model, model_properties):
-    """(see updateModelProperties)
+    """See updateModelProperties.
 
     Like updateModelProperties(), but not run within a transaction.
     """

@@ -74,7 +74,7 @@ class Logic(base.Logic):
         }
 
     entity = self.getForFields(properties, unique=True)
-    return [entity.account.email()]
+    return [entity.link_name]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames
@@ -92,7 +92,8 @@ class Logic(base.Logic):
     if user:
       key_name = user.key().name()
     else:
-      key_name  = self.getKeyNameForFields({'email': account.email()})
+      raise
+      key_name  = self.getKeyNameForFields({'link_name': properties['link_name']})
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 

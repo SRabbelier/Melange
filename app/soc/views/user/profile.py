@@ -158,7 +158,7 @@ def edit(request, page_name=None, link_name=None,
         error = out_of_band.ErrorResponse(msg)
         return simple.errorResponse(request, page_name, error, template, context)
       
-      user = models.user.logic.updateOrCreateFromAccount(properties, account)
+      user = models.user.logic.updateOrCreateFromFields(properties, {'link_name': new_link_name})
       
       # redirect to /user/profile?s=0
       # (causes 'Profile saved' message to be displayed)

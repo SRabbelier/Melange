@@ -43,8 +43,7 @@ def all(request, page_name=None, templates={}):
   
   Args:
     request: the standard Django HTTP request object
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+    page_name: the page name displayed in templates as page and header title
     template: the "sibling" template (or a search list of such templates)
       from which to construct an alternate template name (or names)
 

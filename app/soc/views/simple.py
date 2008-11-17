@@ -43,8 +43,7 @@ def public(request, page_name=None, template=DEF_PUBLIC_TMPL, link_name=None,
 
   Args:
     request: the standard Django HTTP request object
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+    page_name: the page name displayed in templates as page and header title
     template: the template to use for rendering the view (or a search list
       of templates)
     link_name: a site-unique "link_name" (usually extracted from the URL)
@@ -88,8 +87,7 @@ def errorResponse(request, page_name, error, template, context):
   
   Args:
     request: the standard Django HTTP request object
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+    page_name: the page name displayed in templates as page and header title
     error: an out_of_band.ErrorResponse exception
     template: the "sibling" template (or a search list of such templates)
       from which to construct the error.html template name (or names)
@@ -124,8 +122,7 @@ def requestLogin(request, page_name, template, context=None, login_message_fmt=N
   
   Args:
     request: the standard Django HTTP request object
-    page: a soc.logic.site.page.Page object which is abstraction that combines 
-      a Django view with sidebar menu info
+    page_name: the page name displayed in templates as page and header title
     template: the "sibling" template (or a search list of such templates)
       from which to construct the login.html template name (or names)
     login_message_fmt: a custom message format string used to create a

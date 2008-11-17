@@ -112,7 +112,7 @@ class View(home_settings.View):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object
+      page_name: the page name displayed in templates as page and header title
       kwargs: not used
     """
 
@@ -127,7 +127,7 @@ class View(home_settings.View):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object
+      page_name: the page name displayed in templates as page and header title
       kwargs: not used
     """
 

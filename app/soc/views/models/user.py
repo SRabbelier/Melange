@@ -164,8 +164,7 @@ class View(base.View):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """

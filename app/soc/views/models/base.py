@@ -125,8 +125,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
@@ -168,8 +167,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: not used for create()
     """
@@ -197,8 +195,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """
@@ -311,8 +308,7 @@ class View(object):
     
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
     """
 
@@ -352,8 +348,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
-      page: a soc.logic.site.page.Page object which is abstraction
-        that combines a Django view with sidebar menu info
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """

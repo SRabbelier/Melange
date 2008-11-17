@@ -17,9 +17,10 @@ function BlogPreview(container) {
   this.container_ = container;
 }
 
-BlogPreview.prototype.show = function(url, title, title_link) {
+BlogPreview.prototype.show = function(url, entries_num, title, title_link) {
   var feed = new google.feeds.Feed(url);
   var preview = this;
+  feed.setNumEntries(entries_num)
   feed.load(function(result) {
     preview.render_(result, title, title_link);
   });

@@ -139,3 +139,4 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
+invite = view.invite

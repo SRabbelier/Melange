@@ -429,6 +429,16 @@ class View(object):
 
     pass
 
+  def _editSeed(self, request, seed):
+    """Performs any required processing on the form to get its edit page
+
+    Args:
+      request: the django request object
+      seed: the fields to seed the create page with
+    """
+
+    pass
+
   def checkUnspecified(self, access_type, request):
     """Checks whether an unspecified access_type should be allowed
 

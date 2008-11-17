@@ -91,9 +91,8 @@ class RoleView(base.View):
     new_params = {}
 
     new_params['list_template'] = 'soc/models/create_invite.html'
-    new_params['list_redirect_action'] = 'request/create/%s/%s' % (
-        self._params['name_short'].lower(),
-        kwargs['link_name'])
+    new_params['list_redirect_action'] = '/request/create/%s/%s' % (
+        self._params['url_name'], kwargs['link_name'])
     new_params['list_redirect_entity'] = self._params['name']
     new_params['name'] = self._params['name']
     new_params['name_short'] = self._params['name_short']
@@ -189,7 +188,7 @@ class RoleView(base.View):
     params = {}
     default_patterns = self._params['django_patterns_defaults']
     default_patterns += [
-        (r'^%(name_lower)s/invite/%(lnp)s$',
+        (r'^%(url_name)s/invite/%(lnp)s$',
             'soc.views.models.%s.invite', 'Invite %(name)s')]
 
     params['django_patterns_defaults'] = default_patterns

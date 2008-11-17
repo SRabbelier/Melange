@@ -82,9 +82,14 @@ class View(home_settings.View):
     params = {}
     rights = {}
 
+    # add ugettext_lazy ?
     params['name'] = "Site Settings"
-    params['name_short'] = "site_settings"
+    params['name_short'] = "Site Settings"
     params['name_plural'] = "Site Settings"
+    # lower name and replace " " with "/"
+    # for module name lower name and replace " " with "_"
+    params['url_name'] = "site/settings"
+    params['module_name'] = "site_settings"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -96,9 +101,9 @@ class View(home_settings.View):
       'list_heading': 'soc/site_settings/list/site_heading.html',
     }
 
-    params['delete_redirect'] = '/site/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
-    params['sidebar_additional'] = [('/site_settings/edit','Edit Main Site Settings')]
+    params['sidebar_additional'] = [ ( '/' + params['url_name'] + '/edit', 'Edit Main Site Settings')]
 
     params = dicts.merge(original_params, params)
     rights = dicts.merge(original_rights, rights)
@@ -143,7 +148,7 @@ class View(home_settings.View):
 
     patterns = super(View, self).getDjangoURLPatterns()
     patterns += [(r'^$','soc.views.models.site_settings.main_public')]
-    patterns += [(r'^site_settings/edit$', 'soc.views.models.site_settings.main_edit')]
+    patterns += [(r'^' + self._params['url_name'] + '/edit$', 'soc.views.models.site_settings.main_edit')]
     return patterns
 
 view = View()

@@ -54,7 +54,7 @@ class View(object):
   DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
   DEF_CREATE_NEW_ENTITY_MSG = ugettext_lazy(
-      ' You can create a new %(entity_type_lower)s by visiting'
+      ' You can create a new %(entity_type)s by visiting'
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
@@ -69,6 +69,7 @@ class View(object):
         name: the name of the entity (names should have sentence-style caps) 
         name_short: the short form name of the name ('org' vs 'organization')
         name_plural: the plural form of the name
+        url_name: the name of the entity used in urls
         edit_form: the class of the Django form to be used when editing
         create_form: the class of the Django form to be used when creating
         edit_template: the Django template to be used for editing
@@ -87,9 +88,9 @@ class View(object):
     new_rights['any_access'] = [access.checkIsUser]
 
     new_params = {}
-    new_params['create_redirect'] = '/%s' % params['name_short'].lower()
-    new_params['missing_redirect'] = '/%s/create' % params['name_short'].lower()
-
+    new_params['create_redirect'] = '/%s' % params['url_name']
+    new_params['missing_redirect'] = '/%s/create' % params['url_name']
+    
     new_params['sidebar'] = None
     new_params['sidebar_defaults'] = [
      ('/%s/create', 'New %(name)s'),
@@ -101,21 +102,21 @@ class View(object):
 
     new_params['django_patterns'] = None
     new_params['django_patterns_defaults'] = [
-        (r'^%(name_lower)s/show/%(key_fields)s$', 
+        (r'^%(url_name)s/show/%(key_fields)s$', 
             'soc.views.models.%s.public', 'Show %(name)s'),
-        (r'^%(name_lower)s/create$',
+        (r'^%(url_name)s/create$',
             'soc.views.models.%s.create', 'Create %(name)s'),
-        (r'^%(name_lower)s/create/%(key_fields)s$',
+        (r'^%(url_name)s/create/%(key_fields)s$',
             'soc.views.models.%s.create', 'Create %(name)s'),
-        (r'^%(name_lower)s/delete/%(key_fields)s$',
+        (r'^%(url_name)s/delete/%(key_fields)s$',
             'soc.views.models.%s.delete', 'Delete %(name)s'),
-        (r'^%(name_lower)s/edit/%(key_fields)s$',
+        (r'^%(url_name)s/edit/%(key_fields)s$',
             'soc.views.models.%s.edit', 'Edit %(name)s'),
-        (r'^%(name_lower)s/list$',
+        (r'^%(url_name)s/list$',
             'soc.views.models.%s.list', 'List %(name_plural)s'),
         ]
 
-    new_params['list_redirect_action'] = params['name_short'] + '/edit'
+    new_params['list_redirect_action'] = '/' + params['url_name'] + '/edit'
 
     self._rights = dicts.merge(rights, new_rights)
     self._params = dicts.merge(params, new_params)
@@ -463,6 +464,7 @@ class View(object):
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']
     context['entity_type_short'] = params['name_short']
+    context['entity_type_url'] = params['url_name']
 
     template = params['edit_template']
 
@@ -541,7 +543,7 @@ class View(object):
     result = []
 
     for url, title in defaults:
-      url = url % params['name_short'].lower()
+      url = url % params['url_name'].lower()
 
       title = title % {
           'name': params['name'],
@@ -595,18 +597,18 @@ class View(object):
     patterns = []
 
     for url, module, name in default_patterns:
-      name_short_lower = params['name_short'].lower()
-      name_plural_lower = params['name_plural'].lower() 
+      name_short = params['name_short']
+      name_plural = params['name_plural']
 
       name = name % {
-          'name': name_short_lower, 
-          'name_plural': name_plural_lower,
+          'name': name_short, 
+          'name_plural': name_plural,
           }
 
-      module = module % name_short_lower
+      module = module % params['module_name']
 
       url = url % {
-          'name_lower': name_short_lower,
+          'url_name': params['url_name'],
           'lnp': path_link_name.LINKNAME_ARG_PATTERN,
           'ulnp': path_link_name.LINKNAME_PATTERN_CORE,
           'key_fields': key_fields_pattern,

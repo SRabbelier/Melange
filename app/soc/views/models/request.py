@@ -105,6 +105,8 @@ class View(base.View):
     params['name'] = "Request"
     params['name_short'] = "Request"
     params['name_plural'] = "Requests"
+    params['url_name'] = "request"
+    params['module_name'] = "request"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -123,8 +125,8 @@ class View(base.View):
 
     params['sidebar_defaults'] = [('/%s/list', 'List %(plural)s')]
 
-    params['delete_redirect'] = '/request/list'
-    params['create_redirect'] = '/request'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
+    params['create_redirect'] = '/'.join(params['url_name'])
 
     params['save_message'] = [ugettext_lazy('Request saved.')]
 

@@ -97,6 +97,8 @@ class View(role.RoleView):
     params['name'] = "Host"
     params['name_short'] = "Host"
     params['name_plural'] = "Hosts"
+    params['url_name'] = "host"
+    params['module_name'] = "host"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -114,7 +116,7 @@ class View(role.RoleView):
       'list_heading': 'soc/host/list/host_heading.html',
     }
 
-    params['delete_redirect'] = '/host/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['invite_redirect'] = '/request/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]

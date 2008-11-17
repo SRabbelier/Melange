@@ -127,6 +127,8 @@ class View(base.View):
     params['name'] = "User"
     params['name_short'] = "User"
     params['name_plural'] = "Users"
+    params['url_name'] = "user"
+    params['module_name'] = "user"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -143,7 +145,7 @@ class View(base.View):
       'list_heading': 'soc/user/list/user_heading.html',
     }
 
-    params['delete_redirect'] = '/user/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 
@@ -199,8 +201,8 @@ class View(base.View):
     params = {}
     params['name'] = "User (self)"
     params['sidebar'] = [
-        ('/user/edit', 'Profile'),
-        ('/roles/list', 'Roles'),
+        ('/' + self._params['url_name'] + '/edit', 'Profile'),
+        ('/' + self._params['url_name'] + '/roles', 'Roles'),
         ]
     return self.getSidebarLinks(params)
 
@@ -209,7 +211,7 @@ class View(base.View):
     """
 
     patterns = super(View, self).getDjangoURLPatterns()
-    patterns += [(r'^user/edit$','soc.views.user.profile.create')]
+    patterns += [(r'^' + self._params['url_name'] + '/edit$','soc.views.user.profile.create')]
     return patterns
 
 

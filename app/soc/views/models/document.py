@@ -99,6 +99,8 @@ class View(base.View):
     params['name'] = "Document"
     params['name_short'] = "Document"
     params['name_plural'] = "Documents"
+    params['url_name'] = "document"
+    params['module_name'] = "document"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -115,7 +117,7 @@ class View(base.View):
       'list_heading': 'soc/document/list/docs_heading.html',
     }
 
-    params['delete_redirect'] = '/document/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

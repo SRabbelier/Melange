@@ -99,11 +99,16 @@ class View(base.View):
     params['name'] = "Sponsor"
     params['name_short'] = "Sponsor"
     params['name_plural'] = "Sponsors"
+    # TODO(pawel.solyga): create url_name and module_name automatically 
+    # from name. Make that work for all other Views too. Hopefully 
+    # solution that will be implemented in base View.
+    params['url_name'] = "sponsor"
+    params['module_name'] = "sponsor"
        
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    # TODO(tlarsen) Add support for Django style template lookup
+    # TODO(tlarsen): Add support for Django style template lookup
     params['edit_template'] = 'soc/sponsor/edit.html'
     params['public_template'] = 'soc/group/public.html'
     params['list_template'] = 'soc/models/list.html'
@@ -115,7 +120,7 @@ class View(base.View):
       'list_heading': 'soc/group/list/group_heading.html',
     }
     
-    params['delete_redirect'] = '/sponsor/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
     
     params['save_message'] = [ugettext_lazy('Profile saved.')]
     

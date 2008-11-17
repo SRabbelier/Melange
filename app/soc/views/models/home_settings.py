@@ -51,14 +51,14 @@ class SettingsValidationForm(helper.forms.BaseForm):
     # TODO(tlarsen): partial_path will be a hard-coded read-only
     #   field for some (most?) User Roles
   doc_partial_path = forms.CharField(required=False,
-      label=soc.models.work.Work.partial_path.verbose_name,
+      label=ugettext_lazy('Document partial path'),
       help_text=soc.models.work.Work.partial_path.help_text)
 
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
   #   Role-scoped Document selector that we don't have yet
   doc_link_name = forms.CharField(required=False,
-      label=soc.models.work.Work.link_name.verbose_name,
+      label=ugettext_lazy('Document link name'),
       help_text=soc.models.work.Work.link_name.help_text)
 
   def clean_feed_url(self):
@@ -112,8 +112,10 @@ class View(base.View):
     rights = {}
 
     params['name'] = "Home Settings"
-    params['name_short'] = "home_settings"
+    params['name_short'] = "Home Settings"
     params['name_plural'] = "Home Settings"
+    params['url_name'] = "home/settings"
+    params['module_name'] = "home_settings"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -130,7 +132,7 @@ class View(base.View):
       'list_heading': 'soc/home_settings/list/home_heading.html',
     }
 
-    params['delete_redirect'] = '/home/list'
+    params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
     params['save_message'] = [ugettext_lazy('Profile saved.')]
 

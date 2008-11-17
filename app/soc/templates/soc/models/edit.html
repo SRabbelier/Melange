@@ -20,7 +20,7 @@ limitations under the License.
 {{ page_name }}
  {% if entity %}
    <!-- TODO(srabbelier) use a generic entity name as link -->
-   <a href="/{{ entity_type_short|lower }}/show/{{ entity_suffix }}">(Public page)</a>
+   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}">(Public page)</a>
  {% endif %}
 {% endblock %}
 
@@ -49,7 +49,7 @@ Please use this form to edit the {{ entity_type }}.
    </td>
    {% if entity %}
    <td>
-    <input type="button" onclick="location.href='/{{ entity_type_short|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
    </td>
    {% endif %}
    {% endblock %}

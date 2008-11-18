@@ -126,7 +126,7 @@ class View(base.View):
     params['sidebar_defaults'] = [('/%s/list', 'List %(plural)s')]
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
-    params['create_redirect'] = '/'.join(params['url_name'])
+    params['create_redirect'] = '/' + params['url_name']
 
     params['save_message'] = [ugettext_lazy('Request saved.')]
 

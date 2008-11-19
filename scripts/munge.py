@@ -264,7 +264,7 @@ def applyActionToFiles(action, action_args,
                        start_path='', abs_path=False, files_pattern='',
                        recurse_dirs=False, dirs_pattern='',
                        follow_symlinks=False, quiet_output=False,
-                       hide_paths=False, **action_options):
+                       hide_paths=False, hide_text=False, **action_options):
   """Applies a callable action to files, based on options and arguments.
   
   Args:
@@ -283,6 +283,8 @@ def applyActionToFiles(action, action_args,
     follow_symlinks: boolean indicating if symlinks should be traversed
     quiet_output: optional boolean indicating if output should be suppressed
     hide_paths: optional boolean indicating to omit file paths from output
+    hide_text: optional boolean indicating to omit find/replace text from
+      output
     **action_options: remaining keyword arguments that are passed unchanged
       to the action callable
 
@@ -334,7 +336,7 @@ def applyActionToFiles(action, action_args,
               sub_paths.append(item_path)
           continue
       
-        if files_regex.match(item):
+        if os.path.isfile(item_path) and files_regex.match(item):
           try:
             matched, found_output = action(item_path, *action_args,
                                            **action_options)
@@ -348,7 +350,7 @@ def applyActionToFiles(action, action_args,
             if (not quiet_output) and (not hide_paths):
               output.append(item_path)
 
-          if not quiet_output:
+          if (not quiet_output) and (not hide_text):
             output.extend(found_output)
 
     paths = sub_paths
@@ -420,9 +422,15 @@ def _buildParser():
           ' [default: %default]'))
 
   output_group.add_option(
-    '-p', '--nopaths', dest='hide_paths', default=False, action='store_true',
+    '', '--nopaths', dest='hide_paths', default=False, action='store_true',
     help=('suppress printing of file path names for successfully matched'
           ' files to stdout [default: %default]'))
+
+  output_group.add_option(
+    '', '--notext', dest='hide_text', default=False, action='store_true',
+    help=('suppress find/replace text output to stdout (but still print'
+          ' paths if not --nopath, and still perform replacements if'
+          ' specified) [default: %default]'))
 
   output_group.add_option(
     '-q', '--quiet', dest='quiet_output', default=False, action='store_true',
@@ -511,6 +519,7 @@ def _main(argv):
     exit code suitable for sys.exit()
   """
   options = {}  # empty options, used if _parseArgs() fails
+  parser = None
 
   try:
     action, options, args, parser = _parseArgs(argv[1:])
@@ -522,7 +531,9 @@ def _main(argv):
     if not options.get('quiet_output'):
       print >>sys.stderr, '\nERROR: (%s: %s) %s\n' % (
         error.args[0], os.strerror(error.args[0]), error.args[1])
-      print >>sys.stderr, parser.get_usage()
+
+      if parser:
+        print >>sys.stderr, parser.get_usage()
 
     exit_code = error.args[0]
 

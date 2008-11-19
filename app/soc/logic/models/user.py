@@ -54,7 +54,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValues.
     """
 
-    return [entity.account.email()]
+    return [entity.link_name]
 
   def getSuffixValues(self, entity):
     """See base.Logic.getSuffixValues.
@@ -66,15 +66,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    if 'email' in fields:
-      return [fields['email']]
-
-    properties = {
-        'link_name': fields['link_name']
-        }
-
-    entity = self.getForFields(properties, unique=True)
-    return [entity.link_name]
+    return [fields['link_name']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames.

@@ -36,6 +36,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
 from soc.logic import models
+from soc.views import helper
 from soc.views.simple import requestLogin
 
 import soc.views.out_of_band
@@ -55,6 +56,37 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
   ' and <a href="%%(sign_in)s">sign in</a>'
   ' again as %(role)s to view this page.')
 
+DEF_PAGE_DENIED_MSG = ugettext_lazy(
+  'Access to this page has been restricted')
+
+
+def allow(request):
+  """Never returns an alternate HTTP response
+
+  Args:
+    request: a django HTTP request
+  """
+
+  return
+
+def deny(request):
+  """Returns an alternate HTTP response
+
+  Args:
+    request: a django HTTP request
+
+  Returns: a subclass of django.http.HttpResponse which contains the
+  alternate response that should be returned by the calling view.
+  """
+
+  context = helper.responses.getUniversalContext(request)
+  context['login_title'] = 'Access denied'
+  context['login_header'] = 'Access denied'
+  context['login_message'] = DEF_PAGE_DENIED_MSG
+
+  denied_response = helper.responses.respond(request, DEF_LOGIN_TMPL, context=context)
+
+  raise soc.views.out_of_band.AccessViolationResponse(denied_response)
 
 def checkIsLoggedIn(request):
   """Returns an alternate HTTP response if Google Account is not logged in.

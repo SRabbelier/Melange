@@ -82,7 +82,7 @@ def sendMailFromTemplate(template, context):
     context: The context supplied to the template and email (dictionary)
   
   Raises:
-    Error that corresponds with the first problem it finds ff the message 
+    Error that corresponds with the first problem it finds iff the message 
     is not properly initialized.
 
     List of all possible errors:
@@ -102,7 +102,7 @@ def sendMail(context):
     context : The context supplied to the email message (dictionary)
 
   Raises:
-    Error that corresponds with the first problem it finds ff the message 
+    Error that corresponds with the first problem it finds iff the message 
     is not properly initialized.
 
     List of all possible errors:

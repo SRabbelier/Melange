@@ -88,6 +88,7 @@ class View(object):
     rights['unspecified'] = []
     rights['any_access'] = [access.checkIsUser]
     rights['create'] = [access.checkIsDeveloper]
+    rights['edit'] = [access.checkIsDeveloper]
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsDeveloper]
 

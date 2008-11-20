@@ -87,7 +87,7 @@ class Linkable(polymodel.PolyModel):
   "leaf" entities (such as the Document in the example above) could
   be allowed. 
   """
-  #: Required field storing "ID" used in URLS. Lower ASCII characters,
+  #: Required field storing "ID" used in URL links. Lower ASCII characters,
   #: digits and underscores only.  Valid link IDs successfully match
   #: the LINK_ID_REGEX.
   link_id = db.StringProperty(required=True,

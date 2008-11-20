@@ -17,7 +17,11 @@ limitations under the License.
 <p>
 <p>
 {% block instructions %}
+{% if instruction_text %}
+{{ instruction_text }}
+{% else %}
 List of {{ entity_type_plural }} in Google Open Source Programs.
+{% endif %}
 {% endblock %}
 </p>
 {% include list_main %}

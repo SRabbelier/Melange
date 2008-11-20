@@ -66,6 +66,8 @@ class RoleView(base.View):
 
   All views that only Role entities have are defined in this subclass.
   """
+  
+  DEF_INVITE_INSTRUCTION_TEXT = ugettext_lazy('Please use this form to invite someone to become a %(name)s.')
 
   def __init__(self, original_params=None):
     """
@@ -85,13 +87,14 @@ class RoleView(base.View):
 
     new_params = {}
 
-    new_params['list_template'] = 'soc/models/create_invite.html'
+    new_params['list_template'] = 'soc/models/list.html'
     new_params['list_redirect_action'] = '/request/create/%s/%s' % (
         self._params['url_name'], kwargs['link_id'])
     new_params['list_redirect_entity'] = self._params['name']
     new_params['name'] = self._params['name']
     new_params['name_short'] = self._params['name_short']
     new_params['name_plural'] = self._params['name_plural']
+    new_params['instruction_text'] = self.DEF_INVITE_INSTRUCTION_TEXT % self._params
 
     params = dicts.merge(params, new_params)
 

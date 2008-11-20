@@ -405,7 +405,7 @@ def _buildParser():
     help='recurse into subdirectories [default: %default]')
 
   dir_group.add_option(
-    '-d', '--dirs', dest='dirs_pattern', default='^.*$',
+    '-d', '--dirs', dest='dirs_pattern', default='^[^.].*$',
     metavar='SUBDIRS_REGEX',
     help=('Python regex pattern (*not* a glob!) defining subdirectories to'
           ' recurse into (if --recursive) [default: %default]'))

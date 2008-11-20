@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -314,13 +315,14 @@ class View(object):
 
     return self._constructResponse(request, entity, context, form, params)
 
-  def list(self, request, page_name=None, params=None):
+  def list(self, request, page_name=None, params=None, filter=None):
     """Displays the list page for the entity type.
     
     Args:
       request: the standard Django HTTP request object
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
+      filter: a dict for the properties that the entities should have
     """
 
     params = dicts.merge(params, self._params)
@@ -337,8 +339,11 @@ class View(object):
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
     # Fetch one more to see if there should be a 'next' link
-    entities = self._logic.getForLimitAndOffset(limit + 1, offset=offset)
-
+    if not filter:
+      entities = self._logic.getForLimitAndOffset(limit + 1, offset=offset)
+    else:
+      entities = self._logic.getForFields(filter, limit=limit + 1, offset=offset)
+    
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
     templates = params['lists_template']

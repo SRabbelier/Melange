@@ -67,22 +67,17 @@ class RoleView(base.View):
   All views that only Role entities have are defined in this subclass.
   """
 
-  def __init__(self, original_params=None, original_rights=None):
+  def __init__(self, original_params=None):
     """
 
     Args:
-      rights: This dictionary should be filled with the access check
-        functions that should be called, it will be modified in-place.
-      params: This dictionary should be filled with the parameters
+      original_params: This dictionary should be filled with the parameters
     """
 
     params = {}
-    rights = {}
-
     params = dicts.merge(original_params, params)
-    rights = dicts.merge(original_rights, rights)
 
-    base.View.__init__(self, rights=rights, params=params)
+    base.View.__init__(self, params=params)
 
   def invite(self, request, page_name=None, params=None, **kwargs):
     """Displays the request promotion to Role page.

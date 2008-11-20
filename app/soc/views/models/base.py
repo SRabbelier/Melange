@@ -58,14 +58,14 @@ class View(object):
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
-  def __init__(self, params=None, rights=None):
+  def __init__(self, params=None):
     """
 
     Args:
-      rights: This dictionary should be filled with the access check
-        functions that should be called, it will be modified in-place.
       params: This dictionary should be filled with the parameters
         specific to this entity, required fields are:
+        rights: This dictionary should be filled with the access check
+                functions that should be called
         name: the name of the entity (names should have sentence-style caps) 
         name_short: the short form name of the name ('org' vs 'organization')
         name_plural: the plural form of the name
@@ -84,10 +84,15 @@ class View(object):
         sidebar_defaults: a dictionary with defaults for the sidebar 
     """
 
-    new_rights = {}
-    new_rights['any_access'] = [access.checkIsUser]
+    rights = {}
+    rights['unspecified'] = []
+    rights['any_access'] = [access.checkIsUser]
+    rights['create'] = [access.checkIsDeveloper]
+    rights['delete'] = [access.checkIsDeveloper]
+    rights['list'] = [access.checkIsDeveloper]
 
     new_params = {}
+    new_params['rights'] = rights
     new_params['create_redirect'] = '/%s' % params['url_name']
     new_params['missing_redirect'] = '/%s/create' % params['url_name']
     
@@ -118,7 +123,6 @@ class View(object):
 
     new_params['list_redirect_action'] = '/' + params['url_name'] + '/edit'
 
-    self._rights = dicts.merge(rights, new_rights)
     self._params = dicts.merge(params, new_params)
 
   def public(self, request, page_name=None, params=None, **kwargs):
@@ -204,7 +208,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('edit', request)
+      self.checkAccess('edit', request, rights=params['rights'])
     except soc.views.out_of_band.AccessViolationResponse, alt_response:
       return alt_response.response()
 
@@ -435,16 +439,6 @@ class View(object):
 
     pass
 
-  def checkUnspecified(self, access_type, request):
-    """Checks whether an unspecified access_type should be allowed.
-
-    Args:
-      access_type: the access type (such as 'list' or 'edit') that was
-                   not present in the _rights dictionary when checking.
-    """
-
-    pass
-
   def _constructResponse(self, request, entity, context, form, params):
     """Updates the context and returns a response for the specified arguments.
 
@@ -470,7 +464,7 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
-  def checkAccess(self, access_type, request):
+  def checkAccess(self, access_type, request, rights=None):
     """Runs all the defined checks for the specified type
 
     Args:
@@ -483,16 +477,19 @@ class View(object):
              the response provided by the failed access check.
     """
 
+    rights = dicts.merge(rights, self._params['rights'])
+
     # Call each access checker
-    for check in self._rights['any_access']:
+    for check in rights['any_access']:
       check(request)
 
-    if access_type not in self._rights:
-       # No checks defined, so do the 'generic check' and bail out
-      self.checkUnspecified(access_type, request)
+    if access_type not in rights:
+      for check in rights['unspecified']:
+         # No checks defined, so do the 'generic check' and bail out
+        check(request, access_type)
       return
 
-    for check in self._rights[access_type]:
+    for check in rights[access_type]:
       check(request)
 
   def collectCleanedFields(self, form):

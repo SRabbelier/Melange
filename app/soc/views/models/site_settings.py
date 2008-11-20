@@ -70,17 +70,15 @@ class View(home_settings.View):
   """View methods for the Document model.
   """
 
-  def __init__(self, original_params=None, original_rights=None):
+  def __init__(self, original_params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
       original_params: a dict with params for this View
-      original_rights: a dict with right definitions for this View
     """
 
     params = {}
-    rights = {}
 
     # add ugettext_lazy ?
     params['name'] = "Site Settings"
@@ -106,9 +104,8 @@ class View(home_settings.View):
     params['sidebar_additional'] = [ ( '/' + params['url_name'] + '/edit', 'Edit Main Site Settings')]
 
     params = dicts.merge(original_params, params)
-    rights = dicts.merge(original_rights, rights)
 
-    home_settings.View.__init__(self, original_rights=rights, original_params=params)
+    home_settings.View.__init__(self, original_params=params)
 
     self._logic = soc.logic.models.site_settings.logic
 

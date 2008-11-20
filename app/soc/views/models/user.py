@@ -110,19 +110,17 @@ class View(base.View):
   """View methods for the User model.
   """
 
-  def __init__(self, original_params=None, original_rights=None):
+  def __init__(self, original_params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
       original_params: a dict with params for this View
-      original_rights: a dict with right definitions for this View
     """
 
     self._logic = soc.logic.models.user.logic
 
     params = {}
-    rights = {}
 
     params['name'] = "User"
     params['name_short'] = "User"
@@ -153,13 +151,9 @@ class View(base.View):
         self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
         }
 
-    rights['list'] = [helper.access.checkIsDeveloper]
-    rights['delete'] = [helper.access.checkIsDeveloper]
-
     params = dicts.merge(original_params, params)
-    rights = dicts.merge(original_rights, rights)
 
-    base.View.__init__(self, rights=rights, params=params)
+    base.View.__init__(self, params=params)
 
   def editSelf(self, request, page_name=None, params=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.

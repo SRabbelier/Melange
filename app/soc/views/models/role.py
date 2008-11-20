@@ -51,8 +51,10 @@ class RequestForm(helper.forms.BaseForm):
     #: db.Model subclass for which the form will gather information
     model = soc.models.request.Request
 
-    #: exclude pretty much everything, model=None would also remove the help text etc. 
-    exclude = ['inheritance_line', 'requester', 'to', 'role', 'accepted', 'declined']
+    #: Exclude pretty much everything, model=None would 
+    #: also remove the help text etc. 
+    exclude = ['inheritance_line', 'requester', 'to', 'role', 
+        'accepted', 'declined']
 
   requester = forms.CharField(widget=helper.widgets.ReadOnlyInput())
 
@@ -94,7 +96,8 @@ class RoleView(base.View):
     new_params['name'] = self._params['name']
     new_params['name_short'] = self._params['name_short']
     new_params['name_plural'] = self._params['name_plural']
-    new_params['instruction_text'] = self.DEF_INVITE_INSTRUCTION_TEXT % self._params
+    new_params['instruction_text'] = \
+        self.DEF_INVITE_INSTRUCTION_TEXT % self._params
 
     params = dicts.merge(params, new_params)
 

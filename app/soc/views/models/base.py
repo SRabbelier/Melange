@@ -499,7 +499,7 @@ class View(object):
 
     if access_type not in rights:
       for check in rights['unspecified']:
-         # No checks defined, so do the 'generic check' and bail out
+        # No checks defined, so do the 'generic check' and bail out
         check(request, access_type)
       return
 

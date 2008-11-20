@@ -90,10 +90,10 @@ class Linkable(polymodel.PolyModel):
   #: Required field storing "ID" used in URLS. Lower ASCII characters,
   #: digits and underscores only.  Valid link IDs successfully match
   #: the LINK_ID_REGEX.
-  id = db.StringProperty(required=True,
+  link_id = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link ID'))
-  id.help_text = ugettext_lazy(
-      '"ID" used in URLs.'
+  link_id.help_text = ugettext_lazy(
+      '"ID" used when creating URL links.'
       ' Lower ASCII characters, digits, and underscores only.')
 
   #: Optional Self Reference property to another Linkable entity which defines
@@ -104,3 +104,16 @@ class Linkable(polymodel.PolyModel):
   scope.help_text = ugettext_lazy(
       'Reference to another Linkable entity that defines the "scope" of'
       ' this Linkable entity.')
+
+  #: Hidden (not displayed to users or editable in forms) cache of the string
+  #: representation of the transitive closure of scopes, for use in URLs.
+  #: The multiple queries required to produce this string for entities in
+  #: deeply-nested scopes can be prohibitively expensive.  The scope of an
+  #: entity is not expected to change frequently (only for move, copy, and
+  #: maybe re-parenting operations), so this property is not likely to need
+  #: updating.
+  scope_path = db.StringProperty(required=False,
+      verbose_name=ugettext_lazy('Scope path'))
+  scope_path.help_text = ugettext_lazy(
+      'Cache of the string form of the entity scope.')
+

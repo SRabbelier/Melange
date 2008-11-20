@@ -54,12 +54,12 @@ class CreateForm(helper.forms.BaseForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'author', 'created', 'modified']
 
-  def clean_partial_path(self):
-    partial_path = self.cleaned_data.get('partial_path')
+  def clean_scope_path(self):
+    scope_path = self.cleaned_data.get('scope_path')
     # TODO(tlarsen): combine path and link_id and check for uniqueness
-    if not validate.isPartialPathFormatValid(partial_path):
-      raise forms.ValidationError("This partial path is in wrong format.")
-    return partial_path
+    if not validate.isScopePathFormatValid(scope_path):
+      raise forms.ValidationError("This scope path is in wrong format.")
+    return scope_path
 
   def clean_link_id(self):
     link_id = self.cleaned_data.get('link_id')

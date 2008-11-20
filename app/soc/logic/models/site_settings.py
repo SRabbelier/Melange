@@ -34,7 +34,7 @@ class Logic(home_settings.Logic):
   """Logic methods for the SiteSettings model.
   """
 
-  DEF_SITE_SETTINGS_PARTIAL_PATH = 'site'
+  DEF_SITE_SETTINGS_SCOPE_PATH = 'site'
   DEF_SITE_SETTINGS_LINK_ID = 'home'
   DEF_SITE_HOME_DOC_LINK_ID = 'home'
 
@@ -48,7 +48,7 @@ class Logic(home_settings.Logic):
     """Returns the default key values for the site settings.
     """
 
-    return [self.DEF_SITE_SETTINGS_PARTIAL_PATH, 
+    return [self.DEF_SITE_SETTINGS_SCOPE_PATH, 
             self.DEF_SITE_SETTINGS_LINK_ID]
 
 

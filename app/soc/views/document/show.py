@@ -38,14 +38,14 @@ import soc.views.helper.templates
 DEF_DOCS_PUBLIC_TMPL = 'soc/document/public.html'
 
 @decorators.view
-def public(request, page_name=None, partial_path=None, link_id=None,
+def public(request, page_name=None, scope_path=None, link_id=None,
            template=DEF_DOCS_PUBLIC_TMPL):
   """How the "general public" sees a Document.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    partial_path: the Document's site-unique "path" extracted from the URL,
+    scope_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_id
     link_id: the last portion of the Document's site-unique "path"
       extracted from the URL
@@ -69,12 +69,12 @@ def public(request, page_name=None, partial_path=None, link_id=None,
   doc = None
 
   # try to fetch User entity corresponding to link_id if one exists
-  path = path_link_name.combinePath([partial_path, link_id])
+  path = path_link_name.combinePath([scope_path, link_id])
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
     if path:
-      doc = document.logic.getFromFields(partial_path=partial_path,
+      doc = document.logic.getFromFields(scope_path=scope_path,
                                          link_id=link_id)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when Document path doesn't exist in Datastore

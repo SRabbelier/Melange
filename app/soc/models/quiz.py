@@ -52,7 +52,7 @@ class Quiz(soc.models.work.Work):
     work.reviews:  even Quizzes can be "reviewed" (possibly commented
       on during creation or annotated once put into use).
 
-    work.partial_path/work.link_id: used to scope and uniquely identify
+    work.scope_path/work.link_id: used to scope and uniquely identify
       a Quiz in the same way these properties are used with Documents, etc.
 
     work.content:  the "preface" of the Quiz, displayed before any

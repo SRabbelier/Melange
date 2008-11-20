@@ -39,7 +39,7 @@ import soc.views.helper.templates
 DEF_HOME_PUBLIC_TMPL = 'soc/home/public.html'
 
 @decorators.view
-def public(request, page_name=None, partial_path=None, link_id=None, 
+def public(request, page_name=None, scope_path=None, link_id=None, 
            entity_type='HomeSettings',
            template=DEF_HOME_PUBLIC_TMPL):
   """How the "general public" sees a "home" page.
@@ -58,7 +58,7 @@ def public(request, page_name=None, partial_path=None, link_id=None,
   context = helper.responses.getUniversalContext(request)
   
   settings = models.site_settings.logic.getFromFields(
-      partial_path=partial_path, link_id=link_id)
+      scope_path=scope_path, link_id=link_id)
 
   if settings:
     context['home_settings'] = settings

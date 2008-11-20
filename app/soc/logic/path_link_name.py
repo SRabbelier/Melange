@@ -36,33 +36,33 @@ LINK_ID_ARG_PATTERN = r'(?P<link_id>%s)' % LINK_ID_PATTERN_CORE
 LINK_ID_PATTERN = r'^%s$' % LINK_ID_PATTERN_CORE
 LINK_ID_REGEX = re.compile(LINK_ID_PATTERN)
 
-# partial path is multiple link_id chunks,
+# scope path is multiple link_id chunks,
 # each separated by a trailing /
 # (at least 1)
-PARTIAL_PATH_ARG_PATTERN = (r'(?P<partial_path>%(link_id)s'
+SCOPE_PATH_ARG_PATTERN = (r'(?P<scope_path>%(link_id)s'
                              '(?:/%(link_id)s)*)' % {
                                'link_id': LINK_ID_PATTERN_CORE})
-PARTIAL_PATH_PATTERN = r'^%s$' % PARTIAL_PATH_ARG_PATTERN
-PARTIAL_PATH_REGEX = re.compile(PARTIAL_PATH_PATTERN)
+SCOPE_PATH_PATTERN = r'^%s$' % SCOPE_PATH_ARG_PATTERN
+SCOPE_PATH_REGEX = re.compile(SCOPE_PATH_PATTERN)
 
 # path is multiple link_id chunks,
 #   each separated by a trailing /
 #     (at least 1)
 # followed by a single link_id with no trailing /
 PATH_LINK_ID_ARGS_PATTERN = (
-    r'%(partial_path)s/'
+    r'%(scope_path)s/'
      '(?P<link_id>%(link_id)s)' % {
-       'partial_path' : PARTIAL_PATH_ARG_PATTERN,
+       'scope_path' : SCOPE_PATH_ARG_PATTERN,
        'link_id': LINK_ID_PATTERN_CORE})
 PATH_LINK_ID_PATTERN = r'^%s$' % PATH_LINK_ID_ARGS_PATTERN
 PATH_LINK_ID_REGEX = re.compile(PATH_LINK_ID_PATTERN)
 
 
 def getPartsFromPath(path):
-  """Splits path string into partial_path and link_id.
+  """Splits path string into scope_path and link_id.
   
   Returns:
-    {'partial_path': 'everything/but',
+    {'scope_path': 'everything/but',
      'link_id': 'link_id'}
     or {} (empty dict) if string did not match PATH_LINK_ID_PATTERN.
   """

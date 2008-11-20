@@ -85,11 +85,11 @@ class DocSelectForm(helper.forms.BaseForm):
   """Django form displayed to select a Document.
   """
 
-  # TODO(tlarsen): partial_path will be a hard-coded read-only
+  # TODO(tlarsen): scope_path will be a hard-coded read-only
   #   field for some (most?) User Roles
-  doc_partial_path = forms.CharField(required=False,
-      label=soc.models.work.Work.partial_path.verbose_name,
-      help_text=soc.models.work.Work.partial_path.help_text)
+  doc_scope_path = forms.CharField(required=False,
+      label=soc.models.work.Work.scope_path.verbose_name,
+      help_text=soc.models.work.Work.scope_path.help_text)
 
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
@@ -105,7 +105,7 @@ class DocSelectForm(helper.forms.BaseForm):
 DEF_HOME_EDIT_TMPL = 'soc/site_settings/edit.html'
 
 @decorators.view
-def edit(request, page_name=None, partial_path=None, link_id=None, 
+def edit(request, page_name=None, scope_path=None, link_id=None, 
          logic=models.home_settings.logic,
          settings_form_class=SettingsForm,
          template=DEF_HOME_EDIT_TMPL):
@@ -150,11 +150,11 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
         value = settings_form.cleaned_data.get(field)
         fields[field] = value
 
-      doc_partial_path = doc_select_form.cleaned_data.get('doc_partial_path')
+      doc_scope_path = doc_select_form.cleaned_data.get('doc_scope_path')
       doc_link_id = doc_select_form.cleaned_data.get('doc_link_id')
 
       home_doc = document.logic.getFromFields(
-          partial_path=doc_partial_path, link_id=doc_link_id)
+          scope_path=doc_scope_path, link_id=doc_link_id)
 
       if home_doc:
         fields['home'] = home_doc
@@ -171,7 +171,7 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
         home_doc = settings.home
   else: # request.method == 'GET'
     # try to fetch HomeSettings entity by unique key_name
-    settings = logic.getFromFields(partial_path=partial_path, 
+    settings = logic.getFromFields(scope_path=scope_path, 
                                    link_id=link_id)
 
     if settings:
@@ -186,7 +186,7 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
     
       if home_doc:
         doc_select_form = DocSelectForm(initial={
-            'doc_partial_path': home_doc.partial_path,
+            'doc_scope_path': home_doc.scope_path,
             'doc_link_id': home_doc.link_id})
       else:
         doc_select_form = DocSelectForm()

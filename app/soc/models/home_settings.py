@@ -53,9 +53,9 @@ class HomeSettings(polymodel.PolyModel):
       'Feed entries are shown on the home page.')
 
   #: Required path, prepended to a "link ID" to form the Setting URL.
-  partial_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Settings partial path'))
-  partial_path.help_text = ugettext_lazy(
+  scope_path = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Settings scope path'))
+  scope_path.help_text = ugettext_lazy(
     'path portion of URLs for Settings, prepended to link ID')
 
   #: Required link ID, appended to a "path" to form the Setting URL.

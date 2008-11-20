@@ -48,11 +48,11 @@ class SettingsValidationForm(helper.forms.BaseForm):
   This form includes validation functions for Settings fields.
   """
 
-    # TODO(tlarsen): partial_path will be a hard-coded read-only
+    # TODO(tlarsen): scope_path will be a hard-coded read-only
     #   field for some (most?) User Roles
-  doc_partial_path = forms.CharField(required=False,
-      label=ugettext_lazy('Document partial path'),
-      help_text=soc.models.work.Work.partial_path.help_text)
+  doc_scope_path = forms.CharField(required=False,
+      label=ugettext_lazy('Document scope path'),
+      help_text=soc.models.work.Work.scope_path.help_text)
 
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
@@ -166,7 +166,7 @@ class View(base.View):
 
     try:
       if entity.home:
-        form.fields['doc_partial_path'].initial = entity.home.partial_path
+        form.fields['doc_scope_path'].initial = entity.home.scope_path
         form.fields['doc_link_id'].initial = entity.home.link_id
     except db.Error:
       pass
@@ -175,12 +175,12 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    doc_partial_path = fields['doc_partial_path']
+    doc_scope_path = fields['doc_scope_path']
     doc_link_id = fields['doc_link_id']
 
     # TODO notify the user if home_doc is not found
     home_doc = document_logic.logic.getFromFields(
-    partial_path=doc_partial_path, link_id=doc_link_id)
+    scope_path=doc_scope_path, link_id=doc_link_id)
 
     fields['home'] = home_doc
 

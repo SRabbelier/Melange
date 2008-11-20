@@ -62,9 +62,9 @@ class Work(polymodel.PolyModel):
   #: site.  Except in /site/document (Developer) forms, this field is not
   #: usually directly editable by the User, but is instead set by controller
   #: logic to match the "scope" of the document.
-  partial_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Partial path'))
-  partial_path.help_text = ugettext_lazy(
+  scope_path = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Scope path'))
+  scope_path.help_text = ugettext_lazy(
     'path portion of URLs, prepended to link ID')
 
   #: Required link ID, appended to a "path" to form the document URL.

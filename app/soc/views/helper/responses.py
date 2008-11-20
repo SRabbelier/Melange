@@ -108,7 +108,7 @@ def getUniversalContext(request):
   context['sidebar_menu_items'] = sidebar.SIDEBAR
 
   settings = site_settings.logic.getFromFields(
-      partial_path=site_settings.logic.DEF_SITE_SETTINGS_PARTIAL_PATH,
+      scope_path=site_settings.logic.DEF_SITE_SETTINGS_SCOPE_PATH,
       link_id=site_settings.logic.DEF_SITE_SETTINGS_LINK_ID)
   
   if settings:

@@ -62,11 +62,11 @@ def getDocForForm(form):
 
   user = users.get_current_user()
 
-  partial_path = form.cleaned_data.get('partial_path')
+  scope_path = form.cleaned_data.get('scope_path')
   link_id = form.cleaned_data.get('link_id')
 
   properties = {}
-  properties['partial_path'] = partial_path
+  properties['scope_path'] = scope_path
   properties['link_id'] = link_id
   properties['title'] = form.cleaned_data.get('title')
   properties['short_name'] = form.cleaned_data.get('short_name')
@@ -92,10 +92,10 @@ class CreateForm(helper.forms.BaseForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'author', 'created', 'modified']
 
-  def clean_partial_path(self):
-    partial_path = self.cleaned_data.get('partial_path')
+  def clean_scope_path(self):
+    scope_path = self.cleaned_data.get('scope_path')
     # TODO(tlarsen): combine path and link_id and check for uniqueness
-    return partial_path
+    return scope_path
 
   def clean_link_id(self):
     link_id = self.cleaned_data.get('link_id')
@@ -140,7 +140,7 @@ def create(request, page_name=None, template=DEF_DOCS_CREATE_TMPL):
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = path_link_name.combinePath([doc.partial_path, doc.link_id])
+      new_path = path_link_name.combinePath([doc.scope_path, doc.link_id])
 
       # redirect to new /document/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -167,14 +167,14 @@ class EditForm(CreateForm):
 
 
 @decorators.view
-def edit(request, page_name=None, partial_path=None, link_id=None,
+def edit(request, page_name=None, scope_path=None, link_id=None,
          template=DEF_DOCS_EDIT_TMPL):
   """View to modify the properties of a Document Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    partial_path: the Document's site-unique "path" extracted from the URL,
+    scope_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_id
     link_id: the last portion of the Document's site-unique "path"
       extracted from the URL
@@ -199,12 +199,12 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
 
   doc = None  # assume that no Document entity will be found
 
-  path = path_link_name.combinePath([partial_path, link_id])
+  path = path_link_name.combinePath([scope_path, link_id])
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
     if path:
-      doc = document.logic.getFromFields(partial_path=partial_path,
+      doc = document.logic.getFromFields(scope_path=scope_path,
                                          link_id=link_id)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore
@@ -220,7 +220,7 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
       if not doc:
         return http.HttpResponseRedirect('/')
 
-      new_path = path_link_name.combinePath([doc.partial_path, doc.link_id])
+      new_path = path_link_name.combinePath([doc.scope_path, doc.link_id])
         
       # redirect to new /document/edit/new_path?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -248,7 +248,7 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
         # populate form with the existing Document entity
         author_link_id = doc.author.link_id
         form = EditForm(initial={'doc_key_name': doc.key().name(),
-            'title': doc.title, 'partial_path': doc.partial_path,
+            'title': doc.title, 'scope_path': doc.scope_path,
             'link_id': doc.link_id, 'short_name': doc.short_name,
             'content': doc.content, 'author': doc.author,
             'is_featured': doc.is_featured, 'created_by': author_link_id})
@@ -275,14 +275,14 @@ def edit(request, page_name=None, partial_path=None, link_id=None,
 
 
 @decorators.view
-def delete(request, page_name=None, partial_path=None, link_id=None,
+def delete(request, page_name=None, scope_path=None, link_id=None,
            template=DEF_DOCS_EDIT_TMPL):
   """Request handler to delete Document Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    partial_path: the Document's site-unique "path" extracted from the URL,
+    scope_path: the Document's site-unique "path" extracted from the URL,
       minus the trailing link_id
     link_id: the last portion of the Document's site-unique "path"
       extracted from the URL
@@ -306,12 +306,12 @@ def delete(request, page_name=None, partial_path=None, link_id=None,
   context['page_name'] = page_name
 
   existing_doc = None
-  path = path_link_name.combinePath([partial_path, link_id])
+  path = path_link_name.combinePath([scope_path, link_id])
 
   # try to fetch Document entity corresponding to path if one exists    
   try:
     if path:
-      existing_doc = document.logic.getFromFields(partial_path=partial_path,
+      existing_doc = document.logic.getFromFields(scope_path=scope_path,
                                                   link_id=link_id)
   except out_of_band.ErrorResponse, error:
     # show custom 404 page when path doesn't exist in Datastore

@@ -52,9 +52,9 @@ class CreateForm(home_settings.SettingsValidationForm):
     model = soc.models.site_settings.SiteSettings
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home', 'partial_path', 'link_id']
+    exclude = ['inheritance_line', 'home', 'scope_path', 'link_id']
 
-  partial_path = forms.CharField(widget=forms.HiddenInput)
+  scope_path = forms.CharField(widget=forms.HiddenInput)
 
   link_id = forms.CharField(widget=forms.HiddenInput)
 

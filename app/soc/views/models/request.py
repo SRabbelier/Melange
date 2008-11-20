@@ -131,6 +131,41 @@ class View(base.View):
     params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)
+    
+    
+  def listSelf(self, request, page_name=None, params=None, **kwargs):
+    """Displays the unhandled requests for this user.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: not used
+    """
+
+    new_params = {}
+    new_params['list_template'] = 'soc/models/list.html'
+    # TODO(SRabbelier) Change the redirect to something more useful
+    new_params['list_redirect_action'] = '/'
+    new_params['list_redirect_entity'] = 'Request'
+    new_params['name'] = 'Request'
+    new_params['name_short'] = 'Request'
+    new_params['name_plural'] = 'Request'
+    new_params['instruction_text'] = "An overview of your unhandeled requests"
+    
+    params = dicts.merge(params, new_params)
+    
+    # get the current user
+    properties = {'account': users.get_current_user()}    
+    user_entity = user_logic.logic.getForFields(properties, unique=True)
+    
+    # only select the requests for this user that haven't been handled yet
+    filter = {'requester': user_entity,
+              'accepted' : False,
+              'declined' : False}
+    
+    
+    return list(request, "Unhandled Requests", params, filter)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().
@@ -155,6 +190,10 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['user_ln'] = fields['requester'].link_id
     fields['group_ln'] = fields['to'].link_id
+    
+    # make declined explicitly false when not specified
+    if 'declined' not in fields:
+      fields['declined'] = False
 
 
 view = View()
@@ -163,4 +202,5 @@ create = view.create
 edit = view.edit
 delete = view.delete
 list = view.list
+list_self = view.listSelf
 public = view.public

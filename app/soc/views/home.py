@@ -39,7 +39,7 @@ import soc.views.helper.templates
 DEF_HOME_PUBLIC_TMPL = 'soc/home/public.html'
 
 @decorators.view
-def public(request, page_name=None, partial_path=None, link_name=None, 
+def public(request, page_name=None, partial_path=None, link_id=None, 
            entity_type='HomeSettings',
            template=DEF_HOME_PUBLIC_TMPL):
   """How the "general public" sees a "home" page.
@@ -47,7 +47,7 @@ def public(request, page_name=None, partial_path=None, link_name=None,
   Args:
     request: the standard django request object.
     page_name: the page name displayed in templates as page and header title
-    path: path (entire "scoped" portion combined with the link_name)
+    path: path (entire "scoped" portion combined with the link_id)
       used to retrieve the Group's "home" settings
     template: the template path to use for rendering the template
 
@@ -58,7 +58,7 @@ def public(request, page_name=None, partial_path=None, link_name=None,
   context = helper.responses.getUniversalContext(request)
   
   settings = models.site_settings.logic.getFromFields(
-      partial_path=partial_path, link_name=link_name)
+      partial_path=partial_path, link_id=link_id)
 
   if settings:
     context['home_settings'] = settings

@@ -56,17 +56,17 @@ class CreateForm(helper.forms.BaseForm):
 
   def clean_partial_path(self):
     partial_path = self.cleaned_data.get('partial_path')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
+    # TODO(tlarsen): combine path and link_id and check for uniqueness
     if not validate.isPartialPathFormatValid(partial_path):
       raise forms.ValidationError("This partial path is in wrong format.")
     return partial_path
 
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    # TODO(tlarsen): combine path and link_name and check for uniqueness
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
-    return link_name
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    # TODO(tlarsen): combine path and link_id and check for uniqueness
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    return link_id
 
 
 class EditForm(CreateForm):
@@ -140,7 +140,7 @@ class View(base.View):
     """See base.View._editGet().
     """
 
-    form.fields['created_by'].initial = entity.author.link_name
+    form.fields['created_by'].initial = entity.author.link_id
     form.fields['doc_key_name'].initial = entity.key().name(),
 
 

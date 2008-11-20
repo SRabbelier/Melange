@@ -101,7 +101,7 @@ def isReferrerSelf(request,
       request.path; default is None (use request.path)
     suffix: suffix to remove from the HTTP request path before comparing
       it to the HTTP referrer path in the HTTP request object headers
-      (this is often an link name, for example, that may be changing from
+      (this is often an link ID, for example, that may be changing from
       a POST referrer to a GET redirect target) 
   
   Returns:
@@ -124,7 +124,7 @@ def isReferrerSelf(request,
     expected_prefix = request.path
 
   if suffix:
-    # remove suffix (such as a link name) before comparison
+    # remove suffix (such as a link ID) before comparison
     chars_to_remove = len(suffix)
     
     if not suffix.startswith('/'):
@@ -144,7 +144,7 @@ def replaceSuffix(path, old_suffix, new_suffix=None, params=None):
   """Replace the last part of a URL path with something else.
 
   Also appends an optional list of query parameters.  Used for
-  replacing, for example, one link name at the end of a relative
+  replacing, for example, one link ID at the end of a relative
   URL path with another.
 
   Args:

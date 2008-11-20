@@ -43,7 +43,7 @@ class Logic(base.Logic):
     """See base.Logic.getKeyNameValues.
     """
 
-    return [entity.sponsor.link_name, entity.user.link_name]
+    return [entity.sponsor.link_id, entity.user.link_id]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.

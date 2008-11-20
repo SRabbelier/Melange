@@ -31,14 +31,14 @@ from soc.views.helper import responses
 
 
 @decorators.view
-def dashboard(request, page_name=None, link_name=None,
+def dashboard(request, page_name=None, link_id=None,
               template='soc/user/roles/dashboard.html'):
   """A per-User dashboard of that User's Roles on the site.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the User's site-unique "link_name" extracted from the URL
+    link_id: the User's site-unique "link_id" extracted from the URL
     template: the template path to use for rendering the template
 
   Returns:
@@ -46,7 +46,7 @@ def dashboard(request, page_name=None, link_name=None,
   """
   #TODO(tlarsen): this module is currently a placeholder for future work
   
-  # TODO: check that user is logged in and "owns" the link_name;
+  # TODO: check that user is logged in and "owns" the link_id;
   #   if not, call public() view instead
   #   This might be tricky, since we want to use the same style
   #   of template that was passed to us, but how do we figure out
@@ -60,14 +60,14 @@ def dashboard(request, page_name=None, link_name=None,
 
 
 @decorators.view
-def public(request, page_name=None, link_name=None,
+def public(request, page_name=None, link_id=None,
            template='soc/user/roles/public.html'):
   """A "general public" view of a User's Roles on the site.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the User's site-unique "link_name" extracted from the URL
+    link_id: the User's site-unique "link_id" extracted from the URL
     template: the template path to use for rendering the template
 
   Returns:
@@ -75,7 +75,7 @@ def public(request, page_name=None, link_name=None,
   """
   #TODO(tlarsen): this module is currently a placeholder for future work
   
-  # TODO: if link_name is empty or not a valid link_name on the site, display
+  # TODO: if link_id is empty or not a valid link_id on the site, display
   # some sort of "user does not exist" page (a custom 404 page, maybe?).
   
   return responses.respond(request,

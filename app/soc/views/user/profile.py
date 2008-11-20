@@ -55,12 +55,12 @@ class UserForm(helper.forms.BaseForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['account', 'former_accounts', 'is_developer']
   
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
 
-    user = models.user.logic.getForFields({'link_name': link_name},
+    user = models.user.logic.getForFields({'link_id': link_id},
                                           unique=True)
     
     # Get the currently logged in user account
@@ -68,9 +68,9 @@ class UserForm(helper.forms.BaseForm):
     
     if user:
       if current_account != user.account:
-        raise forms.ValidationError("This link name is already in use.")
+        raise forms.ValidationError("This link ID is already in use.")
 
-    return link_name
+    return link_id
 
 
 DEF_USER_PROFILE_EDIT_TMPL = 'soc/user/edit_self.html'
@@ -89,14 +89,14 @@ SUBMIT_PROFILE_SAVED_PARAMS = {
 }
 
 @decorators.view
-def edit(request, page_name=None, link_name=None, 
+def edit(request, page_name=None, link_id=None, 
          template=DEF_USER_PROFILE_EDIT_TMPL):
   """View for a User to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the User's site-unique "link_name" extracted from the URL
+    link_id: the User's site-unique "link_id" extracted from the URL
     template: the template path to use for rendering the template
 
   Returns:
@@ -108,8 +108,8 @@ def edit(request, page_name=None, link_name=None,
   # create default template context for use with any templates
   context = helper.responses.getUniversalContext(request)
 
-  if (not account) and (not link_name):
-    # not logged in, and no link name, so request that the user sign in 
+  if (not account) and (not link_id):
+    # not logged in, and no link ID, so request that the user sign in 
     return simple.requestLogin(request, page_name, template, context,
         # TODO(tlarsen): /user/profile could be a link to a help page instead
         login_message_fmt=ugettext_lazy(
@@ -117,35 +117,35 @@ def edit(request, page_name=None, link_name=None,
             ' or modify an existing one, you must first'
             ' <a href="%(sign_in)s">sign in</a>.'))
 
-  if (not account) and link_name:
-    # not logged in, so show read-only public profile for link_name user
+  if (not account) and link_id:
+    # not logged in, so show read-only public profile for link_id user
     return simple.public(request, page_name=page_name, template=template, 
-                         link_name=link_name, context=context)
+                         link_id=link_id, context=context)
 
-  link_name_user = None
+  link_id_user = None
 
-  # try to fetch User entity corresponding to link_name if one exists
+  # try to fetch User entity corresponding to link_id if one exists
   try:
-    if link_name:
-      link_name_user = accounts.getUserFromLinkNameOr404(link_name)
+    if link_id:
+      link_id_user = accounts.getUserFromLinkIdOr404(link_id)
   except out_of_band.ErrorResponse, error:
-    # show custom 404 page when link name doesn't exist in Datastore
+    # show custom 404 page when link ID doesn't exist in Datastore
     return simple.errorResponse(request, page_name, error, template, context)
   
-  # link_name_user will be None here if link name was already None...
-  if link_name_user and (link_name_user.account != account):
-    # link_name_user exists but is not the currently logged in Google Account,
+  # link_id_user will be None here if link ID was already None...
+  if link_id_user and (link_id_user.account != account):
+    # link_id_user exists but is not the currently logged in Google Account,
     # so show public view for that (other) User entity
     return simple.public(request, page_name=page_name, template=template, 
-                         link_name=link_name, context=context)
+                         link_id=link_id, context=context)
 
   if request.method == 'POST':
     form = UserForm(request.POST)
 
     if form.is_valid():
-      new_link_name = form.cleaned_data.get('link_name')
+      new_link_id = form.cleaned_data.get('link_id')
       properties = {
-        'link_name': new_link_name,
+        'link_id': new_link_id,
         'nick_name': form.cleaned_data.get("nick_name"),
         'account': account,
       }
@@ -157,7 +157,7 @@ def edit(request, page_name=None, link_name=None,
         error = out_of_band.ErrorResponse(msg)
         return simple.errorResponse(request, page_name, error, template, context)
       
-      user = models.user.logic.updateOrCreateFromFields(properties, {'link_name': new_link_name})
+      user = models.user.logic.updateOrCreateFromFields(properties, {'link_id': new_link_id})
       
       # redirect to /user/profile?s=0
       # (causes 'Profile saved' message to be displayed)
@@ -172,7 +172,7 @@ def edit(request, page_name=None, link_name=None,
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(SUBMIT_MSG_PARAM_NAME)
           and (not helper.requests.isReferrerSelf(request,
-                                                  suffix=link_name))):
+                                                  suffix=link_id))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
     
@@ -198,6 +198,6 @@ def edit(request, page_name=None, link_name=None,
 
 @decorators.view
 def create(request, page_name=None, template=DEF_USER_PROFILE_EDIT_TMPL):
-  """create() view is same as edit() view, but with no link_name supplied.
+  """create() view is same as edit() view, but with no link_id supplied.
   """
-  return edit(request, page_name=page_name, link_name=None, template=template)
+  return edit(request, page_name=page_name, link_id=None, template=template)

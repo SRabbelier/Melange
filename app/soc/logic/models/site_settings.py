@@ -35,8 +35,8 @@ class Logic(home_settings.Logic):
   """
 
   DEF_SITE_SETTINGS_PARTIAL_PATH = 'site'
-  DEF_SITE_SETTINGS_LINK_NAME = 'home'
-  DEF_SITE_HOME_DOC_LINK_NAME = 'home'
+  DEF_SITE_SETTINGS_LINK_ID = 'home'
+  DEF_SITE_HOME_DOC_LINK_ID = 'home'
 
   def __init__(self):
     """Defines the name, key_name and model for this entity.
@@ -49,7 +49,7 @@ class Logic(home_settings.Logic):
     """
 
     return [self.DEF_SITE_SETTINGS_PARTIAL_PATH, 
-            self.DEF_SITE_SETTINGS_LINK_NAME]
+            self.DEF_SITE_SETTINGS_LINK_ID]
 
 
 logic = Logic()

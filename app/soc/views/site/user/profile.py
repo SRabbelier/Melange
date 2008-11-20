@@ -61,24 +61,24 @@ class LookupForm(helper.forms.BaseForm):
       label=soc.models.user.User.account.verbose_name,
       help_text=soc.models.user.User.account.help_text)
 
-  link_name = forms.CharField(required=False,
-      label=soc.models.user.User.link_name.verbose_name,
-      help_text=soc.models.user.User.link_name.help_text)
+  link_id = forms.CharField(required=False,
+      label=soc.models.user.User.link_id.verbose_name,
+      help_text=soc.models.user.User.link_id.help_text)
 
   class Meta:
     model = None
 
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
 
-    if not link_name:
-      # link name not supplied (which is OK), so do not try to validate it
+    if not link_id:
+      # link ID not supplied (which is OK), so do not try to validate it
       return None
 
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError('This link name is in wrong format.')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError('This link ID is in wrong format.')
     
-    return link_name
+    return link_id
 
   def clean_account(self):
     email = self.cleaned_data.get('account')
@@ -149,28 +149,28 @@ def lookup(request, page_name=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
             context['lookup_link'] = './list?offset=%s&limit=%s' % (
                 nearest_user_range_start, range_width)
       if not user:
-        # user not found yet, so see if link name was provided
-        link_name = form.cleaned_data.get('link_name')
+        # user not found yet, so see if link ID was provided
+        link_id = form.cleaned_data.get('link_id')
         
-        if link_name:
-          # link name provided, so try to look up by link name 
-          user = models.user.logic.getForFields({'link_name': link_name},
+        if link_id:
+          # link ID provided, so try to look up by link ID 
+          user = models.user.logic.getForFields({'link_id': link_id},
                                                 unique=True)        
           if user:
-            lookup_message = ugettext_lazy('User found by link name.')
+            lookup_message = ugettext_lazy('User found by link ID.')
             # clear previous error, since User was found
             email_error = None
             # clear previous lookup_link, since User was found, the lookup_link
             # is not needed to display.
             context['lookup_link'] = None
           else:
-            context['link_name_error'] = ugettext_lazy(
-                'User with that link name not found.')
+            context['link_id_error'] = ugettext_lazy(
+                'User with that link ID not found.')
             if context['lookup_link'] is None:
               range_width = helper.lists.getPreferredListPagination()
               nearest_user_range_start = (
                 models.user.logic.findNearestEntitiesOffset(
-                    width, [('link_name', link_name)]))
+                    width, [('link_id', link_id)]))
             
               if nearest_user_range_start is not None:
                 context['lookup_link'] = './list?offset=%s&limit=%s' % (
@@ -182,12 +182,12 @@ def lookup(request, page_name=None, template=DEF_SITE_USER_PROFILE_LOOKUP_TMPL):
     # User entity found, so populate form with existing User information
     # context['found_user'] = user
     form = LookupForm(initial={'account': user.account.email(),
-                               'link_name': user.link_name})
+                               'link_id': user.link_id})
 
     if request.path.endswith('lookup'):
-      # convert /lookup path into /profile/link_name path
+      # convert /lookup path into /profile/link_id path
       context['edit_link'] = helper.requests.replaceSuffix(
-          request.path, 'lookup', 'profile/%s' % user.link_name)
+          request.path, 'lookup', 'profile/%s' % user.link_id)
     # else: URL is not one that was expected, so do not display edit link
   elif not form:
     # no pre-populated form was constructed, so show the empty look-up form
@@ -213,9 +213,9 @@ class EditForm(helper.forms.BaseForm):
       label=soc.models.user.User.account.verbose_name,
       help_text=soc.models.user.User.account.help_text)
 
-  link_name = forms.CharField(
-      label=soc.models.user.User.link_name.verbose_name,
-      help_text=soc.models.user.User.link_name.help_text)
+  link_id = forms.CharField(
+      label=soc.models.user.User.link_id.verbose_name,
+      help_text=soc.models.user.User.link_id.help_text)
 
   nick_name = forms.CharField(
       label=soc.models.user.User.nick_name.verbose_name)
@@ -229,20 +229,20 @@ class EditForm(helper.forms.BaseForm):
   class Meta:
     model = None
  
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
 
     key_name = self.data.get('key_name')
     if key_name:
       key_name_user = user_logic.logic.getFromKeyName(key_name)
 
-      if link_name_user and key_name_user and \
-          link_name_user.account != key_name_user.account:
-        raise forms.ValidationError("This link name is already in use.")
+      if link_id_user and key_name_user and \
+          link_id_user.account != key_name_user.account:
+        raise forms.ValidationError("This link ID is already in use.")
 
-    return link_name
+    return link_id
 
   def clean_account(self):
     form_account = users.User(email=self.cleaned_data.get('account'))
@@ -261,14 +261,14 @@ DEF_CREATE_NEW_USER_MSG = ' You can create a new user by visiting' \
                           'a New User</a> page.'
 
 @decorators.view
-def edit(request, page_name=None, link_name=None,
+def edit(request, page_name=None, link_id=None,
          template=DEF_SITE_USER_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a User Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the User's site-unique "link_name" extracted from the URL
+    link_id: the User's site-unique "link_id" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -288,12 +288,12 @@ def edit(request, page_name=None, link_name=None,
 
   user = None  # assume that no User entity will be found
 
-  # try to fetch User entity corresponding to link_name if one exists
+  # try to fetch User entity corresponding to link_id if one exists
   try:
-    if link_name:
-      user = accounts.getUserFromLinkNameOr404(link_name)
+    if link_id:
+      user = accounts.getUserFromLinkIdOr404(link_id)
   except out_of_band.ErrorResponse, error:
-    # show custom 404 page when link name doesn't exist in Datastore
+    # show custom 404 page when link ID doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_USER_MSG
     return simple.errorResponse(request, page_name, error, template, context)
 
@@ -303,11 +303,11 @@ def edit(request, page_name=None, link_name=None,
 
     if form.is_valid():
       key_name = form.cleaned_data.get('key_name')
-      new_link_name = form.cleaned_data.get('link_name')
+      new_link_id = form.cleaned_data.get('link_id')
 
       properties = {}
       properties['account'] = form.cleaned_data.get('account')
-      properties['link_name']  = new_link_name
+      properties['link_id']  = new_link_id
       properties['nick_name']  = form.cleaned_data.get('nick_name')
       properties['is_developer'] = form.cleaned_data.get('is_developer')
       
@@ -316,20 +316,20 @@ def edit(request, page_name=None, link_name=None,
       if not user:
         return http.HttpResponseRedirect('/')
         
-      # redirect to new /site/user/profile/new_link_name?s=0
+      # redirect to new /site/user/profile/new_link_id?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, link_name, new_link_name,
+          request, link_id, new_link_id,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
-    # try to fetch User entity corresponding to link name if one exists
-    if link_name:
+    # try to fetch User entity corresponding to link ID if one exists
+    if link_id:
       if user:
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit) 
         if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
             and (not helper.requests.isReferrerSelf(request,
-                                                    suffix=link_name))):
+                                                    suffix=link_id))):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)
     
@@ -342,7 +342,7 @@ def edit(request, page_name=None, link_name=None,
 
         # populate form with the existing User entity
         form = EditForm(initial={'key_name': user.key().name(),
-            'account': user.account.email(), 'link_name': user.link_name,
+            'account': user.account.email(), 'link_id': user.link_id,
             'nick_name': user.nick_name, 'is_developer': user.is_developer})
       else:
         if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
@@ -350,14 +350,14 @@ def edit(request, page_name=None, link_name=None,
           return http.HttpResponseRedirect(request.path)
           
         context['lookup_error'] = ugettext_lazy(
-            'User with that link name not found.')
-        form = EditForm(initial={'link_name': link_name})
-    else:  # no link name specified in the URL
+            'User with that link ID not found.')
+        form = EditForm(initial={'link_id': link_id})
+    else:  # no link ID specified in the URL
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
 
-      # no link name specified, so start with an empty form
+      # no link ID specified, so start with an empty form
       form = EditForm()
 
   context.update({'form': form,
@@ -378,9 +378,9 @@ class CreateForm(helper.forms.BaseForm):
       label=soc.models.user.User.account.verbose_name,
       help_text=soc.models.user.User.account.help_text)
 
-  link_name = forms.CharField(
-      label=soc.models.user.User.link_name.verbose_name,
-      help_text=soc.models.user.User.link_name.help_text)
+  link_id = forms.CharField(
+      label=soc.models.user.User.link_id.verbose_name,
+      help_text=soc.models.user.User.link_id.help_text)
 
   nick_name = forms.CharField(
       label=soc.models.user.User.nick_name.verbose_name)
@@ -392,15 +392,15 @@ class CreateForm(helper.forms.BaseForm):
   class Meta:
     model = None
   
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
     else:
-      if models.user.logic.getForFields({'link_name': link_name},
+      if models.user.logic.getForFields({'link_id': link_id},
                                         unique=True):
-        raise forms.ValidationError("This link name is already in use.")
-    return link_name
+        raise forms.ValidationError("This link ID is already in use.")
+    return link_id
 
   def clean_account(self):
     new_email = self.cleaned_data.get('account')
@@ -444,11 +444,11 @@ def create(request, page_name=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
 
     if form.is_valid():
       form_account = form.cleaned_data.get('account')
-      link_name = form.cleaned_data.get('link_name')
+      link_id = form.cleaned_data.get('link_id')
 
       properties = {
         'account': form_account,
-        'link_name': link_name,
+        'link_id': link_id,
         'nick_name': form.cleaned_data.get('nick_name'),
         'is_developer': form.cleaned_data.get('is_developer'),
       }
@@ -460,13 +460,13 @@ def create(request, page_name=None, template=DEF_SITE_CREATE_USER_PROFILE_TMPL):
       if not user:
         return http.HttpResponseRedirect('/')
 
-      # redirect to new /site/user/profile/new_link_name?s=0
+      # redirect to new /site/user/profile/new_link_id?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
-          request, 'create', 'edit/' + link_name,
+          request, 'create', 'edit/' + link_id,
           params=profile.SUBMIT_PROFILE_SAVED_PARAMS)
   else: # method == 'GET':
-    # no link name specified, so start with an empty form
+    # no link ID specified, so start with an empty form
     form = CreateForm()
 
   context['form'] = form

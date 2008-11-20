@@ -52,13 +52,13 @@ class HomeSettings(polymodel.PolyModel):
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
 
-  #: Required path, prepended to a "link name" to form the Setting URL.
+  #: Required path, prepended to a "link ID" to form the Setting URL.
   partial_path = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Settings partial path'))
   partial_path.help_text = ugettext_lazy(
-    'path portion of URLs for Settings, prepended to link name')
+    'path portion of URLs for Settings, prepended to link ID')
 
-  #: Required link name, appended to a "path" to form the Setting URL.
-  link_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Setttings link name'))
-  link_name.help_text = ugettext_lazy('link name for Settings used in URLs')
+  #: Required link ID, appended to a "path" to form the Setting URL.
+  link_id = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Setttings link ID'))
+  link_id.help_text = ugettext_lazy('link ID for Settings used in URLs')

@@ -57,9 +57,9 @@ class SettingsValidationForm(helper.forms.BaseForm):
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
   #   Role-scoped Document selector that we don't have yet
-  doc_link_name = forms.CharField(required=False,
-      label=ugettext_lazy('Document link name'),
-      help_text=soc.models.work.Work.link_name.help_text)
+  doc_link_id = forms.CharField(required=False,
+      label=ugettext_lazy('Document link ID'),
+      help_text=soc.models.work.Work.link_id.help_text)
 
   def clean_feed_url(self):
     feed_url = self.cleaned_data.get('feed_url')
@@ -167,7 +167,7 @@ class View(base.View):
     try:
       if entity.home:
         form.fields['doc_partial_path'].initial = entity.home.partial_path
-        form.fields['doc_link_name'].initial = entity.home.link_name
+        form.fields['doc_link_id'].initial = entity.home.link_id
     except db.Error:
       pass
 
@@ -176,11 +176,11 @@ class View(base.View):
     """
 
     doc_partial_path = fields['doc_partial_path']
-    doc_link_name = fields['doc_link_name']
+    doc_link_id = fields['doc_link_id']
 
     # TODO notify the user if home_doc is not found
     home_doc = document_logic.logic.getFromFields(
-    partial_path=doc_partial_path, link_name=doc_link_name)
+    partial_path=doc_partial_path, link_id=doc_link_id)
 
     fields['home'] = home_doc
 

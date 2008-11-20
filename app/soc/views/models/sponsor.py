@@ -55,27 +55,27 @@ class CreateForm(helper.forms.BaseForm):
     exclude = ['founder', 'inheritance_line']
   
   # TODO(pawel.solyga): write validation functions for other fields
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
-    if models.sponsor.logic.getFromFields(link_name=link_name):
-      raise forms.ValidationError("This link name is already in use.")
-    return link_name
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    if models.sponsor.logic.getFromFields(link_id=link_id):
+      raise forms.ValidationError("This link ID is already in use.")
+    return link_id
 
 
 class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.
   """
-  link_name = forms.CharField(widget=helper.widgets.ReadOnlyInput())
+  link_id = forms.CharField(widget=helper.widgets.ReadOnlyInput())
   founded_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
                                required=False)
 
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
-    return link_name
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    return link_id
 
 
 class View(base.View):

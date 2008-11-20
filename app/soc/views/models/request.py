@@ -68,12 +68,12 @@ class CreateForm(helper.forms.BaseForm):
 
   def clean_user(self):
     self.cleaned_data['requester'] =  user_logic.logic.getForFields(
-        {'link_name': self.cleaned_data['user']}, unique=True)
+        {'link_id': self.cleaned_data['user']}, unique=True)
     return self.cleaned_data['user']
 
   def clean_group(self):
     self.cleaned_data['to'] = sponsor_logic.logic.getFromFields(
-        link_name=self.cleaned_data['group'])
+        link_id=self.cleaned_data['group'])
     return self.cleaned_data['group']
 
 
@@ -149,16 +149,16 @@ class View(base.View):
     """
 
     # fill in the email field with the data from the entity
-    form.fields['user'].initial = entity.requester.link_name
-    form.fields['group'].initial = entity.to.link_name 
+    form.fields['user'].initial = entity.requester.link_id
+    form.fields['group'].initial = entity.to.link_id 
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
 
     # fill in the account field with the user created from email
-    fields['user_ln'] = fields['requester'].link_name
-    fields['group_ln'] = fields['to'].link_name
+    fields['user_ln'] = fields['requester'].link_id
+    fields['group_ln'] = fields['to'].link_id
 
 
 view = View()

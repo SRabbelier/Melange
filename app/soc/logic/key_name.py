@@ -31,24 +31,24 @@ class Error(Exception):
   pass
 
 
-def nameDocument(partial_path, link_name=None):
-  """Returns a Document key name constructed from a path and link name.
+def nameDocument(partial_path, link_id=None):
+  """Returns a Document key name constructed from a path and link ID.
     
   Args:
     partial_path: the first portion of the path to the Document that uniquely
       identifies it
-    link_name: optional link name to append to path (when omitted,
-      partial_path is actually the entire path, with the link_name already
+    link_id: optional link ID to append to path (when omitted,
+      partial_path is actually the entire path, with the link_id already
       appended)
 
   Raises:
-    Error if partial_path and link_Name produce a "False" path (None,
+    Error if partial_path and link_id produce a "False" path (None,
     empty string, etc.)
   """
   path = [partial_path]
   
-  if link_name:
-    path.append(link_name)
+  if link_id:
+    path.append(link_id)
 
   path = path_link_name.combinePath(path)
 
@@ -58,7 +58,7 @@ def nameDocument(partial_path, link_name=None):
   return 'Document:%s' % path
 
 
-def nameSiteSettings(partial_path, link_name):
+def nameSiteSettings(partial_path, link_id):
   """Returns a SiteSettings key name constructed from a supplied path.
   
   Raises:
@@ -68,13 +68,13 @@ def nameSiteSettings(partial_path, link_name):
   if not partial_path:
     raise Error('"partial_path" must be non-False: "%s"' % partial_path)
 
-  if not link_name:
-    raise Error('"link_name" must be non-False: "%s"' % link_name)
+  if not link_id:
+    raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'SiteSettings:%s:%s' % (partial_path, link_name)
+  return 'SiteSettings:%s:%s' % (partial_path, link_id)
 
 
-def nameHomeSettings(partial_path, link_name):
+def nameHomeSettings(partial_path, link_id):
   """Returns a HomeSettings key name constructed from a supplied path.
 
   Raises:
@@ -84,10 +84,10 @@ def nameHomeSettings(partial_path, link_name):
   if not partial_path:
     raise Error('"partial_path" must be non-False: "%s"' % partial_path)
 
-  if not link_name:
-    raise Error('"link_name" must be non-False: "%s"' % link_name)
+  if not link_id:
+    raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'HomeSettings:%s:%s' % (partial_path, link_name)
+  return 'HomeSettings:%s:%s' % (partial_path, link_id)
 
 
 def nameUser(email):
@@ -102,31 +102,31 @@ def nameUser(email):
   return 'User:%s' % email
 
 
-def nameSponsor(link_name):
-  """Returns a Sponsor key name constructed from a supplied link name.
+def nameSponsor(link_id):
+  """Returns a Sponsor key name constructed from a supplied link ID.
 
   Raises:
-    Error if link_name is "False" (None, empty string, etc.)
+    Error if link_id is "False" (None, empty string, etc.)
   """
-  if not link_name:
-    raise Error('"link_name" must be non-False: "%s"' % link_name)
+  if not link_id:
+    raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'Group/Sponsor:%s' % link_name
+  return 'Group/Sponsor:%s' % link_id
 
 
-def nameSchool(sponsor_ln, program_ln, link_name):
-  """Returns a School key name constructed from link names.
+def nameSchool(sponsor_ln, program_ln, link_id):
+  """Returns a School key name constructed from link IDs.
      
   Args:
-    sponsor_ln: Sponsor link name
-    program_ln: Program link name
-    link_name: School link name
+    sponsor_ln: Sponsor link ID
+    program_ln: Program link ID
+    link_id: School link ID
 
   Raises:
-    Error if sponsor_ln, program_ln, and link_Name combine to produce
+    Error if sponsor_ln, program_ln, and link_id combine to produce
     a "False" path (None, empty string, etc.)
   """
-  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_name])
+  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_id])
   
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
@@ -134,19 +134,19 @@ def nameSchool(sponsor_ln, program_ln, link_name):
   return 'Group/School:%s' % path
 
 
-def nameOrganization(sponsor_ln, program_ln, link_name):
-  """Returns a Organization key name constructed from link names.
+def nameOrganization(sponsor_ln, program_ln, link_id):
+  """Returns a Organization key name constructed from link IDs.
      
   Args:
-    sponsor_ln: Sponsor link name
-    program_ln: Program link name
-    link_name: Organization link name
+    sponsor_ln: Sponsor link ID
+    program_ln: Program link ID
+    link_id: Organization link ID
 
   Raises:
-    Error if sponsor_ln, program_ln, and link_Name combine to produce
+    Error if sponsor_ln, program_ln, and link_id combine to produce
     a "False" path (None, empty string, etc.)
   """
-  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_name])
+  path = path_link_name.combinePath([[sponsor_ln, program_ln], link_id])
   
   if not path:
     raise Error('"path" must be non-False: "%s"' % path)
@@ -154,26 +154,26 @@ def nameOrganization(sponsor_ln, program_ln, link_name):
   return 'Group/Organization:%s' % path 
 
 
-def nameClub(link_name):
-  """Returns a Club key name constructed from a supplied link name.
+def nameClub(link_id):
+  """Returns a Club key name constructed from a supplied link ID.
 
   Raises:
-    Error if link_name is "False" (None, empty string, etc.)
+    Error if link_id is "False" (None, empty string, etc.)
   """
-  if not link_name:
-    raise Error('"link_name" must be non-False: "%s"' % link_name)
+  if not link_id:
+    raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'Group/Club:%s' % link_name
+  return 'Group/Club:%s' % link_id
 
 
-def nameWork(link_name):
+def nameWork(link_id):
   """Placeholder for work namer.
   """
 
-  if not link_name:
-    raise Error('"link_name" must be non-False: "%s"' % link_name)
+  if not link_id:
+    raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'Work:%s' % link_name
+  return 'Work:%s' % link_id
 
 
 def nameHost(sponsor_ln, user_ln):

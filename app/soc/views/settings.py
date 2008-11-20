@@ -94,9 +94,9 @@ class DocSelectForm(helper.forms.BaseForm):
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
   #   Role-scoped Document selector that we don't have yet
-  doc_link_name = forms.CharField(required=False,
-      label=soc.models.work.Work.link_name.verbose_name,
-      help_text=soc.models.work.Work.link_name.help_text)
+  doc_link_id = forms.CharField(required=False,
+      label=soc.models.work.Work.link_id.verbose_name,
+      help_text=soc.models.work.Work.link_id.help_text)
 
   class Meta:
     model = None
@@ -105,7 +105,7 @@ class DocSelectForm(helper.forms.BaseForm):
 DEF_HOME_EDIT_TMPL = 'soc/site_settings/edit.html'
 
 @decorators.view
-def edit(request, page_name=None, partial_path=None, link_name=None, 
+def edit(request, page_name=None, partial_path=None, link_id=None, 
          logic=models.home_settings.logic,
          settings_form_class=SettingsForm,
          template=DEF_HOME_EDIT_TMPL):
@@ -151,10 +151,10 @@ def edit(request, page_name=None, partial_path=None, link_name=None,
         fields[field] = value
 
       doc_partial_path = doc_select_form.cleaned_data.get('doc_partial_path')
-      doc_link_name = doc_select_form.cleaned_data.get('doc_link_name')
+      doc_link_id = doc_select_form.cleaned_data.get('doc_link_id')
 
       home_doc = document.logic.getFromFields(
-          partial_path=doc_partial_path, link_name=doc_link_name)
+          partial_path=doc_partial_path, link_id=doc_link_id)
 
       if home_doc:
         fields['home'] = home_doc
@@ -172,7 +172,7 @@ def edit(request, page_name=None, partial_path=None, link_name=None,
   else: # request.method == 'GET'
     # try to fetch HomeSettings entity by unique key_name
     settings = logic.getFromFields(partial_path=partial_path, 
-                                   link_name=link_name)
+                                   link_id=link_id)
 
     if settings:
       # populate form with the existing HomeSettings entity
@@ -187,7 +187,7 @@ def edit(request, page_name=None, partial_path=None, link_name=None,
       if home_doc:
         doc_select_form = DocSelectForm(initial={
             'doc_partial_path': home_doc.partial_path,
-            'doc_link_name': home_doc.link_name})
+            'doc_link_id': home_doc.link_id})
       else:
         doc_select_form = DocSelectForm()
     else:

@@ -129,7 +129,7 @@ home_settings_create = page.Page(
 
 home_settings_edit = page.Page(
   page.Url(
-    r'^home/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^home/edit/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.home_settings.edit'),
   'Site: Settings',
   short_name='Edit Site Settings',
@@ -137,7 +137,7 @@ home_settings_edit = page.Page(
 
 home_settings_show = page.Page(
   page.Url(
-    r'^home/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^home/show/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.home_settings.public'),
   'Show Document',
   parent=home)
@@ -175,7 +175,7 @@ site_settings_edit = page.Page(
 
 site_settings_edit = page.Page(
   page.Url(
-    r'^site/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^site/edit/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.site_settings.edit'),
   'Site: Settings',
   short_name='Edit Site Settings',
@@ -183,14 +183,14 @@ site_settings_edit = page.Page(
 
 site_settings_show = page.Page(
   page.Url(
-    r'^site/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^site/show/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.site_settings.public'),
   'Show Site Settings',
   parent=home)
 
 site_settings_delete = page.Page(
   page.Url(
-    r'^site/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^site/delete/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.site_settings.delete'),
   'Delete Site Settings',
   parent=home)
@@ -221,7 +221,7 @@ user_create = page.Page(
 
 site_user_edit = page.Page(
   page.Url(
-    r'^user/edit/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^user/edit/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.user.edit'),
   'Site: Modify Existing User Profile',
   short_name='Modify Site User',
@@ -229,7 +229,7 @@ site_user_edit = page.Page(
 
 user_show = page.Page(
   page.Url(
-    r'^user/show/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^user/show/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.user.public'),
   'User: Show Existing User Profile',
   parent=user_signout)
@@ -244,7 +244,7 @@ user_list = page.Page(
 
 user_delete = page.Page(
   page.Url(
-    r'^user/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^user/delete/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.user.delete'),
   'Site: Delete Existing User',
   short_name='Delete Site User',
@@ -254,7 +254,7 @@ user_delete = page.Page(
 # Document views
 document_show = page.Page(
   page.Url(
-    r'^document/show/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^document/show/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.document.public'),
   'Show Document',
   parent=home)
@@ -276,7 +276,7 @@ site_document_create = page.Page(
 
 site_document_edit = page.Page(
   page.Url(
-    r'^document/edit/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^document/edit/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.document.edit'),
   'Site: Modify Existing Document',
   short_name='Modify Site Document',
@@ -284,7 +284,7 @@ site_document_edit = page.Page(
 
 site_document_delete = page.Page(
   page.Url(
-    r'^document/delete/%s$' % path_link_name.PATH_LINKNAME_ARGS_PATTERN,
+    r'^document/delete/%s$' % path_link_name.PATH_LINK_ID_ARGS_PATTERN,
     'soc.views.models.document.delete'),
   'Site: Delete Existing Document',
   short_name='Delete Site Document',
@@ -301,7 +301,7 @@ site_document_list = page.Page(
 # Sponsor Group public view
 sponsor_profile = page.Page(
   page.Url(
-    r'^sponsor/show/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/show/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.sponsor.public'),
   'Sponsor Public Profile',
   parent=home)
@@ -323,7 +323,7 @@ site_sponsor_create = page.Page(
 
 site_sponsor_delete = page.Page(
   page.Url(
-    r'^sponsor/delete/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/delete/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.sponsor.delete'),
   'Site: Delete Existing Sponsor',
   short_name='Delete Site Sponsor',
@@ -331,7 +331,7 @@ site_sponsor_delete = page.Page(
 
 site_sponsor_edit = page.Page(
   page.Url(
-    r'^sponsor/edit/%s$' % path_link_name.LINKNAME_ARG_PATTERN,
+    r'^sponsor/edit/%s$' % path_link_name.LINK_ID_ARG_PATTERN,
     'soc.views.models.sponsor.edit'),
   'Site: Modify Existing Sponsor',
   short_name='Modify Site Sponsor',
@@ -349,7 +349,7 @@ site_sponsor_list = page.Page(
 host_profile = page.Page(
   page.Url(
       r'^host/show/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
-          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
+          'lnp': path_link_name.LINK_ID_PATTERN_CORE},
     'soc.views.models.host.public'),
   'Host Public Profile',
   parent=home)
@@ -372,7 +372,7 @@ site_host_create = page.Page(
 site_host_delete = page.Page(
   page.Url(
     r'^host/delete/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
-          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
+          'lnp': path_link_name.LINK_ID_PATTERN_CORE},
     'soc.views.models.host.delete'),
   'Site: Delete Existing Host',
   short_name='Delete Site Host',
@@ -381,7 +381,7 @@ site_host_delete = page.Page(
 site_host_edit = page.Page(
   page.Url(
     r'^host/edit/(?P<sponsor_ln>%(lnp)s)/(?P<user_ln>%(lnp)s)$' % {
-          'lnp': path_link_name.LINKNAME_PATTERN_CORE},
+          'lnp': path_link_name.LINK_ID_PATTERN_CORE},
     'soc.views.models.host.edit'),
   'Site: Modify Existing Host',
   short_name='Modify Site Host',
@@ -396,10 +396,10 @@ site_host_list = page.Page(
   parent=site_host_sub_menu)
 
 # these are not really used...
-#    (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<link_name>[_0-9a-z]+)/$',
+#    (r'^org/profile/(?P<program>ghop[_0-9a-z]+)/(?P<link_id>[_0-9a-z]+)/$',
 #     'soc.views.person.profile.edit',
 #     {'template': 'ghop/person/profile/edit.html'}),
-#    (r'^org/profile/(?P<program>[_0-9a-z]+)/(?P<link_name>[_0-9a-z]+)/$',
+#    (r'^org/profile/(?P<program>[_0-9a-z]+)/(?P<link_id>[_0-9a-z]+)/$',
 #     'soc.views.person.profile.edit'),
 
 

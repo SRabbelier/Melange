@@ -208,7 +208,7 @@ class Logic:
     return entity
 
   def getIfFields(self, fields):
-    """Returns entity for supplied link name if one exists.
+    """Returns entity for supplied link ID if one exists.
 
     Args:
       fields: the fields of the entity that uniquely identifies it
@@ -218,18 +218,18 @@ class Logic:
       * Entity for supplied fields
 
     Raises:
-      out_of_band.ErrorResponse if link name is not false, but no entity
-      with the supplied link name exists in the Datastore.
+      out_of_band.ErrorResponse if link ID is not false, but no entity
+      with the supplied link ID exists in the Datastore.
     """
 
     if not all(fields.values()):
-      # exit without error, to let view know that link_name was not supplied
+      # exit without error, to let view know that link_id was not supplied
       return None
 
     entity = self.getFromFields(**fields)
 
     if entity:
-      # an entity exist for this link_name, so return that entity
+      # an entity exist for this link_id, so return that entity
       return entity
 
     format_text = ugettext_lazy('"%(key)s" is "%(value)s"')

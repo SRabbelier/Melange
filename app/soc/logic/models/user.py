@@ -54,25 +54,25 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValues.
     """
 
-    return [entity.link_name]
+    return [entity.link_id]
 
   def getSuffixValues(self, entity):
     """See base.Logic.getSuffixValues.
     """
 
-    return [entity.link_name]
+    return [entity.link_id]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    return [fields['link_name']]
+    return [fields['link_id']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames.
     """
 
-    return ['link_name']
+    return ['link_id']
 
   def updateOrCreateFromAccount(self, properties, account):
     """Like updateOrCreateFromKeyName, but resolves account to key_name first.
@@ -85,7 +85,7 @@ class Logic(base.Logic):
       key_name = user.key().name()
     else:
       raise
-      key_name  = self.getKeyNameForFields({'link_name': properties['link_name']})
+      key_name  = self.getKeyNameForFields({'link_id': properties['link_id']})
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 

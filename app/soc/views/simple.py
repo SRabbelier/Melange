@@ -37,20 +37,20 @@ import soc.views.helper.templates
 DEF_PUBLIC_TMPL = 'soc/base.html'
 
 @decorators.view
-def public(request, page_name=None, template=DEF_PUBLIC_TMPL, link_name=None,
+def public(request, page_name=None, template=DEF_PUBLIC_TMPL, link_id=None,
            context=None):
-  """A simple template view that expects a link_name extracted from the URL.
+  """A simple template view that expects a link_id extracted from the URL.
 
   Args:
     request: the standard Django HTTP request object
     page_name: the page name displayed in templates as page and header title
     template: the template to use for rendering the view (or a search list
       of templates)
-    link_name: a site-unique "link_name" (usually extracted from the URL)
+    link_id: a site-unique "link_id" (usually extracted from the URL)
     context: the context dict supplied to the template, which is modified
       (so supply a copy if such modification is not acceptable)
-    link_name: the link_name parameter is added to the context
-    link_name_user: if the link_name exists for a User, that User
+    link_id: the link_id parameter is added to the context
+    link_id_user: if the link_id exists for a User, that User
       is added to the context
 
 
@@ -69,13 +69,13 @@ def public(request, page_name=None, template=DEF_PUBLIC_TMPL, link_name=None,
   context['page_name'] = page_name
 
   try:
-    if link_name:
-      user = accounts.getUserFromLinkNameOr404(link_name)
+    if link_id:
+      user = accounts.getUserFromLinkIdOr404(link_id)
   except out_of_band.ErrorResponse, error:
     return errorResponse(request, page_name, error, template, context)
 
-  context['link_name'] = link_name
-  context['link_name_user'] = user
+  context['link_id'] = link_id
+  context['link_id_user'] = user
 
   return helper.responses.respond(request, template, context)
 

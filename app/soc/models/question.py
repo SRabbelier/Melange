@@ -45,10 +45,10 @@ class Question(soc.models.work.Work):
       on during creation or annotated once put into use).
 
     work.partial_path:  used to scope (and, when combined with
-      work.link_name, uniquely identify) a Question in the same way the
+      work.link_id, uniquely identify) a Question in the same way the
       property are used with Documents, etc.
 
-    work.link_name:  used to identify (and, when combined with
+    work.link_id:  used to identify (and, when combined with
       work.partial_path, *uniquely* identify) a Question in the same way
       these properties are used with Documents, etc.
       
@@ -87,18 +87,18 @@ class Question(soc.models.work.Work):
     are here now so that the concepts will not be lost before that time.
 
   The recommended use for the combination of work.partial_path and
-  work.link_name is to keep the *same* link_name when copying and
+  work.link_id is to keep the *same* link_id when copying and
   modifying an existing Question for a new Program (or instance of a
   Group that is per-Program), while changing the work.partial_path to
   represent the Program and Group "ownership" of the Question.  For
   example, if a Question asking about prior GSoC participation needed
   to have an additional choice (see the choice_ids and choices properties
-  below), it is desirable to keep the same work.link_name (and also
+  below), it is desirable to keep the same work.link_id (and also
   simply append new choice_ids and choices to keep the old answer values
   compatible).  An existing Question in the above example might be identified
   as something like:
     Question:google/gsoc2009/gsoc_past_participation
-    <type>:<Sponsor>/<Program>/<link_name> 
+    <type>:<Sponsor>/<Program>/<link_id> 
   To make it possible to query for gsoc_past_participation answers regardless
   of the Program, the next year, new values are added to choice_ids and
   choices in a new Question copied from the one above, which would then
@@ -114,7 +114,7 @@ class Question(soc.models.work.Work):
   combination with GSoC, the gsoc_past_participation Question would be
   duplicated (unaltered) to something like:
     Question:google/ghop2009/gsoc_past_participation
-  To get the combined results, query on a link_name of
+  To get the combined results, query on a link_id of
   gsoc_past_participation.  For more targeted results, include the
   partial_path to make the query more specific.
 
@@ -126,7 +126,7 @@ class Question(soc.models.work.Work):
   A dynamic form is most definitely going to be needed to implement the
   Question creation and editing for multiple-choice questions.
   """
-  #: db.ListProperty of short, plain-text, "link_name-like" strings
+  #: db.ListProperty of short, plain-text, "link_id-like" strings
   #: representing the "encoded" answer choices (must be strings compatible
   #: with being query arguments and being used in HTML controls and POST
   #: responses).

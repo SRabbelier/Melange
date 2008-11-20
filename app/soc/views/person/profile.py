@@ -55,7 +55,7 @@ class EditForm(helper.forms.BaseForm):
 
 
 @decorators.view
-def edit(request, page_name=None, program=None, link_name=None,
+def edit(request, page_name=None, program=None, link_id=None,
          template='soc/person/profile/edit.html'):
   """View for a Person to modify the properties of a Person Model.
 
@@ -77,7 +77,7 @@ def edit(request, page_name=None, program=None, link_name=None,
   #   query for the human-readable program name and pass that to the form
   
   # TODO(tlarsen)
-  # if link_name:
+  # if link_id:
   #   query for a site-wide user profile for a friendly display name
   #      to use in the greeting
   # else:
@@ -93,4 +93,4 @@ def edit(request, page_name=None, program=None, link_name=None,
 
   return shortcuts.render_to_response(
       template, dictionary={'template': template, 'form': form, 'user': user,
-                            'program': program, 'link_name': link_name})
+                            'program': program, 'link_id': link_id})

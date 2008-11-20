@@ -45,13 +45,13 @@ def isFeedURLValid(feed_url=None):
   return False
 
 
-def isLinkNameFormatValid(link_name):
-  """Returns True if link_name is in a valid format.
+def isLinkIdFormatValid(link_id):
+  """Returns True if link_id is in a valid format.
 
   Args:
-    link_name: link name used in URLs for identification
+    link_id: link ID used in URLs for identification
   """
-  if path_link_name.LINKNAME_REGEX.match(link_name):
+  if path_link_name.LINK_ID_REGEX.match(link_id):
     return True
   return False
 
@@ -60,7 +60,7 @@ def isPartialPathFormatValid(partial_path):
   """Returns True if partial_path is in a valid format.
   
   Args:
-    partial_path: partial path prepended to link name
+    partial_path: partial path prepended to link ID
       used for identification.
   """
    

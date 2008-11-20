@@ -47,9 +47,9 @@ class CreateForm(helper.forms.BaseForm):
       label=soc.models.user.User.account.verbose_name,
       help_text=soc.models.user.User.account.help_text)
 
-  link_name = forms.CharField(
-      label=soc.models.user.User.link_name.verbose_name,
-      help_text=soc.models.user.User.link_name.help_text)
+  link_id = forms.CharField(
+      label=soc.models.user.User.link_id.verbose_name,
+      help_text=soc.models.user.User.link_id.help_text)
 
   nick_name = forms.CharField(
       label=soc.models.user.User.nick_name.verbose_name)
@@ -61,25 +61,25 @@ class CreateForm(helper.forms.BaseForm):
   class Meta:
     model = None
 
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
 
-    properties = {'link_name': link_name}
+    properties = {'link_id': link_id}
     user = soc.logic.models.user.logic.getForFields(properties, unique=True)
 
-    link_name_user = soc.logic.models.user.logic.getForFields(properties, unique=True)
+    link_id_user = soc.logic.models.user.logic.getForFields(properties, unique=True)
 
     key_name = self.data.get('key_name')
     if key_name:
       key_name_user = user_logic.logic.getFromKeyName(key_name)
       
-      if link_name_user and key_name_user and \
-          link_name_user.account != key_name_user.account:
-        raise forms.ValidationError("This link name is already in use.")
+      if link_id_user and key_name_user and \
+          link_id_user.account != key_name_user.account:
+        raise forms.ValidationError("This link ID is already in use.")
 
-    return link_name
+    return link_id
 
   def clean_email(self):
     form_account = users.User(email=self.cleaned_data.get('email'))

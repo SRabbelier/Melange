@@ -80,7 +80,7 @@ class Answer(polymodel.PolyModel):
   #: contain a single string that is a free-form text answer.
   #:
   #: For Questions that *are* multiple-choice, this list will contain one
-  #: or more short, plain-text, "link_name-like" strings representing the
+  #: or more short, plain-text, "link_id-like" strings representing the
   #: "encoded" answer choices (see the choice_ids property in
   #: soc.models.question.Question).  For such multiple-choice Questions,    
   #: how many strings are stored depends on the max_answers property of

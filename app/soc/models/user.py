@@ -79,11 +79,11 @@ class User(base.ModelWithFieldAttributes):
   nick_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Nick name'))
       
-  #: Required field storing link_name used in URLs to identify user.
+  #: Required field storing link_id used in URLs to identify user.
   #: Lower ASCII characters only.
-  link_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link name'))
-  link_name.help_text = ugettext_lazy(
+  link_id = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Link ID'))
+  link_id.help_text = ugettext_lazy(
       'Field used in URLs to identify user. '
       'Lower ASCII characters only.')
 

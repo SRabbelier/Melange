@@ -87,7 +87,7 @@ class RoleView(base.View):
 
     new_params['list_template'] = 'soc/models/create_invite.html'
     new_params['list_redirect_action'] = '/request/create/%s/%s' % (
-        self._params['url_name'], kwargs['link_name'])
+        self._params['url_name'], kwargs['link_id'])
     new_params['list_redirect_entity'] = self._params['name']
     new_params['name'] = self._params['name']
     new_params['name_short'] = self._params['name_short']

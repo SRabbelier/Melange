@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Path and link name manipulation functions.
+"""Path and link ID manipulation functions.
 """
 
 __authors__ = [
@@ -31,42 +31,42 @@ import re
 #     -OR-
 #   underscore and ASCII digit or lowercase)
 #     zero or more of OR group
-LINKNAME_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
-LINKNAME_ARG_PATTERN = r'(?P<link_name>%s)' % LINKNAME_PATTERN_CORE
-LINKNAME_PATTERN = r'^%s$' % LINKNAME_PATTERN_CORE
-LINKNAME_REGEX = re.compile(LINKNAME_PATTERN)
+LINK_ID_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
+LINK_ID_ARG_PATTERN = r'(?P<link_id>%s)' % LINK_ID_PATTERN_CORE
+LINK_ID_PATTERN = r'^%s$' % LINK_ID_PATTERN_CORE
+LINK_ID_REGEX = re.compile(LINK_ID_PATTERN)
 
-# partial path is multiple link_name chunks,
+# partial path is multiple link_id chunks,
 # each separated by a trailing /
 # (at least 1)
-PARTIAL_PATH_ARG_PATTERN = (r'(?P<partial_path>%(link_name)s'
-                             '(?:/%(link_name)s)*)' % {
-                               'link_name': LINKNAME_PATTERN_CORE})
+PARTIAL_PATH_ARG_PATTERN = (r'(?P<partial_path>%(link_id)s'
+                             '(?:/%(link_id)s)*)' % {
+                               'link_id': LINK_ID_PATTERN_CORE})
 PARTIAL_PATH_PATTERN = r'^%s$' % PARTIAL_PATH_ARG_PATTERN
 PARTIAL_PATH_REGEX = re.compile(PARTIAL_PATH_PATTERN)
 
-# path is multiple link_name chunks,
+# path is multiple link_id chunks,
 #   each separated by a trailing /
 #     (at least 1)
-# followed by a single link_name with no trailing /
-PATH_LINKNAME_ARGS_PATTERN = (
+# followed by a single link_id with no trailing /
+PATH_LINK_ID_ARGS_PATTERN = (
     r'%(partial_path)s/'
-     '(?P<link_name>%(link_name)s)' % {
+     '(?P<link_id>%(link_id)s)' % {
        'partial_path' : PARTIAL_PATH_ARG_PATTERN,
-       'link_name': LINKNAME_PATTERN_CORE})
-PATH_LINKNAME_PATTERN = r'^%s$' % PATH_LINKNAME_ARGS_PATTERN
-PATH_LINKNAME_REGEX = re.compile(PATH_LINKNAME_PATTERN)
+       'link_id': LINK_ID_PATTERN_CORE})
+PATH_LINK_ID_PATTERN = r'^%s$' % PATH_LINK_ID_ARGS_PATTERN
+PATH_LINK_ID_REGEX = re.compile(PATH_LINK_ID_PATTERN)
 
 
 def getPartsFromPath(path):
-  """Splits path string into partial_path and link_name.
+  """Splits path string into partial_path and link_id.
   
   Returns:
     {'partial_path': 'everything/but',
-     'link_name': 'link_name'}
-    or {} (empty dict) if string did not match PATH_LINKNAME_PATTERN.
+     'link_id': 'link_id'}
+    or {} (empty dict) if string did not match PATH_LINK_ID_PATTERN.
   """
-  path_link_name_match = PATH_LINKNAME_REGEX.match(path)
+  path_link_name_match = PATH_LINK_ID_REGEX.match(path)
   
   if not path_link_name_match:
     return {}
@@ -83,7 +83,7 @@ def combinePath(path_parts):
       the list is itself a list); for example:
         'a/complete/path/in/one/string'
         ['some', 'path', 'parts']
-        [['path', 'parts', 'and', 'a'], 'link name']
+        [['path', 'parts', 'and', 'a'], 'link ID']
 
   Returns:
     None if path_parts is False (None, empty string, etc.) or if

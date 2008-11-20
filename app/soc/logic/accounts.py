@@ -113,17 +113,17 @@ def isAccountAvailable(new_account,
 
 
 # TODO(tlarsen): make this generic for any Linkable and move elsewhere
-def getUserFromLinkNameOr404(link_name):
-  """Like getUserFromLinkName but expects to find a user.
+def getUserFromLinkIdOr404(link_id):
+  """Like getUserFromLinkId but expects to find a user.
 
   Raises:
     out_of_band.ErrorResponse if no User entity is found
   """
-  user = models.user.logic.getForFields({'link_name': link_name},
+  user = models.user.logic.getForFields({'link_id': link_id},
                                         unique=True)
 
   if user:
     return user
 
   raise out_of_band.ErrorResponse(
-      'There is no user with a "link name" of "%s".' % link_name, status=404)
+      'There is no user with a "link ID" of "%s".' % link_id, status=404)

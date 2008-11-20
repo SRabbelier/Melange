@@ -15,15 +15,15 @@ limitations under the License.
 {% load forms_helpers %}
 
 {% block header_title %}
-{{ page_name }} for {{ entity.requester.link_name }}
+{{ page_name }} for {{ entity.requester.link_id }}
 {% endblock %}
 
 {% block body %}
 <p>
  <table>
   {% readonly_field_as_table_row entity.fields.role.label entity.role %}
-  {% readonly_field_as_table_row entity.fields.requester.label entity.requester.link_name %}
-  {% readonly_field_as_table_row entity.fields.to.label entity.to.link_name %} 
+  {% readonly_field_as_table_row entity.fields.requester.label entity.requester.link_id %}
+  {% readonly_field_as_table_row entity.fields.to.label entity.to.link_id %} 
   {% readonly_field_as_table_row entity.fields.accepted.label entity.accepted %}
   {% readonly_field_as_table_row entity.fields.declined.label entity.declined %}
   <!-- TODO(pawel.solyga) make this generic -->

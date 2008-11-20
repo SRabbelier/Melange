@@ -90,7 +90,7 @@ class View(role.RoleView):
 
     params['logic'] = soc.logic.models.host.logic
     params['group_logic'] = soc.logic.models.sponsor.logic
-    params['invite_filter'] = {'group_ln': 'link_name'}
+    params['invite_filter'] = {'group_ln': 'link_id'}
 
     params['name'] = "Host"
     params['name_short'] = "Host"

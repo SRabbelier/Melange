@@ -59,44 +59,44 @@ class CreateForm(helper.forms.BaseForm):
     exclude = ['founder', 'inheritance_line']
   
   # TODO(pawel.solyga): write validation functions for other fields
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
-    if models.sponsor.logic.getFromFields(link_name=link_name):
-      raise forms.ValidationError("This link name is already in use.")
-    return link_name
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    if models.sponsor.logic.getFromFields(link_id=link_id):
+      raise forms.ValidationError("This link ID is already in use.")
+    return link_id
 
 
 class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.
   """
-  link_name = forms.CharField(widget=helper.widgets.ReadOnlyInput())
+  link_id = forms.CharField(widget=helper.widgets.ReadOnlyInput())
   founded_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
                                required=False)
 
-  def clean_link_name(self):
-    link_name = self.cleaned_data.get('link_name')
-    if not validate.isLinkNameFormatValid(link_name):
-      raise forms.ValidationError("This link name is in wrong format.")
-    return link_name
+  def clean_link_id(self):
+    link_id = self.cleaned_data.get('link_id')
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    return link_id
 
 
 DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL = 'soc/site/sponsor/profile/edit.html'
-DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG = 'Sponsor link name cannot be changed.'
+DEF_SPONSOR_NO_LINK_ID_CHANGE_MSG = 'Sponsor link ID cannot be changed.'
 DEF_CREATE_NEW_SPONSOR_MSG = ' You can create a new sponsor by visiting' \
                           ' <a href="/site/sponsor/profile">Create ' \
                           'a New Sponsor</a> page.'
 
 @decorators.view
-def edit(request, page_name=None, link_name=None,
+def edit(request, page_name=None, link_id=None,
          template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """View for a Developer to modify the properties of a Sponsor Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the Sponsor's site-unique "link_name" extracted from the URL
+    link_id: the Sponsor's site-unique "link_id" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -119,11 +119,11 @@ def edit(request, page_name=None, link_name=None,
   sponsor_form = None
   existing_sponsor = None
 
-  # try to fetch Sponsor entity corresponding to link_name if one exists
+  # try to fetch Sponsor entity corresponding to link_id if one exists
   try:
-    existing_sponsor = sponsor.logic.getIfFields(link_name=link_name)
+    existing_sponsor = sponsor.logic.getIfFields(link_id=link_id)
   except out_of_band.ErrorResponse, error:
-    # show custom 404 page when link name doesn't exist in Datastore
+    # show custom 404 page when link ID doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
     return simple.errorResponse(request, page_name, error, template, context)
      
@@ -134,12 +134,12 @@ def edit(request, page_name=None, link_name=None,
       sponsor_form = CreateForm(request.POST)
 
     if sponsor_form.is_valid():
-      if link_name:
-        # Form doesn't allow to change link_name but somebody might want to
-        # abuse that manually, so we check if form link_name is the same as
-        # url link_name
-        if sponsor_form.cleaned_data.get('link_name') != link_name:
-          msg = DEF_SPONSOR_NO_LINKNAME_CHANGE_MSG
+      if link_id:
+        # Form doesn't allow to change link_id but somebody might want to
+        # abuse that manually, so we check if form link_id is the same as
+        # url link_id
+        if sponsor_form.cleaned_data.get('link_id') != link_id:
+          msg = DEF_SPONSOR_NO_LINK_ID_CHANGE_MSG
           error = out_of_band.ErrorResponse(msg)
           return simple.errorResponse(request, page_name, error, template, context)
       
@@ -153,7 +153,7 @@ def edit(request, page_name=None, link_name=None,
       if not existing_sponsor:
         fields['founder'] = user
       
-      form_ln = fields['link_name']
+      form_ln = fields['link_id']
       key_fields = models.sponsor.logic.getKeyFieldsFromKwargs(fields)
       form_sponsor = models.sponsor.logic.updateOrCreateFromFields(
           fields, key_fields)
@@ -161,7 +161,7 @@ def edit(request, page_name=None, link_name=None,
       if not form_sponsor:
         return http.HttpResponseRedirect('/')
         
-      # redirect to new /site/sponsor/profile/form_link_name?s=0
+      # redirect to new /site/sponsor/profile/form_link_id?s=0
       # (causes 'Profile saved' message to be displayed)
       return helper.responses.redirectToChangedSuffix(
           request, None, form_ln,
@@ -172,7 +172,7 @@ def edit(request, page_name=None, link_name=None,
       # is 'Profile saved' parameter present, but referrer was not ourself?
       # (e.g. someone bookmarked the GET that followed the POST submit) 
       if (request.GET.get(profile.SUBMIT_MSG_PARAM_NAME)
-          and (not helper.requests.isReferrerSelf(request, suffix=link_name))):
+          and (not helper.requests.isReferrerSelf(request, suffix=link_id))):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
       
@@ -184,15 +184,15 @@ def edit(request, page_name=None, link_name=None,
               values=profile.SUBMIT_MESSAGES))    
               
       # populate form with the existing Sponsor entity
-      founder_link_name = existing_sponsor.founder.link_name
+      founder_link_id = existing_sponsor.founder.link_id
       sponsor_form = EditForm(instance=existing_sponsor, 
-                              initial={'founded_by': founder_link_name})
+                              initial={'founded_by': founder_link_id})
     else:
       if request.GET.get(profile.SUBMIT_MSG_PARAM_NAME):
         # redirect to aggressively remove 'Profile saved' query parameter
         return http.HttpResponseRedirect(request.path)
       
-      # no Sponsor entity exists for this link name, so show a blank form
+      # no Sponsor entity exists for this link ID, so show a blank form
       sponsor_form = CreateForm()
     
   context.update({'form': sponsor_form,
@@ -207,20 +207,20 @@ DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL = 'soc/group/profile/edit.html'
 
 @decorators.view
 def create(request, page_name=None, template=DEF_SITE_SPONSOR_PROFILE_CREATE_TMPL):
-  """create() view is same as edit() view, but with no link_name supplied.
+  """create() view is same as edit() view, but with no link_id supplied.
   """
-  return edit(request, page_name=page_name, link_name=None, template=template)
+  return edit(request, page_name=page_name, link_id=None, template=template)
 
 
 @decorators.view
-def delete(request, page_name=None, link_name=None,
+def delete(request, page_name=None, link_id=None,
            template=DEF_SITE_SPONSOR_PROFILE_EDIT_TMPL):
   """Request handler for a Developer to delete Sponsor Model entity.
 
   Args:
     request: the standard django request object
     page_name: the page name displayed in templates as page and header title
-    link_name: the Sponsor's site-unique "link_name" extracted from the URL
+    link_id: the Sponsor's site-unique "link_id" extracted from the URL
     template: the "sibling" template (or a search list of such templates)
       from which to construct the public.html template name (or names)
 
@@ -240,11 +240,11 @@ def delete(request, page_name=None, link_name=None,
 
   existing_sponsor = None
 
-  # try to fetch Sponsor entity corresponding to link_name if one exists
+  # try to fetch Sponsor entity corresponding to link_id if one exists
   try:
-    existing_sponsor = models.sponsor.logic.getIfFields(link_name=link_name)
+    existing_sponsor = models.sponsor.logic.getIfFields(link_id=link_id)
   except out_of_band.ErrorResponse, error:
-    # show custom 404 page when link name doesn't exist in Datastore
+    # show custom 404 page when link ID doesn't exist in Datastore
     error.message = error.message + DEF_CREATE_NEW_SPONSOR_MSG
     return simple.errorResponse(request, page_name, error, template, context)
 

@@ -34,15 +34,15 @@ Please use this form to look up an existing User in Google Open Source Programs.
 </tr>
 {% endif %}
   {% field_as_table_row form.account %}
-{% if link_name_error %}
+{% if link_id_error %}
 <tr>
  <td>&nbsp;</td>
  <td colspan="3" class="formfielderror">
-  {{ link_name_error }}
+  {{ link_id_error }}
  </td>
 </tr>
 {% endif %}
-  {% field_as_table_row form.link_name %}
+  {% field_as_table_row form.link_id %}
 {% if found_user %}
  <tr>
   <td class="formfieldlabel">Nick name</td>

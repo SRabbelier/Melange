@@ -519,7 +519,7 @@ class View(object):
     patterns = params['key_fields_prefix']
 
     for name in names:
-      pattern = r'(?P<%s>%s)' % (name, path_link_name.LINKNAME_PATTERN_CORE)
+      pattern = r'(?P<%s>%s)' % (name, path_link_name.LINK_ID_PATTERN_CORE)
       patterns.append(pattern)
 
     result = '/'.join(patterns)
@@ -607,8 +607,8 @@ class View(object):
 
       url = url % {
           'url_name': params['url_name'],
-          'lnp': path_link_name.LINKNAME_ARG_PATTERN,
-          'ulnp': path_link_name.LINKNAME_PATTERN_CORE,
+          'lnp': path_link_name.LINK_ID_ARG_PATTERN,
+          'ulnp': path_link_name.LINK_ID_PATTERN_CORE,
           'key_fields': key_fields_pattern,
           }
 

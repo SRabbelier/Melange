@@ -42,18 +42,18 @@ class Logic(base.Logic):
     """See base.Logic.getKeyNameValues.
     """
 
-    return [entity.partial_path, entity.link_name]
+    return [entity.partial_path, entity.link_id]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    return [fields['partial_path'], fields['link_name']]
+    return [fields['partial_path'], fields['link_id']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames.
     """
 
-    return ['partial_path', 'link_name']
+    return ['partial_path', 'link_id']
 
 logic = Logic()

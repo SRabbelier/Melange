@@ -147,7 +147,6 @@ class View(base.View):
     new_params['list_template'] = 'soc/models/list.html'
     # TODO(SRabbelier) Change the redirect to something more useful
     new_params['list_redirect_action'] = '/'
-    new_params['list_redirect_entity'] = 'Request'
     new_params['name'] = 'Request'
     new_params['name_short'] = 'Request'
     new_params['name_plural'] = 'Request'
@@ -156,16 +155,16 @@ class View(base.View):
     params = dicts.merge(params, new_params)
     
     # get the current user
-    properties = {'account': users.get_current_user()}    
+    properties = {'account': users.get_current_user()}
     user_entity = user_logic.logic.getForFields(properties, unique=True)
     
     # only select the requests for this user that haven't been handled yet
     filter = {'requester': user_entity,
-              'accepted' : False,
+              'accepted' : True,
               'declined' : False}
     
     
-    return list(request, "Unhandled Requests", params, filter)
+    return list(request, page_name, params, filter)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

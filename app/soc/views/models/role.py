@@ -91,7 +91,6 @@ class RoleView(base.View):
     new_params['list_template'] = 'soc/models/list.html'
     new_params['list_redirect_action'] = '/request/create/%s/%s' % (
         self._params['url_name'], kwargs['link_id'])
-    new_params['list_redirect_entity'] = self._params['name']
     new_params['name'] = self._params['name']
     new_params['name_short'] = self._params['name_short']
     new_params['name_plural'] = self._params['name_plural']

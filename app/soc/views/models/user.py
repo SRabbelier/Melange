@@ -301,7 +301,12 @@ class View(base.View):
 
     patterns = super(View, self).getDjangoURLPatterns()
     patterns += [(r'^' + self._params['url_name'] + '/edit$','soc.views.models.user.edit_self')]
-    patterns += [(r'^' + self._params['url_name'] + '/roles$','soc.views.models.request.list_self')]
+
+    page_name = "Unhandled Requests"
+    patterns += [(r'^' + self._params['url_name'] + '/roles$',
+                  'soc.views.models.request.list_self',
+                  {'page_name': page_name}, page_name)]
+
     return patterns
 
 

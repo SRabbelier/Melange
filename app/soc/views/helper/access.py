@@ -35,7 +35,8 @@ from google.appengine.api import users
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
-from soc.logic import models
+from soc.logic.models import user as user_logic
+from soc.logic.models import request as request_logic
 from soc.views import helper
 from soc.views.simple import requestLogin
 
@@ -129,7 +130,7 @@ def checkIsUser(request):
 
   checkIsLoggedIn(request)
 
-  user = models.user.logic.getForFields(
+  user = user_logic.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)
 
   if user:
@@ -171,7 +172,7 @@ def checkIsDeveloper(request):
   raise soc.views.out_of_band.AccessViolationResponse(login_response)
 
 
-def checkIsHost(request, program):
+def checkIsInvited(request, role):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
@@ -189,11 +190,18 @@ def checkIsHost(request, program):
 
   checkIsUser(request)
 
-  # TODO(alturin): the soc.logic.host module does not seem to exist...
-  host = soc.logic.host.getHostFromProgram(
-      users.get_current_user(), program)
+  user = user_logic.logic.getForFields(
+      {'account': users.get_current_user()}, unique=True)
 
-  if host:
+  properties = {
+      'requester': user,
+      'role': role,
+      'accepted': True,
+      }
+
+  request = request_logic.logic.getForFields(properties, unique=True)
+
+  if request:
     return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {

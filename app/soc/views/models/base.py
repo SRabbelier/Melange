@@ -124,6 +124,11 @@ class View(object):
 
     new_params['list_redirect_action'] = '/' + params['url_name'] + '/edit'
 
+    new_params['save_message'] = [ugettext_lazy('Profile saved.')]
+    new_params['edit_params'] = {
+        self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
+        }
+
     self._params = dicts.merge(params, new_params)
 
   def public(self, request, page_name=None, params=None, **kwargs):

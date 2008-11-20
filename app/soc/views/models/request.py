@@ -128,10 +128,6 @@ class View(base.View):
 
     params['save_message'] = [ugettext_lazy('Request saved.')]
 
-    params['edit_params'] = {
-        self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
-        }
-
     params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)

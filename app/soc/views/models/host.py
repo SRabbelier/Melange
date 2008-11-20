@@ -117,12 +117,6 @@ class View(role.RoleView):
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['invite_redirect'] = '/request/list'
 
-    params['save_message'] = [ugettext_lazy('Profile saved.')]
-
-    params['edit_params'] = {
-        self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
-        }
-
     params = dicts.merge(original_params, params)
 
     role.RoleView.__init__(self, original_params=params)

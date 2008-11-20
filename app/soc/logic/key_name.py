@@ -31,21 +31,21 @@ class Error(Exception):
   pass
 
 
-def nameDocument(partial_path, link_id=None):
+def nameDocument(scope_path, link_id=None):
   """Returns a Document key name constructed from a path and link ID.
     
   Args:
-    partial_path: the first portion of the path to the Document that uniquely
+    scope_path: the first portion of the path to the Document that uniquely
       identifies it
     link_id: optional link ID to append to path (when omitted,
-      partial_path is actually the entire path, with the link_id already
+      scope_path is actually the entire path, with the link_id already
       appended)
 
   Raises:
-    Error if partial_path and link_id produce a "False" path (None,
+    Error if scope_path and link_id produce a "False" path (None,
     empty string, etc.)
   """
-  path = [partial_path]
+  path = [scope_path]
   
   if link_id:
     path.append(link_id)
@@ -58,36 +58,36 @@ def nameDocument(partial_path, link_id=None):
   return 'Document:%s' % path
 
 
-def nameSiteSettings(partial_path, link_id):
+def nameSiteSettings(scope_path, link_id):
   """Returns a SiteSettings key name constructed from a supplied path.
   
   Raises:
     Error if path is "False" (None, empty string, etc.)
   """
 
-  if not partial_path:
-    raise Error('"partial_path" must be non-False: "%s"' % partial_path)
+  if not scope_path:
+    raise Error('"scope_path" must be non-False: "%s"' % scope_path)
 
   if not link_id:
     raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'SiteSettings:%s:%s' % (partial_path, link_id)
+  return 'SiteSettings:%s:%s' % (scope_path, link_id)
 
 
-def nameHomeSettings(partial_path, link_id):
+def nameHomeSettings(scope_path, link_id):
   """Returns a HomeSettings key name constructed from a supplied path.
 
   Raises:
     Error if path is "False" (None, empty string, etc.)
   """
 
-  if not partial_path:
-    raise Error('"partial_path" must be non-False: "%s"' % partial_path)
+  if not scope_path:
+    raise Error('"scope_path" must be non-False: "%s"' % scope_path)
 
   if not link_id:
     raise Error('"link_id" must be non-False: "%s"' % link_id)
 
-  return 'HomeSettings:%s:%s' % (partial_path, link_id)
+  return 'HomeSettings:%s:%s' % (scope_path, link_id)
 
 
 def nameUser(email):

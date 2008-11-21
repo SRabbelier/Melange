@@ -43,7 +43,7 @@ class Logic(presence.Logic):
     """
     presence.Logic.__init__(self, model=model, base_model=base_model)
 
-  def getKeyValues(self):
+  def getKeyValues(self, unused_entity):
     """Returns the default key values for the site settings.
 
     The Site entity is always expected to be a singleton, so this method

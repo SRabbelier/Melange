@@ -198,7 +198,8 @@ class View(object):
                                                  new_suffix='edit')
 
     if not kwargs:
-      return self.edit(request, page_name=page_name, params=params, **empty_kwargs)
+      return self.edit(request, page_name=page_name, params=params,
+                       **empty_kwargs)
     else:
       return self.edit(request, page_name=page_name, params=params, seed=kwargs, **empty_kwargs)
 
@@ -235,7 +236,8 @@ class View(object):
             'entity_type' : params['name'],
             'create' : params['missing_redirect']
             }
-        return simple.errorResponse(request, page_name, error, template, context)
+        return simple.errorResponse(request, page_name, error, template,
+                                    context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params)

@@ -52,7 +52,7 @@ class CreateForm(presence.SettingsValidationForm):
     model = soc.models.site.Site
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home', 'scope_path', 'link_id']
+    exclude = ['inheritance_line', 'home', 'scope', 'scope_path', 'link_id']
 
   scope_path = forms.CharField(widget=forms.HiddenInput)
 
@@ -120,7 +120,10 @@ class View(presence.View):
     """
 
     keys = self._logic.getKeyFieldNames()
-    values = self._logic.getKeyValues()
+
+    # No entity in this case, since Site key values are hard-coded for the
+    # Site singleton, so pass in None to match parent method footprint.
+    values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
 
     return self.public(request, page_name, **key_values)
@@ -135,7 +138,10 @@ class View(presence.View):
     """
 
     keys = self._logic.getKeyFieldNames()
-    values = self._logic.getKeyValues()
+
+    # No entity in this case, since Site key values are hard-coded for the
+    # Site singleton, so pass in None to match parent method footprint.
+    values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
 
     return self.edit(request, page_name, seed=key_values, **key_values)

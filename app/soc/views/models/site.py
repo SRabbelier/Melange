@@ -146,8 +146,11 @@ class View(presence.View):
 
     patterns = super(View, self).getDjangoURLPatterns()
     patterns += [(r'^$','soc.views.models.site.main_public')]
+
+    page_name = "Edit Site Settings"
     patterns += [(r'^' + self._params['url_name'] + '/edit$',
-                  'soc.views.models.site.main_edit')]
+                  'soc.views.models.site.main_edit',
+                  {'page_name': page_name}, page_name)]
     return patterns
 
 view = View()

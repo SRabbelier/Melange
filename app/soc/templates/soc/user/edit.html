@@ -16,7 +16,7 @@ limitations under the License.
 {% block header_title %}
  {{ page_name }}
  {% if existing_user %}
-for {{ existing_user.nick_name }}
+for {{ existing_user.public_name }}
 <a href="mailto:{{ existing_user.account.email }} ">&lt;{{ existing_user.account.email }}&gt;</a>
  {% endif %}
 {% endblock %}
@@ -43,7 +43,7 @@ Please use this form to alter basic site-wide settings for a User in Google Open
 </tr>
 {% endif %}
   {% field_as_table_row form.link_id %}
-  {% field_as_table_row form.nick_name %}
+  {% field_as_table_row form.public_name %}
   {% field_as_table_row form.is_developer %}
   {% if existing_user.former_accounts %}
   <tr>

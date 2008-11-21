@@ -45,8 +45,8 @@ Please use this form to look up an existing User in Google Open Source Programs.
   {% field_as_table_row form.link_id %}
 {% if found_user %}
  <tr>
-  <td class="formfieldlabel">Nick name</td>
-  <td>{{ found_user.nick_name }}</td>
+  <td class="formfieldlabel">Public name</td>
+  <td>{{ found_user.public_name }}</td>
   <td class="formfieldrequired">&nbsp;</td>
   <td class="formfieldhelptext">&nbsp;</td>
  </tr>
@@ -88,7 +88,7 @@ Please use this form to look up an existing User in Google Open Source Programs.
   </tr>
   <tr>
    <td colspan="4">
-    <a href="{{ edit_link }}">Edit the User profile of {{ found_user.nick_name }}.</a>
+    <a href="{{ edit_link }}">Edit the User profile of {{ found_user.public_name }}.</a>
    </td>
   </tr>
 {% endif %}

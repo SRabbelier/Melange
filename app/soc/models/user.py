@@ -74,10 +74,11 @@ class User(base.ModelWithFieldAttributes):
   #: this User.
   former_accounts = db.ListProperty(users.User)
 
-  #: Required field storing a nickname; displayed publicly.
-  #: Nicknames can be any valid UTF-8 text.
-  nick_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Nick name'))
+  #: Required field storing publicly-displayed name.  Can be a real name
+  #: (though this is not recommended), or a nick name or some other public
+  #: alias.  Public names can be any valid UTF-8 text.
+  public_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Public name'))
       
   #: Required field storing link_id used in URLs to identify user.
   #: Lower ASCII characters only.

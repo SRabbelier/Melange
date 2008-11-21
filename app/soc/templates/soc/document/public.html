@@ -22,6 +22,6 @@ limitations under the License.
 {% endblock %}
 
 {% block body %}
-<div id="created">Created on {{ entity.created }} by {{ entity.author.nick_name }}</div>
+<div id="created">Created on {{ entity.created }} by {{ entity.author.public_name }}</div>
 <div id="content">{{ entity.content|safe }}</div>
 {% endblock %}

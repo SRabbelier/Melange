@@ -23,6 +23,5 @@ MODEL/VIEW TEMPLATE NAMING
 View templates are usually named some_view.html for a corresponding someView()
 function and SomeViewForm form class.  Since SomeView is likely to be a common
 View name for multiple Models, Model-specific templates should be placed in
-soc/<model> sub-directories.  For example, the template used by the Profile
-view for the Person Model belongs in soc/person/profile.html.
+soc/<model>/<view> sub-directories.
 

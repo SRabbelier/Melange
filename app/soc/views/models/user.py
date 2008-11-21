@@ -70,14 +70,14 @@ class CreateForm(helper.forms.BaseForm):
     properties = {'link_id': link_id}
     user = soc.logic.models.user.logic.getForFields(properties, unique=True)
 
-    link_id_user = soc.logic.models.user.logic.getForFields(properties, unique=True)
-
+    link_id_user = soc.logic.models.user.logic.getForFields(properties,
+                                                            unique=True)
     key_name = self.data.get('key_name')
     if key_name:
       key_name_user = user_logic.logic.getFromKeyName(key_name)
       
-      if link_id_user and key_name_user and \
-          link_id_user.account != key_name_user.account:
+      if (link_id_user and key_name_user
+          and (link_id_user.account != key_name_user.account)):
         raise forms.ValidationError("This link ID is already in use.")
 
     return link_id
@@ -117,7 +117,8 @@ class UserForm(helper.forms.BaseForm):
     model = soc.models.user.User
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['account', 'former_accounts', 'is_developer']
+    exclude = ['account', 'former_accounts', 'is_developer',
+               'inheritance_line']
 
   def clean_link_id(self):
     link_id = self.cleaned_data.get('link_id')
@@ -231,9 +232,11 @@ class View(base.View):
         if soc.logic.models.user.logic.isFormerAccount(account):
           msg = DEF_USER_ACCOUNT_INVALID_MSG
           error = out_of_band.ErrorResponse(msg)
-          return simple.errorResponse(request, page_name, error, template, context)
+          return simple.errorResponse(request, page_name, error, template,
+                                      context)
 
-        user = soc.logic.models.user.logic.updateOrCreateFromFields(properties, {'link_id': new_link_id})
+        user = soc.logic.models.user.logic.updateOrCreateFromFields(
+            properties, {'link_id': new_link_id})
 
         # redirect to /user/profile?s=0
         # (causes 'Profile saved' message to be displayed)

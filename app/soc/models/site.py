@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the SiteSettings Model."""
+"""This module contains the Site Model."""
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
@@ -26,16 +26,22 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-import soc.models.home_settings
+import soc.models.presence
 
 
-class SiteSettings(soc.models.home_settings.HomeSettings):
-  """Model of a SiteSettings, which stores per site configuration."""
+class Site(soc.models.presence.Presence):
+  """Model of a Site, which stores per site configuration.
+
+  The Site Model stores configuration information unique to the Melange
+  web site as a whole (in addition to any configuration that is common to
+  any "presence" on the site, such as a Group or Program).
+  """
 
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.
-  ga_tracking_num = db.StringProperty(verbose_name=ugettext_lazy('Google Analytics'))
+  ga_tracking_num = db.StringProperty(
+      verbose_name=ugettext_lazy('Google Analytics'))
   ga_tracking_num.help_text = ugettext_lazy(
       'Valid Google Analytics tracking number. If the number is '
       'entered every page is going to have Google Analytics '

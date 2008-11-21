@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the HomeSettings Model."""
+"""This module contains the Presence Model."""
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
@@ -30,11 +30,17 @@ import soc.models.document
 import soc.models.linkable
 
 
-class HomeSettings(soc.models.linkable.Linkable):
-  """Model that stores settings for various Home pages.
+class Presence(soc.models.linkable.Linkable):
+  """Model for anything that has a "presence" on a Melange site.
 
-  This Model is the basis for more specific "/home" view settings, such as
-  SiteSettings, ProgramSettings, etc.
+  A "presence" is (currently) defined as:
+  * having a "home" page with contents set by selecting a Document
+  * displaying an (optional) ATOM or RSS feed
+
+  Models that have a "presence" on a Melange web site are (currently):
+  * any Group (Organization, Club, etc.)
+  * any Program
+  * the site itself, which is a singleton Presence
   """
 
   #: Reference to Document containing the contents of the "/home" page

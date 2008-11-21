@@ -14,45 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""HomeSettings (Model) query functions.
+"""Site (Model) query functions.
 """
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
 
 from soc.logic.models import base
+from soc.logic.models import presence
 
-import soc.models.home_settings
+import soc.models.presence
+import soc.models.site
 
 
-class Logic(base.Logic):
-  """Logic methods for the HomeSettings model.
+class Logic(presence.Logic):
+  """Logic methods for the Site model.
   """
+
+  DEF_SITE_SCOPE_PATH = 'site'
+  DEF_SITE_LINK_ID = 'home'
+  DEF_SITE_HOME_DOC_LINK_ID = 'home'
 
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.home_settings.HomeSettings)
-  
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
+    base.Logic.__init__(self, soc.models.site.Site,
+                        base_model=soc.models.presence.Presence)
+
+  def getMainKeyValues(self):
+    """Returns the default key values for the site settings.
     """
 
-    return [entity.scope_path, entity.link_id]
+    return [self.DEF_SITE_SCOPE_PATH, 
+            self.DEF_SITE_LINK_ID]
 
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['scope_path'], fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['scope_path', 'link_id']
 
 logic = Logic()

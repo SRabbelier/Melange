@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views for Home Settings.
+"""Views for Models with a "presence" on a Melange site.
 """
 
 __authors__ = [
@@ -35,8 +35,8 @@ from soc.views import helper
 from soc.views.helper import widgets
 from soc.views.models import base
 
-import soc.models.home_settings
-import soc.logic.models.home_settings
+import soc.models.presence
+import soc.logic.models.presence
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
@@ -82,7 +82,7 @@ class CreateForm(SettingsValidationForm):
     """Inner Meta class that defines some behavior for the form.
     """
     #: db.Model subclass for which the form will gather information
-    model = soc.models.home_settings.HomeSettings
+    model = soc.models.presence.Presence
 
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'home']
@@ -113,21 +113,21 @@ class View(base.View):
     params['name_short'] = "Home Settings"
     params['name_plural'] = "Home Settings"
     params['url_name'] = "home/settings"
-    params['module_name'] = "home_settings"
+    params['module_name'] = "presence"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
     # TODO(tlarsen) Add support for Django style template lookup
     params['edit_template'] = 'soc/models/edit.html'
-    params['public_template'] = 'soc/home_settings/public.html'
+    params['public_template'] = 'soc/presence/public.html'
     params['list_template'] = 'soc/models/list.html'
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
       'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/home_settings/list/home_row.html',
-      'list_heading': 'soc/home_settings/list/home_heading.html',
+      'list_row': 'soc/presence/list/home_row.html',
+      'list_heading': 'soc/presence/list/home_heading.html',
     }
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
@@ -136,7 +136,7 @@ class View(base.View):
 
     base.View.__init__(self, params=params)
 
-    self._logic = soc.logic.models.home_settings.logic
+    self._logic = soc.logic.models.presence.logic
 
   def _public(self, request, entity, context):
     """

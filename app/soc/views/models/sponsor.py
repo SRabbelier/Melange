@@ -63,6 +63,18 @@ class CreateForm(helper.forms.BaseForm):
       raise forms.ValidationError("This link ID is already in use.")
     return link_id
 
+  def clean_feed_url(self):
+    feed_url = self.cleaned_data.get('feed_url')
+
+    if feed_url == '':
+      # feed url not supplied (which is OK), so do not try to validate it
+      return None
+    
+    if not validate.isFeedURLValid(feed_url):
+      raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
+
+    return feed_url
+
 
 class EditForm(CreateForm):
   """Django form displayed when editing a Sponsor.

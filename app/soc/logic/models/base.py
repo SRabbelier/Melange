@@ -468,10 +468,6 @@ class Logic:
       supplied key_name and properties.
     """
 
-    import logging
-    logging.info(key_name)
-    logging.info(properties)
-
     entity = self.getFromKeyName(key_name)
 
     if not entity:

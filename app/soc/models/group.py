@@ -28,11 +28,11 @@ from django.utils.translation import ugettext_lazy
 
 from soc.models import countries
 
-import soc.models.linkable
+import soc.models.presence
 import soc.models.user
 
 
-class Group(soc.models.linkable.Linkable):
+class Group(soc.models.presence.Presence):
   """Common data fields for all groups.
   """
 

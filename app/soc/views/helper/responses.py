@@ -30,7 +30,7 @@ from django.template import loader
 
 from soc.logic import accounts
 from soc.logic import system
-from soc.logic.models import site_settings
+from soc.logic.models import site
 from soc.views import helper
 from soc.views.sitemap import sidebar
 
@@ -107,9 +107,9 @@ def getUniversalContext(request):
   context['sign_out'] = users.create_logout_url(request.path)
   context['sidebar_menu_items'] = sidebar.SIDEBAR
 
-  settings = site_settings.logic.getFromFields(
-      scope_path=site_settings.logic.DEF_SITE_SETTINGS_SCOPE_PATH,
-      link_id=site_settings.logic.DEF_SITE_SETTINGS_LINK_ID)
+  settings = site.logic.getFromFields(
+      scope_path=site.logic.DEF_SITE_SCOPE_PATH,
+      link_id=site.logic.DEF_SITE_LINK_ID)
   
   if settings:
     context['ga_tracking_num'] = settings.ga_tracking_num

@@ -25,11 +25,11 @@ __authors__ = [
 from django.conf.urls import defaults
 
 from soc.views.models import document
-from soc.views.models import home_settings
+from soc.views.models import presence
 from soc.views.models import host
 from soc.views.models import request
 from soc.views.models import user
-from soc.views.models import site_settings
+from soc.views.models import site
 from soc.views.models import sponsor
 
 from soc.views.sitemap import sidebar
@@ -38,11 +38,11 @@ from soc.views.sitemap import sitemap
 
 sidebar.SIDEBAR.append(user.view.getUserSidebar())
 
-sidebar.SIDEBAR.append(home_settings.view.getSidebarLinks())
-sitemap.addPages(home_settings.view.getDjangoURLPatterns())
+sidebar.SIDEBAR.append(presence.view.getSidebarLinks())
+sitemap.addPages(presence.view.getDjangoURLPatterns())
 
-sidebar.SIDEBAR.append(site_settings.view.getSidebarLinks())
-sitemap.addPages(site_settings.view.getDjangoURLPatterns())
+sidebar.SIDEBAR.append(site.view.getSidebarLinks())
+sitemap.addPages(site.view.getDjangoURLPatterns())
 
 sidebar.SIDEBAR.append(user.view.getSidebarLinks())
 sitemap.addPages(user.view.getDjangoURLPatterns())

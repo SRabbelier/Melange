@@ -32,16 +32,16 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.views import helper
 from soc.views.helper import widgets
-from soc.views.models import home_settings
+from soc.views.models import presence
 
-import soc.models.site_settings
-import soc.logic.models.site_settings
+import soc.models.site
+import soc.logic.models.site
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
 
 
-class CreateForm(home_settings.SettingsValidationForm):
+class CreateForm(presence.SettingsValidationForm):
   """Django form displayed when creating or editing Site Settings.
   """
 
@@ -49,7 +49,7 @@ class CreateForm(home_settings.SettingsValidationForm):
     """Inner Meta class that defines some behavior for the form.
     """
     #: db.Model subclass for which the form will gather information
-    model = soc.models.site_settings.SiteSettings
+    model = soc.models.site.Site
 
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'home', 'scope_path', 'link_id']
@@ -66,7 +66,7 @@ class EditForm(CreateForm):
   pass
 
 
-class View(home_settings.View):
+class View(presence.View):
   """View methods for the Document model.
   """
 
@@ -87,7 +87,7 @@ class View(home_settings.View):
     # lower name and replace " " with "/"
     # for module name lower name and replace " " with "_"
     params['url_name'] = "site/settings"
-    params['module_name'] = "site_settings"
+    params['module_name'] = "site"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
@@ -95,8 +95,8 @@ class View(home_settings.View):
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
       'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/site_settings/list/site_row.html',
-      'list_heading': 'soc/site_settings/list/site_heading.html',
+      'list_row': 'soc/site/list/site_row.html',
+      'list_heading': 'soc/site/list/site_heading.html',
     }
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
@@ -105,9 +105,9 @@ class View(home_settings.View):
 
     params = dicts.merge(original_params, params)
 
-    home_settings.View.__init__(self, original_params=params)
+    presence.View.__init__(self, original_params=params)
 
-    self._logic = soc.logic.models.site_settings.logic
+    self._logic = soc.logic.models.site.logic
 
   def main_public(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.
@@ -144,8 +144,9 @@ class View(home_settings.View):
     """
 
     patterns = super(View, self).getDjangoURLPatterns()
-    patterns += [(r'^$','soc.views.models.site_settings.main_public')]
-    patterns += [(r'^' + self._params['url_name'] + '/edit$', 'soc.views.models.site_settings.main_edit')]
+    patterns += [(r'^$','soc.views.models.site.main_public')]
+    patterns += [(r'^' + self._params['url_name'] + '/edit$',
+                  'soc.views.models.site.main_edit')]
     return patterns
 
 view = View()

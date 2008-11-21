@@ -25,10 +25,11 @@ from google.appengine.ext import db
 
 from soc.models import base
 
+import soc.models.linkable
 import soc.models.proposal
 
 
-class Task(base.ModelWithFieldAttributes):
+class Task(soc.models.linkable.Linkable):
   """Model of a Task, which is a Proposal to be completed by Contributors.
 
   A Task brings along a Proposal that was used to initiate the Task.  A Task

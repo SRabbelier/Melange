@@ -25,37 +25,7 @@ __authors__ = [
 
 import re
 
-
-# start with ASCII digit or lowercase
-#   (additional ASCII digit or lowercase
-#     -OR-
-#   underscore and ASCII digit or lowercase)
-#     zero or more of OR group
-LINK_ID_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
-LINK_ID_ARG_PATTERN = r'(?P<link_id>%s)' % LINK_ID_PATTERN_CORE
-LINK_ID_PATTERN = r'^%s$' % LINK_ID_PATTERN_CORE
-LINK_ID_REGEX = re.compile(LINK_ID_PATTERN)
-
-# scope path is multiple link_id chunks,
-# each separated by a trailing /
-# (at least 1)
-SCOPE_PATH_ARG_PATTERN = (r'(?P<scope_path>%(link_id)s'
-                             '(?:/%(link_id)s)*)' % {
-                               'link_id': LINK_ID_PATTERN_CORE})
-SCOPE_PATH_PATTERN = r'^%s$' % SCOPE_PATH_ARG_PATTERN
-SCOPE_PATH_REGEX = re.compile(SCOPE_PATH_PATTERN)
-
-# path is multiple link_id chunks,
-#   each separated by a trailing /
-#     (at least 1)
-# followed by a single link_id with no trailing /
-PATH_LINK_ID_ARGS_PATTERN = (
-    r'%(scope_path)s/'
-     '(?P<link_id>%(link_id)s)' % {
-       'scope_path' : SCOPE_PATH_ARG_PATTERN,
-       'link_id': LINK_ID_PATTERN_CORE})
-PATH_LINK_ID_PATTERN = r'^%s$' % PATH_LINK_ID_ARGS_PATTERN
-PATH_LINK_ID_REGEX = re.compile(PATH_LINK_ID_PATTERN)
+from soc.models import linkable
 
 
 def getPartsFromPath(path):
@@ -66,7 +36,7 @@ def getPartsFromPath(path):
      'link_id': 'link_id'}
     or {} (empty dict) if string did not match PATH_LINK_ID_PATTERN.
   """
-  path_link_name_match = PATH_LINK_ID_REGEX.match(path)
+  path_link_name_match = linkable.PATH_LINK_ID_REGEX.match(path)
   
   if not path_link_name_match:
     return {}

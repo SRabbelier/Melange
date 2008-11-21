@@ -22,16 +22,15 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 import soc.models.document
+import soc.models.linkable
 
 
-class HomeSettings(polymodel.PolyModel):
+class HomeSettings(soc.models.linkable.Linkable):
   """Model that stores settings for various Home pages.
 
   This Model is the basis for more specific "/home" view settings, such as
@@ -51,14 +50,3 @@ class HomeSettings(polymodel.PolyModel):
   feed_url.help_text = ugettext_lazy(
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
-
-  #: Required path, prepended to a "link ID" to form the Setting URL.
-  scope_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Settings scope path'))
-  scope_path.help_text = ugettext_lazy(
-    'path portion of URLs for Settings, prepended to link ID')
-
-  #: Required link ID, appended to a "path" to form the Setting URL.
-  link_id = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Setttings link ID'))
-  link_id.help_text = ugettext_lazy('link ID for Settings used in URLs')

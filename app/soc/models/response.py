@@ -21,15 +21,14 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
+import soc.models.linkable
 import soc.models.quiz
 import soc.models.user
 
 
-class Response(polymodel.PolyModel):
+class Response(soc.models.linkable.Linkable):
   """Model of a Response to a Quiz.
 
   A Response is the "collection point" for a set of specific Answers to the

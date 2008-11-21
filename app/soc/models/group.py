@@ -22,18 +22,17 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 from soc.models import countries
 
+import soc.models.linkable
 import soc.models.user
 
 
-class Group(polymodel.PolyModel):
+class Group(soc.models.linkable.Linkable):
   """Common data fields for all groups.
   """
 
@@ -41,14 +40,6 @@ class Group(polymodel.PolyModel):
   name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Name'))
   name.help_text = ugettext_lazy('Complete, formal name of the group.')  
-  
-  #: Required field storing link_id used in URLs to identify group.
-  #: Lower ASCII characters only.
-  link_id = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link ID'))
-  link_id.help_text = ugettext_lazy(
-      'Field used in URLs to identify group. '
-      'Lower ASCII characters only.')
   
   #: Required field storing short name of the group.
   #: It can be used for displaying group as sidebar menu item.

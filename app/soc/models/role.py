@@ -23,18 +23,17 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
 from soc.models import countries
 
+import soc.models.linkable
 import soc.models.user
 
 
-class Role(polymodel.PolyModel):
+class Role(soc.models.linkable.Linkable):
   """Information common to Program participation for all Roles.
 
   Some details of a Role are considered "public" information, and nearly

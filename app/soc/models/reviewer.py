@@ -23,8 +23,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.role
 import soc.models.organization
+import soc.models.role
 
 
 class Reviewer(soc.models.role.Role):

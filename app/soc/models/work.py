@@ -22,16 +22,15 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
+import soc.models.linkable
 import soc.models.user
 
 
-class Work(polymodel.PolyModel):
+class Work(soc.models.linkable.Linkable):
   """Model of a Work created by one or more Persons in Roles.
 
   Work is a "base entity" of other more specific "works" created by Persons
@@ -56,24 +55,6 @@ class Work(polymodel.PolyModel):
       verbose_name=ugettext_lazy('Title'))
   title.help_text = ugettext_lazy(
       'title of the document; often used in the window title')
-
-  #: Required path, prepended to a "link ID" to form the document URL.
-  #: The combined path and link ID must be globally unique on the
-  #: site.  Except in /site/document (Developer) forms, this field is not
-  #: usually directly editable by the User, but is instead set by controller
-  #: logic to match the "scope" of the document.
-  scope_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Scope path'))
-  scope_path.help_text = ugettext_lazy(
-    'path portion of URLs, prepended to link ID')
-
-  #: Required link ID, appended to a "path" to form the document URL.
-  #: The combined path and link ID must be globally unique on the
-  #: site (but, unlike some link IDs, a Work link ID can be reused,
-  #: as long as the combination with the preceding path is unique).
-  link_id = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link ID'))
-  link_id.help_text = ugettext_lazy('link ID used in URLs')
 
   #: short name used in places such as the sidebar menu and breadcrumb trail
   #: (optional: title will be used if short_name is not present)

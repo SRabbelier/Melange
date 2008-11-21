@@ -28,10 +28,10 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-from soc.models import base
+import soc.models.linkable
 
 
-class User(base.ModelWithFieldAttributes):
+class User(soc.models.linkable.Linkable):
   """A user and associated login credentials, the fundamental identity entity.
 
   User is a separate Model class from Person because the same login 
@@ -80,14 +80,6 @@ class User(base.ModelWithFieldAttributes):
   public_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Public name'))
       
-  #: Required field storing link_id used in URLs to identify user.
-  #: Lower ASCII characters only.
-  link_id = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link ID'))
-  link_id.help_text = ugettext_lazy(
-      'Field used in URLs to identify user. '
-      'Lower ASCII characters only.')
-
   #: field storing whether User is a Developer with site-wide access.
   is_developer = db.BooleanProperty(
       verbose_name=ugettext_lazy('Is Developer'))

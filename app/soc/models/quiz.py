@@ -52,11 +52,12 @@ class Quiz(soc.models.work.Work):
     work.reviews:  even Quizzes can be "reviewed" (possibly commented
       on during creation or annotated once put into use).
 
-    work.scope_path/work.link_id: used to scope and uniquely identify
-      a Quiz in the same way these properties are used with Documents, etc.
-
     work.content:  the "preface" of the Quiz, displayed before any
       of the Questions, usually containing instructions for the Quiz
+
+    linkable.scope/linkable.link_id: used to scope and uniquely
+      identify a Quiz in the same way these properties are used with
+      Documents, etc.
 
   In addition to any explicit ReferenceProperties in the Quiz Model and
   those inherited as described above, a Quiz entity participates in these

@@ -56,7 +56,7 @@ class Logic:
     if name:
       self._name = name
     else:
-      self._name = self.getModelClassName()
+      self._name =  self._model.__name__
     
     if skip_properties:
       self._skip_properties = skip_properties
@@ -101,18 +101,12 @@ class Logic:
       keyvalues.append(kwargs[key_field_name])
 
     # construct the KeyName in the appropriate format
-    return ":".join([self._name] + keyvalues)
-
-  def getModelClassName(self):
-    """Returns model class name string.
-    """ 
-    return self._model.__name__ 
+    return "%s:%s" % (self._name, '/'.join(keyvalues))
 
   def getFullModelClassName(self):
     """Returns fully-qualified model module.class name string.
     """ 
-    return '%s.%s' % (self._model.__module__,
-                      self.getModelClassName()) 
+    return '%s.%s' % (self._model.__module__, self._model.__name__)
 
   def getKeyValues(self, entity):
     """Exctracts the key values from entity and returns them.
@@ -473,6 +467,10 @@ class Logic:
       properties changed, or a new entity now associated with the
       supplied key_name and properties.
     """
+
+    import logging
+    logging.info(key_name)
+    logging.info(properties)
 
     entity = self.getFromKeyName(key_name)
 

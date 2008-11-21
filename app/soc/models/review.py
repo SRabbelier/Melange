@@ -23,13 +23,14 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+import soc.models.linkable
 # TODO: Uncomment when Survey model is committed
 #import soc.models.survey
-import soc.models.work
 import soc.models.reviewer
+import soc.models.work
 
 
-class Review(db.Model):
+class Review(soc.models.linkable.Linkable):
   """Model of a review of a Proposal or a Task.
 
   A Review entity is a specific instance of a completed Survey, collecting

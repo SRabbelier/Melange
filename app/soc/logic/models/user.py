@@ -40,7 +40,8 @@ class Logic(base.Logic):
   def isFormerAccount(self, account):
     """Returns true if account is a former account of some User.
     """
-    # TODO(pawel.solyga): replace 1000 with solution that works for any number of queries
+    # TODO(pawel.solyga): replace 1000 with solution that works for any
+    #   number of queries
     users_with_former_accounts = soc.models.user.User.gql(
         'WHERE former_accounts != :1', None).fetch(1000)
     
@@ -74,28 +75,13 @@ class Logic(base.Logic):
 
     return ['link_id']
 
-  def updateOrCreateFromAccount(self, properties, account):
-    """Like updateOrCreateFromKeyName, but resolves account to key_name first.
-    """
-
-    # attempt to retrieve the existing entity
-    user = soc.models.user.User.gql('WHERE account = :1', account).get()
-    
-    if user:
-      key_name = user.key().name()
-    else:
-      raise
-      key_name  = self.getKeyNameForFields({'link_id': properties['link_id']})
-
-    return self.updateOrCreateFromKeyName(properties, key_name)
-
   def _updateField(self, model, name, value):
     """Special case logic for account.
 
     When the account is changed, the former_accounts field should be appended
     with the old account.
     """
-    if name == 'account' and model.account != value:
+    if (name == 'account') and (model.account != value):
       model.former_accounts.append(model.account)
 
     return True

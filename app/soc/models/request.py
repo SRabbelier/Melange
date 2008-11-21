@@ -21,8 +21,6 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
@@ -31,7 +29,7 @@ import soc.models.user
 import soc.models.group
 
 
-class Request(polymodel.PolyModel):
+class Request(soc.models.linkable.Linkable):
   """A request is made to allow a person to create a new Role entity.
   """
 

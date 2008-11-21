@@ -27,7 +27,7 @@ import feedparser
 
 from google.appengine.api import urlfetch
 
-from soc.logic import path_link_name
+from soc.models import linkable
 
 
 def isFeedURLValid(feed_url=None):
@@ -51,7 +51,7 @@ def isLinkIdFormatValid(link_id):
   Args:
     link_id: link ID used in URLs for identification
   """
-  if path_link_name.LINK_ID_REGEX.match(link_id):
+  if linkable.LINK_ID_REGEX.match(link_id):
     return True
   return False
 
@@ -64,7 +64,7 @@ def isScopePathFormatValid(scope_path):
       used for identification.
   """
    
-  if path_link_name.SCOPE_PATH_REGEX.match(scope_path):
+  if linkable.SCOPE_PATH_REGEX.match(scope_path):
     return True
   
   return False

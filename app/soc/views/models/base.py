@@ -36,7 +36,7 @@ import soc.views.out_of_band
 
 from soc.logic import dicts
 from soc.logic import models
-from soc.logic import path_link_name
+from soc.models import linkable
 from soc.views import simple
 from soc.views import helper
 from soc.views.helper import access
@@ -532,7 +532,7 @@ class View(object):
     patterns = params['key_fields_prefix']
 
     for name in names:
-      pattern = r'(?P<%s>%s)' % (name, path_link_name.LINK_ID_PATTERN_CORE)
+      pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
       patterns.append(pattern)
 
     result = '/'.join(patterns)
@@ -620,8 +620,8 @@ class View(object):
 
       url = url % {
           'url_name': params['url_name'],
-          'lnp': path_link_name.LINK_ID_ARG_PATTERN,
-          'ulnp': path_link_name.LINK_ID_PATTERN_CORE,
+          'lnp': linkable.LINK_ID_ARG_PATTERN,
+          'ulnp': linkable.LINK_ID_PATTERN_CORE,
           'key_fields': key_fields_pattern,
           }
 

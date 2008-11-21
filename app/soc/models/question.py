@@ -44,15 +44,15 @@ class Question(soc.models.work.Work):
     work.reviews:  even Questions can be "reviewed" (possibly commented
       on during creation or annotated once put into use).
 
-    work.scope_path:  used to scope (and, when combined with
-      work.link_id, uniquely identify) a Question in the same way the
+    work.content:  the Question text, asked to the respondent
+
+    linkable.scope:  used to scope (and, when combined with
+      linkable.link_id, uniquely identify) a Question in the same way the
       property are used with Documents, etc.
 
-    work.link_id:  used to identify (and, when combined with
-      work.scope_path, *uniquely* identify) a Question in the same way
+    linkable.link_id:  used to identify (and, when combined with
+      linkable.scope, *uniquely* identify) a Question in the same way
       these properties are used with Documents, etc.
-      
-    work.content:  the Question text, asked to the respondent
 
   In addition to any explicit ReferenceProperties in the Question Model
   and those inherited as described above, a Question entity participates
@@ -86,14 +86,14 @@ class Question(soc.models.work.Work):
     when these ideas are implemented in the views and controllers; they
     are here now so that the concepts will not be lost before that time.
 
-  The recommended use for the combination of work.scope_path and
-  work.link_id is to keep the *same* link_id when copying and
+  The recommended use for the combination of linkable.scope and
+  linkable.link_id is to keep the *same* link_id when copying and
   modifying an existing Question for a new Program (or instance of a
-  Group that is per-Program), while changing the work.scope_path to
+  Group that is per-Program), while changing the linkable.scope to
   represent the Program and Group "ownership" of the Question.  For
   example, if a Question asking about prior GSoC participation needed
   to have an additional choice (see the choice_ids and choices properties
-  below), it is desirable to keep the same work.link_id (and also
+  below), it is desirable to keep the same linkable.link_id (and also
   simply append new choice_ids and choices to keep the old answer values
   compatible).  An existing Question in the above example might be identified
   as something like:
@@ -116,7 +116,7 @@ class Question(soc.models.work.Work):
     Question:google/ghop2009/gsoc_past_participation
   To get the combined results, query on a link_id of
   gsoc_past_participation.  For more targeted results, include the
-  scope_path to make the query more specific.
+  scope to make the query more specific.
 
   Question creation to permit use cases like the one above is going to
   be a bit of an "advanced" skill, possibly.  "Doing it wrong" the first

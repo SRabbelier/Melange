@@ -109,13 +109,15 @@ class Logic:
     return '%s.%s' % (self._model.__module__, self._model.__name__)
 
   def getKeyValues(self, entity):
-    """Exctracts the key values from entity and returns them.
+    """Extracts the key values from entity and returns them.
+
+    The default implementation uses the scope and link_id as key values.
 
     Args:
       entity: the entity from which to extract the key values
     """
 
-    raise NotImplementedError
+    return [entity.scope_path, entity.link_id]
 
   def getSuffixValues(self, entity):
     """Returns an array with the public values of the Key Fields.
@@ -131,19 +133,23 @@ class Logic:
     return self.getKeyValues(entity)
 
   def getKeyValuesFromFields(self, fields):
-    """Exctracts the key values from a dict and returns them.
+    """Extracts the key values from a dict and returns them.
+
+    The default implementation uses the scope and link_id as key values.
 
     Args:
       fields: the dict from which to extract the key values
     """
 
-    raise NotImplementedError
+    return [fields['scope_path'], fields['link_id']]
 
   def getKeyFieldNames(self):
     """Returns an array with the names of the Key Fields.
+
+    The default implementation uses the scope and link_id as key values.
     """
 
-    raise NotImplementedError
+    return ['scope_path', 'link_id']
 
   def getKeySuffix(self, entity):
     """Returns a suffix for the specified entity or None if no entity specified.

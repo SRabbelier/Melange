@@ -22,39 +22,21 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import base
+from soc.logic.models import work
 
 import soc.models.document
 import soc.models.work
 
 
-class Logic(base.Logic):
+class Logic(work.Logic):
   """Logic methods for the Document model
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.document.Document,
+               base_model=soc.models.work.Work):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.document.Document,
-                        base_model=soc.models.work.Work)
-
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.scope_path, entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['scope_path'], fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['scope_path', 'link_id']
+    work.Logic.__init__(self, model=model, base_model=base_model)
 
 
 logic = Logic()

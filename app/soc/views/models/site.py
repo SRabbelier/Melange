@@ -101,7 +101,8 @@ class View(presence.View):
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
-    params['sidebar_additional'] = [ ( '/' + params['url_name'] + '/edit', 'Edit Main Site Settings')]
+    params['sidebar_additional'] = [
+        ('/' + params['url_name'] + '/edit', 'Edit Main Site Settings')]
 
     params = dicts.merge(original_params, params)
 
@@ -119,7 +120,7 @@ class View(presence.View):
     """
 
     keys = self._logic.getKeyFieldNames()
-    values = self._logic.getMainKeyValues()
+    values = self._logic.getKeyValues()
     key_values = dicts.zip(keys, values)
 
     return self.public(request, page_name, **key_values)
@@ -134,7 +135,7 @@ class View(presence.View):
     """
 
     keys = self._logic.getKeyFieldNames()
-    values = self._logic.getMainKeyValues()
+    values = self._logic.getKeyValues()
     key_values = dicts.zip(keys, values)
 
     return self.edit(request, page_name, seed=key_values, **key_values)

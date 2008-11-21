@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Host (Model) query functions.
+"""Role (Model) query functions.
 """
 
 __authors__ = [
@@ -22,21 +22,19 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import role
+from soc.logic.models import base
 
-import soc.models.host
 import soc.models.role
 
 
-class Logic(role.Logic):
-  """Logic methods for the Host model.
+class Logic(base.Logic):
+  """Logic methods for the Role model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.role.Role, base_model=None):
     """Defines the name, key_name and model for this entity.
     """
-    role.Logic.__init__(self, model=soc.models.host.Host,
-                        base_model=soc.models.role.Role)
+    base.Logic.__init__(self, model, base_model=base_model)
 
 
 logic = Logic()

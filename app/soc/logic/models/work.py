@@ -32,28 +32,10 @@ class Logic(base.Logic):
   """Logic methods for the Work model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.work.Work, base_model=None):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.work.Work)
-
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['link_id']
+    base.Logic.__init__(self, model, base_model=base_model)
 
 
 logic = Logic()

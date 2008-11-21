@@ -22,40 +22,21 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import base
+from soc.logic.models import group
 
 import soc.models.group
 import soc.models.sponsor
 
 
-class Logic(base.Logic):
+class Logic(group.Logic):
   """Logic methods for the Sponsor model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.sponsor.Sponsor,
+               base_model=soc.models.group.Group):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.sponsor.Sponsor,
-                        base_model=soc.models.group.Group)
-
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['link_id']] 
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['link_id']
-
+    group.Logic.__init__(self, model=model, base_model=base_model)
 
   def isDeletable(self, entity):
     """Returns whether the specified Sponsor entity can be deleted.
@@ -65,5 +46,6 @@ class Logic(base.Logic):
     """
     # TODO(pawel.solyga): Check if Sponsor can be deleted (no Hosts, Programs)
     return True
+
 
 logic = Logic()

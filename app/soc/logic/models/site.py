@@ -37,14 +37,17 @@ class Logic(presence.Logic):
   DEF_SITE_LINK_ID = 'home'
   DEF_SITE_HOME_DOC_LINK_ID = 'home'
 
-  def __init__(self):
+  def __init__(self, model=soc.models.site.Site,
+               base_model=soc.models.presence.Presence):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.site.Site,
-                        base_model=soc.models.presence.Presence)
+    presence.Logic.__init__(self, model=model, base_model=base_model)
 
-  def getMainKeyValues(self):
+  def getKeyValues(self):
     """Returns the default key values for the site settings.
+
+    The Site entity is always expected to be a singleton, so this method
+    returns the hard-coded scope and link_id.
     """
 
     return [self.DEF_SITE_SCOPE_PATH, 

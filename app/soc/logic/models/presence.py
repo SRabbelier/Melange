@@ -32,27 +32,11 @@ class Logic(base.Logic):
   """Logic methods for the Presence model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.presence.Presence,
+               base_model=None):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.presence.Presence)
-  
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
+    base.Logic.__init__(self, model, base_model=base_model)
 
-    return [entity.scope_path, entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['scope_path'], fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['scope_path', 'link_id']
 
 logic = Logic()

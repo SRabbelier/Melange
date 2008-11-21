@@ -31,11 +31,12 @@ class Logic(base.Logic):
   """Logic methods for the Request model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.request.Request,
+               base_model=None):
     """Defines the name, key_name and model for this entity.
     """
 
-    base.Logic.__init__(self, soc.models.request.Request)
+    base.Logic.__init__(self, model, base_model=base_model)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.
@@ -47,6 +48,8 @@ class Logic(base.Logic):
     """See base.Logic.getKeyValuesFromFields.
     """
 
+    # TODO: "program_ln" might be needed here, since some Groups, such as
+    #   Organizations, are per-Program, per-Year
     return [fields['role'], fields['group_ln'], fields['user_ln']]
 
   def getKeyFieldNames(self):

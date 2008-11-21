@@ -1,15 +1,15 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/document/edit/{{ data_element.scope_path }}/{{ data_element.link_id }}'" name="name">
+onclick="document.location.href='/document/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}'" name="name">
   <td align="right">
    <div class="title">
     <a class="noul"
-     href="/document/edit/{{ data_element.scope_path }}/{{ data_element.link_id }}">{{ data_element.scope_path}}/{{ data_element.link_id }}</a>
+     href="/document/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}">{{ list.item.scope_path}}/{{ list.item.link_id }}</a>
    </div>
   </td>
-  <td><div class="title">{{ data_element.title }}</div></td>
-  <td><div class="link_id">{{ data_element.link_id }}</div></td>
-  <td><div class="featured">{{ data_element.is_featured }}</div></td>
-  <td><div class="author">{{ data_element.author.link_id }}</div></td>
-  <td><div class="created">{{ data_element.created }}</div></td>
-  <td><div class="modified">{{ data_element.modified }}</div></td>
+  <td><div class="title">{{ list.item.title }}</div></td>
+  <td><div class="link_id">{{ list.item.link_id }}</div></td>
+  <td><div class="featured">{{ list.item.is_featured }}</div></td>
+  <td><div class="author">{{ list.item.author.link_id }}</div></td>
+  <td><div class="created">{{ list.item.created }}</div></td>
+  <td><div class="modified">{{ list.item.modified }}</div></td>
 </tr>

@@ -2,13 +2,13 @@
 
   {{ pagination_form.as_table }}
  
-  {% if newest %}
-    <a class="novisit" href="{{newest}}">&laquo; First</a>
+  {% if list.newest %}
+    <a class="novisit" href="{{ list.newest }}">&laquo; First</a>
   {% endif %}
-  {% if prev %}
-    <a class="novisit" href="{{prev}}">&lsaquo; Previous</a>
+  {% if list.prev %}
+    <a class="novisit" href="{{ list.prev }}">&lsaquo; Previous</a>
   {% endif %}
-  <b>{{ first }}{% if last %} - {{ last }}{% endif %}</b>
-  {% if next %}<a class="novisit" href="{{next}}">Next &rsaquo;</a>
+  <b>{{ list.first }}{% if list.last %} - {{ list.last }}{% endif %}</b>
+  {% if list.next %}<a class="novisit" href="{{ list.next }}">Next &rsaquo;</a>
   {% endif %}
 </div>

@@ -29,6 +29,7 @@ from django.conf.urls import defaults
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
+import soc.logic.lists
 import soc.logic.out_of_band
 import soc.views.helper.lists
 import soc.views.helper.responses
@@ -125,6 +126,8 @@ class View(object):
 
     new_params['list_redirect_action'] = '/' + params['url_name'] + '/edit'
 
+    description = ugettext_lazy('List of %(name)s in Google Open Source Programs.')
+    new_params['list_description'] = description % params
     new_params['save_message'] = [ugettext_lazy('Profile saved.')]
     new_params['edit_params'] = {
         self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
@@ -349,9 +352,11 @@ class View(object):
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
     templates = params['lists_template']
+    description = params['list_description']
 
-    context = helper.lists.setList(request, context, entities, 
-                                 offset, limit, templates)
+    content = helper.lists.getList(request, entities, templates,
+        description, offset, limit)
+    context['list'] = soc.logic.lists.Lists([content])
 
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']

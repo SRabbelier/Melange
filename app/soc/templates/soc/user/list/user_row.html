@@ -1,10 +1,10 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='{{redirect_action|lower}}/{{ data_element.link_id }}'" name="name">
+onclick="document.location.href='{{redirect_action|lower}}/{{ list.item.link_id }}'" name="name">
   <td align="right"><div class="account"><a class="noul"
-         href="{{redirect_action|lower}}/{{ data_element.link_id }}">{{ data_element.account }}</a>
+         href="{{redirect_action|lower}}/{{ list.item.link_id }}">{{ list.item.account }}</a>
      </div>
   </td>
-  <td><div class="email">{{ data_element.account.email }}</a></div></td>
-  <td><div class="public_name">{{ data_element.public_name }}</div></td>
-  <td><div class="link_id">{{ data_element.link_id }}</div></td>
+  <td><div class="email">{{ list.item.account.email }}</a></div></td>
+  <td><div class="public_name">{{ list.item.public_name }}</div></td>
+  <td><div class="link_id">{{ list.item.link_id }}</div></td>
 </tr>

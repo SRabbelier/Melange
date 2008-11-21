@@ -1,9 +1,9 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ data_element.link_id }}'" name="name">
+onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ list.item.link_id }}'" name="name">
   <td align="right"><div class="name"><a class="noul"
-         href="/{{ entity_type|lower }}/edit/{{ data_element.link_id }}">{{ data_element.name }}</a>
+         href="/{{ entity_type|lower }}/edit/{{ list.item.link_id }}">{{ list.item.name }}</a>
      </div>
   </td>
-  <td><div class="link_id">{{ data_element.link_id }}</a></div></td>
-  <td><div class="short_name">{{ data_element.short_name }}</div></td>
+  <td><div class="link_id">{{ list.item.link_id }}</a></div></td>
+  <td><div class="short_name">{{ list.item.short_name }}</div></td>
 </tr>

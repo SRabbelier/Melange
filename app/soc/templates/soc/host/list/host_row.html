@@ -1,10 +1,10 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ data_element.sponsor.link_id }}/{{ data_element.user.link_id }}'" name="name">
+onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ list.item.sponsor.link_id }}/{{ list.item.user.link_id }}'" name="name">
   <td align="right"><div class="user_link_id"><a class="noul"
-         href="/{{ entity_type|lower }}/edit/{{ data_element.sponsor.link_id }}/{{ data_element.user.link_id }}">{{ data_element.user.link_id }}</a>
+         href="/{{ entity_type|lower }}/edit/{{ list.item.sponsor.link_id }}/{{ list.item.user.link_id }}">{{ list.item.user.link_id }}</a>
      </div>
   </td>
-  <td><div class="sponsor_name">{{ data_element.sponsor.name }}</div></td>
-  <td><div class="given_name">{{ data_element.given_name }}</div></td>
-  <td><div class="surname">{{ data_element.surname }}</div></td>
+  <td><div class="sponsor_name">{{ list.item.sponsor.name }}</div></td>
+  <td><div class="given_name">{{ list.item.given_name }}</div></td>
+  <td><div class="surname">{{ list.item.surname }}</div></td>
 </tr>

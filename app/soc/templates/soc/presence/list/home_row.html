@@ -1,10 +1,10 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/home/settings/edit/{{ data_element.scope_path }}/{{ data_element.link_id }}'" name="name">
+onclick="document.location.href='/home/settings/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}'" name="name">
   <td align="right">
    <div class="title">
     <a class="noul"
-     href="/home/settings/edit/{{ data_element.scope_path }}/{{ data_element.link_id }}">{{ data_element.scope_path}}/{{ data_element.link_id }}</a>
+     href="/home/settings/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}">{{ list.item.scope_path}}/{{ list.item.link_id }}</a>
    </div>
   </td>
-  <td><div class="link_id">{{ data_element.home.title }}</div></td>
+  <td><div class="link_id">{{ list.item.home.title }}</div></td>
 </tr>

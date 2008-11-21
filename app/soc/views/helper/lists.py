@@ -78,36 +78,25 @@ def cleanListParameters(offset=None, limit=None):
   return max(0, offset), max(1, min(limit, MAX_PAGINATION))
 
 
-DEF_LIST_TEMPLATES = {'list_main': 'soc/list/list_main.html',
-                      'list_pagination': 'soc/list/list_pagination.html',
-                      'list_row': 'soc/list/list_row.html',
-                      'list_heading': 'soc/list/list_heading.html'}
-
-def setList(request, context, list_data,
-            offset=0, limit=0, list_templates=DEF_LIST_TEMPLATES):
-  """Updates template context dict with variables used for rendering lists.
+def getList(request, list_data, list_templates, description, offset=0, limit=0):
+  """Returns a dict with fields used for rendering lists.
 
   Args:
     request: the Django HTTP request object
-    context: the template context dict to be updated in-place (pass in a copy
-      if the original must not be modified), or None if a new one is to be
-      created; any existing fields already present in the context dict passed
-      in by the caller are left unaltered 
     list_data: array of data to be displayed in the list
     offset: offset in list which defines first item to return
     limit: max amount of items per page
     list_templates: templates that are used when rendering list
 
   Returns:
-    updated template context dict supplied by the caller or a new context
-    dict if the caller supplied None.
+    A a dictionary with the following values set:
 
     {
-      'list_data': list data to be displayed 
-      'list_main': url to list main template
-      'list_pagination': url to list pagination template
-      'list_row': url to list row template
-      'list_heading': url to list heading template
+      'data': list data to be displayed
+      'main': url to list main template
+      'pagination': url to list pagination template
+      'row': url to list row template
+      'heading': url to list heading template
       'limit': max amount of items per page,
       'newest': url to first page of the list 
       'prev': url to previous page 
@@ -115,42 +104,44 @@ def setList(request, context, list_data,
       'first': offset of the first item in the list
       'last': offest of the lst item in the list
     }
-  """  
+  """
+
   if not list_data:
     list_data = []
-  
+
   more = bool(list_data[limit:])
   if more:
     del list_data[limit:]
+
+  newest = ''
+  next = ''
+  prev = ''
+
   if more:
     next = request.path + '?offset=%d&limit=%d' % (offset+limit, limit)
-  else:
-    next = ''
+
   if offset > 0:
     prev = request.path + '?offset=%d&limit=%d' % (max(0, offset-limit), limit)
-  else:
-    prev = ''
-  newest = ''
+
   if offset > limit:
     newest = request.path + '?limit=%d' % limit
-  
-  if not context:
-    context = {}
-  
-  context.update(
-    {'list_data': list_data, 
-     'list_main': list_templates['list_main'],
-     'list_pagination': list_templates['list_pagination'],
-     'list_row': list_templates['list_row'],
-     'list_heading': list_templates['list_heading'],
+
+  content = {
+      'data': list_data,
+      'description': description,
+     'main': list_templates['list_main'],
+     'pagination': list_templates['list_pagination'],
+     'row': list_templates['list_row'],
+     'heading': list_templates['list_heading'],
      'limit': limit,
      'newest': newest, 
      'prev': prev, 
      'next': next,
      'first': offset+1,
-     'last': len(list_data) > 1 and offset+len(list_data) or None})
-  
-  return context
+     'last': len(list_data) > 1 and offset+len(list_data) or None
+     }
+
+  return content
 
 
 def makePaginationForm(

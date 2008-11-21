@@ -1,11 +1,11 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ data_element.role|lower }}/{{ data_element.to.link_id }}/{{ data_element.requester.link_id }}'" name="name">
+onclick="document.location.href='/{{ entity_type|lower }}/edit/{{ list.item.role|lower }}/{{ list.item.to.link_id }}/{{ list.item.requester.link_id }}'" name="name">
   <td align="right"><div class="user_link_id"><a class="noul"
-         href="/{{ entity_type|lower }}/edit/{{ data_element.role|lower }}/{{ data_element.to.link_id }}/{{ data_element.requester.link_id }}">{{ data_element.requester.link_id }}</a>
+         href="/{{ entity_type|lower }}/edit/{{ list.item.role|lower }}/{{ list.item.to.link_id }}/{{ list.item.requester.link_id }}">{{ list.item.requester.link_id }}</a>
      </div>
   </td>
-  <td><div class="role">{{ data_element.role }}</div></td>
-  <td><div class="to">{{ data_element.to.link_id }}</div></td>
-  <td><div class="accepted">{{ data_element.accepted }}</div></td>
-  <td><div class="declined">{{ data_element.declined }}</div></td>
+  <td><div class="role">{{ list.item.role }}</div></td>
+  <td><div class="to">{{ list.item.to.link_id }}</div></td>
+  <td><div class="accepted">{{ list.item.accepted }}</div></td>
+  <td><div class="declined">{{ list.item.declined }}</div></td>
 </tr>

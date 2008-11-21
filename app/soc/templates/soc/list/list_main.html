@@ -1,17 +1,19 @@
+{{ list.description }}
+
 <div class="list">
-  {% include list_pagination %}
+  {% include list.pagination %}
 
   <table id="queues">
-    {% if not list_data %}
+    {% if not list.rows %}
       <tr><td colspan="9"><span class="disabled">(None)</span></td></tr>
     {% else %}
-      {% include list_heading %}
-      {% for data_element in list_data %}
-        {% include list_row %}
+      {% include list.heading %}
+      {% for _ in list.rows %}
+        {% include list.next_row %}
       {% endfor %}
     {% endif %}
   </table>
 
-  {% include list_pagination %}
+  {% include list.pagination %}
 
 </div>

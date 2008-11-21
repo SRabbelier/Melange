@@ -14,16 +14,10 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 {% block body %}
+{% for _ in list.lists %}
 <p>
-<p>
-{% block instructions %}
-{% if instruction_text %}
-{{ instruction_text }}
-{% else %}
-List of {{ entity_type_plural }} in Google Open Source Programs.
-{% endif %}
-{% endblock %}
+{% include list.next_list %}
 </p>
-{% include list_main %}
-</p>
+{% endfor %}
+
 {% endblock %}

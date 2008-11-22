@@ -52,8 +52,8 @@ def getPreferredListPagination(user=None):
   return DEF_PAGINATION
 
 
-def cleanListParameters(offset=None, limit=None):
-  """Converts and validates offset and limit values of the list.
+def getLimitAndOffset(request, idx):
+  """Retrieves, converts and validates offset and limit values
 
   Args:
     offset: offset in list which defines first item to return
@@ -62,24 +62,34 @@ def cleanListParameters(offset=None, limit=None):
   Returns:
     updated offset and limit values
   """
-  # update offset value
+
+  offset = request.GET.get('offset_%d' % idx)
+  limit = request.GET.get('limit_%d' % idx)
+
+  if offset is None:
+    offset = ''
+
+  if limit is None:
+    limit = ''
+
   try:
     offset = int(offset)
-  except:
-    # also catches offset=None case where offset not supplied
+  except ValueError:
     offset = 0
 
-  # update limit value
   try:
     limit = int(limit)
-  except:
-    # also catches limit=None case where limit not supplied
+  except ValueError:
     limit = getPreferredListPagination()
 
-  return max(0, offset), max(1, min(limit, MAX_PAGINATION))
+  offset = max(0, offset)
+  limit = max(1, limit)
+  limit = min(MAX_PAGINATION, limit)
+
+  return limit, offset
 
 
-def getListContent(request, params, logic, filter):
+def getListContent(request, params, logic, filter=None, idx=0):
   """Returns a dict with fields used for rendering lists.
 
   Args:
@@ -87,6 +97,7 @@ def getListContent(request, params, logic, filter):
     params: a dict with params for the View this list belongs to
     logic: the logic object for the View this list belongs to
     filter: a filter for this list
+    idx: the index of this list
 
   Returns:
     A a dictionary with the following values set:
@@ -106,8 +117,9 @@ def getListContent(request, params, logic, filter):
     }
   """
 
-  offset, limit = helper.lists.cleanListParameters(
-      offset=request.GET.get('offset'), limit=request.GET.get('limit'))
+  limit, offset = getLimitAndOffset(request, idx)
+  arg_name = 'limit_%d' % idx
+  pagination_form = makePaginationForm(request, limit, arg_name)
 
   # Fetch one more to see if there should be a 'next' link
   if not filter:
@@ -125,13 +137,15 @@ def getListContent(request, params, logic, filter):
   newest = next = prev = ''
 
   if more:
-    next = request.path + '?offset=%d&limit=%d' % (offset+limit, limit)
+    next = request.path + '?offset_%d=%d&limit_%d=%d' % (
+        idx, offset+limit, idx, limit)
 
   if offset > 0:
-    prev = request.path + '?offset=%d&limit=%d' % (max(0, offset-limit), limit)
+    prev = request.path + '?offset_%d=%d&limit_%d=%d' % (
+        idx, max(0, offset-limit), idx, limit)
 
   if offset > limit:
-    newest = request.path + '?limit=%d' % limit
+    newest = request.path + '?limit_%d=%d' % (idx, limit)
 
   content = {
       'data': data,
@@ -141,6 +155,7 @@ def getListContent(request, params, logic, filter):
       'limit': limit,
       'newest': newest, 
       'next': next,
+      'pagination_form': pagination_form,
       'prev': prev, 
       }
 
@@ -151,7 +166,7 @@ def getListContent(request, params, logic, filter):
 
 
 def makePaginationForm(
-  request, limit, arg_name='limit', choices=DEF_PAGINATION_CHOICES,
+  request, limit, arg_name, choices=DEF_PAGINATION_CHOICES,
   field_name_fmt=helper.forms.DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
   """Returns a customized pagination limit selection form.
   

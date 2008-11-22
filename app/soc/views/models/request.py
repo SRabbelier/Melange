@@ -155,7 +155,7 @@ class View(base.View):
     uh_params['list_description'] = ugettext_lazy(
         "An overview of your unhandled requests")
 
-    uh_list = helper.lists.getListContent(request, uh_params, self._logic, filter)
+    uh_list = helper.lists.getListContent(request, uh_params, self._logic, filter, 0)
 
     # construct the Open Requests list
     
@@ -168,7 +168,7 @@ class View(base.View):
     ar_params['list_description'] = ugettext_lazy(
         "An overview of your requests, that haven't been handled by an admin yet")
     
-    ar_list = helper.lists.getListContent(request, ar_params, self._logic, filter)
+    ar_list = helper.lists.getListContent(request, ar_params, self._logic, filter, 1)
     
     # fill contents with all the needed lists
     contents = [uh_list,ar_list]

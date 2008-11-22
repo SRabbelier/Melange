@@ -28,6 +28,7 @@ class Lists(object):
 
   DEF_PASSTHROUGH_FIELDS = [
       'pagination',
+      'pagination_form',
       'description',
       'heading',
       'row',

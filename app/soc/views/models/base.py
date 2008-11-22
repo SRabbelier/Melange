@@ -370,12 +370,8 @@ class View(object):
       page_name: the page name displayed in templates as page and header title
     """
 
-    offset, limit = helper.lists.cleanListParameters(
-      offset=request.GET.get('offset'), limit=request.GET.get('limit'))
-
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
-    context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
     context['list'] = soc.logic.lists.Lists(contents)
 
     context['entity_type'] = params['name']

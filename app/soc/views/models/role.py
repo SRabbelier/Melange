@@ -106,7 +106,7 @@ class RoleView(base.View):
     except out_of_band.Error, error:
       return error.response(request)
 
-    content = helper.lists.getListContent(request, params, user_logic.logic, None)
+    content = helper.lists.getListContent(request, params, user_logic.logic)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

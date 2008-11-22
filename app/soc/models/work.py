@@ -91,3 +91,9 @@ class Work(soc.models.linkable.Linkable):
   is_featured.help_text = ugettext_lazy(
       'Field used to indicate if a Work should be featured, for example,'
       ' in the sidebar menu.')
+
+  def name(self):
+    """Alias 'title' Property as 'name' for use in common templates.
+    """
+    return self.title
+

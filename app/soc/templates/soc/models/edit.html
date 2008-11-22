@@ -20,7 +20,8 @@ limitations under the License.
 {{ page_name }}
  {% if entity %}
    <!-- TODO(srabbelier) use a generic entity name as link -->
-   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}">(Public page)</a>
+   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}"
+>{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
  {% endif %}
 {% endblock %}
 

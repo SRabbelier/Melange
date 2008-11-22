@@ -121,7 +121,7 @@ class View(base.View):
       'list_heading': 'soc/request/list/request_heading.html',
     }
 
-    params['sidebar_defaults'] = [('/%s/list', 'List %(plural)s')]
+    params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s')]
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['create_redirect'] = '/' + params['url_name']

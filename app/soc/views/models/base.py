@@ -55,7 +55,7 @@ class View(object):
   DEF_SUBMIT_MSG_PARAM_NAME = 's'
   DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
-  DEF_CREATE_NEW_ENTITY_MSG = ugettext_lazy(
+  DEF_CREATE_NEW_ENTITY_MSG_FMT = ugettext_lazy(
       ' You can create a new %(entity_type)s by visiting'
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
@@ -83,7 +83,10 @@ class View(object):
         save_message: the message to display when the entity is saved
         edit_params: the params to use when editing
         sidebar: the sidebar menu items for this view
-        sidebar_defaults: a dictionary with defaults for the sidebar 
+        sidebar_defaults: a dictionary with defaults for the sidebar; each
+          value in the dict is a two-tuple:
+          (url_format,       # supplied a single positional url_name
+           menu_text_format) # supplied the params dict
     """
 
     rights = {}
@@ -102,24 +105,25 @@ class View(object):
     new_params['sidebar'] = None
     new_params['sidebar_defaults'] = [
      ('/%s/create', 'New %(name)s'),
-     ('/%s/list', 'List %(plural)s'),
+     ('/%s/list', 'List %(name_plural)s'),
     ]
     new_params['sidebar_additional'] = []
+    new_params['sidebar_heading'] = None
 
     new_params['key_fields_prefix'] = []
 
     new_params['django_patterns'] = None
     new_params['django_patterns_defaults'] = [
         (r'^%(url_name)s/show/%(key_fields)s$', 
-            'soc.views.models.%s.public', 'Show %(name)s'),
+            'soc.views.models.%s.public', 'Show %(name_short)s'),
         (r'^%(url_name)s/create$',
-            'soc.views.models.%s.create', 'Create %(name)s'),
+            'soc.views.models.%s.create', 'Create %(name_short)s'),
         (r'^%(url_name)s/create/%(key_fields)s$',
-            'soc.views.models.%s.create', 'Create %(name)s'),
+            'soc.views.models.%s.create', 'Create %(name_short)s'),
         (r'^%(url_name)s/delete/%(key_fields)s$',
-            'soc.views.models.%s.delete', 'Delete %(name)s'),
+            'soc.views.models.%s.delete', 'Delete %(name_short)s'),
         (r'^%(url_name)s/edit/%(key_fields)s$',
-            'soc.views.models.%s.edit', 'Edit %(name)s'),
+            'soc.views.models.%s.edit', 'Edit %(name_short)s'),
         (r'^%(url_name)s/list$',
             'soc.views.models.%s.list', 'List %(name_plural)s'),
         ]
@@ -234,7 +238,7 @@ class View(object):
     except soc.logic.out_of_band.ErrorResponse, error:
       if not seed:
         template = params['public_template']
-        error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
+        error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
             'entity_type_lower' : params['name'].lower(),
             'entity_type' : params['name'],
             'create' : params['missing_redirect']
@@ -396,7 +400,7 @@ class View(object):
       entity = self._logic.getIfFields(key_fields)
     except soc.logic.out_of_band.ErrorResponse, error:
       template = params['edit_template']
-      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG % {
+      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']
@@ -560,15 +564,9 @@ class View(object):
 
     result = []
 
-    for url, title in defaults:
+    for url, menu_text in defaults:
       url = url % params['url_name'].lower()
-
-      title = title % {
-          'name': params['name'],
-          'plural': params['name_plural']
-          }
-
-      item = (url, title)
+      item = (url, menu_text % params)
       result.append(item)
 
     for item in params['sidebar_additional']:
@@ -587,11 +585,15 @@ class View(object):
 
     items = []
 
-    for url, title in self._getSidebarItems(params):
-      items.append({'url': url, 'title': title})
+    for url, menu_text in self._getSidebarItems(params):
+      items.append({'url': url, 'title': menu_text})
 
     res = {}
-    res['heading'] = params['name']
+
+    if not params['sidebar_heading']:
+      params['sidebar_heading'] = params['name']
+
+    res['heading'] = params['sidebar_heading']
     res['items'] = items
 
     return res
@@ -599,7 +601,8 @@ class View(object):
   def getDjangoURLPatterns(self, params=None):
     """Retrieves a list of sidebar entries for this view from self._params.
 
-    If self._params['django_patterns'] is None default entries will be constructed.
+    If self._params['django_patterns'] is None default entries will be
+    constructed.
     """
 
     params = dicts.merge(params, self._params)
@@ -615,14 +618,7 @@ class View(object):
     patterns = []
 
     for url, module, name in default_patterns:
-      name_short = params['name_short']
-      name_plural = params['name_plural']
-
-      name = name % {
-          'name': name_short, 
-          'name_plural': name_plural,
-          }
-
+      name = name % params
       module = module % params['module_name']
 
       url = url % {

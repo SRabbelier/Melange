@@ -190,7 +190,7 @@ class RoleView(base.View):
     default_patterns = self._params['django_patterns_defaults']
     default_patterns += [
         (r'^%(url_name)s/invite/%(lnp)s$',
-            'soc.views.models.%s.invite', 'Invite %(name)s')]
+            'soc.views.models.%s.invite', 'Invite %(name_short)s')]
 
     params['django_patterns_defaults'] = default_patterns
     patterns = super(RoleView, self).getDjangoURLPatterns(params)

@@ -177,6 +177,8 @@ class View(base.View):
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
+    params['sidebar_heading'] = 'Users'
+
     params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)
@@ -291,7 +293,7 @@ class View(base.View):
     """
 
     params = {}
-    params['name'] = "User (self)"
+    params['sidebar_heading'] = "User (self)"
     params['sidebar'] = [
         ('/' + self._params['url_name'] + '/edit', 'Profile'),
         ('/' + self._params['url_name'] + '/roles', 'Roles'),

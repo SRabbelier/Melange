@@ -54,9 +54,9 @@ class CreateForm(presence.SettingsValidationForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'home', 'scope', 'scope_path', 'link_id']
 
-  scope_path = forms.CharField(widget=forms.HiddenInput)
+#  scope_path = forms.CharField(widget=forms.HiddenInput)
 
-  link_id = forms.CharField(widget=forms.HiddenInput)
+#  link_id = forms.CharField(widget=forms.HiddenInput)
 
 
 class EditForm(CreateForm):
@@ -80,17 +80,19 @@ class View(presence.View):
 
     params = {}
 
-    # add ugettext_lazy ?
+    # TODO(alturin): add ugettext_lazy ?
     params['name'] = "Site Settings"
-    params['name_short'] = "Site Settings"
+    params['name_short'] = "Site"
     params['name_plural'] = "Site Settings"
     # lower name and replace " " with "/"
-    # for module name lower name and replace " " with "_"
     params['url_name'] = "site/settings"
     params['module_name'] = "site"
 
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
+
+    params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s')]
+    params['sidebar_heading'] = params['name_short']
 
     params['lists_template'] = {
       'list_main': 'soc/list/list_main.html',
@@ -100,9 +102,6 @@ class View(presence.View):
     }
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
-
-    params['sidebar_additional'] = [
-        ('/' + params['url_name'] + '/edit', 'Edit Main Site Settings')]
 
     params = dicts.merge(original_params, params)
 

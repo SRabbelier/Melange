@@ -22,16 +22,16 @@ __authors__ = [
 ]
 
 
-import polymodel
-
 from google.appengine.ext import db
 
 import soc.models.question
 import soc.models.quiz
 import soc.models.response
 
+from soc.models import base
 
-class Answer(polymodel.PolyModel):
+
+class Answer(base.ModelWithFieldAttributes):
   """Model of a specific Answer to a Question in a specific Response.
 
   The properties in this Model do not have verbose_name or help_text,

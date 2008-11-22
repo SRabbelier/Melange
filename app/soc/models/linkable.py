@@ -23,11 +23,11 @@ __authors__ = [
 
 import re
 
-import polymodel
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
+
+from soc.models import base
 
 
 # start with ASCII digit or lowercase
@@ -66,7 +66,7 @@ PATH_LINK_ID_PATTERN = r'^%s$' % PATH_LINK_ID_ARGS_PATTERN
 PATH_LINK_ID_REGEX = re.compile(PATH_LINK_ID_PATTERN)
 
 
-class Linkable(polymodel.PolyModel):
+class Linkable(base.ModelWithFieldAttributes):
   """A base class for Model classes that are "linkable".
   
   Many entities in Melange are identified by a "link path" that is formed

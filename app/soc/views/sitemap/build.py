@@ -38,8 +38,8 @@ from soc.views.sitemap import sitemap
 
 sidebar.SIDEBAR.append(user.view.getUserSidebar())
 
-sidebar.SIDEBAR.append(presence.view.getSidebarLinks())
-sitemap.addPages(presence.view.getDjangoURLPatterns())
+#sidebar.SIDEBAR.append(presence.view.getSidebarLinks())
+#sitemap.addPages(presence.view.getDjangoURLPatterns())
 
 sidebar.SIDEBAR.append(site.view.getSidebarLinks())
 sitemap.addPages(site.view.getDjangoURLPatterns())

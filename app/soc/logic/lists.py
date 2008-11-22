@@ -137,7 +137,6 @@ class Lists(object):
     """Returns the redirect for the current row item in the current list.
     """
 
-    logic = self.get('logic')
-    action = self.get('action')
-    suffix = logic.getKeySuffix(self.row_data)
-    return "%s/%s" % (action, suffix)
+    action, args = self.get('action')
+    result = action(self.row_data, args)
+    return result

@@ -31,8 +31,8 @@ from soc.views.models import role
 
 import soc.models.host
 import soc.logic.models.host
-import soc.logic.models.sponsor
 import soc.views.helper
+import soc.views.models.sponsor
 
 
 class CreateForm(helper.forms.BaseForm):
@@ -89,7 +89,7 @@ class View(role.RoleView):
     params = {}
 
     params['logic'] = soc.logic.models.host.logic
-    params['group_logic'] = soc.logic.models.sponsor.logic
+    params['group_view'] = soc.views.models.sponsor.view
     params['invite_filter'] = {'group_ln': 'link_id'}
 
     params['name'] = "Host"

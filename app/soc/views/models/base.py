@@ -140,7 +140,7 @@ class View(object):
     new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
     new_params['list_heading'] = 'soc/%(module_name)s/list/heading.html' % params
 
-    new_params['list_action'] = '/' + params['url_name'] + '/edit'
+    new_params['list_action'] = (self.getEditRedirect, None)
     new_params['list_params'] = {
         'list_action': 'action',
         'list_description': 'description',
@@ -442,6 +442,14 @@ class View(object):
     redirect = params['delete_redirect']
 
     return http.HttpResponseRedirect(redirect)
+
+  def getEditRedirect(self, entity, _):
+    """Returns the edit redirect for the specified entity
+    """
+
+    suffix = self._logic.getKeySuffix(entity)
+    url_name = self._params['url_name']
+    return '/%s/edit/%s' % (url_name, suffix)
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

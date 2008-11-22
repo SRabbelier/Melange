@@ -37,6 +37,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import widgets
 from soc.views.models import base
+from soc.views.models import role as role_view
 
 import soc.models.request
 import soc.logic.models.request
@@ -150,8 +151,7 @@ class View(base.View):
               'accepted' : True,
               'declined' : False}
 
-    # TODO(SRabbelier): make into a usefull redirect
-    # params['list_action'] = '/host/create'
+    params['list_action'] = (self.inviteAcceptedRedirect, None)
     params['list_description'] = "An overview of your unhandled requests"
 
     uh = helper.lists.getListContent(request, params, self._logic, filter)
@@ -160,6 +160,13 @@ class View(base.View):
 
     contents = [uh]
     return self._list(request, params, contents, page_name)
+
+  def inviteAcceptedRedirect(self, entity, _):
+    """Returns the redirect for accepting a request
+    """
+
+    return '/%s/create/%s/%s' % (
+        entity.role, entity.to.link_id, entity.requester.link_id)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

@@ -310,7 +310,7 @@ class View(base.View):
     patterns += [(r'^' + self._params['url_name'] + '/edit$',
                    'soc.views.models.user.edit_self')]
 
-    page_name = "Unhandled Requests"
+    page_name = "Requests Overview"
     patterns += [(r'^' + self._params['url_name'] + '/roles$',
                    'soc.views.models.request.list_self',
                    {'page_name': page_name}, page_name)]

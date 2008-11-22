@@ -144,21 +144,36 @@ class View(base.View):
     properties = {'account': users.get_current_user()}
     user_entity = user_logic.logic.getForFields(properties, unique=True)
 
-    # TODO(ljvderijk): Construct the Unhandled Request list
+    # construct the Unhandled Requests list
 
     # only select the requests for this user that haven't been handled yet
     filter = {'requester': user_entity,
-              'accepted' : True,
-              'declined' : False}
+              'declined' : None}
+    
+    uh_params = params.copy()
+    uh_params['list_action'] = (self.inviteAcceptedRedirect, None)
+    uh_params['list_description'] = ugettext_lazy(
+        "An overview of your unhandled requests")
 
-    params['list_action'] = (self.inviteAcceptedRedirect, None)
-    params['list_description'] = "An overview of your unhandled requests"
+    uh_list = helper.lists.getListContent(request, uh_params, self._logic, filter)
 
-    uh = helper.lists.getListContent(request, params, self._logic, filter)
-
-    # TODO(ljvderijk): Construct the other Request lists here
-
-    contents = [uh]
+    # construct the Open Requests list
+    
+    # only select the requests for the user
+    # that haven't been accepted by an admin yet
+    filter = {'requester' : user_entity,
+              'accepted' : None}
+    
+    ar_params = params.copy()
+    ar_params['list_description'] = ugettext_lazy(
+        "An overview of your requests, that haven't been handled by an admin yet")
+    
+    ar_list = helper.lists.getListContent(request, ar_params, self._logic, filter)
+    
+    # fill contents with all the needed lists
+    contents = [uh_list,ar_list]
+    
+    # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
 
   def inviteAcceptedRedirect(self, entity, _):
@@ -191,10 +206,6 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['user_ln'] = fields['requester'].link_id
     fields['group_ln'] = fields['to'].link_id
-    
-    # make declined explicitly false when not specified
-    if 'declined' not in fields:
-      fields['declined'] = False
 
 
 view = View()

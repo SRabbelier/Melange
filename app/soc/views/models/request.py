@@ -34,6 +34,7 @@ from soc.logic import validate
 from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import widgets
 from soc.views.models import base
 

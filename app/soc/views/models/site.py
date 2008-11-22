@@ -109,7 +109,7 @@ class View(presence.View):
 
     self._logic = soc.logic.models.site.logic
 
-  def main_public(self, request, page_name=None, **kwargs):
+  def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.
 
     Args:
@@ -127,7 +127,7 @@ class View(presence.View):
 
     return self.public(request, page_name, **key_values)
 
-  def main_edit(self, request, page_name=None, **kwargs):
+  def mainEdit(self, request, page_name=None, **kwargs):
     """Displays the edit page for the main site settings page.
 
     Args:
@@ -165,5 +165,5 @@ edit = view.edit
 delete = view.delete
 list = view.list
 public = view.public
-main_public = view.main_public
-main_edit = view.main_edit
+main_public = view.mainPublic
+main_edit = view.mainEdit

@@ -143,6 +143,16 @@ class View(base.View):
   """View methods for the User model.
   """
 
+  DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext_lazy(
+    'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
+    ' one or more of the following reasons:'
+    '<ul>'
+    ' <li>the account is invalid</li>'
+    ' <li>the account is already attached to a User profile and cannot be'
+    ' used to create another one</li>'
+    ' <li>the account is a former account that cannot be used again</li>'
+    '</ul>')
+
   def __init__(self, original_params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -235,8 +245,11 @@ class View(base.View):
         # check if user account is not in former_accounts
         # if it is show error message that account is invalid
         if soc.logic.models.user.logic.isFormerAccount(account):
-          error = out_of_band.Error(DEF_USER_ACCOUNT_INVALID_MSG)
-          return error.response(request, template=template, context=context)
+          msg = self.DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
+            'email': account.email()}
+          error = out_of_band.Error(msg)
+          return error.response(request, template=self.EDIT_SELF_TMPL,
+                                context=context)
 
         user = soc.logic.models.user.logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})

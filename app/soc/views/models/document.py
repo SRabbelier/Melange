@@ -52,7 +52,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.document.Document
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'author', 'created', 'modified', 'scope']
+    exclude = ['author', 'created', 'modified', 'scope']
 
   def clean_scope_path(self):
     scope_path = self.cleaned_data.get('scope_path')

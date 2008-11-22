@@ -53,7 +53,7 @@ class CreateForm(presence.SettingsValidationForm):
     model = soc.models.site.Site
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home', 'scope', 'scope_path', 'link_id']
+    exclude = ['home', 'scope', 'scope_path', 'link_id']
 
   scope_path = forms.CharField(widget=forms.HiddenInput)
 

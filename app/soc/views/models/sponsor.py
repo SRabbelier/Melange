@@ -52,7 +52,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.sponsor.Sponsor
     
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'scope_path', 'founder', 'inheritance_line', 'home']
+    exclude = ['scope', 'scope_path', 'founder', 'home']
   
   # TODO(pawel.solyga): write validation functions for other fields
   def clean_link_id(self):

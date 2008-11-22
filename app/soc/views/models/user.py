@@ -120,8 +120,7 @@ class UserForm(helper.forms.BaseForm):
     model = soc.models.user.User
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['account', 'former_accounts', 'is_developer',
-               'inheritance_line']
+    exclude = ['account', 'former_accounts', 'is_developer']
 
   def clean_link_id(self):
     link_id = self.cleaned_data.get('link_id')

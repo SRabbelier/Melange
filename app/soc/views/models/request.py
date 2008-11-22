@@ -54,7 +54,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.request.Request
 
     #: list of model fields which will *not* be gathered by the form 
-    exclude = ['inheritance_line', 'scope', 'scope_path', 'link_id', 'role', 'declined']
+    exclude = ['scope', 'scope_path', 'link_id', 'role', 'declined']
 
   role = forms.CharField(widget=helper.widgets.ReadOnlyInput())
 

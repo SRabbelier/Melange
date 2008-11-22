@@ -54,7 +54,7 @@ class RequestForm(helper.forms.BaseForm):
 
     #: Exclude pretty much everything, model=None would 
     #: also remove the help text etc. 
-    exclude = ['inheritance_line', 'requester', 'to', 'role', 
+    exclude = ['requester', 'to', 'role', 
         'accepted', 'declined']
 
   requester = forms.CharField(widget=helper.widgets.ReadOnlyInput())

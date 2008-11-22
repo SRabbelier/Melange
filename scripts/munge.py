@@ -378,7 +378,8 @@ def _buildParser():
     'Options used to select which files to process.')
 
   filter_group.add_option(
-    '-f', '--files', dest='files_pattern', default='^.*$',
+    '-f', '--files', dest='files_pattern',
+    default='(?!^.*\.pyc|.*\.ico|.*\.gif|.*\.png|.*\.jpg$)',
     metavar='FILES_REGEX',
     help=('Python regex pattern (*not* a glob!) defining files to process'
           ' in each directory [default: %default]'))

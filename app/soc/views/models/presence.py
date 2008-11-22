@@ -85,7 +85,7 @@ class CreateForm(SettingsValidationForm):
     model = soc.models.presence.Presence
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['inheritance_line', 'home']
+    exclude = ['inheritance_line', 'home', 'scope']
 
 
 class EditForm(CreateForm):

@@ -12,44 +12,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
+
+{% block scripts %}
+	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+{% endblock %}
 {% block header_title %}
- {{ page_name }}
- {% if existing_user %}
-for {{ existing_user.name }}
-<a href="mailto:{{ existing_user.account.email }} ">&lt;{{ existing_user.account.email }}&gt;</a>
+{{ page_name }}
+ {% if entity %}
+   <!-- TODO(srabbelier) use a generic entity name as link -->
+   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}"
+>{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
  {% endif %}
 {% endblock %}
+
 {% block body %}
 <p>
 <p>
 {% block instructions %}
-Please use this form to alter basic site-wide settings for a User in Google Open Source Programs.
+Please use this form to edit the {{ entity_type }}.
 {% endblock %}
 </p>
 <form method="POST">
-  {{ form.key_name }}
  <table>
-  {% if existing_user %}
-  {% readonly_field_as_table_row "Account" existing_user.account %}
-  {% endif %}
-  {% field_as_table_row form.account %}
-{% if lookup_error %}
-<tr>
- <td>&nbsp;</td>
- <td colspan="3" class="formfielderror">
-  {{ lookup_error }}
- </td>
-</tr>
-{% endif %}
-  {% field_as_table_row form.link_id %}
-  {% field_as_table_row form.name %}
-  {% field_as_table_row form.is_developer %}
-  {% if existing_user.former_accounts %}
+  {{ form.as_table }}
+  {% if entity.former_accounts %}
   <tr>
-   <td class="formfieldlabel">Former Accounts</td>
+   <td class="formfieldlabel">Former Accounts:</td>
    <td>
-       {% for former_account in existing_user.former_accounts %}
+       {% for former_account in entity.former_accounts %}
        {{ former_account }}<br />
        {% endfor %}
    </td>
@@ -60,23 +50,24 @@ Please use this form to alter basic site-wide settings for a User in Google Open
   <tr>
    <td colspan="4">&nbsp;</td>
   </tr>
-   <table>
-   <tr>
-     {% block submit_buttons %}
-    <td> 
-     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
-    </td>
-    <td>
-     <input type="button" onclick="location.href='/'" value="Cancel"/>
-    </td>
-    {% if submit_error %}
-       <td class="formfielderror">
-        {{ submit_error }}
-       </td>
-    {% endif %}
-    {% endblock %}
-   </tr>
   </table>
+  <table>
+  <tr>
+    {% block submit_buttons %}
+   <td> 
+    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
+   </td>
+   <td>
+    <input type="button" onclick="location.href='/'" value="Cancel"/>
+   </td>
+   {% if entity %}
+   <td>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+   </td>
+   {% endif %}
+   {% endblock %}
+  </tr>
+ </table>
 </form>
 </p>
 {% endblock %}

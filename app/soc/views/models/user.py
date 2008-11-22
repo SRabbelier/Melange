@@ -176,6 +176,8 @@ class View(base.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
+    params['edit_template'] = 'soc/user/edit.html'
+    
     params['sidebar_heading'] = 'Users'
 
     params = dicts.merge(original_params, params)

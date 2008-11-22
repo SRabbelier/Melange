@@ -114,7 +114,7 @@ class Linkable(polymodel.PolyModel):
   link_id = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Link ID'))
   link_id.help_text = ugettext_lazy(
-      '"ID" used when creating URL links.'
+      'Link ID is used as part of various URL links throughout the site.'
       ' Lower ASCII characters, digits, and underscores only.')
 
   #: Optional Self Reference property to another Linkable entity which defines

@@ -36,6 +36,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.models import base
 
+import soc.models.linkable
 import soc.models.user
 import soc.logic.models.user
 import soc.views.helper
@@ -51,10 +52,11 @@ class CreateForm(helper.forms.BaseForm):
 
   link_id = forms.CharField(
       label=soc.models.user.User.link_id.verbose_name,
-      help_text=soc.models.user.User.link_id.help_text)
+      help_text=soc.models.linkable.Linkable.link_id.help_text)
 
   name = forms.CharField(
-      label=soc.models.user.User.name.verbose_name)
+      label=soc.models.user.User.name.verbose_name,
+      help_text=soc.models.user.User.name.help_text)
 
   is_developer = forms.BooleanField(required=False,
       label=soc.models.user.User.is_developer.verbose_name,

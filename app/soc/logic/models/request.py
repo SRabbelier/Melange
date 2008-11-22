@@ -42,21 +42,19 @@ class Logic(base.Logic):
     """See base.Logic.getKeyNameValues.
     """
 
-    return [entity.role, entity.to.link_id, entity.requester.link_id]
+    return [entity.role, entity.scope.link_id, entity.link_id]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    # TODO: "program_ln" might be needed here, since some Groups, such as
-    #   Organizations, are per-Program, per-Year
-    return [fields['role'], fields['group_ln'], fields['user_ln']]
+    return [fields['role'], fields['scope_path'], fields['link_id']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames.
     """
 
-    return ['role', 'group_ln', 'user_ln']
+    return ['role', 'scope_path', 'link_id']
 
 
 logic = Logic()

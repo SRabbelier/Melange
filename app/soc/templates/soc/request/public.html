@@ -22,10 +22,10 @@ limitations under the License.
 <p>
  <table>
   {% readonly_field_as_table_row entity.fields.role.label entity.role %}
-  {% readonly_field_as_table_row entity.fields.requester.label entity.requester.link_id %}
-  {% readonly_field_as_table_row entity.fields.to.label entity.to.link_id %} 
-  {% readonly_field_as_table_row entity.fields.accepted.label entity.accepted %}
-  {% readonly_field_as_table_row entity.fields.declined.label entity.declined %}
+  {% readonly_field_as_table_row entity.fields.link_id.label entity.link_id %}
+  {% readonly_field_as_table_row entity.fields.scope_path.label entity.scope_path %}
+  {% readonly_field_as_table_row entity.fields.user_accepted.label entity.group_accepted %}
+  {% readonly_field_as_table_row entity.fields.group_accepted.label entity.user_accepted %}
   <!-- TODO(pawel.solyga) make this generic -->
  </table>
 </p>

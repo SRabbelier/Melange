@@ -1,11 +1,11 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
 onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td align="right"><div class="user_link_id"><a class="noul"
-         href="{{ list.redirect }}">{{ list.item.requester.link_id }}</a>
+         href="{{ list.redirect }}">{{ list.item.link_id }}</a>
      </div>
   </td>
   <td><div class="role">{{ list.item.role }}</div></td>
-  <td><div class="to">{{ list.item.to.link_id }}</div></td>
-  <td><div class="accepted">{{ list.item.accepted }}</div></td>
-  <td><div class="declined">{{ list.item.declined }}</div></td>
+  <td><div class="to">{{ list.item.scope_path }}</div></td>
+  <td><div class="accepted">{{ list.item.group_accepted }}</div></td>
+  <td><div class="declined">{{ list.item.group_accepted }}</div></td>
 </tr>

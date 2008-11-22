@@ -33,25 +33,14 @@ class Request(soc.models.linkable.Linkable):
   """A request is made to allow a person to create a new Role entity.
   """
 
-  requester = db.ReferenceProperty(reference_class=soc.models.user.User,
-                              required=True, collection_name="requests")
-  requester.help_text = ugettext_lazy(
-      'This is the user who the request is made for')
-
   role = db.StringProperty()
   role.help_text = ugettext_lazy(
       'This should be the type of the role that is requested')
 
-  to = db.ReferenceProperty(reference_class=soc.models.group.Group,
-                            required=True, collection_name="requests")
-  to.help_text = ugettext_lazy(
-      'The group that the request should be made to '
-      '(this group should have the authority to grant the request)')
+  group_accepted = db.BooleanProperty()
+  group_accepted.help_text = ugettext_lazy(
+      'Field used to indicate whether a request has been accepted by the group')
 
-  accepted = db.BooleanProperty()
-  accepted.help_text = ugettext_lazy(
-      'Field used to indicate whether a request has been accepted')
-
-  declined = db.BooleanProperty()
-  declined.help_text = ugettext_lazy(
-      'Field used to indicate that a request has been rejected by the user')
+  user_accepted = db.BooleanProperty()
+  user_accepted.help_text = ugettext_lazy(
+      'Field used to indicate that a request has been accepted by the user')

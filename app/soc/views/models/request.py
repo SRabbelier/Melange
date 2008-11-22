@@ -54,18 +54,18 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.request.Request
 
     #: list of model fields which will *not* be gathered by the form 
-    exclude = ['inheritance_line', 'requester', 'to', 'role', 'declined']
+    exclude = ['inheritance_line', 'scope', 'scope_path', 'link_id', 'role', 'declined']
 
   role = forms.CharField(widget=helper.widgets.ReadOnlyInput())
 
   user = forms.CharField(
-      label=soc.models.request.Request.requester.verbose_name,
-      help_text=soc.models.request.Request.requester.help_text,
-      widget=helper.widgets.ReadOnlyInput())  
+      label=soc.models.request.Request.link_id.verbose_name,
+      help_text=soc.models.request.Request.link_id.help_text,
+      widget=helper.widgets.ReadOnlyInput())
 
   group = forms.CharField(
-      label=soc.models.request.Request.to.verbose_name,
-      help_text=soc.models.request.Request.to.help_text,
+      label=soc.models.request.Request.scope.verbose_name,
+      help_text=soc.models.request.Request.scope.help_text,
       widget=helper.widgets.ReadOnlyInput())
 
   def clean_user(self):
@@ -147,8 +147,8 @@ class View(base.View):
     # construct the Unhandled Requests list
 
     # only select the requests for this user that haven't been handled yet
-    filter = {'requester': user_entity,
-              'declined' : None}
+    filter = {'link_id': user_entity.link_id,
+              'group_accepted' : True}
     
     uh_params = params.copy()
     uh_params['list_action'] = (self.inviteAcceptedRedirect, None)
@@ -161,8 +161,8 @@ class View(base.View):
     
     # only select the requests for the user
     # that haven't been accepted by an admin yet
-    filter = {'requester' : user_entity,
-              'accepted' : None}
+    filter = {'link_id' : user_entity.link_id,
+              'group_accepted' : False}
     
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
@@ -181,31 +181,32 @@ class View(base.View):
     """
 
     return '/%s/create/%s/%s' % (
-        entity.role, entity.to.link_id, entity.requester.link_id)
+        entity.role, entity.scope_path, entity.link_id)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().
     """
 
     # fill in the email field with the data from the entity
-    seed['user'] = seed['user_ln']
-    seed['group'] = seed['group_ln']
+    seed['user'] = seed['link_id']
+    seed['group'] = seed['scope_path']
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
 
     # fill in the email field with the data from the entity
-    form.fields['user'].initial = entity.requester.link_id
-    form.fields['group'].initial = entity.to.link_id 
+    form.fields['user'].initial = entity.link_id
+    form.fields['group'].initial = entity.scope_path
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
 
     # fill in the account field with the user created from email
-    fields['user_ln'] = fields['requester'].link_id
-    fields['group_ln'] = fields['to'].link_id
+    fields['link_id'] = fields['requester'].link_id
+    fields['scope_path'] = fields['to'].link_id
+    fields['scope'] = fields['to']
 
 
 view = View()

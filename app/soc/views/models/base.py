@@ -99,6 +99,7 @@ class View(object):
     new_params = {}
     new_params['rights'] = rights
     new_params['create_redirect'] = '/%(url_name)s' % params
+    new_params['edit_redirect'] = '/%(url_name)s/edit' % params
     new_params['missing_redirect'] = '/%(url_name)s/create' % params
     new_params['delete_redirect'] = '/%(url_name)s/list' % params
     new_params['invite_redirect'] = '/request/list'
@@ -282,18 +283,7 @@ class View(object):
 
     key_name, fields = self.collectCleanedFields(form)
 
-    # get the old_suffix before editing
-    if entity:
-      old_suffix = '%s%s' %('edit/', self._logic.getKeySuffix(entity))
-    else:
-      # retrieve the suffix appened to the create path
-      splitted_path = request.path.split('/create/',1)
-      if len(splitted_path) == 2 :
-        old_suffix = '%s%s' %('create/', splitted_path[1])
-      else:
-        # no suffix after the create in the request path
-        old_suffix = 'create'
-
+    request.path = params['edit_redirect']
     self._editPost(request, entity, fields)
 
     if not key_name:
@@ -306,12 +296,12 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     page_params = params['edit_params']
-    new_suffix = '%s%s' %('edit/', self._logic.getKeySuffix(entity))
+    new_suffix = self._logic.getKeySuffix(entity)
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
-        request, old_suffix, new_suffix,
+        request, None, new_suffix,
         params=page_params)
 
   def editGet(self, request, entity, context, seed, params):

@@ -369,9 +369,6 @@ class View(object):
     context['entity_type_plural'] = params['name_plural']
     context['redirect_action'] = params['list_redirect_action']
 
-    if 'instruction_text' in params:
-      context['instruction_text'] = params['instruction_text']
-
     template = params['list_template']
 
     return helper.responses.respond(request, template, context)

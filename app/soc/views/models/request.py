@@ -144,10 +144,9 @@ class View(base.View):
     """
 
     new_params = {}
-    new_params['list_template'] = 'soc/models/list.html'
     # TODO(SRabbelier) Change the redirect to something more useful
     new_params['list_redirect_action'] = '/'
-    new_params['instruction_text'] = "An overview of your unhandeled requests"
+    new_params['list_description'] = "An overview of your unhandled requests"
     
     params = dicts.merge(params, new_params)
     

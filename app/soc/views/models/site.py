@@ -54,9 +54,9 @@ class CreateForm(presence.SettingsValidationForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['inheritance_line', 'home', 'scope', 'scope_path', 'link_id']
 
-#  scope_path = forms.CharField(widget=forms.HiddenInput)
+  scope_path = forms.CharField(widget=forms.HiddenInput)
 
-#  link_id = forms.CharField(widget=forms.HiddenInput)
+  link_id = forms.CharField(widget=forms.HiddenInput)
 
 
 class EditForm(CreateForm):

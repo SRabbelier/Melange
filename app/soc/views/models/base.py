@@ -197,11 +197,6 @@ class View(object):
     for field in fields:
       empty_kwargs[field] = None
 
-    request.path = params['create_redirect']
-    request.path = helper.requests.replaceSuffix(request.path,
-                                                 old_suffix='edit',
-                                                 new_suffix='edit')
-
     if not kwargs:
       return self.edit(request, page_name=page_name, params=params,
                        **empty_kwargs)
@@ -266,7 +261,16 @@ class View(object):
     key_name, fields = self.collectCleanedFields(form)
 
     # get the old_suffix before editing
-    old_suffix = self._logic.getKeySuffix(entity)
+    if entity:
+      old_suffix = '%s%s' %('edit/', self._logic.getKeySuffix(entity))
+    else:
+      # retrieve the suffix appened to the create path
+      splitted_path = request.path.split('/create/',1)
+      if len(splitted_path) == 2 :
+        old_suffix = '%s%s' %('create/', splitted_path[1])
+      else:
+        # no suffix after the create in the request path
+        old_suffix = 'create'
 
     self._editPost(request, entity, fields)
 
@@ -280,12 +284,12 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     page_params = params['edit_params']
-    suffix = self._logic.getKeySuffix(entity)
+    new_suffix = '%s%s' %('edit/', self._logic.getKeySuffix(entity))
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
-        request, old_suffix, suffix,
+        request, old_suffix, new_suffix,
         params=page_params)
 
   def editGet(self, request, entity, context, seed, params):

@@ -131,24 +131,38 @@ class View(base.View):
       kwargs: not used
     """
 
-    new_params = {}
-    # TODO(SRabbelier) Change the redirect to something more useful
-    new_params['list_redirect_action'] = '/'
-    new_params['list_description'] = "An overview of your unhandled requests"
-    
-    params = dicts.merge(params, new_params)
-    
+    try:
+      self.checkAccess('list', request)
+    except out_of_band.Error, error:
+      return error.response(request)
+
+    params = dicts.merge(params, self._params)
+
     # get the current user
     properties = {'account': users.get_current_user()}
     user_entity = user_logic.logic.getForFields(properties, unique=True)
-    
+
+    ######
+    # Construct the Unhandled Request list
+    ######
+
     # only select the requests for this user that haven't been handled yet
     filter = {'requester': user_entity,
               'accepted' : True,
               'declined' : False}
-    
-    
-    return list(request, page_name=page_name, params=params, filter=filter)
+
+    # TODO(SRabbelier) make into a usefull redirect
+    # params['list_action'] = '/host/create'
+    params['list_description'] = "An overview of your unhandled requests"
+
+    uh = helper.lists.getListContent(request, params, self._logic, filter)
+
+    ######
+    # TODO(ljvderijk) Construct the other Request lists here
+    ######
+
+    contents = [uh]
+    return self._list(request, params, contents, page_name)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

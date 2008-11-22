@@ -136,6 +136,9 @@ class View(object):
     new_params['list_template'] = 'soc/models/list.html'
     new_params['invite_template'] = 'soc/models/invite.html'
 
+    new_params['error_public'] = 'soc/%(module_name)s/error.html' % params
+    new_params['error_edit'] = 'soc/%(module_name)s/error.html'  % params
+
     new_params['list_main'] = 'soc/list/main.html'
     new_params['list_pagination'] = 'soc/list/pagination.html'
     new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
@@ -190,7 +193,7 @@ class View(object):
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
     except out_of_band.Error, error:
-      return error.response(request, template=params['public_template'],
+      return error.response(request, template=params['error_public'],
                             context=context)
 
     self._public(request, entity, context)
@@ -259,7 +262,7 @@ class View(object):
             'entity_type_lower' : params['name'].lower(),
             'entity_type' : params['name'],
             'create' : params['missing_redirect']})
-        return error.response(request, template=params['public_template'],
+        return error.response(request, template=params['error_public'],
                               context=context)
 
     if request.method == 'POST':
@@ -412,7 +415,7 @@ class View(object):
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
-      return error.response(request, template=params['edit_template'],
+      return error.response(request, template=params['error_edit'],
                             context=context)
 
     if not entity:

@@ -16,7 +16,7 @@ limitations under the License.
 {% block page_title %}User Profile{% endblock %}
 {% block header_title %}
 {% if user %}
-Modify Existing User Profile for {{ user.public_name }} <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
+Modify Existing User Profile for {{ user.name }} <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
 {% else %}
 Create a New User Profile for <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
 {% endif %}
@@ -30,7 +30,7 @@ Please use this form to set basic site-wide settings for your participation in G
 </p>
 <form method="POST">
  <table>
-  {% field_as_table_row form.public_name %}
+  {% field_as_table_row form.name %}
   {% field_as_table_row form.link_id %}
   <tr>
    <td colspan="4">&nbsp;</td>

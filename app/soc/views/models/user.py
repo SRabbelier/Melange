@@ -53,8 +53,8 @@ class CreateForm(helper.forms.BaseForm):
       label=soc.models.user.User.link_id.verbose_name,
       help_text=soc.models.user.User.link_id.help_text)
 
-  public_name = forms.CharField(
-      label=soc.models.user.User.public_name.verbose_name)
+  name = forms.CharField(
+      label=soc.models.user.User.name.verbose_name)
 
   is_developer = forms.BooleanField(required=False,
       label=soc.models.user.User.is_developer.verbose_name,
@@ -228,7 +228,7 @@ class View(base.View):
         new_link_id = form.cleaned_data.get('link_id')
         properties = {
           'link_id': new_link_id,
-          'public_name': form.cleaned_data.get("public_name"),
+          'name': form.cleaned_data.get("name"),
           'account': account,
         }
 

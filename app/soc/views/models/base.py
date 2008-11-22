@@ -127,7 +127,22 @@ class View(object):
             'soc.views.models.%s.list', 'List %(name_plural)s'),
         ]
 
-    new_params['list_redirect_action'] = '/' + params['url_name'] + '/edit'
+    new_params['edit_template'] = 'soc/models/edit.html'
+    new_params['list_template'] = 'soc/models/list.html'
+    new_params['invite_template'] = 'soc/models/invite.html'
+
+    new_params['list_main'] = 'soc/list/list_main.html'
+    new_params['list_pagination'] = 'soc/list/list_pagination.html'
+    
+    new_params['list_action'] = '/' + params['url_name'] + '/edit'
+    new_params['list_params'] = {
+        'list_action': 'action',
+        'list_description': 'description',
+        'list_main': 'main',
+        'list_pagination': 'pagination',
+        'list_row': 'row',
+        'list_heading': 'heading',
+        }
 
     description = ugettext_lazy('List of %(name)s in Google Open Source Programs.')
     new_params['list_description'] = description % params
@@ -358,16 +373,16 @@ class View(object):
     
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
-    templates = params['lists_template']
-    description = params['list_description']
+    updates = dicts.rename(params, params['list_params'])
+    updates['logic'] = self._logic
 
-    content = helper.lists.getList(request, entities, templates,
-        description, offset, limit)
+    content = helper.lists.getList(request, entities, offset, limit)
+    content.update(updates)
+
     context['list'] = soc.logic.lists.Lists([content])
 
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']
-    context['redirect_action'] = params['list_redirect_action']
 
     template = params['list_template']
 

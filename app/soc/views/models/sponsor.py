@@ -121,15 +121,10 @@ class View(base.View):
     # TODO(tlarsen): Add support for Django style template lookup
     params['edit_template'] = 'soc/sponsor/edit.html'
     params['public_template'] = 'soc/group/public.html'
-    params['list_template'] = 'soc/models/list.html'
 
-    params['lists_template'] = {
-      'list_main': 'soc/list/list_main.html',
-      'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/group/list/group_row.html',
-      'list_heading': 'soc/group/list/group_heading.html',
-    }
-    
+    params['list_row'] = 'soc/group/list/group_row.html'
+    params['list_heading'] = 'soc/group/list/group_heading.html'
+
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
 
     params = dicts.merge(original_params, params)

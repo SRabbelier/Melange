@@ -110,16 +110,10 @@ class View(base.View):
     params['create_form'] = CreateForm
 
     # TODO(tlarsen) Add support for Django style template lookup
-    params['edit_template'] = 'soc/models/edit.html'
     params['public_template'] = 'soc/request/public.html'
-    params['list_template'] = 'soc/models/list.html'
 
-    params['lists_template'] = {
-      'list_main': 'soc/list/list_main.html',
-      'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/request/list/request_row.html',
-      'list_heading': 'soc/request/list/request_heading.html',
-    }
+    params['list_row'] = 'soc/request/list/request_row.html'
+    params['list_heading'] = 'soc/request/list/request_heading.html'
 
     params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s')]
 
@@ -160,7 +154,7 @@ class View(base.View):
               'declined' : False}
     
     
-    return list(request, page_name, params, filter)
+    return list(request, page_name=page_name, params=params, filter=filter)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

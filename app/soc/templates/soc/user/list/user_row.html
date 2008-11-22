@@ -1,7 +1,7 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='{{redirect_action|lower}}/{{ list.item.link_id }}'" name="name">
+onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td align="right"><div class="account"><a class="noul"
-         href="{{redirect_action|lower}}/{{ list.item.link_id }}">{{ list.item.account }}</a>
+         href="{{ list.redirect }}">{{ list.item.account }}</a>
      </div>
   </td>
   <td><div class="email">{{ list.item.account.email }}</a></div></td>

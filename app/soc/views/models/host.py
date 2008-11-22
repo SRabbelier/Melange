@@ -102,17 +102,10 @@ class View(role.RoleView):
     params['create_form'] = CreateForm
 
     # TODO(tlarsen) Add support for Django style template lookup
-    params['edit_template'] = 'soc/models/edit.html'
     params['public_template'] = 'soc/host/public.html'
-    params['list_template'] = 'soc/models/list.html'
-    params['invite_template'] = 'soc/models/invite.html'
 
-    params['lists_template'] = {
-      'list_main': 'soc/list/list_main.html',
-      'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/host/list/host_row.html',
-      'list_heading': 'soc/host/list/host_heading.html',
-    }
+    params['list_row'] = 'soc/host/list/host_row.html'
+    params['list_heading'] = 'soc/host/list/host_heading.html'
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['invite_redirect'] = '/request/list'

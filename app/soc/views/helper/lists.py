@@ -78,15 +78,14 @@ def cleanListParameters(offset=None, limit=None):
   return max(0, offset), max(1, min(limit, MAX_PAGINATION))
 
 
-def getList(request, list_data, list_templates, description, offset=0, limit=0):
+def getList(request, data, offset, limit):
   """Returns a dict with fields used for rendering lists.
 
   Args:
     request: the Django HTTP request object
-    list_data: array of data to be displayed in the list
+    data: array of data to be displayed in the list
     offset: offset in list which defines first item to return
     limit: max amount of items per page
-    list_templates: templates that are used when rendering list
 
   Returns:
     A a dictionary with the following values set:
@@ -106,12 +105,12 @@ def getList(request, list_data, list_templates, description, offset=0, limit=0):
     }
   """
 
-  if not list_data:
-    list_data = []
+  if not data:
+    data = []
 
-  more = bool(list_data[limit:])
+  more = bool(data[limit:])
   if more:
-    del list_data[limit:]
+    del data[limit:]
 
   newest = ''
   next = ''
@@ -127,19 +126,14 @@ def getList(request, list_data, list_templates, description, offset=0, limit=0):
     newest = request.path + '?limit=%d' % limit
 
   content = {
-      'data': list_data,
-      'description': description,
-     'main': list_templates['list_main'],
-     'pagination': list_templates['list_pagination'],
-     'row': list_templates['list_row'],
-     'heading': list_templates['list_heading'],
-     'limit': limit,
-     'newest': newest, 
-     'prev': prev, 
-     'next': next,
-     'first': offset+1,
-     'last': len(list_data) > 1 and offset+len(list_data) or None
-     }
+      'data': data,
+      'first': offset+1,
+      'last': len(data) > 1 and offset+len(data) or None,
+      'limit': limit,
+      'newest': newest, 
+      'next': next,
+      'prev': prev, 
+      }
 
   return content
 

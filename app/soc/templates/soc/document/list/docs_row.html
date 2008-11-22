@@ -1,9 +1,9 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='/document/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}'" name="name">
+onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td align="right">
    <div class="title">
     <a class="noul"
-     href="/document/edit/{{ list.item.scope_path }}/{{ list.item.link_id }}">{{ list.item.scope_path}}/{{ list.item.link_id }}</a>
+     href="{{ list.redirect }}">{{ list.item.scope_path}}/{{ list.item.link_id }}</a>
    </div>
   </td>
   <td><div class="title">{{ list.item.title }}</div></td>

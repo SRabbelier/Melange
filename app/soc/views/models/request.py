@@ -143,24 +143,20 @@ class View(base.View):
     properties = {'account': users.get_current_user()}
     user_entity = user_logic.logic.getForFields(properties, unique=True)
 
-    ######
-    # Construct the Unhandled Request list
-    ######
+    # TODO(ljvderijk): Construct the Unhandled Request list
 
     # only select the requests for this user that haven't been handled yet
     filter = {'requester': user_entity,
               'accepted' : True,
               'declined' : False}
 
-    # TODO(SRabbelier) make into a usefull redirect
+    # TODO(SRabbelier): make into a usefull redirect
     # params['list_action'] = '/host/create'
     params['list_description'] = "An overview of your unhandled requests"
 
     uh = helper.lists.getListContent(request, params, self._logic, filter)
 
-    ######
-    # TODO(ljvderijk) Construct the other Request lists here
-    ######
+    # TODO(ljvderijk): Construct the other Request lists here
 
     contents = [uh]
     return self._list(request, params, contents, page_name)

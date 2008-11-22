@@ -31,6 +31,7 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import dicts
 from soc.logic import validate
 from soc.views import helper
+from soc.views.helper import access
 from soc.views.helper import widgets
 from soc.views.models import presence
 
@@ -102,6 +103,9 @@ class View(presence.View):
     }
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
+    params['rights'] = {
+      'any_access': [access.allow],
+      'public': [access.allow]}
 
     params = dicts.merge(original_params, params)
 

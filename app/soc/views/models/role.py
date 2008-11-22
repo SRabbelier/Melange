@@ -33,6 +33,7 @@ from soc.logic import dicts
 from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.models import base
 from soc.views.models import user as user_view
 
@@ -103,8 +104,8 @@ class RoleView(base.View):
 
     try:
       self.checkAccess('invite', request)
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request)
 
     return user_view.list(request, page_name=page_name, params=params)
 

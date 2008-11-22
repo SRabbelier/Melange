@@ -30,16 +30,14 @@ from django.utils.translation import ugettext_lazy
 
 import soc.logic
 import soc.logic.lists
-import soc.logic.out_of_band
 import soc.views.helper.lists
 import soc.views.helper.responses
-import soc.views.out_of_band
 
 from soc.logic import dicts
 from soc.logic import models
 from soc.models import linkable
-from soc.views import simple
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
 
 
@@ -153,8 +151,8 @@ class View(object):
 
     try:
       self.checkAccess('public', request)
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -168,9 +166,9 @@ class View(object):
     try:
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
-    except soc.logic.out_of_band.ErrorResponse, error:
-      template = params['public_template']
-      return simple.errorResponse(request, page_name, error, template, context)
+    except out_of_band.Error, error:
+      return error.response(request, template=params['public_template'],
+                            context=context)
 
     self._public(request, entity, context)
 
@@ -208,7 +206,8 @@ class View(object):
       return self.edit(request, page_name=page_name, params=params,
                        **empty_kwargs)
     else:
-      return self.edit(request, page_name=page_name, params=params, seed=kwargs, **empty_kwargs)
+      return self.edit(request, page_name=page_name, params=params,
+                       seed=kwargs, **empty_kwargs)
 
   def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs.
@@ -224,8 +223,8 @@ class View(object):
 
     try:
       self.checkAccess('edit', request, rights=params['rights'])
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request)
 
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
@@ -235,16 +234,15 @@ class View(object):
       if all(kwargs.values()):
         key_fields = self._logic.getKeyFieldsFromDict(kwargs)
         entity = self._logic.getIfFields(key_fields)
-    except soc.logic.out_of_band.ErrorResponse, error:
+    except out_of_band.Error, error:
       if not seed:
-        template = params['public_template']
-        error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
+        error.message_fmt = (
+          error.message_fmt + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
             'entity_type_lower' : params['name'].lower(),
             'entity_type' : params['name'],
-            'create' : params['missing_redirect']
-            }
-        return simple.errorResponse(request, page_name, error, template,
-                                    context)
+            'create' : params['missing_redirect']})
+        return error.response(request, template=params['public_template'],
+                              context=context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params)
@@ -338,8 +336,8 @@ class View(object):
 
     try:
       self.checkAccess('list', request)
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request)
 
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
@@ -349,9 +347,9 @@ class View(object):
 
     # Fetch one more to see if there should be a 'next' link
     if not filter:
-      entities = self._logic.getForLimitAndOffset(limit + 1, offset=offset)
+      entities = self._logic.getForLimitAndOffset(limit+1, offset=offset)
     else:
-      entities = self._logic.getForFields(filter, limit=limit + 1, offset=offset)
+      entities = self._logic.getForFields(filter, limit=limit+1, offset=offset)
     
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
 
@@ -387,8 +385,8 @@ class View(object):
 
     try:
       self.checkAccess('delete', request)
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -398,14 +396,14 @@ class View(object):
     try:
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
-    except soc.logic.out_of_band.ErrorResponse, error:
-      template = params['edit_template']
-      error.message = error.message + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
+    except out_of_band.Error, error:
+      error.message_fmt = (
+        error.message_fmt + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
-          'create' : params['missing_redirect']
-          }
-      return simple.errorResponse(request, page_name, error, template, context)
+          'create' : params['missing_redirect']})
+      return error.response(request, template=params['edit_template'],
+                            context=context)
 
     if not entity:
       #TODO: Create a proper error page for this

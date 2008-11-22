@@ -13,26 +13,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block page_title %}
- {%if login_title %}
-  {{ login_title }}
+ {%if title %}
+  {{ title }}
  {% else %}
   Sign In Required
  {% endif %}
 {% endblock %}
 {% block header_title %}
- {%if login_header %}
-  {{ login_header }}
+ {%if header %}
+  {{ header }}
  {% else %}
   {% comment %}
-   Attempt to use login_title again if login_header is not defined.
+   Attempt to use title again if header is not defined.
   {% endcomment %}
-  {%if login_title %}
-   {{ login_title }}
+  {%if title %}
+   {{ title }}
   {% else %}
    Sign In Required
   {% endif %}
  {% endif %}
 {% endblock %}
 {% block body %}
-<p>{{ login_message|safe }}</p>
+<p>{{ message|safe }}</p>
 {% endblock %}

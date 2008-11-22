@@ -26,7 +26,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from soc.logic import models
-from soc.logic import out_of_band
+from soc.views import out_of_band
 
 import soc.models.user
 import soc.logic.models.user
@@ -117,7 +117,7 @@ def getUserFromLinkIdOr404(link_id):
   """Like getUserFromLinkId but expects to find a user.
 
   Raises:
-    out_of_band.ErrorResponse if no User entity is found
+    out_of_band.Error if no User entity is found
   """
   user = models.user.logic.getForFields({'link_id': link_id},
                                         unique=True)
@@ -125,5 +125,5 @@ def getUserFromLinkIdOr404(link_id):
   if user:
     return user
 
-  raise out_of_band.ErrorResponse(
+  raise out_of_band.Error(
       'There is no user with a "link ID" of "%s".' % link_id, status=404)

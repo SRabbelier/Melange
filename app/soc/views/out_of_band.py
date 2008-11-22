@@ -18,32 +18,100 @@
 """
 
 __authors__ = [
+  '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
-class OutOfBandResponse(Exception):
-  """Base exception for out-of-band responses raised by views.
+from django.utils.translation import ugettext_lazy
+
+from soc.views import helper
+
+import soc.views.helper.responses
+import soc.views.helper.templates
+
+
+class Error(Exception):
+  """Base exception for out-of-band responses raised by logic or views.
   """
+  TEMPLATE_NAME = 'error.html'
+  DEF_TEMPLATE = 'soc/error.html'
 
-  pass
-
-
-class AccessViolationResponse(OutOfBandResponse):
-  """"Out of band response when an access requirement was not met.
-  """
-
-  def __init__(self, response):
-    """Constructor used to set response message.
-
+  def __init__(self, message_fmt, context=None, **response_args):
+    """Constructor used to set response message and HTTP response arguments.
+  
     Args:
-      response: The response that should be returned to the user.
+      message_fmt: format string, when combined with a context supplied to
+        the response() method, produces the message to display on the
+        response page; this can be a simple string containing *no* named
+        format specifiers
+      context: see response()
+      **response_args: keyword arguments that are supplied directly to
+        django.http.HttpResponse; the most commonly used is 'status' to
+        set the HTTP status code for the response
     """
+    self.message_fmt = message_fmt
+    self._context = context
+    self._response_args = response_args
 
-    self._response = response
-
-  def response(self):
-    """Returns the response that was set in the constructor.
+  def response(self, request, template=None, context=None):
+    """Creates an HTTP response from the OutOfBandResponse exception.
+  
+    Args:
+      request: a Django HTTP request
+      template: the "sibling" template (or a search list of such templates)
+        from which to construct the actual template name (or names)
+      context: optional context dict supplied to the template, which is
+        modified (so supply a copy if such modification is not acceptable)
     """
+    if not context:
+      context = self._context
 
-    return self._response
+    if not context:
+      context = helper.responses.getUniversalContext(request)
+
+    if not template:
+      template = []
+
+    # make a list of possible "sibling" templates, then append a default
+    templates = helper.templates.makeSiblingTemplatesList(template,
+        self.TEMPLATE_NAME, default_template=self.DEF_TEMPLATE)
+
+    context['status'] = self._response_args.get('status')
+
+    if not context.get('message'):
+      # supplied context did not explicitly override the message
+      context['message'] = self.message_fmt % context
+
+    return helper.responses.respond(request, templates, context=context,
+                                    response_args=self._response_args)
+
+
+class LoginRequest(Error):
+  """Out of band error raised when login is requested.
+  """
+  TEMPLATE_NAME = 'login.html'
+  DEF_TEMPLATE = 'soc/login.html'
+
+  DEF_LOGIN_MSG_FMT = ugettext_lazy(
+      'Please <a href="%(sign_in)s">sign in</a> to continue.')
+
+  def __init__(self, message_fmt=None, **response_args):
+    """Constructor used to set response message and HTTP response arguments.
+  
+    Args:
+      message_fmt: same as Error.__init__() message_fmt, with the addition
+        of a default value of None, in which case self.DEF_LOGIN_MSG_FMT is
+        used
+      **response_args: see Error.__init__()
+    """
+    if not message_fmt:
+      message_fmt = self.DEF_LOGIN_MSG_FMT
+
+    Error.__init__(self, message_fmt, **response_args)
+
+
+class AccessViolation(Error):
+  """"Out of band error raised when an access requirement was not met.
+  """
+  pass

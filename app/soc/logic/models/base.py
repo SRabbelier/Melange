@@ -30,7 +30,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import out_of_band
+from soc.views import out_of_band
 
 
 class Error(Exception):
@@ -218,7 +218,7 @@ class Logic:
       * Entity for supplied fields
 
     Raises:
-      out_of_band.ErrorResponse if link ID is not false, but no entity
+      out_of_band.Error if link ID is not false, but no entity
       with the supplied link ID exists in the Datastore.
     """
 
@@ -245,7 +245,7 @@ class Logic:
 
 
     # else: fields were supplied, but there is no Entity that has it
-    raise out_of_band.ErrorResponse(msg, status=404)
+    raise out_of_band.Error(msg, status=404)
 
   def getKeyNameForFields(self, fields):
     """Return a Datastore key_name for a Entity from the specified fields.

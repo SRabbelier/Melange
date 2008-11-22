@@ -38,15 +38,8 @@ from soc.logic import accounts
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
-from soc.views.simple import requestLogin
+from soc.views import out_of_band
 
-import soc.views.out_of_band
-
-
-DEF_LOGIN_TMPL = 'soc/login.html'
-
-DEF_LOGIN_MSG_FMT = ugettext_lazy(
-  'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
 DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
   'Please create <a href="/user/edit">User Profile</a>'
@@ -65,7 +58,7 @@ def allow(request):
   """Never returns an alternate HTTP response
 
   Args:
-    request: a django HTTP request
+    request: a Django HTTP request
   """
 
   return
@@ -74,26 +67,23 @@ def deny(request):
   """Returns an alternate HTTP response
 
   Args:
-    request: a django HTTP request
+    request: a Django HTTP request
 
   Returns: a subclass of django.http.HttpResponse which contains the
   alternate response that should be returned by the calling view.
   """
 
   context = helper.responses.getUniversalContext(request)
-  context['login_title'] = 'Access denied'
-  context['login_header'] = 'Access denied'
-  context['login_message'] = DEF_PAGE_DENIED_MSG
+  context['title'] = 'Access denied'
 
-  denied_response = helper.responses.respond(request, DEF_LOGIN_TMPL, context=context)
+  raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
 
-  raise soc.views.out_of_band.AccessViolationResponse(denied_response)
 
 def checkIsLoggedIn(request):
   """Returns an alternate HTTP response if Google Account is not logged in.
 
   Args:
-    request: A Django HTTP request
+    request: a Django HTTP request
 
    Raises:
      AccessViolationResponse: If the required authorization is not met.
@@ -107,17 +97,14 @@ def checkIsLoggedIn(request):
   if users.get_current_user():
     return
 
-  login_response = requestLogin(request, None, DEF_LOGIN_TMPL,
-                                login_message_fmt=DEF_LOGIN_MSG_FMT)
-
-  raise soc.views.out_of_band.AccessViolationResponse(login_response)
+  raise out_of_band.LoginRequest()
 
 
 def checkIsUser(request):
   """Returns an alternate HTTP response if Google Account has no User entity.
 
   Args:
-    request: A Django HTTP request
+    request: a Django HTTP request
 
    Raises:
      AccessViolationResponse: If the required authorization is not met.
@@ -136,10 +123,7 @@ def checkIsUser(request):
   if user:
     return
 
-  login_response = requestLogin(request, None, DEF_LOGIN_TMPL,
-                                login_message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
-
-  raise soc.views.out_of_band.AccessViolationResponse(login_response)
+  raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
 
 def checkIsDeveloper(request):
@@ -163,13 +147,9 @@ def checkIsDeveloper(request):
     return None
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role' : 'a site developer ',
-      }
+      'role': 'a site developer '}
 
-  login_response = requestLogin(request, None, DEF_LOGIN_TMPL,
-                                login_message_fmt=login_message_fmt)
-
-  raise soc.views.out_of_band.AccessViolationResponse(login_response)
+  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
 def checkIsInvited(request, role):
@@ -205,10 +185,6 @@ def checkIsInvited(request, role):
     return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role' : 'a host for this program',
-      }
+      'role': 'a host for this program'}
 
-  login_response = requestLogin(request, None, DEF_LOGIN_TMPL,
-                                login_message_fmt=login_message_fmt)
-
-  raise soc.views.out_of_band.AccessViolationResponse(login_response)
+  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)

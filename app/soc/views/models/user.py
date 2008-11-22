@@ -32,6 +32,7 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.models import base
 
@@ -183,6 +184,8 @@ class View(base.View):
 
     base.View.__init__(self, params=params)
 
+  EDIT_SELF_TMPL = 'soc/user/edit_self.html'
+
   def editSelf(self, request, page_name=None, params=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.
 
@@ -200,11 +203,11 @@ class View(base.View):
 
     try:
       self.checkAccess('editSelf', request, rights=rights)
-    except soc.views.out_of_band.AccessViolationResponse, alt_response:
-      return alt_response.response()
+    except out_of_band.Error, error:
+      return error.response(request, template=self.EDIT_SELF_TMPL)
 
     new_params = {}
-    new_params['edit_template'] = 'soc/user/edit_self.html'
+    new_params['edit_template'] = self.EDIT_SELF_TMPL
     new_params['rights'] = rights
 
     params = dicts.merge(params, new_params)
@@ -232,10 +235,8 @@ class View(base.View):
         # check if user account is not in former_accounts
         # if it is show error message that account is invalid
         if soc.logic.models.user.logic.isFormerAccount(account):
-          msg = DEF_USER_ACCOUNT_INVALID_MSG
-          error = out_of_band.ErrorResponse(msg)
-          return simple.errorResponse(request, page_name, error, template,
-                                      context)
+          error = out_of_band.Error(DEF_USER_ACCOUNT_INVALID_MSG)
+          return error.response(request, template=template, context=context)
 
         user = soc.logic.models.user.logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})

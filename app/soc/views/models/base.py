@@ -365,27 +365,28 @@ class View(object):
     except out_of_band.Error, error:
       return error.response(request)
 
-    context = helper.responses.getUniversalContext(request)
-    context['page_name'] = page_name
+    content = helper.lists.getListContent(request, params, self._logic, filter)
+    contents = [content]
+
+    return self._list(request, params, contents, page_name)
+
+  def _list(self, request, params, contents, page_name):
+    """Returns the list page for the specified contents
+
+    Args:
+      request: the standard Django HTTP request object
+      params: a dict with params for this View
+      contents: a list of content dicts
+      page_name: the page name displayed in templates as page and header title
+    """
 
     offset, limit = helper.lists.cleanListParameters(
       offset=request.GET.get('offset'), limit=request.GET.get('limit'))
 
-    # Fetch one more to see if there should be a 'next' link
-    if not filter:
-      entities = self._logic.getForLimitAndOffset(limit+1, offset=offset)
-    else:
-      entities = self._logic.getForFields(filter, limit=limit+1, offset=offset)
-    
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
     context['pagination_form'] = helper.lists.makePaginationForm(request, limit)
-
-    updates = dicts.rename(params, params['list_params'])
-    updates['logic'] = self._logic
-
-    content = helper.lists.getList(request, entities, offset, limit)
-    content.update(updates)
-
-    context['list'] = soc.logic.lists.Lists([content])
+    context['list'] = soc.logic.lists.Lists(contents)
 
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']

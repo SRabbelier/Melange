@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+from soc.logic import dicts
 from soc.views import helper
 
 import soc.views.helper.forms
@@ -78,14 +79,14 @@ def cleanListParameters(offset=None, limit=None):
   return max(0, offset), max(1, min(limit, MAX_PAGINATION))
 
 
-def getList(request, data, offset, limit):
+def getListContent(request, params, logic, filter):
   """Returns a dict with fields used for rendering lists.
 
   Args:
     request: the Django HTTP request object
-    data: array of data to be displayed in the list
-    offset: offset in list which defines first item to return
-    limit: max amount of items per page
+    params: a dict with params for the View this list belongs to
+    logic: the logic object for the View this list belongs to
+    filter: a filter for this list
 
   Returns:
     A a dictionary with the following values set:
@@ -105,6 +106,15 @@ def getList(request, data, offset, limit):
     }
   """
 
+  offset, limit = helper.lists.cleanListParameters(
+      offset=request.GET.get('offset'), limit=request.GET.get('limit'))
+
+  # Fetch one more to see if there should be a 'next' link
+  if not filter:
+    data = logic.getForLimitAndOffset(limit+1, offset=offset)
+  else:
+    data = logic.getForFields(filter, limit=limit+1, offset=offset)
+
   if not data:
     data = []
 
@@ -112,9 +122,7 @@ def getList(request, data, offset, limit):
   if more:
     del data[limit:]
 
-  newest = ''
-  next = ''
-  prev = ''
+  newest = next = prev = ''
 
   if more:
     next = request.path + '?offset=%d&limit=%d' % (offset+limit, limit)
@@ -129,11 +137,15 @@ def getList(request, data, offset, limit):
       'data': data,
       'first': offset+1,
       'last': len(data) > 1 and offset+len(data) or None,
+      'logic': logic,
       'limit': limit,
       'newest': newest, 
       'next': next,
       'prev': prev, 
       }
+
+  updates = dicts.rename(params, params['list_params'])
+  content.update(updates)
 
   return content
 

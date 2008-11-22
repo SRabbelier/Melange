@@ -79,9 +79,17 @@ class User(soc.models.linkable.Linkable):
   #: alias.  Public names can be any valid UTF-8 text.
   public_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Public name'))
+  public_name.help_text = ugettext_lazy(
+      'Human-readable name (UTF-8) that will be displayed publicly on the'
+      ' site. While you can use your real name, like "First Last", please'
+      ' keep in mind that this "public name" will be used as your alias'
+      ' throughout the site, displayed to all users, for comments, document'
+      ' ownership, and the like.  Please do not use your real name if you'
+      ' are a minor (not an adult) where you live.')
       
   #: field storing whether User is a Developer with site-wide access.
   is_developer = db.BooleanProperty(
       verbose_name=ugettext_lazy('Is Developer'))
   is_developer.help_text = ugettext_lazy(
       'Field used to indicate user with site-wide "Developer" access.')
+

@@ -98,8 +98,10 @@ class View(object):
 
     new_params = {}
     new_params['rights'] = rights
-    new_params['create_redirect'] = '/%s' % params['url_name']
-    new_params['missing_redirect'] = '/%s/create' % params['url_name']
+    new_params['create_redirect'] = '/%(url_name)s' % params
+    new_params['missing_redirect'] = '/%(url_name)s/create' % params
+    new_params['delete_redirect'] = '/%(url_name)s/list' % params
+    new_params['invite_redirect'] = '/request/list'
     
     new_params['sidebar'] = None
     new_params['sidebar_defaults'] = [
@@ -127,13 +129,17 @@ class View(object):
             'soc.views.models.%s.list', 'List %(name_plural)s'),
         ]
 
+    new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
+    new_params['create_template'] = 'soc/models/edit.html'
     new_params['edit_template'] = 'soc/models/edit.html'
     new_params['list_template'] = 'soc/models/list.html'
     new_params['invite_template'] = 'soc/models/invite.html'
 
-    new_params['list_main'] = 'soc/list/list_main.html'
-    new_params['list_pagination'] = 'soc/list/list_pagination.html'
-    
+    new_params['list_main'] = 'soc/list/main.html'
+    new_params['list_pagination'] = 'soc/list/pagination.html'
+    new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
+    new_params['list_heading'] = 'soc/%(module_name)s/list/heading.html' % params
+
     new_params['list_action'] = '/' + params['url_name'] + '/edit'
     new_params['list_params'] = {
         'list_action': 'action',
@@ -526,7 +532,7 @@ class View(object):
     if access_type not in rights:
       for check in rights['unspecified']:
         # No checks defined, so do the 'generic check' and bail out
-        check(request, access_type)
+        check(request)
       return
 
     for check in rights[access_type]:

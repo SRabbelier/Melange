@@ -109,12 +109,6 @@ class View(base.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    # TODO(tlarsen) Add support for Django style template lookup
-    params['public_template'] = 'soc/request/public.html'
-
-    params['list_row'] = 'soc/request/list/request_row.html'
-    params['list_heading'] = 'soc/request/list/request_heading.html'
-
     params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s')]
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'

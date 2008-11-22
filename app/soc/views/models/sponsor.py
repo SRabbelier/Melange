@@ -122,10 +122,8 @@ class View(base.View):
     params['edit_template'] = 'soc/sponsor/edit.html'
     params['public_template'] = 'soc/group/public.html'
 
-    params['list_row'] = 'soc/group/list/group_row.html'
-    params['list_heading'] = 'soc/group/list/group_heading.html'
-
-    params['delete_redirect'] = '/' + params['url_name'] + '/list'
+    params['list_row'] = 'soc/group/list/row.html'
+    params['list_heading'] = 'soc/group/list/heading.html'
 
     params = dicts.merge(original_params, params)
     

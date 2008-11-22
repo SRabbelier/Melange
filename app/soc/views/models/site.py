@@ -95,17 +95,13 @@ class View(presence.View):
     params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s')]
     params['sidebar_heading'] = params['name_short']
 
-    params['lists_template'] = {
-      'list_main': 'soc/list/list_main.html',
-      'list_pagination': 'soc/list/list_pagination.html',
-      'list_row': 'soc/site/list/site_row.html',
-      'list_heading': 'soc/site/list/site_heading.html',
-    }
+    params['public_template'] = 'soc/home/public.html' 
 
-    params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['rights'] = {
+      'unspecified': [access.checkIsDeveloper],
       'any_access': [access.allow],
-      'public': [access.allow]}
+      'public': [access.allow]
+      }
 
     params = dicts.merge(original_params, params)
 

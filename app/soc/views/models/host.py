@@ -101,15 +101,6 @@ class View(role.RoleView):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    # TODO(tlarsen) Add support for Django style template lookup
-    params['public_template'] = 'soc/host/public.html'
-
-    params['list_row'] = 'soc/host/list/host_row.html'
-    params['list_heading'] = 'soc/host/list/host_heading.html'
-
-    params['delete_redirect'] = '/' + params['url_name'] + '/list'
-    params['invite_redirect'] = '/request/list'
-
     params = dicts.merge(original_params, params)
 
     role.RoleView.__init__(self, original_params=params)

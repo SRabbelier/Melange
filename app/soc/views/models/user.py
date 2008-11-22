@@ -176,14 +176,6 @@ class View(base.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    # TODO(tlarsen) Add support for Django style template lookup
-    params['public_template'] = 'soc/user/public.html'
-
-    params['list_row'] = 'soc/user/list/user_row.html'
-    params['list_heading'] = 'soc/user/list/user_heading.html'
-
-    params['delete_redirect'] = '/' + params['url_name'] + '/list'
-
     params['sidebar_heading'] = 'Users'
 
     params = dicts.merge(original_params, params)

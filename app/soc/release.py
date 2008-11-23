@@ -12,9 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Release tag string for display in templates (and possibly other uses).
+
+Set RELEASE_TAG to a release string, commit that change as the *only* change
+in the commit, and then use 'svn copy' on the revision produced by committing
+the updated RELEASE_TAG to create a tags/ release directory of the same name
+as the string value.
+
+After creating the tag, set RELEASE_TAG to None until the next release.
+"""
+
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   ]
 
-RELEASE_TAG = '0.0a20081123'
+# previous RELEASE_TAG = '0.0a20081123'
+
+RELEASE_TAG = None
 

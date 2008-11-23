@@ -504,7 +504,10 @@ class View(object):
     context['entity_type_short'] = params['name_short']
     context['entity_type_url'] = params['url_name']
 
-    template = params['edit_template']
+    if entity:
+      template = params['edit_template']
+    else:
+      template = params['create_template']
 
     return helper.responses.respond(request, template, context)
 

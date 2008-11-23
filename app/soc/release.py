@@ -14,19 +14,52 @@
 
 """Release tag string for display in templates (and possibly other uses).
 
-Set RELEASE_TAG to a release string, commit that change as the *only* change
-in the commit, and then use 'svn copy' on the revision produced by committing
-the updated RELEASE_TAG to create a tags/ release directory of the same name
-as the string value.
+Steps (currently done by hand, but too be scripted in the future) to make
+a release:
 
-After creating the tag, set RELEASE_TAG to None until the next release.
+1) set RELEASE_TAG in this file to a "release candidate" release string that
+   ends in "rc"
+
+2) commit this file *by itself* in its own commit
+
+3) use 'svn cp' to create a release branch in /branches/ with exactly the
+   same name as the contents of the RELEASE_TAG string
+
+4) set RELEASE_TAG back to None in /trunk/
+
+
+To finalize a release candidate in a release branch for a push to the live
+web site:
+
+1) in the release branch, change RELEASE_TAG to remove the trailing "rc"
+
+2) commit this file in the release branch *by itself* in its own commit
+
+3) use 'svn cp' to create a tag in /tags/ with exactly the same name as the
+   contents of the RELEASE_TAG string
+
+4) put the release branch in a state where it is ready for additional patches
+   after the tag by setting the end of the RELEASE_TAG string to "p0"
+
+
+To re-release a previously-tagged release branch after a patch for a push to
+the live web site:
+
+1) increment the "patch suffix" of the RELEASE_TAG string to the next integer
+   (for example, "p0" becomes "p1", so the first tagged patch release will
+   always be "p1", not "p0", which is just a placeholder)
+
+2) (same as #2 for a release candidate)
+
+3) (same as #3 for a release candidate)
+
+4) (there is no step 4)
 """
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   ]
 
-# previous RELEASE_TAG = '0.0a20081123'
 
-RELEASE_TAG = None
+RELEASE_TAG = '0.0a20081123rc'
 

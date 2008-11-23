@@ -121,8 +121,13 @@ TODO(tlarsen): replace this with breadcrumbs
 <a href="http://code.google.com/p/soc/"
 ><img src="/soc/content/images/melange-logo.jpg" alt="Powered by Melange"/></a>
 <br>
+{% if soc_release %}
 <a href="http://code.google.com/p/soc/source/browse/tags/{{ soc_release }}"
->Release {{ soc_release }}</a>
+target="_blank">Release {{ soc_release }}</a>
+{% else %}
+<a href="http://code.google.com/p/soc/source/browse/trunk"
+target="_blank">(unreleased)</a>
+{% endif %}
 	{% endblock %}
    </div>
   </div>

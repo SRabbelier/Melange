@@ -273,3 +273,8 @@ class Role(soc.models.linkable.Linkable):
   tshirt_style = db.StringProperty(
       verbose_name=ugettext_lazy('T-shirt Style'),
       choices=('male', 'female'))
+
+  def name(self):
+    """Alias 'display_name' Property as 'name' for use in common templates.
+    """
+    return self.display_name

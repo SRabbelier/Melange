@@ -28,6 +28,7 @@ from google.appengine.api import users
 from django import http
 from django.template import loader
 
+from soc import release
 from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site
@@ -106,6 +107,9 @@ def getUniversalContext(request):
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
   context['sidebar_menu_items'] = sidebar.SIDEBAR
+
+  context['soc_release'] = release.RELEASE_TAG
+  context['gae_version'] = system.getAppVersion()
 
   settings = site.logic.getFromFields(
       scope_path=site.logic.DEF_SITE_SCOPE_PATH,

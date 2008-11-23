@@ -118,10 +118,11 @@ TODO(tlarsen): replace this with breadcrumbs
 
    <div id="badge">
 	{% block badge %}
-<a href="http://code.google.com/p/soc/" target="_blank">Powered by Melange</a>
-   <span title=" TODO: need a Melange logo " class="popup">
-<small>*</small>
-   </span>
+<a href="http://code.google.com/p/soc/"
+><img src="/soc/content/images/melange-logo.jpg" alt="Powered by Melange"/></a>
+<br>
+<a href="http://code.google.com/p/soc/source/browse/tags/{{ soc_release }}"
+>Release {{ soc_release }}</a>
 	{% endblock %}
    </div>
   </div>
@@ -158,7 +159,8 @@ be displayed here.
 	{% block footer %}
 &copy;2008 Google -
 <a href="http://www.google.com/">Google Home</a> -
-<a href="http://www.google.com/privacy.html">Privacy Policy</a>
+<a href="http://www.google.com/privacy.html">Privacy Policy</a> -
+Version {{ gae_version }}
 	{% endblock %}
     </div>
    </div>

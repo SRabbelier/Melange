@@ -22,9 +22,12 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
+from soc.logic.models import user as user_logic
+from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
 from soc.views.models import base
 from soc.views.models import role
@@ -47,7 +50,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.host.Host
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope']
+    exclude = ['scope', 'user']
 
   def clean_empty(self, field):
     data = self.cleaned_data.get(field)
@@ -104,6 +107,22 @@ class View(role.RoleView):
     params = dicts.merge(original_params, params)
 
     role.RoleView.__init__(self, original_params=params)
+
+  def _editSeed(self, request, seed):
+    """See base.View._editGet().
+    """
+
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+
+    user = user_logic.logic.getForFields(
+        {'link_id': fields['link_id']}, unique=True)
+    fields['user'] = user
+
+    sponsor = sponsor_logic.logic.getForFields(
+        {'link_id': fields['scope_path']}, unique=True)
+    fields['scope'] = sponsor
 
 
 view = View()

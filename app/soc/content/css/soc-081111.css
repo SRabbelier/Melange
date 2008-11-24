@@ -276,7 +276,9 @@ table#queues td {
 }
 
 #created {
-  font-size: small;
+  font-size: x-small;
+  color:#C0C0C0;
+  text-align: right;
 }
 
 /* SIDEBAR MENU */

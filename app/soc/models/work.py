@@ -45,7 +45,7 @@ class Work(soc.models.linkable.Linkable):
   #: Work (this relationship is needed to keep track of lifetime document
   #: creation limits, used to prevent spamming, etc.).
   author = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                 required=True, collection_name="documents",
+                                 required=True, collection_name="created_documents",
                                  verbose_name=ugettext_lazy('Created by'))
 
   #: Required field indicating the "title" of the work, which may have
@@ -72,6 +72,11 @@ class Work(soc.models.linkable.Linkable):
   
   #: date when the work was last modified
   modified = db.DateTimeProperty(auto_now=True)
+  
+  # indicating wich user last modified the work. Used in displaying Work
+  modified_by = db.ReferenceProperty(reference_class=soc.models.user.User,
+                                 required=True, collection_name="modified_documents",
+                                 verbose_name=ugettext_lazy('Modified by'))
 
   # TODO: some sort of access control preferences are needed at this basic
   #   level.  Works need to be restrict-able to:

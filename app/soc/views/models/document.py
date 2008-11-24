@@ -52,7 +52,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.document.Document
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['author', 'created', 'modified', 'scope']
+    exclude = ['author', 'created', 'modified_by', 'modified', 'scope']
 
   def clean_scope_path(self):
     scope_path = self.cleaned_data.get('scope_path')
@@ -75,6 +75,8 @@ class EditForm(CreateForm):
 
   doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
   created_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
+                                      required=False)
+  last_modified_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
                                       required=False)
 
 
@@ -114,14 +116,19 @@ class View(base.View):
     account = users.get_current_user()
     user = soc.logic.models.user.logic.getForFields({'account': account},
                                                     unique=True)
-    fields['author'] = user
+    if not entity:
+      # new document so set author
+      fields['author'] = user
+    
+    fields['modified_by'] = user
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
-
-    form.fields['created_by'].initial = entity.author.link_id
-    form.fields['doc_key_name'].initial = entity.key().name(),
+    
+    form.fields['created_by'].initial = entity.author.name
+    form.fields['last_modified_by'].initial = entity.modified_by.name
+    form.fields['doc_key_name'].initial = entity.key().name()
 
 
 view = View()

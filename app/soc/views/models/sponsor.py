@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -129,6 +130,13 @@ class View(base.View):
     
     base.View.__init__(self, params=params)
 
+  def _editGet(self, request, entity, form):
+    """See base.View._editGet().
+    """
+    
+    # fill in the founded_by with data from the entity
+    form.fields['founded_by'].initial = entity.founder.name
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -136,7 +144,9 @@ class View(base.View):
     account = users.get_current_user()
     user = soc.logic.models.user.logic.getForFields({'account': account},
                                                     unique=True)
-    fields['founder'] = user
+    if not entity:
+      # only if we are creating a new entity we should fill in founder
+      fields['founder'] = user
 
 
 view = View()

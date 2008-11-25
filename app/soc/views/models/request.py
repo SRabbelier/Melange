@@ -101,7 +101,11 @@ class View(base.View):
 
     self._logic = soc.logic.models.request.logic
 
+    rights = {}
+    rights['listSelf'] = [access.checkIsUser]
+
     params = {}
+    params['rights'] = rights
 
     params['name'] = "Request"
     params['name_short'] = "Request"
@@ -135,7 +139,7 @@ class View(base.View):
     """
 
     try:
-      self.checkAccess('list', request)
+      self.checkAccess('listSelf', request)
     except out_of_band.Error, error:
       return error.response(request)
 

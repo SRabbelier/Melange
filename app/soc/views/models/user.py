@@ -164,7 +164,12 @@ class View(base.View):
 
     self._logic = soc.logic.models.user.logic
 
+    rights = {}
+    rights['editSelf'] = [access.allow]
+    rights['roles'] = [access.checkIsUser]
+
     params = {}
+    params['rights'] = rights
 
     params['name'] = "User"
     params['name_short'] = "User"
@@ -195,19 +200,13 @@ class View(base.View):
       kwargs: The Key Fields for the specified entity
     """
 
-    rights = {}
-    rights['any_access'] = [access.checkIsLoggedIn]
-    rights['unspecified'] = [access.deny]
-    rights['editSelf'] = [access.allow]
-
     try:
-      self.checkAccess('editSelf', request, rights=rights)
+      self.checkAccess('editSelf', request)
     except out_of_band.Error, error:
       return error.response(request, template=self.EDIT_SELF_TMPL)
 
     new_params = {}
     new_params['edit_template'] = self.EDIT_SELF_TMPL
-    new_params['rights'] = rights
 
     params = dicts.merge(params, new_params)
     params = dicts.merge(params, self._params)

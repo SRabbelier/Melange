@@ -89,12 +89,15 @@ class View(object):
 
     rights = {}
     rights['unspecified'] = []
-    rights['any_access'] = [access.checkIsUser]
+    rights['any_access'] = [access.checkIsLoggedIn]
     rights['public'] = [access.checkIsUser]
     rights['create'] = [access.checkIsDeveloper]
     rights['edit'] = [access.checkIsDeveloper]
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsDeveloper]
+
+    if 'rights' in params:
+      rights = dicts.merge(params['rights'], rights)
 
     new_params = {}
     new_params['rights'] = rights

@@ -291,17 +291,17 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['account'] = users.User(fields['email'])
 
-  def getUserSidebar(self):
+  def getUserSidebar(self, request):
     """Returns an dictionary with the user sidebar entry.
     """
 
     params = {}
     params['sidebar_heading'] = "User (self)"
     params['sidebar'] = [
-        ('/' + self._params['url_name'] + '/edit', 'Profile'),
-        ('/' + self._params['url_name'] + '/roles', 'Roles'),
+        ('/' + self._params['url_name'] + '/edit', 'Profile', 'editSelf'),
+        ('/' + self._params['url_name'] + '/roles', 'Roles', 'roles'),
         ]
-    return self.getSidebarLinks(params)
+    return self.getSidebarLinks(request, params)
 
   def getDjangoURLPatterns(self):
     """See base.View.getDjangoURLPatterns().

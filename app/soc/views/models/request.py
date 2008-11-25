@@ -35,6 +35,7 @@ from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
+from soc.views.helper import access
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import role as role_view
@@ -111,7 +112,7 @@ class View(base.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s')]
+    params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
     params['delete_redirect'] = '/' + params['url_name'] + '/list'
     params['create_redirect'] = '/' + params['url_name']

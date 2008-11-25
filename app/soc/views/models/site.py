@@ -92,7 +92,7 @@ class View(presence.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
-    params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s')]
+    params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     params['sidebar_heading'] = params['name_short']
 
     params['public_template'] = 'soc/home/public.html' 

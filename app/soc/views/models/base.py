@@ -106,11 +106,10 @@ class View(object):
     
     new_params['sidebar'] = None
     new_params['sidebar_defaults'] = [
-     ('/%s/create', 'New %(name)s'),
-     ('/%s/list', 'List %(name_plural)s'),
+     ('/%s/create', 'New %(name)s', 'create'),
+     ('/%s/list', 'List %(name_plural)s', 'list'),
     ]
     new_params['sidebar_additional'] = []
-    new_params['sidebar_heading'] = None
 
     new_params['key_fields_prefix'] = []
 
@@ -586,9 +585,9 @@ class View(object):
 
     result = []
 
-    for url, menu_text in defaults:
+    for url, menu_text, access_type in defaults:
       url = url % params['url_name'].lower()
-      item = (url, menu_text % params)
+      item = (url, menu_text % params, access_type)
       result.append(item)
 
     for item in params['sidebar_additional']:
@@ -596,7 +595,7 @@ class View(object):
 
     return result
 
-  def getSidebarLinks(self, params=None):
+  def getSidebarLinks(self, request, params=None):
     """Returns an dictionary with one sidebar entry.
 
     Args:
@@ -604,15 +603,23 @@ class View(object):
     """
 
     params = dicts.merge(params, self._params)
+    rights = params['rights']
 
     items = []
 
-    for url, menu_text in self._getSidebarItems(params):
-      items.append({'url': url, 'title': menu_text})
+    for url, menu_text, access_type in self._getSidebarItems(params):
+      try:
+        self.checkAccess(access_type, request, rights)
+        items.append({'url': url, 'title': menu_text})
+      except out_of_band.Error:
+        pass
+
+    if not items:
+      return
 
     res = {}
 
-    if not params['sidebar_heading']:
+    if 'sidebar_heading' not in params:
       params['sidebar_heading'] = params['name']
 
     res['heading'] = params['sidebar_heading']

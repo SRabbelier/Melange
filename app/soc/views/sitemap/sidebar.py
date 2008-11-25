@@ -29,11 +29,11 @@ def addMenu(callback):
   global SIDEBAR
   SIDEBAR.append(callback)
 
-def getSidebar():
+def getSidebar(request):
   sidebar = []
 
   for callback in SIDEBAR:
-    menu = callback()
+    menu = callback(request)
     sidebar.append(menu)
 
   return sidebar

@@ -106,7 +106,7 @@ def getUniversalContext(request):
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
-  context['sidebar_menu_items'] = sidebar.getSidebar()
+  context['sidebar_menu_items'] = sidebar.getSidebar(request)
 
   context['soc_release'] = release.RELEASE_TAG
   context['gae_version'] = system.getAppVersion()

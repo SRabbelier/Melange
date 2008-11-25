@@ -118,6 +118,9 @@ class View(base.View):
     params['edit_form'] = EditForm
     params['create_form'] = CreateForm
 
+    # Disable the presence sidebar until we have some use for it
+    params['sidebar_defaults'] = []
+
     params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)

@@ -25,6 +25,15 @@ __authors__ = [
 SIDEBAR = []
 
 
-def addMenu(pages):
+def addMenu(callback):
   global SIDEBAR
-  SIDEBAR.append(pages)
+  SIDEBAR.append(callback)
+
+def getSidebar():
+  sidebar = []
+
+  for callback in SIDEBAR:
+    menu = callback()
+    sidebar.append(menu)
+
+  return sidebar

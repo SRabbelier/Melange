@@ -36,27 +36,21 @@ from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap
 
 
-sidebar.SIDEBAR.append(user.view.getUserSidebar())
+sidebar.addMenu(user.view.getUserSidebar)
+sidebar.addMenu(presence.view.getSidebarLinks)
+sidebar.addMenu(site.view.getSidebarLinks)
+sidebar.addMenu(user.view.getSidebarLinks)
+sidebar.addMenu(document.view.getSidebarLinks)
+sidebar.addMenu(sponsor.view.getSidebarLinks)
+sidebar.addMenu(host.view.getSidebarLinks)
+sidebar.addMenu(request.view.getSidebarLinks)
 
-#sidebar.SIDEBAR.append(presence.view.getSidebarLinks())
-#sitemap.addPages(presence.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(site.view.getSidebarLinks())
+sitemap.addPages(presence.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(user.view.getSidebarLinks())
 sitemap.addPages(user.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(document.view.getSidebarLinks())
 sitemap.addPages(document.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(sponsor.view.getSidebarLinks())
 sitemap.addPages(sponsor.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(host.view.getSidebarLinks())
 sitemap.addPages(host.view.getDjangoURLPatterns())
-
-sidebar.SIDEBAR.append(request.view.getSidebarLinks())
 sitemap.addPages(request.view.getDjangoURLPatterns())
 
 

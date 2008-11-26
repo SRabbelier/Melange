@@ -34,6 +34,9 @@ def getSidebar(request):
 
   for callback in SIDEBAR:
     menu = callback(request)
-    sidebar.append(menu)
+    
+    if menu:
+      # only if there is a menu we should append it
+      sidebar.append(menu)
 
   return sidebar

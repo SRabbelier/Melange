@@ -207,29 +207,17 @@ class Logic:
 
     return entity
 
-  def getIfFields(self, fields):
-    """Returns entity for supplied link ID if one exists.
 
-    Args:
-      fields: the fields of the entity that uniquely identifies it
-
-    Returns:
-      * None if a field is false.
-      * Entity for supplied fields
+  def getFromFieldsOr404(self, **fields):
+    """Like getFromFields but expects to find an entity.
 
     Raises:
-      out_of_band.Error if link ID is not false, but no entity
-      with the supplied link ID exists in the Datastore.
+      out_of_band.Error if no User entity is found
     """
-
-    if not all(fields.values()):
-      # exit without error, to let view know that link_id was not supplied
-      return None
 
     entity = self.getFromFields(**fields)
 
     if entity:
-      # an entity exist for this link_id, so return that entity
       return entity
 
     format_text = ugettext_lazy('"%(key)s" is "%(value)s"')
@@ -243,9 +231,21 @@ class Logic:
       'There is no "%(name)s" where %(pairs)s.') % {
         'name': self._name, 'pairs': joined_pairs}
 
-
-    # else: fields were supplied, but there is no Entity that has it
     raise out_of_band.Error(msg, status=404)
+
+
+  def getIfFields(self, fields):
+    """Like getFromFieldsOr404 but returns none if not all fields are set
+
+    Raises:
+      out_of_band.Error if no User entity is found and all fields were set
+    """
+
+    if not all(fields.values()):
+      return None
+
+    return self.getFromFieldsOr404(**fields)
+
 
   def getKeyNameForFields(self, fields):
     """Return a Datastore key_name for a Entity from the specified fields.

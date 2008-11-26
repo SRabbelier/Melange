@@ -26,7 +26,6 @@ __authors__ = [
 from google.appengine.api import users
 
 from soc.logic import models
-from soc.views import out_of_band
 
 import soc.models.user
 import soc.logic.models.user
@@ -110,20 +109,3 @@ def isAccountAvailable(new_account,
 
   # email does not already belong to this User, but to some other User
   return False
-
-
-# TODO(tlarsen): make this generic for any Linkable and move elsewhere
-def getUserFromLinkIdOr404(link_id):
-  """Like getUserFromLinkId but expects to find a user.
-
-  Raises:
-    out_of_band.Error if no User entity is found
-  """
-  user = models.user.logic.getForFields({'link_id': link_id},
-                                        unique=True)
-
-  if user:
-    return user
-
-  raise out_of_band.Error(
-      'There is no user with a "link ID" of "%s".' % link_id, status=404)

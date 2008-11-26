@@ -156,7 +156,7 @@ class View(object):
         'list_heading': 'heading',
         }
 
-    description = ugettext_lazy('List of %(name)s in Google Open Source Programs.')
+    description = ugettext_lazy('List of %(name_plural)s in Google Open Source Programs.')
     new_params['list_description'] = description % params
     new_params['save_message'] = [ugettext_lazy('Profile saved.')]
     new_params['edit_params'] = {

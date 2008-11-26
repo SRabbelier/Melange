@@ -119,6 +119,9 @@ class View(base.View):
     if not entity:
       # new document so set author
       fields['author'] = user
+    else:
+      # else the author is the original author
+      fields['author'] = entity.author
     
     fields['modified_by'] = user
 

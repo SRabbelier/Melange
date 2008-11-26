@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views for Host profiles.
+"""Views for User profiles.
 """
 
 __authors__ = [
@@ -110,49 +110,10 @@ class EditForm(CreateForm):
   key_name = forms.CharField(widget=forms.HiddenInput)
 
 
-class UserForm(helper.forms.BaseForm):
-  """Django form displayed when creating or editing a User.
-  """
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    #: db.Model subclass for which the form will gather information
-    model = soc.models.user.User
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['account', 'former_accounts', 'is_developer']
-
-  def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id')
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-
-    user = soc.logic.models.user.logic.getForFields({'link_id': link_id},
-                                          unique=True)
-
-    # Get the currently logged in user account
-    current_account = users.get_current_user()
-
-    if user:
-      if current_account != user.account:
-        raise forms.ValidationError("This link ID is already in use.")
-
-    return link_id
-
-
 class View(base.View):
   """View methods for the User model.
   """
 
-  DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext_lazy(
-    'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
-    ' one or more of the following reasons:'
-    '<ul>'
-    ' <li>the account is invalid</li>'
-    ' <li>the account is already attached to a User profile and cannot be'
-    ' used to create another one</li>'
-    ' <li>the account is a former account that cannot be used again</li>'
-    '</ul>')
 
   def __init__(self, original_params=None):
     """Defines the fields and methods required for the base View class
@@ -164,12 +125,7 @@ class View(base.View):
 
     self._logic = soc.logic.models.user.logic
 
-    rights = {}
-    rights['editSelf'] = [access.allow]
-    rights['roles'] = [access.checkIsUser]
-
     params = {}
-    params['rights'] = rights
 
     params['name'] = "User"
     params['name_short'] = "User"
@@ -188,96 +144,7 @@ class View(base.View):
 
     base.View.__init__(self, params=params)
 
-  EDIT_SELF_TMPL = 'soc/user/edit_self.html'
 
-  def editSelf(self, request, page_name=None, params=None, **kwargs):
-    """Displays User self edit page for the entity specified by **kwargs.
-
-    Args:
-      request: the standard Django HTTP request object
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View
-      kwargs: The Key Fields for the specified entity
-    """
-
-    try:
-      self.checkAccess('editSelf', request)
-    except out_of_band.Error, error:
-      return error.response(request, template=self.EDIT_SELF_TMPL)
-
-    new_params = {}
-    new_params['edit_template'] = self.EDIT_SELF_TMPL
-
-    params = dicts.merge(params, new_params)
-    params = dicts.merge(params, self._params)
-
-    account = users.get_current_user()
-    properties = {'account': account}
-
-    user = soc.logic.models.user.logic.getForFields(properties, unique=True)
-
-    # create default template context for use with any templates
-    context = helper.responses.getUniversalContext(request)
-
-    if request.method == 'POST':
-      form = UserForm(request.POST)
-
-      if form.is_valid():
-        new_link_id = form.cleaned_data.get('link_id')
-        properties = {
-          'link_id': new_link_id,
-          'name': form.cleaned_data.get("name"),
-          'account': account,
-        }
-
-        # check if user account is not in former_accounts
-        # if it is show error message that account is invalid
-        if soc.logic.models.user.logic.isFormerAccount(account):
-          msg = self.DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
-            'email': account.email()}
-          error = out_of_band.Error(msg)
-          return error.response(request, template=self.EDIT_SELF_TMPL,
-                                context=context)
-
-        user = soc.logic.models.user.logic.updateOrCreateFromFields(
-            properties, {'link_id': new_link_id})
-
-        # redirect to /user/profile?s=0
-        # (causes 'Profile saved' message to be displayed)
-        return helper.responses.redirectToChangedSuffix(
-            request, None, params=params['edit_params'])
-    else: # request.method == 'GET'
-      if user:
-        # is 'Profile saved' parameter present, but referrer was not ourself?
-        # (e.g. someone bookmarked the GET that followed the POST submit)
-        if (request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME)
-            and (not helper.requests.isReferrerSelf(request))):
-          # redirect to aggressively remove 'Profile saved' query parameter
-          return http.HttpResponseRedirect(request.path)
-
-        # referrer was us, so select which submit message to display
-        # (may display no message if ?s=0 parameter is not present)
-        context['notice'] = (
-            helper.requests.getSingleIndexedParamValue(
-                request, self.DEF_SUBMIT_MSG_PARAM_NAME,
-                values=params['save_message']))
-
-        # populate form with the existing User entity
-        form = UserForm(instance=user)
-      else:
-        if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
-          # redirect to aggressively remove 'Profile saved' query parameter
-          return http.HttpResponseRedirect(request.path)
-
-        # no User entity exists for this Google Account, so show a blank form
-        form = UserForm()
-
-    context['form'] = form
-
-    template = params['edit_template']
-
-    return helper.responses.respond(request, template, context)
-  
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
@@ -290,33 +157,6 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['account'] = users.User(fields['email'])
 
-  def getUserSidebar(self, request):
-    """Returns an dictionary with the user sidebar entry.
-    """
-
-    params = {}
-    params['sidebar_heading'] = "User (self)"
-    params['sidebar'] = [
-        ('/' + self._params['url_name'] + '/edit', 'Profile', 'editSelf'),
-        ('/' + self._params['url_name'] + '/roles', 'Roles', 'roles'),
-        ]
-    return self.getSidebarLinks(request, params)
-
-  def getDjangoURLPatterns(self):
-    """See base.View.getDjangoURLPatterns().
-    """
-
-    patterns = super(View, self).getDjangoURLPatterns()
-    patterns += [(r'^' + self._params['url_name'] + '/edit$',
-                   'soc.views.models.user.edit_self')]
-
-    page_name = "Requests Overview"
-    patterns += [(r'^' + self._params['url_name'] + '/roles$',
-                   'soc.views.models.request.list_self',
-                   {'page_name': page_name}, page_name)]
-
-    return patterns
-
 
 view = View()
 
@@ -325,4 +165,3 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
-edit_self = view.editSelf

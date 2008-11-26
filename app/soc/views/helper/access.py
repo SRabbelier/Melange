@@ -53,6 +53,9 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
 DEF_PAGE_DENIED_MSG = ugettext_lazy(
   'Access to this page has been restricted')
 
+DEF_LOGOUT_MSG_FMT = ugettext_lazy(
+    'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
+
 
 def allow(request):
   """Never returns an alternate HTTP response
@@ -98,6 +101,27 @@ def checkIsLoggedIn(request):
     return
 
   raise out_of_band.LoginRequest()
+
+
+def checkNotLoggedIn(request):
+  """Returns an alternate HTTP response if Google Account is not logged in.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: If the required authorization is not met.
+
+  Returns:
+    None if the user is logged in, or a subclass of
+    django.http.HttpResponse which contains the alternate response
+    that should be returned by the calling view.
+  """
+
+  if not users.get_current_user():
+    return
+
+  raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
 
 
 def checkIsUser(request):

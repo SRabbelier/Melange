@@ -235,7 +235,7 @@ class Logic:
 
 
   def getIfFields(self, fields):
-    """Like getFromFieldsOr404 but returns none if not all fields are set
+    """Like getFromFieldsOr404 but returns None if not all fields are set
 
     Raises:
       out_of_band.Error if no User entity is found and all fields were set

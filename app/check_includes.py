@@ -6,6 +6,10 @@ import cPickle
 import os
 import graph
 
+
+ROOTDIR = "soc"
+
+
 def parseFile(file_name):
   if os.path.exists("imports.dat"):
     log = open("imports.dat", "r")
@@ -34,7 +38,7 @@ def parseFile(file_name):
 
   for idx, imp in enumerate(imports):
     if imp in set(imports[idx+1:]):
-      print "Warning: file '%s' has a redundant import: '%s'." % (file_name, imp)
+      sys.stderr.write("Warning: file '%s' has a redundant import: '%s'.\n" % (file_name, imp))
 
   if file_name.endswith("__init__.py"):
     normalized = file_name[:-12].replace('/', '.')
@@ -52,7 +56,9 @@ def parseFile(file_name):
 
 
 def buildGraph():
-  import graph
+  if not os.path.exists("imports.dat"):
+    sys.stderr.write("Missing imports.dat file, run 'build' first\n")
+    return
 
   log = open("imports.dat", "r")
   all_imports = cPickle.load(log)
@@ -136,36 +142,53 @@ def drawGraph(gr):
   gv.render(gvv,'png','imports.png')
 
 
+def accumulate(arg, dirname, fnames):
+  for fname in fnames:
+    if not fname.endswith(".py"):
+      continue
+
+    arg.append(os.path.join(dirname, fname))
+
+
 def main(args):
-  if len(args) == 1 and args[0].startswith("."):
-    gr = buildGraph()
-    if args[0] == '.':
-      return showGraph(gr)
-
-    if args[0] == '..':
-      return drawGraph(gr)
-
-    if args[0] == '...':
-      cycles = findCycles(gr)
-      for cycle in cycles:
-        print cycle
-      return 0
-
-  if not args:
-    print "Please specify a filename to parse, or '.' to list the parsed imports"
+  if len(args) != 1:
+    print "Supported options: 'print', 'build', 'find', and 'draw'."
     return -1
 
-  res = 0
+  action = args[0]
 
-  for file_name in args:
-    res += parseFile(file_name)
+  if action == "build":
+    fnames = []
+    os.path.walk(ROOTDIR, accumulate, fnames)
 
-  print "Done parsing."
+    for fname in fnames:
+      parseFile(fname)
 
-  return res
+    print "Done parsing."
+    return 0
+
+  gr = buildGraph()
+  if not gr:
+    return 1
+
+  if action == "show":
+    return showGraph(gr)
+
+  if action == "draw":
+    return drawGraph(gr)
+
+  if action == "find":
+    cycles = findCycles(gr)
+    for cycle in cycles:
+      print cycle
+    return 0
+
+  print "Unknown option."
+  return -1
+
 
 if __name__ == '__main__':
   import sys
+  os.chdir("../app")
   res = main(sys.argv[1:])
-  sys.exit(res)
-
+  sys.exit(0)

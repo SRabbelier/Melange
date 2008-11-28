@@ -30,9 +30,10 @@ from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import validate
+from soc.logic import cleaning
 from soc.logic import models
 from soc.views import helper
+from soc.views.helper import dynaform
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -43,52 +44,26 @@ import soc.views.helper
 import soc.views.helper.widgets
 
 
-class CreateForm(helper.forms.BaseForm):
-  """Django form displayed when creating a Sponsor.
-  """
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    #: db.Model subclass for which the form will gather information
-    model = soc.models.sponsor.Sponsor
-    
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'scope_path', 'founder', 'home']
-  
-  # TODO(pawel.solyga): write validation functions for other fields
-  def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id')
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-    if models.sponsor.logic.getFromFields(link_id=link_id):
-      raise forms.ValidationError("This link ID is already in use.")
-    return link_id
-
-  def clean_feed_url(self):
-    feed_url = self.cleaned_data.get('feed_url')
-
-    if feed_url == '':
-      # feed url not supplied (which is OK), so do not try to validate it
-      return None
-    
-    if not validate.isFeedURLValid(feed_url):
-      raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
-
-    return feed_url
+CreateForm = dynaform.newDynaForm(
+    dynabase = helper.forms.BaseForm,
+    dynamodel = soc.models.sponsor.Sponsor,
+    dynaexclude = ['scope', 'scope_path', 'founder', 'home'],
+    dynafields = {
+        'clean_link_id': cleaning.clean_new_link_id(models.sponsor.logic),
+        'clean_feed_url': cleaning.clean_feed_url,
+        },
+    )
 
 
-class EditForm(CreateForm):
-  """Django form displayed when editing a Sponsor.
-  """
-  link_id = forms.CharField(widget=helper.widgets.ReadOnlyInput())
-  founded_by = forms.CharField(widget=helper.widgets.ReadOnlyInput(),
-                               required=False)
-
-  def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id')
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-    return link_id
+EditForm = dynaform.extendDynaForm(
+    dynaform = CreateForm,
+    dynafields = {
+         'clean_link_id': cleaning.clean_link_id,
+        'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
+        'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
+                               required=False),
+        },
+    )
 
 
 class View(base.View):

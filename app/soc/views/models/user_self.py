@@ -129,16 +129,16 @@ class View(base.View):
       kwargs: The Key Fields for the specified entity
     """
 
-    try:
-      self.checkAccess('editSelf', request)
-    except out_of_band.Error, error:
-      return error.response(request, template=self.EDIT_SELF_TMPL)
-
     new_params = {}
     new_params['edit_template'] = self.EDIT_SELF_TMPL
 
     params = dicts.merge(params, new_params)
     params = dicts.merge(params, self._params)
+
+    try:
+      access.checkAccess('editSelf', request, params['rights'])
+    except out_of_band.Error, error:
+      return error.response(request, template=self.EDIT_SELF_TMPL)
 
     account = users.get_current_user()
     properties = {'account': account}

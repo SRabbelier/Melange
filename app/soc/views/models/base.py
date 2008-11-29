@@ -38,6 +38,8 @@ from soc.logic import models
 from soc.models import linkable
 from soc.views import helper
 from soc.views import out_of_band
+from soc.views.helper import access
+from soc.views.helper import forms
 
 
 class View(object):
@@ -93,7 +95,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('public', request, rights=params['rights'])
+      access.checkAccess('public', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -182,7 +184,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('edit', request, rights=params['rights'])
+      access.checkAccess('edit', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -248,7 +250,7 @@ class View(object):
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    key_name, fields = self.collectCleanedFields(form)
+    key_name, fields = forms.collectCleanedFields(form)
 
     request.path = params['edit_redirect']
     self._editPost(request, entity, fields)
@@ -359,7 +361,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('list', request, rights=params['rights'])
+      access.checkAccess('list', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -423,7 +425,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('delete', request, rights=params['rights'])
+      access.checkAccess('delete', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -541,70 +543,6 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
-  def checkAccess(self, access_type, request, rights=None):
-    """Runs all the defined checks for the specified type
-
-    Args:
-      access_type: the type of request (such as 'list' or 'edit')
-      request: the Django request object
-      rights: A dictionary containing access check functions
-
-    Rights usage: The rights dictionary is used to check if the
-      current user is allowed to view the page specified. The
-      functions defined in this dictionary are always called with the
-      django request object as argument.
-      On any request, regardless of what type, the functions in the
-      'any_access' value are called.
-      If the specified type is not in the rights dictionary, all the
-      functions in the 'unspecified' value are called.
-      When the specified type _is_ in the rights dictionary, all the
-      functions in that access_type's value are called.
-
-    Returns:
-      True: If all the required access checks have been made successfully
-      False: If a check failed, in this case self._response will contain
-             the response provided by the failed access check.
-    """
-
-    rights = dicts.merge(rights, self._params['rights'])
-
-    # Call each access checker
-    for check in rights['any_access']:
-      check(request)
-
-    if access_type not in rights:
-      for check in rights['unspecified']:
-        # No checks defined, so do the 'generic' checks and bail out
-        check(request)
-      return
-
-    for check in rights[access_type]:
-      check(request)
-
-  def collectCleanedFields(self, form):
-    """Collects all cleaned fields and returns them with the key_name.
-
-    Args:
-      form: The form from which the cleaned fields should be collected
-
-    Returns: All the fields that are in the form's cleaned_data
-    property are returned. If there is a key_name field, it is not
-    included in the returend fields, instead, it is returned as the
-    first element in the returned tuple. If no key_name field is
-    present, None is returned as first value instead.
-    """
-
-    fields = {}
-
-    key_name = None
-    if 'key_name' in form.cleaned_data:
-      key_name = form.cleaned_data.pop('key_name')
-
-    for field, value in form.cleaned_data.iteritems():
-      fields[field] = value
-
-    return key_name, fields
-
   def getKeyFieldsPattern(self, params):
     """Returns the Django pattern for this View's entity
 
@@ -698,7 +636,7 @@ class View(object):
 
     for url, menu_text, access_type in self._getSidebarItems(params):
       try:
-        self.checkAccess(access_type, request, rights)
+        access.checkAccess(access_type, request, rights)
         items.append({'url': url, 'title': menu_text})
       except out_of_band.Error:
         pass

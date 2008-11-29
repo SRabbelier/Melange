@@ -57,6 +57,45 @@ DEF_LOGOUT_MSG_FMT = ugettext_lazy(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
 
 
+def checkAccess(access_type, request, rights):
+  """Runs all the defined checks for the specified type
+
+  Args:
+    access_type: the type of request (such as 'list' or 'edit')
+    request: the Django request object
+    rights: A dictionary containing access check functions
+
+  Rights usage: The rights dictionary is used to check if the
+    current user is allowed to view the page specified. The
+    functions defined in this dictionary are always called with the
+    django request object as argument.
+    On any request, regardless of what type, the functions in the
+    'any_access' value are called.
+    If the specified type is not in the rights dictionary, all the
+    functions in the 'unspecified' value are called.
+    When the specified type _is_ in the rights dictionary, all the
+    functions in that access_type's value are called.
+
+  Returns:
+    True: If all the required access checks have been made successfully
+    False: If a check failed, in this case self._response will contain
+           the response provided by the failed access check.
+  """
+
+  # Call each access checker
+  for check in rights['any_access']:
+    check(request)
+
+  if access_type not in rights:
+    for check in rights['unspecified']:
+      # No checks defined, so do the 'generic' checks and bail out
+      check(request)
+    return
+
+  for check in rights[access_type]:
+    check(request)
+
+
 def allow(request):
   """Never returns an alternate HTTP response
 

@@ -137,12 +137,12 @@ class View(base.View):
       kwargs: not used
     """
 
+    params = dicts.merge(params, self._params)
+
     try:
-      self.checkAccess('listSelf', request)
+      access.checkAccess('listSelf', request, params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
-
-    params = dicts.merge(params, self._params)
 
     # get the current user
     properties = {'account': users.get_current_user()}

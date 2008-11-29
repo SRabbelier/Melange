@@ -312,3 +312,28 @@ def makeSelectQueryArgForm(
   field_name = field_name_fmt % {'arg_name': arg_name}
   return SelectQueryArgForm(request.path, arg_name, choices, field_name,
                             initial={field_name: initial_value})
+
+
+def collectCleanedFields(form):
+  """Collects all cleaned fields and returns them with the key_name.
+
+  Args:
+    form: The form from which the cleaned fields should be collected
+
+  Returns: All the fields that are in the form's cleaned_data
+  property are returned. If there is a key_name field, it is not
+  included in the returend fields, instead, it is returned as the
+  first element in the returned tuple. If no key_name field is
+  present, None is returned as first value instead.
+  """
+
+  fields = {}
+
+  key_name = None
+  if 'key_name' in form.cleaned_data:
+    key_name = form.cleaned_data.pop('key_name')
+
+  for field, value in form.cleaned_data.iteritems():
+    fields[field] = value
+
+  return key_name, fields

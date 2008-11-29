@@ -105,7 +105,7 @@ class View(role.RoleView):
 
     params = dicts.merge(original_params, params)
 
-    role.RoleView.__init__(self, original_params=params)
+    role.RoleView.__init__(self, params=params)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

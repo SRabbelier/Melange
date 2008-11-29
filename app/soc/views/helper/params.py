@@ -93,8 +93,8 @@ def constructParams(params):
   new_params['sidebar_additional'] = []
 
   new_params['key_fields_prefix'] = []
-  new_params['link_id_arg_pattern'] = linkable.LINK_ID_PATTERN_CORE
-  new_params['link_id_pattern_core'] = linkable.LINK_ID_ARG_PATTERN
+  new_params['link_id_arg_pattern'] = linkable.LINK_ID_ARG_PATTERN
+  new_params['link_id_pattern_core'] = linkable.LINK_ID_PATTERN_CORE
 
   new_params['django_patterns'] = None
   new_params['django_patterns_defaults'] = [

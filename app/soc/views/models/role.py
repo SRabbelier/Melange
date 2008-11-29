@@ -34,6 +34,7 @@ from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
+from soc.views.helper import access
 from soc.views.models import base
 from soc.views.models import user as user_view
 
@@ -73,15 +74,12 @@ class RoleView(base.View):
   DEF_INVITE_INSTRUCTION_MSG_FMT = ugettext_lazy(
       'Please use this form to invite someone to become a %(name)s.')
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """
 
     Args:
       original_params: This dictionary should be filled with the parameters
     """
-
-    params = {}
-    params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)
 
@@ -102,7 +100,7 @@ class RoleView(base.View):
     params = dicts.merge(new_params, user_view.view._params)
 
     try:
-      self.checkAccess('invite', request)
+      access.checkAccess('invite', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -123,13 +121,15 @@ class RoleView(base.View):
     """See base.View.getDjangoURLPatterns().
     """
 
-    params = {}
     default_patterns = self._params['django_patterns_defaults']
     default_patterns += [
         (r'^%(url_name)s/invite/%(lnp)s$',
             'soc.views.models.%s.invite', 'Invite %(name_short)s')]
 
+    params = {}
     params['django_patterns_defaults'] = default_patterns
+
+    params = dicts.merge(params, self._params)
     patterns = super(RoleView, self).getDjangoURLPatterns(params)
 
     return patterns

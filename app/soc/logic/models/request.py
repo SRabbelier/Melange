@@ -24,6 +24,8 @@ __authors__ = [
 
 from google.appengine.api import users
 
+from django.utils.translation import ugettext_lazy
+
 from soc.logic import mail_dispatcher
 from soc.logic.models import base
 from soc.logic.models import user as user_logic
@@ -36,6 +38,9 @@ import soc.models.request
 class Logic(base.Logic):
   """Logic methods for the Request model.
   """
+
+  DEF_INVITATION_FMT = ugettext_lazy(
+      "Invitation to become a %(role)s for %(group)s")
 
   def __init__(self, model=soc.models.request.Request,
                base_model=None):
@@ -77,44 +82,46 @@ class Logic(base.Logic):
     
   def sendInviteMessage(self, entity):
     """Sends out an invite notification to the user the request is for.
-    
+
     Args:
       entity : A request containing the information needed to create the message
-    
     """
+
     # get the current user
     properties = {'account': users.get_current_user()}
     current_user_entity = user_logic.logic.getForFields(properties, unique=True)
-    
+
     # get the user the request is for
     properties = {'link_id': entity.link_id }
     request_user_entity = user_logic.logic.getForFields(properties, unique=True)
-    
+
     # create the invitation_url
     invitation_url = "%(host)s%(index)s" % {
                           'host' : os.environ['HTTP_HOST'], 
                           'index': self.inviteAcceptedRedirect(entity, None)
                           }
-    
+
     # get the group entity
     group_entity = entity.scope
-    
+
     messageProperties = {
-                      'to_name': request_user_entity.name,
-                      'sender_name': current_user_entity.name,
-                      'role': entity.role,
-                      'group': group_entity.name,
-                      'invitation_url': invitation_url,
-                      'to': request_user_entity.account.email(),
-                      'sender': current_user_entity.account.email(),
-                      'subject': "Invitation to become a %(role)s for %(group)s"
-                         %{'role': entity.role, 'group': group_entity.name},
-                      }
-    
+        'to_name': request_user_entity.name,
+        'sender_name': current_user_entity.name,
+        'role': entity.role,
+        'group': group_entity.name,
+        'invitation_url': invitation_url,
+        'to': request_user_entity.account.email(),
+        'sender': current_user_entity.account.email(),
+        'subject': self.DEF_INVITATION_FMT % {
+            'role': entity.role,
+            'group': group_entity.name
+            },
+        }
+
     # send out the message using the default invitation template    
     mail_dispatcher.sendMailFromTemplate('soc/mail/invitation.html', 
                                          messageProperties)
-    
+
   def inviteAcceptedRedirect(self, entity, _):
     """Returns the redirect for accepting an invite
     """

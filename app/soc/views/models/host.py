@@ -31,6 +31,7 @@ from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
 from soc.views.models import base
 from soc.views.models import role
+from soc.views.helper import access
 
 import soc.models.host
 import soc.logic.models.host
@@ -87,7 +88,11 @@ class View(role.RoleView):
       original_params: a dict with params for this View
     """
 
+    rights = {}
+    rights['edit'] = [access.checkIsInvited]
+
     params = {}
+    params['rights'] = rights
     params['logic'] = soc.logic.models.host.logic
 
     params['logic'] = soc.logic.models.host.logic

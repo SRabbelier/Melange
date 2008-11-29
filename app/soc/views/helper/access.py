@@ -215,7 +215,7 @@ def checkIsDeveloper(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsInvited(request, role):
+def checkIsInvited(request):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
@@ -233,21 +233,36 @@ def checkIsInvited(request, role):
 
   checkIsUser(request)
 
+  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+      'role': 'a host for this program'}
+
+  splitpath = request.path.split('/')
+
+  if len(splitpath) < 4:
+    # TODO: perhaps this needs a better explanation?
+    deny(request)
+
+  role = splitpath[1]
+  group_id = splitpath[3]
+  user_id = splitpath[4]
+
   user = user_logic.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)
 
+  if user_id != user.link_id:
+    # TODO: perhaps this needs a better explanation?
+    deny(request)
+
   properties = {
-      'requester': user,
+      'link_id': user_id,
       'role': role,
-      'accepted': True,
+      'scope_path': group_id,
+      'group_accepted': True,
       }
 
   request = request_logic.logic.getForFields(properties, unique=True)
 
   if request:
     return
-
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a host for this program'}
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)

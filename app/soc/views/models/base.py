@@ -164,6 +164,7 @@ class View(object):
         }
 
     self._params = dicts.merge(params, new_params)
+    self._logic = self._params['logic']
 
   def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.

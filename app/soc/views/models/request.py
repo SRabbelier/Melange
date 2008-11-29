@@ -99,13 +99,12 @@ class View(base.View):
       original_params: a dict with params for this View
     """
 
-    self._logic = soc.logic.models.request.logic
-
     rights = {}
     rights['listSelf'] = [access.checkIsUser]
 
     params = {}
     params['rights'] = rights
+    params['logic'] = soc.logic.models.request.logic
 
     params['name'] = "Request"
     params['name_short'] = "Request"

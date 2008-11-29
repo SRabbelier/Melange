@@ -80,6 +80,7 @@ class View(presence.View):
     """
 
     params = {}
+    params['logic'] = soc.logic.models.site.logic
 
     # TODO(alturin): add ugettext_lazy ?
     params['name'] = "Site Settings"
@@ -106,8 +107,6 @@ class View(presence.View):
     params = dicts.merge(original_params, params)
 
     presence.View.__init__(self, original_params=params)
-
-    self._logic = soc.logic.models.site.logic
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.

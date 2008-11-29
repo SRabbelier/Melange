@@ -108,6 +108,7 @@ class View(base.View):
     """
 
     params = {}
+    params['logic'] = soc.logic.models.presence.logic
 
     params['name'] = "Home Settings"
     params['name_short'] = "Home Settings"
@@ -124,8 +125,6 @@ class View(base.View):
     params = dicts.merge(original_params, params)
 
     base.View.__init__(self, params=params)
-
-    self._logic = soc.logic.models.presence.logic
 
   def _public(self, request, entity, context):
     """

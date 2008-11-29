@@ -87,9 +87,8 @@ class View(role.RoleView):
       original_params: a dict with params for this View
     """
 
-    self._logic = soc.logic.models.host.logic
-
     params = {}
+    params['logic'] = soc.logic.models.host.logic
 
     params['logic'] = soc.logic.models.host.logic
     params['group_view'] = soc.views.models.sponsor.view

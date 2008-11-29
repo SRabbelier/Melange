@@ -94,8 +94,6 @@ class View(base.View):
       original_params: a dict with params for this View
     """
 
-    self._logic = soc.logic.models.user.logic
-
     rights = {}
     rights['unspecified'] = [access.deny]
     rights['any_access'] = [access.allow]
@@ -105,6 +103,7 @@ class View(base.View):
 
     params = {}
     params['rights'] = rights
+    params['logic'] = soc.logic.models.user.logic
 
     params['name'] = "User"
     params['name_short'] = "User"

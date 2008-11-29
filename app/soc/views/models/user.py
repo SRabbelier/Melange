@@ -123,9 +123,8 @@ class View(base.View):
       original_params: a dict with params for this View
     """
 
-    self._logic = soc.logic.models.user.logic
-
     params = {}
+    params['logic'] = soc.logic.models.user.logic
 
     params['name'] = "User"
     params['name_short'] = "User"

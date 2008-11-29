@@ -78,9 +78,8 @@ class View(base.View):
       original_params: a dict with params for this View 
     """    
 
-    self._logic = soc.logic.models.sponsor.logic
-    
     params = {}
+    params['logic'] = soc.logic.models.sponsor.logic
 
     params['name'] = "Sponsor"
     params['name_short'] = "Sponsor"

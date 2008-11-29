@@ -35,11 +35,11 @@ import soc.views.helper.params
 
 from soc.logic import dicts
 from soc.logic import models
-from soc.models import linkable
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import forms
+from soc.views import sitemap
 
 
 class View(object):
@@ -543,24 +543,6 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
-  def getKeyFieldsPattern(self, params):
-    """Returns the Django pattern for this View's entity
-
-    Params usage:
-      key_fields_prefix: The key_fields_prefix value is used as the
-      first part of the returned pattern.
-    """
-
-    names = self._logic.getKeyFieldNames()
-    patterns = params['key_fields_prefix']
-
-    for name in names:
-      pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
-      patterns.append(pattern)
-
-    result = '/'.join(patterns)
-    return result
-
   def _getSidebarItems(self, params):
     """Retrieves a list of sidebar entries for this view
 
@@ -680,31 +662,4 @@ class View(object):
     """
 
     params = dicts.merge(params, self._params)
-
-    # Return the found result
-    if params['django_patterns']:
-      return params['django_patterns']
-
-    # Construct defaults manualy
-    default_patterns = params['django_patterns_defaults']
-    key_fields_pattern = self.getKeyFieldsPattern(params)
-
-    patterns = []
-
-    for url, module, name in default_patterns:
-      name = name % params
-      module = module % params['module_name']
-
-      url = url % {
-          'url_name': params['url_name'],
-          'lnp': linkable.LINK_ID_ARG_PATTERN,
-          'ulnp': linkable.LINK_ID_PATTERN_CORE,
-          'key_fields': key_fields_pattern,
-          }
-
-      kwargs = {'page_name': name}
-
-      item = (url, module, kwargs, name)
-      patterns.append(item)
-
-    return patterns
+    return sitemap.sitemap.getDjangoURLPatterns(params)

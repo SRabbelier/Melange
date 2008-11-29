@@ -27,6 +27,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.models import linkable
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import dynaform
@@ -92,6 +93,8 @@ def constructParams(params):
   new_params['sidebar_additional'] = []
 
   new_params['key_fields_prefix'] = []
+  new_params['link_id_arg_pattern'] = linkable.LINK_ID_PATTERN_CORE
+  new_params['link_id_pattern_core'] = linkable.LINK_ID_ARG_PATTERN
 
   new_params['django_patterns'] = None
   new_params['django_patterns_defaults'] = [
@@ -170,6 +173,9 @@ def constructParams(params):
   if not 'edit_form' in params:
     params['edit_form'] = getEditForm(params)
 
+  if not 'key_fields_pattern' in params:
+    params['key_fields_pattern'] = getKeyFieldsPattern(params)
+
   return params
 
 def getCreateForm(params):
@@ -213,3 +219,21 @@ def getEditForm(params):
     )
 
   return edit_form
+
+def getKeyFieldsPattern(params):
+  """Returns the Django pattern for this View's entity
+
+  Params usage:
+    key_fields_prefix: The key_fields_prefix value is used as the
+    first part of the returned pattern.
+  """
+
+  names = params['logic'].getKeyFieldNames()
+  patterns = params['key_fields_prefix']
+
+  for name in names:
+    pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
+    patterns.append(pattern)
+
+  result = '/'.join(patterns)
+  return result

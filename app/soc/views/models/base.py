@@ -66,28 +66,8 @@ class View(object):
 
     Args:
       params: This dictionary should be filled with the parameters
-        specific to this entity, required fields are:
-        rights: This dictionary should be filled with the access check
-                functions that should be called
-        name: the name of the entity (names should have sentence-style caps) 
-        name_short: the short form name of the name ('org' vs 'organization')
-        name_plural: the plural form of the name
-        url_name: the name of the entity used in urls
-        edit_form: the class of the Django form to be used when editing
-        create_form: the class of the Django form to be used when creating
-        edit_template: the Django template to be used for editing
-        public_template: the Django template to be used as public page 
-        list_template: the Django template to be used as list page
-        lists_template: the Django templates to search for the list page
-        delete_redirect: the Django template to redirect to on delete
-        create_redirect: the Django template to redirect to after creation
-        save_message: the message to display when the entity is saved
-        edit_params: the params to use when editing
-        sidebar: the sidebar menu items for this view
-        sidebar_defaults: a dictionary with defaults for the sidebar; each
-          value in the dict is a two-tuple:
-          (url_format,       # supplied a single positional url_name
-           menu_text_format) # supplied the params dict
+        specific to this entity. See the methods in this class on
+        the fields it should contain, and how they are used.
     """
 
     rights = {}
@@ -211,6 +191,19 @@ class View(object):
   def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.
 
+    Params usage:
+      rights: The rights dictionary is used to check if the user has
+        the required rights to view the public page for this entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      error_public: The error_public value is used as template when
+        the key values (as defined by the page's url) do not
+        correspond to an existing entity.
+      name: The name value is used to set the entity_type in the
+        context so that the template can refer to it.
+      public_template: The public_template value is used as template
+        to display the public page of the found entity.
+
     Args:
       request: the standard Django HTTP request object
       page_name: the page name displayed in templates as page and header title
@@ -221,7 +214,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('public', request)
+      self.checkAccess('public', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -253,6 +246,10 @@ class View(object):
   def create(self, request, page_name=None, params=None, **kwargs):
     """Displays the create page for this entity type.
 
+    Params usage:
+      The params dictionary is passed on to edit, see the docstring
+      for edit on how it uses it.
+
     Args:
       request: the standard Django HTTP request object
       page_name: the page name displayed in templates as page and header title
@@ -277,6 +274,24 @@ class View(object):
 
   def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs.
+
+    Params usage:
+      The params dictionary is passed on to either editGet or editPost
+      depending on the method type of the request. See the docstring
+      for editGet and editPost on how they use it.
+
+      rights: The rights dictionary is used to check if the user has
+        the required rights to edit (or create) a new entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      name: The name value is used to construct the message_fmt of the
+        raised error when there key_values do not define an existing
+        entity. See DEF_CREATE_NEW_ENTITY_MSG_FMT on how the name
+        (and the lower() version of it) is used.
+      missing_redirect: The missing_redirect value is also used to
+        construct the message_fmt mentioned above.
+      error_public: The error_public value is used as the template for
+        the error response mentioned above.
 
     Args:
       request: the standard Django HTTP request object
@@ -316,7 +331,32 @@ class View(object):
       return self.editGet(request, entity, context, seed, params)
 
   def editPost(self, request, entity, context, params):
-    """Same as edit, but on POST.
+    """Processes POST requests for the specified entity
+
+    Params usage:
+      The params dictionary is passed to _constructResponse when the
+      form is not valid (see edit_form and create_form below). See
+      the docstring of _constructResponse on how it uses it.
+
+      edit_form: The edit_form value is used as form when there is an
+        existing entity. It is provided with with the request.POST
+        dictionary on construction. The collectCleanedFields method
+        is called with the newly constructed form. If the form is
+        not valid, it is passed as argument to _constructResponse.
+      create_form: The create_form value is used in a similar way to
+        edit_form, only it is used when there is no existing entity.
+      edit_redirect: The edit_redirect value is used as the first part
+        of the url if the form was valid. The last part of the url is
+        created using the getKeySuffix method of the _logic object.
+      edit_params: The edit_params dictionary is used as argument to
+        redirectToChangedSuffix, it will be appended to the url in the
+        standard ?key=value format.
+
+    Args:
+      request: a django request object
+      entity: the entity that will be modified or created, may be None
+      context: the context dictionary that will be provided to Django
+      params: a dict with params for this View
     """
 
     params = dicts.merge(params, self._params)
@@ -353,7 +393,31 @@ class View(object):
         params=page_params)
 
   def editGet(self, request, entity, context, seed, params):
-    """Same as edit, but on GET.
+    """Processes GET requests for the specified entity
+
+    Params usage:
+      The params dictionary is passed to _constructResponse, see the
+        docstring  of _constructResponse on how it uses it.
+
+      save_message: The save_message list is used as argument to
+        getSingleIndexedParamValue when an existing entity was saved.
+      edit_form: The edit_form is used as form if there is an existing
+        entity. The existing entity is passed as instance to it on
+        construction. If key_name is part of it's fields it will be
+        set to the entity's key().name() value. It is also passed as
+        argument to the _editGet method. See the docstring for
+        _editGet on how it uses it.
+      create_form: The create_form is used as form if there was no
+        existing entity. If the seed argument is present, it is passed
+        as the 'initial' argument on construction. Otherwise, it is
+        called with no arguments.
+
+    Args:
+      request: the django request object
+      entity: the entity that will be edited, may be None
+      context: the context dictionary that will be provided to django
+      seed: if no entity is provided, the initial values for the new entity
+      params: a dict with paras for this View
     """
 
     params = dicts.merge(params, self._params)
@@ -374,8 +438,10 @@ class View(object):
 
       # populate form with the existing entity
       form = params['edit_form'](instance=entity)
+
       if 'key_name' in form.fields:
         form.fields['key_name'].initial = entity.key().name()
+
       self._editGet(request, entity, form)
     else:
       if seed:
@@ -394,12 +460,24 @@ class View(object):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       filter: a dict for the properties that the entities should have
+
+    Params usage:
+      The params dictionary is passed as argument to getListContent in
+        the soc.views.helper.list module. See the docstring for
+        getListContent on how it uses it.
+      The params dictionary is also passed as argument to the _list
+        method. See the docstring for _list on how it uses it.
+
+      rights: The rights dictionary is used to check if the user has
+        the required rights to list all entities of this View's type.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
     """
 
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('list', request)
+      self.checkAccess('list', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -416,6 +494,15 @@ class View(object):
       params: a dict with params for this View
       contents: a list of content dicts
       page_name: the page name displayed in templates as page and header title
+
+    Params usage:
+      name: The name value is used to set the entity_type in the
+        context so that the template can refer to it.
+      name_plural: The name_plural value is used to set
+        the entity_type_plural value in the context so that the
+        template can refer to it.
+      list_template: The list_template value is used as template for
+        to display the list of all entities for this View.
     """
 
     context = helper.responses.getUniversalContext(request)
@@ -437,12 +524,24 @@ class View(object):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
+
+    Params usage:
+      rights: The rights dictionary is used to check if the user has
+        the required rights to delete the specified entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      name: used in the same way as in edit(), see it's docstring for
+        a more detailed explanation on how it is used.
+      missing_redirect: see name
+      error_edit: see name
+      delete_redirect: The delete_redirect value is used as the url to
+        redirect to after having successfully deleted the entity.
     """
 
     params = dicts.merge(params, self._params)
 
     try:
-      self.checkAccess('delete', request)
+      self.checkAccess('delete', request, rights=params['rights'])
     except out_of_band.Error, error:
       return error.response(request)
 
@@ -533,10 +632,22 @@ class View(object):
 
     Args:
       request: the django request object
-      entity: the entity that is used
+      entity: the entity that is used and set in the context
       context: the context to be used
-      form: the form that will be used
+      form: the form that will be used and set in the context
       params: a dict with params for this View
+
+    Params usage:
+      name: The name_plural value is used to set the entity_type
+       value in the context so that the template can refer to it.
+      name_plural: same as name, but used to set entity_type_plural
+      name_short: same as name, but used to set entity_type_short
+      url_name: same as name, but used to set entity_type_url
+      edit_template: The edit_template value is used as template when
+        there is an existing entity to display the edit page for the
+        specified entity.
+      create_template: similar to edit_template, but is used when
+        there is no existing entity.
     """
 
     suffix = self._logic.getKeySuffix(entity)
@@ -562,6 +673,18 @@ class View(object):
     Args:
       access_type: the type of request (such as 'list' or 'edit')
       request: the Django request object
+      rights: A dictionary containing access check functions
+
+    Rights usage: The rights dictionary is used to check if the
+      current user is allowed to view the page specified. The
+      functions defined in this dictionary are always called with the
+      django request object as argument.
+      On any request, regardless of what type, the functions in the
+      'any_access' value are called.
+      If the specified type is not in the rights dictionary, all the
+      functions in the 'unspecified' value are called.
+      When the specified type _is_ in the rights dictionary, all the
+      functions in that access_type's value are called.
 
     Returns:
       True: If all the required access checks have been made successfully
@@ -577,7 +700,7 @@ class View(object):
 
     if access_type not in rights:
       for check in rights['unspecified']:
-        # No checks defined, so do the 'generic check' and bail out
+        # No checks defined, so do the 'generic' checks and bail out
         check(request)
       return
 
@@ -589,6 +712,12 @@ class View(object):
 
     Args:
       form: The form from which the cleaned fields should be collected
+
+    Returns: All the fields that are in the form's cleaned_data
+    property are returned. If there is a key_name field, it is not
+    included in the returend fields, instead, it is returned as the
+    first element in the returned tuple. If no key_name field is
+    present, None is returned as first value instead.
     """
 
     fields = {}
@@ -603,7 +732,11 @@ class View(object):
     return key_name, fields
 
   def getKeyFieldsPattern(self, params):
-    """
+    """Returns the Django pattern for this View's entity
+
+    Params usage:
+      key_fields_prefix: The key_fields_prefix value is used as the
+      first part of the returned pattern.
     """
 
     names = self._logic.getKeyFieldNames()
@@ -617,9 +750,22 @@ class View(object):
     return result
 
   def _getSidebarItems(self, params):
-    """Retrieves a list of sidebar entries for this view from self._params.
+    """Retrieves a list of sidebar entries for this view
 
-    If params['sidebar'] is None default entries will be constructed 
+    Params usage:
+      The params dictionary is provided to the menu_text's format.
+
+      sidebar: The sidebar value is returned directly if non-False
+      sidebar_defaults: The sidebar_defaults are used to construct the
+        sidebar items for this View. It is expected to be a tuple of
+        three items, the item's url, it's menu_text, and it's
+        access_type, see getSidebarLinks on how access_type is used.
+      sidebar_additional: The sidebar_additional values are appended
+        to the list of items verbatim, and should be in the format
+        expected by getSidebarLinks.
+
+    Args:
+      params: a dict with params for this View.
     """
 
     # Return the found result
@@ -644,8 +790,31 @@ class View(object):
   def getSidebarLinks(self, request, params=None):
     """Returns an dictionary with one sidebar entry.
 
+    Calls _getSidebarItems to retrieve the items that should be in the
+    menu. Expected is a tuple with an url, a menu_text, and an
+    access_type. The access_type is then passed to checkAccess, if it
+    raises out_of_band.Error, the item will not be added.
+
     Args:
-      params: see __init__
+      request: the django request object
+      params: a dict with params for this View
+
+    Params usage:
+      The params dictionary is passed as argument to _getSidebarItems,
+        see the docstring of _getSidebarItems on how it uses it.
+
+      rights: The rights dictionary is used to check if the user has
+        the required rights to see a sidebar item.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      sidebar_heading: The sidebar_heading value is used to set the
+        heading variable in the result.
+      name: The name value is used if sidebar_heading is not present.
+
+    Returns: A dictionary is returned with it's 'heading' value set
+      as explained above. It's 'items' value is constructed by
+      calling _getSidebarItems. It constists of dictionaries with a
+      url and a title field.
     """
 
     params = dicts.merge(params, self._params)
@@ -678,6 +847,24 @@ class View(object):
 
     If self._params['django_patterns'] is None default entries will be
     constructed.
+
+    Params usage:
+      The params dictionary is passed to the getKeyFieldsPatterns
+        method, see it's docstring on how it is used.
+      django_patterns: The django_patterns value is returned directly
+        if it is non-False.
+      django_patterns_defaults: The dajngo_patterns_defaults value is
+        used to construct the url patterns. It is expected to be a
+        list of tuples. The tuples should contain an url, a module
+        name, and the name of the url. The name is used as the
+        page_name passed as keyword argument, but also as the name
+        by which the url is known to Django internally.
+      url_name: The url_name argument is passed as argument to each
+        url, together with the link_id pattern, the link_id core
+        pattern, and the key fields for this View.
+
+    Args:
+      params: a dict with params for this View
     """
 
     params = dicts.merge(params, self._params)

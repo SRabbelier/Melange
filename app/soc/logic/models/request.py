@@ -30,6 +30,8 @@ from soc.logic import mail_dispatcher
 from soc.logic.models import base
 from soc.logic.models import user as user_logic
 
+from soc.views.helper import redirects
+
 import os
 
 import soc.models.request
@@ -98,7 +100,7 @@ class Logic(base.Logic):
     # create the invitation_url
     invitation_url = "%(host)s%(index)s" % {
                           'host' : os.environ['HTTP_HOST'], 
-                          'index': self.inviteAcceptedRedirect(entity, None)
+                          'index': redirects.inviteAcceptedRedirect(entity, None)
                           }
 
     # get the group entity
@@ -122,11 +124,5 @@ class Logic(base.Logic):
     mail_dispatcher.sendMailFromTemplate('soc/mail/invitation.html', 
                                          messageProperties)
 
-  def inviteAcceptedRedirect(self, entity, _):
-    """Returns the redirect for accepting an invite
-    """
-
-    return '/%s/create/%s/%s' % (
-        entity.role, entity.scope_path, entity.link_id)
 
 logic = Logic()

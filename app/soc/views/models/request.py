@@ -36,6 +36,7 @@ from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import role as role_view
@@ -155,7 +156,7 @@ class View(base.View):
               'group_accepted' : True}
     
     uh_params = params.copy()
-    uh_params['list_action'] = (self._logic.inviteAcceptedRedirect, None)
+    uh_params['list_action'] = (redirects.inviteAcceptedRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
         "An overview of your unhandled requests")
 

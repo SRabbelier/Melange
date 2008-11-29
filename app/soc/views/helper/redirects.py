@@ -22,10 +22,28 @@ __authors__ = [
   ]
 
 
+def getCreateRequestRedirect(entity, params):
+  """Returns the create request redirect for the specified entity.
+  """
+
+  result ='/request/create/%s/%s/%s' % (
+     params['url_name'], params['group_scope'], entity.link_id)
+  
+  return result
+
+
 def getEditRedirect(entity, params):
-  """Returns the edit redirect for the specified entity
+  """Returns the edit redirect for the specified entity.
   """
 
   suffix = params['logic'].getKeySuffix(entity)
   url_name = params['url_name']
   return '/%s/edit/%s' % (url_name, suffix)
+
+
+def inviteAcceptedRedirect(entity, _):
+  """Returns the redirect for accepting an invite.
+  """
+
+  return '/%s/create/%s/%s' % (
+      entity.role, entity.scope_path, entity.link_id)

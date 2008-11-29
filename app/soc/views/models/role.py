@@ -35,6 +35,7 @@ from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import base
 from soc.views.models import user as user_view
 
@@ -90,13 +91,15 @@ class RoleView(base.View):
     if not params:
       params = {}
     new_params = {}
-    link_id = kwargs['link_id']
+    group_scope = kwargs['link_id']
 
-    new_params['list_action'] = (self.getCreateRequestRedirect, link_id)
+    new_params['list_action'] = (redirects.getCreateRequestRedirect, 
+        {'group_scope' : group_scope,
+        'url_name' : self._params['url_name'] })
     new_params['instruction_text'] = \
         self.DEF_INVITE_INSTRUCTION_MSG_FMT % self._params
 
-    params = dicts.merge(new_params, params)
+    new_params = dicts.merge(new_params, params)
     params = dicts.merge(new_params, user_view.view._params)
 
     try:
@@ -108,14 +111,6 @@ class RoleView(base.View):
     contents = [content]
 
     return self._list(request, params, contents, page_name)
-
-  def getCreateRequestRedirect(self, entity, group_scope):
-    """Returns the edit redirect for the specified entity
-    """
-
-    result ='/request/create/%s/%s/%s' % (
-        self._params['url_name'], group_scope, entity.link_id)
-    return result
 
   def getDjangoURLPatterns(self):
     """See base.View.getDjangoURLPatterns().

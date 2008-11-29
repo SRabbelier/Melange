@@ -25,6 +25,7 @@ __authors__ = [
 
 
 from django import http
+from django import forms
 from django.conf.urls import defaults
 from django.utils.translation import ugettext_lazy
 
@@ -33,12 +34,14 @@ import soc.logic.lists
 import soc.views.helper.lists
 import soc.views.helper.responses
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import models
 from soc.models import linkable
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import dynaform
 
 
 class View(object):
@@ -163,8 +166,47 @@ class View(object):
         self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
         }
 
+    new_params['dynabase'] = helper.forms.BaseForm
+
+    new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
+    new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
+        params.get('extra_dynaexclude', [])
+    new_params['create_dynafields'] = {
+        'clean_link_id': cleaning.clean_new_link_id(params['logic']),
+        'clean_feed_url': cleaning.clean_feed_url,
+        }
+
+    dynafields = {
+        'clean_link_id': cleaning.clean_link_id,
+        'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
+        }
+    dynafields.update(params.get('extra_dynafields', {}))
+
+    new_params['edit_dynainclude'] = None
+    new_params['edit_dynaexclude'] = None
+    new_params['edit_dynafields'] = dynafields
+
     self._params = dicts.merge(params, new_params)
     self._logic = self._params['logic']
+
+    # These need to be constructed seperately, because they require
+    # parameters that can be defined either in params, or new_params.
+    if 'create_form' not in self._params:
+      self._params['create_form'] = dynaform.newDynaForm(
+        dynabase = self._params['dynabase'],
+        dynamodel = self._logic.getModel(),
+        dynainclude = self._params['create_dynainclude'],
+        dynaexclude = self._params['create_dynaexclude'],
+        dynafields = self._params['create_dynafields'],
+        )
+
+    if 'edit_form' not in self._params:
+      self._params['edit_form'] = dynaform.extendDynaForm(
+        dynaform = self._params['create_form'],
+        dynainclude = self._params['edit_dynainclude'],
+        dynaexclude = self._params['edit_dynaexclude'],
+        dynafields = self._params['edit_dynafields'],
+        )
 
   def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.

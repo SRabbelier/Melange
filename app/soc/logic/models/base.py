@@ -63,6 +63,12 @@ class Logic:
     else:
       self._skip_properties = []
 
+  def getModel(self):
+    """Returns the model this logic class uses
+    """
+
+    return self._model
+
   def _updateField(self, model, name, value):
     """Hook called when a field is updated.
 

@@ -30,10 +30,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import cleaning
 from soc.logic import models
 from soc.views import helper
-from soc.views.helper import dynaform
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -42,28 +40,6 @@ import soc.logic.models.sponsor
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
-
-
-CreateForm = dynaform.newDynaForm(
-    dynabase = helper.forms.BaseForm,
-    dynamodel = soc.models.sponsor.Sponsor,
-    dynaexclude = ['scope', 'scope_path', 'founder', 'home'],
-    dynafields = {
-        'clean_link_id': cleaning.clean_new_link_id(models.sponsor.logic),
-        'clean_feed_url': cleaning.clean_feed_url,
-        },
-    )
-
-
-EditForm = dynaform.extendDynaForm(
-    dynaform = CreateForm,
-    dynafields = {
-         'clean_link_id': cleaning.clean_link_id,
-        'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
-        'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
-                               required=False),
-        },
-    )
 
 
 class View(base.View):
@@ -89,9 +65,12 @@ class View(base.View):
     # solution that will be implemented in base View.
     params['url_name'] = "sponsor"
     params['module_name'] = "sponsor"
-       
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+
+    params['extra_dynaexclude'] = ['founder', 'home']
+    params['extra_dynafields'] = {
+        'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
+                                   required=False),
+        }
 
     # TODO(tlarsen): Add support for Django style template lookup
     params['edit_template'] = 'soc/sponsor/edit.html'

@@ -155,7 +155,7 @@ class View(base.View):
               'group_accepted' : True}
     
     uh_params = params.copy()
-    uh_params['list_action'] = (self.inviteAcceptedRedirect, None)
+    uh_params['list_action'] = (self._logic.inviteAcceptedRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
         "An overview of your unhandled requests")
 
@@ -179,13 +179,6 @@ class View(base.View):
     
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
-
-  def inviteAcceptedRedirect(self, entity, _):
-    """Returns the redirect for accepting a request
-    """
-
-    return '/%s/create/%s/%s' % (
-        entity.role, entity.scope_path, entity.link_id)
 
   def _editSeed(self, request, seed):
     """See base.View._editGet().

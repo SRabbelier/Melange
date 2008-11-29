@@ -31,7 +31,7 @@ def addPages(pages):
 
 
 def getDjangoURLPatterns(params):
-  """Retrieves a list of sidebar entries for this view from self._params.
+  """Retrieves a list of sidebar entries for this View
 
   Params usage:
     The params dictionary is passed to the getKeyFieldsPatterns

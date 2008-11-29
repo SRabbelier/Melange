@@ -557,7 +557,7 @@ class View(object):
     """
 
     params = dicts.merge(params, self._params)
-    return sitemap.sidebar.getSidebarLinks(params)
+    return sitemap.sidebar.getSidebarLinks(request, params)
 
   def getDjangoURLPatterns(self, params=None):
     """Retrieves a list of sidebar entries for this view

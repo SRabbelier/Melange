@@ -22,6 +22,9 @@ __authors__ = [
   ]
 
 
+from soc.views import out_of_band
+from soc.views.helper import access
+
 SIDEBAR = []
 
 

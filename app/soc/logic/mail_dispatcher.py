@@ -55,7 +55,7 @@ Usage:
               'group': 'Google Summer of Code 2009',
               'invitation_url': 'http://invitation-url'}
 
-  sendMailUsingTemplate('soc/mail/invitation.html', context)
+  sendMailFromTemplate('soc/mail/invitation.html', context)
 """
 
 __authors__ = [

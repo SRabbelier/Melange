@@ -78,6 +78,30 @@ class Logic:
     """
 
     return True
+  
+  def _onCreate(self, entity):
+    """Called when an entity has been created.
+    
+    Classes that override this can use it to do any post-creation operations.
+    """
+    
+    pass
+  
+  def _onUpdate(self, entity):
+    """Called when an entity has been updated.
+    
+    Classes that override this can use it to do any post-update operations.
+    """
+    
+    pass
+  
+  def _onDelete(self, entity):
+    """Called when an entity has been deleted.
+    
+    Classes that override this can use it to do any post-deletion operations.
+    """
+    
+    pass
 
   def _keyName(self, **kwargs):
     """Returns the KeyName constructed from kwargs for this type of entity.
@@ -316,6 +340,28 @@ class Logic:
     def update():
       return self._unsafeUpdateModelProperties(model, model_properties)
 
+    entity =  db.run_in_transaction(update)
+    
+    # call the _onUpdate method
+    self._onUpdate(entity)
+    
+    return entity
+  
+  def _silentUpdateModelProperties(self, model, model_properties):
+    """Update existing model entity without calling _onUpdate.
+    
+    Args:
+      model: a model entity
+      model_properties: keyword arguments that correspond to model entity
+        properties and their values
+
+    Returns:
+      The original model entity with any supplied properties changed.
+    """
+    
+    def update():
+      return self._unsafeUpdateModelProperties(model, model_properties)
+
     return db.run_in_transaction(update)
 
   def _unsafeUpdateModelProperties(self, model, model_properties):
@@ -352,15 +398,27 @@ class Logic:
     """
 
     entity = self.getFromKeyName(key_name)
-
-    if not entity:
+    
+    create_entity = not entity
+    
+    if create_entity:
       # entity did not exist, so create one in a transaction
       entity = self._model.get_or_insert(key_name, **properties)
-
+      
+    
     # there is no way to be sure if get_or_insert() returned a new entity or
     # got an existing one due to a race, so update with properties anyway,
     # in a transaction
-    return self.updateModelProperties(entity, properties)
+    entity = self._silentUpdateModelProperties(entity, properties)
+    
+    if create_entity:
+      # a new entity has been created call _onCreate
+      self._onCreate(entity)
+    else:
+      # the entity has been updated call _onUpdate
+      self._onUpdate(entity)
+      
+    return entity
 
   def updateOrCreateFromFields(self, properties, fields):
     """Like updateOrCreateFromKeyName, but resolves fields to a key_name first.
@@ -388,3 +446,5 @@ class Logic:
     """
 
     entity.delete()
+    # entity has been deleted call _onDelete
+    self._onDelete(entity)

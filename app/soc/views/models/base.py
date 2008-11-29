@@ -25,23 +25,19 @@ __authors__ = [
 
 
 from django import http
-from django import forms
-from django.conf.urls import defaults
 from django.utils.translation import ugettext_lazy
 
 import soc.logic
 import soc.logic.lists
 import soc.views.helper.lists
 import soc.views.helper.responses
+import soc.views.helper.params
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import models
 from soc.models import linkable
 from soc.views import helper
 from soc.views import out_of_band
-from soc.views.helper import access
-from soc.views.helper import dynaform
 
 
 class View(object):
@@ -52,9 +48,6 @@ class View(object):
 
   self._logic: the logic singleton for this entity
   """
-
-  DEF_SUBMIT_MSG_PARAM_NAME = 's'
-  DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
   DEF_CREATE_NEW_ENTITY_MSG_FMT = ugettext_lazy(
       ' You can create a new %(entity_type)s by visiting'
@@ -70,123 +63,9 @@ class View(object):
         the fields it should contain, and how they are used.
     """
 
-    rights = {}
-    rights['unspecified'] = []
-    rights['any_access'] = [access.checkIsLoggedIn]
-    rights['public'] = [access.checkIsUser]
-    rights['create'] = [access.checkIsDeveloper]
-    rights['edit'] = [access.checkIsDeveloper]
-    rights['delete'] = [access.checkIsDeveloper]
-    rights['list'] = [access.checkIsDeveloper]
+    self._params = helper.params.constructParams(params)
+    self._logic = params['logic']
 
-    if 'rights' in params:
-      rights = dicts.merge(params['rights'], rights)
-
-    new_params = {}
-    new_params['rights'] = rights
-    new_params['create_redirect'] = '/%(url_name)s' % params
-    new_params['edit_redirect'] = '/%(url_name)s/edit' % params
-    new_params['missing_redirect'] = '/%(url_name)s/create' % params
-    new_params['delete_redirect'] = '/%(url_name)s/list' % params
-    new_params['invite_redirect'] = '/request/list'
-    
-    new_params['sidebar'] = None
-    new_params['sidebar_defaults'] = [
-     ('/%s/create', 'New %(name)s', 'create'),
-     ('/%s/list', 'List %(name_plural)s', 'list'),
-    ]
-    new_params['sidebar_additional'] = []
-
-    new_params['key_fields_prefix'] = []
-
-    new_params['django_patterns'] = None
-    new_params['django_patterns_defaults'] = [
-        (r'^%(url_name)s/show/%(key_fields)s$', 
-            'soc.views.models.%s.public', 'Show %(name_short)s'),
-        (r'^%(url_name)s/create$',
-            'soc.views.models.%s.create', 'Create %(name_short)s'),
-        (r'^%(url_name)s/create/%(key_fields)s$',
-            'soc.views.models.%s.create', 'Create %(name_short)s'),
-        (r'^%(url_name)s/delete/%(key_fields)s$',
-            'soc.views.models.%s.delete', 'Delete %(name_short)s'),
-        (r'^%(url_name)s/edit/%(key_fields)s$',
-            'soc.views.models.%s.edit', 'Edit %(name_short)s'),
-        (r'^%(url_name)s/list$',
-            'soc.views.models.%s.list', 'List %(name_plural)s'),
-        ]
-
-    new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
-    new_params['create_template'] = 'soc/models/edit.html'
-    new_params['edit_template'] = 'soc/models/edit.html'
-    new_params['list_template'] = 'soc/models/list.html'
-    new_params['invite_template'] = 'soc/models/invite.html'
-
-    new_params['error_public'] = 'soc/%(module_name)s/error.html' % params
-    new_params['error_edit'] = 'soc/%(module_name)s/error.html'  % params
-
-    new_params['list_main'] = 'soc/list/main.html'
-    new_params['list_pagination'] = 'soc/list/pagination.html'
-    new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
-    new_params['list_heading'] = 'soc/%(module_name)s/list/heading.html' % params
-
-    new_params['list_action'] = (self.getEditRedirect, None)
-    new_params['list_params'] = {
-        'list_action': 'action',
-        'list_description': 'description',
-        'list_main': 'main',
-        'list_pagination': 'pagination',
-        'list_row': 'row',
-        'list_heading': 'heading',
-        }
-
-    description = ugettext_lazy('List of %(name_plural)s in Google Open Source Programs.')
-    new_params['list_description'] = description % params
-    new_params['save_message'] = [ugettext_lazy('Profile saved.')]
-    new_params['edit_params'] = {
-        self.DEF_SUBMIT_MSG_PARAM_NAME: self.DEF_SUBMIT_MSG_PROFILE_SAVED,
-        }
-
-    new_params['dynabase'] = helper.forms.BaseForm
-
-    new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
-    new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
-        params.get('extra_dynaexclude', [])
-    new_params['create_dynafields'] = {
-        'clean_link_id': cleaning.clean_new_link_id(params['logic']),
-        'clean_feed_url': cleaning.clean_feed_url,
-        }
-
-    dynafields = {
-        'clean_link_id': cleaning.clean_link_id,
-        'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
-        }
-    dynafields.update(params.get('extra_dynafields', {}))
-
-    new_params['edit_dynainclude'] = None
-    new_params['edit_dynaexclude'] = None
-    new_params['edit_dynafields'] = dynafields
-
-    self._params = dicts.merge(params, new_params)
-    self._logic = self._params['logic']
-
-    # These need to be constructed seperately, because they require
-    # parameters that can be defined either in params, or new_params.
-    if 'create_form' not in self._params:
-      self._params['create_form'] = dynaform.newDynaForm(
-        dynabase = self._params['dynabase'],
-        dynamodel = self._logic.getModel(),
-        dynainclude = self._params['create_dynainclude'],
-        dynaexclude = self._params['create_dynaexclude'],
-        dynafields = self._params['create_dynafields'],
-        )
-
-    if 'edit_form' not in self._params:
-      self._params['edit_form'] = dynaform.extendDynaForm(
-        dynaform = self._params['create_form'],
-        dynainclude = self._params['edit_dynainclude'],
-        dynaexclude = self._params['edit_dynaexclude'],
-        dynafields = self._params['edit_dynafields'],
-        )
 
   def public(self, request, page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.
@@ -411,6 +290,9 @@ class View(object):
         existing entity. If the seed argument is present, it is passed
         as the 'initial' argument on construction. Otherwise, it is
         called with no arguments.
+      submit_msg_param_name: The submit_msg_param_name value is used
+        as the key part in the ?key=value construct for the submit
+        message parameter (see also save_message).
 
     Args:
       request: the django request object
@@ -426,14 +308,14 @@ class View(object):
     # Remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
     is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
-    if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
+    if request.GET.get(params['submit_msg_param_name']):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
       # Note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
-          request, self.DEF_SUBMIT_MSG_PARAM_NAME,
+          request, params['submit_msg_param_name'],
           values=params['save_message'])
 
       # populate form with the existing entity
@@ -575,14 +457,6 @@ class View(object):
     redirect = params['delete_redirect']
 
     return http.HttpResponseRedirect(redirect)
-
-  def getEditRedirect(self, entity, _):
-    """Returns the edit redirect for the specified entity
-    """
-
-    suffix = self._logic.getKeySuffix(entity)
-    url_name = self._params['url_name']
-    return '/%s/edit/%s' % (url_name, suffix)
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

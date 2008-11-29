@@ -179,7 +179,7 @@ class View(base.View):
       if user:
         # is 'Profile saved' parameter present, but referrer was not ourself?
         # (e.g. someone bookmarked the GET that followed the POST submit)
-        if (request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME)
+        if (request.GET.get(params['submit_msg_param_name'])
             and (not helper.requests.isReferrerSelf(request))):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)
@@ -188,13 +188,13 @@ class View(base.View):
         # (may display no message if ?s=0 parameter is not present)
         context['notice'] = (
             helper.requests.getSingleIndexedParamValue(
-                request, self.DEF_SUBMIT_MSG_PARAM_NAME,
+                request, params['submit_msg_param_name'],
                 values=params['save_message']))
 
         # populate form with the existing User entity
         form = UserForm(instance=user)
       else:
-        if request.GET.get(self.DEF_SUBMIT_MSG_PARAM_NAME):
+        if request.GET.get(params['submit_msg_param_name']):
           # redirect to aggressively remove 'Profile saved' query parameter
           return http.HttpResponseRedirect(request.path)
 

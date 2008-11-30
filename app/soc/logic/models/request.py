@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Host (Model) query functions.
+"""Request (Model) query functions.
 """
 
 __authors__ = [
@@ -99,9 +99,8 @@ class Logic(base.Logic):
 
     # create the invitation_url
     invitation_url = "%(host)s%(index)s" % {
-                          'host' : os.environ['HTTP_HOST'], 
-                          'index': redirects.inviteAcceptedRedirect(entity, None)
-                          }
+        'host' : os.environ['HTTP_HOST'], 
+        'index': redirects.inviteAcceptedRedirect(entity, None)}
 
     # get the group entity
     group_entity = entity.scope

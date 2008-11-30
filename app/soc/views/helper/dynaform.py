@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module defines classes and functions for Dynamic Forms
+"""This module defines classes and functions for Dynamic Forms.
 """
 
 __authors__ = [
@@ -28,7 +28,7 @@ from soc.logic import dicts
 
 
 class DynaFormMetaclass(djangoforms.ModelFormMetaclass):
-  """The DynaForm Meta class, adding support for dynamically defined fields
+  """The DynaForm Meta class, adding support for dynamically defined fields.
 
   The new DynaForm class that is created by class function is very
   similar to one created by the regular djangoforms.ModelFormMetaclass.
@@ -66,7 +66,7 @@ class DynaFormMetaclass(djangoforms.ModelFormMetaclass):
 
 def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None, 
                 dynaexclude=None, dynafields=None):
-  """Creates a new form DynaForm class
+  """Creates a new form DynaForm class.
 
   The returned class extends dynabase, but with the following additions:
   * It has a Meta class with the 'model', 'include', and 'exclude'
@@ -98,8 +98,9 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
   return DynaForm
 
 
-def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None, dynafields=None):
-  """Extends an existing dynaform
+def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None, 
+                   dynafields=None):
+  """Extends an existing dynaform.
 
   If any of dynainclude, dynaexclude or dynafields are not present,
   they are retrieved from dynaform (if present in it's Meta class).

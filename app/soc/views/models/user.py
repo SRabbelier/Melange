@@ -60,6 +60,8 @@ class CreateForm(helper.forms.BaseForm):
       help_text=soc.models.user.User.is_developer.help_text)
 
   class Meta:
+    """Inner Meta class that defines some behavior for the form.
+    """
     model = None
 
   def clean_link_id(self):

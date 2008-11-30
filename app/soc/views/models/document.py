@@ -27,12 +27,10 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
-from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
 from soc.views import helper
-from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.document
@@ -40,6 +38,7 @@ import soc.logic.models.document
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
+
 
 class CreateForm(helper.forms.BaseForm):
   """Django form displayed when Developer creates a Document.
@@ -49,6 +48,8 @@ class CreateForm(helper.forms.BaseForm):
       attrs={'rows':10, 'cols':40}))
 
   class Meta:
+    """Inner Meta class that defines some behavior for the form.
+    """
     model = soc.models.document.Document
 
     #: list of model fields which will *not* be gathered by the form
@@ -76,8 +77,8 @@ class EditForm(CreateForm):
   doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
   created_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
                                       required=False)
-  last_modified_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
-                                      required=False)
+  last_modified_by = forms.fields.CharField(
+      widget=helper.widgets.ReadOnlyInput(), required=False)
 
 
 class View(base.View):

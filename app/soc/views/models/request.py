@@ -50,6 +50,8 @@ class CreateForm(helper.forms.BaseForm):
   """
 
   class Meta:
+    """Inner Meta class that defines some behavior for the form.
+    """
     model = soc.models.request.Request
 
     #: list of model fields which will *not* be gathered by the form 

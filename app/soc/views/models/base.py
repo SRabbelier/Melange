@@ -34,7 +34,6 @@ import soc.views.helper.responses
 import soc.views.helper.params
 
 from soc.logic import dicts
-from soc.logic import models
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access

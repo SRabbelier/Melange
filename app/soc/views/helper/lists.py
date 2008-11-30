@@ -24,7 +24,6 @@ __authors__ = [
 
 
 from soc.logic import dicts
-from soc.views import helper
 
 import soc.views.helper.forms
 
@@ -167,20 +166,20 @@ def getListContent(request, params, logic, filter=None, idx=0):
 
 def makePaginationForm(
   request, limit, arg_name, choices=DEF_PAGINATION_CHOICES,
-  field_name_fmt=helper.forms.DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
+  field_name_fmt=soc.views.helper.forms.DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
   """Returns a customized pagination limit selection form.
   
   Args:
     request: the standard Django HTTP request object
     limit: the initial value of the selection control
-    arg_name: see helper.forms.makeSelectQueryArgForm(); default is 'limit'
-    choices: see helper.forms.makeSelectQueryArgForm(); default is
+    arg_name: see soc.views.helper.forms.makeSelectQueryArgForm(); default is 'limit'
+    choices: see soc.views.helper.forms.makeSelectQueryArgForm(); default is
       DEF_PAGINATION_CHOICES
-    field_name_fmt: see helper.forms.makeSelectQueryArgForm()
+    field_name_fmt: see soc.views.helper.forms.makeSelectQueryArgForm()
   """
   choices = makeNewPaginationChoices(limit=limit, choices=choices)
   
-  return helper.forms.makeSelectQueryArgForm(
+  return soc.views.helper.forms.makeSelectQueryArgForm(
       request, arg_name, limit, choices)
 
 
@@ -191,7 +190,7 @@ def makeNewPaginationChoices(limit=DEF_PAGINATION,
   Args:
     limit: the initial value of the selection control;
       default is DEF_PAGINATION
-    choices: see helper.forms.makeSelectQueryArgForm();
+    choices: see soc.views.helper.forms.makeSelectQueryArgForm();
       default is DEF_PAGINATION_CHOICES
 
   Returns:

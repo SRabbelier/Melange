@@ -23,7 +23,6 @@ __authors__ = [
 
 
 from google.appengine.ext import db
-from google.appengine.api import users
 
 from django import forms
 from django.utils.translation import ugettext_lazy
@@ -32,7 +31,6 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.views import helper
-from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.presence

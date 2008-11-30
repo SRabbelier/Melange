@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-import re
-
 from soc.models import linkable
 
 

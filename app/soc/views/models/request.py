@@ -30,16 +30,13 @@ from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import validate
 from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
-from soc.views.helper import widgets
 from soc.views.models import base
-from soc.views.models import role as role_view
 
 import soc.models.request
 import soc.logic.models.request
@@ -158,9 +155,10 @@ class View(base.View):
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.inviteAcceptedRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
-        "An overview of your unhandled requests")
+        "An overview of your unhandled requests.")
 
-    uh_list = helper.lists.getListContent(request, uh_params, self._logic, filter, 0)
+    uh_list = helper.lists.getListContent(
+        request, uh_params, self._logic, filter, 0)
 
     # construct the Open Requests list
     
@@ -171,12 +169,13 @@ class View(base.View):
     
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
-        "An overview of your requests, that haven't been handled by an admin yet")
+        "List of your pending requests.")
     
-    ar_list = helper.lists.getListContent(request, ar_params, self._logic, filter, 1)
+    ar_list = helper.lists.getListContent(
+        request, ar_params, self._logic, filter, 1)
     
     # fill contents with all the needed lists
-    contents = [uh_list,ar_list]
+    contents = [uh_list, ar_list]
     
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)

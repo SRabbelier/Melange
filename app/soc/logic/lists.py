@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""List generation logic
+"""List generation logic.
 """
 
 __authors__ = [
@@ -23,7 +23,7 @@ __authors__ = [
 
 
 class Lists(object):
-  """List array suitable for enumerating over with just 'for in'
+  """List array suitable for enumerating over with just 'for in'.
   """
 
   DEF_PASSTHROUGH_FIELDS = [
@@ -41,23 +41,23 @@ class Lists(object):
       ]
 
   def __init__(self, contents):
-    """Constructs a new Lists object with the specified contents
+    """Constructs a new Lists object with the specified contents.
     """
 
     # All the contents of all the lists
-    self.contents = contents
-    self.content = {}
+    self._contents = contents
+    self._content = {}
 
     # For iterating over all the lists
-    self.lists = range(len(contents))
-    self.list_data = []
+    self._lists = range(len(contents))
+    self._list_data = []
 
     # For iterating over the rows
-    self.rows = []
-    self.row_data = []
+    self._rows = []
+    self._row_data = []
 
   def __getattr__(self, attr):
-    """Delegate field lookup to the current list if appropriate
+    """Delegate field lookup to the current list if appropriate.
 
     If, and only if, a lookup is done on one of the fields defined in
     DEF_PASSTHROUGH_FIELDS, and the current list defines this field,
@@ -67,44 +67,44 @@ class Lists(object):
     if attr not in self.DEF_PASSTHROUGH_FIELDS:
       raise AttributeError()
 
-    if attr not in self.content:
+    if attr not in self._content:
       raise AttributeError()
 
     return self.get(attr)
 
   def get(self, item):
-    """Returns the item for the current list data
+    """Returns the item for the current list data.
     """
 
-    return self.content[item]
+    return self._content[item]
 
-  def next_list(self):
-    """Shifts out the current list content
+  def nextList(self):
+    """Shifts out the current list content.
 
     The main content of the next list is returned for further processing.
     """
 
     # Advance the list data once
-    self.content = self.contents[0]
-    self.contents = self.contents[1:]
+    self._content = self._contents[0]
+    self._contents = self._contents[1:]
 
     # Update internal 'iterators'
-    self.list_data = self.get('data')
-    self.rows = range(len(self.list_data))
+    self._list_data = self.get('data')
+    self._rows = range(len(self._list_data))
 
     return self.get('main')
 
-  def next_row(self):
-    """Returns the next list row for the current list
+  def nextRow(self):
+    """Returns the next list row for the current list.
 
-    Before calling this method, next_list should be called at least once.
+    Before calling this method, nextList should be called at least once.
     """
 
     # Update internal 'iterators'
-    self.row_data =  self.list_data[0]
+    self._row_data =  self._list_data[0]
 
     # Advance the row data once
-    self.list_data = self.list_data[1:]
+    self._list_data = self._list_data[1:]
 
     return self.get('row')
 
@@ -115,7 +115,7 @@ class Lists(object):
     without using a while loop.
     """
 
-    return self.lists
+    return self._lists
 
   def rows(self):
     """Returns a list of numbers the size of the amount of items.
@@ -124,20 +124,19 @@ class Lists(object):
     the current list, without using a while loop.
     """
 
-    return self.rows
+    return self._rows
 
   def item(self):
-    """Returns the current row item for the current list
+    """Returns the current row item for the current list.
 
-    Before calling this method, next_row should be called at least once.
+    Before calling this method, nextRow should be called at least once.
     """
 
-    return self.row_data
+    return self._row_data
 
   def redirect(self):
     """Returns the redirect for the current row item in the current list.
     """
 
     action, args = self.get('action')
-    result = action(self.row_data, args)
-    return result
+    return action(self._row_data, args)

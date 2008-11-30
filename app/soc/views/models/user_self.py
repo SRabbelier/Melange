@@ -26,11 +26,11 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
+from django import http
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
-from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -119,7 +119,7 @@ class View(base.View):
 
   EDIT_SELF_TMPL = 'soc/user/edit_self.html'
 
-  def edit(self, request, page_name=None, params=None, **kwargs):
+  def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.
 
     Args:
@@ -219,7 +219,7 @@ class View(base.View):
     # fill in the account field with the user created from email
     fields['account'] = users.User(fields['email'])
 
-  def getSidebarLinks(self, request):
+  def getSidebarLinks(self, request, params=None):
     """Returns an dictionary with the user sidebar entry.
     """
 
@@ -233,7 +233,7 @@ class View(base.View):
 
     return super(View, self).getSidebarLinks(request, params)
 
-  def getDjangoURLPatterns(self):
+  def getDjangoURLPatterns(self, params=None):
     """See base.View.getDjangoURLPatterns().
     """
 

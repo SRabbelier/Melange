@@ -21,9 +21,8 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
-from google.appengine.ext import db
 
-from soc.models import base
+from google.appengine.ext import db
 
 import soc.models.linkable
 import soc.models.proposal

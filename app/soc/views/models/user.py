@@ -26,14 +26,11 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
-from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
-from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.models import base
 
 import soc.models.linkable

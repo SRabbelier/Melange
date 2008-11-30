@@ -22,14 +22,10 @@ __authors__ = [
   ]
 
 
-from django import forms
-from django.utils.translation import ugettext_lazy
-
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
-from soc.views.models import base
 from soc.views.models import role
 from soc.views.helper import access
 

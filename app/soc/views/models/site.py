@@ -22,24 +22,15 @@ __authors__ = [
   ]
 
 
-from google.appengine.ext import db
-from google.appengine.api import users
-
 from django import forms
-from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
-from soc.logic import validate
-from soc.views import helper
 from soc.views.helper import access
-from soc.views.helper import widgets
 from soc.views.models import presence
 
 import soc.models.site
 import soc.logic.models.site
 import soc.logic.dicts
-import soc.views.helper
-import soc.views.helper.widgets
 
 
 class CreateForm(presence.SettingsValidationForm):
@@ -144,13 +135,13 @@ class View(presence.View):
 
     return self.edit(request, page_name, seed=key_values, **key_values)
 
-  def getDjangoURLPatterns(self):
+  def getDjangoURLPatterns(self, params=None):
     """See base.View.getDjangoURLPatterns().
     """
 
     page_name = "Home Page"
     patterns = super(View, self).getDjangoURLPatterns()
-    patterns += [(r'^$','soc.views.models.site.main_public',
+    patterns += [(r'^$', 'soc.views.models.site.main_public',
                  {'page_name': page_name}, page_name)]
 
     page_name = "Edit Site Settings"

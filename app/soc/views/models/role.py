@@ -22,15 +22,10 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
-from django import http
 from django.utils.translation import ugettext_lazy
 
-from soc.models import request as request_model
 from soc.logic import dicts
-from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -112,7 +107,7 @@ class RoleView(base.View):
 
     return self._list(request, params, contents, page_name)
 
-  def getDjangoURLPatterns(self):
+  def getDjangoURLPatterns(self, params=None):
     """See base.View.getDjangoURLPatterns().
     """
 

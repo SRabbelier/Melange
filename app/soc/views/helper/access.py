@@ -232,7 +232,14 @@ def checkIsInvited(request):
   """
 
   checkIsUser(request)
-
+  
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(request)  
+    return
+  except out_of_band.Error:
+    pass
+  
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a host for this program'}
 

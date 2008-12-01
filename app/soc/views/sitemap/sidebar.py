@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sidebar
+"""Module contains sidebar related functions.
 """
 
 __authors__ = [
@@ -24,6 +24,7 @@ __authors__ = [
 
 from soc.views import out_of_band
 from soc.views.helper import access
+
 
 SIDEBAR = []
 
@@ -46,7 +47,7 @@ def getSidebar(request):
 
 
 def getSidebarItems(params):
-  """Retrieves a list of sidebar entries for this view
+  """Retrieves a list of sidebar entries for this view.
 
   Params usage:
     The params dictionary is provided to the menu_text's format.
@@ -98,7 +99,7 @@ def getSidebarLinks(request, params=None):
 
   Params usage:
     The params dictionary is passed as argument to getSidebarItems,
-      see the docstring of getSidebarItems on how it uses it.
+    see the docstring of getSidebarItems on how it uses it.
 
     rights: The rights dictionary is used to check if the user has
       the required rights to see a sidebar item.
@@ -108,10 +109,10 @@ def getSidebarLinks(request, params=None):
       heading variable in the result.
     name: The name value is used if sidebar_heading is not present.
 
-  Returns: A dictionary is returned with it's 'heading' value set
-    as explained above. It's 'items' value is constructed by
-    calling _getSidebarItems. It constists of dictionaries with a
-    url and a title field.
+  Returns: 
+    A dictionary is returned with it's 'heading' value set as explained above.
+    It's 'items' value is constructed by calling _getSidebarItems. It constists
+    of dictionaries with a url and a title field.
   """
 
   rights = params['rights']

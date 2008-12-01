@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sidebar
+"""Module contains sidemap related functions.
 """
 
 __authors__ = [
@@ -31,11 +31,12 @@ def addPages(pages):
 
 
 def getDjangoURLPatterns(params):
-  """Retrieves a list of sidebar entries for this View
+  """Retrieves a list of sidebar entries for this View.
 
   Params usage:
     The params dictionary is passed to the getKeyFieldsPatterns
-      method, see it's docstring on how it is used.
+    method, see it's docstring on how it is used.
+    
     django_patterns: The django_patterns value is returned directly
       if it is non-False.
     django_patterns_defaults: The dajngo_patterns_defaults value is

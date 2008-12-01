@@ -1,0 +1,10 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+onclick="document.location.href='{{ list.redirect }}'" name="link_id">
+  <td align="right">
+   <div class="title">
+    <a class="noul"
+     href="{{ list.redirect }}">{{ list.item.link_id }}</a>
+   </div>
+  </td>
+  <td><div class="scope_path">{{ list.item.scope_path}}</div></td>
+</tr>

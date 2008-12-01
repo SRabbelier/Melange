@@ -32,6 +32,7 @@ from soc.views.models import user
 from soc.views.models import user_self
 from soc.views.models import site
 from soc.views.models import sponsor
+from soc.views.models import program
 
 from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap
@@ -45,6 +46,7 @@ sidebar.addMenu(document.view.getSidebarLinks)
 sidebar.addMenu(sponsor.view.getSidebarLinks)
 sidebar.addMenu(host.view.getSidebarLinks)
 sidebar.addMenu(request.view.getSidebarLinks)
+sidebar.addMenu(program.view.getSidebarLinks)
 
 sitemap.addPages(presence.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
@@ -54,6 +56,7 @@ sitemap.addPages(document.view.getDjangoURLPatterns())
 sitemap.addPages(sponsor.view.getDjangoURLPatterns())
 sitemap.addPages(host.view.getDjangoURLPatterns())
 sitemap.addPages(request.view.getDjangoURLPatterns())
+sitemap.addPages(program.view.getDjangoURLPatterns())
 
 
 def getPatterns():

@@ -31,6 +31,14 @@ def getCreateRequestRedirect(entity, params):
   
   return result
 
+def getCreateProgramRedirect(entity, params):
+  """Returns the create program redirect for the specified entity.
+  """
+
+  result ='/%s/create/%s' % (
+     params['url_name'], entity.link_id)
+
+  return result
 
 def getEditRedirect(entity, params):
   """Returns the edit redirect for the specified entity.

@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.logic.helper import notifications
 from soc.logic.models import base
 
 import soc.models.user
@@ -85,6 +86,11 @@ class Logic(base.Logic):
       model.former_accounts.append(model.account)
 
     return True
+  
+  def _onCreate(self, entity):
+    """Send out a message to welcome the new user.
+    """
+    notifications.sendWelcomeMessage(entity)
 
 
 logic = Logic()

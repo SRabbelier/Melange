@@ -23,18 +23,20 @@ __authors__ = [
 
 
 import os
+import soc.logic.models as model_logic
 
 from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import mail_dispatcher
-from soc.logic.models import user as user_logic
 from soc.views.helper import redirects
 
 
 DEF_INVITATION_FMT = ugettext_lazy(
     "Invitation to become a %(role)s for %(group)s")
+
+DEF_WELCOME_FMT = ugettext_lazy("Welcome to Melange %(name)s")
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.
@@ -42,6 +44,9 @@ def sendInviteNotification(entity):
   Args:
     entity : A request containing the information needed to create the message
   """
+  
+  # get user logic
+  user_logic = model_logic.user
 
   # get the current user
   properties = {'account': users.get_current_user()}
@@ -75,4 +80,37 @@ def sendInviteNotification(entity):
 
   # send out the message using the default invitation template    
   mail_dispatcher.sendMailFromTemplate('soc/mail/invitation.html', 
+                                       messageProperties)
+  
+def sendWelcomeMessage(user_entity):
+  """Sends out a welcome message to a user.
+
+    Args:
+      user_entity: User entity which the message should be send to
+  """
+  
+  # get user logic
+  user_logic = model_logic.user  
+  
+  # get the current user
+  properties = {'account': users.get_current_user()}
+  current_user_entity = user_logic.logic.getForFields(properties, unique=True)
+
+  # create the message contents
+  # TODO(Lennard) change the message sender to some sort of no-reply adress that is
+  # probably a setting in sitesettings. (adress must be a developer). This is due
+  # to a GAE limitation that allows only devs or the current user to send an email.
+  # Currently this results in a user receiving the same email twice.
+  messageProperties = {
+      'to_name': user_entity.name,
+      'sender_name': current_user_entity.name,
+      'to': user_entity.account.email(),
+      'sender': current_user_entity.account.email(),
+      'subject': DEF_WELCOME_FMT % {
+          'name': user_entity.name
+          }
+      } 
+
+  # send out the message using the default welcome template    
+  mail_dispatcher.sendMailFromTemplate('soc/mail/welcome.html', 
                                        messageProperties)

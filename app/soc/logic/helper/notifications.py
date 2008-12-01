@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helper functions for sending out notifications
+"""Helper functions for sending out notifications.
 """
 
 __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
+
+
+import os
 
 from google.appengine.api import users
 
@@ -27,15 +30,11 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import mail_dispatcher
 from soc.logic.models import user as user_logic
-
 from soc.views.helper import redirects
-
-import os
 
 
 DEF_INVITATION_FMT = ugettext_lazy(
     "Invitation to become a %(role)s for %(group)s")
-
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.

@@ -211,7 +211,7 @@ class View(object):
       return self.editGet(request, entity, context, seed, params)
 
   def editPost(self, request, entity, context, params):
-    """Processes POST requests for the specified entity
+    """Processes POST requests for the specified entity.
 
     Params usage:
       The params dictionary is passed to _constructResponse when the
@@ -273,11 +273,11 @@ class View(object):
         params=page_params)
 
   def editGet(self, request, entity, context, seed, params):
-    """Processes GET requests for the specified entity
+    """Processes GET requests for the specified entity.
 
     Params usage:
       The params dictionary is passed to _constructResponse, see the
-        docstring  of _constructResponse on how it uses it.
+      docstring  of _constructResponse on how it uses it.
 
       save_message: The save_message list is used as argument to
         getSingleIndexedParamValue when an existing entity was saved.
@@ -346,10 +346,9 @@ class View(object):
 
     Params usage:
       The params dictionary is passed as argument to getListContent in
-        the soc.views.helper.list module. See the docstring for
-        getListContent on how it uses it.
-      The params dictionary is also passed as argument to the _list
-        method. See the docstring for _list on how it uses it.
+      the soc.views.helper.list module. See the docstring for getListContent 
+      on how it uses it. The params dictionary is also passed as argument to 
+      the _list method. See the docstring for _list on how it uses it.
 
       rights: The rights dictionary is used to check if the user has
         the required rights to list all entities of this View's type.
@@ -370,7 +369,7 @@ class View(object):
     return self._list(request, params, contents, page_name)
 
   def _list(self, request, params, contents, page_name):
-    """Returns the list page for the specified contents
+    """Returns the list page for the specified contents.
 
     Args:
       request: the standard Django HTTP request object
@@ -410,9 +409,9 @@ class View(object):
 
     Params usage:
       rights: The rights dictionary is used to check if the user has
-        the required rights to delete the specified entity.
-        See checkAccess for more details on how the rights dictionary
-        is used to check access rights.
+        the required rights to delete the specified entity. See checkAccess 
+        for more details on how the rights dictionary is used to check access 
+        rights.
       name: used in the same way as in edit(), see it's docstring for
         a more detailed explanation on how it is used.
       missing_redirect: see name
@@ -464,7 +463,7 @@ class View(object):
 
     Args:
       request: the django request object
-      entity:  the entity to create or update from POST contents
+      entity: the entity to create or update from POST contents
       fields: the new field values
     """
 
@@ -551,8 +550,8 @@ class View(object):
 
     Params usage:
       The params dictionary is passed as argument to getSidebarItems
-        from the soc.views.sitemap.sidebar module, see the docstring
-        of _getSidebarItems on how it uses it.
+      from the soc.views.sitemap.sidebar module, see the docstring
+      of _getSidebarItems on how it uses it.
     """
 
     params = dicts.merge(params, self._params)
@@ -563,8 +562,8 @@ class View(object):
 
     Params usage:
       The params dictionary is passed to the getDjangoURLPatterns
-        function in the soc.views.sitemap.sitemap module, see the
-        docstring of getDjangoURLPatterns on how it uses it.
+      function in the soc.views.sitemap.sitemap module, see the
+      docstring of getDjangoURLPatterns on how it uses it.
 
     Args:
       params: a dict with params for this View

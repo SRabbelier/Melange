@@ -320,11 +320,11 @@ def collectCleanedFields(form):
   Args:
     form: The form from which the cleaned fields should be collected
 
-  Returns: All the fields that are in the form's cleaned_data
-  property are returned. If there is a key_name field, it is not
-  included in the returend fields, instead, it is returned as the
-  first element in the returned tuple. If no key_name field is
-  present, None is returned as first value instead.
+  Returns: 
+    All the fields that are in the form's cleaned_data property are returned. 
+    If there is a key_name field, it is not included in the returend fields, 
+    instead, it is returned as the first element in the returned tuple. 
+    If no key_name field is present, None is returned as first value instead.
   """
 
   fields = {}

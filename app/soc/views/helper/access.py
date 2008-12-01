@@ -58,28 +58,27 @@ DEF_LOGOUT_MSG_FMT = ugettext_lazy(
 
 
 def checkAccess(access_type, request, rights):
-  """Runs all the defined checks for the specified type
+  """Runs all the defined checks for the specified type.
 
   Args:
     access_type: the type of request (such as 'list' or 'edit')
     request: the Django request object
-    rights: A dictionary containing access check functions
+    rights: a dictionary containing access check functions
 
-  Rights usage: The rights dictionary is used to check if the
-    current user is allowed to view the page specified. The
-    functions defined in this dictionary are always called with the
-    django request object as argument.
-    On any request, regardless of what type, the functions in the
-    'any_access' value are called.
-    If the specified type is not in the rights dictionary, all the
-    functions in the 'unspecified' value are called.
-    When the specified type _is_ in the rights dictionary, all the
-    functions in that access_type's value are called.
+  Rights usage: 
+    The rights dictionary is used to check if the current user is allowed 
+    to view the page specified. The functions defined in this dictionary 
+    are always called with the django request object as argument. On any 
+    request, regardless of what type, the functions in the 'any_access' value 
+    are called. If the specified type is not in the rights dictionary, all 
+    the functions in the 'unspecified' value are called. When the specified 
+    type _is_ in the rights dictionary, all the functions in that access_type's 
+    value are called.
 
   Returns:
     True: If all the required access checks have been made successfully
     False: If a check failed, in this case self._response will contain
-           the response provided by the failed access check.
+      the response provided by the failed access check.
   """
 
   # Call each access checker
@@ -97,7 +96,7 @@ def checkAccess(access_type, request, rights):
 
 
 def allow(request):
-  """Never returns an alternate HTTP response
+  """Never returns an alternate HTTP response.
 
   Args:
     request: a Django HTTP request
@@ -106,13 +105,14 @@ def allow(request):
   return
 
 def deny(request):
-  """Returns an alternate HTTP response
+  """Returns an alternate HTTP response.
 
   Args:
     request: a Django HTTP request
 
-  Returns: a subclass of django.http.HttpResponse which contains the
-  alternate response that should be returned by the calling view.
+  Returns: 
+    a subclass of django.http.HttpResponse which contains the
+    alternate response that should be returned by the calling view.
   """
 
   context = helper.responses.getUniversalContext(request)
@@ -128,7 +128,7 @@ def checkIsLoggedIn(request):
     request: a Django HTTP request
 
    Raises:
-     AccessViolationResponse: If the required authorization is not met.
+     AccessViolationResponse: if the required authorization is not met
 
   Returns:
     None if the user is logged in, or a subclass of
@@ -149,7 +149,7 @@ def checkNotLoggedIn(request):
     request: a Django HTTP request
 
    Raises:
-     AccessViolationResponse: If the required authorization is not met.
+     AccessViolationResponse: if the required authorization is not met
 
   Returns:
     None if the user is logged in, or a subclass of
@@ -170,7 +170,7 @@ def checkIsUser(request):
     request: a Django HTTP request
 
    Raises:
-     AccessViolationResponse: If the required authorization is not met.
+     AccessViolationResponse: if the required authorization is not met
 
   Returns:
     None if User exists for a Google Account, or a subclass of
@@ -193,10 +193,10 @@ def checkIsDeveloper(request):
   """Returns an alternate HTTP response if Google Account is not a Developer.
 
   Args:
-    request: A Django HTTP request
+    request: a Django HTTP request
 
    Raises:
-     AccessViolationResponse: If the required authorization is not met.
+     AccessViolationResponse: if the required authorization is not met
 
   Returns:
     None if Google Account is logged in and logged-in user is a Developer,
@@ -220,10 +220,10 @@ def checkIsInvited(request):
      for the specified program.
 
   Args:
-    request: A Django HTTP request
+    request: a Django HTTP request
 
    Raises:
-     AccessViolationResponse: If the required authorization is not met.
+     AccessViolationResponse: if the required authorization is not met
 
   Returns:
     None if Host exists for the specified program, or a subclass of

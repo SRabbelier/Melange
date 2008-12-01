@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Params related methods
+"""Params related methods.
 """
 
 __authors__ = [
@@ -46,7 +46,7 @@ def constructParams(params):
 
   Params usage:
     The params dictionary is passed to getCreateForm and getEditForm,
-      see their docstring on how they use it.
+    see their docstring on how they use it.
 
     rights: The rights value is merged with a default rights
       dictionary and then used as rights value.
@@ -179,7 +179,7 @@ def constructParams(params):
   return params
 
 def getCreateForm(params):
-  """Constructs a new CreateForm using params
+  """Constructs a new CreateForm using params.
 
   Params usage:
     dynabase: The dynabase value is used as the base argument to
@@ -201,7 +201,7 @@ def getCreateForm(params):
   return create_form
 
 def getEditForm(params):
-  """Constructs a new EditForm using params
+  """Constructs a new EditForm using params.
 
   Params usage:
     create_form: The dynabase value is used as the dynaform argument
@@ -221,11 +221,11 @@ def getEditForm(params):
   return edit_form
 
 def getKeyFieldsPattern(params):
-  """Returns the Django pattern for this View's entity
+  """Returns the Django pattern for this View's entity.
 
   Params usage:
     key_fields_prefix: The key_fields_prefix value is used as the
-    first part of the returned pattern.
+      first part of the returned pattern.
   """
 
   names = params['logic'].getKeyFieldNames()

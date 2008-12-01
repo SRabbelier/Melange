@@ -23,11 +23,12 @@ __authors__ = [
 
 
 import os
-import soc.logic.models as model_logic
 
 from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
+
+import soc.logic.models as model_logic
 
 from soc.logic import mail_dispatcher
 from soc.views.helper import redirects

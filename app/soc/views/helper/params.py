@@ -87,9 +87,9 @@ def constructParams(params):
 
   new_params['sidebar'] = None
   new_params['sidebar_defaults'] = [
-   ('/%s/create', 'New %(name)s', 'create'),
-   ('/%s/list', 'List %(name_plural)s', 'list'),
-  ]
+      ('/%s/create', 'New %(name)s', 'create'),
+      ('/%s/list', 'List %(name_plural)s', 'list'),
+      ]
   new_params['sidebar_additional'] = []
 
   new_params['key_fields_prefix'] = []
@@ -145,23 +145,26 @@ def constructParams(params):
 
   new_params['dynabase'] = helper.forms.BaseForm
 
-  new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
-  new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
-      params.get('extra_dynaexclude', [])
-  new_params['create_dynafields'] = {
+  create_dynafields = {
       'clean_link_id': cleaning.clean_new_link_id(params['logic']),
       'clean_feed_url': cleaning.clean_feed_url,
       }
+  create_dynafields.update(params.get('create_extra_dynafields', {}))
 
-  dynafields = {
+  new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
+  new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
+      params.get('extra_dynaexclude', [])
+  new_params['create_dynafields'] = create_dynafields
+
+  edit_dynafields = {
       'clean_link_id': cleaning.clean_link_id,
       'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
       }
-  dynafields.update(params.get('extra_dynafields', {}))
+  edit_dynafields.update(params.get('edit_extra_dynafields', {}))
 
   new_params['edit_dynainclude'] = None
   new_params['edit_dynaexclude'] = None
-  new_params['edit_dynafields'] = dynafields
+  new_params['edit_dynafields'] = edit_dynafields
 
   params = dicts.merge(params, new_params)
 

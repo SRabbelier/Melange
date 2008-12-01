@@ -108,10 +108,6 @@ class View(role.RoleView):
 
     role.RoleView.__init__(self, params=params)
 
-  def _editSeed(self, request, seed):
-    """See base.View._editGet().
-    """
-
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """

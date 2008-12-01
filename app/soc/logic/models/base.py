@@ -39,7 +39,7 @@ class Error(Exception):
   pass
 
 
-class Logic:
+class Logic(object):
   """Base logic for entity classes.
 
   The BaseLogic class functions specific to Entity classes by relying

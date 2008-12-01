@@ -64,7 +64,7 @@ class View(base.View):
     params['module_name'] = "sponsor"
 
     params['extra_dynaexclude'] = ['founder', 'home']
-    params['extra_dynafields'] = {
+    params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
                                    required=False),
         }

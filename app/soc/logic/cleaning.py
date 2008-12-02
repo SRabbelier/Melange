@@ -37,7 +37,8 @@ def clean_new_link_id(logic):
   """
 
   def wrapped(self):
-    link_id = self.cleaned_data.get('link_id')
+    # convert to lowercase for user comfort
+    link_id = self.cleaned_data.get('link_id').lower()
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
     if logic.getFromFields(link_id=link_id):
@@ -48,7 +49,8 @@ def clean_new_link_id(logic):
 
 
 def clean_link_id(self):
-  link_id = self.cleaned_data.get('link_id')
+  # convert to lowercase for user comfort
+  link_id = self.cleaned_data.get('link_id').lower()
   if not validate.isLinkIdFormatValid(link_id):
     raise forms.ValidationError("This link ID is in wrong format.")
   return link_id

@@ -55,7 +55,7 @@ class UserForm(helper.forms.BaseForm):
     exclude = ['account', 'former_accounts', 'is_developer']
 
   def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id')
+    link_id = self.cleaned_data.get('link_id').lower()
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
 

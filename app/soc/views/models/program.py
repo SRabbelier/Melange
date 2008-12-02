@@ -42,9 +42,6 @@ class View(base.View):
   """View methods for the Sponsor model.
   """
 
-  DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext_lazy(
-      'Please use this form to select a Sponsor for the new Program')
-
   def __init__(self, original_params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -91,7 +88,6 @@ class View(base.View):
       return super(View, self).create(request, page_name=page_name,
           params=params, **kwargs)
 
-    params = dicts.merge(params, self._params)
     return self.selectSponsor(request, page_name, params)
 
   def selectSponsor(self, request, page_name, params):
@@ -115,12 +111,15 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    new_params = {}
-    new_params['list_action'] = (redirects.getCreateProgramRedirect, params)
-    new_params['list_description'] = \
-        self.DEF_CREATE_INSTRUCTION_MSG_FMT % self._params
+    view = sponsor_view.view
+    redirect = redirects.getCreateRedirect
 
-    new_params = dicts.merge(new_params, sponsor_view.view._params)
+    params = dicts.merge(params, self._params)
+
+    new_params = {}
+    new_params['list_action'] = (redirect, params)
+
+    new_params = dicts.merge(new_params, view.getParams())
     params = dicts.merge(new_params, params)
 
     content = helper.lists.getListContent(request, params)

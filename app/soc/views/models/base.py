@@ -541,6 +541,12 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
+  def getParams(self):
+    """Returns this view's params attribute
+    """
+
+    return self._params
+
   def getSidebarLinks(self, request, params=None):
     """Returns an dictionary with one sidebar entry.
 

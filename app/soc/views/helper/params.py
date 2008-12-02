@@ -34,8 +34,11 @@ from soc.views.helper import dynaform
 from soc.views.helper import redirects
 
 
-LIST_DESCRIPTION_FMT = ugettext_lazy(
+DEF_LIST_DESCRIPTION_FMT = ugettext_lazy(
     'List of %(name_plural)s in Google Open Source Programs.')
+
+DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext_lazy(
+      'Please use this form to select a %(name).')
 
 DEF_SUBMIT_MSG_PARAM_NAME = 's'
 DEF_SUBMIT_MSG_PROFILE_SAVED = 0
@@ -136,7 +139,7 @@ def constructParams(params):
       'list_heading': 'heading',
       }
 
-  new_params['list_description'] = LIST_DESCRIPTION_FMT % params
+  new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
   new_params['save_message'] = [ugettext_lazy('Profile saved.')]
   new_params['submit_msg_param_name'] = DEF_SUBMIT_MSG_PARAM_NAME
   new_params['edit_params'] = {

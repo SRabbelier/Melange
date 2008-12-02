@@ -31,7 +31,7 @@ def getCreateRequestRedirect(entity, params):
   
   return result
 
-def getCreateProgramRedirect(entity, params):
+def getCreateRedirect(entity, params):
   """Returns the create program redirect for the specified entity.
   """
 

@@ -109,7 +109,6 @@ COUNTRIES_AND_TERRITORIES = (
   'Germany',
   'Ghana',
   'Gibraltar',
-  'Great Britain',
   'Greece',
   'Greenland',
   'Grenada',

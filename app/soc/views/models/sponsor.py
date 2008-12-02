@@ -70,7 +70,6 @@ class View(base.View):
         }
 
     # TODO(tlarsen): Add support for Django style template lookup
-    params['edit_template'] = 'soc/sponsor/edit.html'
     params['public_template'] = 'soc/group/public.html'
 
     params['list_row'] = 'soc/group/list/row.html'

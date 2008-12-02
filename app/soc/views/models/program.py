@@ -72,12 +72,12 @@ class View(base.View):
 
     base.View.__init__(self, params=params)
 
-  def create(self, request, page_name=None, params=None, **kwargs):
+  def create(self, request, **kwargs):
     """Specialized create view to enforce needing a scope_path
 
     This view simply gives control to the base.View.create if the
     scope_path is specified in kwargs. If it is not present, it
-    instead displays the result of self.selectSponsor. Refer to the
+    instead displays the result of self.select. Refer to the
     respective docstrings on what they do.
 
     Args: 
@@ -85,47 +85,11 @@ class View(base.View):
     """
 
     if 'scope_path' in kwargs:
-      return super(View, self).create(request, page_name=page_name,
-          params=params, **kwargs)
-
-    return self.selectSponsor(request, page_name, params)
-
-  def selectSponsor(self, request, page_name, params):
-    """Displays a list page allowing the user to select a Sponsor
-
-    After having selected the Sponsor, the user is redirected to the
-    'create a new program' page with the scope_path set appropriately.
-
-    Params usage:
-      The params dictionary is passed to getCreateProgramRedirect from
-        the redirects module, please see the docstring for
-        getCreateProgramRedirect on how it uses it.
-      The params dictionary is also passed to getListContent from
-        the helper.list module, please refer to its docstring also.
-      The params dictionary is passed to self._list as well, refer
-        to its docstring for details on how it uses it.
-
-    Args:
-      request: the standard Django HTTP request object
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View
-    """
+      return super(View, self).create(request, **kwargs)
 
     view = sponsor_view.view
     redirect = redirects.getCreateRedirect
-
-    params = dicts.merge(params, self._params)
-
-    new_params = {}
-    new_params['list_action'] = (redirect, params)
-
-    new_params = dicts.merge(new_params, view.getParams())
-    params = dicts.merge(new_params, params)
-
-    content = helper.lists.getListContent(request, params)
-    contents = [content]
-
-    return self._list(request, params, contents, page_name)
+    return self.select(request, view, redirect, **kwargs)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

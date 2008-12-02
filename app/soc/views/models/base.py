@@ -458,6 +458,33 @@ class View(object):
 
     return http.HttpResponseRedirect(redirect)
 
+  def select(self, request, view, redirect, page_name=None, params=None):
+    """Displays a list page allowing the user to select an entity
+
+    After having selected the Sponsor, the user is redirected to the
+    'create a new program' page with the scope_path set appropriately.
+
+    Params usage:
+      The params dictionary is also passed to getListContent from
+        the helper.list module, please refer to its docstring also.
+      The params dictionary is passed to self._list as well, refer
+        to its docstring for details on how it uses it.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+    """
+
+    params = dicts.merge(params, view.getParams())
+    params = dicts.merge(params, self._params)
+    params['list_action'] = (redirect, self._params)
+
+    content = helper.lists.getListContent(request, params)
+    contents = [content]
+
+    return self._list(request, params, contents, page_name)
+
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.
 

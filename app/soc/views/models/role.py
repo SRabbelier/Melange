@@ -98,13 +98,14 @@ class RoleView(base.View):
 
     new_params = dicts.merge(new_params, params)
     params = dicts.merge(new_params, user_view.view._params)
+    params['logic'] = user_logic.logic
 
     try:
       access.checkAccess('invite', request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 
-    content = helper.lists.getListContent(request, params, user_logic.logic)
+    content = helper.lists.getListContent(request, params)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

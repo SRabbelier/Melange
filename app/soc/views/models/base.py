@@ -363,7 +363,7 @@ class View(object):
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 
-    content = helper.lists.getListContent(request, params, self._logic, filter)
+    content = helper.lists.getListContent(request, params, filter)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

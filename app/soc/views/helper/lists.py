@@ -88,13 +88,12 @@ def getLimitAndOffset(request, idx):
   return limit, offset
 
 
-def getListContent(request, params, logic, filter=None, idx=0):
+def getListContent(request, params, filter=None, idx=0):
   """Returns a dict with fields used for rendering lists.
 
   Args:
     request: the Django HTTP request object
     params: a dict with params for the View this list belongs to
-    logic: the logic object for the View this list belongs to
     filter: a filter for this list
     idx: the index of this list
 
@@ -115,6 +114,8 @@ def getListContent(request, params, logic, filter=None, idx=0):
       'last': offest of the lst item in the list
     }
   """
+
+  logic = params['logic']
 
   limit, offset = getLimitAndOffset(request, idx)
   arg_name = 'limit_%d' % idx

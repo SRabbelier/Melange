@@ -123,7 +123,7 @@ class View(base.View):
     new_params = dicts.merge(new_params, sponsor_view.view._params)
     params = dicts.merge(new_params, params)
 
-    content = helper.lists.getListContent(request, params, sponsor_logic.logic)
+    content = helper.lists.getListContent(request, params)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

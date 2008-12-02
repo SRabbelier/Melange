@@ -140,6 +140,7 @@ class View(base.View):
     """
 
     params = dicts.merge(params, self._params)
+    params['logic'] = self._logic
 
     try:
       access.checkAccess('listSelf', request, params['rights'])
@@ -162,7 +163,7 @@ class View(base.View):
         "An overview of your unhandled requests.")
 
     uh_list = helper.lists.getListContent(
-        request, uh_params, self._logic, filter, 0)
+        request, uh_params, filter, 0)
 
     # construct the Open Requests list
     
@@ -176,7 +177,7 @@ class View(base.View):
         "List of your pending requests.")
     
     ar_list = helper.lists.getListContent(
-        request, ar_params, self._logic, filter, 1)
+        request, ar_params, filter, 1)
     
     # fill contents with all the needed lists
     contents = [uh_list, ar_list]

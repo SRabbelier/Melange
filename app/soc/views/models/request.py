@@ -42,6 +42,8 @@ import soc.models.request
 import soc.logic.models.request
 import soc.logic.dicts
 import soc.views.helper
+import soc.views.helper.lists
+import soc.views.helper.responses
 import soc.views.helper.widgets
 
 
@@ -142,7 +144,7 @@ class View(base.View):
     try:
       access.checkAccess('listSelf', request, params['rights'])
     except out_of_band.Error, error:
-      return error.response(request)
+      return helper.responses.errorResponse(error, request)
 
     # get the current user
     properties = {'account': users.get_current_user()}

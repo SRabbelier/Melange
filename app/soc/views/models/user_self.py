@@ -138,7 +138,8 @@ class View(base.View):
     try:
       access.checkAccess('editSelf', request, params['rights'])
     except out_of_band.Error, error:
-      return error.response(request, template=self.EDIT_SELF_TMPL)
+      return helper.responses.errorResponse(error, request, 
+          template=self.EDIT_SELF_TMPL)
 
     account = users.get_current_user()
     properties = {'account': account}
@@ -165,8 +166,8 @@ class View(base.View):
           msg = self.DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
             'email': account.email()}
           error = out_of_band.Error(msg)
-          return error.response(request, template=self.EDIT_SELF_TMPL,
-                                context=context)
+          return helper.responses.errorResponse(
+              error, request, template=self.EDIT_SELF_TMPL, context=context)
 
         user = soc.logic.models.user.logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})

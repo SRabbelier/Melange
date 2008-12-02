@@ -27,18 +27,18 @@ __authors__ = [
 from django import http
 from django.utils.translation import ugettext_lazy
 
-import soc.logic
-import soc.logic.lists
-import soc.views.helper.lists
-import soc.views.helper.responses
-import soc.views.helper.params
-
 from soc.logic import dicts
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import forms
 from soc.views import sitemap
+
+import soc.logic
+import soc.logic.lists
+import soc.views.helper.lists
+import soc.views.helper.responses
+import soc.views.helper.params
 
 
 class View(object):
@@ -96,7 +96,7 @@ class View(object):
     try:
       access.checkAccess('public', request, rights=params['rights'])
     except out_of_band.Error, error:
-      return error.response(request)
+      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -111,8 +111,8 @@ class View(object):
       key_fields = self._logic.getKeyFieldsFromDict(kwargs)
       entity = self._logic.getIfFields(key_fields)
     except out_of_band.Error, error:
-      return error.response(request, template=params['error_public'],
-                            context=context)
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'], context=context)
 
     self._public(request, entity, context)
 
@@ -185,7 +185,7 @@ class View(object):
     try:
       access.checkAccess('edit', request, rights=params['rights'])
     except out_of_band.Error, error:
-      return error.response(request)
+      return helper.responses.errorResponse(error, request)
 
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
@@ -202,8 +202,8 @@ class View(object):
             'entity_type_lower' : params['name'].lower(),
             'entity_type' : params['name'],
             'create' : params['missing_redirect']})
-        return error.response(request, template=params['error_public'],
-                              context=context)
+        return helper.responses.errorResponse(
+            error, request, template=params['error_public'], context=context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params)
@@ -361,7 +361,7 @@ class View(object):
     try:
       access.checkAccess('list', request, rights=params['rights'])
     except out_of_band.Error, error:
-      return error.response(request)
+      return helper.responses.errorResponse(error, request)
 
     content = helper.lists.getListContent(request, params, self._logic, filter)
     contents = [content]
@@ -425,7 +425,7 @@ class View(object):
     try:
       access.checkAccess('delete', request, rights=params['rights'])
     except out_of_band.Error, error:
-      return error.response(request)
+      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -441,8 +441,8 @@ class View(object):
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
-      return error.response(request, template=params['error_edit'],
-                            context=context)
+      return helper.responses.errorResponse(
+          error, request, template=params['error_edit'], context=context)
 
     if not entity:
       #TODO: Create a proper error page for this

@@ -33,6 +33,7 @@ from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site
 from soc.views import helper
+from soc.views.helper import templates
 from soc.views.sitemap import sidebar
 
 import soc.logic
@@ -136,3 +137,37 @@ def redirectToChangedSuffix(
   path = helper.requests.replaceSuffix(request.path, old_suffix, new_suffix,
                                        params=params)
   return http.HttpResponseRedirect(path)
+
+
+def errorResponse(self, error, request, template=None, context=None):
+  """Creates an HTTP response from the soc.views.out_of_band.Error exception.
+
+  Args:
+    errror: a out_of_band.Error object
+    request: a Django HTTP request
+    template: the "sibling" template (or a search list of such templates)
+      from which to construct the actual template name (or names)
+    context: optional context dict supplied to the template, which is
+      modified (so supply a copy if such modification is not acceptable)
+  """
+  if not context:
+    context = error.context
+
+  if not context:
+    context = getUniversalContext(request)
+
+  if not template:
+    template = []
+
+  # make a list of possible "sibling" templates, then append a default
+  sibling_templates = templates.makeSiblingTemplatesList(template,
+      error.TEMPLATE_NAME, default_template=error.DEF_TEMPLATE)
+
+  context['status'] = error.response_args.get('status')
+
+  if not context.get('message'):
+    # supplied context did not explicitly override the message
+    context['message'] = self.message_fmt % context
+
+  return respond(request, sibling_templates, context=context,
+                 response_args=error.response_args)

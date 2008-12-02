@@ -20,9 +20,9 @@ __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
 ]
 
+
 import reflistprop
 
-import soc.models.answer
 import soc.models.question
 import soc.models.work
 

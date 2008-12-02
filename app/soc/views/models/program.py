@@ -64,9 +64,11 @@ class View(base.View):
 
     params['extra_dynaexclude'] = ['home']
     params['create_extra_dynafields'] = {
+        'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
+                  attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=False),
-         'clean_link_id': cleaning.clean_link_id,
+        'clean_link_id': cleaning.clean_link_id,
         }
 
     params = dicts.merge(original_params, params)

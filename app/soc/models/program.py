@@ -21,6 +21,8 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import db
+
 from django.utils.translation import ugettext_lazy
 
 import soc.models.presence
@@ -30,4 +32,23 @@ class Program(soc.models.presence.Presence):
   """The Program model, representing a Program ran by a Sponsor
   """
 
-  pass
+  #: Required field storing name of the group.
+  name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Name'))
+  name.help_text = ugettext_lazy('Complete, formal name of the program.')
+
+  #: Required field storing short name of the group.
+  #: It can be used for displaying group as sidebar menu item.
+  short_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Short name'))
+  short_name.help_text = ugettext_lazy('Short name used for sidebar menu')
+
+  #: Required field storing short name of the group.
+  #: It can be used for displaying group as sidebar menu item.
+  generic_name = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Generic name'))
+  generic_name.help_text = ugettext_lazy('Generic Name used to group')
+
+  #: Required field storing description of the group.
+  description = db.TextProperty(required=True,
+      verbose_name=ugettext_lazy('Description'))

@@ -23,6 +23,9 @@ limitations under the License.
  <table>
   {% readonly_field_as_table_row entity.fields.link_id.label entity.link_id %}
   {% readonly_field_as_table_row entity.fields.scope_path.label entity.scope_path %}
+  {% readonly_field_as_table_row entity.fields.name.label entity.name %}
+  {% readonly_field_as_table_row entity.fields.short_name.label entity.short_name %}
+  {% readonly_field_as_table_row entity.fields.generic_name.label entity.generic_name %}
   <!-- TODO(pawel.solyga) make this generic -->
  </table>
 </p>

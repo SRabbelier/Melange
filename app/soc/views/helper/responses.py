@@ -139,7 +139,7 @@ def redirectToChangedSuffix(
   return http.HttpResponseRedirect(path)
 
 
-def errorResponse(self, error, request, template=None, context=None):
+def errorResponse(error, request, template=None, context=None):
   """Creates an HTTP response from the soc.views.out_of_band.Error exception.
 
   Args:
@@ -167,7 +167,7 @@ def errorResponse(self, error, request, template=None, context=None):
 
   if not context.get('message'):
     # supplied context did not explicitly override the message
-    context['message'] = self.message_fmt % context
+    context['message'] = error.message_fmt % context
 
   return respond(request, sibling_templates, context=context,
                  response_args=error.response_args)

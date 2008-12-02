@@ -115,11 +115,11 @@ class View(base.View):
 
     new_params = {}
     new_params['list_action'] = (redirects.getCreateProgramRedirect, params)
-    new_params['instruction_text'] = \
+    new_params['list_description'] = \
         self.DEF_CREATE_INSTRUCTION_MSG_FMT % self._params
 
+    new_params = dicts.merge(new_params, sponsor_view.view._params)
     params = dicts.merge(new_params, params)
-    params = dicts.merge(params, sponsor_view.view._params)
 
     content = helper.lists.getListContent(request, params, sponsor_logic.logic)
     contents = [content]
@@ -132,6 +132,14 @@ class View(base.View):
 
     # fill in the email field with the data from the entity
     form.fields['scope_path'].initial = entity.scope_path
+
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+
+    sponsor = sponsor_logic.logic.getFromFields(link_id=fields['scope_path'])
+    fields['scope'] = sponsor
+
 
   def getDjangoURLPatterns(self, params=None):
     """See base.View.getDjangoURLPatterns().

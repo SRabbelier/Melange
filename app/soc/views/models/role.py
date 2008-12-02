@@ -93,7 +93,7 @@ class RoleView(base.View):
     new_params['list_action'] = (redirects.getCreateRequestRedirect, 
         {'group_scope' : group_scope,
         'url_name' : self._params['url_name'] })
-    new_params['instruction_text'] = \
+    new_params['list_description'] = \
         self.DEF_INVITE_INSTRUCTION_MSG_FMT % self._params
 
     new_params = dicts.merge(new_params, params)

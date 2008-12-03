@@ -95,6 +95,19 @@ class View(presence.View):
       'public': [access.allow]
       }
 
+    patterns = []
+
+    page_name = "Home Page"
+    patterns += [(r'^$', 'soc.views.models.%(module_name)s.main_public', 
+                  page_name)]
+
+    page_name = "Edit Site Settings"
+    patterns += [(r'^%(url_name)s/edit$',
+                  'soc.views.models.%(module_name)s.main_edit',
+                  page_name)]
+
+    new_params['extra_django_patterns'] = patterns
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -135,20 +148,6 @@ class View(presence.View):
 
     return self.edit(request, page_name, seed=key_values, **key_values)
 
-  def getDjangoURLPatterns(self, params=None):
-    """See base.View.getDjangoURLPatterns().
-    """
-
-    page_name = "Home Page"
-    patterns = super(View, self).getDjangoURLPatterns()
-    patterns += [(r'^$', 'soc.views.models.site.main_public',
-                 {'page_name': page_name}, page_name)]
-
-    page_name = "Edit Site Settings"
-    patterns += [(r'^' + self._params['url_name'] + '/edit$',
-                  'soc.views.models.site.main_edit',
-                  {'page_name': page_name}, page_name)]
-    return patterns
 
 view = View()
 

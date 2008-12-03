@@ -68,6 +68,10 @@ class View(base.View):
         'clean_link_id': cleaning.clean_link_id,
         }
 
+    new_params['extra_django_patterns'] = [
+        (r'^%(url_name)s/create/(?P<scope_path>%(ulnp)s)$',
+            'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -104,24 +108,6 @@ class View(base.View):
 
     sponsor = sponsor_logic.logic.getFromFields(link_id=fields['scope_path'])
     fields['scope'] = sponsor
-
-
-  def getDjangoURLPatterns(self, params=None):
-    """See base.View.getDjangoURLPatterns().
-    """
-
-    default_patterns = self._params['django_patterns_defaults']
-    default_patterns += [
-        (r'^%(url_name)s/create/(?P<scope_path>%(ulnp)s)$',
-            'soc.views.models.%s.create', 'Create %(name_short)s')]
-
-    params = {}
-    params['django_patterns_defaults'] = default_patterns
-
-    params = dicts.merge(params, self._params)
-    patterns = super(View, self).getDjangoURLPatterns(params)
-
-    return patterns
 
 
 view = View()

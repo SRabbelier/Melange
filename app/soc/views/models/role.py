@@ -80,6 +80,16 @@ class View(base.View):
       params: This dictionary should be filled with the parameters
     """
 
+    new_params = {}
+
+    patterns = [(r'^%(url_name)s/invite/%(lnp)s$',
+        'soc.views.models.%(module_name)s.invite',
+        'Invite %(name_short)s')]
+
+    new_params['extra_django_patterns'] = patterns
+
+    params = dicts.merge(params, new_params)
+
     super(View, self).__init__(params=params)
 
   def create(self, request, **kwargs):
@@ -129,21 +139,3 @@ class View(base.View):
     contents = [content]
 
     return self._list(request, params, contents, page_name)
-
-  def getDjangoURLPatterns(self, params=None):
-    """See base.View.getDjangoURLPatterns().
-    """
-
-    default_patterns = self._params['django_patterns_defaults']
-    default_patterns += [
-        (r'^%(url_name)s/invite/%(lnp)s$',
-            'soc.views.models.%s.invite', 'Invite %(name_short)s')]
-
-    params = {}
-    params['django_patterns_defaults'] = default_patterns
-
-    params = dicts.merge(params, self._params)
-    patterns = super(View, self).getDjangoURLPatterns(params)
-
-    return patterns
-

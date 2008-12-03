@@ -113,6 +113,18 @@ class View(base.View):
     
     new_params['sidebar_heading'] = 'Users'
 
+    patterns = []
+
+    page_name = "Profile"
+    patterns += [(r'^%(url_name)s/edit$',
+                  'soc.views.models.%(module_name)s.edit', page_name)]
+
+    page_name = "Requests Overview"
+    patterns += [(r'^%(url_name)s/roles$',
+                   'soc.views.models.request.list_self', page_name)]
+
+    new_params['django_patterns_defaults'] = patterns
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -233,21 +245,6 @@ class View(base.View):
         ]
 
     return super(View, self).getSidebarLinks(request, params)
-
-  def getDjangoURLPatterns(self, params=None):
-    """See base.View.getDjangoURLPatterns().
-    """
-
-    patterns = []
-    patterns += [(r'^' + self._params['url_name'] + '/edit$',
-                   'soc.views.models.user_self.edit')]
-
-    page_name = "Requests Overview"
-    patterns += [(r'^' + self._params['url_name'] + '/roles$',
-                   'soc.views.models.request.list_self',
-                   {'page_name': page_name}, page_name)]
-
-    return patterns
 
 
 view = View()

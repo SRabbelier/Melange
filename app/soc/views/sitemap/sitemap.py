@@ -59,13 +59,14 @@ def getDjangoURLPatterns(params):
 
   # Construct defaults manualy
   default_patterns = params['django_patterns_defaults']
+  default_patterns += params['extra_django_patterns']
   key_fields_pattern = params['key_fields_pattern']
 
   patterns = []
 
   for url, module, name in default_patterns:
     name = name % params
-    module = module % params['module_name']
+    module = module % params
 
     url = url % {
         'url_name': params['url_name'],

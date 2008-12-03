@@ -100,19 +100,20 @@ def constructParams(params):
   new_params['link_id_pattern_core'] = linkable.LINK_ID_PATTERN_CORE
 
   new_params['django_patterns'] = None
+  new_params['extra_django_patterns'] = []
   new_params['django_patterns_defaults'] = [
       (r'^%(url_name)s/show/%(key_fields)s$',
-          'soc.views.models.%s.public', 'Show %(name_short)s'),
+          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
       (r'^%(url_name)s/create$',
-          'soc.views.models.%s.create', 'Create %(name_short)s'),
+          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/create/%(key_fields)s$',
-          'soc.views.models.%s.create', 'Create %(name_short)s'),
+          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/delete/%(key_fields)s$',
-          'soc.views.models.%s.delete', 'Delete %(name_short)s'),
+          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
       (r'^%(url_name)s/edit/%(key_fields)s$',
-          'soc.views.models.%s.edit', 'Edit %(name_short)s'),
+          'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s'),
       (r'^%(url_name)s/list$',
-          'soc.views.models.%s.list', 'List %(name_plural)s'),
+          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
       ]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params

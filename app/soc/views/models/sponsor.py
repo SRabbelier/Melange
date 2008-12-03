@@ -24,22 +24,15 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
-from django import forms
-
 from soc.logic import dicts
-from soc.views import helper
-from soc.views.models import base
+from soc.views.models import group
 
 import soc.models.sponsor
 import soc.logic.models.sponsor
 import soc.logic.dicts
-import soc.views.helper
-import soc.views.helper.widgets
 
 
-class View(base.View):
+class View(group.View):
   """View methods for the Sponsor model.
   """
 
@@ -63,39 +56,9 @@ class View(base.View):
     new_params['url_name'] = "sponsor"
     new_params['module_name'] = "sponsor"
 
-    new_params['extra_dynaexclude'] = ['founder', 'home']
-    new_params['edit_extra_dynafields'] = {
-        'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
-                                   required=False),
-        }
-
-    # TODO(tlarsen): Add support for Django style template lookup
-    new_params['public_template'] = 'soc/group/public.html'
-
-    new_params['list_row'] = 'soc/group/list/row.html'
-    new_params['list_heading'] = 'soc/group/list/heading.html'
-
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
-    """
-    
-    # fill in the founded_by with data from the entity
-    form.fields['founded_by'].initial = entity.founder.name
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    account = users.get_current_user()
-    user = soc.logic.models.user.logic.getForFields({'account': account},
-                                                    unique=True)
-    if not entity:
-      # only if we are creating a new entity we should fill in founder
-      fields['founder'] = user
 
 
 view = View()

@@ -36,7 +36,8 @@ class Logic(work.Logic):
                base_model=soc.models.work.Work):
     """Defines the name, key_name and model for this entity.
     """
-    work.Logic.__init__(self, model=model, base_model=base_model)
+
+    super(Logic, self).__init__(model=model, base_model=base_model)
 
 
 logic = Logic()

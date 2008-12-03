@@ -41,7 +41,8 @@ class Logic(presence.Logic):
                base_model=soc.models.presence.Presence):
     """Defines the name, key_name and model for this entity.
     """
-    presence.Logic.__init__(self, model=model, base_model=base_model)
+
+    super(Logic, self).__init__(model=model, base_model=base_model)
 
   def getKeyValues(self, unused_entity):
     """Returns the default key values for the site settings.

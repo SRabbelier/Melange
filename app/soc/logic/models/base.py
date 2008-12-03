@@ -43,21 +43,22 @@ class Logic(object):
   """Base logic for entity classes.
 
   The BaseLogic class functions specific to Entity classes by relying
-  on the the child-classes to implement _model, _name and _key_name
+  on arguments passed to __init__.
   """
 
   def __init__(self, model, base_model=None,
                name=None, skip_properties=None):
     """Defines the name, key_name and model for this entity.
     """
+
     self._model = model
     self._base_model = base_model
-    
+
     if name:
       self._name = name
     else:
       self._name =  self._model.__name__
-    
+
     if skip_properties:
       self._skip_properties = skip_properties
     else:

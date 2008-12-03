@@ -35,8 +35,9 @@ class Logic(role.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-    role.Logic.__init__(self, model=soc.models.host.Host,
-                        base_model=soc.models.role.Role)
+
+    super(Logic, self).__init__(model=soc.models.host.Host,
+                                base_model=soc.models.role.Role)
 
 
 logic = Logic()

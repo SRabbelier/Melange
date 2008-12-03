@@ -35,21 +35,23 @@ class Logic(base.Logic):
   def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, soc.models.user.User,
+
+    super(Logic, self).__init__(soc.models.user.User,
                         skip_properties=['former_accounts'])
 
   def isFormerAccount(self, account):
     """Returns true if account is a former account of some User.
     """
+
     # TODO(pawel.solyga): replace 1000 with solution that works for any
     #   number of queries
     users_with_former_accounts = soc.models.user.User.gql(
         'WHERE former_accounts != :1', None).fetch(1000)
-    
+
     for former_account_user in users_with_former_accounts: 
       if account in former_account_user.former_accounts:
         return True
-    
+
     return False
 
   def getKeyValues(self, entity):

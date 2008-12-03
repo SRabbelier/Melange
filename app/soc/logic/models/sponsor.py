@@ -36,7 +36,8 @@ class Logic(group.Logic):
                base_model=soc.models.group.Group):
     """Defines the name, key_name and model for this entity.
     """
-    group.Logic.__init__(self, model=model, base_model=base_model)
+
+    super(Logic, self).__init__(model=model, base_model=base_model)
 
   def isDeletable(self, entity):
     """Returns whether the specified Sponsor entity can be deleted.
@@ -44,6 +45,7 @@ class Logic(group.Logic):
     Args:
       entity: an existing Sponsor entity in datastore
     """
+
     # TODO(pawel.solyga): Check if Sponsor can be deleted (no Hosts, Programs)
     return True
 

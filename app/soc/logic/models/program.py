@@ -34,6 +34,7 @@ class Logic(base.Logic):
   def __init__(self, model=soc.models.program.Program, base_model=None):
     """Defines the name, key_name and model for this entity.
     """
+
     super(Logic, self).__init__(model=model, base_model=base_model)
 
 

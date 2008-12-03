@@ -34,7 +34,8 @@ class Logic(base.Logic):
   def __init__(self, model=soc.models.group.Group, base_model=None):
     """Defines the name, key_name and model for this entity.
     """
-    base.Logic.__init__(self, model, base_model=base_model)
+
+    super(Logic, self).__init__(model, base_model=base_model)
 
   def getKeyValues(self, entity):
     """Extracts the key values from entity and returns them.

@@ -37,7 +37,7 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    base.Logic.__init__(self, model, base_model=base_model)
+    super(Logic, self).__init__(model, base_model=base_model)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.

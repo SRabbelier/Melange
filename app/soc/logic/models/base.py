@@ -108,7 +108,7 @@ class Logic(object):
     """Returns the KeyName constructed from kwargs for this type of entity.
 
     The KeyName is in the following format:
-    entity.name:<key_value1>:<key_value2>:...:<key_valueN>
+    <key_value1>:<key_value2>:...:<key_valueN>
     """
 
     # get the KeyFieldNames for this entity
@@ -132,7 +132,7 @@ class Logic(object):
       keyvalues.append(kwargs[key_field_name])
 
     # construct the KeyName in the appropriate format
-    return "%s:%s" % (self._name, '/'.join(keyvalues))
+    return '/'.join(keyvalues)
 
   def getFullModelClassName(self):
     """Returns fully-qualified model module.class name string.

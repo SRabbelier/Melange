@@ -27,6 +27,7 @@ from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
 from soc.views.models import role
+from soc.views.models import sponsor as sponsor_view
 from soc.views.helper import access
 
 import soc.models.host
@@ -91,6 +92,9 @@ class View(role.View):
     new_params['rights'] = rights
     new_params['logic'] = soc.logic.models.host.logic
 
+    new_params['scope_logic'] = sponsor_logic
+    new_params['scope_view'] = sponsor_view
+
     new_params['logic'] = soc.logic.models.host.logic
     new_params['group_view'] = soc.views.models.sponsor.view
     new_params['invite_filter'] = {'group_ln': 'link_id'}
@@ -112,14 +116,10 @@ class View(role.View):
     """See base.View._editPost().
     """
 
-    user = user_logic.logic.getForFields(
-        {'link_id': fields['link_id']}, unique=True)
+    user = user_logic.logic.getFromKeyName(fields['link_id'])
     fields['user'] = user
 
-    sponsor = sponsor_logic.logic.getForFields(
-        {'link_id': fields['scope_path']}, unique=True)
-    fields['scope'] = sponsor
-
+    super(View, self)._editPost(request, entity, fields)
 
 view = View()
 

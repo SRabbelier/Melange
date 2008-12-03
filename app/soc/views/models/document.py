@@ -30,6 +30,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic import validate
+from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views.models import base
 
@@ -114,25 +115,26 @@ class View(base.View):
     """
 
     account = users.get_current_user()
-    user = soc.logic.models.user.logic.getForFields({'account': account},
-                                                    unique=True)
+    user = user_logic.logic.getForFields({'account': account}, unique=True)
+
     if not entity:
-      # new document so set author
       fields['author'] = user
     else:
-      # else the author is the original author
       fields['author'] = entity.author
-    
+
     fields['modified_by'] = user
+
+    super(View, self)._editPost(request, entity, fields)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
-    
+
     form.fields['created_by'].initial = entity.author.name
     form.fields['last_modified_by'].initial = entity.modified_by.name
     form.fields['doc_key_name'].initial = entity.key().name()
 
+    super(View, self)._editGet(request, entity, form)
 
 view = View()
 

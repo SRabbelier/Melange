@@ -27,6 +27,7 @@ from google.appengine.api import users
 from django import forms
 
 from soc.logic import dicts
+from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views.models import base
 
@@ -75,9 +76,8 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    account = users.get_current_user()
-    user = soc.logic.models.user.logic.getForFields({'account': account},
-                                                    unique=True)
     if not entity:
       # only if we are creating a new entity we should fill in founder
+      account = users.get_current_user()
+      user = user_logic.logic.getForFields({'account': account}, unique=True)
       fields['founder'] = user

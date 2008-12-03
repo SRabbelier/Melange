@@ -146,15 +146,20 @@ class View(base.View):
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
+
     # fill in the email field with the data from the entity
     form.fields['email'].initial = entity.account.email()
+
+    super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
+
     # fill in the account field with the user created from email
     fields['account'] = users.User(fields['email'])
 
+    super(View, self)._editPost(request, entity, fields)
 
 view = View()
 

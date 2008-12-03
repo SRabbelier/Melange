@@ -494,7 +494,12 @@ class View(object):
       fields: the new field values
     """
 
-    pass
+    # If scope_logic is not defined, this entity has no scope
+    if 'scope_logic' not in self._params:
+      return
+
+    scope = self._params['scope_logic'].logic.getFromKeyName(fields['scope_path'])
+    fields['scope'] = scope
 
   def _public(self, request, entity, context):
     """Performs any required processing to get an entities public page.
@@ -516,7 +521,8 @@ class View(object):
       form: the django form that will be used for the page
     """
 
-    pass
+    # fill in the email field with the data from the entity
+    form.fields['scope_path'].initial = entity.scope_path
 
   def _editSeed(self, request, seed):
     """Performs any required processing on the form to get its edit page.

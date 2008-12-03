@@ -198,6 +198,8 @@ class View(base.View):
     form.fields['user'].initial = entity.link_id
     form.fields['group'].initial = entity.scope_path
 
+    super(View, self)._editGet(request, entity, form)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -206,6 +208,8 @@ class View(base.View):
     fields['link_id'] = fields['requester'].link_id
     fields['scope_path'] = fields['to'].link_id
     fields['scope'] = fields['to']
+
+    super(View, self)._editPost(request, entity, fields)
 
 
 view = View()

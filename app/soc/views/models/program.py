@@ -53,6 +53,9 @@ class View(base.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
 
+    new_params['scope_logic'] = sponsor_logic
+    new_params['scope_view'] = sponsor_view
+
     new_params['name'] = "Program"
     new_params['name_short'] = "Program"
     new_params['name_plural'] = "Programs"
@@ -94,20 +97,6 @@ class View(base.View):
     view = sponsor_view.view
     redirect = redirects.getCreateRedirect
     return self.select(request, view, redirect, **kwargs)
-
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
-    """
-
-    # fill in the email field with the data from the entity
-    form.fields['scope_path'].initial = entity.scope_path
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    sponsor = sponsor_logic.logic.getFromFields(link_id=fields['scope_path'])
-    fields['scope'] = sponsor
 
 
 view = View()

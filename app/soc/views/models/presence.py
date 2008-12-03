@@ -151,6 +151,8 @@ class View(base.View):
     except db.Error:
       pass
 
+    super(View, self)._editGet(request, entity, form)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -163,6 +165,8 @@ class View(base.View):
     scope_path=doc_scope_path, link_id=doc_link_id)
 
     fields['home'] = home_doc
+
+    super(View, self)._editPost(request, entity, fields)
 
 
 view = View()

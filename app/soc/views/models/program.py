@@ -64,7 +64,7 @@ class View(base.View):
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
                   attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                   required=False),
+                                   required=True),
         'clean_link_id': cleaning.clean_link_id,
         }
 

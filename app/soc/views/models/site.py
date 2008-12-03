@@ -62,42 +62,42 @@ class View(presence.View):
   """View methods for the Document model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
-    params = {}
-    params['logic'] = soc.logic.models.site.logic
+    new_params = {}
+    new_params['logic'] = soc.logic.models.site.logic
 
     # TODO(alturin): add ugettext_lazy ?
-    params['name'] = "Site Settings"
-    params['name_short'] = "Site"
-    params['name_plural'] = "Site Settings"
+    new_params['name'] = "Site Settings"
+    new_params['name_short'] = "Site"
+    new_params['name_plural'] = "Site Settings"
     # lower name and replace " " with "/"
-    params['url_name'] = "site/settings"
-    params['module_name'] = "site"
+    new_params['url_name'] = "site/settings"
+    new_params['module_name'] = "site"
 
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+    new_params['edit_form'] = EditForm
+    new_params['create_form'] = CreateForm
 
-    params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
-    params['sidebar_heading'] = params['name_short']
+    new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
+    new_params['sidebar_heading'] = new_params['name_short']
 
-    params['public_template'] = 'soc/home/public.html' 
+    new_params['public_template'] = 'soc/home/public.html'
 
-    params['rights'] = {
+    new_params['rights'] = {
       'unspecified': [access.checkIsDeveloper],
       'any_access': [access.allow],
       'public': [access.allow]
       }
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
-    presence.View.__init__(self, original_params=params)
+    super(View, self).__init__(params=params)
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.

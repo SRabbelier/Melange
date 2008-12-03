@@ -97,32 +97,32 @@ class View(base.View):
   """View methods for the Document model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
-    params = {}
-    params['logic'] = soc.logic.models.presence.logic
+    new_params = {}
+    new_params['logic'] = soc.logic.models.presence.logic
 
-    params['name'] = "Home Settings"
-    params['name_short'] = "Home Settings"
-    params['name_plural'] = "Home Settings"
-    params['url_name'] = "home/settings"
-    params['module_name'] = "presence"
+    new_params['name'] = "Home Settings"
+    new_params['name_short'] = "Home Settings"
+    new_params['name_plural'] = "Home Settings"
+    new_params['url_name'] = "home/settings"
+    new_params['module_name'] = "presence"
 
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+    new_params['edit_form'] = EditForm
+    new_params['create_form'] = CreateForm
 
     # Disable the presence sidebar until we have some use for it
-    params['sidebar_defaults'] = []
+    new_params['sidebar_defaults'] = []
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   def _public(self, request, entity, context):
     """

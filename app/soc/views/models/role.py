@@ -77,10 +77,10 @@ class RoleView(base.View):
     """
 
     Args:
-      original_params: This dictionary should be filled with the parameters
+      params: This dictionary should be filled with the parameters
     """
 
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   def create(self, request, **kwargs):
     """Specialized create view to enforce needing a scope_path

@@ -76,35 +76,35 @@ class View(role.RoleView):
   """View methods for the Host model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
     rights = {}
     rights['edit'] = [access.checkIsInvited]
 
-    params = {}
-    params['rights'] = rights
-    params['logic'] = soc.logic.models.host.logic
+    new_params = {}
+    new_params['rights'] = rights
+    new_params['logic'] = soc.logic.models.host.logic
 
-    params['logic'] = soc.logic.models.host.logic
-    params['group_view'] = soc.views.models.sponsor.view
-    params['invite_filter'] = {'group_ln': 'link_id'}
+    new_params['logic'] = soc.logic.models.host.logic
+    new_params['group_view'] = soc.views.models.sponsor.view
+    new_params['invite_filter'] = {'group_ln': 'link_id'}
 
-    params['name'] = "Host"
-    params['name_short'] = "Host"
-    params['name_plural'] = "Hosts"
-    params['url_name'] = "host"
-    params['module_name'] = "host"
+    new_params['name'] = "Host"
+    new_params['name_short'] = "Host"
+    new_params['name_plural'] = "Hosts"
+    new_params['url_name'] = "host"
+    new_params['module_name'] = "host"
 
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+    new_params['edit_form'] = EditForm
+    new_params['create_form'] = CreateForm
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
     role.RoleView.__init__(self, params=params)
 

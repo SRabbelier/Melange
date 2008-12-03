@@ -86,12 +86,12 @@ class View(base.View):
     ' <li>the account is a former account that cannot be used again</li>'
     '</ul>')
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
     rights = {}
@@ -101,21 +101,21 @@ class View(base.View):
     rights['roles'] = [access.checkIsUser]
     rights['signIn'] = [access.checkNotLoggedIn]
 
-    params = {}
-    params['rights'] = rights
-    params['logic'] = soc.logic.models.user.logic
+    new_params = {}
+    new_params['rights'] = rights
+    new_params['logic'] = soc.logic.models.user.logic
 
-    params['name'] = "User"
-    params['name_short'] = "User"
-    params['name_plural'] = "Users"
-    params['url_name'] = "user"
-    params['module_name'] = "user_self"
+    new_params['name'] = "User"
+    new_params['name_short'] = "User"
+    new_params['name_plural'] = "Users"
+    new_params['url_name'] = "user"
+    new_params['module_name'] = "user_self"
     
-    params['sidebar_heading'] = 'Users'
+    new_params['sidebar_heading'] = 'Users'
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   EDIT_SELF_TMPL = 'soc/user/edit_self.html'
 

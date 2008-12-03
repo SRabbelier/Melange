@@ -43,41 +43,41 @@ class View(base.View):
   """View methods for the Sponsor model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View 
+      params: a dict with params for this View
     """    
 
-    params = {}
-    params['logic'] = soc.logic.models.sponsor.logic
+    new_params = {}
+    new_params['logic'] = soc.logic.models.sponsor.logic
 
-    params['name'] = "Sponsor"
-    params['name_short'] = "Sponsor"
-    params['name_plural'] = "Sponsors"
+    new_params['name'] = "Sponsor"
+    new_params['name_short'] = "Sponsor"
+    new_params['name_plural'] = "Sponsors"
     # TODO(pawel.solyga): create url_name and module_name automatically 
     # from name. Make that work for all other Views too. Hopefully 
     # solution that will be implemented in base View.
-    params['url_name'] = "sponsor"
-    params['module_name'] = "sponsor"
+    new_params['url_name'] = "sponsor"
+    new_params['module_name'] = "sponsor"
 
-    params['extra_dynaexclude'] = ['founder', 'home']
-    params['edit_extra_dynafields'] = {
+    new_params['extra_dynaexclude'] = ['founder', 'home']
+    new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
                                    required=False),
         }
 
     # TODO(tlarsen): Add support for Django style template lookup
-    params['public_template'] = 'soc/group/public.html'
+    new_params['public_template'] = 'soc/group/public.html'
 
-    params['list_row'] = 'soc/group/list/row.html'
-    params['list_heading'] = 'soc/group/list/heading.html'
+    new_params['list_row'] = 'soc/group/list/row.html'
+    new_params['list_heading'] = 'soc/group/list/heading.html'
 
-    params = dicts.merge(original_params, params)
-    
-    base.View.__init__(self, params=params)
+    params = dicts.merge(params, new_params)
+
+    super(View, self).__init__(params=params)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

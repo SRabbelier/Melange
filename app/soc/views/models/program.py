@@ -42,25 +42,25 @@ class View(base.View):
   """View methods for the Sponsor model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View 
+      params: a dict with params for this View
     """    
 
-    params = {}
-    params['logic'] = soc.logic.models.program.logic
+    new_params = {}
+    new_params['logic'] = soc.logic.models.program.logic
 
-    params['name'] = "Program"
-    params['name_short'] = "Program"
-    params['name_plural'] = "Programs"
-    params['url_name'] = "program"
-    params['module_name'] = "program"
+    new_params['name'] = "Program"
+    new_params['name_short'] = "Program"
+    new_params['name_plural'] = "Programs"
+    new_params['url_name'] = "program"
+    new_params['module_name'] = "program"
 
-    params['extra_dynaexclude'] = ['home']
-    params['create_extra_dynafields'] = {
+    new_params['extra_dynaexclude'] = ['home']
+    new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
                   attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -68,9 +68,9 @@ class View(base.View):
         'clean_link_id': cleaning.clean_link_id,
         }
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   def create(self, request, **kwargs):
     """Specialized create view to enforce needing a scope_path

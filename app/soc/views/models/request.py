@@ -93,40 +93,37 @@ class View(base.View):
   """View methods for the Docs model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
     rights = {}
     rights['listSelf'] = [access.checkIsUser]
 
-    params = {}
-    params['rights'] = rights
-    params['logic'] = soc.logic.models.request.logic
+    new_params = {}
+    new_params['rights'] = rights
+    new_params['logic'] = soc.logic.models.request.logic
 
-    params['name'] = "Request"
-    params['name_short'] = "Request"
-    params['name_plural'] = "Requests"
-    params['url_name'] = "request"
-    params['module_name'] = "request"
+    new_params['name'] = "Request"
+    new_params['name_short'] = "Request"
+    new_params['name_plural'] = "Requests"
+    new_params['url_name'] = "request"
+    new_params['module_name'] = "request"
 
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+    new_params['edit_form'] = EditForm
+    new_params['create_form'] = CreateForm
 
-    params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
+    new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
-    params['delete_redirect'] = '/' + params['url_name'] + '/list'
-    params['create_redirect'] = '/' + params['url_name']
+    new_params['save_message'] = [ugettext_lazy('Request saved.')]
 
-    params['save_message'] = [ugettext_lazy('Request saved.')]
+    params = dicts.merge(params, new_params)
 
-    params = dicts.merge(original_params, params)
-
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
     
     
   def listSelf(self, request, page_name=None, params=None, **kwargs):

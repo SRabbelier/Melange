@@ -45,6 +45,7 @@ class Error(Exception):
         django.http.HttpResponse; the most commonly used is 'status' to
         set the HTTP status code for the response
     """
+
     self.message_fmt = message_fmt
     self.context = context
     self.response_args = response_args
@@ -67,13 +68,15 @@ class LoginRequest(Error):
         a default value of None, in which case self.DEF_LOGIN_MSG_FMT is used
       **response_args: see Error.__init__()
     """
+
     if not message_fmt:
       message_fmt = self.DEF_LOGIN_MSG_FMT
 
-    Error.__init__(self, message_fmt, **response_args)
+    super(LoginRequest, self).__init__(message_fmt, **response_args)
 
 
 class AccessViolation(Error):
   """"Out of band error raised when an access requirement was not met.
   """
+
   pass

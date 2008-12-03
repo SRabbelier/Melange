@@ -85,29 +85,29 @@ class View(base.View):
   """View methods for the Document model.
   """
 
-  def __init__(self, original_params=None):
+  def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
     Params:
-      original_params: a dict with params for this View
+      params: a dict with params for this View
     """
 
-    params = {}
-    params['logic'] = soc.logic.models.document.logic
+    new_params = {}
+    new_params['logic'] = soc.logic.models.document.logic
 
-    params['name'] = "Document"
-    params['name_short'] = "Document"
-    params['name_plural'] = "Documents"
-    params['url_name'] = "document"
-    params['module_name'] = "document"
+    new_params['name'] = "Document"
+    new_params['name_short'] = "Document"
+    new_params['name_plural'] = "Documents"
+    new_params['url_name'] = "document"
+    new_params['module_name'] = "document"
 
-    params['edit_form'] = EditForm
-    params['create_form'] = CreateForm
+    new_params['edit_form'] = EditForm
+    new_params['create_form'] = CreateForm
 
-    params = dicts.merge(original_params, params)
+    params = dicts.merge(params, new_params)
 
-    base.View.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

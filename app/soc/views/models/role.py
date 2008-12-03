@@ -64,7 +64,7 @@ class RequestForm(helper.forms.BaseForm):
   to = forms.CharField(widget=helper.widgets.ReadOnlyInput())
 
 
-class RoleView(base.View):
+class View(base.View):
   """Views for all entities that inherit from Role.
 
   All views that only Role entities have are defined in this subclass.
@@ -143,7 +143,7 @@ class RoleView(base.View):
     params['django_patterns_defaults'] = default_patterns
 
     params = dicts.merge(params, self._params)
-    patterns = super(RoleView, self).getDjangoURLPatterns(params)
+    patterns = super(View, self).getDjangoURLPatterns(params)
 
     return patterns
 

@@ -72,7 +72,7 @@ class EditForm(CreateForm):
 
   pass
 
-class View(role.RoleView):
+class View(role.View):
   """View methods for the Host model.
   """
 
@@ -106,7 +106,7 @@ class View(role.RoleView):
 
     params = dicts.merge(params, new_params)
 
-    role.RoleView.__init__(self, params=params)
+    super(View, self).__init__(params=params)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

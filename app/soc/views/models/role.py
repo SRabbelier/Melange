@@ -87,29 +87,11 @@ class View(base.View):
         'Invite %(name_short)s')]
 
     new_params['extra_django_patterns'] = patterns
+    new_params['scope_redirect'] = redirects.getInviteRedirect
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-
-  def create(self, request, **kwargs):
-    """Specialized create view to enforce needing a scope_path
-
-    This view simply gives control to the base.View.create if the
-    scope_path is specified in kwargs. If it is not present, it
-    instead displays the result of self.select. Refer to the
-    respective docstrings on what they do.
-
-    Args:
-      see base.View.create
-    """
-
-    if 'scope_path' in kwargs:
-      return super(View, self).create(request, **kwargs)
-
-    view = sponsor_view.view
-    redirect = redirects.getInviteRedirect
-    return self.select(request, view, redirect, **kwargs)
 
   def invite(self, request, page_name=None, params=None, **kwargs):
     """Displays the request promotion to Role page.

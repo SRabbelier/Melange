@@ -55,6 +55,9 @@ class View(object):
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
+  DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext_lazy(
+      'Please select a %s for the new %s.')
+
   def __init__(self, params=None):
     """
 
@@ -137,7 +140,15 @@ class View(object):
       kwargs: not used for create()
     """
 
-    params = dicts.merge(params, self._params)
+    new_params = dicts.merge(params, self._params)
+
+    if ('scope_view' in new_params) and ('scope_path' not in kwargs):
+      view = new_params['scope_view'].view
+      redirect = new_params['scope_redirect']
+      return self.select(request, view, redirect,
+                         params=params, page_name=page_name, **kwargs)
+
+    params = new_params
 
     # Create page is an edit page with no key fields
     empty_kwargs = {}
@@ -479,6 +490,8 @@ class View(object):
     params = dicts.merge(params, view.getParams())
     params = dicts.merge(params, self._params)
     params['list_action'] = (redirect, self._params)
+    params['list_description'] = self.DEF_CREATE_INSTRUCTION_MSG_FMT % (
+        params['name'], self._params['name'])
 
     content = helper.lists.getListContent(request, params)
     contents = [content]

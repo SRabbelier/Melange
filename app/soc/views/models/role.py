@@ -32,8 +32,8 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import base
-from soc.views.models import user as user_view
 from soc.views.models import sponsor as sponsor_view
+from soc.views.models import user as user_view
 
 import soc.models.request
 import soc.views.helper.lists

@@ -65,9 +65,8 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['home']
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
-                  attrs={'rows':10, 'cols':40})),
-        'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                   required=True),
+            attrs={'rows':10, 'cols':40})),
+        'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         'clean_link_id': cleaning.clean_link_id,
         }
 

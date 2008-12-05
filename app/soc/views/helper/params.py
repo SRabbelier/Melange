@@ -185,6 +185,7 @@ def constructParams(params):
 
   return params
 
+
 def getCreateForm(params):
   """Constructs a new CreateForm using params.
 
@@ -207,6 +208,7 @@ def getCreateForm(params):
 
   return create_form
 
+
 def getEditForm(params):
   """Constructs a new EditForm using params.
 
@@ -226,6 +228,7 @@ def getEditForm(params):
     )
 
   return edit_form
+
 
 def getKeyFieldsPattern(params):
   """Returns the Django pattern for this View's entity.

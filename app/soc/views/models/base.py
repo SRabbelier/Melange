@@ -470,7 +470,7 @@ class View(object):
     return http.HttpResponseRedirect(redirect)
 
   def select(self, request, view, redirect, page_name=None, params=None):
-    """Displays a list page allowing the user to select an entity
+    """Displays a list page allowing the user to select an entity.
 
     After having selected the Sponsor, the user is redirected to the
     'create a new program' page with the scope_path set appropriately.
@@ -588,7 +588,7 @@ class View(object):
     return helper.responses.respond(request, template, context)
 
   def getParams(self):
-    """Returns this view's params attribute
+    """Returns this view's params attribute.
     """
 
     return self._params

@@ -29,7 +29,7 @@ import soc.models.presence
 
 
 class Program(soc.models.presence.Presence):
-  """The Program model, representing a Program ran by a Sponsor
+  """The Program model, representing a Program ran by a Sponsor.
   """
 
   #: Required field storing name of the group.

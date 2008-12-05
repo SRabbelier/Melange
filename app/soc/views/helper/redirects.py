@@ -31,14 +31,16 @@ def getCreateRequestRedirect(entity, params):
   
   return result
 
+
 def getInviteRedirect(entity, params):
-  """
+  """Returns the invitation redirect for the specified entity.
   """
 
   result ='/%s/invite/%s' % (
      params['url_name'], entity.link_id)
 
   return result
+
 
 def getCreateRedirect(entity, params):
   """Returns the create program redirect for the specified entity.
@@ -48,6 +50,7 @@ def getCreateRedirect(entity, params):
      params['url_name'], entity.link_id)
 
   return result
+
 
 def getEditRedirect(entity, params):
   """Returns the edit redirect for the specified entity.

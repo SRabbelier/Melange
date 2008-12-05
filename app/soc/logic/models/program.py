@@ -28,7 +28,7 @@ import soc.models.program
 
 
 class Logic(base.Logic):
-  """Logic methods for the Document model
+  """Logic methods for the Program model
   """
 
   def __init__(self, model=soc.models.program.Program, base_model=None):

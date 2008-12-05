@@ -27,19 +27,19 @@ from google.appengine.api import users
 from django import forms
 from django.utils.translation import ugettext_lazy
 
-from soc.logic import dicts
 from soc.logic import cleaning
+from soc.logic import dicts
 from soc.logic.models import sponsor as sponsor_logic
+from soc.views import helper
 from soc.views.helper import redirects
 from soc.views.models import base
 from soc.views.models import sponsor as sponsor_view
-from soc.views import helper
 
 import soc.logic.models.program
 
 
 class View(base.View):
-  """View methods for the Sponsor model.
+  """View methods for the Program model.
   """
 
   def __init__(self, params=None):

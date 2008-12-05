@@ -28,16 +28,16 @@ from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
 
-import soc.logic.models as model_logic
-
 from soc.logic import mail_dispatcher
 from soc.views.helper import redirects
 
+import soc.logic.models as model_logic
 
-DEF_INVITATION_FMT = ugettext_lazy(
+
+DEF_INVITATION_MSG_FMT = ugettext_lazy(
     "Invitation to become a %(role)s for %(group)s")
 
-DEF_WELCOME_FMT = ugettext_lazy("Welcome to Melange %(name)s")
+DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s")
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.
@@ -73,7 +73,7 @@ def sendInviteNotification(entity):
       'invitation_url': invitation_url,
       'to': request_user_entity.account.email(),
       'sender': current_user_entity.account.email(),
-      'subject': DEF_INVITATION_FMT % {
+      'subject': DEF_INVITATION_MSG_FMT % {
           'role': entity.role,
           'group': group_entity.name
           },
@@ -97,17 +97,18 @@ def sendWelcomeMessage(user_entity):
   properties = {'account': users.get_current_user()}
   current_user_entity = user_logic.logic.getForFields(properties, unique=True)
 
-  # create the message contents
-  # TODO(Lennard) change the message sender to some sort of no-reply adress that is
+  # TODO(Lennard): change the message sender to some sort of no-reply adress that is
   # probably a setting in sitesettings. (adress must be a developer). This is due
   # to a GAE limitation that allows only devs or the current user to send an email.
   # Currently this results in a user receiving the same email twice.
+  
+  # create the message contents
   messageProperties = {
       'to_name': user_entity.name,
       'sender_name': current_user_entity.name,
       'to': user_entity.account.email(),
       'sender': current_user_entity.account.email(),
-      'subject': DEF_WELCOME_FMT % {
+      'subject': DEF_WELCOME_MSG_FMT % {
           'name': user_entity.name
           }
       } 

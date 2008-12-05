@@ -25,14 +25,14 @@ __authors__ = [
 from django.conf.urls import defaults
 
 from soc.views.models import document
-from soc.views.models import presence
 from soc.views.models import host
+from soc.views.models import presence
+from soc.views.models import program
 from soc.views.models import request
-from soc.views.models import user
-from soc.views.models import user_self
 from soc.views.models import site
 from soc.views.models import sponsor
-from soc.views.models import program
+from soc.views.models import user
+from soc.views.models import user_self
 
 from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap

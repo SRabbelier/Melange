@@ -43,11 +43,13 @@ class Program(soc.models.presence.Presence):
       verbose_name=ugettext_lazy('Short name'))
   short_name.help_text = ugettext_lazy('Short name used for sidebar menu')
 
-  #: Required field storing short name of the group.
-  #: It can be used for displaying group as sidebar menu item.
-  generic_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Generic name'))
-  generic_name.help_text = ugettext_lazy('Generic Name used to group')
+  #: Optional field used to relate it to other programs
+  #: For example, GSoC would be a group label for GSoC2008/GSoC2009
+  group_label = db.StringProperty(
+      verbose_name=ugettext_lazy('Group label'))
+  group_label.help_text = ugettext_lazy(
+      'Optional name used to relate this program to others. '
+      'For example, GSoC would be a group label for GSoC 2008 and GSoC 2009.')
 
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,

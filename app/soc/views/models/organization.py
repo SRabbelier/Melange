@@ -26,8 +26,8 @@ from google.appengine.api import users
 
 from django import forms
 
-from soc.logic import dicts
 from soc.logic import cleaning
+from soc.logic import dicts
 from soc.views.helper import redirects
 from soc.views.models import group
 from soc.views.models import program as program_view

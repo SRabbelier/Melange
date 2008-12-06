@@ -77,6 +77,15 @@ class Logic(object):
 
     return self._scope_logic
 
+  def getScopeDepth(self):
+    """
+    """
+
+    if self._scope_logic:
+      return 1 + self._scope_logic.logic.getScopeDepth()
+
+    return 0
+
   def _updateField(self, model, name, value):
     """Hook called when a field is updated.
 
@@ -226,12 +235,11 @@ class Logic(object):
     key_name = self.getKeyNameForFields(kwargs)
 
     if key_name:
-      entity = self._model.get_by_key_name(key_name)
+      entity = self.getFromKeyName(key_name)
     else:
       entity = None
 
     return entity
-
 
   def getFromFieldsOr404(self, **fields):
     """Like getFromFields but expects to find an entity.
@@ -258,7 +266,6 @@ class Logic(object):
 
     raise out_of_band.Error(msg, status=404)
 
-
   def getIfFields(self, fields):
     """Like getFromFieldsOr404 but returns None if not all fields are set
 
@@ -270,7 +277,6 @@ class Logic(object):
       return None
 
     return self.getFromFieldsOr404(**fields)
-
 
   def getKeyNameForFields(self, fields):
     """Return a Datastore key_name for a Entity from the specified fields.

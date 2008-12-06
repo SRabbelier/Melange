@@ -45,19 +45,19 @@ class Logic(base.Logic):
     """See base.Logic.getKeyNameValues.
     """
 
-    return [entity.role, entity.scope.link_id, entity.link_id]
+    return [entity.scope.link_id, entity.role, entity.link_id]
 
   def getKeyValuesFromFields(self, fields):
     """See base.Logic.getKeyValuesFromFields.
     """
 
-    return [fields['role'], fields['scope_path'], fields['link_id']]
+    return [fields['scope_path'], fields['role'], fields['link_id']]
 
   def getKeyFieldNames(self):
     """See base.Logic.getKeyFieldNames.
     """
 
-    return ['role', 'scope_path', 'link_id']
+    return ['scope_path', 'role', 'link_id']
   
   def _onCreate(self, entity):
     """Sends out a message notifying users about the new invite/request.

@@ -27,7 +27,7 @@ def getCreateRequestRedirect(entity, params):
   """
 
   result ='/request/create/%s/%s/%s' % (
-     params['url_name'], params['group_scope'], entity.key.name())
+     params['group_scope'], params['url_name'], entity.key().name())
   
   return result
 

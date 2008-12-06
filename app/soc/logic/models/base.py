@@ -150,19 +150,6 @@ class Logic(object):
 
     return [entity.scope_path, entity.link_id]
 
-  def getSuffixValues(self, entity):
-    """Returns an array with the public values of the Key Fields.
-
-    Defaults to getKeyValues
-    If any of the Key Fields should not be made public, this method
-    should return their public counterparts instead.
-
-    Args:
-      entity: the entity for which to construct the suffix 
-    """
-
-    return self.getKeyValues(entity)
-
   def getKeyValuesFromFields(self, fields):
     """Extracts the key values from a dict and returns them.
 
@@ -192,7 +179,7 @@ class Logic(object):
     if not entity:
       return None
 
-    key_values = self.getSuffixValues(entity)
+    key_values = self.getKeyValues(entity)
     suffix = '/'.join(key_values)
 
     return suffix

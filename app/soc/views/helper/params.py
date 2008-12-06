@@ -45,7 +45,7 @@ DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
 
 def constructParams(params):
-  """Constructs a new params dictionary based on params
+  """Constructs a new params dictionary based on params.
 
   Params usage:
     The params dictionary is passed to getCreateForm and getEditForm,
@@ -258,7 +258,7 @@ def getKeyFieldsPattern(params):
   return result
 
 def getScopePattern(params):
-  """Returns the Scope pattern for this entity
+  """Returns the Scope pattern for this entity.
   """
 
   logic = params['logic']

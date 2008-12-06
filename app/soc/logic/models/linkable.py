@@ -41,7 +41,7 @@ class Logic(base.Logic):
     super(Logic, self).__init__(soc.models.linkable.Linkable)
 
   def getScopeDepth(self):
-    """Returns the scope depth for this entity 
+    """Returns the scope depth for this entity.
 
     As it is impossible to determine the scope depth of a Linkable,
     None is returned. This causes the scope regexp to match a scope

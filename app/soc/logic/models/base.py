@@ -66,21 +66,21 @@ class Logic(object):
       self._skip_properties = []
 
   def getModel(self):
-    """Returns the model this logic class uses
+    """Returns the model this logic class uses.
     """
 
     return self._model
 
   def getScopeLogic(self):
-    """Returns the logic of the enclosing scope
+    """Returns the logic of the enclosing scope.
     """
 
     return self._scope_logic
 
   def getScopeDepth(self):
-    """Returns the scope depth for this entity
+    """Returns the scope depth for this entity.
 
-    Returns None if any of the parent scopes return None
+    Returns None if any of the parent scopes return None.
     """
 
     if not self._scope_logic:
@@ -270,7 +270,7 @@ class Logic(object):
     raise out_of_band.Error(msg, status=404)
 
   def getIfFields(self, fields):
-    """Like getFromFieldsOr404 but returns None if not all fields are set
+    """Like getFromFieldsOr404 but returns None if not all fields are set.
 
     Raises:
       out_of_band.Error if no User entity is found and all fields were set

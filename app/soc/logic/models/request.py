@@ -18,7 +18,7 @@
 """
 
 __authors__ = [
-  '"Sverre Rabbelier" <sverer@rabbelier.nl>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
@@ -26,6 +26,7 @@ import soc.models.request
 
 from soc.logic.helper import notifications
 from soc.logic.models import base
+from soc.logic.models import sponsor as sponsor_logic
 
 
 class Logic(base.Logic):
@@ -33,11 +34,12 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.request.Request,
-               base_model=None):
+               base_model=None, scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model, base_model=base_model)
+    super(Logic, self).__init__(model, base_model=base_model,
+                                scope_logic=scope_logic)
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyNameValues.

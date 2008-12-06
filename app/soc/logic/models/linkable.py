@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Document (Model) query functions.
+"""Linkable (Model) query functions.
 """
 
 __authors__ = [
@@ -22,24 +22,33 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import work
-from soc.logic.models import linkable as linkable_logic
+from soc.logic.models import base
 
-import soc.models.document
-import soc.models.work
+import soc.models.linkable
 
 
-class Logic(work.Logic):
-  """Logic methods for the Document model
+class Logic(base.Logic):
+  """Logic methods for the Linkable model.
+
+  Note: Logic classes should not inherit from this class, instead
+  it is meant to be referred to with scope_logic.
   """
 
-  def __init__(self, model=soc.models.document.Document,
-               base_model=soc.models.work.Work, scope_logic=linkable_logic):
+  def __init__(self):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+    super(Logic, self).__init__(soc.models.linkable.Linkable)
+
+  def getScopeDepth(self):
+    """Returns the scope depth for this entity 
+
+    As it is impossible to determine the scope depth of a Linkable,
+    None is returned. This causes the scope regexp to match a scope
+    with an arbitrary depth. 
+    """
+
+    return None
 
 
 logic = Logic()

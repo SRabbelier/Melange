@@ -24,6 +24,7 @@ __authors__ = [
 
 
 from soc.logic.models import base
+from soc.logic.models import linkable as linkable_logic
 
 import soc.models.presence
 
@@ -33,7 +34,7 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.presence.Presence,
-               base_model=None, scope_logic=None):
+               base_model=None, scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.
     """
 

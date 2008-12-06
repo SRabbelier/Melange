@@ -77,15 +77,6 @@ class Logic(object):
 
     return self._scope_logic
 
-  def getScopeDepth(self):
-    """
-    """
-
-    if self._scope_logic:
-      return 1 + self._scope_logic.logic.getScopeDepth()
-
-    return 0
-
   def _updateField(self, model, name, value):
     """Hook called when a field is updated.
 

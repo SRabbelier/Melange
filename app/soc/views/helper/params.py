@@ -241,16 +241,11 @@ def getKeyFieldsPattern(params):
       first part of the returned pattern.
   """
 
-  logic = params['logic']
-  names = logic.getKeyFieldNames()
+  names = params['logic'].getKeyFieldNames()
   patterns = params['key_fields_prefix']
 
   for name in names:
-    regexp = linkable.LINK_ID_PATTERN_CORE
-    if name == 'scope_path':
-      regexp = '/'.join((regexp for i in range(logic.getScopeDepth())))
-
-    pattern = r'(?P<%s>%s)' % (name, regexp)
+    pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
     patterns.append(pattern)
 
   result = '/'.join(patterns)

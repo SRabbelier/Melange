@@ -54,6 +54,7 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.program.logic
 
     new_params['scope_view'] = sponsor_view
+    new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['name'] = "Program"
     new_params['name_short'] = "Program"
@@ -68,8 +69,6 @@ class View(base.View):
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         'clean_link_id': cleaning.clean_link_id,
         }
-
-    new_params['scope_redirect'] = redirects.getCreateRedirect
 
     params = dicts.merge(params, new_params)
 

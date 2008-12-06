@@ -71,6 +71,7 @@ class View(base.View):
 
     # fill in the founded_by with data from the entity
     form.fields['founded_by'].initial = entity.founder.name
+    super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -81,3 +82,5 @@ class View(base.View):
       account = users.get_current_user()
       user = user_logic.logic.getForFields({'account': account}, unique=True)
       fields['founder'] = user
+
+    super(View, self)._editPost(request, entity, fields)

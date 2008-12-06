@@ -26,6 +26,7 @@ from django.conf.urls import defaults
 
 from soc.views.models import document
 from soc.views.models import host
+from soc.views.models import organization
 from soc.views.models import presence
 from soc.views.models import program
 from soc.views.models import request
@@ -47,6 +48,7 @@ sidebar.addMenu(sponsor.view.getSidebarLinks)
 sidebar.addMenu(host.view.getSidebarLinks)
 sidebar.addMenu(request.view.getSidebarLinks)
 sidebar.addMenu(program.view.getSidebarLinks)
+sidebar.addMenu(organization.view.getSidebarLinks)
 
 sitemap.addPages(presence.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
@@ -57,6 +59,7 @@ sitemap.addPages(sponsor.view.getDjangoURLPatterns())
 sitemap.addPages(host.view.getDjangoURLPatterns())
 sitemap.addPages(request.view.getDjangoURLPatterns())
 sitemap.addPages(program.view.getDjangoURLPatterns())
+sitemap.addPages(organization.view.getDjangoURLPatterns())
 
 
 def getPatterns():

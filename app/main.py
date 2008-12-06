@@ -37,6 +37,8 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 sys.path.insert(0, os.path.abspath('django.zip'))
 
+ultimate_sys_path = None
+
 # Force Django to reload its settings.
 from django.conf import settings
 settings._target = None
@@ -61,6 +63,12 @@ django.core.signals.got_request_exception.disconnect(
 
 
 def main():
+  global ultimate_sys_path
+  if ultimate_sys_path is None:
+    ultimate_sys_path = list(sys.path)
+  else:
+    sys.path[:] = ultimate_sys_path
+
   # Create a Django application for WSGI.
   application = django.core.handlers.wsgi.WSGIHandler()
 

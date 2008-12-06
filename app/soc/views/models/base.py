@@ -508,7 +508,7 @@ class View(object):
     """
 
     # If scope_logic is not defined, this entity has no scope
-    if 'scope_logic' not in self._params:
+    if not self._params['scope_logic']:
       return
 
     scope = self._params['scope_logic'].logic.getFromKeyName(fields['scope_path'])
@@ -535,7 +535,8 @@ class View(object):
     """
 
     # fill in the email field with the data from the entity
-    form.fields['scope_path'].initial = entity.scope_path
+    if 'scope_path' in form.fields:
+      form.fields['scope_path'].initial = entity.scope_path
 
   def _editSeed(self, request, seed):
     """Performs any required processing on the form to get its edit page.

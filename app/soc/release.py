@@ -61,5 +61,5 @@ __authors__ = [
   ]
 
 
-RELEASE_TAG = '0.1a20081206rc'
+RELEASE_TAG = None
 

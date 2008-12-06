@@ -60,7 +60,6 @@ def getDjangoURLPatterns(params):
   # Construct defaults manualy
   default_patterns = params['django_patterns_defaults']
   default_patterns += params['extra_django_patterns']
-  key_fields_pattern = params['key_fields_pattern']
 
   patterns = []
 
@@ -72,7 +71,8 @@ def getDjangoURLPatterns(params):
         'url_name': params['url_name'],
         'lnp': params['link_id_arg_pattern'],
         'ulnp': params['link_id_pattern_core'],
-        'key_fields': key_fields_pattern,
+        'key_fields': params['key_fields_pattern'],
+        'scope': params['scope_path_pattern'],
         }
 
     kwargs = {'page_name': name}

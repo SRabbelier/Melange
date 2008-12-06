@@ -69,10 +69,6 @@ class View(base.View):
         'clean_link_id': cleaning.clean_link_id,
         }
 
-    new_params['extra_django_patterns'] = [
-        (r'^%(url_name)s/create/(?P<scope_path>%(ulnp)s)$',
-            'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
-
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     params = dicts.merge(params, new_params)

@@ -101,6 +101,7 @@ def constructParams(params):
   new_params['key_fields_prefix'] = []
   new_params['link_id_arg_pattern'] = linkable.LINK_ID_ARG_PATTERN
   new_params['link_id_pattern_core'] = linkable.LINK_ID_PATTERN_CORE
+  new_params['scope_path_pattern'] = getScopePattern(params)
 
   new_params['django_patterns'] = None
   new_params['extra_django_patterns'] = []
@@ -110,6 +111,8 @@ def constructParams(params):
       (r'^%(url_name)s/create$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/create/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
+      (r'^%(url_name)s/create/%(scope)s$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/delete/%(key_fields)s$',
           'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
@@ -246,7 +249,7 @@ def getKeyFieldsPattern(params):
 
   for name in names:
     if name == 'scope_path':
-      pattern = getScopePattern(params)
+      pattern = params['scope_path_pattern']
     else:
       pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
     patterns.append(pattern)

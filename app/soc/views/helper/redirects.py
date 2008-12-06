@@ -27,7 +27,7 @@ def getCreateRequestRedirect(entity, params):
   """
 
   result ='/request/create/%s/%s/%s' % (
-     params['url_name'], params['group_scope'], entity.link_id)
+     params['url_name'], params['group_scope'], entity.key.name())
   
   return result
 
@@ -37,7 +37,7 @@ def getInviteRedirect(entity, params):
   """
 
   result ='/%s/invite/%s' % (
-     params['url_name'], entity.link_id)
+     params['url_name'], entity.key().name())
 
   return result
 
@@ -47,7 +47,7 @@ def getCreateRedirect(entity, params):
   """
 
   result ='/%s/create/%s' % (
-     params['url_name'], entity.link_id)
+     params['url_name'], entity.key().name())
 
   return result
 
@@ -56,9 +56,8 @@ def getEditRedirect(entity, params):
   """Returns the edit redirect for the specified entity.
   """
 
-  suffix = params['logic'].getKeySuffix(entity)
   url_name = params['url_name']
-  return '/%s/edit/%s' % (url_name, suffix)
+  return '/%s/edit/%s' % (url_name, entity.key().name())
 
 
 def inviteAcceptedRedirect(entity, _):

@@ -181,7 +181,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext_lazy('City'))
   res_city.help_text = ugettext_lazy('lower ASCII characters only')
 
-  #: Required field containing residence address state or province; kept
+  #: Optional field containing residence address state or province; kept
   #: private.  Residence state/province can only be lower ASCII, not UTF-8
   #: text, because it may be used as a shipping address.
   res_state = db.StringProperty(

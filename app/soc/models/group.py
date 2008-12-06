@@ -83,7 +83,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext_lazy('City'))
   city.help_text = ugettext_lazy('lower ASCII characters only')
 
-  #: Required field containing group address state or province.
+  #: Optional field containing group address state or province.
   #: Group state/province can only be lower ASCII, not UTF-8
   #: text, because, if supplied, it is used as a shipping address.
   state = db.StringProperty(

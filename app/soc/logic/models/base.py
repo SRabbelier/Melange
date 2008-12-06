@@ -77,6 +77,18 @@ class Logic(object):
 
     return self._scope_logic
 
+  def getScopeDepth(self):
+    """Returns the scope depth for this entity
+
+    Returns None if any of the parent scopes return None
+    """
+
+    if not self._scope_logic:
+      return 0
+
+    depth = self._scope_logic.logic.getScopeDepth()
+    return None if (depth is None) else (depth + 1)
+
   def _updateField(self, model, name, value):
     """Hook called when a field is updated.
 

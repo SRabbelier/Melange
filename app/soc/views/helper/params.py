@@ -245,8 +245,24 @@ def getKeyFieldsPattern(params):
   patterns = params['key_fields_prefix']
 
   for name in names:
-    pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
+    if name == 'scope_path':
+      pattern = getScopePattern(params)
+    else:
+      pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
     patterns.append(pattern)
 
   result = '/'.join(patterns)
   return result
+
+def getScopePattern(params):
+  """Returns the Scope pattern for this entity
+  """
+
+  logic = params['logic']
+  depth = logic.getScopeDepth()
+  if depth is None:
+    return linkable.SCOPE_PATH_ARG_PATTERN
+
+  regexps = [linkable.LINK_ID_PATTERN_CORE for i in range(depth)]
+  regexp = '/'.join(regexps)
+  return r'(?P<scope_path>%s)' % regexp

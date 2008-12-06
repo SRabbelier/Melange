@@ -82,6 +82,9 @@ def constructParams(params):
 
   new_params = {}
   new_params['rights'] = rights
+  new_params['scope_logic'] = params['logic'].getScopeLogic()
+
+
   new_params['create_redirect'] = '/%(url_name)s' % params
   new_params['edit_redirect'] = '/%(url_name)s/edit' % params
   new_params['missing_redirect'] = '/%(url_name)s/create' % params

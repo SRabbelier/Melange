@@ -46,13 +46,14 @@ class Logic(object):
   on arguments passed to __init__.
   """
 
-  def __init__(self, model, base_model=None,
+  def __init__(self, model, base_model=None, scope_logic=None,
                name=None, skip_properties=None):
     """Defines the name, key_name and model for this entity.
     """
 
     self._model = model
     self._base_model = base_model
+    self._scope_logic = scope_logic
 
     if name:
       self._name = name
@@ -69,6 +70,12 @@ class Logic(object):
     """
 
     return self._model
+
+  def getScopeLogic(self):
+    """Returns the logic of the enclosing scope
+    """
+
+    return self._scope_logic
 
   def _updateField(self, model, name, value):
     """Hook called when a field is updated.

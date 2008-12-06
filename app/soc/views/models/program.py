@@ -53,7 +53,6 @@ class View(base.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
 
-    new_params['scope_logic'] = sponsor_logic
     new_params['scope_view'] = sponsor_view
 
     new_params['name'] = "Program"

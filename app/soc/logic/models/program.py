@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.logic.models import base
+from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
@@ -31,11 +32,13 @@ class Logic(base.Logic):
   """Logic methods for the Program model
   """
 
-  def __init__(self, model=soc.models.program.Program, base_model=None):
+  def __init__(self, model=soc.models.program.Program, 
+               base_model=None, scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, base_model=base_model)
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
 
 
 logic = Logic()

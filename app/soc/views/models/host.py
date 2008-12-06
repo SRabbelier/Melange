@@ -92,7 +92,6 @@ class View(role.View):
     new_params['rights'] = rights
     new_params['logic'] = soc.logic.models.host.logic
 
-    new_params['scope_logic'] = sponsor_logic
     new_params['scope_view'] = sponsor_view
 
     new_params['logic'] = soc.logic.models.host.logic

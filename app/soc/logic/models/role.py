@@ -31,11 +31,13 @@ class Logic(base.Logic):
   """Logic methods for the Role model.
   """
 
-  def __init__(self, model=soc.models.role.Role, base_model=None):
+  def __init__(self, model=soc.models.role.Role,
+               base_model=None, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model, base_model=base_model)
+    super(Logic, self).__init__(model, base_model=base_model,
+                                scope_logic=scope_logic)
 
 
 logic = Logic()

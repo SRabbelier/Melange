@@ -26,6 +26,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.views.helper import access
+from soc.views.models import document as document_view
 from soc.views.models import presence
 
 import soc.models.site
@@ -109,6 +110,25 @@ class View(presence.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def getSidebarMenus(self, request, params=None):
+    """See base.View.getSidebarMenus.
+
+    Returns a custom sidebar entry for the 'site' singleton.
+    """
+
+    entity = self._logic.getFromFields(link_id=self._logic.DEF_SITE_LINK_ID)
+
+    submenus = []
+
+    if entity:
+      submenus = document_view.view.getMenusForScope(entity, self._params)
+
+    new_params = {}
+    new_params['sidebar_additional'] = submenus
+
+    params = dicts.merge(params, new_params)
+    return super(View, self).getSidebarMenus(request, params=params)
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.

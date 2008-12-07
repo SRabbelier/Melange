@@ -15,7 +15,7 @@
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
-  '"Lennard de Rijk" <rijk0214@gmail.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 

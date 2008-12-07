@@ -22,22 +22,12 @@ __authors__ = [
   ]
 
 
-def getCreateRequestRedirect(entity, params):
-  """Returns the create request redirect for the specified entity.
-  """
-
-  result ='/request/create/%s/%s/%s' % (
-     params['group_scope'], params['url_name'], entity.key().name())
-  
-  return result
-
-
 def getInviteRedirect(entity, params):
   """Returns the invitation redirect for the specified entity.
   """
 
   result ='/%s/invite/%s' % (
-     params['url_name'], entity.key().name())
+      params['url_name'], entity.key().name())
 
   return result
 
@@ -47,7 +37,7 @@ def getCreateRedirect(entity, params):
   """
 
   result ='/%s/create/%s' % (
-     params['url_name'], entity.key().name())
+      params['url_name'], entity.key().name())
 
   return result
 
@@ -56,8 +46,26 @@ def getEditRedirect(entity, params):
   """Returns the edit redirect for the specified entity.
   """
 
-  url_name = params['url_name']
-  return '/%s/edit/%s' % (url_name, entity.key().name())
+  return '/%s/edit/%s' % (
+      params['url_name'], entity.key().name())
+
+
+def getPublicRedirect(entity, params):
+  """Returns the public redirect for the specified entity.
+  """
+
+  return '/%s/show/%s' % (
+      params['url_name'], entity.key().name())
+
+
+def getCreateRequestRedirect(entity, params):
+  """Returns the create request redirect for the specified entity.
+  """
+
+  result ='/request/create/%s/%s/%s' % (
+      params['group_scope'], params['url_name'], entity.key().name())
+
+  return result
 
 
 def inviteAcceptedRedirect(entity, _):

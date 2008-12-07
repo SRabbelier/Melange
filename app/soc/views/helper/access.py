@@ -35,6 +35,7 @@ from google.appengine.api import users
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
+from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
@@ -115,7 +116,7 @@ def deny(request):
     alternate response that should be returned by the calling view.
   """
 
-  context = helper.responses.getUniversalContext(request)
+  context = {}
   context['title'] = 'Access denied'
 
   raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
@@ -215,6 +216,46 @@ def checkIsDeveloper(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
+def checkIsHost(request):
+  """Returns an alternate HTTP response if Google Account has no Host entity
+     for the specified program.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if Host exists for the specified program, or a subclass of
+    django.http.HttpResponse which contains the alternate response
+    should be returned by the calling view.
+  """
+
+  try:
+    # if the current user is a developer we allow access
+    checkIsInvited(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  checkIsUser(request)
+
+  user = user_logic.logic.getForFields(
+      {'account': users.get_current_user()}, unique=True)
+
+  host = host_logic.logic.getForFields(
+      {'user': user}, unique=True)
+
+  if host:
+    return
+
+  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+      'role': 'a host '}
+
+  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+
 def checkIsInvited(request):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
@@ -231,15 +272,15 @@ def checkIsInvited(request):
     should be returned by the calling view.
   """
 
-  checkIsUser(request)
-  
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)  
+    checkIsDeveloper(request)
     return
   except out_of_band.Error:
     pass
-  
+
+  checkIsUser(request)
+
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a host for this program'}
 

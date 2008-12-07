@@ -111,7 +111,12 @@ class View(base.View):
     new_params['url_name'] = "user"
     new_params['module_name'] = "user_self"
     
-    new_params['sidebar_heading'] = 'Users'
+    new_params['sidebar_heading'] = 'User (self)'
+    new_params['sidebar'] = [
+        (users.create_login_url("user/edit"), 'Sign In', 'signIn'),
+        ('/' + new_params['url_name'] + '/edit', 'Profile', 'editSelf'),
+        ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
+        ]
 
     patterns = []
 
@@ -237,20 +242,6 @@ class View(base.View):
     fields['account'] = users.User(fields['email'])
 
     super(View, self)._editPost(request, entity, fields)
-
-  def getSidebarLinks(self, request, params=None):
-    """Returns an dictionary with the user sidebar entry.
-    """
-
-    params = {}
-    params['sidebar_heading'] = "User (self)"
-    params['sidebar'] = [
-        (users.create_login_url(request.path), 'Sign In', 'signIn'),
-        ('/' + self._params['url_name'] + '/edit', 'Profile', 'editSelf'),
-        ('/' + self._params['url_name'] + '/roles', 'Roles', 'roles'),
-        ]
-
-    return super(View, self).getSidebarLinks(request, params)
 
 
 view = View()

@@ -32,6 +32,7 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
+from soc.views.helper import access
 from soc.views.models import base
 
 import soc.models.document
@@ -94,8 +95,13 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = {}
+    rights['any_access'] = [access.allow]
+    rights['public'] = [access.checkIsDocumentPublic]
+
     new_params = {}
     new_params['logic'] = soc.logic.models.document.logic
+    new_params['rights'] = rights
 
     new_params['name'] = "Document"
     new_params['name_short'] = "Document"

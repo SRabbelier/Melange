@@ -207,7 +207,7 @@ def checkIsDeveloper(request):
   checkIsUser(request)
 
   if accounts.isDeveloper(account=users.get_current_user()):
-    return None
+    return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a site developer '}
@@ -273,3 +273,15 @@ def checkIsInvited(request):
     return
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+
+def checkIsDocumentPublic(request):
+  """Checks whether a document is public
+
+  Args:
+    request: a Django HTTP request
+  """
+
+  # TODO: A proper check needs to be done to see if the document
+  # is public or not, probably involving analysing it's scope or such.
+  allow(request)

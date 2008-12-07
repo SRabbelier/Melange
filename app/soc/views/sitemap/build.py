@@ -48,6 +48,7 @@ sidebar.addMenu(sponsor.view.getSidebarLinks)
 sidebar.addMenu(host.view.getSidebarLinks)
 sidebar.addMenu(request.view.getSidebarLinks)
 sidebar.addMenu(program.view.getSidebarLinks)
+sidebar.addMenu(program.view.getExtraMenus)
 sidebar.addMenu(organization.view.getSidebarLinks)
 
 sitemap.addPages(presence.view.getDjangoURLPatterns())

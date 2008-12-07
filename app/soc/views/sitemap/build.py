@@ -39,17 +39,17 @@ from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap
 
 
-sidebar.addMenu(user_self.view.getSidebarLinks)
-sidebar.addMenu(presence.view.getSidebarLinks)
-sidebar.addMenu(site.view.getSidebarLinks)
-sidebar.addMenu(user.view.getSidebarLinks)
-sidebar.addMenu(document.view.getSidebarLinks)
-sidebar.addMenu(sponsor.view.getSidebarLinks)
-sidebar.addMenu(host.view.getSidebarLinks)
-sidebar.addMenu(request.view.getSidebarLinks)
-sidebar.addMenu(program.view.getSidebarLinks)
+sidebar.addMenu(user_self.view.getSidebarMenus)
+sidebar.addMenu(presence.view.getSidebarMenus)
+sidebar.addMenu(site.view.getSidebarMenus)
+sidebar.addMenu(user.view.getSidebarMenus)
+sidebar.addMenu(document.view.getSidebarMenus)
+sidebar.addMenu(sponsor.view.getSidebarMenus)
+sidebar.addMenu(host.view.getSidebarMenus)
+sidebar.addMenu(request.view.getSidebarMenus)
+sidebar.addMenu(program.view.getSidebarMenus)
 sidebar.addMenu(program.view.getExtraMenus)
-sidebar.addMenu(organization.view.getSidebarLinks)
+sidebar.addMenu(organization.view.getSidebarMenus)
 
 sitemap.addPages(presence.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())

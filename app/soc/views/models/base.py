@@ -598,7 +598,7 @@ class View(object):
 
     return self._params
 
-  def getSidebarLinks(self, request, params=None):
+  def getSidebarMenus(self, request, params=None):
     """Returns an dictionary with one sidebar entry.
 
     Args:
@@ -612,7 +612,7 @@ class View(object):
     """
 
     params = dicts.merge(params, self._params)
-    return sitemap.sidebar.getSidebarLinks(request, params)
+    return sitemap.sidebar.getSidebarMenus(request, params)
 
   def getDjangoURLPatterns(self, params=None):
     """Retrieves a list of sidebar entries for this view

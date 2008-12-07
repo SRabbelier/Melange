@@ -63,10 +63,10 @@ def getSidebarItems(params):
     sidebar_defaults: The sidebar_defaults are used to construct the
       sidebar items for this View. It is expected to be a tuple of
       three items, the item's url, it's menu_text, and it's
-      access_type, see getSidebarLinks on how access_type is used.
+      access_type, see getSidebarMenus on how access_type is used.
     sidebar_additional: The sidebar_additional values are appended
       to the list of items verbatim, and should be in the format
-      expected by getSidebarLinks.
+      expected by getSidebarMenus.
 
   Args:
     params: a dict with params for this View.
@@ -92,7 +92,7 @@ def getSidebarItems(params):
   return result
 
 
-def getSidebarLinks(request, params=None):
+def getSidebarMenus(request, params=None):
   """Returns an dictionary with one sidebar entry.
 
   Calls getSidebarItems to retrieve the items that should be in the

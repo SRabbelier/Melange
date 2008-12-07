@@ -30,17 +30,24 @@ SIDEBAR = []
 
 
 def addMenu(callback):
+  """Adds a callback to the menu builder.
+
+  The callback should return a list of menu's when called.
+  """
+
   global SIDEBAR
   SIDEBAR.append(callback)
 
 def getSidebar(request):
+  """Constructs a sidebar for the specified request
+  """
+
   sidebar = []
 
   for callback in SIDEBAR:
-    menu = callback(request)
-    
-    if menu:
-      # only if there is a menu we should append it
+    menus = callback(request)
+
+    for menu in (menus if menus else []):
       sidebar.append(menu)
 
   return sidebar
@@ -129,12 +136,14 @@ def getSidebarLinks(request, params=None):
   if not items:
     return
 
-  res = {}
+  menu = {}
 
   if 'sidebar_heading' not in params:
     params['sidebar_heading'] = params['name']
 
-  res['heading'] = params['sidebar_heading']
-  res['items'] = items
+  menu['heading'] = params['sidebar_heading']
+  menu['items'] = items
 
-  return res
+  menus = [menu]
+
+  return menus

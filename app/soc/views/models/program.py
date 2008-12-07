@@ -34,8 +34,8 @@ from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import base
-from soc.views.models import sponsor as sponsor_view
 from soc.views.models import document as document_view
+from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
 
 import soc.logic.models.program

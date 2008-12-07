@@ -318,12 +318,12 @@ def checkIsInvited(request):
 
 
 def checkIsDocumentPublic(request):
-  """Checks whether a document is public
+  """Checks whether a document is public.
 
   Args:
     request: a Django HTTP request
   """
 
-  # TODO: A proper check needs to be done to see if the document
+  # TODO(srabbelier): A proper check needs to be done to see if the document
   # is public or not, probably involving analysing it's scope or such.
   allow(request)

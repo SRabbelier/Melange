@@ -512,7 +512,7 @@ class View(object):
     if not self._params['scope_logic']:
       return
 
-    # If this entity is unscoped, to not try to retrieve a scope
+    # If this entity is unscoped, do not try to retrieve a scope
     if 'scope_path' not in fields:
       return
 

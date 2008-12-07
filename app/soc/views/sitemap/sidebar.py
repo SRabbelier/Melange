@@ -39,7 +39,7 @@ def addMenu(callback):
   SIDEBAR.append(callback)
 
 def getSidebar(request):
-  """Constructs a sidebar for the specified request
+  """Constructs a sidebar for the specified request.
   """
 
   sidebar = []
@@ -100,8 +100,8 @@ def getSidebarMenu(request, items, params):
   raises out_of_band.Error, the item will not be added.
 
   Args:
-    items: see above
     request: the django request object
+    items: see above
     params: a dict with params for this View
 
   Params usage:

@@ -285,14 +285,15 @@ def checkIsInvited(request):
       'role': 'a host for this program'}
 
   splitpath = request.path.split('/')
+  splitpath = splitpath[1:] # cut off leading ''
 
   if len(splitpath) < 4:
     # TODO: perhaps this needs a better explanation?
     deny(request)
 
-  role = splitpath[1]
-  group_id = splitpath[3]
-  user_id = splitpath[4]
+  role = splitpath[0]
+  group_id = splitpath[2]
+  user_id = splitpath[3]
 
   user = user_logic.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)

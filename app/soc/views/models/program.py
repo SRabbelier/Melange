@@ -55,7 +55,7 @@ class View(base.View):
 
     rights = {}
     rights['any_access'] = [access.allow]
-    rights['public'] = [access.allow]
+    rights['show'] = [access.allow]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
@@ -99,13 +99,14 @@ class View(base.View):
 
     entities = logic.getForLimitAndOffset(1000)
 
+    doc_params = document_view.view.getParams()
     menus = []
 
     for entity in entities:
       menu = {}
       menu['heading'] = entity.short_name
       items = document_view.view.getMenusForScope(entity, params)
-      menu['items'] = sidebar.getSidebarMenu(request, items, params=params)
+      menu['items'] = sidebar.getSidebarMenu(request, items, params=doc_params)
       menus.append(menu)
 
     return menus

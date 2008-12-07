@@ -98,7 +98,7 @@ class View(base.View):
 
     rights = {}
     rights['any_access'] = [access.allow]
-    rights['public'] = [access.checkIsDocumentPublic]
+    rights['show'] = [access.checkIsDocumentPublic]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.document.logic

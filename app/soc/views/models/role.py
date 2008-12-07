@@ -97,20 +97,19 @@ class View(base.View):
     """Displays the request promotion to Role page.
     """
 
-    if not params:
-      params = {}
     new_params = {}
+
     group_scope = kwargs['link_id']
 
-    new_params['list_action'] = (redirects.getCreateRequestRedirect, 
+    new_params['list_action'] = (redirects.getCreateRequestRedirect,
         {'group_scope' : group_scope,
-        'url_name' : self._params['url_name'] })
+        'url_name' : self._params['url_name']})
     new_params['list_description'] = \
         self.DEF_INVITE_INSTRUCTION_MSG_FMT % self._params
+    new_params['logic'] = user_logic.logic
 
-    new_params = dicts.merge(new_params, params)
+    new_params = dicts.merge(params, new_params)
     params = dicts.merge(new_params, user_view.view._params)
-    params['logic'] = user_logic.logic
 
     try:
       access.checkAccess('invite', request, rights=params['rights'])

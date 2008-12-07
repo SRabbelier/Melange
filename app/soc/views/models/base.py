@@ -156,12 +156,8 @@ class View(object):
     for field in fields:
       empty_kwargs[field] = None
 
-    if not kwargs:
-      return self.edit(request, page_name=page_name, params=params,
-                       **empty_kwargs)
-    else:
-      return self.edit(request, page_name=page_name, params=params,
-                       seed=kwargs, **empty_kwargs)
+    return self.edit(request, page_name=page_name,
+                     params=params, seed=kwargs, **empty_kwargs)
 
   def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs.

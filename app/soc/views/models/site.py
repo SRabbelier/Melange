@@ -69,8 +69,14 @@ class View(presence.View):
       params: a dict with params for this View
     """
 
+    rights = {}
+    rights['unspecified'] = [access.checkIsDeveloper]
+    rights['any_access'] = [access.allow]
+    rights['public'] = [access.allow]
+
     new_params = {}
     new_params['logic'] = soc.logic.models.site.logic
+    new_params['rights'] = rights
 
     # TODO(alturin): add ugettext_lazy ?
     new_params['name'] = "Site Settings"
@@ -87,12 +93,6 @@ class View(presence.View):
     new_params['sidebar_heading'] = new_params['name_short']
 
     new_params['public_template'] = 'soc/home/public.html'
-
-    new_params['rights'] = {
-      'unspecified': [access.checkIsDeveloper],
-      'any_access': [access.allow],
-      'public': [access.allow]
-      }
 
     patterns = []
 

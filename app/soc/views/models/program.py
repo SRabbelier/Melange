@@ -30,13 +30,13 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import sponsor as sponsor_logic
-from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import base
 from soc.views.models import sponsor as sponsor_view
 from soc.views.models import document as document_view
+from soc.views.sitemap import sidebar
 
 import soc.logic.models.program
 
@@ -82,39 +82,6 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  def _getItemsForProgram(self, entity, params):
-    """Returns the menu items for one specifc program
-
-    Args:
-      entity: the program for which the entry should be constructed
-      params: a dict with params for this View.
-    """
-
-    filter = {
-        'scope_path': entity.key().name(),
-        'is_featured': True,
-        }
-
-    doc_params = document_view.view.getParams()
-    entities = document_logic.logic.getForFields(filter)
-
-    submenus = []
-
-    # add a link to the home page
-    submenu = {}
-    submenu['title'] = "Home"
-    submenu['url'] = redirects.getPublicRedirect(entity, params)
-    submenus.append(submenu)
-
-    # add a link to all featured documents
-    for entity in entities:
-      submenu = {}
-      submenu['title'] = entity.short_name
-      submenu['url'] = redirects.getPublicRedirect(entity, doc_params)
-      submenus.append(submenu)
-
-    return submenus
-
   def getExtraMenus(self, request, params=None):
     """Returns the extra menu's for this view.
 
@@ -137,7 +104,8 @@ class View(base.View):
     for entity in entities:
       menu = {}
       menu['heading'] = entity.short_name
-      menu['items'] = self._getItemsForProgram(entity, params)
+      items = document_view.view.getMenusForScope(entity, params)
+      menu['items'] = sidebar.getSidebarMenu(request, items, params=params)
       menus.append(menu)
 
     return menus

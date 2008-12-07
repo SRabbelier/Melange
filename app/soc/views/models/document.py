@@ -33,6 +33,7 @@ from soc.logic import validate
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import base
 
 import soc.models.document
@@ -141,6 +142,37 @@ class View(base.View):
     form.fields['doc_key_name'].initial = entity.key().name()
 
     super(View, self)._editGet(request, entity, form)
+
+  def getMenusForScope(self, entity, params):
+    """Returns the featured menu items for one specifc entity.
+
+    A link to the home page of the specified entity is also included.
+
+    Args:
+      entity: the entity for which the entry should be constructed
+      params: a dict with params for this View.
+    """
+
+    filter = {
+        'scope_path': entity.key().name(),
+        'is_featured': True,
+        }
+
+    entities = self._logic.getForFields(filter)
+
+    submenus = []
+
+    # add a link to the home page
+    submenu = (redirects.getPublicRedirect(entity, params), "Home", 'public')
+    submenus.append(submenu)
+
+    # add a link to all featured documents
+    for entity in entities:
+      submenu = (redirects.getPublicRedirect(entity, self._params),
+                 entity.short_name, 'public')
+      submenus.append(submenu)
+
+    return submenus
 
 view = View()
 

@@ -81,26 +81,26 @@ def getSidebarItems(params):
 
   result = []
 
+  for item in params['sidebar_additional']:
+    result.append(item)
+
   for url, menu_text, access_type in defaults:
     url = url % params['url_name'].lower()
     item = (url, menu_text % params, access_type)
     result.append(item)
 
-  for item in params['sidebar_additional']:
-    result.append(item)
-
   return result
 
 
-def getSidebarMenus(request, params=None):
+def getSidebarMenu(request, items, params):
   """Returns an dictionary with one sidebar entry.
 
-  Calls getSidebarItems to retrieve the items that should be in the
-  menu. Expected is a tuple with an url, a menu_text, and an
+  Items is expected to be a tuple with an url, a menu_text, and an
   access_type. The access_type is then passed to checkAccess, if it
   raises out_of_band.Error, the item will not be added.
 
   Args:
+    items: see above
     request: the django request object
     params: a dict with params for this View
 
@@ -124,16 +124,34 @@ def getSidebarMenus(request, params=None):
 
   rights = params['rights']
 
-  items = []
+  submenus = []
 
-  for url, menu_text, access_type in getSidebarItems(params):
+  for url, menu_text, access_type in items:
     try:
       access.checkAccess(access_type, request, rights)
-      items.append({'url': url, 'title': menu_text})
+      submenus.append({'url': url, 'title': menu_text})
     except out_of_band.Error:
       pass
 
-  if not items:
+  return submenus
+
+
+def getSidebarMenus(request, params=None):
+  """Constructs the default sidebar menu for a View.
+
+  Calls getSidebarItems to retrieve the items that should be in the
+  menu. Then passes the result to getSidebarMenu. See the respective
+  docstrings for an explanation on what they do.
+
+  Args:
+    request: the django request object
+    params: a dict with params for this View
+  """
+
+  items = getSidebarItems(params)
+  submenus = getSidebarMenu(request, items, params)
+
+  if not submenus:
     return
 
   menu = {}
@@ -142,7 +160,7 @@ def getSidebarMenus(request, params=None):
     params['sidebar_heading'] = params['name']
 
   menu['heading'] = params['sidebar_heading']
-  menu['items'] = items
+  menu['items'] = submenus
 
   menus = [menu]
 

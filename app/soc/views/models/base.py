@@ -511,6 +511,10 @@ class View(object):
     if not self._params['scope_logic']:
       return
 
+    # If this entity is unscoped, to not try to retrieve a scope
+    if 'scope_path' not in fields:
+      return
+
     scope = self._params['scope_logic'].logic.getFromKeyName(fields['scope_path'])
     fields['scope'] = scope
 

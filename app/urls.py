@@ -15,6 +15,7 @@
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Lennard de Rijk" <rijk0214@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -23,3 +24,7 @@ from soc.views.sitemap import build
 
 
 urlpatterns = build.getPatterns()
+
+# define the error handlers
+handler404 = 'django.views.defaults.page_not_found'
+handler500 = 'django.views.defaults.server_error'

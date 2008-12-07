@@ -46,8 +46,6 @@ class CreateForm(presence.SettingsValidationForm):
     #: list of model fields which will *not* be gathered by the form
     exclude = ['home', 'scope', 'scope_path', 'link_id']
 
-  scope_path = forms.CharField(widget=forms.HiddenInput)
-
   link_id = forms.CharField(widget=forms.HiddenInput)
 
 
@@ -101,7 +99,7 @@ class View(presence.View):
     patterns += [(r'^$', 'soc.views.models.%(module_name)s.main_public', 
                   page_name)]
 
-    page_name = "Edit Site Settings"
+    page_name = "Edit Site"
     patterns += [(r'^%(url_name)s/edit$',
                   'soc.views.models.%(module_name)s.main_edit',
                   page_name)]

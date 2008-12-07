@@ -33,9 +33,7 @@ class Logic(presence.Logic):
   """Logic methods for the Site model.
   """
 
-  DEF_SITE_SCOPE_PATH = 'site'
-  DEF_SITE_LINK_ID = 'home'
-  DEF_SITE_HOME_DOC_LINK_ID = 'home'
+  DEF_SITE_LINK_ID = 'site'
 
   def __init__(self, model=soc.models.site.Site,
                base_model=soc.models.presence.Presence):
@@ -44,15 +42,38 @@ class Logic(presence.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model)
 
-  def getKeyValues(self, unused_entity):
-    """Returns the default key values for the site settings.
+  def getKeyValues(self, entity):
+    """Returns the key values for the site settings.
 
-    The Site entity is always expected to be a singleton, so this method
-    returns the hard-coded scope and link_id.
+    The Site entity is a singleton, so this method returns a
+    hard-coded link_id.
+
+    Args:
+      entity: unused
     """
 
-    return [self.DEF_SITE_SCOPE_PATH, 
-            self.DEF_SITE_LINK_ID]
+    return [self.DEF_SITE_LINK_ID]
+
+  def getKeyValuesFromFields(self, fields):
+    """Extracts the key values from a dict and returns them.
+
+    The Site entity is a singleton, so this method returns a
+    hard-coded link_id.
+
+    Args:
+      fields: unused
+    """
+
+    return [self.DEF_SITE_LINK_ID]
+
+  def getKeyFieldNames(self):
+    """Returns an array with the names of the Key Fields.
+
+    The Site entity is an unscoped singleton, it's key fields consist
+    of just the link_id.
+    """
+
+    return ['link_id']
 
 
 logic = Logic()

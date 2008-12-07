@@ -71,7 +71,7 @@ def constructParams(params):
   rights = {}
   rights['unspecified'] = []
   rights['any_access'] = [access.checkIsLoggedIn]
-  rights['public'] = [access.checkIsUser]
+  rights['show'] = [access.checkIsUser]
   rights['create'] = [access.checkIsDeveloper]
   rights['edit'] = [access.checkIsDeveloper]
   rights['delete'] = [access.checkIsDeveloper]
@@ -106,19 +106,19 @@ def constructParams(params):
   new_params['django_patterns'] = None
   new_params['extra_django_patterns'] = []
   new_params['django_patterns_defaults'] = [
-      (r'^%(url_name)s/show/%(key_fields)s$',
+      (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
-      (r'^%(url_name)s/create$',
+      (r'^%(url_name)s/(?P<access_type>create)$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/create/%(key_fields)s$',
+      (r'^%(url_name)s/(?P<access_type>create)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/create/%(scope)s$',
+      (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/delete/%(key_fields)s$',
+      (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
-      (r'^%(url_name)s/edit/%(key_fields)s$',
+      (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s'),
-      (r'^%(url_name)s/list$',
+      (r'^%(url_name)s/(?P<access_type>list)$',
           'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
       ]
 

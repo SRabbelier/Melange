@@ -126,7 +126,8 @@ class View(base.View):
     super(View, self).__init__(params=params)
     
     
-  def listSelf(self, request, page_name=None, params=None, **kwargs):
+  def listSelf(self, request, access_type,
+               page_name=None, params=None, **kwargs):
     """Displays the unhandled requests for this user.
 
     Args:
@@ -140,7 +141,7 @@ class View(base.View):
     params['logic'] = self._logic
 
     try:
-      access.checkAccess('listSelf', request, params['rights'])
+      access.checkAccess(access_type, request, params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 

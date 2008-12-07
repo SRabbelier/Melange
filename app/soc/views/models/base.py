@@ -71,7 +71,8 @@ class View(object):
     self._logic = params['logic']
 
 
-  def public(self, request, page_name=None, params=None, **kwargs):
+  def public(self, request, access_type,
+             page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.
 
     Params usage:
@@ -97,7 +98,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      access.checkAccess('public', request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 
@@ -126,7 +127,8 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
-  def create(self, request, page_name=None, params=None, **kwargs):
+  def create(self, request, access_type,
+             page_name=None, params=None, **kwargs):
     """Displays the create page for this entity type.
 
     Params usage:
@@ -156,10 +158,11 @@ class View(object):
     for field in fields:
       empty_kwargs[field] = None
 
-    return self.edit(request, page_name=page_name,
+    return self.edit(request, access_type, page_name=page_name,
                      params=params, seed=kwargs, **empty_kwargs)
 
-  def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
+  def edit(self, request, access_type,
+           page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs.
 
     Params usage:
@@ -190,7 +193,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      access.checkAccess('edit', request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 
@@ -342,7 +345,8 @@ class View(object):
 
     return self._constructResponse(request, entity, context, form, params)
 
-  def list(self, request, page_name=None, params=None, filter=None):
+  def list(self, request, access_type,
+           page_name=None, params=None, filter=None):
     """Displays the list page for the entity type.
     
     Args:
@@ -366,7 +370,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      access.checkAccess('list', request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 
@@ -405,7 +409,8 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
-  def delete(self, request, page_name=None, params=None, **kwargs):
+  def delete(self, request, access_type,
+             page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by **kwargs.
 
     Args:
@@ -430,7 +435,7 @@ class View(object):
     params = dicts.merge(params, self._params)
 
     try:
-      access.checkAccess('delete', request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 

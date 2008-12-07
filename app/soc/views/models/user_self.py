@@ -97,7 +97,7 @@ class View(base.View):
     rights = {}
     rights['unspecified'] = [access.deny]
     rights['any_access'] = [access.allow]
-    rights['editSelf'] = [access.checkIsLoggedIn]
+    rights['edit'] = [access.checkIsLoggedIn]
     rights['roles'] = [access.checkIsUser]
     rights['signIn'] = [access.checkNotLoggedIn]
 
@@ -114,18 +114,18 @@ class View(base.View):
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         (users.create_login_url("user/edit"), 'Sign In', 'signIn'),
-        ('/' + new_params['url_name'] + '/edit', 'Profile', 'editSelf'),
+        ('/' + new_params['url_name'] + '/edit', 'Profile', 'edit'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
         ]
 
     patterns = []
 
     page_name = "Profile"
-    patterns += [(r'^%(url_name)s/edit$',
+    patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',
                   'soc.views.models.%(module_name)s.edit', page_name)]
 
     page_name = "Requests Overview"
-    patterns += [(r'^%(url_name)s/roles$',
+    patterns += [(r'^%(url_name)s/(?P<access_type>roles)$',
                    'soc.views.models.request.list_self', page_name)]
 
     new_params['django_patterns_defaults'] = patterns
@@ -136,7 +136,8 @@ class View(base.View):
 
   EDIT_SELF_TMPL = 'soc/user/edit_self.html'
 
-  def edit(self, request, page_name=None, params=None, seed=None, **kwargs):
+  def edit(self, request, access_type,
+           page_name=None, params=None, seed=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.
 
     Args:
@@ -153,7 +154,7 @@ class View(base.View):
     params = dicts.merge(params, self._params)
 
     try:
-      access.checkAccess('editSelf', request, params['rights'])
+      access.checkAccess(access_type, request, params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request, 
           template=self.EDIT_SELF_TMPL)

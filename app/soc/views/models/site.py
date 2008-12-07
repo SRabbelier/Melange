@@ -72,7 +72,7 @@ class View(presence.View):
     rights = {}
     rights['unspecified'] = [access.checkIsDeveloper]
     rights['any_access'] = [access.allow]
-    rights['public'] = [access.allow]
+    rights['show'] = [access.allow]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.site.logic
@@ -101,7 +101,7 @@ class View(presence.View):
                   page_name)]
 
     page_name = "Edit Site"
-    patterns += [(r'^%(url_name)s/edit$',
+    patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',
                   'soc.views.models.%(module_name)s.main_edit',
                   page_name)]
 
@@ -146,7 +146,7 @@ class View(presence.View):
     values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
 
-    return self.public(request, page_name, **key_values)
+    return self.public(request, "show", page_name, **key_values)
 
   def mainEdit(self, request, page_name=None, **kwargs):
     """Displays the edit page for the main site settings page.

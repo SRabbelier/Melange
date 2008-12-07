@@ -31,6 +31,7 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.views import helper
+from soc.views.helper import access
 from soc.views.models import base
 
 import soc.models.presence
@@ -105,8 +106,13 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = {}
+    rights['any_access'] = [access.allow]
+    rights['show'] = [access.allow]
+
     new_params = {}
     new_params['logic'] = soc.logic.models.presence.logic
+    new_params['rights'] = rights
 
     new_params['name'] = "Home Settings"
     new_params['name_short'] = "Home Settings"
@@ -125,7 +131,7 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
   def _public(self, request, entity, context):
-    """
+    """See base.View._public().
     """
 
     if not entity:

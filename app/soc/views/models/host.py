@@ -86,7 +86,8 @@ class View(role.View):
     """
 
     rights = {}
-    rights['edit'] = [access.checkIsInvited]
+    rights['create'] = [access.checkIsHost]
+    rights['edit'] = [access.checkIsHost]
 
     new_params = {}
     new_params['rights'] = rights

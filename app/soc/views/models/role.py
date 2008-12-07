@@ -82,7 +82,7 @@ class View(base.View):
 
     new_params = {}
 
-    patterns = [(r'^%(url_name)s/invite/%(lnp)s$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(lnp)s$',
         'soc.views.models.%(module_name)s.invite',
         'Invite %(name_short)s')]
 
@@ -93,7 +93,8 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  def invite(self, request, page_name=None, params=None, **kwargs):
+  def invite(self, request, access_type,
+             page_name=None, params=None, **kwargs):
     """Displays the request promotion to Role page.
     """
 
@@ -112,7 +113,7 @@ class View(base.View):
     params = dicts.merge(new_params, user_view.view._params)
 
     try:
-      access.checkAccess('invite', request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 

@@ -19,9 +19,11 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+from soc.logic.helper import request
 from soc.logic.models import base
 
 import soc.models.role
@@ -38,6 +40,12 @@ class Logic(base.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
+    
+  def _onCreate(self, entity):
+    """Will remove any outstanding requests for the new role entity.
+    """
+  
+    request.removeRequestForRole(entity)
 
 
 logic = Logic()

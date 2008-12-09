@@ -47,9 +47,9 @@ class View(group.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic
 
-    new_params['name'] = "Sponsor"
-    new_params['name_short'] = "Sponsor"
-    new_params['name_plural'] = "Sponsors"
+    new_params['name'] = "Program Owner"
+    new_params['name_short'] = "Program Owner"
+    new_params['name_plural'] = "Program Owners"
     # TODO(pawel.solyga): create url_name and module_name automatically 
     # from name. Make that work for all other Views too. Hopefully 
     # solution that will be implemented in base View.

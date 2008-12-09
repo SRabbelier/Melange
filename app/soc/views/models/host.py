@@ -99,9 +99,9 @@ class View(role.View):
     new_params['group_view'] = soc.views.models.sponsor.view
     new_params['invite_filter'] = {'group_ln': 'link_id'}
 
-    new_params['name'] = "Host"
-    new_params['name_short'] = "Host"
-    new_params['name_plural'] = "Hosts"
+    new_params['name'] = "Program Administrator"
+    new_params['name_short'] = "Program Administrator"
+    new_params['name_plural'] = "Program Administrators"
     new_params['url_name'] = "host"
     new_params['module_name'] = "host"
 

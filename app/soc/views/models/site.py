@@ -163,8 +163,8 @@ class View(presence.View):
     # Site singleton, so pass in None to match parent method footprint.
     values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
-
-    return self.edit(request, page_name, seed=key_values, **key_values)
+    
+    return self.edit(request, "edit", page_name, seed=key_values, **key_values)
 
 
 view = View()

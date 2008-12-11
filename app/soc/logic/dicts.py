@@ -89,6 +89,18 @@ def zip(keys, values):
 
   return result
 
+
+def unzip(target, order):
+  """Constructs a list from target in the order specified by order
+
+  Args:
+    target: the dictionary to pull the values from
+    order: the order of the keys
+  """
+
+  return (target[key] for key in order)
+
+
 def rename(target, keys):
   """Returns a dict containing only the key/value pairs from keys.
 

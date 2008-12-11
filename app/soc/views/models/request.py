@@ -103,6 +103,7 @@ class View(base.View):
 
     rights = {}
     rights['listSelf'] = [access.checkIsUser]
+    rights['create'] = [access.checkCanInvite]
 
     new_params = {}
     new_params['rights'] = rights

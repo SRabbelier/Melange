@@ -33,8 +33,10 @@ __authors__ = [
 from google.appengine.api import users
 
 from django.utils.translation import ugettext_lazy
+from django.core import urlresolvers
 
 from soc.logic import accounts
+from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
@@ -233,7 +235,7 @@ def checkIsHost(request):
   """
 
   try:
-    # if the current user is a developer we allow access
+    # if the current user is invited to create a host profile we allow access
     checkIsInvited(request)
     return
   except out_of_band.Error:
@@ -315,6 +317,48 @@ def checkIsInvited(request):
     return
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+
+def checkCanInvite(request):
+  """Checks to see if the current user can create an invite
+
+  Note that if the current url is not in the default 'request' form
+  this method either deny()s or performs the wrong access check.
+
+  Args:
+    request: a Django HTTP request
+  """
+
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  # Mine the url for params
+  try:
+    callback, args, kwargs = urlresolvers.resolve(request.path)
+  except Exception:
+    deny(request)
+
+  # Construct a new url by reshufling the kwargs
+  order = ['role', 'access_type', 'scope_path', 'link_id']
+  url_params = dicts.unzip(kwargs, order)
+  url = '/'.join([''] + list(url_params))
+
+  # Mine the reshufled url
+  try:
+    callback, args, kwargs = urlresolvers.resolve(url)
+  except Exception:
+    deny(request)
+
+  # Get the everything we need for the access check
+  params = callback.im_self.getParams()
+  access_type = kwargs['access_type']
+
+  # Perform the access check
+  helper.access.checkAccess(access_type, request, rights=params['rights'])
 
 
 def checkIsDocumentPublic(request):

@@ -100,6 +100,7 @@ class View(base.View):
     rights['edit'] = [access.checkIsLoggedIn]
     rights['roles'] = [access.checkIsUser]
     rights['signIn'] = [access.checkNotLoggedIn]
+    rights['notification'] = [access.checkIsUser]
 
     new_params = {}
     new_params['rights'] = rights
@@ -116,6 +117,7 @@ class View(base.View):
         (users.create_login_url("user/edit"), 'Sign In', 'signIn'),
         ('/' + new_params['url_name'] + '/edit', 'Profile', 'edit'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
+        ('/' + 'notification/list', 'Notifications', 'notification'),
         ]
 
     patterns = []
@@ -127,9 +129,9 @@ class View(base.View):
     page_name = "Requests Overview"
     patterns += [(r'^%(url_name)s/(?P<access_type>roles)$',
                    'soc.views.models.request.list_self', page_name)]
-
+    
     new_params['django_patterns_defaults'] = patterns
-
+    
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

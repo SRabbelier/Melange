@@ -26,6 +26,7 @@ do not meet the required criteria.
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -38,6 +39,7 @@ from django.core import urlresolvers
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
+from soc.logic.models import notification as notification_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
@@ -318,6 +320,54 @@ def checkIsInvited(request):
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+def checkIsMyNotification(request):
+  """Returns an alternate HTTP response if this request is for a Notification belonging
+     to the current user.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if the current User is allowed to access this Notification.
+  """
+  
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  checkIsUser(request)
+  
+  splitpath = request.path.split('/')
+  splitpath = splitpath[1:] # cut off leading ''
+  
+  # get the notification scope (user link_id) from the request path
+  user_link_id = splitpath[2]
+  # get the notification link_id from the request path
+  notification_link_id = splitpath[3]
+  
+  properties = {
+      'link_id': notification_link_id,
+      'scope_path': user_link_id,
+      }
+  
+  notification = notification_logic.logic.getForFields(properties, unique=True)
+  
+  user = user_logic.logic.getForFields(
+      {'account': users.get_current_user()}, unique=True)
+  
+  # check if the key of the current user matches the key from the scope of the message
+  if user.key() == notification.scope.key():
+    # access granted
+    return None
+  else:
+    # access denied
+    deny(request)  
 
 def checkCanInvite(request):
   """Checks to see if the current user can create an invite
@@ -359,7 +409,6 @@ def checkCanInvite(request):
 
   # Perform the access check
   helper.access.checkAccess(access_type, request, rights=params['rights'])
-
 
 def checkIsDocumentPublic(request):
   """Checks whether a document is public.

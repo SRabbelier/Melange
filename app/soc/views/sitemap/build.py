@@ -26,6 +26,7 @@ from django.conf.urls import defaults
 
 from soc.views.models import document
 from soc.views.models import host
+from soc.views.models import notification
 from soc.views.models import organization
 from soc.views.models import presence
 from soc.views.models import program
@@ -55,6 +56,7 @@ sitemap.addPages(presence.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
 sitemap.addPages(user.view.getDjangoURLPatterns())
 sitemap.addPages(user_self.view.getDjangoURLPatterns())
+sitemap.addPages(notification.view.getDjangoURLPatterns())
 sitemap.addPages(document.view.getDjangoURLPatterns())
 sitemap.addPages(sponsor.view.getDjangoURLPatterns())
 sitemap.addPages(host.view.getDjangoURLPatterns())

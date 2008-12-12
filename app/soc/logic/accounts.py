@@ -31,7 +31,7 @@ import soc.models.user
 import soc.logic.models.user
 
 
-def isDeveloper(account=None):
+def isDeveloper(account=None, user=None):
   """Returns True if a Google Account is a Developer with special privileges.
   
   Since it only works on the current logged-in user, if account matches the
@@ -47,6 +47,9 @@ def isDeveloper(account=None):
     account: a Google Account (users.User) object; if not supplied,
       the current logged-in user is checked
   """
+
+  if user and (not account):
+    account = user.account
 
   # Get the currently logged in user
   current = users.get_current_user()
@@ -65,7 +68,8 @@ def isDeveloper(account=None):
   if not account:
     account = current
 
-  user = models.user.logic.getForFields({'account': account}, unique=True)
+  if not user:
+    user = models.user.logic.getForFields({'account': account}, unique=True)
 
   if not user:
     # no User entity for this Google Account, and account is not the

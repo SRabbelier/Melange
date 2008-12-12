@@ -25,6 +25,8 @@ __authors__ = [
   ]
 
 
+import itertools
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
@@ -304,30 +306,37 @@ class Logic(object):
     query = self._model.all()
     return query.fetch(limit, offset)
 
-  def getForFields(self, properties, unique=False, limit=1000, offset=0):
+  def getForFields(self, filter, unique=False):
     """Returns all entities that have the specified properties.
 
     Args:
       properties: the properties that the entity should have
       unique: if set, only the first item from the resultset will be returned
-      limit: max amount of entities to return
-      offset: optional number of results to skip first; default zero.
     """
 
-    if not properties:
+    if not filter:
       raise Error("Properties did not contain any values")
 
-    format_text = '%(key)s = :%(key)s'
-    msg_pairs = [format_text % {'key': key} for key in properties.iterkeys()]
-    joined_pairs = ' AND '.join(msg_pairs)
-    condition = 'WHERE %s' % joined_pairs
+    queries = dicts.split(filter)
 
-    query = self._model.gql(condition, **properties)
+    def toQuery(filter):
+      q = db.Query(self._model)
+      for key, value in filter.iteritems():
+        q.filter(key, value)
+      return q
+
+    result = itertools.chain(*[toQuery(x) for x in queries])
 
     if unique:
-      return query.get()
+      # Return the first item, we need the loop as itertools.chain
+      # returns an iterable rather than a list
+      for item in result:
+        return item
 
-    return query.fetch(limit, offset)
+      # In the case result is empty, return None
+      return None
+
+    return result
 
   def updateModelProperties(self, model, model_properties):
     """Update existing model entity using supplied model properties.

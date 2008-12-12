@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+import itertools
+
 from soc.logic import dicts
 
 import soc.views.helper.forms
@@ -125,12 +127,14 @@ def getListContent(request, params, filter=None, idx=0):
   if not filter:
     data = logic.getForLimitAndOffset(limit+1, offset=offset)
   else:
-    data = logic.getForFields(filter, limit=limit+1, offset=offset)
+    data = logic.getForFields(filter)
 
   if not data:
     data = []
 
-  more = bool(data[limit:])
+  data = list(itertools.islice(data, limit+1))
+
+  more = len(data) > limit
   if more:
     del data[limit:]
 

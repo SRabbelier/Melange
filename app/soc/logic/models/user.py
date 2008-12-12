@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from soc.logic.helper import notifications
 from soc.logic.models import base
 
@@ -53,6 +55,22 @@ class Logic(base.Logic):
         return True
 
     return False
+
+  def getForCurrentAccount(self):
+    """Retrieves the user entity for the currently logged in account
+
+    If there is no user logged in, or they have no associated User
+    entity, None is returend.
+    """
+
+    account = users.get_current_user()
+
+    if not account:
+      return None
+
+    user = self.getForFields({'account': account}, unique=True)
+
+    return user
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyValues.

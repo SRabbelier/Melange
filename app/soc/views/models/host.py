@@ -22,7 +22,9 @@ __authors__ = [
   ]
 
 
+from soc.logic import accounts
 from soc.logic import dicts
+from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
@@ -34,6 +36,8 @@ import soc.models.host
 import soc.logic.models.host
 import soc.views.helper
 import soc.views.models.sponsor
+
+tolist = list
 
 
 class CreateForm(helper.forms.BaseForm):
@@ -88,6 +92,7 @@ class View(role.View):
     rights = {}
     rights['create'] = [access.checkIsHost]
     rights['edit'] = [access.checkIsHost]
+    rights['list'] = [access.checkIsHost]
 
     new_params = {}
     new_params['rights'] = rights
@@ -111,6 +116,27 @@ class View(role.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def list(self, request, access_type,
+               page_name=None, params=None, filter=None):
+    """See base.View.list
+
+    Passes a filter to base.View.list so that only hosts from a sponsor
+    that this user is host for are listed.
+    """
+
+    user = user_logic.logic.getForCurrentAccount()
+
+    # Don't bother looking up everything if there's no user
+    if user and (not accounts.isDeveloper(user=user)):
+      hosts = host_logic.logic.getForFields({'user': user})
+      sponsors = tolist((host.scope for host in hosts))
+
+      new_filter = {'scope': sponsors}
+      filter = dicts.merge(filter, new_filter)
+
+    return super(View, self).list(request, access_type, page_name=page_name,
+                                  params=params, filter=filter)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

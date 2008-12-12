@@ -120,3 +120,49 @@ def rename(target, keys):
       result[new_key] = value
 
   return result
+
+
+def split(target):
+  """Takes a dictionary and splits it into single-valued dicts
+
+  If there are any values in target that are a list it is split up
+  into a new dictionary instead.
+
+  >>> split({})
+  [{}]
+  >>> split({'foo':'bar'})
+  [{'foo': 'bar'}]
+  >>> split({'foo':'bar', 'bar':'baz'})
+  [{'foo': 'bar', 'bar': 'baz'}]
+  >>> split({'foo':'bar', 'bar':['one', 'two']})
+  [{'foo': 'bar', 'bar': 'one'}, {'foo': 'bar', 'bar': 'two'}]
+  >>> split({'foo':'bar', 'bar':['one', 'two'], 'baz': ['three', 'four']})
+  [{'bar': 'one', 'foo': 'bar', 'baz': 'three'},
+  {'bar': 'two', 'foo': 'bar', 'baz': 'three'},
+  {'bar': 'one', 'foo': 'bar', 'baz': 'four'},
+  {'bar': 'two', 'foo': 'bar', 'baz': 'four'}]
+  """
+
+  result = [{}]
+
+  for key, values in target.iteritems():
+    # Make the value a list if it's not
+    if not isinstance(values, list):
+      values = [values]
+
+    tmpresult = []
+
+    # Iterate over all we gathered so far
+    for filter in result:
+      for value in values:
+        # Create a new dict from the current filter
+        newdict = dict(filter)
+
+        # And create a new dict that also has the current key/value pair
+        newdict[key] = value
+        tmpresult.append(newdict)
+
+    # Update the result for the next iteration
+    result = tmpresult
+
+  return result

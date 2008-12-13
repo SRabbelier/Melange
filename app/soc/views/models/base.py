@@ -261,7 +261,6 @@ class View(object):
 
     key_name, fields = forms.collectCleanedFields(form)
 
-    request.path = params['edit_redirect']
     self._editPost(request, entity, fields)
 
     if not key_name:
@@ -274,13 +273,14 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     page_params = params['edit_params']
-    new_suffix = self._logic.getKeySuffix(entity)
+    params['suffix'] = self._logic.getKeySuffix(entity)
+
+    request.path = params['edit_redirect'] % params
 
     # redirect to (possibly new) location of the entity
     # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
-        request, None, new_suffix,
-        params=page_params)
+        request, None, params=page_params)
 
   def editGet(self, request, entity, context, seed, params):
     """Processes GET requests for the specified entity.

@@ -115,33 +115,11 @@ class View(base.View):
 
     new_params['create_form'] = CreateForm
 
+    new_params['edit_redirect'] = '%(url_name)s/list'
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-
-  def create(self, request, access_type,
-             page_name=None, params=None, **kwargs):
-    """On a successful post create redirects the user to the notification list.
-
-    for parameters see base.create()
-    """
-
-    if request.method == 'POST':
-      response = super(View, self).create(request, access_type,
-        page_name, params, **kwargs)
-
-      if (response.__class__ == http.HttpResponseRedirect and
-          response['location'].startswith(
-              '/%s/edit/' %(self._params['url_name']))):
-        # redirect to list instead of edit view
-        return http.HttpResponseRedirect('/%s/list' %(self._params['url_name']))
-      else:
-        return response
-
-    else:
-      # request.method == 'GET' so act normal
-      return super(View, self).create(request, access_type,
-          page_name, params, **kwargs)
 
   def list(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):

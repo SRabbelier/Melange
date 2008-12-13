@@ -105,23 +105,9 @@ class View(base.View):
 
     new_params['create_form'] = CreateForm
 
-    # define the django url patterns
-    new_params['django_patterns_defaults'] = [
-      (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>list)$',
-          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
-      ]
-
     rights = {}
     rights['unspecified'] = [access.deny]
-    rights['any_access'] = [access.allow]
+    rights['edit'] = [access.deny]
     rights['show'] = [access.checkIsMyNotification]
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsUser]

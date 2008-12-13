@@ -342,31 +342,26 @@ def checkIsMyNotification(request):
     pass
 
   checkIsUser(request)
-  
-  splitpath = request.path.split('/')
-  splitpath = splitpath[1:] # cut off leading ''
-  
-  # get the notification scope (user link_id) from the request path
-  user_link_id = splitpath[2]
-  # get the notification link_id from the request path
-  notification_link_id = splitpath[3]
-  
-  properties = {
-      'link_id': notification_link_id,
-      'scope_path': user_link_id,
-      }
-  
+
+  # Mine the url for params
+  try:
+    callback, args, kwargs = urlresolvers.resolve(request.path)
+  except Exception:
+    deny(request)
+
+  properties = dicts.filter(kwargs, ['link_id', 'scope_path'])
+
   notification = notification_logic.logic.getForFields(properties, unique=True)
-  
   user = user_logic.logic.getForCurrentAccount()
-  
-  # check if the key of the current user matches the key from the scope of the message
+
+  # We need to check to see if the key's are equal since the User
+  # objects are different and the default __eq__ method does not check
+  # if the keys are equal (which is what we want).
   if user.key() == notification.scope.key():
-    # access granted
     return None
-  else:
-    # access denied
-    deny(request)  
+
+  # TODO(ljvderijk) Make this give a proper error message
+  deny(request)
 
 def checkCanInvite(request):
   """Checks to see if the current user can create an invite

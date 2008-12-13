@@ -94,17 +94,6 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    new_params = {}
-    new_params['logic'] = notification_logic.logic
-
-    new_params['name'] = "Notification"
-    new_params['name_short'] = "Notification"
-    new_params['name_plural'] = "Notifications"
-    new_params['url_name'] = "notification"
-    new_params['module_name'] = "notification"
-
-    new_params['create_form'] = CreateForm
-
     rights = {}
     rights['unspecified'] = [access.deny]
     rights['edit'] = [access.deny]
@@ -114,7 +103,17 @@ class View(base.View):
     # create is developer only for the time being to test functionality
     rights['create'] = [access.checkIsDeveloper]
 
+    new_params = {}
+    new_params['logic'] = notification_logic.logic
     new_params['rights'] = rights
+
+    new_params['name'] = "Notification"
+    new_params['name_short'] = "Notification"
+    new_params['name_plural'] = "Notifications"
+    new_params['url_name'] = "notification"
+    new_params['module_name'] = "notification"
+
+    new_params['create_form'] = CreateForm
 
     params = dicts.merge(params, new_params)
 

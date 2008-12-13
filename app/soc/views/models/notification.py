@@ -168,8 +168,7 @@ class View(base.View):
     params = dicts.merge(params, self._params)
       
     # get the current user
-    properties = {'account': users.get_current_user()}
-    user_entity = user_logic.logic.getForFields(properties, unique=True)
+    user_entity = user_logic.logic.getForCurrentAccount()
 
     # only select the notifications for this user so construct a filter
     filter = {'scope': user_entity}
@@ -193,8 +192,8 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    account = users.get_current_user()
-    current_user = user_logic.logic.getForFields({'account': account}, unique=True)
+    # get the current user
+    current_user = user_logic.logic.getForCurrentAccount()
     
     to_user = user_logic.logic.getForFields(
         {'link_id' : fields['to_user']}, unique=True)
@@ -225,11 +224,10 @@ class View(base.View):
     # and the notification has not been read yet
     if not entity.has_been_read:
       # get the current user
-      account = users.get_current_user()
-      user = user_logic.logic.getForFields({'account': account}, unique=True)
+      user = user_logic.logic.getForCurrentAccount()
       
       if entity.scope.key() == user.key():
-      # mark the entity as read
+        # mark the entity as read
         self._logic.updateModelProperties(entity, {'has_been_read' : True} )
     
     context['entity_type_url'] = self._params['url_name']

@@ -358,8 +358,7 @@ def checkIsMyNotification(request):
   
   notification = notification_logic.logic.getForFields(properties, unique=True)
   
-  user = user_logic.logic.getForFields(
-      {'account': users.get_current_user()}, unique=True)
+  user = user_logic.logic.getForCurrentAccount()
   
   # check if the key of the current user matches the key from the scope of the message
   if user.key() == notification.scope.key():

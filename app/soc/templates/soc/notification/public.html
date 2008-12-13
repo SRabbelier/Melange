@@ -22,7 +22,7 @@ Notification about: {{ entity.subject }}
 {% endblock %}
 
 {% block body %}
-From: 
+From:
 {% if not entity.from_user  %}
 	Anonymous
 {% else %}
@@ -31,8 +31,8 @@ From:
 To: {{ entity.scope.name }} <br />
 Sent On: {{ entity.created_on }} <br />
 Subject: {{ entity.subject }} <br />
-Message: <br/> 
-{{ entity.message }} 
+Message: <br/>
+{{ entity.message }}
 <p />
 
 <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>

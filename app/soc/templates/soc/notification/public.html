@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
 {% block page_title %}
 Notification
@@ -22,19 +23,24 @@ Notification about: {{ entity.subject }}
 {% endblock %}
 
 {% block body %}
-From:
-{% if not entity.from_user  %}
-	Anonymous
-{% else %}
-	{{ entity.from_user.name }}
-{% endif %} <br />
-To: {{ entity.scope.name }} <br />
-Sent On: {{ entity.created_on }} <br />
-Subject: {{ entity.subject }} <br />
-Message: <br/>
-{{ entity.message }}
-<p />
+<table>
 
-<input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+{% if entity.from_user %}
+{% readonly_field_as_table_row entity.fields.from_user.label entity.from_user.name %}
+{% else %}
+{% readonly_field_as_table_row entity.fields.from_user.label "Anonymous" %}
+{% endif %}
+
+{% readonly_field_as_table_row "To" entity.scope.name %}
+{% readonly_field_as_table_row "Sent On" entity.created_on %}
+{% readonly_field_as_table_row entity.fields.subject.label entity.subject %}
+{% readonly_multiline_field_as_table_row entity.fields.message.label entity.message %}
+
+<tr>
+  <td>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+  </td>
+</tr>
+</table>
 
 {% endblock %}

@@ -115,7 +115,7 @@ class View(base.View):
 
     new_params['create_form'] = CreateForm
 
-    new_params['edit_redirect'] = '%(url_name)s/list'
+    new_params['edit_redirect'] = '/%(url_name)s/list'
 
     params = dicts.merge(params, new_params)
 

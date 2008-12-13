@@ -63,7 +63,7 @@ class CreateForm(helper.forms.BaseForm):
     model = notification_model.Notification
 
     # exclude the necessary fields from the form
-    exclude = ['link_id', 'scope', 'scope_path', 'from_user', 'has_been_read']
+    exclude = ['link_id', 'scope', 'scope_path', 'from_user', 'unread']
 
   def clean_to_user(self):
     """Check if the to_user field has been filled in correctly.
@@ -185,13 +185,14 @@ class View(base.View):
 
     # if the user viewing is the user for which this notification is meant
     # and the notification has not been read yet
-    if not entity.has_been_read:
+    if entity.unread:
       # get the current user
       user = user_logic.logic.getForCurrentAccount()
-
+      
+      # if the message is meant for the user that is reading it
       if entity.scope.key() == user.key():
         # mark the entity as read
-        self._logic.updateModelProperties(entity, {'has_been_read' : True} )
+        self._logic.updateModelProperties(entity, {'unread' : False} )
 
     context['entity_type_url'] = self._params['url_name']
     context['entity_suffix'] = self._logic.getKeySuffix(entity)

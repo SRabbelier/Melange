@@ -53,6 +53,6 @@ class Notification(soc.models.linkable.Linkable):
   created_on = db.DateTimeProperty(auto_now_add=True,
       verbose_name=ugettext_lazy('Created On'))
   
-  # boolean property that marks if the notification has been read
-  has_been_read = db.BooleanProperty(default=False,
-      verbose_name=ugettext_lazy('Read'))
+  # boolean property that marks if the notification is unread
+  unread = db.BooleanProperty(default=True,
+      verbose_name=ugettext_lazy('Unread'))

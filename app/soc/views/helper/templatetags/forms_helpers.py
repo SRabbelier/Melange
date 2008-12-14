@@ -20,10 +20,15 @@
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
 from django import template
+from django.forms import forms as forms_in
+from django.utils import encoding
+from django.utils.encoding import force_unicode
+from django.utils.html import escape
 
 
 register = template.Library()
@@ -97,3 +102,81 @@ def readonly_multiline_field_as_table_row(field_label, field_value):
   """
   return {'field_label': field_label,
           'field_value': field_value}
+
+
+@register.inclusion_tag('soc/templatetags/_as_table.html')
+def as_table(form):
+  """Outputs a form as a properly formatted html table
+
+  Args:
+    form: the form that should be converted to a table
+  """
+
+  fields = []
+  hidden_fields = []
+  hidden_fields_errors = []
+
+  # Iterate over all fields and prepare it for adding 
+  for name, field in form.fields.items():
+    bf = forms_in.BoundField(form, field, name)
+
+    # If the field is hidden we display it elsewhere
+    if not bf.is_hidden:
+      example_text = ''
+      if hasattr(field, 'example_text'):
+        example_text = force_unicode(field.example_text)
+
+      item = (bf, field.required, example_text)
+      fields.append(item)
+    else:
+      hidden_fields.append(unicode(bf))
+
+      for e in bf.errors:
+        item = (name, force_unicode(e))
+        hidden_fields_errors.append(item)
+
+  return {
+      'top_errors': form.non_field_errors() or '',
+      'hidden_field_errors': hidden_fields_errors or '',
+      'form': form,
+      'fields': fields or '',
+      'hidden_fields': hidden_fields or '',
+      }
+
+
+@register.inclusion_tag('soc/templatetags/_as_table_row.html')
+def as_table_row(form, field, required, example_text):
+  """Outputs a field as a properly formatted html row
+
+  Args:
+    form: the form that the row belongs to
+    field: the field that should be converted to a row
+    required: whether the field is required
+    example_text: the example_text for this row
+  """
+
+  # Escape and cache in local variable.
+  errors = [force_unicode(escape(error)) for error in field.errors]
+
+  if field.label:
+    label = escape(force_unicode(field.label))
+
+    # Only add the suffix if the label does not end in punctuation.
+    if form.label_suffix and (label[-1] not in ':?.!'):
+      label += form.label_suffix
+
+    label = field.label_tag(label) or ''
+
+  field_class_type = 'formfield%slabel' % ('error' if errors else '')
+
+  help_text = field.help_text
+
+  return {
+      'help_text': force_unicode(help_text) if help_text else '',
+      'field_class_type': field_class_type,
+      'label': force_unicode(label) if field.label else '',
+      'field': unicode(field),
+      'required': required,
+      'example_text': example_text,
+      'errors': errors,
+      }

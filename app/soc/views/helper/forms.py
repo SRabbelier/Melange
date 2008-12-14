@@ -98,6 +98,10 @@ class DbModelForm(djangoforms.ModelForm):
         if hasattr(model_prop, 'help_text'):
           self.fields[field_name].help_text = model_prop.help_text
 
+        # Check if the Model property added example_text, and copy that verbatim
+        # to the corresponding field help_text.
+        if hasattr(model_prop, 'example_text'):
+          self.fields[field_name].example_text = model_prop.example_text
 
 class BaseForm(DbModelForm):
   """Subclass of DbModelForm that extends as_table HTML output.
@@ -110,11 +114,13 @@ class BaseForm(DbModelForm):
   
   DEF_NORMAL_ROW = u'<tr title="%(help_text)s"><td class=' \
       '"%(field_class_type)s">%(label)s</td><td>' \
-      '%(errors)s%(field)s%(required)s</td></tr>'
+      '%(errors)s%(field)s%(required)s%(example_text)s</td></tr>'
   DEF_ERROR_ROW = u'<tr><td>&nbsp;</td><td class="formfielderror">%s</td></tr>'
   DEF_ROW_ENDER = '</td></tr>'
   DEF_REQUIRED_HTML = u'<td class="formfieldrequired">(required)</td>'
   DEF_HELP_TEXT_HTML = u'%s'
+  DEF_EXAMPLE_TEXT_HTML = u'<td class="formfieldexample">e.g. %s</td>'
+
 
   def __init__(self, *args, **kwargs):
     """Parent class initialization.
@@ -123,11 +129,11 @@ class BaseForm(DbModelForm):
       *args, **kwargs:  passed through to parent __init__() constructor
     """
     super(BaseForm, self).__init__(error_class=CustomErrorList, *args, **kwargs)
-  
-  def _html_output_with_required(self, normal_row, error_row, row_ender, 
-          help_text_html, required_html, errors_on_separate_row):
+
+  def _html_output_with_required(self, normal_row, error_row, row_ender,
+          help_text_html, required_html, example_text_html, errors_on_separate_row):
     """Helper function for outputting HTML.
-    
+
     Used by as_table(), as_ul(), as_p(). Displays information
     about required fields.
     """
@@ -170,19 +176,25 @@ class BaseForm(DbModelForm):
         if field.required:
           required = required_html
         else:
-          required = u''
-        
+          required = u'<td></td>'
+
+        if hasattr(field, 'example_text'):
+          example_text = example_text_html % force_unicode(field.example_text)
+        else:
+          example_text = u'<td></td>'
+
         if errors_on_separate_row and bf_errors:
           errors = u''
         else:
           errors = force_unicode(bf_errors)
-        
+
         output.append(normal_row % {'field_class_type': field_class_type,
-                                    'errors': errors, 
-                                    'label': force_unicode(label), 
+                                    'errors': errors,
+                                    'label': force_unicode(label),
                                     'field': unicode(bf),
                                     'required': required,
-                                    'help_text': help_text})
+                                    'help_text': help_text,
+                                    'example_text': example_text})
     if top_errors:
       output.insert(0, error_row % force_unicode(top_errors))
     if hidden_fields: # Insert any hidden fields in the last row.
@@ -197,23 +209,25 @@ class BaseForm(DbModelForm):
           # not be able to conscript the last row for our purposes,
           # so insert a new, empty row.
           last_row = normal_row % {'errors': '', 'label': '',
-                                   'field': '', 'help_text': ''}
+                                   'field': '', 'help_text': '', 'example_text': ''}
           output.append(last_row)
         output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
       else:
         # If there aren't any rows in the output, just append the
         # hidden fields.
         output.append(str_hidden)
+
     return mark_safe(u'\n'.join(output))
 
   def as_table(self):
     """Returns form rendered as HTML <tr> rows -- with no <table></table>."""
-    
+
     return self._html_output_with_required(self.DEF_NORMAL_ROW,
                                            self.DEF_ERROR_ROW,
                                            self.DEF_ROW_ENDER,
                                            self.DEF_HELP_TEXT_HTML,
-                                           self.DEF_REQUIRED_HTML, True)
+                                           self.DEF_REQUIRED_HTML,
+                                           self.DEF_EXAMPLE_TEXT_HTML, True)
 
 
 class SelectQueryArgForm(forms.Form):

@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
 {% block scripts %}
 	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
@@ -34,7 +35,7 @@ Please use this form to edit the {{ entity_type }}.
 </p>
 <form method="POST">
  <table>
-  {{ form.as_table }}
+  {% as_table form %}
   {% if entity.former_accounts %}
   <tr>
    <td class="formfieldlabel">Former Accounts:</td>

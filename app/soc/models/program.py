@@ -36,21 +36,24 @@ class Program(soc.models.presence.Presence):
   name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Name'))
   name.help_text = ugettext_lazy('Complete, formal name of the program.')
+  name.example_text = ugettext_lazy('Google Summer of Code 2009')
 
   #: Required field storing short name of the group.
   #: It can be used for displaying group as sidebar menu item.
   short_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Short name'))
   short_name.help_text = ugettext_lazy('Short name used for sidebar menu')
+  short_name.example_text = ugettext_lazy('GSoC 2009')
 
   #: Optional field used to relate it to other programs
   #: For example, GSoC would be a group label for GSoC2008/GSoC2009
   group_label = db.StringProperty(
       verbose_name=ugettext_lazy('Group label'))
   group_label.help_text = ugettext_lazy(
-      'Optional name used to relate this program to others. '
-      'For example, GSoC would be a group label for GSoC 2008 and GSoC 2009.')
+      'Optional name used to relate this program to others.')
+  group_label.example_text = ugettext_lazy('GSoC')
 
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,
       verbose_name=ugettext_lazy('Description'))
+  description.example_text = ugettext_lazy('This is the program for GSoC 2009')

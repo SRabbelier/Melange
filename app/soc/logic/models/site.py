@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import base
 from soc.logic.models import presence
 
 import soc.models.presence
@@ -45,8 +44,8 @@ class Logic(presence.Logic):
   def getKeyValues(self, entity):
     """Returns the key values for the site settings.
 
-    The Site entity is a singleton, so this method returns a
-    hard-coded link_id.
+    The Site entity is a singleton, so this method returns 
+    a hard-coded link_id.
 
     Args:
       entity: unused
@@ -57,8 +56,8 @@ class Logic(presence.Logic):
   def getKeyValuesFromFields(self, fields):
     """Extracts the key values from a dict and returns them.
 
-    The Site entity is a singleton, so this method returns a
-    hard-coded link_id.
+    The Site entity is a singleton, so this method returns 
+    a hard-coded link_id.
 
     Args:
       fields: unused

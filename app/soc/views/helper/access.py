@@ -33,8 +33,8 @@ __authors__ = [
 
 from google.appengine.api import users
 
-from django.utils.translation import ugettext_lazy
 from django.core import urlresolvers
+from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
 from soc.logic import dicts
@@ -215,7 +215,7 @@ def checkIsDeveloper(request):
     return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a site developer '}
+      'role': 'a Site Developer '}
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
@@ -255,7 +255,7 @@ def checkIsHost(request):
     return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a host '}
+      'role': 'a Program Administrator '}
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
@@ -286,7 +286,7 @@ def checkIsInvited(request):
   checkIsUser(request)
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a host for this program'}
+      'role': 'a Program Administrator for this Program'}
 
   splitpath = request.path.split('/')
   splitpath = splitpath[1:] # cut off leading ''
@@ -364,7 +364,7 @@ def checkIsMyNotification(request):
   deny(request)
 
 def checkCanInvite(request):
-  """Checks to see if the current user can create an invite
+  """Checks to see if the current user can create an invite.
 
   Note that if the current url is not in the default 'request' form
   this method either deny()s or performs the wrong access check.

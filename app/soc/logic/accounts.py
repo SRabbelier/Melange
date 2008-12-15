@@ -27,7 +27,6 @@ from google.appengine.api import users
 
 from soc.logic import models
 
-import soc.models.user
 import soc.logic.models.user
 
 

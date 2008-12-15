@@ -21,8 +21,6 @@ __authors__ = [
 ]
 
 
-from django.utils.translation import ugettext_lazy
-
 import soc.models.group
 
 

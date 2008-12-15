@@ -25,8 +25,6 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-from soc.models import base
-
 import soc.models.linkable
 import soc.models.user
 
@@ -35,8 +33,8 @@ class Notification(soc.models.linkable.Linkable):
   """Model of a Notification.
   """
 
-  # a reference to the user this Notification is from
-  # this is a non-required property, None will indicate an Anonymous Admin
+  #: a reference to the user this Notification is from
+  #: this is a non-required property, None will indicate an Anonymous Admin
   from_user = db.ReferenceProperty(reference_class=soc.models.user.User,
       required=False,
       collection_name="sent_notifications",
@@ -45,14 +43,14 @@ class Notification(soc.models.linkable.Linkable):
   subject = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Subject'))
   
-  # the message that is contained within this Notification
+  #: the message that is contained within this Notification
   message = db.TextProperty(required=True,
       verbose_name=ugettext_lazy('Message'))
   
-  # date and time on which this Notification was created
+  #: date and time on which this Notification was created
   created_on = db.DateTimeProperty(auto_now_add=True,
       verbose_name=ugettext_lazy('Created On'))
   
-  # boolean property that marks if the notification is unread
+  #: boolean property that marks if the notification is unread
   unread = db.BooleanProperty(default=True,
       verbose_name=ugettext_lazy('Unread'))

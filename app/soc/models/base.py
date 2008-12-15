@@ -69,7 +69,7 @@ class ModelWithFieldAttributes(db.Model):
       Property itself via the Model entity.
     """
     if not cls._fields_cache or (cls != cls._fields_cache.__class__.Meta.model):
-      class FieldsProxy(forms_helper.DbModelForm):
+      class FieldsProxy(forms_helper.BaseForm):
         """Form used as a proxy to access User model properties attributes.
         """
       

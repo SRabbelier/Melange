@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the view code for Notifications
+"""This module contains the view code for Notifications.
 """
 
 __authors__ = [
@@ -24,17 +24,13 @@ __authors__ = [
 
 import time
 
-from google.appengine.api import users
-
 from django import forms
-from django import http
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
 from soc.models import notification as notification_model
 from soc.views import helper
-from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import base
@@ -60,6 +56,8 @@ class CreateForm(helper.forms.BaseForm):
     self.fields.keyOrder = ['to_user', 'subject', 'message']
 
   class Meta:
+    """Inner Meta class that defines some behavior for the form.
+    """
     model = notification_model.Notification
 
     # exclude the necessary fields from the form
@@ -122,7 +120,7 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
   def list(self, request, access_type,
-           page_name=None, params=None, seed=None, **kwargs):
+           page_name=None, params=None, filter=None):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
@@ -161,7 +159,7 @@ class View(base.View):
     to_user = user_logic.logic.getForFields(
         {'link_id' : fields['to_user']}, unique=True)
 
-    fields['link_id'] = '%i' %(time.time())
+    fields['link_id'] = '%i' % (time.time())
     fields['scope'] = to_user
     fields['from_user'] = current_user
     fields['scope_path'] = fields['to_user']

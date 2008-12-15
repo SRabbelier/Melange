@@ -26,7 +26,6 @@ __authors__ = [
 
 from django import template
 from django.forms import forms as forms_in
-from django.utils import encoding
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 

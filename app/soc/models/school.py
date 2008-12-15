@@ -39,9 +39,4 @@ class School(soc.models.group.Group):
      back-reference Query of the Student model 'school' reference.
   """
   
-  #: Type name used in templates
-  TYPE_NAME = ugettext_lazy('School')
-  #: Type short name used for example in urls
-  TYPE_NAME_SHORT = 'school'
-  #: Type plural name used in templates
-  TYPE_NAME_PLURAL = ugettext_lazy('Schools')
+  pass

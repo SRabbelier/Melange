@@ -37,10 +37,5 @@ class Organization(soc.models.group.Group):
      'reviewers' back-reference Query of the Organization model 'org'
      reference.
   """
-
-  #: Type name used in templates
-  TYPE_NAME = ugettext_lazy('Organization')
-  #: Type short name used for example in urls
-  TYPE_NAME_SHORT = 'org'
-  #: Type plural name used in templates
-  TYPE_NAME_PLURAL = ugettext_lazy('Organizations')
+  
+  pass

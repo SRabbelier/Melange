@@ -29,10 +29,5 @@ import soc.models.group
 class Sponsor(soc.models.group.Group):
   """Sponsor details."""
   
-  #: Type name used in templates
-  TYPE_NAME = ugettext_lazy('Sponsor')
-  #: Type short name used for example in urls
-  TYPE_NAME_SHORT = 'sponsor'
-  #: Type plural name used in templates
-  TYPE_NAME_PLURAL = ugettext_lazy('Sponsors')
+  pass
 

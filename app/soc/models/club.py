@@ -38,10 +38,5 @@ class Club(soc.models.group.Group):
      relation is implemented as the 'members' back-reference Query of the
      Member model 'club' reference.
   """
-
-  #: Type name used in templates
-  TYPE_NAME = ugettext_lazy('Club')
-  #: Type short name used for example in urls
-  TYPE_NAME_SHORT = 'club'
-  #: Type plural name used in templates
-  TYPE_NAME_PLURAL = ugettext_lazy('Clubs')
+  
+  pass

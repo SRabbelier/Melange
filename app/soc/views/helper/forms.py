@@ -57,7 +57,7 @@ class BaseForm(djangoforms.ModelForm):
     Args:
       *args, **kwargs:  passed through to parent __init__() constructor
     """
-    super(BaseForm, self).__init__(*args, **kwargs)
+    super(djangoforms.ModelForm, self).__init__(*args, **kwargs)
 
     for field_name in self.fields.iterkeys():
       # Since fields can be added only to the ModelForm subclass, check to

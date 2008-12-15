@@ -235,7 +235,7 @@ class View(base.View):
     # fill in the email field with the data from the entity
     form.fields['email'].initial = entity.account.email()
 
-    super(View, self)._editGet(request ,entity, form)
+    super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

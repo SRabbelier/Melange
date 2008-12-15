@@ -28,11 +28,8 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
-from soc.views import helper
+from soc.views.helper import widgets
 from soc.views.models import base
-
-import soc.views.helper
-import soc.views.helper.widgets
 
 
 class View(base.View):
@@ -51,7 +48,7 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
-        'founded_by': forms.CharField(widget=helper.widgets.ReadOnlyInput(),
+        'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
 

@@ -516,7 +516,8 @@ class View(object):
     if 'scope_path' not in fields:
       return
 
-    scope = self._params['scope_logic'].logic.getFromKeyName(fields['scope_path'])
+    scope = self._params['scope_logic'].logic.getFromKeyName(
+        fields['scope_path'])
     fields['scope'] = scope
 
   def _public(self, request, entity, context):

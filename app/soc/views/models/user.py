@@ -70,7 +70,6 @@ class CreateForm(helper.forms.BaseForm):
       raise forms.ValidationError("This link ID is in wrong format.")
 
     properties = {'link_id': link_id}
-    user = soc.logic.models.user.logic.getForFields(properties, unique=True)
 
     link_id_user = soc.logic.models.user.logic.getForFields(properties,
                                                             unique=True)

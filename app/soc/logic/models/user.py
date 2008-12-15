@@ -57,7 +57,7 @@ class Logic(base.Logic):
     return False
 
   def getForCurrentAccount(self):
-    """Retrieves the user entity for the currently logged in account
+    """Retrieves the user entity for the currently logged in account.
 
     If there is no user logged in, or they have no associated User
     entity, None is returend.

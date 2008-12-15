@@ -91,7 +91,7 @@ def zip(keys, values):
 
 
 def unzip(target, order):
-  """Constructs a list from target in the order specified by order
+  """Constructs a list from target in the order specified by order.
 
   Args:
     target: the dictionary to pull the values from
@@ -123,7 +123,7 @@ def rename(target, keys):
 
 
 def split(target):
-  """Takes a dictionary and splits it into single-valued dicts
+  """Takes a dictionary and splits it into single-valued dicts.
 
   If there are any values in target that are a list it is split up
   into a new dictionary instead.

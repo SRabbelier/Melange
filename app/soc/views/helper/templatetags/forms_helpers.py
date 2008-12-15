@@ -72,8 +72,8 @@ def readonly_field_as_table_row(field_label, field_value):
   _readonly_field_as_table_row.html template (which is actually 
   doing all of the work).
 
-  See soc/templates/soc/templatetags/_readonly_field_as_table_row.html for the CSS
-  styles used by this template tag.
+  See soc/templates/soc/templatetags/_readonly_field_as_table_row.html for
+  the CSS styles used by this template tag.
 
   Usage:
     {% load forms_helpers %}
@@ -96,9 +96,10 @@ def readonly_field_as_table_row(field_label, field_value):
           'field_value': field_value}
 
 
-@register.inclusion_tag('soc/templatetags/_readonly_multiline_field_as_table_row.html')
+@register.inclusion_tag(
+    'soc/templatetags/_readonly_multiline_field_as_table_row.html')
 def readonly_multiline_field_as_table_row(field_label, field_value):
-  """See readonly_field_as_table_row, but with a different template tag
+  """See readonly_field_as_table_row, but with a different template tag.
   """
   return {'field_label': field_label,
           'field_value': field_value}

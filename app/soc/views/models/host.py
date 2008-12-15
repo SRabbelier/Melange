@@ -37,6 +37,8 @@ import soc.logic.models.host
 import soc.views.helper
 import soc.views.models.sponsor
 
+# TODO(pawel.solyga): Rename all list methods and functions to something else
+# and remove this tolist assignment
 tolist = list
 
 
@@ -117,9 +119,9 @@ class View(role.View):
 
     super(View, self).__init__(params=params)
 
-  def list(self, request, access_type,
-               page_name=None, params=None, filter=None):
-    """See base.View.list
+  def list(self, request, access_type, page_name=None, 
+           params=None, filter=None):
+    """See base.View.list.
 
     Passes a filter to base.View.list so that only hosts from a sponsor
     that this user is host for are listed.

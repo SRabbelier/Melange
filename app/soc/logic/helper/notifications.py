@@ -97,10 +97,11 @@ def sendWelcomeMessage(user_entity):
   properties = {'account': users.get_current_user()}
   current_user_entity = user_logic.logic.getForFields(properties, unique=True)
 
-  # TODO(Lennard): change the message sender to some sort of no-reply adress that is
-  # probably a setting in sitesettings. (adress must be a developer). This is due
-  # to a GAE limitation that allows only devs or the current user to send an email.
-  # Currently this results in a user receiving the same email twice.
+  # TODO(Lennard): change the message sender to some sort of no-reply adress 
+  # that is probably a setting in sitesettings. (adress must be a developer). 
+  # This is due to a GAE limitation that allows only devs or the current user 
+  # to send an email. Currently this results in a user receiving the same 
+  # email twice.
   
   # create the message contents
   messageProperties = {

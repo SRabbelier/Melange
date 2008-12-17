@@ -81,7 +81,9 @@ def sendInviteNotification(entity):
       }
   
   # render the message
-  message = loader.render_to_string('soc/notification/messages/invitation.html', dictionary=messageProperties)
+  message = loader.render_to_string(
+      'soc/notification/messages/invitation.html', 
+      dictionary=messageProperties)
   
   # create the fields for the notification
   fields = { 

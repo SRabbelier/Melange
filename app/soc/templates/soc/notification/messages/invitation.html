@@ -1,3 +1,4 @@
+{% extends "soc/notification/messages/base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -11,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-
 {% block content %}
 You have been invited by {{ sender_name }} to become a {{ role }} for {{ group }}.
 Please click <a href="{{ invitation_url }}">here</a> to fill in the necessary information and accept the invitation.

@@ -28,13 +28,18 @@ import os
 from google.appengine.api import users
 
 from django.template import loader
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import mail_dispatcher
 from soc.views.helper import redirects
 
+import soc.views.models as model_view
 import soc.logic.models as model_logic
 
+
+DEF_NEW_NOTIFICATION_MSG = ugettext_lazy(
+  "You have received a new Notification")
 
 DEF_INVITATION_MSG_FMT = ugettext_lazy(
     "Invitation to become a %(role)s for %(group)s")
@@ -59,7 +64,7 @@ def sendInviteNotification(entity):
   request_user_entity = user_logic.getForFields(properties, unique=True)
 
   # create the invitation_url
-  invitation_url = "%(host)s%(index)s" % {
+  invitation_url = "http://%(host)s%(index)s" % {
       'host' : os.environ['HTTP_HOST'], 
       'index': redirects.inviteAcceptedRedirect(entity, None)}
 
@@ -96,6 +101,42 @@ def sendInviteNotification(entity):
   notification_logic.updateOrCreateFromFields(fields, 
       notification_logic.getKeyFieldsFromDict(fields))
   
+def sendNewNotificationMessage(notification_entity):
+  """Sends an email to a user about a new notification
+  
+    Args:
+      notification_entity: Notification about which the message should be sent    
+  """
+
+  # get user logic
+  user_logic = model_logic.user  
+  
+  # get the current user
+  current_user_entity = user_logic.logic.getForCurrentAccount()
+
+  # create the url to show this notification
+  notification_url = "http://%(host)s%(index)s" % {
+      'host' : os.environ['HTTP_HOST'], 
+      'index': redirects.getPublicRedirect(notification_entity,
+          model_view.notification.view.getParams())}
+
+
+  # TODO(Lennard): Change the sender to the no-reply address
+
+  # create the message contents
+  messageProperties = {
+      'to_name': notification_entity.scope.name,
+      'sender_name': current_user_entity.name,
+      'to': notification_entity.scope.account.email(),
+      'sender': current_user_entity.account.email(),
+      'subject': force_unicode(DEF_NEW_NOTIFICATION_MSG),
+      'notification' : notification_entity,
+      'notification_url' : notification_url
+      }
+  
+  # send out the message using the default new notification template    
+  mail_dispatcher.sendMailFromTemplate('soc/mail/new_notification.html', 
+                                       messageProperties)
   
 def sendWelcomeMessage(user_entity):
   """Sends out a welcome message to a user.
@@ -108,8 +149,7 @@ def sendWelcomeMessage(user_entity):
   user_logic = model_logic.user  
   
   # get the current user
-  properties = {'account': users.get_current_user()}
-  current_user_entity = user_logic.logic.getForFields(properties, unique=True)
+  current_user_entity = user_logic.logic.getForCurrentAccount()
 
   # TODO(Lennard): change the message sender to some sort of no-reply adress 
   # that is probably a setting in sitesettings. (adress must be a developer). 

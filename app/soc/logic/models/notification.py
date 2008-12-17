@@ -22,6 +22,9 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
+from soc.logic.helper import notifications
 from soc.logic.models import base
 from soc.logic.models import user as user_logic
 
@@ -37,6 +40,22 @@ class Logic(base.Logic):
     """
     super(Logic, self).__init__(model=soc.models.notification.Notification,
          base_model=None, scope_logic=user_logic)
+    
+  def _onCreate(self, entity):
+    """Sends out a message if there is only one unread notification.
+    """
+    
+    # create a special query on which we can call count
+    query = db.Query(self._model)
+    query.filter('scope =', entity.scope)
+    query.filter('unread = ', True)
+    
+    # count the number of results with a maximum of two
+    unread_count = query.count(2)
+    
+    if unread_count == 1:
+      # there is only one unread notification so send out an email
+      notifications.sendNewNotificationMessage(entity)
 
 
 logic = Logic()

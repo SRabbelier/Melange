@@ -34,7 +34,14 @@ Notification about: {{ entity.subject }}
 {% readonly_field_as_table_row "To" entity.scope.name %}
 {% readonly_field_as_table_row "Sent On" entity.created_on %}
 {% readonly_field_as_table_row entity.fields.subject.label entity.subject %}
-{% readonly_multiline_field_as_table_row entity.fields.message.label entity.message %}
+
+<tr title="{{ field.help_text }}">
+ <td class="formfieldlabel">
+	{{ entity.fields.message.label }}:
+ </td>
+ <td class="formfieldvalue">
+	{{ entity.message|safe|linebreaks }}
+ </td>
 
 <tr>
   <td>

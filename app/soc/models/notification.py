@@ -38,7 +38,7 @@ class Notification(soc.models.linkable.Linkable):
   from_user = db.ReferenceProperty(reference_class=soc.models.user.User,
       required=False,
       collection_name="sent_notifications",
-      verbose_name=ugettext_lazy('From User'))
+      verbose_name=ugettext_lazy('From'))
   
   subject = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Subject'))

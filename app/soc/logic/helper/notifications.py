@@ -22,10 +22,12 @@ __authors__ = [
   ]
 
 
+import time
 import os
 
 from google.appengine.api import users
 
+from django.template import loader
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import mail_dispatcher
@@ -47,15 +49,14 @@ def sendInviteNotification(entity):
   """
   
   # get user logic
-  user_logic = model_logic.user
+  user_logic = model_logic.user.logic
 
   # get the current user
-  properties = {'account': users.get_current_user()}
-  current_user_entity = user_logic.logic.getForFields(properties, unique=True)
+  current_user_entity = user_logic.getForCurrentAccount()
   
   # get the user the request is for
   properties = {'link_id': entity.link_id }
-  request_user_entity = user_logic.logic.getForFields(properties, unique=True)
+  request_user_entity = user_logic.getForFields(properties, unique=True)
 
   # create the invitation_url
   invitation_url = "%(host)s%(index)s" % {
@@ -64,24 +65,37 @@ def sendInviteNotification(entity):
 
   # get the group entity
   group_entity = entity.scope
-
+  
+  # create the properties for the message
   messageProperties = {
       'to_name': request_user_entity.name,
       'sender_name': current_user_entity.name,
       'role': entity.role,
       'group': group_entity.name,
       'invitation_url': invitation_url,
-      'to': request_user_entity.account.email(),
-      'sender': current_user_entity.account.email(),
-      'subject': DEF_INVITATION_MSG_FMT % {
-          'role': entity.role,
-          'group': group_entity.name
-          },
       }
-
-  # send out the message using the default invitation template    
-  mail_dispatcher.sendMailFromTemplate('soc/mail/invitation.html', 
-                                       messageProperties)
+  
+  # render the message
+  message = loader.render_to_string('soc/notification/messages/invitation.html', dictionary=messageProperties)
+  
+  # create the fields for the notification
+  fields = { 
+      'from_user' : current_user_entity,
+      'subject' : DEF_INVITATION_MSG_FMT % {
+          'role' : entity.role,
+          'group' : group_entity.name 
+          },
+      'message' : message,
+      'scope' : request_user_entity,
+      'link_id' :'%i' % (time.time()),
+      'scope_path' : request_user_entity.link_id
+  }
+  
+  # create and put a new notification in the datastore
+  notification_logic = model_logic.notification.logic
+  notification_logic.updateOrCreateFromFields(fields, 
+      notification_logic.getKeyFieldsFromDict(fields))
+  
   
 def sendWelcomeMessage(user_entity):
   """Sends out a welcome message to a user.

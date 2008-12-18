@@ -94,6 +94,7 @@ class View(base.View):
 
     rights = {}
     rights['unspecified'] = [access.deny]
+    rights['edit'] = [access.deny]
     rights['show'] = [access.checkIsMyNotification]
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsUser]
@@ -111,19 +112,6 @@ class View(base.View):
     new_params['module_name'] = "notification"
 
     new_params['create_form'] = CreateForm
-    
-    new_params['django_patterns_defaults'] = [
-      (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>list)$',
-          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
-      ]
 
     new_params['edit_redirect'] = '/%(url_name)s/list'
 

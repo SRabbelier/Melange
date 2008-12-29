@@ -111,6 +111,7 @@ class View(base.View):
     new_params['url_name'] = "notification"
     new_params['module_name'] = "notification"
 
+    new_params['no_create_with_key_fields'] = True
     new_params['create_form'] = CreateForm
 
     new_params['edit_redirect'] = '/%(url_name)s/list'

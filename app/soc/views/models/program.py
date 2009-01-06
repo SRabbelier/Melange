@@ -89,7 +89,12 @@ class View(base.View):
     """See base._editPost().
     """
     
-    fields['timeline'] = self._createTimelineForType(fields['workflow'])
+    if not entity:
+      # there is no existing entity so create a new timeline
+      fields['timeline'] = self._createTimelineForType(fields['workflow'])
+    else:
+      # use the timeline from the entity
+      fields['timeline'] = entity.timeline
     
   def _createTimelineForType(self, type):
     """Creates and stores a timeline model for the given type of program

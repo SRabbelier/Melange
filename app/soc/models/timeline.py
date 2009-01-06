@@ -25,17 +25,12 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext_lazy
 
-import soc.models.program
+from soc.models import base
 
-class Timeline(soc.models.timeline.Timeline):
+
+class Timeline(base.ModelWithFieldAttributes):
   """The Timeline Model, representing the timeline for a Program.
   """
-
-  #: Required 1:1 relationship indicating the Program the Timeline
-  #: belongs to.
-  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
-                                 required=True, collection_name="timeline",
-                                 verbose_name=ugettext_lazy('Timeline'))
 
   program_start_data = db.DateTimeProperty(
       verbose_name=ugettext_lazy('Program Start date'))

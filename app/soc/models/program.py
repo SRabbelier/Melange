@@ -26,6 +26,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext_lazy
 
 import soc.models.presence
+import soc.models.timeline
 
 
 class Program(soc.models.presence.Presence):
@@ -57,3 +58,9 @@ class Program(soc.models.presence.Presence):
   description = db.TextProperty(required=True,
       verbose_name=ugettext_lazy('Description'))
   description.example_text = ugettext_lazy('This is the program for GSoC 2009')
+
+  #: Required 1:1 relationship indicating the Program the Timeline
+  #: belongs to.
+  timeline = db.ReferenceProperty(reference_class=soc.models.timeline.Timeline,
+                                 required=True, collection_name="program",
+                                 verbose_name=ugettext_lazy('Timeline'))

@@ -33,6 +33,7 @@ from soc.views.models import program
 from soc.views.models import request
 from soc.views.models import site
 from soc.views.models import sponsor
+from soc.views.models import timeline
 from soc.views.models import user
 from soc.views.models import user_self
 
@@ -61,6 +62,7 @@ sitemap.addPages(program.view.getDjangoURLPatterns())
 sitemap.addPages(request.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
 sitemap.addPages(sponsor.view.getDjangoURLPatterns())
+sitemap.addPages(timeline.view.getDjangoURLPatterns())
 sitemap.addPages(user_self.view.getDjangoURLPatterns())
 sitemap.addPages(user.view.getDjangoURLPatterns())
 

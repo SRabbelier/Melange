@@ -33,7 +33,7 @@ class Timeline(soc.models.timeline.Timeline):
 
   #: Required 1:1 relationship indicating the Program the Timeline
   #: belongs to.
-  founder = db.ReferenceProperty(reference_class=soc.models.program.Program,
+  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
                                  required=True, collection_name="timeline",
                                  verbose_name=ugettext_lazy('Timeline'))
 

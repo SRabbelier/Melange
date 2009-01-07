@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Timeline Model."""
+"""This module contains the Timeline Model.
+"""
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
@@ -32,10 +33,10 @@ class Timeline(base.ModelWithFieldAttributes):
   """The Timeline Model, representing the timeline for a Program.
   """
 
-  program_start_data = db.DateTimeProperty(
+  program_start = db.DateTimeProperty(
       verbose_name=ugettext_lazy('Program Start date'))
 
-  program_end_data = db.DateTimeProperty(
+  program_end = db.DateTimeProperty(
       verbose_name=ugettext_lazy('Program End date'))
 
   org_signup_start = db.DateTimeProperty(

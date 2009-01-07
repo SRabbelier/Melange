@@ -97,7 +97,7 @@ class View(base.View):
       fields['timeline'] = entity.timeline
     
   def _createTimelineForType(self, type):
-    """Creates and stores a timeline model for the given type of program
+    """Creates and stores a timeline model for the given type of program.
     """
     
     timelines = {'gsoc' : gsoc.models.timeline.Timeline(),

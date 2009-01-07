@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Program Model."""
+"""This module contains the Program Model.
+"""
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
@@ -62,9 +63,9 @@ class Program(soc.models.presence.Presence):
   #: Required field storing the type of workflow this program has
   workflow = db.StringProperty(required=True,
       choices=['gsoc', 'ghop'],
-      verbose_name= ugettext_lazy('Type of workflow'))
-  workflow.example_text = ugettext_lazy('Project-based for GSoC type workflow, ' 
-      'task-based for GHOP type workflow')
+      verbose_name= ugettext_lazy('Workflow type'))
+  workflow.example_text = ugettext_lazy('Project-based for GSoC workflow type, ' 
+      'task-based for GHOP workflow type')
 
   #: Required 1:1 relationship indicating the Program the Timeline
   #: belongs to.

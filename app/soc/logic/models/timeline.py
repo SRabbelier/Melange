@@ -28,7 +28,7 @@ import soc.models.timeline
 
 
 class Logic(base.Logic):
-  """Logic methods for the Timeline model
+  """Logic methods for the Timeline model.
   """
 
   def __init__(self, model=soc.models.timeline.Timeline,

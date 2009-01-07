@@ -51,6 +51,13 @@ class View(base.View):
     new_params['url_name'] = "timeline"
     new_params['module_name'] = "timeline"
 
+    patterns = [(r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
+                  'soc.views.models.%(module_name)s.edit', "Edit %(name_short)s")]
+
+    new_params['django_patterns_defaults'] = patterns
+
+    new_params['edit_dynafields']= []
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

@@ -22,46 +22,22 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import base
+from soc.logic.models import timeline as timeline_logic
 from soc.logic.models import program as program_logic
 
-import soc.models.timeline
+import gsoc.models.timeline
 
 
-class Logic(base.Logic):
-  """Logic methods for the Timeline model.
+class Logic(timeline_logic.Logic):
+  """Logic methods for the Timeline model
   """
 
-  def __init__(self, model=soc.models.timeline.Timeline,
+  def __init__(self, model=gsoc.models.timeline.Timeline,
                base_model=None, scope_logic=program_logic):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
-
-  def getScopeDepth(self):
-    """See base.Logic.getScopeDepth
-    """
-
-    return 3
-
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.scope_path]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['scope_path']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['scope_path']
 
 logic = Logic()

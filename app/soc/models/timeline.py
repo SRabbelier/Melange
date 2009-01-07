@@ -33,6 +33,9 @@ class Timeline(base.ModelWithFieldAttributes):
   """The Timeline Model, representing the timeline for a Program.
   """
 
+  scope_path = db.StringProperty(required=True,
+      verbose_name=ugettext_lazy('Scope Path'))
+
   program_start = db.DateTimeProperty(
       verbose_name=ugettext_lazy('Program Start date'))
 

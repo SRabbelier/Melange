@@ -27,7 +27,6 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import timeline as timeline_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
@@ -71,6 +70,8 @@ class View(base.View):
     new_params['url_name'] = "program"
     new_params['module_name'] = "program"
 
+    new_params['edit_template'] = 'soc/program/edit.html'
+
     new_params['extra_dynaexclude'] = ['home', 'timeline']
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
@@ -84,26 +85,36 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-  
+
   def _editPost(self, request, entity, fields):
     """See base._editPost().
     """
-    
+
     if not entity:
       # there is no existing entity so create a new timeline
-      fields['timeline'] = self._createTimelineForType(fields['workflow'])
+      fields['timeline'] = self._createTimelineForType(fields)
     else:
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
-    
-  def _createTimelineForType(self, type):
+
+  def _createTimelineForType(self, fields):
     """Creates and stores a timeline model for the given type of program.
     """
-    
-    timelines = {'gsoc' : gsoc.models.timeline.Timeline(),
-                 'ghop' : soc.models.timeline.Timeline()}
-        
-    return timelines[type].put()
+
+    timelines = {'gsoc' : gsoc.logic.models.timeline.logic,
+                 'ghop' : soc.logic.models.timeline.logic,}
+
+    workflow = fields['workflow']
+
+    timeline_logic = timelines[workflow]
+
+    key_fields = self._logic.getKeyFieldsFromDict(fields)
+    key_name = self._logic.getKeyNameForFields(key_fields)
+
+    properties = {'scope_path': key_name}
+
+    timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
+    return timeline
 
   def getExtraMenus(self, request, params=None):
     """Returns the extra menu's for this view.

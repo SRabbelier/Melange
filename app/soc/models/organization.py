@@ -37,7 +37,7 @@ class Organization(soc.models.group.Group):
   """
   
   #: Optional development mailing list.     
-  dev_mailing_list = db.EmailProperty(required=False,
+  dev_mailing_list = db.StringProperty(required=False,
     verbose_name=ugettext_lazy('Development Mailing List'))
   dev_mailing_list.help_text = ugettext_lazy(
     'Mailing list email address, URL to sign-up page, etc.')

@@ -36,4 +36,9 @@ class Organization(soc.models.group.Group):
      reference.
   """
   
-  pass
+  #: Optional development mailing list.     
+  dev_mailing_list = db.EmailProperty(required=False,
+    verbose_name=ugettext_lazy('Development Mailing List'))
+  dev_mailing_list.help_text = ugettext_lazy(
+    'Mailing list email address, URL to sign-up page, etc.')
+

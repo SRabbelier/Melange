@@ -67,7 +67,17 @@ class Group(soc.models.presence.Presence):
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,
       verbose_name=ugettext_lazy('Description'))
-      
+ 
+  #: Optional public mailing list.     
+  pub_mailing_list = db.StringProperty(required=False,
+    verbose_name=ugettext_lazy('Public Mailing List'))
+  pub_mailing_list.help_text = ugettext_lazy(
+    'Mailing list email address, URL to sign-up page, etc.')
+
+  #: Optional public IRC channel.
+  irc_channel = db.StringProperty(required=False,
+    verbose_name=ugettext_lazy('Public IRC Channel (and Network)'))
+
   #: Required field containing a group street address.
   #: Group street address can only be lower ASCII, not UTF-8 text, 
   #: because, if supplied, it is used as a shipping address.

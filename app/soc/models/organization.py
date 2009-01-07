@@ -14,12 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Organization Model."""
+"""This module contains the Organization Model.
+"""
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
+
+from google.appengine.ext import db
+
+from django.utils.translation import ugettext_lazy
 
 import soc.models.group
 

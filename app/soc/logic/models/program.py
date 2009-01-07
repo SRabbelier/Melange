@@ -26,12 +26,17 @@ __authors__ = [
 from soc.logic.models import base
 from soc.logic.models import sponsor as sponsor_logic
 
+import gsoc.logic.models.timeline
+import soc.logic.models.timeline
 import soc.models.program
 
 
 class Logic(base.Logic):
   """Logic methods for the Program model
   """
+
+  TIMELINE_LOGIC = {'gsoc' : gsoc.logic.models.timeline.logic,
+                    'ghop' : soc.logic.models.timeline.logic}
 
   def __init__(self, model=soc.models.program.Program, 
                base_model=None, scope_logic=sponsor_logic):

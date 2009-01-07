@@ -25,6 +25,8 @@ __authors__ = [
 from django import forms
 
 from soc.logic import dicts
+from soc.logic.models import program as program_logic
+from soc.views.helper import params as params_helper
 from soc.views.models import base
 
 import soc.logic.models.timeline
@@ -61,6 +63,24 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    for name, value in program_logic.logic.TIMELINE_LOGIC.iteritems():
+      create_form = params_helper.getCreateForm(self._params, value.getModel())
+      edit_form = params_helper.getEditForm(self._params, create_form)
+      self._params['edit_form_%s' % name] = edit_form
+
+  def edit(self, request, access_type,
+           page_name=None, params=None, seed=None, **kwargs):
+    """See base.View.edit
+    """
+
+    params = dicts.merge(params, self._params)
+
+    program = program_logic.logic.getFromKeyName(kwargs['scope_path'])
+    params['edit_form'] = params["edit_form_%s" % program.workflow]
+
+    return super(View, self).edit(request, access_type, page_name=page_name,
+                                  params=params, seed=seed, **kwargs)
 
 
 view = View()

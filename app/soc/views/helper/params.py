@@ -68,6 +68,8 @@ def constructParams(params):
       from the cleaning module.
   """
 
+  logic = params['logic']
+
   rights = {}
   rights['unspecified'] = []
   rights['any_access'] = [access.checkIsLoggedIn]
@@ -82,7 +84,7 @@ def constructParams(params):
 
   new_params = {}
   new_params['rights'] = rights
-  new_params['scope_logic'] = params['logic'].getScopeLogic()
+  new_params['scope_logic'] = logic.getScopeLogic()
 
   # Do not expand edit_redirect to allow it to be overriden without suffix
   new_params['edit_redirect'] = '/%(url_name)s/edit/%(suffix)s'
@@ -158,7 +160,7 @@ def constructParams(params):
   new_params['dynabase'] = helper.forms.BaseForm
 
   create_dynafields = {
-      'clean_link_id': cleaning.clean_new_link_id(params['logic']),
+      'clean_link_id': cleaning.clean_new_link_id(logic),
       'clean_feed_url': cleaning.clean_feed_url,
       }
   create_dynafields.update(params.get('create_extra_dynafields', {}))
@@ -183,10 +185,10 @@ def constructParams(params):
   # These need to be constructed separately, because they require
   # parameters that can be defined either in params, or new_params.
   if not 'create_form' in params:
-    params['create_form'] = getCreateForm(params)
+    params['create_form'] = getCreateForm(params, logic.getModel())
 
   if not 'edit_form' in params:
-    params['edit_form'] = getEditForm(params)
+    params['edit_form'] = getEditForm(params, params['create_form'])
 
   if not 'key_fields_pattern' in params:
     params['key_fields_pattern'] = getKeyFieldsPattern(params)
@@ -194,7 +196,7 @@ def constructParams(params):
   return params
 
 
-def getCreateForm(params):
+def getCreateForm(params, model):
   """Constructs a new CreateForm using params.
 
   Params usage:
@@ -208,7 +210,7 @@ def getCreateForm(params):
 
   create_form = dynaform.newDynaForm(
     dynabase = params['dynabase'],
-    dynamodel = params['logic'].getModel(),
+    dynamodel = model,
     dynainclude = params['create_dynainclude'],
     dynaexclude = params['create_dynaexclude'],
     dynafields = params['create_dynafields'],
@@ -217,7 +219,7 @@ def getCreateForm(params):
   return create_form
 
 
-def getEditForm(params):
+def getEditForm(params, base_form):
   """Constructs a new EditForm using params.
 
   Params usage:
@@ -229,7 +231,7 @@ def getEditForm(params):
   """
 
   edit_form = dynaform.extendDynaForm(
-    dynaform = params['create_form'],
+    dynaform = base_form,
     dynainclude = params['edit_dynainclude'],
     dynaexclude = params['edit_dynaexclude'],
     dynafields = params['edit_dynafields'],

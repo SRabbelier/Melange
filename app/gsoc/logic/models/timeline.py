@@ -23,9 +23,9 @@ __authors__ = [
 
 
 from soc.logic.models import timeline as timeline_logic
-from soc.logic.models import program as program_logic
 
 import gsoc.models.timeline
+import soc.models.timeline
 
 
 class Logic(timeline_logic.Logic):
@@ -33,7 +33,8 @@ class Logic(timeline_logic.Logic):
   """
 
   def __init__(self, model=gsoc.models.timeline.Timeline,
-               base_model=None, scope_logic=program_logic):
+               base_model=soc.models.timeline.Timeline,
+               scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 

@@ -27,16 +27,15 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models import program as program_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
-
-import gsoc.models.timeline
-import soc.models.timeline
 
 import soc.logic.models.program
 
@@ -82,6 +81,11 @@ class View(base.View):
         'clean_link_id': cleaning.clean_link_id,
         }
 
+    new_params['edit_extra_dynafields'] = {
+        'workflow': forms.CharField(widget=widgets.ReadOnlyInput(),
+                                   required=True),
+        }
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -101,12 +105,9 @@ class View(base.View):
     """Creates and stores a timeline model for the given type of program.
     """
 
-    timelines = {'gsoc' : gsoc.logic.models.timeline.logic,
-                 'ghop' : soc.logic.models.timeline.logic,}
-
     workflow = fields['workflow']
 
-    timeline_logic = timelines[workflow]
+    timeline_logic = program_logic.logic.TIMELINE_LOGIC[workflow]
 
     key_fields = self._logic.getKeyFieldsFromDict(fields)
     key_name = self._logic.getKeyNameForFields(key_fields)

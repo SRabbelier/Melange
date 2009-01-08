@@ -81,6 +81,13 @@ class View(base.View):
 
     return super(View, self).edit(request, access_type, page_name=page_name,
                                   params=params, seed=seed, **kwargs)
+  
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+    
+    # a timeline can only be edited, so set the scope path using entity
+    fields['scope_path'] = entity.scope_path
 
 
 view = View()

@@ -32,7 +32,7 @@ import soc.models.program
 
 
 class Logic(base.Logic):
-  """Logic methods for the Program model
+  """Logic methods for the Program model.
   """
 
   TIMELINE_LOGIC = {'gsoc' : gsoc.logic.models.timeline.logic,

@@ -71,7 +71,7 @@ class View(base.View):
 
   def edit(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):
-    """See base.View.edit
+    """See base.View.edit.
     """
 
     params = dicts.merge(params, self._params)

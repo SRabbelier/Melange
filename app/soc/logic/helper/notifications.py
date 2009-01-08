@@ -22,8 +22,8 @@ __authors__ = [
   ]
 
 
-import time
 import os
+import time
 
 from google.appengine.api import users
 
@@ -39,12 +39,12 @@ import soc.logic.models as model_logic
 
 
 DEF_NEW_NOTIFICATION_MSG = ugettext_lazy(
-  "You have received a new Notification")
+  "You have received a new Notification.")
 
 DEF_INVITATION_MSG_FMT = ugettext_lazy(
-    "Invitation to become a %(role)s for %(group)s")
+    "Invitation to become a %(role)s for %(group)s.")
 
-DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s")
+DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s,")
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.

@@ -40,7 +40,7 @@ class Logic(base.Logic):
                                 scope_logic=scope_logic)
 
   def getScopeDepth(self):
-    """See base.Logic.getScopeDepth
+    """See base.Logic.getScopeDepth.
     """
 
     return 3

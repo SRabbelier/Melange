@@ -29,7 +29,7 @@ import soc.models.timeline
 
 
 class Logic(timeline_logic.Logic):
-  """Logic methods for the Timeline model
+  """Logic methods for the Timeline model.
   """
 
   def __init__(self, model=gsoc.models.timeline.Timeline,

@@ -15,6 +15,24 @@ extra_paths = [HERE,
               ]
 
 import nose
+from nose import plugins
+
+class AppEngineDatastoreClearPlugin(plugins.Plugin):
+  """Nose plugin to clear the AppEngine datastore between tests.
+  """
+  name = 'AppEngineDatastoreClearPlugin'
+  enabled = True
+  def options(self, parser, env):
+    return plugins.Plugin.options(self, parser, env)
+
+  def configure(self, parser, env):
+    plugins.Plugin.configure(self, parser, env)
+    self.enabled = True
+
+  def afterTest(self, test):
+    from google.appengine.api import apiproxy_stub_map
+    datastore = apiproxy_stub_map.apiproxy.GetStub('datastore')
+    datastore.Clear()
 
 
 def main():
@@ -34,11 +52,12 @@ def main():
                                           urlfetch_stub.URLFetchServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('user',
                                           user_service_stub.UserServiceStub())
-  apiproxy_stub_map.apiproxy.RegisterStub('datastore_v3',
-    datastore_file_stub.DatastoreFileStub('your_app_id', '/dev/null',
-                                          '/dev/null'))
+  apiproxy_stub_map.apiproxy.RegisterStub('datastore',
+    datastore_file_stub.DatastoreFileStub('your_app_id', None, None))
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
-  nose.main()
+  import django.test.utils
+  django.test.utils.setup_test_environment()
+  nose.main(plugins=[AppEngineDatastoreClearPlugin(), ])
 
 
 if __name__ == '__main__':

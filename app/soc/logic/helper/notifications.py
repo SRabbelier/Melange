@@ -52,25 +52,25 @@ def sendInviteNotification(entity):
   Args:
     entity : A request containing the information needed to create the message
   """
-  
+
   # get user logic
   user_logic = model_logic.user.logic
 
   # get the current user
   current_user_entity = user_logic.getForCurrentAccount()
-  
+
   # get the user the request is for
   properties = {'link_id': entity.link_id }
   request_user_entity = user_logic.getForFields(properties, unique=True)
 
   # create the invitation_url
   invitation_url = "http://%(host)s%(index)s" % {
-      'host' : os.environ['HTTP_HOST'], 
+      'host' : os.environ['HTTP_HOST'],
       'index': redirects.inviteAcceptedRedirect(entity, None)}
 
   # get the group entity
   group_entity = entity.scope
-  
+
   # create the properties for the message
   messageProperties = {
       'to_name': request_user_entity.name,
@@ -79,46 +79,46 @@ def sendInviteNotification(entity):
       'group': group_entity.name,
       'invitation_url': invitation_url,
       }
-  
+
   # render the message
   message = loader.render_to_string(
-      'soc/notification/messages/invitation.html', 
+      'soc/notification/messages/invitation.html',
       dictionary=messageProperties)
-  
+
   # create the fields for the notification
-  fields = { 
+  fields = {
       'from_user' : current_user_entity,
       'subject' : DEF_INVITATION_MSG_FMT % {
           'role' : entity.role,
-          'group' : group_entity.name 
+          'group' : group_entity.name
           },
       'message' : message,
       'scope' : request_user_entity,
       'link_id' :'%i' % (time.time()),
       'scope_path' : request_user_entity.link_id
   }
-  
+
   # create and put a new notification in the datastore
   notification_logic = model_logic.notification.logic
-  notification_logic.updateOrCreateFromFields(fields, 
+  notification_logic.updateOrCreateFromFields(fields,
       notification_logic.getKeyFieldsFromDict(fields))
-  
+
 def sendNewNotificationMessage(notification_entity):
   """Sends an email to a user about a new notification
-  
+
     Args:
-      notification_entity: Notification about which the message should be sent    
+      notification_entity: Notification about which the message should be sent
   """
 
   # get user logic
-  user_logic = model_logic.user  
-  
+  user_logic = model_logic.user
+
   # get the current user
   current_user_entity = user_logic.logic.getForCurrentAccount()
 
   # create the url to show this notification
   notification_url = "http://%(host)s%(index)s" % {
-      'host' : os.environ['HTTP_HOST'], 
+      'host' : os.environ['HTTP_HOST'],
       'index': redirects.getPublicRedirect(notification_entity,
           model_view.notification.view.getParams())}
 
@@ -135,30 +135,30 @@ def sendNewNotificationMessage(notification_entity):
       'notification' : notification_entity,
       'notification_url' : notification_url
       }
-  
-  # send out the message using the default new notification template    
-  mail_dispatcher.sendMailFromTemplate('soc/mail/new_notification.html', 
+
+  # send out the message using the default new notification template
+  mail_dispatcher.sendMailFromTemplate('soc/mail/new_notification.html',
                                        messageProperties)
-  
+
 def sendWelcomeMessage(user_entity):
   """Sends out a welcome message to a user.
 
     Args:
       user_entity: User entity which the message should be send to
   """
-  
+
   # get user logic
-  user_logic = model_logic.user  
-  
+  user_logic = model_logic.user
+
   # get the current user
   current_user_entity = user_logic.logic.getForCurrentAccount()
 
-  # TODO(Lennard): change the message sender to some sort of no-reply adress 
-  # that is probably a setting in sitesettings. (adress must be a developer). 
-  # This is due to a GAE limitation that allows only devs or the current user 
-  # to send an email. Currently this results in a user receiving the same 
+  # TODO(Lennard): change the message sender to some sort of no-reply adress
+  # that is probably a setting in sitesettings. (adress must be a developer).
+  # This is due to a GAE limitation that allows only devs or the current user
+  # to send an email. Currently this results in a user receiving the same
   # email twice.
-  
+
   # create the message contents
   messageProperties = {
       'to_name': user_entity.name,
@@ -168,8 +168,8 @@ def sendWelcomeMessage(user_entity):
       'subject': DEF_WELCOME_MSG_FMT % {
           'name': user_entity.name
           }
-      } 
+      }
 
-  # send out the message using the default welcome template    
-  mail_dispatcher.sendMailFromTemplate('soc/mail/welcome.html', 
+  # send out the message using the default welcome template
+  mail_dispatcher.sendMailFromTemplate('soc/mail/welcome.html',
                                        messageProperties)

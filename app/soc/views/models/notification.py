@@ -27,6 +27,7 @@ import time
 from django import forms
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import validate
 from soc.models import notification as notification_model
@@ -63,21 +64,7 @@ class CreateForm(helper.forms.BaseForm):
     # exclude the necessary fields from the form
     exclude = ['link_id', 'scope', 'scope_path', 'from_user', 'unread']
 
-  def clean_to_user(self):
-    """Check if the to_user field has been filled in correctly.
-    """
-    link_id = self.cleaned_data.get('to_user').lower()
-
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-
-    to_user = user_logic.logic.getForFields({'link_id' : link_id}, unique=True)
-
-    if not to_user:
-      # user does not exist
-      raise forms.ValidationError("This user does not exist")
-
-    return link_id
+  clean_to_user = cleaning.clean_existing_user('to_user')
 
 
 class View(base.View):
@@ -157,13 +144,10 @@ class View(base.View):
     # get the current user
     current_user = user_logic.logic.getForCurrentAccount()
 
-    to_user = user_logic.logic.getForFields(
-        {'link_id' : fields['to_user']}, unique=True)
-
     fields['link_id'] = '%i' % (time.time())
-    fields['scope'] = to_user
+    fields['scope'] = fields['to_user']
     fields['from_user'] = current_user
-    fields['scope_path'] = fields['to_user']
+    fields['scope_path'] = fields['to_user'].link_id
 
   def _editSeed(self, request, seed):
     """Checks if scope_path is seeded and puts it into to_user.

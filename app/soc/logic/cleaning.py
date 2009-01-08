@@ -26,6 +26,7 @@ __authors__ = [
 from django import forms
 
 from soc.logic import validate
+from soc.logic.models import user as user_logic
 
 
 def clean_new_link_id(logic):
@@ -54,6 +55,26 @@ def clean_link_id(self):
   if not validate.isLinkIdFormatValid(link_id):
     raise forms.ValidationError("This link ID is in wrong format.")
   return link_id
+
+
+def clean_existing_user(field_name):
+  """Check if the field_name field is a valid user.
+  """
+
+  def wrapped(self):
+    link_id = self.cleaned_data.get(field_name).lower()
+  
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+  
+    user_entity = user_logic.logic.getForFields({'link_id' : link_id}, unique=True)
+  
+    if not user_entity:
+      # user does not exist
+      raise forms.ValidationError("This user does not exist")
+  
+    return user_entity
+  return wrapped
 
 
 def clean_feed_url(self):

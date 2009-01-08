@@ -1,0 +1,7 @@
+README.txt
+coverage.py
+setup.py
+coverage.egg-info/SOURCES.txt
+coverage.egg-info/dependency_links.txt
+coverage.egg-info/entry_points.txt
+coverage.egg-info/top_level.txt

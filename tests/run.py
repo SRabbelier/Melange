@@ -11,11 +11,11 @@ extra_paths = [HERE,
                os.path.join(appengine_location, 'lib', 'yaml', 'lib'),
                appengine_location,
                os.path.join(HERE, 'app'),
+               os.path.join(HERE, 'thirdparty', 'coverage'),
               ]
 
 import nose
-from nose import config
-from nose.plugins import manager
+
 
 def main():
   sys.path = extra_paths + sys.path
@@ -38,7 +38,7 @@ def main():
     datastore_file_stub.DatastoreFileStub('your_app_id', '/dev/null',
                                           '/dev/null'))
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
-  nose.main(config=config.Config(files=config.all_config_files()))
+  nose.main()
 
 
 if __name__ == '__main__':

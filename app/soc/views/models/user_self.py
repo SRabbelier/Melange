@@ -114,7 +114,7 @@ class View(base.View):
     
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
-        (users.create_login_url("user/edit"), 'Sign In', 'signIn'),
+        (users.create_login_url("/user/edit"), 'Sign In', 'signIn'),
         ('/' + new_params['url_name'] + '/edit', 'Profile', 'edit'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
         ('/' + 'notification/list', 'Notifications', 'notification'),

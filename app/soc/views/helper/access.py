@@ -40,6 +40,7 @@ from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import notification as notification_logic
+from soc.logic.models import group_app  as group_app_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
@@ -362,6 +363,50 @@ def checkIsMyNotification(request):
 
   # TODO(ljvderijk) Make this give a proper error message
   deny(request)
+
+def checkIsMyApplication(request):
+  """Returns an alternate HTTP response if this request is for a Notification belonging
+     to the current user.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if the current User is allowed to access this Notification.
+  """
+  
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  checkIsUser(request)
+
+  # Mine the url for params
+  try:
+    callback, args, kwargs = urlresolvers.resolve(request.path)
+  except Exception:
+    deny(request)
+
+  properties = dicts.filter(kwargs, ['link_id'])
+
+  application = group_app_logic.logic.getForFields(properties, unique=True)
+  user = user_logic.logic.getForCurrentAccount()
+
+  # We need to check to see if the key's are equal since the User
+  # objects are different and the default __eq__ method does not check
+  # if the keys are equal (which is what we want).
+  if user.key() == application.applicant.key():
+    return None
+
+  # TODO(srabbelier) Make this give a proper error message
+  deny(request)
+
 
 def checkCanInvite(request):
   """Checks to see if the current user can create an invite.

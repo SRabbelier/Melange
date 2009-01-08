@@ -25,6 +25,7 @@ __authors__ = [
 from django.conf.urls import defaults
 
 from soc.views.models import club
+from soc.views.models import club_app
 from soc.views.models import document
 from soc.views.models import host
 from soc.views.models import notification
@@ -45,6 +46,7 @@ from soc.views.sitemap import sitemap
 sidebar.addMenu(user_self.view.getSidebarMenus)
 sidebar.addMenu(presence.view.getSidebarMenus)
 sidebar.addMenu(club.view.getSidebarMenus)
+sidebar.addMenu(club_app.view.getSidebarMenus)
 sidebar.addMenu(site.view.getSidebarMenus)
 sidebar.addMenu(user.view.getSidebarMenus)
 sidebar.addMenu(document.view.getSidebarMenus)
@@ -56,6 +58,7 @@ sidebar.addMenu(program.view.getExtraMenus)
 sidebar.addMenu(organization.view.getSidebarMenus)
 
 sitemap.addPages(club.view.getDjangoURLPatterns())
+sitemap.addPages(club_app.view.getDjangoURLPatterns())
 sitemap.addPages(document.view.getDjangoURLPatterns())
 sitemap.addPages(host.view.getDjangoURLPatterns())
 sitemap.addPages(notification.view.getDjangoURLPatterns())

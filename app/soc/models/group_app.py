@@ -103,7 +103,7 @@ class GroupApplication(soc.models.linkable.Linkable):
       'Please select your backup group administrator.'))
 
   member_criteria = db.TextProperty(required=True,
-    verbose_text=ugettext_lazy(
+    verbose_name=ugettext_lazy(
       'What criteria do you use to select the members of your group?'
       ' Please be as specific as possible.'))
   member_disappears = ugettext_lazy(
@@ -115,6 +115,6 @@ class GroupApplication(soc.models.linkable.Linkable):
     verbose_name=ugettext_lazy(
       'Please select the application template you would like potential'
       ' members of your group to use.  (optional).'))
-  contrib_template.help_text = ugettext_lazy(
+  member_template.help_text = ugettext_lazy(
     'This template will be presented to potential members when they'
     ' apply to the group.')

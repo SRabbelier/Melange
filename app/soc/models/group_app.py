@@ -78,23 +78,22 @@ class GroupApplication(soc.models.linkable.Linkable):
     verbose_name=ugettext_lazy(
       'Has your group participated previously?'
       ' If so, please summarize your involvement and any past successes'
-      ' and failures. (optional)'))
+      ' and failures.'))
 
   prior_application = db.TextProperty(required=False,
     verbose_name=ugettext_lazy(
       'If your group has not previously participated, have you applied in'
-      ' the past?  If so, for what sort of participation? (optional)'))
+      ' the past?  If so, for what sort of participation?'))
 
   pub_mailing_list = db.StringProperty(required=False,
     verbose_name=ugettext_lazy(
-      'What is the main public mailing list for your group? (optional)'))
+      'What is the main public mailing list for your group?'))
   pub_mailing_list.help_text = ugettext_lazy(
     'Mailing list email address, URL to sign-up page, etc.')
 
   irc_channel = db.StringProperty(required=False,
     verbose_name=ugettext_lazy(
-      'Where is the main IRC channel for your group?'
-      ' (optional)'))
+      'Where is the main IRC channel for your group?'))
   irc_channel.help_text = ugettext_lazy('IRC network and channel.')
 
   backup_admin = db.ReferenceProperty(reference_class=soc.models.user.User,
@@ -106,15 +105,5 @@ class GroupApplication(soc.models.linkable.Linkable):
     verbose_name=ugettext_lazy(
       'What criteria do you use to select the members of your group?'
       ' Please be as specific as possible.'))
-  member_disappears = ugettext_lazy(
+  member_criteria.help_text = ugettext_lazy(
     'Members include mentors, admininstrators, and the like.')
-
-  member_template = db.ReferenceProperty(
-    reference_class=soc.models.document.Document, required=False,
-    collection_name='group_app_member_template',
-    verbose_name=ugettext_lazy(
-      'Please select the application template you would like potential'
-      ' members of your group to use.  (optional).'))
-  member_template.help_text = ugettext_lazy(
-    'This template will be presented to potential members when they'
-    ' apply to the group.')

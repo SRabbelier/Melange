@@ -35,7 +35,9 @@ Please use this form to edit the {{ entity_type }}.
 </p>
 <form method="POST">
   <table>
-  {% as_table form %}
+    {% block form_table %}
+      {% as_table form %}
+    {% endblock %}
   </table>
   <table>
   <tr>

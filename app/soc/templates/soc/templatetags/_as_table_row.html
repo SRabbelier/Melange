@@ -23,10 +23,14 @@ limitations under the License.
 </tr>
 {% endif %}
 
+{% block label_row %}{% endblock %}
+
 <tr title="{{ help_text }}">
+  {% block label_column %}
   <td class="{{ field_class_type }}">
     {{ label }}
   </td>
+  {% endblock %}
   <td>
     {{ field }}
 

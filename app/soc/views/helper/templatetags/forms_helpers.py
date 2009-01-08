@@ -112,6 +112,19 @@ def as_table(form):
     form: the form that should be converted to a table
   """
 
+  return as_table_helper(form)
+
+@register.inclusion_tag('soc/templatetags/_as_twoline_table.html')
+def as_twoline_table(form):
+  """Outputs a form as a properly formatted html table
+
+  Args:
+    form: the form that should be converted to a table
+  """
+
+  return as_table_helper(form)
+
+def as_table_helper(form):
   fields = []
   hidden_fields = []
   hidden_fields_errors = []
@@ -155,6 +168,22 @@ def as_table_row(form, field, required, example_text):
     example_text: the example_text for this row
   """
 
+  return as_table_row_helper(form, field, required, example_text)
+
+@register.inclusion_tag('soc/templatetags/_as_twoline_table_row.html')
+def as_twoline_table_row(form, field, required, example_text):
+  """Outputs a field as a properly formatted html row
+
+  Args:
+    form: the form that the row belongs to
+    field: the field that should be converted to a row
+    required: whether the field is required
+    example_text: the example_text for this row
+  """
+
+  return as_table_row_helper(form, field, required, example_text)
+
+def as_table_row_helper(form, field, required, example_text):
   # Escape and cache in local variable.
   errors = [force_unicode(escape(error)) for error in field.errors]
 

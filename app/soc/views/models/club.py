@@ -62,12 +62,6 @@ class View(base.View):
                                    required=False),
         }
 
-    # TODO(tlarsen): Add support for Django style template lookup
-    new_params['public_template'] = 'soc/club/public.html'
-
-    new_params['list_row'] = 'soc/club/list/row.html'
-    new_params['list_heading'] = 'soc/club/list/heading.html'
-
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

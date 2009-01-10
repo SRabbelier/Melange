@@ -213,7 +213,7 @@ class View(group_app.View):
         application = self._logic.getFromFields(link_id=kwargs['link_id'])
         self._logic.updateModelProperties(application, fields)
         
-        return self.showUnhandledApplications(request, access_type, 
+        return self.showReviewOverview(request, access_type, 
             page_name=page_name, params=params, **kwargs)
 
     # the application has nog been reviewed so show the information

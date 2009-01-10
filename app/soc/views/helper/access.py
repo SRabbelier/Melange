@@ -365,7 +365,7 @@ def checkIsMyNotification(request):
   deny(request)
 
 def checkIsMyApplication(request):
-  """Returns an alternate HTTP response if this request is for a Notification belonging
+  """Returns an alternate HTTP response if this request is for a Application belonging
      to the current user.
 
   Args:
@@ -375,7 +375,7 @@ def checkIsMyApplication(request):
      AccessViolationResponse: if the required authorization is not met
 
   Returns:
-    None if the current User is allowed to access this Notification.
+    None if the current User is allowed to access this Application.
   """
   
   try:

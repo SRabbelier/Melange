@@ -321,6 +321,25 @@ def checkIsInvited(request):
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+def checkIsApplied(request):
+  """Returns an alternate HTTP response if Google Account has no Club App
+     entity for the specified Club.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if Club App  exists for the specified program, or a subclass
+    of django.http.HttpResponse which contains the alternate response
+    should be returned by the calling view.
+  """
+
+  #TODO(srabbelier): implement this
+  pass
+
 def checkIsMyNotification(request):
   """Returns an alternate HTTP response if this request is for a Notification belonging
      to the current user.

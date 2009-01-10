@@ -31,6 +31,7 @@ from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models import group_app as group_app_logic
 from soc.logic.models import club as club_logic
+from soc.views.helper import access
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -49,9 +50,12 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = {}
+    rights['create'] = [access.checkIsApplied]
+
     new_params = {}
-    
     new_params['logic'] = soc.logic.models.club.logic
+    new_params['rights'] = rights
 
     new_params['name'] = "Club"
 

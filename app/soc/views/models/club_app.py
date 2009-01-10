@@ -86,7 +86,9 @@ class View(group_app.View):
     new_params['extra_django_patterns'] = patterns
     
     new_params['name'] = "Club Application"
+    new_params['name_plural'] = "Club Applications"
     new_params['name_short'] = "Club App"
+    new_params['url_name'] = "club_app"
 
     new_params['sidebar_additional'] = [
         ('/%(url_name)s/review' % new_params,

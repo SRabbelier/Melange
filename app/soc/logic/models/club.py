@@ -18,11 +18,14 @@
 """
 
 __authors__ = [
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from soc.logic.models import group
+from soc.logic.models import group_app as group_app_logic
+from soc.logic.models import request as request_logic
 
 import soc.models.club
 import soc.models.group
@@ -39,6 +42,25 @@ class Logic(group.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def _onCreate(self, entity):
+    """Invites the org admin and backup admin
+    """
+
+    # Find their application
+    application = group_app_logic.logic.getFromFields(link_id=entity.link_id)
+
+    properties = {
+        'scope': entity,
+        'scope_path': entity.key().name(),
+        'role': 'club_admin',
+        'group_accepted': True,
+        }
+
+    for admin in [application.applicant, application.backup_admin]:
+      properties['link_id'] = admin.link_id
+      key_fields = request_logic.logic.getKeyFieldsFromDict(properties)
+      request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
 
 logic = Logic()

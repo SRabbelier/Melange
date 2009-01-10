@@ -56,6 +56,13 @@ def getPublicRedirect(entity, params):
 
   return '/%s/show/%s' % (
       params['url_name'], entity.key().name())
+  
+def getReviewRedirect(entity, params):
+  """Returns the redirect to review the specified entity
+  """
+  
+  return '/%s/review/%s' % (
+      params['url_name'], entity.link_id)
 
 
 def getCreateRequestRedirect(entity, params):

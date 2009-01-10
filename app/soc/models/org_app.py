@@ -39,7 +39,18 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   approach.  At that time, existing OrgApplication entities will be migrated
   (converted) to their new representations in the Datastore.
   """
+  
+  prior_participation = db.TextProperty(required=False,
+    verbose_name=ugettext_lazy(
+      'Has your group participated previously?'
+      ' If so, please summarize your involvement and any past successes'
+      ' and failures.'))
 
+  prior_application = db.TextProperty(required=False,
+    verbose_name=ugettext_lazy(
+      'If your group has not previously participated, have you applied in'
+      ' the past?  If so, for what sort of participation?'))
+  
   license_name = db.StringProperty(required=True,
     verbose_name=ugettext_lazy(
       'What license does your organization use?'))

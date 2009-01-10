@@ -74,17 +74,6 @@ class GroupApplication(soc.models.linkable.Linkable):
       'Why is your group applying to participate?'
       ' What do you hope to gain by participating?'))
 
-  prior_participation = db.TextProperty(required=False,
-    verbose_name=ugettext_lazy(
-      'Has your group participated previously?'
-      ' If so, please summarize your involvement and any past successes'
-      ' and failures.'))
-
-  prior_application = db.TextProperty(required=False,
-    verbose_name=ugettext_lazy(
-      'If your group has not previously participated, have you applied in'
-      ' the past?  If so, for what sort of participation?'))
-
   pub_mailing_list = db.StringProperty(required=False,
     verbose_name=ugettext_lazy(
       'What is the main public mailing list for your group?'))
@@ -107,3 +96,17 @@ class GroupApplication(soc.models.linkable.Linkable):
       ' Please be as specific as possible.'))
   member_criteria.help_text = ugettext_lazy(
     'Members include mentors, admininstrators, and the like.')
+  
+  # boolean to indicate if an application has been reviewed
+  reviewed = db.BooleanProperty(required=True, default=False,
+      verbose_name=ugettext_lazy('Has been reviewed')
+      )
+  # boolean to indicate if an application has been accepted
+  accepted = db.BooleanProperty(required=True, default=False,
+      verbose_name=ugettext_lazy('Has been accepted')
+      )
+  
+  # boolean to indicate that this application has been
+  # handled and turned into a group
+  application_completed = db.BooleanProperty(required=True, default=False,
+      verbose_name=ugettext_lazy('Has been completed'))

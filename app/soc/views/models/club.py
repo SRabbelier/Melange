@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -28,6 +29,8 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
+from soc.logic.models import group_app as group_app_logic
+from soc.logic.models import club as club_logic
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -52,7 +55,7 @@ class View(base.View):
 
     new_params['name'] = "Club"
 
-    new_params['extra_dynaexclude'] = ['founder', 'home']
+    new_params['extra_dynaexclude'] = ['founder', 'home', 'member_template']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
@@ -61,6 +64,28 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def create(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """See base.View.create()
+    """
+
+    if 'link_id' not in kwargs:
+      return super(View, self).create(request, access_type, page_name,
+                                      params=params, **kwargs)
+
+    # Find their application
+    key_fields = group_app_logic.logic.getKeyFieldsFromDict(kwargs)
+    application = group_app_logic.logic.getFromFields(**key_fields)
+
+    # Extract the application fields
+    field_names = application.properties().keys()
+    fields = dict( [(i, getattr(application, i)) for i in field_names] )
+
+    empty = dict( [(i, None) for i in self._logic.getKeyFieldNames()] )
+
+    return super(View, self).edit(request, access_type, page_name,
+                                  params=params, seed=fields, **empty)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

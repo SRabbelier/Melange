@@ -86,6 +86,18 @@ def constructParams(params):
   new_params['rights'] = rights
   new_params['scope_logic'] = logic.getScopeLogic()
 
+  if 'name_short' not in params:
+    params['name_short'] = params['name']
+
+  if 'name_plural' not in params:
+    params['name_plural'] = params['name'] + 's'
+
+  if 'module_name' not in params:
+    params['module_name'] = params['name_short'].replace(' ', '_').lower()
+
+  if 'url_name' not in params:
+    params['url_name'] = params['module_name']
+
   # Do not expand edit_redirect to allow it to be overriden without suffix
   new_params['edit_redirect'] = '/%(url_name)s/edit/%(suffix)s'
   new_params['missing_redirect'] = '/%(url_name)s/create' % params

@@ -51,11 +51,7 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.club.logic
 
     new_params['name'] = "Club"
-    new_params['name_short'] = "Club"
-    new_params['name_plural'] = "Clubs"
-    new_params['url_name'] = "club"
-    new_params['module_name'] = "club"
-    
+
     new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),

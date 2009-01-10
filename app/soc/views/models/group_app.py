@@ -46,11 +46,8 @@ class View(base.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.group_app.logic
 
-    new_params['name'] = "Group App"
+    new_params['name'] = "Group Application"
     new_params['name_short'] = "Group App"
-    new_params['name_plural'] = "Group Apps"
-    new_params['url_name'] = "group_app"
-    new_params['module_name'] = "group_app"
 
     params = dicts.merge(params, new_params)
 

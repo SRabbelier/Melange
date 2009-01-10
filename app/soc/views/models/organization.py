@@ -53,10 +53,7 @@ class View(group.View):
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['name'] = "Organization"
-    new_params['name_short'] = "Organization"
-    new_params['name_plural'] = "Organizations"
     new_params['url_name'] = "org"
-    new_params['module_name'] = "organization"
 
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,

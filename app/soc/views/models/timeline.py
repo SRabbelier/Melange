@@ -48,10 +48,6 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.timeline.logic
 
     new_params['name'] = "Timeline"
-    new_params['name_short'] = "Timeline"
-    new_params['name_plural'] = "Timelines"
-    new_params['url_name'] = "timeline"
-    new_params['module_name'] = "timeline"
 
     patterns = [(r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
                   'soc.views.models.%(module_name)s.edit', "Edit %(name_short)s")]

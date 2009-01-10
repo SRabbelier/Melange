@@ -125,10 +125,6 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.user.logic
 
     new_params['name'] = "User"
-    new_params['name_short'] = "User"
-    new_params['name_plural'] = "Users"
-    new_params['url_name'] = "user"
-    new_params['module_name'] = "user"
 
     new_params['edit_form'] = EditForm
     new_params['create_form'] = CreateForm

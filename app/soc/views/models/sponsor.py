@@ -48,12 +48,6 @@ class View(group.View):
     new_params['logic'] = soc.logic.models.sponsor.logic
 
     new_params['name'] = "Program Owner"
-    new_params['name_short'] = "Program Owner"
-    new_params['name_plural'] = "Program Owners"
-    # TODO(pawel.solyga): create url_name and module_name automatically 
-    # from name. Make that work for all other Views too. Hopefully 
-    # solution that will be implemented in base View.
-    new_params['url_name'] = "sponsor"
     new_params['module_name'] = "sponsor"
 
     params = dicts.merge(params, new_params)

@@ -93,10 +93,6 @@ class View(base.View):
     new_params['rights'] = rights
 
     new_params['name'] = "Notification"
-    new_params['name_short'] = "Notification"
-    new_params['name_plural'] = "Notifications"
-    new_params['url_name'] = "notification"
-    new_params['module_name'] = "notification"
 
     new_params['no_create_with_key_fields'] = True
     new_params['create_form'] = CreateForm

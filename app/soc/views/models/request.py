@@ -110,10 +110,6 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.request.logic
 
     new_params['name'] = "Request"
-    new_params['name_short'] = "Request"
-    new_params['name_plural'] = "Requests"
-    new_params['url_name'] = "request"
-    new_params['module_name'] = "request"
 
     new_params['edit_form'] = EditForm
     new_params['create_form'] = CreateForm

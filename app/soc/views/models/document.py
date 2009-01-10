@@ -105,10 +105,6 @@ class View(base.View):
     new_params['rights'] = rights
 
     new_params['name'] = "Document"
-    new_params['name_short'] = "Document"
-    new_params['name_plural'] = "Documents"
-    new_params['url_name'] = "document"
-    new_params['module_name'] = "document"
 
     new_params['edit_form'] = EditForm
     new_params['create_form'] = CreateForm

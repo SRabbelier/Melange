@@ -64,10 +64,6 @@ class View(base.View):
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['name'] = "Program"
-    new_params['name_short'] = "Program"
-    new_params['name_plural'] = "Programs"
-    new_params['url_name'] = "program"
-    new_params['module_name'] = "program"
 
     new_params['edit_template'] = 'soc/program/edit.html'
 

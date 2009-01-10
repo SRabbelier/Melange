@@ -115,8 +115,6 @@ class View(base.View):
     new_params['rights'] = rights
 
     new_params['name'] = "Home Settings"
-    new_params['name_short'] = "Home Settings"
-    new_params['name_plural'] = "Home Settings"
     new_params['url_name'] = "home/settings"
     new_params['module_name'] = "presence"
 

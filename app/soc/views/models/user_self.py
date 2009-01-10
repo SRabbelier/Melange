@@ -107,11 +107,9 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.user.logic
 
     new_params['name'] = "User"
-    new_params['name_short'] = "User"
-    new_params['name_plural'] = "Users"
-    new_params['url_name'] = "user"
     new_params['module_name'] = "user_self"
-    
+    new_params['url_name'] = "user"
+
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         (users.create_login_url("/user/edit"), 'Sign In', 'signIn'),

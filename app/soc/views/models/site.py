@@ -78,11 +78,8 @@ class View(presence.View):
     new_params['logic'] = soc.logic.models.site.logic
     new_params['rights'] = rights
 
-    # TODO(alturin): add ugettext_lazy ?
     new_params['name'] = "Site Settings"
     new_params['name_short'] = "Site"
-    new_params['name_plural'] = "Site Settings"
-    # lower name and replace " " with "/"
     new_params['url_name'] = "site/settings"
     new_params['module_name'] = "site"
 

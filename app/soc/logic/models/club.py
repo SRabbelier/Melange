@@ -44,23 +44,29 @@ class Logic(group.Logic):
                                 scope_logic=scope_logic)
 
   def _onCreate(self, entity):
-    """Invites the org admin and backup admin
+    """Invites the group admin and backup admin.
     """
 
     # Find their application
     application = group_app_logic.logic.getFromFields(link_id=entity.link_id)
 
-    properties = {
-        'scope': entity,
-        'scope_path': entity.key().name(),
-        'role': 'club_admin',
-        'group_accepted': True,
-        }
+    if application:
+      # only if there is an application send out the invites
+      properties = {
+          'scope': entity,
+          'scope_path': entity.key().name(),
+          'role': 'club_admin',
+          'group_accepted': True,
+          }
 
-    for admin in [application.applicant, application.backup_admin]:
-      properties['link_id'] = admin.link_id
-      key_fields = request_logic.logic.getKeyFieldsFromDict(properties)
-      request_logic.logic.updateOrCreateFromFields(properties, key_fields)
+      for admin in [application.applicant, application.backup_admin]:
+        properties['link_id'] = admin.link_id
+        key_fields = request_logic.logic.getKeyFieldsFromDict(properties)
+        request_logic.logic.updateOrCreateFromFields(properties, key_fields)
+
+      # set the application to completed  
+      fields = {'application_completed' : True}
+      group_app_logic.logic.updateModelProperties(application, fields)
 
 
 logic = Logic()

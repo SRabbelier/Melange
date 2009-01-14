@@ -47,17 +47,33 @@ class SettingsValidationForm(helper.forms.BaseForm):
   This form includes validation functions for Settings fields.
   """
 
-    # TODO(tlarsen): scope_path will be a hard-coded read-only
-    #   field for some (most?) User Roles
-  doc_scope_path = forms.CharField(required=False,
-      label=ugettext_lazy('Document scope path'),
+  # TODO(tlarsen): scope_path will be a hard-coded read-only
+  #   field for some (most?) User Roles
+  home_scope_path = forms.CharField(required=False,
+      label=ugettext_lazy('home page Document scope path'),
+      help_text=soc.models.work.Work.scope_path.help_text)
+
+  # TODO(tlarsen): actually, using these two text fields to specify
+  #   the Document is pretty cheesy; this needs to be some much better
+  #   Role-scoped Document selector that we don't have yet.  See:
+  #     http://code.google.com/p/soc/issues/detail?id=151
+  home_link_id = forms.CharField(required=False,
+      label=ugettext_lazy('home page Document link ID'),
+      help_text=soc.models.work.Work.link_id.help_text)
+
+  # TODO(tlarsen): scope_path will be a hard-coded read-only
+  #   field for some (most?) User Roles
+  tos_scope_path = forms.CharField(required=False,
+      label=ugettext_lazy('Terms of Service Document scope path'),
       help_text=soc.models.work.Work.scope_path.help_text)
 
   # TODO(tlarsen): actually, using these two text fields to specify
   #   the Document is pretty cheesy; this needs to be some much better
   #   Role-scoped Document selector that we don't have yet
-  doc_link_id = forms.CharField(required=False,
-      label=ugettext_lazy('Document link ID'),
+  #   See:
+  #     http://code.google.com/p/soc/issues/detail?id=151
+  tos_link_id = forms.CharField(required=False,
+      label=ugettext_lazy('Terms of Service Document link ID'),
       help_text=soc.models.work.Work.link_id.help_text)
 
   def clean_feed_url(self):
@@ -84,7 +100,11 @@ class CreateForm(SettingsValidationForm):
     model = soc.models.presence.Presence
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['home', 'scope']
+    exclude = ['scope',
+      # TODO(tlarsen): this needs to be enabled once a button to a list
+      #   selection "interstitial" page is implemented, see:
+      #     http://code.google.com/p/soc/issues/detail?id=151
+      'home', 'tos']
 
 
 class EditForm(CreateForm):
@@ -144,14 +164,34 @@ class View(base.View):
       home_doc.content = helper.templates.unescape(home_doc.content)
       context['home_document'] = home_doc
 
+    try:
+      tos_doc = entity.tos
+    except db.Error:
+      tos_doc = None
+
+    if tos_doc:
+      # TODO(tlarsen): This may not be the correct way to do this...  Also,
+      #   at some point, this needs to be a link to *all* of the various
+      #   Terms of Service that might apply to the scope of this particular
+      #   page (e.g. site-wide ToS, program ToS, group ToS, etc.).  See:
+      #     http://code.google.com/p/soc/issues/detail?id=153
+      #   So, this probably needs to be added to base.py, but these
+      # overridden _public() methods do not seem to call it.
+      context['tos_link'] = '/document/show/%s/%s' % (
+        tos_doc.scope_path, tos_doc.link_id)
+
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
 
     try:
       if entity.home:
-        form.fields['doc_scope_path'].initial = entity.home.scope_path
-        form.fields['doc_link_id'].initial = entity.home.link_id
+        form.fields['home_scope_path'].initial = entity.home.scope_path
+        form.fields['home_link_id'].initial = entity.home.link_id
+
+      if entity.tos:
+        form.fields['tos_scope_path'].initial = entity.tos.scope_path
+        form.fields['tos_link_id'].initial = entity.tos.link_id
     except db.Error:
       pass
 
@@ -161,14 +201,23 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    doc_scope_path = fields['doc_scope_path']
-    doc_link_id = fields['doc_link_id']
+    home_scope_path = fields['home_scope_path']
+    home_link_id = fields['home_link_id']
 
     # TODO notify the user if home_doc is not found
     home_doc = document_logic.logic.getFromFields(
-    scope_path=doc_scope_path, link_id=doc_link_id)
+      scope_path=home_scope_path, link_id=home_link_id)
 
     fields['home'] = home_doc
+
+    tos_scope_path = fields['tos_scope_path']
+    tos_link_id = fields['tos_link_id']
+
+    # TODO notify the user if tos_doc is not found
+    tos_doc = document_logic.logic.getFromFields(
+      scope_path=tos_scope_path, link_id=tos_link_id)
+
+    fields['tos'] = tos_doc
 
     super(View, self)._editPost(request, entity, fields)
 
@@ -180,3 +229,4 @@ edit = view.edit
 delete = view.delete
 list = view.list
 public = view.public
+

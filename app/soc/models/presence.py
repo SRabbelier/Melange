@@ -56,3 +56,12 @@ class Presence(soc.models.linkable.Linkable):
   feed_url.help_text = ugettext_lazy(
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
+
+  #: Reference to Document containing optional Terms of Service
+  tos = db.ReferenceProperty(
+    reference_class=soc.models.document.Document,
+    verbose_name=ugettext_lazy('Terms of Service'),
+    collection_name='tos')
+  tos.help_text = ugettext_lazy(
+      'Document containing optional Terms of Service for participating.')
+

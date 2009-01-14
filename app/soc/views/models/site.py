@@ -45,7 +45,11 @@ class CreateForm(presence.SettingsValidationForm):
     model = soc.models.site.Site
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['home', 'scope', 'scope_path', 'link_id']
+    exclude = ['scope', 'scope_path', 'link_id',
+      # TODO(tlarsen): this needs to be enabled once a button to a list
+      #   selection "interstitial" page is implemented, see:
+      #     http://code.google.com/p/soc/issues/detail?id=151
+      'home', 'tos']
 
   link_id = forms.CharField(widget=forms.HiddenInput)
 

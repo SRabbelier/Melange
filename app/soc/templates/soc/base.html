@@ -165,6 +165,9 @@ be displayed here.
 &copy;2008 Google -
 <a href="http://www.google.com/">Google Home</a> -
 <a href="http://www.google.com/privacy.html">Privacy Policy</a> -
+{% if tos_link %}
+<a href="{{tos_link}}">Terms of Service</a> -
+{% endif %}
 Version {{ gae_version }}
 	{% endblock %}
     </div>

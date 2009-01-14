@@ -46,7 +46,11 @@ class View(base.View):
 
     new_params = {}
 
-    new_params['extra_dynaexclude'] = ['founder', 'home']
+    new_params['extra_dynaexclude'] = ['founder',
+      # TODO(tlarsen): these need to be enabled once a button to a list
+      #   selection "interstitial" page is implemented, see:
+      #     http://code.google.com/p/soc/issues/detail?id=151
+      'home', 'tos', 'member_template']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),

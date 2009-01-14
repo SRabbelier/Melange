@@ -89,3 +89,11 @@ class User(soc.models.linkable.Linkable):
   is_developer.help_text = ugettext_lazy(
       'Field used to indicate user with site-wide Developer access.')
 
+  #: field storing whether User has agreed to the site-wide Terms of Service.
+  #: (Not a required field because the Terms of Service might not be present
+  #: when the first User profile is created when bootstrapping the site.)
+  agrees_to_tos = db.BooleanProperty(
+      verbose_name=ugettext_lazy('Agrees to ToS'))
+  agrees_to_tos.help_text = ugettext_lazy(
+      'Indicates that the user agrees to the site-wide Terms of Service.')
+

@@ -67,7 +67,12 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/program/edit.html'
 
-    new_params['extra_dynaexclude'] = ['home', 'timeline']
+    new_params['extra_dynaexclude'] = ['timeline',
+      # TODO(tlarsen): these need to be enabled once a button to a list
+      #   selection "interstitial" page is implemented, see:
+      #   http://code.google.com/p/soc/issues/detail?id=151
+      'home', 'tos']
+
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),

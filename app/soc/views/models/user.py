@@ -59,6 +59,11 @@ class CreateForm(helper.forms.BaseForm):
       label=soc.models.user.User.is_developer.verbose_name,
       help_text=soc.models.user.User.is_developer.help_text)
 
+  agrees_to_tos = forms.BooleanField(required=False,
+      widget=helper.widgets.ReadOnlyBool(),
+      label=soc.models.user.User.agrees_to_tos.verbose_name,
+      help_text=soc.models.user.User.agrees_to_tos.help_text)
+
   class Meta:
     """Inner Meta class that defines some behavior for the form.
     """

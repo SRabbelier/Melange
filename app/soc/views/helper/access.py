@@ -261,6 +261,39 @@ def checkIsHost(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
+def checkIsClubAdminForClub(request):
+  """Returns an alternate HTTP response if Google Account has no Club Admin
+     entity for the specified club.
+
+  Args:
+    request: a Django HTTP request
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if Club Admin exists for the specified club, or a subclass of
+    django.http.HttpResponse which contains the alternate response
+    should be returned by the calling view.
+  """
+
+  try:
+    # if the current user is invited to create a host profile we allow access
+    checkIsDeveloper(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  checkIsUser(request)
+
+  # TODO(srabbelier) implement this
+
+  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+      'role': 'a Club Admin for this Club'}
+
+  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+
 def checkIsInvited(request):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
@@ -321,7 +354,8 @@ def checkIsInvited(request):
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
-def checkIsApplied(request):
+
+def checkIsClubAppAccepted(request):
   """Returns an alternate HTTP response if Google Account has no Club App
      entity for the specified Club.
 
@@ -337,8 +371,32 @@ def checkIsApplied(request):
     should be returned by the calling view.
   """
 
-  #TODO(srabbelier): implement this
-  pass
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(request)
+    return
+  except out_of_band.Error:
+    pass
+
+  checkIsUser(request)
+
+  user = user_logic.logic.getForCurrentAccount()
+
+  properties = {
+      'applicant': user,
+      'reviewed': True,
+      'accepted': True,
+      'application_completed': False,
+      }
+
+  group_app = group_app_logic.logic.getForFields(properties, unique=True)
+
+  if group_app:
+    return
+
+  # TODO(srabbelier) Make this give a proper error message
+  deny(request)
+
 
 def checkIsMyNotification(request):
   """Returns an alternate HTTP response if this request is for a Notification belonging

@@ -51,7 +51,8 @@ class View(base.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsApplied]
+    rights['create'] = [access.checkIsClubAppAccepted]
+    rights['edit'] = [access.checkIsClubAdminForClub]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club.logic
@@ -64,6 +65,8 @@ class View(base.View):
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
+
+    new_params['edit_redirect'] = '/notification/list'
 
     params = dicts.merge(params, new_params)
 

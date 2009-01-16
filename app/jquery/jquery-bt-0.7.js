@@ -118,7 +118,12 @@ jQuery.fn.bt = function(content, options) {
     var contentSelect = false;
   }
 
+  var tooltips_pool = [];
+
+
   return this.each(function(index) {
+
+    tooltips_pool.push(this);
 
     var opts = jQuery.extend(false, jQuery.fn.bt.defaults, options);
 
@@ -128,6 +133,10 @@ jQuery.fn.bt = function(content, options) {
     opts.overlap = numb(opts.overlap);
 
     var turnOn = function () {
+
+      for (var x in tooltips_pool) {
+        turnOff.apply(tooltips_pool[x]);
+      }
 
       if (typeof $(this).data('bt-box') == 'object') {
         // if there's already a popup, remove it before creating a new one.

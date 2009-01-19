@@ -31,6 +31,9 @@ from django.template import loader
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy
 
+# We cannot import soc.logic.models notification nor user here
+# due to cyclic imports
+from soc.logic import dicts
 from soc.logic import mail_dispatcher
 from soc.views.helper import redirects
 
@@ -46,6 +49,9 @@ DEF_INVITATION_MSG_FMT = ugettext_lazy(
 
 DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s,")
 
+DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
+
+
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.
@@ -54,55 +60,62 @@ def sendInviteNotification(entity):
     entity : A request containing the information needed to create the message
   """
 
-  # get user logic
-  user_logic = model_logic.user.logic
-
-  # get the current user
-  current_user_entity = user_logic.getForCurrentAccount()
-
   # get the user the request is for
   properties = {'link_id': entity.link_id }
-  request_user_entity = user_logic.getForFields(properties, unique=True)
+  to_user = model_logic.user.logic.getForFields(properties, unique=True)
 
-  # create the invitation_url
   invitation_url = "http://%(host)s%(index)s" % {
       'host' : os.environ['HTTP_HOST'],
-      'index': redirects.inviteAcceptedRedirect(entity, None)}
+      'index': redirects.inviteAcceptedRedirect(entity, None),
+      }
 
-  # get the group entity
-  group_entity = entity.scope
-
-  # create the properties for the message
-  messageProperties = {
-      'to_name': request_user_entity.name,
-      'sender_name': current_user_entity.name,
+  message_properties = {
       'role': entity.role,
-      'group': group_entity.name,
+      'group': entity.scope.name,
       'invitation_url': invitation_url,
       }
 
-  # render the message
-  message = loader.render_to_string(
-      'soc/notification/messages/invitation.html',
-      dictionary=messageProperties)
+  subject = DEF_INVITATION_MSG_FMT % {
+      'role' : entity.role,
+      'group' : entity.scope.name
+      }
 
-  # create the fields for the notification
+  template = DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE
+
+  sendNotification(to_user, message_properties, subject, template)
+
+
+def sendNotification(to_user, message_properties, subject, template):
+  """Sends out an notification to the specified user.
+
+  Args:
+    entity : A request containing the information needed to create the message
+  """
+
+  from_user = model_logic.user.logic.getForCurrentAccount()
+
+  new_message_properties = {
+      'sender_name': from_user.name,
+      'to_name': to_user.name,
+      }
+
+  message_properties = dicts.merge(message_properties, new_message_properties)
+
+  message = loader.render_to_string(template, dictionary=message_properties)
+
   fields = {
-      'from_user' : current_user_entity,
-      'subject' : DEF_INVITATION_MSG_FMT % {
-          'role' : entity.role,
-          'group' : group_entity.name
-          },
+      'from_user' : from_user,
+      'subject': subject,
       'message' : message,
-      'scope' : request_user_entity,
+      'scope' : to_user,
       'link_id' :'%i' % (time.time()),
-      'scope_path' : request_user_entity.link_id
+      'scope_path' : to_user.link_id
   }
 
+  key_fields = model_logic.notification.logic.getKeyFieldsFromDict(fields)
+
   # create and put a new notification in the datastore
-  notification_logic = model_logic.notification.logic
-  notification_logic.updateOrCreateFromFields(fields,
-      notification_logic.getKeyFieldsFromDict(fields))
+  model_logic.notification.logic.updateOrCreateFromFields(fields, key_fields)
 
 
 def sendNewNotificationMessage(notification_entity):

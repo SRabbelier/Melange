@@ -62,8 +62,8 @@ class Logic(base.Logic):
   def _onCreate(self, entity):
     """Sends out a message notifying users about the new invite/request.
     """
-    
-    if entity.group_accepted:  
+
+    if entity.group_accepted:
       # this is an invite
       notifications.sendInviteNotification(entity)
     elif entity.user_accepted:

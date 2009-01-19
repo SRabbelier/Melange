@@ -46,6 +46,7 @@ DEF_INVITATION_MSG_FMT = ugettext_lazy(
 
 DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s,")
 
+
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.
 
@@ -103,6 +104,7 @@ def sendInviteNotification(entity):
   notification_logic.updateOrCreateFromFields(fields,
       notification_logic.getKeyFieldsFromDict(fields))
 
+
 def sendNewNotificationMessage(notification_entity):
   """Sends an email to a user about a new notification
 
@@ -139,6 +141,7 @@ def sendNewNotificationMessage(notification_entity):
   # send out the message using the default new notification template
   mail_dispatcher.sendMailFromTemplate('soc/mail/new_notification.html',
                                        messageProperties)
+
 
 def sendWelcomeMessage(user_entity):
   """Sends out a welcome message to a user.

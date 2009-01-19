@@ -50,7 +50,7 @@ class View(group_app.View):
 
     Params:
       params: a dict with params for this View
-    """    
+    """
 
     rights = {}
     rights['create'] = [access.checkIsUser]
@@ -75,16 +75,16 @@ class View(group_app.View):
               ),
         'clean_backup_admin_link_id': cleaning.clean_existing_user('backup_admin_link_id'),
         }
-    
+
     patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
         'soc.views.models.%(module_name)s.showReviewOverview',
         'Review %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>review)/%(lnp)s$',
           'soc.views.models.%(module_name)s.review',
           'Review %(name_short)s')]
-    
+
     new_params['extra_django_patterns'] = patterns
-    
+
     new_params['name'] = "Club Application"
     new_params['name_plural'] = "Club Applications"
     new_params['name_short'] = "Club App"
@@ -93,7 +93,7 @@ class View(group_app.View):
     new_params['sidebar_additional'] = [
         ('/%(url_name)s/review' % new_params,
          'Review %(name_plural)s' % new_params, 'review')]
-    
+
     new_params['review_template'] = 'soc/club_app/review.html'
 
     params = dicts.merge(params, new_params)
@@ -146,37 +146,36 @@ class View(group_app.View):
 
     if not entity:
       fields['applicant'] = user_logic.logic.getForCurrentAccount()
-      
+
     # the application has either been created or edited so
     # the review status needs to be set accordingly
     fields['reviewed'] = False
     fields['accepted'] = False
-      
+
   def _public(self, request, entity, context):
     """See base._public().
     """
-    
-    context['entity_type_url'] = self._params['url_name']
 
+    context['entity_type_url'] = self._params['url_name']
 
   def review(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Handles the view containing the review of an application.
-    
-    accepted (true or false) in the GET data will mark 
-    the application accordingly. 
-    
-    
+
+    accepted (true or false) in the GET data will mark
+    the application accordingly.
+
+
     For params see base.View.public().
     """
-    
+
     params = dicts.merge(params, self._params)
-    
+
     try:
       access.checkAccess(access_type, request, rights=params['rights'])
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
-    
+
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
@@ -188,15 +187,15 @@ class View(group_app.View):
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
-    
+
     get_dict = request.GET
-    
+
     # check to see if we can make a decision for this application
     if 'accepted' in get_dict.keys():
       accepted_value = get_dict['accepted']
-      
+
       fields = {'reviewed' : False}
-      
+
       if accepted_value == 'true':
         # the application has been accepted
         fields['accepted'] = True
@@ -205,17 +204,17 @@ class View(group_app.View):
         # the application has been denied
         fields['accepted'] = False
         fields['reviewed'] = True
-      
-      if fields['reviewed']: 
+
+      if fields['reviewed']:
         # the application has either been denied or accepted
         # mark it as reviewed and update accordingly
         application = self._logic.getFromFields(link_id=kwargs['link_id'])
         self._logic.updateModelProperties(application, fields)
-        
-        return self.showReviewOverview(request, access_type, 
+
+        return self.showReviewOverview(request, access_type,
             page_name=page_name, params=params, **kwargs)
 
-    # the application has nog been reviewed so show the information
+    # the application has not been reviewed so show the information
     # using the appropriate review template
     params['public_template'] = params['review_template']
 
@@ -243,7 +242,7 @@ class View(group_app.View):
         request, ur_params, filter, 0)
 
     # only select the requests that haven't been turned into a group yet
-    filter = {'accepted' : True, 
+    filter = {'accepted' : True,
         'application_completed' : False}
 
     uh_params = params.copy()
@@ -257,18 +256,18 @@ class View(group_app.View):
     #only select the requests the have been denied
     filter = {'reviewed' : True,
         'accepted' : False}
-    
+
     den_params = params.copy()
     den_params['list_description'] = ugettext_lazy('A list of all applications '
         'that have been denied')
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
-    
+
     den_list = helper.lists.getListContent(
         request, den_params, filter, 0)
-    
+
     # fill contents with all the needed lists
     contents = [ur_list, uh_list, den_list]
-    
+
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
 

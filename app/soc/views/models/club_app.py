@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.helper import notifications
 from soc.logic.models import user as user_logic
 from soc.models import group_app as group_app_model
 from soc.views import helper
@@ -200,6 +201,7 @@ class View(group_app.View):
         # the application has been accepted
         fields['accepted'] = True
         fields['reviewed'] = True
+        notifications.sendNewClubNotification(entity)
       elif accepted_value == 'false':
         # the application has been denied
         fields['accepted'] = False

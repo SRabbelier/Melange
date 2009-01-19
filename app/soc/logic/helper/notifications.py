@@ -47,10 +47,14 @@ DEF_NEW_NOTIFICATION_MSG = ugettext_lazy(
 DEF_INVITATION_MSG_FMT = ugettext_lazy(
     "Invitation to become a %(role)s for %(group)s.")
 
+DEF_NEW_CLUB_MSG_FMT = ugettext_lazy(
+    "Your club application for %(name)s has been accepted.")
+
 DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
 
+DEF_NEW_CLUB_TEMPLATE = 'soc/club/messages/accepted.html'
 
 
 def sendInviteNotification(entity):
@@ -81,6 +85,34 @@ def sendInviteNotification(entity):
       }
 
   template = DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE
+
+  sendNotification(to_user, message_properties, subject, template)
+
+
+def sendNewClubNotification(entity):
+  """Sends out an invite notification to the applicant of the club
+
+  Args:
+    entity : An accepted club application
+  """
+
+  to_user = entity.applicant
+
+  url = "http://%(host)s/club/create/%(key_name)s" % {
+      'host' : os.environ['HTTP_HOST'],
+      'key_name': entity.key().name(),
+      }
+
+  message_properties = {
+      'club_name': entity.name,
+      'url': url,
+      }
+
+  subject = DEF_NEW_CLUB_MSG_FMT % {
+      'name': entity.name,
+      }
+
+  template = DEF_NEW_CLUB_TEMPLATE
 
   sendNotification(to_user, message_properties, subject, template)
 

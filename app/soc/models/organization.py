@@ -46,4 +46,12 @@ class Organization(soc.models.group.Group):
     verbose_name=ugettext_lazy('Development Mailing List'))
   dev_mailing_list.help_text = ugettext_lazy(
     'Mailing list email address, URL to sign-up page, etc.')
+    
+  member_template = db.ReferenceProperty(
+    reference_class=soc.models.document.Document, required=False,
+    collection_name='group_app_member_template',
+    verbose_name=ugettext_lazy('Application template'))
+  member_template.help_text = ugettext_lazy(
+    'This template will be presented to potential members when they'
+    ' apply to the group.')
 

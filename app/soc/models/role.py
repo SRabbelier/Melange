@@ -75,6 +75,14 @@ class Role(soc.models.linkable.Linkable):
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name='roles')
 
+  #: field storing whether User has agreed to the Role-specific Terms of
+  #: Service. (Not a required field because some Roles may not have special
+  #: Terms of Service.)
+  agrees_to_tos = db.BooleanProperty(
+      verbose_name=ugettext_lazy('Agrees to ToS'))
+  agrees_to_tos.help_text = ugettext_lazy(
+      'Indicates that the user agrees to the Terms of Service for this Role.')
+
   #====================================================================
   #  (public) name information
   #====================================================================

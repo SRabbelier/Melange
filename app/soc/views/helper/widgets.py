@@ -47,14 +47,16 @@ class ReadOnlyInput(forms.widgets.Input):
 class ReadOnlyBool(forms.widgets.Input):
   """Read only checkbox widget.
   """
-  input_type = 'checkbox'
+  input_type = 'text'
 
   def render(self, name, value, attrs=None):
     """Render ReadOnlyBool widget as HTML.
+
+    Displays "text" field like ReadOnlyInput, but contents will be one of:
+    * empty (no text at all, just a greyed-out box) if no answer at all
+    * "True" (in the same greyed-out box) if True
+    * "False" (in the same greyed-out box) if False
     """
-    # TODO(tlarsen): this really should display "Yes" or "No" (wrapped with
-    #   ugettext_lazy(), of course), instead of displaying a greyed-out but
-    #   toggleable checkbox (that has no effect on the field, though).
     attrs['readonly'] = 'readonly'
     return super(ReadOnlyBool, self).render(name, value, attrs)
 

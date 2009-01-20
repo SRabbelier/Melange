@@ -63,7 +63,10 @@ disable-checker=design
 #        or a descendant of the class where it's defined.
 # R0201: Method could be a function. Used when a method doesn't use its bound instance, and so 
 #        could be written as a function.
-disable-msg=W0613,W0622,W0232,W0142,W0102,W0212,R0201
+# R0801: Similar lines in %s files. Indicates that a set of similar lines has been detected 
+#        among multiple file. This usually means that the code should be refactored to avoid this
+#        duplication.
+disable-msg=W0613,W0622,W0232,W0142,W0102,W0212,R0201,R0801
 
 
 [REPORTS]

@@ -36,6 +36,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import lists as list_helper
 from soc.views.models import group_app
 
 import soc.logic.dicts
@@ -110,28 +111,82 @@ class View(group_app.View):
 
     params = dicts.merge(params, self._params)
 
+    try:
+      access.checkAccess(access_type, request, params['rights'])
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(error, request)
+
     # get the current user
     user_entity = user_logic.logic.getForCurrentAccount()
 
     is_developer = accounts.isDeveloper(user=user_entity)
 
-    if is_developer:
-      filter = {}
-    else:
+    filter = {
+        'application_completed': False,
+        'reviewed': False,
+        }
+
+    if not is_developer:
       # only select the applications for this user so construct a filter
-      filter = {'applicant': user_entity}
+      filter['applicant'] = user_entity
+
+    # Get all the pending applications
+
+    pa_params = params.copy() # pending applications
 
     if is_developer:
-      params['list_description'] = ugettext_lazy(
-          "An overview all club applications.")
+      pa_params['list_description'] = ugettext_lazy(
+          "An overview all pending club applications.")
     else:
-      params['list_description'] = ugettext_lazy(
-          "An overview of your club applications.")
+      pa_params['list_description'] = ugettext_lazy(
+          "An overview of your pending club applications.")
 
-    # use the generic list method with the filter. The access check in this
-    # method will trigger an errorResponse when user_entity is None
-    return super(View, self).list(request, access_type,
-        page_name, params, filter)
+    pa_list = list_helper.getListContent(
+        request, pa_params, filter, 0)
+
+    # Get all the reviewed applications now
+
+    # Re-use the old filter, but set to only reviewed and accepted
+    filter['reviewed'] = True
+    filter['accepted'] = True
+
+    aa_params = params.copy() # accepted applications
+
+    if is_developer:
+      aa_params['list_description'] = ugettext_lazy(
+          "An overview all accepted club applications.")
+    else:
+      aa_params['list_description'] = ugettext_lazy(
+          "An overview of your accepted club applications.")
+
+    aa_params['url_name'] = 'club'
+    aa_params['list_action'] = (redirects.getCreateRedirect, aa_params)
+
+    aa_list = list_helper.getListContent(
+        request, aa_params, filter, 1)
+
+    # Get all the reviewd applications that were denied
+
+    # Re use the old filter, but this time only for denied apps
+    filter['accepted'] = False
+
+    da_params = params.copy() # denied applications
+
+    if is_developer:
+      da_params['list_description'] = ugettext_lazy(
+          "An overview all denied club applications.")
+    else:
+      da_params['list_description'] = ugettext_lazy(
+          "An overview of your denied club applications.")
+
+    da_list = list_helper.getListContent(
+        request, da_params, filter, 2)
+
+    # fill contents with all the needed lists
+    contents = [pa_list, aa_list, da_list]
+
+    # call the _list method from base to display the list
+    return self._list(request, params, contents, page_name)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

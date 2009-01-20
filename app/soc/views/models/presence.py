@@ -32,6 +32,7 @@ from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import base
 
 import soc.models.presence
@@ -115,7 +116,7 @@ class EditForm(CreateForm):
 
 
 class View(base.View):
-  """View methods for the Document model.
+  """View methods for the Presence model.
   """
 
   def __init__(self, params=None):
@@ -148,6 +149,22 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
+  def getToSLink(self, entity):
+    """Returns link to 'show' the ToS Document if it exists, None otherwise.
+
+    Args:
+      entity: Presence entity that may or may not have a tos property
+    """
+    if not entity:
+      return None
+
+    try:
+      tos_doc = entity.tos
+    except db.Error:
+      return None
+
+    return redirects.getPublicRedirect(tos_doc, {'url_name': 'document'})
+
   def _public(self, request, entity, context):
     """See base.View._public().
     """
@@ -164,21 +181,7 @@ class View(base.View):
       home_doc.content = helper.templates.unescape(home_doc.content)
       context['home_document'] = home_doc
 
-    try:
-      tos_doc = entity.tos
-    except db.Error:
-      tos_doc = None
-
-    if tos_doc:
-      # TODO(tlarsen): This may not be the correct way to do this...  Also,
-      #   at some point, this needs to be a link to *all* of the various
-      #   Terms of Service that might apply to the scope of this particular
-      #   page (e.g. site-wide ToS, program ToS, group ToS, etc.).  See:
-      #     http://code.google.com/p/soc/issues/detail?id=153
-      #   So, this probably needs to be added to base.py, but these
-      # overridden _public() methods do not seem to call it.
-      context['tos_link'] = '/document/show/%s/%s' % (
-        tos_doc.scope_path, tos_doc.link_id)
+    context['tos_link'] = self.getToSLink(entity)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

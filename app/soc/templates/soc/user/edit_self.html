@@ -56,6 +56,20 @@ be unique and not in use by any other user of the site.
   </tr>
   <tr><td colspan="4">&nbsp;</td></tr>
 
+{% if tos_link %}
+  {% field_as_table_row form.agrees_to_tos %}
+  <tr>
+   <td class="fieldhelptext" colspan="4">
+In order to participate on this site, you must agree to the
+<a href="{{tos_link}}">site-wide Terms of Service</a>.<br><br>
+(There may also be additional Terms of Service specific to participation
+in certain Programs or Groups.  Those are agreed to elsewhere on the site,
+when signing up for the specific participation Roles.)
+   </td>
+  </tr>
+  <tr><td colspan="4">&nbsp;</td></tr>
+{% endif %}
+
  </table>
  <table>
   <tr>

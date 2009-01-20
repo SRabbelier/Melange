@@ -176,8 +176,9 @@ class View(base.View):
         new_link_id = form.cleaned_data.get('link_id')
         properties = {
           'link_id': new_link_id,
-          'name': form.cleaned_data.get("name"),
+          'name': form.cleaned_data.get('name'),
           'account': account,
+          'agrees_to_tos': form.cleaned_data.get('agrees_to_tos'),
         }
 
         # check if user account is not in former_accounts

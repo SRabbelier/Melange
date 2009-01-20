@@ -149,22 +149,6 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  def getToSLink(self, entity):
-    """Returns link to 'show' the ToS Document if it exists, None otherwise.
-
-    Args:
-      entity: Presence entity that may or may not have a tos property
-    """
-    if not entity:
-      return None
-
-    try:
-      tos_doc = entity.tos
-    except db.Error:
-      return None
-
-    return redirects.getPublicRedirect(tos_doc, {'url_name': 'document'})
-
   def _public(self, request, entity, context):
     """See base.View._public().
     """
@@ -180,8 +164,6 @@ class View(base.View):
     if home_doc:
       home_doc.content = helper.templates.unescape(home_doc.content)
       context['home_document'] = home_doc
-
-    context['tos_link'] = self.getToSLink(entity)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

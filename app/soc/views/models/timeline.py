@@ -14,16 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views for Programs.
+"""Views for Timeline.
 """
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
+from google.appengine.ext import db
+
 from django import forms
 
+from gsoc.models import timeline
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
 from soc.views.helper import params as params_helper
@@ -46,15 +50,28 @@ class View(base.View):
 
     new_params = {}
     new_params['logic'] = soc.logic.models.timeline.logic
-
+    new_params['edit_template'] = 'soc/timeline/edit.html'
     new_params['name'] = "Timeline"
 
     patterns = [(r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
-                  'soc.views.models.%(module_name)s.edit', "Edit %(name_short)s")]
+                  'soc.views.models.%(module_name)s.edit', 
+                  "Edit %(name_short)s")]
 
     new_params['django_patterns_defaults'] = patterns
 
-    new_params['edit_dynafields']= []
+    new_params['edit_dynafields'] = []
+
+    timeline_properties = timeline.Timeline.properties()
+    form_fields = {}
+    
+    # add class 'datetime-pick' for each DateTimeField
+    # this is used with datetimepicker js widget
+    for key, value in timeline_properties.iteritems():
+      if isinstance(value, db.DateTimeProperty):
+        form_fields[key] = forms.DateTimeField(required=False,
+          widget=forms.TextInput(attrs={'class':'datetime-pick'}))
+    
+    new_params['create_extra_dynafields'] = form_fields
 
     params = dicts.merge(params, new_params)
 

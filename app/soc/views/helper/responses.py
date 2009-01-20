@@ -187,5 +187,8 @@ def getToSLink(presence):
   except db.Error:
     return None
 
+  if not tos_doc:
+    return None
+
   return redirects.getPublicRedirect(tos_doc, {'url_name': 'document'})
 

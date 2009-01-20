@@ -269,7 +269,7 @@ class View(base.View):
     items = [('/' + 'notification/list', link_title, 'notification')]
 
     new_params = {}
-    new_params['sidebar'] = items
+    new_params['sidebar_additional'] = items
 
     params = dicts.merge(params, new_params)
 

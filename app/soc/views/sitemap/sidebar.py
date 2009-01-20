@@ -74,7 +74,11 @@ def getSidebarItems(params):
 
   # Return the found result
   if params['sidebar']:
-    return params['sidebar']
+    default = params['sidebar']
+    result = default[:]
+    for item in params['sidebar_additional']:
+      result.append(item)
+    return result
 
   # Construct defaults manualy
   defaults = params['sidebar_defaults']

@@ -41,5 +41,22 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+  def getToS(self, entity):
+    """Returns the ToS Document of the Presence entity, or None if no ToS.
+
+    Args:
+      entity:  Presence (or one of its sub-classes) entity that may or may
+        not have a ToS Document attached
+    """
+    if not entity:
+      return None
+
+    try:
+      tos_doc = entity.tos
+    except db.Error:
+      return None
+
+    return tos_doc
+
 
 logic = Logic()

@@ -31,6 +31,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
+from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -38,7 +39,6 @@ from soc.views.models import base
 
 import soc.models.linkable
 import soc.models.user
-import soc.logic.models.user
 import soc.views.helper
 
 
@@ -59,7 +59,7 @@ class UserForm(helper.forms.BaseForm):
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
 
-    user = soc.logic.models.user.logic.getForFields({'link_id': link_id},
+    user = user_logic.logic.getForFields({'link_id': link_id},
                                           unique=True)
 
     # Get the currently logged in user account
@@ -104,7 +104,7 @@ class View(base.View):
 
     new_params = {}
     new_params['rights'] = rights
-    new_params['logic'] = soc.logic.models.user.logic
+    new_params['logic'] = user_logic.logic
 
     new_params['name'] = "User"
     new_params['module_name'] = "user_self"
@@ -162,7 +162,7 @@ class View(base.View):
     account = users.get_current_user()
     properties = {'account': account}
 
-    user = soc.logic.models.user.logic.getForFields(properties, unique=True)
+    user = user_logic.logic.getForFields(properties, unique=True)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -180,14 +180,14 @@ class View(base.View):
 
         # check if user account is not in former_accounts
         # if it is show error message that account is invalid
-        if soc.logic.models.user.logic.isFormerAccount(account):
+        if user_logic.logic.isFormerAccount(account):
           msg = self.DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
             'email': account.email()}
           error = out_of_band.Error(msg)
           return helper.responses.errorResponse(
               error, request, template=self.EDIT_SELF_TMPL, context=context)
 
-        user = soc.logic.models.user.logic.updateOrCreateFromFields(
+        user = user_logic.logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})
 
         # redirect to /user/profile?s=0

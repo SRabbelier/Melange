@@ -32,6 +32,7 @@ from soc.logic import dicts
 from soc.logic import validate
 from soc.models import notification as notification_model
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects

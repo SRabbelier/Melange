@@ -29,8 +29,10 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic import validate
-from soc.logic.models import user as user_logic
+from soc.logic.models.site import logic as site_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import helper
+from soc.views.helper import responses
 from soc.views.models import base
 
 import soc.models.linkable
@@ -80,7 +82,7 @@ class CreateForm(helper.forms.BaseForm):
                                                             unique=True)
     key_name = self.data.get('key_name')
     if key_name:
-      key_name_user = user_logic.logic.getFromKeyName(key_name)
+      key_name_user = user_logic.getFromKeyName(key_name)
       
       if (link_id_user and key_name_user
           and (link_id_user.account != key_name_user.account)):
@@ -92,7 +94,7 @@ class CreateForm(helper.forms.BaseForm):
     form_account = users.User(email=self.cleaned_data.get('email'))
     key_name = self.data.get('key_name')
     if key_name:
-      user = user_logic.logic.getFromKeyName(key_name)
+      user = user_logic.getFromKeyName(key_name)
       old_email = user.account.email()
     else:
       old_email = None
@@ -100,7 +102,7 @@ class CreateForm(helper.forms.BaseForm):
     new_email = form_account.email()
 
     if new_email != old_email \
-        and user_logic.logic.getForFields({'email': new_email}, unique=True):
+        and user_logic.getForFields({'email': new_email}, unique=True):
       raise forms.ValidationError("This account is already in use.")
 
     return self.cleaned_data.get('email')
@@ -149,6 +151,7 @@ class View(base.View):
 
     # fill in the email field with the data from the entity
     form.fields['email'].initial = entity.account.email()
+    form.fields['agrees_to_tos'].example_text = self._getToSExampleText()
 
     super(View, self)._editGet(request, entity, form)
 
@@ -160,6 +163,19 @@ class View(base.View):
     fields['account'] = users.User(fields['email'])
 
     super(View, self)._editPost(request, entity, fields)
+
+  def _getToSExampleText(self):
+    """Returns example_text linking to site-wide ToS, or a warning message.
+    """
+    tos_link = responses.getToSLink(site_logic.getSingleton())
+
+    if not tos_link:
+      return ('<div class="notice">&nbsp;<i>No site-wide</i> Terms of'
+              ' Service <i>are currently set!</i>&nbsp;</div>')
+
+    return ('<i>current site-wide <b><a href=%s>Terms of Service</a></b></i>'
+            % tos_link)
+
 
 view = View()
 

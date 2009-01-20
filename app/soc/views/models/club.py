@@ -60,7 +60,7 @@ class View(base.View):
 
     new_params['name'] = "Club"
 
-    new_params['extra_dynaexclude'] = ['founder', 'home', 'member_template']
+    new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),

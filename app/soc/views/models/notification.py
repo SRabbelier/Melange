@@ -84,7 +84,7 @@ class View(base.View):
     rights['unspecified'] = [access.deny]
     rights['edit'] = [access.deny]
     rights['show'] = [access.checkIsMyNotification]
-    rights['delete'] = [access.checkIsDeveloper]
+    rights['delete'] = [access.checkIsMyNotification]
     rights['list'] = [access.checkIsUser]
     # create is developer only for the time being to test functionality
     rights['create'] = [access.checkIsDeveloper]

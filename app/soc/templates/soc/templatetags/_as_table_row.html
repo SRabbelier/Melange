@@ -41,7 +41,7 @@ limitations under the License.
     {% endif %}
 
     {% if example_text %}
-      <td class="formfieldexample">e.g. {{ example_text }}</td>
+      <td class="formfieldexample">{{ example_text|safe }}</td>
     {% else %}
       <td></td>
     {% endif %}

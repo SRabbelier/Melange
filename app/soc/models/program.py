@@ -38,14 +38,16 @@ class Program(soc.models.presence.Presence):
   name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Name'))
   name.help_text = ugettext_lazy('Complete, formal name of the program.')
-  name.example_text = ugettext_lazy('Google Summer of Code 2009')
+  name.example_text = ugettext_lazy(
+      '<small><i>e.g.</i></small> <tt>Google Summer of Code 2009</tt>')
 
   #: Required field storing short name of the group.
   #: It can be used for displaying group as sidebar menu item.
   short_name = db.StringProperty(required=True,
       verbose_name=ugettext_lazy('Short name'))
   short_name.help_text = ugettext_lazy('Short name used for sidebar menu')
-  short_name.example_text = ugettext_lazy('GSoC 2009')
+  short_name.example_text = ugettext_lazy(
+      '<small><i>e.g.</i></small> <tt>GSoC 2009</tt>')
 
   #: Optional field used to relate it to other programs
   #: For example, GSoC would be a group label for GSoC2008/GSoC2009
@@ -53,19 +55,25 @@ class Program(soc.models.presence.Presence):
       verbose_name=ugettext_lazy('Group label'))
   group_label.help_text = ugettext_lazy(
       'Optional name used to relate this program to others.')
-  group_label.example_text = ugettext_lazy('GSoC')
+  group_label.example_text = ugettext_lazy(
+      '<small><i>e.g.</i></small> <tt>GSoC</tt>')
 
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,
       verbose_name=ugettext_lazy('Description'))
-  description.example_text = ugettext_lazy('This is the program for GSoC 2009')
+  description.example_text = ugettext_lazy(
+      '<small><i>for example:</i></small><br>'
+      '<tt><b>GSoC 2009</b> is the <i>Google Summer of Code</i>,'
+      ' but in <u>2009</u>!</tt><br><br>'
+      '<small><i>(rich text formatting is supported)</i></small>')
   
   #: Required field storing the type of workflow this program has
   workflow = db.StringProperty(required=True,
       choices=['gsoc', 'ghop'],
       verbose_name= ugettext_lazy('Workflow type'))
-  workflow.example_text = ugettext_lazy('Project-based for GSoC workflow type, ' 
-      'task-based for GHOP workflow type')
+  workflow.example_text = ugettext_lazy(
+      '<b><tt>Project-based</tt></b> for GSoC workflow type,<br>' 
+      ' <b><tt>Task-based</tt></b> for GHOP workflow type.')
 
   #: Required 1:1 relationship indicating the Program the Timeline
   #: belongs to.

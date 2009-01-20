@@ -440,7 +440,8 @@ table#queues td {
   color: red;
 }
 
-.notice { 
+.notice {
+  width: 450px;
   background:#fad163; 
   font-size: small;
   font-weight: bold;

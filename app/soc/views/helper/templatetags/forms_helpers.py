@@ -94,6 +94,7 @@ def readonly_field_as_table_row(field_label, field_value):
   return {'field_label': field_label,
           'field_value': field_value}
 
+
 @register.inclusion_tag('soc/templatetags/_readonly_field_as_twoline_table_row.html')
 def readonly_field_as_twoline_table_row(field_label, field_value):
   """See readonly_field_as_table_row().
@@ -113,23 +114,25 @@ def readonly_multiline_field_as_table_row(field_label, field_value):
 
 @register.inclusion_tag('soc/templatetags/_as_table.html')
 def as_table(form):
-  """Outputs a form as a properly formatted html table
+  """Outputs a form as a properly formatted html table.
 
   Args:
     form: the form that should be converted to a table
   """
 
   return as_table_helper(form)
+
 
 @register.inclusion_tag('soc/templatetags/_as_twoline_table.html')
 def as_twoline_table(form):
-  """Outputs a form as a properly formatted html table
+  """Outputs a form as a properly formatted html table.
 
   Args:
     form: the form that should be converted to a table
   """
 
   return as_table_helper(form)
+
 
 def as_table_helper(form):
   fields = []
@@ -166,7 +169,7 @@ def as_table_helper(form):
 
 @register.inclusion_tag('soc/templatetags/_as_table_row.html')
 def as_table_row(form, field, required, example_text):
-  """Outputs a field as a properly formatted html row
+  """Outputs a field as a properly formatted html row.
 
   Args:
     form: the form that the row belongs to
@@ -176,10 +179,11 @@ def as_table_row(form, field, required, example_text):
   """
 
   return as_table_row_helper(form, field, required, example_text)
+
 
 @register.inclusion_tag('soc/templatetags/_as_twoline_table_row.html')
 def as_twoline_table_row(form, field, required, example_text):
-  """Outputs a field as a properly formatted html row
+  """Outputs a field as a properly formatted html row.
 
   Args:
     form: the form that the row belongs to
@@ -189,6 +193,7 @@ def as_twoline_table_row(form, field, required, example_text):
   """
 
   return as_table_row_helper(form, field, required, example_text)
+
 
 def as_table_row_helper(form, field, required, example_text):
   # Escape and cache in local variable.

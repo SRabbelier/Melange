@@ -90,7 +90,7 @@ def sendInviteNotification(entity):
 
 
 def sendNewClubNotification(entity):
-  """Sends out an invite notification to the applicant of the club
+  """Sends out an invite notification to the applicant of the club.
 
   Args:
     entity : An accepted club application
@@ -121,7 +121,10 @@ def sendNotification(to_user, message_properties, subject, template):
   """Sends out an notification to the specified user.
 
   Args:
-    entity : A request containing the information needed to create the message
+    to_user : user to which the notification will be send
+    message_properties : email message properties
+    subject : subject of notification email
+    template : template used for generating notification
   """
 
   from_user = model_logic.user.logic.getForCurrentAccount()
@@ -151,7 +154,7 @@ def sendNotification(to_user, message_properties, subject, template):
 
 
 def sendNewNotificationMessage(notification_entity):
-  """Sends an email to a user about a new notification
+  """Sends an email to a user about a new notification.
 
     Args:
       notification_entity: Notification about which the message should be sent

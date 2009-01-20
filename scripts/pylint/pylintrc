@@ -61,7 +61,9 @@ disable-checker=design
 # W0212: Access to a protected member %s of a client class Used when a protected member 
 #        (i.e. class member with a name beginning with an underscore) is access outside the class 
 #        or a descendant of the class where it's defined.
-disable-msg=W0613,W0622,W0232,W0142,W0102,W0212
+# R0201: Method could be a function. Used when a method doesn't use its bound instance, and so 
+#        could be written as a function.
+disable-msg=W0613,W0622,W0232,W0142,W0102,W0212,R0201
 
 
 [REPORTS]

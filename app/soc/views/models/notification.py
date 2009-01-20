@@ -33,6 +33,7 @@ from soc.logic import validate
 from soc.models import notification as notification_model
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.models import base
 from soc.logic.models import notification as notification_logic
@@ -112,26 +113,51 @@ class View(base.View):
 
     params = dicts.merge(params, self._params)
 
+    try:
+      access.checkAccess(access_type, request, params['rights'])
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(error, request)
+
     # get the current user
     user_entity = user_logic.logic.getForCurrentAccount()
 
     # only select the notifications for this user so construct a filter
-    filter = {'scope': user_entity}
+    filter = {
+        'scope': user_entity,
+        'unread': True,
+        }
 
     # create the list parameters
-    list_params = params.copy()
+    un_params = params.copy() # unread notifications
 
     # define the list redirect action to show the notification
-    list_params['list_action'] = (redirects.getPublicRedirect, params)
-    list_params['list_description'] = ugettext_lazy(
-        "An overview of your received Notifications.")
+    un_params['list_action'] = (redirects.getPublicRedirect, params)
+    un_params['list_description'] = ugettext_lazy(
+        "An overview of your unread Notifications.")
 
     # TODO(Lennard) when list sorting is implemented sort on descending date
+    un_list = list_helper.getListContent(
+        request, un_params, filter, 0)
 
-    # use the generic list method with the filter. The access check in this
-    # method will trigger an errorResponse when user_entity is None
-    return super(View, self).list(request, access_type,
-        page_name, list_params, filter)
+    # Now get the read list
+
+    # Reuse the filter, but only for read notifications
+    filter['unread'] = False
+
+    rn_params = params.copy() # read notifications
+
+    rn_params['list_action'] = (redirects.getPublicRedirect, params)
+    rn_params['list_description'] = ugettext_lazy(
+        "An overview of your read Notifications.")
+
+    rn_list = list_helper.getListContent(
+        request, rn_params, filter, 1)
+
+    # fill contents with all the needed lists
+    contents = [un_list, rn_list]
+
+    # call the _list method from base to display the list
+    return self._list(request, params, contents, page_name)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

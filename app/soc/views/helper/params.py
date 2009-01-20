@@ -273,6 +273,7 @@ def getKeyFieldsPattern(params):
   result = '/'.join(patterns)
   return result
 
+
 def getScopePattern(params):
   """Returns the Scope pattern for this entity.
   """

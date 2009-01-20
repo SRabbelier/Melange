@@ -71,7 +71,7 @@ def clean_existing_user(field_name):
   
     if not user_entity:
       # user does not exist
-      raise forms.ValidationError("This user does not exist")
+      raise forms.ValidationError("This user does not exist.")
   
     return user_entity
   return wrapped

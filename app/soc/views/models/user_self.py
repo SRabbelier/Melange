@@ -247,7 +247,7 @@ class View(base.View):
     super(View, self)._editPost(request, entity, fields)
 
   def getSidebarMenus(self, request, params=None):
-    """See base.View.getSidebarMenus()
+    """See base.View.getSidebarMenus().
     """
 
     link_title = ugettext_lazy('Notifications')

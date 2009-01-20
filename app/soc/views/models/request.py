@@ -56,7 +56,7 @@ class CreateForm(helper.forms.BaseForm):
     """
     model = soc.models.request.Request
 
-    #: list of model fields which will *not* be gathered by the form 
+    #: list of model fields which will *not* be gathered by the form
     exclude = ['scope', 'scope_path', 'link_id', 'role', 'declined']
 
   role = forms.CharField(widget=helper.widgets.ReadOnlyInput())
@@ -121,8 +121,8 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-    
-    
+
+
   def listSelf(self, request, access_type,
                page_name=None, params=None, **kwargs):
     """Displays the unhandled requests for this user.
@@ -151,7 +151,7 @@ class View(base.View):
     # only select the requests for this user that haven't been handled yet
     filter = {'link_id': user_entity.link_id,
               'group_accepted' : True}
-    
+
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.inviteAcceptedRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
@@ -161,22 +161,22 @@ class View(base.View):
         request, uh_params, filter, 0)
 
     # construct the Open Requests list
-    
+
     # only select the requests for the user
     # that haven't been accepted by an admin yet
     filter = {'link_id' : user_entity.link_id,
               'group_accepted' : False}
-    
+
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
         "List of your pending requests.")
-    
+
     ar_list = helper.lists.getListContent(
         request, ar_params, filter, 1)
-    
+
     # fill contents with all the needed lists
     contents = [uh_list, ar_list]
-    
+
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
 

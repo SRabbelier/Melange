@@ -136,7 +136,7 @@ class View(group_app.View):
 
     if is_developer:
       pa_params['list_description'] = ugettext_lazy(
-          "An overview all pending club applications.")
+          "An overview of all pending club applications.")
     else:
       pa_params['list_description'] = ugettext_lazy(
           "An overview of your pending club applications.")
@@ -154,7 +154,7 @@ class View(group_app.View):
 
     if is_developer:
       aa_params['list_description'] = ugettext_lazy(
-          "An overview all accepted club applications.")
+          "An overview of all accepted club applications.")
     else:
       aa_params['list_description'] = ugettext_lazy(
           "An overview of your accepted club applications.")
@@ -174,7 +174,7 @@ class View(group_app.View):
 
     if is_developer:
       da_params['list_description'] = ugettext_lazy(
-          "An overview all denied club applications.")
+          "An overview of all denied club applications.")
     else:
       da_params['list_description'] = ugettext_lazy(
           "An overview of your denied club applications.")

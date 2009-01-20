@@ -27,10 +27,13 @@ from google.appengine.api import users
 
 from django import forms
 from django import http
+from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic import validate
+from soc.logic import models as model_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -115,7 +118,6 @@ class View(base.View):
         (users.create_login_url("/user/edit"), 'Sign In', 'signIn'),
         ('/' + new_params['url_name'] + '/edit', 'Profile', 'edit'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
-        ('/' + 'notification/list', 'Notifications', 'notification'),
         ]
 
     patterns = []
@@ -243,6 +245,35 @@ class View(base.View):
     fields['account'] = users.User(fields['email'])
 
     super(View, self)._editPost(request, entity, fields)
+
+  def getSidebarMenus(self, request, params=None):
+    """See base.View.getSidebarMenus()
+    """
+
+    link_title = ugettext_lazy('Notifications')
+
+    user = user_logic.logic.getForCurrentAccount()
+
+    filter = {
+        'scope': user,
+        'unread': True,
+        }
+
+    notifications = model_logic.notification.logic.getForFields(filter)
+    count = len(list(notifications))
+
+    if count > 0:
+      link_title = '<b>%s (%d)</b>' % (force_unicode(link_title), count)
+      link_title = mark_safe(link_title)
+
+    items = [('/' + 'notification/list', link_title, 'notification')]
+
+    new_params = {}
+    new_params['sidebar'] = items
+
+    params = dicts.merge(params, new_params)
+
+    return super(View, self).getSidebarMenus(request, params=params)
 
 
 view = View()

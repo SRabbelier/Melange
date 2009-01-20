@@ -74,5 +74,10 @@ class Logic(presence.Logic):
 
     return ['link_id']
 
+  def getSingleton(self):
+    """Return singleton Site settings entity, since there is always only one.
+    """
+    return self.getFromFields(link_id=self.DEF_SITE_LINK_ID)
+
 
 logic = Logic()

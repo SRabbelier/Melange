@@ -56,10 +56,10 @@ class View(group_app.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsUser]
+    rights['create'] = [access.checkAgreesToSiteToS]
     rights['delete'] = [access.checkIsMyApplication(club_app_logic)]
     rights['edit'] = [access.checkIsMyApplication(club_app_logic)]
-    rights['list'] = [access.checkIsUser]
+    rights['list'] = [access.checkAgreesToSiteToS]
     rights['public'] = [access.checkIsMyApplication(club_app_logic)]
     rights['review'] = [access.checkIsDeveloper]
 

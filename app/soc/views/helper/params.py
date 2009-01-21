@@ -73,7 +73,7 @@ def constructParams(params):
   rights = {}
   rights['unspecified'] = []
   rights['any_access'] = [access.checkIsLoggedIn]
-  rights['show'] = [access.checkIsUser]
+  rights['show'] = [access.checkAgreesToSiteToS]
   rights['create'] = [access.checkIsDeveloper]
   rights['edit'] = [access.checkIsDeveloper]
   rights['delete'] = [access.checkIsDeveloper]

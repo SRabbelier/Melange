@@ -103,7 +103,7 @@ class View(base.View):
     """
 
     rights = {}
-    rights['listSelf'] = [access.checkIsUser]
+    rights['listSelf'] = [access.checkAgreesToSiteToS]
     rights['create'] = [access.checkCanInvite]
 
     new_params = {}

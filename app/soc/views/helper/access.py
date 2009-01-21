@@ -236,20 +236,21 @@ def checkIsDeveloper(request, args, kwargs):
 
 
 def checkIsHost(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account has no Host entity
+  """Raises an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
   Args:
     request: a Django HTTP request
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if Host exists for the specified program, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    should be returned by the calling view.
+  Raises:
+    AccessViolationResponse:
+    * if User has not been invited to be a Host, or
+    * if User is not already a Host, or
+    * if User has not agreed to the site-wide ToS, or
+    * if no User exists for the logged-in Google Account, or
+    * if the user is not even logged in
   """
+  checkAgreesToSiteToS(request, args, kwargs)
 
   try:
     # if the current user is invited to create a host profile we allow access
@@ -257,8 +258,6 @@ def checkIsHost(request, args, kwargs):
     return
   except out_of_band.Error:
     pass
-
-  checkAgreesToSiteToS(request, args, kwargs)
 
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)

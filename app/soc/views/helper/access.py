@@ -225,8 +225,8 @@ def checkIsDeveloper(request, args, kwargs):
     * if no User exists for the logged-in Google Account, or
     * if no Google Account is logged in at all
   """
-  # Developers need to bypass the ToS check to avoid "chicken-and-egg" problem
-  checkIsUser(request, args, kwargs)
+
+  checkAgreesToSiteToS(request, args, kwargs)
 
   if accounts.isDeveloper(account=users.get_current_user()):
     return

@@ -25,17 +25,22 @@ __authors__ = [
 
 from google.appengine.api import users
 
+from django import http
 from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models import group_app as group_app_logic
 from soc.logic.models import club as club_logic
+from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import dynaform
 from soc.views.helper import widgets
+from soc.views.helper import responses
 from soc.views.models import base
 
 import soc.logic.models.club
+import soc.views.helper
 
 
 class View(base.View):
@@ -51,14 +56,22 @@ class View(base.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsClubAppAccepted]
+    rights['create'] = [access.checkIsHost]
     rights['edit'] = [access.checkIsClubAdminForClub]
+    rights['applicant'] = [access.checkIsClubAppAccepted]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club.logic
     new_params['rights'] = rights
-
     new_params['name'] = "Club"
+    
+    patterns = []
+
+    page_name = "Club Creation via Accepted Application"
+    patterns += [(r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
+                  'soc.views.models.%(module_name)s.applicant', page_name)]
+    
+    new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
@@ -66,33 +79,119 @@ class View(base.View):
                                    required=False),
         }
 
-    new_params['edit_redirect'] = '/notification/list'
-
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+    
+    # create and store the special form for applicants
+    updated_fields = {
+        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=False)}
+        
+    applicant_create_form = dynaform.extendDynaForm(
+        dynaform = self._params['create_form'],
+        dynafields = updated_fields)
+    
+    params['applicant_create_form'] = applicant_create_form
 
-  def create(self, request, access_type,
-             page_name=None, params=None, **kwargs):
-    """See base.View.create()
+
+  def applicant(self, request, access_type,
+                  page_name=None, params=None, **kwargs):
+    """Handles the creation of a club via an approved club application.
+    
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
     """
+    
+    
+    # merge the params
+    params = dicts.merge(params, self._params)
+    
+    # check if the current user has access to this page
+    try:
+      access.checkAccess(access_type, request, rights=params['rights'])
+    except out_of_band.Error, error:
+      return responses.errorResponse(error, request)
+    
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+    
+    
+    if request.method == 'POST':
+      return self.applicantPost(request, context, params, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.applicantGet(request, context, params, **kwargs)
 
-    if 'link_id' not in kwargs:
-      return super(View, self).create(request, access_type, page_name,
-                                      params=params, **kwargs)
 
-    # Find their application
+  def applicantGet(self, request, context, params, **kwargs):
+    """Handles the GET request concerning the creation of a club via an 
+    approved club application.
+    
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+    
+    # find the application
     key_fields = group_app_logic.logic.getKeyFieldsFromDict(kwargs)
     application = group_app_logic.logic.getFromFields(**key_fields)
-
-    # Extract the application fields
+    
+    # extract the application fields
     field_names = application.properties().keys()
     fields = dict( [(i, getattr(application, i)) for i in field_names] )
+    
+    # create the form using the fields from the application as the initial value
+    form = params['applicant_create_form'](initial=fields)
+    
+    # construct the appropriate response
+    return super(View, self)._constructResponse(request, entity=None, 
+        context=context, form=form, params=params)
 
-    empty = dict( [(i, None) for i in self._logic.getKeyFieldNames()] )
 
-    return super(View, self).edit(request, access_type, page_name,
-                                  params=params, seed=fields, **empty)
+  def applicantPost(self, request, context, params, **kwargs):
+    """Handles the POST request concerning the creation of a club via an 
+    approved club application.
+    
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+    
+    # populate the form using the POST data
+    form = params['applicant_create_form'](request.POST)
+    
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=None, context=context,
+          form=form, params=params)
+    
+    # collect the cleaned data from the valid form
+    key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
+    
+    # fill in the founder of the club
+    account = users.get_current_user()
+    user = user_logic.logic.getForFields({'account': account}, unique=True)
+    fields['founder'] = user
+    
+    if not key_name:
+      key_fields =  self._logic.getKeyFieldsFromDict(fields)
+      key_name = self._logic.getKeyNameForFields(key_fields)
+    
+    # create the club entity
+    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+    
+    # redirect to notifications list to see the admin invite
+    return http.HttpResponseRedirect('/notification/list')
+
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -101,6 +200,7 @@ class View(base.View):
     # fill in the founded_by with data from the entity
     form.fields['founded_by'].initial = entity.founder.name
     super(View, self)._editGet(request, entity, form)
+
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -114,8 +214,10 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
+
 view = View()
 
+applicant = view.applicant
 create = view.create
 delete = view.delete
 edit = view.edit

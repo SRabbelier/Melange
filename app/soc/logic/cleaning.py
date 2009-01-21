@@ -56,6 +56,25 @@ def clean_existing_user(field_name):
     return user_entity
   return wrapped
 
+def clean_existing_user_not_equal_to_current(field_name):
+  """Check if the field_name field is a valid user and is not 
+     equal to the current user.
+  """
+
+  def wrapped(self):
+    
+    clean_user_field = clean_existing_user(field_name)
+    user_entity = clean_user_field(self)
+    
+    current_user_entity = user_logic.logic.getForCurrentAccount()
+    
+    if user_entity.key() == current_user_entity.key():
+      # users are equal
+      raise forms.ValidationError("You cannot enter yourself here")
+    
+    return user_entity
+  return wrapped
+
 
 def clean_feed_url(self):
   feed_url = self.cleaned_data.get('feed_url')

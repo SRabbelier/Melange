@@ -78,7 +78,8 @@ class View(group_app.View):
         'backup_admin_link_id': forms.CharField(
               label=soc.models.club_app.ClubApplication.backup_admin.verbose_name
               ),
-        'clean_backup_admin_link_id': cleaning.clean_existing_user('backup_admin_link_id'),
+        'clean_backup_admin_link_id': 
+            cleaning.clean_existing_user_not_equal_to_current('backup_admin_link_id'),
         }
 
     patterns = [(r'^%(url_name)s/(?P<access_type>review)$',

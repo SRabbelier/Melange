@@ -79,7 +79,7 @@ class View(group_app.View):
         }
 
     patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
-        'soc.views.models.%(module_name)s.showReviewOverview',
+        'soc.views.models.%(module_name)s.review_overview',
         'Review %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>review)/%(lnp)s$',
           'soc.views.models.%(module_name)s.review',
@@ -268,7 +268,7 @@ class View(group_app.View):
         application = self._logic.getFromFields(link_id=kwargs['link_id'])
         self._logic.updateModelProperties(application, fields)
 
-        return self.showReviewOverview(request, access_type,
+        return self.reviewOverview(request, access_type,
             page_name=page_name, params=params, **kwargs)
 
     # the application has not been reviewed so show the information
@@ -278,8 +278,7 @@ class View(group_app.View):
     return super(View, self).public(request, access_type,
         page_name=page_name, params=params, **kwargs)
 
-
-  def showReviewOverview(self, request, access_type,
+  def reviewOverview(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays multiple lists of applications that are in different
     states of the application process.
@@ -337,5 +336,5 @@ list = view.list
 public = view.public
 export = view.export
 review = view.review
-showReviewOverview = view.showReviewOverview
+review_overview = view.reviewOverview
 

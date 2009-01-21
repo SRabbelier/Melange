@@ -63,7 +63,7 @@ DEF_LOGOUT_MSG_FMT = ugettext_lazy(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
 
 
-def checkAccess(access_type, request, rights):
+def checkAccess(access_type, request, rights, args=None, kwargs=None):
   """Runs all the defined checks for the specified type.
 
   Args:
@@ -89,19 +89,19 @@ def checkAccess(access_type, request, rights):
 
   # Call each access checker
   for check in rights['any_access']:
-    check(request)
+    check(request, args, kwargs)
 
   if access_type not in rights:
     for check in rights['unspecified']:
       # No checks defined, so do the 'generic' checks and bail out
-      check(request)
+      check(request, args, kwargs)
     return
 
   for check in rights[access_type]:
-    check(request)
+    check(request, args, kwargs)
 
 
-def allow(request):
+def allow(request, args, kwargs):
   """Never returns an alternate HTTP response.
 
   Args:
@@ -110,7 +110,8 @@ def allow(request):
 
   return
 
-def deny(request):
+
+def deny(request, args, kwargs):
   """Returns an alternate HTTP response.
 
   Args:
@@ -127,7 +128,7 @@ def deny(request):
   raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
 
 
-def checkIsLoggedIn(request):
+def checkIsLoggedIn(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account is not logged in.
 
   Args:
@@ -148,7 +149,7 @@ def checkIsLoggedIn(request):
   raise out_of_band.LoginRequest()
 
 
-def checkNotLoggedIn(request):
+def checkNotLoggedIn(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account is not logged in.
 
   Args:
@@ -169,7 +170,7 @@ def checkNotLoggedIn(request):
   raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
 
 
-def checkIsUser(request):
+def checkIsUser(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account has no User entity.
 
   Args:
@@ -184,7 +185,7 @@ def checkIsUser(request):
     should be returned by the calling view.
   """
 
-  checkIsLoggedIn(request)
+  checkIsLoggedIn(request, args, kwargs)
 
   user = user_logic.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)
@@ -195,7 +196,7 @@ def checkIsUser(request):
   raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
 
-def checkIsDeveloper(request):
+def checkIsDeveloper(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account is not a Developer.
 
   Args:
@@ -210,7 +211,7 @@ def checkIsDeveloper(request):
     response should be returned by the calling view.
   """
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   if accounts.isDeveloper(account=users.get_current_user()):
     return
@@ -221,7 +222,7 @@ def checkIsDeveloper(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsHost(request):
+def checkIsHost(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
@@ -239,12 +240,12 @@ def checkIsHost(request):
 
   try:
     # if the current user is invited to create a host profile we allow access
-    checkIsInvited(request)
+    checkIsInvited(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   user = user_logic.logic.getForFields(
       {'account': users.get_current_user()}, unique=True)
@@ -261,7 +262,7 @@ def checkIsHost(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsClubAdminForClub(request):
+def checkIsClubAdminForClub(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account has no Club Admin
      entity for the specified club.
 
@@ -279,12 +280,12 @@ def checkIsClubAdminForClub(request):
 
   try:
     # if the current user is invited to create a host profile we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   # TODO(srabbelier) implement this
 
@@ -294,7 +295,7 @@ def checkIsClubAdminForClub(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsInvited(request):
+def checkIsInvited(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
@@ -312,12 +313,12 @@ def checkIsInvited(request):
 
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a Program Administrator for this Program'}
@@ -327,7 +328,7 @@ def checkIsInvited(request):
 
   if len(splitpath) < 4:
     # TODO: perhaps this needs a better explanation?
-    deny(request)
+    deny(request, args, kwargs)
 
   role = splitpath[0]
   group_id = splitpath[2]
@@ -338,7 +339,7 @@ def checkIsInvited(request):
 
   if user_id != user.link_id:
     # TODO: perhaps this needs a better explanation?
-    deny(request)
+    deny(request, args, kwargs)
 
   properties = {
       'link_id': user_id,
@@ -355,7 +356,7 @@ def checkIsInvited(request):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsClubAppAccepted(request):
+def checkIsClubAppAccepted(request, args, kwargs):
   """Returns an alternate HTTP response if Google Account has no Club App
      entity for the specified Club.
 
@@ -373,12 +374,12 @@ def checkIsClubAppAccepted(request):
 
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   user = user_logic.logic.getForCurrentAccount()
 
@@ -395,10 +396,10 @@ def checkIsClubAppAccepted(request):
     return
 
   # TODO(srabbelier) Make this give a proper error message
-  deny(request)
+  deny(request, args, kwargs)
 
 
-def checkIsMyNotification(request):
+def checkIsMyNotification(request, args, kwargs):
   """Returns an alternate HTTP response if this request is for a Notification belonging
      to the current user.
 
@@ -414,18 +415,18 @@ def checkIsMyNotification(request):
   
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   # Mine the url for params
   try:
     callback, args, kwargs = urlresolvers.resolve(request.path)
   except Exception:
-    deny(request)
+    deny(request, args, kwargs)
 
   properties = dicts.filter(kwargs, ['link_id', 'scope_path'])
 
@@ -439,9 +440,10 @@ def checkIsMyNotification(request):
     return None
 
   # TODO(ljvderijk) Make this give a proper error message
-  deny(request)
+  deny(request, args, kwargs)
 
-def checkIsMyApplication(request):
+
+def checkIsMyApplication(request, args, kwargs):
   """Returns an alternate HTTP response if this request is for a Application belonging
      to the current user.
 
@@ -457,18 +459,18 @@ def checkIsMyApplication(request):
   
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
 
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   # Mine the url for params
   try:
     callback, args, kwargs = urlresolvers.resolve(request.path)
   except Exception:
-    deny(request)
+    deny(request, args, kwargs)
 
   properties = dicts.filter(kwargs, ['link_id'])
 
@@ -482,10 +484,10 @@ def checkIsMyApplication(request):
     return None
 
   # TODO(srabbelier) Make this give a proper error message
-  deny(request)
+  deny(request, args, kwargs)
 
 
-def checkCanInvite(request):
+def checkCanInvite(request, args, kwargs):
   """Checks to see if the current user can create an invite.
 
   Note that if the current url is not in the default 'request' form
@@ -497,7 +499,7 @@ def checkCanInvite(request):
 
   try:
     # if the current user is a developer we allow access
-    checkIsDeveloper(request)
+    checkIsDeveloper(request, args, kwargs)
     return
   except out_of_band.Error:
     pass
@@ -506,7 +508,7 @@ def checkCanInvite(request):
   try:
     callback, args, kwargs = urlresolvers.resolve(request.path)
   except Exception:
-    deny(request)
+    deny(request, args, kwargs)
 
   # Construct a new url by reshufling the kwargs
   order = ['role', 'access_type', 'scope_path', 'link_id']
@@ -517,16 +519,17 @@ def checkCanInvite(request):
   try:
     callback, args, kwargs = urlresolvers.resolve(url)
   except Exception:
-    deny(request)
+    deny(request, args, kwargs)
 
   # Get the everything we need for the access check
   params = callback.im_self.getParams()
   access_type = kwargs['access_type']
 
   # Perform the access check
-  helper.access.checkAccess(access_type, request, rights=params['rights'])
+  checkAccess(access_type, request, rights=params['rights'])
 
-def checkIsDocumentPublic(request):
+
+def checkIsDocumentPublic(request, args, kwargs):
   """Checks whether a document is public.
 
   Args:
@@ -535,4 +538,4 @@ def checkIsDocumentPublic(request):
 
   # TODO(srabbelier): A proper check needs to be done to see if the document
   # is public or not, probably involving analysing it's scope or such.
-  allow(request)
+  allow(request, args, kwargs)

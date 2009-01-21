@@ -27,6 +27,8 @@ from soc.views.helper import access
 
 
 SIDEBAR = []
+SIDEBAR_ACCESS_ARGS = ['SIDEBAR_CALLING']
+SIDEBAR_ACCESS_KWARGS = {'SIDEBAR_CALLING': True}
 
 
 def addMenu(callback):
@@ -130,9 +132,12 @@ def getSidebarMenu(request, items, params):
 
   submenus = []
 
+  args = SIDEBAR_ACCESS_ARGS
+  kwargs = SIDEBAR_ACCESS_KWARGS
+
   for url, menu_text, access_type in items:
     try:
-      access.checkAccess(access_type, request, rights)
+      access.checkAccess(access_type, request, rights, args, kwargs)
       submenus.append({'url': url, 'title': menu_text})
     except out_of_band.Error:
       pass

@@ -61,7 +61,7 @@ class View(base.View):
     rights['edit'] = [access.checkIsClubAdminForClub]
     rights['delete'] = [access.checkIsHost]
     rights['list'] = [access.checkIsHost]
-    rights['applicant'] = [access.checkIsClubAppAccepted]
+    rights['applicant'] = [access.checkIsApplicationAccepted(club_app_logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club.logic

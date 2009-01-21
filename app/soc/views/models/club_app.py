@@ -57,10 +57,10 @@ class View(group_app.View):
 
     rights = {}
     rights['create'] = [access.checkIsUser]
-    rights['delete'] = [access.checkIsMyApplication(club_app_logic.logic)]
-    rights['edit'] = [access.checkIsMyApplication(club_app_logic.logic)]
+    rights['delete'] = [access.checkIsMyApplication(club_app_logic)]
+    rights['edit'] = [access.checkIsMyApplication(club_app_logic)]
     rights['list'] = [access.checkIsUser]
-    rights['public'] = [access.checkIsMyApplication(club_app_logic.logic)]
+    rights['public'] = [access.checkIsMyApplication(club_app_logic)]
     rights['review'] = [access.checkIsDeveloper]
 
     new_params = {}

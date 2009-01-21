@@ -40,7 +40,6 @@ from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import notification as notification_logic
-from soc.logic.models import club_app  as club_app_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
@@ -356,7 +355,7 @@ def checkIsInvited(request, args, kwargs):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsClubAppAccepted(request, args, kwargs):
+def checkIsApplicationAccepted(app_logic):
   """Returns an alternate HTTP response if Google Account has no Club App
      entity for the specified Club.
 
@@ -372,31 +371,34 @@ def checkIsClubAppAccepted(request, args, kwargs):
     should be returned by the calling view.
   """
 
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(request, args, kwargs)
-    return
-  except out_of_band.Error:
-    pass
+  def wrapper(request, args, kwargs):
+    try:
+      # if the current user is a developer we allow access
+      checkIsDeveloper(request, args, kwargs)
+      return
+    except out_of_band.Error:
+      pass
 
-  checkIsUser(request, args, kwargs)
+    checkIsUser(request, args, kwargs)
 
-  user = user_logic.logic.getForCurrentAccount()
+    user = user_logic.logic.getForCurrentAccount()
 
-  properties = {
-      'applicant': user,
-      'reviewed': True,
-      'accepted': True,
-      'application_completed': False,
-      }
+    properties = {
+        'applicant': user,
+        'reviewed': True,
+        'accepted': True,
+        'application_completed': False,
+        }
 
-  club_app = club_app_logic.logic.getForFields(properties, unique=True)
+    application = app_logic.logic.getForFields(properties, unique=True)
 
-  if club_app:
-    return
+    if application:
+      return
 
-  # TODO(srabbelier) Make this give a proper error message
-  deny(request, args, kwargs)
+    # TODO(srabbelier) Make this give a proper error message
+    deny(request, args, kwargs)
+
+  return wrapper
 
 
 def checkIsMyNotification(request, args, kwargs):
@@ -470,6 +472,10 @@ def checkIsMyApplication(app_logic):
     properties = dicts.filter(kwargs, ['link_id'])
 
     application = app_logic.logic.getForFields(properties, unique=True)
+    
+    if not application:
+      deny(request, args, kwargs)
+    
     user = user_logic.logic.getForCurrentAccount()
 
     # We need to check to see if the key's are equal since the User

@@ -50,6 +50,11 @@ DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
   'Please create <a href="/user/edit">User Profile</a>'
   ' in order to view this page.')
 
+DEF_AGREE_TO_TOS_MSG_FMT = ugettext_lazy(
+  'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
+  ' Service</a> in your <a href="/user/edit">User Profile</a>'
+  ' in order to view this page.')
+
 DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
   'Please <a href="%%(sign_out)s">sign out</a>'
   ' and <a href="%%(sign_in)s">sign in</a>'
@@ -101,26 +106,23 @@ def checkAccess(access_type, request, rights, args=None, kwargs=None):
 
 
 def allow(request, args, kwargs):
-  """Never returns an alternate HTTP response.
+  """Never raises an alternate HTTP response.  (an access no-op, basically)
 
   Args:
     request: a Django HTTP request
   """
-
   return
 
 
 def deny(request, args, kwargs):
-  """Returns an alternate HTTP response.
+  """Always raises an alternate HTTP response.
 
   Args:
     request: a Django HTTP request
 
-  Returns: 
-    a subclass of django.http.HttpResponse which contains the
-    alternate response that should be returned by the calling view.
+  Raises:
+    always raises AccessViolationResponse if called
   """
-
   context = {}
   context['title'] = 'Access denied'
 
@@ -128,20 +130,15 @@ def deny(request, args, kwargs):
 
 
 def checkIsLoggedIn(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account is not logged in.
+  """Raises an alternate HTTP response if Google Account is not logged in.
 
   Args:
     request: a Django HTTP request
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if the user is logged in, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    that should be returned by the calling view.
+  Raises:
+    AccessViolationResponse:
+    * if no Google Account is even logged in
   """
-
   if users.get_current_user():
     return
 
@@ -149,20 +146,15 @@ def checkIsLoggedIn(request, args, kwargs):
 
 
 def checkNotLoggedIn(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account is not logged in.
+  """Raises an alternate HTTP response if Google Account is logged in.
 
   Args:
     request: a Django HTTP request
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if the user is logged in, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    that should be returned by the calling view.
+  Raises:
+    AccessViolationResponse:
+    * if a Google Account is currently logged in
   """
-
   if not users.get_current_user():
     return
 
@@ -170,20 +162,16 @@ def checkNotLoggedIn(request, args, kwargs):
 
 
 def checkIsUser(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account has no User entity.
+  """Raises an alternate HTTP response if Google Account has no User entity.
 
   Args:
     request: a Django HTTP request
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if User exists for a Google Account, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    should be returned by the calling view.
+  Raises:
+    AccessViolationResponse:
+    * if no User exists for the logged-in Google Account, or
+    * if no Google Account is logged in at all
   """
-
   checkIsLoggedIn(request, args, kwargs)
 
   user = user_logic.getForFields({'account': users.get_current_user()},
@@ -195,21 +183,46 @@ def checkIsUser(request, args, kwargs):
   raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
 
-def checkIsDeveloper(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account is not a Developer.
+def checkAgreesToSiteToS(request):
+  """Raises an alternate HTTP response if User has not agreed to site-wide ToS.
 
   Args:
     request: a Django HTTP request
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if Google Account is logged in and logged-in user is a Developer,
-    or a subclass of django.http.HttpResponse which contains the alternate
-    response should be returned by the calling view.
+  Raises:
+    AccessViolationResponse:
+    * if User has not agreed to the site-wide ToS, or
+    * if no User exists for the logged-in Google Account, or
+    * if no Google Account is logged in at all
   """
+  checkIsUser(request)
 
+  user = user_logic.getForFields({'account': users.get_current_user()},
+                                 unique=True)
+  
+  if user_logic.agreesToSiteToS(user):
+    return
+
+  # Would not reach this point of site-wide ToS did not exist, since
+  # agreesToSiteToS() call above always returns True if no ToS is in effect.
+  login_msg_fmt = DEF_AGREE_TO_TOS_MSG_FMT % {
+      'tos_link': 'TODO(tlarsen): fix circular import first to make this work'}
+
+  raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
+
+
+def checkIsDeveloper(request, args, kwargs):
+  """Raises an alternate HTTP response if Google Account is not a Developer.
+
+  Args:
+    request: a Django HTTP request
+
+  Raises:
+    AccessViolationResponse:
+    * if User is not a Developer, or
+    * if no User exists for the logged-in Google Account, or
+    * if no Google Account is logged in at all
+  """
   checkIsUser(request, args, kwargs)
 
   if accounts.isDeveloper(account=users.get_current_user()):

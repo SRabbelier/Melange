@@ -127,7 +127,7 @@ class View(group_app.View):
       # only select the applications for this user so construct a filter
       filter['applicant'] = user_entity
 
-    # Get all the pending applications
+    # get all the pending applications
 
     pa_params = params.copy() # pending applications
 
@@ -141,9 +141,9 @@ class View(group_app.View):
     pa_list = list_helper.getListContent(
         request, pa_params, filter, 0)
 
-    # Get all the reviewed applications now
+    # get all the reviewed applications now
 
-    # Re-use the old filter, but set to only reviewed and accepted
+    # re-use the old filter, but set to only reviewed and accepted
     filter['status'] = 'accepted'
 
     aa_params = params.copy() # accepted applications
@@ -161,9 +161,9 @@ class View(group_app.View):
     aa_list = list_helper.getListContent(
         request, aa_params, filter, 1)
 
-    # Get all the reviewed applications that were denied
+    # get all the reviewed applications that were denied
 
-    # Re use the old filter, but this time only for denied apps
+    # re use the old filter, but this time only for denied apps
     filter['status'] = 'rejected'
 
     da_params = params.copy() # denied applications
@@ -178,8 +178,21 @@ class View(group_app.View):
     da_list = list_helper.getListContent(
         request, da_params, filter, 2)
 
-    # fill contents with all the needed lists
     contents = [pa_list, aa_list, da_list]
+
+    if is_developer:
+      # re use the old filter, but this time only for ignored apps
+      filter['status'] = 'ignored'
+
+      ia_params = params.copy() # ignored applications
+
+      ia_params['list_description'] = ugettext_lazy(
+          "An overview of all ignored club applications.")
+
+      ia_list = list_helper.getListContent(
+          request, ia_params, filter, 2)
+
+      contents += [ia_list]
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
@@ -244,8 +257,11 @@ class View(group_app.View):
         # this application has been properly reviewed update the status
         fields = {'status' : status_value}
 
-        application = self._logic.getFromFields(link_id=kwargs['link_id'])
-        self._logic.updateModelProperties(application, fields)
+        self._logic.updateModelProperties(entity, fields)
+        
+        if status_value is 'accepted':
+          # the application has been accepted send out a notification
+          notifications.sendNewClubNotification(entity)
 
         return self.reviewOverview(request, access_type,
             page_name=page_name, params=params, **kwargs)
@@ -289,19 +305,30 @@ class View(group_app.View):
     uh_list = helper.lists.getListContent(
         request, uh_params, filter, 0)
 
-    #only select the requests the have been denied
+    # only select the requests the have been rejected
     filter ['status'] = 'rejected'
 
     den_params = params.copy()
     den_params['list_description'] = ugettext_lazy('A list of all applications '
-        'that have been denied')
+        'that have been ignored')
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     den_list = helper.lists.getListContent(
         request, den_params, filter, 0)
 
+    # only select the request that have been ignored
+    filter ['status'] = 'ignored'
+
+    ign_params = params.copy()
+    ign_params['list_description'] = ugettext_lazy('A list of all applications '
+        'that have been ignored')
+    ign_params ['list_action'] = (redirects.getReviewRedirect, params)
+
+    ign_list = helper.lists.getListContent(
+        request, ign_params, filter, 0)
+
     # fill contents with all the needed lists
-    contents = [ur_list, uh_list, den_list]
+    contents = [ur_list, uh_list, den_list, ign_list]
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)

@@ -183,7 +183,7 @@ def checkIsUser(request, args, kwargs):
   raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
 
-def checkAgreesToSiteToS(request):
+def checkAgreesToSiteToS(request, args, kwargs):
   """Raises an alternate HTTP response if User has not agreed to site-wide ToS.
 
   Args:
@@ -195,7 +195,7 @@ def checkAgreesToSiteToS(request):
     * if no User exists for the logged-in Google Account, or
     * if no Google Account is logged in at all
   """
-  checkIsUser(request)
+  checkIsUser(request, args, kwargs)
 
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)
@@ -223,6 +223,7 @@ def checkIsDeveloper(request, args, kwargs):
     * if no User exists for the logged-in Google Account, or
     * if no Google Account is logged in at all
   """
+  # Developers need to bypass the ToS check to avoid "chicken-and-egg" problem
   checkIsUser(request, args, kwargs)
 
   if accounts.isDeveloper(account=users.get_current_user()):
@@ -257,7 +258,7 @@ def checkIsHost(request, args, kwargs):
   except out_of_band.Error:
     pass
 
-  checkIsUser(request, args, kwargs)
+  checkAgreesToSiteToS(request, args, kwargs)
 
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)
@@ -296,7 +297,7 @@ def checkIsClubAdminForClub(request, args, kwargs):
   except out_of_band.Error:
     pass
 
-  checkIsUser(request, args, kwargs)
+  checkAgreesToSiteToS(request, args, kwargs)
 
   # TODO(srabbelier) implement this
 
@@ -329,7 +330,7 @@ def checkIsInvited(request, args, kwargs):
   except out_of_band.Error:
     pass
 
-  checkIsUser(request, args, kwargs)
+  checkAgreesToSiteToS(request, args, kwargs)
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a Program Administrator for this Program'}
@@ -391,7 +392,7 @@ def checkIsApplicationAccepted(app_logic):
     except out_of_band.Error:
       pass
 
-    checkIsUser(request, args, kwargs)
+    checkAgreesToSiteToS(request, args, kwargs)
 
     user = user_logic.getForCurrentAccount()
 
@@ -434,7 +435,7 @@ def checkIsMyNotification(request, args, kwargs):
   except out_of_band.Error:
     pass
 
-  checkIsUser(request, args, kwargs)
+  checkAgreesToSiteToS(request, args, kwargs)
 
   # Mine the url for params
   try:
@@ -479,7 +480,7 @@ def checkIsMyApplication(app_logic):
     except out_of_band.Error:
       pass
 
-    checkIsUser(request, args, kwargs)
+    checkAgreesToSiteToS(request, args, kwargs)
 
     properties = dicts.filter(kwargs, ['link_id'])
 

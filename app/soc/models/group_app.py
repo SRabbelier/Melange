@@ -96,20 +96,14 @@ class GroupApplication(soc.models.linkable.Linkable):
       ' Please be as specific as possible.'))
   member_criteria.help_text = ugettext_lazy(
     'Members include mentors, admininstrators, and the like.')
-  
-  # boolean to indicate if an application has been reviewed
-  reviewed = db.BooleanProperty(required=True, default=False,
-      verbose_name=ugettext_lazy('Has been reviewed')
-      )
-  # boolean to indicate if an application has been accepted
-  accepted = db.BooleanProperty(required=True, default=False,
-      verbose_name=ugettext_lazy('Has been accepted')
-      )
-  
-  # boolean to indicate that this application has been
-  # handled and turned into a group
-  application_completed = db.BooleanProperty(required=True, default=False,
-      verbose_name=ugettext_lazy('Has been completed'))
+
+  # property containing the status of the application
+  # completed means that the application has been processed into a real group
+  status = db.StringProperty(required=True, 
+      choices=['accepted','rejected','ignored','needs review','completed'],
+      default='needs review',
+      verbose_name=ugettext_lazy('Application Status'))
+
   
   # timestamp to record the time on which this application has been created
   created_on = db.DateTimeProperty(required=True, auto_now_add=True,

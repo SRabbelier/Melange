@@ -71,8 +71,7 @@ class View(group_app.View):
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
-    new_params['extra_dynaexclude'] = ['applicant', 'backup_admin',
-        'reviewed', 'accepted', 'application_completed', 
+    new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
     new_params['create_extra_dynafields'] = {
         'backup_admin_link_id': forms.CharField(
@@ -121,8 +120,7 @@ class View(group_app.View):
     is_developer = accounts.isDeveloper(user=user_entity)
 
     filter = {
-        'application_completed': False,
-        'reviewed': False,
+        'status': 'needs review',
         }
 
     if not is_developer:
@@ -146,8 +144,7 @@ class View(group_app.View):
     # Get all the reviewed applications now
 
     # Re-use the old filter, but set to only reviewed and accepted
-    filter['reviewed'] = True
-    filter['accepted'] = True
+    filter['status'] = 'accepted'
 
     aa_params = params.copy() # accepted applications
 
@@ -164,10 +161,10 @@ class View(group_app.View):
     aa_list = list_helper.getListContent(
         request, aa_params, filter, 1)
 
-    # Get all the reviewd applications that were denied
+    # Get all the reviewed applications that were denied
 
     # Re use the old filter, but this time only for denied apps
-    filter['accepted'] = False
+    filter['status'] = 'rejected'
 
     da_params = params.copy() # denied applications
 
@@ -203,9 +200,8 @@ class View(group_app.View):
       fields['applicant'] = user_logic.logic.getForCurrentAccount()
 
     # the application has either been created or edited so
-    # the review status needs to be set accordingly
-    fields['reviewed'] = False
-    fields['accepted'] = False
+    # the status needs to be set accordingly
+    fields['status'] = 'needs review'
 
   def _public(self, request, entity, context):
     """See base._public().
@@ -241,24 +237,13 @@ class View(group_app.View):
     get_dict = request.GET
 
     # check to see if we can make a decision for this application
-    if 'accepted' in get_dict.keys():
-      accepted_value = get_dict['accepted']
+    if 'status' in get_dict.keys():
+      status_value = get_dict['status']
 
-      fields = {'reviewed' : False}
+      if status_value in ['accepted', 'rejected', 'ignored']:
+        # this application has been properly reviewed update the status
+        fields = {'status' : status_value}
 
-      if accepted_value == 'true':
-        # the application has been accepted
-        fields['accepted'] = True
-        fields['reviewed'] = True
-        notifications.sendNewClubNotification(entity)
-      elif accepted_value == 'false':
-        # the application has been denied
-        fields['accepted'] = False
-        fields['reviewed'] = True
-
-      if fields['reviewed']:
-        # the application has either been denied or accepted
-        # mark it as reviewed and update accordingly
         application = self._logic.getFromFields(link_id=kwargs['link_id'])
         self._logic.updateModelProperties(application, fields)
 
@@ -283,7 +268,7 @@ class View(group_app.View):
     params = dicts.merge(params, self._params)
 
     # only select the requests that haven't been reviewed yet
-    filter = {'reviewed' : False}
+    filter = {'status' : 'needs review'}
 
     ur_params = params.copy()
     ur_params['list_description'] = ugettext_lazy('A list of all unhandled '
@@ -294,8 +279,7 @@ class View(group_app.View):
         request, ur_params, filter, 0)
 
     # only select the requests that haven't been turned into a group yet
-    filter = {'accepted' : True,
-        'application_completed' : False}
+    filter['status'] = 'accepted'
 
     uh_params = params.copy()
     uh_params['list_description'] = ugettext_lazy('A list of all applications '
@@ -306,8 +290,7 @@ class View(group_app.View):
         request, uh_params, filter, 0)
 
     #only select the requests the have been denied
-    filter = {'reviewed' : True,
-        'accepted' : False}
+    filter ['status'] = 'rejected'
 
     den_params = params.copy()
     den_params['list_description'] = ugettext_lazy('A list of all applications '

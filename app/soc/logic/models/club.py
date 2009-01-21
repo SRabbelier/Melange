@@ -65,7 +65,7 @@ class Logic(group.Logic):
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
       # set the application to completed  
-      fields = {'application_completed' : True}
+      fields = {'status' : 'completed'}
       club_app_logic.logic.updateModelProperties(application, fields)
 
 

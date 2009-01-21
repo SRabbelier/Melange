@@ -399,9 +399,7 @@ def checkIsApplicationAccepted(app_logic):
 
     properties = {
         'applicant': user,
-        'reviewed': True,
-        'accepted': True,
-        'application_completed': False,
+        'status': 'accepted'
         }
 
     application = app_logic.logic.getForFields(properties, unique=True)

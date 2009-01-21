@@ -35,6 +35,7 @@ from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import base
 
@@ -122,7 +123,8 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-
+  @decorators.merge_params
+  @decorators.check_access
   def listSelf(self, request, access_type,
                page_name=None, params=None, **kwargs):
     """Displays the unhandled requests for this user.
@@ -133,14 +135,6 @@ class View(base.View):
       params: a dict with params for this View
       kwargs: not used
     """
-
-    params = dicts.merge(params, self._params)
-    params['logic'] = self._logic
-
-    try:
-      access.checkAccess(access_type, request, params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # get the current user
     properties = {'account': users.get_current_user()}

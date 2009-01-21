@@ -34,6 +34,7 @@ from soc.models import notification as notification_model
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.models import base
@@ -105,19 +106,14 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
+  @decorators.merge_params
+  @decorators.check_access
   def list(self, request, access_type,
            page_name=None, params=None, filter=None):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # get the current user
     user_entity = user_logic.logic.getForCurrentAccount()

@@ -39,6 +39,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.models import base
 
 import soc.models.linkable
@@ -127,6 +128,8 @@ class View(base.View):
     new_params['module_name'] = "user_self"
     new_params['url_name'] = "user"
 
+    new_params['edit_template'] = 'soc/user/edit_self.html'
+
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         (users.create_login_url("/user/edit"), 'Sign In', 'signIn'),
@@ -150,8 +153,8 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  EDIT_SELF_TMPL = 'soc/user/edit_self.html'
-
+  @decorators.merge_params
+  @decorators.check_access
   def edit(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):
     """Displays User self edit page for the entity specified by **kwargs.
@@ -162,18 +165,6 @@ class View(base.View):
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
     """
-
-    new_params = {}
-    new_params['edit_template'] = self.EDIT_SELF_TMPL
-
-    params = dicts.merge(params, new_params)
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request, 
-          template=self.EDIT_SELF_TMPL)
 
     account = users.get_current_user()
     properties = {'account': account}
@@ -202,7 +193,7 @@ class View(base.View):
             'email': account.email()}
           error = out_of_band.Error(msg)
           return helper.responses.errorResponse(
-              error, request, template=self.EDIT_SELF_TMPL, context=context)
+              error, request, template=params['edit_template'], context=context)
 
         user = user_logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})

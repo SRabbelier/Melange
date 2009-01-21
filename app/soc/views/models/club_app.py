@@ -35,6 +35,7 @@ from soc.models import group_app as group_app_model
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import lists as list_helper
 from soc.views.models import group_app
@@ -102,19 +103,14 @@ class View(group_app.View):
 
     super(View, self).__init__(params=params)
 
+  @decorators.merge_params
+  @decorators.check_access
   def list(self, request, access_type,
            page_name=None, params=None, filter=None):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # get the current user
     user_entity = user_logic.logic.getForCurrentAccount()
@@ -214,6 +210,8 @@ class View(group_app.View):
 
     context['entity_type_url'] = self._params['url_name']
 
+  @decorators.merge_params
+  @decorators.check_access
   def review(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Handles the view containing the review of an application.
@@ -224,13 +222,6 @@ class View(group_app.View):
 
     For params see base.View.public().
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -278,6 +269,8 @@ class View(group_app.View):
     return super(View, self).public(request, access_type,
         page_name=page_name, params=params, **kwargs)
 
+  @decorators.merge_params
+  @decorators.check_access
   def reviewOverview(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays multiple lists of applications that are in different

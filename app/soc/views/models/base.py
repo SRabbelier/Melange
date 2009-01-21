@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import dicts
 from soc.views import helper
 from soc.views import out_of_band
-from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import forms
 from soc.views.helper import redirects
 from soc.views import sitemap
@@ -71,7 +71,8 @@ class View(object):
     self._params = helper.params.constructParams(params)
     self._logic = params['logic']
 
-
+  @decorators.merge_params
+  @decorators.check_access
   def public(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays the public page for the entity specified by **kwargs.
@@ -95,13 +96,6 @@ class View(object):
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -128,6 +122,8 @@ class View(object):
 
     return helper.responses.respond(request, template, context=context)
 
+  @decorators.merge_params
+  @decorators.check_access
   def export(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays the export page for the entity specified by **kwargs.
@@ -154,16 +150,10 @@ class View(object):
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
-    params = dicts.merge(params, self._params)
 
     if not params.get('export_content_type'):
       return self.public(request, access_type, page_name=page_name,
                          params=params, **kwargs)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -193,6 +183,7 @@ class View(object):
     return helper.responses.respond(request, template, context=context,
                                     response_args=response_args)
 
+  @decorators.check_access
   def create(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays the create page for this entity type.
@@ -227,6 +218,8 @@ class View(object):
     return self.edit(request, access_type, page_name=page_name,
                      params=params, seed=kwargs, **empty_kwargs)
 
+  @decorators.merge_params
+  @decorators.check_access
   def edit(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):
     """Displays the edit page for the entity specified by **kwargs.
@@ -256,13 +249,6 @@ class View(object):
       kwargs: The Key Fields for the specified entity
     """
 
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
-
     context = helper.responses.getUniversalContext(request)
     context['page_name'] = page_name
     entity = None
@@ -282,11 +268,12 @@ class View(object):
             error, request, template=params['error_public'], context=context)
 
     if request.method == 'POST':
-      return self.editPost(request, entity, context, params)
+      return self.editPost(request, entity, context, params=params)
     else:
-      return self.editGet(request, entity, context, seed, params)
+      return self.editGet(request, entity, context, seed, params=params)
 
-  def editPost(self, request, entity, context, params):
+  @decorators.merge_params
+  def editPost(self, request, entity, context, params=None):
     """Processes POST requests for the specified entity.
 
     Params usage:
@@ -312,10 +299,8 @@ class View(object):
       request: a django request object
       entity: the entity that will be modified or created, may be None
       context: the context dictionary that will be provided to Django
-      params: a dict with params for this View
+      params: required, a dict with params for this View
     """
-
-    params = dicts.merge(params, self._params)
 
     if entity:
       form = params['edit_form'](request.POST)
@@ -348,7 +333,8 @@ class View(object):
     return helper.responses.redirectToChangedSuffix(
         request, None, params=page_params)
 
-  def editGet(self, request, entity, context, seed, params):
+  @decorators.merge_params
+  def editGet(self, request, entity, context, seed, params=None):
     """Processes GET requests for the specified entity.
 
     Params usage:
@@ -376,10 +362,9 @@ class View(object):
       entity: the entity that will be edited, may be None
       context: the context dictionary that will be provided to django
       seed: if no entity is provided, the initial values for the new entity
-      params: a dict with paras for this View
+      params: required, a dict with params for this View
     """
 
-    params = dicts.merge(params, self._params)
     suffix = self._logic.getKeySuffix(entity)
 
     # Remove the params from the request, this is relevant only if
@@ -411,6 +396,8 @@ class View(object):
 
     return self._constructResponse(request, entity, context, form, params)
 
+  @decorators.merge_params
+  @decorators.check_access
   def list(self, request, access_type,
            page_name=None, params=None, filter=None):
     """Displays the list page for the entity type.
@@ -426,19 +413,7 @@ class View(object):
       the soc.views.helper.list module. See the docstring for getListContent 
       on how it uses it. The params dictionary is also passed as argument to 
       the _list method. See the docstring for _list on how it uses it.
-
-      rights: The rights dictionary is used to check if the user has
-        the required rights to list all entities of this View's type.
-        See checkAccess for more details on how the rights dictionary
-        is used to check access rights.
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     content = helper.lists.getListContent(request, params, filter)
     contents = [content]
@@ -475,6 +450,8 @@ class View(object):
 
     return helper.responses.respond(request, template, context)
 
+  @decorators.merge_params
+  @decorators.check_access
   def delete(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by **kwargs.
@@ -497,13 +474,6 @@ class View(object):
       delete_redirect: The delete_redirect value is used as the url to
         redirect to after having successfully deleted the entity.
     """
-
-    params = dicts.merge(params, self._params)
-
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(error, request)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -539,8 +509,8 @@ class View(object):
   def select(self, request, view, redirect, page_name=None, params=None):
     """Displays a list page allowing the user to select an entity.
 
-    After having selected the Sponsor, the user is redirected to the
-    'create a new program' page with the scope_path set appropriately.
+    After having selected the Scope, the user is redirected to the
+    'create a new entity' page with the scope_path set appropriately.
 
     Params usage:
       The params dictionary is also passed to getListContent from
@@ -678,6 +648,7 @@ class View(object):
 
     return self._params
 
+  @decorators.merge_params
   def getSidebarMenus(self, request, params=None):
     """Returns an dictionary with one sidebar entry.
 
@@ -691,9 +662,9 @@ class View(object):
       of _getSidebarItems on how it uses it.
     """
 
-    params = dicts.merge(params, self._params)
     return sitemap.sidebar.getSidebarMenus(request, params)
 
+  @decorators.merge_params
   def getDjangoURLPatterns(self, params=None):
     """Retrieves a list of sidebar entries for this view
 
@@ -706,6 +677,5 @@ class View(object):
       params: a dict with params for this View
     """
 
-    params = dicts.merge(params, self._params)
     return sitemap.sitemap.getDjangoURLPatterns(params)
 

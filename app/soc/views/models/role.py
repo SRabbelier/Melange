@@ -30,6 +30,7 @@ from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import base
 from soc.views.models import user as user_view
@@ -93,7 +94,7 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
   def invite(self, request, access_type,
-             page_name=None, params=None, **kwargs):
+             page_name=None, params=None, *args, **kwargs):
     """Displays the request promotion to Role page.
     """
 
@@ -110,9 +111,10 @@ class View(base.View):
 
     new_params = dicts.merge(params, new_params)
     params = dicts.merge(new_params, user_view.view._params)
+    rights = params['rights']
 
     try:
-      access.checkAccess(access_type, request, rights=params['rights'])
+      access.checkAccess(access_type, request, rights, args, kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
 

@@ -30,6 +30,12 @@ from google.appengine.runtime import DeadlineExceededError
 
 from django import http
 
+from soc.logic import dicts
+
+
+class Error(Exception):
+  pass
+
 
 def view(func):
   """Decorator that insists that exceptions are handled by view.
@@ -49,3 +55,48 @@ def view(func):
       return http.HttpResponse('AssertionError')
 
   return view_wrapper
+
+
+def merge_params(func):
+  """Decorator that merges 'params' with self._params
+  """
+
+  @wraps(func)
+  def wrapper(self, *args, **kwargs):
+    params = kwargs.get('params', {})
+    kwargs['params'] = dicts.merge(params, self._params)
+    return func(self, *args, **kwargs)
+
+  return wrapper
+
+
+def check_access(func):
+  """This decorator does access checks for the specified view method
+
+  The rights dictionary is extracted from 'params', or, if either 'params' or
+  'rights' do not exist, from self._params['rights'].
+  """
+
+  # Do not pollute helper.decorators with access specific imports
+  from soc.views import out_of_band
+  from soc.views import helper
+  from soc.views.helper import access
+
+  @wraps(func)
+  def wrapper(self, request, access_type, *args, **kwargs):
+    params = kwargs.get('params', {})
+
+    # Try to extract rights
+    if 'rights' in params:
+      rights = params['rights']
+    else:
+      rights = self._params['rights']
+
+    # Do the access check dance
+    try:
+      access.checkAccess(access_type, request, rights, args, kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(error, request)
+    return func(self, request, access_type, *args, **kwargs)
+
+  return wrapper

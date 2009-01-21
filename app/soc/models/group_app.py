@@ -110,3 +110,12 @@ class GroupApplication(soc.models.linkable.Linkable):
   # handled and turned into a group
   application_completed = db.BooleanProperty(required=True, default=False,
       verbose_name=ugettext_lazy('Has been completed'))
+  
+  # timestamp to record the time on which this application has been created
+  created_on = db.DateTimeProperty(required=True, auto_now_add=True,
+      verbose_name=ugettext_lazy('Created on'))
+  
+  # timestamp to record the time on which this application has been last modified
+  # also changes when the review properties change
+  last_modified_on = db.DateTimeProperty(required=True, auto_now=True,
+      verbose_name=ugettext_lazy('Last modified on'))

@@ -31,9 +31,11 @@ limitations under the License.
   {% readonly_field_as_twoline_table_row entity.fields.irc_channel.label entity.irc_channel %}
   {% readonly_field_as_twoline_table_row entity.fields.backup_admin.label entity.backup_admin.link_id %}
   {% readonly_field_as_twoline_table_row entity.fields.member_criteria.label entity.member_criteria %}
-  {% readonly_field_as_twoline_table_row entity.fields.reviewed.label entity.reviewed %}
-  {% readonly_field_as_twoline_table_row entity.fields.accepted.label entity.accepted %}
-  {% readonly_field_as_twoline_table_row entity.fields.application_completed.label entity.application_completed %}
+  {% readonly_field_as_table_row entity.fields.reviewed.label entity.reviewed %}
+  {% readonly_field_as_table_row entity.fields.accepted.label entity.accepted %}
+  {% readonly_field_as_table_row entity.fields.application_completed.label entity.application_completed %}
+  {% readonly_field_as_table_row "Created on" entity.created_on %}
+  {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
  </table>
 </p>
 

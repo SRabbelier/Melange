@@ -118,7 +118,7 @@ def getUniversalContext(request):
   if settings:
     context['ga_tracking_num'] = settings.ga_tracking_num
  
-  context['tos_link'] = getToSLink(settings)
+  context['tos_link'] = redirects.getToSRedirect(settings)
  
   return context
 
@@ -172,23 +172,3 @@ def errorResponse(error, request, template=None, context=None):
 
   return respond(request, sibling_templates, context=context,
                  response_args=error.response_args)
-
-def getToSLink(presence):
-  """Returns link to 'show' the ToS Document if it exists, None otherwise.
-
-  Args:
-    presence: Presence entity that may or may not have a tos property
-  """
-  if not presence:
-    return None
-
-  try:
-    tos_doc = presence.tos
-  except db.Error:
-    return None
-
-  if not tos_doc:
-    return None
-
-  return redirects.getPublicRedirect(tos_doc, {'url_name': 'document'})
-

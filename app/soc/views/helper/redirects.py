@@ -22,6 +22,9 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
+
 def getInviteRedirect(entity, params):
   """Returns the invitation redirect for the specified entity.
   """
@@ -99,3 +102,22 @@ def getApplicantRedirect(entity, params):
   return '/%s/applicant/%s' % (
       params['url_name'], entity.link_id)
 
+
+def getToSRedirect(presence):
+  """Returns link to 'show' the ToS Document if it exists, None otherwise.
+
+  Args:
+    presence: Presence entity that may or may not have a tos property
+  """
+  if not presence:
+    return None
+
+  try:
+    tos_doc = presence.tos
+  except db.Error:
+    return None
+
+  if not tos_doc:
+    return None
+
+  return getPublicRedirect(tos_doc, {'url_name': 'document'})

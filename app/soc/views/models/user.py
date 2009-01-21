@@ -32,7 +32,7 @@ from soc.logic import validate
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import helper
-from soc.views.helper import responses
+from soc.views.helper import redirects
 from soc.views.models import base
 
 import soc.models.linkable
@@ -167,7 +167,7 @@ class View(base.View):
   def _getToSExampleText(self):
     """Returns example_text linking to site-wide ToS, or a warning message.
     """
-    tos_link = responses.getToSLink(site_logic.getSingleton())
+    tos_link = redirects.getToSRedirect(site_logic.getSingleton())
 
     if not tos_link:
       return ('<div class="notice">&nbsp;<i>No site-wide</i> Terms of'

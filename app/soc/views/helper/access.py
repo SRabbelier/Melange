@@ -41,9 +41,11 @@ from soc.logic import dicts
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.request import logic as request_logic
+from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views import out_of_band
+from soc.views.helper import redirects
 
 
 DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
@@ -206,7 +208,7 @@ def checkAgreesToSiteToS(request, args, kwargs):
   # Would not reach this point of site-wide ToS did not exist, since
   # agreesToSiteToS() call above always returns True if no ToS is in effect.
   login_msg_fmt = DEF_AGREE_TO_TOS_MSG_FMT % {
-      'tos_link': 'TODO(tlarsen): fix circular import first to make this work'}
+      'tos_link': redirects.getToSRedirect(site_logic.getSingleton())}
 
   raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
 

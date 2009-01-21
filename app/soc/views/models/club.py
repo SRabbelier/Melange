@@ -34,6 +34,7 @@ from soc.logic.models import group_app as group_app_logic
 from soc.logic.models import club as club_logic
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
 from soc.views.helper import responses
@@ -94,7 +95,8 @@ class View(base.View):
 
     params['applicant_create_form'] = applicant_create_form
 
-
+  @decorators.merge_params
+  @decorators.check_access
   def applicant(self, request, access_type,
                   page_name=None, params=None, **kwargs):
     """Handles the creation of a club via an approved club application.
@@ -106,27 +108,15 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-
-    # merge the params
-    params = dicts.merge(params, self._params)
-
-    # check if the current user has access to this page
-    try:
-      access.checkAccess(access_type, request, rights=params['rights'])
-    except out_of_band.Error, error:
-      return responses.errorResponse(error, request)
-
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     context['page_name'] = page_name
-
 
     if request.method == 'POST':
       return self.applicantPost(request, context, params, **kwargs)
     else:
       # request.method == 'GET'
       return self.applicantGet(request, context, params, **kwargs)
-
 
   def applicantGet(self, request, context, params, **kwargs):
     """Handles the GET request concerning the creation of a club via an
@@ -153,7 +143,6 @@ class View(base.View):
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=params)
-
 
   def applicantPost(self, request, context, params, **kwargs):
     """Handles the POST request concerning the creation of a club via an
@@ -192,7 +181,6 @@ class View(base.View):
     # redirect to notifications list to see the admin invite
     return http.HttpResponseRedirect('/notification/list')
 
-
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
@@ -200,7 +188,6 @@ class View(base.View):
     # fill in the founded_by with data from the entity
     form.fields['founded_by'].initial = entity.founder.name
     super(View, self)._editGet(request, entity, form)
-
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

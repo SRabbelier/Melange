@@ -38,10 +38,10 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
 from soc.logic import dicts
-from soc.logic.models import host as host_logic
-from soc.logic.models import notification as notification_logic
-from soc.logic.models import user as user_logic
-from soc.logic.models import request as request_logic
+from soc.logic.models.host import logic as host_logic
+from soc.logic.models.notification import logic as notification_logic
+from soc.logic.models.request import logic as request_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 
@@ -186,8 +186,8 @@ def checkIsUser(request, args, kwargs):
 
   checkIsLoggedIn(request, args, kwargs)
 
-  user = user_logic.logic.getForFields(
-      {'account': users.get_current_user()}, unique=True)
+  user = user_logic.getForFields({'account': users.get_current_user()},
+                                 unique=True)
 
   if user:
     return
@@ -246,11 +246,10 @@ def checkIsHost(request, args, kwargs):
 
   checkIsUser(request, args, kwargs)
 
-  user = user_logic.logic.getForFields(
-      {'account': users.get_current_user()}, unique=True)
+  user = user_logic.getForFields({'account': users.get_current_user()},
+                                 unique=True)
 
-  host = host_logic.logic.getForFields(
-      {'user': user}, unique=True)
+  host = host_logic.getForFields({'user': user}, unique=True)
 
   if host:
     return
@@ -333,8 +332,8 @@ def checkIsInvited(request, args, kwargs):
   group_id = splitpath[2]
   user_id = splitpath[3]
 
-  user = user_logic.logic.getForFields(
-      {'account': users.get_current_user()}, unique=True)
+  user = user_logic.getForFields({'account': users.get_current_user()},
+                                 unique=True)
 
   if user_id != user.link_id:
     # TODO: perhaps this needs a better explanation?
@@ -347,7 +346,7 @@ def checkIsInvited(request, args, kwargs):
       'group_accepted': True,
       }
 
-  request = request_logic.logic.getForFields(properties, unique=True)
+  request = request_logic.getForFields(properties, unique=True)
 
   if request:
     return
@@ -381,7 +380,7 @@ def checkIsApplicationAccepted(app_logic):
 
     checkIsUser(request, args, kwargs)
 
-    user = user_logic.logic.getForCurrentAccount()
+    user = user_logic.getForCurrentAccount()
 
     properties = {
         'applicant': user,
@@ -432,8 +431,8 @@ def checkIsMyNotification(request, args, kwargs):
 
   properties = dicts.filter(kwargs, ['link_id', 'scope_path'])
 
-  notification = notification_logic.logic.getForFields(properties, unique=True)
-  user = user_logic.logic.getForCurrentAccount()
+  notification = notification_logic.getForFields(properties, unique=True)
+  user = user_logic.getForCurrentAccount()
 
   # We need to check to see if the key's are equal since the User
   # objects are different and the default __eq__ method does not check
@@ -476,7 +475,7 @@ def checkIsMyApplication(app_logic):
     if not application:
       deny(request, args, kwargs)
     
-    user = user_logic.logic.getForCurrentAccount()
+    user = user_logic.getForCurrentAccount()
 
     # We need to check to see if the key's are equal since the User
     # objects are different and the default __eq__ method does not check

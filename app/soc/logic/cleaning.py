@@ -29,26 +29,6 @@ from soc.logic import validate
 from soc.logic.models import user as user_logic
 
 
-def clean_new_link_id(logic):
-  """Clean method for new link_id's
-
-  Returns a clean method that checks if the specified link_id is
-  in the proper format, and verifies that the link_id is not already in
-  in use by another entity of the same type.
-  """
-
-  def wrapped(self):
-    # convert to lowercase for user comfort
-    link_id = self.cleaned_data.get('link_id').lower()
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-    if logic.getFromFields(link_id=link_id):
-      raise forms.ValidationError("This link ID is already in use.")
-    return link_id
-
-  return wrapped
-
-
 def clean_link_id(self):
   # convert to lowercase for user comfort
   link_id = self.cleaned_data.get('link_id').lower()

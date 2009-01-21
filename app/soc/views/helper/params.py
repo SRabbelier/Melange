@@ -64,8 +64,8 @@ def constructParams(params):
       constructing the create_dynainclude value.
     extra_dynaexclude: The extra_dynaexclude value is used when
       constructing the create_dynaexclude value.
-    logic: The logic value is used as argument to clean_new_link_id
-      from the cleaning module.
+    logic: The logic value is used as argument to save the scope_logic
+      and create a create form.
   """
 
   logic = params['logic']
@@ -178,7 +178,7 @@ def constructParams(params):
   new_params['dynabase'] = helper.forms.BaseForm
 
   create_dynafields = {
-      'clean_link_id': cleaning.clean_new_link_id(logic),
+      'clean_link_id': cleaning.clean_link_id,
       'clean_feed_url': cleaning.clean_feed_url,
       }
   create_dynafields.update(params.get('create_extra_dynafields', {}))

@@ -158,7 +158,7 @@ class View(group_app.View):
           "An overview of your accepted club applications.")
 
     aa_params['url_name'] = 'club'
-    aa_params['list_action'] = (redirects.getCreateRedirect, aa_params)
+    aa_params['list_action'] = (redirects.getApplicantRedirect, aa_params)
 
     aa_list = list_helper.getListContent(
         request, aa_params, filter, 1)

@@ -56,8 +56,8 @@ def getPublicRedirect(entity, params):
 
   return '/%s/show/%s' % (
       params['url_name'], entity.key().name())
- 
- 
+
+
 def getExportRedirect(entity, params):
   """Returns the export redirect for the specified entity.
   """
@@ -65,7 +65,7 @@ def getExportRedirect(entity, params):
   return '/%s/export/%s' % (
       params['url_name'], entity.key().name())
 
-  
+
 def getReviewRedirect(entity, params):
   """Returns the redirect to review the specified entity
   """
@@ -90,3 +90,12 @@ def inviteAcceptedRedirect(entity, _):
 
   return '/%s/create/%s/%s' % (
       entity.role, entity.scope_path, entity.link_id)
+
+
+def getApplicantRedirect(entity, params):
+  """Returns the redirect for processing accepted Applications.
+  """
+
+  return '/%s/applicant/%s' % (
+      params['url_name'], entity.link_id)
+

@@ -557,7 +557,7 @@ class View(object):
     fields['scope'] = scope
 
   def _public(self, request, entity, context):
-    """Performs any required processing to get an entity' public page.
+    """Performs any required processing to get an entity's public page.
 
     Args:
       request: the django request object

@@ -98,7 +98,7 @@ def sendNewClubNotification(entity):
 
   to_user = entity.applicant
 
-  url = "http://%(host)s/club/create/%(key_name)s" % {
+  url = "http://%(host)s/club/applicant/%(key_name)s" % {
       'host' : os.environ['HTTP_HOST'],
       'key_name': entity.key().name(),
       }

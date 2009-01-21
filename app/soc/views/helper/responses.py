@@ -22,8 +22,8 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from django import http
 from django.template import loader

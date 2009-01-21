@@ -30,7 +30,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
-from soc.logic.models import group_app as group_app_logic
+from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import club as club_logic
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -59,6 +59,8 @@ class View(base.View):
     rights = {}
     rights['create'] = [access.checkIsHost]
     rights['edit'] = [access.checkIsClubAdminForClub]
+    rights['delete'] = [access.checkIsHost]
+    rights['list'] = [access.checkIsHost]
     rights['applicant'] = [access.checkIsClubAppAccepted]
 
     new_params = {}
@@ -130,8 +132,8 @@ class View(base.View):
     """
 
     # find the application
-    key_fields = group_app_logic.logic.getKeyFieldsFromDict(kwargs)
-    application = group_app_logic.logic.getFromFields(**key_fields)
+    key_fields = club_app_logic.logic.getKeyFieldsFromDict(kwargs)
+    application = club_app_logic.logic.getFromFields(**key_fields)
 
     # extract the application fields
     field_names = application.properties().keys()

@@ -24,7 +24,7 @@ __authors__ = [
 
 
 from soc.logic.models import group
-from soc.logic.models import group_app as group_app_logic
+from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import request as request_logic
 
 import soc.models.club
@@ -48,7 +48,7 @@ class Logic(group.Logic):
     """
 
     # Find their application
-    application = group_app_logic.logic.getFromFields(link_id=entity.link_id)
+    application = club_app_logic.logic.getFromFields(link_id=entity.link_id)
 
     if application:
       # only if there is an application send out the invites
@@ -66,7 +66,7 @@ class Logic(group.Logic):
 
       # set the application to completed  
       fields = {'application_completed' : True}
-      group_app_logic.logic.updateModelProperties(application, fields)
+      club_app_logic.logic.updateModelProperties(application, fields)
 
 
 logic = Logic()

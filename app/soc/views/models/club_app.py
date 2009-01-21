@@ -30,8 +30,8 @@ from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import notifications
+from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import user as user_logic
-from soc.models import group_app as group_app_model
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -57,24 +57,26 @@ class View(group_app.View):
 
     rights = {}
     rights['create'] = [access.checkIsUser]
-    rights['delete'] = [access.checkIsMyApplication]
-    rights['edit'] = [access.checkIsMyApplication]
+    rights['delete'] = [access.checkIsMyApplication(club_app_logic.logic)]
+    rights['edit'] = [access.checkIsMyApplication(club_app_logic.logic)]
     rights['list'] = [access.checkIsUser]
-    rights['public'] = [access.checkIsMyApplication]
+    rights['public'] = [access.checkIsMyApplication(club_app_logic.logic)]
     rights['review'] = [access.checkIsDeveloper]
 
     new_params = {}
 
     new_params['rights'] = rights
+    new_params['logic'] = club_app_logic.logic
 
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin',
-        'reviewed', 'accepted', 'application_completed']
+        'reviewed', 'accepted', 'application_completed', 
+        'created_on', 'last_modified_on']
     new_params['create_extra_dynafields'] = {
         'backup_admin_link_id': forms.CharField(
-              label=group_app_model.GroupApplication.backup_admin.verbose_name
+              label=soc.models.club_app.ClubApplication.backup_admin.verbose_name
               ),
         'clean_backup_admin_link_id': cleaning.clean_existing_user('backup_admin_link_id'),
         }

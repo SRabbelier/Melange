@@ -40,7 +40,7 @@ from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import notification as notification_logic
-from soc.logic.models import group_app  as group_app_logic
+from soc.logic.models import club_app  as club_app_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import request as request_logic
 from soc.views import helper
@@ -390,9 +390,9 @@ def checkIsClubAppAccepted(request, args, kwargs):
       'application_completed': False,
       }
 
-  group_app = group_app_logic.logic.getForFields(properties, unique=True)
+  club_app = club_app_logic.logic.getForFields(properties, unique=True)
 
-  if group_app:
+  if club_app:
     return
 
   # TODO(srabbelier) Make this give a proper error message
@@ -443,7 +443,7 @@ def checkIsMyNotification(request, args, kwargs):
   deny(request, args, kwargs)
 
 
-def checkIsMyApplication(request, args, kwargs):
+def checkIsMyApplication(app_logic):
   """Returns an alternate HTTP response if this request is for a Application belonging
      to the current user.
 
@@ -456,35 +456,32 @@ def checkIsMyApplication(request, args, kwargs):
   Returns:
     None if the current User is allowed to access this Application.
   """
-  
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(request, args, kwargs)
-    return
-  except out_of_band.Error:
-    pass
 
-  checkIsUser(request, args, kwargs)
+  def wrapper(request, args, kwargs):
+    try:
+      # if the current user is a developer we allow access
+      checkIsDeveloper(request, args, kwargs)
+      return
+    except out_of_band.Error:
+      pass
 
-  # Mine the url for params
-  try:
-    callback, args, kwargs = urlresolvers.resolve(request.path)
-  except Exception:
+    checkIsUser(request, args, kwargs)
+
+    properties = dicts.filter(kwargs, ['link_id'])
+
+    application = app_logic.logic.getForFields(properties, unique=True)
+    user = user_logic.logic.getForCurrentAccount()
+
+    # We need to check to see if the key's are equal since the User
+    # objects are different and the default __eq__ method does not check
+    # if the keys are equal (which is what we want).
+    if user.key() == application.applicant.key():
+      return None
+
+    # TODO(srabbelier) Make this give a proper error message
     deny(request, args, kwargs)
 
-  properties = dicts.filter(kwargs, ['link_id'])
-
-  application = group_app_logic.logic.getForFields(properties, unique=True)
-  user = user_logic.logic.getForCurrentAccount()
-
-  # We need to check to see if the key's are equal since the User
-  # objects are different and the default __eq__ method does not check
-  # if the keys are equal (which is what we want).
-  if user.key() == application.applicant.key():
-    return None
-
-  # TODO(srabbelier) Make this give a proper error message
-  deny(request, args, kwargs)
+  return wrapper
 
 
 def checkCanInvite(request, args, kwargs):

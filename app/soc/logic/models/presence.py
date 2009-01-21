@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.logic.models import base
 from soc.logic.models import linkable as linkable_logic
 

@@ -75,13 +75,6 @@ class Role(soc.models.linkable.Linkable):
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name='roles')
 
-  #: field storing whether User has agreed to the Role-specific Terms of
-  #: Service. (Not a required field because some Roles may not have special
-  #: Terms of Service.)
-  agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext_lazy('Agrees to ToS'))
-  agrees_to_tos.help_text = ugettext_lazy(
-      'Indicates that the user agrees to the Terms of Service for this Role.') 
 
   #====================================================================
   #  (public) name information
@@ -217,7 +210,7 @@ class Role(soc.models.linkable.Linkable):
   #: be lower ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_street = db.StringProperty(
-      verbose_name=ugettext_lazy('Street address'))
+      verbose_name=ugettext_lazy('Shipping Street address'))
   ship_street.help_text = ugettext_lazy(
       'street number and name, lower ASCII characters only')
 
@@ -225,14 +218,14 @@ class Role(soc.models.linkable.Linkable):
   #: Shipping city can only be lower ASCII, not UTF-8 text, because, if
   #: supplied, it is used as a shipping address.
   ship_city = db.StringProperty(
-      verbose_name=ugettext_lazy('City'))
+      verbose_name=ugettext_lazy('Shipping City'))
   ship_city.help_text = ugettext_lazy('lower ASCII characters only')
 
   #: Optional field containing shipping address state or province; kept
   #: private.  Shipping state/province can only be lower ASCII, not UTF-8
   #: text, because, if supplied, it is used as a shipping address.
   ship_state = db.StringProperty(
-      verbose_name=ugettext_lazy('State/Province'))
+      verbose_name=ugettext_lazy('Shipping State/Province'))
   ship_state.help_text = ugettext_lazy(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
@@ -240,7 +233,7 @@ class Role(soc.models.linkable.Linkable):
   #: Optional field containing shipping address country or territory; kept
   #: private.
   ship_country = db.StringProperty(
-      verbose_name=ugettext_lazy('Country/Territory'),
+      verbose_name=ugettext_lazy('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
   #: Optional field containing shipping address postal code (ZIP code in
@@ -248,7 +241,7 @@ class Role(soc.models.linkable.Linkable):
   #: lower ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_postalcode = db.StringProperty(
-      verbose_name=ugettext_lazy('ZIP/Postal Code'))
+      verbose_name=ugettext_lazy('Shipping ZIP/Postal Code'))
   ship_postalcode.help_text = ugettext_lazy('lower ASCII characters only')
 
   #: Required field containing a phone number that will be supplied
@@ -281,6 +274,14 @@ class Role(soc.models.linkable.Linkable):
   tshirt_style = db.StringProperty(
       verbose_name=ugettext_lazy('T-shirt Style'),
       choices=('male', 'female'))
+  
+  #: field storing whether User has agreed to the Role-specific Terms of
+  #: Service. (Not a required field because some Roles may not have special
+  #: Terms of Service.)
+  agrees_to_tos = db.BooleanProperty(
+      verbose_name=ugettext_lazy('Agrees to ToS'))
+  agrees_to_tos.help_text = ugettext_lazy(
+      'Indicates that the user agrees to the Terms of Service for this Role.')
 
   def name(self):
     """Alias 'display_name' Property as 'name' for use in common templates.

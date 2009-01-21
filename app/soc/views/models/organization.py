@@ -73,3 +73,5 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
+export = view.export
+

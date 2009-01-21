@@ -56,6 +56,15 @@ def getPublicRedirect(entity, params):
 
   return '/%s/show/%s' % (
       params['url_name'], entity.key().name())
+ 
+ 
+def getExportRedirect(entity, params):
+  """Returns the export redirect for the specified entity.
+  """
+
+  return '/%s/export/%s' % (
+      params['url_name'], entity.key().name())
+
   
 def getReviewRedirect(entity, params):
   """Returns the redirect to review the specified entity

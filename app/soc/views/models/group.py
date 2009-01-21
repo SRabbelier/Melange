@@ -85,3 +85,4 @@ class View(base.View):
       fields['founder'] = user
 
     super(View, self)._editPost(request, entity, fields)
+

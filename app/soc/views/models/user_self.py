@@ -280,3 +280,5 @@ class View(base.View):
 view = View()
 
 edit = view.edit
+export = view.export
+

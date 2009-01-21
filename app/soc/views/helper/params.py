@@ -121,6 +121,8 @@ def constructParams(params):
   new_params['django_patterns_defaults'] = [
       (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
+      (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.export', 'Show %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>create)$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
@@ -139,13 +141,17 @@ def constructParams(params):
         'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
+  new_params['export_template'] = 'soc/%(module_name)s/export.html' % params
   new_params['create_template'] = 'soc/models/edit.html'
   new_params['edit_template'] = 'soc/models/edit.html'
   new_params['list_template'] = 'soc/models/list.html'
   new_params['invite_template'] = 'soc/models/invite.html'
 
+  new_params['export_content_type'] = None
+
   new_params['error_public'] = 'soc/%(module_name)s/error.html' % params
-  new_params['error_edit'] = 'soc/%(module_name)s/error.html'  % params
+  new_params['error_export'] = new_params['error_public']
+  new_params['error_edit'] = new_params['error_public']
 
   new_params['list_main'] = 'soc/list/main.html'
   new_params['list_pagination'] = 'soc/list/pagination.html'

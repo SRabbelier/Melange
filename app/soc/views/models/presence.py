@@ -214,4 +214,5 @@ edit = view.edit
 delete = view.delete
 list = view.list
 public = view.public
+export = view.export
 

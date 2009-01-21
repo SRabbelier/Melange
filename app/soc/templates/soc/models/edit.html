@@ -55,6 +55,11 @@ Please use this form to edit the {{ entity_type }}.
    <td>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
    </td>
+{% if export_link %}
+   <td>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/export/{{ entity_suffix }}'" value="Export"/>
+   </td>
+{% endif %}
    {% endif %}
    {% endblock %}
   </tr>

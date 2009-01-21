@@ -120,3 +120,4 @@ class View(base.View):
     contents = [content]
 
     return self._list(request, params, contents, page_name)
+

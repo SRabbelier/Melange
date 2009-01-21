@@ -104,6 +104,8 @@ class View(base.View):
     new_params['logic'] = soc.logic.models.document.logic
     new_params['rights'] = rights
 
+    new_params['export_content_type'] = 'text/text'
+
     new_params['name'] = "Document"
 
     new_params['edit_form'] = EditForm
@@ -170,6 +172,7 @@ class View(base.View):
 
     return submenus
 
+
 view = View()
 
 create = view.create
@@ -177,3 +180,5 @@ edit = view.edit
 delete = view.delete
 list = view.list
 public = view.public
+export = view.export
+

@@ -335,5 +335,7 @@ delete = view.delete
 edit = view.edit
 list = view.list
 public = view.public
+export = view.export
 review = view.review
 showReviewOverview = view.showReviewOverview
+

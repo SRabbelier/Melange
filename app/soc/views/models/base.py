@@ -32,6 +32,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import forms
+from soc.views.helper import redirects
 from soc.views import sitemap
 
 import soc.logic
@@ -125,7 +126,72 @@ class View(object):
 
     template = params['public_template']
 
-    return helper.responses.respond(request, template, context)
+    return helper.responses.respond(request, template, context=context)
+
+  def export(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Displays the export page for the entity specified by **kwargs.
+
+    Params usage:
+      rights: The rights dictionary is used to check if the user has
+        the required rights to view the export page for this entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      error_export: The error_export value is used as template when
+        the key values (as defined by the page's url) do not
+        correspond to an existing entity.
+      name: The name value is used to set the entity_type in the
+        context so that the template can refer to it.
+      export_template: The export_template value is used as template
+        to display the export page of the found entity.
+      export_content_type: The export_content_type value is used to set
+        the Content-Type header of the HTTP response.  If empty (or None),
+        public() is called instead.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+    params = dicts.merge(params, self._params)
+
+    if not params.get('export_content_type'):
+      return self.public(request, access_type, page_name=page_name,
+                         params=params, kwargs=kwargs)
+
+    try:
+      access.checkAccess(access_type, request, rights=params['rights'])
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(error, request)
+
+    # create default template context for use with any templates
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
+    entity = None
+
+    if not all(kwargs.values()):
+      #TODO: Change this into a proper redirect
+      return http.HttpResponseRedirect('/')
+
+    try:
+      key_fields = self._logic.getKeyFieldsFromDict(kwargs)
+      entity = self._logic.getIfFields(key_fields)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_export'], context=context)
+
+    self._export(request, entity, context)
+
+    context['entity'] = entity
+    context['entity_type'] = params['name']
+
+    template = params['export_template']
+
+    response_args = {'mimetype': params['export_content_type']}
+
+    return helper.responses.respond(request, template, context=context,
+                                    response_args=response_args)
 
   def create(self, request, access_type,
              page_name=None, params=None, **kwargs):
@@ -521,14 +587,23 @@ class View(object):
     fields['scope'] = scope
 
   def _public(self, request, entity, context):
-    """Performs any required processing to get an entities public page.
+    """Performs any required processing to get an entity' public page.
 
     Args:
       request: the django request object
       entity: the entity to make public
       context: the context object
     """
+    pass
 
+  def _export(self, request, entity, context):
+    """Performs any required processing to get an entity's export page.
+
+    Args:
+      request: the django request object
+      entity: the entity to export
+      context: the context object
+    """
     pass
 
   def _editGet(self, request, entity, form):
@@ -587,6 +662,9 @@ class View(object):
     context['entity_type_short'] = params['name_short']
     context['entity_type_url'] = params['url_name']
 
+    if params.get('export_content_type'):
+      context['export_link'] = redirects.getExportRedirect(entity, params)
+
     if entity:
       template = params['edit_template']
     else:
@@ -630,3 +708,4 @@ class View(object):
 
     params = dicts.merge(params, self._params)
     return sitemap.sitemap.getDjangoURLPatterns(params)
+

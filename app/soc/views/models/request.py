@@ -218,3 +218,5 @@ delete = view.delete
 list = view.list
 list_self = view.listSelf
 public = view.public
+export = view.export
+

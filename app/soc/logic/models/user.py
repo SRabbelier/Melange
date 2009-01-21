@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from soc.logic.helper import notifications
 from soc.logic.models import base

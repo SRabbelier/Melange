@@ -122,7 +122,7 @@ def constructParams(params):
       (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.export', 'Show %(name_short)s'),
+          'soc.views.models.%(module_name)s.export', 'Export %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>create)$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',

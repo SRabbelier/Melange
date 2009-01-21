@@ -26,6 +26,7 @@ from google.appengine.api import users
 
 from soc.logic.helper import notifications
 from soc.logic.models import base
+from soc.logic.models.site import logic as site_logic
 
 import soc.models.user
 
@@ -71,6 +72,39 @@ class Logic(base.Logic):
     user = self.getForFields({'account': account}, unique=True)
 
     return user
+
+  def agreesToSiteToS(self, entity):
+    """Returns indication of User's answer to the site-wide Terms of Service.
+
+    Args:
+      entity: User entity to check for agreement to site-wide ToS
+
+    Returns:
+      True: no site-wide ToS is currently in effect on the site
+      True: site-wide ToS is in effect *and* User agrees to it
+        (User explicitly answered "Yes")
+      False: site-wide ToS is in effect but User does not agree to it
+        (User explicitly answered "No")
+      None: site-wide ToS in effect, but User has not answered "Yes" or "No"
+        (this answer still evaluates to False, denying access to the site,
+         but can be used to detect non-answer to ask the User to provide the
+         missing answer)
+    """
+    if not site_logic.getToS(site_logic.getSingleton()):
+      # no site-wide ToS in effect, so let the User slide for now
+      return True
+
+    try:
+      agrees = entity.agrees_to_tos
+    except db.Error:
+      # return still-False "third answer" indicating that answer is missing
+      return None
+
+    # make sure the stored value is really a Boolean only
+    if not agrees:
+      return False
+
+    return True
 
   def getKeyValues(self, entity):
     """See base.Logic.getKeyValues.

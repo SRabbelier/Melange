@@ -190,7 +190,7 @@ class View(group_app.View):
           "An overview of all ignored club applications.")
 
       ia_list = list_helper.getListContent(
-          request, ia_params, filter, 2)
+          request, ia_params, filter, 3)
 
       contents += [ia_list]
 
@@ -303,7 +303,7 @@ class View(group_app.View):
     uh_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     uh_list = helper.lists.getListContent(
-        request, uh_params, filter, 0)
+        request, uh_params, filter, 1)
 
     # only select the requests the have been rejected
     filter ['status'] = 'rejected'
@@ -314,7 +314,7 @@ class View(group_app.View):
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     den_list = helper.lists.getListContent(
-        request, den_params, filter, 0)
+        request, den_params, filter, 2)
 
     # only select the request that have been ignored
     filter ['status'] = 'ignored'
@@ -325,7 +325,7 @@ class View(group_app.View):
     ign_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     ign_list = helper.lists.getListContent(
-        request, ign_params, filter, 0)
+        request, ign_params, filter, 3)
 
     # fill contents with all the needed lists
     contents = [ur_list, uh_list, den_list, ign_list]

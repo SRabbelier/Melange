@@ -158,7 +158,7 @@ class View(object):
 
     if not params.get('export_content_type'):
       return self.public(request, access_type, page_name=page_name,
-                         params=params, kwargs=kwargs)
+                         params=params, **kwargs)
 
     try:
       access.checkAccess(access_type, request, rights=params['rights'])
@@ -662,7 +662,7 @@ class View(object):
     context['entity_type_short'] = params['name_short']
     context['entity_type_url'] = params['url_name']
 
-    if params.get('export_content_type'):
+    if params.get('export_content_type') and entity:
       context['export_link'] = redirects.getExportRedirect(entity, params)
 
     if entity:

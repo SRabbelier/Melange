@@ -187,7 +187,7 @@ def collectCleanedFields(form):
 
   Returns: 
     All the fields that are in the form's cleaned_data property are returned. 
-    If there is a key_name field, it is not included in the returend fields, 
+    If there is a key_name field, it is not included in the returned fields, 
     instead, it is returned as the first element in the returned tuple. 
     If no key_name field is present, None is returned as first value instead.
   """

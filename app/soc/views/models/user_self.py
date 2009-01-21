@@ -34,7 +34,8 @@ from django.utils.translation import ugettext_lazy
 from soc.logic import dicts
 from soc.logic import validate
 from soc.logic import models as model_logic
-from soc.logic.models import user as user_logic
+from soc.logic.models.site import logic as site_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -62,8 +63,7 @@ class UserForm(helper.forms.BaseForm):
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
 
-    user = user_logic.logic.getForFields({'link_id': link_id},
-                                          unique=True)
+    user = user_logic.getForFields({'link_id': link_id}, unique=True)
 
     # Get the currently logged in user account
     current_account = users.get_current_user()
@@ -73,6 +73,20 @@ class UserForm(helper.forms.BaseForm):
         raise forms.ValidationError("This link ID is already in use.")
 
     return link_id
+
+  def clean_agrees_to_tos(self):
+    agrees_to_tos = self.cleaned_data.get('agrees_to_tos')
+
+    if not site_logic.getToS(site_logic.getSingleton()):
+      return agrees_to_tos
+
+    # Site settings specify a site-wide ToS, so agreement is *required*
+    if agrees_to_tos:
+      return True
+
+    raise forms.ValidationError(
+        'The site-wide Terms of Service must be accepted to participate'
+        ' on this site.')
 
 
 class View(base.View):
@@ -107,7 +121,7 @@ class View(base.View):
 
     new_params = {}
     new_params['rights'] = rights
-    new_params['logic'] = user_logic.logic
+    new_params['logic'] = user_logic
 
     new_params['name'] = "User"
     new_params['module_name'] = "user_self"
@@ -164,7 +178,7 @@ class View(base.View):
     account = users.get_current_user()
     properties = {'account': account}
 
-    user = user_logic.logic.getForFields(properties, unique=True)
+    user = user_logic.getForFields(properties, unique=True)
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
@@ -183,14 +197,14 @@ class View(base.View):
 
         # check if user account is not in former_accounts
         # if it is show error message that account is invalid
-        if user_logic.logic.isFormerAccount(account):
+        if user_logic.isFormerAccount(account):
           msg = self.DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
             'email': account.email()}
           error = out_of_band.Error(msg)
           return helper.responses.errorResponse(
               error, request, template=self.EDIT_SELF_TMPL, context=context)
 
-        user = user_logic.logic.updateOrCreateFromFields(
+        user = user_logic.updateOrCreateFromFields(
             properties, {'link_id': new_link_id})
 
         # redirect to /user/profile?s=0
@@ -253,7 +267,7 @@ class View(base.View):
 
     link_title = ugettext_lazy('Notifications')
 
-    user = user_logic.logic.getForCurrentAccount()
+    user = user_logic.getForCurrentAccount()
 
     filter = {
         'scope': user,

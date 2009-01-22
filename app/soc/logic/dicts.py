@@ -43,12 +43,14 @@ def filter(target, keys):
   return result
 
 
-def merge(target, updates):
+def merge(target, updates, sub_merge=False, recursive=False):
   """Like the builtin 'update' method but does not overwrite existing values.
 
   Args:
     target: The dictionary that is to be updated, may be None
     updates: A dictionary containing new values for the original dict
+    sub_merge: Merge a dict or list present in both target and update
+    recursive: Determines whether merge_subdicts is recursive
 
   Returns:
     the target dict, with any missing values from updates merged in, in-place.
@@ -60,6 +62,19 @@ def merge(target, updates):
   for key, value in updates.iteritems():
     if key not in target:
       target[key] = value
+    elif sub_merge:
+      target_value = target[key]
+
+      # try to merge dicts
+      if isinstance(value, dict) and isinstance(target_value, dict):
+        # the merge becomes recursive by specifying it not only as value
+        # to sub_merge but also to recursive
+        target[key] = merge(target_value, value,
+                            sub_merge=recursive, recursive=recursive)
+
+      # try to merge lists
+      if isinstance(value, list) and isinstance(target_value, list):
+        target[key] = target_value + value
 
   return target
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to create a "release" subdirectory.  This is a subdirectory
+# Script to create a "build" subdirectory.  This is a subdirectory
 # containing a bunch of symlinks, from which the app can be updated.
 # The main reason for this is to import Django from a zipfile, which
 # saves dramatically in upload time: statting and computing the SHA1
@@ -8,13 +8,13 @@
 # actually need to be uploaded, they still add to the work done for
 # each update.
 
-DEFAULT_APP_RELEASE=../release
+DEFAULT_APP_BUILD=../build
 DEFAULT_APP_FOLDER="../app"
 DEFAULT_APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
 DEFAULT_APP_DIRS="soc ghop gsoc feedparser python25src reflistprop jquery"
 DEFAULT_ZIP_FILES="tiny_mce.zip"
 
-APP_RELEASE=${APP_RELEASE:-"${DEFAULT_APP_RELEASE}"}
+APP_BUILD=${APP_BUILD:-"${DEFAULT_APP_BUILD}"}
 APP_FOLDER=${APP_FOLDER:-"${DEFAULT_APP_FOLDER}"}
 APP_FILES=${APP_FILES:-"${DEFAULT_APP_FILES}"}
 APP_DIRS=${APP_DIRS:-"${DEFAULT_APP_DIRS}"}
@@ -25,14 +25,14 @@ cd $APP_FOLDER
 # Remove old zip files (and django.zip in its old location)
 rm -rf $ZIP_FILES django.zip
 
-# Remove old $APP_RELEASE directory.
-rm -rf $APP_RELEASE
+# Remove old $APP_BUILD directory.
+rm -rf $APP_BUILD
 
-# Create new $APP_RELEASE directory.
-mkdir $APP_RELEASE
+# Create new $APP_BUILD directory.
+mkdir $APP_BUILD
 
-# Create new django.zip file, but directly in the $APP_RELEASE directory,
-# rather than in $APP_FOLDER and creating a symlink in $APP_RELEASE.  This
+# Create new django.zip file, but directly in the $APP_BUILD directory,
+# rather than in $APP_FOLDER and creating a symlink in $APP_BUILD.  This
 # keeps the presence of a django.zip file in the app/ folder from breaking
 # debugging into app/django.
 #
@@ -42,7 +42,7 @@ mkdir $APP_RELEASE
 # - *.po and *.mo files because they are bulky and unneeded.
 # - *.pyc and *.pyo because they aren't used by App Engine anyway.
 
-zip -q "$APP_RELEASE/django.zip" `find django \
+zip -q "$APP_BUILD/django.zip" `find django \
     -name .svn -prune -o \
     -name gis -prune -o \
     -name admin -prune -o \
@@ -71,8 +71,8 @@ popd > /dev/null
 # Create symbolic links.
 for x in $APP_FILES $APP_DIRS $ZIP_FILES
 do
-    ln -s $APP_FOLDER/$x $APP_RELEASE/$x
+    ln -s $APP_FOLDER/$x $APP_BUILD/$x
 done
 
-echo "Release created in $APP_RELEASE."
+echo "Build results in $APP_BUILD."
 

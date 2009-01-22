@@ -56,7 +56,7 @@ def clean_existing_user(field_name):
     return user_entity
   return wrapped
 
-def clean_existing_user_not_equal_to_current(field_name):
+def clean_users_not_same(field_name):
   """Check if the field_name field is a valid user and is not 
      equal to the current user.
   """

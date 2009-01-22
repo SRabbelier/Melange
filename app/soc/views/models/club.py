@@ -100,7 +100,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def applicant(self, request, access_type,
-      page_name=None, params=None, **kwargs):
+                page_name=None, params=None, **kwargs):
     """Handles the creation of a club via an approved club application.
 
     Args:

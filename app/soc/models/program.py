@@ -67,13 +67,32 @@ class Program(soc.models.presence.Presence):
       ' but in <u>2009</u>!</tt><br><br>'
       '<small><i>(rich text formatting is supported)</i></small>')
   
+  #: Required field storing application/tasks limit of the program.
+  apps_tasks_limit = db.IntegerProperty(required=True,
+      verbose_name=ugettext_lazy('Application/Tasks Limit'))
+  apps_tasks_limit.example_text = ugettext_lazy(
+      '<small><i>e.g.</i></small> '
+      '<tt><b>20</b> is the student applications limit for <i>Google Summer '
+      'of Code</i>, but <b>1</b> is the tasks limit that the student can work '
+      'on at the same time during <i>GHOP</i></tt>')
+
+  #: Required field storing slots limit of the program.
+  slots = db.IntegerProperty(required=True,
+      verbose_name=ugettext_lazy('Slots'))
+  slots.example_text = ugettext_lazy(
+      '<small><i>e.g.</i></small> '
+      '<tt><b>500</b> might be an amount of slots for <i>Google Summer '
+      'of Code</i>, which indicates how many students can be accepted '
+      'to the program.<br>For <i>GHOP</i> this indicates how '
+      'many tasks can be completed.</tt>')
+
   #: Required field storing the type of workflow this program has
   workflow = db.StringProperty(required=True,
       choices=['gsoc', 'ghop'],
       verbose_name= ugettext_lazy('Workflow type'))
   workflow.example_text = ugettext_lazy(
-      '<b><tt>Project-based</tt></b> for GSoC workflow type,<br>' 
-      ' <b><tt>Task-based</tt></b> for GHOP workflow type.')
+      '<tt><b>Project-based</b> for GSoC workflow type,<br>' 
+      '<b>Task-based</b> for GHOP workflow type.</tt>')
 
   #: Required 1:1 relationship indicating the Program the Timeline
   #: belongs to.

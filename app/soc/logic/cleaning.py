@@ -87,3 +87,20 @@ def clean_feed_url(self):
     raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
   return feed_url
+
+def clean_url(field_name):
+  """Clean method for cleaning a field belonging to a LinkProperty.
+  """
+
+  def wrapped(self):
+
+    value = self.cleaned_data.get(field_name)
+
+    # LinkProperty does not accept the empty string so we must return None
+    if not value or value == u'':
+      return None
+
+    # call the Django URLField cleaning method to properly clean/validate this field
+    return forms.URLField.clean(self, value )
+  return wrapped
+

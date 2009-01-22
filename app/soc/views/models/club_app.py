@@ -259,7 +259,7 @@ class View(group_app.View):
 
         self._logic.updateModelProperties(entity, fields)
         
-        if status_value is 'accepted':
+        if status_value == 'accepted':
           # the application has been accepted send out a notification
           notifications.sendNewClubNotification(entity)
 

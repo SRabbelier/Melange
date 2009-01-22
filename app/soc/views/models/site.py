@@ -56,9 +56,8 @@ class View(presence.View):
     new_params['rights'] = rights
 
     new_params['name'] = "Site Settings"
+    new_params['name_plural'] = new_params['name']
     new_params['name_short'] = "Site"
-    new_params['url_name'] = "site/settings"
-    new_params['module_name'] = "site"
 
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']

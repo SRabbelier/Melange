@@ -34,33 +34,6 @@ import soc.logic.models.site
 import soc.logic.dicts
 
 
-class CreateForm(presence.SettingsValidationForm):
-  """Django form displayed when creating or editing Site Settings.
-  """
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    #: db.Model subclass for which the form will gather information
-    model = soc.models.site.Site
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'scope_path', 'link_id',
-      # TODO(tlarsen): this needs to be enabled once a button to a list
-      #   selection "interstitial" page is implemented, see:
-      #     http://code.google.com/p/soc/issues/detail?id=151
-      'home', 'tos']
-
-  link_id = forms.CharField(widget=forms.HiddenInput)
-
-
-class EditForm(CreateForm):
-  """Django form displayed a Document is edited.
-  """
-
-  pass
-
-
 class View(presence.View):
   """View methods for the Document model.
   """
@@ -86,9 +59,6 @@ class View(presence.View):
     new_params['name_short'] = "Site"
     new_params['url_name'] = "site/settings"
     new_params['module_name'] = "site"
-
-    new_params['edit_form'] = EditForm
-    new_params['create_form'] = CreateForm
 
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']

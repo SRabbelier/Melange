@@ -25,14 +25,13 @@ __authors__ = [
 
 from django import forms
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.helper import widgets
-from soc.views.models import base
+from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
@@ -40,7 +39,7 @@ from soc.views.sitemap import sidebar
 import soc.logic.models.program
 
 
-class View(base.View):
+class View(presence.View):
   """View methods for the Program model.
   """
 
@@ -67,19 +66,16 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/program/edit.html'
 
-    new_params['extra_dynaexclude'] = ['timeline',
-      # TODO(tlarsen): these need to be enabled once a button to a list
-      #   selection "interstitial" page is implemented, see:
-      #   http://code.google.com/p/soc/issues/detail?id=151
-      'home', 'tos']
+    new_params['extra_dynaexclude'] = ['timeline']
 
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
+
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
-        'workflow' : forms.ChoiceField(choices=[('gsoc','Project-based'), 
+
+        'workflow' : forms.ChoiceField(choices=[('gsoc','Project-based'),
             ('ghop','Task-based')], required=True),
-        'clean_link_id': cleaning.clean_link_id,
         }
 
     new_params['edit_extra_dynafields'] = {
@@ -101,6 +97,8 @@ class View(base.View):
     else:
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
+
+    super(View, self)._editPost(request, entity, fields)
 
   def _createTimelineForType(self, fields):
     """Creates and stores a timeline model for the given type of program.

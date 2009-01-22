@@ -36,8 +36,8 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
-from soc.views.helper import widgets
 from soc.views.helper import responses
+from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.logic.models.club
@@ -100,7 +100,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def applicant(self, request, access_type,
-                  page_name=None, params=None, **kwargs):
+      page_name=None, params=None, **kwargs):
     """Handles the creation of a club via an approved club application.
 
     Args:

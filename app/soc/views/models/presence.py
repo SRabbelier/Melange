@@ -116,7 +116,8 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    scope_path = entity.key().name()
+    key_fields = self._logic.getKeyFieldsFromDict(fields)
+    scope_path = self._logic.getKeyNameForFields(key_fields)
     home_link_id = fields['home_link_id']
 
     # TODO notify the user if home_doc is not found

@@ -64,6 +64,11 @@ class View(presence.View):
 
     new_params['public_template'] = 'soc/home/public.html'
 
+    new_params['create_extra_dynafields'] = {
+        'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
+        }
+    new_params['edit_dynafields'] = []
+
     patterns = []
 
     page_name = "Home Page"

@@ -58,7 +58,7 @@ def view(func):
 
 
 def merge_params(func):
-  """Decorator that merges 'params' with self._params
+  """Decorator that merges 'params' with self._params.
   """
 
   @wraps(func)
@@ -71,7 +71,7 @@ def merge_params(func):
 
 
 def check_access(func):
-  """This decorator does access checks for the specified view method
+  """This decorator does access checks for the specified view method.
 
   The rights dictionary is extracted from 'params', or, if either 'params' or
   'rights' do not exist, from self._params['rights'].

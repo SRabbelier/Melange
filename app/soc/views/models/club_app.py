@@ -310,7 +310,7 @@ class View(group_app.View):
 
     den_params = params.copy()
     den_params['list_description'] = ugettext_lazy('A list of all applications '
-        'that have been ignored')
+        'that have been rejected')
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     den_list = helper.lists.getListContent(

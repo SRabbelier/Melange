@@ -34,6 +34,6 @@ class ClubAdmin(soc.models.role.Role):
   #: A many:1 relationship associating Admins with specific Club
   #: details and capabilities. The back-reference in the Club model
   #: is a Query named 'admins'.
-  org = db.ReferenceProperty(
+  club = db.ReferenceProperty(
       reference_class=soc.models.club.Club,
       required=True, collection_name='admins')

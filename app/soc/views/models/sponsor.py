@@ -63,4 +63,4 @@ edit = view.edit
 list = view.list
 public = view.public
 export = view.export
-
+pick = view.pick

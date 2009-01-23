@@ -626,6 +626,13 @@ class View(object):
     if 'scope_path' in form.fields:
       form.fields['scope_path'].initial = entity.scope_path
 
+    field = request.GET.get('field', None)
+    value = request.GET.get('value', None)
+
+    if field and value:
+      form.fields[field].initial = value
+
+
   def _editSeed(self, request, seed):
     """Performs any required processing on the form to get its edit page.
 

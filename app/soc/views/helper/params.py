@@ -78,6 +78,7 @@ def constructParams(params):
   rights['edit'] = [access.checkIsDeveloper]
   rights['delete'] = [access.checkIsDeveloper]
   rights['list'] = [access.checkIsDeveloper]
+  rights['pick'] = [access.checkHasPickGetArgs]
 
   if 'rights' in params:
     rights = dicts.merge(params['rights'], rights)
@@ -133,6 +134,8 @@ def constructParams(params):
           'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>list)$',
           'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
+      (r'^%(url_name)s/(?P<access_type>pick)$',
+          'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s'),
       ]
 
   if not params.get('no_create_with_key_fields'):

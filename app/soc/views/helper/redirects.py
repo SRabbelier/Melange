@@ -91,9 +91,15 @@ def inviteAcceptedRedirect(entity, _):
   """Returns the redirect for accepting an invite.
   """
 
-  return '/%s/create/%s/%s' % (
+  return '/%s/accept_invite/%s/%s' % (
       entity.role, entity.scope_path, entity.link_id)
 
+def inviteProcessRedirect(entity, _):
+  """Returns the redirect for processing an invite
+  """
+
+  return '/request/process_invite/%s/%s/%s' % (
+      entity.scope_path, entity.role, entity.link_id)
 
 def getApplicantRedirect(entity, params):
   """Returns the redirect for processing accepted Applications.

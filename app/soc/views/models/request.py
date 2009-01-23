@@ -27,8 +27,11 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
+from django import http
+from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import user as user_logic
@@ -37,6 +40,8 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import responses
+from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.request
@@ -45,53 +50,10 @@ import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.lists
 import soc.views.helper.responses
-import soc.views.helper.widgets
-
-
-class CreateForm(helper.forms.BaseForm):
-  """Django form displayed when Developer creates a Request.
-  """
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    model = soc.models.request.Request
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'scope_path', 'link_id', 'role', 'declined']
-
-  role = forms.CharField(widget=helper.widgets.ReadOnlyInput())
-
-  user = forms.CharField(
-      label=soc.models.request.Request.link_id.verbose_name,
-      help_text=soc.models.request.Request.link_id.help_text,
-      widget=helper.widgets.ReadOnlyInput())
-
-  group = forms.CharField(
-      label=soc.models.request.Request.scope.verbose_name,
-      help_text=soc.models.request.Request.scope.help_text,
-      widget=helper.widgets.ReadOnlyInput())
-
-  def clean_user(self):
-    self.cleaned_data['requester'] =  user_logic.logic.getForFields(
-        {'link_id': self.cleaned_data['user']}, unique=True)
-    return self.cleaned_data['user']
-
-  def clean_group(self):
-    self.cleaned_data['to'] = sponsor_logic.logic.getFromFields(
-        link_id=self.cleaned_data['group'])
-    return self.cleaned_data['group']
-
-
-class EditForm(CreateForm):
-  """Django form displayed when Developer edits a Request.
-  """
-
-  pass
 
 
 class View(base.View):
-  """View methods for the Docs model.
+  """View methods for the Request model.
   """
 
   def __init__(self, params=None):
@@ -104,7 +66,11 @@ class View(base.View):
 
     rights = {}
     rights['listSelf'] = [access.checkAgreesToSiteToS]
-    rights['create'] = [access.checkCanInvite]
+    rights['create'] = [access.allow] # TODO(ljvderijk) Set to deny once host has been converted
+    rights['edit'] = [access.checkIsDeveloper]
+    rights['process_invite'] = [access.checkIsMyUncompletedRequest]
+    rights['list'] = [access.checkIsDeveloper]
+    rights['delete'] = [access.checkIsDeveloper]
 
     new_params = {}
     new_params['rights'] = rights
@@ -112,16 +78,86 @@ class View(base.View):
 
     new_params['name'] = "Request"
 
-    new_params['edit_form'] = EditForm
-    new_params['create_form'] = CreateForm
-
     new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
     new_params['save_message'] = [ugettext_lazy('Request saved.')]
+    
+    new_params['extra_dynaexclude'] = ['group_accepted', 'user_accepted', 
+        'role_verbose', 'completed']
+    
+    # TODO(ljvderijk) add clean field that checks to see if the user already has
+    # the role that's been entered in the create form fields
+    new_params['create_extra_dynafields'] = {
+        'role' : forms.CharField(widget=widgets.ReadOnlyInput(),
+                                   required=True),
+        'clean_link_id': cleaning.clean_existing_user('link_id')
+        }
+
+    patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(lnp)s$',
+        'soc.views.models.%(module_name)s.invite',
+        'Create invite for %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.processInvite',
+          'Process Invite to for a Role')]
+
+    new_params['extra_django_patterns'] = patterns
+    
+    new_params['invite_processing_template'] = 'soc/request/process_invite.html'
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+
+  @decorators.merge_params
+  @decorators.check_access
+  def processInvite(self, request, access_type,
+                   page_name=None, params=None, **kwargs):
+    """Creates the page upon which an invite can be processed.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+    
+    request_logic = params['logic']
+
+    # get the request entity using the information from kwargs
+    fields = {'link_id' : kwargs['link_id'],
+        'scope_path' : kwargs['scope_path'],
+        'role' : kwargs['role'],
+        'group_accepted' : True,
+        'user_accepted' : False,
+        'completed' : False}
+    request_entity = request_logic.getForFields(fields, unique=True)
+    
+    get_dict = request.GET
+    
+    if 'status' in get_dict.keys():
+      if get_dict['status'] == 'rejected':
+        # this invite has been rejected mark accepted as False and mark completed as True
+        request_logic.updateModelProperties(request_entity, {
+            'user_accepted' : False, 'completed' : True})
+        
+        # redirect to user role overview
+        return http.HttpResponseRedirect('/user/roles')
+
+    # put the entity in the context
+    context['entity'] = request_entity
+    context['module_name'] = params['module_name']
+
+    #display the invite processing page using the appropriate template
+    template = params['invite_processing_template']
+
+    return responses.respond(request, template, context=context)
+
 
   @decorators.merge_params
   @decorators.check_access
@@ -140,26 +176,29 @@ class View(base.View):
     properties = {'account': users.get_current_user()}
     user_entity = user_logic.logic.getForFields(properties, unique=True)
 
-    # construct the Unhandled Requests list
+    # construct the Unhandled Invites list
 
-    # only select the requests for this user that haven't been handled yet
+    # only select the Invites for this user that haven't been handled yet
     filter = {'link_id': user_entity.link_id,
-              'group_accepted' : True}
+              'group_accepted' : True,
+              'user_accepted' : False,
+              'completed' : False}
 
     uh_params = params.copy()
-    uh_params['list_action'] = (redirects.inviteAcceptedRedirect, None)
+    uh_params['list_action'] = (redirects.inviteProcessRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
-        "An overview of your unhandled requests.")
+        "An overview of your unhandled invites.")
 
     uh_list = helper.lists.getListContent(
         request, uh_params, filter, 0)
 
     # construct the Open Requests list
 
-    # only select the requests for the user
+    # only select the requests from the user
     # that haven't been accepted by an admin yet
     filter = {'link_id' : user_entity.link_id,
-              'group_accepted' : False}
+              'group_accepted' : False,
+              'completed' : False}
 
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
@@ -174,32 +213,20 @@ class View(base.View):
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
 
-  def _editSeed(self, request, seed):
-    """See base.View._editGet().
-    """
-
-    # fill in the email field with the data from the entity
-    seed['user'] = seed['link_id']
-    seed['group'] = seed['scope_path']
-
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
-    """
-
-    # fill in the email field with the data from the entity
-    form.fields['user'].initial = entity.link_id
-    form.fields['group'].initial = entity.scope_path
-
-    super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
 
-    # fill in the account field with the user created from email
-    fields['link_id'] = fields['requester'].link_id
-    fields['scope_path'] = fields['to'].link_id
-    fields['scope'] = fields['to']
+    # TODO(ljvderijk) remove this once host has been rewritten
+    callback, args, kwargs = urlresolvers.resolve(request.path)
+
+    # fill in the fields via kwargs
+    fields['link_id'] = kwargs['link_id']
+    fields['scope_path'] = kwargs['scope_path']
+    fields['role'] = kwargs['role']
+    fields['role_verbose'] = 'Some Role'
+    fields['group_accepted'] = True
 
     super(View, self)._editPost(request, entity, fields)
 
@@ -211,6 +238,7 @@ edit = view.edit
 delete = view.delete
 list = view.list
 list_self = view.listSelf
+processInvite = view.processInvite
 public = view.public
 export = view.export
 

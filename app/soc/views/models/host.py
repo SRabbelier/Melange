@@ -78,6 +78,9 @@ class EditForm(CreateForm):
 
   pass
 
+# TODO(ljvderijk) rewrite the Host View module to comply with the new request system
+# so that non-developers can create Hosts
+
 class View(role.View):
   """View methods for the Host model.
   """
@@ -91,8 +94,9 @@ class View(role.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsHost]
-    rights['edit'] = [access.checkIsHost]
+    rights['create'] = [access.checkIsDeveloper]
+    # TODO(ljvderijk) write the edit check
+    #rights['edit'] = [access.checkIsMyHost]
     rights['list'] = [access.checkIsHost]
 
     new_params = {}

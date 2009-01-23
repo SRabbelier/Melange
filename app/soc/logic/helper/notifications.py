@@ -70,7 +70,7 @@ def sendInviteNotification(entity):
 
   invitation_url = "http://%(host)s%(index)s" % {
       'host' : os.environ['HTTP_HOST'],
-      'index': redirects.inviteProcessRedirect(entity, None),
+      'index': redirects.getInviteProcessRedirect(entity, None),
       }
 
   message_properties = {

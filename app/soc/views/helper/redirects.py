@@ -103,7 +103,7 @@ def getInviteAcceptedRedirect(entity, _):
 
 
 def getInviteProcessRedirect(entity, _):
-  """Returns the redirect for processing an invite
+  """Returns the redirect for processing an invite.
   """
 
   return '/request/process_invite/%s/%s/%s' % (

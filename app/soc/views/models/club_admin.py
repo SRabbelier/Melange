@@ -72,7 +72,7 @@ class View(base.View):
 
     new_params['name'] = "Club Admin"
 
-    new_params['extra_dynaexclude'] = ['user', 'club', 'state']
+    new_params['extra_dynaexclude'] = ['user', 'state']
 
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -113,9 +113,6 @@ class View(base.View):
 
     fields['user'] = fields['link_id']
     fields['link_id'] = fields['user'].link_id
-
-    club = club_logic.logic.getFromKeyName(fields['scope_path'])
-    fields['club'] =  club
 
     super(View, self)._editPost(request, entity, fields)
 
@@ -191,7 +188,6 @@ class View(base.View):
     fields['link_id'] = fields['user'].link_id
 
     club = club_logic.logic.getFromKeyName(fields['scope_path'])
-    fields['club'] =  club
     fields['scope'] = club
     
     # make sure that this role becomes active once more in case this user

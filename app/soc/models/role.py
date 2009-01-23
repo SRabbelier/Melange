@@ -274,7 +274,7 @@ class Role(soc.models.linkable.Linkable):
   tshirt_style = db.StringProperty(
       verbose_name=ugettext_lazy('T-shirt Style'),
       choices=('male', 'female'))
-  
+
   #: field storing whether User has agreed to the Role-specific Terms of
   #: Service. (Not a required field because some Roles may not have special
   #: Terms of Service.)
@@ -282,6 +282,20 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext_lazy('Agrees to ToS'))
   agrees_to_tos.help_text = ugettext_lazy(
       'Indicates that the user agrees to the Terms of Service for this Role.')
+
+  #: field storing the state of this role
+  #: Active means that this role can exercise all it's privileges.
+  #: Invalid mean that this role cannot exercise it's privileges.
+  #: Inactive means that this role cannot exercise it's data-editing
+  #: privileges but should be able to see the data. For instance when a program
+  #: has been marked inactive an Organization Admin should still be able to see
+  #: the student applications.
+  state = db.StringProperty(default='active',
+      choices=['active','invalid','inactive'],
+      verbose_name=ugettext_lazy('State of this Role'))
+  state.help_text = ugettext_lazy(
+      'Indicates the state of the role concerning which privileges may be used')
+
 
   def name(self):
     """Alias 'display_name' Property as 'name' for use in common templates.

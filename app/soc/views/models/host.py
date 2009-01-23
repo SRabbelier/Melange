@@ -53,7 +53,7 @@ class CreateForm(helper.forms.BaseForm):
     model = soc.models.host.Host
 
     #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'user']
+    exclude = ['scope', 'user', 'state']
 
   def clean_empty(self, field):
     data = self.cleaned_data.get(field)

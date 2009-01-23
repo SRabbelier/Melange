@@ -32,17 +32,17 @@ limitations under the License.
   {% endblock %}
   <td>
     {{ field }}
-
-    {% if required %}
-    <td class="formfieldrequired">(required)</td>
-    {% else %}
-    <td></td>
-    {% endif %}
-
-    {% if example_text %}
-      <td class="formfieldexample">{{ example_text|safe }}</td>
-    {% else %}
-      <td></td>
-    {% endif %}
   </td>
+
+  {% if required %}
+  <td class="formfieldrequired">(required)</td>
+  {% else %}
+  <td></td>
+  {% endif %}
+
+  {% if example_text %}
+    <td class="formfieldexample">{{ example_text|safe }}</td>
+  {% else %}
+    <td></td>
+  {% endif %} {% endif %}
 </tr>

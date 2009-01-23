@@ -19,9 +19,11 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+from soc.logic.helper import request
 from soc.logic.models import role
 from soc.logic.models import club as club_logic
 
@@ -40,6 +42,13 @@ class Logic(role.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+
+  def _onCreate(self, entity):
+    """Will mark any outstanding requests for the new Club Admin as completly accepted.
+    """
+    # TODO(ljvderijk) apply this to all other role logics if this solution is accepted
+    request.completeRequestForRole(entity, 'club_admin')
 
 
 logic = Logic()

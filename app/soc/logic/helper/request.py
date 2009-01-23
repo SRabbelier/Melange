@@ -25,30 +25,27 @@ __authors__ = [
 import soc.logic.models as model_logic
 
 
-def removeRequestForRole(role_entity):
-  """Removes the request that leads to the creation of the given entity.
+def completeRequestForRole(role_entity, role_name):
+  """Marks the request that leads to the given role_entity as completly accepted.
   
   Args:
     role_entity : A datastore entity that is either a role or a subclass of the role model
+    role_name : The name in the request that is used to describe the type of the role_entity
    
   """
-  
-  # get the type of the role entity using the classname
-  role_type = role_entity.__class__.__name__
-  
+
   # get the request logic so we can query the datastore
   request_logic = model_logic.request.logic
-  
+
   # create the query properties for the specific role
-  properties = {'scope' : role_entity.scope,
+  properties = {'scope_path' : role_entity.scope_path,
       'link_id' : role_entity.link_id,
-      'role' : role_type.lower() }
-  
+      'role' : role_name}
+
   # get the request that complies with properties
   request_entity = request_logic.getForFields(properties, unique=True)
-  
-  # delete the request from the datastore, if there is any
+
+  # mark the request completed, if there is any
   if request_entity:
-    request_logic.delete(request_entity)
-    
-    
+    request_logic.updateModelProperties(request_entity,
+        {'completed' : True, 'group_accepted' : True, 'user_accepted' : True})

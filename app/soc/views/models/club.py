@@ -105,6 +105,7 @@ class View(base.View):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity

@@ -33,6 +33,7 @@ from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import base
 
@@ -58,6 +59,7 @@ class View(base.View):
     new_params = {}
 
     new_params['extra_dynaexclude'] = ['home', 'tos']
+    new_params['home_template'] = 'soc/presence/home.html'
 
     new_params['create_extra_dynafields'] = {
         # override some editors
@@ -77,6 +79,22 @@ class View(base.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+  @decorators.check_access
+  def home(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """See base.View.public().
+
+    Overrides public_template to point at 'home_template'.
+    """
+
+    new_params = {}
+    new_params['public_template'] = self._params['home_template']
+
+    params = dicts.merge(params, new_params)
+
+    return self.public(request, access_type,
+                       page_name=page_name, params=params, **kwargs)
 
   def _public(self, request, entity, context):
     """See base.View._public().

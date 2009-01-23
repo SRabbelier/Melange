@@ -62,7 +62,8 @@ class View(presence.View):
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']
 
-    new_params['public_template'] = 'soc/home/public.html'
+    new_params['public_template'] = 'soc/presence/public.html'
+    new_params['home_template'] = 'soc/site/home.html'
 
     new_params['create_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
@@ -121,7 +122,7 @@ class View(presence.View):
     values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
 
-    return self.public(request, "show", page_name, **key_values)
+    return self.home(request, "home", page_name=page_name, **key_values)
 
   def mainEdit(self, request, page_name=None, **kwargs):
     """Displays the edit page for the main site settings page.
@@ -138,7 +139,7 @@ class View(presence.View):
     # Site singleton, so pass in None to match parent method footprint.
     values = self._logic.getKeyValues(None)
     key_values = dicts.zip(keys, values)
-    
+
     return self.edit(request, "edit", page_name, seed=key_values, **key_values)
 
 

@@ -1,4 +1,4 @@
-{% extends "soc/home/public.html" %}
+{% extends "soc/base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,16 +12,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
-{% block missing_doc %}
-The contents of this default Site home page can be changed by
-<a href="/document/edit">creating a new Document</a> or
-<a href="/document/list">editing an existing Document</a> and then selecting
-that Document in the
-<a href="/site/edit">Site Settings</a> interface.
-Other elements of this page, such as a feed to be displayed below this
-content, can also be set using the
-<a href="/site/edit">Site Settings</a> interface.
-You need to sign in as site Developer in order to change
-<a href="/site/edit">Site Settings</a>.
+{% block header_title %}
+{{ page_name }} for {{ entity.link_id }}
+{% endblock %}
+
+{% block body %}
+<p>
+ <table>
+  {% readonly_field_as_table_row entity.fields.link_id.label entity.link_id %}
+  {% readonly_field_as_table_row entity.fields.home.label entity.home.key.name %}
+  {% readonly_field_as_table_row entity.fields.feed_url.label entity.feed_url %}
+  {% readonly_field_as_table_row entity.fields.tos.label entity.tos %}
+  {% readonly_field_as_table_row entity.fields.ga_tracking_num.label entity.ga_tracking_num %}
+  {% readonly_field_as_table_row entity.fields.gmaps_api_key.label entity.gmaps_api_key %}
+  <!-- TODO(pawel.solyga) make this generic -->
+ </table>
+</p>
 {% endblock %}

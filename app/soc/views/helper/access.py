@@ -126,7 +126,14 @@ def deny(request, args, kwargs):
   Raises:
     always raises AccessViolationResponse if called
   """
-  context = {}
+
+  import soc.views.helper.responses
+
+  if kwargs.get('SIDEBAR_CALLING', False):
+    context = {}
+  else:
+    context = soc.views.helper.responses.getUniversalContext(request)
+
   context['title'] = 'Access denied'
 
   raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)

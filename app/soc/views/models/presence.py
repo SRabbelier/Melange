@@ -56,7 +56,11 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = {}
+    rights['home'] = [access.allow]
+
     new_params = {}
+    new_params['rights'] = rights
 
     new_params['extra_dynaexclude'] = ['home', 'tos']
     new_params['home_template'] = 'soc/presence/home.html'

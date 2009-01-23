@@ -82,8 +82,7 @@ class View(base.View):
 
     new_params['save_message'] = [ugettext_lazy('Request saved.')]
     
-    new_params['extra_dynaexclude'] = ['group_accepted', 'user_accepted', 
-        'role_verbose', 'completed']
+    new_params['extra_dynaexclude'] = ['state', 'role_verbose']
     
     # TODO(ljvderijk) add clean field that checks to see if the user already has
     # the role that's been entered in the create form fields
@@ -133,18 +132,16 @@ class View(base.View):
     fields = {'link_id' : kwargs['link_id'],
         'scope_path' : kwargs['scope_path'],
         'role' : kwargs['role'],
-        'group_accepted' : True,
-        'user_accepted' : False,
-        'completed' : False}
+        'state' : 'group_accepted'}
     request_entity = request_logic.getForFields(fields, unique=True)
     
     get_dict = request.GET
     
     if 'status' in get_dict.keys():
       if get_dict['status'] == 'rejected':
-        # this invite has been rejected mark accepted as False and mark completed as True
+        # this invite has been rejected mark as rejected
         request_logic.updateModelProperties(request_entity, {
-            'user_accepted' : False, 'completed' : True})
+            'state' : 'rejected'})
         
         # redirect to user role overview
         return http.HttpResponseRedirect('/user/roles')
@@ -180,9 +177,7 @@ class View(base.View):
 
     # only select the Invites for this user that haven't been handled yet
     filter = {'link_id': user_entity.link_id,
-              'group_accepted' : True,
-              'user_accepted' : False,
-              'completed' : False}
+              'state' : 'group_accepted'}
 
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.inviteProcessRedirect, None)
@@ -197,8 +192,7 @@ class View(base.View):
     # only select the requests from the user
     # that haven't been accepted by an admin yet
     filter = {'link_id' : user_entity.link_id,
-              'group_accepted' : False,
-              'completed' : False}
+              'state' : 'new'}
 
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
@@ -226,7 +220,7 @@ class View(base.View):
     fields['scope_path'] = kwargs['scope_path']
     fields['role'] = kwargs['role']
     fields['role_verbose'] = 'Some Role'
-    fields['group_accepted'] = True
+    fields['state'] = 'group_accepted'
 
     super(View, self)._editPost(request, entity, fields)
 

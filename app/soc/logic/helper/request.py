@@ -48,4 +48,4 @@ def completeRequestForRole(role_entity, role_name):
   # mark the request completed, if there is any
   if request_entity:
     request_logic.updateModelProperties(request_entity,
-        {'completed' : True, 'group_accepted' : True, 'user_accepted' : True})
+        {'state' : 'completed'})

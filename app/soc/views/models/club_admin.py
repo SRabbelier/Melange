@@ -283,8 +283,7 @@ class View(base.View):
         'scope_path' : club.link_id,
         'role' : params['module_name'],
         'role_verbose' : params['name'],
-        'group_accepted' : True,
-        'completed' : False}
+        'state' : 'group_accepted'}
 
     # extract the key_name for the new request entity
     key_fields = request_logic.logic.getKeyFieldsFromDict(request_fields)

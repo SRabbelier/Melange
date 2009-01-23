@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
 
@@ -36,19 +37,22 @@ class Request(soc.models.linkable.Linkable):
   role = db.StringProperty(required=True)
   role.help_text = ugettext_lazy(
       'This should be the type of the role that is requested')
-  
+
   role_verbose = db.StringProperty(required=True)
   role_verbose.help_text = ugettext_lazy(
       'This should be the verbose name of the role that is in this request')
 
-  group_accepted = db.BooleanProperty(required=True, default=False)
-  group_accepted.help_text = ugettext_lazy(
-      'Field used to indicate whether a request has been accepted by the group')
+  # property that determines the state of the request
+  # new : new Request
+  # group_accepted : The group has accepted this request
+  # completed : This request has been handled either following a creation of
+  #             the role entity
+  # rejected : This request has been rejected by either the user or the group
+  # ignored : The request has been ignored by the group and will not give
+  #           the user access to create the role
+  state = db.StringProperty(required=True, default='new',
+      choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
+  state.help_text = ugettext_lazy(
+      'Shows the state of the request')
 
-  user_accepted = db.BooleanProperty(required=True, default=False)
-  user_accepted.help_text = ugettext_lazy(
-      'Field used to indicate that a request has been accepted by the user')
-  
-  completed = db.BooleanProperty(required=True, default=False)
-  completed.help_text = ugettext_lazy(
-      'Field used to indiicate that a request has been completed and should be archived')
+

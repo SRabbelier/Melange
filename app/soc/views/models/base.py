@@ -388,8 +388,10 @@ class View(object):
 
       self._editGet(request, entity, form)
     else:
+      seed = seed if seed else {}
+      self._editSeed(request, seed)
+
       if seed:
-        self._editSeed(request, seed)
         form = params['create_form'](initial=seed)
       else:
         form = params['create_form']()
@@ -641,7 +643,11 @@ class View(object):
       seed: the fields to seed the create page with
     """
 
-    pass
+    field = request.GET.get('field', None)
+    value = request.GET.get('value', None)
+
+    if field and value:
+      seed[field] = value
 
   def _constructResponse(self, request, entity, context, form, params):
     """Updates the context and returns a response for the specified arguments.

@@ -203,6 +203,8 @@ class View(group_app.View):
 
     form.fields['backup_admin_link_id'].initial = entity.backup_admin.link_id
 
+    super(View, self)._editGet(request, entity, form)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """

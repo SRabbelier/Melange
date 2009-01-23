@@ -40,9 +40,14 @@ limitations under the License.
   <td></td>
   {% endif %}
 
+  {% if select_url %}
+  <td><a href="{{ select_url }}">select</a></td>
+  {% comment %} no else branch, as example_text will take care of the last <td></td> {% endcomment %}
+  {% endif %}
+
   {% if example_text %}
     <td class="formfieldexample">{{ example_text|safe }}</td>
-  {% else %}
+  {% else %} {% if not select_url %}
     <td></td>
-  {% endif %}
+  {% endif %} {% endif %}
 </tr>

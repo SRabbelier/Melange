@@ -26,9 +26,9 @@ limitations under the License.
 </ul>
 {% endif %}
 
-{% for field, required, example_text in fields %}
+{% for field, required, example_text, reference in fields %}
   {% block fields_loop %}
-    {% as_table_row form field required example_text %}
+    {% as_table_row field required example_text reference %}
   {% endblock %}
 {% endfor %}
 

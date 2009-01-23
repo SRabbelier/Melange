@@ -675,6 +675,7 @@ class View(object):
     context['entity_type_plural'] = params['name_plural']
     context['entity_type_short'] = params['name_short']
     context['entity_type_url'] = params['url_name']
+    context['return_url'] = request.path
 
     if params.get('export_content_type') and entity:
       context['export_link'] = redirects.getExportRedirect(entity, params)

@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from django import template
 from django.forms import forms as forms_in
 from django.utils.encoding import force_unicode
@@ -112,36 +114,67 @@ def readonly_multiline_field_as_table_row(field_label, field_value):
           'field_value': field_value}
 
 
-@register.inclusion_tag('soc/templatetags/_as_table.html')
-def as_table(form):
+@register.inclusion_tag('soc/templatetags/_as_table.html', takes_context=True)
+def as_table(context, form):
   """Outputs a form as a properly formatted html table.
 
   Args:
     form: the form that should be converted to a table
   """
 
-  return as_table_helper(form)
+  return as_table_helper(context, form)
 
 
-@register.inclusion_tag('soc/templatetags/_as_twoline_table.html')
-def as_twoline_table(form):
+@register.inclusion_tag('soc/templatetags/_as_twoline_table.html',
+                        takes_context=True)
+def as_twoline_table(context, form):
   """Outputs a form as a properly formatted html table.
 
   Args:
     form: the form that should be converted to a table
   """
 
-  return as_table_helper(form)
+  return as_table_helper(context, form)
 
 
-def as_table_helper(form):
+def get_reference_url(form, name):
+  """Retrieves the reference url from a field
+
+  Args:
+    form: the form the field is defined in
+    name: the name of the field
+  """
+
+  if not hasattr(form, 'Meta'):
+    return None
+
+  if not hasattr(form.Meta, 'model'):
+    return None
+
+  if not hasattr(form.Meta.model, name):
+    return None
+
+  field = getattr(form.Meta.model, name)
+
+  if not isinstance(field, db.ReferenceProperty):
+    return None
+
+  return getattr(field, 'redirect_url', None)
+
+
+def as_table_helper(context, form):
   fields = []
   hidden_fields = []
   hidden_fields_errors = []
+  entity = context['entity']
 
   # Iterate over all fields and prepare it for adding 
   for name, field in form.fields.items():
     bf = forms_in.BoundField(form, field, name)
+    reference = None
+
+    if name.endswith('_link_id'):
+      reference = get_reference_url(form, name[:-8])
 
     # If the field is hidden we display it elsewhere
     if not bf.is_hidden:
@@ -149,7 +182,7 @@ def as_table_helper(form):
       if hasattr(field, 'example_text'):
         example_text = force_unicode(field.example_text)
 
-      item = (bf, field.required, example_text)
+      item = (bf, field.required, example_text, reference)
       fields.append(item)
     else:
       hidden_fields.append(unicode(bf))
@@ -158,17 +191,19 @@ def as_table_helper(form):
         item = (name, force_unicode(e))
         hidden_fields_errors.append(item)
 
-  return {
+  context.update({
       'top_errors': form.non_field_errors() or '',
       'hidden_field_errors': hidden_fields_errors or '',
-      'form': form,
       'fields': fields or '',
       'hidden_fields': hidden_fields or '',
-      }
+      })
+
+  return context
 
 
-@register.inclusion_tag('soc/templatetags/_as_table_row.html')
-def as_table_row(form, field, required, example_text):
+@register.inclusion_tag('soc/templatetags/_as_table_row.html',
+                        takes_context=True)
+def as_table_row(context, field, required, example_text, reference):
   """Outputs a field as a properly formatted html row.
 
   Args:
@@ -176,28 +211,39 @@ def as_table_row(form, field, required, example_text):
     field: the field that should be converted to a row
     required: whether the field is required
     example_text: the example_text for this row
+    reference: the entity_suffix if the field is a reference
   """
 
-  return as_table_row_helper(form, field, required, example_text)
+  return as_table_row_helper(context, field, required, example_text, reference)
 
 
-@register.inclusion_tag('soc/templatetags/_as_twoline_table_row.html')
-def as_twoline_table_row(form, field, required, example_text):
-  """Outputs a field as a properly formatted html row.
-
-  Args:
-    form: the form that the row belongs to
-    field: the field that should be converted to a row
-    required: whether the field is required
-    example_text: the example_text for this row
+@register.inclusion_tag('soc/templatetags/_as_twoline_table_row.html',
+                        takes_context=True)
+def as_twoline_table_row(context, field, required, example_text, reference):
+  """See as_table_row().
   """
 
-  return as_table_row_helper(form, field, required, example_text)
+  return as_table_row_helper(context, field, required, example_text, reference)
 
 
-def as_table_row_helper(form, field, required, example_text):
+def as_table_row_helper(context, field, required, example_text, reference):
+  """See as_table_row().
+  """
+
   # Escape and cache in local variable.
   errors = [force_unicode(escape(error)) for error in field.errors]
+
+  form = context['form']
+  entity = context['entity']
+
+  if reference:
+    from soc.views.helper import redirects
+    params = {
+        'url_name': reference,
+        'field_name': field.name,
+        'return_url': context['return_url']
+        }
+    select_url = redirects.getSelectRedirect(entity, params)
 
   if field.label:
     label = escape(force_unicode(field.label))
@@ -212,12 +258,15 @@ def as_table_row_helper(form, field, required, example_text):
 
   help_text = field.help_text
 
-  return {
+  context.update({
       'help_text': force_unicode(help_text) if help_text else '',
       'field_class_type': field_class_type,
       'label': force_unicode(label) if field.label else '',
       'field': unicode(field),
       'required': required,
       'example_text': example_text,
+      'select_url': select_url if reference else None,
       'errors': errors,
-      }
+      })
+
+  return context

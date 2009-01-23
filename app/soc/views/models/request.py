@@ -149,6 +149,8 @@ class View(base.View):
     # put the entity in the context
     context['entity'] = request_entity
     context['module_name'] = params['module_name']
+    context['invite_accepted_redirect'] = (
+        redirects.getInviteAcceptedRedirect(entity, self._params))
 
     #display the invite processing page using the appropriate template
     template = params['invite_processing_template']
@@ -180,7 +182,7 @@ class View(base.View):
               'state' : 'group_accepted'}
 
     uh_params = params.copy()
-    uh_params['list_action'] = (redirects.inviteProcessRedirect, None)
+    uh_params['list_action'] = (redirects.getInviteProcessRedirect, None)
     uh_params['list_description'] = ugettext_lazy(
         "An overview of your unhandled invites.")
 

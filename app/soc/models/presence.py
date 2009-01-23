@@ -49,6 +49,7 @@ class Presence(soc.models.linkable.Linkable):
     collection_name='home')
   home.help_text = ugettext_lazy(
       'Document to be used as the "/home" page static contents.')
+  home.redirect_url = soc.models.document.Document.URL_NAME
 
   #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
   #: on the site page using Google's JavaScript blog widget  
@@ -64,4 +65,4 @@ class Presence(soc.models.linkable.Linkable):
     collection_name='tos')
   tos.help_text = ugettext_lazy(
       'Document containing optional Terms of Service for participating.')
-
+  tos.redirect_url = soc.models.document.Document.URL_NAME

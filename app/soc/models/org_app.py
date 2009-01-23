@@ -73,6 +73,7 @@ class OrgApplication(soc.models.group_app.GroupApplication):
       'Please select your backup group administrator (if there is one).'
       ' They will be emailed to confirm, and this group will not be '
       ' accepted until they respond. (optional).'))
+  backup_admin.redirect_url = soc.models.user.User.URL_NAME
 
   contrib_template = db.ReferenceProperty(
     reference_class=soc.models.document.Document, required=False,
@@ -84,6 +85,7 @@ class OrgApplication(soc.models.group_app.GroupApplication):
     'This template will be presented to contributors, such as students'
     ' and other non-member participants, when they apply to contribute'
     ' to the organization.')
+  contrib_template.redirect_url = soc.models.document.Document.URL_NAME
 
   contrib_disappears = db.TextProperty(required=True,
     verbose_text=ugettext_lazy(

@@ -61,6 +61,8 @@ class User(soc.models.linkable.Linkable):
      Query of the Response model 'respondent' reference.
   """
 
+  URL_NAME = 'user'
+
   #: A Google Account, which also provides a "private" email address.
   #: This email address is only used in an automated fashion by 
   #: Melange web applications and is not made visible to other users 

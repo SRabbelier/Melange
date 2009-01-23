@@ -506,7 +506,8 @@ class View(object):
 
     return http.HttpResponseRedirect(redirect)
 
-  def select(self, request, view, redirect, page_name=None, params=None):
+  def select(self, request, view, redirect,
+             page_name=None, params=None, filter=None):
     """Displays a list page allowing the user to select an entity.
 
     After having selected the Scope, the user is redirected to the
@@ -520,8 +521,11 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      view: the view for which to generate the select page
+      redirect: the redirect to use
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
+      filter: a filter that all displayed entities should satisfy
     """
 
     params = dicts.merge(params, view.getParams())
@@ -530,10 +534,43 @@ class View(object):
     params['list_description'] = self.DEF_CREATE_INSTRUCTION_MSG_FMT % (
         params['name'], self._params['name'])
 
-    content = helper.lists.getListContent(request, params)
+    content = helper.lists.getListContent(request, params, filter=filter)
     contents = [content]
 
     return self._list(request, params, contents, page_name)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def pick(self, request, acces_type, page_name=None, params=None):
+    """Displays a list page allowing the user to select an entity.
+
+    After having selected an entity, the user is redirected to the
+    return_url as specified in the GET args.
+
+    Params usage:
+      The params dictionary is passed to self.select, refer
+        to its docstring for details on how it uses it.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+    """
+
+    get_dict = request.GET
+    filter = {}
+
+    # scope_path is not required
+    scope_path = get_dict.get('scope_path', None)
+    return_url = get_dict['continue']
+    field = get_dict['field']
+
+    if scope_path:
+      filter['scope_path'] = scope_path
+
+    redirect = redirects.getReturnRedirect(return_url, field)
+    return self.select(request, self, redirect, page_name=page_name,
+                       params=params, filter=filter)
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

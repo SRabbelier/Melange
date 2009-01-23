@@ -38,6 +38,7 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import accounts
 from soc.logic import dicts
+from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.request import logic as request_logic
@@ -236,8 +237,87 @@ def checkIsDeveloper(request, args, kwargs):
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+def checkCanCreateFromRequest(role_name):
+  """Raises an alternate HTTP response if the specified invite does not exist
+     or if it has not been group_accepted. 
+  """
+  def wrapper(request, args, kwargs):
+    checkAgreesToSiteToS(request, args, kwargs)
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    if user_entity.link_id != kwargs['link_id']:
+      deny(request, args, kwargs)
+
+    fields = {'link_id' : kwargs['link_id'],
+        'scope_path' : kwargs['scope_path'],
+        'role' : role_name}
+
+    request_entity = request_logic.getFromFieldsOr404(**fields)
+
+    if not request_entity.group_accepted:
+      # TODO tell the user that this request has not been accepted yet
+      deny(request, args, kwargs)
+
+    return
+  return wrapper
+
+def checkIsMyUncompletedRequest(request, args, kwargs):
+  """Raises an alternate HTTP response if the specified Request has been completed.
+  """
+  checkAgreesToSiteToS(request, args, kwargs)
+
+  user_entity = user_logic.getForCurrentAccount()
+
+  if user_entity.link_id != kwargs['link_id']:
+    # not the current user's request
+    return deny(request, args, kwargs)
+
+  fields = {'link_id' : kwargs['link_id'],
+            'scope_path' : kwargs['scope_path'],
+            'role' : kwargs['role'],
+            'completed' : False}
+
+  request_entity = request_logic.getForFields(fields, unique=True)
+
+  if not request_entity:
+    # TODO return 404
+    return deny(request, args, kwargs)
+
+  return
 
 def checkIsHost(request, args, kwargs):
+  """Raises an alternate HTTP response if Google Account has no Host entity.
+
+  Args:
+    request: a Django HTTP request
+
+  Raises:
+    AccessViolationResponse:
+    * if User is not already a Host, or
+    * if User has not agreed to the site-wide ToS, or
+    * if no User exists for the logged-in Google Account, or
+    * if the user is not even logged in
+  """
+  checkAgreesToSiteToS(request, args, kwargs)
+
+  user = user_logic.getForFields({'account': users.get_current_user()},
+                                 unique=True)
+
+  fields = {'user' : user,
+            'active' : True}
+
+  host = host_logic.getForFields(fields, unique=True)
+
+  if host:
+    return
+
+  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+      'role': 'a Program Administrator '}
+
+  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+def checkIsHostForProgram(request, args, kwargs):
   """Raises an alternate HTTP response if Google Account has no Host entity
      for the specified program.
 
@@ -246,25 +326,21 @@ def checkIsHost(request, args, kwargs):
 
   Raises:
     AccessViolationResponse:
-    * if User has not been invited to be a Host, or
-    * if User is not already a Host, or
+    * if User is not already a Host for the specified program, or
     * if User has not agreed to the site-wide ToS, or
     * if no User exists for the logged-in Google Account, or
     * if the user is not even logged in
   """
   checkAgreesToSiteToS(request, args, kwargs)
 
-  try:
-    # if the current user is invited to create a host profile we allow access
-    checkIsInvited(request, args, kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)
 
-  host = host_logic.getForFields({'user': user}, unique=True)
+  fields = {'user' : user,
+            'scope_path' : kwargs['scope_path'],
+            'active' : True}
+
+  host = host_logic.getForFields(fields, unique=True)
 
   if host:
     return
@@ -300,7 +376,16 @@ def checkIsClubAdminForClub(request, args, kwargs):
 
   checkAgreesToSiteToS(request, args, kwargs)
 
-  # TODO(srabbelier) implement this
+  user = user_logic.getForCurrentAccount()
+
+  fields = {'user' : user,
+            'scope_path' : kwargs['link_id'],
+            'state' : 'active'}
+
+  club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
+
+  if club_admin_entity:
+    return
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a Club Admin for this Club'}
@@ -498,6 +583,50 @@ def checkIsMyApplication(app_logic):
 
     # TODO(srabbelier) Make this give a proper error message
     deny(request, args, kwargs)
+
+  return wrapper
+
+def checkIsMyActiveRole(role_logic):
+  """Returns an alternate HTTP response if there is no active role found for
+     the current user using the given role_logic.
+
+   Raises:
+     AccessViolationResponse: if the required authorization is not met
+
+  Returns:
+    None if the current User has no active role for the given role_logic.
+  """
+
+  def wrapper(request, args, kwargs):
+    try:
+      # if the current user is a developer we allow access
+      checkIsDeveloper(request, args, kwargs)
+      return
+    except out_of_band.Error:
+      pass
+
+    user = user_logic.getForCurrentAccount()
+
+    if not user or user.link_id != kwargs['link_id']:
+      # not my role
+      deny(request, args, kwargs)
+
+    fields = {'link_id' : kwargs['link_id'],
+              'scope_path' : kwargs['scope_path']
+              }
+
+    role_entity = role_logic.logic.getForFields(fields, unique=True)
+
+    if not role_entity:
+      # no role found
+      deny(request, args, kwargs)
+      
+    if role_entity.state == 'active':
+      # this role exist and is active
+      return
+    else:
+      # this role is not active
+      deny(request, args, kwargs)
 
   return wrapper
 

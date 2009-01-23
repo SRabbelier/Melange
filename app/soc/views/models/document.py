@@ -161,7 +161,7 @@ class View(base.View):
     submenus = []
 
     # add a link to the home page
-    submenu = (redirects.getPublicRedirect(entity, params), "Home", 'show')
+    submenu = (redirects.getHomeRedirect(entity, params), "Home", 'show')
     submenus.append(submenu)
 
     # add a link to all featured documents

@@ -69,6 +69,13 @@ def getExportRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
+def getHomeRedirect(entity, params):
+  """Returns the home redirect for the specified entity
+  """
+
+  return '/%s/home/%s' % (
+      params['url_name'], entity.key().name())
+
 def getReviewRedirect(entity, params):
   """Returns the redirect to review the specified entity
   """

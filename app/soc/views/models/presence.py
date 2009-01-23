@@ -76,6 +76,15 @@ class View(base.View):
         'clean_feed_url': cleaning.clean_feed_url,
         }
 
+    patterns = []
+
+    page_name = "Home"
+    patterns += [(r'^%(url_name)s/(?P<access_type>home)/%(key_fields)s$',
+                  'soc.views.models.%(module_name)s.home',
+                  page_name)]
+
+    new_params['extra_django_patterns'] = patterns
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

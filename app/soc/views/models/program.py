@@ -153,4 +153,4 @@ edit = view.edit
 list = view.list
 public = view.public
 export = view.export
-
+home = view.home

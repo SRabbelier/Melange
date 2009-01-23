@@ -153,4 +153,4 @@ public = view.public
 export = view.export
 main_public = view.mainPublic
 main_edit = view.mainEdit
-
+home = view.home

@@ -33,14 +33,22 @@ class Request(soc.models.linkable.Linkable):
   """A request is made to allow a person to create a new Role entity.
   """
 
-  role = db.StringProperty()
+  role = db.StringProperty(required=True)
   role.help_text = ugettext_lazy(
       'This should be the type of the role that is requested')
+  
+  role_verbose = db.StringProperty(required=True)
+  role_verbose.help_text = ugettext_lazy(
+      'This should be the verbose name of the role that is in this request')
 
-  group_accepted = db.BooleanProperty()
+  group_accepted = db.BooleanProperty(required=True, default=False)
   group_accepted.help_text = ugettext_lazy(
       'Field used to indicate whether a request has been accepted by the group')
 
-  user_accepted = db.BooleanProperty()
+  user_accepted = db.BooleanProperty(required=True, default=False)
   user_accepted.help_text = ugettext_lazy(
       'Field used to indicate that a request has been accepted by the user')
+  
+  completed = db.BooleanProperty(required=True, default=False)
+  completed.help_text = ugettext_lazy(
+      'Field used to indiicate that a request has been completed and should be archived')

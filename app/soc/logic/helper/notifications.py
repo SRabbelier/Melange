@@ -45,7 +45,7 @@ DEF_NEW_NOTIFICATION_MSG = ugettext_lazy(
   "You have received a new Notification.")
 
 DEF_INVITATION_MSG_FMT = ugettext_lazy(
-    "Invitation to become a %(role)s for %(group)s.")
+    "Invitation to become a %(role_verbose)s for %(group)s.")
 
 DEF_NEW_CLUB_MSG_FMT = ugettext_lazy(
     "Your club application for %(name)s has been accepted.")
@@ -70,17 +70,17 @@ def sendInviteNotification(entity):
 
   invitation_url = "http://%(host)s%(index)s" % {
       'host' : os.environ['HTTP_HOST'],
-      'index': redirects.inviteAcceptedRedirect(entity, None),
+      'index': redirects.inviteProcessRedirect(entity, None),
       }
 
   message_properties = {
-      'role': entity.role,
+      'role_verbose' : entity.role_verbose,
       'group': entity.scope.name,
       'invitation_url': invitation_url,
       }
 
   subject = DEF_INVITATION_MSG_FMT % {
-      'role' : entity.role,
+      'role_verbose' : entity.role_verbose,
       'group' : entity.scope.name
       }
 

@@ -629,7 +629,7 @@ class View(object):
     field = request.GET.get('field', None)
     value = request.GET.get('value', None)
 
-    if field and value:
+    if field and value and field in form.fields:
       form.fields[field].initial = value
 
 

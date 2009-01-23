@@ -245,8 +245,8 @@ def checkIsDeveloper(request, args, kwargs):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 def checkCanCreateFromRequest(role_name):
-  """Raises an alternate HTTP response if the specified invite does not exist
-     or if it has not been group_accepted. 
+  """Raises an alternate HTTP response if the specified request does not exist
+     or if it's state is not group_accepted. 
   """
   def wrapper(request, args, kwargs):
     checkAgreesToSiteToS(request, args, kwargs)
@@ -262,15 +262,16 @@ def checkCanCreateFromRequest(role_name):
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
-    if not request_entity.group_accepted:
+    if request_entity.state != 'group_accepted':
       # TODO tell the user that this request has not been accepted yet
       deny(request, args, kwargs)
 
     return
   return wrapper
 
-def checkIsMyUncompletedRequest(request, args, kwargs):
-  """Raises an alternate HTTP response if the specified Request has been completed.
+def checkIsMyGroupAcceptedRequest(request, args, kwargs):
+  """Raises an alternate HTTP response if the specified request does not exist
+     or if it's state is not group_accepted
   """
   checkAgreesToSiteToS(request, args, kwargs)
 
@@ -282,13 +283,15 @@ def checkIsMyUncompletedRequest(request, args, kwargs):
 
   fields = {'link_id' : kwargs['link_id'],
             'scope_path' : kwargs['scope_path'],
-            'role' : kwargs['role'],
-            'completed' : False}
+            'role' : kwargs['role']}
 
   request_entity = request_logic.getForFields(fields, unique=True)
 
   if not request_entity:
     # TODO return 404
+    return deny(request, args, kwargs)
+
+  if request_entity.state != 'group_accepted':
     return deny(request, args, kwargs)
 
   return
@@ -306,6 +309,14 @@ def checkIsHost(request, args, kwargs):
     * if no User exists for the logged-in Google Account, or
     * if the user is not even logged in
   """
+
+  try:
+    # if the current user is invited to create a host profile we allow access
+    checkIsDeveloper(request, args, kwargs)
+    return
+  except out_of_band.Error:
+    pass
+
   checkAgreesToSiteToS(request, args, kwargs)
 
   user = user_logic.getForFields({'account': users.get_current_user()},

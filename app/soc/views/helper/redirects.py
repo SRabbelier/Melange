@@ -123,7 +123,7 @@ def getReturnRedirect(return_url, field):
 
   return wrapped
 
-def inviteAcceptedRedirect(entity, _):
+def getInviteAcceptedRedirect(entity, _):
   """Returns the redirect for accepting an invite.
   """
 

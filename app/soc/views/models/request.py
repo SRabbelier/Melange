@@ -68,7 +68,7 @@ class View(base.View):
     rights['listSelf'] = [access.checkAgreesToSiteToS]
     rights['create'] = [access.allow] # TODO(ljvderijk) Set to deny once host has been converted
     rights['edit'] = [access.checkIsDeveloper]
-    rights['process_invite'] = [access.checkIsMyUncompletedRequest]
+    rights['process_invite'] = [access.checkIsMyGroupAcceptedRequest]
     rights['list'] = [access.checkIsDeveloper]
     rights['delete'] = [access.checkIsDeveloper]
 
@@ -150,7 +150,7 @@ class View(base.View):
     context['entity'] = request_entity
     context['module_name'] = params['module_name']
     context['invite_accepted_redirect'] = (
-        redirects.getInviteAcceptedRedirect(entity, self._params))
+        redirects.getInviteAcceptedRedirect(request_entity, self._params))
 
     #display the invite processing page using the appropriate template
     template = params['invite_processing_template']

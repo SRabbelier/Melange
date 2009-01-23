@@ -680,6 +680,27 @@ def checkCanInvite(request, args, kwargs):
   checkAccess(access_type, request, rights=params['rights'])
 
 
+def checkHasPickGetArgs(request, arg, kwargs):
+  """Raises an alternate HTTP response if the request misses get args
+
+  Args:
+    request: a Django HTTP request
+
+  Raises:
+    AccessViolationResponse:
+    * if continue is not in request.GET
+    * if field is not in request.GET
+  """
+
+  get_args = request.GET
+
+  if 'continue' in get_args and 'field' in get_args:
+    return
+
+  #TODO(SRabbelier) inform user that return_url and field are required
+  deny(request, arg, kwargs)
+
+
 def checkIsDocumentPublic(request, args, kwargs):
   """Checks whether a document is public.
 

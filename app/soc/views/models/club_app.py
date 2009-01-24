@@ -61,7 +61,7 @@ class View(group_app.View):
     rights['edit'] = [access.checkIsMyApplication(club_app_logic)]
     rights['list'] = [access.checkAgreesToSiteToS]
     rights['public'] = [access.checkIsMyApplication(club_app_logic)]
-    rights['review'] = [access.checkIsDeveloper]
+    rights['review'] = [access.checkIsHost]
 
     new_params = {}
 

@@ -66,7 +66,7 @@ class View(base.View):
 
     rights = {}
     rights['listSelf'] = [access.checkAgreesToSiteToS]
-    rights['create'] = [access.allow] # TODO(ljvderijk) Set to deny once host has been converted
+    rights['create'] = [access.deny]
     rights['edit'] = [access.checkIsDeveloper]
     rights['process_invite'] = [access.checkIsMyGroupAcceptedRequest]
     rights['list'] = [access.checkIsDeveloper]
@@ -90,6 +90,11 @@ class View(base.View):
         'role' : forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
         'clean_link_id': cleaning.clean_existing_user('link_id')
+        }
+
+    new_params['edit_extra_dynafields'] = {
+        'scope_path': forms.CharField(widget=forms.HiddenInput,
+                                        required=True),
         }
 
     patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(lnp)s$',
@@ -208,23 +213,6 @@ class View(base.View):
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
-
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    # TODO(ljvderijk) remove this once host has been rewritten
-    callback, args, kwargs = urlresolvers.resolve(request.path)
-
-    # fill in the fields via kwargs
-    fields['link_id'] = kwargs['link_id']
-    fields['scope_path'] = kwargs['scope_path']
-    fields['role'] = kwargs['role']
-    fields['role_verbose'] = 'Some Role'
-    fields['state'] = 'group_accepted'
-
-    super(View, self)._editPost(request, entity, fields)
 
 
 view = View()

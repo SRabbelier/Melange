@@ -19,17 +19,24 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+from django import forms
+
+from soc.logic import cleaning
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
+from soc.logic.models import sponsor as sponsor_logic
 from soc.views import helper
+from soc.views.helper import access
+from soc.views.helper import dynaform
+from soc.views.helper import widgets
 from soc.views.models import role
 from soc.views.models import sponsor as sponsor_view
-from soc.views.helper import access
 
 import soc.models.host
 import soc.logic.models.host
@@ -39,47 +46,6 @@ import soc.views.models.sponsor
 # TODO(pawel.solyga): Rename all list methods and functions to something else
 # and remove this tolist assignment
 tolist = list
-
-
-class CreateForm(helper.forms.BaseForm):
-  """Django form displayed when creating a Host.
-  """
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-
-    #: db.Model subclass for which the form will gather information
-    model = soc.models.host.Host
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['scope', 'user', 'state']
-
-  def clean_empty(self, field):
-    data = self.cleaned_data.get(field)
-    if not data or data == u'':
-      return None
-
-    return data
-
-  def clean_home_page(self):
-    return self.clean_empty('home_page')
-
-  def clean_blog(self):
-    return self.clean_empty('blog')
-
-  def clean_photo_url(self):
-    return self.clean_empty('photo_url')
-
-
-class EditForm(CreateForm):
-  """Django form displayed when editing a Host.
-  """
-
-  pass
-
-# TODO(ljvderijk) rewrite the Host View module to comply with the new request system
-# so that non-developers can create Hosts
 
 class View(role.View):
   """View methods for the Host model.
@@ -94,30 +60,51 @@ class View(role.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsDeveloper]
-    # TODO(ljvderijk) write the edit check
-    #rights['edit'] = [access.checkIsMyHost]
+    rights['create'] = [access.checkIsHost]
+    rights['edit'] = [access.checkIsMyActiveRole(soc.logic.models.host)]
+    rights['invite'] = [access.checkIsHost]
     rights['list'] = [access.checkIsHost]
+    rights['accept_invite'] = [access.checkCanCreateFromRequest('host')]
+
 
     new_params = {}
     new_params['rights'] = rights
     new_params['logic'] = soc.logic.models.host.logic
+    new_params['group_logic'] = sponsor_logic.logic
 
     new_params['scope_view'] = sponsor_view
 
-    new_params['logic'] = soc.logic.models.host.logic
     new_params['group_view'] = soc.views.models.sponsor.view
     new_params['invite_filter'] = {'group_ln': 'link_id'}
 
     new_params['name'] = "Program Administrator"
     new_params['module_name'] = "host"
 
-    new_params['edit_form'] = EditForm
-    new_params['create_form'] = CreateForm
+    new_params['extra_dynaexclude'] = ['user', 'state']
+
+    new_params['create_extra_dynafields'] = {
+       'scope_path': forms.CharField(widget=forms.HiddenInput,
+                                  required=True),
+       'clean_link_id' : cleaning.clean_existing_user('link_id'),
+       'clean_home_page' : cleaning.clean_url('home_page'),
+       'clean_blog' : cleaning.clean_url('blog'),
+       'clean_photo_url' : cleaning.clean_url('photo_url')}
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    # create and store the special form for invited users
+    updated_fields = {
+        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=False)}
+
+    invited_create_form = dynaform.extendDynaForm(
+        dynaform = self._params['create_form'],
+        dynafields = updated_fields)
+
+    params['invited_create_form'] = invited_create_form
+
 
   def list(self, request, access_type, page_name=None, 
            params=None, filter=None):
@@ -144,18 +131,29 @@ class View(role.View):
     """See base.View._editPost().
     """
 
-    user = user_logic.logic.getFromKeyName(fields['link_id'])
-    fields['user'] = user
+    fields['user'] = fields['link_id']
+    fields['link_id'] = fields['link_id'].link_id
 
     super(View, self)._editPost(request, entity, fields)
 
+  def _acceptInvitePost(self, fields, request, context, params, **kwargs):
+    """Fills in the fields that were missing in the invited_created_form
+    
+    For params see base.View._acceptInvitePost()
+    """
+    # fill in the appropriate fields that were missing in the form
+    fields['user'] = fields['link_id']
+    fields['link_id'] = fields['link_id'].link_id
+
+
 view = View()
 
+acceptInvite = view.acceptInvite
 create = view.create
 delete = view.delete
 edit = view.edit
+invite = view.invite
 list = view.list
 public = view.public
 export = view.export
-invite = view.invite
 

@@ -57,10 +57,10 @@ class View(base.View):
     """
 
     rights = {}
-    rights['create'] = [access.checkIsHost]
+    rights['create'] = [access.checkIsDeveloper]
     rights['edit'] = [access.checkIsClubAdminForClub]
-    rights['delete'] = [access.checkIsHost]
-    rights['list'] = [access.checkIsHost]
+    rights['delete'] = [access.checkIsDeveloper]
+    rights['list'] = [access.checkIsDeveloper]
     rights['applicant'] = [access.checkIsApplicationAccepted(club_app_logic)]
 
     new_params = {}

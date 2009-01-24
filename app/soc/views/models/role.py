@@ -24,7 +24,7 @@ __authors__ = [
 
 
 from django import http
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.models import request as request_logic
@@ -49,7 +49,7 @@ class View(base.View):
   All views that only Role entities have are defined in this subclass.
   """
   
-  DEF_INVITE_INSTRUCTION_MSG_FMT = ugettext_lazy(
+  DEF_INVITE_INSTRUCTION_MSG_FMT = ugettext(
       'Please use this form to invite someone to become a %(name)s.')
 
   def __init__(self, params=None):

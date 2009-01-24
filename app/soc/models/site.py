@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.presence
 
@@ -41,14 +41,14 @@ class Site(soc.models.presence.Presence):
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.
   ga_tracking_num = db.StringProperty(
-      verbose_name=ugettext_lazy('Google Analytics'))
-  ga_tracking_num.help_text = ugettext_lazy(
+      verbose_name=ugettext('Google Analytics'))
+  ga_tracking_num.help_text = ugettext(
       'Valid Google Analytics tracking number. If the number is '
       'entered every page is going to have Google Analytics '
       'initialization code in footer.')
 
   #: Valid Google Maps API Key. Used to embed Google Maps.
-  gmaps_api_key = db.StringProperty(verbose_name=ugettext_lazy('Google Maps'))
-  gmaps_api_key.help_text = ugettext_lazy(
+  gmaps_api_key = db.StringProperty(verbose_name=ugettext('Google Maps'))
+  gmaps_api_key.help_text = ugettext(
       'Valid Google Maps API Key. This key is used for '
       'embedding Google Maps into the website.')

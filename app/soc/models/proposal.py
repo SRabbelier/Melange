@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.work
 import soc.models.quiz
@@ -55,7 +55,7 @@ class Proposal(soc.models.work.Work):
   #: optional, indexed plain text field used for different purposes,
   #: depending on the specific type of the work
   abstract = db.StringProperty(multiline=True)
-  abstract.help_text = ugettext_lazy(
+  abstract.help_text = ugettext(
       'short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')
 

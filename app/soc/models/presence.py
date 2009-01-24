@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.document
 import soc.models.linkable
@@ -47,22 +47,22 @@ class Presence(soc.models.linkable.Linkable):
   home = db.ReferenceProperty(
     reference_class=soc.models.document.Document,
     collection_name='home')
-  home.help_text = ugettext_lazy(
+  home.help_text = ugettext(
       'Document to be used as the "/home" page static contents.')
   home.redirect_url = soc.models.document.Document.URL_NAME
 
   #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
   #: on the site page using Google's JavaScript blog widget  
-  feed_url = db.LinkProperty(verbose_name=ugettext_lazy('Feed URL'))
-  feed_url.help_text = ugettext_lazy(
+  feed_url = db.LinkProperty(verbose_name=ugettext('Feed URL'))
+  feed_url.help_text = ugettext(
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
 
   #: Reference to Document containing optional Terms of Service
   tos = db.ReferenceProperty(
     reference_class=soc.models.document.Document,
-    verbose_name=ugettext_lazy('Terms of Service'),
+    verbose_name=ugettext('Terms of Service'),
     collection_name='tos')
-  tos.help_text = ugettext_lazy(
+  tos.help_text = ugettext(
       'Document containing optional Terms of Service for participating.')
   tos.redirect_url = soc.models.document.Document.URL_NAME

@@ -25,7 +25,7 @@ import re
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.models import base
 
@@ -112,8 +112,8 @@ class Linkable(base.ModelWithFieldAttributes):
   #: digits and underscores only.  Valid link IDs successfully match
   #: the LINK_ID_REGEX.
   link_id = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Link ID'))
-  link_id.help_text = ugettext_lazy(
+      verbose_name=ugettext('Link ID'))
+  link_id.help_text = ugettext(
       'Link ID is used as part of various URL links throughout the site.'
       ' Lower ASCII characters, digits, and underscores only.')
 
@@ -121,8 +121,8 @@ class Linkable(base.ModelWithFieldAttributes):
   #: the "scope" of this Linkable entity. The back-reference in the Linkable 
   #: model is a Query named 'links'.
   scope = db.SelfReferenceProperty(required=False,
-      collection_name='links', verbose_name=ugettext_lazy('Link Scope'))
-  scope.help_text = ugettext_lazy(
+      collection_name='links', verbose_name=ugettext('Link Scope'))
+  scope.help_text = ugettext(
       'Reference to another Linkable entity that defines the "scope" of'
       ' this Linkable entity.')
 
@@ -134,7 +134,7 @@ class Linkable(base.ModelWithFieldAttributes):
   #: maybe re-parenting operations), so this property is not likely to need
   #: updating.
   scope_path = db.StringProperty(required=False,
-      verbose_name=ugettext_lazy('Scope path'))
-  scope_path.help_text = ugettext_lazy(
+      verbose_name=ugettext('Scope path'))
+  scope_path.help_text = ugettext(
       'Cache of the string form of the entity scope.')
 

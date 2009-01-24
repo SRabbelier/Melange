@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.models import base
 
@@ -34,22 +34,22 @@ class Timeline(base.ModelWithFieldAttributes):
   """
 
   scope_path = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Scope Path'))
+      verbose_name=ugettext('Scope Path'))
 
   program_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Program Start date'))
+      verbose_name=ugettext('Program Start date'))
 
   program_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Program End date'))
+      verbose_name=ugettext('Program End date'))
 
   org_signup_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Organization Signup Start date'))
+      verbose_name=ugettext('Organization Signup Start date'))
 
   org_signup_end  = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Organization Signup End date'))
+      verbose_name=ugettext('Organization Signup End date'))
 
   student_signup_start  = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Student Signup Start date'))
+      verbose_name=ugettext('Student Signup Start date'))
 
   student_signup_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Student Signup End date'))
+      verbose_name=ugettext('Student Signup End date'))

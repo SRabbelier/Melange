@@ -26,7 +26,7 @@ __authors__ = [
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.linkable
 
@@ -68,8 +68,8 @@ class User(soc.models.linkable.Linkable):
   #: Melange web applications and is not made visible to other users 
   #: of any Melange application.
   account = db.UserProperty(required=True,
-      verbose_name=ugettext_lazy('User account'))
-  account.help_text = ugettext_lazy(
+      verbose_name=ugettext('User account'))
+  account.help_text = ugettext(
       'A valid Google Account.')
 
   #: A list (possibly empty) of former Google Accounts associated with
@@ -80,22 +80,22 @@ class User(soc.models.linkable.Linkable):
   #: (though this is not recommended), or a nick name or some other public
   #: alias.  Public names can be any valid UTF-8 text.
   name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Public name'))
-  name.help_text = ugettext_lazy(
+      verbose_name=ugettext('Public name'))
+  name.help_text = ugettext(
       'Human-readable name (UTF-8) that will be displayed publicly on the'
       ' site.')
       
   #: field storing whether User is a Developer with site-wide access.
   is_developer = db.BooleanProperty(
-      verbose_name=ugettext_lazy('Is Developer'))
-  is_developer.help_text = ugettext_lazy(
+      verbose_name=ugettext('Is Developer'))
+  is_developer.help_text = ugettext(
       'Field used to indicate user with site-wide Developer access.')
 
   #: field storing whether User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)
   agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext_lazy('Agrees to ToS'))
-  agrees_to_tos.help_text = ugettext_lazy(
+      verbose_name=ugettext('Agrees to ToS'))
+  agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the site-wide Terms of Service.')
 

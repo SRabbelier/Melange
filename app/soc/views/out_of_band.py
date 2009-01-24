@@ -23,7 +23,7 @@ __authors__ = [
   ]
 
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 
 class Error(Exception):
@@ -57,7 +57,7 @@ class LoginRequest(Error):
   TEMPLATE_NAME = 'login.html'
   DEF_TEMPLATE = 'soc/login.html'
 
-  DEF_LOGIN_MSG_FMT = ugettext_lazy(
+  DEF_LOGIN_MSG_FMT = ugettext(
       'Please <a href="%(sign_in)s">sign in</a> to continue.')
 
   def __init__(self, message_fmt=None, **response_args):

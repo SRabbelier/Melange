@@ -25,7 +25,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.models import countries
 
@@ -85,8 +85,8 @@ class Role(soc.models.linkable.Linkable):
   #: given_name can only be lower ASCII, not UTF-8 text, because it is
   #: used, for example, as part of the shipping (mailing) address.
   given_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('First (given) name'))
-  given_name.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('First (given) name'))
+  given_name.help_text = ugettext('lower ASCII characters only')
 
   #: Required field storing the parts of the Role's name
   #: corresponding to the field names; displayed publicly.
@@ -94,8 +94,8 @@ class Role(soc.models.linkable.Linkable):
   #: used, for example, as part of the shipping (mailing) address.
   surname = db.StringProperty(
       required=True,
-      verbose_name=ugettext_lazy('Last (family) name'))
-  surname.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('Last (family) name'))
+  surname.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field used as a display name, such as for awards
   #: certificates. Should be the entire display name in the format
@@ -103,8 +103,8 @@ class Role(soc.models.linkable.Linkable):
   #: given name in some cultures, for example). Display names can be
   #: any valid UTF-8 text.
   display_name = db.StringProperty(
-      verbose_name=ugettext_lazy('Display Name'))
-  display_name.help_text = ugettext_lazy(
+      verbose_name=ugettext('Display Name'))
+  display_name.help_text = ugettext(
       'Optional field used as a display name, such as for awards '
       'certificates. Should be the entire display name in the format '
       'the person would like it displayed (could be family name followed '
@@ -120,47 +120,47 @@ class Role(soc.models.linkable.Linkable):
   #: kept secret).
   email = db.EmailProperty(
       required=True,
-      verbose_name=ugettext_lazy('Email Address'))
+      verbose_name=ugettext('Email Address'))
 
   #: Optional field storing Instant Messaging network; displayed publicly.
   im_network = db.StringProperty(
-      verbose_name=ugettext_lazy('IM Network'))
-  im_network.help_text = ugettext_lazy(
+      verbose_name=ugettext('IM Network'))
+  im_network.help_text = ugettext(
       'examples: irc:irc.freenode.org xmpp:gmail.com/Home')
 
   #: Optional field storing Instant Messaging handle; displayed publicly.
   im_handle = db.StringProperty(
-      verbose_name=ugettext_lazy('IM Handle'))
-  im_handle.help_text = ugettext_lazy(
+      verbose_name=ugettext('IM Handle'))
+  im_handle.help_text = ugettext(
       'personal identifier, such as: screen name, IRC nick, user name')
 
   #: Optional field storing a home page URL; displayed publicly.
   home_page = db.LinkProperty(
-      verbose_name=ugettext_lazy('Home Page URL'))
+      verbose_name=ugettext('Home Page URL'))
 
   #: Optional field storing a blog URL; displayed publicly.
   blog = db.LinkProperty(
-      verbose_name=ugettext_lazy('Blog URL'))
+      verbose_name=ugettext('Blog URL'))
 
   #: Optional field storing a URL to an image, expected to be a
   #: personal photo (or cartoon avatar, perhaps); displayed publicly.
   photo_url = db.LinkProperty(
-      verbose_name=ugettext_lazy('Thumbnail Photo URL'))
-  photo_url.help_text = ugettext_lazy(
+      verbose_name=ugettext('Thumbnail Photo URL'))
+  photo_url.help_text = ugettext(
       'URL of 64x64 pixel thumbnail image')
 
   #: Optional field storing the latitude provided by the Role; displayed
   #: publicly.
   latitude = db.FloatProperty(
-      verbose_name=ugettext_lazy('Latitude'))
-  latitude.help_text = ugettext_lazy(
+      verbose_name=ugettext('Latitude'))
+  latitude.help_text = ugettext(
       'decimal degrees northerly (N), use minus sign (-) for southerly (S)')
 
   #: Optional field storing the longitude provided by the Role; displayed
   #: publicly.
   longitude = db.FloatProperty(
-      verbose_name=ugettext_lazy('Longitude'))
-  longitude.help_text = ugettext_lazy(
+      verbose_name=ugettext('Longitude'))
+  longitude.help_text = ugettext(
       'decimal degrees easterly (E), use minus sign (-) for westerly (W)')
 
   #====================================================================
@@ -171,38 +171,38 @@ class Role(soc.models.linkable.Linkable):
   #: Residence street address can only be lower ASCII, not UTF-8 text, because
   #: it may be used as a shipping address.
   res_street = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Street address'))
-  res_street.help_text = ugettext_lazy(
+      verbose_name=ugettext('Street address'))
+  res_street.help_text = ugettext(
       'street number and name, lower ASCII characters only')
 
   #: Required field containing residence address city; kept private.
   #: Residence city can only be lower ASCII, not UTF-8 text, because it
   #: may be used as a shipping address.
   res_city = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('City'))
-  res_city.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('City'))
+  res_city.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field containing residence address state or province; kept
   #: private.  Residence state/province can only be lower ASCII, not UTF-8
   #: text, because it may be used as a shipping address.
   res_state = db.StringProperty(
-      verbose_name=ugettext_lazy('State/Province'))
-  res_state.help_text = ugettext_lazy(
+      verbose_name=ugettext('State/Province'))
+  res_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
 
   #: Required field containing residence address country or territory; kept
   #: private.
   res_country = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Country/Territory'),
+      verbose_name=ugettext('Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
   #: Required field containing residence address postal code (ZIP code in
   #: the United States); kept private.  Residence postal code can only be
   #: lower ASCII, not UTF-8 text, because it may be used as a shipping address.
   res_postalcode = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('ZIP/Postal Code'))
-  res_postalcode.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('ZIP/Postal Code'))
+  res_postalcode.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field containing a separate shipping street address; kept
   #: private.  If shipping address is not present in its entirety, the
@@ -210,30 +210,30 @@ class Role(soc.models.linkable.Linkable):
   #: be lower ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_street = db.StringProperty(
-      verbose_name=ugettext_lazy('Shipping Street address'))
-  ship_street.help_text = ugettext_lazy(
+      verbose_name=ugettext('Shipping Street address'))
+  ship_street.help_text = ugettext(
       'street number and name, lower ASCII characters only')
 
   #: Optional field containing shipping address city; kept private.
   #: Shipping city can only be lower ASCII, not UTF-8 text, because, if
   #: supplied, it is used as a shipping address.
   ship_city = db.StringProperty(
-      verbose_name=ugettext_lazy('Shipping City'))
-  ship_city.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('Shipping City'))
+  ship_city.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field containing shipping address state or province; kept
   #: private.  Shipping state/province can only be lower ASCII, not UTF-8
   #: text, because, if supplied, it is used as a shipping address.
   ship_state = db.StringProperty(
-      verbose_name=ugettext_lazy('Shipping State/Province'))
-  ship_state.help_text = ugettext_lazy(
+      verbose_name=ugettext('Shipping State/Province'))
+  ship_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
 
   #: Optional field containing shipping address country or territory; kept
   #: private.
   ship_country = db.StringProperty(
-      verbose_name=ugettext_lazy('Shipping Country/Territory'),
+      verbose_name=ugettext('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
   #: Optional field containing shipping address postal code (ZIP code in
@@ -241,15 +241,15 @@ class Role(soc.models.linkable.Linkable):
   #: lower ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_postalcode = db.StringProperty(
-      verbose_name=ugettext_lazy('Shipping ZIP/Postal Code'))
-  ship_postalcode.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('Shipping ZIP/Postal Code'))
+  ship_postalcode.help_text = ugettext('lower ASCII characters only')
 
   #: Required field containing a phone number that will be supplied
   #: to shippers; kept private.
   phone = db.PhoneNumberProperty(
       required=True,
-      verbose_name=ugettext_lazy('Phone Number'))
-  phone.help_text = ugettext_lazy(
+      verbose_name=ugettext('Phone Number'))
+  phone.help_text = ugettext(
       'include complete international calling number with country code')
 
   #====================================================================
@@ -260,27 +260,27 @@ class Role(soc.models.linkable.Linkable):
   #: determining Program participation eligibility); kept private.
   birth_date = db.DateProperty(
       required=True,
-      verbose_name=ugettext_lazy('Birth Date'))
-  birth_date.help_text = ugettext_lazy(
+      verbose_name=ugettext('Birth Date'))
+  birth_date.help_text = ugettext(
       'required for determining program eligibility')
 
   #: Optional field indicating choice of t-shirt, from XXS to XXXL;
   #: kept private.
   tshirt_size = db.StringProperty(
-      verbose_name=ugettext_lazy('T-shirt Size'),
+      verbose_name=ugettext('T-shirt Size'),
       choices=('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'))
 
   #: Optional field indicating choice of t-shirt fit; kept private.
   tshirt_style = db.StringProperty(
-      verbose_name=ugettext_lazy('T-shirt Style'),
+      verbose_name=ugettext('T-shirt Style'),
       choices=('male', 'female'))
 
   #: field storing whether User has agreed to the Role-specific Terms of
   #: Service. (Not a required field because some Roles may not have special
   #: Terms of Service.)
   agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext_lazy('Agrees to ToS'))
-  agrees_to_tos.help_text = ugettext_lazy(
+      verbose_name=ugettext('Agrees to ToS'))
+  agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the Terms of Service for this Role.')
 
   #: field storing the state of this role
@@ -292,8 +292,8 @@ class Role(soc.models.linkable.Linkable):
   #: the student applications.
   state = db.StringProperty(default='active',
       choices=['active','invalid','inactive'],
-      verbose_name=ugettext_lazy('State of this Role'))
-  state.help_text = ugettext_lazy(
+      verbose_name=ugettext('State of this Role'))
+  state.help_text = ugettext(
       'Indicates the state of the role concerning which privileges may be used')
 
 

@@ -29,7 +29,7 @@ from google.appengine.api import users
 
 from django.template import loader
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 # We cannot import soc.logic.models notification nor user here
 # due to cyclic imports
@@ -41,16 +41,16 @@ import soc.views.models as model_view
 import soc.logic.models as model_logic
 
 
-DEF_NEW_NOTIFICATION_MSG = ugettext_lazy(
+DEF_NEW_NOTIFICATION_MSG = ugettext(
   "You have received a new Notification.")
 
-DEF_INVITATION_MSG_FMT = ugettext_lazy(
+DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
 
-DEF_NEW_CLUB_MSG_FMT = ugettext_lazy(
+DEF_NEW_CLUB_MSG_FMT = ugettext(
     "Your club application for %(name)s has been accepted.")
 
-DEF_WELCOME_MSG_FMT = ugettext_lazy("Welcome to Melange %(name)s,")
+DEF_WELCOME_MSG_FMT = ugettext("Welcome to Melange %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
 

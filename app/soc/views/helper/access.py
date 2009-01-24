@@ -34,7 +34,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from django.core import urlresolvers
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import accounts
 from soc.logic import dicts
@@ -49,24 +49,24 @@ from soc.views import out_of_band
 from soc.views.helper import redirects
 
 
-DEF_NO_USER_LOGIN_MSG_FMT = ugettext_lazy(
+DEF_NO_USER_LOGIN_MSG_FMT = ugettext(
   'Please create <a href="/user/edit">User Profile</a>'
   ' in order to view this page.')
 
-DEF_AGREE_TO_TOS_MSG_FMT = ugettext_lazy(
+DEF_AGREE_TO_TOS_MSG_FMT = ugettext(
   'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
   ' Service</a> in your <a href="/user/edit">User Profile</a>'
   ' in order to view this page.')
 
-DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext_lazy(
+DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
   'Please <a href="%%(sign_out)s">sign out</a>'
   ' and <a href="%%(sign_in)s">sign in</a>'
   ' again as %(role)s to view this page.')
 
-DEF_PAGE_DENIED_MSG = ugettext_lazy(
+DEF_PAGE_DENIED_MSG = ugettext(
   'Access to this page has been restricted')
 
-DEF_LOGOUT_MSG_FMT = ugettext_lazy(
+DEF_LOGOUT_MSG_FMT = ugettext(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
 
 

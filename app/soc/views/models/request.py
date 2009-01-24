@@ -29,7 +29,7 @@ from google.appengine.api import users
 from django import forms
 from django import http
 from django.core import urlresolvers
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -81,7 +81,7 @@ class View(base.View):
 
     new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
-    new_params['save_message'] = [ugettext_lazy('Request saved.')]
+    new_params['save_message'] = [ugettext('Request saved.')]
     
     new_params['extra_dynaexclude'] = ['state', 'role_verbose']
     
@@ -205,7 +205,7 @@ class View(base.View):
 
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.getInviteProcessRedirect, None)
-    uh_params['list_description'] = ugettext_lazy(
+    uh_params['list_description'] = ugettext(
         "An overview of your unhandled invites.")
 
     uh_list = helper.lists.getListContent(
@@ -219,7 +219,7 @@ class View(base.View):
               'state': 'new'}
 
     ar_params = params.copy()
-    ar_params['list_description'] = ugettext_lazy(
+    ar_params['list_description'] = ugettext(
         "List of your pending requests.")
 
     ar_list = helper.lists.getListContent(

@@ -23,7 +23,7 @@ __authors__ = [
 
 
 from django import forms
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -34,10 +34,10 @@ from soc.views.helper import dynaform
 from soc.views.helper import redirects
 
 
-DEF_LIST_DESCRIPTION_FMT = ugettext_lazy(
+DEF_LIST_DESCRIPTION_FMT = ugettext(
     'List of %(name_plural)s in Google Open Source Programs.')
 
-DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext_lazy(
+DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext(
       'Please use this form to select a %(name).')
 
 DEF_SUBMIT_MSG_PARAM_NAME = 's'
@@ -172,7 +172,7 @@ def constructParams(params):
       }
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
-  new_params['save_message'] = [ugettext_lazy('Profile saved.')]
+  new_params['save_message'] = [ugettext('Profile saved.')]
   new_params['submit_msg_param_name'] = DEF_SUBMIT_MSG_PARAM_NAME
   new_params['edit_params'] = {
       DEF_SUBMIT_MSG_PARAM_NAME: DEF_SUBMIT_MSG_PROFILE_SAVED,

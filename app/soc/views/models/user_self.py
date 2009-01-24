@@ -29,7 +29,7 @@ from django import forms
 from django import http
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic import validate
@@ -94,7 +94,7 @@ class View(base.View):
   """View methods for the User model.
   """
 
-  DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext_lazy(
+  DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
     ' one or more of the following reasons:'
     '<ul>'
@@ -256,7 +256,7 @@ class View(base.View):
     """See base.View.getSidebarMenus().
     """
 
-    link_title = ugettext_lazy('Notifications')
+    link_title = ugettext('Notifications')
 
     user = user_logic.getForCurrentAccount()
 

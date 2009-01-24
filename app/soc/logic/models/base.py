@@ -29,7 +29,7 @@ import itertools
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.views import out_of_band
@@ -258,14 +258,14 @@ class Logic(object):
     if entity:
       return entity
 
-    format_text = ugettext_lazy('"%(key)s" is "%(value)s"')
+    format_text = ugettext('"%(key)s" is "%(value)s"')
 
     msg_pairs = [format_text % {'key': key, 'value': value}
       for key, value in fields.iteritems()]
 
     joined_pairs = ' and '.join(msg_pairs)
 
-    msg = ugettext_lazy(
+    msg = ugettext(
       'There is no "%(name)s" where %(pairs)s.') % {
         'name': self._name, 'pairs': joined_pairs}
 

@@ -25,7 +25,7 @@ __authors__ = [
 import time
 
 from django import forms
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -129,7 +129,7 @@ class View(base.View):
 
     # define the list redirect action to show the notification
     un_params['list_action'] = (redirects.getPublicRedirect, params)
-    un_params['list_description'] = ugettext_lazy(
+    un_params['list_description'] = ugettext(
         "An overview of your unread Notifications.")
 
     # TODO(Lennard) when list sorting is implemented sort on descending date
@@ -144,7 +144,7 @@ class View(base.View):
     rn_params = params.copy() # read notifications
 
     rn_params['list_action'] = (redirects.getPublicRedirect, params)
-    rn_params['list_description'] = ugettext_lazy(
+    rn_params['list_description'] = ugettext(
         "An overview of your read Notifications.")
 
     rn_list = list_helper.getListContent(

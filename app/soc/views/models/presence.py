@@ -25,7 +25,7 @@ __authors__ = [
 from google.appengine.ext import db
 
 from django import forms
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -68,11 +68,11 @@ class View(base.View):
     new_params['create_extra_dynafields'] = {
         # override some editors
         'home_link_id': forms.CharField(required=False,
-            label=ugettext_lazy('Home page Document link ID'),
+            label=ugettext('Home page Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
 
         'tos_link_id': forms.CharField(required=False,
-            label=ugettext_lazy('Terms of Service Document link ID'),
+            label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
 
         # add cleaning of the link id and feed url

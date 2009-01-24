@@ -25,7 +25,7 @@ __authors__ = [
 
 
 from django import http
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.views import helper
@@ -51,12 +51,12 @@ class View(object):
   self._logic: the logic singleton for this entity
   """
 
-  DEF_CREATE_NEW_ENTITY_MSG_FMT = ugettext_lazy(
+  DEF_CREATE_NEW_ENTITY_MSG_FMT = ugettext(
       ' You can create a new %(entity_type)s by visiting'
       ' <a href="%(create)s">Create '
       'a New %(entity_type)s</a> page.')
 
-  DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext_lazy(
+  DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext(
       'Please select a %s for the new %s.')
 
   def __init__(self, params=None):

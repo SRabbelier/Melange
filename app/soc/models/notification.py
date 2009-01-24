@@ -23,7 +23,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.linkable
 import soc.models.user
@@ -38,19 +38,19 @@ class Notification(soc.models.linkable.Linkable):
   from_user = db.ReferenceProperty(reference_class=soc.models.user.User,
       required=False,
       collection_name="sent_notifications",
-      verbose_name=ugettext_lazy('From'))
+      verbose_name=ugettext('From'))
 
   subject = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Subject'))
+      verbose_name=ugettext('Subject'))
 
   #: the message that is contained within this Notification
   message = db.TextProperty(required=True,
-      verbose_name=ugettext_lazy('Message'))
+      verbose_name=ugettext('Message'))
 
   #: date and time on which this Notification was created
   created_on = db.DateTimeProperty(auto_now_add=True,
-      verbose_name=ugettext_lazy('Created On'))
+      verbose_name=ugettext('Created On'))
 
   #: boolean property that marks if the notification is unread
   unread = db.BooleanProperty(default=True,
-      verbose_name=ugettext_lazy('Unread'))
+      verbose_name=ugettext('Unread'))

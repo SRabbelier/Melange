@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.linkable
 import soc.models.user
@@ -47,26 +47,26 @@ class Work(soc.models.linkable.Linkable):
   author = db.ReferenceProperty(reference_class=soc.models.user.User,
                                 required=True,
                                 collection_name="created_documents",
-                                verbose_name=ugettext_lazy('Created by'))
+                                verbose_name=ugettext('Created by'))
 
   #: Required field indicating the "title" of the work, which may have
   #: different uses depending on the specific type of the work. Works
   #: can be indexed, filtered, and sorted by 'title'.
   title = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Title'))
-  title.help_text = ugettext_lazy(
+      verbose_name=ugettext('Title'))
+  title.help_text = ugettext(
       'title of the document; often used in the window title')
 
   #: short name used in places such as the sidebar menu and breadcrumb trail
   #: (optional: title will be used if short_name is not present)
-  short_name = db.StringProperty(verbose_name=ugettext_lazy('Short name'))
-  short_name.help_text = ugettext_lazy(
+  short_name = db.StringProperty(verbose_name=ugettext('Short name'))
+  short_name.help_text = ugettext(
       'short name used, for example, in the sidebar menu')
 
   #: Required db.TextProperty containing the contents of the Work.
   #: The content is only to be displayed to Persons in Roles eligible to
   #: view them (which may be anyone, for example, with the site front page).
-  content = db.TextProperty(verbose_name=ugettext_lazy('Content'))
+  content = db.TextProperty(verbose_name=ugettext('Content'))
   
   #: date when the work was created
   created = db.DateTimeProperty(auto_now_add=True)
@@ -78,7 +78,7 @@ class Work(soc.models.linkable.Linkable):
   modified_by = db.ReferenceProperty(reference_class=soc.models.user.User,
                                      required=True,
                                      collection_name="modified_documents",
-                                     verbose_name=ugettext_lazy('Modified by'))
+                                     verbose_name=ugettext('Modified by'))
 
   # TODO: some sort of access control preferences are needed at this basic
   #   level.  Works need to be restrict-able to:
@@ -94,8 +94,8 @@ class Work(soc.models.linkable.Linkable):
   #: the sidebar menu (and possibly elsewhere); FAQs, Terms of Service,
   #: and the like are examples of "featured" Works
   is_featured = db.BooleanProperty(
-      verbose_name=ugettext_lazy('Is Featured'))
-  is_featured.help_text = ugettext_lazy(
+      verbose_name=ugettext('Is Featured'))
+  is_featured.help_text = ugettext(
       'Field used to indicate if a Work should be featured, for example,'
       ' in the sidebar menu.')
 

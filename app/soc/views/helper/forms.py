@@ -46,7 +46,7 @@ class BaseForm(djangoforms.ModelForm):
   This class detects the presence of a help_text attribute and adds it to
   the corresponding form field object.
 
-  ugettext_lazy() proxies used for internationalization in the Model will
+  ugettext() proxies used for internationalization in the Model will
   still work correctly with this new behavior, as long as the original
   strings are used as the translation keys.
   """

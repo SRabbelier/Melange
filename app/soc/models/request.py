@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 import soc.models.user
 import soc.models.group
@@ -35,11 +35,11 @@ class Request(soc.models.linkable.Linkable):
   """
 
   role = db.StringProperty(required=True)
-  role.help_text = ugettext_lazy(
+  role.help_text = ugettext(
       'This should be the type of the role that is requested')
 
   role_verbose = db.StringProperty(required=True)
-  role_verbose.help_text = ugettext_lazy(
+  role_verbose.help_text = ugettext(
       'This should be the verbose name of the role that is in this request')
 
   # property that determines the state of the request
@@ -52,6 +52,6 @@ class Request(soc.models.linkable.Linkable):
   #           the user access to create the role
   state = db.StringProperty(required=True, default='new',
       choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
-  state.help_text = ugettext_lazy('Shows the state of the request')
+  state.help_text = ugettext('Shows the state of the request')
 
 

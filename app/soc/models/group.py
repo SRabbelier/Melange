@@ -24,7 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.models import countries
 
@@ -38,86 +38,86 @@ class Group(soc.models.presence.Presence):
 
   #: Required field storing name of the group.
   name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Name'))
-  name.help_text = ugettext_lazy('Complete, formal name of the group.')  
+      verbose_name=ugettext('Name'))
+  name.help_text = ugettext('Complete, formal name of the group.')  
   
   #: Required field storing short name of the group.
   #: It can be used for displaying group as sidebar menu item.
   short_name = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Short name'))
-  short_name.help_text = ugettext_lazy('Short name used for sidebar menu')
+      verbose_name=ugettext('Short name'))
+  short_name.help_text = ugettext('Short name used for sidebar menu')
 
   #: Required many:1 relationship indicating the founding User of the
   #: Group (this relationship is needed to keep track of lifetime group
   #: creation limits, used to prevent spamming, etc.).
   founder = db.ReferenceProperty(reference_class=soc.models.user.User,
                                  required=True, collection_name="groups",
-                                 verbose_name=ugettext_lazy('Founded by'))
+                                 verbose_name=ugettext('Founded by'))
 
   #: Required field storing a home page URL of the group.
   home_page = db.LinkProperty(required=True,
-      verbose_name=ugettext_lazy('Home Page URL'))
+      verbose_name=ugettext('Home Page URL'))
   
   #: Required email address used as the "public" contact mechanism for
   #: the Group (as opposed to the founder.account email address which is
   #: kept secret, revealed only to Developers).
   email = db.EmailProperty(required=True,
-      verbose_name=ugettext_lazy('Email'))  
+      verbose_name=ugettext('Email'))  
   
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,
-      verbose_name=ugettext_lazy('Description'))
+      verbose_name=ugettext('Description'))
  
   #: Optional public mailing list.     
   pub_mailing_list = db.StringProperty(required=False,
-    verbose_name=ugettext_lazy('Public Mailing List'))
-  pub_mailing_list.help_text = ugettext_lazy(
+    verbose_name=ugettext('Public Mailing List'))
+  pub_mailing_list.help_text = ugettext(
     'Mailing list email address, URL to sign-up page, etc.')
 
   #: Optional public IRC channel.
   irc_channel = db.StringProperty(required=False,
-    verbose_name=ugettext_lazy('Public IRC Channel (and Network)'))
+    verbose_name=ugettext('Public IRC Channel (and Network)'))
 
   #: Required field containing a group street address.
   #: Group street address can only be lower ASCII, not UTF-8 text, 
   #: because, if supplied, it is used as a shipping address.
   street = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Street address'))
-  street.help_text = ugettext_lazy(
+      verbose_name=ugettext('Street address'))
+  street.help_text = ugettext(
       'street number and name, lower ASCII characters only')
 
   #: Required field containing group address city.
   #: City can only be lower ASCII, not UTF-8 text, because, if
   #: supplied, it is used as a shipping address.
   city = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('City'))
-  city.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('City'))
+  city.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field containing group address state or province.
   #: Group state/province can only be lower ASCII, not UTF-8
   #: text, because, if supplied, it is used as a shipping address.
   state = db.StringProperty(
-      verbose_name=ugettext_lazy('State/Province'))
-  state.help_text = ugettext_lazy(
+      verbose_name=ugettext('State/Province'))
+  state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
 
   #: Required field containing address country or territory of the group.
   country = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('Country/Territory'),
+      verbose_name=ugettext('Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
   #: Required field containing address postal code of the group (ZIP code in
   #: the United States). Postal code can only be lower ASCII, not UTF-8 
   #: text, because, if supplied, it is used as a shipping address.
   postalcode = db.StringProperty(required=True,
-      verbose_name=ugettext_lazy('ZIP/Postal Code'))
-  postalcode.help_text = ugettext_lazy('lower ASCII characters only')
+      verbose_name=ugettext('ZIP/Postal Code'))
+  postalcode.help_text = ugettext('lower ASCII characters only')
 
   #: Required contact phone number that will be, amongst other uses,
   #: supplied to shippers along with the shipping address; kept private.
   phone = db.PhoneNumberProperty(required=True,
-      verbose_name=ugettext_lazy('Phone Number'))
-  phone.help_text = ugettext_lazy(
+      verbose_name=ugettext('Phone Number'))
+  phone.help_text = ugettext(
       'include complete international calling number with country code')
 

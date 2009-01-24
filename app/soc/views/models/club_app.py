@@ -24,7 +24,7 @@ __authors__ = [
 
 
 from django import forms
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext
 
 from soc.logic import accounts
 from soc.logic import cleaning
@@ -132,10 +132,10 @@ class View(group_app.View):
     pa_params = params.copy() # pending applications
 
     if is_developer:
-      pa_params['list_description'] = ugettext_lazy(
+      pa_params['list_description'] = ugettext(
           "An overview of all pending club applications.")
     else:
-      pa_params['list_description'] = ugettext_lazy(
+      pa_params['list_description'] = ugettext(
           "An overview of your pending club applications.")
 
     pa_list = list_helper.getListContent(
@@ -149,10 +149,10 @@ class View(group_app.View):
     aa_params = params.copy() # accepted applications
 
     if is_developer:
-      aa_params['list_description'] = ugettext_lazy(
+      aa_params['list_description'] = ugettext(
           "An overview of all accepted club applications.")
     else:
-      aa_params['list_description'] = ugettext_lazy(
+      aa_params['list_description'] = ugettext(
           "An overview of your accepted club applications.")
 
     aa_params['url_name'] = 'club'
@@ -169,10 +169,10 @@ class View(group_app.View):
     da_params = params.copy() # denied applications
 
     if is_developer:
-      da_params['list_description'] = ugettext_lazy(
+      da_params['list_description'] = ugettext(
           "An overview of all denied club applications.")
     else:
-      da_params['list_description'] = ugettext_lazy(
+      da_params['list_description'] = ugettext(
           "An overview of your denied club applications.")
 
     da_list = list_helper.getListContent(
@@ -186,7 +186,7 @@ class View(group_app.View):
 
       ia_params = params.copy() # ignored applications
 
-      ia_params['list_description'] = ugettext_lazy(
+      ia_params['list_description'] = ugettext(
           "An overview of all ignored club applications.")
 
       ia_list = list_helper.getListContent(
@@ -289,7 +289,7 @@ class View(group_app.View):
     filter = {'status' : 'needs review'}
 
     ur_params = params.copy()
-    ur_params['list_description'] = ugettext_lazy('A list of all unhandled '
+    ur_params['list_description'] = ugettext('A list of all unhandled '
         'applications.')
     ur_params ['list_action'] = (redirects.getReviewRedirect, params)
 
@@ -300,7 +300,7 @@ class View(group_app.View):
     filter['status'] = 'accepted'
 
     uh_params = params.copy()
-    uh_params['list_description'] = ugettext_lazy('A list of all applications '
+    uh_params['list_description'] = ugettext('A list of all applications '
         'that have been accepted but not turned into a Club yet')
     uh_params ['list_action'] = (redirects.getReviewRedirect, params)
 
@@ -311,7 +311,7 @@ class View(group_app.View):
     filter ['status'] = 'rejected'
 
     den_params = params.copy()
-    den_params['list_description'] = ugettext_lazy('A list of all applications '
+    den_params['list_description'] = ugettext('A list of all applications '
         'that have been rejected')
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
 
@@ -322,7 +322,7 @@ class View(group_app.View):
     filter ['status'] = 'ignored'
 
     ign_params = params.copy()
-    ign_params['list_description'] = ugettext_lazy('A list of all applications '
+    ign_params['list_description'] = ugettext('A list of all applications '
         'that have been ignored')
     ign_params ['list_action'] = (redirects.getReviewRedirect, params)
 

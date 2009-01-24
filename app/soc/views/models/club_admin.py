@@ -97,9 +97,9 @@ class View(role.View):
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
-
-    fields['user'] = fields['link_id']
-    fields['link_id'] = fields['user'].link_id
+    if not entity:
+      fields['user'] = fields['link_id']
+      fields['link_id'] = fields['user'].link_id
 
     super(View, self)._editPost(request, entity, fields)
 

@@ -244,6 +244,7 @@ def checkIsDeveloper(request, args, kwargs):
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+
 def checkCanCreateFromRequest(role_name):
   """Raises an alternate HTTP response if the specified request does not exist
      or if it's state is not group_accepted. 
@@ -268,6 +269,7 @@ def checkCanCreateFromRequest(role_name):
 
     return
   return wrapper
+
 
 def checkIsMyGroupAcceptedRequest(request, args, kwargs):
   """Raises an alternate HTTP response if the specified request does not exist
@@ -295,6 +297,7 @@ def checkIsMyGroupAcceptedRequest(request, args, kwargs):
     return deny(request, args, kwargs)
 
   return
+
 
 def checkIsHost(request, args, kwargs):
   """Raises an alternate HTTP response if Google Account has no Host entity.
@@ -334,6 +337,7 @@ def checkIsHost(request, args, kwargs):
       'role': 'a Program Administrator '}
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
 
 def checkIsHostForProgram(request, args, kwargs):
   """Raises an alternate HTTP response if Google Account has no Host entity
@@ -412,67 +416,6 @@ def checkIsClubAdminForClub(request, args, kwargs):
 
   login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
       'role': 'a Club Admin for this Club'}
-
-  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-
-def checkIsInvited(request, args, kwargs):
-  """Returns an alternate HTTP response if Google Account has no Host entity
-     for the specified program.
-
-  Args:
-    request: a Django HTTP request
-
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if Host exists for the specified program, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    should be returned by the calling view.
-  """
-
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(request, args, kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  checkAgreesToSiteToS(request, args, kwargs)
-
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a Program Administrator for this Program'}
-
-  splitpath = request.path.split('/')
-  splitpath = splitpath[1:] # cut off leading ''
-
-  if len(splitpath) < 4:
-    # TODO: perhaps this needs a better explanation?
-    deny(request, args, kwargs)
-
-  role = splitpath[0]
-  group_id = splitpath[2]
-  user_id = splitpath[3]
-
-  user = user_logic.getForFields({'account': users.get_current_user()},
-                                 unique=True)
-
-  if user_id != user.link_id:
-    # TODO: perhaps this needs a better explanation?
-    deny(request, args, kwargs)
-
-  properties = {
-      'link_id': user_id,
-      'role': role,
-      'scope_path': group_id,
-      'group_accepted': True,
-      }
-
-  request = request_logic.getForFields(properties, unique=True)
-
-  if request:
-    return
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
@@ -608,6 +551,7 @@ def checkIsMyApplication(app_logic):
     deny(request, args, kwargs)
 
   return wrapper
+
 
 def checkIsMyActiveRole(role_logic):
   """Returns an alternate HTTP response if there is no active role found for

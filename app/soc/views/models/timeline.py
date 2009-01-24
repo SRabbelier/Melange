@@ -27,9 +27,9 @@ from google.appengine.ext import db
 
 from django import forms
 
-from gsoc.models import timeline
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
+from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.models import base
 
@@ -61,36 +61,42 @@ class View(base.View):
 
     new_params['edit_dynafields'] = []
 
-    timeline_properties = timeline.Timeline.properties()
-    form_fields = {}
-    
-    # add class 'datetime-pick' for each DateTimeField
-    # this is used with datetimepicker js widget
-    for key, value in timeline_properties.iteritems():
-      if isinstance(value, db.DateTimeProperty):
-        form_fields[key] = forms.DateTimeField(required=False,
-          widget=forms.TextInput(attrs={'class':'datetime-pick'}))
-    
-    new_params['create_extra_dynafields'] = form_fields
-
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
 
-    for name, value in program_logic.logic.TIMELINE_LOGIC.iteritems():
-      create_form = params_helper.getCreateForm(self._params, value.getModel())
-      edit_form = params_helper.getEditForm(self._params, create_form)
+    for name, logic_value in program_logic.logic.TIMELINE_LOGIC.iteritems():
+      fields = {}
+      
+      # add class 'datetime-pick' for each DateTimeField
+      # this is used with datetimepicker js widget
+      for prop_key, prop_value in logic_value.getModel().properties().iteritems():
+        if isinstance(prop_value, db.DateTimeProperty):
+          fields[prop_key] = forms.DateTimeField(required=False,
+            widget=forms.TextInput(attrs={'class':'datetime-pick'}))
+      
+      create_form = params_helper.getCreateForm(self._params, logic_value.getModel())
+      edit_form = dynaform.extendDynaForm(
+        dynaform = create_form,
+        dynainclude = self._params['edit_dynainclude'],
+        dynaexclude = self._params['edit_dynaexclude'],
+        dynafields = fields,
+        )
+        
       self._params['edit_form_%s' % name] = edit_form
 
   def edit(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):
     """See base.View.edit.
     """
-
     params = dicts.merge(params, self._params)
-
+    
+    # TODO(pawel.solyga): If program doesn't exist for timeline display
+    # customized error message without pointing to 'Create Timeline'
+    
     program = program_logic.logic.getFromKeyName(kwargs['scope_path'])
-    params['edit_form'] = params["edit_form_%s" % program.workflow]
+    if program:
+      params['edit_form'] = params["edit_form_%s" % program.workflow]
 
     return super(View, self).edit(request, access_type, page_name=page_name,
                                   params=params, seed=seed, **kwargs)

@@ -92,6 +92,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
@@ -146,6 +147,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
@@ -194,6 +196,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: not used for create()
@@ -244,6 +247,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
@@ -406,6 +410,7 @@ class View(object):
     
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       filter: a dict for the properties that the entities should have
@@ -460,6 +465,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: The Key Fields for the specified entity
@@ -555,6 +561,7 @@ class View(object):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
     """

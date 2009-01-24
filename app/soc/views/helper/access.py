@@ -396,8 +396,13 @@ def checkIsClubAdminForClub(request, args, kwargs):
 
   user = user_logic.getForCurrentAccount()
 
+  if kwargs.get('scope_path'):
+    scope_path = kwargs['scope_path']
+  else:
+    scope_path = kwargs['link_id']
+
   fields = {'user' : user,
-            'scope_path' : kwargs['link_id'],
+            'scope_path' : scope_path,
             'state' : 'active'}
 
   club_admin_entity = club_admin_logic.getForFields(fields, unique=True)

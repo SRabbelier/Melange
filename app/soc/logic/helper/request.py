@@ -29,8 +29,10 @@ def completeRequestForRole(role_entity, role_name):
   """Marks the request that leads to the given role_entity as completed.
   
   Args:
-    role_entity : A datastore entity that is either a role or a subclass of the role model
-    role_name : The name in the request that is used to describe the type of the role_entity
+    role_entity: A datastore entity that is either a role or a subclass 
+      of the role model
+    role_name: The name in the request that is used to describe the 
+      type of the role_entity
    
   """
 
@@ -39,8 +41,8 @@ def completeRequestForRole(role_entity, role_name):
 
   # create the query properties for the specific role
   properties = {'scope_path' : role_entity.scope_path,
-      'link_id' : role_entity.link_id,
-      'role' : role_name}
+      'link_id': role_entity.link_id,
+      'role': role_name}
 
   # get the request that complies with properties
   request_entity = request_logic.getForFields(properties, unique=True)
@@ -48,4 +50,4 @@ def completeRequestForRole(role_entity, role_name):
   # mark the request completed, if there is any
   if request_entity:
     request_logic.updateModelProperties(request_entity,
-        {'state' : 'completed'})
+        {'state': 'completed'})

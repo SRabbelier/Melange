@@ -41,7 +41,7 @@ limitations under the License.
   {% endif %}
 
   {% if select_url %}
-  <td><a href="{{ select_url }}">select</a></td>
+  <td><input type="button" onclick="location.href='{{ select_url }}'" value="Select"/></td>
   {% else %}
   <td></td>
   {% endif %}

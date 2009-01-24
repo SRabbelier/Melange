@@ -163,7 +163,7 @@ td.formfieldlabel {
   font-size: small;
 }
 
-td.formfielderrorlabel, span.formfielderrorlabel {
+td.formfielderrorlabel, td.warning, span.formfielderrorlabel {
   font-weight: bold;
   color: #FF0000;
   font-size: small;

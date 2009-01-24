@@ -26,7 +26,7 @@ import soc.logic.models as model_logic
 
 
 def completeRequestForRole(role_entity, role_name):
-  """Marks the request that leads to the given role_entity as completly accepted.
+  """Marks the request that leads to the given role_entity as completed.
   
   Args:
     role_entity : A datastore entity that is either a role or a subclass of the role model

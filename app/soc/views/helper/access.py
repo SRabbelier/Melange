@@ -271,6 +271,26 @@ def checkCanCreateFromRequest(role_name):
   return wrapper
 
 
+def checkCanProcessRequest(role_name):
+  """Raises an alternate HTTP response if the specified request does not exist
+     or if it's state is completed or denied. 
+  """
+  def wrapper(request, args, kwargs):
+
+    fields = {'link_id': kwargs['link_id'],
+        'scope_path': kwargs['scope_path'],
+        'role': role_name}
+
+    request_entity = request_logic.getFromFieldsOr404(**fields)
+
+    if request_entity.state in ['completed', 'denied']:
+      # TODO tell the user that this request has been processed
+      deny(request, args, kwargs)
+
+    return
+  return wrapper
+
+
 def checkIsMyGroupAcceptedRequest(request, args, kwargs):
   """Raises an alternate HTTP response if the specified request does not exist
      or if it's state is not group_accepted.

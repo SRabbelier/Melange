@@ -87,7 +87,7 @@ class View(base.View):
     # TODO(ljvderijk) add clean field that checks to see if the user already has
     # the role that's been entered in the create form fields
     new_params['create_extra_dynafields'] = {
-        'role' : forms.CharField(widget=widgets.ReadOnlyInput(),
+        'role': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
         'clean_link_id': cleaning.clean_existing_user('link_id')
         }
@@ -101,7 +101,7 @@ class View(base.View):
         'soc.views.models.%(module_name)s.invite',
         'Create invite for %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.processInvite',
+          'soc.views.models.%(module_name)s.process_invite',
           'Process Invite to for a Role')]
 
     new_params['extra_django_patterns'] = patterns
@@ -122,7 +122,7 @@ class View(base.View):
     Args:
       request: the standard Django HTTP request object
       access_type : the name of the access type which should be checked
-      context: dictionary containing the context for this view
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
@@ -134,10 +134,10 @@ class View(base.View):
     request_logic = params['logic']
 
     # get the request entity using the information from kwargs
-    fields = {'link_id' : kwargs['link_id'],
-        'scope_path' : kwargs['scope_path'],
-        'role' : kwargs['role'],
-        'state' : 'group_accepted'}
+    fields = {'link_id': kwargs['link_id'],
+        'scope_path': kwargs['scope_path'],
+        'role': kwargs['role'],
+        'state': 'group_accepted'}
     request_entity = request_logic.getForFields(fields, unique=True)
     
     get_dict = request.GET
@@ -146,7 +146,7 @@ class View(base.View):
       if get_dict['status'] == 'rejected':
         # this invite has been rejected mark as rejected
         request_logic.updateModelProperties(request_entity, {
-            'state' : 'rejected'})
+            'state': 'rejected'})
         
         # redirect to user role overview
         return http.HttpResponseRedirect('/user/roles')
@@ -171,6 +171,7 @@ class View(base.View):
 
     Args:
       request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: not used
@@ -184,7 +185,7 @@ class View(base.View):
 
     # only select the Invites for this user that haven't been handled yet
     filter = {'link_id': user_entity.link_id,
-              'state' : 'group_accepted'}
+              'state': 'group_accepted'}
 
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.getInviteProcessRedirect, None)
@@ -198,8 +199,8 @@ class View(base.View):
 
     # only select the requests from the user
     # that haven't been accepted by an admin yet
-    filter = {'link_id' : user_entity.link_id,
-              'state' : 'new'}
+    filter = {'link_id': user_entity.link_id,
+              'state': 'new'}
 
     ar_params = params.copy()
     ar_params['list_description'] = ugettext_lazy(
@@ -222,7 +223,7 @@ edit = view.edit
 delete = view.delete
 list = view.list
 list_self = view.listSelf
-processInvite = view.processInvite
+process_invite = view.processInvite
 public = view.public
 export = view.export
 

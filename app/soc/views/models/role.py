@@ -378,7 +378,7 @@ class View(base.View):
     # set right fields for the request form
     user_entity = user_logic.logic.getForCurrentAccount()
     fields = {'link_id' : user_entity.link_id,
-              'role' : '%(module_name)s' %(params),
+              'role' : params['module_name'],
               'group_id' : kwargs['scope_path']}
 
     # get the request view parameters and initialize the create form

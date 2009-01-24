@@ -21,10 +21,7 @@ __authors__ = [
 ]
 
 
-from google.appengine.ext import db
-
 import soc.models.role
-import soc.models.club
 
 
 class ClubAdmin(soc.models.role.Role):

@@ -69,7 +69,7 @@ class View(base.View):
         'soc.views.models.%(module_name)s.invite',
         'Create invite for %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
-        'soc.views.models.%(module_name)s.acceptInvite',
+        'soc.views.models.%(module_name)s.accept_invite',
         'Accept invite for %(name_plural)s')]
 
     new_params['extra_django_patterns'] = patterns

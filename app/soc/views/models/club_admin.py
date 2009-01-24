@@ -23,19 +23,13 @@ __authors__ = [
   ]
 
 
-from django import http
 from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import club as club_logic
-from soc.logic.models import user as user_logic
-from soc.logic.models import request as request_logic
 from soc.views.helper import access
-from soc.views.helper import decorators
 from soc.views.helper import dynaform
-from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import club as club_view
 from soc.views.models import role
@@ -96,7 +90,6 @@ class View(role.View):
 
     params['invited_create_form'] = invited_create_form
 
-
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -105,7 +98,6 @@ class View(role.View):
     fields['link_id'] = fields['user'].link_id
 
     super(View, self)._editPost(request, entity, fields)
-
 
   def _acceptInvitePost(self, fields, request, context, params, **kwargs):
     """Fills in the fields that were missing in the invited_created_form
@@ -119,7 +111,7 @@ class View(role.View):
 
 view = View()
 
-acceptInvite = view.acceptInvite
+accept_invite = view.acceptInvite
 create = view.create
 delete = view.delete
 edit = view.edit

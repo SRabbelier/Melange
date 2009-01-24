@@ -57,7 +57,7 @@ class Logic(group.Logic):
           'scope_path': entity.key().name(),
           'role': 'club_admin',
           'role_verbose' : 'Club Admin',
-          'group_accepted': True,
+          'state': 'group_accepted',
           }
 
       for admin in [application.applicant, application.backup_admin]:

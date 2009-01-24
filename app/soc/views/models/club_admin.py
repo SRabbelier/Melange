@@ -55,7 +55,6 @@ class View(role.View):
     rights['delete'] = [access.checkIsDeveloper]
     rights['invite'] = [access.checkIsClubAdminForClub]
     rights['accept_invite'] = [access.checkCanCreateFromRequest('club_admin')]
-    rights['request'] = [access.deny]
     rights['process_request'] = [access.checkIsClubAdminForClub,
         access.checkCanProcessRequest('club_admin')]
 
@@ -77,6 +76,8 @@ class View(role.View):
        'clean_home_page' : cleaning.clean_url('home_page'),
        'clean_blog' : cleaning.clean_url('blog'),
        'clean_photo_url' : cleaning.clean_url('photo_url')}
+
+    new_params['allow_invites'] = True
 
     params = dicts.merge(params, new_params)
 
@@ -122,5 +123,4 @@ invite = view.invite
 list = view.list
 process_request = view.processRequest
 public = view.public
-request = view.request
 export = view.export

@@ -69,10 +69,14 @@ class View(base.View):
     new_params['name'] = "Club"
 
     patterns = []
-
+    
+    # TODO(ljvderijk) implement requests list for clubs
     page_name = "Club Creation via Accepted Application"
     patterns += [(r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
-                  'soc.views.models.%(module_name)s.applicant', page_name)]
+                  'soc.views.models.%(module_name)s.applicant', page_name),]
+        #(r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',
+        #'soc.views.models.%(module_name)s.list_requests',
+        #'List of requests for %(name_plural)s')]
 
     new_params['extra_django_patterns'] = patterns
 

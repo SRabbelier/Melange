@@ -64,10 +64,8 @@ class View(role.View):
     rights['invite'] = [access.checkIsHost]
     rights['list'] = [access.checkIsHost]
     rights['accept_invite'] = [access.checkCanCreateFromRequest('host')]
-    rights['request'] = [access.deny]
     rights['process_request'] = [access.checkIsHost,
         access.checkCanProcessRequest('host')]
-
 
     new_params = {}
     new_params['rights'] = rights
@@ -91,6 +89,8 @@ class View(role.View):
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),
        'clean_photo_url': cleaning.clean_url('photo_url')}
+
+    new_params['allow_invites'] = True
 
     params = dicts.merge(params, new_params)
 
@@ -158,5 +158,4 @@ invite = view.invite
 list = view.list
 process_request = view.processRequest
 public = view.public
-request = view.request
 export = view.export

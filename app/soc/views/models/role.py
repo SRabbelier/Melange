@@ -61,18 +61,37 @@ class View(base.View):
 
     new_params = {}
     # TODO(ljvderijk) parameterize these patterns
-    patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
-        'soc.views.models.%(module_name)s.invite',
-        'Create invite for %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
-        'soc.views.models.%(module_name)s.accept_invite',
-        'Accept invite for %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
-        'soc.views.models.%(module_name)s.request',
-        'Create a Request to become %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
-        'soc.views.models.%(module_name)s.process_request',
-        'Process request for %(name)s')]
+
+    patterns = params.get('extra_django_patterns')
+
+    if not patterns:
+      patterns = []
+
+    if params.get('allow_requests_and_invites'):
+      # add patterns concerning requests and invites
+      patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
+          'soc.views.models.%(module_name)s.invite',
+          'Create invite for %(name)s'),
+          (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
+          'soc.views.models.%(module_name)s.accept_invite',
+          'Accept invite for %(name)s'),
+          (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
+          'soc.views.models.%(module_name)s.process_request',
+          'Process request for %(name)s'),
+          (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
+          'soc.views.models.%(module_name)s.request',
+          'Create a Request to become %(name)s')]
+    elif params.get('allow_invites'):
+      # add patterns concerning only invites
+      patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
+          'soc.views.models.%(module_name)s.invite',
+          'Create invite for %(name)s'),
+          (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
+          'soc.views.models.%(module_name)s.accept_invite',
+          'Accept invite for %(name)s'),
+          (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
+          'soc.views.models.%(module_name)s.process_request',
+          'Process request for %(name)s')]
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect

@@ -100,7 +100,7 @@ class View(role.View):
     super(View, self)._editPost(request, entity, fields)
 
   def _acceptInvitePost(self, fields, request, context, params, **kwargs):
-    """Fills in the fields that were missing in the invited_created_form
+    """Fills in the fields that were missing in the invited_created_form.
     
     For params see base.View._acceptInvitePost()
     """

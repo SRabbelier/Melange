@@ -109,7 +109,7 @@ def checkAccess(access_type, request, rights, args=None, kwargs=None):
 
 
 def allow(request, args, kwargs):
-  """Never raises an alternate HTTP response.  (an access no-op, basically)
+  """Never raises an alternate HTTP response.  (an access no-op, basically).
 
   Args:
     request: a Django HTTP request
@@ -257,9 +257,9 @@ def checkCanCreateFromRequest(role_name):
     if user_entity.link_id != kwargs['link_id']:
       deny(request, args, kwargs)
 
-    fields = {'link_id' : kwargs['link_id'],
-        'scope_path' : kwargs['scope_path'],
-        'role' : role_name}
+    fields = {'link_id': kwargs['link_id'],
+        'scope_path': kwargs['scope_path'],
+        'role': role_name}
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
@@ -283,9 +283,9 @@ def checkIsMyGroupAcceptedRequest(request, args, kwargs):
     # not the current user's request
     return deny(request, args, kwargs)
 
-  fields = {'link_id' : kwargs['link_id'],
-            'scope_path' : kwargs['scope_path'],
-            'role' : kwargs['role']}
+  fields = {'link_id': kwargs['link_id'],
+            'scope_path': kwargs['scope_path'],
+            'role': kwargs['role']}
 
   request_entity = request_logic.getForFields(fields, unique=True)
 
@@ -325,8 +325,8 @@ def checkIsHost(request, args, kwargs):
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)
 
-  fields = {'user' : user,
-            'state' : 'active'}
+  fields = {'user': user,
+            'state': 'active'}
 
   host = host_logic.getForFields(fields, unique=True)
 
@@ -358,9 +358,9 @@ def checkIsHostForProgram(request, args, kwargs):
   user = user_logic.getForFields({'account': users.get_current_user()},
                                  unique=True)
 
-  fields = {'user' : user,
-            'scope_path' : kwargs['scope_path'],
-            'state' : 'active'}
+  fields = {'user': user,
+            'scope_path': kwargs['scope_path'],
+            'state': 'active'}
 
   host = host_logic.getForFields(fields, unique=True)
 
@@ -405,9 +405,9 @@ def checkIsClubAdminForClub(request, args, kwargs):
   else:
     scope_path = kwargs['link_id']
 
-  fields = {'user' : user,
-            'scope_path' : scope_path,
-            'state' : 'active'}
+  fields = {'user': user,
+            'scope_path': scope_path,
+            'state': 'active'}
 
   club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
 
@@ -465,8 +465,8 @@ def checkIsApplicationAccepted(app_logic):
 
 
 def checkIsMyNotification(request, args, kwargs):
-  """Returns an alternate HTTP response if this request is for a Notification belonging
-     to the current user.
+  """Returns an alternate HTTP response if this request is for 
+     a Notification belonging to the current user.
 
   Args:
     request: a Django HTTP request
@@ -509,8 +509,8 @@ def checkIsMyNotification(request, args, kwargs):
 
 
 def checkIsMyApplication(app_logic):
-  """Returns an alternate HTTP response if this request is for a Application belonging
-     to the current user.
+  """Returns an alternate HTTP response if this request is for 
+     a Application belonging to the current user.
 
   Args:
     request: a Django HTTP request
@@ -578,8 +578,8 @@ def checkIsMyActiveRole(role_logic):
       # not my role
       deny(request, args, kwargs)
 
-    fields = {'link_id' : kwargs['link_id'],
-              'scope_path' : kwargs['scope_path']
+    fields = {'link_id': kwargs['link_id'],
+              'scope_path': kwargs['scope_path']
               }
 
     role_entity = role_logic.logic.getForFields(fields, unique=True)
@@ -641,7 +641,7 @@ def checkCanInvite(request, args, kwargs):
 
 
 def checkHasPickGetArgs(request, arg, kwargs):
-  """Raises an alternate HTTP response if the request misses get args
+  """Raises an alternate HTTP response if the request misses get args.
 
   Args:
     request: a Django HTTP request

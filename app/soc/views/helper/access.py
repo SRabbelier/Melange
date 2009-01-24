@@ -207,8 +207,7 @@ def checkAgreesToSiteToS(request, args, kwargs):
   """
   checkIsUser(request, args, kwargs)
 
-  user = user_logic.getForFields({'account': users.get_current_user()},
-                                 unique=True)
+  user = user_logic.getForCurrentAccount()
   
   if user_logic.agreesToSiteToS(user):
     return

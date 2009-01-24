@@ -323,7 +323,7 @@ def checkIsHost(request, args, kwargs):
                                  unique=True)
 
   fields = {'user' : user,
-            'active' : True}
+            'state' : 'active'}
 
   host = host_logic.getForFields(fields, unique=True)
 
@@ -356,7 +356,7 @@ def checkIsHostForProgram(request, args, kwargs):
 
   fields = {'user' : user,
             'scope_path' : kwargs['scope_path'],
-            'active' : True}
+            'state' : 'active'}
 
   host = host_logic.getForFields(fields, unique=True)
 

@@ -24,22 +24,16 @@ __authors__ = [
 
 
 from django import http
-from django import forms
 from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic.models import request as request_logic
-from soc.logic.models import user as user_logic
 from soc.logic.helper import request as request_helper
-from soc.views import helper
-from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import base
 from soc.views.models import request as request_view
-from soc.views.models import user as user_view
 
 import soc.models.request
 import soc.views.helper.lists
@@ -109,13 +103,13 @@ class View(base.View):
 
     Args:
       request: the standard Django HTTP request object
-      page_name: the page name displayed in templates as page and header title
+      context: dictionary containing the context for this view
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
 
     # set the role to the right name
-    fields = {'role' : '%(module_name)s' %(params)}
+    fields = {'role': '%(module_name)s' % (params)}
 
     # get the request view parameters and initialize the create form
     request_params = request_view.view.getParams()
@@ -149,15 +143,15 @@ class View(base.View):
     key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
     
     # get the group entity for which this request is via the scope_path
-    group_key_fields = kwargs['scope_path'].rsplit('/',1)
+    group_key_fields = kwargs['scope_path'].rsplit('/', 1)
     
     if len(group_key_fields) == 1:
       # there is only a link_id
-      fields = {'link_id' : group_key_fields[0]}
+      fields = {'link_id': group_key_fields[0]}
     else:
       # there is a scope_path and link_id
-      fields = {'scope_path' : group_key_fields[0],
-                'link_id' : group_key_fields[1]}
+      fields = {'scope_path': group_key_fields[0],
+                'link_id': group_key_fields[1]}
     
     group = params['group_logic'].getForFields(fields, unique=True)
     
@@ -167,23 +161,23 @@ class View(base.View):
       request_scope_path = group.link_id
 
     # create the fields for the new request entity
-    request_fields = {'link_id' : form_fields['link_id'].link_id,
-        'scope' : group,
-        'scope_path' : request_scope_path,
-        'role' : params['module_name'],
-        'role_verbose' : params['name'],
-        'state' : 'group_accepted'}
+    request_fields = {'link_id': form_fields['link_id'].link_id,
+        'scope': group,
+        'scope_path': request_scope_path,
+        'role': params['module_name'],
+        'role_verbose': params['name'],
+        'state': 'group_accepted'}
 
     # extract the key_name for the new request entity
     key_fields = request_logic.logic.getKeyFieldsFromDict(request_fields)
     key_name = request_logic.logic.getKeyNameForFields(key_fields)
 
     # create the request entity
-    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
+    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, 
+        key_name)
     
     # TODO(ljvderijk) redirect to a more useful place like the group homepage
     return http.HttpResponseRedirect('/')
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -194,7 +188,7 @@ class View(base.View):
     Args:
       request: the standard Django HTTP request object
       access_type : the name of the access type which should be checked
-      context: dictionary containing the context for this view
+      page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       kwargs: the Key Fields for the specified entity
     """
@@ -220,9 +214,10 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-    # create the form using the scope_path and link_id from kwargs as initial value
-    fields = {'link_id' : kwargs['link_id'],
-              'scope_path' : kwargs['scope_path']}
+    # create the form using the scope_path and link_id from kwargs 
+    # as initial value
+    fields = {'link_id': kwargs['link_id'],
+              'scope_path': kwargs['scope_path']}
     form = params['invited_create_form'](initial=fields)
 
     # construct the appropriate response
@@ -275,9 +270,8 @@ class View(base.View):
     # redirect to the roles overview page
     return http.HttpResponseRedirect('/user/roles')
 
-
   def _acceptInvitePost(self, fields, request, context, params, **kwargs):
-    """ Used to post-process data after the fields have been cleaned.
+    """Used to post-process data after the fields have been cleaned.
 
       Args:
       fields : the cleaned fields from the role form

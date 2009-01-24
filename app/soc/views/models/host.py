@@ -31,7 +31,6 @@ from soc.logic import dicts
 from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
-from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
@@ -85,10 +84,10 @@ class View(role.View):
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,
                                   required=True),
-       'clean_link_id' : cleaning.clean_existing_user('link_id'),
-       'clean_home_page' : cleaning.clean_url('home_page'),
-       'clean_blog' : cleaning.clean_url('blog'),
-       'clean_photo_url' : cleaning.clean_url('photo_url')}
+       'clean_link_id': cleaning.clean_existing_user('link_id'),
+       'clean_home_page': cleaning.clean_url('home_page'),
+       'clean_blog': cleaning.clean_url('blog'),
+       'clean_photo_url': cleaning.clean_url('photo_url')}
 
     params = dicts.merge(params, new_params)
 
@@ -137,7 +136,7 @@ class View(role.View):
     super(View, self)._editPost(request, entity, fields)
 
   def _acceptInvitePost(self, fields, request, context, params, **kwargs):
-    """Fills in the fields that were missing in the invited_created_form
+    """Fills in the fields that were missing in the invited_created_form.
     
     For params see base.View._acceptInvitePost()
     """
@@ -148,7 +147,7 @@ class View(role.View):
 
 view = View()
 
-acceptInvite = view.acceptInvite
+accept_invite = view.acceptInvite
 create = view.create
 delete = view.delete
 edit = view.edit

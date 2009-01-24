@@ -138,7 +138,7 @@ def as_twoline_table(context, form):
 
 
 def get_reference_url(form, name):
-  """Retrieves the reference url from a field
+  """Retrieves the reference url from a field.
 
   Args:
     form: the form the field is defined in

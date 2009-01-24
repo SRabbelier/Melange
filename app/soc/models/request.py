@@ -52,7 +52,6 @@ class Request(soc.models.linkable.Linkable):
   #           the user access to create the role
   state = db.StringProperty(required=True, default='new',
       choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
-  state.help_text = ugettext_lazy(
-      'Shows the state of the request')
+  state.help_text = ugettext_lazy('Shows the state of the request')
 
 

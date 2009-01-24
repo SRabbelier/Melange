@@ -70,14 +70,14 @@ def getExportRedirect(entity, params):
 
 
 def getHomeRedirect(entity, params):
-  """Returns the home redirect for the specified entity
+  """Returns the home redirect for the specified entity.
   """
 
   return '/%s/home/%s' % (
       params['url_name'], entity.key().name())
 
 def getReviewRedirect(entity, params):
-  """Returns the redirect to review the specified entity
+  """Returns the redirect to review the specified entity.
   """
   
   return '/%s/review/%s' % (
@@ -95,7 +95,7 @@ def getCreateRequestRedirect(entity, params):
 
 
 def getSelectRedirect(entity, params):
-  """Returns the pick redirect for the specified entity
+  """Returns the pick redirect for the specified entity.
   """
 
   if entity:
@@ -110,11 +110,11 @@ def getSelectRedirect(entity, params):
 
 
 def getReturnRedirect(return_url, field):
-  """Returns a function that has return_url and field embedded
+  """Returns a function that has return_url and field embedded.
   """
 
   def wrapped(entity, params):
-    """Returns the return redirect for the specified entity
+    """Returns the return redirect for the specified entity.
     """
 
     result = '%s?field=%s&value=%s' % (

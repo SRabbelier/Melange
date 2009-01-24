@@ -273,7 +273,7 @@ def checkCanCreateFromRequest(role_name):
 
 def checkIsMyGroupAcceptedRequest(request, args, kwargs):
   """Raises an alternate HTTP response if the specified request does not exist
-     or if it's state is not group_accepted
+     or if it's state is not group_accepted.
   """
   checkAgreesToSiteToS(request, args, kwargs)
 

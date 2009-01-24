@@ -102,6 +102,6 @@ def clean_url(field_name):
       return None
 
     # call the Django URLField cleaning method to properly clean/validate this field
-    return forms.URLField.clean(self, value)
+    return forms.URLField.clean(self.fields[field_name], value)
   return wrapped
 

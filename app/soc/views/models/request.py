@@ -39,6 +39,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import dynaform
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
@@ -107,10 +108,27 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
     
     new_params['invite_processing_template'] = 'soc/request/process_invite.html'
+    new_params['request_processing_template'] = 'soc/request/process_request.html'
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    # create and store the special forms for invite and requests
+    params['invite_form'] = params['create_form']
+
+    updated_fields = {
+        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=True),
+        'group_id' : forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=True)}
+
+    request_form = dynaform.extendDynaForm(
+        dynaform = self._params['create_form'],
+        dynafields = updated_fields)
+
+    params['request_form'] = request_form
+
 
   @decorators.merge_params
   @decorators.check_access

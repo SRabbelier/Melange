@@ -28,6 +28,8 @@ from django.utils.translation import ugettext_lazy
 
 from soc.logic import dicts
 from soc.logic.models import request as request_logic
+from soc.logic.models import user as user_logic
+from soc.logic.helper import notifications as notifications_helper
 from soc.logic.helper import request as request_helper
 from soc.views.helper import decorators
 from soc.views.helper import redirects
@@ -58,13 +60,19 @@ class View(base.View):
     """
 
     new_params = {}
-    # TODO(ljvderijk) add request and process_request
+    # TODO(ljvderijk) parameterize these patterns
     patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
         'soc.views.models.%(module_name)s.invite',
-        'Create invite for %(name_plural)s'),
+        'Create invite for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
         'soc.views.models.%(module_name)s.accept_invite',
-        'Accept invite for %(name_plural)s')]
+        'Accept invite for %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
+        'soc.views.models.%(module_name)s.request',
+        'Create a Request to become %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
+        'soc.views.models.%(module_name)s.process_request',
+        'Process request for %(name)s')]
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
@@ -113,7 +121,7 @@ class View(base.View):
 
     # get the request view parameters and initialize the create form
     request_params = request_view.view.getParams()
-    form = request_params['create_form'](initial=fields)
+    form = request_params['invite_form'](initial=fields)
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
@@ -132,7 +140,7 @@ class View(base.View):
 
     # get the request view parameters and populate the form using POST data
     request_params = request_view.view.getParams()
-    form = request_params['create_form'](request.POST)
+    form = request_params['invite_form'](request.POST)
 
     if not form.is_valid():
       # return the invalid form response
@@ -143,22 +151,11 @@ class View(base.View):
     key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
     
     # get the group entity for which this request is via the scope_path
-    group_key_fields = kwargs['scope_path'].rsplit('/', 1)
-    
-    if len(group_key_fields) == 1:
-      # there is only a link_id
-      fields = {'link_id': group_key_fields[0]}
-    else:
-      # there is a scope_path and link_id
-      fields = {'scope_path': group_key_fields[0],
-                'link_id': group_key_fields[1]}
-    
-    group = params['group_logic'].getForFields(fields, unique=True)
-    
-    if group.scope_path:
-      request_scope_path = '%s/%s' % [group.scope_path, group.link_id]
-    else:
-      request_scope_path = group.link_id
+    group = self._getGroupEntityFromScopePath(params['group_logic'],
+         kwargs['scope_path'])
+
+    # get the request scope path
+    request_scope_path = self._getRequestScopePathFromGroup(group)
 
     # create the fields for the new request entity
     request_fields = {'link_id': form_fields['link_id'].link_id,
@@ -175,9 +172,50 @@ class View(base.View):
     # create the request entity
     entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, 
         key_name)
-    
+
+    # send out an invite notification
+    notifications_helper.sendInviteNotification(entity)
+
     # TODO(ljvderijk) redirect to a more useful place like the group homepage
     return http.HttpResponseRedirect('/')
+
+  def _getGroupEntityFromScopePath(self, group_logic, scope_path):
+    """Returns a group entity by using the given scope_path that's in kwargs.
+    
+    Args:
+      group_logic: logic for the group which should be retrieved
+      kwargs: the Key Fields for the specified entity
+    """
+    group_key_fields = scope_path.rsplit('/',1)
+
+    if len(group_key_fields) == 1:
+      # there is only a link_id
+      fields = {'link_id' : group_key_fields[0]}
+    else:
+      # there is a scope_path and link_id
+      fields = {'scope_path' : group_key_fields[0],
+                'link_id' : group_key_fields[1]}
+
+    group = group_logic.getForFields(fields, unique=True)
+
+    return group
+
+  def _getRequestScopePathFromGroup(self, group_entity):
+    """Returns the scope_path that should be put in a request for a given group.
+
+    Args:
+      group_entity: The group entity for which the request scope_path should
+                    be returned.
+    """
+
+    if group_entity.scope_path:
+      request_scope_path = '%s/%s' % [
+          group_entity.scope_path, group_entity.link_id]
+    else:
+      request_scope_path = group_entity.link_id
+
+    return request_scope_path
+
 
   @decorators.merge_params
   @decorators.check_access
@@ -281,3 +319,150 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
     pass
+
+
+  @decorators.merge_params
+  @decorators.check_access
+  def request(self, request, access_type,
+                   page_name=None, params=None, **kwargs):
+    """Handles the GET request concerning the view that creates a request
+    for attaining a certain Role.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    if request.method == 'POST':
+      return self.requestPost(request, context, params, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.requestGet(request, context, params, **kwargs)
+
+  def requestGet(self, request, context, params, **kwargs):
+    """Handles the GET request concerning the creation of a request
+    to attain a role.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # set right fields for the request form
+    user_entity = user_logic.logic.getForCurrentAccount()
+    fields = {'link_id' : user_entity.link_id,
+              'role' : '%(module_name)s' %(params),
+              'group_id' : kwargs['scope_path']}
+
+    # get the request view parameters and initialize the create form
+    request_params = request_view.view.getParams()
+    form = request_params['request_form'](initial=fields)
+
+    # construct the appropriate response
+    return super(View, self)._constructResponse(request, entity=None,
+        context=context, form=form, params=params)
+
+  def requestPost(self, request, context, params, **kwargs):
+    """Handles the POST request concerning the creation of a request
+    to attain a role.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the request view parameters and populate the form using POST data
+    request_params = request_view.view.getParams()
+    form = request_params['invite_form'](request.POST)
+
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=None, context=context,
+          form=form, params=params)
+
+    # get the group entity for which this request is via the scope_path
+    group = self._getGroupEntityFromScopePath(params['group_logic'],
+         kwargs['scope_path'])
+
+    # get the request scope path
+    request_scope_path = self._getRequestScopePathFromGroup(group)
+
+    # defensively set the fields we need for this request and set state to new
+    user_entity = user_logic.logic.getForCurrentAccount()
+    request_fields = {'link_id' : user_entity.link_id,
+        'scope' : group,
+        'scope_path' : request_scope_path,
+        'role' : params['module_name'],
+        'role_verbose' : params['name'],
+        'state' : 'new'}
+
+    # extract the key_name for the new request entity
+    key_fields = request_logic.logic.getKeyFieldsFromDict(request_fields)
+    key_name = request_logic.logic.getKeyNameForFields(key_fields)
+
+    # create the request entity
+    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
+
+    # TODO(ljvderijk) send out a message to alert the users able to process this request
+
+    # redirect to roles overview
+    return http.HttpResponseRedirect('/user/roles')
+
+
+  @decorators.merge_params
+  @decorators.check_access
+  def processRequest(self, request, access_type,
+                   page_name=None, params=None, **kwargs):
+    """Creates the page upon which a request can be processed.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    # get the request entity using the information from kwargs
+    fields = {'link_id': kwargs['link_id'],
+        'scope_path': kwargs['scope_path'],
+        'role': params['module_name']}
+    request_entity = request_logic.logic.getForFields(fields, unique=True)
+    
+    get_dict = request.GET
+    
+    if 'status' in get_dict.keys():
+      if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
+        # update the request_entity and redirect away from this page
+        request_state = get_dict['status']
+        request_logic.logic.updateModelProperties(request_entity, {
+            'state': get_dict['status']})
+
+        if request_state == 'group_accepted':
+          notifications_helper.sendInviteNotification(request_entity)
+
+        # TODO(ljvderijk) redirect to group requests overview
+        return http.HttpResponseRedirect('/')
+
+    # put the entity in the context
+    context['entity'] = request_entity
+    context['module_name'] = params['module_name']
+
+    #display the request processing page using the appropriate template
+    template = request_view.view.getParams()['request_processing_template']
+
+    return responses.respond(request, template, context=context)

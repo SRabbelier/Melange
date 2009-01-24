@@ -55,6 +55,9 @@ class View(role.View):
     rights['delete'] = [access.checkIsDeveloper]
     rights['invite'] = [access.checkIsClubAdminForClub]
     rights['accept_invite'] = [access.checkCanCreateFromRequest('club_admin')]
+    rights['request'] = [access.deny]
+    rights['process_request'] = [access.checkIsClubAdminForClub,
+        access.checkCanProcessRequest('club_admin')]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_admin.logic
@@ -117,5 +120,7 @@ delete = view.delete
 edit = view.edit
 invite = view.invite
 list = view.list
+process_request = view.processRequest
 public = view.public
+request = view.request
 export = view.export

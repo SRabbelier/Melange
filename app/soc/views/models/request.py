@@ -112,7 +112,6 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-
   @decorators.merge_params
   @decorators.check_access
   def processInvite(self, request, access_type,
@@ -161,7 +160,6 @@ class View(base.View):
     template = params['invite_processing_template']
 
     return responses.respond(request, template, context=context)
-
 
   @decorators.merge_params
   @decorators.check_access

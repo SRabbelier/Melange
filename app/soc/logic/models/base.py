@@ -310,7 +310,7 @@ class Logic(object):
     """Returns all entities that have the specified properties.
 
     Args:
-      properties: the properties that the entity should have
+      filter: a dict for the properties that the entities should have
       unique: if set, only the first item from the resultset will be returned
     """
 

@@ -385,7 +385,7 @@ def checkIsHost(kwargs):
 
 def checkIsHostForProgram(kwargs):
   """Raises an alternate HTTP response if Google Account has no Host entity
-     for the specified program.
+     for the specified Sponsor.
 
   Args:
     request: a Django HTTP request
@@ -402,8 +402,13 @@ def checkIsHostForProgram(kwargs):
 
   user = user_logic.getForCurrentAccount()
 
+  if kwargs.get('scope_path'):
+    scope_path = kwargs['scope_path']
+  else:
+    scope_path = kwargs['link_id']
+
   fields = {'user': user,
-            'scope_path': kwargs['scope_path'],
+            'scope_path': scope_path,
             'state': 'active'}
 
   host = host_logic.getForFields(fields, unique=True)

@@ -25,6 +25,7 @@ __authors__ = [
 
 
 from soc.logic import dicts
+from soc.views.helper import access
 from soc.views.models import group
 
 import soc.models.sponsor
@@ -45,10 +46,16 @@ class View(group.View):
       params: a dict with params for this View
     """    
 
+    rights = {}
+    rights['create'] = [access.checkIsDeveloper]
+    rights['edit'] = [access.checkIsHostForProgram]
+    rights['delete'] = [access.checkIsDeveloper]
+    rights['list'] = [access.checkIsDeveloper]
+    rights['list_requests'] = [access.checkIsHostForProgram]
+
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic
-
-    # TODO(ljvderijk) Set rights for the different views including list_requests
+    new_params['rights'] = rights
 
     new_params['name'] = "Program Owner"
     new_params['module_name'] = "sponsor"

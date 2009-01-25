@@ -25,6 +25,7 @@ __authors__ = [
 from google.appengine.api import users
 from google.appengine.ext import db
 
+from soc.cache import sidebar
 from soc.logic.helper import notifications
 from soc.logic.models import base
 from soc.logic.models.site import logic as site_logic
@@ -131,21 +132,32 @@ class Logic(base.Logic):
 
     return ['link_id']
 
-  def _updateField(self, model, name, value):
+  def _updateField(self, entity, name, value):
     """Special case logic for account.
 
     When the account is changed, the former_accounts field should be appended
     with the old account.
+    Also, if either is_developer or agrees_to_tos change, the user's
+    rights have changed, so we need to flush the sidebar.
     """
-    if (name == 'account') and (model.account != value):
-      model.former_accounts.append(model.account)
+
+    if (name == 'is_developer') and (entity.is_developer != value):
+      sidebar.flush(entity.account)
+
+    if (name == 'agrees_to_tos') and (entity.agrees_to_tos != value):
+      sidebar.flush(entity.account)
+
+    if (name == 'account') and (entity.account != value):
+      entity.former_accounts.append(entity.account)
 
     return True
   
   def _onCreate(self, entity):
     """Send out a message to welcome the new user.
     """
+
     notifications.sendWelcomeMessage(entity)
+    sidebar.flush(entity.account)
 
 
 logic = Logic()

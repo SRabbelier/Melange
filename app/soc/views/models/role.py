@@ -60,7 +60,6 @@ class View(base.View):
     """
 
     new_params = {}
-    # TODO(ljvderijk) parameterize these patterns
 
     patterns = params.get('extra_django_patterns')
 
@@ -170,7 +169,7 @@ class View(base.View):
     key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
     
     # get the group entity for which this request is via the scope_path
-    group = self._getGroupEntityFromScopePath(params['group_logic'],
+    group = self._logic.getGroupEntityFromScopePath(params['group_logic'],
          kwargs['scope_path'])
 
     # get the request scope path
@@ -197,27 +196,6 @@ class View(base.View):
 
     # TODO(ljvderijk) redirect to a more useful place like the group homepage
     return http.HttpResponseRedirect('/')
-
-  def _getGroupEntityFromScopePath(self, group_logic, scope_path):
-    """Returns a group entity by using the given scope_path that's in kwargs.
-    
-    Args:
-      group_logic: logic for the group which should be retrieved
-      kwargs: the Key Fields for the specified entity
-    """
-    group_key_fields = scope_path.rsplit('/',1)
-
-    if len(group_key_fields) == 1:
-      # there is only a link_id
-      fields = {'link_id' : group_key_fields[0]}
-    else:
-      # there is a scope_path and link_id
-      fields = {'scope_path' : group_key_fields[0],
-                'link_id' : group_key_fields[1]}
-
-    group = group_logic.getForFields(fields, unique=True)
-
-    return group
 
   def _getRequestScopePathFromGroup(self, group_entity):
     """Returns the scope_path that should be put in a request for a given group.
@@ -410,7 +388,7 @@ class View(base.View):
           form=form, params=params)
 
     # get the group entity for which this request is via the scope_path
-    group = self._getGroupEntityFromScopePath(params['group_logic'],
+    group = self._logic.getGroupEntityFromScopePath(params['group_logic'],
          kwargs['scope_path'])
 
     # get the request scope path

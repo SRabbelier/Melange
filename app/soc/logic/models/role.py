@@ -41,4 +41,26 @@ class Logic(base.Logic):
                                 scope_logic=scope_logic)
 
 
+  def getGroupEntityFromScopePath(self, group_logic, scope_path):
+    """Returns a group entity by using the given scope_path.
+    
+    Args:
+      group_logic: logic for the group which should be retrieved
+      scope_path : the scope path of the entity
+    """
+    group_key_fields = scope_path.rsplit('/',1)
+
+    if len(group_key_fields) == 1:
+      # there is only a link_id
+      fields = {'link_id' : group_key_fields[0]}
+    else:
+      # there is a scope_path and link_id
+      fields = {'scope_path' : group_key_fields[0],
+                'link_id' : group_key_fields[1]}
+
+    group = group_logic.getForFields(fields, unique=True)
+
+    return group
+
+
 logic = Logic()

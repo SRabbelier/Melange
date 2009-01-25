@@ -25,6 +25,8 @@ __authors__ = [
 from soc.views import out_of_band
 from soc.views.helper import access
 
+import soc.cache.sidebar
+
 
 SIDEBAR = []
 SIDEBAR_ACCESS_ARGS = ['SIDEBAR_CALLING']
@@ -40,6 +42,8 @@ def addMenu(callback):
   global SIDEBAR
   SIDEBAR.append(callback)
 
+
+@soc.cache.sidebar.cache
 def getSidebar():
   """Constructs a sidebar for the current user.
   """

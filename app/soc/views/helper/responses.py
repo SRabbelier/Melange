@@ -22,6 +22,7 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+
 from google.appengine.api import users
 from google.appengine.ext import db
 
@@ -108,6 +109,7 @@ def getUniversalContext(request):
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
+
   context['sidebar_menu_items'] = sidebar.getSidebar()
 
   context['soc_release'] = release.RELEASE_TAG

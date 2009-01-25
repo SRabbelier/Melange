@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -90,6 +91,17 @@ def getCreateRequestRedirect(entity, params):
 
   result ='/request/create/%s/%s/%s' % (
       params['group_scope'], params['url_name'], entity.key().name())
+
+  return result
+
+
+def getListRequestsRedirect(entity, params):
+  """Returns the redirect for the List Requests paged for the given
+  Group entity and Group View params.
+  """
+
+  result = '/%s/list_requests/%s' % (
+      params['url_name'], entity.key().name())
 
   return result
 

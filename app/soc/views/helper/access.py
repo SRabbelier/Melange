@@ -42,6 +42,7 @@ from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.request import logic as request_logic
+from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import helper
@@ -68,6 +69,9 @@ DEF_PAGE_DENIED_MSG = ugettext(
 
 DEF_LOGOUT_MSG_FMT = ugettext(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
+
+DEF_GROUP_NOT_FOUND_MSG = ugettext(
+    'The requested Group can not be found')
 
 
 def checkAccess(access_type, rights, kwargs=None):
@@ -237,6 +241,28 @@ def checkIsDeveloper(kwargs):
       'role': 'a Site Developer '}
 
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+
+def checkCanMakeRequestToGroup(group_logic):
+  """Raises an alternate HTTP response if the specified group is not in an
+  active state.
+  
+  Note that state hasn't been implemented yet
+  
+  Args:
+    group_logic: Logic module for the type of group which the request is for
+  """
+
+  def wrapper(kwargs):
+    group_entity = role_logic.getGroupEntityFromScopePath(
+        group_logic.logic, kwargs['scope_path'])
+
+    if not group_entity:
+      raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
+
+    # TODO(ljvderijk) check if the group is active
+    return
+  return wrapper
 
 
 def checkCanCreateFromRequest(role_name):

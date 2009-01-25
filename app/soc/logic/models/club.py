@@ -69,5 +69,7 @@ class Logic(group.Logic):
       fields = {'status' : 'completed'}
       club_app_logic.logic.updateEntityProperties(application, fields)
 
+    super(Logic, self)._onCreate(entity)
+
 
 logic = Logic()

@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+from soc.cache import sidebar
 from soc.logic.models import base
 
 import soc.models.role
@@ -61,6 +62,17 @@ class Logic(base.Logic):
     group = group_logic.getForFields(fields, unique=True)
 
     return group
+
+  def _updateField(self, entity, name, value):
+    """Special logic for role. If state changes to active we flush the sidebar.
+    """
+
+    if (name == 'state') and (entity.state != value) and value == 'active':
+      # in case the state of the role changes to active we flush the sidebar
+      # cache. Other changes will be visible after the retention time expires.
+      sidebar.flush(entity.user.account)
+
+    return True
 
 
 logic = Logic()

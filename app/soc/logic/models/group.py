@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.cache import sidebar
 from soc.logic.models import base
 
 import soc.models.group
@@ -91,5 +92,9 @@ class Logic(base.Logic):
 
     return True
 
+  def _onCreate(self, entity):
+    """Flushes the sidebar for the current user.
+    """
+    sidebar.flush()
 
 logic = Logic()

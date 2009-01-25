@@ -129,7 +129,7 @@ def deny(kwargs):
 
   import soc.views.helper.responses
 
-  kwargs.get('context', {})
+  context = kwargs.get('context', {})
   context['title'] = 'Access denied'
 
   raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)

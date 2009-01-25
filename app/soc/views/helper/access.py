@@ -383,7 +383,7 @@ def checkIsHost(kwargs):
   raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
 
-def checkIsHostForProgram(kwargs):
+def checkIsHostForSponsor(kwargs):
   """Raises an alternate HTTP response if Google Account has no Host entity
      for the specified Sponsor.
 

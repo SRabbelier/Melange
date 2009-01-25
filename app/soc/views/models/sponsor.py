@@ -48,10 +48,10 @@ class View(group.View):
 
     rights = {}
     rights['create'] = [access.checkIsDeveloper]
-    rights['edit'] = [access.checkIsHostForProgram]
+    rights['edit'] = [access.checkIsHostForSponsor]
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsDeveloper]
-    rights['list_requests'] = [access.checkIsHostForProgram]
+    rights['list_requests'] = [access.checkIsHostForSponsor]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic

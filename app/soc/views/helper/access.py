@@ -610,42 +610,6 @@ def checkIsMyActiveRole(role_logic):
   return wrapper
 
 
-def checkCanInvite(kwargs):
-  """Checks to see if the current user can create an invite.
-
-  Note that if the current url is not in the default 'request' form
-  this method either deny()s or performs the wrong access check.
-
-  Args:
-    request: a Django HTTP request
-  """
-
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  # Construct a new url by reshufling the kwargs
-  order = ['role', 'access_type', 'scope_path', 'link_id']
-  url_params = dicts.unzip(kwargs, order)
-  url = '/'.join([''] + list(url_params))
-
-  # Mine the reshufled url
-  try:
-    callback, args, kwargs = urlresolvers.resolve(url)
-  except Exception:
-    deny(kwargs)
-
-  # Get the everything we need for the access check
-  params = callback.im_self.getParams()
-  access_type = kwargs['access_type']
-
-  # Perform the access check
-  checkAccess(access_type, rights=params['rights'], kwargs=kwargs)
-
-
 def checkHasPickGetArgs(kwargs):
   """Raises an alternate HTTP response if the request misses get args.
 

@@ -124,10 +124,16 @@ class View(base.View):
     # set the pagename to include the link_id
     page_name = '%s %s' %(page_name, kwargs['link_id'])
 
-    role_names = params['roles_logic'].keys()
+    # get the group from the request
+    group_logic = params['logic']
 
+    group_entity = group_logic.getFromFields(**kwargs)
+
+    role_names = params['roles_logic'].keys()
+    
     # list all incoming requests
     filter = {
+        'scope' : group_entity,
         'role': role_names,
         'state': 'new'
         }
@@ -145,6 +151,7 @@ class View(base.View):
 
     # list all outstanding invites
     filter = {
+        'scope' : group_entity,
         'role': role_names,
         'state': 'group_accepted'
         }
@@ -162,6 +169,7 @@ class View(base.View):
 
     # list all ignored requests
     filter = {
+        'scope' : group_entity,
         'role': role_names,
         'state': 'ignored'
         }

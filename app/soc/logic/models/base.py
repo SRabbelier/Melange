@@ -91,12 +91,17 @@ class Logic(object):
     depth = self._scope_logic.logic.getScopeDepth()
     return None if (depth is None) else (depth + 1)
 
-  def _updateField(self, model, name, value):
+  def _updateField(self, entity, name, value):
     """Hook called when a field is updated.
 
     Base classes should override if any special actions need to be
     taken when a field is updated. The field is not updated if the
     method does not return a True value.
+
+    Args:
+      entity: the unaltered entity
+      name: the name of the field to be changed
+      value: the new value
     """
 
     return True
@@ -338,64 +343,58 @@ class Logic(object):
 
     return result
 
-  def updateModelProperties(self, model, model_properties):
-    """Update existing model entity using supplied model properties.
+  def updateEntityProperties(self, entity, entity_properties):
+    """Update existing entity using supplied properties.
 
     Args:
       model: a model entity
-      model_properties: keyword arguments that correspond to model entity
+      model_properties: keyword arguments that correspond to entity
         properties and their values
 
     Returns:
-      The original model entity with any supplied properties changed.
+      The original entity with any supplied properties changed.
     """
 
     def update():
-      return self._unsafeUpdateModelProperties(model, model_properties)
+      return self._unsafeUpdateEntityProperties(entity, entity_properties)
 
-    entity =  db.run_in_transaction(update)
-    
+    entity = db.run_in_transaction(update)
+
     # call the _onUpdate method
     self._onUpdate(entity)
-    
-    return entity
-  
-  def _silentUpdateModelProperties(self, model, model_properties):
-    """Update existing model entity without calling _onUpdate.
-    
-    Args:
-      model: a model entity
-      model_properties: keyword arguments that correspond to model entity
-        properties and their values
 
-    Returns:
-      The original model entity with any supplied properties changed.
+    return entity
+
+  def _silentUpdateEntityProperties(self, entity, entity_properties):
+    """See _unsafeUpdateEntityProperties.
+
+    Does not call _onUpdate.
     """
     
     def update():
-      return self._unsafeUpdateModelProperties(model, model_properties)
+      return self._unsafeUpdateEntityProperties(entity, entity_properties)
 
     return db.run_in_transaction(update)
 
-  def _unsafeUpdateModelProperties(self, model, model_properties):
-    """See updateModelProperties.
+  def _unsafeUpdateEntityProperties(self, entity, entity_properties):
+    """See updateEntityProperties.
 
-    Like updateModelProperties(), but not run within a transaction.
+    Like updateEntityProperties(), but not run within a transaction.
     """
 
-    properties = model.properties()
+    properties = entity.properties()
 
     for prop in properties.values():
       name = prop.name
 
-      if not name in self._skip_properties and name in model_properties:
-        value = model_properties[prop.name]
+      if not name in self._skip_properties and name in entity_properties:
+        value = entity_properties[prop.name]
 
-        if self._updateField(model, name, value):
-          prop.__set__(model, value)
+        if self._updateField(entity, name, value):
+          prop.__set__(entity, value)
 
-    model.put()
-    return model
+    entity.put()
+    return entity
 
   def updateOrCreateFromKeyName(self, properties, key_name):
     """Update existing entity, or create new one with supplied properties.
@@ -422,7 +421,7 @@ class Logic(object):
     # there is no way to be sure if get_or_insert() returned a new entity or
     # got an existing one due to a race, so update with properties anyway,
     # in a transaction
-    entity = self._silentUpdateModelProperties(entity, properties)
+    entity = self._silentUpdateEntityProperties(entity, properties)
     
     if create_entity:
       # a new entity has been created call _onCreate

@@ -446,7 +446,7 @@ class View(base.View):
       if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
         # update the request_entity and redirect away from this page
         request_state = get_dict['status']
-        request_logic.logic.updateModelProperties(request_entity, {
+        request_logic.logic.updateEntityProperties(request_entity, {
             'state': get_dict['status']})
 
         if request_state == 'group_accepted':

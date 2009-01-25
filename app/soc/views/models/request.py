@@ -165,7 +165,7 @@ class View(base.View):
     if 'status' in get_dict.keys():
       if get_dict['status'] == 'rejected':
         # this invite has been rejected mark as rejected
-        request_logic.updateModelProperties(request_entity, {
+        request_logic.updateEntityProperties(request_entity, {
             'state': 'rejected'})
 
         # redirect to user role overview

@@ -67,7 +67,7 @@ class Logic(group.Logic):
 
       # set the application to completed  
       fields = {'status' : 'completed'}
-      club_app_logic.logic.updateModelProperties(application, fields)
+      club_app_logic.logic.updateEntityProperties(application, fields)
 
 
 logic = Logic()

@@ -194,7 +194,7 @@ class View(base.View):
       # if the message is meant for the user that is reading it
       if entity.scope.key() == user.key():
         # mark the entity as read
-        self._logic.updateModelProperties(entity, {'unread' : False} )
+        self._logic.updateEntityProperties(entity, {'unread' : False} )
 
     context['entity_type_url'] = self._params['url_name']
     context['entity_suffix'] = self._logic.getKeySuffix(entity)

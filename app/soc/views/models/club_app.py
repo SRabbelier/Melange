@@ -259,7 +259,7 @@ class View(group_app.View):
         # this application has been properly reviewed update the status
         fields = {'status' : status_value}
 
-        self._logic.updateModelProperties(entity, fields)
+        self._logic.updateEntityProperties(entity, fields)
         
         if status_value == 'accepted':
           # the application has been accepted send out a notification

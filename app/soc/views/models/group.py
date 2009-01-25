@@ -124,7 +124,7 @@ class View(base.View):
     # set the pagename to include the link_id
     page_name = '%s %s' %(page_name, kwargs['link_id'])
 
-    role_names = params['role_names']
+    role_names = params['roles_logic'].keys()
 
     # list all incoming requests
     filter = {

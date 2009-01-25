@@ -42,6 +42,8 @@ from soc.views.helper import widgets
 from soc.views.models import group
 
 import soc.logic.models.club
+import soc.logic.models.club_admin
+import soc.logic.models.club_member
 import soc.views.helper
 
 
@@ -84,8 +86,10 @@ class View(group.View):
                                    required=False),
         }
 
-    # set the role names for the request overview
-    new_params['role_names'] =  ['club_admin', 'club_member']
+    # set the roles logic
+    new_params['roles_logic'] =  {
+        'club_admin': soc.logic.models.club_admin.logic,
+        'club_member': soc.logic.models.club_admin.logic}
 
     params = dicts.merge(params, new_params)
 

@@ -28,8 +28,9 @@ from soc.logic import dicts
 from soc.views.models import group
 
 import soc.models.sponsor
-import soc.logic.models.sponsor
 import soc.logic.dicts
+import soc.logic.models.host
+import soc.logic.models.sponsor
 
 
 class View(group.View):
@@ -52,8 +53,8 @@ class View(group.View):
     new_params['name'] = "Program Owner"
     new_params['module_name'] = "sponsor"
 
-    # set the role names for the request overview
-    new_params['role_names'] =  ['host']
+    # set the roles logic
+    new_params['roles_logic'] =  {'host': soc.logic.models.host.logic}
 
     params = dicts.merge(params, new_params)
 

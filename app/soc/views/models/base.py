@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+import simplejson
+
 from django import http
 from django.utils.translation import ugettext
 
@@ -566,8 +568,10 @@ class View(object):
       params: a dict with params for this View
     """
 
+    if not simplejson:
+      raise Exception("Simplejson not installed")
+
     get_dict = request.GET
-    filter = {}
 
     # scope_path is not required
     scope_path = get_dict.get('scope_path', None)
@@ -575,11 +579,26 @@ class View(object):
     field = get_dict['field']
 
     if scope_path:
+      filter = {}
       filter['scope_path'] = scope_path
+      data = data = self._logic.getForFields(filter)
+    else:
+      data = self._logic.getForLimitAndOffset(1000)
 
-    redirect = redirects.getReturnRedirect(return_url, field)
-    return self.select(request, self, redirect, page_name=page_name,
-                       params=params, filter=filter)
+    data = [i.toDict() for i in data]
+
+    to_json = {
+        'data': data,
+        'return_url': return_url,
+        'field': field,
+        }
+
+    json = simplejson.dumps(to_json)
+
+    context = {'json': json}
+    template = 'soc/json.html'
+
+    return helper.responses.respond(request, template, context)
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

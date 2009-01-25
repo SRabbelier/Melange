@@ -47,7 +47,21 @@ class ModelWithFieldAttributes(db.Model):
   """
 
   _fields_cache = None
-  
+
+  def toDict(self):
+    """Returns a dict with all StringProperty values of this entity
+    """
+
+    result = {}
+
+    for key, value in self.properties().iteritems():
+      # Skip everything but StringProperties
+      if not isinstance(value, db.StringProperty):
+        continue
+      result[key] = getattr(self, key)
+
+    return result
+
   @classmethod
   def fields(cls):
     """Called by the Django template engine during template instantiation.

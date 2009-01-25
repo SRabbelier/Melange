@@ -61,6 +61,7 @@ class View(role.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.club_admin.logic
     new_params['group_logic'] = club_logic.logic
+    new_params['group_view'] = club_view.view
     new_params['rights'] = rights
 
     new_params['scope_view'] = club_view

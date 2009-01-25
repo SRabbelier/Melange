@@ -194,8 +194,13 @@ class View(base.View):
     # send out an invite notification
     notifications_helper.sendInviteNotification(entity)
 
-    # TODO(ljvderijk) redirect to a more useful place like the group homepage
-    return http.HttpResponseRedirect('/')
+    group_view = params.get('group_view')
+    if not group_view:
+      return http.HttpResponseRedirect('/')
+    else:
+      # redirect to the requests list
+      return http.HttpResponseRedirect(
+          redirects.getListRequestsRedirect(group, group_view.getParams()))
 
   def _getRequestScopePathFromGroup(self, group_entity):
     """Returns the scope_path that should be put in a request for a given group.
@@ -452,8 +457,14 @@ class View(base.View):
         if request_state == 'group_accepted':
           notifications_helper.sendInviteNotification(request_entity)
 
-        # TODO(ljvderijk) redirect to group requests overview
-        return http.HttpResponseRedirect('/')
+        group_view = params.get('group_view')
+        if not group_view:
+          return http.HttpResponseRedirect('/')
+        else:
+          # redirect to the requests list
+          return http.HttpResponseRedirect(
+              redirects.getListRequestsRedirect(request_entity.scope, 
+                  group_view.getParams()))
 
     # put the entity in the context
     context['entity'] = request_entity

@@ -71,10 +71,10 @@ class View(role.View):
     new_params['rights'] = rights
     new_params['logic'] = soc.logic.models.host.logic
     new_params['group_logic'] = sponsor_logic.logic
+    new_params['group_view'] = soc.views.models.sponsor.view
 
     new_params['scope_view'] = sponsor_view
 
-    new_params['group_view'] = soc.views.models.sponsor.view
     new_params['invite_filter'] = {'group_ln': 'link_id'}
 
     new_params['name'] = "Program Administrator"

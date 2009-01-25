@@ -81,6 +81,7 @@ def check_access(func):
   from soc.views import out_of_band
   from soc.views import helper
   from soc.views.helper import access
+  from soc.views.helper import responses
 
   @wraps(func)
   def wrapper(self, request, access_type, *args, **kwargs):
@@ -92,9 +93,16 @@ def check_access(func):
     else:
       rights = self._params['rights']
 
+    check_kwargs = kwargs.copy()
+    context = responses.getUniversalContext(request)
+
+    check_kwargs['GET'] = request.GET
+    check_kwargs['POST'] = request.POST
+    check_kwargs['context'] = context
+
     # Do the access check dance
     try:
-      access.checkAccess(access_type, request, rights, args, kwargs)
+      access.checkAccess(access_type, rights, kwargs=check_kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request)
     return func(self, request, access_type, *args, **kwargs)

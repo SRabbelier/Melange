@@ -103,7 +103,7 @@ class View(base.View):
         'Create invite for %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.process_invite',
-          'Process Invite to for a Role')]
+          'Process Invite to become')]
 
     new_params['extra_django_patterns'] = patterns
     
@@ -146,7 +146,6 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
-    context['page_name'] = page_name
     
     request_logic = params['logic']
 
@@ -156,7 +155,11 @@ class View(base.View):
         'role': kwargs['role'],
         'state': 'group_accepted'}
     request_entity = request_logic.getForFields(fields, unique=True)
-    
+
+    # set the page name using the request_entity
+    context['page_name'] = '%s %s' % (page_name, 
+        request_entity.role_verbose)
+
     get_dict = request.GET
     
     if 'status' in get_dict.keys():
@@ -164,7 +167,7 @@ class View(base.View):
         # this invite has been rejected mark as rejected
         request_logic.updateModelProperties(request_entity, {
             'state': 'rejected'})
-        
+
         # redirect to user role overview
         return http.HttpResponseRedirect('/user/roles')
 

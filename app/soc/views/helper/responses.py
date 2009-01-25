@@ -113,7 +113,7 @@ def getUniversalContext(request):
   context['soc_release'] = release.RELEASE_TAG
   context['gae_version'] = system.getAppVersion()
 
-  settings = site.logic.getFromFields(link_id=site.logic.DEF_SITE_LINK_ID)
+  settings = site.logic.getSingleton()
   
   if settings:
     context['ga_tracking_num'] = settings.ga_tracking_num

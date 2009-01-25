@@ -24,6 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.cache import sidebar
 from soc.logic.helper import notifications
 from soc.logic.models import base
 from soc.logic.models import user as user_logic
@@ -56,6 +57,19 @@ class Logic(base.Logic):
     if unread_count == 1:
       # there is only one unread notification so send out an email
       notifications.sendNewNotificationMessage(entity)
+
+    # flush the sidebar cache
+    sidebar.flush(entity.scope.account)
+
+  def _updateField(self, entity, name, value):
+    """If unread changes we flush the sidebar cache.
+    """
+
+    if (name == 'unread') and (entity.unread != value):
+      # in case that the unread value changes we flush the sidebar.
+      sidebar.flush(entity.scope.account)
+
+    return True
 
 
 logic = Logic()

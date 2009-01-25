@@ -40,14 +40,14 @@ def addMenu(callback):
   global SIDEBAR
   SIDEBAR.append(callback)
 
-def getSidebar(request):
-  """Constructs a sidebar for the specified request.
+def getSidebar():
+  """Constructs a sidebar for the current user.
   """
 
   sidebar = []
 
   for callback in SIDEBAR:
-    menus = callback(request)
+    menus = callback()
 
     for menu in (menus if menus else []):
       sidebar.append(menu)
@@ -98,7 +98,7 @@ def getSidebarItems(params):
   return result
 
 
-def getSidebarMenu(request, items, params):
+def getSidebarMenu(items, params):
   """Returns an dictionary with one sidebar entry.
 
   Items is expected to be a tuple with an url, a menu_text, and an
@@ -106,7 +106,6 @@ def getSidebarMenu(request, items, params):
   raises out_of_band.Error, the item will not be added.
 
   Args:
-    request: the django request object
     items: see above
     params: a dict with params for this View
 
@@ -145,7 +144,7 @@ def getSidebarMenu(request, items, params):
   return submenus
 
 
-def getSidebarMenus(request, params=None):
+def getSidebarMenus(params=None):
   """Constructs the default sidebar menu for a View.
 
   Calls getSidebarItems to retrieve the items that should be in the
@@ -153,12 +152,11 @@ def getSidebarMenus(request, params=None):
   docstrings for an explanation on what they do.
 
   Args:
-    request: the django request object
     params: a dict with params for this View
   """
 
   items = getSidebarItems(params)
-  submenus = getSidebarMenu(request, items, params)
+  submenus = getSidebarMenu(items, params)
 
   if not submenus:
     return

@@ -87,7 +87,7 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
-  def getSidebarMenus(self, request, params=None):
+  def getSidebarMenus(self, params=None):
     """See base.View.getSidebarMenus.
 
     Returns a custom sidebar entry for the 'site' singleton.
@@ -104,7 +104,7 @@ class View(presence.View):
     new_params['sidebar_additional'] = submenus
 
     params = dicts.merge(params, new_params)
-    return super(View, self).getSidebarMenus(request, params=params)
+    return super(View, self).getSidebarMenus(params=params)
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.

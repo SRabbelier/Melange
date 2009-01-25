@@ -116,7 +116,7 @@ class View(presence.View):
     timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
     return timeline
 
-  def getExtraMenus(self, request, params=None):
+  def getExtraMenus(self, params=None):
     """Returns the extra menu's for this view.
 
     A menu item is generated for each program that is currently
@@ -124,7 +124,6 @@ class View(presence.View):
     as well as all public documents for that program.
 
     Args:
-      request: unused
       params: a dict with params for this View.
     """
 
@@ -140,7 +139,7 @@ class View(presence.View):
       menu = {}
       menu['heading'] = entity.short_name
       items = document_view.view.getMenusForScope(entity, params)
-      menu['items'] = sidebar.getSidebarMenu(request, items, params=doc_params)
+      menu['items'] = sidebar.getSidebarMenu(items, params=doc_params)
       menus.append(menu)
 
     return menus

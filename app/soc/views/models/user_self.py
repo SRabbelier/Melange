@@ -252,7 +252,7 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-  def getSidebarMenus(self, request, params=None):
+  def getSidebarMenus(self, params=None):
     """See base.View.getSidebarMenus().
     """
 
@@ -279,7 +279,7 @@ class View(base.View):
 
     params = dicts.merge(params, new_params)
 
-    return super(View, self).getSidebarMenus(request, params=params)
+    return super(View, self).getSidebarMenus(params=params)
 
 
 view = View()

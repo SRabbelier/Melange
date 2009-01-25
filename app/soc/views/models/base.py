@@ -707,11 +707,10 @@ class View(object):
     return self._params
 
   @decorators.merge_params
-  def getSidebarMenus(self, request, params=None):
+  def getSidebarMenus(self, params=None):
     """Returns an dictionary with one sidebar entry.
 
     Args:
-      request: the django request object
       params: a dict with params for this View
 
     Params usage:
@@ -720,7 +719,7 @@ class View(object):
       of _getSidebarItems on how it uses it.
     """
 
-    return sitemap.sidebar.getSidebarMenus(request, params)
+    return sitemap.sidebar.getSidebarMenus(params=params)
 
   @decorators.merge_params
   def getDjangoURLPatterns(self, params=None):

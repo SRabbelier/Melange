@@ -94,6 +94,16 @@ def getCreateRequestRedirect(entity, params):
   return result
 
 
+def getProcessRequestRedirect(entity, _):
+  """Returns the redirect for processing the specified request entity
+  """
+
+  result = '/%s/process_request/%s/%s' % (
+      entity.role, entity.scope_path, entity.link_id)
+
+  return result
+
+
 def getSelectRedirect(entity, params):
   """Returns the pick redirect for the specified entity.
   """

@@ -47,8 +47,13 @@ class View(group.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic
 
+    # TODO(ljvderijk) Set rights for the different views including list_requests
+
     new_params['name'] = "Program Owner"
     new_params['module_name'] = "sponsor"
+
+    # set the role names for the request overview
+    new_params['role_names'] =  ['host']
 
     params = dicts.merge(params, new_params)
 
@@ -61,6 +66,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
+list_requests = view.listRequests
 public = view.public
 export = view.export
 pick = view.pick

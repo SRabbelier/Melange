@@ -19,22 +19,30 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from google.appengine.api import users
 
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
+from soc.views.helper import decorators
+from soc.views.helper import lists as list_helper
+from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
+from soc.views.models.request import view as request_view
 
 
 class View(base.View):
   """View methods for the Group model.
   """
+
+  # TODO(ljvderijk) add sidebar entry for listRequests to each group
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -55,6 +63,19 @@ class View(base.View):
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
+
+    #set the extra_django_patterns and include the one from params
+    patterns = params.get('extra_django_patterns')
+
+    if not patterns:
+      patterns = []
+
+    patterns += [
+        (r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.list_requests',
+        'List of requests for %(name)s')]
+
+    new_params['extra_django_patterns'] = patterns
 
     # TODO(tlarsen): Add support for Django style template lookup
     new_params['public_template'] = 'soc/group/public.html'
@@ -86,3 +107,76 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def listRequests(self, request, access_type,
+                page_name=None, params=None, **kwargs):
+    """Gives an overview of all the requests for a specific group.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # set the pagename to include the link_id
+    page_name = '%s %s' %(page_name, kwargs['link_id'])
+
+    role_names = params['role_names']
+
+    # list all incoming requests
+    filter = {
+        'role': role_names,
+        'state': 'new'
+        }
+
+    # create the list parameters
+    inc_req_params = request_view.getParams()
+
+    # define the list redirect action to the request processing page
+    inc_req_params['list_action'] = (redirects.getProcessRequestRedirect, None)
+    inc_req_params['list_description'] = ugettext(
+        "An overview of the %(name)s's incoming requests." % params)
+    
+    inc_req_content = list_helper.getListContent(
+        request, inc_req_params, filter, 0)
+
+    # list all outstanding invites
+    filter = {
+        'role': role_names,
+        'state': 'group_accepted'
+        }
+
+    # create the list parameters
+    out_inv_params = request_view.getParams()
+
+    # define the list redirect action to the request processing page
+    out_inv_params['list_action'] = (redirects.getProcessRequestRedirect, None)
+    out_inv_params['list_description'] = ugettext(
+        "An overview of the %(name)s's outstanding invites." % params)
+
+    out_inv_content = list_helper.getListContent(
+        request, out_inv_params, filter, 1)
+
+    # list all ignored requests
+    filter = {
+        'role': role_names,
+        'state': 'ignored'
+        }
+
+    # create the list parameters
+    ignored_params = request_view.getParams()
+
+    # define the list redirect action to the request processing page
+    ignored_params['list_action'] = (redirects.getProcessRequestRedirect, None)
+    ignored_params['list_description'] = ugettext(
+        "An overview of the %(name)s's ignored requests." % params)
+    
+    ignored_content = list_helper.getListContent(
+        request, ignored_params, filter, 2)
+
+    contents = [inc_req_content, out_inv_content, ignored_content]
+
+    return self._list(request, params, contents, page_name)

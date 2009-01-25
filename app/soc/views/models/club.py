@@ -27,7 +27,6 @@ from google.appengine.api import users
 
 from django import http
 from django import forms
-from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
@@ -38,18 +37,15 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
-from soc.views.helper import lists as list_helper
-from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
-from soc.views.models import base
-from soc.views.models.request import view as request_view
+from soc.views.models import group
 
 import soc.logic.models.club
 import soc.views.helper
 
 
-class View(base.View):
+class View(group.View):
   """View methods for the Club model.
   """
 
@@ -78,10 +74,7 @@ class View(base.View):
 
     patterns += [(r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.applicant', 
-        "%(name)s Creation via Accepted Application"),
-        (r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.list_requests',
-        'List of requests for %(name)s')]
+        "%(name)s Creation via Accepted Application"),]
 
     new_params['extra_django_patterns'] = patterns
 
@@ -90,6 +83,9 @@ class View(base.View):
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
+
+    # set the role names for the request overview
+    new_params['role_names'] =  ['club_admin', 'club_member']
 
     params = dicts.merge(params, new_params)
 
@@ -192,82 +188,6 @@ class View(base.View):
 
     # redirect to notifications list to see the admin invite
     return http.HttpResponseRedirect('/notification/list')
-
-
-  @decorators.merge_params
-  @decorators.check_access
-  def listRequests(self, request, access_type,
-                page_name=None, params=None, **kwargs):
-    """Gives an overview of all the requests for a specific club.
-
-    Args:
-      request: the standard Django HTTP request object
-      access_type : the name of the access type which should be checked
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View
-      kwargs: the Key Fields for the specified entity
-    """
-
-    # set the pagename to include the link_id
-    page_name = '%s %s' %(page_name, kwargs['link_id'])
-
-    club_roles = ['club_admin', 'club_member']
-
-    # list all incoming requests
-    filter = {
-        'role': club_roles,
-        'state': 'new'
-        }
-
-    # create the list parameters
-    inc_req_params = request_view.getParams()
-
-    # define the list redirect action to the request processing page
-    inc_req_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    inc_req_params['list_description'] = ugettext(
-        "An overview of the club's incoming requests.")
-    
-    inc_req_content = list_helper.getListContent(
-        request, inc_req_params, filter, 0)
-
-    # list all outstanding invites
-    filter = {
-        'role': club_roles,
-        'state': 'group_accepted'
-        }
-
-    # create the list parameters
-    out_inv_params = request_view.getParams()
-
-    # define the list redirect action to the request processing page
-    out_inv_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    out_inv_params['list_description'] = ugettext(
-        "An overview of the club's outstanding invites.")
-
-    out_inv_content = list_helper.getListContent(
-        request, out_inv_params, filter, 1)
-
-    # list all ignored requests
-    filter = {
-        'role': club_roles,
-        'state': 'ignored'
-        }
-
-    # create the list parameters
-    ignored_params = request_view.getParams()
-
-    # define the list redirect action to the request processing page
-    ignored_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    ignored_params['list_description'] = ugettext(
-        "An overview of the club's ignored requests.")
-    
-    ignored_content = list_helper.getListContent(
-        request, ignored_params, filter, 2)
-
-
-    contents = [inc_req_content, out_inv_content, ignored_content]
-
-    return self._list(request, params, contents, page_name)
 
 
   def _editGet(self, request, entity, form):

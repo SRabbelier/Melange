@@ -95,6 +95,16 @@ def getCreateRequestRedirect(entity, params):
   return result
 
 
+def getRequestRedirectForRole(entity, role_name):
+  """Returns the redirect to create a request for a specific role.
+  """
+
+  result ='/%s/request/%s' % (
+      role_name, entity.key().name())
+
+  return result
+
+
 def getInviteRedirectForRole(entity, role_name):
   """Returns the redirect to create an invite for a specific role.
   """

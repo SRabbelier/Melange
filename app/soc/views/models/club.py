@@ -64,6 +64,7 @@ class View(group.View):
     rights['delete'] = [access.checkIsDeveloper]
     rights['home'] = [access.allow]
     rights['list'] = [access.checkIsDeveloper]
+    rights['apply_member'] = [access.checkAgreesToSiteToS]
     rights['list_requests'] = [access.checkIsClubAdminForClub]
     rights['list_roles'] = [access.checkIsClubAdminForClub]
     rights['applicant'] = [access.checkIsApplicationAccepted(club_app_logic)]
@@ -72,14 +73,21 @@ class View(group.View):
     new_params['logic'] = soc.logic.models.club.logic
     new_params['rights'] = rights
     new_params['name'] = "Club"
+    new_params['url_name'] = "club"
 
     patterns = []
 
     patterns += [(r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.applicant', 
-        "%(name)s Creation via Accepted Application"),]
+        "%(name)s Creation via Accepted Application"),
+        (r'^%(url_name)s/(?P<access_type>apply_member)$',
+        'soc.views.models.%(module_name)s.apply_member', 
+        "List of all %(name_plural)s you can apply to"),]
 
     new_params['extra_django_patterns'] = patterns
+
+    new_params['sidebar_additional'] = [
+        ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'list_apply'),]
 
     new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
@@ -190,6 +198,28 @@ class View(group.View):
     return http.HttpResponseRedirect('/notification/list')
 
 
+  @decorators.merge_params
+  @decorators.check_access
+  def applyMember(self, request, access_type,
+                page_name=None, params=None, **kwargs):
+    """Shows a list of all clubs and you can choose one to apply to become a member.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    list_params = params.copy()
+    list_params['list_action'] = (redirects.getRequestRedirectForRole, 'club_member')
+    list_params['list_description'] = 'Choose a club to apply to become a Club Member'
+
+    return self.list(request, access_type, 
+        page_name, params=list_params, filter=None)
+
+
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
@@ -256,6 +286,7 @@ class View(group.View):
 view = View()
 
 applicant = view.applicant
+apply_member = view.applyMember
 create = view.create
 delete = view.delete
 edit = view.edit

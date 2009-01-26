@@ -233,9 +233,9 @@ class View(group.View):
           "Invite an Admin", 'any_access')
       submenus.append(submenu)
 
-      # add a link to invite an user
+      # add a link to invite a member
       submenu = (redirects.getInviteRedirect(group_entity, 'club_member'), 
-          "Invite an User", 'any_access')
+          "Invite a Member", 'any_access')
       submenus.append(submenu)
 
       # add a link to the request page

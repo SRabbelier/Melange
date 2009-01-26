@@ -359,7 +359,7 @@ def checkIsHost(kwargs):
   """
 
   try:
-    # if the current user is invited to create a host profile we allow access
+    # if the current user is a developer we allow access
     checkIsDeveloper(kwargs)
     return
   except out_of_band.Error:
@@ -397,6 +397,13 @@ def checkIsHostForSponsor(kwargs):
     * if no User exists for the logged-in Google Account, or
     * if the user is not even logged in
   """
+
+  try:
+    # if the current user is a developer we allow access
+    checkIsDeveloper(kwargs)
+    return
+  except out_of_band.Error:
+    pass
 
   checkAgreesToSiteToS(kwargs)
 

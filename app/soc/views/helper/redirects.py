@@ -95,7 +95,7 @@ def getCreateRequestRedirect(entity, params):
   return result
 
 
-def getInviteRedirect(entity, role_name):
+def getInviteRedirectForRole(entity, role_name):
   """Returns the redirect to create an invite for a specific role.
   """
 

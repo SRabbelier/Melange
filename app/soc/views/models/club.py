@@ -229,18 +229,23 @@ class View(group.View):
       submenus.append(submenu)
 
       # add a link to invite an admin
-      submenu = (redirects.getInviteRedirect(group_entity, 'club_admin'), 
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_admin'), 
           "Invite an Admin", 'any_access')
       submenus.append(submenu)
 
       # add a link to invite a member
-      submenu = (redirects.getInviteRedirect(group_entity, 'club_member'), 
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_member'), 
           "Invite a Member", 'any_access')
       submenus.append(submenu)
 
       # add a link to the request page
       submenu = (redirects.getListRequestsRedirect(group_entity, params), 
           "List Requests and Invites", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(group_entity, params), 
+          "Edit Club Profile", 'any_access')
       submenus.append(submenu)
 
       # TODO(ljvderijk) add more usefull links, like resign as admin/member

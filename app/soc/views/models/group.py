@@ -34,11 +34,13 @@ from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.helper import widgets
-from soc.views.models import base
+from soc.views.models import presence
+from soc.views.models import document as document_view
 from soc.views.models.request import view as request_view
+from soc.views.sitemap import sidebar
 
 
-class View(base.View):
+class View(presence.View):
   """View methods for the Group model.
   """
 
@@ -259,3 +261,105 @@ class View(base.View):
 
     role_views = self._params['role_views']
     role_views[role_name] = role_view
+
+  def getExtraMenus(self, params=None):
+    """Returns the extra menu's for this view.
+
+    A menu item is generated for each group that the user has an active
+    role for. The public page for each group is added as menu item,
+    as well as all public documents for that group.
+
+    Args:
+      params: a dict with params for this View.
+    """
+
+    params = dicts.merge(params, self._params)
+    logic = params['logic']
+
+    # get the current user
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    # set fields to match every active role this user has
+    fields = {'user': user_entity,
+              'state' : 'active'}
+
+    # get the role views and start filling group_entities
+    role_views = self._params['role_views']
+    role_descriptions = {}
+
+    for role_name in role_views.keys():
+      # get the view for a specific role
+      role_view = role_views[role_name]
+
+      # get the params for this view
+      role_view_params = role_view.getParams()
+
+      # get the logic for this view
+      role_logic = role_view_params['logic']
+
+      # get all the active roles that this user has
+      roles = role_logic.getForFields(fields)
+
+      # for each role that we find
+      for role in roles:
+
+        # get the Key Name of the group
+        group_key_name = role.scope.key().name()
+
+        # try to get an existing description
+        existing_role_descriptions = role_descriptions.get(group_key_name)
+
+        if existing_role_descriptions:
+          # add this description to existing roles
+          existing_roles = existing_role_descriptions['roles']
+          existing_roles[role_name] = role
+        else:
+          # create a description of this role
+          role_description = {'roles' : {role_name: role},
+              'group' : role.scope}
+
+          # add the new entry to our dictionary
+          role_descriptions[group_key_name] = role_description
+
+    # get the document view params to add the group's documents to the menu
+    doc_params = document_view.view.getParams()
+
+    menus = []
+
+    # for each role description in our collection
+    for role_description in role_descriptions.itervalues():
+      #start with an empty menu
+      menu = {}
+
+      # get the group for this role description
+      group_entity = role_description['group']
+
+      # set the menu header name
+      menu['heading'] = '%s %s' %(params['name'], 
+          group_entity.short_name)
+
+      # TODO add homepage thing to groups
+      doc_items = document_view.view.getMenusForScope(group_entity, params)
+      doc_items = sidebar.getSidebarMenu(doc_items, params=doc_params)
+
+      # get the group specific items
+      group_items = self._getExtraMenuItems(role_description, params)
+      group_items = sidebar.getSidebarMenu(group_items, params=self._params)
+
+      menu['items'] = doc_items + group_items
+
+      menus.append(menu)
+
+    return menus
+
+  def _getExtraMenuItems(self, role_description, params=None):
+    """Used to implement group instance specific needs for the side menu
+
+    Args:
+      role_description : dict containing all the roles which is a dict of 
+                         name and the role entity to which it belongs. Also
+                         group contains the group entity to which these roles
+                         belong.
+      params: a dict with params for this View.
+    """
+    return []

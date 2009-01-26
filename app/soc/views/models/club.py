@@ -42,8 +42,6 @@ from soc.views.helper import widgets
 from soc.views.models import group
 
 import soc.logic.models.club
-import soc.logic.models.club_admin
-import soc.logic.models.club_member
 import soc.views.helper
 
 
@@ -65,6 +63,7 @@ class View(group.View):
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsDeveloper]
     rights['list_requests'] = [access.checkIsClubAdminForClub]
+    rights['list_roles'] = [access.checkIsClubAdminForClub]
     rights['applicant'] = [access.checkIsApplicationAccepted(club_app_logic)]
 
     new_params = {}
@@ -85,11 +84,6 @@ class View(group.View):
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
-
-    # set the roles logic
-    new_params['roles_logic'] =  {
-        'club_admin': soc.logic.models.club_admin.logic,
-        'club_member': soc.logic.models.club_admin.logic}
 
     params = dicts.merge(params, new_params)
 
@@ -223,6 +217,7 @@ delete = view.delete
 edit = view.edit
 list = view.list
 list_requests = view.listRequests
+list_roles = view.listRoles
 public = view.public
 export = view.export
 pick = view.pick

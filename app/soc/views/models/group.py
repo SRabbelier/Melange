@@ -73,7 +73,10 @@ class View(base.View):
     patterns += [
         (r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.list_requests',
-        'List of requests for %(name)s')]
+        'List of requests for %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>list_roles)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.list_roles',
+        'List of roles for %(name)s')]
 
     new_params['extra_django_patterns'] = patterns
 
@@ -82,6 +85,8 @@ class View(base.View):
 
     new_params['list_row'] = 'soc/group/list/row.html'
     new_params['list_heading'] = 'soc/group/list/heading.html'
+
+    new_params['role_views'] = {}
 
     params = dicts.merge(params, new_params)
 
@@ -129,7 +134,7 @@ class View(base.View):
 
     group_entity = group_logic.getFromFields(**kwargs)
 
-    role_names = params['roles_logic'].keys()
+    role_names = params['role_views'].keys()
     
     # list all incoming requests
     filter = {
@@ -188,3 +193,69 @@ class View(base.View):
     contents = [inc_req_content, out_inv_content, ignored_content]
 
     return self._list(request, params, contents, page_name)
+
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listRoles(self, request, access_type,
+                page_name=None, params=None, **kwargs):
+    """Gives an overview of all the roles in a specific group.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # set the pagename to include the link_id
+    page_name = '%s %s' %(page_name, kwargs['link_id'])
+
+    # get the group from the request
+    group_logic = params['logic']
+
+    group_entity = group_logic.getFromFields(**kwargs)
+
+    # create the filter
+    filter = {
+        'scope' : group_entity,
+        'state': 'active'
+        }
+
+    role_views = params['role_views']
+    contents = []
+    index = 0
+
+    # for each role we create a separate list
+    for role_name in role_views.keys():
+      # create the list parameters
+      list_params = role_views[role_name].getParams().copy()
+
+      # TODO(ljvderijk) define the list redirect action to the managing page
+      list_params['list_action'] = (redirects.getEditRedirect, list_params)
+      list_params['list_description'] = ugettext(
+          "An overview of the %s for this %s." % (
+          list_params['name_plural'], params['name']))
+    
+      new_list_content = list_helper.getListContent(
+          request, list_params, filter, index)
+
+      contents += [new_list_content]
+
+      index += 1
+
+    # call the _list method from base.View to show the list
+    return self._list(request, params, contents, page_name)
+
+
+  def registerRole(self, role_name, role_view):
+    """Adds a role to the role_views param.
+    
+    Args:
+      role_name: The name of the role that needs to be added
+      role_view: The view that needs to be added to role_views.
+    """
+
+    role_views = self._params['role_views']
+    role_views[role_name] = role_view

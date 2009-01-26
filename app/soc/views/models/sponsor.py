@@ -30,7 +30,6 @@ from soc.views.models import group
 
 import soc.models.sponsor
 import soc.logic.dicts
-import soc.logic.models.host
 import soc.logic.models.sponsor
 
 
@@ -52,6 +51,7 @@ class View(group.View):
     rights['delete'] = [access.checkIsDeveloper]
     rights['list'] = [access.checkIsDeveloper]
     rights['list_requests'] = [access.checkIsHostForSponsor]
+    rights['list_roles'] = [access.checkIsHostForSponsor]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic
@@ -59,9 +59,6 @@ class View(group.View):
 
     new_params['name'] = "Program Owner"
     new_params['module_name'] = "sponsor"
-
-    # set the roles logic
-    new_params['roles_logic'] =  {'host': soc.logic.models.host.logic}
 
     params = dicts.merge(params, new_params)
 
@@ -75,6 +72,7 @@ delete = view.delete
 edit = view.edit
 list = view.list
 list_requests = view.listRequests
+list_roles = view.listRoles
 public = view.public
 export = view.export
 pick = view.pick

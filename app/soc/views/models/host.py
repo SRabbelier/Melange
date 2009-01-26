@@ -42,9 +42,6 @@ import soc.logic.models.host
 import soc.views.helper
 import soc.views.models.sponsor
 
-# TODO(pawel.solyga): Rename all list methods and functions to something else
-# and remove this tolist assignment
-tolist = list
 
 class View(role.View):
   """View methods for the Host model.
@@ -62,7 +59,7 @@ class View(role.View):
     rights['create'] = [access.checkIsHost]
     rights['edit'] = [access.checkIsMyActiveRole(soc.logic.models.host)]
     rights['invite'] = [access.checkIsHost]
-    rights['list'] = [access.checkIsHost]
+    rights['list'] = [access.checkIsDeveloper]
     rights['accept_invite'] = [access.checkCanCreateFromRequest('host')]
     rights['process_request'] = [access.checkIsHost,
         access.checkCanProcessRequest('host')]
@@ -96,6 +93,9 @@ class View(role.View):
 
     super(View, self).__init__(params=params)
 
+    # register the role with the group_view
+    params['group_view'].registerRole(params['module_name'], self)
+
     # create and store the special form for invited users
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
@@ -106,28 +106,6 @@ class View(role.View):
         dynafields = updated_fields)
 
     params['invited_create_form'] = invited_create_form
-
-
-  def list(self, request, access_type, page_name=None, 
-           params=None, filter=None):
-    """See base.View.list.
-
-    Passes a filter to base.View.list so that only hosts from a sponsor
-    that this user is host for are listed.
-    """
-
-    user = user_logic.logic.getForCurrentAccount()
-
-    # Don't bother looking up everything if there's no user
-    if user and (not accounts.isDeveloper(user=user)):
-      hosts = host_logic.logic.getForFields({'user': user})
-      sponsors = tolist((host.scope for host in hosts))
-
-      new_filter = {'scope': sponsors}
-      filter = dicts.merge(filter, new_filter)
-
-    return super(View, self).list(request, access_type, page_name=page_name,
-                                  params=params, filter=filter)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

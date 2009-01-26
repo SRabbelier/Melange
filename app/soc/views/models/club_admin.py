@@ -84,6 +84,9 @@ class View(role.View):
 
     super(View, self).__init__(params=params)
 
+    # register the role with the group_view
+    params['group_view'].registerRole(params['module_name'], self)
+
     # create and store the special form for invited users
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),

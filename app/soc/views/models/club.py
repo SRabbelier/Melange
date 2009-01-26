@@ -37,6 +37,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import group
@@ -61,6 +62,7 @@ class View(group.View):
     rights['create'] = [access.checkIsDeveloper]
     rights['edit'] = [access.checkIsClubAdminForClub]
     rights['delete'] = [access.checkIsDeveloper]
+    rights['home'] = [access.allow]
     rights['list'] = [access.checkIsDeveloper]
     rights['list_requests'] = [access.checkIsClubAdminForClub]
     rights['list_roles'] = [access.checkIsClubAdminForClub]
@@ -209,12 +211,50 @@ class View(group.View):
     super(View, self)._editPost(request, entity, fields)
 
 
+  def _getExtraMenuItems(self, role_description, params=None):
+    """Used to create the specific club menu entries.
+
+    For args see group.View._getExtraMenuItems().
+    """
+
+    submenus = []
+
+    group_entity = role_description['group']
+    roles = role_description['roles']
+  
+    if roles.get('club_admin'):
+      # add a link to the management page
+      submenu = (redirects.getListRolesRedirect(group_entity, params), 
+          "Manage Admins and Members", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite an admin
+      submenu = (redirects.getInviteRedirect(group_entity, 'club_admin'), 
+          "Invite an Admin", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite an user
+      submenu = (redirects.getInviteRedirect(group_entity, 'club_member'), 
+          "Invite an User", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the request page
+      submenu = (redirects.getListRequestsRedirect(group_entity, params), 
+          "List Requests and Invites", 'any_access')
+      submenus.append(submenu)
+
+      # TODO(ljvderijk) add more usefull links, like resign as admin/member
+
+    return submenus
+
+
 view = View()
 
 applicant = view.applicant
 create = view.create
 delete = view.delete
 edit = view.edit
+home = view.home
 list = view.list
 list_requests = view.listRequests
 list_roles = view.listRoles

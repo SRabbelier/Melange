@@ -338,7 +338,7 @@ class View(presence.View):
       menu['heading'] = '%s %s' %(params['name'], 
           group_entity.short_name)
 
-      # TODO add homepage thing to groups
+      # get the documents for this group entity
       doc_items = document_view.view.getMenusForScope(group_entity, params)
       doc_items = sidebar.getSidebarMenu(doc_items, params=doc_params)
 
@@ -346,8 +346,10 @@ class View(presence.View):
       group_items = self._getExtraMenuItems(role_description, params)
       group_items = sidebar.getSidebarMenu(group_items, params=self._params)
 
+      # add the items together
       menu['items'] = doc_items + group_items
 
+      # append this as a new menu
       menus.append(menu)
 
     return menus

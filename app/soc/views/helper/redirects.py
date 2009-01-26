@@ -95,12 +95,33 @@ def getCreateRequestRedirect(entity, params):
   return result
 
 
+def getInviteRedirect(entity, role_name):
+  """Returns the redirect to create an invite for a specific role.
+  """
+
+  result ='/%s/invite/%s' % (
+      role_name, entity.key().name())
+
+  return result
+
+
 def getListRequestsRedirect(entity, params):
   """Returns the redirect for the List Requests paged for the given
   Group entity and Group View params.
   """
 
   result = '/%s/list_requests/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
+def getListRolesRedirect(entity, params):
+  """Returns the redirect for the List Roles paged for the given
+  Group entity and Group View params.
+  """
+
+  result = '/%s/list_roles/%s' % (
       params['url_name'], entity.key().name())
 
   return result
@@ -144,6 +165,7 @@ def getReturnRedirect(return_url, field):
     return result
 
   return wrapped
+
 
 def getInviteAcceptedRedirect(entity, _):
   """Returns the redirect for accepting an invite.

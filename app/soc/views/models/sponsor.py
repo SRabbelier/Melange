@@ -49,6 +49,7 @@ class View(group.View):
     rights['create'] = [access.checkIsDeveloper]
     rights['edit'] = [access.checkIsHostForSponsor]
     rights['delete'] = [access.checkIsDeveloper]
+    rights['home'] = [access.checkIsHostForSponsor]
     rights['list'] = [access.checkIsDeveloper]
     rights['list_requests'] = [access.checkIsHostForSponsor]
     rights['list_roles'] = [access.checkIsHostForSponsor]
@@ -64,12 +65,17 @@ class View(group.View):
 
     super(View, self).__init__(params=params)
 
+    # TODO(ljvderijk) add sidebar entries for specific sponsors
+    #def _getExtraMenuItems(self, role_description, params=None):
+
+
 
 view = View()
 
 create = view.create
 delete = view.delete
 edit = view.edit
+home = view.home
 list = view.list
 list_requests = view.listRequests
 list_roles = view.listRoles

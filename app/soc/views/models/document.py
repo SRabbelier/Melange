@@ -96,9 +96,9 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['any_access'] = [access.allow]
-    rights['show'] = [access.checkIsDocumentPublic]
+    rights = access.Checker(params)
+    rights['any_access'] = ['allow']
+    rights['show'] = ['checkIsDocumentPublic']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.document.logic

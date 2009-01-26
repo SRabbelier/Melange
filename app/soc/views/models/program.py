@@ -51,9 +51,9 @@ class View(presence.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['any_access'] = [access.allow]
-    rights['show'] = [access.allow]
+    rights = access.Checker(params)
+    rights['any_access'] = ['allow']
+    rights['show'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic

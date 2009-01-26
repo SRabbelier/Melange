@@ -65,13 +65,13 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['listSelf'] = [access.checkAgreesToSiteToS]
-    rights['create'] = [access.deny]
-    rights['edit'] = [access.checkIsDeveloper]
-    rights['process_invite'] = [access.checkIsMyGroupAcceptedRequest]
-    rights['list'] = [access.checkIsDeveloper]
-    rights['delete'] = [access.checkIsDeveloper]
+    rights = access.Checker(params)
+    rights['listSelf'] = ['checkAgreesToSiteToS']
+    rights['create'] = ['deny']
+    rights['edit'] = ['checkIsDeveloper']
+    rights['process_invite'] = ['checkIsMyGroupAcceptedRequest']
+    rights['list'] = ['checkIsDeveloper']
+    rights['delete'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['rights'] = rights

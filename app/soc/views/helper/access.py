@@ -74,433 +74,475 @@ DEF_GROUP_NOT_FOUND_MSG = ugettext(
     'The requested Group can not be found')
 
 
-def checkAccess(access_type, rights, kwargs=None):
-  """Runs all the defined checks for the specified type.
-
-  Args:
-    access_type: the type of request (such as 'list' or 'edit')
-    rights: a dictionary containing access check functions
-    kwargs: a dictionary with django's arguments
-
-  Rights usage: 
-    The rights dictionary is used to check if the current user is allowed 
-    to view the page specified. The functions defined in this dictionary 
-    are always called with the provided kwargs dictionary as argument. On any
-    request, regardless of what type, the functions in the 'any_access' value
-    are called. If the specified type is not in the rights dictionary, all
-    the functions in the 'unspecified' value are called. When the specified
-    type _is_ in the rights dictionary, all the functions in that access_type's
-    value are called.
+def denySidebar(fun):
+  """Decorator that denies access if the sidebar is calling.
   """
 
-  # Call each access checker
-  for check in rights['any_access']:
-    check(kwargs)
+  from functools import wraps
 
-  if access_type not in rights:
-    for check in rights['unspecified']:
-      # No checks defined, so do the 'generic' checks and bail out
-      check(kwargs)
+  @wraps(fun)
+  def wrapper(self, django_args, *args, **kwargs):
+    if django_args.get('SIDEBAR_CALLING'):
+      raise out_of_band.Error("Sidebar Calling")
+    return fun(self, django_args, *args, **kwargs)
+  return wrapper
+
+
+class Checker(object):
+  """
+  The __setitem__() and __getitem__() methods are overloaded to DTRT
+  when adding new access rights, and retrieving them, so use these
+  rather then modifying rights directly if so desired.
+  """
+
+  def __init__(self, params):
+    """Adopts base.rights as rights if base is set.
+    """
+
+    base = params.get('rights') if params else None
+    self.rights = base.rights if base else {}
+
+  def __setitem__(self, key, value):
+    """Sets a value only if no old value exists.
+    """
+
+    oldvalue = self.rights.get(key)
+    self.rights[key] = oldvalue if oldvalue else value
+
+  def __getitem__(self, key):
+    """Retrieves the right checkers and massages then into a default format.
+
+    The result is guaranteed to be a list of 2-tuples, the first element is a
+    checker (iff there is an checker with the specified name), the second
+    element is a list of arguments that should be passed to the checker when
+    calling it in addition to the standard django_args.
+    """
+
+    result = []
+
+    for i in self.rights.get(key, []):
+      # Be nice an repack so that it is always a list with tuples
+      if isinstance(i, tuple):
+        name, arg = i
+        tmp = (getattr(self, name), (arg if isinstance(arg, list) else [arg]))
+        result.append(tmp)
+      else:
+        tmp = (getattr(self, i), [])
+        result.append(tmp)
+
+    return result
+
+  def checkAccess(self, access_type, django_args):
+    """Runs all the defined checks for the specified type.
+
+    Args:
+      access_type: the type of request (such as 'list' or 'edit')
+      rights: a dictionary containing access check functions
+      django_args: a dictionary with django's arguments
+
+    Rights usage:
+      The rights dictionary is used to check if the current user is allowed
+      to view the page specified. The functions defined in this dictionary
+      are always called with the provided django_args dictionary as argument. On any
+      request, regardless of what type, the functions in the 'any_access' value
+      are called. If the specified type is not in the rights dictionary, all
+      the functions in the 'unspecified' value are called. When the specified
+      type _is_ in the rights dictionary, all the functions in that access_type's
+      value are called.
+    """
+
+    self.id = users.get_current_user()
+
+    # Call each access checker
+    for check, args in self['any_access']:
+      check(django_args, *args)
+
+    if access_type not in self.rights:
+      for check, args in self['unspecified']:
+        # No checks defined, so do the 'generic' checks and bail out
+        check(django_args, *args)
+      return
+
+    for check, args in self[access_type]:
+      check(django_args, *args)
+
+  def allow(self, django_args):
+    """Never raises an alternate HTTP response.  (an access no-op, basically).
+
+    Args:
+      django_args: a dictionary with django's arguments
+    """
+
     return
 
-  for check in rights[access_type]:
-    check(kwargs)
+  def deny(self, django_args):
+    """Always raises an alternate HTTP response.
 
+    Args:
+      django_args: a dictionary with django's arguments
 
-def allow(kwargs):
-  """Never raises an alternate HTTP response.  (an access no-op, basically).
+    Raises:
+      always raises AccessViolationResponse if called
+    """
 
-  Args:
-    kwargs: a dictionary with django's arguments
-  """
+    context = django_args.get('context', {})
+    context['title'] = 'Access denied'
 
-  return
+    raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
 
+  def checkIsLoggedIn(self, django_args):
+    """Raises an alternate HTTP response if Google Account is not logged in.
 
-def deny(kwargs):
-  """Always raises an alternate HTTP response.
+    Args:
+      django_args: a dictionary with django's arguments
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    Raises:
+      AccessViolationResponse:
+      * if no Google Account is even logged in
+    """
 
-  Raises:
-    always raises AccessViolationResponse if called
-  """
+    if self.id:
+      return
 
-  import soc.views.helper.responses
+    raise out_of_band.LoginRequest()
 
-  context = kwargs.get('context', {})
-  context['title'] = 'Access denied'
+  def checkNotLoggedIn(self, django_args):
+    """Raises an alternate HTTP response if Google Account is logged in.
 
-  raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
+    Args:
+      django_args: a dictionary with django's arguments
 
+    Raises:
+      AccessViolationResponse:
+      * if a Google Account is currently logged in
+    """
 
-def checkIsLoggedIn(kwargs):
-  """Raises an alternate HTTP response if Google Account is not logged in.
+    if not self.id:
+      return
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
 
-  Raises:
-    AccessViolationResponse:
-    * if no Google Account is even logged in
-  """
+  def checkIsUser(self, django_args):
+    """Raises an alternate HTTP response if Google Account has no User entity.
 
-  if users.get_current_user():
-    return
+    Args:
+      django_args: a dictionary with django's arguments
 
-  raise out_of_band.LoginRequest()
+    Raises:
+      AccessViolationResponse:
+      * if no User exists for the logged-in Google Account, or
+      * if no Google Account is logged in at all
+    """
 
+    self.checkIsLoggedIn(django_args)
 
-def checkNotLoggedIn(kwargs):
-  """Raises an alternate HTTP response if Google Account is logged in.
+    user = user_logic.getForCurrentAccount()
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    if user:
+      return
 
-  Raises:
-    AccessViolationResponse:
-    * if a Google Account is currently logged in
-  """
-  
-  if not users.get_current_user():
-    return
+    raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
-  raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
+  def checkAgreesToSiteToS(self, django_args):
+    """Raises an alternate HTTP response if User has not agreed to site-wide ToS.
 
+    Args:
+      django_args: a dictionary with django's arguments
 
-def checkIsUser(kwargs):
-  """Raises an alternate HTTP response if Google Account has no User entity.
+    Raises:
+      AccessViolationResponse:
+      * if User has not agreed to the site-wide ToS, or
+      * if no User exists for the logged-in Google Account, or
+      * if no Google Account is logged in at all
+    """
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    self.checkIsUser(django_args)
 
-  Raises:
-    AccessViolationResponse:
-    * if no User exists for the logged-in Google Account, or
-    * if no Google Account is logged in at all
-  """
+    user = user_logic.getForCurrentAccount()
 
-  checkIsLoggedIn(kwargs)
+    if user_logic.agreesToSiteToS(user):
+      return
 
-  user = user_logic.getForCurrentAccount()
+    # Would not reach this point of site-wide ToS did not exist, since
+    # agreesToSiteToS() call above always returns True if no ToS is in effect.
+    login_msg_fmt = DEF_AGREE_TO_TOS_MSG_FMT % {
+        'tos_link': redirects.getToSRedirect(site_logic.getSingleton())}
 
-  if user:
-    return
+    raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
 
-  raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
+  def checkIsDeveloper(self, django_args):
+    """Raises an alternate HTTP response if Google Account is not a Developer.
 
+    Args:
+      django_args: a dictionary with django's arguments
 
-def checkAgreesToSiteToS(kwargs):
-  """Raises an alternate HTTP response if User has not agreed to site-wide ToS.
+    Raises:
+      AccessViolationResponse:
+      * if User is not a Developer, or
+      * if no User exists for the logged-in Google Account, or
+      * if no Google Account is logged in at all
+    """
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    self.checkAgreesToSiteToS(django_args)
 
-  Raises:
-    AccessViolationResponse:
-    * if User has not agreed to the site-wide ToS, or
-    * if no User exists for the logged-in Google Account, or
-    * if no Google Account is logged in at all
-  """
+    if accounts.isDeveloper(account=self.id):
+      return
 
-  checkIsUser(kwargs)
+    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': 'a Site Developer '}
 
-  user = user_logic.getForCurrentAccount()
-  
-  if user_logic.agreesToSiteToS(user):
-    return
+    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
-  # Would not reach this point of site-wide ToS did not exist, since
-  # agreesToSiteToS() call above always returns True if no ToS is in effect.
-  login_msg_fmt = DEF_AGREE_TO_TOS_MSG_FMT % {
-      'tos_link': redirects.getToSRedirect(site_logic.getSingleton())}
+  def checkCanMakeRequestToGroup(self, django_args, group_logic):
+    """Raises an alternate HTTP response if the specified group is not in an
+    active state.
 
-  raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
+    Note that state hasn't been implemented yet
 
+    Args:
+      group_logic: Logic module for the type of group which the request is for
+    """
 
-def checkIsDeveloper(kwargs):
-  """Raises an alternate HTTP response if Google Account is not a Developer.
-
-  Args:
-    kwargs: a dictionary with django's arguments
-
-  Raises:
-    AccessViolationResponse:
-    * if User is not a Developer, or
-    * if no User exists for the logged-in Google Account, or
-    * if no Google Account is logged in at all
-  """
-
-  checkAgreesToSiteToS(kwargs)
-
-  if accounts.isDeveloper(account=users.get_current_user()):
-    return
-
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a Site Developer '}
-
-  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-
-def checkCanMakeRequestToGroup(group_logic):
-  """Raises an alternate HTTP response if the specified group is not in an
-  active state.
-  
-  Note that state hasn't been implemented yet
-  
-  Args:
-    group_logic: Logic module for the type of group which the request is for
-  """
-
-  def wrapper(kwargs):
     group_entity = role_logic.getGroupEntityFromScopePath(
-        group_logic.logic, kwargs['scope_path'])
+        group_logic.logic, django_args['scope_path'])
 
     if not group_entity:
       raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
 
     # TODO(ljvderijk) check if the group is active
     return
-  return wrapper
 
+  def checkCanCreateFromRequest(self, django_args, role_name):
+    """Raises an alternate HTTP response if the specified request does not exist
+       or if it's state is not group_accepted.
+    """
 
-def checkCanCreateFromRequest(role_name):
-  """Raises an alternate HTTP response if the specified request does not exist
-     or if it's state is not group_accepted. 
-  """
-
-  def wrapper(kwargs):
-    checkAgreesToSiteToS(kwargs)
+    self.checkAgreesToSiteToS(django_args)
 
     user_entity = user_logic.getForCurrentAccount()
 
-    if user_entity.link_id != kwargs['link_id']:
-      deny(kwargs)
+    if user_entity.link_id != django_args['link_id']:
+      deny(django_args)
 
-    fields = {'link_id': kwargs['link_id'],
-        'scope_path': kwargs['scope_path'],
+    fields = {'link_id': django_args['link_id'],
+        'scope_path': django_args['scope_path'],
         'role': role_name}
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
     if request_entity.state != 'group_accepted':
       # TODO tell the user that this request has not been accepted yet
-      deny(kwargs)
+      deny(django_args)
 
     return
 
-  return wrapper
+  def checkCanProcessRequest(self, django_args, role_name):
+    """Raises an alternate HTTP response if the specified request does not exist
+       or if it's state is completed or denied.
+    """
 
-
-def checkCanProcessRequest(role_name):
-  """Raises an alternate HTTP response if the specified request does not exist
-     or if it's state is completed or denied. 
-  """
-
-  def wrapper(kwargs):
-
-    fields = {'link_id': kwargs['link_id'],
-        'scope_path': kwargs['scope_path'],
+    fields = {'link_id': django_args['link_id'],
+        'scope_path': django_args['scope_path'],
         'role': role_name}
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
     if request_entity.state in ['completed', 'denied']:
       # TODO tell the user that this request has been processed
-      deny(kwargs)
+      deny(django_args)
 
     return
-  
-  return wrapper
 
+  def checkIsMyGroupAcceptedRequest(self, django_args):
+    """Raises an alternate HTTP response if the specified request does not exist
+       or if it's state is not group_accepted.
+    """
 
-def checkIsMyGroupAcceptedRequest(kwargs):
-  """Raises an alternate HTTP response if the specified request does not exist
-     or if it's state is not group_accepted.
-  """
+    self.checkAgreesToSiteToS(django_args)
 
-  checkAgreesToSiteToS(kwargs)
+    user_entity = user_logic.getForCurrentAccount()
 
-  user_entity = user_logic.getForCurrentAccount()
+    if user_entity.link_id != django_args['link_id']:
+      # not the current user's request
+      return deny(django_args)
 
-  if user_entity.link_id != kwargs['link_id']:
-    # not the current user's request
-    return deny(kwargs)
+    fields = {'link_id': django_args['link_id'],
+              'scope_path': django_args['scope_path'],
+              'role': django_args['role']}
 
-  fields = {'link_id': kwargs['link_id'],
-            'scope_path': kwargs['scope_path'],
-            'role': kwargs['role']}
+    request_entity = request_logic.getForFields(fields, unique=True)
 
-  request_entity = request_logic.getForFields(fields, unique=True)
+    if not request_entity:
+      # TODO return 404
+      return deny(django_args)
 
-  if not request_entity:
-    # TODO return 404
-    return deny(kwargs)
+    if request_entity.state != 'group_accepted':
+      return deny(django_args)
 
-  if request_entity.state != 'group_accepted':
-    return deny(kwargs)
-
-  return
-
-
-def checkIsHost(kwargs):
-  """Raises an alternate HTTP response if Google Account has no Host entity.
-
-  Args:
-    request: a Django HTTP request
-
-  Raises:
-    AccessViolationResponse:
-    * if User is not already a Host, or
-    * if User has not agreed to the site-wide ToS, or
-    * if no User exists for the logged-in Google Account, or
-    * if the user is not even logged in
-  """
-
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  checkAgreesToSiteToS(kwargs)
-
-  user = user_logic.getForCurrentAccount()
-
-  fields = {'user': user,
-            'state': 'active'}
-
-  host = host_logic.getForFields(fields, unique=True)
-
-  if host:
     return
 
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a Program Administrator '}
+  @denySidebar
+  def checkIsHost(self, django_args):
+    """Raises an alternate HTTP response if Google Account has no Host entity.
 
-  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+    Args:
+      request: a Django HTTP request
 
+    Raises:
+      AccessViolationResponse:
+      * if User is not already a Host, or
+      * if User has not agreed to the site-wide ToS, or
+      * if no User exists for the logged-in Google Account, or
+      * if the user is not even logged in
+    """
 
-def checkIsHostForSponsor(kwargs):
-  """Raises an alternate HTTP response if Google Account has no Host entity
-     for the specified Sponsor.
-
-  Args:
-    request: a Django HTTP request
-
-  Raises:
-    AccessViolationResponse:
-    * if User is not already a Host for the specified program, or
-    * if User has not agreed to the site-wide ToS, or
-    * if no User exists for the logged-in Google Account, or
-    * if the user is not even logged in
-  """
-
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  checkAgreesToSiteToS(kwargs)
-
-  user = user_logic.getForCurrentAccount()
-
-  if kwargs.get('scope_path'):
-    scope_path = kwargs['scope_path']
-  else:
-    scope_path = kwargs['link_id']
-
-  fields = {'user': user,
-            'scope_path': scope_path,
-            'state': 'active'}
-
-  host = host_logic.getForFields(fields, unique=True)
-
-  if host:
-    return
-
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a Program Administrator '}
-
-  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-
-def checkIsClubAdminForClub(kwargs):
-  """Returns an alternate HTTP response if Google Account has no Club Admin
-     entity for the specified club.
-
-  Args:
-    kwargs: a dictionary with django's arguments
-
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if Club Admin exists for the specified club, or a subclass of
-    django.http.HttpResponse which contains the alternate response
-    should be returned by the calling view.
-  """
-
-  try:
-    # if the current user is invited to create a host profile we allow access
-    checkIsDeveloper(kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  checkAgreesToSiteToS(kwargs)
-
-  user = user_logic.getForCurrentAccount()
-
-  if kwargs.get('scope_path'):
-    scope_path = kwargs['scope_path']
-  else:
-    scope_path = kwargs['link_id']
-
-  fields = {'user': user,
-            'scope_path': scope_path,
-            'state': 'active'}
-
-  club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
-
-  if club_admin_entity:
-    return
-
-  login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-      'role': 'a Club Admin for this Club'}
-
-  raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-
-def checkIsApplicationAccepted(app_logic):
-  """Returns an alternate HTTP response if Google Account has no Club App
-     entity for the specified Club.
-
-  Args:
-    kwargs: a dictionary with django's arguments
-
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if Club App  exists for the specified program, or a subclass
-    of django.http.HttpResponse which contains the alternate response
-    should be returned by the calling view.
-  """
-
-  def wrapper(kwargs):
     try:
       # if the current user is a developer we allow access
-      checkIsDeveloper(kwargs)
+      self.checkIsDeveloper(django_args)
       return
     except out_of_band.Error:
       pass
 
-    checkAgreesToSiteToS(kwargs)
+    self.checkAgreesToSiteToS(django_args)
+
+    user = user_logic.getForCurrentAccount()
+
+    if django_args.get('scope_path'):
+      scope_path = django_args['scope_path']
+    else:
+      scope_path = django_args['link_id']
+
+    fields = {'user': user,
+              'scope_path': scope_path,
+              'state': 'active'}
+
+    host = host_logic.getForFields(fields, unique=True)
+
+    self.checkAgreesToSiteToS(django_args)
+
+    user = user_logic.getForCurrentAccount()
+
+    fields = {'user': user,
+              'state': 'active'}
+
+    host = host_logic.getForFields(fields, unique=True)
+
+    if host:
+      return
+
+    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': 'a Program Administrator '}
+
+    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  def checkIsHostForSponsor(self, django_args):
+    """Raises an alternate HTTP response if Google Account has no Host entity
+       for the specified Sponsor.
+
+    Args:
+      request: a Django HTTP request
+
+    Raises:
+      AccessViolationResponse:
+      * if User is not already a Host for the specified program, or
+      * if User has not agreed to the site-wide ToS, or
+      * if no User exists for the logged-in Google Account, or
+      * if the user is not even logged in
+    """
+
+    self.checkAgreesToSiteToS(django_args)
+
+    user = user_logic.getForCurrentAccount()
+
+    if django_args.get('scope_path'):
+      scope_path = django_args['scope_path']
+    else:
+      scope_path = django_args['link_id']
+
+    fields = {'user': user,
+              'scope_path': scope_path,
+              'state': 'active'}
+
+    host = host_logic.getForFields(fields, unique=True)
+
+    if host:
+      return
+
+    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': 'a Program Administrator '}
+
+    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  def checkIsClubAdminForClub(self, django_args):
+    """Returns an alternate HTTP response if Google Account has no Club Admin
+       entity for the specified club.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
+
+    Returns:
+      None if Club Admin exists for the specified club, or a subclass of
+      django.http.HttpResponse which contains the alternate response
+      should be returned by the calling view.
+    """
+
+    try:
+      # if the current user is invited to create a host profile we allow access
+      checkIsDeveloper(django_args)
+      return
+    except out_of_band.Error:
+      pass
+
+    self.checkAgreesToSiteToS(django_args)
+
+    user = user_logic.getForCurrentAccount()
+
+    if django_args.get('scope_path'):
+      scope_path = django_args['scope_path']
+    else:
+      scope_path = django_args['link_id']
+
+    fields = {'user': user,
+              'scope_path': scope_path,
+              'state': 'active'}
+
+    club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
+
+    if club_admin_entity:
+      return
+
+    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': 'a Club Admin for this Club'}
+
+    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  def checkIsApplicationAccepted(self, django_args, app_logic):
+    """Returns an alternate HTTP response if Google Account has no Club App
+       entity for the specified Club.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
+
+    Returns:
+      None if Club App  exists for the specified program, or a subclass
+      of django.http.HttpResponse which contains the alternate response
+      should be returned by the calling view.
+    """
+
+    try:
+      # if the current user is a developer we allow access
+      checkIsDeveloper(django_args)
+      return
+    except out_of_band.Error:
+      pass
+
+    self.checkAgreesToSiteToS(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -515,80 +557,75 @@ def checkIsApplicationAccepted(app_logic):
       return
 
     # TODO(srabbelier) Make this give a proper error message
-    deny(kwargs)
+    deny(django_args)
 
-  return wrapper
+  def checkIsMyNotification(self, django_args):
+    """Returns an alternate HTTP response if this request is for
+       a Notification belonging to the current user.
 
+    Args:
+      django_args: a dictionary with django's arguments
 
-def checkIsMyNotification(kwargs):
-  """Returns an alternate HTTP response if this request is for 
-     a Notification belonging to the current user.
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    Returns:
+      None if the current User is allowed to access this Notification.
+    """
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if the current User is allowed to access this Notification.
-  """
-  
-  try:
-    # if the current user is a developer we allow access
-    checkIsDeveloper(kwargs)
-    return
-  except out_of_band.Error:
-    pass
-
-  checkAgreesToSiteToS(kwargs)
-
-  properties = dicts.filter(kwargs, ['link_id', 'scope_path'])
-
-  notification = notification_logic.getForFields(properties, unique=True)
-  user = user_logic.getForCurrentAccount()
-
-  # We need to check to see if the key's are equal since the User
-  # objects are different and the default __eq__ method does not check
-  # if the keys are equal (which is what we want).
-  if user.key() == notification.scope.key():
-    return None
-
-  # TODO(ljvderijk) Make this give a proper error message
-  deny(kwargs)
-
-
-def checkIsMyApplication(app_logic):
-  """Returns an alternate HTTP response if this request is for 
-     a Application belonging to the current user.
-
-  Args:
-    request: a Django HTTP request
-
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if the current User is allowed to access this Application.
-  """
-
-  def wrapper(kwargs):
     try:
       # if the current user is a developer we allow access
-      checkIsDeveloper(kwargs)
+      checkIsDeveloper(django_args)
       return
     except out_of_band.Error:
       pass
 
-    checkAgreesToSiteToS(kwargs)
+    self.checkAgreesToSiteToS(django_args)
 
-    properties = dicts.filter(kwargs, ['link_id'])
+    properties = dicts.filter(django_args, ['link_id', 'scope_path'])
+
+    notification = notification_logic.getForFields(properties, unique=True)
+    user = user_logic.getForCurrentAccount()
+
+    # We need to check to see if the key's are equal since the User
+    # objects are different and the default __eq__ method does not check
+    # if the keys are equal (which is what we want).
+    if user.key() == notification.scope.key():
+      return None
+
+    # TODO(ljvderijk) Make this give a proper error message
+    deny(django_args)
+
+  def checkIsMyApplication(self, django_args, app_logic):
+    """Returns an alternate HTTP response if this request is for
+       a Application belonging to the current user.
+
+    Args:
+      request: a Django HTTP request
+
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
+
+    Returns:
+      None if the current User is allowed to access this Application.
+    """
+
+    try:
+      # if the current user is a developer we allow access
+      self.checkIsDeveloper(django_args)
+      return
+    except out_of_band.Error:
+      pass
+
+    self.checkAgreesToSiteToS(django_args)
+
+    properties = dicts.filter(django_args, ['link_id'])
 
     application = app_logic.logic.getForFields(properties, unique=True)
-    
+
     if not application:
-      deny(kwargs)
-    
+      deny(django_args)
+
     user = user_logic.getForCurrentAccount()
 
     # We need to check to see if the key's are equal since the User
@@ -598,84 +635,76 @@ def checkIsMyApplication(app_logic):
       return None
 
     # TODO(srabbelier) Make this give a proper error message
-    deny(kwargs)
+    deny(django_args)
 
-  return wrapper
+  def checkIsMyActiveRole(self, django_args, role_logic):
+    """Returns an alternate HTTP response if there is no active role found for
+       the current user using the given role_logic.
 
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
 
-def checkIsMyActiveRole(role_logic):
-  """Returns an alternate HTTP response if there is no active role found for
-     the current user using the given role_logic.
+    Returns:
+      None if the current User has no active role for the given role_logic.
+    """
 
-   Raises:
-     AccessViolationResponse: if the required authorization is not met
-
-  Returns:
-    None if the current User has no active role for the given role_logic.
-  """
-
-  def wrapper(kwargs):
     try:
       # if the current user is a developer we allow access
-      checkIsDeveloper(kwargs)
+      checkIsDeveloper(django_args)
       return
     except out_of_band.Error:
       pass
 
     user = user_logic.getForCurrentAccount()
 
-    if not user or user.link_id != kwargs['link_id']:
+    if not user or user.link_id != django_args['link_id']:
       # not my role
-      deny(kwargs)
+      deny(django_args)
 
-    fields = {'link_id': kwargs['link_id'],
-              'scope_path': kwargs['scope_path']
+    fields = {'link_id': django_args['link_id'],
+              'scope_path': django_args['scope_path']
               }
 
     role_entity = role_logic.logic.getForFields(fields, unique=True)
 
     if not role_entity:
       # no role found
-      deny(kwargs)
-      
+      deny(django_args)
+
     if role_entity.state == 'active':
       # this role exist and is active
       return
     else:
       # this role is not active
-      deny(kwargs)
+      deny(django_args)
 
-  return wrapper
+  def checkHasPickGetArgs(self, django_args):
+    """Raises an alternate HTTP response if the request misses get args.
 
+    Args:
+      django_args: a dictionary with django's arguments
 
-def checkHasPickGetArgs(kwargs):
-  """Raises an alternate HTTP response if the request misses get args.
+    Raises:
+      AccessViolationResponse:
+      * if continue is not in request.GET
+      * if field is not in request.GET
+    """
 
-  Args:
-    kwargs: a dictionary with django's arguments
+    get_args = django_args.get('GET', {})
 
-  Raises:
-    AccessViolationResponse:
-    * if continue is not in request.GET
-    * if field is not in request.GET
-  """
+    if 'continue' in get_args and 'field' in get_args:
+      return
 
-  get_args = kwargs.get('GET', {})
+    #TODO(SRabbelier) inform user that return_url and field are required
+    deny(django_args)
 
-  if 'continue' in get_args and 'field' in get_args:
-    return
+  def checkIsDocumentPublic(self, django_args):
+    """Checks whether a document is public.
 
-  #TODO(SRabbelier) inform user that return_url and field are required
-  deny(kwargs)
+    Args:
+      django_args: a dictionary with django's arguments
+    """
 
-
-def checkIsDocumentPublic(kwargs):
-  """Checks whether a document is public.
-
-  Args:
-    kwargs: a dictionary with django's arguments
-  """
-
-  # TODO(srabbelier): A proper check needs to be done to see if the document
-  # is public or not, probably involving analysing it's scope or such.
-  allow(kwargs)
+    # TODO(srabbelier): A proper check needs to be done to see if the document
+    # is public or not, probably involving analysing it's scope or such.
+    allow(django_args)

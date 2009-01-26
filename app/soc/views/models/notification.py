@@ -82,14 +82,14 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['unspecified'] = [access.deny]
-    rights['edit'] = [access.deny]
-    rights['show'] = [access.checkIsMyNotification]
-    rights['delete'] = [access.checkIsMyNotification]
-    rights['list'] = [access.checkAgreesToSiteToS]
+    rights = access.Checker(params)
+    rights['unspecified'] = ['deny']
+    rights['edit'] = ['deny']
+    rights['show'] = ['checkIsMyNotification']
+    rights['delete'] = ['checkIsMyNotification']
+    rights['list'] = ['checkAgreesToSiteToS']
     # create is developer only for the time being to test functionality
-    rights['create'] = [access.checkIsDeveloper]
+    rights['create'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = notification_logic.logic

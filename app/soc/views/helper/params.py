@@ -70,21 +70,17 @@ def constructParams(params):
 
   logic = params['logic']
 
-  rights = {}
+  rights = access.Checker(params)
   rights['unspecified'] = []
-  rights['any_access'] = [access.checkIsLoggedIn]
-  rights['show'] = [access.checkAgreesToSiteToS]
-  rights['create'] = [access.checkIsDeveloper]
-  rights['edit'] = [access.checkIsDeveloper]
-  rights['delete'] = [access.checkIsDeveloper]
-  rights['list'] = [access.checkIsDeveloper]
-  rights['pick'] = [access.checkHasPickGetArgs]
-
-  if 'rights' in params:
-    rights = dicts.merge(params['rights'], rights)
+  rights['any_access'] = ['checkIsLoggedIn']
+  rights['show'] = ['checkAgreesToSiteToS']
+  rights['create'] = ['checkIsDeveloper']
+  rights['edit'] = ['checkIsDeveloper']
+  rights['delete'] = ['checkIsDeveloper']
+  rights['list'] = ['checkIsDeveloper']
+  rights['pick'] = ['checkHasPickGetArgs']
 
   new_params = {}
-  new_params['rights'] = rights
   new_params['scope_logic'] = logic.getScopeLogic()
 
   if 'name_short' not in params:
@@ -213,6 +209,9 @@ def constructParams(params):
 
   if not 'key_fields_pattern' in params:
     params['key_fields_pattern'] = getKeyFieldsPattern(params)
+
+  # merge already done by access.Checker
+  params['rights'] = rights
 
   return params
 

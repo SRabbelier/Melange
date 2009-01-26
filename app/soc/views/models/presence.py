@@ -56,8 +56,8 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['home'] = [access.allow]
+    rights = access.Checker(params)
+    rights['home'] = ['allow']
 
     new_params = {}
     new_params['rights'] = rights

@@ -55,14 +55,14 @@ class View(role.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['create'] = [access.checkIsHost]
-    rights['edit'] = [access.checkIsMyActiveRole(soc.logic.models.host)]
-    rights['invite'] = [access.checkIsHost]
-    rights['list'] = [access.checkIsDeveloper]
-    rights['accept_invite'] = [access.checkCanCreateFromRequest('host')]
-    rights['process_request'] = [access.checkIsHost,
-        access.checkCanProcessRequest('host')]
+    rights = access.Checker(params)
+    rights['create'] = ['checkIsHost']
+    rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.host)]
+    rights['invite'] = ['checkIsHost']
+    rights['list'] = ['checkIsDeveloper']
+    rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
+    rights['process_request'] = ['checkIsHost',
+        ('checkCanProcessRequest','host')]
 
     new_params = {}
     new_params['rights'] = rights

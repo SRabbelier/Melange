@@ -112,13 +112,13 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['unspecified'] = [access.deny]
-    rights['any_access'] = [access.allow]
-    rights['edit'] = [access.checkIsLoggedIn]
-    rights['roles'] = [access.checkAgreesToSiteToS]
-    rights['signIn'] = [access.checkNotLoggedIn]
-    rights['notification'] = [access.checkAgreesToSiteToS]
+    rights = access.Checker(params)
+    rights['unspecified'] = ['deny']
+    rights['any_access'] = ['allow']
+    rights['edit'] = ['checkIsLoggedIn']
+    rights['roles'] = ['checkAgreesToSiteToS']
+    rights['signIn'] = ['checkNotLoggedIn']
+    rights['notification'] = ['checkAgreesToSiteToS']
 
     new_params = {}
     new_params['rights'] = rights

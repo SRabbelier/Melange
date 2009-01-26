@@ -49,14 +49,14 @@ class View(role.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['create'] = [access.checkIsDeveloper]
-    rights['edit'] = [access.checkIsMyActiveRole(soc.logic.models.club_admin)]
-    rights['delete'] = [access.checkIsDeveloper]
-    rights['invite'] = [access.checkIsClubAdminForClub]
-    rights['accept_invite'] = [access.checkCanCreateFromRequest('club_admin')]
-    rights['process_request'] = [access.checkIsClubAdminForClub,
-        access.checkCanProcessRequest('club_admin')]
+    rights = access.Checker(params)
+    rights['create'] = ['checkIsDeveloper']
+    rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.club_admin)]
+    rights['delete'] = ['checkIsDeveloper']
+    rights['invite'] = ['checkIsClubAdminForClub']
+    rights['accept_invite'] = ['checkCanCreateFromRequest', 'club_admin']
+    rights['process_request'] = ['checkIsClubAdminForClub',
+        ('checkCanProcessRequest', 'club_admin')]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_admin.logic

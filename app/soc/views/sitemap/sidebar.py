@@ -140,7 +140,7 @@ def getSidebarMenu(items, params):
 
   for url, menu_text, access_type in items:
     try:
-      access.checkAccess(access_type, rights, kwargs)
+      rights.checkAccess(access_type, kwargs)
       submenus.append({'url': url, 'title': menu_text})
     except out_of_band.Error:
       pass

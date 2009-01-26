@@ -55,13 +55,13 @@ class View(group_app.View):
       params: a dict with params for this View
     """
 
-    rights = {}
-    rights['create'] = [access.checkAgreesToSiteToS]
-    rights['delete'] = [access.checkIsMyApplication(club_app_logic)]
-    rights['edit'] = [access.checkIsMyApplication(club_app_logic)]
-    rights['list'] = [access.checkAgreesToSiteToS]
-    rights['public'] = [access.checkIsMyApplication(club_app_logic)]
-    rights['review'] = [access.checkIsHost]
+    rights = access.Checker(params)
+    rights['create'] = ['checkAgreesToSiteToS']
+    rights['delete'] = [('checkIsMyApplication', club_app_logic)]
+    rights['edit'] = [('checkIsMyApplication', club_app_logic)]
+    rights['list'] = ['checkAgreesToSiteToS']
+    rights['public'] = [('checkIsMyApplication', club_app_logic)]
+    rights['review'] = ['checkIsHost']
 
     new_params = {}
 

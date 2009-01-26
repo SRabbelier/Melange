@@ -45,14 +45,14 @@ class View(group.View):
       params: a dict with params for this View
     """    
 
-    rights = {}
-    rights['create'] = [access.checkIsDeveloper]
-    rights['edit'] = [access.checkIsHostForSponsor]
-    rights['delete'] = [access.checkIsDeveloper]
-    rights['home'] = [access.checkIsHostForSponsor]
-    rights['list'] = [access.checkIsDeveloper]
-    rights['list_requests'] = [access.checkIsHostForSponsor]
-    rights['list_roles'] = [access.checkIsHostForSponsor]
+    rights = access.Checker(params)
+    rights['create'] = ['checkIsDeveloper']
+    rights['edit'] = ['checkIsHostForSponsor']
+    rights['delete'] = ['checkIsDeveloper']
+    rights['home'] = ['checkIsHostForSponsor']
+    rights['list'] = ['checkIsDeveloper']
+    rights['list_requests'] = ['checkIsHostForSponsor']
+    rights['list_roles'] = ['checkIsHostForSponsor']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic

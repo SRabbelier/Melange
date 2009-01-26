@@ -73,6 +73,13 @@ class Logic(base.Logic):
       sidebar.flush(entity.user.account)
 
     return True
+  
+  def _onCreate(self, entity):
+    """Flush the sidebar cache when a new active role entity has been created.
+    """
+
+    if entity.state == 'active':
+      sidebar.flush(entity.user.account)
 
 
 logic = Logic()

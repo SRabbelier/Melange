@@ -44,14 +44,14 @@ def addMenu(callback):
 
 
 @soc.cache.sidebar.cache
-def getSidebar():
+def getSidebar(id, user):
   """Constructs a sidebar for the current user.
   """
 
   sidebar = []
 
   for callback in SIDEBAR:
-    menus = callback()
+    menus = callback(id, user)
 
     for menu in (menus if menus else []):
       sidebar.append(menu)
@@ -102,7 +102,7 @@ def getSidebarItems(params):
   return result
 
 
-def getSidebarMenu(items, params):
+def getSidebarMenu(id, user, items, params):
   """Returns an dictionary with one sidebar entry.
 
   Items is expected to be a tuple with an url, a menu_text, and an
@@ -138,6 +138,9 @@ def getSidebarMenu(items, params):
   args = SIDEBAR_ACCESS_ARGS
   kwargs = SIDEBAR_ACCESS_KWARGS
 
+  # reset and pre-fill the Checker's cache
+  rights.setCurrentUser(id, user)
+
   for url, menu_text, access_type in items:
     try:
       rights.checkAccess(access_type, kwargs)
@@ -148,7 +151,7 @@ def getSidebarMenu(items, params):
   return submenus
 
 
-def getSidebarMenus(params=None):
+def getSidebarMenus(id, user, params=None):
   """Constructs the default sidebar menu for a View.
 
   Calls getSidebarItems to retrieve the items that should be in the
@@ -160,7 +163,7 @@ def getSidebarMenus(params=None):
   """
 
   items = getSidebarItems(params)
-  submenus = getSidebarMenu(items, params)
+  submenus = getSidebarMenu(id, user, items, params)
 
   if not submenus:
     return

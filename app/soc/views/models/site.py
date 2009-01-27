@@ -87,13 +87,13 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
-  def getSidebarMenus(self, params=None):
+  def getSidebarMenus(self, id, user, params=None):
     """See base.View.getSidebarMenus.
 
     Returns a custom sidebar entry for the 'site' singleton.
     """
 
-    entity = self._logic.getFromFields(link_id=self._logic.DEF_SITE_LINK_ID)
+    entity = self._logic.getSingleton()
 
     submenus = []
 
@@ -104,7 +104,7 @@ class View(presence.View):
     new_params['sidebar_additional'] = submenus
 
     params = dicts.merge(params, new_params)
-    return super(View, self).getSidebarMenus(params=params)
+    return super(View, self).getSidebarMenus(id, user, params=params)
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.

@@ -252,13 +252,11 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-  def getSidebarMenus(self, params=None):
+  def getSidebarMenus(self, id, user, params=None):
     """See base.View.getSidebarMenus().
     """
 
     link_title = ugettext('Notifications')
-
-    user = user_logic.getForCurrentAccount()
 
     filter = {
         'scope': user,
@@ -279,7 +277,7 @@ class View(base.View):
 
     params = dicts.merge(params, new_params)
 
-    return super(View, self).getSidebarMenus(params=params)
+    return super(View, self).getSidebarMenus(id, user, params=params)
 
 
 view = View()

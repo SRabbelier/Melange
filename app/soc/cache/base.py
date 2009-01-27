@@ -43,7 +43,7 @@ def getCacher(get, put):
         return result
 
       result = func(*args, **kwargs)
-      put(result)
+      put(result, *args, **kwargs)
       return result
 
     return wrapper

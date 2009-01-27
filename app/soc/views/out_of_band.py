@@ -32,7 +32,7 @@ class Error(Exception):
   TEMPLATE_NAME = 'error.html'
   DEF_TEMPLATE = 'soc/error.html'
 
-  def __init__(self, message_fmt, context=None, **response_args):
+  def __init__(self, message_fmt=None, context=None, **response_args):
     """Constructor used to set response message and HTTP response arguments.
   
     Args:
@@ -45,6 +45,9 @@ class Error(Exception):
         django.http.HttpResponse; the most commonly used is 'status' to
         set the HTTP status code for the response
     """
+
+    if not message_fmt:
+      message_fmt = ""
 
     self.message_fmt = message_fmt
     self.context = context

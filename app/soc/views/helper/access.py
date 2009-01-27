@@ -32,6 +32,7 @@ __authors__ = [
 
 
 from google.appengine.api import users
+from google.appengine.api import memcache
 
 from django.core import urlresolvers
 from django.utils.translation import ugettext
@@ -117,6 +118,9 @@ class Checker(object):
 
     base = params.get('rights') if params else None
     self.rights = base.rights if base else {}
+    self.id = None
+    self.user = None
+    self.cached_rights = {}
 
   def __setitem__(self, key, value):
     """Sets a value only if no old value exists.
@@ -140,13 +144,80 @@ class Checker(object):
       # Be nice an repack so that it is always a list with tuples
       if isinstance(i, tuple):
         name, arg = i
-        tmp = (getattr(self, name), (arg if isinstance(arg, list) else [arg]))
+        tmp = (name, (arg if isinstance(arg, list) else [arg]))
         result.append(tmp)
       else:
-        tmp = (getattr(self, i), [])
+        tmp = (i, [])
         result.append(tmp)
 
     return result
+
+  def key(self, checker_name):
+    """Returns the key for the specified checker for the current user.
+    """
+
+    return "%s.%s" % (self.id, checker_name)
+
+  def put(self, checker_name, value):
+    """Puts the result for the specified checker in the cache.
+    """
+
+    retention = 30
+
+    memcache_key = self.key(checker_name)
+    memcache.add(memcache_key, value, retention)
+
+  def get(self, checker_name):
+    """Retrieves the result for the specified checker from cache.
+    """
+
+    memcache_key = self.key(checker_name)
+    return memcache.get(memcache_key)
+
+  def doCheck(self, checker_name, django_args, args):
+    """Runs the specified checker with the specified arguments.
+    """
+
+    checker = getattr(self, checker_name)
+    checker(django_args, *args)
+
+  def doCachedCheck(self, checker_name, django_args, args):
+    """Retrieves from cache or runs the specified checker.
+    """
+
+    cached = self.get(checker_name)
+
+    if cached is None:
+      try:
+        self.doCheck(checker_name, django_args, args)
+        self.put(checker_name, True)
+        return
+      except out_of_band.Error, e:
+        self.put(checker_name, e)
+        raise
+
+    if cached is True:
+      return
+
+    # re-raise the cached exception
+    raise cached
+
+  def check(self, use_cache, checker_name, django_args, args):
+    """Runs the checker, optionally using the cache.
+    """
+
+    if use_cache:
+      self.doCachedCheck(checker_name, django_args, args)
+    else:
+      self.doCheck(checker_name, django_args, args)
+
+  def setCurrentUser(self, id, user):
+    """Sets up everything for the current user.
+    """
+
+    self.id = id
+    self.user = user
+    self.cached_rights = {}
 
   def checkAccess(self, access_type, django_args):
     """Runs all the defined checks for the specified type.
@@ -167,20 +238,20 @@ class Checker(object):
       value are called.
     """
 
-    self.id = users.get_current_user()
+    use_cache = django_args.get('SIDEBAR_CALLING')
 
     # Call each access checker
-    for check, args in self['any_access']:
-      check(django_args, *args)
+    for checker_name, args in self['any_access']:
+      self.check(use_cache, checker_name, django_args, args)
 
     if access_type not in self.rights:
-      for check, args in self['unspecified']:
-        # No checks defined, so do the 'generic' checks and bail out
-        check(django_args, *args)
+      # No checks defined, so do the 'generic' checks and bail out
+      for checker_name, args in self['unspecified']:
+        self.check(use_cache, checker_name, django_args, args)
       return
 
-    for check, args in self[access_type]:
-      check(django_args, *args)
+    for checker_name, args in self[access_type]:
+      self.check(use_cache, checker_name, django_args, args)
 
   def allow(self, django_args):
     """Never raises an alternate HTTP response.  (an access no-op, basically).
@@ -253,12 +324,10 @@ class Checker(object):
 
     self.checkIsLoggedIn(django_args)
 
-    user = user_logic.getForCurrentAccount()
-
-    if not user:
+    if not self.user:
       raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
-    if user_logic.agreesToSiteToS(user):
+    if user_logic.agreesToSiteToS(self.user):
       return
 
     # Would not reach this point of site-wide ToS did not exist, since

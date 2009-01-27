@@ -28,34 +28,33 @@ from google.appengine.api import users
 import soc.cache.base
 
 
-def key(user):
+def key(id):
   """Returns the memcache key for the user's sidebar
   """
 
-  return 'sidebar_for_%s' % repr(user)
+  return 'sidebar_for_%s' % repr(id)
 
 
-def get():
+def get(id, user):
   """Retrieves the sidebar for the specified user from the memcache
   """
 
-  user = users.get_current_user()
-  return memcache.get(key(user))
+  memcache_key = key(id)
+  return memcache.get(memcache_key)
 
 
-def put(sidebar):
+def put(sidebar, id, user):
   """Sets the sidebar for the specified user in the memcache
 
   Args:
     sidebar: the sidebar to be cached
   """
 
-  # Store sidebar for an hour since new programs might get added
-  # etc. etc.
-  retention = 60*60
+  # Store sidebar for ten minutes since new programs might get added
+  retention = 10*60
 
-  user = users.get_current_user()
-  memcache.add(key(user), sidebar, retention)
+  memcache_key = key(id)
+  memcache.add(memcache_key, sidebar, retention)
 
 
 def flush(user=None):
@@ -68,7 +67,8 @@ def flush(user=None):
   if not user:
     user = users.get_current_user()
 
-  memcache.delete(key(user))
+  memcache_key = key(user)
+  memcache.delete(memcache_key)
 
 
 # define the cache function

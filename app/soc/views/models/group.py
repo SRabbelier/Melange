@@ -262,7 +262,7 @@ class View(presence.View):
     role_views = self._params['role_views']
     role_views[role_name] = role_view
 
-  def getExtraMenus(self, params=None):
+  def getExtraMenus(self, id, user, params=None):
     """Returns the extra menu's for this view.
 
     A menu item is generated for each group that the user has an active
@@ -276,11 +276,8 @@ class View(presence.View):
     params = dicts.merge(params, self._params)
     logic = params['logic']
 
-    # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
-
     # set fields to match every active role this user has
-    fields = {'user': user_entity,
+    fields = {'user': user,
               'state' : 'active'}
 
     # get the role views and start filling group_entities

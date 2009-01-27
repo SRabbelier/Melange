@@ -116,7 +116,7 @@ class View(presence.View):
     timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
     return timeline
 
-  def getExtraMenus(self, params=None):
+  def getExtraMenus(self, id, user, params=None):
     """Returns the extra menu's for this view.
 
     A menu item is generated for each program that is currently

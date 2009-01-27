@@ -97,9 +97,15 @@ def check_access(func):
     check_kwargs = kwargs.copy()
     context = responses.getUniversalContext(request)
 
+    id = context['account']
+    user = context['user']
+
     check_kwargs['GET'] = request.GET
     check_kwargs['POST'] = request.POST
     check_kwargs['context'] = context
+
+    # reset and pre-fill the Checker's cache
+    rights.setCurrentUser(id, user)
 
     # Do the access check dance
     try:

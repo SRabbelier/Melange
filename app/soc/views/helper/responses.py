@@ -96,21 +96,26 @@ def getUniversalContext(request):
   """
 
   account = users.get_current_user()
+  user = None
+  is_admin = False
 
   context = {}
   context['request'] = request
 
   if account:
-    context['account'] = account
-    context['user'] = soc.logic.models.user.logic.getForFields(
+    user = soc.logic.models.user.logic.getForFields(
         {'account': account}, unique=True)
-    context['is_admin'] = accounts.isDeveloper(account=account)
+    is_admin = accounts.isDeveloper(account=account)
+
+  context['account'] = account
+  context['user'] = user
+  context['is_admin'] = is_admin
 
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
 
-  context['sidebar_menu_items'] = sidebar.getSidebar()
+  context['sidebar_menu_items'] = sidebar.getSidebar(account, user)
 
   context['soc_release'] = release.RELEASE_TAG
   context['gae_version'] = system.getAppVersion()

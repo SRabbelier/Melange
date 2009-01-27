@@ -47,6 +47,7 @@ def main():
   from google.appengine.api import mail_stub
   from google.appengine.api import user_service_stub
   from google.appengine.api import urlfetch_stub
+  from google.appengine.api.memcache import memcache_stub
   apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
   apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
                                           urlfetch_stub.URLFetchServiceStub())
@@ -54,6 +55,8 @@ def main():
                                           user_service_stub.UserServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('datastore',
     datastore_file_stub.DatastoreFileStub('your_app_id', None, None))
+  apiproxy_stub_map.apiproxy.RegisterStub('memcache',
+    memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
   import django.test.utils
   django.test.utils.setup_test_environment()

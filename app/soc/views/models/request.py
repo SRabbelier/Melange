@@ -72,6 +72,7 @@ class View(base.View):
     rights['process_invite'] = ['checkIsMyGroupAcceptedRequest']
     rights['list'] = ['checkIsDeveloper']
     rights['delete'] = ['checkIsDeveloper']
+    rights['roles'] = ['checkIsUser']
 
     new_params = {}
     new_params['rights'] = rights

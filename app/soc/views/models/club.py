@@ -87,7 +87,7 @@ class View(group.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['sidebar_additional'] = [
-        ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'list_apply'),]
+        ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
 
     new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {

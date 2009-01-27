@@ -24,6 +24,8 @@ __authors__ = [
     ]
 
 
+from google.appengine.api import users
+
 from django import forms
 
 from soc.logic import validate
@@ -57,6 +59,27 @@ def clean_existing_user(field_name):
     return user_entity
   return wrapped
 
+
+def clean_user_not_exist(field_name):
+  """Check if the field_name value is a valid link_id and a user with the
+     link id does not exist.
+  """ 
+
+  def wrapped(self):
+    link_id = self.cleaned_data.get(field_name).lower()
+  
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+  
+    user_entity = user_logic.logic.getForFields({'link_id' : link_id}, unique=True)
+  
+    if user_entity:
+      # user exists already
+      raise forms.ValidationError("There is already a user with this link id.")
+  
+    return link_id
+  return wrapped
+
 def clean_users_not_same(field_name):
   """Check if the field_name field is a valid user and is not 
      equal to the current user.
@@ -74,6 +97,40 @@ def clean_users_not_same(field_name):
       raise forms.ValidationError("You cannot enter yourself here")
     
     return user_entity
+  return wrapped
+
+
+def clean_user_account(field_name):
+  """Returns the User with the given field_name value.
+  """
+  def wrapped(self):
+    email_adress = self.cleaned_data.get(field_name).lower()
+
+    # get the user account for this email
+    user_account = users.User(email_adress)
+
+    return user_account
+  return wrapped
+
+
+def clean_user_account_not_in_use(field_name):
+  """Check if the field_name value contains an email 
+     address that hasn't been used for an existing account.
+  """ 
+
+  def wrapped(self):
+    email_adress = self.cleaned_data.get(field_name).lower()
+
+    # get the user account for this email and check if it's in use
+    user_account = users.User(email_adress)
+
+    fields = {'account' : user_account}
+    user_entity = user_logic.logic.getForFields(fields, unique=True)
+
+    if user_entity or user_logic.logic.isFormerAccount(user_account):
+      raise forms.ValidationError("There is already a user with this email adress.")
+
+    return user_account
   return wrapped
 
 
@@ -104,4 +161,42 @@ def clean_url(field_name):
     # call the Django URLField cleaning method to properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)
   return wrapped
+
+
+def validate_user_edit(link_id_field, account_field):
+  """Clean method for cleaning user edit form.
+  
+  Raises ValidationError if:
+    -Another User has the given email address as account
+    -Another User has the given email address in it's FormerAccounts list
+  """
+  def wrapper(self):
+    cleaned_data = self.cleaned_data
+    
+    link_id = cleaned_data.get(link_id_field)
+    user_account = cleaned_data.get(account_field)
+
+    # if both fields were valid do this check
+    if link_id and user_account:
+      # get the user from the link_id in the form
+      fields = {'link_id': link_id}
+      user_entity = user_logic.logic.getForFields(fields, unique=True)
+
+      former_accounts = user_entity.former_accounts
+
+      # if it's not the user's current account or one of his former accounts
+      if (user_entity.account != user_account  and 
+          user_account not in former_accounts):
+
+        # get the user having the given account
+        fields = {'account': user_account}
+        user_from_account_entity = user_logic.logic.getForFields(fields, unique=True)
+
+        # if there is a user with the given account or it's a former account
+        if user_from_account_entity or user_logic.logic.isFormerAccount(user_account):
+          # raise an error because this email address can't be used
+            raise forms.ValidationError("There is already a user with this email adress.")
+
+    return cleaned_data
+  return wrapper
 

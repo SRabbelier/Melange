@@ -62,7 +62,56 @@ django.core.signals.got_request_exception.disconnect(
     django.db._rollback_on_exception)
 
 
-def main():
+def profile_main_as_html():
+  """Main program for profiling. Profiling data added as HTML to the page.
+  """
+  import cProfile
+  import pstats
+  import StringIO
+
+  prof = cProfile.Profile()
+  prof = prof.runctx('real_main()', globals(), locals())
+  stream = StringIO.StringIO()
+  stats = pstats.Stats(prof, stream=stream)
+  # stats.strip_dirs()  # Don't; too many modules are named __init__.py.
+  
+  # 'time', 'cumulative' or 'calls'
+  stats.sort_stats('time')  
+  
+  # Optional arg: how many to print
+  stats.print_stats() 
+  # The rest is optional.
+  # stats.print_callees()
+  # stats.print_callers()
+  print '\n<hr>'
+  print '<h1>Profile data</h1>'
+  print '<pre>'
+  print stream.getvalue()[:1000000]
+  print '</pre>'
+
+
+def profile_main_as_logs():
+  """Main program for profiling. Profiling data logged.
+  """
+  import cProfile
+  import pstats
+  import StringIO
+  
+  prof = cProfile.Profile()
+  prof = prof.runctx("real_main()", globals(), locals())
+  stream = StringIO.StringIO()
+  stats = pstats.Stats(prof, stream=stream)
+  stats.sort_stats('time')  # Or cumulative
+  stats.print_stats(80)  # 80 = how many to print
+  # The rest is optional.
+  # stats.print_callees()
+  # stats.print_callers()
+  logging.info("Profile data:\n%s", stream.getvalue())
+
+
+def real_main():
+  """Main program without profiling.
+  """
   global ultimate_sys_path
   if ultimate_sys_path is None:
     ultimate_sys_path = list(sys.path)
@@ -75,6 +124,7 @@ def main():
   # Run the WSGI CGI handler with that application.
   util.run_wsgi_app(application)
 
+main = real_main
 
 if __name__ == '__main__':
   main()

@@ -116,9 +116,9 @@ class View(base.View):
     rights['unspecified'] = ['deny']
     rights['any_access'] = ['allow']
     rights['edit'] = ['checkIsLoggedIn']
-    rights['roles'] = ['checkAgreesToSiteToS']
+    rights['roles'] = ['checkIsUser']
     rights['signIn'] = ['checkNotLoggedIn']
-    rights['notification'] = ['checkAgreesToSiteToS']
+    rights['notification'] = ['checkIsUser']
 
     new_params = {}
     new_params['rights'] = rights

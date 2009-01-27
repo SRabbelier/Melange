@@ -56,10 +56,10 @@ class View(group_app.View):
     """
 
     rights = access.Checker(params)
-    rights['create'] = ['checkAgreesToSiteToS']
+    rights['create'] = ['checkIsUser']
     rights['delete'] = [('checkIsMyApplication', club_app_logic)]
     rights['edit'] = [('checkIsMyApplication', club_app_logic)]
-    rights['list'] = ['checkAgreesToSiteToS']
+    rights['list'] = ['checkIsUser']
     rights['public'] = [('checkIsMyApplication', club_app_logic)]
     rights['review'] = ['checkIsHost']
 

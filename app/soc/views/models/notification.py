@@ -87,7 +87,7 @@ class View(base.View):
     rights['edit'] = ['deny']
     rights['show'] = ['checkIsMyNotification']
     rights['delete'] = ['checkIsMyNotification']
-    rights['list'] = ['checkAgreesToSiteToS']
+    rights['list'] = ['checkIsUser']
     # create is developer only for the time being to test functionality
     rights['create'] = ['checkIsDeveloper']
 

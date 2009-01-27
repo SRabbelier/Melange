@@ -66,7 +66,7 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['listSelf'] = ['checkAgreesToSiteToS']
+    rights['listSelf'] = ['checkIsUser']
     rights['create'] = ['deny']
     rights['edit'] = ['checkIsDeveloper']
     rights['process_invite'] = ['checkIsMyGroupAcceptedRequest']

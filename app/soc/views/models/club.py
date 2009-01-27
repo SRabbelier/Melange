@@ -64,7 +64,7 @@ class View(group.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
-    rights['apply_member'] = ['checkAgreesToSiteToS']
+    rights['apply_member'] = ['checkIsUser']
     rights['list_requests'] = ['checkIsClubAdminForClub']
     rights['list_roles'] = ['checkIsClubAdminForClub']
     rights['applicant'] = [('checkIsApplicationAccepted', club_app_logic)]

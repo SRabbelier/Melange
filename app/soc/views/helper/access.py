@@ -232,33 +232,15 @@ class Checker(object):
       AccessViolationResponse:
       * if no User exists for the logged-in Google Account, or
       * if no Google Account is logged in at all
+      * if User has not agreed to the site-wide ToS, if one exists
     """
 
     self.checkIsLoggedIn(django_args)
 
     user = user_logic.getForCurrentAccount()
 
-    if user:
-      return
-
-    raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
-
-  def checkAgreesToSiteToS(self, django_args):
-    """Raises an alternate HTTP response if User has not agreed to site-wide ToS.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-    Raises:
-      AccessViolationResponse:
-      * if User has not agreed to the site-wide ToS, or
-      * if no User exists for the logged-in Google Account, or
-      * if no Google Account is logged in at all
-    """
-
-    self.checkIsUser(django_args)
-
-    user = user_logic.getForCurrentAccount()
+    if not user:
+      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
 
     if user_logic.agreesToSiteToS(user):
       return
@@ -283,7 +265,7 @@ class Checker(object):
       * if no Google Account is logged in at all
     """
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     if accounts.isDeveloper(account=self.id):
       return
@@ -317,7 +299,7 @@ class Checker(object):
        or if it's state is not group_accepted.
     """
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user_entity = user_logic.getForCurrentAccount()
 
@@ -358,7 +340,7 @@ class Checker(object):
        or if it's state is not group_accepted.
     """
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user_entity = user_logic.getForCurrentAccount()
 
@@ -403,7 +385,7 @@ class Checker(object):
     except out_of_band.Error:
       pass
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -418,7 +400,7 @@ class Checker(object):
 
     host = host_logic.getForFields(fields, unique=True)
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -450,7 +432,7 @@ class Checker(object):
       * if the user is not even logged in
     """
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -496,7 +478,7 @@ class Checker(object):
     except out_of_band.Error:
       pass
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -542,7 +524,7 @@ class Checker(object):
     except out_of_band.Error:
       pass
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     user = user_logic.getForCurrentAccount()
 
@@ -580,7 +562,7 @@ class Checker(object):
     except out_of_band.Error:
       pass
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     properties = dicts.filter(django_args, ['link_id', 'scope_path'])
 
@@ -617,7 +599,7 @@ class Checker(object):
     except out_of_band.Error:
       pass
 
-    self.checkAgreesToSiteToS(django_args)
+    self.checkIsUser(django_args)
 
     properties = dicts.filter(django_args, ['link_id'])
 

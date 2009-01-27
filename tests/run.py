@@ -41,6 +41,7 @@ def main():
   os.environ['SERVER_NAME'] = 'Foo'
   os.environ['SERVER_PORT'] = '8080'
   os.environ['APPLICATION_ID'] = 'test-app-run'
+  os.environ['USER_EMAIL'] = 'test@example.com'
   import main as app_main
   from google.appengine.api import apiproxy_stub_map
   from google.appengine.api import datastore_file_stub

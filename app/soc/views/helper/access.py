@@ -88,6 +88,22 @@ def denySidebar(fun):
   return wrapper
 
 
+def allowDeveloper(fun):
+  """Decorator that allows access if the current user is a Developer.
+  """
+
+  from functools import wraps
+
+  @wraps(fun)
+  def wrapper(self, django_args, *args, **kwargs):
+    try:
+      # if the current user is a developer we allow access
+      return self.checkIsDeveloper(django_args)
+    except out_of_band.Error:
+      return fun(self, django_args, *args, **kwargs)
+  return wrapper
+
+
 class Checker(object):
   """
   The __setitem__() and __getitem__() methods are overloaded to DTRT
@@ -364,6 +380,7 @@ class Checker(object):
     return
 
   @denySidebar
+  @allowDeveloper
   def checkIsHost(self, django_args):
     """Raises an alternate HTTP response if Google Account has no Host entity.
 
@@ -377,13 +394,6 @@ class Checker(object):
       * if no User exists for the logged-in Google Account, or
       * if the user is not even logged in
     """
-
-    try:
-      # if the current user is a developer we allow access
-      self.checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     self.checkIsUser(django_args)
 
@@ -455,6 +465,7 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+  @allowDeveloper
   def checkIsClubAdminForClub(self, django_args):
     """Returns an alternate HTTP response if Google Account has no Club Admin
        entity for the specified club.
@@ -470,13 +481,6 @@ class Checker(object):
       django.http.HttpResponse which contains the alternate response
       should be returned by the calling view.
     """
-
-    try:
-      # if the current user is invited to create a host profile we allow access
-      checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     self.checkIsUser(django_args)
 
@@ -501,6 +505,7 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+  @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):
     """Returns an alternate HTTP response if Google Account has no Club App
        entity for the specified Club.
@@ -516,13 +521,6 @@ class Checker(object):
       of django.http.HttpResponse which contains the alternate response
       should be returned by the calling view.
     """
-
-    try:
-      # if the current user is a developer we allow access
-      checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     self.checkIsUser(django_args)
 
@@ -541,6 +539,7 @@ class Checker(object):
     # TODO(srabbelier) Make this give a proper error message
     deny(django_args)
 
+  @allowDeveloper
   def checkIsMyNotification(self, django_args):
     """Returns an alternate HTTP response if this request is for
        a Notification belonging to the current user.
@@ -554,13 +553,6 @@ class Checker(object):
     Returns:
       None if the current User is allowed to access this Notification.
     """
-
-    try:
-      # if the current user is a developer we allow access
-      checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     self.checkIsUser(django_args)
 
@@ -578,6 +570,7 @@ class Checker(object):
     # TODO(ljvderijk) Make this give a proper error message
     deny(django_args)
 
+  @allowDeveloper
   def checkIsMyApplication(self, django_args, app_logic):
     """Returns an alternate HTTP response if this request is for
        a Application belonging to the current user.
@@ -591,13 +584,6 @@ class Checker(object):
     Returns:
       None if the current User is allowed to access this Application.
     """
-
-    try:
-      # if the current user is a developer we allow access
-      self.checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     self.checkIsUser(django_args)
 
@@ -619,6 +605,7 @@ class Checker(object):
     # TODO(srabbelier) Make this give a proper error message
     deny(django_args)
 
+  @allowDeveloper
   def checkIsMyActiveRole(self, django_args, role_logic):
     """Returns an alternate HTTP response if there is no active role found for
        the current user using the given role_logic.
@@ -629,13 +616,6 @@ class Checker(object):
     Returns:
       None if the current User has no active role for the given role_logic.
     """
-
-    try:
-      # if the current user is a developer we allow access
-      checkIsDeveloper(django_args)
-      return
-    except out_of_band.Error:
-      pass
 
     user = user_logic.getForCurrentAccount()
 

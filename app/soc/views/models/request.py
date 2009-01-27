@@ -99,10 +99,7 @@ class View(base.View):
                                         required=True),
         }
 
-    patterns = [(r'^%(url_name)s/(?P<access_type>invite)/%(lnp)s$',
-        'soc.views.models.%(module_name)s.invite',
-        'Create invite for %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.process_invite',
           'Process Invite to become')]
 

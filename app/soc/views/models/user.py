@@ -27,92 +27,19 @@ from google.appengine.api import users
 
 from django import forms
 
+from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import validate
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import helper
+from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.linkable
-import soc.models.user
 import soc.logic.models.user
 import soc.views.helper
-
-
-class CreateForm(helper.forms.BaseForm):
-  """Django form displayed when creating a User.
-  """
-
-  email = forms.EmailField(
-      label=soc.models.user.User.account.verbose_name,
-      help_text=soc.models.user.User.account.help_text)
-
-  link_id = forms.CharField(
-      label=soc.models.user.User.link_id.verbose_name,
-      help_text=soc.models.linkable.Linkable.link_id.help_text)
-
-  name = forms.CharField(
-      label=soc.models.user.User.name.verbose_name,
-      help_text=soc.models.user.User.name.help_text)
-
-  is_developer = forms.BooleanField(required=False,
-      label=soc.models.user.User.is_developer.verbose_name,
-      help_text=soc.models.user.User.is_developer.help_text)
-
-  agrees_to_tos = forms.BooleanField(required=False,
-      widget=helper.widgets.ReadOnlyBool(),
-      label=soc.models.user.User.agrees_to_tos.verbose_name,
-      help_text=soc.models.user.User.agrees_to_tos.help_text)
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    model = None
-
-  def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id').lower()
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-
-    properties = {'link_id': link_id}
-
-    link_id_user = soc.logic.models.user.logic.getForFields(properties,
-                                                            unique=True)
-    key_name = self.data.get('key_name')
-    if key_name:
-      key_name_user = user_logic.getFromKeyName(key_name)
-      
-      if (link_id_user and key_name_user
-          and (link_id_user.account != key_name_user.account)):
-        raise forms.ValidationError("This link ID is already in use.")
-
-    return link_id
-
-  def clean_email(self):
-    form_account = users.User(email=self.cleaned_data.get('email'))
-    key_name = self.data.get('key_name')
-    if key_name:
-      user = user_logic.getFromKeyName(key_name)
-      old_email = user.account.email()
-    else:
-      old_email = None
-
-    new_email = form_account.email()
-
-    if new_email != old_email \
-        and user_logic.getForFields({'email': new_email}, unique=True):
-      raise forms.ValidationError("This account is already in use.")
-
-    return self.cleaned_data.get('email')
-
-
-class EditForm(CreateForm):
-  """Django form displayed when editing a User.
-  """
-
-  key_name = forms.CharField(widget=forms.HiddenInput)
 
 
 class View(base.View):
@@ -128,18 +55,35 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = access.Checker(params)
+    rights['create'] = ['checkIsDeveloper']
+    rights['edit'] = ['checkIsDeveloper']
+    rights['delete'] = ['checkIsDeveloper']
+    rights['list'] = ['checkIsDeveloper']
+
     new_params = {}
     new_params['logic'] = soc.logic.models.user.logic
-
+    new_params['rights'] = rights
+    
     new_params['name'] = "User"
 
-    new_params['edit_form'] = EditForm
-    new_params['create_form'] = CreateForm
-
     new_params['edit_template'] = 'soc/user/edit.html'
-    
+
     new_params['sidebar_heading'] = 'Users'
 
+    new_params['extra_dynaexclude'] = ['former_accounts']
+    new_params['create_extra_dynafields'] = {
+        'clean_link_id': cleaning.clean_user_not_exist('link_id'),
+        'clean_account': cleaning.clean_user_account_not_in_use('account')}
+
+#TODO edit_extra_dynafields => link_id read only
+    new_params['edit_extra_dynafields'] = {
+        'link_id' : forms.CharField(widget=widgets.ReadOnlyInput(),
+                                   required=True),
+        'clean_link_id': cleaning.clean_link_id,
+        'clean_account': cleaning.clean_user_account('account'),
+        'clean' : cleaning.validate_user_edit('link_id', 'account'),
+    }
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -150,19 +94,10 @@ class View(base.View):
     """
 
     # fill in the email field with the data from the entity
-    form.fields['email'].initial = entity.account.email()
+    form.fields['account'].initial = entity.account.email()
     form.fields['agrees_to_tos'].example_text = self._getToSExampleText()
 
     super(View, self)._editGet(request, entity, form)
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    # fill in the account field with the user created from email
-    fields['account'] = users.User(fields['email'])
-
-    super(View, self)._editPost(request, entity, fields)
 
   def _getToSExampleText(self):
     """Returns example_text linking to site-wide ToS, or a warning message.

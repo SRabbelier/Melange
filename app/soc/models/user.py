@@ -94,7 +94,7 @@ class User(soc.models.linkable.Linkable):
   #: field storing whether User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)
-  agrees_to_tos = db.BooleanProperty(default=False,
+  agrees_to_tos = db.BooleanProperty(
       verbose_name=ugettext('Agrees to ToS'))
   agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the site-wide Terms of Service.')

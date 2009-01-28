@@ -66,13 +66,8 @@ class View(base.View):
     new_params['home_template'] = 'soc/presence/home.html'
 
     new_params['create_extra_dynafields'] = {
-        # override some editors
         'home_link_id': forms.CharField(required=False,
             label=ugettext('Home page Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-
-        'tos_link_id': forms.CharField(required=False,
-            label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
 
         # add cleaning of the link id and feed url
@@ -135,12 +130,6 @@ class View(base.View):
     except db.Error:
       pass
 
-    try:
-      if entity.tos:
-        form.fields['tos_link_id'].initial = entity.tos.link_id
-    except db.Error:
-      pass
-
     super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
@@ -156,13 +145,5 @@ class View(base.View):
       scope_path=scope_path, link_id=home_link_id)
 
     fields['home'] = home_doc
-
-    tos_link_id = fields['tos_link_id']
-
-    # TODO notify the user if tos_doc is not found
-    tos_doc = document_logic.logic.getFromFields(
-      scope_path=scope_path, link_id=tos_link_id)
-
-    fields['tos'] = tos_doc
 
     super(View, self)._editPost(request, entity, fields)

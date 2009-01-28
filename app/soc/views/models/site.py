@@ -27,14 +27,14 @@ from django import forms
 from soc.logic import dicts
 from soc.views.helper import access
 from soc.views.models import document as document_view
-from soc.views.models import presence
+from soc.views.models import tossed
 
 import soc.models.site
 import soc.logic.models.site
 import soc.logic.dicts
 
 
-class View(presence.View):
+class View(tossed.View):
   """View methods for the Document model.
   """
 

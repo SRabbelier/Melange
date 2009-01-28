@@ -22,20 +22,20 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import presence
+from soc.logic.models import tossed
 
-import soc.models.presence
+import soc.models.tossed
 import soc.models.site
 
 
-class Logic(presence.Logic):
+class Logic(tossed.Logic):
   """Logic methods for the Site model.
   """
 
   DEF_SITE_LINK_ID = 'site'
 
   def __init__(self, model=soc.models.site.Site,
-               base_model=soc.models.presence.Presence):
+               base_model=soc.models.tossed.Tossed):
     """Defines the name, key_name and model for this entity.
     """
 

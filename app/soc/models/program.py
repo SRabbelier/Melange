@@ -26,11 +26,11 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.presence
+import soc.models.tossed
 import soc.models.timeline
 
 
-class Program(soc.models.presence.Presence):
+class Program(soc.models.tossed.Tossed):
   """The Program model, representing a Program ran by a Sponsor.
   """
 
@@ -99,3 +99,10 @@ class Program(soc.models.presence.Presence):
   timeline = db.ReferenceProperty(reference_class=soc.models.timeline.Timeline,
                                  required=True, collection_name="program",
                                  verbose_name=ugettext('Timeline'))
+
+  #: Whether the program is enabled
+  is_enabled = db.BooleanProperty(default=False,
+      verbose_name=ugettext('Is Enabled'))
+  is_enabled.help_text = ugettext(
+      'Field used to indicate if a Presence is enabled at all, and as such'
+      '  accessible to non-developers.')

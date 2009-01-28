@@ -99,6 +99,19 @@ class View(base.View):
 
     super(View, self)._editGet(request, entity, form)
 
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+
+    if not entity:
+      # developer is creating a new entity set agrees_to_tos to None
+      fields['agrees_to_tos'] = None
+    else:
+      # editing an existing user so don't change the agrees_to_tos field
+      fields['agrees_to_tos'] = entity.agrees_to_tos
+
+    super(View, self)._editPost(request, entity, fields)
+
   def getToSExampleText(self):
     """Returns example_text linking to site-wide ToS, or a warning message.
     """

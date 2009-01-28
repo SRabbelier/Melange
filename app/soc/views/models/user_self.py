@@ -155,7 +155,19 @@ class View(base.View):
     """
 
     # fill in the account field with the current User
-    fields['account'] = users.User() 
+    fields['account'] = users.User()
+
+    # special actions if there is no ToS present
+    s_logic = model_logic.site.logic
+    site_tos = s_logic.getToS(s_logic.getSingleton())
+    if not site_tos:
+      # there is no Terms of Service set
+      if not entity:
+        # we are a new user so set the agrees_to_tos field to None
+        fields['agrees_to_tos'] = None
+      else:
+        # editing an existing user so don't change the agrees_to_tos field
+        fields['agrees_to_tos'] = entity.agrees_to_tos
 
     super(View, self)._editPost(request, entity, fields)
 

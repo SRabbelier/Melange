@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Generic cleaning methods
+"""Generic cleaning methods.
 """
 
 __authors__ = [
@@ -50,7 +50,8 @@ def clean_existing_user(field_name):
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
   
-    user_entity = user_logic.logic.getForFields({'link_id' : link_id}, unique=True)
+    user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
+        unique=True)
   
     if not user_entity:
       # user does not exist
@@ -71,7 +72,8 @@ def clean_user_not_exist(field_name):
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
   
-    user_entity = user_logic.logic.getForFields({'link_id' : link_id}, unique=True)
+    user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
+        unique=True)
   
     if user_entity:
       # user exists already
@@ -79,6 +81,7 @@ def clean_user_not_exist(field_name):
   
     return link_id
   return wrapped
+
 
 def clean_users_not_same(field_name):
   """Check if the field_name field is a valid user and is not 
@@ -94,7 +97,7 @@ def clean_users_not_same(field_name):
     
     if user_entity.key() == current_user_entity.key():
       # users are equal
-      raise forms.ValidationError("You cannot enter yourself here")
+      raise forms.ValidationError("You cannot enter yourself here.")
     
     return user_entity
   return wrapped
@@ -124,7 +127,7 @@ def clean_user_account_not_in_use(field_name):
     # get the user account for this email and check if it's in use
     user_account = users.User(email_adress)
 
-    fields = {'account' : user_account}
+    fields = {'account': user_account}
     user_entity = user_logic.logic.getForFields(fields, unique=True)
 
     if user_entity or user_logic.logic.isFormerAccount(user_account):
@@ -145,6 +148,7 @@ def clean_feed_url(self):
     raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
   return feed_url
+
 
 def clean_url(field_name):
   """Clean method for cleaning a field belonging to a LinkProperty.
@@ -190,12 +194,13 @@ def validate_user_edit(link_id_field, account_field):
 
         # get the user having the given account
         fields = {'account': user_account}
-        user_from_account_entity = user_logic.logic.getForFields(fields, unique=True)
+        user_from_account_entity = user_logic.logic.getForFields(fields, 
+            unique=True)
 
         # if there is a user with the given account or it's a former account
         if user_from_account_entity or user_logic.logic.isFormerAccount(user_account):
           # raise an error because this email address can't be used
-            raise forms.ValidationError("There is already a user with this email adress.")
+          raise forms.ValidationError("There is already a user with this email adress.")
 
     return cleaned_data
   return wrapper

@@ -99,7 +99,7 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
 
 
 def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None, 
-                   dynafields=None):
+                   dynafields=None, append=False):
   """Extends an existing dynaform.
 
   If any of dynainclude, dynaexclude or dynafields are not present,
@@ -108,6 +108,10 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
   While it is rather useles to extend from a dynaform that does not have
   a Meta class, it is allowed, the resulting DynaForm is the same as if
   newDynaForm was called with all extendDynForm's keyword arguments.
+
+  If append is True, the form's original values for include and
+  exclude will be appended to the supplied dynainclude and
+  dynaexclude, which both are still allowed to be None.
   """
 
   # Try to retrieve the Meta class from the existing dynaform
@@ -118,10 +122,13 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
     dynamodel = getattr(meta, 'model', None)
 
     if not dynainclude:
-      dynainclude = getattr(meta, 'include', None)
-
+      dynainclude = []
     if not dynaexclude:
-      dynaexclude = getattr(meta, 'exclude', None)
+      dynaexclude = []
+
+    if append:
+      dynainclude += getattr(meta, 'include', [])
+      dynaexclude += getattr(meta, 'exclude', [])
 
     # The most intersting parameter, the 'extra fields' dictionary
     dynaconf = getattr(meta, 'dynaconf', {})

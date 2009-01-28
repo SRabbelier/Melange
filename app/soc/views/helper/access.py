@@ -51,13 +51,13 @@ from soc.views import out_of_band
 from soc.views.helper import redirects
 
 
-DEF_NO_USER_LOGIN_MSG_FMT = ugettext(
-  'Please create <a href="/user/edit">User Profile</a>'
+DEF_NO_USER_LOGIN_MSG= ugettext(
+  'Please create <a href="/user/create_profile">User Profile</a>'
   ' in order to view this page.')
 
 DEF_AGREE_TO_TOS_MSG_FMT = ugettext(
   'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
-  ' Service</a> in your <a href="/user/edit">User Profile</a>'
+  ' Service</a> in your <a href="/user/edit_profile">User Profile</a>'
   ' in order to view this page.')
 
 DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
@@ -74,6 +74,15 @@ DEF_LOGOUT_MSG_FMT = ugettext(
 DEF_GROUP_NOT_FOUND_MSG = ugettext(
     'The requested Group can not be found')
 
+DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
+    'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
+    ' one or more of the following reasons:'
+    '<ul>'
+    ' <li>the account is invalid</li>'
+    ' <li>the account is already attached to a User profile and cannot be'
+    ' used to create another one</li>'
+    ' <li>the account is a former account that cannot be used again</li>'
+    '</ul>')
 
 def denySidebar(fun):
   """Decorator that denies access if the sidebar is calling.
@@ -323,7 +332,7 @@ class Checker(object):
     self.checkIsLoggedIn(django_args)
 
     if not self.user:
-      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG_FMT)
+      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
 
     if user_logic.agreesToSiteToS(self.user):
       return
@@ -334,6 +343,47 @@ class Checker(object):
         'tos_link': redirects.getToSRedirect(site_logic.getSingleton())}
 
     raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
+  
+  def checkIsUnusedAccount(self, django_args):
+    """Raises an alternate HTTP response if Google Account has a User entity.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+    Raises:
+      AccessViolationResponse:
+      * if a User exists for the logged-in Google Account, or
+      * if a User has this Gooogle Account in their formerAccounts list
+    """
+
+    self.checkIsLoggedIn(django_args)
+
+    if self.user or user_logic.isFormerAccount(self.id):
+      message_fmt = DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
+          'email' : self.id.email()}
+      raise out_of_band.LoginRequest(message_fmt=message_fmt)
+
+    return
+
+  def checkHasUserEntity(self, django_args):
+    """Raises an alternate HTTP response if Google Account has no User entity.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+    Raises:
+      AccessViolationResponse:
+      * if no User exists for the logged-in Google Account, or
+      * if no Google Account is logged in at all
+    """
+
+    self.checkIsLoggedIn(django_args)
+
+    if not self.user:
+      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
+
+    return
+
 
   def checkIsDeveloper(self, django_args):
     """Raises an alternate HTTP response if Google Account is not a Developer.

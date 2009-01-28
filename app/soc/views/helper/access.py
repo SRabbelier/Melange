@@ -120,7 +120,6 @@ class Checker(object):
     self.rights = base.rights if base else {}
     self.id = None
     self.user = None
-    self.cached_rights = {}
 
   def __setitem__(self, key, value):
     """Sets a value only if no old value exists.
@@ -217,7 +216,6 @@ class Checker(object):
 
     self.id = id
     self.user = user
-    self.cached_rights = {}
 
   def checkAccess(self, access_type, django_args):
     """Runs all the defined checks for the specified type.
@@ -448,8 +446,8 @@ class Checker(object):
 
     return
 
-  @denySidebar
   @allowDeveloper
+  @denySidebar
   def checkIsHost(self, django_args):
     """Raises an alternate HTTP response if Google Account has no Host entity.
 

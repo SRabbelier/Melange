@@ -44,4 +44,4 @@ class SidebarTest(unittest.TestCase):
     """Test that the sidebar builds and does not return None.
     """
 
-    self.assertNotEqual(None, sidebar.getSidebar())
+    self.assertNotEqual(None, sidebar.getSidebar('id', None))

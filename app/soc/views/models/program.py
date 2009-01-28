@@ -28,7 +28,9 @@ from django import forms
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import presence
@@ -117,6 +119,7 @@ class View(presence.View):
     timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
     return timeline
 
+  @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):
     """Returns the extra menu's for this view.
 
@@ -128,20 +131,29 @@ class View(presence.View):
       params: a dict with params for this View.
     """
 
-    params = dicts.merge(params, self._params)
     logic = params['logic']
+    rights = params['rights']
 
     entities = logic.getForLimitAndOffset(1000)
 
     doc_params = document_view.view.getParams()
     menus = []
 
+    rights.setCurrentUser(id, user)
+    filter_args = {}
+
     for entity in entities:
+      filter_args['scope_path'] = entity.key().name()
+      try:
+        rights.doCheck('checkIsHost', filter_args, [])
+      except out_of_band.Error:
+        continue
+
       menu = {}
       menu['heading'] = entity.short_name
       items = document_view.view.getMenusForScope(entity, params)
       items += [(redirects.getEditRedirect(entity, params),'Edit','edit')]
-      menu['items'] = sidebar.getSidebarMenu(id, user, items, params=doc_params)
+      menu['items'] = sidebar.getSidebarMenu(id, user, items, params=params)
       menu['group'] = 'Programs'
       menus.append(menu)
 

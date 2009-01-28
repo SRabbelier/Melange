@@ -66,3 +66,9 @@ class Presence(soc.models.linkable.Linkable):
   tos.help_text = ugettext(
       'Document containing optional Terms of Service for participating.')
   tos.redirect_url = soc.models.document.Document.URL_NAME
+
+  is_enabled = db.BooleanProperty(
+      verbose_name=ugettext('Is Enabled'))
+  is_enabled.help_text = ugettext(
+      'Field used to indicate if a Presence is enabled at all, and as such'
+      '  accessible to non-developers.')

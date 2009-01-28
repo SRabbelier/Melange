@@ -26,6 +26,7 @@ from google.appengine.api import memcache
 from google.appengine.api import users
 
 import soc.cache.base
+import soc.cache.rights
 
 
 def key(id):
@@ -57,18 +58,21 @@ def put(sidebar, id, user):
   memcache.add(memcache_key, sidebar, retention)
 
 
-def flush(user=None):
+def flush(id=None):
   """Removes the sidebar for the current user from the memcache.
 
+  Also calls soc.cache.rights.flush for the specified user.
+
   Args:
-    user: defaults to the current user if not set
+    id: defaults to the current account if not set
   """
 
-  if not user:
-    user = users.get_current_user()
+  if not id:
+    id = users.get_current_user()
 
-  memcache_key = key(user)
+  memcache_key = key(id)
   memcache.delete(memcache_key)
+  soc.cache.rights.flush(id)
 
 
 # define the cache function

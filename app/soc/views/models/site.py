@@ -63,8 +63,10 @@ class View(presence.View):
     new_params['sidebar_heading'] = new_params['name_short']
 
     new_params['public_template'] = 'soc/presence/public.html'
+    new_params['edit_template'] = 'soc/site/edit.html'
     new_params['home_template'] = 'soc/site/home.html'
 
+    new_params['extra_dynaexclude'] = ['is_enabled']
     new_params['create_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         }

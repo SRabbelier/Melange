@@ -56,21 +56,15 @@ class View(presence.View):
 
     new_params = {}
 
-    new_params['extra_dynaexclude'] = ['founder',
-      # TODO(tlarsen): these need to be enabled once a button to a list
-      #   selection "interstitial" page is implemented, see:
-      #     http://code.google.com/p/soc/issues/detail?id=151
-      'home', 'tos', 'member_template']
+    new_params['extra_dynaexclude'] = ['founder','home', 'tos',
+                                       'member_template']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }
 
     #set the extra_django_patterns and include the one from params
-    patterns = params.get('extra_django_patterns')
-
-    if not patterns:
-      patterns = []
+    patterns = params.get('extra_django_patterns', [])
 
     patterns += [
         (r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',

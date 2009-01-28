@@ -63,6 +63,7 @@ class View(presence.View):
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['name'] = "Program"
+    new_params['sidebar_grouping'] = 'Programs'
 
     new_params['edit_template'] = 'soc/program/edit.html'
 

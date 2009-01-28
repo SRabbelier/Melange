@@ -68,6 +68,8 @@ class View(group_app.View):
     new_params['rights'] = rights
     new_params['logic'] = club_app_logic.logic
 
+    new_params['sidebar_grouping'] = 'Clubs'
+
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 

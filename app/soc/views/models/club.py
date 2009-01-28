@@ -74,6 +74,7 @@ class View(group.View):
     new_params['rights'] = rights
     new_params['name'] = "Club"
     new_params['url_name'] = "club"
+    new_params['sidebar_grouping'] = 'Clubs'
 
     patterns = []
 

@@ -68,6 +68,7 @@ class View(role.View):
     new_params['scope_view'] = club_view
 
     new_params['name'] = "Club Member"
+    new_params['sidebar_grouping'] = 'Clubs'
 
     new_params['extra_dynaexclude'] = ['user', 'state']
 

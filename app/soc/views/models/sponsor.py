@@ -60,6 +60,7 @@ class View(group.View):
 
     new_params['name'] = "Program Owner"
     new_params['module_name'] = "sponsor"
+    new_params['sidebar_grouping'] = 'Programs'
 
     params = dicts.merge(params, new_params)
 

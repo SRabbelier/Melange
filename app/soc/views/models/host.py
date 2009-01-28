@@ -76,6 +76,7 @@ class View(role.View):
 
     new_params['name'] = "Program Administrator"
     new_params['module_name'] = "host"
+    new_params['sidebar_grouping'] = 'Programs'
 
     new_params['extra_dynaexclude'] = ['user', 'state']
 

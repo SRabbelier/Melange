@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -76,7 +77,6 @@ class View(base.View):
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),
         'clean_account': cleaning.clean_user_account_not_in_use('account')}
 
-    #TODO edit_extra_dynafields => link_id read only
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
@@ -95,11 +95,11 @@ class View(base.View):
 
     # fill in the email field with the data from the entity
     form.fields['account'].initial = entity.account.email()
-    form.fields['agrees_to_tos'].example_text = self._getToSExampleText()
+    form.fields['agrees_to_tos'].example_text = self.getToSExampleText()
 
     super(View, self)._editGet(request, entity, form)
 
-  def _getToSExampleText(self):
+  def getToSExampleText(self):
     """Returns example_text linking to site-wide ToS, or a warning message.
     """
     tos_link = redirects.getToSRedirect(site_logic.getSingleton())

@@ -347,6 +347,7 @@ class View(presence.View):
 
       # add the items together
       menu['items'] = doc_items + group_items
+      menu['group'] = 'Clubs'
 
       # append this as a new menu
       menus.append(menu)

@@ -1,5 +1,24 @@
 <ul>
-{% for subitem in sidebar_menu_items %}
+{% regroup sidebar_menu_items by group as grouped_items %}
+
+{% for grouped_item in grouped_items %}
+  {% ifequal grouped_item.grouper 'main' %}
+    {% for subitem in grouped_item.list %}
 {% include 'soc/sidebar/submenu.html' %}
+    {% endfor %}
+  {% endifequal %}
+{% endfor %}
+
+{% for grouped_item in grouped_items %}
+  {% ifnotequal grouped_item.grouper 'main' %}
+  <li class="expandable">
+    <span>{{ grouped_item.grouper }}</span>
+    <ul>
+      {% for subitem in grouped_item.list %}
+{% include 'soc/sidebar/submenu.html' %}
+      {% endfor %}
+    </ul>
+  </li>
+  {% endifnotequal %}
 {% endfor %}
 </ul>

@@ -140,6 +140,7 @@ class View(presence.View):
       menu['heading'] = entity.short_name
       items = document_view.view.getMenusForScope(entity, params)
       menu['items'] = sidebar.getSidebarMenu(id, user, items, params=doc_params)
+      menu['group'] = 'Programs'
       menus.append(menu)
 
     return menus

@@ -1,8 +1,8 @@
-<li class="expandable">
-<span>{{ subitem.heading }}</span>
-<ul>
+    <li class="expandable">
+      <span>{{ subitem.heading }}</span>
+      <ul>
 {% for item in subitem.items %}
 {% include 'soc/sidebar/menuitem.html' %}
 {% endfor %}
-</ul>
-</li>
+      </ul>
+    </li>

@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import operator
+
 from soc.views import out_of_band
 from soc.views.helper import access
 
@@ -56,7 +58,7 @@ def getSidebar(id, user):
     for menu in (menus if menus else []):
       sidebar.append(menu)
 
-  return sidebar
+  return sorted(sidebar, key=lambda x: x.get('group'))
 
 
 def getSidebarItems(params):
@@ -175,6 +177,7 @@ def getSidebarMenus(id, user, params=None):
 
   menu['heading'] = params['sidebar_heading']
   menu['items'] = submenus
+  menu['group'] = params['sidebar_grouping']
 
   menus = [menu]
 

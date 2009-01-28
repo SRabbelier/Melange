@@ -102,6 +102,7 @@ def constructParams(params):
   new_params['invite_redirect'] = '/request/list'
 
   new_params['sidebar'] = None
+  new_params['sidebar_grouping'] = 'main'
   new_params['sidebar_defaults'] = [
       ('/%s/create', 'New %(name)s', 'create'),
       ('/%s/list', 'List %(name_plural)s', 'list'),

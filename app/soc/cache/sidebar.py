@@ -29,14 +29,14 @@ import soc.cache.base
 
 
 def key(id):
-  """Returns the memcache key for the user's sidebar
+  """Returns the memcache key for the user's sidebar.
   """
 
   return 'sidebar_for_%s' % repr(id)
 
 
 def get(id, user):
-  """Retrieves the sidebar for the specified user from the memcache
+  """Retrieves the sidebar for the specified user from the memcache.
   """
 
   memcache_key = key(id)
@@ -44,7 +44,7 @@ def get(id, user):
 
 
 def put(sidebar, id, user):
-  """Sets the sidebar for the specified user in the memcache
+  """Sets the sidebar for the specified user in the memcache.
 
   Args:
     sidebar: the sidebar to be cached
@@ -58,7 +58,7 @@ def put(sidebar, id, user):
 
 
 def flush(user=None):
-  """Removes the sidebar for the current user from the memcache
+  """Removes the sidebar for the current user from the memcache.
 
   Args:
     user: defaults to the current user if not set

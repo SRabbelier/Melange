@@ -26,14 +26,14 @@ from functools import wraps
 
 
 def getCacher(get, put):
-  """Returns a caching decorator that uses get and put
+  """Returns a caching decorator that uses get and put.
   """
 
   # TODO(SRabbelier) possibly accept 'key' instead, and define
   # get and put in terms of key, depends on further usage
 
   def cache(func):
-    """Decorator that caches the result from func
+    """Decorator that caches the result from func.
     """
   
     @wraps(func)

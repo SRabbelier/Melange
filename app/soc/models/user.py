@@ -86,7 +86,7 @@ class User(soc.models.linkable.Linkable):
       ' site.')
       
   #: field storing whether User is a Developer with site-wide access.
-  is_developer = db.BooleanProperty(
+  is_developer = db.BooleanProperty(default=False,
       verbose_name=ugettext('Is Developer'))
   is_developer.help_text = ugettext(
       'Field used to indicate user with site-wide Developer access.')
@@ -94,7 +94,7 @@ class User(soc.models.linkable.Linkable):
   #: field storing whether User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)
-  agrees_to_tos = db.BooleanProperty(
+  agrees_to_tos = db.BooleanProperty(default=False,
       verbose_name=ugettext('Agrees to ToS'))
   agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the site-wide Terms of Service.')

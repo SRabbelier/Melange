@@ -29,6 +29,7 @@ from google.appengine.api import users
 from django import forms
 
 from soc.logic import validate
+from soc.logic.models import site as site_logic
 from soc.logic.models import user as user_logic
 
 
@@ -39,6 +40,28 @@ def clean_link_id(self):
     raise forms.ValidationError("This link ID is in wrong format.")
   return link_id
 
+
+def clean_agrees_to_tos(field_name):
+  """Checks if there is a ToS to see if it is allowed to leave 
+     the field_name field false.
+  """
+
+  def wrapper(self):
+    agrees_to_tos = self.cleaned_data.get(field_name)
+
+    if not site_logic.logic.getToS(site_logic.logic.getSingleton()):
+      return agrees_to_tos
+
+    # Site settings specify a site-wide ToS, so agreement is *required*
+    if agrees_to_tos:
+      return True
+    
+    # there was no agreement made so raise an error
+    raise forms.ValidationError(
+        'The site-wide Terms of Service must be accepted to participate'
+        ' on this site.')
+
+  return wrapper
 
 def clean_existing_user(field_name):
   """Check if the field_name field is a valid user.

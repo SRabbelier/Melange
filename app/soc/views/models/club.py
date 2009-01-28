@@ -202,7 +202,7 @@ class View(group.View):
   @decorators.merge_params
   @decorators.check_access
   def applyMember(self, request, access_type,
-                page_name=None, params=None, **kwargs):
+                  page_name=None, params=None, **kwargs):
     """Shows a list of all clubs and you can choose one to apply to become a member.
 
     Args:

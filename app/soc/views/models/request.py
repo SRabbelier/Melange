@@ -118,7 +118,7 @@ class View(base.View):
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True),
-        'group_id' : forms.CharField(widget=widgets.ReadOnlyInput(),
+        'group_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True)}
 
     request_form = dynaform.extendDynaForm(

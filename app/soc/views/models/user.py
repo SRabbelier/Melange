@@ -76,13 +76,13 @@ class View(base.View):
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),
         'clean_account': cleaning.clean_user_account_not_in_use('account')}
 
-#TODO edit_extra_dynafields => link_id read only
+    #TODO edit_extra_dynafields => link_id read only
     new_params['edit_extra_dynafields'] = {
-        'link_id' : forms.CharField(widget=widgets.ReadOnlyInput(),
+        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
         'clean_link_id': cleaning.clean_link_id,
         'clean_account': cleaning.clean_user_account('account'),
-        'clean' : cleaning.validate_user_edit('link_id', 'account'),
+        'clean': cleaning.validate_user_edit('link_id', 'account'),
     }
     params = dicts.merge(params, new_params)
 

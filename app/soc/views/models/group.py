@@ -117,7 +117,7 @@ class View(presence.View):
   @decorators.merge_params
   @decorators.check_access
   def listRequests(self, request, access_type,
-                page_name=None, params=None, **kwargs):
+                   page_name=None, params=None, **kwargs):
     """Gives an overview of all the requests for a specific group.
 
     Args:
@@ -140,7 +140,7 @@ class View(presence.View):
     
     # list all incoming requests
     filter = {
-        'scope' : group_entity,
+        'scope': group_entity,
         'role': role_names,
         'state': 'new'
         }
@@ -158,7 +158,7 @@ class View(presence.View):
 
     # list all outstanding invites
     filter = {
-        'scope' : group_entity,
+        'scope': group_entity,
         'role': role_names,
         'state': 'group_accepted'
         }
@@ -176,7 +176,7 @@ class View(presence.View):
 
     # list all ignored requests
     filter = {
-        'scope' : group_entity,
+        'scope': group_entity,
         'role': role_names,
         'state': 'ignored'
         }
@@ -278,7 +278,7 @@ class View(presence.View):
 
     # set fields to match every active role this user has
     fields = {'user': user,
-              'state' : 'active'}
+              'state': 'active'}
 
     # get the role views and start filling group_entities
     role_views = self._params['role_views']
@@ -312,8 +312,8 @@ class View(presence.View):
           existing_roles[role_name] = role
         else:
           # create a description of this role
-          role_description = {'roles' : {role_name: role},
-              'group' : role.scope}
+          role_description = {'roles': {role_name: role},
+              'group': role.scope}
 
           # add the new entry to our dictionary
           role_descriptions[group_key_name] = role_description
@@ -355,7 +355,7 @@ class View(presence.View):
     return menus
 
   def _getExtraMenuItems(self, role_description, params=None):
-    """Used to implement group instance specific needs for the side menu
+    """Used to implement group instance specific needs for the side menu.
 
     Args:
       role_description : dict containing all the roles which is a dict of 

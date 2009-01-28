@@ -74,11 +74,11 @@ class View(role.View):
 
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                  required=True),
-       'clean_link_id' : cleaning.clean_existing_user('link_id'),
-       'clean_home_page' : cleaning.clean_url('home_page'),
-       'clean_blog' : cleaning.clean_url('blog'),
-       'clean_photo_url' : cleaning.clean_url('photo_url')}
+          required=True),
+       'clean_link_id': cleaning.clean_existing_user('link_id'),
+       'clean_home_page': cleaning.clean_url('home_page'),
+       'clean_blog': cleaning.clean_url('blog'),
+       'clean_photo_url': cleaning.clean_url('photo_url')}
 
     new_params['allow_requests_and_invites'] = True
 

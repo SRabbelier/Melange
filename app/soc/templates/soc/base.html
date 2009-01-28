@@ -33,8 +33,9 @@ limitations under the License.
 	<script src="/soc/content/js/tips-081027.js"></script>
 	{% block scripts %}{% endblock %}
  </head>
-
+{% block body_tag %}
  <body>
+{% endblock %}
 
   <div id="login">
 	{% block login_links %}
@@ -42,6 +43,9 @@ limitations under the License.
 	<b>{{ account.email }} ({{ account.nickname }})</b> | 
 	{% endif %}
 	{% if is_debug %}
+	<form id="flush_form" action="/_ah/admin/memcache" method="post" style="display: inline;">
+      <input type="submit" class="button" name="action:flush" value="Flush Cache" onclick="return confirm('Are you sure you want to flush all keys from the cache?');"/>
+    </form> | 
 	<a class="novisit" target="_blank" href="/_ah/admin">Admin</a> | 
 	{% endif %}
 	<a class="novisit" href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 

@@ -358,12 +358,14 @@ class Checker(object):
 
     self.checkIsLoggedIn(django_args)
 
-    if self.user or user_logic.isFormerAccount(self.id):
-      message_fmt = DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
-          'email' : self.id.email()}
-      raise out_of_band.LoginRequest(message_fmt=message_fmt)
+    if not self.user and not user_logic.isFormerAccount(self.id):
+      # this account has not been used yet
+      return
 
-    return
+    message_fmt = DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
+        'email' : self.id.email()}
+    raise out_of_band.LoginRequest(message_fmt=message_fmt)
+
 
   def checkHasUserEntity(self, django_args):
     """Raises an alternate HTTP response if Google Account has no User entity.

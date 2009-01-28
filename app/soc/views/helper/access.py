@@ -389,7 +389,7 @@ class Checker(object):
     user_entity = user_logic.getForCurrentAccount()
 
     if user_entity.link_id != django_args['link_id']:
-      deny(django_args)
+      self.deny(django_args)
 
     fields = {'link_id': django_args['link_id'],
         'scope_path': django_args['scope_path'],
@@ -399,7 +399,7 @@ class Checker(object):
 
     if request_entity.state != 'group_accepted':
       # TODO tell the user that this request has not been accepted yet
-      deny(django_args)
+      self.deny(django_args)
 
     return
 
@@ -416,7 +416,7 @@ class Checker(object):
 
     if request_entity.state in ['completed', 'denied']:
       # TODO tell the user that this request has been processed
-      deny(django_args)
+      self.deny(django_args)
 
     return
 
@@ -431,7 +431,7 @@ class Checker(object):
 
     if user_entity.link_id != django_args['link_id']:
       # not the current user's request
-      return deny(django_args)
+      self.deny(django_args)
 
     fields = {'link_id': django_args['link_id'],
               'scope_path': django_args['scope_path'],
@@ -441,10 +441,10 @@ class Checker(object):
 
     if not request_entity:
       # TODO return 404
-      return deny(django_args)
+      self.deny(django_args)
 
     if request_entity.state != 'group_accepted':
-      return deny(django_args)
+      self.deny(django_args)
 
     return
 
@@ -496,6 +496,7 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+  @allowDeveloper
   def checkIsHostForSponsor(self, django_args):
     """Raises an alternate HTTP response if Google Account has no Host entity
        for the specified Sponsor.
@@ -606,7 +607,7 @@ class Checker(object):
       return
 
     # TODO(srabbelier) Make this give a proper error message
-    deny(django_args)
+    self.deny(django_args)
 
   @allowDeveloper
   def checkIsMyNotification(self, django_args):
@@ -637,7 +638,7 @@ class Checker(object):
       return None
 
     # TODO(ljvderijk) Make this give a proper error message
-    deny(django_args)
+    self.deny(django_args)
 
   @allowDeveloper
   def checkIsMyApplication(self, django_args, app_logic):
@@ -661,18 +662,16 @@ class Checker(object):
     application = app_logic.logic.getForFields(properties, unique=True)
 
     if not application:
-      deny(django_args)
-
-    user = user_logic.getForCurrentAccount()
+      self.deny(django_args)
 
     # We need to check to see if the key's are equal since the User
     # objects are different and the default __eq__ method does not check
     # if the keys are equal (which is what we want).
-    if user.key() == application.applicant.key():
+    if self.user.key() == application.applicant.key():
       return None
 
     # TODO(srabbelier) Make this give a proper error message
-    deny(django_args)
+    self.deny(django_args)
 
   @allowDeveloper
   def checkIsMyActiveRole(self, django_args, role_logic):
@@ -686,11 +685,9 @@ class Checker(object):
       None if the current User has no active role for the given role_logic.
     """
 
-    user = user_logic.getForCurrentAccount()
-
-    if not user or user.link_id != django_args['link_id']:
+    if not self.user or self.user.link_id != django_args['link_id']:
       # not my role
-      deny(django_args)
+      self.deny(django_args)
 
     fields = {'link_id': django_args['link_id'],
               'scope_path': django_args['scope_path']
@@ -700,14 +697,14 @@ class Checker(object):
 
     if not role_entity:
       # no role found
-      deny(django_args)
+      self.deny(django_args)
 
     if role_entity.state == 'active':
       # this role exist and is active
       return
     else:
       # this role is not active
-      deny(django_args)
+      self.deny(django_args)
 
   def checkHasPickGetArgs(self, django_args):
     """Raises an alternate HTTP response if the request misses get args.
@@ -727,7 +724,7 @@ class Checker(object):
       return
 
     #TODO(SRabbelier) inform user that return_url and field are required
-    deny(django_args)
+    self.deny(django_args)
 
   def checkIsDocumentPublic(self, django_args):
     """Checks whether a document is public.
@@ -738,4 +735,4 @@ class Checker(object):
 
     # TODO(srabbelier): A proper check needs to be done to see if the document
     # is public or not, probably involving analysing it's scope or such.
-    allow(django_args)
+    self.allow(django_args)

@@ -54,7 +54,7 @@ class View(role.View):
     rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.club_admin)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = ['checkIsClubAdminForClub']
-    rights['accept_invite'] = ['checkCanCreateFromRequest', 'club_admin']
+    rights['accept_invite'] = [('checkCanCreateFromRequest', 'club_admin')]
     rights['process_request'] = ['checkIsClubAdminForClub',
         ('checkCanProcessRequest', 'club_admin')]
 

@@ -337,11 +337,13 @@ class View(presence.View):
 
       # get the documents for this group entity
       doc_items = document_view.view.getMenusForScope(group_entity, params)
-      doc_items = sidebar.getSidebarMenu(doc_items, params=doc_params)
+      doc_items = sidebar.getSidebarMenu(id, user, doc_items,
+                                         params=doc_params)
 
       # get the group specific items
       group_items = self._getExtraMenuItems(role_description, params)
-      group_items = sidebar.getSidebarMenu(group_items, params=self._params)
+      group_items = sidebar.getSidebarMenu(id, user, group_items,
+                                           params=self._params)
 
       # add the items together
       menu['items'] = doc_items + group_items

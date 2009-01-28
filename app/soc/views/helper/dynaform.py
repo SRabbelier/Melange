@@ -121,14 +121,19 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
   if meta:
     dynamodel = getattr(meta, 'model', None)
 
+    originclude = getattr(meta, 'include', [])
+    origexclude = getattr(meta, 'exclude', [])
+
     if not dynainclude:
-      dynainclude = []
+      dynainclude = originclude
+      originclude = []
     if not dynaexclude:
-      dynaexclude = []
+      dynaexclude = origexclude
+      origexclude = []
 
     if append:
-      dynainclude += getattr(meta, 'include', [])
-      dynaexclude += getattr(meta, 'exclude', [])
+      dynainclude += originclude
+      dynaexclude += origexclude
 
     # The most intersting parameter, the 'extra fields' dictionary
     dynaconf = getattr(meta, 'dynaconf', {})

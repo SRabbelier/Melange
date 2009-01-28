@@ -51,7 +51,7 @@ def put(sidebar, id, user):
   """
 
   # Store sidebar for ten minutes since new programs might get added
-  retention = 10*60
+  retention = 3*60
 
   memcache_key = key(id)
   memcache.add(memcache_key, sidebar, retention)

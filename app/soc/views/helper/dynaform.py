@@ -105,7 +105,7 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
   If any of dynainclude, dynaexclude or dynafields are not present,
   they are retrieved from dynaform (if present in it's Meta class).
 
-  While it is rather useles to extend from a dynaform that does not have
+  While it is rather useless to extend from a dynaform that does not have
   a Meta class, it is allowed, the resulting DynaForm is the same as if
   newDynaForm was called with all extendDynForm's keyword arguments.
 
@@ -135,7 +135,7 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
       dynainclude += originclude
       dynaexclude += origexclude
 
-    # The most intersting parameter, the 'extra fields' dictionary
+    # The most interesting parameter, the 'extra fields' dictionary
     dynaconf = getattr(meta, 'dynaconf', {})
     if not dynafields:
       dynafields = dynaconf

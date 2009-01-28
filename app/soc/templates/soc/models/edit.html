@@ -49,7 +49,11 @@ Please use this form to edit the {{ entity_type }}.
     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
    </td>
    <td>
-    <input type="button" onclick="location.href='/'" value="Cancel"/>
+   {% if edit_cancel_redirect %}
+   <input type="button" onclick="location.href='{{ edit_cancel_redirect }}'" value="Cancel"/>
+   {% else %}
+   <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
+   {% endif %}
    </td>
    {% if entity %}
    <td>

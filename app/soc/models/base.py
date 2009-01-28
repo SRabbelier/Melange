@@ -49,7 +49,7 @@ class ModelWithFieldAttributes(db.Model):
   _fields_cache = None
 
   def toDict(self):
-    """Returns a dict with all StringProperty values of this entity
+    """Returns a dict with all StringProperty values of this entity.
     """
 
     result = {}

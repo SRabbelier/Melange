@@ -138,7 +138,7 @@ def getListRolesRedirect(entity, params):
 
 
 def getProcessRequestRedirect(entity, _):
-  """Returns the redirect for processing the specified request entity
+  """Returns the redirect for processing the specified request entity.
   """
 
   result = '/%s/process_request/%s/%s' % (

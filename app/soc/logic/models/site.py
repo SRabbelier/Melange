@@ -34,6 +34,8 @@ class Logic(presence.Logic):
 
   DEF_SITE_LINK_ID = 'site'
 
+  # TODO setting a new Terms Of Service should clear all users acceptance of the terms
+
   def __init__(self, model=soc.models.site.Site,
                base_model=soc.models.presence.Presence):
     """Defines the name, key_name and model for this entity.
@@ -78,6 +80,5 @@ class Logic(presence.Logic):
     """Return singleton Site settings entity, since there is always only one.
     """
     return self.getFromFields(link_id=self.DEF_SITE_LINK_ID)
-
 
 logic = Logic()

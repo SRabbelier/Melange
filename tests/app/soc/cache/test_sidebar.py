@@ -20,16 +20,16 @@ __authors__ = [
   ]
 
 
+import unittest
+
 from google.appengine.api import users
 from google.appengine.api import memcache
-
-import unittest
 
 from soc.cache import sidebar
 
 
 class SidebarCacheTest(unittest.TestCase):
-  """Tests that the sidebar properly uses caching
+  """Tests that the sidebar properly uses caching.
   """
 
   def setUp(self):
@@ -40,32 +40,32 @@ class SidebarCacheTest(unittest.TestCase):
     memcache.flush_all()
 
   def testGetCurrentUser(self):
-    """Santiy check to see if get_current_user returns same value
+    """Sanity check to see if get_current_user returns same value.
     """
 
     self.assertEqual(self.user, users.get_current_user())
 
   def testKey(self):
-    """Test that the key method returns a unique key
+    """Test that the key method returns a unique key.
     """
 
     self.assertEqual("sidebar_for_users.User(email='test@example.com')",
                      sidebar.key(self.user))
 
   def testGet(self):
-    """Test that get without setting something returns None
+    """Test that get without setting something returns None.
     """
     self.assertEqual(None, sidebar.get())
 
   def testGetPut(self):
-    """Test that getting after putting gives back what you put in
+    """Test that getting after putting gives back what you put in.
     """
 
     sidebar.put(42)
     self.assertEqual(42, sidebar.get())
 
   def testFlush(self):
-    """Test that getting after putting and flushing returns None
+    """Test that getting after putting and flushing returns None.
     """
 
     sidebar.put(42)
@@ -73,7 +73,7 @@ class SidebarCacheTest(unittest.TestCase):
     self.assertEqual(None, sidebar.get())
 
   def testCache(self):
-    """Test that the result of a cached sidebar is cached
+    """Test that the result of a cached sidebar is cached.
     """
 
     @sidebar.cache

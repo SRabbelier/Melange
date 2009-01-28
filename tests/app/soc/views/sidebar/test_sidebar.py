@@ -27,12 +27,13 @@ from google.appengine.api import memcache
 
 from soc.views.sitemap import sidebar
 
+
 class SidebarTest(unittest.TestCase):
   def setUp(self):
     pass
 
   def testSidebarCallbacksAreAdded(self):
-    """Test that the sidebar callbacks are added when importing 'build'
+    """Test that the sidebar callbacks are added when importing 'build'.
     """
 
     self.assertEqual([], sidebar.SIDEBAR)
@@ -40,7 +41,7 @@ class SidebarTest(unittest.TestCase):
     self.assertNotEqual([], sidebar.SIDEBAR)
 
   def testSidebarBuilds(self):
-    """test that the sidebar builds and does not return None
+    """Test that the sidebar builds and does not return None.
     """
 
     self.assertNotEqual(None, sidebar.getSidebar())

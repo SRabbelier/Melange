@@ -28,7 +28,7 @@ from soc.cache import base
 
 
 class CacheDecoratorTest(unittest.TestCase):
-  """Tests that the @cache decorator caches the result
+  """Tests that the @cache decorator caches the result.
   """
 
   def setUp(self):
@@ -53,14 +53,14 @@ class CacheDecoratorTest(unittest.TestCase):
     memcache.add('answer_to_life', 42)
 
   def testMemcache(self):
-    """Santiy check to see if memcache is working
+    """Sanity check to see if memcache is working.
     """
 
     memcache.add('answer_to_life', 42)
     self.assertEqual(memcache.get('answer_to_life'), 42)
 
   def testSidebarCaching(self):
-    """Test that the caching decorator caches
+    """Test that the caching decorator caches.
     """
 
     self.failOnSecondCall()

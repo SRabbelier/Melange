@@ -279,7 +279,7 @@ class Role(soc.models.linkable.Linkable):
   #: Service. (Not a required field because some Roles may not have special
   #: Terms of Service.)
   agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext('Agrees to ToS'))
+      verbose_name=ugettext('I agree to the Terms of Service'))
   agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the Terms of Service for this Role.')
 

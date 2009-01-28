@@ -95,7 +95,7 @@ class User(soc.models.linkable.Linkable):
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)
   agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext('Agrees to ToS'))
+      verbose_name=ugettext('I agree to the Terms Of Service'))
   agrees_to_tos.help_text = ugettext(
       'Indicates that the user agrees to the site-wide Terms of Service.')
 

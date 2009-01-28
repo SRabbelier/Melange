@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.cache import sidebar
 from soc.logic.models import work
 from soc.logic.models import linkable as linkable_logic
 
@@ -40,6 +41,22 @@ class Logic(work.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def _updateField(self, entity, name, value):
+    """Special logic for role. If state changes to active we flush the sidebar.
+    """
+
+    if (name == 'is_featured') and (entity.is_featured != value):
+      sidebar.flush()
+
+    return True
+
+  def _onCreate(self, entity):
+    """Flush the sidebar cache when a new active role entity has been created.
+    """
+
+    if entity.is_featured:
+      sidebar.flush()
 
 
 logic = Logic()

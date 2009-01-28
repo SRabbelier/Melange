@@ -106,3 +106,9 @@ class Program(soc.models.tossed.Tossed):
   is_enabled.help_text = ugettext(
       'Field used to indicate if a Presence is enabled at all, and as such'
       '  accessible to non-developers.')
+
+  #: Whether the program is enabled
+  allocations_visible = db.BooleanProperty(default=False,
+      verbose_name=ugettext('Slot allocations visible'))
+  allocations_visible.help_text = ugettext(
+      'Field used to indicate if the slot allocations should be visible.')

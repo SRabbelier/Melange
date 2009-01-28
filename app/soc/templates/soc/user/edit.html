@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/models/edit.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,27 +14,7 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
-{% block scripts %}
-	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
-{% endblock %}
-{% block header_title %}
-{{ page_name }}
- {% if entity %}
-   <!-- TODO(srabbelier) use a generic entity name as link -->
-   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}"
->{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
- {% endif %}
-{% endblock %}
-
-{% block body %}
-<p>
-<p>
-{% block instructions %}
-Please use this form to edit the {{ entity_type }}.
-{% endblock %}
-</p>
-<form method="POST">
- <table>
+{% block form_table %}
   {% as_table form %}
   {% if entity.former_accounts %}
   <tr>
@@ -48,27 +28,4 @@ Please use this form to edit the {{ entity_type }}.
    <td class="formfieldhelptext">&nbsp;</td>
   </tr>
   {% endif %}
-  <tr>
-   <td colspan="4">&nbsp;</td>
-  </tr>
-  </table>
-  <table>
-  <tr>
-    {% block submit_buttons %}
-   <td> 
-    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
-   </td>
-   <td>
-    <input type="button" onclick="location.href='/'" value="Cancel"/>
-   </td>
-   {% if entity %}
-   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
-   </td>
-   {% endif %}
-   {% endblock %}
-  </tr>
- </table>
-</form>
-</p>
 {% endblock %}

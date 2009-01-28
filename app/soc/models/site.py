@@ -26,10 +26,10 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.tossed
+import soc.models.presence_with_tos
 
 
-class Site(soc.models.tossed.Tossed):
+class Site(soc.models.presence_with_tos.PresenceWithToS):
   """Model of a Site, which stores per site configuration.
 
   The Site Model stores configuration information unique to the Melange

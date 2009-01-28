@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Views for Tossed.
+"""Views for PresenceWithToS.
 """
 
 __authors__ = [
@@ -31,12 +31,12 @@ from soc.logic import dicts
 from soc.logic.models import document as document_logic
 from soc.views.models import presence
 
-import soc.logic.models.tossed
+import soc.logic.models.presence_with_tos
 import soc.models.work
 
 
 class View(presence.View):
-  """View methods for the Tossed model.
+  """View methods for the PresenceWithToS model.
   """
 
   def __init__(self, params=None):
@@ -48,7 +48,7 @@ class View(presence.View):
     """
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.tossed.logic
+    new_params['logic'] = soc.logic.models.presence_with_tos.logic
 
     new_params['create_extra_dynafields'] = {
         'tos_link_id': forms.CharField(required=False,

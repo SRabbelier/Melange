@@ -14,31 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tossed (Model) query functions.
+"""This module contains the PresenceWithToS Model.
 """
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  ]
+]
+
+from google.appengine.ext import db
+
+from django.utils.translation import ugettext
+
+import soc.models.presence
 
 
-from soc.logic.models import presence
-from soc.logic.models import presence as presence_logic
-
-import soc.models.tossed
-
-
-class Logic(presence.Logic):
-  """Logic methods for the Tossed model.
+class PresenceWithToS(soc.models.presence.Presence):
+  """Model of a Presence that has a Terms of Service.
   """
 
-  def __init__(self, model=soc.models.tossed.Tossed,
-               base_model=None, scope_logic=presence_logic):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
-
-
-logic = Logic()
+  #: Reference to Document containing optional Terms of Service
+  tos = db.ReferenceProperty(
+    reference_class=soc.models.document.Document,
+    verbose_name=ugettext('Terms of Service'),
+    collection_name='tos')
+  tos.help_text = ugettext(
+      'Document containing optional Terms of Service for participating.')
+  tos.redirect_url = soc.models.document.Document.URL_NAME

@@ -23,15 +23,15 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import tossed
-from soc.logic.models import tossed as tossed_logic
+from soc.logic.models import presence_with_tos
+from soc.logic.models import presence_with_tos as tos_logic
 
 import gsoc.logic.models.timeline
 import soc.logic.models.timeline
 import soc.models.program
 
 
-class Logic(tossed.Logic):
+class Logic(presence_with_tos.Logic):
   """Logic methods for the Program model.
   """
 
@@ -39,7 +39,7 @@ class Logic(tossed.Logic):
                     'ghop' : soc.logic.models.timeline.logic}
 
   def __init__(self, model=soc.models.program.Program, 
-               base_model=None, scope_logic=tossed_logic):
+               base_model=None, scope_logic=tos_logic):
     """Defines the name, key_name and model for this entity.
     """
 

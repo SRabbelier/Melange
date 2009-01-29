@@ -278,7 +278,18 @@ class View(group.View):
           "Edit Club Profile", 'any_access')
       submenus.append(submenu)
 
-      # TODO(ljvderijk) add more usefull links, like resign as admin/member
+      # add a link to resign as club admin
+      submenu = (redirects.getManageRedirect(roles['club_admin'], 
+          {'url_name': 'club_admin'}), 
+          "Resign as Club Admin", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('club_member'):
+      # add a link to resign as club member
+      submenu = (redirects.getManageRedirect(roles['club_member'], 
+          {'url_name' : 'club_member'}), 
+          "Resign as Club Member", 'any_access')
+      submenus.append(submenu)
 
     return submenus
 

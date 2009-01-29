@@ -30,7 +30,7 @@ from django.utils.translation import ugettext
 from soc.models import base
 
 
-# start with ASCII digit or lowercase
+# start with ASCII lowercase
 #   (additional ASCII digit or lowercase
 #     -OR-
 #   underscore and ASCII digit or lowercase)
@@ -39,7 +39,7 @@ from soc.models import base
 # * starting or ending underscores are *not* permitted
 # * double internal underscores are *not* permitted
 #
-LINK_ID_PATTERN_CORE = r'[0-9a-z](?:[0-9a-z]|_[0-9a-z])*'
+LINK_ID_PATTERN_CORE = r'[a-z](?:[0-9a-z]|_[0-9a-z])*'
 LINK_ID_ARG_PATTERN = r'(?P<link_id>%s)' % LINK_ID_PATTERN_CORE
 LINK_ID_PATTERN = r'^%s$' % LINK_ID_PATTERN_CORE
 LINK_ID_REGEX = re.compile(LINK_ID_PATTERN)

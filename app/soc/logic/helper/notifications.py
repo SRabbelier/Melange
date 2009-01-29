@@ -143,7 +143,7 @@ def sendNotification(to_user, message_properties, subject, template):
       'subject': subject,
       'message' : message,
       'scope' : to_user,
-      'link_id' :'%i' % (time.time()),
+      'link_id' :'t%i' % (time.time()),
       'scope_path' : to_user.link_id
   }
 

@@ -163,7 +163,7 @@ class View(base.View):
     # get the current user
     current_user = user_logic.logic.getForCurrentAccount()
 
-    fields['link_id'] = '%i' % (time.time())
+    fields['link_id'] = 't%i' % (time.time())
     fields['scope'] = fields['to_user']
     fields['from_user'] = current_user
     fields['scope_path'] = fields['to_user'].link_id

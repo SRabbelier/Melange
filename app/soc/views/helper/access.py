@@ -773,7 +773,7 @@ class Checker(object):
        AccessViolationResponse: if the required authorization is not met
 
     Returns:
-      None if the current User has no active role for the given role_logic.
+      None if the current User has an active role for the given role_logic.
     """
 
     if not self.user or self.user.link_id != django_args['link_id']:
@@ -781,21 +781,58 @@ class Checker(object):
       self.deny(django_args)
 
     fields = {'link_id': django_args['link_id'],
-              'scope_path': django_args['scope_path']
+              'scope_path': django_args['scope_path'],
               }
 
-    role_entity = role_logic.logic.getForFields(fields, unique=True)
+    role_entity = role_logic.logic.getFromFieldsOr404(**fields)
 
-    if not role_entity:
-      # no role found
+    if role_entity.state != 'active':
+      # role is not active
       self.deny(django_args)
 
-    if role_entity.state == 'active':
-      # this role exist and is active
-      return
-    else:
-      # this role is not active
+
+  @allowDeveloper
+  @denySidebar
+  def checkIsAllowedToManageRole(self, django_args, role_logic, manage_role_logic):
+    """Returns an alternate HTTP response if the user is not allowed to manage
+       the role given in args.
+
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
+
+    Returns:
+      None if the current User has an active role for the given role_logic.
+      None if the current User has an active managing role
+    """
+
+    try:
+      # check if it is my role the user's own role
+      self.checkIsMyActiveRole(django_args, role_logic)
+    except out_of_band.Error:
+      pass
+
+    # apparently it's not the user's role so check if managing this role is allowed
+    fields = {'link_id': django_args['link_id'],
+              'scope_path': django_args['scope_path'],
+              }
+
+    role_entity = role_logic.logic.getFromFieldsOr404(**fields)
+
+    if role_entity.state != 'active':
+      # cannot manage this entity
       self.deny(django_args)
+
+    fields = {'link_id': self.user.link_id,
+        'scope_path': django_args['scope_path'],
+        'state' : 'active'
+        }
+
+    manage_entity = manage_role_logic.logic.getForFields(fields, unique=True)
+
+    if not manage_entity:
+      self.deny(django_args)
+
+    return
 
   def checkHasPickGetArgs(self, django_args):
     """Raises an alternate HTTP response if the request misses get args.

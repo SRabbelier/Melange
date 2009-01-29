@@ -104,10 +104,10 @@ class Program(soc.models.presence_with_tos.PresenceWithToS):
   is_enabled = db.BooleanProperty(default=False,
       verbose_name=ugettext('Is Enabled'))
   is_enabled.help_text = ugettext(
-      'Field used to indicate if a Presence is enabled at all, and as such'
+      'Field used to indicate if a Program is enabled at all, and as such'
       '  accessible to non-developers.')
 
-  #: Whether the program is enabled
+  #: Whether the slots allocations are visible
   allocations_visible = db.BooleanProperty(default=False,
       verbose_name=ugettext('Slot allocations visible'))
   allocations_visible.help_text = ugettext(

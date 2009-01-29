@@ -34,6 +34,7 @@ from soc.views.models import club as club_view
 from soc.views.models import role
 
 import soc.logic.models.club_member
+import soc.logic.models.club_admin
 
 
 class View(role.View):
@@ -58,6 +59,9 @@ class View(role.View):
         ('checkCanMakeRequestToGroup', club_logic)]
     rights['process_request'] = ['checkIsClubAdminForClub',
         ('checkCanProcessRequest','club_member')]
+    rights['manage'] = [
+        ('checkIsAllowedToManageRole', [soc.logic.models.club_member,
+             soc.logic.models.club_admin])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_member.logic
@@ -128,6 +132,7 @@ delete = view.delete
 edit = view.edit
 invite = view.invite
 list = view.list
+manage = view.manage
 process_request = view.processRequest
 request = view.request
 public = view.public

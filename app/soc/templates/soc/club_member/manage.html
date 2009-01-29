@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/club_member/public.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,20 +12,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
 
 {% block header_title %}
-{{ page_name }} for {{ entity.user.name }} ({{ entity.given_name }} {{ entity.surname }})
+{{ page_name }} {{ entity.link_id }} for {{ entity.scope_path }}
 {% endblock %}
 
-{% block body %}
-<p>
- <table>
-  {% readonly_field_as_table_row entity.fields.given_name.label entity.given_name %}
-  {% readonly_field_as_table_row entity.fields.surname.label entity.surname %}
-  {% readonly_field_as_table_row entity.fields.display_name.label entity.display_name %}
-  <!-- TODO(pawel.solyga) make this generic -->
- </table>
-</p>
-{% block manage %} {% endblock %}
+{% block manage %}
+<tr>
+  <td>
+    Please select the appropriate action:</br>
+    <input type="button" onclick="location.href='/{{ url_name }}/manage/{{ entity.scope_path }}/{{ entity.link_id }}?resign=true'" value="Resign"/>
+    <input type="button" onclick="location.href='{{ cancel_redirect }}'" value="Cancel"/>
+  </td>
+</tr>
 {% endblock %}

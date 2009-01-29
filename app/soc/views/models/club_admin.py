@@ -57,6 +57,9 @@ class View(role.View):
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'club_admin')]
     rights['process_request'] = ['checkIsClubAdminForClub',
         ('checkCanProcessRequest', 'club_admin')]
+    rights['manage'] = [
+        ('checkIsAllowedToManageRole', [soc.logic.models.club_admin,
+             soc.logic.models.club_admin])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_admin.logic
@@ -126,6 +129,7 @@ delete = view.delete
 edit = view.edit
 invite = view.invite
 list = view.list
+manage = view.manage
 process_request = view.processRequest
 public = view.public
 export = view.export

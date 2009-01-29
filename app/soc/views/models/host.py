@@ -63,6 +63,9 @@ class View(role.View):
     rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
     rights['process_request'] = ['checkIsHost',
         ('checkCanProcessRequest','host')]
+    rights['manage'] = [
+        ('checkIsAllowedToManageRole', [soc.logic.models.host,
+             soc.logic.models.host])]
 
     new_params = {}
     new_params['rights'] = rights
@@ -135,6 +138,7 @@ delete = view.delete
 edit = view.edit
 invite = view.invite
 list = view.list
+manage = view.manage
 process_request = view.processRequest
 public = view.public
 export = view.export

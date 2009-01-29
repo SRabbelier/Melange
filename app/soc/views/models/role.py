@@ -92,12 +92,20 @@ class View(base.View):
           'soc.views.models.%(module_name)s.process_request',
           'Process request for %(name)s')]
 
+    # add manage pattern
+    patterns += [(r'^%(url_name)s/(?P<access_type>manage)/%(scope)s/%(lnp)s$',
+        'soc.views.models.%(module_name)s.manage',
+        'Manage a %(name)s'),]
+
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    # add manage template
+    params['manage_template'] = 'soc/%(module_name)s/manage.html' % params
 
   @decorators.merge_params
   @decorators.check_access
@@ -325,9 +333,62 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
+  def manage(self, request, access_type,
+                   page_name=None, params=None, **kwargs):
+    """Handles the request concerning the view that let's 
+       you manage a role's state.
+
+    Args:
+      request: the standard Django HTTP request object
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    logic = params['logic']
+
+    # get the entity for the given fields in kwargs
+    fields = {'scope_path': kwargs['scope_path'],
+        'link_id': kwargs['link_id']}
+    role_entity = logic.getForFields(kwargs, unique=True)
+
+    # get the redirect for the cancel button or when the resignation is done
+    redirect = redirects.getListRolesRedirect(role_entity.scope, 
+        params['group_view'].getParams())
+
+    # check to see if resign is true
+    get_dict = request.GET
+    resign = get_dict.get('resign')
+
+    if resign == 'true':
+      # change the state of this role_entity to invalid
+      fields = {'state': 'invalid'}
+      logic.updateEntityProperties(role_entity, fields)
+
+      # redirect to the roles listing
+      return http.HttpResponseRedirect(redirect)
+
+    # set the appropriate context
+    context['entity'] = role_entity
+    context['url_name'] = params['url_name']
+    context['cancel_redirect'] = redirect
+
+    # get the manage template
+    template = params['manage_template']
+
+    # return a proper response
+    return responses.respond(request, template, context=context)
+
+
+  @decorators.merge_params
+  @decorators.check_access
   def request(self, request, access_type,
                    page_name=None, params=None, **kwargs):
-    """Handles the GET request concerning the view that creates a request
+    """Handles the request concerning the view that creates a request
     for attaining a certain Role.
 
     Args:

@@ -24,12 +24,17 @@ limitations under the License.
   {% readonly_field_as_table_row entity.fields.name.label entity.name %}
   {% readonly_field_as_table_row entity.fields.home_page.label entity.home_page %}
   {% readonly_field_as_table_row entity.fields.description.label entity.description %}
-  {% readonly_field_as_table_row entity.fields.street.label entity.street %}
-  {% readonly_field_as_table_row entity.fields.city.label entity.city %}
-  {% readonly_field_as_table_row entity.fields.state.label entity.state %}
-  {% readonly_field_as_table_row entity.fields.country.label entity.country %}
-  {% readonly_field_as_table_row entity.fields.postalcode.label entity.postalcode %}
+  {% readonly_field_as_table_row entity.fields.contact_street.label entity.contact_street %}
+  {% readonly_field_as_table_row entity.fields.contact_city.label entity.contact_city %}
+  {% readonly_field_as_table_row entity.fields.contact_state.label entity.contact_state %}
+  {% readonly_field_as_table_row entity.fields.contact_country.label entity.contact_country %}
+  {% readonly_field_as_table_row entity.fields.contact_postalcode.label entity.contact_postalcode %}
   {% readonly_field_as_table_row entity.fields.phone.label entity.phone %}
+  {% readonly_field_as_table_row entity.fields.shipping_street.label entity.shipping_street %}
+  {% readonly_field_as_table_row entity.fields.shipping_city.label entity.shipping_city %}
+  {% readonly_field_as_table_row entity.fields.shipping_state.label entity.shipping_state %}
+  {% readonly_field_as_table_row entity.fields.shipping_country.label entity.shipping_country %}
+  {% readonly_field_as_table_row entity.fields.shipping_postalcode.label entity.shipping_postalcode %}
  </table>
 </p>
 {% endblock %}

@@ -278,25 +278,14 @@ class View(presence.View):
     role_descriptions = {}
 
     for role_name in role_views.keys():
-      # get the view for a specific role
       role_view = role_views[role_name]
-
-      # get the params for this view
       role_view_params = role_view.getParams()
-
-      # get the logic for this view
       role_logic = role_view_params['logic']
 
-      # get all the active roles that this user has
       roles = role_logic.getForFields(fields)
 
-      # for each role that we find
       for role in roles:
-
-        # get the Key Name of the group
         group_key_name = role.scope.key().name()
-
-        # try to get an existing description
         existing_role_descriptions = role_descriptions.get(group_key_name)
 
         if existing_role_descriptions:

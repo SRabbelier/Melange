@@ -46,6 +46,7 @@ from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
+from soc.logic.models.program import logic as program_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import redirects
@@ -567,25 +568,18 @@ class Checker(object):
 
     self.checkIsUser(django_args)
 
-    user = user_logic.getForCurrentAccount()
+    scope_path = None
 
-    if django_args.get('scope_path'):
+    if 'scope_path' in django_args:
       scope_path = django_args['scope_path']
-    else:
+    if 'link_id' in django_args:
       scope_path = django_args['link_id']
 
-    fields = {'user': user,
-              'scope_path': scope_path,
+    fields = {'user': self.user,
               'state': 'active'}
 
-    host = host_logic.getForFields(fields, unique=True)
-
-    self.checkIsUser(django_args)
-
-    user = user_logic.getForCurrentAccount()
-
-    fields = {'user': user,
-              'state': 'active'}
+    if scope_path:
+      fields['scope_path'] = scope_path
 
     host = host_logic.getForFields(fields, unique=True)
 
@@ -596,6 +590,21 @@ class Checker(object):
         'role': 'a Program Administrator '}
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  @denySidebar
+  @allowDeveloper
+  def checkIsHostForProgram(self, django_args):
+    """Checks if the user is a host for the specified program.
+    """
+
+    key_fields = program_logic.getKeyFieldsFromDict(django_args)
+    program = program_logic.getFromFields(**key_fields)
+
+    if not program:
+      self.deny(django_args)
+
+    new_args = { 'scope_path': program.scope_path }
+    self.checkIsHost(new_args)
 
   @allowDeveloper
   def checkIsHostForSponsor(self, django_args):
@@ -880,3 +889,29 @@ class Checker(object):
     # TODO(srabbelier): A proper check needs to be done to see if the document
     # is public or not, probably involving analysing it's scope or such.
     self.allow(django_args)
+
+  @allowIfCheckPasses('checkIsHost')
+  def checkIsProgramActive(self, django_args):
+    """Checks whether a program is active
+    """
+
+    if 'entity' in django_args:
+      program = django_args['entity']
+    else:
+      key_fields = program_logic.getKeyFieldsFromDict(django_args)
+      program = program_logic.getFromFields(**key_fields)
+
+    if not program:
+      self.deny(django_args)
+
+    if program.is_enabled:
+      return
+
+    context = django_args.get('context', {})
+    context['title'] = 'Access denied'
+
+    message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': ugettext('a Program Administrator')}
+
+    raise out_of_band.AccessViolation(DEF_DEV_LOGOUT_LOGIN_MSG_FMT,
+                                      context=context)

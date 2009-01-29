@@ -56,6 +56,9 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
+    rights['create'] = ['checkIsHost']
+    rights['edit'] = ['checkIsHostForProgram']
+    rights['delete'] = ['checkIsHostForProgram']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
@@ -143,9 +146,9 @@ class View(presence_with_tos.View):
     filter_args = {}
 
     for entity in entities:
-      filter_args['scope_path'] = entity.key().name()
+      filter_args['entity'] = entity
       try:
-        rights.doCheck('checkIsHost', filter_args, [])
+        rights.doCheck('checkIsProgramActive', filter_args, [])
       except out_of_band.Error:
         continue
 

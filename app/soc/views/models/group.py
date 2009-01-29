@@ -57,7 +57,7 @@ class View(presence.View):
     new_params = {}
 
     new_params['extra_dynaexclude'] = ['founder','home', 'tos',
-                                       'member_template']
+                                       'member_template', 'state']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
@@ -84,7 +84,7 @@ class View(presence.View):
 
     new_params['role_views'] = {}
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

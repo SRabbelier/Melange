@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
@@ -78,41 +79,45 @@ class Group(soc.models.presence.Presence):
   irc_channel = db.StringProperty(required=False,
     verbose_name=ugettext('Public IRC Channel (and Network)'))
 
+  #====================================================================
+  # (private) contact information
+  #====================================================================
+
   #: Required field containing a group street address.
   #: Group street address can only be lower ASCII, not UTF-8 text, 
-  #: because, if supplied, it is used as a shipping address.
-  street = db.StringProperty(required=True,
+  #: because, if supplied, it might be used as a shipping address.
+  contact_street = db.StringProperty(required=True,
       verbose_name=ugettext('Street address'))
-  street.help_text = ugettext(
+  contact_street.help_text = ugettext(
       'street number and name, lower ASCII characters only')
 
   #: Required field containing group address city.
   #: City can only be lower ASCII, not UTF-8 text, because, if
-  #: supplied, it is used as a shipping address.
-  city = db.StringProperty(required=True,
+  #: supplied, it might be used as a shipping address.
+  contact_city = db.StringProperty(required=True,
       verbose_name=ugettext('City'))
-  city.help_text = ugettext('lower ASCII characters only')
+  contact_city.help_text = ugettext('lower ASCII characters only')
 
-  #: Optional field containing group address state or province.
+  #: Required field containing group address state or province.
   #: Group state/province can only be lower ASCII, not UTF-8
-  #: text, because, if supplied, it is used as a shipping address.
-  state = db.StringProperty(
+  #: text, because, if supplied, it might be used as a shipping address.
+  contact_state = db.StringProperty(
       verbose_name=ugettext('State/Province'))
-  state.help_text = ugettext(
+  contact_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
 
   #: Required field containing address country or territory of the group.
-  country = db.StringProperty(required=True,
+  contact_country = db.StringProperty(required=True,
       verbose_name=ugettext('Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
   #: Required field containing address postal code of the group (ZIP code in
-  #: the United States). Postal code can only be lower ASCII, not UTF-8 
-  #: text, because, if supplied, it is used as a shipping address.
-  postalcode = db.StringProperty(required=True,
+  #: the United States).Postal code can only be lower ASCII, not UTF-8 
+  #: text, because, if supplied, it might be used as a shipping address.
+  contact_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext('ZIP/Postal Code'))
-  postalcode.help_text = ugettext('lower ASCII characters only')
+  contact_postalcode.help_text = ugettext('lower ASCII characters only')
 
   #: Required contact phone number that will be, amongst other uses,
   #: supplied to shippers along with the shipping address; kept private.
@@ -120,4 +125,52 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Phone Number'))
   phone.help_text = ugettext(
       'include complete international calling number with country code')
+
+  #====================================================================
+  # (private) shipping information
+  #====================================================================
+
+  #: Optional field containing a group street address.
+  #: Group street address can only be lower ASCII, not UTF-8 text, 
+  #: because, if supplied, it is used as a shipping address.
+  shipping_street = db.StringProperty(required=False,
+      verbose_name=ugettext('Shipping Street address'))
+  shipping_street.help_text = ugettext(
+      'street number and name, lower ASCII characters only')
+
+  #: Optional field containing group address city.
+  #: City can only be lower ASCII, not UTF-8 text, because, if
+  #: supplied, it is used as a shipping address.
+  shipping_city = db.StringProperty(required=False,
+      verbose_name=ugettext('Shipping City'))
+  shipping_city.help_text = ugettext('lower ASCII characters only')
+
+  #: Optional field containing group address state or province.
+  #: Group state/province can only be lower ASCII, not UTF-8
+  #: text, because, if supplied, it is used as a shipping address.
+  shipping_state = db.StringProperty(
+      verbose_name=ugettext('Shipping State/Province'))
+  shipping_state.help_text = ugettext(
+      'optional if country/territory does not have states or provinces, '
+      'lower ASCII characters only')
+
+  #: Optional field containing address postal code of the group (ZIP code in
+  #: the United States). Postal code can only be lower ASCII, not UTF-8 
+  #: text, because, if supplied, it is used as a shipping address.
+  shipping_postalcode = db.StringProperty(required=False,
+      verbose_name=ugettext('Shipping ZIP/Postal Code'))
+  shipping_postalcode.help_text = ugettext('lower ASCII characters only')
+
+  #: Optional field containing address country or territory of the group.
+  shipping_country = db.StringProperty(required=False,
+      verbose_name=ugettext('Shipping Country/Territory'),
+      choices=countries.COUNTRIES_AND_TERRITORIES)
+
+  #: Required property showing the current state of the group
+  #: new: the group has not been active yet
+  #: active: the group is active
+  #: inactive: used to mark a group as read-only
+  #: invalid: the group has been marked as removed
+  state = db.StringProperty(required=True, default='new',
+      choices=['new', 'active', 'inactive', 'invalid'])
 

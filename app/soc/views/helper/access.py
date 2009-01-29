@@ -795,14 +795,20 @@ class Checker(object):
   @denySidebar
   def checkIsAllowedToManageRole(self, django_args, role_logic, manage_role_logic):
     """Returns an alternate HTTP response if the user is not allowed to manage
-       the role given in args.
+       the role given in args. 
+
+     Args:
+       role_logic: determines the logic for the role in args.
+       manage_role_logic: determines the logic for the role which is allowed 
+           to manage this role.
 
      Raises:
        AccessViolationResponse: if the required authorization is not met
 
     Returns:
-      None if the current User has an active role for the given role_logic.
-      None if the current User has an active managing role
+      None if the given role is active and belongs to the current user.
+      None if the current User has an active role (from manage_role_logic) 
+           that belongs to the same scope as the role that needs to be managed
     """
 
     try:

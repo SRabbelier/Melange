@@ -26,6 +26,7 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import group
 
 import soc.models.sponsor
@@ -67,9 +68,45 @@ class View(group.View):
 
     super(View, self).__init__(params=params)
 
-    # TODO(ljvderijk) add sidebar entries for specific sponsors
-    #def _getExtraMenuItems(self, role_description, params=None):
+  def _getExtraMenuItems(self, role_description, params=None):
+    """Used to create the specific Sponsor menu entries.
 
+    For args see group.View._getExtraMenuItems().
+    """
+
+    submenus = []
+
+    group_entity = role_description['group']
+    roles = role_description['roles']
+  
+    if roles.get('host'):
+      # add a link to the management page
+      submenu = (redirects.getListRolesRedirect(group_entity, params), 
+          "Manage Program Administrators", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite an a host
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'host'), 
+          "Invite a Host", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the request page
+      submenu = (redirects.getListRequestsRedirect(group_entity, params), 
+          "List Host Invites", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(group_entity, params), 
+          "Edit Sponsor Profile", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to resign as a host
+      submenu = (redirects.getManageRedirect(roles['host'], 
+          {'url_name': 'host'}), 
+          "Resign as Host", 'any_access')
+      submenus.append(submenu)
+
+    return submenus
 
 
 view = View()

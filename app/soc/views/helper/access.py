@@ -98,20 +98,30 @@ def denySidebar(fun):
   return wrapper
 
 
-def allowDeveloper(fun):
-  """Decorator that allows access if the current user is a Developer.
+def allowIfCheckPasses(checker_name):
+  """Returns a decorator that allows access if the specified checker passes.
   """
 
   from functools import wraps
 
-  @wraps(fun)
-  def wrapper(self, django_args, *args, **kwargs):
-    try:
-      # if the current user is a developer we allow access
-      return self.checkIsDeveloper(django_args)
-    except out_of_band.Error:
-      return fun(self, django_args, *args, **kwargs)
-  return wrapper
+  def decorator(fun):
+    """Decorator that allows access if the current user is a Developer.
+    """
+
+    @wraps(fun)
+    def wrapper(self, django_args, *args, **kwargs):
+      try:
+        # if the check passes we allow access regardless
+        return self.doCheck(checker_name, django_args, [])
+      except out_of_band.Error:
+        # otherwise we run the original check
+        return fun(self, django_args, *args, **kwargs)
+    return wrapper
+
+  return decorator
+
+
+allowDeveloper = allowIfCheckPasses('checkIsDeveloper')
 
 
 class Checker(object):

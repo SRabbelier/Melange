@@ -410,6 +410,34 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+  @allowDeveloper
+  @denySidebar
+  def checkIsGroupActive(self, django_args, group_logic):
+    """Raises an alternate HTTP response if Group state is not active.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+    Raises:
+      AccessViolationResponse:
+      * if no Group is found
+      * if the Group state is not active
+    """
+
+    fields = {'link_id': django_args['link_id']}
+
+    if django_args.get('scope_path'):
+      fields['scope_path'] = django_args['scope_path']
+
+    group_entity = group_logic.logic.getFromFieldsOr404(**fields)
+
+    if group_entity.state == 'active':
+      return
+
+    # TODO tell the user that this group is not active
+    self.deny(django_args)
+
+
   def checkCanMakeRequestToGroup(self, django_args, group_logic):
     """Raises an alternate HTTP response if the specified group is not in an
     active state.
@@ -426,12 +454,16 @@ class Checker(object):
     if not group_entity:
       raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
 
-    # TODO(ljvderijk) check if the group is active
+    if group_entity.state != 'active':
+      # TODO tell the user that this group is not active
+      self.deny(django_args)
+
     return
 
   def checkCanCreateFromRequest(self, django_args, role_name):
     """Raises an alternate HTTP response if the specified request does not exist
-       or if it's state is not group_accepted.
+       or if it's state is not group_accepted. Also when the group this request
+       is from is in an inactive or invalid state access will be denied.
     """
 
     self.checkIsUser(django_args)
@@ -451,11 +483,16 @@ class Checker(object):
       # TODO tell the user that this request has not been accepted yet
       self.deny(django_args)
 
+    if request_entity.scope.state in ['invalid', 'inactive']:
+      # TODO tell the user that it is not possible to create this role anymore
+      self.deny(django_args)
+
     return
 
   def checkCanProcessRequest(self, django_args, role_name):
     """Raises an alternate HTTP response if the specified request does not exist
-       or if it's state is completed or denied.
+       or if it's state is completed or denied. Also Raises an alternate HTTP response
+       whenever the group in the request is not active.
     """
 
     fields = {'link_id': django_args['link_id'],
@@ -466,6 +503,10 @@ class Checker(object):
 
     if request_entity.state in ['completed', 'denied']:
       # TODO tell the user that this request has been processed
+      self.deny(django_args)
+
+    if request_entity.scope.state != 'active':
+      # TODO tell the user that this group cannot process requests
       self.deny(django_args)
 
     return

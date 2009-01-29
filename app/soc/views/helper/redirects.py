@@ -147,6 +147,16 @@ def getProcessRequestRedirect(entity, _):
   return result
 
 
+def getManageRedirect(entity, params):
+  """Returns the redirect for managing the given entity.
+  """
+
+  result = '/%s/manage/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
 def getSelectRedirect(entity, params):
   """Returns the pick redirect for the specified entity.
   """

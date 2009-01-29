@@ -228,8 +228,7 @@ class View(presence.View):
       # create the list parameters
       list_params = role_views[role_name].getParams().copy()
 
-      # TODO(ljvderijk) define the list redirect action to the managing page
-      list_params['list_action'] = (redirects.getEditRedirect, list_params)
+      list_params['list_action'] = (redirects.getManageRedirect, list_params)
       list_params['list_description'] = ugettext(
           "An overview of the %s for this %s." % (
           list_params['name_plural'], params['name']))
@@ -326,8 +325,7 @@ class View(presence.View):
       group_entity = role_description['group']
 
       # set the menu header name
-      menu['heading'] = '%s %s' %(params['name'], 
-          group_entity.short_name)
+      menu['heading'] = group_entity.short_name
 
       # get the documents for this group entity
       doc_items = document_view.view.getMenusForScope(group_entity, params)
@@ -341,7 +339,7 @@ class View(presence.View):
 
       # add the items together
       menu['items'] = doc_items + group_items
-      menu['group'] = 'Clubs'
+      menu['group'] = params['name_plural']
 
       # append this as a new menu
       menus.append(menu)

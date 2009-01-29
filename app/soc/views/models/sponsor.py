@@ -47,7 +47,8 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsHostForSponsor']
+    rights['edit'] = ['checkIsHostForSponsor', 
+        ('checkIsGroupActive', soc.logic.models.sponsor)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['checkIsHostForSponsor']
     rights['list'] = ['checkIsDeveloper']

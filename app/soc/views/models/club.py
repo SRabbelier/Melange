@@ -60,11 +60,11 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsClubAdminForClub']
+    rights['edit'] = ['checkIsClubAdminForClub', ('checkIsGroupActive', club_logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
-    rights['apply_member'] = ['checkIsUser']
+    rights['apply_member'] = ['checkIsUser', ('checkIsGroupActive', club_logic)]
     rights['list_requests'] = ['checkIsClubAdminForClub']
     rights['list_roles'] = ['checkIsClubAdminForClub']
     rights['applicant'] = [('checkIsApplicationAccepted', club_app_logic)]
@@ -90,7 +90,6 @@ class View(group.View):
     new_params['sidebar_additional'] = [
         ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
 
-    new_params['extra_dynaexclude'] = ['founder', 'home']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),

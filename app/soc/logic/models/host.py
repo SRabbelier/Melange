@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -40,6 +41,21 @@ class Logic(role.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+
+  def _onCreate(self, entity):
+    """Marks the Sponsor for this Host as active it's state is new.
+    """
+
+    sponsor_entity = entity.scope
+
+    if sponsor_entity.state == 'new':
+      # this sponsor is new so mark as active
+      fields = {'state' : 'active'}
+      sponsor_logic.logic.updateEntityProperties(sponsor_entity, fields)
+
+    # call super
+    super(Logic, self)._onCreate(entity)
 
 
 logic = Logic()

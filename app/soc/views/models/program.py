@@ -152,10 +152,18 @@ class View(presence_with_tos.View):
       except out_of_band.Error:
         continue
 
+      items = document_view.view.getMenusForScope(entity, params)
+
+      try:
+        rights.doCachedCheck('checkIsHost', {}, [])
+        items += [(redirects.getEditRedirect(entity, params),'Edit','any_access')]
+        items += [(redirects.getCreateDocumentRedirect(entity, 'program'),
+          "Create new document", 'any_access')]
+      except out_of_band.Error:
+        pass
+
       menu = {}
       menu['heading'] = entity.short_name
-      items = document_view.view.getMenusForScope(entity, params)
-      items += [(redirects.getEditRedirect(entity, params),'Edit','edit')]
       menu['items'] = sidebar.getSidebarMenu(id, user, items, params=params)
       menu['group'] = 'Programs'
       menus.append(menu)

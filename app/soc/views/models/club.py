@@ -261,17 +261,17 @@ class View(group.View):
   
     if roles.get('club_admin'):
       # add a link to the management page
-      submenu = (redirects.getListRolesRedirect(group_entity, params), 
+      submenu = (redirects.getListRolesRedirect(group_entity, params),
           "Manage Admins and Members", 'any_access')
       submenus.append(submenu)
 
       # add a link to invite an admin
-      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_admin'), 
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_admin'),
           "Invite an Admin", 'any_access')
       submenus.append(submenu)
 
       # add a link to invite a member
-      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_member'), 
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_member'),
           "Invite a Member", 'any_access')
       submenus.append(submenu)
 
@@ -296,6 +296,11 @@ class View(group.View):
       submenu = (redirects.getManageRedirect(roles['club_member'], 
           {'url_name' : 'club_member'}), 
           "Resign as Club Member", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('club_member') or roles.get('club_admin'):
+      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'club'),
+          "Create new document", 'any_access')
       submenus.append(submenu)
 
     return submenus

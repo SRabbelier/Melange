@@ -211,6 +211,13 @@ def getApplicantRedirect(entity, params):
       params['url_name'], entity.link_id)
 
 
+def getCreateDocumentRedirect(entity, prefix):
+  """Returns the redirect for new documents.
+  """
+
+  return '/document/create/%s/%s' % (prefix, entity.key().name())
+
+
 def getToSRedirect(presence):
   """Returns link to 'show' the ToS Document if it exists, None otherwise.
 

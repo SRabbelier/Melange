@@ -58,7 +58,8 @@ def getDjangoURLPatterns(params):
     return params['django_patterns']
 
   # Construct defaults manualy
-  default_patterns = params['django_patterns_defaults']
+  default_django_patterns = params['django_patterns_defaults']
+  default_patterns = default_django_patterns[:]
   default_patterns += params['extra_django_patterns']
 
   patterns = []

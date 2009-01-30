@@ -33,12 +33,16 @@ from soc.logic.models import site as site_logic
 from soc.logic.models import user as user_logic
 
 
-def clean_link_id(self):
-  # convert to lowercase for user comfort
-  link_id = self.cleaned_data.get('link_id').lower()
-  if not validate.isLinkIdFormatValid(link_id):
-    raise forms.ValidationError("This link ID is in wrong format.")
-  return link_id
+def clean_link_id(field_name):
+  """Checks if the field_name value is in a valid link ID format. 
+  """
+  def wrapper(self):
+    # convert to lowercase for user comfort
+    link_id = self.cleaned_data.get(field_name).lower()
+    if not validate.isLinkIdFormatValid(link_id):
+      raise forms.ValidationError("This link ID is in wrong format.")
+    return link_id
+  return wrapper
 
 
 def clean_agrees_to_tos(field_name):
@@ -68,10 +72,7 @@ def clean_existing_user(field_name):
   """
 
   def wrapped(self):
-    link_id = self.cleaned_data.get(field_name).lower()
-  
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
+    link_id = clean_link_id(field_name)(self)
   
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
         unique=True)
@@ -90,10 +91,7 @@ def clean_user_not_exist(field_name):
   """ 
 
   def wrapped(self):
-    link_id = self.cleaned_data.get(field_name).lower()
-  
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
+    link_id = clean_link_id(field_name)(self)
   
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
         unique=True)

@@ -179,7 +179,7 @@ def constructParams(params):
   new_params['dynabase'] = helper.forms.BaseForm
 
   create_dynafields = {
-      'clean_link_id': cleaning.clean_link_id,
+      'clean_link_id': cleaning.clean_link_id('link_id'),
       'clean_feed_url': cleaning.clean_feed_url,
       }
   create_dynafields.update(params.get('create_extra_dynafields', {}))
@@ -190,7 +190,7 @@ def constructParams(params):
   new_params['create_dynafields'] = create_dynafields
 
   edit_dynafields = {
-      'clean_link_id': cleaning.clean_link_id,
+      'clean_link_id': cleaning.clean_link_id('link_id'),
       'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
       }
   edit_dynafields.update(params.get('edit_extra_dynafields', {}))

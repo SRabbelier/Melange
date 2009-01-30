@@ -90,7 +90,7 @@ class View(base.View):
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),}
 
     new_params['edit_extra_dynafields'] = {
-        'clean_link_id': cleaning.clean_link_id
+        'clean_link_id': cleaning.clean_link_id('link_id')
         }
 
     new_params['sidebar_heading'] = 'User (self)'

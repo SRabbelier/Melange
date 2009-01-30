@@ -58,7 +58,7 @@ class View(group.View):
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
-        'clean_link_id': cleaning.clean_link_id,
+        'clean_link_id': cleaning.clean_link_id('link_id'),
         }
 
     params = dicts.merge(params, new_params)

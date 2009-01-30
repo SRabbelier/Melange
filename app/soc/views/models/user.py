@@ -81,7 +81,7 @@ class View(base.View):
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True),
-        'clean_link_id': cleaning.clean_link_id,
+        'clean_link_id': cleaning.clean_link_id('link_id'),
         'agreed_to_tos_on' : forms.CharField(widget=widgets.ReadOnlyInput(),
             required=False),
         'clean_account': cleaning.clean_user_account('account'),

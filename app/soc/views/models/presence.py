@@ -71,7 +71,7 @@ class View(base.View):
             help_text=soc.models.work.Work.link_id.help_text),
 
         # add cleaning of the link id and feed url
-        'clean_link_id': cleaning.clean_link_id,
+        'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_feed_url': cleaning.clean_feed_url,
         }
 

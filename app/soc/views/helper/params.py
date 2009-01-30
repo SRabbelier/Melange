@@ -110,7 +110,6 @@ def constructParams(params):
       ]
   new_params['sidebar_additional'] = []
 
-  new_params['key_fields_prefix'] = []
   new_params['link_id_arg_pattern'] = linkable.LINK_ID_ARG_PATTERN
   new_params['link_id_pattern_core'] = linkable.LINK_ID_PATTERN_CORE
   new_params['scope_path_pattern'] = getScopePattern(params)
@@ -264,14 +263,10 @@ def getEditForm(params, base_form):
 
 def getKeyFieldsPattern(params):
   """Returns the Django pattern for this View's entity.
-
-  Params usage:
-    key_fields_prefix: The key_fields_prefix value is used as the
-      first part of the returned pattern.
   """
 
   names = params['logic'].getKeyFieldNames()
-  patterns = params['key_fields_prefix']
+  patterns = []
 
   for name in names:
     if name == 'scope_path':

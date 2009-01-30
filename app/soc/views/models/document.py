@@ -28,12 +28,16 @@ from google.appengine.api import users
 
 from django import forms
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import validate
-from soc.logic.models import user as user_logic
+from soc.logic.models.user import logic as user_logic
+from soc.logic.models.document import logic as document_logic
+from soc.models import linkable
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import params as params_helper
 from soc.views.models import base
 
 import soc.models.document
@@ -41,47 +45,6 @@ import soc.logic.models.document
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.widgets
-
-
-class CreateForm(helper.forms.BaseForm):
-  """Django form displayed when Developer creates a Document.
-  """
-
-  content = forms.fields.CharField(widget=helper.widgets.TinyMCE(
-      attrs={'rows':10, 'cols':40}))
-
-  class Meta:
-    """Inner Meta class that defines some behavior for the form.
-    """
-    model = soc.models.document.Document
-
-    #: list of model fields which will *not* be gathered by the form
-    exclude = ['author', 'created', 'modified_by', 'modified', 'scope']
-
-  def clean_scope_path(self):
-    scope_path = self.cleaned_data.get('scope_path')
-    # TODO(tlarsen): combine path and link_id and check for uniqueness
-    if not validate.isScopePathFormatValid(scope_path):
-      raise forms.ValidationError("This scope path is in wrong format.")
-    return scope_path
-
-  def clean_link_id(self):
-    link_id = self.cleaned_data.get('link_id').lower()
-    # TODO(tlarsen): combine path and link_id and check for uniqueness
-    if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
-    return link_id
-
-
-class EditForm(CreateForm):
-  """Django form displayed a Document is edited.
-  """
-
-  doc_key_name = forms.fields.CharField(widget=forms.HiddenInput)
-  created_by = forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
-                                      required=False)
-  last_modified_by = forms.fields.CharField(
-      widget=helper.widgets.ReadOnlyInput(), required=False)
 
 
 class View(base.View):
@@ -101,15 +64,44 @@ class View(base.View):
     rights['show'] = ['checkIsDocumentPublic']
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.document.logic
+    new_params['logic'] = document_logic
     new_params['rights'] = rights
-
-    new_params['export_content_type'] = 'text/text'
 
     new_params['name'] = "Document"
 
-    new_params['edit_form'] = EditForm
-    new_params['create_form'] = CreateForm
+    new_params['export_content_type'] = 'text/text'
+
+    names = [i for i in document_logic.getKeyFieldNames() if i != 'link_id']
+    create_pattern = params_helper.getPattern(names, linkable.SCOPE_PATH_ARG_PATTERN)
+
+    new_params['extra_django_patterns'] = [
+        (r'^document/(?P<access_type>create)/%s$' % create_pattern,
+        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+
+    new_params['no_create_with_scope'] = True
+    new_params['no_create_with_key_fields'] = True
+
+    new_params['create_extra_dynafields'] = {
+        'content': forms.fields.CharField(
+            widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
+        'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
+                                             required=True),
+        'prefix': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
+                                        required=True),
+
+        'clean_link_id': cleaning.clean_link_id('link_id'),
+        'clean_scope_path': cleaning.clean_scope_path('scope_path'),
+        }
+    new_params['extra_dynaexclude'] = ['author', 'created',
+                                       'modified_by', 'modified']
+
+    new_params['edit_extra_dynafields'] = {
+        'doc_key_name': forms.fields.CharField(widget=forms.HiddenInput),
+        'created_by': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
+                                             required=False),
+        'last_modified_by': forms.fields.CharField(
+            widget=helper.widgets.ReadOnlyInput(), required=False),
+        }
 
     params = dicts.merge(params, new_params)
 
@@ -120,7 +112,7 @@ class View(base.View):
     """
 
     account = users.get_current_user()
-    user = user_logic.logic.getForFields({'account': account}, unique=True)
+    user = user_logic.getForFields({'account': account}, unique=True)
 
     if not entity:
       fields['author'] = user

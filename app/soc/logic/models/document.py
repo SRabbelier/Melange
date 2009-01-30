@@ -42,6 +42,24 @@ class Logic(work.Logic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+  def getKeyValues(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.prefix, entity.scope_path, entity.link_id]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['prefix'], fields['scope_path'], fields['link_id']]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames.
+    """
+
+    return ['prefix', 'scope_path', 'link_id']
+
   def _updateField(self, entity, name, value):
     """Special logic for role. If state changes to active we flush the sidebar.
     """

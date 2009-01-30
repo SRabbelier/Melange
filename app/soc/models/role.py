@@ -275,13 +275,21 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('T-shirt Style'),
       choices=('male', 'female'))
 
-  #: field storing whether User has agreed to the Role-specific Terms of
-  #: Service. (Not a required field because some Roles may not have special
-  #: Terms of Service.)
-  agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext('I agree to the Terms of Service'))
-  agrees_to_tos.help_text = ugettext(
-      'Indicates that the user agrees to the Terms of Service for this Role.')
+  #: field storing wheter the User has agreed to the site-wide Terms of Service.
+  #: (Not a required field because the Terms of Service might not be present
+  #: when the first User profile is created when bootstrapping the site.)
+  agreed_to_tos = db.BooleanProperty(required=False, default=False,
+      verbose_name=ugettext('I Agree to the Terms of Service'))
+  agreed_to_tos.help_text = ugettext(
+      'Indicates whether the user agreed to this role Terms of Service.')
+
+  #: field storing when the User has agreed to the site-wide Terms of Service.
+  #: (Not a required field because the Terms of Service might not be present
+  #: when the first User profile is created when bootstrapping the site.)
+  agreed_to_tos_on = db.DateTimeProperty(required=False, default=None,
+      verbose_name=ugettext('Has agreed to the Terms of Service on'))
+  agreed_to_tos_on.help_text = ugettext(
+      'Indicates when the user agreed to this role Terms of Service.')
 
   #: field storing the state of this role
   #: Active means that this role can exercise all it's privileges.

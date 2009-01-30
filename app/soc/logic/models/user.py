@@ -85,25 +85,20 @@ class Logic(base.Logic):
       True: no site-wide ToS is currently in effect on the site
       True: site-wide ToS is in effect *and* User agrees to it
         (User explicitly answered "Yes")
-      False: site-wide ToS is in effect but User does not agree to it
-        (User explicitly answered "No")
-      None: site-wide ToS in effect, but User has not answered "Yes" or "No"
-        (this answer still evaluates to False, denying access to the site,
-         but can be used to detect non-answer to ask the User to provide the
-         missing answer)
+      False: site-wide ToS is in effect but User did not agree to it yet
     """
     if not site_logic.getToS(site_logic.getSingleton()):
       # no site-wide ToS in effect, so let the User slide for now
       return True
 
     try:
-      agrees = entity.agrees_to_tos
+      agreed_on = entity.agreed_to_tos_on
     except db.Error:
-      # return still-False "third answer" indicating that answer is missing
-      return None
+      # return False indicating that answer is missing
+      return False
 
-    # make sure the stored value is really a Boolean only
-    if not agrees:
+    # user has not agreed yet
+    if not agreed_on:
       return False
 
     return True
@@ -144,7 +139,7 @@ class Logic(base.Logic):
     if (name == 'is_developer') and (entity.is_developer != value):
       sidebar.flush(entity.account)
 
-    if (name == 'agrees_to_tos') and (entity.agrees_to_tos != value):
+    if (name == 'agreed_to_tos') and (entity.agreed_to_tos != value):
       sidebar.flush(entity.account)
 
     if (name == 'account') and (entity.account != value):

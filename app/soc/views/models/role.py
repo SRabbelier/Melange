@@ -100,7 +100,9 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
 
-    params = dicts.merge(params, new_params)
+    new_params['extra_dynaexclude'] = ['user', 'state', 'agreed_to_tos_on']
+
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

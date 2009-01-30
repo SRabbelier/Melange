@@ -56,8 +56,13 @@ be unique and not in use by any other user of the site.
   </tr>
   <tr><td colspan="4">&nbsp;</td></tr>
 
-{% if tos_link %}
-  {% field_as_table_row form.agrees_to_tos %}
+{% if tos_link and not user.agreed_to_tos %}
+<tr>
+  <td>
+      {{ tos_contents|safe|linebreaks }}
+  </td>
+</tr>
+  {% field_as_table_row form.agreed_to_tos %}
   <tr>
    <td class="fieldhelptext" colspan="4">
 In order to participate on this site, you must agree to the

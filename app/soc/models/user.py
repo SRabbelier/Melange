@@ -91,11 +91,19 @@ class User(soc.models.linkable.Linkable):
   is_developer.help_text = ugettext(
       'Field used to indicate user with site-wide Developer access.')
 
-  #: field storing whether User has agreed to the site-wide Terms of Service.
+  #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)
-  agrees_to_tos = db.BooleanProperty(
-      verbose_name=ugettext('I agree to the Terms Of Service'))
-  agrees_to_tos.help_text = ugettext(
-      'Indicates that the user agrees to the site-wide Terms of Service.')
+  agreed_to_tos = db.BooleanProperty(required=False, default=False,
+      verbose_name=ugettext('I Agree to the Terms of Service'))
+  agreed_to_tos.help_text = ugettext(
+      'Indicates whether the user agreed to the site-wide Terms of Service.')
+
+  #: field storing when the User has agreed to the site-wide Terms of Service.
+  #: (Not a required field because the Terms of Service might not be present
+  #: when the first User profile is created when bootstrapping the site.)
+  agreed_to_tos_on = db.DateTimeProperty(required=False, default=None,
+      verbose_name=ugettext('Has agreed to the Terms of Service on'))
+  agreed_to_tos_on.help_text = ugettext(
+      'Indicates when the user agreed to the site-wide Terms of Service.')
 

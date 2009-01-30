@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+import datetime
+
 from google.appengine.api import users
 
 from django import http
@@ -82,8 +84,9 @@ class View(base.View):
     # set the specific fields for the users profile page
     new_params['extra_dynaexclude'] = ['former_accounts', 
         'account', 'is_developer']
+
     new_params['create_extra_dynafields'] = {
-        'clean_agrees_to_tos' : cleaning.clean_agrees_to_tos('agrees_to_tos'),
+        'clean_agreed_to_tos' : cleaning.clean_agrees_to_tos('agreed_to_tos'),
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),}
 
     new_params['edit_extra_dynafields'] = {
@@ -140,15 +143,30 @@ class View(base.View):
            page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
 
 
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
+  def editGet(self, request, entity, context, seed, params=None):
+    """Overwrite so we can add the contents of the ToS.
+    For params see base.View.editGet().
     """
 
-    # set the ToS example text
-    form.fields['agrees_to_tos'].example_text = user_view.view.getToSExampleText()
-    form.fields['link_id'].initial = entity.link_id
+    s_logic = model_logic.site.logic
+    site_tos = s_logic.getToS(s_logic.getSingleton())
+    if site_tos:
+      context['tos_contents'] = site_tos.content
 
-    super(View, self)._editGet(request, entity, form)
+    return super(View, self).editGet(request, entity, context, seed, params=params)
+
+  def editPost(self, request, entity, context, params=None):
+    """Overwrite so we can add the contents of the ToS.
+    For params see base.View.editPost().
+    """
+
+    s_logic = model_logic.site.logic
+    site_tos = s_logic.getToS(s_logic.getSingleton())
+    if site_tos:
+      context['tos_contents'] = site_tos.content
+
+    return super(View, self).editPost(request, entity, context, params=params)
+
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -164,10 +182,14 @@ class View(base.View):
       # there is no Terms of Service set
       if not entity:
         # we are a new user so set the agrees_to_tos field to None
-        fields['agrees_to_tos'] = None
+        fields['agreed_to_tos'] = None
       else:
-        # editing an existing user so don't change the agrees_to_tos field
-        fields['agrees_to_tos'] = entity.agrees_to_tos
+        # editing an existing user so no value changes allowed
+        fields['agreed_to_tos'] = entity.agreed_to_tos
+    else:
+      if not entity or not entity.agreed_to_tos:
+        # set the time of agreement
+        fields['agreed_to_tos_on'] = datetime.datetime.now()
 
     super(View, self)._editPost(request, entity, fields)
 

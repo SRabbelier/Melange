@@ -72,7 +72,7 @@ class View(role.View):
     new_params['name'] = "Club Admin"
     new_params['sidebar_grouping'] = 'Clubs'
 
-    new_params['extra_dynaexclude'] = ['user', 'state']
+    new_params['extra_dynaexclude'] = ['agreed_to_tos']
 
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,

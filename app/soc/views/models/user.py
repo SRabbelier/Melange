@@ -72,18 +72,22 @@ class View(base.View):
 
     new_params['sidebar_heading'] = 'Users'
 
-    new_params['extra_dynaexclude'] = ['former_accounts']
+    new_params['extra_dynaexclude'] = ['former_accounts', 'agreed_to_tos',
+        'agreed_to_tos_on']
     new_params['create_extra_dynafields'] = {
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),
         'clean_account': cleaning.clean_user_account_not_in_use('account')}
 
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-                                   required=True),
+            required=True),
         'clean_link_id': cleaning.clean_link_id,
+        'agreed_to_tos_on' : forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=False),
         'clean_account': cleaning.clean_user_account('account'),
         'clean': cleaning.validate_user_edit('link_id', 'account'),
     }
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -95,24 +99,13 @@ class View(base.View):
 
     # fill in the email field with the data from the entity
     form.fields['account'].initial = entity.account.email()
-    form.fields['agrees_to_tos'].example_text = self.getToSExampleText()
+    form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
+    form.fields['agreed_to_tos_on'].example_text = self._getToSExampleText()
 
     super(View, self)._editGet(request, entity, form)
 
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
 
-    if not entity:
-      # developer is creating a new entity set agrees_to_tos to None
-      fields['agrees_to_tos'] = None
-    else:
-      # editing an existing user so don't change the agrees_to_tos field
-      fields['agrees_to_tos'] = entity.agrees_to_tos
-
-    super(View, self)._editPost(request, entity, fields)
-
-  def getToSExampleText(self):
+  def _getToSExampleText(self):
     """Returns example_text linking to site-wide ToS, or a warning message.
     """
     tos_link = redirects.getToSRedirect(site_logic.getSingleton())

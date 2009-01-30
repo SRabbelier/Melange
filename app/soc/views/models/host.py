@@ -75,13 +75,11 @@ class View(role.View):
 
     new_params['scope_view'] = sponsor_view
 
-    new_params['invite_filter'] = {'group_ln': 'link_id'}
-
     new_params['name'] = "Program Administrator"
     new_params['module_name'] = "host"
     new_params['sidebar_grouping'] = 'Programs'
 
-    new_params['extra_dynaexclude'] = ['user', 'state']
+    new_params['extra_dynaexclude'] = ['agreed_to_tos']
 
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,

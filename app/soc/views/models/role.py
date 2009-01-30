@@ -48,9 +48,23 @@ class View(base.View):
 
   All views that only Role entities have are defined in this subclass.
   """
-  
+
   DEF_INVITE_INSTRUCTION_MSG_FMT = ugettext(
       'Please use this form to invite someone to become a %(name)s.')
+
+  DEF_REQUEST_INSTRUCTION_MSG_FMT = ugettext(
+      'Please use this form to request to become a %(name)s')
+
+  DEF_INVITE_ERROR_MSG_FMT = ugettext(
+      'This user can not receive an invite to become a %(name)s. <br/>'
+      'Please make sure there is no outstanding invite or request and '
+      'be sure that this user is not a %(name)s.')
+
+  DEF_REQUEST_ERROR_MSG_FMT = ugettext(
+      'You can not request to become a %(name)s. <br/>'
+      'Please make sure there is no outstanding invite or request and '
+      'be sure that you are not a %(name)s already.')
+
 
   def __init__(self, params=None):
     """
@@ -126,6 +140,8 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     context['page_name'] = page_name
+    context['instruction_message'] = (self.DEF_INVITE_INSTRUCTION_MSG_FMT %
+        params)
 
     if request.method == 'POST':
       return self.invitePost(request, context, params, **kwargs)
@@ -153,7 +169,7 @@ class View(base.View):
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
-        context=context, form=form, params=params)
+        context=context, form=form, params=request_params)
 
   def invitePost(self, request, context, params, **kwargs):
     """Handles the POST request concerning the view that creates an invite
@@ -177,7 +193,7 @@ class View(base.View):
 
     # collect the cleaned data from the valid form
     key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
-    
+
     # get the group entity for which this request is via the scope_path
     group = self._logic.getGroupEntityFromScopePath(params['group_logic'],
          kwargs['scope_path'])
@@ -192,6 +208,12 @@ class View(base.View):
         'role': params['module_name'],
         'role_verbose': params['name'],
         'state': 'group_accepted'}
+
+    if not self._isValidNewRequest(request_fields, params):
+      # not a valid invite
+      context['error_message'] = self.DEF_INVITE_ERROR_MSG_FMT % (
+          params)
+      return self.inviteGet(request, context, params, **kwargs)
 
     # extract the key_name for the new request entity
     key_fields = request_logic.logic.getKeyFieldsFromDict(request_fields)
@@ -302,7 +324,7 @@ class View(base.View):
     group_logic = params['group_logic']
     group_entity = group_logic.getFromKeyName(fields['scope_path'])
     fields['scope'] = group_entity
-    
+
     # make sure that this role becomes active once more in case this user
     # has been reinvited
     fields ['state'] = 'active'
@@ -403,6 +425,8 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     context['page_name'] = page_name
+    context['instruction_message'] = (self.DEF_REQUEST_INSTRUCTION_MSG_FMT %
+        params)
 
     if request.method == 'POST':
       return self.requestPost(request, context, params, **kwargs)
@@ -433,7 +457,7 @@ class View(base.View):
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
-        context=context, form=form, params=params)
+        context=context, form=form, params=request_params)
 
   def requestPost(self, request, context, params, **kwargs):
     """Handles the POST request concerning the creation of a request
@@ -470,6 +494,12 @@ class View(base.View):
         'role' : params['module_name'],
         'role_verbose' : params['name'],
         'state' : 'new'}
+
+    if self._isValidNewRequest(request_fields, params):
+      # not a valid request
+      context['error_message'] = self.DEF_REQUEST_ERROR_MSG_FMT % (
+          params)
+      return self.requestGet(request, context, params, **kwargs)
 
     # extract the key_name for the new request entity
     key_fields = request_logic.logic.getKeyFieldsFromDict(request_fields)
@@ -537,3 +567,34 @@ class View(base.View):
     template = request_view.view.getParams()['request_processing_template']
 
     return responses.respond(request, template, context=context)
+
+  def _isValidNewRequest(self, request_fields, params):
+    """Checks if this is a valid Request object to make.
+
+    Args:
+    request_fields: dict containing the fields for the new request entity.
+    params: parameters for the current view
+    """
+    fields = request_fields.copy()
+    fields['state'] = ['new', 'group_accepted', 'ignored']
+
+    request_entity = request_logic.logic.getForFields(fields, unique=True)
+    
+    if request_entity:
+      # already outstanding request
+      return False
+
+    # check if the role already exists
+    fields = {'scope' : request_fields['scope'],
+        'link_id': request_fields['link_id'],
+        'state': ['active','inactive'],
+        }
+
+    role_entity = params['logic'].getForFields(fields, unique=True)
+
+    if role_entity:
+      # already has this role
+      return False
+
+    # no oustanding request or a valid role
+    return True

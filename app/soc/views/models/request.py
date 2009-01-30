@@ -82,16 +82,15 @@ class View(base.View):
 
     new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
+    new_params['create_template'] = ['soc/request/create.html']
     new_params['save_message'] = [ugettext('Request saved.')]
     
     new_params['extra_dynaexclude'] = ['state', 'role_verbose']
-    
-    # TODO(ljvderijk) add clean field that checks to see if the user already has
-    # the role that's been entered in the create form fields
+
     new_params['create_extra_dynafields'] = {
         'role': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
-        'clean_link_id': cleaning.clean_existing_user('link_id')
+        'clean_link_id': cleaning.clean_existing_user('link_id'),
         }
 
     new_params['edit_extra_dynafields'] = {

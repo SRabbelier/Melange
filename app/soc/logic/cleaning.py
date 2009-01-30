@@ -35,7 +35,7 @@ from soc.logic.models import user as user_logic
 
 
 def clean_link_id(field_name):
-  """Checks if the field_name value is in a valid link ID format. 
+  """Checks if the field_name value is in a valid link ID format.
   """
   def wrapper(self):
     # convert to lowercase for user comfort
@@ -43,6 +43,18 @@ def clean_link_id(field_name):
     if not validate.isLinkIdFormatValid(link_id):
       raise forms.ValidationError("This link ID is in wrong format.")
     return link_id
+  return wrapper
+
+
+def clean_scope_path(field_name):
+  """Checks if the field_name value is in a valid scope path format.
+  """
+  def wrapper(self):
+    # convert to lowercase for user comfort
+    scope_path = self.cleaned_data.get(field_name).lower()
+    if not validate.isScopePathFormatValid(scope_path):
+      raise forms.ValidationError("This scope path is in wrong format.")
+    return scope_path
   return wrapper
 
 

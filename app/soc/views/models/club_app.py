@@ -30,6 +30,7 @@ from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import notifications
+from soc.logic import models as model_logic
 from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
@@ -81,6 +82,7 @@ class View(group_app.View):
               ),
         'clean_backup_admin_link_id': 
             cleaning.clean_users_not_same('backup_admin_link_id'),
+        'clean_link_id' : self.clean_club_app_link_id('link_id')
         }
 
     new_params['edit_extra_dynafields'] = {
@@ -340,6 +342,34 @@ class View(group_app.View):
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
+
+  def clean_club_app_link_id(self, field_name):
+    """Cleans the link_id in the club application form
+    """
+    def wrapper(self):
+      # validate the link_id
+      club_link_id = cleaning.clean_link_id(field_name)(self)
+
+      # check if there is already an application with the given link_id
+      fields = {'link_id': club_link_id,
+                'state': ['accepted','ignored','needs review','completed']}
+      club_app_entity = club_app_logic.logic.getForFields(fields, unique=True)
+
+      if club_app_entity:
+        raise forms.ValidationError(
+            ugettext('This link ID is already in use, please specify another one'))
+
+      # check if there is already a club with the given link_id
+      fields['state'] = ['new', 'active', 'inactive']
+      club_logic = model_logic.club
+      club_entity = club_logic.logic.getForFields(fields, unique=True)
+
+      if club_entity:
+        raise forms.ValidationError(
+            ugettext('This link ID is already in use, please specify another one'))
+
+      return club_link_id
+    return wrapper
 
 
 view = View()

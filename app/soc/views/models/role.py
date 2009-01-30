@@ -114,7 +114,7 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
 
-    new_params['extra_dynaexclude'] = ['user', 'state', 'agreed_to_tos_on']
+    new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -207,7 +207,7 @@ class View(base.View):
         'scope_path': request_scope_path,
         'role': params['module_name'],
         'role_verbose': params['name'],
-        'state': 'group_accepted'}
+        'status': 'group_accepted'}
 
     if not self._isValidNewRequest(request_fields, params):
       # not a valid invite
@@ -327,7 +327,7 @@ class View(base.View):
 
     # make sure that this role becomes active once more in case this user
     # has been reinvited
-    fields ['state'] = 'active'
+    fields ['status'] = 'active'
 
     # get the key_name for the new entity
     key_fields =  self._logic.getKeyFieldsFromDict(fields)
@@ -360,7 +360,7 @@ class View(base.View):
   def manage(self, request, access_type,
                    page_name=None, params=None, **kwargs):
     """Handles the request concerning the view that let's 
-       you manage a role's state.
+       you manage a role's status.
 
     Args:
       request: the standard Django HTTP request object
@@ -389,8 +389,8 @@ class View(base.View):
     resign = get_dict.get('resign')
 
     if resign == 'true':
-      # change the state of this role_entity to invalid
-      fields = {'state': 'invalid'}
+      # change the status of this role_entity to invalid
+      fields = {'status': 'invalid'}
       logic.updateEntityProperties(role_entity, fields)
 
       # redirect to the roles listing
@@ -486,14 +486,14 @@ class View(base.View):
     # get the request scope path
     request_scope_path = self._getRequestScopePathFromGroup(group)
 
-    # defensively set the fields we need for this request and set state to new
+    # defensively set the fields we need for this request and set status to new
     user_entity = user_logic.logic.getForCurrentAccount()
     request_fields = {'link_id' : user_entity.link_id,
         'scope' : group,
         'scope_path' : request_scope_path,
         'role' : params['module_name'],
         'role_verbose' : params['name'],
-        'state' : 'new'}
+        'status' : 'new'}
 
     if self._isValidNewRequest(request_fields, params):
       # not a valid request
@@ -540,14 +540,14 @@ class View(base.View):
     
     get_dict = request.GET
     
-    if 'state' in get_dict.keys():
-      if get_dict['state'] in ['group_accepted', 'rejected', 'ignored']:
+    if 'status' in get_dict.keys():
+      if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
         # update the request_entity and redirect away from this page
-        request_state = get_dict['state']
+        request_status = get_dict['status']
         request_logic.logic.updateEntityProperties(request_entity, {
-            'state': get_dict['state']})
+            'status': get_dict['status']})
 
-        if request_state == 'group_accepted':
+        if request_status == 'group_accepted':
           notifications_helper.sendInviteNotification(request_entity)
 
         group_view = params.get('group_view')
@@ -576,7 +576,7 @@ class View(base.View):
     params: parameters for the current view
     """
     fields = request_fields.copy()
-    fields['state'] = ['new', 'group_accepted', 'ignored']
+    fields['status'] = ['new', 'group_accepted', 'ignored']
 
     request_entity = request_logic.logic.getForFields(fields, unique=True)
     
@@ -587,7 +587,7 @@ class View(base.View):
     # check if the role already exists
     fields = {'scope' : request_fields['scope'],
         'link_id': request_fields['link_id'],
-        'state': ['active','inactive'],
+        'status': ['active','inactive'],
         }
 
     role_entity = params['logic'].getForFields(fields, unique=True)

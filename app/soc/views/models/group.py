@@ -57,7 +57,7 @@ class View(presence.View):
     new_params = {}
 
     new_params['extra_dynaexclude'] = ['founder','home', 'tos',
-                                       'member_template', 'state']
+                                       'member_template', 'status']
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
@@ -136,7 +136,7 @@ class View(presence.View):
     filter = {
         'scope': group_entity,
         'role': role_names,
-        'state': 'new'
+        'status': 'new'
         }
 
     # create the list parameters
@@ -154,7 +154,7 @@ class View(presence.View):
     filter = {
         'scope': group_entity,
         'role': role_names,
-        'state': 'group_accepted'
+        'status': 'group_accepted'
         }
 
     # create the list parameters
@@ -172,7 +172,7 @@ class View(presence.View):
     filter = {
         'scope': group_entity,
         'role': role_names,
-        'state': 'ignored'
+        'status': 'ignored'
         }
 
     # create the list parameters
@@ -216,7 +216,7 @@ class View(presence.View):
     # create the filter
     filter = {
         'scope' : group_entity,
-        'state': 'active'
+        'status': 'active'
         }
 
     role_views = params['role_views']
@@ -271,7 +271,7 @@ class View(presence.View):
 
     # set fields to match every active role this user has
     fields = {'user': user,
-              'state': 'active'}
+              'status': 'active'}
 
     # get the role views and start filling group_entities
     role_views = self._params['role_views']

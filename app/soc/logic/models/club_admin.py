@@ -43,14 +43,14 @@ class Logic(role.Logic):
                                 scope_logic=scope_logic)
 
   def _onCreate(self, entity):
-    """Marks the Club for this Club Admin as active it's state is new.
+    """Marks the Club for this Club Admin as active it's status is new.
     """
 
     club_entity = entity.scope
 
-    if club_entity.state == 'new':
+    if club_entity.status == 'new':
       # this club is new so mark as active
-      fields = {'state' : 'active'}
+      fields = {'status' : 'active'}
       club_logic.logic.updateEntityProperties(club_entity, fields)
 
     # call super

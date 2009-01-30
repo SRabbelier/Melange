@@ -424,7 +424,7 @@ class Checker(object):
   @allowDeveloper
   @denySidebar
   def checkIsGroupActive(self, django_args, group_logic):
-    """Raises an alternate HTTP response if Group state is not active.
+    """Raises an alternate HTTP response if Group status is not active.
 
     Args:
       django_args: a dictionary with django's arguments
@@ -432,7 +432,7 @@ class Checker(object):
     Raises:
       AccessViolationResponse:
       * if no Group is found
-      * if the Group state is not active
+      * if the Group status is not active
     """
 
     fields = {'link_id': django_args['link_id']}
@@ -442,7 +442,7 @@ class Checker(object):
 
     group_entity = group_logic.logic.getFromFieldsOr404(**fields)
 
-    if group_entity.state == 'active':
+    if group_entity.status == 'active':
       return
 
     # TODO tell the user that this group is not active
@@ -451,9 +451,9 @@ class Checker(object):
 
   def checkCanMakeRequestToGroup(self, django_args, group_logic):
     """Raises an alternate HTTP response if the specified group is not in an
-    active state.
+    active status.
 
-    Note that state hasn't been implemented yet
+    Note that status hasn't been implemented yet
 
     Args:
       group_logic: Logic module for the type of group which the request is for
@@ -465,7 +465,7 @@ class Checker(object):
     if not group_entity:
       raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
 
-    if group_entity.state != 'active':
+    if group_entity.status != 'active':
       # TODO tell the user that this group is not active
       self.deny(django_args)
 
@@ -473,8 +473,8 @@ class Checker(object):
 
   def checkCanCreateFromRequest(self, django_args, role_name):
     """Raises an alternate HTTP response if the specified request does not exist
-       or if it's state is not group_accepted. Also when the group this request
-       is from is in an inactive or invalid state access will be denied.
+       or if it's status is not group_accepted. Also when the group this request
+       is from is in an inactive or invalid status access will be denied.
     """
 
     self.checkIsUser(django_args)
@@ -490,11 +490,11 @@ class Checker(object):
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
-    if request_entity.state != 'group_accepted':
+    if request_entity.status != 'group_accepted':
       # TODO tell the user that this request has not been accepted yet
       self.deny(django_args)
 
-    if request_entity.scope.state in ['invalid', 'inactive']:
+    if request_entity.scope.status in ['invalid', 'inactive']:
       # TODO tell the user that it is not possible to create this role anymore
       self.deny(django_args)
 
@@ -502,7 +502,7 @@ class Checker(object):
 
   def checkCanProcessRequest(self, django_args, role_name):
     """Raises an alternate HTTP response if the specified request does not exist
-       or if it's state is completed or denied. Also Raises an alternate HTTP response
+       or if it's status is completed or denied. Also Raises an alternate HTTP response
        whenever the group in the request is not active.
     """
 
@@ -512,11 +512,11 @@ class Checker(object):
 
     request_entity = request_logic.getFromFieldsOr404(**fields)
 
-    if request_entity.state in ['completed', 'denied']:
+    if request_entity.status in ['completed', 'denied']:
       # TODO tell the user that this request has been processed
       self.deny(django_args)
 
-    if request_entity.scope.state != 'active':
+    if request_entity.scope.status != 'active':
       # TODO tell the user that this group cannot process requests
       self.deny(django_args)
 
@@ -524,7 +524,7 @@ class Checker(object):
 
   def checkIsMyGroupAcceptedRequest(self, django_args):
     """Raises an alternate HTTP response if the specified request does not exist
-       or if it's state is not group_accepted.
+       or if it's status is not group_accepted.
     """
 
     self.checkIsUser(django_args)
@@ -545,7 +545,7 @@ class Checker(object):
       # TODO return 404
       self.deny(django_args)
 
-    if request_entity.state != 'group_accepted':
+    if request_entity.status != 'group_accepted':
       self.deny(django_args)
 
     return
@@ -576,7 +576,7 @@ class Checker(object):
       scope_path = django_args['link_id']
 
     fields = {'user': self.user,
-              'state': 'active'}
+              'status': 'active'}
 
     if scope_path:
       fields['scope_path'] = scope_path
@@ -633,7 +633,7 @@ class Checker(object):
 
     fields = {'user': user,
               'scope_path': scope_path,
-              'state': 'active'}
+              'status': 'active'}
 
     host = host_logic.getForFields(fields, unique=True)
 
@@ -673,7 +673,7 @@ class Checker(object):
 
     fields = {'user': user,
               'scope_path': scope_path,
-              'state': 'active'}
+              'status': 'active'}
 
     club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
 
@@ -708,7 +708,7 @@ class Checker(object):
 
     properties = {
         'applicant': user,
-        'state': 'accepted'
+        'status': 'accepted'
         }
 
     application = app_logic.logic.getForFields(properties, unique=True)
@@ -805,7 +805,7 @@ class Checker(object):
 
     role_entity = role_logic.logic.getFromFieldsOr404(**fields)
 
-    if role_entity.state != 'active':
+    if role_entity.status != 'active':
       # role is not active
       self.deny(django_args)
 
@@ -843,13 +843,13 @@ class Checker(object):
 
     role_entity = role_logic.logic.getFromFieldsOr404(**fields)
 
-    if role_entity.state != 'active':
+    if role_entity.status != 'active':
       # cannot manage this entity
       self.deny(django_args)
 
     fields = {'link_id': self.user.link_id,
         'scope_path': django_args['scope_path'],
-        'state' : 'active'
+        'status' : 'active'
         }
 
     manage_entity = manage_role_logic.logic.getForFields(fields, unique=True)

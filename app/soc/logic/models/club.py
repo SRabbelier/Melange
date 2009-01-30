@@ -57,7 +57,7 @@ class Logic(group.Logic):
           'scope_path': entity.key().name(),
           'role': 'club_admin',
           'role_verbose' : 'Club Admin',
-          'state': 'group_accepted',
+          'status': 'group_accepted',
           }
 
       for admin in [application.applicant, application.backup_admin]:
@@ -66,7 +66,7 @@ class Logic(group.Logic):
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
       # set the application to completed  
-      fields = {'state' : 'completed'}
+      fields = {'status' : 'completed'}
       club_app_logic.logic.updateEntityProperties(application, fields)
 
     super(Logic, self)._onCreate(entity)

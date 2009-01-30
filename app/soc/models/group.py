@@ -166,11 +166,11 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
 
-  #: Required property showing the current state of the group
+  #: Required property showing the current status of the group
   #: new: the group has not been active yet
   #: active: the group is active
   #: inactive: used to mark a group as read-only
   #: invalid: the group has been marked as removed
-  state = db.StringProperty(required=True, default='new',
+  status = db.StringProperty(required=True, default='new',
       choices=['new', 'active', 'inactive', 'invalid'])
 

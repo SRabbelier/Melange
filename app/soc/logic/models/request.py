@@ -63,10 +63,10 @@ class Logic(base.Logic):
     """Sends out a message notifying users about the new invite/request.
     """
 
-    if entity.state == 'group_accepted':
+    if entity.status == 'group_accepted':
       # this is an invite
       notifications.sendInviteNotification(entity)
-    elif entity.state == 'new':
+    elif entity.status == 'new':
       # this is a request
       # TODO(Lennard) Create a new request message
       pass

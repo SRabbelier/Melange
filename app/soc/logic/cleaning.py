@@ -199,7 +199,7 @@ def clean_new_club_link_id(field_name, club_logic, club_app_logic):
 
       # check if there is already an application with the given link_id
       fields = {'link_id': club_link_id,
-                'state': ['accepted','ignored','needs review','completed']}
+                'status': ['accepted','ignored','needs review','completed']}
       club_app_entity = club_app_logic.logic.getForFields(fields, unique=True)
 
       if club_app_entity:
@@ -207,7 +207,7 @@ def clean_new_club_link_id(field_name, club_logic, club_app_logic):
             ugettext('This link ID is already in use, please specify another one'))
 
       # check if there is already a club with the given link_id
-      fields['state'] = ['new', 'active', 'inactive']
+      fields['status'] = ['new', 'active', 'inactive']
       club_entity = club_logic.logic.getForFields(fields, unique=True)
 
       if club_entity:

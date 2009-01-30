@@ -28,9 +28,9 @@ Please select your response.
 
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?state=group_accepted'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?state=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?state=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=group_accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
   </td>
 </tr>
 </table>

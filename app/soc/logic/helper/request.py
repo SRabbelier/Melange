@@ -50,4 +50,4 @@ def completeRequestForRole(role_entity, role_name):
   # mark the request completed, if there is any
   if request_entity:
     request_logic.updateEntityProperties(request_entity,
-        {'state': 'completed'})
+        {'status': 'completed'})

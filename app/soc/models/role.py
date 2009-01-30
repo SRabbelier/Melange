@@ -291,18 +291,18 @@ class Role(soc.models.linkable.Linkable):
   agreed_to_tos_on.help_text = ugettext(
       'Indicates when the user agreed to this role Terms of Service.')
 
-  #: field storing the state of this role
+  #: field storing the status of this role
   #: Active means that this role can exercise all it's privileges.
   #: Invalid mean that this role cannot exercise it's privileges.
   #: Inactive means that this role cannot exercise it's data-editing
   #: privileges but should be able to see the data. For instance when a program
   #: has been marked inactive an Organization Admin should still be able to see
   #: the student applications.
-  state = db.StringProperty(default='active',
+  status = db.StringProperty(default='active',
       choices=['active','invalid','inactive'],
-      verbose_name=ugettext('State of this Role'))
-  state.help_text = ugettext(
-      'Indicates the state of the role concerning which privileges may be used')
+      verbose_name=ugettext('Status of this Role'))
+  status.help_text = ugettext(
+      'Indicates the status of the role concerning which privileges may be used')
 
 
   def name(self):

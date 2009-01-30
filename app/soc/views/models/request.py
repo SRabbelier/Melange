@@ -85,7 +85,7 @@ class View(base.View):
     new_params['create_template'] = ['soc/request/create.html']
     new_params['save_message'] = [ugettext('Request saved.')]
     
-    new_params['extra_dynaexclude'] = ['state', 'role_verbose']
+    new_params['extra_dynaexclude'] = ['status', 'role_verbose']
 
     new_params['create_extra_dynafields'] = {
         'role': forms.CharField(widget=widgets.ReadOnlyInput(),
@@ -150,7 +150,7 @@ class View(base.View):
     fields = {'link_id': kwargs['link_id'],
         'scope_path': kwargs['scope_path'],
         'role': kwargs['role'],
-        'state': 'group_accepted'}
+        'status': 'group_accepted'}
     request_entity = request_logic.getForFields(fields, unique=True)
 
     # set the page name using the request_entity
@@ -159,11 +159,11 @@ class View(base.View):
 
     get_dict = request.GET
     
-    if 'state' in get_dict.keys():
-      if get_dict['state'] == 'rejected':
+    if 'status' in get_dict.keys():
+      if get_dict['status'] == 'rejected':
         # this invite has been rejected mark as rejected
         request_logic.updateEntityProperties(request_entity, {
-            'state': 'rejected'})
+            'status': 'rejected'})
 
         # redirect to user role overview
         return http.HttpResponseRedirect('/user/roles')
@@ -201,7 +201,7 @@ class View(base.View):
 
     # only select the Invites for this user that haven't been handled yet
     filter = {'link_id': user_entity.link_id,
-              'state': 'group_accepted'}
+              'status': 'group_accepted'}
 
     uh_params = params.copy()
     uh_params['list_action'] = (redirects.getInviteProcessRedirect, None)
@@ -216,7 +216,7 @@ class View(base.View):
     # only select the requests from the user
     # that haven't been accepted by an admin yet
     filter = {'link_id': user_entity.link_id,
-              'state': 'new'}
+              'status': 'new'}
 
     ar_params = params.copy()
     ar_params['list_description'] = ugettext(

@@ -64,11 +64,11 @@ class Logic(base.Logic):
     return group
 
   def _updateField(self, entity, name, value):
-    """Special logic for role. If state changes to active we flush the sidebar.
+    """Special logic for role. If status changes to active we flush the sidebar.
     """
 
-    if (name == 'state') and (entity.state != value) and value == 'active':
-      # in case the state of the role changes to active we flush the sidebar
+    if (name == 'status') and (entity.status != value) and value == 'active':
+      # in case the status of the role changes to active we flush the sidebar
       # cache. Other changes will be visible after the retention time expires.
       sidebar.flush(entity.user.account)
 
@@ -78,7 +78,7 @@ class Logic(base.Logic):
     """Flush the sidebar cache when a new active role entity has been created.
     """
 
-    if entity.state == 'active':
+    if entity.status == 'active':
       sidebar.flush(entity.user.account)
 
 

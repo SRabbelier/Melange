@@ -44,14 +44,14 @@ class Logic(role.Logic):
 
 
   def _onCreate(self, entity):
-    """Marks the Sponsor for this Host as active it's state is new.
+    """Marks the Sponsor for this Host as active it's status is new.
     """
 
     sponsor_entity = entity.scope
 
-    if sponsor_entity.state == 'new':
+    if sponsor_entity.status == 'new':
       # this sponsor is new so mark as active
-      fields = {'state' : 'active'}
+      fields = {'status' : 'active'}
       sponsor_logic.logic.updateEntityProperties(sponsor_entity, fields)
 
     # call super

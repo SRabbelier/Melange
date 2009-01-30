@@ -28,6 +28,7 @@ from google.appengine.api import users
 from django import http
 from django import forms
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models import club_app as club_app_logic
@@ -90,9 +91,14 @@ class View(group.View):
     new_params['sidebar_additional'] = [
         ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
 
+    new_params['create_extra_dynafields'] = {
+        'clean_link_id': cleaning.clean_new_club_link_id('link_id', 
+            club_logic, club_app_logic)
+        }
     new_params['edit_extra_dynafields'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
+        'clean_link_id': cleaning.clean_link_id('link_id')
         }
 
     params = dicts.merge(params, new_params)
@@ -102,7 +108,8 @@ class View(group.View):
     # create and store the special form for applicants
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=False)}
+            required=False),
+        'clean_link_id': cleaning.clean_link_id('link_id')}
 
     applicant_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],

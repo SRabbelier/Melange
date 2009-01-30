@@ -27,6 +27,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import validate
 from soc.logic.models import site as site_logic
@@ -186,6 +187,35 @@ def clean_url(field_name):
     # call the Django URLField cleaning method to properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)
   return wrapped
+
+
+def clean_new_club_link_id(field_name, club_logic, club_app_logic):
+    """Cleans the field_name value to check if it's a valid 
+       link_id for a new club.
+    """
+    def wrapper(self):
+      # validate the link_id
+      club_link_id = clean_link_id(field_name)(self)
+
+      # check if there is already an application with the given link_id
+      fields = {'link_id': club_link_id,
+                'state': ['accepted','ignored','needs review','completed']}
+      club_app_entity = club_app_logic.logic.getForFields(fields, unique=True)
+
+      if club_app_entity:
+        raise forms.ValidationError(
+            ugettext('This link ID is already in use, please specify another one'))
+
+      # check if there is already a club with the given link_id
+      fields['state'] = ['new', 'active', 'inactive']
+      club_entity = club_logic.logic.getForFields(fields, unique=True)
+
+      if club_entity:
+        raise forms.ValidationError(
+            ugettext('This link ID is already in use, please specify another one'))
+
+      return club_link_id
+    return wrapper
 
 
 def validate_user_edit(link_id_field, account_field):

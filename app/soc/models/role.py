@@ -302,7 +302,7 @@ class Role(soc.models.linkable.Linkable):
       choices=['active','invalid','inactive'],
       verbose_name=ugettext('Status of this Role'))
   status.help_text = ugettext(
-      'Indicates the status of the role concerning which privileges may be used')
+      'Indicates the status of the role concerning which privileges may be used.')
 
 
   def name(self):

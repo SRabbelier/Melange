@@ -98,9 +98,9 @@ class GroupApplication(soc.models.linkable.Linkable):
   member_criteria.help_text = ugettext(
     'Members include mentors, admininstrators, and the like.')
 
-  # property containing the status of the application
+  # property containing the state of the application
   # completed means that the application has been processed into a real group
-  status = db.StringProperty(required=True, 
+  state = db.StringProperty(required=True, 
       choices=['accepted','rejected','ignored','needs review','completed'],
       default='needs review',
       verbose_name=ugettext('Application Status'))

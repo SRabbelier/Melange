@@ -31,7 +31,7 @@ limitations under the License.
   {% readonly_field_as_twoline_table_row entity.fields.irc_channel.label entity.irc_channel %}
   {% readonly_field_as_twoline_table_row entity.fields.backup_admin.label entity.backup_admin.link_id %}
   {% readonly_field_as_twoline_table_row entity.fields.member_criteria.label entity.member_criteria %}
-  {% readonly_field_as_table_row entity.fields.status.label entity.status %}
+  {% readonly_field_as_table_row entity.fields.state.label entity.state %}
   {% readonly_field_as_table_row "Created on" entity.created_on %}
   {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
  </table>
@@ -39,9 +39,9 @@ limitations under the License.
 
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=accepted'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?state=accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?state=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?state=ignored'" value="Ignore"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.link_id }}'" value="Delete"/>
   </td>
 </tr>

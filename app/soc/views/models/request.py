@@ -160,8 +160,8 @@ class View(base.View):
 
     get_dict = request.GET
     
-    if 'status' in get_dict.keys():
-      if get_dict['status'] == 'rejected':
+    if 'state' in get_dict.keys():
+      if get_dict['state'] == 'rejected':
         # this invite has been rejected mark as rejected
         request_logic.updateEntityProperties(request_entity, {
             'state': 'rejected'})

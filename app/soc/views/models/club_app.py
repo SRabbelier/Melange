@@ -73,7 +73,7 @@ class View(group_app.View):
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
-    new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
+    new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'state',
         'created_on', 'last_modified_on']
     new_params['create_extra_dynafields'] = {
         'backup_admin_link_id': forms.CharField(
@@ -81,6 +81,10 @@ class View(group_app.View):
               ),
         'clean_backup_admin_link_id': 
             cleaning.clean_users_not_same('backup_admin_link_id'),
+        }
+
+    new_params['edit_extra_dynafields'] = {
+        'clean_link_id' : cleaning.clean_link_id('link_id'),
         }
 
     patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
@@ -122,7 +126,7 @@ class View(group_app.View):
     is_developer = accounts.isDeveloper(user=user_entity)
 
     filter = {
-        'status': 'needs review',
+        'state': 'needs review',
         }
 
     if not is_developer:
@@ -146,7 +150,7 @@ class View(group_app.View):
     # get all the reviewed applications now
 
     # re-use the old filter, but set to only reviewed and accepted
-    filter['status'] = 'accepted'
+    filter['state'] = 'accepted'
 
     aa_params = params.copy() # accepted applications
 
@@ -166,7 +170,7 @@ class View(group_app.View):
     # get all the reviewed applications that were denied
 
     # re use the old filter, but this time only for denied apps
-    filter['status'] = 'rejected'
+    filter['state'] = 'rejected'
 
     da_params = params.copy() # denied applications
 
@@ -184,7 +188,7 @@ class View(group_app.View):
 
     if is_developer:
       # re use the old filter, but this time only for ignored apps
-      filter['status'] = 'ignored'
+      filter['state'] = 'ignored'
 
       ia_params = params.copy() # ignored applications
 
@@ -217,8 +221,8 @@ class View(group_app.View):
       fields['applicant'] = user_logic.logic.getForCurrentAccount()
 
     # the application has either been created or edited so
-    # the status needs to be set accordingly
-    fields['status'] = 'needs review'
+    # the state needs to be set accordingly
+    fields['state'] = 'needs review'
 
   def _public(self, request, entity, context):
     """See base._public().
@@ -254,16 +258,16 @@ class View(group_app.View):
     get_dict = request.GET
 
     # check to see if we can make a decision for this application
-    if 'status' in get_dict.keys():
-      status_value = get_dict['status']
+    if 'state' in get_dict.keys():
+      state_value = get_dict['state']
 
-      if status_value in ['accepted', 'rejected', 'ignored']:
-        # this application has been properly reviewed update the status
-        fields = {'status' : status_value}
+      if state_value in ['accepted', 'rejected', 'ignored']:
+        # this application has been properly reviewed update the state
+        fields = {'state' : state_value}
 
         self._logic.updateEntityProperties(entity, fields)
         
-        if status_value == 'accepted':
+        if state_value == 'accepted':
           # the application has been accepted send out a notification
           notifications.sendNewClubNotification(entity)
 
@@ -288,7 +292,7 @@ class View(group_app.View):
     params = dicts.merge(params, self._params)
 
     # only select the requests that haven't been reviewed yet
-    filter = {'status' : 'needs review'}
+    filter = {'state' : 'needs review'}
 
     ur_params = params.copy()
     ur_params['list_description'] = ugettext('A list of all unhandled '
@@ -299,7 +303,7 @@ class View(group_app.View):
         request, ur_params, filter, 0)
 
     # only select the requests that haven't been turned into a group yet
-    filter['status'] = 'accepted'
+    filter['state'] = 'accepted'
 
     uh_params = params.copy()
     uh_params['list_description'] = ugettext('A list of all applications '
@@ -310,7 +314,7 @@ class View(group_app.View):
         request, uh_params, filter, 1)
 
     # only select the requests the have been rejected
-    filter ['status'] = 'rejected'
+    filter ['state'] = 'rejected'
 
     den_params = params.copy()
     den_params['list_description'] = ugettext('A list of all applications '
@@ -321,7 +325,7 @@ class View(group_app.View):
         request, den_params, filter, 2)
 
     # only select the request that have been ignored
-    filter ['status'] = 'ignored'
+    filter ['state'] = 'ignored'
 
     ign_params = params.copy()
     ign_params['list_description'] = ugettext('A list of all applications '
@@ -336,6 +340,7 @@ class View(group_app.View):
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
+
 
 view = View()
 

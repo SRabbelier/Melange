@@ -510,12 +510,12 @@ class View(base.View):
     
     get_dict = request.GET
     
-    if 'status' in get_dict.keys():
-      if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
+    if 'state' in get_dict.keys():
+      if get_dict['state'] in ['group_accepted', 'rejected', 'ignored']:
         # update the request_entity and redirect away from this page
-        request_state = get_dict['status']
+        request_state = get_dict['state']
         request_logic.logic.updateEntityProperties(request_entity, {
-            'state': get_dict['status']})
+            'state': get_dict['state']})
 
         if request_state == 'group_accepted':
           notifications_helper.sendInviteNotification(request_entity)

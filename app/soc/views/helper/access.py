@@ -708,7 +708,7 @@ class Checker(object):
 
     properties = {
         'applicant': user,
-        'status': 'accepted'
+        'state': 'accepted'
         }
 
     application = app_logic.logic.getForFields(properties, unique=True)

@@ -18,8 +18,13 @@
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
 
+
+from google.appengine.ext import db
+
+from django.utils.translation import ugettext
 
 import soc.models.work
 
@@ -41,4 +46,11 @@ class Document(soc.models.work.Work):
 
   URL_NAME = 'document'
 
-  pass
+  #: field storing whether a link to the Document should be featured in
+  #: the sidebar menu (and possibly elsewhere); FAQs, Terms of Service,
+  #: and the like are examples of "featured" Document
+  is_featured = db.BooleanProperty(
+      verbose_name=ugettext('Is Featured'))
+  is_featured.help_text = ugettext(
+      'Field used to indicate if a Work should be featured, for example,'
+      ' in the sidebar menu.')

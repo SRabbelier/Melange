@@ -90,15 +90,6 @@ class Work(soc.models.linkable.Linkable):
   #    * anyone, even those not logged in
   #  (and possibly others)
 
-  #: field storing whether a link to the Work should be featured in
-  #: the sidebar menu (and possibly elsewhere); FAQs, Terms of Service,
-  #: and the like are examples of "featured" Works
-  is_featured = db.BooleanProperty(
-      verbose_name=ugettext('Is Featured'))
-  is_featured.help_text = ugettext(
-      'Field used to indicate if a Work should be featured, for example,'
-      ' in the sidebar menu.')
-
   def name(self):
     """Alias 'title' Property as 'name' for use in common templates.
     """

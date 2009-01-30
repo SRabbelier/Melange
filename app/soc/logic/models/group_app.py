@@ -38,22 +38,4 @@ class Logic(base.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model)
 
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['link_id']
-
 logic = Logic()

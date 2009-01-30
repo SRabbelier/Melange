@@ -123,8 +123,6 @@ def constructParams(params):
           'soc.views.models.%(module_name)s.export', 'Export %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>create)$',
           'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
@@ -134,6 +132,11 @@ def constructParams(params):
       (r'^%(url_name)s/(?P<access_type>pick)$',
           'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s'),
       ]
+
+  if not params.get('no_create_with_scope'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
+        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
 
   if not params.get('no_create_with_key_fields'):
     new_params['django_patterns_defaults'] += [

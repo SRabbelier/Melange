@@ -269,11 +269,24 @@ def getKeyFieldsPattern(params):
   """
 
   names = params['logic'].getKeyFieldNames()
+  scope_path_pattern = params['scope_path_pattern']
+
+  return getPattern(names, scope_path_pattern)
+
+
+def getPattern(names, scope_path_pattern):
+  """Returns the Django patterns for the specified names.
+
+  Args:
+    names: the field names that should be included in the pattern
+    scope_path_pattern: the pattern to use if the name is 'scope_path'
+  """
+
   patterns = []
 
   for name in names:
     if name == 'scope_path':
-      pattern = params['scope_path_pattern']
+      pattern = scope_path_pattern
     else:
       pattern = r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
     patterns.append(pattern)

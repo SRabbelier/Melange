@@ -170,7 +170,7 @@ def constructParams(params):
       }
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
-  new_params['save_message'] = [ugettext('Profile saved.')]
+  new_params['save_message'] = [ugettext('%(name)s saved.' % params)]
   new_params['submit_msg_param_name'] = DEF_SUBMIT_MSG_PARAM_NAME
   new_params['edit_params'] = {
       DEF_SUBMIT_MSG_PARAM_NAME: DEF_SUBMIT_MSG_PROFILE_SAVED,

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Contributor Model."""
+"""This module contains the Student Model."""
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',

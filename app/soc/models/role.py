@@ -102,13 +102,13 @@ class Role(soc.models.linkable.Linkable):
   #: the Role would like it displayed (could be surname followed by
   #: given name in some cultures, for example). Display names can be
   #: any valid UTF-8 text.
-  name_on_certificates = db.StringProperty(
-      verbose_name=ugettext('Display Name'))
-  name_on_certificates.help_text = ugettext(
-      'Optional field used as a display name, such as for awards '
-      'certificates. Should be the entire name in the format '
+  name_on_documents = db.StringProperty(
+      verbose_name=ugettext('Name on documents'))
+  name_on_documents.help_text = ugettext(
+      'Optional field used as a display name, such as for documents like '
+      'awards certificates. Should be the entire name in the format '
       'the person would like it displayed (could be family name followed '
-      'by given name in some cultures, for example). Display names can be '
+      'by given name in some cultures, for example). Name on documents can be '
       'any valid UTF-8 text.')
 
   #====================================================================

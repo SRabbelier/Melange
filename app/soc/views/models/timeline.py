@@ -29,6 +29,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
+from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.models import base
@@ -48,7 +49,11 @@ class View(base.View):
       params: a dict with params for this View
     """
 
+    rights = access.Checker(params)
+    rights['edit'] = ['checkCanEditTimeline']
+
     new_params = {}
+    new_params['rights'] = rights
     new_params['logic'] = soc.logic.models.timeline.logic
     new_params['edit_template'] = 'soc/timeline/edit.html'
     new_params['name'] = "Timeline"

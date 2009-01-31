@@ -100,12 +100,19 @@ class Program(soc.models.presence_with_tos.PresenceWithToS):
                                  required=True, collection_name="program",
                                  verbose_name=ugettext('Timeline'))
 
-  #: Whether the program is enabled
-  is_enabled = db.BooleanProperty(default=False,
-      verbose_name=ugettext('Is Enabled'))
-  is_enabled.help_text = ugettext(
-      'Field used to indicate if a Program is enabled at all, and as such'
-      '  accessible to non-developers.')
+  #: Status of the program
+  #: Invisible: Program Stealth-Mode Visible to Hosts and Devs only
+  #: Visible: Visible to everyone.
+  #: Inactive: Not visible in sidebar but can be reached for date retention
+  #: Invalid: Not visible or editable by anyone
+  status = db.StringProperty(required=True, default='invisible',
+      verbose_name=ugettext('Program Status'),
+      choices=['invisible', 'visible', 'inactive', 'invalid'])
+  status.example_text = ugettext(
+      '<tt>Invisible: Program Stealth-Mode Visible to Hosts and Devs only.<br/>'
+      'Visible: Visible to everyone.<br/>'
+      'Inactive: Not visible in sidebar, not editable.<br/>'
+      'Invalid: Not visible or editable by anyone.</tt>')
 
   #: Whether the slots allocations are visible
   allocations_visible = db.BooleanProperty(default=False,

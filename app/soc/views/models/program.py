@@ -58,7 +58,7 @@ class View(presence_with_tos.View):
     rights['show'] = ['allow']
     rights['create'] = ['checkIsHost']
     rights['edit'] = ['checkIsHostForProgram']
-    rights['delete'] = ['checkIsHostForProgram']
+    rights['delete'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
@@ -70,10 +70,9 @@ class View(presence_with_tos.View):
     new_params['name'] = "Program"
     new_params['sidebar_grouping'] = 'Programs'
 
-    new_params['edit_template'] = 'soc/program/edit.html'
-
     new_params['extra_dynaexclude'] = ['timeline']
 
+    # TODO add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
@@ -137,28 +136,45 @@ class View(presence_with_tos.View):
     logic = params['logic']
     rights = params['rights']
 
-    entities = logic.getForLimitAndOffset(1000)
+    # only get all invisible and visible programs
+    fields = {'status':['invisible', 'visible']}
+    entities = logic.getForFields(fields)
 
-    doc_params = document_view.view.getParams()
+    #TODO(ljvderijk) Add timeline dependent entries
+
     menus = []
 
     rights.setCurrentUser(id, user)
     filter_args = {}
 
     for entity in entities:
-      filter_args['entity'] = entity
-      try:
-        rights.doCheck('checkIsProgramActive', filter_args, [])
-      except out_of_band.Error:
-        continue
+      items = []
 
-      items = document_view.view.getMenusForScope(entity, params)
+      if entity.status == 'visible':
+        # show the documents for this program, even for not logged in users
+        items += document_view.view.getMenusForScope(entity, params)
 
       try:
-        rights.doCachedCheck('checkIsHost', {}, [])
-        items += [(redirects.getEditRedirect(entity, params),'Edit','any_access')]
+        # check if the current user is a host for this program
+        rights.doCachedCheck('checkIsHostForProgram', 
+            {'scope_path' : entity.scope_path,
+            'link_id' : entity.link_id,
+            'workflow' : entity.workflow}, [])
+
+        if entity.status == 'invisible':
+          # still add the document links so hosts can see how it looks like
+          items += document_view.view.getMenusForScope(entity, params)
+
+        # add link to edit Program Profile
+        items += [(redirects.getEditRedirect(entity, params),
+            'Edit Program Profile','any_access')]
+        # add link to edit Program Timeline
+        items += [(redirects.getEditRedirect(entity, {'url_name': 'timeline'}),
+            "Edit Program Timeline", 'any_access')]
+        # add link to create a new Program Document
         items += [(redirects.getCreateDocumentRedirect(entity, 'program'),
           "Create new document", 'any_access')]
+
       except out_of_band.Error:
         pass
 

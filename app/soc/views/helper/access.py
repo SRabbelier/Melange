@@ -45,8 +45,9 @@ from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
-from soc.logic.models.user import logic as user_logic
 from soc.logic.models.program import logic as program_logic
+from soc.logic.models.user import logic as user_logic
+from soc.logic.models.timeline import logic as timeline_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import redirects
@@ -600,10 +601,10 @@ class Checker(object):
     key_fields = program_logic.getKeyFieldsFromDict(django_args)
     program = program_logic.getFromFields(**key_fields)
 
-    if not program:
+    if not program or program.status == 'invalid':
       self.deny(django_args)
 
-    new_args = { 'scope_path': program.scope_path }
+    new_args = {'scope_path': program.scope_path }
     self.checkIsHost(new_args)
 
   @allowDeveloper
@@ -890,9 +891,9 @@ class Checker(object):
     # is public or not, probably involving analysing it's scope or such.
     self.allow(django_args)
 
-  @allowIfCheckPasses('checkIsHost')
-  def checkIsProgramActive(self, django_args):
-    """Checks whether a program is active
+  @allowIfCheckPasses('checkIsHostForProgram')
+  def checkIsProgramVisible(self, django_args):
+    """Checks whether a program is visible.
     """
 
     if 'entity' in django_args:
@@ -904,7 +905,7 @@ class Checker(object):
     if not program:
       self.deny(django_args)
 
-    if program.is_enabled:
+    if program.status == 'visible':
       return
 
     context = django_args.get('context', {})
@@ -915,3 +916,23 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(DEF_DEV_LOGOUT_LOGIN_MSG_FMT,
                                       context=context)
+
+
+  def checkCanEditTimeline(self, django_args):
+    """Allows developers and hosts for this program's timeline to edit it.
+    """
+    time_line_keyname = django_args['scope_path']
+    timeline_entity = timeline_logic.getFromKeyName(time_line_keyname)
+
+    if not timeline_entity:
+      # timeline does not exists so deny
+      self.deny(django_args)
+
+    splitkeyname = time_line_keyname.rsplit('/')
+
+    fields = {'scope_path' : splitkeyname[0],
+        'workflow' : splitkeyname[1],
+        'link_id' : splitkeyname[2],
+        }
+
+    return self.checkIsHostForProgram(fields)

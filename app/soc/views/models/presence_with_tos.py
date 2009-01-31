@@ -76,6 +76,7 @@ class View(presence.View):
     """See base.View._editPost().
     """
 
+    prefix = self._params['document_prefix']
     key_fields = self._logic.getKeyFieldsFromDict(fields)
     scope_path = self._logic.getKeyNameForFields(key_fields)
 
@@ -83,7 +84,7 @@ class View(presence.View):
 
     # TODO notify the user if tos_doc is not found
     tos_doc = document_logic.logic.getFromFields(
-      scope_path=scope_path, link_id=tos_link_id)
+      scope_path=scope_path, link_id=tos_link_id, prefix=prefix)
 
     fields['tos'] = tos_doc
 

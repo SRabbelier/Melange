@@ -23,27 +23,21 @@ __authors__ = [
 
 
 from soc.logic.models import base
+from soc.logic.models import presence_with_tos as tos_logic
 
 import soc.models.timeline
-
 
 class Logic(base.Logic):
   """Logic methods for the Timeline model.
   """
 
   def __init__(self, model=soc.models.timeline.Timeline,
-               base_model=None, scope_logic=None):
+               base_model=None, scope_logic=tos_logic):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
-
-  def getScopeDepth(self):
-    """See base.Logic.getScopeDepth.
-    """
-
-    return 3
 
   def getKeyValuesFromEntity(self, entity):
     """See base.Logic.getKeyNameValues.

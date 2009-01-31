@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import base
 from soc.logic.models import group
 from soc.logic.models import program as program_logic
 
@@ -41,11 +40,6 @@ class Logic(group.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
-
-  # Restore base.Logic key field related methods
-  getKeyValuesFromEntity = base.Logic.getKeyValuesFromEntity
-  getKeyValuesFromFields = base.Logic.getKeyValuesFromFields
-  getKeyFieldNames = base.Logic.getKeyFieldNames
 
 
 logic = Logic()

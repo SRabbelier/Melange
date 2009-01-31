@@ -930,11 +930,10 @@ class Checker(object):
       # timeline does not exists so deny
       self.deny(django_args)
 
-    splitkeyname = time_line_keyname.rsplit('/')
+    split_keyname = time_line_keyname.rsplit('/')
 
-    fields = {'scope_path' : splitkeyname[0],
-        'workflow' : splitkeyname[1],
-        'link_id' : splitkeyname[2],
+    fields = {'scope_path' : split_keyname[0],
+        'link_id' : split_keyname[1],
         }
 
     return self.checkIsHostForProgram(fields)

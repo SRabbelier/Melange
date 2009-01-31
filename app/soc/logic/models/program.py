@@ -45,24 +45,6 @@ class Logic(presence_with_tos.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
-    
-  def getKeyValuesFromEntity(self, entity):
-    """See base.Logic.getKeyNameValues.
-    """
-
-    return [entity.scope_path, entity.workflow, entity.link_id]
-
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
-
-    return [fields['scope_path'], fields['workflow'], fields['link_id']]
-
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
-
-    return ['scope_path', 'workflow', 'link_id']
 
 
 logic = Logic()

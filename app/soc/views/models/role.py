@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django import http
 from django.utils.translation import ugettext
 

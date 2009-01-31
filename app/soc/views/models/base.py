@@ -24,9 +24,8 @@ __authors__ = [
   ]
 
 
-import simplejson
-
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -567,9 +566,6 @@ class View(object):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
     """
-
-    if not simplejson:
-      raise Exception("Simplejson not installed")
 
     get_dict = request.GET
 

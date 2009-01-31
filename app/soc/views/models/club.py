@@ -224,26 +224,6 @@ class View(group.View):
         page_name, params=list_params, filter=None)
 
 
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
-    """
-
-    # fill in the founded_by with data from the entity
-    form.fields['founded_by'].initial = entity.founder.name
-    super(View, self)._editGet(request, entity, form)
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    if not entity:
-      # only if we are creating a new entity we should fill in founder
-      user = user_logic.logic.getForCurrentAccount()
-      fields['founder'] = user
-
-    super(View, self)._editPost(request, entity, fields)
-
-
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific club menu entries.
 

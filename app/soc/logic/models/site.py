@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.cache import sidebar
 from soc.logic.models import presence_with_tos
 
 import soc.models.presence_with_tos
@@ -78,6 +79,12 @@ class Logic(presence_with_tos.Logic):
     """Return singleton Site settings entity, since there is always only one.
     """
     return self.getFromFields(link_id=self.DEF_SITE_LINK_ID)
+
+  def _onCreate(self, entity):
+    """Flush the sidebar cache when a new active role entity has been created.
+    """
+
+    sidebar.flush()
 
 
 logic = Logic()

@@ -40,6 +40,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import user as user_view
@@ -209,10 +210,13 @@ class View(base.View):
     count = len(list(notifications))
 
     if count > 0:
-      link_title = '<b>%s (%d)</b>' % (force_unicode(link_title), count)
+      link_title = '<span class="unread">%s (%d)</span>' % (force_unicode(link_title), count)
       link_title = mark_safe(link_title)
 
     items = [('/' + 'notification/list', link_title, 'notification')]
+    if user:
+      items += [(redirects.getCreateDocumentRedirect(user, 'user'),
+          "Create a New Document", 'any_access')]
 
     new_params = {}
     new_params['sidebar_additional'] = items

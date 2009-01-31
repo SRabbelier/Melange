@@ -322,6 +322,11 @@ table#queues td {
   margin-bottom: 1em;
 }
 
+span.unread {
+  font-weight: bold;
+  color: #FF0000;
+}
+
  
 /* SEARCH FIELD */ 
 #search {

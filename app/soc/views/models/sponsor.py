@@ -80,6 +80,11 @@ class View(group.View):
     roles = role_description['roles']
   
     if roles.get('host'):
+      # add a link to create a new program
+      submenu = (redirects.getCreateRedirect(group_entity,
+          {'url_name': 'program'}),"Create a new Program", 'any_access')
+      submenus.append(submenu)
+
       # add a link to the management page
       submenu = (redirects.getListRolesRedirect(group_entity, params), 
           "Manage Program Administrators", 'any_access')

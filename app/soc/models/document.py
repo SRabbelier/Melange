@@ -47,30 +47,26 @@ class Document(soc.models.work.Work):
   URL_NAME = 'document'
 
   #: field storing the prefix of this document
-  prefix = db.StringProperty(default='user',
-      choices=['site','sponsor','program', 'club', 'organization', 'user'],
+  prefix = db.StringProperty(default='user', required=True,
+      choices=['site','club', 'sponsor', 'program', 'organization', 'user'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the document,'
       ' determines which access scheme is used.')
 
-  #: field storing the access status of this document
-  # wiki = any user can read and write the document
-  # public = any user can read, only restricted can write
-  # member = member can read, only restricted can write
-  # restricted = restricted can read, only admin can write
-  # admin = admin can read, only admin can write
-  #
-  # example meanings for an organisations:
-  # admin = ['org_admin']
-  # restricted = ['org_admin', 'org_mentor']
-  # member = ['org_admin', 'org_mentor', 'org_student']
-  # public = anyone
-  # wiki = anyone
-  access_status = db.StringProperty(default='restricted', required=True,
-      choices=['admin','restricted', 'member', 'public', 'wiki'],
-      verbose_name=ugettext('Access type'))
-  access_status.help_text = ugettext(
+  #: field storing the required access to read this document
+  read_access = db.StringProperty(default='public', required=True,
+      choices=['admin','restricted', 'member', 'user', 'public'],
+      verbose_name=ugettext('Read Access'))
+  read_access.help_text = ugettext(
+      'Indicates the state of the document, '
+      'determines the access scheme.')
+
+  #: field storing the required access to write to this document
+  write_access = db.StringProperty(default='public', required=True,
+      choices=['admin','restricted', 'member', 'user'],
+      verbose_name=ugettext('Write Access'))
+  write_access.help_text = ugettext(
       'Indicates the state of the document, '
       'determines the access scheme.')
 

@@ -81,7 +81,7 @@ class Logic(base.Logic):
     if entity.status == 'active':
       sidebar.flush(entity.user.account)
 
-    super(View, self)._onCreate(entity)
+    super(Logic, self)._onCreate(entity)
 
 
 logic = Logic()

@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import http
 from django import forms
 
@@ -190,8 +188,7 @@ class View(group.View):
     key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
 
     # fill in the founder of the club
-    account = users.get_current_user()
-    user = user_logic.logic.getForFields({'account': account}, unique=True)
+    user = user_logic.logic.getForCurrentAccount()
     fields['founder'] = user
 
     if not key_name:
@@ -241,8 +238,7 @@ class View(group.View):
 
     if not entity:
       # only if we are creating a new entity we should fill in founder
-      account = users.get_current_user()
-      user = user_logic.logic.getForFields({'account': account}, unique=True)
+      user = user_logic.logic.getForCurrentAccount()
       fields['founder'] = user
 
     super(View, self)._editPost(request, entity, fields)

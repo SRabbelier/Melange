@@ -98,15 +98,15 @@ class Role(soc.models.linkable.Linkable):
   surname.help_text = ugettext('lower ASCII characters only')
 
   #: Optional field used as a display name, such as for awards
-  #: certificates. Should be the entire display name in the format
+  #: certificates. Should be the entire name in the format
   #: the Role would like it displayed (could be surname followed by
   #: given name in some cultures, for example). Display names can be
   #: any valid UTF-8 text.
-  display_name = db.StringProperty(
+  name_on_certificates = db.StringProperty(
       verbose_name=ugettext('Display Name'))
-  display_name.help_text = ugettext(
+  name_on_certificates.help_text = ugettext(
       'Optional field used as a display name, such as for awards '
-      'certificates. Should be the entire display name in the format '
+      'certificates. Should be the entire name in the format '
       'the person would like it displayed (could be family name followed '
       'by given name in some cultures, for example). Display names can be '
       'any valid UTF-8 text.')
@@ -306,6 +306,9 @@ class Role(soc.models.linkable.Linkable):
 
 
   def name(self):
-    """Alias 'display_name' Property as 'name' for use in common templates.
+    """Property as 'name' for use in common templates.
     """
-    return self.display_name
+    if self.name_on_certificates:
+      return self.name_on_certificates
+    else:
+      return '%s %s' (self.given_name, self.surname)

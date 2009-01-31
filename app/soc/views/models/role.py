@@ -26,6 +26,7 @@ __authors__ = [
 from django import http
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
@@ -113,6 +114,15 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
+
+    new_params['create_extra_dynafields'] = {
+       'clean_link_id' : cleaning.clean_existing_user('link_id'),
+       'clean_home_page' : cleaning.clean_url('home_page'),
+       'clean_blog' : cleaning.clean_url('blog'),
+       'clean_photo_url' : cleaning.clean_url('photo_url'),
+       'scope_path': forms.CharField(widget=forms.HiddenInput,
+                                  required=True),
+       }
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
 

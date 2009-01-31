@@ -24,7 +24,6 @@ __authors__ = [
 
 from django import forms
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import club as club_logic
 from soc.views.helper import access
@@ -75,14 +74,6 @@ class View(role.View):
     new_params['sidebar_grouping'] = 'Clubs'
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos']
-
-    new_params['create_extra_dynafields'] = {
-       'scope_path': forms.CharField(widget=forms.HiddenInput,
-          required=True),
-       'clean_link_id': cleaning.clean_existing_user('link_id'),
-       'clean_home_page': cleaning.clean_url('home_page'),
-       'clean_blog': cleaning.clean_url('blog'),
-       'clean_photo_url': cleaning.clean_url('photo_url')}
 
     new_params['allow_requests_and_invites'] = True
 

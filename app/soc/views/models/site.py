@@ -24,8 +24,10 @@ __authors__ = [
 
 from django import forms
 
+from soc.logic import accounts
 from soc.logic import dicts
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import document as document_view
 from soc.views.models import presence_with_tos
 
@@ -100,7 +102,11 @@ class View(presence_with_tos.View):
     submenus = []
 
     if entity:
-      submenus = document_view.view.getMenusForScope(entity, self._params)
+      submenus += document_view.view.getMenusForScope(entity, self._params)
+
+    if accounts.isDeveloper(id, user):
+      submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
+          "Create new document", 'any_access')]
 
     new_params = {}
     new_params['sidebar_additional'] = submenus

@@ -26,7 +26,7 @@ import soc.models.request
 
 from soc.logic.helper import notifications
 from soc.logic.models import base
-from soc.logic.models import sponsor as sponsor_logic
+from soc.logic.models import linkable as linkable_logic
 
 
 class Logic(base.Logic):
@@ -34,7 +34,7 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.request.Request,
-               base_model=None, scope_logic=sponsor_logic):
+               base_model=None, scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.
     """
 

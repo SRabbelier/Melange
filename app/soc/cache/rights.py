@@ -32,11 +32,13 @@ RIGHTS = [
     'checkCanProcessRequest',
     'checkHasPickGetArgs',
     'checkHasUserEntity',
+    'checkHasHostEntity',
     'checkIsActive',
     'checkIsApplicationAccepted',
     'checkIsClubAdminForClub',
     'checkIsDeveloper',
-    'checkIsDocumentPublic',
+    'checkIsDocumentReadable',
+    'checkIsDocumentWritable',
     'checkIsGroupActive',
     'checkIsHost',
     'checkIsHostForSponsor',
@@ -48,6 +50,7 @@ RIGHTS = [
     'checkIsProgramActive',
     'checkIsUnusedAccount',
     'checkIsUser',
+    'checkIsUserSelf'
     'checkNotLoggedIn',
     ]
 

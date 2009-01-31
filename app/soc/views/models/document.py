@@ -61,7 +61,10 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = ['checkIsDocumentPublic']
+    rights['show'] = ['checkIsDocumentReadable']
+    rights['create'] = ['checkIsUser']
+    rights['edit'] = ['checkIsDocumentWritable']
+    rights['delete'] = ['checkIsDocumentWritable']
 
     new_params = {}
     new_params['logic'] = document_logic

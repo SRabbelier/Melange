@@ -39,7 +39,9 @@ from django.utils.translation import ugettext
 
 from soc.logic import accounts
 from soc.logic import dicts
+from soc.logic import rights as rights_logic
 from soc.logic.models.club_admin import logic as club_admin_logic
+from soc.logic.models.club_member import logic as club_member_logic
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.notification import logic as notification_logic
@@ -67,6 +69,10 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
   'Please <a href="%%(sign_out)s">sign out</a>'
   ' and <a href="%%(sign_in)s">sign in</a>'
   ' again as %(role)s to view this page.')
+
+DEF_NEED_MEMBERSHIP_MSG_FMT = ugettext(
+  'You need to be in the %(status)s group to %(action)s'
+  ' documents in the %(prefix)s prefix.')
 
 DEF_PAGE_DENIED_MSG = ugettext(
   'Access to this page has been restricted')
@@ -133,6 +139,18 @@ class Checker(object):
   when adding new access rights, and retrieving them, so use these
   rather then modifying rights directly if so desired.
   """
+
+  MEMBERSHIP = {
+    'anyone': 'allow',
+    'club_admin': 'checkIsClubAdminForScope',
+    'club_member': 'checkIsClubMemberForScope',
+    'host': 'checkHasHostEntity',
+    'org_admin': 'deny',
+    'org_mentor': 'deny',
+    'org_student': 'deny',
+    'user': 'checkIsUser',
+    'user_self': 'checkIsUserSelf',
+    }
 
   def __init__(self, params):
     """Adopts base.rights as rights if base is set.
@@ -273,6 +291,40 @@ class Checker(object):
     for checker_name, args in self[access_type]:
       self.check(use_cache, checker_name, django_args, args)
 
+  def checkMembership(self, action, prefix, status, django_args):
+    """Checks whether the user has access to the specified status.
+
+    Args:
+      action: the action that was performed (e.g., 'read')
+      prefix: the prefix, determines what access set is used
+      status: the access status (e.g., 'public')
+      django_args: the django args to pass on to the checkers
+    """
+
+    checker = rights_logic.Checker(prefix)
+    roles = checker.getMembership(status)
+
+    message_fmt = DEF_NEED_MEMBERSHIP_MSG_FMT % {
+        'action': action,
+        'prefix': prefix,
+        'status': status,
+        }
+
+    # try to see if they belong to any of the roles, if not, raise an
+    # access violation for the specified action, prefix and status.
+    for role in roles:
+      try:
+        checker_name = self.MEMBERSHIP[role]
+        self.doCheck(checker_name, django_args, [])
+
+        # the check passed, we can stop now
+        break
+      except out_of_band.Error:
+        continue
+    else:
+      raise out_of_band.AccessViolation(message_fmt)
+
+
   def allow(self, django_args):
     """Never raises an alternate HTTP response.  (an access no-op, basically).
 
@@ -356,7 +408,23 @@ class Checker(object):
         'tos_link': redirects.getToSRedirect(site_logic.getSingleton())}
 
     raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
-  
+
+  @allowDeveloper
+  def checkIsUserSelf(self, django_args):
+    """Checks whether the specified user is the logged in user
+
+    Args:
+      django_args: the keyword args from django, only scope_path is used
+    """
+
+    if not 'scope_path' in django_args:
+      self.deny(django_args)
+
+    if self.user.link_id == django_args['scope_path']:
+      return
+
+    raise out_of_band.AccessViolation()
+
   def checkIsUnusedAccount(self, django_args):
     """Raises an alternate HTTP response if Google Account has a User entity.
 
@@ -593,6 +661,12 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
+  def checkHasHostEntity(self, django_args):
+    """Checks whether the current user has a Host entity.
+    """
+
+    self.checkIsHost({})
+
   @denySidebar
   @allowDeveloper
   def checkIsHostForProgram(self, django_args):
@@ -686,6 +760,65 @@ class Checker(object):
         'role': 'a Club Admin for this Club'}
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  @allowDeveloper
+  @allowIfCheckPasses('checkIsClubAdminForClub')
+  def checkIsClubMemberForClub(self, django_args):
+    """Returns an alternate HTTP response if Google Account has no Club Member
+       entity for the specified club.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the required authorization is not met
+
+    Returns:
+      None if Club Member exists for the specified club, or a subclass of
+      django.http.HttpResponse which contains the alternate response
+      should be returned by the calling view.
+    """
+
+    self.checkIsUser(django_args)
+
+    if django_args.get('scope_path'):
+      scope_path = django_args['scope_path']
+    else:
+      scope_path = django_args['link_id']
+
+    fields = {'user': self.user,
+              'scope_path': scope_path,
+              'status': 'active'}
+
+    club_member_entity = club_member_logic.getForFields(fields, unique=True)
+
+    if club_member_entity:
+      return
+
+    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
+        'role': 'a Club Member for this Club'}
+
+    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+
+  def checkIsClubAdminForScope(self, django_args):
+    """Checks whether the current user is a Club Mdmin.
+
+    Args:
+      django_args: the keyword arguments from django, only scope_path is used
+    """
+
+    scope_path = django_args['scope_path']
+    self.checkIsClubAdminForClub({'link_id': scope_path})
+
+  def checkIsClubMemberForScope(self, django_args):
+    """Checks whether the current user is a Club Mdmin.
+
+    Args:
+      django_args: the keyword arguments from django, only scope_path is used
+    """
+
+    scope_path = django_args['scope_path']
+    self.checkIsClubMemberForClub({'link_id': scope_path})
 
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):
@@ -883,15 +1016,33 @@ class Checker(object):
 
   @denySidebar
   @allowDeveloper
-  def checkIsDocumentPublic(self, django_args):
-    """Checks whether a document is public.
+  def checkIsDocumentReadable(self, django_args):
+    """Checks whether a document is readable.
 
     Args:
       django_args: a dictionary with django's arguments
     """
 
     key_fields = document_logic.getKeyFieldsFromFields(django_args)
-    document_logic.getFromKeyFields(key_fields)
+    document = document_logic.getFromKeyFields(key_fields)
+
+    self.checkMembership('read', document.prefix,
+                         document.read_access, django_args)
+
+  @denySidebar
+  @allowDeveloper
+  def checkIsDocumentWritable(self, django_args):
+    """Checks whether a document is writable.
+
+    Args:
+      django_args: a dictionary with django's arguments
+    """
+
+    key_fields = document_logic.getKeyFieldsFromFields(django_args)
+    document = document_logic.getFromKeyFields(key_fields)
+
+    self.checkMembership('write', document.prefix,
+                         document.write_access, django_args)
 
   @allowIfCheckPasses('checkIsHostForProgram')
   def checkIsProgramVisible(self, django_args):
@@ -919,10 +1070,10 @@ class Checker(object):
     raise out_of_band.AccessViolation(DEF_DEV_LOGOUT_LOGIN_MSG_FMT,
                                       context=context)
 
-
   def checkCanEditTimeline(self, django_args):
-    """Allows developers and hosts for this program's timeline to edit it.
+    """Checks whether this program's timeline may be edited.
     """
+
     time_line_keyname = django_args['scope_path']
     timeline_entity = timeline_logic.getFromKeyName(time_line_keyname)
 

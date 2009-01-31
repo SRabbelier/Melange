@@ -151,8 +151,8 @@ class View(group.View):
     """
 
     # find the application
-    key_fields = club_app_logic.logic.getKeyFieldsFromDict(kwargs)
-    application = club_app_logic.logic.getFromFields(**key_fields)
+    key_fields = club_app_logic.logic.getKeyFieldsFromFields(kwargs)
+    application = club_app_logic.logic.getFromKeyFields(key_fields)
 
     # extract the application fields
     field_names = application.properties().keys()
@@ -192,8 +192,8 @@ class View(group.View):
     fields['founder'] = user
 
     if not key_name:
-      key_fields =  self._logic.getKeyFieldsFromDict(fields)
-      key_name = self._logic.getKeyNameForFields(key_fields)
+      key_fields =  self._logic.getKeyFieldsFromFields(fields)
+      key_name = self._logic.getKeyNameFromFields(key_fields)
 
     # create the club entity
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)

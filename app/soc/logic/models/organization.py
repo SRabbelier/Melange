@@ -43,7 +43,7 @@ class Logic(group.Logic):
                                 scope_logic=scope_logic)
 
   # Restore base.Logic key field related methods
-  getKeyValues = base.Logic.getKeyValues
+  getKeyValuesFromEntity = base.Logic.getKeyValuesFromEntity
   getKeyValuesFromFields = base.Logic.getKeyValuesFromFields
   getKeyFieldNames = base.Logic.getKeyFieldNames
 

@@ -136,14 +136,17 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    prefix = self._params['document_prefix']
-    key_fields = self._logic.getKeyFieldsFromDict(fields)
-    scope_path = self._logic.getKeyNameForFields(key_fields)
-    home_link_id = fields['home_link_id']
+    key_fields = self._logic.getKeyFieldsFromFields(fields)
+    scope_path = self._logic.getKeyNameFromFields(key_fields)
+
+    key_fields = {
+        'scope_path': scope_path,
+        'link_id': fields['home_link_id'],
+        'prefix': self._params['document_prefix'],
+        }
 
     # TODO notify the user if home_doc is not found
-    home_doc = document_logic.logic.getFromFields(
-      scope_path=scope_path, link_id=home_link_id, prefix=prefix)
+    home_doc = document_logic.logic.getFromKeyFields(key_fields)
 
     fields['home'] = home_doc
 

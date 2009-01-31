@@ -124,7 +124,7 @@ class View(presence_with_tos.View):
 
     # No entity in this case, since Site key values are hard-coded for the
     # Site singleton, so pass in None to match parent method footprint.
-    values = self._logic.getKeyValues(None)
+    values = self._logic.getKeyValuesFromEntity(None)
     key_values = dicts.zip(keys, values)
 
     return self.home(request, "home", page_name=page_name, **key_values)
@@ -142,7 +142,7 @@ class View(presence_with_tos.View):
 
     # No entity in this case, since Site key values are hard-coded for the
     # Site singleton, so pass in None to match parent method footprint.
-    values = self._logic.getKeyValues(None)
+    values = self._logic.getKeyValuesFromEntity(None)
     key_values = dicts.zip(keys, values)
 
     return self.edit(request, "edit", page_name, seed=key_values, **key_values)

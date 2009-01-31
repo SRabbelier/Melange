@@ -40,6 +40,7 @@ from django.utils.translation import ugettext
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models.club_admin import logic as club_admin_logic
+from soc.logic.models.document import logic as document_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.request import logic as request_logic
@@ -441,7 +442,7 @@ class Checker(object):
     if django_args.get('scope_path'):
       fields['scope_path'] = django_args['scope_path']
 
-    group_entity = group_logic.logic.getFromFieldsOr404(**fields)
+    group_entity = group_logic.logic.getFromKeyFieldsOr404(fields)
 
     if group_entity.status == 'active':
       return
@@ -489,7 +490,7 @@ class Checker(object):
         'scope_path': django_args['scope_path'],
         'role': role_name}
 
-    request_entity = request_logic.getFromFieldsOr404(**fields)
+    request_entity = request_logic.getFromKeyFieldsOr404(fields)
 
     if request_entity.status != 'group_accepted':
       # TODO tell the user that this request has not been accepted yet
@@ -511,7 +512,7 @@ class Checker(object):
         'scope_path': django_args['scope_path'],
         'role': role_name}
 
-    request_entity = request_logic.getFromFieldsOr404(**fields)
+    request_entity = request_logic.getFromKeyFieldsOr404(fields)
 
     if request_entity.status in ['completed', 'denied']:
       # TODO tell the user that this request has been processed
@@ -598,8 +599,8 @@ class Checker(object):
     """Checks if the user is a host for the specified program.
     """
 
-    key_fields = program_logic.getKeyFieldsFromDict(django_args)
-    program = program_logic.getFromFields(**key_fields)
+    key_fields = program_logic.getKeyFieldsFromFields(django_args)
+    program = program_logic.getFromKeyFields(key_fields)
 
     if not program or program.status == 'invalid':
       self.deny(django_args)
@@ -804,7 +805,7 @@ class Checker(object):
               'scope_path': django_args['scope_path'],
               }
 
-    role_entity = role_logic.logic.getFromFieldsOr404(**fields)
+    role_entity = role_logic.logic.getFromKeyFieldsOr404(fields)
 
     if role_entity.status != 'active':
       # role is not active
@@ -842,7 +843,7 @@ class Checker(object):
               'scope_path': django_args['scope_path'],
               }
 
-    role_entity = role_logic.logic.getFromFieldsOr404(**fields)
+    role_entity = role_logic.logic.getFromKeyFieldsOr404(fields)
 
     if role_entity.status != 'active':
       # cannot manage this entity
@@ -880,6 +881,8 @@ class Checker(object):
     #TODO(SRabbelier) inform user that return_url and field are required
     self.deny(django_args)
 
+  @denySidebar
+  @allowDeveloper
   def checkIsDocumentPublic(self, django_args):
     """Checks whether a document is public.
 
@@ -887,9 +890,8 @@ class Checker(object):
       django_args: a dictionary with django's arguments
     """
 
-    # TODO(srabbelier): A proper check needs to be done to see if the document
-    # is public or not, probably involving analysing it's scope or such.
-    self.allow(django_args)
+    key_fields = document_logic.getKeyFieldsFromFields(django_args)
+    document_logic.getFromKeyFields(key_fields)
 
   @allowIfCheckPasses('checkIsHostForProgram')
   def checkIsProgramVisible(self, django_args):
@@ -899,8 +901,8 @@ class Checker(object):
     if 'entity' in django_args:
       program = django_args['entity']
     else:
-      key_fields = program_logic.getKeyFieldsFromDict(django_args)
-      program = program_logic.getFromFields(**key_fields)
+      key_fields = program_logic.getKeyFieldsFromFields(django_args)
+      program = program_logic.getFromKeyFields(key_fields)
 
     if not program:
       self.deny(django_args)

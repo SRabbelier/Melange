@@ -128,7 +128,7 @@ class View(presence.View):
     # get the group from the request
     group_logic = params['logic']
 
-    group_entity = group_logic.getFromFields(**kwargs)
+    group_entity = group_logic.getFromKeyFields(kwargs)
 
     role_names = params['role_views'].keys()
     
@@ -211,7 +211,7 @@ class View(presence.View):
     # get the group from the request
     group_logic = params['logic']
 
-    group_entity = group_logic.getFromFields(**kwargs)
+    group_entity = group_logic.getFromKeyFields(kwargs)
 
     # create the filter
     filter = {

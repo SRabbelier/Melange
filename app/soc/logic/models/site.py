@@ -42,7 +42,7 @@ class Logic(presence_with_tos.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model)
 
-  def getKeyValues(self, entity):
+  def getKeyValuesFromEntity(self, entity):
     """Returns the key values for the site settings.
 
     The Site entity is a singleton, so this method returns 
@@ -78,7 +78,12 @@ class Logic(presence_with_tos.Logic):
   def getSingleton(self):
     """Return singleton Site settings entity, since there is always only one.
     """
-    return self.getFromFields(link_id=self.DEF_SITE_LINK_ID)
+
+    fields = {
+        'link_id': self.DEF_SITE_LINK_ID,
+        }
+
+    return self.getFromKeyFields(fields)
 
 
 logic = Logic()

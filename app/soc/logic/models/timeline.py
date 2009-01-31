@@ -45,7 +45,7 @@ class Logic(base.Logic):
 
     return 3
 
-  def getKeyValues(self, entity):
+  def getKeyValuesFromEntity(self, entity):
     """See base.Logic.getKeyNameValues.
     """
 

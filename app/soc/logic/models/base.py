@@ -131,32 +131,30 @@ class Logic(object):
     
     pass
 
-  def _keyName(self, **kwargs):
+  def getKeyNameFromFields(self, fields):
     """Returns the KeyName constructed from kwargs for this type of entity.
 
     The KeyName is in the following format:
     <key_value1>:<key_value2>:...:<key_valueN>
     """
 
-    # get the KeyFieldNames for this entity
     key_field_names = self.getKeyFieldNames()
 
     # check if all given KeyFieldNames are valid for this entity
-    if not all(key in key_field_names for key in kwargs.keys()):
+    if not all(key in key_field_names for key in fields.keys()):
       raise Error("Some of the provided arguments are not key fields")
 
-    # check if all key_field_names for this entity are present in kwargs
-    if not all(field in kwargs.keys() for field in key_field_names):
+    # check if all key_field_names for this entity are present in fields
+    if not all(field in fields.keys() for field in key_field_names):
       raise Error("Not all the required key fields are present")
 
-    # check if all kwargs.values() are non-false
-    if not all(kwargs.values()):
+    if not all(fields.values()):
       raise Error("Not all KeyValues are non-false")
 
     # construct the KeyValues in the order given by getKeyFieldNames()
     keyvalues = []
     for key_field_name in key_field_names:
-      keyvalues.append(kwargs[key_field_name])
+      keyvalues.append(fields[key_field_name])
 
     # construct the KeyName in the appropriate format
     return '/'.join(keyvalues)
@@ -166,7 +164,7 @@ class Logic(object):
     """ 
     return '%s.%s' % (self._model.__module__, self._model.__name__)
 
-  def getKeyValues(self, entity):
+  def getKeyValuesFromEntity(self, entity):
     """Extracts the key values from entity and returns them.
 
     The default implementation uses the scope and link_id as key values.
@@ -206,12 +204,12 @@ class Logic(object):
     if not entity:
       return None
 
-    key_values = self.getKeyValues(entity)
+    key_values = self.getKeyValuesFromEntity(entity)
     suffix = '/'.join(key_values)
 
     return suffix
 
-  def getKeyFieldsFromDict(self, dictionary):
+  def getKeyFieldsFromFields(self, dictionary):
     """Does any required massaging and filtering of dictionary.
 
     The resulting dictionary contains just the key names, and has any
@@ -236,30 +234,29 @@ class Logic(object):
 
     return self._model.get_by_key_name(key_name)
 
-  def getFromFields(self, **kwargs):
+  def getFromKeyFields(self, fields):
     """Returns the entity for the specified key names, or None if not found.
 
     Args:
       **kwargs: the fields of the entity that uniquely identifies it
     """
 
-    key_name = self.getKeyNameForFields(kwargs)
-
-    if key_name:
+    if all(fields.values()):
+      key_name = self.getKeyNameFromFields(fields)
       entity = self.getFromKeyName(key_name)
     else:
       entity = None
 
     return entity
 
-  def getFromFieldsOr404(self, **fields):
-    """Like getFromFields but expects to find an entity.
+  def getFromKeyFieldsOr404(self, fields):
+    """Like getFromKeyFields but expects to find an entity.
 
     Raises:
       out_of_band.Error if no User entity is found
     """
 
-    entity = self.getFromFields(**fields)
+    entity = self.getFromKeyFields(fields)
 
     if entity:
       return entity
@@ -276,30 +273,6 @@ class Logic(object):
         'name': self._name, 'pairs': joined_pairs}
 
     raise out_of_band.Error(msg, status=404)
-
-  def getIfFields(self, fields):
-    """Like getFromFieldsOr404 but returns None if not all fields are set.
-
-    Raises:
-      out_of_band.Error if no User entity is found and all fields were set
-    """
-
-    if not all(fields.values()):
-      return None
-
-    return self.getFromFieldsOr404(**fields)
-
-  def getKeyNameForFields(self, fields):
-    """Return a Datastore key_name for a Entity from the specified fields.
-
-    Args:
-      fields: the fields of the entity that uniquely identifies it
-    """
-
-    if not all(fields.values()):
-      return None
-
-    return self._keyName(**fields)
 
   def getForLimitAndOffset(self, limit, offset=0):
     """Returns entities for given offset and limit or None if not found.
@@ -438,7 +411,7 @@ class Logic(object):
     """
 
     # attempt to retrieve the existing entity
-    key_name  = self.getKeyNameForFields(fields)
+    key_name  = self.getKeyNameFromFields(fields)
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 

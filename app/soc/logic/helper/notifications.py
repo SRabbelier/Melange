@@ -147,7 +147,7 @@ def sendNotification(to_user, message_properties, subject, template):
       'scope_path' : to_user.link_id
   }
 
-  key_fields = model_logic.notification.logic.getKeyFieldsFromDict(fields)
+  key_fields = model_logic.notification.logic.getKeyFieldsFromFields(fields)
 
   # create and put a new notification in the datastore
   model_logic.notification.logic.updateOrCreateFromFields(fields, key_fields)

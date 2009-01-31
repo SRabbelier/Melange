@@ -103,8 +103,8 @@ class Logic(base.Logic):
 
     return True
 
-  def getKeyValues(self, entity):
-    """See base.Logic.getKeyValues.
+  def getKeyValuesFromEntity(self, entity):
+    """See base.Logic.getKeyValuesFromEntity.
     """
 
     return [entity.link_id]

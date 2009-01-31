@@ -47,8 +47,12 @@ class Logic(group.Logic):
     """Invites the group admin and backup admin.
     """
 
+    fields = {
+        'link_id': entity.link_id
+        }
+
     # Find their application
-    application = club_app_logic.logic.getFromFields(link_id=entity.link_id)
+    application = club_app_logic.logic.getFromKeyFields(fields)
 
     if application:
       # only if there is an application send out the invites
@@ -62,7 +66,7 @@ class Logic(group.Logic):
 
       for admin in [application.applicant, application.backup_admin]:
         properties['link_id'] = admin.link_id
-        key_fields = request_logic.logic.getKeyFieldsFromDict(properties)
+        key_fields = request_logic.logic.getKeyFieldsFromFields(properties)
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
       # set the application to completed  

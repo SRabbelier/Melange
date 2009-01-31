@@ -39,7 +39,7 @@ class Logic(group_app.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model)
 
-  def getKeyValues(self, entity):
+  def getKeyValuesFromEntity(self, entity):
     """See base.Logic.getKeyNameValues.
     """
 

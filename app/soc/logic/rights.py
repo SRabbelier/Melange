@@ -23,7 +23,7 @@ __authors__ = [
 
 
 class Checker(object):
-  """
+  """Checker class that maps from prefix and status to membership.
   """
 
   SITE_MEMBERSHIP = {
@@ -79,7 +79,7 @@ class Checker(object):
     self.rights = self.RIGHTS[prefix]
 
   def getMembership(self, status):
-    """
+    """Retrieves the membership list for the specified status.
     """
 
     if status == 'user':

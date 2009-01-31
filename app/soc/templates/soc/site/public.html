@@ -29,6 +29,8 @@ limitations under the License.
   {% if entity.tos %}
     {% readonly_field_as_table_row entity.fields.tos.label entity.tos.key.name %}
   {% endif %}
+  {% readonly_field_as_table_row entity.fields.ga_tracking_num.label entity.ga_tracking_num %}
+  {% readonly_field_as_table_row entity.fields.gmaps_api_key.label entity.gmaps_api_key %}
   <!-- TODO(pawel.solyga) make this generic -->
  </table>
 </p>

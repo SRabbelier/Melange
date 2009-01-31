@@ -51,7 +51,7 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['unspecified'] = ['checkIsDeveloper']
     rights['any_access'] = ['allow']
-    rights['show'] = ['allow']
+    rights['show'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.site.logic
@@ -64,11 +64,9 @@ class View(presence_with_tos.View):
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']
 
-    new_params['public_template'] = 'soc/presence/public.html'
     new_params['edit_template'] = 'soc/site/edit.html'
     new_params['home_template'] = 'soc/site/home.html'
 
-    new_params['extra_dynaexclude'] = ['is_enabled']
     new_params['create_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         }

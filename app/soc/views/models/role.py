@@ -254,8 +254,8 @@ class View(base.View):
     """
 
     if group_entity.scope_path:
-      request_scope_path = '%s/%s' % [
-          group_entity.scope_path, group_entity.link_id]
+      request_scope_path = '%s/%s' % (
+          group_entity.scope_path, group_entity.link_id)
     else:
       request_scope_path = group_entity.link_id
 

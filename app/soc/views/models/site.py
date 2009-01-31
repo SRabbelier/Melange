@@ -103,10 +103,9 @@ class View(presence_with_tos.View):
 
     if entity:
       submenus += document_view.view.getMenusForScope(entity, self._params)
-
-    if accounts.isDeveloper(id, user):
-      submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
-          "Create new document", 'any_access')]
+      if accounts.isDeveloper(id, user):
+        submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
+            "Create new document", 'any_access')]
 
     new_params = {}
     new_params['sidebar_additional'] = submenus

@@ -506,7 +506,7 @@ class View(base.View):
         'role_verbose' : params['name'],
         'status' : 'new'}
 
-    if self._isValidNewRequest(request_fields, params):
+    if not self._isValidNewRequest(request_fields, params):
       # not a valid request
       context['error_message'] = self.DEF_REQUEST_ERROR_MSG_FMT % (
           params)

@@ -45,6 +45,7 @@ RIGHTS = [
     'checkIsMyApplication',
     'checkIsMyGroupAcceptedRequest',
     'checkIsMyNotification',
+    'checkIsProgramActive',
     'checkIsUnusedAccount',
     'checkIsUser',
     'checkNotLoggedIn',

@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -26,6 +27,7 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import group
 from soc.views.models import program as program_view
@@ -46,6 +48,18 @@ class View(group.View):
       original_params: a dict with params for this View
     """
 
+    # TODO do the proper access checks
+    rights = access.Checker(params)
+    rights['create'] = ['checkIsDeveloper']
+    rights['edit'] = ['checkIsDeveloper']
+    rights['delete'] = ['checkIsDeveloper']
+    rights['home'] = ['allow']
+    rights['list'] = ['checkIsDeveloper']
+    rights['list_requests'] = ['checkIsDeveloper']
+    rights['list_roles'] = ['checkIsDeveloper']
+    # TODO(ljvderijk) implement Org application process
+    #rights['applicant'] = ['checkIsDeveloper']
+
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic
 
@@ -54,7 +68,13 @@ class View(group.View):
 
     new_params['name'] = "Organization"
     new_params['url_name'] = "org"
+    new_params['sidebar_grouping'] = 'Organizations'
 
+    new_params['public_template'] = 'soc/organization/public.html'
+    new_params['list_row'] = 'soc/organization/list/row.html'
+    new_params['list_heading'] = 'soc/organization/list/heading.html'
+
+    #TODO(ljvderijk) add cleaning methods to not overwrite existing orgs
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
@@ -65,13 +85,19 @@ class View(group.View):
 
     super(View, self).__init__(params=params)
 
+    # TODO(ljvderijk) define several menu items for organizations
+    #def _getExtraMenuItems(self, role_description, params=None):
+
 
 view = View()
 
 create = view.create
 delete = view.delete
 edit = view.edit
+home = view.home
 list = view.list
+list_requests = view.listRequests
+list_roles = view.listRoles
 public = view.public
 export = view.export
 pick = view.pick

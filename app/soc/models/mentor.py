@@ -14,17 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Reviewer Model."""
+"""This module contains the Organization Mentor Model."""
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
 ]
 
 
-import soc.models.reviewer
+import soc.models.role
 
 
-class Mentor(soc.models.reviewer.Reviewer):
+class Mentor(soc.models.role.Role):
   """Organization Mentor.
   """
   pass

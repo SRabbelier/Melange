@@ -71,5 +71,7 @@ class Logic(base.Logic):
       # TODO(Lennard) Create a new request message
       pass
 
+    super(Logic, self)._onCreate(entity)
+
 
 logic = Logic()

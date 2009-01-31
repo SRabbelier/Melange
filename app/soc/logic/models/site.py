@@ -80,11 +80,5 @@ class Logic(presence_with_tos.Logic):
     """
     return self.getFromFields(link_id=self.DEF_SITE_LINK_ID)
 
-  def _onCreate(self, entity):
-    """Flush the sidebar cache when a new active role entity has been created.
-    """
-
-    sidebar.flush()
-
 
 logic = Logic()

@@ -31,6 +31,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.cache import sidebar
 from soc.logic import dicts
 from soc.views import out_of_band
 
@@ -108,11 +109,11 @@ class Logic(object):
   
   def _onCreate(self, entity):
     """Called when an entity has been created.
-    
+
     Classes that override this can use it to do any post-creation operations.
     """
-    
-    pass
+
+    sidebar.flush()
   
   def _onUpdate(self, entity):
     """Called when an entity has been updated.

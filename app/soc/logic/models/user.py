@@ -152,7 +152,8 @@ class Logic(base.Logic):
     """
 
     notifications.sendWelcomeMessage(entity)
-    sidebar.flush(entity.account)
+
+    super(Logic, self)._onCreate(entity)
 
 
 logic = Logic()

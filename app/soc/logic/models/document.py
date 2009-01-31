@@ -69,12 +69,5 @@ class Logic(work.Logic):
 
     return True
 
-  def _onCreate(self, entity):
-    """Flush the sidebar cache when a new active role entity has been created.
-    """
-
-    if entity.is_featured:
-      sidebar.flush()
-
 
 logic = Logic()

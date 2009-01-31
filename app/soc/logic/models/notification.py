@@ -58,8 +58,7 @@ class Logic(base.Logic):
       # there is only one unread notification so send out an email
       notifications.sendNewNotificationMessage(entity)
 
-    # flush the sidebar cache
-    sidebar.flush(entity.scope.account)
+    super(Logic, self)._onCreate(entity)
 
   def _updateField(self, entity, name, value):
     """If unread changes we flush the sidebar cache.

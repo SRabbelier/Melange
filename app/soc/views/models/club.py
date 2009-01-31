@@ -94,8 +94,6 @@ class View(group.View):
             club_logic, club_app_logic)
         }
     new_params['edit_extra_dynafields'] = {
-        'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
-                                   required=False),
         'clean_link_id': cleaning.clean_link_id('link_id')
         }
 

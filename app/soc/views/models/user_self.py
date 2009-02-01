@@ -94,6 +94,9 @@ class View(base.View):
 
     new_params['edit_extra_dynafields'] = {
         'clean_link_id': cleaning.clean_link_id('link_id'),
+        'agreed_to_tos_on': forms.DateTimeField(
+          widget=widgets.ReadOnlyInput(attrs={'disabled':'true'}),
+          required=False),
         }
 
     new_params['sidebar_heading'] = 'User (self)'
@@ -124,20 +127,6 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-    # create and store the special form when editing your profile after signing the ToS
-    updated_fields = {
-        'agreed_to_tos_on': forms.DateTimeField(
-          widget=widgets.ReadOnlyInput(attrs={'disabled':'true'}),
-          required=False),
-        'clean_agreed_to_tos' : lambda x: True
-          }
-
-    signed_tos_edit_form = dynaform.extendDynaForm(
-        dynaform = self._params['edit_form'],
-        dynafields = updated_fields)
-
-    params['signed_tos_edit_form'] = signed_tos_edit_form
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -156,10 +145,6 @@ class View(base.View):
     user_entity = user_logic.getForCurrentAccount()
     link_id = user_entity.link_id
 
-    if user_entity.agreed_to_tos:
-      # use the special form
-      params['edit_form'] = params['signed_tos_edit_form']
-
     return self.edit(request, access_type,
          page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
 
@@ -177,12 +162,18 @@ class View(base.View):
     return super(View, self).editGet(request, entity, context, seed, params=params)
 
   def _editGet(self, request, entity, form):
-    """Sets the content of the agreed_to_tos_on field.
+    """Sets the content of the agreed_to_tos_on field and replaces.
+
+    Also replaces the agreed_to_tos field with a hidden field when the ToS has been signed.
     For params see base.View._editGet().
     """
 
     if entity.agreed_to_tos:
       form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
+      # replace the 'agreed_to_tos' field with a hidden field so 
+      # that the form checks still pass
+      form.fields['agreed_to_tos'] = forms.fields.CharField(widget=forms.HiddenInput,
+      initial=entity.agreed_to_tos, required=True)
 
   def editPost(self, request, entity, context, params=None):
     """Overwrite so we can add the contents of the ToS.

@@ -574,12 +574,12 @@ class View(object):
     return_url = get_dict['continue']
     field = get_dict['field']
 
+    filter = {}
+
     if scope_path:
-      filter = {}
       filter['scope_path'] = scope_path
-      data = data = self._logic.getForFields(filter)
-    else:
-      data = self._logic.getForLimitAndOffset(1000)
+
+    data = self._logic.getForFields(filter=filter, limit=1000)
 
     data = [i.toDict() for i in data]
 

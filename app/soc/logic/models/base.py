@@ -274,46 +274,31 @@ class Logic(object):
 
     raise out_of_band.Error(msg, status=404)
 
-  def getForLimitAndOffset(self, limit, offset=0):
-    """Returns entities for given offset and limit or None if not found.
-
-    Args:
-      limit: max amount of entities to return
-      offset: optional number of results to skip first; default zero.
-    """
-
-    query = self._model.all()
-    return query.fetch(limit, offset)
-
-  def getForFields(self, filter, unique=False):
+  def getForFields(self, filter=None, unique=False, limit=1000, offset=0):
     """Returns all entities that have the specified properties.
 
     Args:
       filter: a dict for the properties that the entities should have
       unique: if set, only the first item from the resultset will be returned
+      limit: the amount of entities to fetch at most
+      offset: the position to start at
     """
 
     if not filter:
-      raise Error("Properties did not contain any values")
+      filter = {}
+    if unique:
+      limit = 1
 
-    queries = dicts.split(filter)
+    q = db.Query(self._model)
 
-    def toQuery(filter):
-      q = db.Query(self._model)
-      for key, value in filter.iteritems():
+    for key, values in filter.iteritems():
+      for value in (values if isinstance(values, list) else [values]):
         q.filter(key, value)
-      return q
 
-    result = itertools.chain(*[toQuery(x) for x in queries])
+    result = q.fetch(limit, offset)
 
     if unique:
-      # Return the first item, we need the loop as itertools.chain
-      # returns an iterable rather than a list
-      for item in result:
-        return item
-
-      # In the case result is empty, return None
-      return None
+      return result[0] if result else None
 
     return result
 

@@ -124,17 +124,10 @@ def getListContent(request, params, filter=None, idx=0):
   pagination_form = makePaginationForm(request, limit, arg_name)
 
   # Fetch one more to see if there should be a 'next' link
-  if not filter:
-    data = logic.getForLimitAndOffset(limit+1, offset=offset)
-  else:
-    data = logic.getForFields(filter)
-
-  if not data:
-    data = []
-
-  data = list(itertools.islice(data, limit+1))
+  data = logic.getForFields(filter=filter, limit=limit+1, offset=offset)
 
   more = len(data) > limit
+
   if more:
     del data[limit:]
 

@@ -84,7 +84,7 @@ class View(base.View):
 
     # set the specific fields for the users profile page
     new_params['extra_dynaexclude'] = ['former_accounts', 
-        'account', 'is_developer']
+        'account', 'is_developer', 'status']
 
     new_params['create_extra_dynafields'] = {
         'clean_agreed_to_tos': cleaning.clean_agrees_to_tos('agreed_to_tos'),

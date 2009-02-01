@@ -107,3 +107,11 @@ class User(soc.models.linkable.Linkable):
   agreed_to_tos_on.help_text = ugettext(
       'Indicates when the user agreed to the site-wide Terms of Service.')
 
+  #: field storing the status of this User.
+  #: valid: Is just that, it's a valid User.
+  #: invalid: This means that this User has been excluded from using the website.
+  status = db.StringProperty(required=True, default='valid',
+      choices=['valid', 'invalid'],)
+  status.help_text = ugettext(
+      'Indicates the status of the User. Invalid means that this account '
+      'has been excluded from using the website.')

@@ -73,10 +73,15 @@ class View(base.View):
     new_params['sidebar_heading'] = 'Users'
 
     new_params['extra_dynaexclude'] = ['former_accounts', 'agreed_to_tos',
-        'agreed_to_tos_on']
+        'agreed_to_tos_on', 'status']
     new_params['create_extra_dynafields'] = {
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),
         'clean_account': cleaning.clean_user_account_not_in_use('account')}
+
+    # recreate the choices for the edit form
+    status_choices = []
+    for choice in user_logic.getModel().status.choices:
+      status_choices.append((choice, choice))
 
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
@@ -84,6 +89,7 @@ class View(base.View):
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'agreed_to_tos_on' : forms.CharField(widget=widgets.ReadOnlyInput(),
             required=False),
+        'status' : forms.ChoiceField(choices=status_choices),
         'clean_account': cleaning.clean_user_account('account'),
         'clean': cleaning.validate_user_edit('link_id', 'account'),
     }
@@ -101,6 +107,7 @@ class View(base.View):
     form.fields['account'].initial = entity.account.email()
     form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
     form.fields['agreed_to_tos_on'].example_text = self._getToSExampleText()
+    form.fields['status'].initial = entity.status
 
     super(View, self)._editGet(request, entity, form)
 

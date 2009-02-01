@@ -41,6 +41,7 @@ class ReadOnlyInput(forms.widgets.Input):
     """Render ReadOnlyInput widget as HTML.
     """
     attrs['readonly'] = 'readonly'
+    attrs['class'] = 'plaintext'
     return super(ReadOnlyInput, self).render(name, value, attrs)
 
 

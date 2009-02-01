@@ -27,8 +27,11 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
+from soc.views.helper import dynaform
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import group
 from soc.views.models import program as program_view
 
@@ -57,8 +60,7 @@ class View(group.View):
     rights['list'] = ['checkIsDeveloper']
     rights['list_requests'] = ['checkIsDeveloper']
     rights['list_roles'] = ['checkIsDeveloper']
-    # TODO(ljvderijk) implement Org application process
-    #rights['applicant'] = ['checkIsDeveloper']
+    rights['applicant'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic
@@ -74,6 +76,9 @@ class View(group.View):
     new_params['list_row'] = 'soc/organization/list/row.html'
     new_params['list_heading'] = 'soc/organization/list/heading.html'
 
+    new_params['application_logic'] = org_app_logic
+    new_params['group_applicant_url'] = True
+
     #TODO(ljvderijk) add cleaning methods to not overwrite existing orgs
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -85,12 +90,26 @@ class View(group.View):
 
     super(View, self).__init__(params=params)
 
+    # create and store the special form for applicants
+    updated_fields = {
+        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
+            required=False),
+        'clean_link_id': cleaning.clean_link_id('link_id')}
+
+    applicant_create_form = dynaform.extendDynaForm(
+        dynaform = self._params['create_form'],
+        dynafields = updated_fields)
+
+    params['applicant_create_form'] = applicant_create_form
+
+
     # TODO(ljvderijk) define several menu items for organizations
     #def _getExtraMenuItems(self, role_description, params=None):
 
 
 view = View()
 
+applicant = view.applicant
 create = view.create
 delete = view.delete
 edit = view.edit

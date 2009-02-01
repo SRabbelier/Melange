@@ -87,7 +87,8 @@ class View(base.View):
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True),
         'clean_link_id': cleaning.clean_link_id('link_id'),
-        'agreed_to_tos_on' : forms.CharField(widget=widgets.ReadOnlyInput(),
+        'agreed_to_tos_on' : forms.DateTimeField(
+            widget=widgets.ReadOnlyInput(attrs={'disabled':'true'}),
             required=False),
         'status' : forms.ChoiceField(choices=status_choices),
         'clean_account': cleaning.clean_user_account('account'),

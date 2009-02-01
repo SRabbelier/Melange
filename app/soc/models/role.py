@@ -303,7 +303,12 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Status of this Role'))
   status.help_text = ugettext(
       'Indicates the status of the role concerning which privileges may be used.')
-
+      
+  #: field storing whether the User has agreed to publish his location
+  publish_location = db.BooleanProperty(required=False, default=False,
+      verbose_name=ugettext('Publish my location'))
+  publish_location.help_text = ugettext(
+      'Indicates whether the user agreed to publish location.')
 
   def name(self):
     """Property as 'name' for use in common templates.

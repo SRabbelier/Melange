@@ -87,7 +87,7 @@ class View(base.View):
         'account', 'is_developer']
 
     new_params['create_extra_dynafields'] = {
-        'clean_agreed_to_tos' : cleaning.clean_agrees_to_tos('agreed_to_tos'),
+        'clean_agreed_to_tos': cleaning.clean_agrees_to_tos('agreed_to_tos'),
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),}
 
     new_params['edit_extra_dynafields'] = {

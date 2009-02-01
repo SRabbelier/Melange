@@ -79,7 +79,7 @@ class View(presence_with_tos.View):
 
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
 
-        'workflow' : forms.ChoiceField(choices=[('gsoc','Project-based'),
+        'workflow': forms.ChoiceField(choices=[('gsoc','Project-based'),
             ('ghop','Task-based')], required=True),
         }
 
@@ -157,9 +157,9 @@ class View(presence_with_tos.View):
       try:
         # check if the current user is a host for this program
         rights.doCachedCheck('checkIsHostForProgram', 
-            {'scope_path' : entity.scope_path,
-            'link_id' : entity.link_id,
-            'workflow' : entity.workflow}, [])
+            {'scope_path': entity.scope_path,
+            'link_id': entity.link_id,
+            'workflow': entity.workflow}, [])
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like
@@ -173,7 +173,7 @@ class View(presence_with_tos.View):
             "Edit Program Timeline", 'any_access')]
         # add link to create a new Program Document
         items += [(redirects.getCreateDocumentRedirect(entity, 'program'),
-          "Create new document", 'any_access')]
+            "Create a New Document", 'any_access')]
 
       except out_of_band.Error:
         pass

@@ -274,7 +274,7 @@ class View(group.View):
 
     if roles.get('club_member') or roles.get('club_admin'):
       submenu = (redirects.getCreateDocumentRedirect(group_entity, 'club'),
-          "Create new document", 'any_access')
+          "Create a New Document", 'any_access')
       submenus.append(submenu)
 
     return submenus

@@ -82,7 +82,7 @@ class View(group.View):
     if roles.get('host'):
       # add a link to create a new program
       submenu = (redirects.getCreateRedirect(group_entity,
-          {'url_name': 'program'}),"Create a new Program", 'any_access')
+          {'url_name': 'program'}),"Create a New Program", 'any_access')
       submenus.append(submenu)
 
       # add a link to the management page
@@ -112,7 +112,7 @@ class View(group.View):
       submenus.append(submenu)
 
       submenu = (redirects.getCreateDocumentRedirect(group_entity, 'sponsor'),
-          "Create new document", 'any_access')
+          "Create a New Document", 'any_access')
       submenus.append(submenu)
 
     return submenus

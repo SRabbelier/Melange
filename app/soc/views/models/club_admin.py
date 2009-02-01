@@ -27,6 +27,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import club as club_logic
+from soc.logic.models import club_admin as club_admin_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
@@ -50,15 +51,15 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.club_admin)]
+    rights['edit'] = [('checkHasRole', club_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['invite'] = ['checkIsClubAdminForClub']
+    rights['invite'] = [('checkHasRole', club_admin_logic.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'club_admin')]
-    rights['process_request'] = ['checkIsClubAdminForClub',
-        ('checkCanProcessRequest', 'club_admin')]
-    rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.club_admin,
-             soc.logic.models.club_admin])]
+    rights['process_request'] = [('checkHasRole', club_admin_logic.logic),
+                                 ('checkCanProcessRequest', 'club_admin')]
+    rights['manage'] = [('checkIsAllowedToManageRole',
+                         [soc.logic.models.club_admin,
+                          soc.logic.models.club_admin])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_admin.logic

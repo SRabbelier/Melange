@@ -26,31 +26,26 @@ from google.appengine.api import memcache
 
 
 RIGHTS = [
-    'checkAccess',
     'checkCanCreateFromRequest',
+    'checkCanEditTimeline',
     'checkCanMakeRequestToGroup',
     'checkCanProcessRequest',
     'checkHasPickGetArgs',
+    'checkHasRole',
     'checkHasUserEntity',
-    'checkHasHostEntity',
     'checkIsActive',
+    'checkIsAllowedToManageRole',
     'checkIsApplicationAccepted',
-    'checkIsClubAdminForClub',
     'checkIsDeveloper',
     'checkIsDocumentReadable',
     'checkIsDocumentWritable',
-    'checkIsGroupActive',
-    'checkIsHost',
-    'checkIsHostForSponsor',
+    'checkIsHostForProgram',
     'checkIsLoggedIn',
-    'checkIsMyActiveRole',
-    'checkIsMyApplication',
+    'checkIsMyEntity',
     'checkIsMyGroupAcceptedRequest',
-    'checkIsMyNotification',
-    'checkIsProgramActive',
     'checkIsUnusedAccount',
     'checkIsUser',
-    'checkIsUserSelf'
+    'checkIsUserSelf',
     'checkNotLoggedIn',
     ]
 

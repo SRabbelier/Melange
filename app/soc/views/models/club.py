@@ -29,7 +29,8 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models import club_app as club_app_logic
-from soc.logic.models import club as club_logic
+from soc.logic.models import club  as club_logic
+from soc.logic.models import club_admin as club_admin_logic
 from soc.logic.models import request as request_logic
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -57,14 +58,17 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsClubAdminForClub', ('checkIsGroupActive', club_logic)]
+    rights['edit'] = [('checkHasRole', club_admin_logic.logic),
+                      ('checkIsActive', club_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
-    rights['apply_member'] = ['checkIsUser', ('checkIsGroupActive', club_logic)]
-    rights['list_requests'] = ['checkIsClubAdminForClub']
-    rights['list_roles'] = ['checkIsClubAdminForClub']
-    rights['applicant'] = [('checkIsApplicationAccepted', club_app_logic)]
+    rights['apply_member'] = ['checkIsUser',
+                              ('checkIsActive', club_logic.logic)]
+    rights['list_requests'] = [('checkHasRole', club_admin_logic.logic)]
+    rights['list_roles'] = [('checkHasRole', club_admin_logic.logic)]
+    rights['applicant'] = [('checkIsApplicationAccepted',
+                            club_app_logic.logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club.logic

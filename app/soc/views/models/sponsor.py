@@ -25,6 +25,7 @@ __authors__ = [
 
 
 from soc.logic import dicts
+from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import group
@@ -48,13 +49,13 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsHostForSponsor', 
-        ('checkIsGroupActive', soc.logic.models.sponsor)]
+    rights['edit'] = [('checkHasRole', sponsor_logic),
+                      ('checkIsActive', sponsor_logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['home'] = ['checkIsHostForSponsor']
+    rights['home'] = [('checkHasRole', sponsor_logic)]
     rights['list'] = ['checkIsDeveloper']
-    rights['list_requests'] = ['checkIsHostForSponsor']
-    rights['list_roles'] = ['checkIsHostForSponsor']
+    rights['list_requests'] = [('checkHasRole', sponsor_logic)]
+    rights['list_roles'] = [('checkHasRole', sponsor_logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic

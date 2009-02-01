@@ -26,6 +26,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import organization as org_logic
+from soc.logic.models import org_admin as org_admin_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
@@ -49,7 +50,7 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.org_admin)]
+    rights['edit'] = [('checkHasRole', org_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     # TODO accessCheck checkIsAdministratorForOrg
     rights['invite'] = ['checkIsDeveloper']

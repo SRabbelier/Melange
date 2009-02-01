@@ -56,16 +56,15 @@ class View(role.View):
     """
 
     rights = access.Checker(params)
-    rights['create'] = ['checkIsHost']
-    rights['edit'] = [('checkIsMyActiveRole', soc.logic.models.host)]
-    rights['invite'] = ['checkIsHost']
+    rights['create'] = [('checkHasRole', host_logic.logic)]
+    rights['edit'] = [('checkHasRole', host_logic.logic)]
+    rights['invite'] = [('checkHasRole', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
     rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
-    rights['process_request'] = ['checkIsHost',
-        ('checkCanProcessRequest','host')]
-    rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.host,
-             soc.logic.models.host])]
+    rights['process_request'] = [('checkHasRole', host_logic.logic),
+                                 ('checkCanProcessRequest','host')]
+    rights['manage'] = [('checkIsAllowedToManageRole',
+                         [host_logic, host_logic])]
 
     new_params = {}
     new_params['rights'] = rights
@@ -83,7 +82,7 @@ class View(role.View):
 
     new_params['create_extra_dynafields'] = {
        'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                  required=True),
+                                     required=True),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),

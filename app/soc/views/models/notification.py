@@ -38,8 +38,8 @@ from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.models import base
-from soc.logic.models import notification as notification_logic
-from soc.logic.models import user as user_logic
+from soc.logic.models.notification import logic as notification_logic
+from soc.logic.models.user import logic as user_logic
 
 
 class CreateForm(helper.forms.BaseForm):
@@ -85,14 +85,14 @@ class View(base.View):
     rights = access.Checker(params)
     rights['unspecified'] = ['deny']
     rights['edit'] = ['deny']
-    rights['show'] = ['checkIsMyNotification']
-    rights['delete'] = ['checkIsMyNotification']
+    rights['show'] = [('checkIsMyEntity', notification_logic)]
+    rights['delete'] = [('checkIsMyEntity', notification_logic)]
     rights['list'] = ['checkIsUser']
     # create is developer only for the time being to test functionality
     rights['create'] = ['checkIsDeveloper']
 
     new_params = {}
-    new_params['logic'] = notification_logic.logic
+    new_params['logic'] = notification_logic
     new_params['rights'] = rights
 
     new_params['name'] = "Notification"
@@ -116,7 +116,7 @@ class View(base.View):
     """
 
     # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.getForCurrentAccount()
 
     # only select the notifications for this user so construct a filter
     filter = {
@@ -161,7 +161,7 @@ class View(base.View):
     """
 
     # get the current user
-    current_user = user_logic.logic.getForCurrentAccount()
+    current_user = user_logic.getForCurrentAccount()
 
     fields['link_id'] = 't%i' % (time.time())
     fields['scope'] = fields['to_user']
@@ -189,7 +189,7 @@ class View(base.View):
     # and the notification has not been read yet
     if entity.unread:
       # get the current user
-      user = user_logic.logic.getForCurrentAccount()
+      user = user_logic.getForCurrentAccount()
       
       # if the message is meant for the user that is reading it
       if entity.scope.key() == user.key():

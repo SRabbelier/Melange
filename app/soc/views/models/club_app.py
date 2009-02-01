@@ -28,6 +28,7 @@ from django import forms
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import models as model_logic
+from soc.logic.models import host as host_logic
 from soc.logic.models import club_app as club_app_logic
 from soc.views.helper import access
 from soc.views.models import group_app
@@ -49,11 +50,11 @@ class View(group_app.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsUser']
-    rights['delete'] = [('checkIsMyApplication', club_app_logic)]
-    rights['edit'] = [('checkIsMyApplication', club_app_logic)]
+    rights['delete'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
+    rights['edit'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
     rights['list'] = ['checkIsUser']
-    rights['public'] = [('checkIsMyApplication', club_app_logic)]
-    rights['review'] = ['checkIsHost']
+    rights['public'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
+    rights['review'] = [('checkHasRole', host_logic.logic)]
 
     new_params = {}
 

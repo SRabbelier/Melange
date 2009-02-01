@@ -27,6 +27,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
+from soc.logic.models import host as host_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -56,7 +57,7 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
-    rights['create'] = ['checkIsHost']
+    rights['create'] = [('checkHasRole', host_logic.logic)]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
 

@@ -44,16 +44,19 @@ from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.club_member import logic as club_member_logic
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.host import logic as host_logic
+from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.notification import logic as notification_logic
+from soc.logic.models.org_admin import logic as org_admin_logic
+from soc.logic.models.program import logic as program_logic
 from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
-from soc.logic.models.program import logic as program_logic
+#from soc.logic.models.student import logic as student_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
+from soc.views.helper import redirects
 from soc.views import helper
 from soc.views import out_of_band
-from soc.views.helper import redirects
 
 
 DEF_NO_USER_LOGIN_MSG= ugettext(
@@ -73,6 +76,27 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
 DEF_NEED_MEMBERSHIP_MSG_FMT = ugettext(
   'You need to be in the %(status)s group to %(action)s'
   ' documents in the %(prefix)s prefix.')
+
+DEF_NEED_ROLE_MSG = ugettext(
+  'You do not have the required role.')
+
+DEF_NOT_YOUR_ENTITY_MSG = ugettext(
+  'This entity does not belong to you.')
+
+DEF_NO_ACTIVE_GROUP_MSG = ugettext(
+  'There is no such active group.')
+
+DEF_NO_REQUEST_MSG = ugettext(
+  'There is no accepted request that would allow you to visit this page.')
+
+DEF_NEED_PICK_ARGS_MSG = ugettext(
+  'The "continue" and "field" args are not both present.')
+
+DEF_REQUEST_COMPLETED_MSG = ugettext(
+  'This request cannot be accepted (it is either completed or denied).')
+
+DEF_SCOPE_INACTIVE_MSG = ugettext(
+  'The scope for this request is not active.')
 
 DEF_PAGE_DENIED_MSG = ugettext(
   'Access to this page has been restricted')
@@ -142,14 +166,14 @@ class Checker(object):
 
   MEMBERSHIP = {
     'anyone': 'allow',
-    'club_admin': 'checkIsClubAdminForScope',
-    'club_member': 'checkIsClubMemberForScope',
-    'host': 'checkHasHostEntity',
-    'org_admin': 'deny',
-    'org_mentor': 'deny',
-    'org_student': 'deny',
+    'club_admin': ('checkHasRole', club_admin_logic),
+    'club_member': ('checkHasRole', club_member_logic),
+    'host': ('checkHasRole', host_logic),
+    'org_admin': ('checkHasRole', org_admin_logic),
+    'org_mentor': ('checkHasRole', mentor_logic),
+    'org_student': 'deny', #('checkHasRole', student_logic),
     'user': 'checkIsUser',
-    'user_self': 'checkIsUserSelf',
+    'user_self': ('checkIsUserSelf', 'scope_path'),
     }
 
   def __init__(self, params):
@@ -410,17 +434,17 @@ class Checker(object):
     raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
 
   @allowDeveloper
-  def checkIsUserSelf(self, django_args):
+  def checkIsUserSelf(self, django_args, field_name):
     """Checks whether the specified user is the logged in user.
 
     Args:
       django_args: the keyword args from django, only scope_path is used
     """
 
-    if not 'scope_path' in django_args:
+    if not field_name in django_args:
       self.deny(django_args)
 
-    if self.user.link_id == django_args['scope_path']:
+    if self.user.link_id == django_args[field_name]:
       return
 
     raise out_of_band.AccessViolation()
@@ -447,7 +471,6 @@ class Checker(object):
         'email' : self.id.email()}
     raise out_of_band.LoginRequest(message_fmt=message_fmt)
 
-
   def checkHasUserEntity(self, django_args):
     """Raises an alternate HTTP response if Google Account has no User entity.
 
@@ -467,7 +490,6 @@ class Checker(object):
 
     return
 
-
   def checkIsDeveloper(self, django_args):
     """Raises an alternate HTTP response if Google Account is not a Developer.
 
@@ -483,7 +505,7 @@ class Checker(object):
 
     self.checkIsUser(django_args)
 
-    if accounts.isDeveloper(account=self.id):
+    if accounts.isDeveloper(account=self.id, user=self.user):
       return
 
     login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
@@ -493,7 +515,8 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsGroupActive(self, django_args, group_logic):
+  def checkIsActive(self, django_args, logic,
+                    field_name='scope_path', filter_field='link_id'):
     """Raises an alternate HTTP response if Group status is not active.
 
     Args:
@@ -505,19 +528,32 @@ class Checker(object):
       * if the Group status is not active
     """
 
-    fields = {'link_id': django_args['link_id']}
+    self.checkIsUser(django_args)
 
-    if django_args.get('scope_path'):
-      fields['scope_path'] = django_args['scope_path']
+    if field_name and (field_name not in django_args):
+      self.deny(django_args)
 
-    group_entity = group_logic.logic.getFromKeyFieldsOr404(fields)
+    fields = {
+        filter_field: django_args[filter_field],
+        'status': active,
+        }
 
-    if group_entity.status == 'active':
+    if field_name:
+      fields['scope_path'] = django_args[field_name]
+
+    entity = logic.geForFields(fields)
+
+    if entity:
       return
 
-    # TODO tell the user that this group is not active
-    self.deny(django_args)
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
+  def checkHasRole(self, django_args, logic):
+    """Checks that the user has the specified role.
+    """
+
+    django_args['user'] = self.user
+    self.checkIsActive(django_args, logic, 'scope_path', 'user')
 
   def checkCanMakeRequestToGroup(self, django_args, group_logic):
     """Raises an alternate HTTP response if the specified group is not in an
@@ -537,7 +573,7 @@ class Checker(object):
 
     if group_entity.status != 'active':
       # TODO tell the user that this group is not active
-      self.deny(django_args)
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
     return
 
@@ -547,28 +583,27 @@ class Checker(object):
        is from is in an inactive or invalid status access will be denied.
     """
 
-    self.checkIsUser(django_args)
+    self.checkIsUserSelf(django_args, 'link_id')
 
-    user_entity = user_logic.getForCurrentAccount()
-
-    if user_entity.link_id != django_args['link_id']:
-      self.deny(django_args)
-
-    fields = {'link_id': django_args['link_id'],
+    fields = {
+        'link_id': django_args['link_id'],
         'scope_path': django_args['scope_path'],
-        'role': role_name}
+        'role': role_name,
+        'status': 'group_accepted',
+        }
 
-    request_entity = request_logic.getFromKeyFieldsOr404(fields)
+    entity = request_logic.getFromFields(fields)
 
-    if request_entity.status != 'group_accepted':
-      # TODO tell the user that this request has not been accepted yet
-      self.deny(django_args)
+    if entity and (entity.scope.status not in ['invalid', 'inactive']):
+      return
 
-    if request_entity.scope.status in ['invalid', 'inactive']:
-      # TODO tell the user that it is not possible to create this role anymore
-      self.deny(django_args)
+    raise out_of_band.AccessViolation(message_fmt=DEF_CANNOT_CREATE_MSG)
 
-    return
+  def checkIsMyGroupAcceptedRequest(self, django_args):
+    """Checks whether the user can accept the specified request.
+    """
+
+    self.checkCanCreateFromRequest(django_args, django_args['role'])
 
   def checkCanProcessRequest(self, django_args, role_name):
     """Raises an alternate HTTP response if the specified request does not exist
@@ -576,96 +611,21 @@ class Checker(object):
        whenever the group in the request is not active.
     """
 
-    fields = {'link_id': django_args['link_id'],
+    fields = {
+        'link_id': django_args['link_id'],
         'scope_path': django_args['scope_path'],
-        'role': role_name}
+        'role': role_name,
+        }
 
     request_entity = request_logic.getFromKeyFieldsOr404(fields)
 
     if request_entity.status in ['completed', 'denied']:
-      # TODO tell the user that this request has been processed
-      self.deny(django_args)
+      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_COMPLETED_MSG)
 
-    if request_entity.scope.status != 'active':
-      # TODO tell the user that this group cannot process requests
-      self.deny(django_args)
-
-    return
-
-  def checkIsMyGroupAcceptedRequest(self, django_args):
-    """Raises an alternate HTTP response if the specified request does not exist
-       or if it's status is not group_accepted.
-    """
-
-    self.checkIsUser(django_args)
-
-    user_entity = user_logic.getForCurrentAccount()
-
-    if user_entity.link_id != django_args['link_id']:
-      # not the current user's request
-      self.deny(django_args)
-
-    fields = {'link_id': django_args['link_id'],
-              'scope_path': django_args['scope_path'],
-              'role': django_args['role']}
-
-    request_entity = request_logic.getForFields(fields, unique=True)
-
-    if not request_entity:
-      # TODO return 404
-      self.deny(django_args)
-
-    if request_entity.status != 'group_accepted':
-      self.deny(django_args)
-
-    return
-
-  @allowDeveloper
-  @denySidebar
-  def checkIsHost(self, django_args):
-    """Raises an alternate HTTP response if Google Account has no Host entity.
-
-    Args:
-      request: a Django HTTP request
-
-    Raises:
-      AccessViolationResponse:
-      * if User is not already a Host, or
-      * if User has not agreed to the site-wide ToS, or
-      * if no User exists for the logged-in Google Account, or
-      * if the user is not even logged in
-    """
-
-    self.checkIsUser(django_args)
-
-    scope_path = None
-
-    if 'scope_path' in django_args:
-      scope_path = django_args['scope_path']
-    if 'link_id' in django_args:
-      scope_path = django_args['link_id']
-
-    fields = {'user': self.user,
-              'status': 'active'}
-
-    if scope_path:
-      fields['scope_path'] = scope_path
-
-    host = host_logic.getForFields(fields, unique=True)
-
-    if host:
+    if request_entity.scope.status == 'active':
       return
 
-    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Program Administrator '}
-
-    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-  def checkHasHostEntity(self, django_args):
-    """Checks whether the current user has a Host entity.
-    """
-
-    self.checkIsHost({})
+    raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
   @denySidebar
   @allowDeveloper
@@ -680,145 +640,7 @@ class Checker(object):
       self.deny(django_args)
 
     new_args = {'scope_path': program.scope_path }
-    self.checkIsHost(new_args)
-
-  @allowDeveloper
-  def checkIsHostForSponsor(self, django_args):
-    """Raises an alternate HTTP response if Google Account has no Host entity
-       for the specified Sponsor.
-
-    Args:
-      request: a Django HTTP request
-
-    Raises:
-      AccessViolationResponse:
-      * if User is not already a Host for the specified program, or
-      * if User has not agreed to the site-wide ToS, or
-      * if no User exists for the logged-in Google Account, or
-      * if the user is not even logged in
-    """
-
-    self.checkIsUser(django_args)
-
-    user = user_logic.getForCurrentAccount()
-
-    if django_args.get('scope_path'):
-      scope_path = django_args['scope_path']
-    else:
-      scope_path = django_args['link_id']
-
-    fields = {'user': user,
-              'scope_path': scope_path,
-              'status': 'active'}
-
-    host = host_logic.getForFields(fields, unique=True)
-
-    if host:
-      return
-
-    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Program Administrator '}
-
-    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-  @allowDeveloper
-  def checkIsClubAdminForClub(self, django_args):
-    """Returns an alternate HTTP response if Google Account has no Club Admin
-       entity for the specified club.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if Club Admin exists for the specified club, or a subclass of
-      django.http.HttpResponse which contains the alternate response
-      should be returned by the calling view.
-    """
-
-    self.checkIsUser(django_args)
-
-    user = user_logic.getForCurrentAccount()
-
-    if django_args.get('scope_path'):
-      scope_path = django_args['scope_path']
-    else:
-      scope_path = django_args['link_id']
-
-    fields = {'user': user,
-              'scope_path': scope_path,
-              'status': 'active'}
-
-    club_admin_entity = club_admin_logic.getForFields(fields, unique=True)
-
-    if club_admin_entity:
-      return
-
-    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Club Admin for this Club'}
-
-    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-  @allowDeveloper
-  @allowIfCheckPasses('checkIsClubAdminForClub')
-  def checkIsClubMemberForClub(self, django_args):
-    """Returns an alternate HTTP response if Google Account has no Club Member
-       entity for the specified club.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if Club Member exists for the specified club, or a subclass of
-      django.http.HttpResponse which contains the alternate response
-      should be returned by the calling view.
-    """
-
-    self.checkIsUser(django_args)
-
-    if django_args.get('scope_path'):
-      scope_path = django_args['scope_path']
-    else:
-      scope_path = django_args['link_id']
-
-    fields = {'user': self.user,
-              'scope_path': scope_path,
-              'status': 'active'}
-
-    club_member_entity = club_member_logic.getForFields(fields, unique=True)
-
-    if club_member_entity:
-      return
-
-    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Club Member for this Club'}
-
-    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
-
-  def checkIsClubAdminForScope(self, django_args):
-    """Checks whether the current user is a Club Mdmin.
-
-    Args:
-      django_args: the keyword arguments from django, only scope_path is used
-    """
-
-    scope_path = django_args['scope_path']
-    self.checkIsClubAdminForClub({'link_id': scope_path})
-
-  def checkIsClubMemberForScope(self, django_args):
-    """Checks whether the current user is a Club Mdmin.
-
-    Args:
-      django_args: the keyword arguments from django, only scope_path is used
-    """
-
-    scope_path = django_args['scope_path']
-    self.checkIsClubMemberForClub({'link_id': scope_path})
+    self.checkHasRole(new_args, host_logic)
 
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):
@@ -839,14 +661,12 @@ class Checker(object):
 
     self.checkIsUser(django_args)
 
-    user = user_logic.getForCurrentAccount()
-
     properties = {
-        'applicant': user,
+        'applicant': self.user,
         'status': 'accepted'
         }
 
-    application = app_logic.logic.getForFields(properties, unique=True)
+    application = app_logic.getForFields(properties, unique=True)
 
     if application:
       return
@@ -854,96 +674,23 @@ class Checker(object):
     # TODO(srabbelier) Make this give a proper error message
     self.deny(django_args)
 
-  @allowDeveloper
-  def checkIsMyNotification(self, django_args):
-    """Returns an alternate HTTP response if this request is for
-       a Notification belonging to the current user.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if the current User is allowed to access this Notification.
+  def checkIsMyEntity(self, django_args, logic, field_name='user'):
+    """Checks whether the entity belongs to the user.
     """
 
     self.checkIsUser(django_args)
 
-    properties = dicts.filter(django_args, ['link_id', 'scope_path'])
+    fields = {
+        'link_id': django_args['link_id'],
+        field_name: self.user,
+        }
 
-    notification = notification_logic.getForFields(properties, unique=True)
-    user = user_logic.getForCurrentAccount()
+    entity = logic.getForFields(fields)
 
-    # We need to check to see if the key's are equal since the User
-    # objects are different and the default __eq__ method does not check
-    # if the keys are equal (which is what we want).
-    if user.key() == notification.scope.key():
-      return None
+    if entity:
+      return
 
-    # TODO(ljvderijk) Make this give a proper error message
-    self.deny(django_args)
-
-  @allowDeveloper
-  def checkIsMyApplication(self, django_args, app_logic):
-    """Returns an alternate HTTP response if this request is for
-       a Application belonging to the current user.
-
-    Args:
-      request: a Django HTTP request
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if the current User is allowed to access this Application.
-    """
-
-    self.checkIsUser(django_args)
-
-    properties = dicts.filter(django_args, ['link_id'])
-
-    application = app_logic.logic.getForFields(properties, unique=True)
-
-    if not application:
-      self.deny(django_args)
-
-    # We need to check to see if the key's are equal since the User
-    # objects are different and the default __eq__ method does not check
-    # if the keys are equal (which is what we want).
-    if self.user.key() == application.applicant.key():
-      return None
-
-    # TODO(srabbelier) Make this give a proper error message
-    self.deny(django_args)
-
-  @allowDeveloper
-  def checkIsMyActiveRole(self, django_args, role_logic):
-    """Returns an alternate HTTP response if there is no active role found for
-       the current user using the given role_logic.
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if the current User has an active role for the given role_logic.
-    """
-
-    if not self.user or self.user.link_id != django_args['link_id']:
-      # not my role
-      self.deny(django_args)
-
-    fields = {'link_id': django_args['link_id'],
-              'scope_path': django_args['scope_path'],
-              }
-
-    role_entity = role_logic.logic.getFromKeyFieldsOr404(fields)
-
-    if role_entity.status != 'active':
-      # role is not active
-      self.deny(django_args)
-
+    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
   @allowDeveloper
   @denySidebar
@@ -967,22 +714,21 @@ class Checker(object):
 
     try:
       # check if it is my role the user's own role
-      self.checkIsMyActiveRole(django_args, role_logic)
+      self.checkHasRole(django_args, role_logic)
     except out_of_band.Error:
       pass
 
     # apparently it's not the user's role so check if managing this role is allowed
-    fields = {'link_id': django_args['link_id'],
-              'scope_path': django_args['scope_path'],
-              }
+    fields = {
+        'link_id': django_args['link_id'],
+        'scope_path': django_args['scope_path'],
+        'status': 'active',
+        }
 
-    role_entity = role_logic.logic.getFromKeyFieldsOr404(fields)
+    role_entity = role_logic.logic.getForFields(fields)
 
-    if role_entity.status != 'active':
-      # cannot manage this entity
-      self.deny(django_args)
-
-    fields = {'link_id': self.user.link_id,
+    fields = {
+        'link_id': self.user.link_id,
         'scope_path': django_args['scope_path'],
         'status': 'active'
         }
@@ -1011,8 +757,7 @@ class Checker(object):
     if 'continue' in get_args and 'field' in get_args:
       return
 
-    #TODO(SRabbelier) inform user that return_url and field are required
-    self.deny(django_args)
+    raise out_of_band.Error(message_fmt=DEF_NEED_PICK_ARGS_MSG)
 
   @denySidebar
   @allowDeveloper
@@ -1044,32 +789,6 @@ class Checker(object):
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)
 
-  @allowIfCheckPasses('checkIsHostForProgram')
-  def checkIsProgramVisible(self, django_args):
-    """Checks whether a program is visible.
-    """
-
-    if 'entity' in django_args:
-      program = django_args['entity']
-    else:
-      key_fields = program_logic.getKeyFieldsFromFields(django_args)
-      program = program_logic.getFromKeyFields(key_fields)
-
-    if not program:
-      self.deny(django_args)
-
-    if program.status == 'visible':
-      return
-
-    context = django_args.get('context', {})
-    context['title'] = 'Access denied'
-
-    message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': ugettext('a Program Administrator')}
-
-    raise out_of_band.AccessViolation(DEF_DEV_LOGOUT_LOGIN_MSG_FMT,
-                                      context=context)
-
   def checkCanEditTimeline(self, django_args):
     """Checks whether this program's timeline may be edited.
     """
@@ -1083,8 +802,9 @@ class Checker(object):
 
     split_keyname = time_line_keyname.rsplit('/')
 
-    fields = {'scope_path' : split_keyname[0],
+    fields = {
+        'scope_path' : split_keyname[0],
         'link_id' : split_keyname[1],
         }
 
-    return self.checkIsHostForProgram(fields)
+    self.checkIsHostForProgram(fields)

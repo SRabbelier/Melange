@@ -208,7 +208,7 @@ def getApplicantRedirect(entity, params):
   """
 
   return '/%s/applicant/%s' % (
-      params['url_name'], entity.link_id)
+      params['url_name'], entity.key().name())
 
 
 def getCreateDocumentRedirect(entity, prefix):

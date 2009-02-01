@@ -1,0 +1,91 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+
+{% block scripts %}
+	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+{% if gmaps_api_key %}
+	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ gmaps_api_key }}" type="text/javascript"></script>
+	<script type="text/javascript" src="/soc/content/js/map-090201.js"></script>
+{% endif %}
+{% endblock %}
+{% block header_title %}
+{{ page_name }}
+ {% if entity %}
+   <!-- TODO(srabbelier) use a generic entity name as link -->
+   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}"
+>{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
+ {% endif %}
+{% endblock %}
+
+{% block body %}
+{% block body_tag %}
+  {% if gmaps_api_key %}
+    <body onLoad="role_profile_gmap.map_load()" onunload="GUnload()">
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+<p>
+<p>
+{% block instructions %}
+Please use this form to edit the {{ entity_type }}.
+{% if not gmaps_api_key %}
+<br /><span class="error">Google Maps API key not present: please login as administrator and insert your key in Site, Edit Site Settings, Google Maps field</span>
+{% endif %}
+{% endblock %}
+</p>
+<form method="POST">
+  <table>
+    {% block form_table %}
+      {% as_table form %}
+    {% endblock %}
+    {% if gmaps_api_key %}
+    <tr title="your location">
+      <td class="formfieldlabel">
+        <label for="id_location">Location:</label>
+      </td>
+      <td>
+        <div id="role_profile_map"></div>
+      </td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    {% endif %}
+  </table>
+  <table>
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+    {% block submit_buttons %}
+   <td> 
+    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
+   </td>
+   <td>
+    <input type="button" onclick="location.href='/'" value="Cancel"/>
+   </td>
+   {% if entity %}
+   <td>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+   </td>
+   {% endif %}
+   {% endblock %}
+  </tr>
+ </table>
+</form>
+</p>
+{% endblock %}

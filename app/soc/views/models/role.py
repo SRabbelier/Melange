@@ -115,12 +115,16 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
+    new_params['create_template'] = 'soc/role/edit.html'
+    new_params['edit_template'] = 'soc/role/edit.html'
 
     new_params['create_extra_dynafields'] = {
-       'clean_link_id' : cleaning.clean_existing_user('link_id'),
-       'clean_home_page' : cleaning.clean_url('home_page'),
-       'clean_blog' : cleaning.clean_url('blog'),
-       'clean_photo_url' : cleaning.clean_url('photo_url'),
+       'latitude':forms.fields.FloatField(widget=forms.HiddenInput),
+       'longitude': forms.fields.FloatField(widget=forms.HiddenInput),
+       'clean_link_id': cleaning.clean_existing_user('link_id'),
+       'clean_home_page': cleaning.clean_url('home_page'),
+       'clean_blog': cleaning.clean_url('blog'),
+       'clean_photo_url': cleaning.clean_url('photo_url'),
        'scope_path': forms.CharField(widget=forms.HiddenInput,
                                   required=True),
        }
@@ -137,7 +141,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def invite(self, request, access_type,
-                   page_name=None, params=None, **kwargs):
+             page_name=None, params=None, **kwargs):
     """Creates the page on which an invite can be send out.
 
     Args:
@@ -369,7 +373,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def manage(self, request, access_type,
-                   page_name=None, params=None, **kwargs):
+             page_name=None, params=None, **kwargs):
     """Handles the request concerning the view that let's 
        you manage a role's status.
 
@@ -422,7 +426,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def request(self, request, access_type,
-                   page_name=None, params=None, **kwargs):
+              page_name=None, params=None, **kwargs):
     """Handles the request concerning the view that creates a request
     for attaining a certain Role.
 
@@ -528,7 +532,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def processRequest(self, request, access_type,
-                   page_name=None, params=None, **kwargs):
+                     page_name=None, params=None, **kwargs):
     """Creates the page upon which a request can be processed.
 
     Args:
@@ -596,7 +600,7 @@ class View(base.View):
       return False
 
     # check if the role already exists
-    fields = {'scope' : request_fields['scope'],
+    fields = {'scope': request_fields['scope'],
         'link_id': request_fields['link_id'],
         'status': ['active','inactive'],
         }

@@ -281,6 +281,12 @@ table#queues td {
   text-align: right;
 }
 
+/* Google Map */
+#role_profile_map {
+  height: 240px;
+  width: 320px;
+}
+
 /* SIDEBAR MENU */
 #side {
   width: 200px;

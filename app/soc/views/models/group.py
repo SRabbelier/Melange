@@ -26,6 +26,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
+from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -33,18 +34,19 @@ from soc.logic.models import user as user_logic
 from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models.request import view as request_view
 from soc.views.sitemap import sidebar
 
+import soc.views.helper
 
 class View(presence.View):
   """View methods for the Group model.
   """
 
-  # TODO(ljvderijk) add sidebar entry for listRequests to each group
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -73,6 +75,13 @@ class View(presence.View):
         (r'^%(url_name)s/(?P<access_type>list_roles)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.list_roles',
         'List of roles for %(name)s')]
+
+    if params.get('group_applicant_url'):
+      # add the applicant pattern
+      patterns += [
+          (r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.applicant', 
+          "%(name)s Creation via Accepted Application"),]
 
     new_params['extra_django_patterns'] = patterns
 
@@ -106,6 +115,119 @@ class View(presence.View):
       fields['founder'] = user
 
     super(View, self)._editPost(request, entity, fields)
+
+
+  @decorators.merge_params
+  @decorators.check_access
+  def applicant(self, request, access_type,
+                page_name=None, params=None, **kwargs):
+    """Handles the creation of a group via an approved group application.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    if request.method == 'POST':
+      return self.applicantPost(request, context, params, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.applicantGet(request, context, params, **kwargs)
+
+  def applicantGet(self, request, context, params, **kwargs):
+    """Handles the GET request concerning the creation of a group via an
+    approved group application.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # find the application
+    application_logic = params['application_logic']
+    key_fields = application_logic.logic.getKeyFieldsFromFields(kwargs)
+    application = application_logic.logic.getFromKeyFields(key_fields)
+
+    # extract the application fields
+    field_names = application.properties().keys()
+    fields = dict( [(i, getattr(application, i)) for i in field_names] )
+
+    # create the form using the fields from the application as the initial value
+    form = params['applicant_create_form'](initial=fields)
+
+    # construct the appropriate response
+    return super(View, self)._constructResponse(request, entity=None,
+        context=context, form=form, params=params)
+
+  def applicantPost(self, request, context, params, **kwargs):
+    """Handles the POST request concerning the creation of a group via an
+    approved group application.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # populate the form using the POST data
+    form = params['applicant_create_form'](request.POST)
+
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=None, context=context,
+          form=form, params=params)
+
+    # collect the cleaned data from the valid form
+    key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
+
+    # do post processing
+    self._applicantPost(request, context, fields)
+
+    if not key_name:
+      key_fields =  self._logic.getKeyFieldsFromFields(fields)
+      key_name = self._logic.getKeyNameFromFields(key_fields)
+
+    # create the group entity
+    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+
+    # redirect to notifications list to see the admin invite
+    return http.HttpResponseRedirect('/notification/list')
+
+  def _applicantPost(self, request, context, fields):
+    """Performs any required processing on the entity to post its edit page.
+
+    Args:
+      request: the django request object
+      context: the context for the webpage
+      fields: the new field values
+    """
+
+     # fill in the founder of the group
+    user = user_logic.logic.getForCurrentAccount()
+    fields['founder'] = user
+
+    # If scope_logic is not defined, this entity has no scope
+    if not self._params['scope_logic']:
+      return
+
+    # If this entity is unscoped, do not try to retrieve a scope
+    if 'scope_path' not in fields:
+      return
+
+    scope = self._params['scope_logic'].logic.getFromKeyName(
+        fields['scope_path'])
+    fields['scope'] = scope
+
 
   @decorators.merge_params
   @decorators.check_access

@@ -39,10 +39,10 @@ limitations under the License.
 
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=accepted'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.link_id }}'" value="Delete"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.key.name }}'" value="Delete"/>
   </td>
 </tr>
 </table>

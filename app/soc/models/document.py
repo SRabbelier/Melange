@@ -48,7 +48,7 @@ class Document(soc.models.work.Work):
 
   #: field storing the prefix of this document
   prefix = db.StringProperty(default='user', required=True,
-      choices=['site','club', 'sponsor', 'program', 'organization', 'user'],
+      choices=['site', 'club', 'sponsor', 'program', 'organization', 'user'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the document,'
@@ -56,7 +56,7 @@ class Document(soc.models.work.Work):
 
   #: field storing the required access to read this document
   read_access = db.StringProperty(default='public', required=True,
-      choices=['admin','restricted', 'member', 'user', 'public'],
+      choices=['admin', 'restricted', 'member', 'user', 'public'],
       verbose_name=ugettext('Read Access'))
   read_access.help_text = ugettext(
       'Indicates the state of the document, '
@@ -64,7 +64,7 @@ class Document(soc.models.work.Work):
 
   #: field storing the required access to write to this document
   write_access = db.StringProperty(default='public', required=True,
-      choices=['admin','restricted', 'member', 'user'],
+      choices=['admin', 'restricted', 'member', 'user'],
       verbose_name=ugettext('Write Access'))
   write_access.help_text = ugettext(
       'Indicates the state of the document, '

@@ -86,19 +86,22 @@ class SelectQueryArgForm(forms.Form):
   """
 
   ONCHANGE_JAVASCRIPT_FMT = '''
-<script type="text/javascript"> 
-  function changeArg_%(arg_name)s(item) 
+<script type="text/javascript">
+  function changeArg_%(arg_name)s(item)
   {
     var idx=item.selectedIndex;
     item.selected=true;
-    var value=item.value 
-    var url = location.href 
-    var reg = /%(arg_name)s=\d+/ 
-    url = url.replace(reg, "%(arg_name)s="+value) 
-    if(url.match(reg))
-      document.location.href = url 
-   else
-      document.location.href = "%(page_path)s?%(arg_name)s="+value; 
+    var value=item.value;
+    var url = location.href;
+    var ourreg = /%(arg_name)s=\d+/;
+    var anyreg = /\w+=\d+/;
+    if(url.match(ourreg))
+      url = url.replace(ourreg, "%(arg_name)s="+value);
+    else if(url.match(anyreg))
+      url = url + "&%(arg_name)s=" + value;
+    else
+      url = "%(page_path)s?%(arg_name)s="+value;
+    document.location.href = url;
   }
 </script>
 '''

@@ -134,7 +134,17 @@ class Logic(base.Logic):
     with the old account.
     Also, if either is_developer or agrees_to_tos change, the user's
     rights have changed, so we need to flush the sidebar.
+    Make sure once the user agreed ToS, the ToS fields can't be changed.
     """
+
+    # iff the agreed_to_tos is True and we want to set it to False 
+    if (name == 'agreed_to_tos') and (not value) and entity.agreed_to_tos:
+      return False
+
+    # iff the agreed_to_tos_on has a value and we want to change it
+    if (name == 'agreed_to_tos_on') and entity.agreed_to_tos_on and (
+        value != entity.agreed_to_tos_on):
+      return False
 
     if (name == 'is_developer') and (entity.is_developer != value):
       sidebar.flush(entity.account)

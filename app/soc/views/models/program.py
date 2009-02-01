@@ -178,9 +178,13 @@ class View(presence_with_tos.View):
       except out_of_band.Error:
         pass
 
+      items = sidebar.getSidebarMenu(id, user, items, params=params)
+      if not items:
+        continue
+
       menu = {}
       menu['heading'] = entity.short_name
-      menu['items'] = sidebar.getSidebarMenu(id, user, items, params=params)
+      menu['items'] = items
       menu['group'] = 'Programs'
       menus.append(menu)
 

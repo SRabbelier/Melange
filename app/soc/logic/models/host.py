@@ -51,7 +51,7 @@ class Logic(role.Logic):
 
     if sponsor_entity.status == 'new':
       # this sponsor is new so mark as active
-      fields = {'status' : 'active'}
+      fields = {'status': 'active'}
       sponsor_logic.logic.updateEntityProperties(sponsor_entity, fields)
 
     # call super

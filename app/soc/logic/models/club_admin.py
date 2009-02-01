@@ -50,7 +50,7 @@ class Logic(role.Logic):
 
     if club_entity.status == 'new':
       # this club is new so mark as active
-      fields = {'status' : 'active'}
+      fields = {'status': 'active'}
       club_logic.logic.updateEntityProperties(club_entity, fields)
 
     # call super

@@ -67,14 +67,6 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   dev_mailing_list.help_text = ugettext(
     'Mailing list email address, URL to sign-up page, etc.')
 
-  backup_admin = db.ReferenceProperty(reference_class=soc.models.user.User,
-    required=False,  collection_name='backup_admin_app',
-    verbose_name=ugettext(
-      'Please select your backup group administrator (if there is one).'
-      ' They will be emailed to confirm, and this group will not be '
-      ' accepted until they respond. (optional).'))
-  backup_admin.redirect_url = soc.models.user.User.URL_NAME
-
   contrib_template = db.ReferenceProperty(
     reference_class=soc.models.document.Document, required=False,
     collection_name='org_app_contrib_template',
@@ -88,25 +80,25 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   contrib_template.redirect_url = soc.models.document.Document.URL_NAME
 
   contrib_disappears = db.TextProperty(required=True,
-    verbose_text=ugettext(
+    verbose_name=ugettext(
       'What is your plan for dealing with disappearing contributors?'))
   contrib_disappears.help_text = ugettext(
     'Contributors include students and other non-member participants.')
 
   member_disappears = db.TextProperty(required=True,
-    verbose_text=ugettext(
+    verbose_name=ugettext(
       'What is your plan for dealing with disappearing members?'))
-  member_disappears = ugettext(
-    'Members include mentors, admininstrators, and the like.')
+  member_disappears.help_text = ugettext(
+    'Members include mentors, administrators, and the like.')
 
   encourage_contribs = db.TextProperty(required=True,
-    verbose_text=ugettext(
+    verbose_name=ugettext(
       'What steps will you take to encourage contributors to interact with'
       ' your community before, during, and after the program?'))
   encourage_contribs.help_text = contrib_disappears.help_text
 
   continued_contribs = db.TextProperty(required=True,
-    verbose_text=ugettext(
+    verbose_name=ugettext(
       'What will you do to ensure that your accepted contributors stick'
       ' with the project after the program concludes?'))
   continued_contribs.help_text = contrib_disappears.help_text

@@ -53,7 +53,7 @@ def getPreferredListPagination(user=None):
   return DEF_PAGINATION
 
 
-def getLimitAndOffset(request, idx):
+def getLimitAndOffset(request, offset_key, limit_key):
   """Retrieves, converts and validates offset and limit values
 
   Args:
@@ -64,8 +64,8 @@ def getLimitAndOffset(request, idx):
     updated offset and limit values
   """
 
-  offset = request.GET.get('offset_%d' % idx)
-  limit = request.GET.get('limit_%d' % idx)
+  offset = request.GET.get(offset_key)
+  limit = request.GET.get(limit_key)
 
   if offset is None:
     offset = ''
@@ -88,6 +88,16 @@ def getLimitAndOffset(request, idx):
   limit = min(MAX_PAGINATION, limit)
 
   return limit, offset
+
+
+def generateLinkFromGetArgs(request, offset_and_limits):
+  """Constructs the get args for the url.
+  """
+
+  args = ["%s=%s" % (k, v) for k, v in offset_and_limits.iteritems()]
+  link_suffix = '?' + '&'.join(args)
+
+  return request.path + link_suffix
 
 
 def getListContent(request, params, filter=None, idx=0):
@@ -119,9 +129,11 @@ def getListContent(request, params, filter=None, idx=0):
 
   logic = params['logic']
 
-  limit, offset = getLimitAndOffset(request, idx)
-  arg_name = 'limit_%d' % idx
-  pagination_form = makePaginationForm(request, limit, arg_name)
+  offset_key = 'offset_%d' % idx
+  limit_key = 'limit_%d' % idx
+
+  limit, offset = getLimitAndOffset(request, offset_key, limit_key)
+  pagination_form = makePaginationForm(request, limit, limit_key)
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset)
@@ -133,16 +145,28 @@ def getListContent(request, params, filter=None, idx=0):
 
   newest = next = prev = ''
 
+  get_args = request.GET
+  offset_and_limits = {}
+
+  for key, value in get_args.iteritems():
+    if key.startswith('offset_') or key.startswith('limit_'):
+      offset_and_limits[key] = value
+
   if more:
-    next = request.path + '?offset_%d=%d&limit_%d=%d' % (
-        idx, offset+limit, idx, limit)
+    offset_and_limits[offset_key] = offset+limit
+    offset_and_limits[limit_key] = limit
+    next = generateLinkFromGetArgs(request, offset_and_limits)
 
   if offset > 0:
-    prev = request.path + '?offset_%d=%d&limit_%d=%d' % (
-        idx, max(0, offset-limit), idx, limit)
+    offset_and_limits[offset_key] = max(0, offset-limit)
+    offset_and_limits[limit_key] = limit
+    prev = generateLinkFromGetArgs(request, offset_and_limits)
 
   if offset > limit:
-    newest = request.path + '?limit_%d=%d' % (idx, limit)
+    del offset_and_limits[offset_key]
+    offset_and_limits[limit_key] = limit
+
+    newest = generateLinkFromGetArgs(request, offset_and_limits)
 
   content = {
       'data': data,

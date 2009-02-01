@@ -82,7 +82,7 @@ def getReviewRedirect(entity, params):
   """
   
   return '/%s/review/%s' % (
-      params['url_name'], entity.link_id)
+      params['url_name'], entity.key().name())
 
 
 def getCreateRequestRedirect(entity, params):

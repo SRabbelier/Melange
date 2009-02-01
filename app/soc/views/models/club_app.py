@@ -24,21 +24,12 @@ __authors__ = [
 
 
 from django import forms
-from django.utils.translation import ugettext
 
-from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.helper import notifications
 from soc.logic import models as model_logic
 from soc.logic.models import club_app as club_app_logic
-from soc.logic.models import user as user_logic
-from soc.views import helper
-from soc.views import out_of_band
 from soc.views.helper import access
-from soc.views.helper import decorators
-from soc.views.helper import redirects
-from soc.views.helper import lists as list_helper
 from soc.views.models import group_app
 
 import soc.logic.dicts
@@ -71,278 +62,22 @@ class View(group_app.View):
 
     new_params['sidebar_grouping'] = 'Clubs'
 
-    new_params['create_template'] = 'soc/models/twoline_edit.html'
-    new_params['edit_template'] = 'soc/models/twoline_edit.html'
-
-    new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
-        'created_on', 'last_modified_on']
     new_params['create_extra_dynafields'] = {
-        'backup_admin_link_id': forms.CharField(
-              label=soc.models.club_app.ClubApplication.backup_admin.verbose_name
-              ),
-        'clean_backup_admin_link_id': 
-            cleaning.clean_users_not_same('backup_admin_link_id'),
         'clean_link_id': cleaning.clean_new_club_link_id('link_id', 
             model_logic.club, club_app_logic)
         }
-
-    new_params['edit_extra_dynafields'] = {
-        'clean_link_id' : cleaning.clean_link_id('link_id'),
-        }
-
-    patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
-        'soc.views.models.%(module_name)s.review_overview',
-        'Review %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>review)/%(lnp)s$',
-          'soc.views.models.%(module_name)s.review',
-          'Review %(name_short)s')]
-
-    new_params['extra_django_patterns'] = patterns
 
     new_params['name'] = "Club Application"
     new_params['name_plural'] = "Club Applications"
     new_params['name_short'] = "Club App"
     new_params['url_name'] = "club_app"
-
-    new_params['sidebar_additional'] = [
-        ('/%(url_name)s/review' % new_params,
-         'Review %(name_plural)s' % new_params, 'review')]
+    new_params['group_url_name'] = 'club'
 
     new_params['review_template'] = 'soc/club_app/review.html'
 
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def list(self, request, access_type,
-           page_name=None, params=None, filter=None):
-    """Lists all notifications that the current logged in user has stored.
-
-    for parameters see base.list()
-    """
-
-    # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
-
-    is_developer = accounts.isDeveloper(user=user_entity)
-
-    filter = {
-        'status': 'needs review',
-        }
-
-    if not is_developer:
-      # only select the applications for this user so construct a filter
-      filter['applicant'] = user_entity
-
-    # get all the pending applications
-
-    pa_params = params.copy() # pending applications
-
-    if is_developer:
-      pa_params['list_description'] = ugettext(
-          "An overview of all pending club applications.")
-    else:
-      pa_params['list_description'] = ugettext(
-          "An overview of your pending club applications.")
-
-    pa_list = list_helper.getListContent(
-        request, pa_params, filter, 0)
-
-    # get all the reviewed applications now
-
-    # re-use the old filter, but set to only reviewed and accepted
-    filter['status'] = 'accepted'
-
-    aa_params = params.copy() # accepted applications
-
-    if is_developer:
-      aa_params['list_description'] = ugettext(
-          "An overview of all accepted club applications.")
-    else:
-      aa_params['list_description'] = ugettext(
-          "An overview of your accepted club applications.")
-
-    aa_params['url_name'] = 'club'
-    aa_params['list_action'] = (redirects.getApplicantRedirect, aa_params)
-
-    aa_list = list_helper.getListContent(
-        request, aa_params, filter, 1)
-
-    # get all the reviewed applications that were denied
-
-    # re use the old filter, but this time only for denied apps
-    filter['status'] = 'rejected'
-
-    da_params = params.copy() # denied applications
-
-    if is_developer:
-      da_params['list_description'] = ugettext(
-          "An overview of all denied club applications.")
-    else:
-      da_params['list_description'] = ugettext(
-          "An overview of your denied club applications.")
-
-    da_list = list_helper.getListContent(
-        request, da_params, filter, 2)
-
-    contents = [pa_list, aa_list, da_list]
-
-    if is_developer:
-      # re use the old filter, but this time only for ignored apps
-      filter['status'] = 'ignored'
-
-      ia_params = params.copy() # ignored applications
-
-      ia_params['list_description'] = ugettext(
-          "An overview of all ignored club applications.")
-
-      ia_list = list_helper.getListContent(
-          request, ia_params, filter, 3)
-
-      contents += [ia_list]
-
-    # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
-
-  def _editGet(self, request, entity, form):
-    """See base.View._editGet().
-    """
-
-    form.fields['backup_admin_link_id'].initial = entity.backup_admin.link_id
-
-    super(View, self)._editGet(request, entity, form)
-
-  def _editPost(self, request, entity, fields):
-    """See base.View._editPost().
-    """
-
-    fields['backup_admin'] = fields['backup_admin_link_id']
-
-    if not entity:
-      fields['applicant'] = user_logic.logic.getForCurrentAccount()
-
-    # the application has either been created or edited so
-    # the status needs to be set accordingly
-    fields['status'] = 'needs review'
-
-  def _public(self, request, entity, context):
-    """See base._public().
-    """
-
-    context['entity_type_url'] = self._params['url_name']
-
-  @decorators.merge_params
-  @decorators.check_access
-  def review(self, request, access_type,
-             page_name=None, params=None, **kwargs):
-    """Handles the view containing the review of an application.
-
-    accepted (true or false) in the GET data will mark
-    the application accordingly.
-
-
-    For params see base.View.public().
-    """
-
-    # create default template context for use with any templates
-    context = helper.responses.getUniversalContext(request)
-    context['page_name'] = page_name
-    entity = None
-
-    try:
-      key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-      entity = self._logic.getFromKeyFieldsOr404(key_fields)
-    except out_of_band.Error, error:
-      return helper.responses.errorResponse(
-          error, request, template=params['error_public'], context=context)
-
-    get_dict = request.GET
-
-    # check to see if we can make a decision for this application
-    if 'status' in get_dict.keys():
-      status_value = get_dict['status']
-
-      if status_value in ['accepted', 'rejected', 'ignored']:
-        # this application has been properly reviewed update the status
-        fields = {'status' : status_value}
-
-        self._logic.updateEntityProperties(entity, fields)
-        
-        if status_value == 'accepted':
-          # the application has been accepted send out a notification
-          notifications.sendNewClubNotification(entity)
-
-        return self.reviewOverview(request, access_type,
-            page_name=page_name, params=params, **kwargs)
-
-    # the application has not been reviewed so show the information
-    # using the appropriate review template
-    params['public_template'] = params['review_template']
-
-    return super(View, self).public(request, access_type,
-        page_name=page_name, params=params, **kwargs)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def reviewOverview(self, request, access_type,
-             page_name=None, params=None, **kwargs):
-    """Displays multiple lists of applications that are in a different
-    status of the application process.
-    """
-
-    params = dicts.merge(params, self._params)
-
-    # only select the requests that haven't been reviewed yet
-    filter = {'status' : 'needs review'}
-
-    ur_params = params.copy()
-    ur_params['list_description'] = ugettext('A list of all unhandled '
-        'applications.')
-    ur_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    ur_list = helper.lists.getListContent(
-        request, ur_params, filter, 0)
-
-    # only select the requests that haven't been turned into a group yet
-    filter['status'] = 'accepted'
-
-    uh_params = params.copy()
-    uh_params['list_description'] = ugettext('A list of all applications '
-        'that have been accepted but not turned into a Club yet')
-    uh_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    uh_list = helper.lists.getListContent(
-        request, uh_params, filter, 1)
-
-    # only select the requests the have been rejected
-    filter ['status'] = 'rejected'
-
-    den_params = params.copy()
-    den_params['list_description'] = ugettext('A list of all applications '
-        'that have been rejected')
-    den_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    den_list = helper.lists.getListContent(
-        request, den_params, filter, 2)
-
-    # only select the request that have been ignored
-    filter ['status'] = 'ignored'
-
-    ign_params = params.copy()
-    ign_params['list_description'] = ugettext('A list of all applications '
-        'that have been ignored')
-    ign_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    ign_list = helper.lists.getListContent(
-        request, ign_params, filter, 3)
-
-    # fill contents with all the needed lists
-    contents = [ur_list, uh_list, den_list, ign_list]
-
-    # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
 
 
 view = View()

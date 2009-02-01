@@ -47,14 +47,14 @@ DEF_NEW_NOTIFICATION_MSG = ugettext(
 DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
 
-DEF_NEW_CLUB_MSG_FMT = ugettext(
-    "Your club application for %(name)s has been accepted.")
+DEF_NEW_GROUP_MSG_FMT = ugettext(
+    "Your %(application_type)s for %(group_name)s has been accepted.")
 
 DEF_WELCOME_MSG_FMT = ugettext("Welcome to Melange %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
 
-DEF_NEW_CLUB_TEMPLATE = 'soc/club/messages/accepted.html'
+DEF_NEW_GROUP_TEMPLATE = 'soc/group/messages/accepted.html'
 
 
 def sendInviteNotification(entity):
@@ -89,30 +89,32 @@ def sendInviteNotification(entity):
   sendNotification(to_user, message_properties, subject, template)
 
 
-def sendNewClubNotification(entity):
-  """Sends out an invite notification to the applicant of the club.
+def sendNewGroupNotification(entity, params):
+  """Sends out an invite notification to the applicant of the group.
 
   Args:
-    entity : An accepted club application
+    entity : An accepted group application
   """
 
   to_user = entity.applicant
 
-  url = "http://%(host)s/club/applicant/%(key_name)s" % {
-      'host' : os.environ['HTTP_HOST'],
-      'key_name': entity.key().name(),
+  url = "http://%(host)s%(redirect)s" % {
+      'redirect': redirects.getApplicantRedirect(entity, 
+      {'url_name': params['group_url_name']}),
+      'host': os.environ['HTTP_HOST'],
       }
 
   message_properties = {
-      'club_name': entity.name,
+      'group_name': entity.name,
       'url': url,
       }
 
-  subject = DEF_NEW_CLUB_MSG_FMT % {
-      'name': entity.name,
+  subject = DEF_NEW_GROUP_MSG_FMT % {
+      'application_type': params['name'],
+      'group_name': entity.name,
       }
 
-  template = DEF_NEW_CLUB_TEMPLATE
+  template = DEF_NEW_GROUP_TEMPLATE
 
   sendNotification(to_user, message_properties, subject, template)
 

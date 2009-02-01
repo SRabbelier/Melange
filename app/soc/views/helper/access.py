@@ -49,8 +49,8 @@ from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.program import logic as program_logic
-from soc.logic.models.user import logic as user_logic
 from soc.logic.models.timeline import logic as timeline_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import redirects
@@ -411,7 +411,7 @@ class Checker(object):
 
   @allowDeveloper
   def checkIsUserSelf(self, django_args):
-    """Checks whether the specified user is the logged in user
+    """Checks whether the specified user is the logged in user.
 
     Args:
       django_args: the keyword args from django, only scope_path is used
@@ -984,7 +984,7 @@ class Checker(object):
 
     fields = {'link_id': self.user.link_id,
         'scope_path': django_args['scope_path'],
-        'status' : 'active'
+        'status': 'active'
         }
 
     manage_entity = manage_role_logic.logic.getForFields(fields, unique=True)

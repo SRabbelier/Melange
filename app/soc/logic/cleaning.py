@@ -80,6 +80,7 @@ def clean_agrees_to_tos(field_name):
 
   return wrapper
 
+
 def clean_existing_user(field_name):
   """Check if the field_name field is a valid user.
   """
@@ -211,7 +212,7 @@ def clean_new_club_link_id(field_name, club_logic, club_app_logic):
 
       # check if there is already an application with the given link_id
       fields = {'link_id': club_link_id,
-                'status': ['accepted','ignored','needs review','completed']}
+                'status': ['accepted', 'ignored', 'needs review', 'completed']}
       club_app_entity = club_app_logic.logic.getForFields(fields, unique=True)
 
       if club_app_entity:

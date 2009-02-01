@@ -72,7 +72,7 @@ class Checker(object):
       }
 
   def __init__(self, prefix):
-    """Constructs a Checker for the specified prefix
+    """Constructs a Checker for the specified prefix.
     """
 
     self.prefix = prefix

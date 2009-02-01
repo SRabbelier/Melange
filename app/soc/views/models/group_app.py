@@ -32,6 +32,8 @@ from soc.logic import dicts
 from soc.logic.helper import notifications
 from soc.logic.models import group_app as group_app_logic
 from soc.logic.models import user as user_logic
+from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
@@ -66,7 +68,7 @@ class View(base.View):
     patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
         'soc.views.models.%(module_name)s.review_overview',
         'Review %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>review)/%(lnp)s$',
+        (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.review',
           'Review %(name_short)s')]
 

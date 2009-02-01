@@ -34,6 +34,7 @@ from soc.views.models import mentor
 from soc.views.models import notification
 from soc.views.models import organization
 from soc.views.models import org_admin
+from soc.views.models import org_app
 from soc.views.models import program
 from soc.views.models import request
 from soc.views.models import site
@@ -64,6 +65,7 @@ sidebar.addMenu(program.view.getExtraMenus)
 sidebar.addMenu(organization.view.getSidebarMenus)
 sidebar.addMenu(org_admin.view.getSidebarMenus)
 sidebar.addMenu(mentor.view.getSidebarMenus)
+sidebar.addMenu(org_app.view.getSidebarMenus)
 
 sitemap.addPages(club.view.getDjangoURLPatterns())
 sitemap.addPages(club_admin.view.getDjangoURLPatterns())
@@ -75,6 +77,7 @@ sitemap.addPages(mentor.view.getDjangoURLPatterns())
 sitemap.addPages(notification.view.getDjangoURLPatterns())
 sitemap.addPages(organization.view.getDjangoURLPatterns())
 sitemap.addPages(org_admin.view.getDjangoURLPatterns())
+sitemap.addPages(org_app.view.getDjangoURLPatterns())
 sitemap.addPages(program.view.getDjangoURLPatterns())
 sitemap.addPages(request.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())

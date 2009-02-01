@@ -1,0 +1,61 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+
+{% block header_title %}
+{{ page_name }} for {{ entity.name }}
+{% endblock %}
+
+{% block body %}
+<p>
+ <table>
+  {% readonly_field_as_twoline_table_row entity.fields.name.label entity.name %}
+  {% readonly_field_as_twoline_table_row entity.fields.applicant.label entity.applicant.link_id %}
+  {% readonly_field_as_twoline_table_row entity.fields.home_page.label entity.home_page %}
+  {% readonly_field_as_twoline_table_row entity.fields.email.label entity.email %}
+  {% readonly_field_as_twoline_table_row entity.fields.description.label entity.description %}
+  {% readonly_field_as_twoline_table_row entity.fields.why_applying.label entity.why_applying %}
+  {% readonly_field_as_twoline_table_row entity.fields.prior_participation.label entity.prior_participation %}
+  {% readonly_field_as_twoline_table_row entity.fields.prior_application.label entity.prior_application %}
+  {% readonly_field_as_twoline_table_row entity.fields.license_name.label entity.license_name %}
+  {% readonly_field_as_twoline_table_row entity.fields.pub_mailing_list.label entity.pub_mailing_list %}
+  {% readonly_field_as_twoline_table_row entity.fields.dev_mailing_list.label entity.dev_mailing_list %}
+  {% readonly_field_as_twoline_table_row entity.fields.irc_channel.label entity.irc_channel %}
+  {% readonly_field_as_twoline_table_row entity.fields.backup_admin.label entity.backup_admin.link_id %}
+  {% readonly_field_as_twoline_table_row entity.fields.member_criteria.label entity.member_criteria %}
+  {% readonly_field_as_twoline_table_row entity.fields.contrib_disappears.label entity.contrib_disappears %}
+  {% readonly_field_as_twoline_table_row entity.fields.member_disappears.label entity.member_disappears %}
+  {% readonly_field_as_twoline_table_row entity.fields.encourage_contribs.label entity.encourage_contribs %}
+  {% readonly_field_as_twoline_table_row entity.fields.continued_contribs.label entity.continued_contribs %}
+  {% readonly_field_as_twoline_table_row entity.fields.ideas.label entity.ideas %}
+  {% readonly_field_as_twoline_table_row entity.fields.contrib_template.label entity.contrib_template %}
+ 
+
+  {% readonly_field_as_table_row entity.fields.status.label entity.status %}
+  {% readonly_field_as_table_row "Created on" entity.created_on %}
+  {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
+ </table>
+</p>
+
+<tr>
+  <td>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.key.name }}'" value="Delete"/>
+  </td>
+</tr>
+</table>
+{% endblock %}

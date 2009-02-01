@@ -60,9 +60,7 @@ be unique and not in use by any other user of the site.
 {% if not user.agreed_to_tos %}
 <tr>
   <td>
-      <div id="ToS" style="overflow:auto" height="200px" width="400px">
       {{ tos_contents|safe|linebreaks }}
-      </div>
   </td>
 </tr>
   {% field_as_table_row form.agreed_to_tos %}

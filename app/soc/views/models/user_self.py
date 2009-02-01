@@ -172,7 +172,7 @@ class View(base.View):
       form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
       # replace the 'agreed_to_tos' field with a hidden field so 
       # that the form checks still pass
-      form.fields['agreed_to_tos'] = forms.fields.CharField(widget=forms.HiddenInput,
+      form.fields['agreed_to_tos'] = forms.fields.BooleanField(widget=forms.HiddenInput,
       initial=entity.agreed_to_tos, required=True)
 
   def editPost(self, request, entity, context, params=None):

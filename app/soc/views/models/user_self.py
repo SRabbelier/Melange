@@ -28,6 +28,7 @@ import datetime
 
 from google.appengine.api import users
 
+from django import forms
 from django import http
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
@@ -40,6 +41,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import dynaform
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
@@ -84,14 +86,14 @@ class View(base.View):
 
     # set the specific fields for the users profile page
     new_params['extra_dynaexclude'] = ['former_accounts', 
-        'account', 'is_developer', 'status']
+        'account', 'is_developer', 'status', 'agreed_to_tos_on']
 
     new_params['create_extra_dynafields'] = {
         'clean_agreed_to_tos': cleaning.clean_agrees_to_tos('agreed_to_tos'),
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),}
 
     new_params['edit_extra_dynafields'] = {
-        'clean_link_id': cleaning.clean_link_id('link_id')
+        'clean_link_id': cleaning.clean_link_id('link_id'),
         }
 
     new_params['sidebar_heading'] = 'User (self)'
@@ -122,6 +124,20 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
+    # create and store the special form when editing your profile after signing the ToS
+    updated_fields = {
+        'agreed_to_tos_on': forms.DateTimeField(
+          widget=widgets.ReadOnlyInput(attrs={'disabled':'true'}),
+          required=False),
+        'clean_agreed_to_tos' : lambda x: True
+          }
+
+    signed_tos_edit_form = dynaform.extendDynaForm(
+        dynaform = self._params['edit_form'],
+        dynafields = updated_fields)
+
+    params['signed_tos_edit_form'] = signed_tos_edit_form
+
 
   @decorators.merge_params
   @decorators.check_access
@@ -140,8 +156,12 @@ class View(base.View):
     user_entity = user_logic.getForCurrentAccount()
     link_id = user_entity.link_id
 
+    if user_entity.agreed_to_tos:
+      # use the special form
+      params['edit_form'] = params['signed_tos_edit_form']
+
     return self.edit(request, access_type,
-           page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
+         page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
 
 
   def editGet(self, request, entity, context, seed, params=None):
@@ -155,6 +175,14 @@ class View(base.View):
       context['tos_contents'] = site_tos.content
 
     return super(View, self).editGet(request, entity, context, seed, params=params)
+
+  def _editGet(self, request, entity, form):
+    """Sets the content of the agreed_to_tos_on field.
+    For params see base.View._editGet().
+    """
+
+    if entity.agreed_to_tos:
+      form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
 
   def editPost(self, request, entity, context, params=None):
     """Overwrite so we can add the contents of the ToS.

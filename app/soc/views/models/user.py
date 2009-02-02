@@ -105,7 +105,7 @@ class View(base.View):
     """
 
     # fill in the email field with the data from the entity
-    form.fields['account'].initial = entity.account.email()
+    form.fields['account'].initial = entity.account.email
     form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
     form.fields['agreed_to_tos_on'].example_text = self._getToSExampleText()
     form.fields['status'].initial = entity.status

@@ -69,7 +69,7 @@ class Logic(group.Logic):
           'scope': entity,
           'scope_path': entity.key().name(),
           'role': 'org_admin',
-          'role_verbose' : 'Organization Admin',
+          'role_verbose': 'Organization Admin',
           'status': 'group_accepted',
           }
 
@@ -79,7 +79,7 @@ class Logic(group.Logic):
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
       # set the application to completed  
-      fields = {'status' : 'completed'}
+      fields = {'status': 'completed'}
       org_app_logic.logic.updateEntityProperties(application, fields)
 
     super(Logic, self)._onCreate(entity)

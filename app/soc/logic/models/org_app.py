@@ -28,6 +28,7 @@ from soc.logic.models import program as program_logic
 import soc.models.group_app
 import soc.models.org_app
 
+
 class Logic(group_app.Logic):
   """Logic methods for the Organization Application model.
   """

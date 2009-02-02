@@ -120,9 +120,9 @@ class View(base.View):
     page_name = ugettext("List of your roles")
     patterns += [(r'^%(url_name)s/(?P<access_type>roles)$',
                    'soc.views.models.request.list_self', page_name)]
-    
+
     new_params['django_patterns_defaults'] = patterns
-    
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

@@ -103,8 +103,7 @@ def getUniversalContext(request):
   context['request'] = request
 
   if account:
-    user = soc.logic.models.user.logic.getForFields(
-        {'account': account}, unique=True)
+    user = soc.logic.models.user.logic.getForCurrentAccount()
     is_admin = accounts.isDeveloper(account=account)
 
   context['account'] = account

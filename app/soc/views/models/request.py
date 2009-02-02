@@ -194,8 +194,7 @@ class View(base.View):
     """
 
     # get the current user
-    properties = {'account': users.get_current_user()}
-    user_entity = user_logic.logic.getForFields(properties, unique=True)
+    user_entity = user_logic.logic.getForCurrentAccount()
 
     # construct the Unhandled Invites list
 

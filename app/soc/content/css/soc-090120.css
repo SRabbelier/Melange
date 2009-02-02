@@ -475,7 +475,7 @@ span.unread {
 }
 
 .plaintext {
-background:transparent none repeat scroll 0 0;
-border:0 none;
-color:black;
+  background:transparent none repeat scroll 0 0;
+  border:0 none;
+  color:black;
 }

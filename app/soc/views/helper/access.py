@@ -447,7 +447,7 @@ class Checker(object):
     if self.user.link_id == django_args[field_name]:
       return
 
-    raise out_of_band.AccessViolation()
+    raise out_of_band.AccessViolation(DEF_NOT_YOUR_ENTITY_MSG)
 
   def checkIsUnusedAccount(self, django_args):
     """Raises an alternate HTTP response if Google Account has a User entity.
@@ -597,7 +597,7 @@ class Checker(object):
     if entity and (entity.scope.status not in ['invalid', 'inactive']):
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_CANNOT_CREATE_MSG)
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_REQUEST_MSG)
 
   def checkIsMyGroupAcceptedRequest(self, django_args):
     """Checks whether the user can accept the specified request.

@@ -284,35 +284,37 @@ class Logic(object):
       offset: the position to start at
     """
 
-    if not filter:
-      filter = {}
     if unique:
       limit = 1
 
-    format_eq = '%(key)s = :%(num)d'
-    format_in = '%(key)s IN (%(values)s)'
+    if filter:
+      format_eq = '%(key)s = :%(num)d'
+      format_in = '%(key)s IN (%(values)s)'
 
-    n = 1
-    conditionals = []
-    args = []
+      n = 1
+      conditionals = []
+      args = []
 
-    for key, value in filter.iteritems():
-      if isinstance(value, list):
-        count = len(value)
-        args.extend(value)
-        values = ', '.join([':%d' % i for i in range(n, n + count)])
-        sub = format_in % {'key': key, 'values': values}
-        n = n + count
-      else:
-        sub = format_eq % {'key': key, 'num': n}
-        args.append(value)
-        n = n + 1
-      conditionals.append(sub)
+      for key, value in filter.iteritems():
+        if isinstance(value, list):
+          count = len(value)
+          args.extend(value)
+          values = ', '.join([':%d' % i for i in range(n, n + count)])
+          sub = format_in % {'key': key, 'values': values}
+          n = n + count
+        else:
+          sub = format_eq % {'key': key, 'num': n}
+          args.append(value)
+          n = n + 1
+        conditionals.append(sub)
 
-    joined_pairs = ' AND '.join(conditionals)
-    condition = 'WHERE ' + joined_pairs
+      joined_pairs = ' AND '.join(conditionals)
+      condition = 'WHERE ' + joined_pairs
 
-    q = self._model.gql(condition, *args)
+      q = self._model.gql(condition, *args)
+    else:
+      q = self._model.all()
+
     result = q.fetch(limit, offset)
 
     if unique:

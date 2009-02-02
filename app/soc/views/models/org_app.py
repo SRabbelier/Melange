@@ -47,10 +47,13 @@ class View(group_app.View):
     #TODO(ljvderijk) do the right rights check
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['delete'] = [('checkIsMyApplication', org_app_logic)]
-    rights['edit'] = [('checkIsMyApplication', org_app_logic)]
+    rights['delete'] = [('checkIsMyEntity',
+                       [org_app_logic.logic, 'applicant', True])]
+    rights['edit'] = [('checkIsMyEntity',
+                       [org_app_logic.logic, 'applicant', True])]
     rights['list'] = ['checkIsDeveloper']
-    rights['public'] = [('checkIsMyApplication', org_app_logic)]
+    rights['public'] = [('checkIsMyEntity',
+                       [org_app_logic.logic, 'applicant', True])]
     rights['review'] = ['checkIsDeveloper']
 
     new_params = {}

@@ -119,8 +119,10 @@ class View(base.View):
     new_params['edit_template'] = 'soc/role/edit.html'
 
     new_params['create_extra_dynafields'] = {
-       'latitude':forms.fields.FloatField(widget=forms.HiddenInput),
-       'longitude': forms.fields.FloatField(widget=forms.HiddenInput),
+       'latitude':forms.fields.FloatField(widget=forms.HiddenInput,
+          required=False),
+       'longitude': forms.fields.FloatField(widget=forms.HiddenInput,
+          required=False),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),

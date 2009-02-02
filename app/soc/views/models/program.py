@@ -159,8 +159,7 @@ class View(presence_with_tos.View):
         # check if the current user is a host for this program
         rights.doCachedCheck('checkIsHostForProgram', 
             {'scope_path': entity.scope_path,
-            'link_id': entity.link_id,
-            'workflow': entity.workflow}, [])
+            'link_id': entity.link_id}, [])
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like

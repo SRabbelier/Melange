@@ -58,8 +58,8 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasRole', club_admin_logic.logic),
-                      ('checkIsActive', club_logic.logic)]
+    rights['edit'] = [('checkHasRole', [club_admin_logic.logic, 'link_id']),
+                      ('checkIsActive', [club_logic.logic, None])]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']

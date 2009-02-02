@@ -57,7 +57,7 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
-    rights['create'] = [('checkHasRole', host_logic.logic)]
+    rights['create'] = [('checkSeeded', ['checkHasRole', host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
 

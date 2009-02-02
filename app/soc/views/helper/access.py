@@ -558,6 +558,13 @@ class Checker(object):
     django_args['user'] = self.user
     self.checkIsActive(django_args, logic, field_name, 'user')
 
+  def checkSeeded(self, django_args, checker_name, *args):
+    """Wrapper to update the django_args with the contens of seed first.
+    """
+
+    django_args.update(django_args.get('seed', {}))
+    self.doCheck(checker_name, django_args, args)
+
   def checkCanMakeRequestToGroup(self, django_args, group_logic):
     """Raises an alternate HTTP response if the specified group is not in an
     active status.

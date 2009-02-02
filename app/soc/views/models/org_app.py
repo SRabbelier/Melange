@@ -27,7 +27,9 @@ from django import forms
 from soc.logic import dicts
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
+from soc.views.helper import redirects
 from soc.views.models import group_app
+from soc.views.models import program as program_view
 
 import soc.logic.dicts
 
@@ -61,7 +63,10 @@ class View(group_app.View):
     new_params['rights'] = rights
     new_params['logic'] = org_app_logic.logic
 
-    new_params['sidebar_grouping'] = 'Organization'
+    new_params['scope_view'] = program_view
+    new_params['scope_redirect'] = redirects.getCreateRedirect
+
+    new_params['sidebar_grouping'] = 'Organizations'
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']

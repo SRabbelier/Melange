@@ -535,13 +535,13 @@ class Checker(object):
 
     fields = {
         filter_field: django_args[filter_field],
-        'status': active,
+        'status': 'active',
         }
 
     if field_name:
       fields['scope_path'] = django_args[field_name]
 
-    entity = logic.geForFields(fields)
+    entity = logic.getForFields(fields, unique=True)
 
     if entity:
       return

@@ -289,12 +289,30 @@ class Logic(object):
     if unique:
       limit = 1
 
-    q = db.Query(self._model)
+    format_eq = '%(key)s = :%(num)d'
+    format_in = '%(key)s IN (%(values)s)'
 
-    for key, values in filter.iteritems():
-      for value in (values if isinstance(values, list) else [values]):
-        q.filter(key, value)
+    n = 1
+    conditionals = []
+    args = []
 
+    for key, value in filter.iteritems():
+      if isinstance(value, list):
+        count = len(value)
+        args.extend(value)
+        values = ', '.join([':%d' % i for i in range(n, n + count)])
+        sub = format_in % {'key': key, 'values': values}
+        n = n + count
+      else:
+        sub = format_eq % {'key': key, 'num': n}
+        args.append(value)
+        n = n + 1
+      conditionals.append(sub)
+
+    joined_pairs = ' AND '.join(conditionals)
+    condition = 'WHERE ' + joined_pairs
+
+    q = self._model.gql(condition, *args)
     result = q.fetch(limit, offset)
 
     if unique:

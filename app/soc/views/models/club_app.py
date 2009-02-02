@@ -50,10 +50,10 @@ class View(group_app.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsUser']
-    rights['delete'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
-    rights['edit'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
+    rights['delete'] = [('checkIsMyEntity', [club_app_logic.logic, 'applicant'])]
+    rights['edit'] = [('checkIsMyEntity', [club_app_logic.logic, 'applicant'])]
     rights['list'] = ['checkIsUser']
-    rights['public'] = [('checkIsMyEntity', [club_app_logic, 'applicant'])]
+    rights['public'] = [('checkIsMyEntity', [club_app_logic.logic, 'applicant'])]
     rights['review'] = [('checkHasRole', host_logic.logic)]
 
     new_params = {}

@@ -592,7 +592,7 @@ class Checker(object):
         'status': 'group_accepted',
         }
 
-    entity = request_logic.getFromFields(fields)
+    entity = request_logic.getForFields(fields, unique=True)
 
     if entity and (entity.scope.status not in ['invalid', 'inactive']):
       return
@@ -682,7 +682,7 @@ class Checker(object):
 
     fields = {
         'link_id': django_args['link_id'],
-        field_name: self.user,
+        field_name: self.user.key().name(),
         }
 
     entity = logic.getForFields(fields)

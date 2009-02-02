@@ -120,9 +120,9 @@ class View(base.View):
 
     new_params['create_extra_dynafields'] = {
        'latitude':forms.fields.FloatField(widget=forms.HiddenInput,
-          required=False),
+                                          required=False),
        'longitude': forms.fields.FloatField(widget=forms.HiddenInput,
-          required=False),
+                                            required=False),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),

@@ -463,7 +463,9 @@ class Checker(object):
 
     self.checkIsLoggedIn(django_args)
 
-    if not self.user and not user_logic.isFormerAccount(self.id):
+    user_entity = user_logic.getForFields({'account':self.id}, unique=True)
+
+    if not user_entity and not user_logic.isFormerAccount(self.id):
       # this account has not been used yet
       return
 

@@ -71,7 +71,8 @@ class Logic(base.Logic):
     if not account:
       return None
 
-    user = self.getForFields({'account': account}, unique=True)
+    user = self.getForFields({'account': account, 'status':'valid'}, 
+        unique=True)
 
     return user
 

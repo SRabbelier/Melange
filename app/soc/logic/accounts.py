@@ -68,7 +68,8 @@ def isDeveloper(account=None, user=None):
     account = current
 
   if not user:
-    user = models.user.logic.getForFields({'account': account}, unique=True)
+    user = models.user.logic.getForFields(
+        {'account': account, 'status': 'valid'}, unique=True)
 
   if not user:
     # no User entity for this Google Account, and account is not the

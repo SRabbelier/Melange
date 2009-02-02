@@ -674,7 +674,8 @@ class Checker(object):
     # TODO(srabbelier) Make this give a proper error message
     self.deny(django_args)
 
-  def checkIsMyEntity(self, django_args, logic, field_name='user'):
+  def checkIsMyEntity(self, django_args, logic,
+                      field_name='user', user=False):
     """Checks whether the entity belongs to the user.
     """
 
@@ -682,7 +683,7 @@ class Checker(object):
 
     fields = {
         'link_id': django_args['link_id'],
-        field_name: self.user.key().name(),
+        field_name: self.user if user else self.user.key().name()
         }
 
     entity = logic.getForFields(fields)

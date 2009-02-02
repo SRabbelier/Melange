@@ -63,7 +63,7 @@ class Document(soc.models.work.Work):
       'determines the access scheme.')
 
   #: field storing the required access to write to this document
-  write_access = db.StringProperty(default='public', required=True,
+  write_access = db.StringProperty(default='admin', required=True,
       choices=['admin', 'restricted', 'member', 'user'],
       verbose_name=ugettext('Write Access'))
   write_access.help_text = ugettext(

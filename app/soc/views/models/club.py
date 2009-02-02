@@ -65,8 +65,8 @@ class View(group.View):
     rights['list'] = ['checkIsDeveloper']
     rights['apply_member'] = ['checkIsUser',
                               ('checkIsActive', club_logic.logic)]
-    rights['list_requests'] = [('checkHasRole', club_admin_logic.logic)]
-    rights['list_roles'] = [('checkHasRole', club_admin_logic.logic)]
+    rights['list_requests'] = [('checkHasRole', [club_admin_logic.logic, 'link_id'])]
+    rights['list_roles'] = [('checkHasRole', [club_admin_logic.logic, 'link_id'])]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             club_app_logic.logic)]
 

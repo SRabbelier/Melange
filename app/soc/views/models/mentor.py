@@ -59,8 +59,8 @@ class View(role.View):
     rights['process_request'] = ['checkIsDeveloper',
         ('checkCanProcessRequest', 'mentor')]
     rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.mentor,
-             soc.logic.models.org_admin])]
+        ('checkIsAllowedToManageRole', [soc.logic.models.mentor.logic,
+             soc.logic.models.org_admin.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.mentor.logic

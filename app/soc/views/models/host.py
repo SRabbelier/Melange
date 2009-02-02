@@ -64,7 +64,7 @@ class View(role.View):
     rights['process_request'] = [('checkHasRole', host_logic.logic),
                                  ('checkCanProcessRequest','host')]
     rights['manage'] = [('checkIsAllowedToManageRole',
-                         [host_logic, host_logic])]
+                         [host_logic.logic, host_logic.logic])]
 
     new_params = {}
     new_params['rights'] = rights

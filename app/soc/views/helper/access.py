@@ -548,12 +548,15 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
-  def checkHasRole(self, django_args, logic):
+  def checkHasRole(self, django_args, logic, field_name=None):
     """Checks that the user has the specified role.
     """
 
+    if not field_name:
+      field_name = 'scope_path'
+
     django_args['user'] = self.user
-    self.checkIsActive(django_args, logic, 'scope_path', 'user')
+    self.checkIsActive(django_args, logic, field_name, 'user')
 
   def checkCanMakeRequestToGroup(self, django_args, group_logic):
     """Raises an alternate HTTP response if the specified group is not in an
@@ -726,7 +729,7 @@ class Checker(object):
         'status': 'active',
         }
 
-    role_entity = role_logic.logic.getForFields(fields)
+    role_entity = role_logic.getForFields(fields)
 
     fields = {
         'link_id': self.user.link_id,
@@ -734,7 +737,7 @@ class Checker(object):
         'status': 'active'
         }
 
-    manage_entity = manage_role_logic.logic.getForFields(fields, unique=True)
+    manage_entity = manage_role_logic.getForFields(fields, unique=True)
 
     if not manage_entity:
       self.deny(django_args)

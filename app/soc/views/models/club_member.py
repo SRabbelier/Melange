@@ -60,8 +60,8 @@ class View(role.View):
     rights['process_request'] = [('checkHasRole', club_admin_logic.logic),
                                  ('checkCanProcessRequest','club_member')]
     rights['manage'] = [('checkIsAllowedToManageRole',
-                         [soc.logic.models.club_member,
-                          soc.logic.models.club_admin])]
+                         [soc.logic.models.club_member.logic,
+                          club_admin_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club_member.logic

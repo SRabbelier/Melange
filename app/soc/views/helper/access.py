@@ -92,6 +92,9 @@ DEF_NO_REQUEST_MSG = ugettext(
 DEF_NEED_PICK_ARGS_MSG = ugettext(
   'The "continue" and "field" args are not both present.')
 
+DEF_REVIEW_COMPLETED_MSG = ugettext(
+    'This Application can not be reviewed anymore (it has been completed or rejected)')
+
 DEF_REQUEST_COMPLETED_MSG = ugettext(
   'This request cannot be accepted (it is either completed or denied).')
 
@@ -116,6 +119,21 @@ DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     ' used to create another one</li>'
     ' <li>the account is a former account that cannot be used again</li>'
     '</ul>')
+
+
+def allowSidebar(fun):
+  """Decorator that allows access if the sidebar is calling.
+  """
+
+  from functools import wraps
+
+  @wraps(fun)
+  def wrapper(self, django_args, *args, **kwargs):
+    if django_args.get('SIDEBAR_CALLING'):
+      return
+    return fun(self, django_args, *args, **kwargs)
+  return wrapper
+
 
 def denySidebar(fun):
   """Decorator that denies access if the sidebar is calling.
@@ -661,7 +679,7 @@ class Checker(object):
 
   @allowDeveloper
   def checkCanEditGroupApp(self, django_args, group_app_logic):
-    """Checks if the group_app in args is valid to be edited.
+    """Checks if the group_app in args is valid to be edited by the current user.
 
     Args:
       group_app_logic: A logic instance for the Group Application
@@ -684,6 +702,34 @@ class Checker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+
+  @allowSidebar
+  def checkCanReviewGroupApp(self, django_args, group_app_logic):
+    """Checks if the group_app in args is valid to be reviewed.
+
+    Args:
+      group_app_logic: A logic instance for the Group Application
+    """
+
+    if 'link_id' not in django_args:
+      # calling review overview, so we can't check a specified entity
+      return
+
+    fields = {
+        'link_id': django_args['link_id'],
+        'status' : ['needs review', 'accepted', 'rejected', 'ignored']
+        }
+
+    if 'scope_path' in django_args:
+      fields['scope_path'] = django_args['scope_path']
+
+    entity = group_app_logic.getForFields(fields)
+
+    if entity:
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
 
 
   @allowDeveloper

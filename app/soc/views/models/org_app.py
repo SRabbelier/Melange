@@ -56,7 +56,8 @@ class View(group_app.View):
     rights['list'] = ['checkIsDeveloper']
     rights['public'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic])]
-    rights['review'] = ['checkIsDeveloper']
+    rights['review'] = ['checkIsDeveloper',
+                        ('checkCanReviewGroupApp', [org_app_logic.logic])]
 
     new_params = {}
 

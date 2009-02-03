@@ -110,10 +110,22 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    fields['backup_admin'] = fields['backup_admin_link_id']
-
     if not entity:
-      fields['applicant'] = user_logic.logic.getForCurrentAccount()
+      # creating a new group application
+      key_fields =  self._logic.getKeyFieldsFromFields(fields)
+      group_app_entity = self._logic.getForFields(key_fields, unique=True)
+
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      if group_app_entity.applicant.key() != user_entity.key():
+        # someone else is applying remove the existing group application
+        group_app_logic.logic.delete(group_app_entity)
+
+      # set the applicant field to the current user
+      fields['applicant'] = user_entity
+
+    #set the backup_admin field with the cleaned link_id
+    fields['backup_admin'] = fields['backup_admin_link_id']
 
     # the application has either been created or edited so
     # the status needs to be set accordingly

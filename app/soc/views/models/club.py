@@ -58,15 +58,15 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasRole', [club_admin_logic.logic, 'link_id']),
+    rights['edit'] = [('checkHasActiveRole', [club_admin_logic.logic, 'link_id']),
                       ('checkIsActive', [club_logic.logic, None])]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
     rights['apply_member'] = ['checkIsUser',
                               ('checkIsActive', club_logic.logic)]
-    rights['list_requests'] = [('checkHasRole', [club_admin_logic.logic, 'link_id'])]
-    rights['list_roles'] = [('checkHasRole', [club_admin_logic.logic, 'link_id'])]
+    rights['list_requests'] = [('checkHasActiveRole', [club_admin_logic.logic, 'link_id'])]
+    rights['list_roles'] = [('checkHasActiveRole', [club_admin_logic.logic, 'link_id'])]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             club_app_logic.logic)]
 

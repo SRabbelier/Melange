@@ -56,12 +56,12 @@ class View(role.View):
     """
 
     rights = access.Checker(params)
-    rights['create'] = [('checkHasRole', host_logic.logic)]
-    rights['edit'] = [('checkHasRole', host_logic.logic)]
-    rights['invite'] = [('checkHasRole', host_logic.logic)]
+    rights['create'] = [('checkHasActiveRole', host_logic.logic)]
+    rights['edit'] = [('checkHasActiveRole', host_logic.logic)]
+    rights['invite'] = [('checkHasActiveRole', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
     rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
-    rights['process_request'] = [('checkHasRole', host_logic.logic),
+    rights['process_request'] = [('checkHasActiveRole', host_logic.logic),
                                  ('checkCanProcessRequest','host')]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [host_logic.logic, host_logic.logic])]

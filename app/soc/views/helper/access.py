@@ -184,12 +184,12 @@ class Checker(object):
 
   MEMBERSHIP = {
     'anyone': 'allow',
-    'club_admin': ('checkHasRole', club_admin_logic),
-    'club_member': ('checkHasRole', club_member_logic),
-    'host': ('checkHasRole', host_logic),
-    'org_admin': ('checkHasRole', org_admin_logic),
-    'org_mentor': ('checkHasRole', mentor_logic),
-    'org_student': 'deny', #('checkHasRole', student_logic),
+    'club_admin': ('checkHasActiveRole', club_admin_logic),
+    'club_member': ('checkHasActiveRole', club_member_logic),
+    'host': ('checkHasActiveRole', host_logic),
+    'org_admin': ('checkHasActiveRole', org_admin_logic),
+    'org_mentor': ('checkHasActiveRole', mentor_logic),
+    'org_student': 'deny', #('checkHasActiveRole', student_logic),
     'user': 'checkIsUser',
     'user_self': ('checkIsUserSelf', 'scope_path'),
     }
@@ -570,8 +570,8 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
-  def checkHasRole(self, django_args, logic, field_name=None):
-    """Checks that the user has the specified role.
+  def checkHasActiveRole(self, django_args, logic, field_name=None):
+    """Checks that the user has the specified active role.
     """
 
     if not field_name:
@@ -674,7 +674,7 @@ class Checker(object):
       self.deny(django_args)
 
     new_args = {'scope_path': program.scope_path }
-    self.checkHasRole(new_args, host_logic)
+    self.checkHasActiveRole(new_args, host_logic)
 
 
   @allowDeveloper
@@ -808,7 +808,7 @@ class Checker(object):
 
     try:
       # check if it is my role the user's own role
-      self.checkHasRole(django_args, role_logic)
+      self.checkHasActiveRole(django_args, role_logic)
     except out_of_band.Error:
       pass
 

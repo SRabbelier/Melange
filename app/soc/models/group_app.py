@@ -105,7 +105,6 @@ class GroupApplication(soc.models.linkable.Linkable):
       default='needs review',
       verbose_name=ugettext('Application Status'))
 
-  
   # timestamp to record the time on which this application has been created
   created_on = db.DateTimeProperty(required=True, auto_now_add=True,
       verbose_name=ugettext('Created on'))

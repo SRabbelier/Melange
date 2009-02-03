@@ -24,7 +24,9 @@ __authors__ = [
 
 from django import forms
 
+from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic import models as model_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import redirects
@@ -71,10 +73,16 @@ class View(group_app.View):
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
-    # TODO(ljvderijk) add cleaning method to ensure uniqueness
+
     new_params['create_extra_dynafields'] = {
-            'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
-                                             required=True)}
+        'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
+                                             required=True),
+        'clean': cleaning.validate_new_group('link_id', 'scope_path',
+            model_logic.organization, org_app_logic)}
+
+    # get rid of the clean method
+    new_params['edit_extra_dynafields'] = {
+        'clean': (lambda x: x.cleaned_data)}
 
     new_params['name'] = "Organization Application"
     new_params['name_plural'] = "Organization Applications"

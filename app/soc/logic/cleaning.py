@@ -27,11 +27,16 @@ __authors__ = [
 from google.appengine.api import users
 
 from django import forms
+from django.forms.util import ErrorList
 from django.utils.translation import ugettext
 
 from soc.logic import validate
 from soc.logic.models import site as site_logic
 from soc.logic.models import user as user_logic
+
+
+DEF_LINK_ID_IN_USE_MSG = ugettext(
+    'This link ID is already in use, please specify another one')
 
 
 def clean_link_id(field_name):
@@ -202,35 +207,6 @@ def clean_url(field_name):
   return wrapped
 
 
-def clean_new_club_link_id(field_name, club_logic, club_app_logic):
-    """Cleans the field_name value to check if it's a valid 
-       link_id for a new club.
-    """
-    def wrapper(self):
-      # validate the link_id
-      club_link_id = clean_link_id(field_name)(self)
-
-      # check if there is already an application with the given link_id
-      fields = {'link_id': club_link_id,
-                'status': ['accepted', 'ignored', 'needs review', 'completed']}
-      club_app_entity = club_app_logic.logic.getForFields(fields, unique=True)
-
-      if club_app_entity:
-        raise forms.ValidationError(
-            ugettext('This link ID is already in use, please specify another one'))
-
-      # check if there is already a club with the given link_id
-      fields['status'] = ['new', 'active', 'inactive']
-      club_entity = club_logic.logic.getForFields(fields, unique=True)
-
-      if club_entity:
-        raise forms.ValidationError(
-            ugettext('This link ID is already in use, please specify another one'))
-
-      return club_link_id
-    return wrapper
-
-
 def validate_user_edit(link_id_field, account_field):
   """Clean method for cleaning user edit form.
   
@@ -269,3 +245,49 @@ def validate_user_edit(link_id_field, account_field):
     return cleaned_data
   return wrapper
 
+
+def validate_new_group(link_id_field, scope_path_field, 
+                       group_logic, group_app_logic):
+  """Clean method used to clean the group application or new group form.
+  
+    Raises ValidationError if:
+    -A valid application with this link id and scope path already exists
+    -A valid group with this link id and scope path already exists
+  """
+  def wrapper(self):
+      cleaned_data = self.cleaned_data
+
+      fields = {'status': ['accepted', 'ignored', 'needs review', 'completed']}
+
+      link_id = cleaned_data.get(link_id_field)
+
+      if link_id:
+        fields['link_id'] = link_id
+
+        scope_path = cleaned_data.get(scope_path_field)
+        if scope_path:
+          fields['scope_path'] = scope_path
+
+        # get the application
+        group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
+
+        if group_app_entity:
+          # add the error message to the link id field
+          self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
+          del cleaned_data[link_id_field]
+          # return the new cleaned_data
+          return cleaned_data
+
+        # check if there is already a group for the given fields
+        fields['status'] = ['new', 'active', 'inactive']
+        group_entity = group_logic.logic.getForFields(fields, unique=True)
+
+        if group_entity:
+          # add the error message to the link id field
+          self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
+          del cleaned_data[link_id_field]
+          # return the new cleaned_data
+          return cleaned_data
+
+      return cleaned_data
+  return wrapper

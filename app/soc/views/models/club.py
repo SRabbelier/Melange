@@ -92,12 +92,12 @@ class View(group.View):
         ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
 
     new_params['create_extra_dynafields'] = {
-        'clean_link_id': cleaning.clean_new_club_link_id('link_id', 
-            club_logic, club_app_logic)
-        }
+        'clean' : cleaning.validate_new_group('link_id', 'scope_path',
+            club_logic, club_app_logic)}
+
+    # get rid of the clean method
     new_params['edit_extra_dynafields'] = {
-        'clean_link_id': cleaning.clean_link_id('link_id')
-        }
+        'clean' : (lambda x: x.cleaned_data)}
 
     params = dicts.merge(params, new_params)
 

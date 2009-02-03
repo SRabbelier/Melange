@@ -257,13 +257,16 @@ class View(base.View):
 
       if status_value in ['accepted', 'rejected', 'ignored']:
         # this application has been properly reviewed update the status
-        fields = {'status' : status_value}
 
-        self._logic.updateEntityProperties(entity, fields)
+        # only update if the status changes
+        if entity.status != status_value:
+          fields = {'status' : status_value}
 
-        if status_value == 'accepted':
-          # the application has been accepted send out a notification
-          notifications.sendNewGroupNotification(entity, params)
+          self._logic.updateEntityProperties(entity, fields)
+
+          if status_value == 'accepted':
+            # the application has been accepted send out a notification
+            notifications.sendNewGroupNotification(entity, params)
 
         return self.reviewOverview(request, access_type,
             page_name=page_name, params=params, **kwargs)

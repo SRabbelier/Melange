@@ -561,11 +561,14 @@ class View(base.View):
       if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
         # update the request_entity and redirect away from this page
         request_status = get_dict['status']
-        request_logic.logic.updateEntityProperties(request_entity, {
-            'status': get_dict['status']})
 
-        if request_status == 'group_accepted':
-          notifications_helper.sendInviteNotification(request_entity)
+        # only update when the status is changing
+        if request_status != request_entity.status:
+          request_logic.logic.updateEntityProperties(request_entity, {
+              'status': get_dict['status']})
+
+          if request_status == 'group_accepted':
+            notifications_helper.sendInviteNotification(request_entity)
 
         group_view = params.get('group_view')
         if not group_view:

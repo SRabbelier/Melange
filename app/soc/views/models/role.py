@@ -206,7 +206,7 @@ class View(base.View):
     if not form.is_valid():
       # return the invalid form response
       return self._constructResponse(request, entity=None, context=context,
-          form=form, params=params)
+          form=form, params=request_params)
 
     # collect the cleaned data from the valid form
     key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
@@ -494,7 +494,7 @@ class View(base.View):
     if not form.is_valid():
       # return the invalid form response
       return self._constructResponse(request, entity=None, context=context,
-          form=form, params=params)
+          form=form, params=request_params)
 
     # get the group entity for which this request is via the scope_path
     group = self._logic.getGroupEntityFromScopePath(params['group_logic'],

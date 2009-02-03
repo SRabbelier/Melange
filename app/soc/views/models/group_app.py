@@ -117,7 +117,8 @@ class View(base.View):
 
       user_entity = user_logic.logic.getForCurrentAccount()
 
-      if group_app_entity.applicant.key() != user_entity.key():
+      if group_app_entity and (
+          group_app_entity.applicant.key() != user_entity.key()):
         # someone else is applying remove the existing group application
         group_app_logic.logic.delete(group_app_entity)
 

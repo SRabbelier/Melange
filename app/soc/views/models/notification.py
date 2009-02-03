@@ -86,7 +86,7 @@ class View(base.View):
     rights['unspecified'] = ['deny']
     rights['edit'] = ['deny']
     rights['show'] = [('checkIsMyEntity', [notification_logic, 'scope_path'])]
-    rights['delete'] = [('checkIsMyEntity', notification_logic)]
+    rights['delete'] = [('checkIsMyEntity', [notification_logic, 'scope_path'])]
     rights['list'] = ['checkIsUser']
     # create is developer only for the time being to test functionality
     rights['create'] = ['checkIsDeveloper']

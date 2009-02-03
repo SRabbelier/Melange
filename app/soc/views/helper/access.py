@@ -441,6 +441,8 @@ class Checker(object):
       django_args: the keyword args from django, only scope_path is used
     """
 
+    self.checkIsUser(django_args)
+
     if not field_name in django_args:
       self.deny(django_args)
 
@@ -571,11 +573,11 @@ class Checker(object):
     """Raises an alternate HTTP response if the specified group is not in an
     active status.
 
-    Note that status hasn't been implemented yet
-
     Args:
       group_logic: Logic module for the type of group which the request is for
     """
+
+    self.checkIsUser(django_args)
 
     group_entity = role_logic.getGroupEntityFromScopePath(
         group_logic.logic, django_args['scope_path'])
@@ -584,7 +586,7 @@ class Checker(object):
       raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
 
     if group_entity.status != 'active':
-      # TODO tell the user that this group is not active
+      # tell the user that this group is not active
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
     return
@@ -622,6 +624,8 @@ class Checker(object):
        or if it's status is completed or denied. Also Raises an alternate HTTP response
        whenever the group in the request is not active.
     """
+
+    self.checkIsUser(django_args)
 
     fields = {
         'link_id': django_args['link_id'],

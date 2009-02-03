@@ -658,6 +658,34 @@ class Checker(object):
     new_args = {'scope_path': program.scope_path }
     self.checkHasRole(new_args, host_logic)
 
+
+  @allowDeveloper
+  def checkCanEditGroupApp(self, django_args, group_app_logic):
+    """Checks if the group_app in args is valid to be edited.
+
+    Args:
+      group_app_logic: A logic instance for the Group Application
+    """
+
+    self.checkIsUser(django_args)
+
+    fields = {
+        'link_id': django_args['link_id'],
+        'applicant': self.user,
+        'status' : ['needs review', 'rejected']
+        }
+
+    if 'scope_path' in django_args:
+      fields['scope_path'] = django_args['scope_path']
+
+    entity = group_app_logic.getForFields(fields)
+
+    if entity:
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):
     """Returns an alternate HTTP response if Google Account has no Club App
@@ -701,6 +729,9 @@ class Checker(object):
         'link_id': django_args['link_id'],
         field_name: self.user if user else self.user.key().name()
         }
+
+    if 'scope_path' in django_args:
+      fields['scope_path'] = django_args['scope_path']
 
     entity = logic.getForFields(fields)
 

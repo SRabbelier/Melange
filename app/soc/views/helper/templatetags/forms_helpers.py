@@ -263,6 +263,7 @@ def as_table_row_helper(context, field, required, example_text, reference):
       'field_class_type': field_class_type,
       'label': force_unicode(label) if field.label else '',
       'field': unicode(field),
+      'field_id': field.auto_id,
       'required': required,
       'example_text': example_text,
       'select_url': select_url if reference else None,

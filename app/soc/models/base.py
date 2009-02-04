@@ -53,12 +53,18 @@ class ModelWithFieldAttributes(db.Model):
     """
 
     result = {}
+    props = self.properties()
 
-    for key, value in self.properties().iteritems():
+    for key, value in props.iteritems():
       # Skip everything but StringProperties
       if not isinstance(value, db.StringProperty):
         continue
       result[key] = getattr(self, key)
+
+    if hasattr(self, 'name'):
+      name_prop = getattr(self, 'name')
+      if callable(name_prop):
+        result['name'] = name_prop()
 
     return result
 

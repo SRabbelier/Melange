@@ -26,6 +26,7 @@ __authors__ = [
 from django import forms
 
 from soc.logic import dicts
+from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import program as program_logic
 from soc.logic.models import host as host_logic
 from soc.views import helper
@@ -141,8 +142,6 @@ class View(presence_with_tos.View):
     fields = {'status':['invisible', 'visible']}
     entities = logic.getForFields(fields)
 
-    #TODO(ljvderijk) Add timeline dependent entries
-
     menus = []
 
     rights.setCurrentUser(id, user)
@@ -154,6 +153,7 @@ class View(presence_with_tos.View):
       if entity.status == 'visible':
         # show the documents for this program, even for not logged in users
         items += document_view.view.getMenusForScope(entity, params)
+        items += self._getTimeDependentEntries(entity, params)
 
       try:
         # check if the current user is a host for this program
@@ -164,6 +164,7 @@ class View(presence_with_tos.View):
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like
           items += document_view.view.getMenusForScope(entity, params)
+          items += self._getTimeDependentEntries(entity, params)
 
         # add link to edit Program Profile
         items += [(redirects.getEditRedirect(entity, params),
@@ -189,6 +190,21 @@ class View(presence_with_tos.View):
       menus.append(menu)
 
     return menus
+
+  def _getTimeDependentEntries(self, program_entity, params):
+    items = []
+
+    #TODO(ljvderijk) Add more timeline dependent entries
+    timeline_entity = program_entity.timeline
+
+    if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+      # add the organization signup link
+      items += [
+          (redirects.getCreateRedirect(program_entity, {'url_name': 'org_app'}),
+          "Apply to become an Organization", 'any_access')]
+
+    return items
+
 
 view = View()
 

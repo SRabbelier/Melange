@@ -12,6 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" href="/soc/content/css/thickbox.css" type="text/css"/>
+{% endblock %}
+{% block scripts %}
+	<script src="/jquery/jquery-thickbox.js"></script>
+{% endblock %}
 {% load forms_helpers %}
 {% block page_title %}User Profile{% endblock %}
 {% block header_title %}
@@ -59,15 +66,20 @@ be unique and not in use by any other user of the site.
 {% if tos_link %}
 {% if not user.agreed_to_tos %}
 <tr>
-  <td>
+  <td style="width:450px" colspan="4">
+    <div id="ToS" style="overflow:auto;height:200px">
       {{ tos_contents|safe|linebreaks }}
+    </div>
   </td>
 </tr>
   {% field_as_table_row form.agreed_to_tos %}
   <tr>
    <td class="fieldhelptext" colspan="4">
+   <div id="ToS_hidden" style="display:none">
+      {{ tos_contents|safe|linebreaks }}
+   </div>
 In order to participate on this site, you must agree to the
-<a href="{{tos_link}}">site-wide Terms of Service</a>.<br><br>
+<a href="#TB_inline?height=500&amp;width=500&amp;inlineId=ToS_hidden" title="Terms of Service" class="thickbox">site-wide Terms of Service</a>.<br><br>
 (There may also be additional Terms of Service specific to participation
 in certain Programs or Groups.  Those are agreed to elsewhere on the site,
 when signing up for the specific participation Roles.)

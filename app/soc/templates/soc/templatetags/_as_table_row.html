@@ -31,6 +31,23 @@ limitations under the License.
   </td>
   {% endblock %}
   <td>
+  {% if select_url %}
+    <script type="text/javascript">
+      $.getJSON("{{ select_url }}",
+        function(data){
+          $("#{{ field_id }}").autocomplete(data.data, {
+            matchContains: true,
+            formatItem: function(item) {
+              return item.link_id+" ("+item.name+")";
+            },
+            formatResult: function(item) {
+              return item.link_id;
+            }
+          });
+        }
+      );
+    </script>
+  {% endif %}
     {{ field }}
   </td>
 
@@ -40,19 +57,9 @@ limitations under the License.
   <td></td>
   {% endif %}
 
-  {% if select_url %}
-  <td><input type="button" onclick="location.href='{{ select_url }}'" value="Select"/></td>
-  {% else %}
-  <td></td>
-  {% endif %}
-
   {% if example_text %}
     <td class="formfieldexample">{{ example_text|safe }}</td>
   {% else %}
-    {% if select_url %}
-      <td class="warning">(discards unsaved changes)</td>
-    {% else %}
       <td></td>
-    {% endif %}
   {% endif %}
 </tr>

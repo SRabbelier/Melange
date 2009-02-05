@@ -564,24 +564,12 @@ class View(object):
 
     get_dict = request.GET
 
-    # scope_path is not required
-    scope_path = get_dict.get('scope_path', None)
-    return_url = get_dict['continue']
-    field = get_dict['field']
-
-    filter = {}
-
-    if scope_path:
-      filter['scope_path'] = scope_path
-
-    data = self._logic.getForFields(filter=filter, limit=1000)
+    data = self._logic.getForFields(filter=get_dict, limit=1000)
 
     data = [i.toDict() for i in data]
 
     to_json = {
         'data': data,
-        'return_url': return_url,
-        'field': field,
         }
 
     json = simplejson.dumps(to_json)

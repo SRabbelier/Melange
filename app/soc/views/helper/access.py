@@ -877,25 +877,6 @@ class Checker(object):
 
     return
 
-  def checkHasPickGetArgs(self, django_args):
-    """Raises an alternate HTTP response if the request misses get args.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-    Raises:
-      AccessViolationResponse:
-      * if continue is not in request.GET
-      * if field is not in request.GET
-    """
-
-    get_args = django_args.get('GET', {})
-
-    if 'continue' in get_args and 'field' in get_args:
-      return
-
-    raise out_of_band.Error(message_fmt=DEF_NEED_PICK_ARGS_MSG)
-
   @denySidebar
   @allowDeveloper
   def checkIsDocumentReadable(self, django_args):

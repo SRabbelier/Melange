@@ -78,7 +78,7 @@ def constructParams(params):
   rights['edit'] = ['checkIsDeveloper']
   rights['delete'] = ['checkIsDeveloper']
   rights['list'] = ['checkIsDeveloper']
-  rights['pick'] = ['checkHasPickGetArgs']
+  rights['pick'] = ['checkIsUser'] # TODO(SRabbelier): proper check
 
   new_params = {}
   new_params['scope_logic'] = logic.getScopeLogic()

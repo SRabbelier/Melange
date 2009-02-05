@@ -77,7 +77,6 @@ class OrgApplication(soc.models.group_app.GroupApplication):
     'This template will be presented to contributors, such as students'
     ' and other non-member participants, when they apply to contribute'
     ' to the organization.')
-  contrib_template.redirect_url = soc.models.document.Document.URL_NAME
 
   contrib_disappears = db.TextProperty(required=True,
     verbose_name=ugettext(

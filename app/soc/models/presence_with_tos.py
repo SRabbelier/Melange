@@ -39,4 +39,3 @@ class PresenceWithToS(soc.models.presence.Presence):
     collection_name='tos')
   tos.help_text = ugettext(
       'Document containing optional Terms of Service for participating.')
-  tos.redirect_url = soc.models.document.Document.URL_NAME

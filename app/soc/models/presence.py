@@ -49,7 +49,6 @@ class Presence(soc.models.linkable.Linkable):
     collection_name='home')
   home.help_text = ugettext(
       'Document to be used as the "/home" page static contents.')
-  home.redirect_url = soc.models.document.Document.URL_NAME
 
   #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
   #: on the site page using Google's JavaScript blog widget  

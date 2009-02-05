@@ -38,6 +38,7 @@ from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.helper import responses
+from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.logic.models.group_app
@@ -82,9 +83,9 @@ class View(base.View):
         'created_on', 'last_modified_on']
 
     new_params['create_extra_dynafields'] = {
-        'backup_admin_link_id': forms.CharField(
-              label=params['logic'].getModel().backup_admin.verbose_name
-              ),
+        'backup_admin_link_id': widgets.ReferenceField(
+              reference_url='user',
+              label=params['logic'].getModel().backup_admin.verbose_name),
         'clean_backup_admin_link_id': 
             cleaning.clean_users_not_same('backup_admin_link_id'),
         }

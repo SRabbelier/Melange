@@ -31,6 +31,8 @@ from django.forms import forms as forms_in
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 
+from soc.views.helper import widgets
+
 
 register = template.Library()
 
@@ -171,10 +173,10 @@ def as_table_helper(context, form):
   # Iterate over all fields and prepare it for adding 
   for name, field in form.fields.items():
     bf = forms_in.BoundField(form, field, name)
-    reference = None
+    attrs = {}
 
-    if name.endswith('_link_id'):
-      reference = get_reference_url(form, name[:-8])
+    if isinstance(field, widgets.ReferenceField):
+      attrs = field.rf
 
     # If the field is hidden we display it elsewhere
     if not bf.is_hidden:
@@ -182,7 +184,7 @@ def as_table_helper(context, form):
       if hasattr(field, 'example_text'):
         example_text = force_unicode(field.example_text)
 
-      item = (bf, field.required, example_text, reference)
+      item = (bf, field.required, example_text, attrs)
       fields.append(item)
     else:
       hidden_fields.append(unicode(bf))
@@ -226,7 +228,7 @@ def as_twoline_table_row(context, field, required, example_text, reference):
   return as_table_row_helper(context, field, required, example_text, reference)
 
 
-def as_table_row_helper(context, field, required, example_text, reference):
+def as_table_row_helper(context, field, required, example_text, attrs):
   """See as_table_row().
   """
 
@@ -236,14 +238,23 @@ def as_table_row_helper(context, field, required, example_text, reference):
   form = context['form']
   entity = context['entity']
 
+  reference = attrs.get('reference_url')
+  filter = attrs.get('filter')
+
   if reference:
     from soc.views.helper import redirects
     params = {
         'url_name': reference,
-        'field_name': field.name,
-        'return_url': context['return_url']
         }
-    select_url = redirects.getSelectRedirect(entity, params)
+
+    if entity:
+      args = {}
+      for filter_field in (i for i in filter if hasattr(entity, i)):
+        args[filter_field] = getattr(entity, filter_field)
+
+      params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
+
+    select_url = redirects.getSelectRedirect(params)
 
   if field.label:
     label = escape(force_unicode(field.label))

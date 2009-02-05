@@ -88,6 +88,7 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['status', 'role_verbose']
 
     new_params['create_extra_dynafields'] = {
+        'link_id': widgets.ReferenceField(reference_url='user'),
         'role': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
         'clean_link_id': cleaning.clean_existing_user('link_id'),

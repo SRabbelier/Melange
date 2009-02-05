@@ -166,34 +166,14 @@ def getManageRedirect(entity, params):
   return result
 
 
-def getSelectRedirect(entity, params):
+def getSelectRedirect(params):
   """Returns the pick redirect for the specified entity.
   """
 
-  if entity:
-    result = '/%s/pick?scope_path=%s&field=%s&continue=%s' % (
-        params['url_name'], entity.key().name(),
-        params['field_name'], params['return_url'])
+  if params.get('args'):
+    return '/%(url_name)s/pick?%(args)s' % params
   else:
-    result = '/%s/pick?field=%s&continue=%s' % (
-        params['url_name'], params['field_name'], params['return_url'])
-
-  return result
-
-
-def getReturnRedirect(return_url, field):
-  """Returns a function that has return_url and field embedded.
-  """
-
-  def wrapped(entity, params):
-    """Returns the return redirect for the specified entity.
-    """
-
-    result = '%s?field=%s&value=%s' % (
-        return_url, field, entity.link_id)
-    return result
-
-  return wrapped
+    return '/%(url_name)s/pick' % params
 
 
 def getInviteAcceptedRedirect(entity, _):

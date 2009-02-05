@@ -89,7 +89,6 @@ class GroupApplication(soc.models.linkable.Linkable):
     required=True,  collection_name='group_app_backup_admin',
     verbose_name=ugettext(
       'Please select your backup group administrator.'))
-  backup_admin.redirect_url = soc.models.user.User.URL_NAME
 
   member_criteria = db.TextProperty(required=True,
     verbose_name=ugettext(

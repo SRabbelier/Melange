@@ -35,6 +35,7 @@ from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.presence
@@ -66,14 +67,18 @@ class View(base.View):
     new_params['home_template'] = 'soc/presence/home.html'
 
     new_params['create_extra_dynafields'] = {
-        'home_link_id': forms.CharField(required=False,
-            label=ugettext('Home page Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-
         # add cleaning of the link id and feed url
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_feed_url': cleaning.clean_feed_url,
         }
+
+    new_params['edit_extra_dynafields'] = {
+        'home_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['scope_path'],
+            required=False, label=ugettext('Home page Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+    }
+
 
     patterns = []
 
@@ -135,6 +140,9 @@ class View(base.View):
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
+
+    if 'home_link_id' not in fields:
+      return super(View, self)._editPost(request, entity, fields)
 
     scope_path = self._logic.getKeyNameFromFields(fields)
 

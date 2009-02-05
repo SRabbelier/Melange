@@ -30,6 +30,7 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.models import document as document_logic
 from soc.views.models import presence
+from soc.views.helper import widgets
 
 import soc.logic.models.presence_with_tos
 import soc.models.work
@@ -50,9 +51,10 @@ class View(presence.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.presence_with_tos.logic
 
-    new_params['create_extra_dynafields'] = {
-        'tos_link_id': forms.CharField(required=False,
-            label=ugettext('Terms of Service Document link ID'),
+    new_params['edit_extra_dynafields'] = {
+        'tos_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['scope_path'],
+            required=False, label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         }
 
@@ -75,6 +77,9 @@ class View(presence.View):
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
+
+    if 'tos_link_id' not in fields:
+      return super(View, self)._editPost(request, entity, fields)
 
     scope_path = self._logic.getKeyNameFromFields(fields)
 

@@ -132,23 +132,19 @@ class Logic(object):
     pass
 
   def getKeyNameFromFields(self, fields):
-    """Returns the KeyName constructed from kwargs for this type of entity.
+    """Returns the KeyName constructed from fields dict for this type of entity.
 
     The KeyName is in the following format:
-    <key_value1>:<key_value2>:...:<key_valueN>
+    <key_value1>/<key_value2>/.../<key_valueN>
     """
 
     key_field_names = self.getKeyFieldNames()
-
-    # check if all given KeyFieldNames are valid for this entity
-    if not all(key in key_field_names for key in fields.keys()):
-      raise Error("Some of the provided arguments are not key fields")
 
     # check if all key_field_names for this entity are present in fields
     if not all(field in fields.keys() for field in key_field_names):
       raise Error("Not all the required key fields are present")
 
-    if not all(fields.values()):
+    if not all(fields.get(field) for field in key_field_names):
       raise Error("Not all KeyValues are non-false")
 
     # construct the KeyValues in the order given by getKeyFieldNames()

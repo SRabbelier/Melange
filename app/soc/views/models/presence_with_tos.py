@@ -76,8 +76,7 @@ class View(presence.View):
     """See base.View._editPost().
     """
 
-    key_fields = self._logic.getKeyFieldsFromFields(fields)
-    scope_path = self._logic.getKeyNameFromFields(key_fields)
+    scope_path = self._logic.getKeyNameFromFields(fields)
 
     key_fields = {
         'scope_path': scope_path,

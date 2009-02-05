@@ -109,8 +109,7 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     try:
-      key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-      entity = self._logic.getFromKeyFieldsOr404(key_fields)
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
@@ -168,8 +167,7 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     try:
-      key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-      entity = self._logic.getFromKeyFieldsOr404(key_fields)
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_export'], context=context)
@@ -260,8 +258,7 @@ class View(object):
 
     try:
       if all(kwargs.values()):
-        key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-        entity = self._logic.getFromKeyFieldsOr404(key_fields)
+        entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       if not seed:
         error.message_fmt = (
@@ -320,8 +317,7 @@ class View(object):
     self._editPost(request, entity, fields)
 
     if not key_name:
-      key_fields =  self._logic.getKeyFieldsFromFields(fields)
-      key_name = self._logic.getKeyNameFromFields(key_fields)
+      key_name = self._logic.getKeyNameFromFields(fields)
 
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
@@ -490,8 +486,7 @@ class View(object):
     entity = None
 
     try:
-      key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-      entity = self._logic.getFromKeyFieldsOr404(key_fields)
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       error.message_fmt = (
         error.message_fmt + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {

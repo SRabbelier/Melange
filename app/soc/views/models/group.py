@@ -154,8 +154,7 @@ class View(presence.View):
 
     # find the application
     application_logic = params['application_logic']
-    key_fields = application_logic.logic.getKeyFieldsFromFields(kwargs)
-    application = application_logic.logic.getFromKeyFields(key_fields)
+    application = application_logic.logic.getFromKeyFields(kwargs)
 
     # extract the application fields
     field_names = application.properties().keys()
@@ -194,8 +193,7 @@ class View(presence.View):
     self._applicantPost(request, context, fields)
 
     if not key_name:
-      key_fields =  self._logic.getKeyFieldsFromFields(fields)
-      key_name = self._logic.getKeyNameFromFields(key_fields)
+      key_name = self._logic.getKeyNameFromFields(fields)
 
     # create the group entity
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)

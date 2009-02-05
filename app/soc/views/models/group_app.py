@@ -245,8 +245,7 @@ class View(base.View):
     entity = None
 
     try:
-      key_fields = self._logic.getKeyFieldsFromFields(kwargs)
-      entity = self._logic.getFromKeyFieldsOr404(key_fields)
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)

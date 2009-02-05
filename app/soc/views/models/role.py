@@ -233,8 +233,7 @@ class View(base.View):
       return self.inviteGet(request, context, params, **kwargs)
 
     # extract the key_name for the new request entity
-    key_fields = request_logic.logic.getKeyFieldsFromFields(request_fields)
-    key_name = request_logic.logic.getKeyNameFromFields(key_fields)
+    key_name = request_logic.logic.getKeyNameFromFields(request_fields)
 
     # create the request entity
     entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, 
@@ -347,8 +346,7 @@ class View(base.View):
     fields ['status'] = 'active'
 
     # get the key_name for the new entity
-    key_fields =  self._logic.getKeyFieldsFromFields(fields)
-    key_name = self._logic.getKeyNameFromFields(key_fields)
+    key_name = self._logic.getKeyNameFromFields(fields)
 
     # create new Role entity
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
@@ -519,8 +517,7 @@ class View(base.View):
       return self.requestGet(request, context, params, **kwargs)
 
     # extract the key_name for the new request entity
-    key_fields = request_logic.logic.getKeyFieldsFromFields(request_fields)
-    key_name = request_logic.logic.getKeyNameFromFields(key_fields)
+    key_name = request_logic.logic.getKeyNameFromFields(request_fields)
 
     # create the request entity
     entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)

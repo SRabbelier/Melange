@@ -115,8 +115,7 @@ class View(presence_with_tos.View):
 
     timeline_logic = program_logic.logic.TIMELINE_LOGIC[workflow]
 
-    key_fields = self._logic.getKeyFieldsFromFields(fields)
-    key_name = self._logic.getKeyNameFromFields(key_fields)
+    key_name = self._logic.getKeyNameFromFields(fields)
 
     properties = {'scope_path': key_name}
 

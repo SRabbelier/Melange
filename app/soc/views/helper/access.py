@@ -661,14 +661,13 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
-  @denySidebar
   @allowDeveloper
+  @denySidebar
   def checkIsHostForProgram(self, django_args):
     """Checks if the user is a host for the specified program.
     """
 
-    key_fields = program_logic.getKeyFieldsFromFields(django_args)
-    program = program_logic.getFromKeyFields(key_fields)
+    program = program_logic.getFromKeyFields(django_args)
 
     if not program or program.status == 'invalid':
       self.deny(django_args)
@@ -877,8 +876,7 @@ class Checker(object):
       django_args: a dictionary with django's arguments
     """
 
-    key_fields = document_logic.getKeyFieldsFromFields(django_args)
-    document = document_logic.getFromKeyFields(key_fields)
+    document = document_logic.getFromKeyFields(django_args)
 
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)

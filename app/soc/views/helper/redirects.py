@@ -26,6 +26,15 @@ __authors__ = [
 from google.appengine.ext import db
 
 
+def getApplyRedirect(entity, params):
+  """Returns the apply redirect for the specified entity.
+  """
+
+  result ='/%s/apply/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
 def getInviteRedirect(entity, params):
   """Returns the invitation redirect for the specified entity.
   """
@@ -37,7 +46,7 @@ def getInviteRedirect(entity, params):
 
 
 def getCreateRedirect(entity, params):
-  """Returns the create program redirect for the specified entity.
+  """Returns the create redirect for the specified entity.
   """
 
   result ='/%s/create/%s' % (

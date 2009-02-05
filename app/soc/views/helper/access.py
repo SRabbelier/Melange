@@ -40,6 +40,7 @@ from django.utils.translation import ugettext
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic import rights as rights_logic
+from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.club_member import logic as club_member_logic
 from soc.logic.models.document import logic as document_logic
@@ -103,6 +104,9 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 
 DEF_PAGE_DENIED_MSG = ugettext(
   'Access to this page has been restricted')
+
+DEF_PAGE_INACTIVE_MSG = ugettext(
+    'This page is inactive at this time')
 
 DEF_LOGOUT_MSG_FMT = ugettext(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
@@ -674,6 +678,48 @@ class Checker(object):
 
     new_args = {'scope_path': program.scope_path }
     self.checkHasActiveRole(new_args, host_logic)
+
+
+  @allowDeveloper
+  @denySidebar
+  def checkIsActivePeriod(self, django_args, period_name, key_name_arg):
+    """Checks if the given period is active for the given program.
+    
+    Args:
+      django_args: a dictionary with django's arguments.
+      period_name: the name of the period which is checked.
+      key_name_arg: the entry in django_args that specifies the given program
+        keyname. If none is given the key_name is constructed from django_args
+        itself.
+
+    Raises:
+      AccessViolationResponse:
+      * if no active Program is found
+      * if the period is not active
+    """
+
+    if key_name_arg and key_name_arg in django_args:
+      key_name = django_args[key_name_arg]
+    else:
+      key_name = program_logic.getKeyNameFromFields(fields)
+
+    program_entity = program_logic.getFromKeyName(key_name)
+
+    if not program_entity or (
+        program_entity.status in ['inactive', 'invalid']):
+      raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
+
+    if timeline_helper.isActivePeriod(program_entity.timeline, period_name):
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+
+  def checkCanCreateOrgApp(self, django_args, period_name):
+    if 'seed' in django_args:
+      return self.checkIsActivePeriod(django_args['seed'], 
+          period_name, 'scope_path')
+    else:
+      return
 
 
   @allowDeveloper

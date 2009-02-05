@@ -45,23 +45,6 @@ class ReadOnlyInput(forms.widgets.Input):
     return super(ReadOnlyInput, self).render(name, value, attrs)
 
 
-class ReadOnlyBool(forms.widgets.Input):
-  """Read only checkbox widget.
-  """
-  input_type = 'text'
-
-  def render(self, name, value, attrs=None):
-    """Render ReadOnlyBool widget as HTML.
-
-    Displays "text" field like ReadOnlyInput, but contents will be one of:
-    * empty (no text at all, just a greyed-out box) if no answer at all
-    * "True" (in the same greyed-out box) if True
-    * "False" (in the same greyed-out box) if False
-    """
-    attrs['readonly'] = 'readonly'
-    return super(ReadOnlyBool, self).render(name, value, attrs)
-
-
 class TinyMCE(forms.widgets.Textarea):
   """TinyMCE widget. 
   
@@ -123,3 +106,18 @@ tinyMCE.init(%(settings_json)s)
         {'attrs': widgets.flatatt(final_attrs),
          'value': html.escape(value), 
          'settings_json':  mce_json})
+
+
+class ReferenceField(forms.CharField):
+  """Widget for selecting a reference to an Entity.
+  """
+
+  def __init__(self, reference_url, filter=None,
+               *args, **kwargs):
+    """Initializes the widget with the specified url and filter.
+    """
+
+    self.rf = {}
+    self.rf['reference_url'] = reference_url
+    self.rf['filter'] = filter if filter else []
+    super(ReferenceField, self).__init__(*args, **kwargs)

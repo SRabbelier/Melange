@@ -65,7 +65,7 @@ class View(base.View):
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
-    patterns = [(r'^%(url_name)s/(?P<access_type>review)$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>review_overview)$',
         'soc.views.models.%(module_name)s.review_overview',
         'Review %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
@@ -76,7 +76,7 @@ class View(base.View):
 
     new_params['sidebar_additional'] = [
         ('/%(url_name)s/review' % params,
-         'Review %(name_plural)s' % params, 'review')]
+         'Review %(name_plural)s' % params, 'review_overview')]
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']

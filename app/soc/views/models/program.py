@@ -199,7 +199,7 @@ class View(presence_with_tos.View):
     if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
       # add the organization signup link
       items += [
-          (redirects.getCreateRedirect(program_entity, {'url_name': 'org_app'}),
+          (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
     return items

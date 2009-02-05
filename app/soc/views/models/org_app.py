@@ -29,6 +29,7 @@ from soc.logic import dicts
 from soc.logic import models as model_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import group_app
 from soc.views.models import program as program_view
@@ -48,18 +49,23 @@ class View(group_app.View):
       params: a dict with params for this View
     """
 
-    #TODO(ljvderijk) do the right rights check
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['delete'] = [('checkCanEditGroupApp',
-                       [org_app_logic.logic])]
+                       [org_app_logic.logic]),
+                       ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
     rights['edit'] = [('checkCanEditGroupApp',
-                       [org_app_logic.logic])]
+                       [org_app_logic.logic]),
+                       ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
     rights['list'] = ['checkIsDeveloper']
     rights['public'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic])]
-    rights['review'] = ['checkIsDeveloper',
+    # TODO(ljvderijk) fix host access check
+    rights['review'] = ['checkIsHostForProgram',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
+    rights['review_overview'] = ['checkIsDeveloper']
+    rights['apply'] = ['checkIsUser',
+                             ('checkCanCreateOrgApp', ['org_signup'])]
 
     new_params = {}
 
@@ -70,6 +76,12 @@ class View(group_app.View):
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['sidebar_grouping'] = 'Organizations'
+
+    patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
+        'soc.views.models.%(module_name)s.create',
+        'Create an %(name_plural)s'),]
+
+    new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']

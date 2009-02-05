@@ -89,6 +89,8 @@ class View(group_app.View):
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
+        'clean_ideas': cleaning.clean_url('ideas'),
+        'clean_contrib_template': cleaning.clean_url('contrib_template'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             model_logic.organization, org_app_logic)}
 

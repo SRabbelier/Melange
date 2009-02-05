@@ -251,13 +251,13 @@ def validate_new_group(link_id_field, scope_path_field,
   """Clean method used to clean the group application or new group form.
   
     Raises ValidationError if:
-    -A valid application with this link id and scope path already exists
-    -A valid group with this link id and scope path already exists
+    -A application with this link id and scope path already exists
+    -A group with this link id and scope path already exists
   """
   def wrapper(self):
       cleaned_data = self.cleaned_data
 
-      fields = {'status': ['accepted', 'ignored', 'needs review', 'completed']}
+      fields = {}
 
       link_id = cleaned_data.get(link_id_field)
 
@@ -271,7 +271,12 @@ def validate_new_group(link_id_field, scope_path_field,
         # get the application
         group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
 
-        if group_app_entity:
+        # get the current user
+        user_entity = user_logic.logic.getForCurrentAccount()
+
+        # make sure it's not the applicant creating the new group
+        if group_app_entity and (
+            group_app_entity.applicant.key() != user_entity.key()):
           # add the error message to the link id field
           self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
           del cleaned_data[link_id_field]
@@ -279,7 +284,6 @@ def validate_new_group(link_id_field, scope_path_field,
           return cleaned_data
 
         # check if there is already a group for the given fields
-        fields['status'] = ['new', 'active', 'inactive']
         group_entity = group_logic.logic.getForFields(fields, unique=True)
 
         if group_entity:

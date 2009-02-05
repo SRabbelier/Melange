@@ -25,8 +25,8 @@ __authors__ = [
 
 
 from soc.logic import dicts
-from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.models import group

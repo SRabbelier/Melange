@@ -82,12 +82,12 @@ class View(group.View):
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
-        'clean' : cleaning.validate_new_group('link_id', 'scope_path',
+        'clean': cleaning.validate_new_group('link_id', 'scope_path',
             soc.logic.models.organization, org_app_logic)}
 
     # get rid of the clean method
     new_params['edit_extra_dynafields'] = {
-        'clean' : (lambda x: x.cleaned_data)}
+        'clean': (lambda x: x.cleaned_data)}
 
     params = dicts.merge(params, new_params)
 

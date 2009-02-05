@@ -35,6 +35,7 @@ def isBeforePeriod(entity, period):
 
   return isBeforeEvent(entity, '%s_start' % period)
 
+
 def isBeforeEvent(entity, event):
   """Returns true iff the current DateTime is before the given event.
 
@@ -48,6 +49,7 @@ def isBeforeEvent(entity, event):
     return datetime.datetime.utcnow() < event_time
   else:
     return False
+
 
 def isActivePeriod(entity, period):
   """Returns true iff the current DateTime is between period_start and period_end.
@@ -65,6 +67,7 @@ def isActivePeriod(entity, period):
 
   return period_started and period_not_ended
 
+
 def isAfterPeriod(entity, period):
   """Returns true iff the current DateTime is after the given period_end.
 
@@ -74,6 +77,7 @@ def isAfterPeriod(entity, period):
   """
 
   return isAfterEvent(entity, '%s_end' % period)
+
 
 def isAfterEvent(entity, event):
   """Returns true iff the current DateTime is after the given event.
@@ -88,6 +92,7 @@ def isAfterEvent(entity, event):
     return event_time < datetime.datetime.utcnow()
   else:
     return False
+
 
 def getDateTimeByName(entity, name):
   """Returns the DateTime property with the given name. 

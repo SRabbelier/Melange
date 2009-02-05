@@ -207,6 +207,22 @@ class Checker(object):
     self.id = None
     self.user = None
 
+  def normalizeChecker(self, checker):
+    """Normalizes the checker to a pre-defined format.
+
+    The result is guaranteed to be a list of 2-tuples, the first element is a
+    checker (iff there is an checker with the specified name), the second
+    element is a list of arguments that should be passed to the checker when
+    calling it in addition to the standard django_args.
+    """
+
+    # Be nice an repack so that it is always a list with tuples
+    if isinstance(checker, tuple):
+      name, arg = checker
+      return (name, (arg if isinstance(arg, list) else [arg]))
+    else:
+      return (checker, [])
+
   def __setitem__(self, key, value):
     """Sets a value only if no old value exists.
     """
@@ -215,27 +231,10 @@ class Checker(object):
     self.rights[key] = oldvalue if oldvalue else value
 
   def __getitem__(self, key):
-    """Retrieves the right checkers and massages then into a default format.
-
-    The result is guaranteed to be a list of 2-tuples, the first element is a
-    checker (iff there is an checker with the specified name), the second
-    element is a list of arguments that should be passed to the checker when
-    calling it in addition to the standard django_args.
+    """Retrieves and normalizes the right checkers.
     """
 
-    result = []
-
-    for i in self.rights.get(key, []):
-      # Be nice an repack so that it is always a list with tuples
-      if isinstance(i, tuple):
-        name, arg = i
-        tmp = (name, (arg if isinstance(arg, list) else [arg]))
-        result.append(tmp)
-      else:
-        tmp = (i, [])
-        result.append(tmp)
-
-    return result
+    return [self.normalizeChecker(i) for i in self.rights.get(key, [])]
 
   def key(self, checker_name):
     """Returns the key for the specified checker for the current user.
@@ -360,9 +359,8 @@ class Checker(object):
     # access violation for the specified action, prefix and status.
     for role in roles:
       try:
-        checker_name = self.MEMBERSHIP[role]
-        self.doCheck(checker_name, django_args, [])
-
+        checker_name, args = self.normalizeChecker(self.MEMBERSHIP[role])
+        self.doCheck(checker_name, django_args, args)
         # the check passed, we can stop now
         break
       except out_of_band.Error:

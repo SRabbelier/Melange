@@ -223,9 +223,9 @@ class Logic(object):
 
   def getFromKeyName(self, key_name):
     """"Returns entity for key_name or None if not found.
--
--    Args:
--      key_name: key name of entity
+
+    Args:
+      key_name: key name of entity
     """
 
     return self._model.get_by_key_name(key_name)
@@ -234,11 +234,14 @@ class Logic(object):
     """Returns the entity for the specified key names, or None if not found.
 
     Args:
-      **kwargs: the fields of the entity that uniquely identifies it
+      fields: a dict containing the fields of the entity that 
+        uniquely identifies it
     """
 
-    if all(fields.values()):
-      key_name = self.getKeyNameFromFields(fields)
+    key_fields = self.getKeyFieldsFromFields(fields)
+
+    if all(key_fields.values()):
+      key_name = self.getKeyNameFromFields(key_fields)
       entity = self.getFromKeyName(key_name)
     else:
       entity = None
@@ -249,10 +252,12 @@ class Logic(object):
     """Like getFromKeyFields but expects to find an entity.
 
     Raises:
-      out_of_band.Error if no User entity is found
+      out_of_band.Error if no entity is found
     """
 
-    entity = self.getFromKeyFields(fields)
+    key_fields = self.getKeyFieldsFromFields(fields)
+
+    entity = self.getFromKeyFields(key_fields)
 
     if entity:
       return entity
@@ -260,7 +265,7 @@ class Logic(object):
     format_text = ugettext('"%(key)s" is "%(value)s"')
 
     msg_pairs = [format_text % {'key': key, 'value': value}
-      for key, value in fields.iteritems()]
+      for key, value in key_fields.iteritems()]
 
     joined_pairs = ' and '.join(msg_pairs)
 

@@ -53,7 +53,9 @@ class OrgApplication(soc.models.group_app.GroupApplication):
       'What license does your organization use?'))
  
   ideas = db.LinkProperty(required=True, verbose_name=ugettext(
-      'What is the ideas list of your organization?'))
+      'What is the URL to the ideas list of your organization?'))
+  ideas.help_text = ugettext('For instance a link to a Melange public '
+      'document or some other URL')
 
   dev_mailing_list = db.StringProperty(required=False, verbose_name=ugettext(
       'What is the main development mailing list for your group?'))
@@ -61,12 +63,14 @@ class OrgApplication(soc.models.group_app.GroupApplication):
       'Mailing list email address, URL to sign-up page, etc.')
 
   contrib_template = db.LinkProperty(required=False, verbose_name=ugettext(
-      'What application template would you like contributors'
+      'What is the URL to the application template would you like contributors'
       ' to your organization to use.'))
   contrib_template.help_text = ugettext(
       'This template can be used by contributors, such as students'
       ' and other non-member participants, when they apply to contribute'
       ' to the organization.')
+  contrib_template.help_text = ugettext('For instance a link to a Melange '
+      'public document or some other URL')
 
   contrib_disappears = db.TextProperty(required=True, verbose_name=ugettext(
       'What is your plan for dealing with disappearing contributors?'))

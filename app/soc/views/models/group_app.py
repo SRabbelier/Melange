@@ -76,7 +76,7 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['sidebar_additional'] = [
-        ('/%(url_name)s/review' % params,
+        ('/%(url_name)s/review_overview' % params,
          'Review %(name_plural)s' % params, 'review_overview')]
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
@@ -190,6 +190,20 @@ class View(base.View):
     aa_list = list_helper.getListContent(
         request, aa_params, filter, 1)
 
+    if is_developer:
+      # re use the old filter, but this time only for pre-accepted apps
+      filter['status'] = 'pre-accepted'
+
+      pa_params = params.copy() # pre-accepted applications
+
+      pa_params['list_description'] = ugettext(
+          "An overview of all pre-accepted %(name_plural)s.") % params
+
+      pa_list = list_helper.getListContent(
+          request, pa_params, filter, 4)
+
+      contents += [pa_list]
+
     # get all the reviewed applications that were denied
 
     # re use the old filter, but this time only for denied apps
@@ -257,7 +271,7 @@ class View(base.View):
     if 'status' in get_dict.keys():
       status_value = get_dict['status']
 
-      if status_value in ['accepted', 'rejected', 'ignored']:
+      if status_value in ['accepted', 'rejected', 'ignored', 'pre-accepted']:
         # this application has been properly reviewed update the status
 
         # only update if the status changes
@@ -312,6 +326,17 @@ class View(base.View):
 
     uh_list = list_helper.getListContent(
         request, uh_params, filter, 1)
+    
+    # only select the requests that have been pre-accpeted
+    filter['status'] = 'pre-accepted'
+
+    pa_params = params.copy()
+    pa_params['list_description'] = ugettext(
+        "An overview of all pre-accepted %(name_plural)s.") % params
+    pa_params ['list_action'] = (redirects.getReviewRedirect, params)
+
+    pa_list = list_helper.getListContent(
+        request, pa_params, filter, 4)
 
     # only select the requests the have been rejected
     filter ['status'] = 'rejected'
@@ -336,7 +361,7 @@ class View(base.View):
         request, ign_params, filter, 3)
 
     # fill contents with all the needed lists
-    contents = [ur_list, uh_list, den_list, ign_list]
+    contents = [ur_list, uh_list, pa_list, den_list, ign_list]
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)

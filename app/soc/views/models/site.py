@@ -113,7 +113,7 @@ class View(presence_with_tos.View):
 
     if entity:
       submenus += document_view.view.getMenusForScope(entity, self._params)
-      if accounts.isDeveloper(id, user):
+      if user and accounts.isDeveloper(id, user):
         submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
             "Create a New Document", 'any_access')]
 

@@ -85,6 +85,10 @@ class View(group_app.View):
 
     new_params['review_template'] = 'soc/club_app/review.html'
 
+    new_params['sidebar_additional'] = [
+        ('/%(url_name)s/review_overview/' % new_params,
+         'Review %(name_plural)s' % new_params, 'review_overview')]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

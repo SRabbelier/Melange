@@ -63,7 +63,7 @@ class View(group_app.View):
     # TODO(ljvderijk) fix host access check
     rights['review'] = ['checkIsHostForProgram',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
-    rights['review_overview'] = ['checkIsDeveloper']
+    rights['review_overview'] = ['checkIsHostForProgram']
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', ['org_signup'])]
 

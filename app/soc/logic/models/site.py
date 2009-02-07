@@ -83,7 +83,13 @@ class Logic(presence_with_tos.Logic):
         'link_id': self.DEF_SITE_LINK_ID,
         }
 
-    return self.getFromKeyFields(fields)
+    key_name = self.getKeyNameFromFields(fields)
+    singleton = self.getFromKeyName(key_name)
 
+    # if there is no site singleton yet, create it
+    if not singleton:
+      singleton = self.updateOrCreateFromKeyName(fields, key_name)
+
+    return singleton
 
 logic = Logic()

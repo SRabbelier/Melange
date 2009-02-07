@@ -23,11 +23,13 @@ __authors__ = [
 
 
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import presence_with_tos
 
@@ -70,7 +72,17 @@ class View(presence_with_tos.View):
     new_params['create_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         }
-    new_params['edit_dynafields'] = []
+    new_params['edit_extra_dynafields'] = {
+        'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
+        'home_link_id': widgets.ReferenceField(
+            reference_url='document',
+            required=False, label=ugettext('Home page Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+        'tos_link_id': widgets.ReferenceField(
+            reference_url='document',
+            required=False, label=ugettext('Terms of Service Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+        }
 
     patterns = []
 

@@ -677,7 +677,6 @@ class Checker(object):
     new_args = {'scope_path': program.scope_path }
     self.checkHasActiveRole(new_args, host_logic)
 
-
   @allowDeveloper
   @denySidebar
   def checkIsActivePeriod(self, django_args, period_name, key_name_arg):
@@ -713,12 +712,14 @@ class Checker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
   def checkCanCreateOrgApp(self, django_args, period_name):
+    """Checks to see if the program in the scope_path is accepting org apps
+    """
+
     if 'seed' in django_args:
       return self.checkIsActivePeriod(django_args['seed'], 
           period_name, 'scope_path')
     else:
       return
-
 
   @allowDeveloper
   def checkCanEditGroupApp(self, django_args, group_app_logic):
@@ -774,7 +775,6 @@ class Checker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
-
 
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):

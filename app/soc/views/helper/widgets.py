@@ -62,10 +62,24 @@ class TinyMCE(forms.widgets.Textarea):
     {% endblock %}
   """ 
 
+  features1 = ("bold,italic,underline,strikethrough,|,"
+               "forecolor,backcolor,blockquote,|"
+              ",justifyleft,justifycenter,justifyright,justifyfull,|,"
+              "fontselect, fontsizeselect,formatselect")
+
+  features2 = ("newdocument,|,bullist,numlist,|,outdent,indent,|,undo,redo,|"
+      ",link,unlink,anchor,image,cleanup,help,code,hr,removeformat,visualaid,|,"
+      "sub,sup,|,charmap,"
+      "")
+
   DEF_MCE_SETTINGS = {'mode': "exact",
-                      'theme': "simple",
+                      'theme': "advanced",
+                      'theme_advanced_buttons1': features1,
+                      'theme_advanced_buttons2': features2,
+                      'theme_advanced_buttons3': '',
                       'theme_advanced_toolbar_location': "top",
-                      'theme_advanced_toolbar_align': "center"}
+                      'theme_advanced_toolbar_align': "left"}
+
 
   TINY_MCE_HTML_FMT = u'''\
 <textarea %(attrs)s>%(value)s</textarea>

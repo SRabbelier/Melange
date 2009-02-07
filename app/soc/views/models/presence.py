@@ -79,7 +79,6 @@ class View(base.View):
             help_text=soc.models.work.Work.link_id.help_text),
     }
 
-
     patterns = []
 
     page_name = "Home"

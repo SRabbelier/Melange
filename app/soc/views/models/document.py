@@ -86,7 +86,7 @@ class View(base.View):
 
     new_params['create_extra_dynafields'] = {
         'content': forms.fields.CharField(
-            widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
+            widget=helper.widgets.TinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
         'prefix': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),

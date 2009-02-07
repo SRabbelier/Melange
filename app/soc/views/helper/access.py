@@ -61,49 +61,58 @@ from soc.views import out_of_band
 
 
 DEF_NO_USER_LOGIN_MSG= ugettext(
-  'Please create <a href="/user/create_profile">User Profile</a>'
-  ' in order to view this page.')
+    'Please create <a href="/user/create_profile">User Profile</a>'
+    ' in order to view this page.')
 
 DEF_AGREE_TO_TOS_MSG_FMT = ugettext(
-  'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
-  ' Service</a> in your <a href="/user/edit_profile">User Profile</a>'
-  ' in order to view this page.')
+    'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
+    ' Service</a> in your <a href="/user/edit_profile">User Profile</a>'
+    ' in order to view this page.')
 
 DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
-  'Please <a href="%%(sign_out)s">sign out</a>'
-  ' and <a href="%%(sign_in)s">sign in</a>'
-  ' again as %(role)s to view this page.')
+    'Please <a href="%%(sign_out)s">sign out</a>'
+    ' and <a href="%%(sign_in)s">sign in</a>'
+    ' again as %(role)s to view this page.')
 
 DEF_NEED_MEMBERSHIP_MSG_FMT = ugettext(
-  'You need to be in the %(status)s group to %(action)s'
-  ' documents in the %(prefix)s prefix.')
+    'You need to be in the %(status)s group to %(action)s'
+    ' documents in the %(prefix)s prefix.')
 
 DEF_NEED_ROLE_MSG = ugettext(
-  'You do not have the required role.')
+    'You do not have the required role.')
 
 DEF_NOT_YOUR_ENTITY_MSG = ugettext(
-  'This entity does not belong to you.')
+    'This entity does not belong to you.')
 
 DEF_NO_ACTIVE_GROUP_MSG = ugettext(
-  'There is no such active group.')
+    'There is no such active group.')
+
+DEF_NO_ACTIVE_ROLE_MSG = ugettext(
+    'There is no such active role.')
+
+DEF_NO_ACTIVE_PROGRAM_MSG = ugettext(
+    'There is no such active program.')
 
 DEF_NO_REQUEST_MSG = ugettext(
-  'There is no accepted request that would allow you to visit this page.')
+    'There is no accepted request that would allow you to visit this page.')
+
+DEF_NO_APPLICATION_MSG = ugettext(
+    'There is no application that would allow you to visit this page.')
 
 DEF_NEED_PICK_ARGS_MSG = ugettext(
-  'The "continue" and "field" args are not both present.')
+    'The "continue" and "field" args are not both present.')
 
 DEF_REVIEW_COMPLETED_MSG = ugettext(
     'This Application can not be reviewed anymore (it has been completed or rejected)')
 
 DEF_REQUEST_COMPLETED_MSG = ugettext(
-  'This request cannot be accepted (it is either completed or denied).')
+    'This request cannot be accepted (it is either completed or denied).')
 
 DEF_SCOPE_INACTIVE_MSG = ugettext(
-  'The scope for this request is not active.')
+    'The scope for this request is not active.')
 
 DEF_PAGE_DENIED_MSG = ugettext(
-  'Access to this page has been restricted')
+    'Access to this page has been restricted')
 
 DEF_PAGE_INACTIVE_MSG = ugettext(
     'This page is inactive at this time')
@@ -672,7 +681,7 @@ class Checker(object):
     program = program_logic.getFromKeyFields(django_args)
 
     if not program or program.status == 'invalid':
-      self.deny(django_args)
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
 
     new_args = {'scope_path': program.scope_path }
     self.checkHasActiveRole(new_args, host_logic)
@@ -747,7 +756,6 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
-
   @allowSidebar
   def checkCanReviewGroupApp(self, django_args, group_app_logic):
     """Checks if the group_app in args is valid to be reviewed.
@@ -805,8 +813,7 @@ class Checker(object):
     if application:
       return
 
-    # TODO(srabbelier) Make this give a proper error message
-    self.deny(django_args)
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
 
   def checkIsMyEntity(self, django_args, logic,
                       field_name='user', user=False):
@@ -860,10 +867,11 @@ class Checker(object):
     fields = {
         'link_id': django_args['link_id'],
         'scope_path': django_args['scope_path'],
-        'status': 'active',
         }
 
-    role_entity = role_logic.getForFields(fields)
+    role_entity = role_logic.getFromKeyFieldsOr404(fields)
+    if role_entity.status != 'active':
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ROLE_MSG)
 
     fields = {
         'link_id': self.user.link_id,
@@ -874,7 +882,7 @@ class Checker(object):
     manage_entity = manage_role_logic.getForFields(fields, unique=True)
 
     if not manage_entity:
-      self.deny(django_args)
+      raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
     return
 
@@ -887,8 +895,7 @@ class Checker(object):
       django_args: a dictionary with django's arguments
     """
 
-    key_fields = document_logic.getKeyFieldsFromFields(django_args)
-    document = document_logic.getFromKeyFields(key_fields)
+    document = document_logic.getFromKeyFieldsOr404(django_args)
 
     self.checkMembership('read', document.prefix,
                          document.read_access, django_args)
@@ -902,7 +909,7 @@ class Checker(object):
       django_args: a dictionary with django's arguments
     """
 
-    document = document_logic.getFromKeyFields(django_args)
+    document = document_logic.getFromKeyFieldsOr404(django_args)
 
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)

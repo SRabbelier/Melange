@@ -63,7 +63,7 @@ class View(group_app.View):
     # TODO(ljvderijk) fix host access check
     rights['review'] = ['checkIsHostForProgram',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
-    rights['review_overview'] = ['checkIsHostForProgram']
+    rights['review_overview'] = ['checkIsDeveloper']
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', ['org_signup'])]
 
@@ -79,10 +79,7 @@ class View(group_app.View):
 
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         'soc.views.models.%(module_name)s.create',
-        'Create an %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>list)/%(scope)s$',
-        'soc.views.models.%(module_name)s.create',
-        'Create an %(name_plural)s')]
+        'Create an %(name_plural)s'),]
 
     new_params['extra_django_patterns'] = patterns
 

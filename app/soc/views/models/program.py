@@ -164,7 +164,10 @@ class View(presence_with_tos.View):
           # still add the document links so hosts can see how it looks like
           items += document_view.view.getMenusForScope(entity, params)
           items += self._getTimeDependentEntries(entity, params)
-
+        
+        items += [(redirects.getReviewOverviewRedirect(
+            entity, {'url_name': 'org_app'}),
+            "List all Org Applications", 'any_access')]
         # add link to edit Program Profile
         items += [(redirects.getEditRedirect(entity, params),
             'Edit Program Profile','any_access')]

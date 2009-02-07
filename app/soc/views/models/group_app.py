@@ -66,7 +66,7 @@ class View(base.View):
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
-    patterns = [(r'^%(url_name)s/(?P<access_type>review_overview)$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>review_overview)/%(scope)s$',
         'soc.views.models.%(module_name)s.review_overview',
         'Review %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
@@ -74,10 +74,6 @@ class View(base.View):
           'Review %(name_short)s')]
 
     new_params['extra_django_patterns'] = patterns
-
-    new_params['sidebar_additional'] = [
-        ('/%(url_name)s/review_overview' % params,
-         'Review %(name_plural)s' % params, 'review_overview')]
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
@@ -305,8 +301,13 @@ class View(base.View):
 
     params = dicts.merge(params, self._params)
 
+    filter = {}
+
+    if kwargs['scope_path']:
+      filter = {'scope_path': kwargs['scope_path']}
+
     # only select the requests that haven't been reviewed yet
-    filter = {'status' : 'needs review'}
+    filter['status'] = 'needs review'
 
     ur_params = params.copy()
     ur_params['list_description'] = ugettext('A list of all unhandled '
@@ -336,7 +337,7 @@ class View(base.View):
     pa_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     pa_list = list_helper.getListContent(
-        request, pa_params, filter, 4)
+        request, pa_params, filter, 2)
 
     # only select the requests the have been rejected
     filter ['status'] = 'rejected'
@@ -347,7 +348,7 @@ class View(base.View):
     den_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     den_list = list_helper.getListContent(
-        request, den_params, filter, 2)
+        request, den_params, filter, 3)
 
     # only select the request that have been ignored
     filter ['status'] = 'ignored'
@@ -358,7 +359,7 @@ class View(base.View):
     ign_params ['list_action'] = (redirects.getReviewRedirect, params)
 
     ign_list = list_helper.getListContent(
-        request, ign_params, filter, 3)
+        request, ign_params, filter, 4)
 
     # fill contents with all the needed lists
     contents = [ur_list, uh_list, pa_list, den_list, ign_list]

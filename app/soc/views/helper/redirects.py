@@ -93,6 +93,12 @@ def getReviewRedirect(entity, params):
   return '/%s/review/%s' % (
       params['url_name'], entity.key().name())
 
+def getReviewOverviewRedirect(entity, params):
+  """Returns the redirect to the review_overview using the 
+     keyname of the specified entity.
+  """
+  return '/%s/review_overview/%s' % (
+      params['url_name'], entity.key().name())
 
 def getCreateRequestRedirect(entity, params):
   """Returns the create request redirect for the specified entity.

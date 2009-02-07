@@ -688,6 +688,20 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
+  def checkIsHostForProgramInScope(self, django_args):
+    """Checks if the user is a host for the specified program.
+    """
+
+    program = program_logic.getFromKeyName(django_args['scope_path'])
+
+    if not program or program.status == 'invalid':
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
+
+    django_args = {'scope_path': program.scope_path}
+    self.checkHasActiveRoleForScope(django_args, host_logic)
+
+  @allowDeveloper
+  @denySidebar
   def checkIsActivePeriod(self, django_args, period_name, key_name_arg):
     """Checks if the given period is active for the given program.
     

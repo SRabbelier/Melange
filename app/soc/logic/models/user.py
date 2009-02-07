@@ -54,8 +54,9 @@ class Logic(base.Logic):
         'WHERE former_accounts != :1', None).fetch(1000)
 
     for former_account_user in users_with_former_accounts: 
-      if account in former_account_user.former_accounts:
-        return True
+      for former_account in former_account_user.former_accounts:
+        if str(account) == str(former_account):
+          return True
 
     return False
 
@@ -153,7 +154,7 @@ class Logic(base.Logic):
     if (name == 'agreed_to_tos') and (entity.agreed_to_tos != value):
       sidebar.flush(entity.account)
 
-    if (name == 'account') and (entity.account != value):
+    if (name == 'account') and (str(entity.account) != str(value)):
       entity.former_accounts.append(entity.account)
 
     return True

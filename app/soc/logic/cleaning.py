@@ -216,7 +216,7 @@ def validate_user_edit(link_id_field, account_field):
   """
   def wrapper(self):
     cleaned_data = self.cleaned_data
-    
+
     link_id = cleaned_data.get(link_id_field)
     user_account = cleaned_data.get(account_field)
 
@@ -229,8 +229,7 @@ def validate_user_edit(link_id_field, account_field):
       former_accounts = user_entity.former_accounts
 
       # if it's not the user's current account or one of his former accounts
-      if (user_entity.account != user_account  and 
-          user_account not in former_accounts):
+      if user_entity.account != user_account:
 
         # get the user having the given account
         fields = {'account': user_account}

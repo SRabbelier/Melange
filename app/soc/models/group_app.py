@@ -86,7 +86,7 @@ class GroupApplication(soc.models.linkable.Linkable):
   irc_channel.help_text = ugettext('IRC network and channel.')
 
   backup_admin = db.ReferenceProperty(reference_class=soc.models.user.User,
-    required=True,  collection_name='group_app_backup_admin',
+    required=False, collection_name='group_app_backup_admin',
     verbose_name=ugettext(
       'Please select your backup group administrator.'))
 

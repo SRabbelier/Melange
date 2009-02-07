@@ -197,12 +197,12 @@ class Checker(object):
 
   MEMBERSHIP = {
     'anyone': 'allow',
-    'club_admin': ('checkHasActiveRole', club_admin_logic),
-    'club_member': ('checkHasActiveRole', club_member_logic),
-    'host': ('checkHasActiveRole', host_logic),
-    'org_admin': ('checkHasActiveRole', org_admin_logic),
-    'org_mentor': ('checkHasActiveRole', mentor_logic),
-    'org_student': 'deny', #('checkHasActiveRole', student_logic),
+    'club_admin': ('checkHasActiveRoleForScope', club_admin_logic),
+    'club_member': ('checkHasActiveRoleForScope', club_member_logic),
+    'host': ('checkHasActiveRoleForScope', host_logic),
+    'org_admin': ('checkHasActiveRoleForScope', org_admin_logic),
+    'org_mentor': ('checkHasActiveRoleForScope', mentor_logic),
+    'org_student': 'deny', #('checkHasActiveRoleForScope', student_logic),
     'user': 'checkIsUser',
     'user_self': ('checkIsUserSelf', 'scope_path'),
     }
@@ -581,7 +581,7 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
 
-  def checkHasActiveRole(self, django_args, logic, field_name=None):
+  def checkHasActiveRoleForScope(self, django_args, logic, field_name=None):
     """Checks that the user has the specified active role.
     """
 
@@ -684,7 +684,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
 
     new_args = {'scope_path': program.scope_path }
-    self.checkHasActiveRole(new_args, host_logic)
+    self.checkHasActiveRoleForScope(new_args, host_logic)
 
   @allowDeveloper
   @denySidebar
@@ -859,7 +859,7 @@ class Checker(object):
 
     try:
       # check if it is my role the user's own role
-      self.checkHasActiveRole(django_args, role_logic)
+      self.checkHasActiveRoleForScope(django_args, role_logic)
     except out_of_band.Error:
       pass
 

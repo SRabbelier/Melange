@@ -51,13 +51,13 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRole', club_admin_logic.logic)]
+    rights['edit'] = [('checkHasActiveRoleForScope', club_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['invite'] = [('checkHasActiveRole', club_admin_logic.logic)]
+    rights['invite'] = [('checkHasActiveRoleForScope', club_admin_logic.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest','club_member')]
     rights['request'] = ['checkIsUser',
                          ('checkCanMakeRequestToGroup', club_logic)]
-    rights['process_request'] = [('checkHasActiveRole', club_admin_logic.logic),
+    rights['process_request'] = [('checkHasActiveRoleForScope', club_admin_logic.logic),
                                  ('checkCanProcessRequest','club_member')]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [soc.logic.models.club_member.logic,

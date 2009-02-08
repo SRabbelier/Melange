@@ -24,6 +24,7 @@ __authors__ = [
 
 
 from django import forms
+from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import accounts
@@ -42,6 +43,10 @@ from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.logic.models.group_app
+
+
+DEF_APPLICATION_LIST_DESCRIPTION_FMT = ugettext(
+    'Overview of %(name_plural)s which status is %(status)s')
 
 
 class View(base.View):
@@ -66,9 +71,12 @@ class View(base.View):
     new_params['create_template'] = 'soc/models/twoline_edit.html'
     new_params['edit_template'] = 'soc/models/twoline_edit.html'
 
-    patterns = [(r'^%(url_name)s/(?P<access_type>review_overview)/%(scope)s$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>list_self)/%(scope)s$',
+        'soc.views.models.%(module_name)s.list_self',
+        'List my %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>review_overview)/%(scope)s$',
         'soc.views.models.%(module_name)s.review_overview',
-        'Review %(name_plural)s'),
+        'List of %(name_plural)s for reviewing'),
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.review',
           'Review %(name_short)s')]
@@ -133,110 +141,85 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None):
-    """Lists all notifications that the current logged in user has stored.
+           page_name=None, params=None, filter={}, **kwargs):
+    """Lists all notifications in seperate tables, depending on their status.
 
     for parameters see base.list()
     """
 
-    # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
+    # create the selection list
+    selection=[('needs review',(redirects.getEditRedirect, params)), 
+               ('pre-accepted', (redirects.getEditRedirect, params)),
+               ('accepted', (redirects.getEditRedirect, params)),
+               ('rejected', (redirects.getEditRedirect, params)),
+               ('ignored', (redirects.getEditRedirect, params)),]
 
-    is_developer = accounts.isDeveloper(user=user_entity)
+    return self._applicationListConstructor(request, params, page_name, 
+        filter=filter, selection=selection, **kwargs)
+
+
+  def _applicationListConstructor(self, request, params, page_name, filter={}, 
+                                  selection=[], **kwargs):
+    """Constructs the list containing applications for the given the arguments.
+    
+    Args:
+      filter: This is the filter used for all application
+      selection: This is a list containing tuples stating the status for an
+        application and the redirect action.
+      See base.View.public() for the rest.
+    
+    Returns:
+      HTTP Response containing the list view.
+
+    """
+
     contents = []
+    list_params = params.copy()
+    index = 0
 
-    filter = {
-        'status': 'needs review',
-        }
+    for choice in selection:
+      # only select the requests that have been pre-accpeted
+      filter['status'] = choice[0]
 
-    if not is_developer:
-      # only select the applications for this user so construct a filter
-      filter['applicant'] = user_entity
+      list_params['list_description'] = (
+          DEF_APPLICATION_LIST_DESCRIPTION_FMT % (
+          {'name_plural': params['name_plural'], 'status': choice[0]}))
+      list_params['list_action'] = choice[1]
 
-    # get all the pending applications
+      list_content = list_helper.getListContent(
+          request, list_params, filter, index)
 
-    pa_params = params.copy() # pending applications
+      contents += [list_content]
 
-    if is_developer:
-      pa_params['list_description'] = ugettext(
-          "An overview of all pending %(name_plural)s.") % params
-    else:
-      pa_params['list_description'] = ugettext(
-          "An overview of your pending %(name_plural)s.") % params
-
-    pa_list = list_helper.getListContent(
-        request, pa_params, filter, 0)
-
-    # get all the reviewed applications now
-
-    # re-use the old filter, but set to only reviewed and accepted
-    filter['status'] = 'accepted'
-
-    aa_params = params.copy() # accepted applications
-
-    if is_developer:
-      aa_params['list_description'] = ugettext(
-          "An overview of all accepted %(name_plural)s.") % params
-    else:
-      aa_params['list_description'] = ugettext(
-          "An overview of your accepted %(name_plural)s.") % params
-
-    aa_params['url_name'] = params['group_url_name']
-    aa_params['list_action'] = (redirects.getApplicantRedirect, aa_params)
-
-    aa_list = list_helper.getListContent(
-        request, aa_params, filter, 1)
-
-    if is_developer:
-      # re use the old filter, but this time only for pre-accepted apps
-      filter['status'] = 'pre-accepted'
-
-      pa_params = params.copy() # pre-accepted applications
-
-      pa_params['list_description'] = ugettext(
-          "An overview of all pre-accepted %(name_plural)s.") % params
-
-      pa_list = list_helper.getListContent(
-          request, pa_params, filter, 4)
-
-      contents += [pa_list]
-
-    # get all the reviewed applications that were denied
-
-    # re use the old filter, but this time only for denied apps
-    filter['status'] = 'rejected'
-
-    da_params = params.copy() # denied applications
-
-    if is_developer:
-      da_params['list_description'] = ugettext(
-          "An overview of all denied %(name_plural)s.") % params
-    else:
-      da_params['list_description'] = ugettext(
-          "An overview of your denied %(name_plural)s.") % params
-
-    da_list = list_helper.getListContent(
-        request, da_params, filter, 2)
-
-    contents += [pa_list, aa_list, da_list]
-
-    if is_developer:
-      # re use the old filter, but this time only for ignored apps
-      filter['status'] = 'ignored'
-
-      ia_params = params.copy() # ignored applications
-
-      ia_params['list_description'] = ugettext(
-          "An overview of all ignored %(name_plural)s.") % params
-
-      ia_list = list_helper.getListContent(
-          request, ia_params, filter, 3)
-
-      contents += [ia_list]
+      index += 1
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
 
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listSelf(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """List all applications from the current logged-in user.
+
+    For params see base.View.public().
+    """
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+    filter = {'applicant' : user_entity}
+
+    if kwargs['scope_path']:
+      filter['scope_path'] = kwargs['scope_path']
+
+    # create the selection list
+    selection=[('needs review',(redirects.getEditRedirect, params)), 
+               ('accepted', (redirects.getApplicantRedirect,
+                   {'url_name': params['group_url_name']})),
+               ('rejected', (redirects.getEditRedirect, params))]
+
+    return self._applicationListConstructor(request, params, page_name,
+        filter=filter, selection=selection, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access
@@ -281,8 +264,19 @@ class View(base.View):
             # the application has been accepted send out a notification
             notifications.sendNewGroupNotification(entity, params)
 
-        return self.reviewOverview(request, access_type,
-            page_name=page_name, params=params, **kwargs)
+        # redirect to the review overview
+        fields = {'url_name': params['url_name']}
+
+        scope_path = entity.scope_path
+
+        if not scope_path:
+          scope_path = ''
+
+        # add scope_path to the dictionary
+        fields['scope_path'] = scope_path
+
+        return http.HttpResponseRedirect(
+            '/%(url_name)s/review_overview/%(scope_path)s' %fields)
 
     # the application has not been reviewed so show the information
     # using the appropriate review template
@@ -300,73 +294,17 @@ class View(base.View):
     status of the application process.
     """
 
-    params = dicts.merge(params, self._params)
+    selection = [('needs review',(redirects.getReviewRedirect, params)),
+                 ('accepted', (redirects.getReviewRedirect, params)),
+                 ('pre-accepted', (redirects.getReviewRedirect, params)),
+                 ('rejected', (redirects.getReviewRedirect, params)),
+                 ('ignored', (redirects.getReviewRedirect, params)),]
 
     filter = {}
 
-    if kwargs.get('scope_path'):
+    if kwargs['scope_path']:
       filter['scope_path'] = kwargs['scope_path']
-    elif kwargs.get('link_id'):
-      filter['scope_path'] = kwargs['link_id']
 
-    # only select the requests that haven't been reviewed yet
-    filter['status'] = 'needs review'
-
-    ur_params = params.copy()
-    ur_params['list_description'] = ugettext('A list of all unhandled '
-        '%(name_plural)s.') % params
-    ur_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    ur_list = list_helper.getListContent(
-        request, ur_params, filter, 0)
-
-    # only select the requests that haven't been turned into a group yet
-    filter['status'] = 'accepted'
-
-    uh_params = params.copy()
-    uh_params['list_description'] = ugettext('A list of all %(name_plural)s '
-        'that have been accepted but not completed yet') % params
-    uh_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    uh_list = list_helper.getListContent(
-        request, uh_params, filter, 1)
-    
-    # only select the requests that have been pre-accpeted
-    filter['status'] = 'pre-accepted'
-
-    pa_params = params.copy()
-    pa_params['list_description'] = ugettext(
-        "An overview of all pre-accepted %(name_plural)s.") % params
-    pa_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    pa_list = list_helper.getListContent(
-        request, pa_params, filter, 4)
-
-    # only select the requests the have been rejected
-    filter ['status'] = 'rejected'
-
-    den_params = params.copy()
-    den_params['list_description'] = ugettext('A list of all %(name_plural)s '
-        'that have been rejected') % params
-    den_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    den_list = list_helper.getListContent(
-        request, den_params, filter, 2)
-
-    # only select the request that have been ignored
-    filter ['status'] = 'ignored'
-
-    ign_params = params.copy()
-    ign_params['list_description'] = ugettext('A list of all %(name_plural)s '
-        'that have been ignored') % params
-    ign_params ['list_action'] = (redirects.getReviewRedirect, params)
-
-    ign_list = list_helper.getListContent(
-        request, ign_params, filter, 3)
-
-    # fill contents with all the needed lists
-    contents = [ur_list, uh_list, pa_list, den_list, ign_list]
-
-    # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
+    return self._applicationListConstructor(request, params, page_name,
+        filter=filter, selection=selection, **kwargs)
 

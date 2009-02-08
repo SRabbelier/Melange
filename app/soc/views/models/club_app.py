@@ -54,7 +54,8 @@ class View(group_app.View):
                          [club_app_logic.logic])]
     rights['edit'] = [('checkCanEditGroupApp',
                        [club_app_logic.logic])]
-    rights['list'] = ['checkIsUser']
+    rights['list'] = ['checkIsDeveloper']
+    rights['list_self'] = ['checkIsUser']
     rights['public'] = [('checkCanEditGroupApp',
                          [club_app_logic.logic])]
     # TODO(ljvderijk) make sure host role check is fixed
@@ -86,6 +87,8 @@ class View(group_app.View):
     new_params['review_template'] = 'soc/club_app/review.html'
 
     new_params['sidebar_additional'] = [
+        ('/%(url_name)s/list_self/' % new_params,
+         'List all my %(name_plural)s' % new_params, 'list_self'),
         ('/%(url_name)s/review_overview/' % new_params,
          'Review %(name_plural)s' % new_params, 'review_overview')]
 
@@ -100,6 +103,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
+list_self = view.listSelf
 public = view.public
 export = view.export
 review = view.review

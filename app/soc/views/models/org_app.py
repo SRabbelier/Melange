@@ -58,9 +58,9 @@ class View(group_app.View):
                        [org_app_logic.logic]),
                        ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
     rights['list'] = ['checkIsDeveloper']
+    rights['list_self'] = ['checkIsUser']
     rights['public'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic])]
-    # TODO(ljvderijk) fix host access check
     rights['review'] = ['checkIsHostForProgramInScope',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
     rights['review_overview'] = ['checkIsHostForProgramInScope']
@@ -117,6 +117,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
+list_self = view.listSelf
 public = view.public
 export = view.export
 review = view.review

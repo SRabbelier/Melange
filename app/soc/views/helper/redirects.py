@@ -97,6 +97,7 @@ def getReviewOverviewRedirect(entity, params):
   """Returns the redirect to the review_overview using the 
      keyname of the specified entity.
   """
+
   return '/%s/review_overview/%s' % (
       params['url_name'], entity.key().name())
 
@@ -136,6 +137,16 @@ def getListRequestsRedirect(entity, params):
   """
 
   result = '/%s/list_requests/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
+def getListSelfRedirect(entity, params):
+  """Returns the redirect for list_self access type.
+  """
+
+  result = '/%s/list_self/%s' % (
       params['url_name'], entity.key().name())
 
   return result

@@ -143,6 +143,7 @@ class View(base.View):
     user_entity = user_logic.logic.getForCurrentAccount()
 
     is_developer = accounts.isDeveloper(user=user_entity)
+    contents = []
 
     filter = {
         'status': 'needs review',
@@ -217,7 +218,7 @@ class View(base.View):
     da_list = list_helper.getListContent(
         request, da_params, filter, 2)
 
-    contents = [pa_list, aa_list, da_list]
+    contents += [pa_list, aa_list, da_list]
 
     if is_developer:
       # re use the old filter, but this time only for ignored apps

@@ -303,8 +303,10 @@ class View(base.View):
 
     filter = {}
 
-    if kwargs['scope_path']:
+    if kwargs.get('scope_path'):
       filter['scope_path'] = kwargs['scope_path']
+    elif kwargs.get('link_id'):
+      filter['scope_path'] = kwargs['link_id']
 
     # only select the requests that haven't been reviewed yet
     filter['status'] = 'needs review'

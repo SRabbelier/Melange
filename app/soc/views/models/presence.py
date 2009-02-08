@@ -63,7 +63,7 @@ class View(base.View):
     new_params = {}
     new_params['rights'] = rights
 
-    new_params['extra_dynaexclude'] = ['home', 'tos']
+    new_params['extra_dynaexclude'] = ['home']
     new_params['home_template'] = 'soc/presence/home.html'
 
     new_params['create_extra_dynafields'] = {

@@ -51,6 +51,8 @@ class View(presence.View):
     new_params = {}
     new_params['logic'] = soc.logic.models.presence_with_tos.logic
 
+    new_params['extra_dynaexclude'] = ['tos']
+
     new_params['edit_extra_dynafields'] = {
         'tos_link_id': widgets.ReferenceField(
             reference_url='document', filter=['scope_path'],

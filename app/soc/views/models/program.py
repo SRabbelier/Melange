@@ -24,6 +24,7 @@ __authors__ = [
 
 
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
@@ -41,6 +42,7 @@ from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
 
 import soc.logic.models.program
+import soc.models.work
 
 
 class View(presence_with_tos.View):
@@ -72,25 +74,37 @@ class View(presence_with_tos.View):
     new_params['name'] = "Program"
     new_params['sidebar_grouping'] = 'Programs'
 
-    new_params['extra_dynaexclude'] = ['timeline']
+    new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement', 
+        'mentor_agreement', 'student_agreement']
 
     # TODO add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynafields'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
-
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
-
         'workflow': forms.ChoiceField(choices=[('gsoc','Project-based'),
             ('ghop','Task-based')], required=True),
         }
 
     new_params['edit_extra_dynafields'] = {
         'workflow': forms.CharField(widget=widgets.ReadOnlyInput(),
-                                   required=True),
+            required=True),
+        'org_admin_agreement_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['scope_path'],
+            required=False, label=ugettext(
+                'Organization Admin Agreement Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+        'mentor_agreement_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['scope_path'],
+            required=False, label=ugettext('Mentor Agreement Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+        'student_agreement_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['scope_path'],
+            required=False, label=ugettext('Student Agreement Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
         }
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

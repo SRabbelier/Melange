@@ -100,6 +100,39 @@ class Program(soc.models.presence_with_tos.PresenceWithToS):
                                  required=True, collection_name="program",
                                  verbose_name=ugettext('Timeline'))
 
+  #: Whether the slots allocations are visible
+  allocations_visible = db.BooleanProperty(default=False,
+      verbose_name=ugettext('Slot allocations visible'))
+  allocations_visible.help_text = ugettext(
+      'Field used to indicate if the slot allocations should be visible.')
+
+  #: Document reference property used for the Org Admin Agreement
+  org_admin_agreement = db.ReferenceProperty(
+    reference_class=soc.models.document.Document,
+    verbose_name=ugettext('Organization Admin Agreement'),
+    collection_name='org_admin_agreement')
+  org_admin_agreement.help_text = ugettext(
+      'Document containing optional Mentor Agreement for participating as a '
+      'Organization admin.')
+
+  #: Document reference property used for the Mentor Agreement
+  mentor_agreement = db.ReferenceProperty(
+    reference_class=soc.models.document.Document,
+    verbose_name=ugettext('Mentor Agreement'),
+    collection_name='mentor_agreement')
+  mentor_agreement.help_text = ugettext(
+      'Document containing optional Mentor Agreement for participating as a '
+      'Mentor.')
+
+  #: Document reference property used for the Student Agreement
+  student_agreement = db.ReferenceProperty(
+    reference_class=soc.models.document.Document,
+    verbose_name=ugettext('Student Agreement'),
+    collection_name='student_agreement')
+  student_agreement.help_text = ugettext(
+      'Document containing optional Student Agreement for participating as a '
+      'Student.')
+
   #: Status of the program
   #: Invisible: Program Stealth-Mode Visible to Hosts and Devs only
   #: Visible: Visible to everyone.
@@ -113,9 +146,3 @@ class Program(soc.models.presence_with_tos.PresenceWithToS):
       'Visible: Visible to everyone.<br/>'
       'Inactive: Not visible in sidebar, not editable.<br/>'
       'Invalid: Not visible or editable by anyone.</tt>')
-
-  #: Whether the slots allocations are visible
-  allocations_visible = db.BooleanProperty(default=False,
-      verbose_name=ugettext('Slot allocations visible'))
-  allocations_visible.help_text = ugettext(
-      'Field used to indicate if the slot allocations should be visible.')

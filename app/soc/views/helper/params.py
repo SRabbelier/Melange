@@ -189,6 +189,7 @@ def constructParams(params):
       }
   create_dynafields.update(params.get('create_extra_dynafields', {}))
 
+  new_params['references'] = []
   new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
   new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
       params.get('extra_dynaexclude', [])

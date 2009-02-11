@@ -23,6 +23,7 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+from google.appengine.ext import db
 
 from django import http
 from django.utils import simplejson
@@ -588,6 +589,23 @@ class View(object):
       fields: the new field values
     """
 
+    scope_path = self._logic.getKeyNameFromFields(fields)
+
+    key_fields = {
+        'scope_path': scope_path,
+        'prefix': self._params['document_prefix'],
+        }
+
+    for field_name, original_name, logic, _ in self._params['references']:
+      if field_name not in fields:
+        continue
+
+      key_fields['link_id'] = fields[field_name]
+
+      # TODO notify the user if home_doc is not found
+      entity = logic.getFromKeyFields(key_fields)
+      fields[original_name] = entity
+
     # If scope_logic is not defined, this entity has no scope
     if not self._params['scope_logic']:
       return
@@ -633,12 +651,18 @@ class View(object):
     if 'scope_path' in form.fields:
       form.fields['scope_path'].initial = entity.scope_path
 
+    for field_name, original_name, _, getter in self._params['references']:
+      try:
+        field = getter(entity)
+        form.fields[field_name].initial = field.link_id if field else None
+      except db.Error:
+        pass
+
     field = request.GET.get('field', None)
     value = request.GET.get('value', None)
 
     if field and value and field in form.fields:
       form.fields[field].initial = value
-
 
   def _editSeed(self, request, seed):
     """Performs any required processing on the form to get its edit page.

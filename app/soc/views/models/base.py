@@ -678,6 +678,16 @@ class View(object):
     if field and value:
       seed[field] = value
 
+  def _editContext(self, request, context):
+    """Performs any required processing on the context for edit pages.
+
+    Args:
+      request: the django request object
+      context: the context dictionary that will be used
+    """
+
+    pass
+
   def _constructResponse(self, request, entity, context, form, params):
     """Updates the context and returns a response for the specified arguments.
 
@@ -721,6 +731,7 @@ class View(object):
     else:
       template = params['create_template']
 
+    self._editContext(request, context)
     return helper.responses.respond(request, template, context)
 
   def getParams(self):

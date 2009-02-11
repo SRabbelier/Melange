@@ -243,6 +243,11 @@ def getCreateForm(params, model):
     dynafields = params['create_dynafields'],
     )
 
+  if 'extra_key_order' in params:
+    for field in params['extra_key_order']:
+      create_form.base_fields.keyOrder.remove(field)
+    create_form.base_fields.keyOrder.extend(params['extra_key_order'])
+
   return create_form
 
 

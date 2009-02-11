@@ -174,6 +174,11 @@ class View(group.View):
           "Edit Club Profile", 'any_access')
       submenus.append(submenu)
 
+    if roles.get('club_member') or roles.get('club_admin'):
+      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'club'),
+          "Create a New Document", 'any_access')
+      submenus.append(submenu)
+
       # add a link to resign as club admin
       submenu = (redirects.getManageRedirect(roles['club_admin'], 
           {'url_name': 'club_admin'}), 
@@ -185,11 +190,6 @@ class View(group.View):
       submenu = (redirects.getManageRedirect(roles['club_member'], 
           {'url_name' : 'club_member'}), 
           "Resign as Club Member", 'any_access')
-      submenus.append(submenu)
-
-    if roles.get('club_member') or roles.get('club_admin'):
-      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'club'),
-          "Create a New Document", 'any_access')
       submenus.append(submenu)
 
     return submenus

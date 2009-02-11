@@ -106,8 +106,60 @@ class View(group.View):
     params['applicant_create_form'] = applicant_create_form
 
 
-    # TODO(ljvderijk) define several menu items for organizations
-    #def _getExtraMenuItems(self, role_description, params=None):
+  def _getExtraMenuItems(self, role_description, params=None):
+    """Used to create the specific Organization menu entries.
+
+    For args see group.View._getExtraMenuItems().
+    """
+    submenus = []
+
+    group_entity = role_description['group']
+    roles = role_description['roles']
+
+    if roles.get('org_admin'):
+      # add a link to the management page
+      submenu = (redirects.getListRolesRedirect(group_entity, params),
+          "Manage Admins and Mentors", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite an org admin
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'org_admin'),
+          "Invite an Org Admin", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite a member
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 'mentor'),
+          "Invite a Mentor", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the request page
+      submenu = (redirects.getListRequestsRedirect(group_entity, params), 
+          "List Requests and Invites", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(group_entity, params), 
+          "Edit Organization Profile", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('org_admin') or roles.get('mentor'):
+      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'org'),
+          "Create a New Document", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('org_admin'):
+      submenu = (redirects.getManageRedirect(roles['org_admin'], 
+          {'url_name': 'org_admin'}), 
+          "Resign as Org Admin", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('mentor'):
+      submenu = (redirects.getManageRedirect(roles['mentor'], 
+          {'url_name' : 'mentor'}), 
+          "Resign as Mentor", 'any_access')
+      submenus.append(submenu)
+
+    return submenus
 
 
 view = View()

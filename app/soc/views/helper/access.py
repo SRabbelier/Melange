@@ -900,7 +900,6 @@ class Checker(object):
 
     return
 
-  @denySidebar
   @allowDeveloper
   def checkIsDocumentReadable(self, django_args):
     """Checks whether a document is readable.

@@ -161,6 +161,7 @@ class View(base.View):
 
     # add a link to all featured documents
     for entity in entities:
+      #TODO only if a document is readable it might be added
       submenu = (redirects.getPublicRedirect(entity, self._params),
                  entity.short_name, 'show')
       submenus.append(submenu)

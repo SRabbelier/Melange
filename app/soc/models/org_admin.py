@@ -25,6 +25,6 @@ import soc.models.role
 
 
 class OrgAdmin(soc.models.role.Role):
-  """Adminitrator details for a specific Organization.
+  """Administrator details for a specific Organization.
   """
   pass

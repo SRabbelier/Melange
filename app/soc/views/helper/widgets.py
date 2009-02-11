@@ -31,6 +31,8 @@ from django.utils import html
 from django.utils import simplejson
 from django.utils import safestring
 
+from soc.logic import dicts
+
 
 class ReadOnlyInput(forms.widgets.Input):
   """Read only input widget.
@@ -45,7 +47,7 @@ class ReadOnlyInput(forms.widgets.Input):
     return super(ReadOnlyInput, self).render(name, value, attrs)
 
 
-class TinyMCE(forms.widgets.Textarea):
+class FullTinyMCE(forms.widgets.Textarea):
   """TinyMCE widget. 
   
   Requires to include tiny_mce_src.js in your template. Widget can be
@@ -94,14 +96,9 @@ tinyMCE.init(%(settings_json)s)
       mce_settings: dict with TinyMCE widget settings
       *args, **kwargs:  passed through to parent __init__() constructor
     """
+
     super(forms.widgets.Textarea, self).__init__(*args, **kwargs)
-    
-    # copy the class defaults to an instance data member
-    self.mce_settings = copy.deepcopy(self.DEF_MCE_SETTINGS)
-    
-    if mce_settings:
-      # modify the per-instance settings if called supplied customizations
-      self.mce_settings.update(mce_settings)
+    self.mce_settings = self.DEF_MCE_SETTINGS
   
   def render(self, name, value, attrs=None):
     """Render TinyMCE widget as HTML.
@@ -121,6 +118,19 @@ tinyMCE.init(%(settings_json)s)
          'value': html.escape(value), 
          'settings_json':  mce_json})
 
+
+class TinyMCE(FullTinyMCE):
+  """Regular version of TinyMce
+  """
+
+  def __init__(self, *args, **kwargs):
+    """
+    """
+
+    super(TinyMCE, self).__init__(*args, **kwargs)
+    keys = ['mode', 'theme', 'theme_advanced_toolbar_location',
+            'theme_advanced_toolbar_align']
+    self.mce_settings = dicts.filter(self.mce_settings, keys)
 
 class ReferenceField(forms.CharField):
   """Widget for selecting a reference to an Entity.

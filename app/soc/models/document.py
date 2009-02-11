@@ -48,7 +48,7 @@ class Document(soc.models.work.Work):
 
   #: field storing the prefix of this document
   prefix = db.StringProperty(default='user', required=True,
-      choices=['site', 'club', 'sponsor', 'program', 'organization', 'user'],
+      choices=['site', 'club', 'sponsor', 'program', 'org', 'user'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the document,'

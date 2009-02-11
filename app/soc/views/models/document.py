@@ -146,6 +146,7 @@ class View(base.View):
     """
 
     filter = {
+        'prefix' : params['url_name'],
         'scope_path': entity.key().name(),
         'is_featured': True,
         }

@@ -27,6 +27,8 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models import organization as org_logic
+from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
@@ -51,16 +53,20 @@ class View(group.View):
       original_params: a dict with params for this View
     """
 
-    # TODO do the proper access checks
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsDeveloper']
+    rights['edit'] = [('checkHasActiveRoleForScope', 
+                           [org_admin_logic.logic, 'link_id']),
+                      ('checkIsActive', [org_logic.logic, None])]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
-    rights['list_requests'] = ['checkIsDeveloper']
-    rights['list_roles'] = ['checkIsDeveloper']
-    rights['applicant'] = ['checkIsDeveloper']
+    rights['list_requests'] = [('checkHasActiveRoleForScope', 
+                                [org_admin_logic.logic, 'link_id'])]
+    rights['list_roles'] = [('checkHasActiveRoleForScope', 
+                             [org_admin_logic.logic, 'link_id'])]
+    rights['applicant'] = [('checkIsApplicationAccepted',
+                            org_app_logic.logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic

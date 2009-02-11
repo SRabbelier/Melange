@@ -28,8 +28,9 @@ from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import program as program_logic
+from soc.logic.models.document import logic as document_logic
 from soc.logic.models import host as host_logic
+from soc.logic.models import program as program_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -90,19 +91,31 @@ class View(presence_with_tos.View):
         'workflow': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True),
         'org_admin_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['scope_path'],
+            reference_url='document', filter=['__scoped__'],
+            field_name='org_admin_agreement',
             required=False, label=ugettext(
                 'Organization Admin Agreement Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         'mentor_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['scope_path'],
+            reference_url='document', filter=['__scoped__'],
             required=False, label=ugettext('Mentor Agreement Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         'student_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['scope_path'],
+            reference_url='document', filter=['__scoped__'],
             required=False, label=ugettext('Student Agreement Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         }
+
+    references = [
+        ('org_admin_agreement_link_id', 'org_admin_agreement', document_logic,
+         lambda x: x.org_admin_agreement),
+        ('mentor_agreement_link_id', 'mentor_agreement', document_logic,
+         lambda x: x.mentor_agreement),
+        ('student_agreement_link_id', 'student_agreement', document_logic,
+         lambda x: x.student_agreement),
+        ]
+
+    new_params['references'] = references
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

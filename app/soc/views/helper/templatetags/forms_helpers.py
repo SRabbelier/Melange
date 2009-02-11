@@ -252,6 +252,9 @@ def as_table_row_helper(context, field, required, example_text, attrs):
       for filter_field in (i for i in filter if hasattr(entity, i)):
         args[filter_field] = getattr(entity, filter_field)
 
+      if '__scoped__' in filter:
+        args['scope_path'] = entity.key().name()
+
       params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
 
     select_url = redirects.getSelectRedirect(params)
@@ -273,7 +276,7 @@ def as_table_row_helper(context, field, required, example_text, attrs):
       'help_text': force_unicode(help_text) if help_text else '',
       'field_class_type': field_class_type,
       'label': force_unicode(label) if field.label else '',
-      'field': unicode(field),
+      'field': field,
       'field_id': field.auto_id,
       'required': required,
       'example_text': example_text,

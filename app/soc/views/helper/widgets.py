@@ -145,3 +145,28 @@ class ReferenceField(forms.CharField):
     self.rf['reference_url'] = reference_url
     self.rf['filter'] = filter if filter else []
     super(ReferenceField, self).__init__(*args, **kwargs)
+
+
+class AgreementField(widgets.Widget):
+  """Widget for selecting a reference to an Entity.
+  """
+
+  HTML_CODE = """
+  <span style="width:450px" colspan="4">
+    <div id="ToS" style="overflow:auto;height:200px">
+      %s
+    </div>
+  </span>
+  """
+
+  def __init__(self, *args, **kwargs):
+    self.text = "No Agreement Text Specified"
+    super(AgreementField, self).__init__(*args, **kwargs)
+
+  def render(self, name, value, attrs=None):
+    """
+    """
+
+    value = self.text.replace('\n', '<BR />')
+    result = self.HTML_CODE % value
+    return result

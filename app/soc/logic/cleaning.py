@@ -226,9 +226,7 @@ def validate_user_edit(link_id_field, account_field):
       fields = {'link_id': link_id}
       user_entity = user_logic.logic.getForFields(fields, unique=True)
 
-      former_accounts = user_entity.former_accounts
-
-      # if it's not the user's current account or one of his former accounts
+      # if it's not the user's current account
       if user_entity.account != user_account:
 
         # get the user having the given account
@@ -239,7 +237,7 @@ def validate_user_edit(link_id_field, account_field):
         # if there is a user with the given account or it's a former account
         if user_from_account_entity or user_logic.logic.isFormerAccount(user_account):
           # raise an error because this email address can't be used
-          raise forms.ValidationError("There is already a user with this email adress.")
+          raise forms.ValidationError("There is already a user with this email address.")
 
     return cleaned_data
   return wrapper

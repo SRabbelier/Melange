@@ -362,7 +362,6 @@ class View(presence.View):
     # call the _list method from base.View to show the list
     return self._list(request, params, contents, page_name)
 
-
   def registerRole(self, role_name, role_view):
     """Adds a role to the role_views param.
     

@@ -39,9 +39,37 @@ DEF_LINK_ID_IN_USE_MSG = ugettext(
     'This link ID is already in use, please specify another one')
 
 
+def check_field_is_empty(field_name):
+  """Returns decorator that bypasses cleaning for empty fields.
+  """
+
+  def decorator(fun):
+    """Decorator that checks if a field is empty if so doesn't do the cleaning.
+
+    Note Django will capture errors concerning required fields that are empty.
+    """
+    from functools import wraps
+
+    @wraps(fun)
+    def wrapper(self):
+      field_content = self.cleaned_data.get(field_name)
+
+      if not field_content:
+        # field has no content so bail out
+        return field_content
+      else:
+        # field has contents
+        return fun(self)
+    return wrapper
+
+  return decorator
+
+
 def clean_link_id(field_name):
   """Checks if the field_name value is in a valid link ID format.
   """
+
+  @check_field_is_empty(field_name)
   def wrapper(self):
     # convert to lowercase for user comfort
     link_id = self.cleaned_data.get(field_name).lower()
@@ -54,6 +82,8 @@ def clean_link_id(field_name):
 def clean_scope_path(field_name):
   """Checks if the field_name value is in a valid scope path format.
   """
+
+  @check_field_is_empty(field_name)
   def wrapper(self):
     # convert to lowercase for user comfort
     scope_path = self.cleaned_data.get(field_name).lower()
@@ -68,6 +98,7 @@ def clean_agrees_to_tos(field_name):
      the field_name field false.
   """
 
+  @check_field_is_empty(field_name)
   def wrapper(self):
     agrees_to_tos = self.cleaned_data.get(field_name)
 
@@ -90,6 +121,7 @@ def clean_existing_user(field_name):
   """Check if the field_name field is a valid user.
   """
 
+  @check_field_is_empty(field_name)
   def wrapped(self):
     link_id = clean_link_id(field_name)(self)
   
@@ -109,6 +141,7 @@ def clean_user_not_exist(field_name):
      link id does not exist.
   """ 
 
+  @check_field_is_empty(field_name)
   def wrapped(self):
     link_id = clean_link_id(field_name)(self)
   
@@ -128,6 +161,7 @@ def clean_users_not_same(field_name):
      equal to the current user.
   """
 
+  @check_field_is_empty(field_name)
   def wrapped(self):
     
     clean_user_field = clean_existing_user(field_name)
@@ -146,6 +180,8 @@ def clean_users_not_same(field_name):
 def clean_user_account(field_name):
   """Returns the User with the given field_name value.
   """
+
+  @check_field_is_empty(field_name)
   def wrapped(self):
     email_adress = self.cleaned_data.get(field_name).lower()
 
@@ -161,6 +197,7 @@ def clean_user_account_not_in_use(field_name):
      address that hasn't been used for an existing account.
   """ 
 
+  @check_field_is_empty(field_name)
   def wrapped(self):
     email_adress = self.cleaned_data.get(field_name).lower()
 
@@ -194,6 +231,7 @@ def clean_url(field_name):
   """Clean method for cleaning a field belonging to a LinkProperty.
   """
 
+  @check_field_is_empty(field_name)
   def wrapped(self):
 
     value = self.cleaned_data.get(field_name)
@@ -214,6 +252,7 @@ def validate_user_edit(link_id_field, account_field):
     -Another User has the given email address as account
     -Another User has the given email address in it's FormerAccounts list
   """
+
   def wrapper(self):
     cleaned_data = self.cleaned_data
 
@@ -251,6 +290,7 @@ def validate_new_group(link_id_field, scope_path_field,
     -A application with this link id and scope path already exists
     -A group with this link id and scope path already exists
   """
+
   def wrapper(self):
       cleaned_data = self.cleaned_data
 

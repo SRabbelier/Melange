@@ -27,10 +27,12 @@ from django import forms
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import models as model_logic
+from soc.logic.models import program as program_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import group_app
 from soc.views.models import program as program_view
 
@@ -82,6 +84,8 @@ class View(group_app.View):
         'Create an %(name_plural)s'),]
 
     new_params['extra_django_patterns'] = patterns
+    new_params['extra_key_order'] = ['admin_agreement',
+                                     'agreed_to_admin_agreement']
 
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
@@ -89,6 +93,10 @@ class View(group_app.View):
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
+        'admin_agreement': forms.fields.Field(required=False,
+            widget=widgets.AgreementField),
+        'agreed_to_admin_agreement': forms.fields.BooleanField(
+            initial=False, required=True),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean_contrib_template': cleaning.clean_url('contrib_template'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
@@ -109,6 +117,32 @@ class View(group_app.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def _editContext(self, request, context):
+    """See base.View._editContext.
+    """
+
+    entity = context['entity']
+    form = context['form']
+
+    if 'scope_path' in form.initial:
+      scope_path = form.initial['scope_path']
+    elif 'scope_path' in request.POST:
+      # TODO: do this nicely
+      scope_path = request.POST['scope_path']
+    else:
+      # TODO: is this always sufficient?
+      del form.fields['admin_agreement']
+      return
+
+    entity = program_logic.logic.getFromKeyName(scope_path)
+
+    if not entity or not entity.org_admin_agreement:
+      return
+
+    content = entity.org_admin_agreement.content
+
+    form.fields['admin_agreement'].widget.text = content
 
 
 view = View()

@@ -56,7 +56,7 @@ def check_field_is_empty(field_name):
 
       if not field_content:
         # field has no content so bail out
-        return field_content
+        return None
       else:
         # field has contents
         return fun(self)
@@ -235,10 +235,6 @@ def clean_url(field_name):
   def wrapped(self):
 
     value = self.cleaned_data.get(field_name)
-
-    # LinkProperty does not accept the empty string so we must return None
-    if not value or value == u'':
-      return None
 
     # call the Django URLField cleaning method to properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)

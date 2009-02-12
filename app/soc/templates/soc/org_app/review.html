@@ -32,7 +32,8 @@ limitations under the License.
 {% block buttons %}
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-accepted'" value="Pre-Accept"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=rejected'" value="Reject"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=ignored'" value="Ignore"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.key.name }}'" value="Delete"/>

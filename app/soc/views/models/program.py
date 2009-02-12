@@ -103,6 +103,14 @@ class View(presence_with_tos.View):
             reference_url='document', filter=['__scoped__'],
             required=False, label=ugettext('Student Agreement Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
+        'home_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['__scoped__'],
+            required=False, label=ugettext('Home page Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
+        'tos_link_id': widgets.ReferenceField(
+            reference_url='document', filter=['__scoped__'],
+            required=False, label=ugettext('Terms of Service Document link ID'),
+            help_text=soc.models.work.Work.link_id.help_text),
         }
 
     references = [

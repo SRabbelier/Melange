@@ -167,9 +167,16 @@ class View(group.View):
       submenus.append(submenu)
 
     if roles.get('mentor'):
+      # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['mentor'], 
           {'url_name' : 'mentor'}), 
           "Resign as Mentor", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(roles['mentor'],
+          {'url_name': 'mentor'}),
+          "Edit My Org Mentor Profile", 'any_access')
       submenus.append(submenu)
 
     return submenus

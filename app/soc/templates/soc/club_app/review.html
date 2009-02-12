@@ -16,6 +16,8 @@ limitations under the License.
 {% block group_details %}
   {% readonly_field_as_twoline_table_row entity.fields.pub_mailing_list.label entity.pub_mailing_list %}
   {% readonly_field_as_twoline_table_row entity.fields.irc_channel.label entity.irc_channel %}
+  {% if entity.backup_admin %}
   {% readonly_field_as_twoline_table_row entity.fields.backup_admin.label entity.backup_admin.link_id %}
+  {% endif %}
   {% readonly_field_as_twoline_table_row entity.fields.member_criteria.label entity.member_criteria %}
 {% endblock %}

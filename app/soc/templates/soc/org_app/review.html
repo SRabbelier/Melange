@@ -20,7 +20,9 @@ limitations under the License.
   {% readonly_field_as_twoline_table_row entity.fields.pub_mailing_list.label entity.pub_mailing_list %}
   {% readonly_field_as_twoline_table_row entity.fields.dev_mailing_list.label entity.dev_mailing_list %}
   {% readonly_field_as_twoline_table_row entity.fields.irc_channel.label entity.irc_channel %}
+  {% if entity.backup_admin %}
   {% readonly_field_as_twoline_table_row entity.fields.backup_admin.label entity.backup_admin.link_id %}
+  {% endif %}
   {% readonly_field_as_twoline_table_row entity.fields.member_criteria.label entity.member_criteria %}
   {% readonly_field_as_twoline_table_row entity.fields.contrib_disappears.label entity.contrib_disappears %}
   {% readonly_field_as_twoline_table_row entity.fields.member_disappears.label entity.member_disappears %}

@@ -92,7 +92,6 @@ class View(presence_with_tos.View):
             required=True),
         'org_admin_agreement_link_id': widgets.ReferenceField(
             reference_url='document', filter=['__scoped__'],
-            field_name='org_admin_agreement',
             required=False, label=ugettext(
                 'Organization Admin Agreement Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),

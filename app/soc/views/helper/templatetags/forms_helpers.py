@@ -172,6 +172,9 @@ def as_table_helper(context, form):
 
   # Iterate over all fields and prepare it for adding 
   for name, field in form.fields.items():
+    if not field:
+      continue
+
     bf = forms_in.BoundField(form, field, name)
     attrs = {}
 

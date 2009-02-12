@@ -107,7 +107,7 @@ class View(base.View):
     """See base.View._editGet().
     """
 
-    if entity:
+    if entity.backup_admin:
       form.fields['backup_admin_link_id'].initial = entity.backup_admin.link_id
 
     super(View, self)._editGet(request, entity, form)

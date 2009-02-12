@@ -65,6 +65,9 @@ class Logic(group.Logic):
           }
 
       for admin in [application.applicant, application.backup_admin]:
+        if not admin:
+          continue
+
         properties['link_id'] = admin.link_id
         key_fields = request_logic.logic.getKeyFieldsFromFields(properties)
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)

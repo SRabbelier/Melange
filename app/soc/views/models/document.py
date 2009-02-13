@@ -65,6 +65,7 @@ class View(base.View):
     rights['create'] = ['checkIsUser']
     rights['edit'] = ['checkIsDocumentWritable']
     rights['delete'] = ['checkIsDocumentWritable']
+    rights['pick'] = ['checkDocumentPick']
 
     new_params = {}
     new_params['logic'] = document_logic

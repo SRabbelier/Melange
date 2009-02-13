@@ -114,6 +114,9 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 DEF_PAGE_DENIED_MSG = ugettext(
     'Access to this page has been restricted')
 
+DEF_PREFIX_NOT_IN_ARGS_MSG = ugettext(
+    'A required GET url argument ("prefix") was not specified')
+
 DEF_PAGE_INACTIVE_MSG = ugettext(
     'This page is inactive at this time')
 
@@ -937,6 +940,35 @@ class Checker(object):
 
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)
+
+  @allowDeveloper
+  def checkDocumentPick(self, django_args):
+    """Checks whether the user has access to the specified pick url.
+
+    Will update the 'read_access' field of django_args['GET'].
+    """
+
+    get_args = django_args['GET']
+
+    # make mutable in order to inject the proper read_access filter
+    mutable = get_args._mutable
+    get_args._mutable = True
+
+    if 'prefix' not in get_args:
+      raise out_of_band.AccessViolation(message_fmt=DEF_PREFIX_NOT_IN_ARGS_MSG)
+
+    prefix = get_args['prefix']
+
+    checker = rights_logic.Checker(prefix)
+    memberships = checker.getMemberships()
+
+    roles = []
+    for key, value in memberships.iteritems():
+      if self.hasMembership(value, django_args):
+        roles.append(key)
+
+    get_args.setlist('read_access', roles)
+    get_args._mutable = mutable
 
   def checkCanEditTimeline(self, django_args):
     """Checks whether this program's timeline may be edited.

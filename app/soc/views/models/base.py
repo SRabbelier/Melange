@@ -425,7 +425,7 @@ class View(object):
 
     return self._list(request, params, contents, page_name)
 
-  def _list(self, request, params, contents, page_name):
+  def _list(self, request, params, contents, page_name, context={}):
     """Returns the list page for the specified contents.
 
     Args:
@@ -433,6 +433,7 @@ class View(object):
       params: a dict with params for this View
       contents: a list of content dicts
       page_name: the page name displayed in templates as page and header title
+      context: the context for this page
 
     Params usage:
       name: The name value is used to set the entity_type in the
@@ -444,7 +445,8 @@ class View(object):
         to display the list of all entities for this View.
     """
 
-    context = helper.responses.getUniversalContext(request)
+    context = dicts.merge(context, 
+        helper.responses.getUniversalContext(request))
     context['page_name'] = page_name
     context['list'] = soc.logic.lists.Lists(contents)
 

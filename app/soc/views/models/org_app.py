@@ -129,9 +129,11 @@ class View(group_app.View):
                page_name=None, params=None, **kwargs):
 
     params['list_template'] = 'soc/org_app/review_overview.html'
+    context = {'bulk_accept_link': '/org_app/bulk_accept/%(scope_path)s' %(
+        kwargs)}
 
     return super(View, self).reviewOverview(request, access_type,
-        page_name=page_name, params=params, **kwargs)
+        page_name=page_name, params=params, context=context, **kwargs)
 
   def _editContext(self, request, context):
     """See base.View._editContext.
@@ -160,6 +162,17 @@ class View(group_app.View):
     form.fields['admin_agreement'].widget.text = content
 
 
+  def _review(self, request, params, app_entity, status, **kwargs):
+    """Sends out an email if an org_app has been reviewed and accepted.
+
+    For params see group_app.View._review().
+    """
+
+    if status == 'accepted':
+      #TODO(ljvderijk) create the email template
+      pass
+
+
   @decorators.merge_params
   @decorators.check_access
   def bulkAccept(self, request, access_type,
@@ -183,6 +196,8 @@ class View(group_app.View):
     to_json = {
         'program' : program_entity.name,
         'applications': org_apps,
+        'link' : '/org_app/review/%s/(link_id)?status=accepted' %(
+            program_entity.key().name()),
         }
 
     json = simplejson.dumps(to_json)

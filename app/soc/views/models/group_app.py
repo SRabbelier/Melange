@@ -195,7 +195,12 @@ class View(base.View):
       index += 1
 
     # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
+    if kwargs['context']:
+      context = kwargs['context']
+    else:
+      context = {}
+
+    return self._list(request, params, contents, page_name, context=context)
 
 
   @decorators.merge_params
@@ -260,6 +265,7 @@ class View(base.View):
           fields = {'status' : status_value}
 
           self._logic.updateEntityProperties(entity, fields)
+          self._review(request, params, entity, status_value, **kwargs)
 
           if status_value == 'accepted':
             # the application has been accepted send out a notification
@@ -285,6 +291,19 @@ class View(base.View):
 
     return super(View, self).public(request, access_type,
         page_name=page_name, params=params, **kwargs)
+
+
+  def _review(self, request, params, app_entity, status, **kwargs):
+    """Does any required post review processing.
+
+    Args:
+      request: the standard Django HTTP request object
+      params: a dict with params for this View
+      app_entity: The update application entity
+      status: The status that was given to the reviewed app_entity
+
+    """
+    pass
 
 
   @decorators.merge_params

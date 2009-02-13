@@ -179,6 +179,7 @@ class View(group.View):
           "Create a New Document", 'any_access')
       submenus.append(submenu)
 
+    if roles.get('club_admin'):
       # add a link to resign as club admin
       submenu = (redirects.getManageRedirect(roles['club_admin'], 
           {'url_name': 'club_admin'}), 

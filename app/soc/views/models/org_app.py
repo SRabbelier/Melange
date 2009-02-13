@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from django import forms
+from django.utils import simplejson
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -32,6 +33,7 @@ from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import group_app
 from soc.views.models import program as program_view
@@ -66,6 +68,7 @@ class View(group_app.View):
     rights['review'] = ['checkIsHostForProgramInScope',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
     rights['review_overview'] = ['checkIsHostForProgramInScope']
+    rights['bulk_accept'] = ['checkIsHostForProgramInScope']
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', ['org_signup'])]
 
@@ -81,7 +84,10 @@ class View(group_app.View):
 
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         'soc.views.models.%(module_name)s.create',
-        'Create an %(name_plural)s'),]
+        'Create an %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>bulk_accept)/%(scope)s$',
+        'soc.views.models.%(module_name)s.bulk_accept',
+        'Bulk Acceptation of %(name_plural)s'),]
 
     new_params['extra_django_patterns'] = patterns
     new_params['extra_key_order'] = ['admin_agreement',
@@ -118,6 +124,15 @@ class View(group_app.View):
 
     super(View, self).__init__(params=params)
 
+  @ decorators.merge_params
+  def reviewOverview(self, request, access_type,
+               page_name=None, params=None, **kwargs):
+
+    params['list_template'] = 'soc/org_app/review_overview.html'
+
+    return super(View, self).reviewOverview(request, access_type,
+        page_name=page_name, params=params, **kwargs)
+
   def _editContext(self, request, context):
     """See base.View._editContext.
     """
@@ -145,8 +160,43 @@ class View(group_app.View):
     form.fields['admin_agreement'].widget.text = content
 
 
+  @decorators.merge_params
+  @decorators.check_access
+  def bulkAccept(self, request, access_type,
+               page_name=None, params=None, **kwargs):
+    """Returns a HTTP Response containing JSON information needed 
+       to bulk-accept orgs.
+    """
+
+    program_entity = program_logic.logic.getFromKeyName(kwargs['scope_path'])
+
+    # get all pre-accepted org applications for the given program
+    filter = {'scope' : program_entity,
+              'status' : 'pre-accepted'}
+    org_app_entities = org_app_logic.logic.getForFields(filter=filter)
+
+    # convert each application into a dictionary containing only the fields
+    # given by the dict_filter
+    dict_filter = ['link_id', 'name']
+    org_apps = [dicts.filter(i.toDict(), dict_filter) for i in org_app_entities]
+
+    to_json = {
+        'program' : program_entity.name,
+        'applications': org_apps,
+        }
+
+    json = simplejson.dumps(to_json)
+
+    # use the standard JSON template to return our response
+    context = {'json': json}
+    template = 'soc/json.html'
+
+    return responses.respond(request, template, context)
+
+
 view = View()
 
+bulk_accept = view.bulkAccept
 create = view.create
 delete = view.delete
 edit = view.edit

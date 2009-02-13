@@ -195,6 +195,8 @@ class View(group_app.View):
 
     to_json = {
         'program' : program_entity.name,
+        'nr_applications' : len(org_apps),
+        'application_type' : params['name_plural'],
         'applications': org_apps,
         'link' : '/org_app/review/%s/(link_id)?status=accepted' %(
             program_entity.key().name()),

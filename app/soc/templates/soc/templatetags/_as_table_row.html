@@ -33,7 +33,7 @@ limitations under the License.
   <td>
   {% if select_url %}
     <script type="text/javascript">
-      $.getJSON("{{ select_url }}",
+      $.getJSON("{{ select_url|safe }}",
         function(data){
           $("#{{ field_id }}").autocomplete(data.data, {
             matchContains: true,

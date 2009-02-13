@@ -345,6 +345,25 @@ class Checker(object):
     for checker_name, args in self[access_type]:
       self.check(use_cache, checker_name, django_args, args)
 
+  def hasMembership(self, roles, django_args):
+    """Checks whether the user has access to any of the specified roles.
+
+    Args:
+      roles: a list of roles to check
+    """
+
+    for role in roles:
+      try:
+        checker_name, args = self.normalizeChecker(self.MEMBERSHIP[role])
+        self.doCheck(checker_name, django_args, args)
+        # the check passed, we can stop now
+        return True
+      except out_of_band.Error:
+        continue
+
+    return False
+
+  @allowDeveloper
   def checkMembership(self, action, prefix, status, django_args):
     """Checks whether the user has access to the specified status.
 
@@ -366,17 +385,8 @@ class Checker(object):
 
     # try to see if they belong to any of the roles, if not, raise an
     # access violation for the specified action, prefix and status.
-    for role in roles:
-      try:
-        checker_name, args = self.normalizeChecker(self.MEMBERSHIP[role])
-        self.doCheck(checker_name, django_args, args)
-        # the check passed, we can stop now
-        break
-      except out_of_band.Error:
-        continue
-    else:
+    if not self.hasMembership(roles, django_args):
       raise out_of_band.AccessViolation(message_fmt)
-
 
   def allow(self, django_args):
     """Never raises an alternate HTTP response.  (an access no-op, basically).

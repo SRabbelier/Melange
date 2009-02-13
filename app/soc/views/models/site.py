@@ -61,6 +61,7 @@ class View(presence_with_tos.View):
 
     new_params['name'] = "Site Settings"
     new_params['name_plural'] = new_params['name']
+    new_params['document_prefix'] = 'site'
     new_params['name_short'] = "Site"
 
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
@@ -75,12 +76,14 @@ class View(presence_with_tos.View):
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'home_link_id': widgets.ReferenceField(
-            reference_url='document',
-            required=False, label=ugettext('Home page Document link ID'),
+            reference_url='document', required=False,
+            filter_fields={'prefix': new_params['document_prefix']},
+            label=ugettext('Home page Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         'tos_link_id': widgets.ReferenceField(
-            reference_url='document',
-            required=False, label=ugettext('Terms of Service Document link ID'),
+            reference_url='document', required=False,
+            filter_fields={'prefix': new_params['document_prefix']},
+            label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         }
 

@@ -74,6 +74,8 @@ class View(presence_with_tos.View):
 
     new_params['name'] = "Program"
     new_params['sidebar_grouping'] = 'Programs'
+    new_params['document_prefix'] = "program"
+
 
     new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement', 
         'mentor_agreement', 'student_agreement']
@@ -87,31 +89,32 @@ class View(presence_with_tos.View):
             ('ghop','Task-based')], required=True),
         }
 
-    new_params['edit_extra_dynafields'] = {
-        'workflow': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=True),
-        'org_admin_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['__scoped__'],
-            required=False, label=ugettext(
-                'Organization Admin Agreement Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-        'mentor_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['__scoped__'],
-            required=False, label=ugettext('Mentor Agreement Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-        'student_agreement_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['__scoped__'],
-            required=False, label=ugettext('Student Agreement Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-        'home_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['__scoped__'],
-            required=False, label=ugettext('Home page Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-        'tos_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['__scoped__'],
-            required=False, label=ugettext('Terms of Service Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
-        }
+    reference_fields = [
+        ('org_admin_agreement_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Organization Admin Agreement Document link ID')),
+        ('mentor_agreement_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Mentor Agreement Document link ID')),
+        ('student_agreement_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Student Agreement Document link ID')),
+        ('home_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Home page Document link ID')),
+        ('tos_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Terms of Service Document link ID'))
+        ]
+
+    result = {}
+
+    for key, help_text, label in reference_fields:
+      result[key] = widgets.ReferenceField(
+          reference_url='document', filter=['__scoped__'],
+          filter_fields={'prefix': new_params['document_prefix']},
+          required=False, label=label, help_text=help_text)
+
+    result['workflow'] = forms.CharField(widget=widgets.ReadOnlyInput(),
+                                         required=True)
+
+    new_params['edit_extra_dynafields'] = result
+
 
     references = [
         ('org_admin_agreement_link_id', 'org_admin_agreement', document_logic,

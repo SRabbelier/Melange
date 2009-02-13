@@ -40,7 +40,7 @@ class View(presence.View):
   """View methods for the PresenceWithToS model.
   """
 
-  def __init__(self, params=None):
+  def __init__(self, params):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
@@ -55,8 +55,9 @@ class View(presence.View):
 
     new_params['edit_extra_dynafields'] = {
         'tos_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['scope_path'],
-            required=False, label=ugettext('Terms of Service Document link ID'),
+            reference_url='document', filter=['scope_path'], required=False,
+            filter_fields={'prefix': params['document_prefix']},
+            label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
         }
 

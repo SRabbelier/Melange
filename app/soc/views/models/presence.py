@@ -49,7 +49,7 @@ class View(base.View):
   """View methods for the Presence model.
   """
 
-  def __init__(self, params=None):
+  def __init__(self, params):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
@@ -75,6 +75,7 @@ class View(base.View):
     new_params['edit_extra_dynafields'] = {
         'home_link_id': widgets.ReferenceField(
             reference_url='document', filter=['scope_path'],
+            filter_fields={'prefix': params['document_prefix']},
             required=False, label=ugettext('Home page Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
     }

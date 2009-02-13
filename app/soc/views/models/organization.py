@@ -76,6 +76,7 @@ class View(group.View):
 
     new_params['name'] = "Organization"
     new_params['url_name'] = "org"
+    new_params['document_prefix'] = "org"
     new_params['sidebar_grouping'] = 'Organizations'
 
     new_params['public_template'] = 'soc/organization/public.html'

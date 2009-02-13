@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from soc.logic import dicts
+
 class Checker(object):
   """Checker class that maps from prefix and status to membership.
   """
@@ -89,3 +91,9 @@ class Checker(object):
       return ['anyone']
 
     return self.rights[status]
+
+  def getMemberships(self):
+    """Returns all memberships for the configured prefix.
+    """
+
+    return dicts.merge(self.rights, {'user': ['user'], 'public': ['anyone']})

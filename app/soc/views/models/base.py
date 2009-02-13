@@ -565,11 +565,14 @@ class View(object):
       params: a dict with params for this View
     """
 
-    get_dict = request.GET
+    # convert to a regular dict
+    filter = {}
+    for key in request.GET.keys():
+      # need to use getlist as we want to support multiple values
+      filter[key] = request.GET.getlist(key)
 
-    data = self._logic.getForFields(filter=get_dict, limit=1000)
-
-    data = [i.toDict() for i in data]
+    entities = self._logic.getForFields(filter=filter, limit=1000)
+    data = [i.toDict() for i in entities]
 
     to_json = {
         'data': data,

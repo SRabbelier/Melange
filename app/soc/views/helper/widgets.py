@@ -136,7 +136,7 @@ class ReferenceField(forms.CharField):
   """Widget for selecting a reference to an Entity.
   """
 
-  def __init__(self, reference_url, filter=None,
+  def __init__(self, reference_url, filter=None, filter_fields=None,
                *args, **kwargs):
     """Initializes the widget with the specified url and filter.
     """
@@ -144,6 +144,7 @@ class ReferenceField(forms.CharField):
     self.rf = {}
     self.rf['reference_url'] = reference_url
     self.rf['filter'] = filter if filter else []
+    self.rf['filter_fields'] = filter_fields if filter_fields else {}
     super(ReferenceField, self).__init__(*args, **kwargs)
 
 

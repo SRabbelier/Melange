@@ -243,6 +243,7 @@ def as_table_row_helper(context, field, required, example_text, attrs):
 
   reference = attrs.get('reference_url')
   filter = attrs.get('filter')
+  filter_fields = attrs.get('filter_fields')
 
   if reference:
     from soc.views.helper import redirects
@@ -252,6 +253,8 @@ def as_table_row_helper(context, field, required, example_text, attrs):
 
     if entity:
       args = {}
+      for filter_field, filter_value in filter_fields.iteritems():
+        args[filter_field] = filter_value
       for filter_field in (i for i in filter if hasattr(entity, i)):
         args[filter_field] = getattr(entity, filter_field)
 

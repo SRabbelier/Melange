@@ -96,7 +96,7 @@ def constructParams(params):
     params['url_name'] = params['module_name']
 
   if 'document_prefix' not in params:
-    params['document_prefix'] = params['name_short'].lower()
+    params['document_prefix'] = params['url_name']
 
   # Do not expand edit_redirect to allow it to be overriden without suffix
   new_params['edit_redirect'] = '/%(url_name)s/edit/%(suffix)s'

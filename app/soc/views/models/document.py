@@ -87,8 +87,10 @@ class View(base.View):
         'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')
         ]
 
+    new_params['no_create_raw'] = True
     new_params['no_create_with_scope'] = True
     new_params['no_create_with_key_fields'] = True
+    new_params['no_list_raw'] = True
 
     new_params['create_extra_dynafields'] = {
         'content': forms.fields.CharField(

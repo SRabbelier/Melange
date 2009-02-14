@@ -124,17 +124,18 @@ def constructParams(params):
           'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.export', 'Export %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>create)$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>list)$',
-          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s'),
       (r'^%(url_name)s/(?P<access_type>pick)$',
           'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s'),
       ]
+
+  if not params.get('no_create_raw'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>create)$',
+          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
 
   if not params.get('no_create_with_scope'):
     new_params['django_patterns_defaults'] += [
@@ -145,6 +146,11 @@ def constructParams(params):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>create)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+
+  if not params.get('no_list_raw'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>list)$',
+          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
   new_params['export_template'] = 'soc/%(module_name)s/export.html' % params

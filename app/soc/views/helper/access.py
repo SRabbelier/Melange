@@ -967,6 +967,9 @@ class Checker(object):
       if self.hasMembership(value, django_args):
         roles.append(key)
 
+    if not roles:
+      roles = ['deny']
+
     get_args.setlist('read_access', roles)
     get_args._mutable = mutable
 

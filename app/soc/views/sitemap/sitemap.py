@@ -22,10 +22,16 @@ __authors__ = [
   ]
 
 
+import soc.logic.system
+
+
 SITEMAP = []
 
 
 def addPages(pages):
+  """Adds the specified pages to the sitemap.
+  """
+
   global SITEMAP
   SITEMAP += pages
 
@@ -81,5 +87,10 @@ def getDjangoURLPatterns(params):
 
     item = (url, module, kwargs, name)
     patterns.append(item)
+
+  if soc.logic.system.isDebug():
+    patterns += [('^seed_db$', 'soc.models.seed_db.seed'),
+                 ('^clear_db$', 'soc.models.seed_db.clear'),
+                 ('^reseed_db$', 'soc.models.seed_db.reseed')]
 
   return patterns

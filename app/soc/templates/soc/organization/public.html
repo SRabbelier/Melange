@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/group/public.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,27 +14,9 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
-{% block header_title %}
-{{ page_name }} for {{ entity.name }}
-{% endblock %}
-
-{% block body %}
-<p>
- <table>
-  {% readonly_field_as_table_row entity.fields.name.label entity.name %}
-  {% readonly_field_as_table_row entity.fields.home_page.label entity.home_page %}
-  {% readonly_field_as_table_row entity.fields.description.label entity.description %}
-  {% readonly_field_as_table_row entity.fields.contact_street.label entity.contact_street %}
-  {% readonly_field_as_table_row entity.fields.contact_city.label entity.contact_city %}
-  {% readonly_field_as_table_row entity.fields.contact_state.label entity.contact_state %}
-  {% readonly_field_as_table_row entity.fields.contact_country.label entity.contact_country %}
-  {% readonly_field_as_table_row entity.fields.contact_postalcode.label entity.contact_postalcode %}
-  {% readonly_field_as_table_row entity.fields.phone.label entity.phone %}
-  {% readonly_field_as_table_row entity.fields.shipping_street.label entity.shipping_street %}
-  {% readonly_field_as_table_row entity.fields.shipping_city.label entity.shipping_city %}
-  {% readonly_field_as_table_row entity.fields.shipping_state.label entity.shipping_state %}
-  {% readonly_field_as_table_row entity.fields.shipping_country.label entity.shipping_country %}
-  {% readonly_field_as_table_row entity.fields.shipping_postalcode.label entity.shipping_postalcode %}
- </table>
-</p>
+{% block fields %}
+  {{ block.super }}
+  {% readonly_field_as_table_row entity.fields.dev_mailing_list.label entity.dev_mailing_list %}
+  {% readonly_field_as_table_row entity.fields.member_template.label entity.member_template %}
+  {% readonly_field_as_table_row entity.fields.ideas.label entity.ideas %}
 {% endblock %}

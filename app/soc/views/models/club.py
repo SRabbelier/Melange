@@ -78,6 +78,8 @@ class View(group.View):
     new_params['document_prefix'] = "club"
     new_params['sidebar_grouping'] = 'Clubs'
 
+    new_params['public_template'] = 'soc/group/public.html'
+
     patterns = []
 
     patterns += [(r'^%(url_name)s/(?P<access_type>apply_member)$',

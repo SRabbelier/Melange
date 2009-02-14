@@ -189,7 +189,7 @@ class View(presence_with_tos.View):
       if entity.status == 'visible':
         # show the documents for this program, even for not logged in users
         items += document_view.view.getMenusForScope(entity, params)
-        items += self._getTimeDependentEntries(entity, params)
+        items += self._getTimeDependentEntries(entity, params, id, user)
 
       try:
         # check if the current user is a host for this program
@@ -214,6 +214,9 @@ class View(presence_with_tos.View):
         # add link to create a new Program Document
         items += [(redirects.getCreateDocumentRedirect(entity, 'program'),
             "Create a New Document", 'any_access')]
+        # add link to list all Program Document
+        items += [(redirects.getListDocumentsRedirect(entity, 'program'),
+            "List Documents", 'any_access')]
 
       except out_of_band.Error:
         pass
@@ -230,18 +233,19 @@ class View(presence_with_tos.View):
 
     return menus
 
-  def _getTimeDependentEntries(self, program_entity, params):
+  def _getTimeDependentEntries(self, program_entity, params, id, user):
     items = []
 
     #TODO(ljvderijk) Add more timeline dependent entries
     timeline_entity = program_entity.timeline
 
-    if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+    if user and timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
       # add the organization signup link
       items += [
           (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
+      # add the 'list my orgs' link
       items += [
           (redirects.getListSelfRedirect(program_entity, {'url_name' : 'org_app'}),
            "List my Org Applications", 'any_access')]

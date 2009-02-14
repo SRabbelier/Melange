@@ -120,6 +120,9 @@ class View(presence_with_tos.View):
         submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
             "Create a New Document", 'any_access')]
 
+        submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
+            "List Documents", 'any_access')]
+
     new_params = {}
     new_params['sidebar_additional'] = submenus
 

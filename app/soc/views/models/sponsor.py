@@ -114,8 +114,14 @@ class View(group.View):
           "Resign as Host", 'any_access')
       submenus.append(submenu)
 
+      # add a link to create a new document
       submenu = (redirects.getCreateDocumentRedirect(group_entity, 'sponsor'),
           "Create a New Document", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to list all documents
+      submenu = (redirects.getListDocumentsRedirect(group_entity, 'sponsor'),
+          "List Documents", 'any_access')
       submenus.append(submenu)
 
     return submenus

@@ -154,6 +154,10 @@ class View(group.View):
           "Create a New Document", 'any_access')
       submenus.append(submenu)
 
+      submenu = (redirects.getListDocumentsRedirect(group_entity, 'org'),
+          "List Documents", 'any_access')
+      submenus.append(submenu)
+
     if roles.get('org_admin'):
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['org_admin'], 

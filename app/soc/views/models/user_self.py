@@ -237,6 +237,9 @@ class View(base.View):
       items += [(redirects.getCreateDocumentRedirect(user, 'user'),
           "Create a New Document", 'any_access')]
 
+      items += [(redirects.getListDocumentsRedirect(user, 'user'),
+          "List Documents", 'any_access')]
+
     new_params = {}
     new_params['sidebar_additional'] = items
 

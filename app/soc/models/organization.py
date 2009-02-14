@@ -40,13 +40,13 @@ class Organization(soc.models.group.Group):
      'reviewers' back-reference Query of the Organization model 'org'
      reference.
   """
-  
+
   #: Optional development mailing list.     
   dev_mailing_list = db.StringProperty(required=False,
     verbose_name=ugettext('Development Mailing List'))
   dev_mailing_list.help_text = ugettext(
     'Mailing list email address, URL to sign-up page, etc.')
-    
+
   member_template = db.ReferenceProperty(
     reference_class=soc.models.document.Document, required=False,
     collection_name='org_app_member_template',
@@ -55,3 +55,8 @@ class Organization(soc.models.group.Group):
     'This template will be presented to potential members when they'
     ' apply to the organization.')
 
+  ideas = db.LinkProperty(required=False, verbose_name=ugettext('Idea list'))
+  ideas.help_text = ugettext(
+      'The URL to the ideas list of your organization.')
+  ideas.example_text = ugettext('For instance a link to a Melange public '
+      'document or some other URL')

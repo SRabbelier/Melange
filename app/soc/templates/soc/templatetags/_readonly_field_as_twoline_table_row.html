@@ -11,6 +11,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+
+{% if field_value %}
  <tr>
  <td class="formfieldlabel">
 	{{ field_label }}:
@@ -21,5 +23,4 @@ limitations under the License.
 	{{ field_value }}
  </td>
 </tr>
-
-
+{% endif %}

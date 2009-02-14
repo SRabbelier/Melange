@@ -366,6 +366,7 @@ def validate_access(self, view, field):
 
   access_level = self.cleaned_data[field]
   prefix = self.cleaned_data['prefix']
+  scope_path = self.cleaned_data['scope_path']
 
   params = view.getParams()
   rights = params['rights']
@@ -377,6 +378,6 @@ def validate_access(self, view, field):
 
   roles = checker.getMembership(access_level)
 
-  if not rights.hasMembership(roles, {}):
+  if not rights.hasMembership(roles, {'scope_path': scope_path}):
     self._errors[field] = ErrorList([DEF_NO_RIGHTS_FOR_ACL_MSG])
     del self.cleaned_data[field]

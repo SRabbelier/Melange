@@ -195,7 +195,7 @@ class View(base.View):
       index += 1
 
     # call the _list method from base to display the list
-    if kwargs['context']:
+    if kwargs.get('context'):
       context = kwargs['context']
     else:
       context = {}

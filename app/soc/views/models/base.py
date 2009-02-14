@@ -583,7 +583,11 @@ class View(object):
     context = {'json': json}
     template = 'soc/json.html'
 
-    return helper.responses.respond(request, template, context)
+    response = responses.respond(request, template, context)
+    # TODO IE7 seems to ignore the headers
+    response['Pragma'] = 'no-cache'
+    response['Cache-Control'] = 'no-cache, must-revalidate'
+    return response
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

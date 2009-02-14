@@ -208,7 +208,11 @@ class View(group_app.View):
     context = {'json': json}
     template = 'soc/json.html'
 
-    return responses.respond(request, template, context)
+    response = responses.respond(request, template, context)
+    # TODO IE7 seems to ignore the headers
+    response['Pragma'] = 'no-cache'
+    response['Cache-Control'] = 'no-cache, must-revalidate'
+    return response
 
 
 view = View()

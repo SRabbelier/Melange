@@ -111,6 +111,9 @@ DEF_REQUEST_COMPLETED_MSG = ugettext(
 DEF_SCOPE_INACTIVE_MSG = ugettext(
     'The scope for this request is not active.')
 
+DEF_NO_LIST_ACCESS_MSG = ugettext(
+    'You do not have the required rights to list documents for this scope and prefix.')
+
 DEF_PAGE_DENIED_MSG = ugettext(
     'Access to this page has been restricted')
 
@@ -947,6 +950,22 @@ class Checker(object):
 
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)
+
+  @allowDeveloper
+  def checkDocumentList(self, django_args):
+    """Checks whether the user is allowed to list documents.
+    """
+
+    filter = django_args['filter']
+
+    prefix = filter['prefix']
+    scope_path = filter['scope_path']
+
+    checker = rights_logic.Checker(prefix)
+    roles = checker.getMembership('list')
+
+    if not self.hasMembership(roles, filter):
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_LIST_ACCESS_MSG)
 
   @allowDeveloper
   def checkDocumentPick(self, django_args):

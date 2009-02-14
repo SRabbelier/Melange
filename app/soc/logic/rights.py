@@ -32,36 +32,42 @@ class Checker(object):
       'admin': [],
       'restricted': ['host'],
       'member': ['user'],
+      'list': [],
       }
 
   CLUB_MEMBERSHIP = {
       'admin': ['host', 'club_admin'],
       'restricted': ['host', 'club_admin'],
       'member': ['host', 'club_admin', 'club_member'],
+      'list': ['host', 'club_admin', 'club_member'],
       }
 
   SPONSOR_MEMBERSHIP = {
       'admin': ['host'],
       'restricted': ['host'],
       'member': ['host'],
+      'list': ['host'],
       }
 
   PROGRAM_MEMBERSHIP = {
       'admin': ['host'],
       'restricted': ['host', 'org_admin'],
       'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
+      'list': ['host', 'org_admin', 'org_mentor'],
       }
 
   ORGANIZATION_MEMBERSHIP = {
       'admin': ['host', 'org_admin'],
       'restricted': ['host', 'org_admin', 'org_mentor'],
       'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
+      'list': ['host', 'org_admin', 'org_mentor'],
       }
 
   USER_MEMBERSHIP = {
       'admin': ['user_self'],
       'restricted': ['user_self'], # ,'friends'
       'member': ['user'],
+      'list': ['user_self'],
       }
 
   RIGHTS = {
@@ -96,4 +102,10 @@ class Checker(object):
     """Returns all memberships for the configured prefix.
     """
 
-    return dicts.merge(self.rights, {'user': ['user'], 'public': ['anyone']})
+    extra_rights = {
+        'user': ['user'],
+        'public': ['anyone'],
+        'list': [],
+        }
+
+    return dicts.merge(extra_rights, self.rights)

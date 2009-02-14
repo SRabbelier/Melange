@@ -65,6 +65,7 @@ class View(base.View):
     rights['create'] = ['checkIsUser']
     rights['edit'] = ['checkIsDocumentWritable']
     rights['delete'] = ['checkIsDocumentWritable']
+    rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
 
     new_params = {}

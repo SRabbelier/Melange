@@ -200,7 +200,7 @@ class View(presence_with_tos.View):
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like
           items += document_view.view.getMenusForScope(entity, params)
-          items += self._getTimeDependentEntries(entity, params)
+          items += self._getTimeDependentEntries(entity, params, id, user)
 
         items += [(redirects.getReviewOverviewRedirect(
             entity, {'url_name': 'org_app'}),
@@ -239,16 +239,18 @@ class View(presence_with_tos.View):
     #TODO(ljvderijk) Add more timeline dependent entries
     timeline_entity = program_entity.timeline
 
-    if user and timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+    if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
       # add the organization signup link
       items += [
           (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
-      # add the 'list my orgs' link
-      items += [
-          (redirects.getListSelfRedirect(program_entity, {'url_name' : 'org_app'}),
-           "List my Org Applications", 'any_access')]
+      if user:
+        # add the 'List my Org Applications' link
+        items += [
+            (redirects.getListSelfRedirect(program_entity, 
+                                           {'url_name' : 'org_app'}),
+             "List my Org Applications", 'any_access')]
 
     return items
 

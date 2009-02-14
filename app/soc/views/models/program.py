@@ -191,11 +191,14 @@ class View(presence_with_tos.View):
         items += document_view.view.getMenusForScope(entity, params)
         items += self._getTimeDependentEntries(entity, params, id, user)
 
+        url = redirects.getPublicListRedirect(entity, {'url_name': 'org'})
+        items += [(url, "List Organizations", 'any_access')]
+
       try:
         # check if the current user is a host for this program
         rights.doCachedCheck('checkIsHostForProgram', 
-            {'scope_path': entity.scope_path,
-            'link_id': entity.link_id}, [])
+                             {'scope_path': entity.scope_path,
+                              'link_id': entity.link_id}, [])
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like

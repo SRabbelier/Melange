@@ -31,7 +31,9 @@ from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import group
@@ -39,7 +41,6 @@ from soc.views.models import program as program_view
 
 import soc.models.organization
 import soc.logic.models.organization
-
 
 class View(group.View):
   """View methods for the Organization model.
@@ -54,13 +55,15 @@ class View(group.View):
     """
 
     rights = access.Checker(params)
+    rights['any_access'] = ['allow']
+    rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasActiveRoleForScope', 
                            [org_admin_logic.logic, 'link_id']),
                       ('checkIsActive', [org_logic.logic, None])]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
-    rights['list'] = ['checkIsDeveloper']
+    rights['public_list'] = ['allow']
     rights['list_requests'] = [('checkHasActiveRoleForScope', 
                                 [org_admin_logic.logic, 'link_id'])]
     rights['list_roles'] = [('checkHasActiveRoleForScope', 
@@ -70,6 +73,7 @@ class View(group.View):
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic
+    new_params['rights'] = rights
 
     new_params['scope_view'] = program_view
     new_params['scope_redirect'] = redirects.getCreateRedirect
@@ -85,12 +89,14 @@ class View(group.View):
 
     new_params['application_logic'] = org_app_logic
     new_params['group_applicant_url'] = True
+    new_params['sans_link_id_public_list'] = True
 
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
-            soc.logic.models.organization, org_app_logic)}
+            soc.logic.models.organization, org_app_logic)
+        }
 
     # get rid of the clean method
     new_params['edit_extra_dynafields'] = {
@@ -104,7 +110,8 @@ class View(group.View):
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=False),
-        'clean_link_id': cleaning.clean_link_id('link_id')}
+        'clean_link_id': cleaning.clean_link_id('link_id')
+        }
 
     applicant_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
@@ -112,6 +119,26 @@ class View(group.View):
 
     params['applicant_create_form'] = applicant_create_form
 
+  @decorators.merge_params
+  @decorators.check_access
+  def listPublic(self, request, access_type, page_name=None,
+           params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+
+    new_params = {}
+    new_params['list_action'] = (redirects.getPublicRedirect, params)
+    # safe to merge them the wrong way around because of @merge_params
+    params = dicts.merge(new_params, params)
+
+    new_filter = {}
+    new_filter['status'] = 'active'
+    filter = dicts.merge(filter, new_filter)
+
+    content = lists.getListContent(request, params, filter)
+    contents = [content]
+
+    return self._list(request, params, contents, page_name)
 
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific Organization menu entries.
@@ -195,6 +222,7 @@ delete = view.delete
 edit = view.edit
 home = view.home
 list = view.list
+list_public = view.listPublic
 list_requests = view.listRequests
 list_roles = view.listRoles
 public = view.public

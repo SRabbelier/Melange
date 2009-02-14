@@ -224,6 +224,13 @@ def getCreateDocumentRedirect(entity, prefix):
   return '/document/create/%s/%s' % (prefix, entity.key().name())
 
 
+def getListDocumentsRedirect(entity, prefix):
+  """Returns the redirect for listing documents.
+  """
+
+  return '/document/list/%s/%s' % (prefix, entity.key().name())
+
+
 def getToSRedirect(presence):
   """Returns link to 'show' the ToS Document if it exists, None otherwise.
 

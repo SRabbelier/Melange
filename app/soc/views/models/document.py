@@ -76,11 +76,15 @@ class View(base.View):
     new_params['export_content_type'] = 'text/text'
 
     names = [i for i in document_logic.getKeyFieldNames() if i != 'link_id']
-    create_pattern = params_helper.getPattern(names, linkable.SCOPE_PATH_ARG_PATTERN)
+    create_pattern = params_helper.getPattern(
+        names, linkable.SCOPE_PATH_ARG_PATTERN)
 
     new_params['extra_django_patterns'] = [
         (r'^document/(?P<access_type>create)/%s$' % create_pattern,
-        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
+        (r'^document/(?P<access_type>list)/%s$' % create_pattern,
+        'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')
+        ]
 
     new_params['no_create_with_scope'] = True
     new_params['no_create_with_key_fields'] = True
@@ -111,6 +115,14 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def list(self, request, access_type, page_name=None,
+           params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+
+    return super(View, self).list(request, access_type, page_name=page_name,
+                                  params=params, filter=kwargs)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

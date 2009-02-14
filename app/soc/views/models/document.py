@@ -95,6 +95,7 @@ class View(base.View):
 
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_scope_path': cleaning.clean_scope_path('scope_path'),
+        'clean': cleaning.validate_document_acl(self),
         }
     new_params['extra_dynaexclude'] = ['author', 'created',
                                        'modified_by', 'modified']

@@ -31,12 +31,17 @@ from django.forms.util import ErrorList
 from django.utils.translation import ugettext
 
 from soc.logic import validate
+from soc.logic import rights as rights_logic
 from soc.logic.models import site as site_logic
 from soc.logic.models import user as user_logic
+from soc.models import document as document_model
 
 
 DEF_LINK_ID_IN_USE_MSG = ugettext(
     'This link ID is already in use, please specify another one')
+
+DEF_NO_RIGHTS_FOR_ACL_MSG = ugettext(
+     'You do not have the required rights for that ACL.')
 
 
 def check_field_is_empty(field_name):
@@ -328,3 +333,50 @@ def validate_new_group(link_id_field, scope_path_field,
 
       return cleaned_data
   return wrapper
+
+
+def validate_document_acl(view):
+  """Validates that the document ACL settings are correct.
+  """
+
+  def wrapper(self):
+    cleaned_data = self.cleaned_data
+    read_access = cleaned_data.get('read_access')
+    write_access = cleaned_data.get('write_access')
+
+    if not (read_access and write_access and ('prefix' in cleaned_data)):
+      return cleaned_data
+
+    if read_access != 'public':
+      ordening = document_model.Document.DOCUMENT_ACCESS
+      if ordening.index(read_access) < ordening.index(write_access):
+        raise forms.ValidationError(
+            "Read access should be less strict than write access.")
+
+    validate_access(self, view, 'read_access')
+    validate_access(self, view, 'write_access')
+
+    return cleaned_data
+
+  return wrapper
+
+def validate_access(self, view, field):
+  """Validates that the user has access to the ACL for the specified fields.
+  """
+
+  access_level = self.cleaned_data[field]
+  prefix = self.cleaned_data['prefix']
+
+  params = view.getParams()
+  rights = params['rights']
+
+  user = user_logic.logic.getForCurrentAccount()
+
+  rights.setCurrentUser(user.account, user)
+  checker = rights_logic.Checker(prefix)
+
+  roles = checker.getMembership(access_level)
+
+  if not rights.hasMembership(roles, {}):
+    self._errors[field] = ErrorList([DEF_NO_RIGHTS_FOR_ACL_MSG])
+    del self.cleaned_data[field]

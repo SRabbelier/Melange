@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -405,7 +405,7 @@ class View(object):
   def list(self, request, access_type,
            page_name=None, params=None, filter=None):
     """Displays the list page for the entity type.
-    
+
     Args:
       request: the standard Django HTTP request object
       access_type : the name of the access type which should be checked
@@ -415,8 +415,8 @@ class View(object):
 
     Params usage:
       The params dictionary is passed as argument to getListContent in
-      the soc.views.helper.list module. See the docstring for getListContent 
-      on how it uses it. The params dictionary is also passed as argument to 
+      the soc.views.helper.list module. See the docstring for getListContent
+      on how it uses it. The params dictionary is also passed as argument to
       the _list method. See the docstring for _list on how it uses it.
     """
 
@@ -425,7 +425,7 @@ class View(object):
 
     return self._list(request, params, contents, page_name)
 
-  def _list(self, request, params, contents, page_name, context={}):
+  def _list(self, request, params, contents, page_name, context=None):
     """Returns the list page for the specified contents.
 
     Args:
@@ -445,7 +445,7 @@ class View(object):
         to display the list of all entities for this View.
     """
 
-    context = dicts.merge(context, 
+    context = dicts.merge(context,
         helper.responses.getUniversalContext(request))
     context['page_name'] = page_name
     context['list'] = soc.logic.lists.Lists(contents)
@@ -472,8 +472,8 @@ class View(object):
 
     Params usage:
       rights: The rights dictionary is used to check if the user has
-        the required rights to delete the specified entity. See checkAccess 
-        for more details on how the rights dictionary is used to check access 
+        the required rights to delete the specified entity. See checkAccess
+        for more details on how the rights dictionary is used to check access
         rights.
       name: used in the same way as in edit(), see it's docstring for
         a more detailed explanation on how it is used.

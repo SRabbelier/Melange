@@ -29,6 +29,7 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
+from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
@@ -41,6 +42,9 @@ import soc.logic.models.org_admin
 class View(role.View):
   """View methods for the Organization Admin model.
   """
+
+  DEF_ALREADY_AGREED_MSG = ugettext(
+      "You already agreed to the Agreement when applying")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -164,6 +168,14 @@ class View(role.View):
       # TODO: is this always sufficient?
       form.fields['admin_agreement'] = None
       return
+
+    org_app = org_app_logic.logic.getFromKeyName(scope_path)
+
+    if not entity and org_app:
+      if org_app.applicant.key() == context['user'].key():
+        form.fields['agreed_to_admin_agreement'] = forms.fields.BooleanField(
+            widget=widgets.ReadOnlyInput, initial=True, required=True,
+            help_text=self.DEF_ALREADY_AGREED_MSG)
 
     entity = org_logic.logic.getFromKeyName(scope_path)
 

@@ -113,9 +113,14 @@ def constructParams(params):
       ]
   new_params['sidebar_additional'] = []
 
+  names_sans_link_id = [i for i in logic.getKeyFieldNames() if i != 'link_id']
+  sans_link_id_pattern = getPattern(names_sans_link_id,
+                              linkable.SCOPE_PATH_ARG_PATTERN)
+
   new_params['link_id_arg_pattern'] = linkable.LINK_ID_ARG_PATTERN
   new_params['link_id_pattern_core'] = linkable.LINK_ID_PATTERN_CORE
   new_params['scope_path_pattern'] = getScopePattern(params)
+  new_params['sans_link_id_pattern'] = sans_link_id_pattern
 
   new_params['django_patterns'] = None
   new_params['extra_django_patterns'] = []
@@ -151,6 +156,21 @@ def constructParams(params):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list)$',
           'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
+
+  if params.get('sans_link_id_create'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>create)/%(sans_link_id)s$',
+         'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+
+  if params.get('sans_link_id_list'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>list)/%(sans_link_id)s$',
+         'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
+
+  if params.get('sans_link_id_public_list'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>list_public)/%(sans_link_id)s$',
+         'soc.views.models.%(module_name)s.list_public', 'List %(name_plural)s')]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
   new_params['export_template'] = 'soc/%(module_name)s/export.html' % params
@@ -252,7 +272,8 @@ def getCreateForm(params, model):
 
   if 'extra_key_order' in params:
     for field in params['extra_key_order']:
-      create_form.base_fields.keyOrder.remove(field)
+      if field in create_form.base_fields.keyOrder:
+        create_form.base_fields.keyOrder.remove(field)
     create_form.base_fields.keyOrder.extend(params['extra_key_order'])
 
   return create_form

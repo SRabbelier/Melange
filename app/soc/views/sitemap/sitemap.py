@@ -74,6 +74,7 @@ def getDjangoURLPatterns(params):
         'ulnp': params['link_id_pattern_core'],
         'key_fields': params['key_fields_pattern'],
         'scope': params['scope_path_pattern'],
+        'sans_link_id': params['sans_link_id_pattern'],
         }
 
     kwargs = {'page_name': name}

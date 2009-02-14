@@ -76,21 +76,12 @@ class View(base.View):
 
     new_params['export_content_type'] = 'text/text'
 
-    names = [i for i in document_logic.getKeyFieldNames() if i != 'link_id']
-    create_pattern = params_helper.getPattern(
-        names, linkable.SCOPE_PATH_ARG_PATTERN)
-
-    new_params['extra_django_patterns'] = [
-        (r'^document/(?P<access_type>create)/%s$' % create_pattern,
-        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s'),
-        (r'^document/(?P<access_type>list)/%s$' % create_pattern,
-        'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')
-        ]
-
     new_params['no_create_raw'] = True
     new_params['no_create_with_scope'] = True
     new_params['no_create_with_key_fields'] = True
     new_params['no_list_raw'] = True
+    new_params['sans_link_id_create'] = True
+    new_params['sans_link_id_list'] = True
 
     new_params['create_extra_dynafields'] = {
         'content': forms.fields.CharField(

@@ -355,6 +355,13 @@ class Checker(object):
       roles: a list of roles to check
     """
 
+    try:
+      # we need to check manually, as we must return True!
+      self.checkIsDeveloper(django_args)
+      return True
+    except out_of_band.Error:
+      pass
+
     for role in roles:
       try:
         checker_name, args = self.normalizeChecker(self.MEMBERSHIP[role])

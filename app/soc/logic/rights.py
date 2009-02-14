@@ -69,7 +69,7 @@ class Checker(object):
       'club': CLUB_MEMBERSHIP,
       'sponsor': SPONSOR_MEMBERSHIP,
       'program': PROGRAM_MEMBERSHIP,
-      'organization': ORGANIZATION_MEMBERSHIP,
+      'org': ORGANIZATION_MEMBERSHIP,
       'user': USER_MEMBERSHIP,
       }
 

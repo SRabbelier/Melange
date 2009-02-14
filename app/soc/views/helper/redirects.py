@@ -71,6 +71,22 @@ def getPublicRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
+def getListRedirect(entity, params):
+  """Returns the public redirect for the specified entity.
+  """
+
+  return '/%s/list/%s' % (
+      params['url_name'], entity.key().name())
+
+
+def getPublicListRedirect(entity, params):
+  """Returns the public redirect for the specified entity.
+  """
+
+  return '/%s/list_public/%s' % (
+      params['url_name'], entity.key().name())
+
+
 def getExportRedirect(entity, params):
   """Returns the export redirect for the specified entity.
   """

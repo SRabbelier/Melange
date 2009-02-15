@@ -22,17 +22,22 @@ __authors__ = [
   ]
 
 
+import datetime
 import itertools
 
-from google.appengine.ext.db import users
+from google.appengine.api import users
+from google.appengine.ext import db
 
 from soc.models.site import Site
 from soc.models.user import User
 from soc.models.sponsor import Sponsor
+from soc.models.host import Host
 from soc.models.program import Program
 from soc.models.timeline import Timeline
 from soc.models.org_app import OrgApplication
 from soc.models.organization import Organization
+from soc.models.org_admin import OrgAdmin
+from soc.models.mentor import Mentor
 from soc.models.notification import Notification
 
 
@@ -42,7 +47,10 @@ def seed(*args, **kwargs):
 
   account = users.get_current_user()
 
-  properties = {
+  if not account:
+    account = users.User(email='test@example.com')
+
+  user_properties = {
         'key_name': 'test',
         'link_id': 'test',
         'account': account,
@@ -50,10 +58,11 @@ def seed(*args, **kwargs):
         'name': 'Test',
         }
 
-  current_user = User(**properties)
+  current_user = User(**user_properties)
   current_user.put()
 
-  properties = {
+
+  group_properties = {
        'key_name': 'google',
        'link_id': 'google',
        'name': 'Google Inc.',
@@ -70,20 +79,45 @@ def seed(*args, **kwargs):
        'status': 'active',
        }
 
-  google = Sponsor(**properties)
+  google = Sponsor(**group_properties)
   google.put()
 
 
-  properties = {
+  role_properties = {
+      'key_name': 'google/test',
+      'link_id': 'test',
+      'scope': google,
+      'scope_path': 'google',
+      'user': current_user,
+      'given_name': 'Test',
+      'surname': 'Example',
+      'name_on_documents': 'Test Example',
+      'email': 'test@example.com',
+      'res_street': 'Some Street',
+      'res_city': 'Some City',
+      'res_state': 'Some State',
+      'res_country': 'United States',
+      'res_postalcode': '12345',
+      'phone': '1-555-BANANA',
+      'birth_date': db.DateProperty.now(),
+      'agreed_to_tos': True,
+      }
+
+
+  google_host = Host(**role_properties)
+  google_host.put()
+
+
+  timeline_properties = {
         'key_name': 'google/gsoc2009',
         'scope_path': 'google/gsoc2009',
         }
 
-  gsoc2009_timeline = Timeline(**properties)
+  gsoc2009_timeline = Timeline(**timeline_properties)
   gsoc2009_timeline.put()
 
 
-  properties = {
+  program_properties = {
       'key_name': 'google/gsoc2009',
       'link_id': 'gsoc2009',
       'scope_path': 'google',
@@ -99,10 +133,11 @@ def seed(*args, **kwargs):
       'status': 'visible',
       }
 
-  gsoc2009 = Program(**properties)
+  gsoc2009 = Program(**program_properties)
   gsoc2009.put()
 
-  properties = {
+
+  org_app_properties = {
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
     'applicant': current_user,
@@ -122,35 +157,42 @@ def seed(*args, **kwargs):
     }
 
   for i in range(15):
-    properties['key_name'] = 'google/gsoc2009/org_%d' % i
-    properties['link_id'] = 'org_%d' % i
-    properties['name'] = 'Organization %d' % i
-    entity = OrgApplication(**properties)
+    org_app_properties['key_name'] = 'google/gsoc2009/org_%d' % i
+    org_app_properties['link_id'] = 'org_%d' % i
+    org_app_properties['name'] = 'Organization %d' % i
+    entity = OrgApplication(**org_app_properties)
     entity.put()
 
-  properties = {
+
+  group_properties.update({
     'key_name': 'google/gsoc2009/melange',
     'link_id': 'melange',
     'name': 'Melange Development Team',
     'short_name': 'Melange',
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
-    'founder': current_user,
-    'contact_street': 'Some Street',
-    'contact_city': 'Some City',
-    'contact_country': 'United States',
-    'contact_postalcode': '12345',
-    'phone': '1-555-BANANA',
     'home_page': 'http://code.google.com/p/soc',
-    'email': 'ospo@google.com',
     'description': 'Melange, share the love!',
-    'status': 'active',
     'license_name': 'Apache License',
     'ideas': 'http://code.google.com/p/soc/issues',
-    }
+    })
 
-  melange = Organization(**properties)
+  melange = Organization(**group_properties)
   melange.put()
+
+
+  role_properties.update({
+      'key_name': 'google/gsoc2009/melange/test',
+      'link_id': 'test',
+      'scope_path': 'google/gsoc2009/melange',
+      'scope': melange,
+      })
+
+  melange_admin = OrgAdmin(**role_properties)
+  melange_admin.put()
+
+  melange_mentor = Mentor(**role_properties)
+  melange_mentor.put()
 
   return
 
@@ -161,10 +203,13 @@ def clear(*args, **kwargs):
 
   entities = itertools.chain(*[
       Notification.all(),
+      Mentor.all(),
+      OrgAdmin.all(),
       Organization.all(),
       OrgApplication.all(),
       Timeline.all(),
       Program.all(),
+      Host.all(),
       Sponsor.all(),
       User.all(),
       Site.all(),

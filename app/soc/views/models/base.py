@@ -126,6 +126,45 @@ class View(object):
 
   @decorators.merge_params
   @decorators.check_access
+  def admin(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Displays the admin page for the entity specified by **kwargs.
+
+    Params usage:
+      rights: The rights dictionary is used to check if the user has
+        the required rights to view the public page for this entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      name: The name value is used to set the entity_type in the
+        context so that the template can refer to it.
+      public_template: The public_template value is used as template
+        to display the public page of the found entity.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # create default template context for use with any templates
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(error, request, context=context)
+
+    form = params['admin_form'](instance=entity)
+    template = params['admin_template']
+
+    return self._constructResponse(request, entity, context, form,
+                                   params, template=template)
+
+  @decorators.merge_params
+  @decorators.check_access
   def export(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Displays the export page for the entity specified by **kwargs.

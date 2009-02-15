@@ -27,6 +27,7 @@ from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic import accounts
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
@@ -127,7 +128,10 @@ class View(group.View):
     """
 
     new_params = {}
-    new_params['list_action'] = (redirects.getPublicRedirect, params)
+    if accounts.isDeveloper():
+      new_params['list_action'] = (redirects.getAdminRedirect, params)
+    else:
+      new_params['list_action'] = (redirects.getPublicRedirect, params)
     # safe to merge them the wrong way around because of @merge_params
     params = dicts.merge(new_params, params)
 

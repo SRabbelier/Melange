@@ -43,8 +43,13 @@ from soc.views.models import timeline
 from soc.views.models import user
 from soc.views.models import user_self
 
+from soc.views.models import role
+
 from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap
+
+
+# TODO: instead of commenting out club stuff, make it depend on a setting
 
 
 sidebar.addMenu(user_self.view.getSidebarMenus)
@@ -86,6 +91,12 @@ sitemap.addPages(sponsor.view.getDjangoURLPatterns())
 sitemap.addPages(timeline.view.getDjangoURLPatterns())
 sitemap.addPages(user_self.view.getDjangoURLPatterns())
 sitemap.addPages(user.view.getDjangoURLPatterns())
+
+#role.addRole(club_admin.view)
+#role.addRole(club_member.view)
+role.addRole(host.view)
+role.addRole(org_admin.view)
+role.addRole(mentor.view)
 
 
 def getPatterns():

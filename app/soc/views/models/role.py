@@ -45,6 +45,19 @@ import soc.views.helper.responses
 import soc.views.helper.widgets
 
 
+ROLE_VIEWS = {}
+
+
+def addRole(view):
+  """Adds the specified view to the known role views.
+  """
+
+  global ROLE_VIEWS
+  params = view.getParams()
+  name = params['url_name']
+  ROLE_VIEWS[name] = view
+
+
 class View(base.View):
   """Views for all entities that inherit from Role.
 

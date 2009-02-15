@@ -116,6 +116,21 @@ def readonly_multiline_field_as_table_row(field_label, field_value):
           'field_value': field_value}
 
 
+@register.inclusion_tag('soc/templatetags/_as_readonly_table.html',
+                        takes_context=True)
+def as_readonly_table(context, form):
+  """Outputs a form as a properly formatted html table.
+
+  Args:
+    form: the form that should be converted to a table
+  """
+
+  # create the bound fields
+  fields = [forms_in.BoundField(form, field, name) for name, field in
+            form.fields.items() if field]
+
+  return {'fields': fields}
+
 @register.inclusion_tag('soc/templatetags/_as_table.html', takes_context=True)
 def as_table(context, form):
   """Outputs a form as a properly formatted html table.

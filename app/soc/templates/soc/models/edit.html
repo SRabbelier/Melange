@@ -29,6 +29,11 @@ limitations under the License.
 Please use this form to edit the {{ entity_type }}.
 {% endblock %}
 </p>
+
+{% if error_message %}
+  <div class="error">{{ error_message|safe }}</div>
+{% endif %}
+
 <form method="POST">
   <table>
     {% block form_table %}
@@ -41,9 +46,11 @@ Please use this form to edit the {{ entity_type }}.
   </tr>
   <tr>
     {% block submit_buttons %}
+    {% block save_button %}
    <td> 
     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
    </td>
+   {% endblock %}
    <td>
    {% if edit_cancel_redirect %}
    <input type="button" onclick="location.href='{{ edit_cancel_redirect }}'" value="Cancel"/>

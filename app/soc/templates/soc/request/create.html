@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/models/edit.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,44 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
 
-{% block header_title %}
-{{ page_name }}
-{% endblock %}
-
-{% block body %}
-<p>
-<p>
 {% block instructions %}
-{{instruction_message}}
+{{ instruction_message }}
 {% endblock %}
-{% if error_message %}
- <div class="error">
- {{error_message|safe}}
- </div>
-{% endif %}
-</p>
-<form method="POST">
-  <table>
-    {% block form_table %}
-      {% as_table form %}
-    {% endblock form_table %}
-  </table>
-  <table>
-  <tr>
-   <td colspan="4">&nbsp;</td>
-  </tr>
-  <tr>
-    {% block submit_buttons %}
+
+{% block save_button %}
    <td> 
     <input style="font-weight: bold" type="submit" value="Submit"/></span>
    </td>
-   <td>
-   <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
-   </td>
- </table>
-</form>
-</p>
-{% endblock submit_buttons %}
-{% endblock body %}
+{% endblock %}

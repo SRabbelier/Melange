@@ -1,4 +1,4 @@
-{% extends "soc/base.html" %}
+{% extends "soc/models/edit.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,16 +21,7 @@ limitations under the License.
 	<script type="text/javascript" src="/soc/content/js/map-090201.js"></script>
 {% endif %}
 {% endblock %}
-{% block header_title %}
-{{ page_name }}
- {% if entity %}
-   <!-- TODO(srabbelier) use a generic entity name as link -->
-   <a href="/{{ entity_type_url|lower }}/show/{{ entity_suffix }}"
->{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
- {% endif %}
-{% endblock %}
 
-{% block body %}
 {% block body_tag %}
   {% if gmaps_api_key %}
     <body onLoad="role_profile_gmap.map_load()" onunload="GUnload()">
@@ -38,20 +29,16 @@ limitations under the License.
     {{ block.super }}
   {% endif %}
 {% endblock %}
-<p>
-<p>
+
 {% block instructions %}
-Please use this form to edit the {{ entity_type }}.
+{{ block.super }}
 {% if not gmaps_api_key %}
 <br /><span class="error">Google Maps API key not present. Please login as administrator and insert your key in Site Settings, Google Maps field.</span>
 {% endif %}
 {% endblock %}
-</p>
-<form method="POST">
-  <table>
-    {% block form_table %}
-      {% as_table form %}
-    {% endblock %}
+
+{% block form_table %}
+{{ block.super }}
     {% if gmaps_api_key %}
     <tr title="your location">
       <td class="formfieldlabel">
@@ -65,27 +52,4 @@ Please use this form to edit the {{ entity_type }}.
       <td></td>
     </tr>
     {% endif %}
-  </table>
-  <table>
-  <tr>
-   <td colspan="4">&nbsp;</td>
-  </tr>
-  <tr>
-    {% block submit_buttons %}
-   <td> 
-    <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
-   </td>
-   <td>
-    <input type="button" onclick="location.href='/'" value="Cancel"/>
-   </td>
-   {% if entity %}
-   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
-   </td>
-   {% endif %}
-   {% endblock %}
-  </tr>
- </table>
-</form>
-</p>
 {% endblock %}

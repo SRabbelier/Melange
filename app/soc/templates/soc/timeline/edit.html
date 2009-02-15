@@ -16,11 +16,5 @@ limitations under the License.
 {% block instructions %}
 {{ block.super }} Note that all times are in UTC.
 {% endblock %}
-{% block submit_buttons %}
-<td> 
- <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
-</td>
-<td>
- <input type="button" onclick="location.href='/'" value="Cancel"/>
-</td>
-{% endblock %}
+
+{% block delete_button %}{% endblock %}

@@ -14,7 +14,13 @@ limitations under the License.
 {% endcomment %}
 
 {% block body %}
-<span id="acceptance_text">If you want to accept all pre-accepted organizations please <button id="button_accept" onclick="javascript:acceptOrgInit();">click here</button></span><span class="progressBar" style="display:none;" id="applications_progress_bar"></span><span id="description_progressbar"></span><span id="description_done"></span>
+<span id="acceptance_text">
+  If you want to accept all pre-accepted organizations please 
+  <button id="button_accept" onclick="javascript:acceptOrgInit();">click here</button>
+</span>
+<span class="progressBar" style="display:none;" id="applications_progress_bar"></span>
+<span id="description_progressbar"></span><span id="description_done"></span>
+
 {{ block.super}}
 
 {% endblock %}

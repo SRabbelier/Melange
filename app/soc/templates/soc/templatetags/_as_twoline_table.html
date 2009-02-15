@@ -14,6 +14,10 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
-{% block fields_loop %}
-  {% as_twoline_table_row field required example_text reference %}
+{% block main_fields_loop %}
+  {% as_twoline_table_row item %}
+{% endblock %}
+
+{% block grouped_fields_loop %}
+  {% as_twoline_table_row item %}
 {% endblock %}

@@ -26,10 +26,29 @@ limitations under the License.
 </ul>
 {% endif %}
 
-{% for field, required, example_text, reference in fields %}
-  {% block fields_loop %}
-    {% as_table_row field required example_text reference %}
-  {% endblock %}
+{% regroup fields by group as grouped_fields %}
+
+{% for grouped_field in grouped_fields %}
+  {% ifequal grouped_field.grouper 'main' %}
+    <tr><td class="grouptitle">General</td></tr>
+    {% for item in grouped_field.list %}
+      {% block main_fields_loop %}
+      {% as_table_row item %}
+      {% endblock %}
+    {% endfor %}
+  {% endifequal %}
+{% endfor %}
+
+{% for grouped_field in grouped_fields %}
+  {% ifnotequal grouped_field.grouper 'main' %}
+  <tr><td>&nbsp;</td></tr>
+  <tr><td class="grouptitle">{{ grouped_field.grouper }}</td></tr>
+  {% for item in grouped_field.list %}
+    {% block grouped_fields_loop %}
+      {% as_table_row item %}
+    {% endblock %}
+  {% endfor %}
+  {% endifnotequal %}
 {% endfor %}
 
 {% for field in  hidden_fields %}

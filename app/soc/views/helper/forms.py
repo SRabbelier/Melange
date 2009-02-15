@@ -65,20 +65,17 @@ class BaseForm(djangoforms.ModelForm):
       if hasattr(self.Meta.model, field_name):
         model_prop = getattr(self.Meta.model, field_name)
 
-        # Check if the Model property defined verbose_name, and copy that
-        # verbatim to the corresponding field label.
         if hasattr(model_prop, 'verbose_name'):
           self.fields[field_name].label = model_prop.verbose_name
 
-        # Check if the Model property added help_text, and copy that verbatim
-        # to the corresponding field help_text.
         if hasattr(model_prop, 'help_text'):
           self.fields[field_name].help_text = model_prop.help_text
 
-        # Check if the Model property added example_text, and copy that verbatim
-        # to the corresponding field help_text.
         if hasattr(model_prop, 'example_text'):
           self.fields[field_name].example_text = model_prop.example_text
+
+        if hasattr(model_prop, 'group'):
+          self.fields[field_name].group = model_prop.group
 
 
 class SelectQueryArgForm(forms.Form):

@@ -120,7 +120,7 @@ def getUniversalContext(request):
   context['gae_version'] = system.getAppVersion()
 
   settings = site.logic.getSingleton()
-  
+
   if settings:
     context['ga_tracking_num'] = settings.ga_tracking_num
     context['gmaps_api_key'] = settings.gmaps_api_key
@@ -128,6 +128,12 @@ def getUniversalContext(request):
  
   return context
 
+def useJavaScript(context, uses):
+  """Updates the context for JavaScript usage.
+  """
+
+  for use in uses:
+    context['uses_%s' % use] = True
 
 def redirectToChangedSuffix(
     request, old_suffix, new_suffix=None, params=None):

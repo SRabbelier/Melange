@@ -41,7 +41,6 @@ from soc.views import sitemap
 import soc.logic
 import soc.logic.lists
 import soc.views.helper.lists
-import soc.views.helper.responses
 import soc.views.helper.params
 
 
@@ -103,6 +102,7 @@ class View(object):
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     entity = None
 
@@ -151,6 +151,7 @@ class View(object):
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     try:
@@ -200,6 +201,7 @@ class View(object):
 
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     entity = None
 
@@ -294,6 +296,7 @@ class View(object):
     """
 
     context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     entity = None
 
@@ -487,6 +490,7 @@ class View(object):
 
     context = dicts.merge(context,
         helper.responses.getUniversalContext(request))
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     context['list'] = soc.logic.lists.Lists(contents)
 
@@ -523,11 +527,6 @@ class View(object):
         redirect to after having successfully deleted the entity.
     """
 
-    # create default template context for use with any templates
-    context = helper.responses.getUniversalContext(request)
-    context['page_name'] = page_name
-    entity = None
-
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
@@ -537,11 +536,7 @@ class View(object):
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
       return helper.responses.errorResponse(
-          error, request, template=params['error_edit'], context=context)
-
-    if not entity:
-      #TODO: Create a proper error page for this
-      return http.HttpResponseRedirect('/')
+          error, request, template=params['error_edit'])
 
     if not self._logic.isDeletable(entity):
       # TODO: Update the notice area telling the user that they

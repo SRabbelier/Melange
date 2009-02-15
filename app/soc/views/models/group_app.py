@@ -240,11 +240,6 @@ class View(base.View):
     For params see base.View.public().
     """
 
-    # create default template context for use with any templates
-    context = responses.getUniversalContext(request)
-    context['page_name'] = page_name
-    entity = None
-
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:

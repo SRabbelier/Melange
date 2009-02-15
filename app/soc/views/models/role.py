@@ -128,6 +128,7 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
+
     new_params['create_template'] = 'soc/role/edit.html'
     new_params['edit_template'] = 'soc/role/edit.html'
 
@@ -169,6 +170,7 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     context['instruction_message'] = (self.DEF_INVITE_INSTRUCTION_MSG_FMT %
         params)
@@ -296,6 +298,7 @@ class View(base.View):
 
      # get the context for this webpage
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     if request.method == 'POST':
@@ -399,6 +402,7 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     logic = params['logic']
@@ -452,6 +456,7 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     context['instruction_message'] = (self.DEF_REQUEST_INSTRUCTION_MSG_FMT %
         params)
@@ -557,6 +562,7 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     # get the request entity using the information from kwargs

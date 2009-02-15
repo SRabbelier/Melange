@@ -47,6 +47,23 @@ DEF_SUBMIT_MSG_PARAM_NAME = 's'
 DEF_SUBMIT_MSG_PROFILE_SAVED = 0
 
 
+# list with all js scripts used for documentary purposes
+DEF_JS_USES_LIST = [
+    'jq',
+    'jq_ajaqQueue',
+    'jq_autocomplete',
+    'jq_bgiframe',
+    'jq_bt',
+    'jq_datetimepicker',
+    'jq_progressbar',
+    'jq_thickbox',
+    'jq_ui_core',
+    'menu',
+    'orgaccept',
+    'tinymce',
+    ]
+
+
 def constructParams(params):
   """Constructs a new params dictionary based on params.
 
@@ -186,6 +203,13 @@ def constructParams(params):
   new_params['invite_template'] = 'soc/models/invite.html'
 
   new_params['export_content_type'] = None
+
+  # TODO: Use only the js modules needed instead of js_uses_all
+  new_params['js_uses_all'] = DEF_JS_USES_LIST
+  new_params['js_uses_list'] = ['jq', 'menu']
+  new_params['js_uses_show'] = ['jq', 'menu']
+  new_params['js_uses_edit'] = ['jq', 'menu', 'tinymce', 'jq_bt',
+                                'jq_autocomplete']
 
   new_params['error_public'] = 'soc/%(module_name)s/error.html' % params
   new_params['error_export'] = new_params['error_public']

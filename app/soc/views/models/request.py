@@ -144,7 +144,8 @@ class View(base.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
-    
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+
     request_logic = params['logic']
 
     # get the request entity using the information from kwargs

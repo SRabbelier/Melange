@@ -697,7 +697,8 @@ class View(object):
 
     pass
 
-  def _constructResponse(self, request, entity, context, form, params):
+  def _constructResponse(self, request, entity, context,
+                         form, params, template=None):
     """Updates the context and returns a response for the specified arguments.
 
     Args:
@@ -706,6 +707,7 @@ class View(object):
       context: the context to be used
       form: the form that will be used and set in the context
       params: a dict with params for this View
+      template: if specified, this template is
 
     Params usage:
       name: The name_plural value is used to set the entity_type
@@ -735,10 +737,11 @@ class View(object):
     if params.get('export_content_type') and entity:
       context['export_link'] = redirects.getExportRedirect(entity, params)
 
-    if entity:
-      template = params['edit_template']
-    else:
-      template = params['create_template']
+    if not template:
+      if entity:
+        template = params['edit_template']
+      else:
+        template = params['create_template']
 
     self._editContext(request, context)
     return helper.responses.respond(request, template, context)

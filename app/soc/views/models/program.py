@@ -28,9 +28,9 @@ from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models.document import logic as document_logic
 from soc.logic.models import host as host_logic
 from soc.logic.models import program as program_logic
+from soc.logic.models.document import logic as document_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -207,7 +207,7 @@ class View(presence_with_tos.View):
 
         items += [(redirects.getReviewOverviewRedirect(
             entity, {'url_name': 'org_app'}),
-            "Review Org Applications", 'any_access')]
+            "Review Organization Applications", 'any_access')]
         # add link to edit Program Profile
         items += [(redirects.getEditRedirect(entity, params),
             'Edit Program Profile','any_access')]
@@ -249,11 +249,11 @@ class View(presence_with_tos.View):
           "Apply to become an Organization", 'any_access')]
 
       if user:
-        # add the 'List my Org Applications' link
+        # add the 'List my Organization Applications' link
         items += [
             (redirects.getListSelfRedirect(program_entity, 
                                            {'url_name' : 'org_app'}),
-             "List my Org Applications", 'any_access')]
+             "List My Organization Applications", 'any_access')]
 
     return items
 

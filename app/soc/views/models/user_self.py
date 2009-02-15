@@ -46,6 +46,7 @@ from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import user as user_view
+from soc.views.models import role as role_view
 
 import soc.models.user
 
@@ -53,6 +54,8 @@ import soc.models.user
 class View(base.View):
   """Views for User own profiles.
   """
+
+  DEF_ROLE_LIST_MSG_FMT = ugettext("An overview of your roles as %(name)s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -68,6 +71,7 @@ class View(base.View):
     rights['create_profile'] = ['checkIsUnusedAccount']
     rights['edit_profile'] = ['checkHasUserEntity']
     rights['roles'] = ['checkIsUser']
+    rights['requests'] = ['checkIsUser']
     rights['signIn'] = ['checkNotLoggedIn']
     rights['notification'] = ['checkIsUser']
 
@@ -105,6 +109,7 @@ class View(base.View):
         ('/' + new_params['url_name'] + '/create_profile', 'Create Profile', 'create_profile'),
         ('/' + new_params['url_name'] + '/edit_profile', 'Edit Profile', 'edit_profile'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
+        ('/' + new_params['url_name'] + '/requests', 'Requests', 'requests'),
         ]
 
     patterns = []
@@ -119,6 +124,10 @@ class View(base.View):
 
     page_name = ugettext("List of your roles")
     patterns += [(r'^%(url_name)s/(?P<access_type>roles)$',
+                   'soc.views.models.user_self.roles', page_name)]
+
+    page_name = ugettext("List of your requests")
+    patterns += [(r'^%(url_name)s/(?P<access_type>requests)$',
                    'soc.views.models.request.list_self', page_name)]
 
     new_params['django_patterns_defaults'] = patterns
@@ -126,7 +135,6 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -147,7 +155,6 @@ class View(base.View):
 
     return self.edit(request, access_type,
          page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
-
 
   def editGet(self, request, entity, context, seed, params=None):
     """Overwrite so we can add the contents of the ToS.
@@ -187,7 +194,6 @@ class View(base.View):
 
     return super(View, self).editPost(request, entity, context, params=params)
 
-
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -213,6 +219,42 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def roles(self, request, access_type,
+               page_name=None, params=None, **kwargs):
+    """Displays the unhandled requests for this user.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: not used
+    """
+
+    user = user_logic.getForCurrentAccount()
+
+
+    # only select the roles for the current user
+    filter = {
+        'link_id': user.link_id,
+        }
+
+    contents = []
+
+    i = 0
+
+    for name, view in sorted(role_view.ROLE_VIEWS.iteritems()):
+      params = view.getParams().copy()
+      params['list_action'] = (redirects.getEditRedirect, params)
+      params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % params
+
+      list = helper.lists.getListContent(request, params, filter, i)
+      contents.append(list)
+      i += 1
+
+    return self._list(request, params, contents, page_name)
 
   def getSidebarMenus(self, id, user, params=None):
     """See base.View.getSidebarMenus().
@@ -253,4 +295,4 @@ view = View()
 create = view.create
 edit = view.editProfile
 export = view.export
-
+roles = view.roles

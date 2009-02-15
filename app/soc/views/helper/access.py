@@ -103,7 +103,7 @@ DEF_NEED_PICK_ARGS_MSG = ugettext(
     'The "continue" and "field" args are not both present.')
 
 DEF_REVIEW_COMPLETED_MSG = ugettext(
-    'This Application can not be reviewed anymore (it has been completed or rejected)')
+    'This Application can not be reviewed anymore (it has been completed or rejected).')
 
 DEF_REQUEST_COMPLETED_MSG = ugettext(
     'This request cannot be accepted (it is either completed or denied).')
@@ -115,19 +115,19 @@ DEF_NO_LIST_ACCESS_MSG = ugettext(
     'You do not have the required rights to list documents for this scope and prefix.')
 
 DEF_PAGE_DENIED_MSG = ugettext(
-    'Access to this page has been restricted')
+    'Access to this page has been restricted.')
 
 DEF_PREFIX_NOT_IN_ARGS_MSG = ugettext(
-    'A required GET url argument ("prefix") was not specified')
+    'A required GET url argument ("prefix") was not specified.')
 
 DEF_PAGE_INACTIVE_MSG = ugettext(
-    'This page is inactive at this time')
+    'This page is inactive at this time.')
 
 DEF_LOGOUT_MSG_FMT = ugettext(
-    'Please <a href="%(sign_out)s">sign out</a> in order to view this page')
+    'Please <a href="%(sign_out)s">sign out</a> in order to view this page.')
 
 DEF_GROUP_NOT_FOUND_MSG = ugettext(
-    'The requested Group can not be found')
+    'The requested Group can not be found.')
 
 DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'

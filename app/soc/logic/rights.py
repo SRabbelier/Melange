@@ -24,6 +24,7 @@ __authors__ = [
 
 from soc.logic import dicts
 
+
 class Checker(object):
   """Checker class that maps from prefix and status to membership.
   """

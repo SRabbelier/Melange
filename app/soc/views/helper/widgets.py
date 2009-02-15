@@ -37,14 +37,28 @@ from soc.logic import dicts
 class ReadOnlyInput(forms.widgets.Input):
   """Read only input widget.
   """
+
   input_type = 'text'
 
   def render(self, name, value, attrs=None):
     """Render ReadOnlyInput widget as HTML.
     """
+
     attrs['readonly'] = 'readonly'
     attrs['class'] = 'plaintext'
+
     return super(ReadOnlyInput, self).render(name, value, attrs)
+
+
+class PlainTextWidget(forms.widgets.Widget):
+  """Read only input widget.
+  """
+
+  def render(self, name, value, attrs=None):
+    """Render ReadOnlyInput widget as HTML.
+    """
+
+    return str(value) if value else ""
 
 
 class FullTinyMCE(forms.widgets.Textarea):

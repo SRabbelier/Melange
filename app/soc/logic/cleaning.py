@@ -30,8 +30,8 @@ from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext
 
-from soc.logic import validate
 from soc.logic import rights as rights_logic
+from soc.logic import validate
 from soc.logic.models import site as site_logic
 from soc.logic.models import user as user_logic
 from soc.models import document as document_model

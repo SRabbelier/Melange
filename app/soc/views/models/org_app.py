@@ -217,6 +217,7 @@ class View(group_app.View):
 
 view = View()
 
+admin = view.admin
 bulk_accept = view.bulkAccept
 create = view.create
 delete = view.delete

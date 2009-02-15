@@ -128,6 +128,8 @@ def constructParams(params):
   new_params['django_patterns_defaults'] = [
       (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
+      (r'^%(url_name)s/(?P<access_type>admin)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.admin', 'Show %(name_short)s (admin)'),
       (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.export', 'Export %(name_short)s'),
       (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
@@ -177,6 +179,7 @@ def constructParams(params):
   new_params['export_template'] = 'soc/%(module_name)s/export.html' % params
   new_params['create_template'] = 'soc/models/edit.html'
   new_params['edit_template'] = 'soc/models/edit.html'
+  new_params['admin_template'] = 'soc/models/admin.html'
   new_params['list_template'] = 'soc/models/list.html'
   new_params['invite_template'] = 'soc/models/invite.html'
 

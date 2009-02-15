@@ -129,6 +129,7 @@ class View(group.View):
 
 view = View()
 
+admin = view.admin
 create = view.create
 delete = view.delete
 edit = view.edit

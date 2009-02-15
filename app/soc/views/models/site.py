@@ -168,6 +168,7 @@ class View(presence_with_tos.View):
 
 view = View()
 
+admin = view.admin
 create = view.create
 edit = view.edit
 delete = view.delete

@@ -119,6 +119,7 @@ class View(role.View):
 view = View()
 
 accept_invite = view.acceptInvite
+admin = view.admin
 create = view.create
 delete = view.delete
 edit = view.edit

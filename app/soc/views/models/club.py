@@ -205,6 +205,7 @@ class View(group.View):
 
 view = View()
 
+admin = view.admin
 applicant = view.applicant
 apply_member = view.applyMember
 create = view.create

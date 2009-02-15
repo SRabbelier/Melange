@@ -116,6 +116,7 @@ class View(base.View):
 
 view = View()
 
+admin = view.admin
 create = view.create
 delete = view.delete
 edit = view.edit

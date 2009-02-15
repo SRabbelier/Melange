@@ -201,6 +201,8 @@ class View(base.View):
 
 
 view = View()
+
+admin = view.admin
 create = view.create
 edit = view.edit
 delete = view.delete

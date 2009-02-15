@@ -216,6 +216,7 @@ class View(group.View):
 
 view = View()
 
+admin = view.admin
 applicant = view.applicant
 create = view.create
 delete = view.delete

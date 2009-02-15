@@ -44,7 +44,8 @@ class View(role.View):
   """
 
   DEF_ALREADY_AGREED_MSG = ugettext(
-      "You already agreed to the Agreement when applying")
+      "You have already accepted this agreement when submitting "
+      "the organization application.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class

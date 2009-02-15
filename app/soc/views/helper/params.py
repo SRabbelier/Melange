@@ -32,6 +32,7 @@ from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import dynaform
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 
 
 DEF_LIST_DESCRIPTION_FMT = ugettext(
@@ -241,6 +242,9 @@ def constructParams(params):
   if not 'edit_form' in params:
     params['edit_form'] = getEditForm(params, params['create_form'])
 
+  if not 'admin_form' in params:
+    params['admin_form'] = getAdminForm(params['edit_form'])
+
   if not 'key_fields_pattern' in params:
     params['key_fields_pattern'] = getKeyFieldsPattern(params)
 
@@ -298,6 +302,24 @@ def getEditForm(params, base_form):
     )
 
   return edit_form
+
+
+def getAdminForm(base_form):
+  """Constructs a new AdminForm from base_form.
+  """
+
+  # extend to do a proper copy
+  admin_form = dynaform.extendDynaForm(
+    dynaform = base_form,
+    )
+
+  # replace all widgets with PTW's
+  for key, value in admin_form.base_fields.iteritems():
+    if not isinstance(value, forms.fields.Field):
+      continue
+    value.widget = widgets.PlainTextWidget()
+
+  return admin_form
 
 
 def getKeyFieldsPattern(params):

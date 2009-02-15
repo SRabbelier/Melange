@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import copy
+
 from django import forms
 from django.utils.translation import ugettext
 
@@ -311,15 +313,15 @@ def getAdminForm(base_form):
   """Constructs a new AdminForm from base_form.
   """
 
-  # extend to do a proper copy
-  admin_form = dynaform.extendDynaForm(
-    dynaform = base_form,
-    )
+  # extend _and_ deepcopy the base_fields to do a proper copy
+  admin_form = dynaform.extendDynaForm(dynaform = base_form)
+  admin_form.base_fields = copy.deepcopy(admin_form.base_fields)
 
   # replace all widgets with PTW's
   for key, value in admin_form.base_fields.iteritems():
     if not isinstance(value, forms.fields.Field):
       continue
+
     value.widget = widgets.PlainTextWidget()
 
   return admin_form

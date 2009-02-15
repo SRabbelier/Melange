@@ -183,7 +183,7 @@ class View(group_app.View):
 
     program_entity = program_logic.logic.getFromKeyName(kwargs['scope_path'])
 
-    # get all pre-accepted org applications for the given program
+    # get all pre-accepted organization applications for the given program
     filter = {'scope' : program_entity,
               'status' : 'pre-accepted'}
     org_app_entities = org_app_logic.logic.getForFields(filter=filter)
@@ -209,9 +209,13 @@ class View(group_app.View):
     template = 'soc/json.html'
 
     response = responses.respond(request, template, context)
-    # TODO IE7 seems to ignore the headers
+    
+    # if the browser supports HTTP/1.1
+    # post-check and pre-check and no-store for IE7
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
+    # if the browser supports HTTP/1.0
     response['Pragma'] = 'no-cache'
-    response['Cache-Control'] = 'no-cache, must-revalidate'
+    
     return response
 
 

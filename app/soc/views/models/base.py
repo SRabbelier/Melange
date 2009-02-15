@@ -35,6 +35,7 @@ from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import forms
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views import sitemap
 
 import soc.logic
@@ -623,9 +624,12 @@ class View(object):
     template = 'soc/json.html'
 
     response = responses.respond(request, template, context)
-    # TODO IE7 seems to ignore the headers
+    # if the browser supports HTTP/1.1
+    # post-check and pre-check and no-store for IE7
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
+    # if the browser supports HTTP/1.0
     response['Pragma'] = 'no-cache'
-    response['Cache-Control'] = 'no-cache, must-revalidate'
+    
     return response
 
   def _editPost(self, request, entity, fields):

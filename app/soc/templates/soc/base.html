@@ -17,8 +17,15 @@ limitations under the License.
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
 	{% block stylesheet %}
   <link rel="stylesheet" href="/soc/content/css/soc-090120.css" type="text/css"/>
+  {% if uses_jq_autocomplete %}
   <link rel="stylesheet" href="/soc/content/css/jquery-autocomplete.css" type="text/css"/>
+  {% endif %}
+  {% if uses_jq_thickbox %}
   <link rel="stylesheet" href="/soc/content/css/jquery-thickbox.css" type="text/css"/>
+  {% endif %}
+  {% if uses_jq_datetimepicker %}
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.datetimepicker.css">
+  {% endif %}
 	{% endblock %}
   <title>
     {% block page_title %}
@@ -29,16 +36,51 @@ limitations under the License.
       {% endif %}
     {% endblock %}
   </title>
-	<script src="/jquery/jquery-1.2.6.js"></script>
-	<script src="/jquery/jquery-bt-0.7.js"></script>
-	<script src="/soc/content/js/menu-081108.js"></script>
-	<script src="/soc/content/js/tips-081027.js"></script>
-	<script type='text/javascript' src='/jquery/jquery-bgiframe.js'></script>
-	<script type='text/javascript' src='/jquery/jquery-ajaxQueue.js'></script>
-	<script type='text/javascript' src='/jquery/jquery-autocomplete.js'></script>
-	<script type='text/javascript' src='/jquery/jquery-thickbox.js'></script>
-	{% block scripts %}{% endblock %}
+
+{% block scripts %}
+  {% if uses_jq %}
+  <script type='text/javascript' src="/jquery/jquery-1.2.6.js"></script>
+  {% endif %}
+  {% if uses_jq_bt %}
+  <script type='text/javascript' src="/jquery/jquery-bt-0.7.js"></script>
+  {% endif %}
+  {% if uses_menu %}
+  <script type='text/javascript' src="/soc/content/js/menu-081108.js"></script>
+  {% endif %}
+  {% if uses_jq_bt %}
+  <script type='text/javascript' src="/soc/content/js/tips-081027.js"></script>
+  {% endif %}
+  {% if uses_jq_bgiframe %}
+  <script type='text/javascript' src='/jquery/jquery-bgiframe.js'></script>
+  {% endif %}
+  {% if uses_jq_ajaqQueue %}
+  <script type='text/javascript' src='/jquery/jquery-ajaxQueue.js'></script>
+  {% endif %}
+  {% if uses_jq_autocomplete %}
+  <script type='text/javascript' src='/jquery/jquery-autocomplete.js'></script>
+  {% endif %}
+  {% if uses_jq_thickbox %}
+  <script type='text/javascript' src='/jquery/jquery-thickbox.js'></script>
+  {% endif %}
+  {% if uses_tinymce %}
+  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+  {% endif %}
+  {% if uses_jq_progressbar %}
+  <script type="text/javascript" src="/jquery/jquery-progressbar.js"></script>
+  {% endif %}
+  {% if uses_orgaccept %}
+  <script type="text/javascript" src="/soc/content/js/org-accept.js"></script>
+  {% endif %}
+  {% if uses_jq_ui_core %}
+  <script type="text/javascript" src="/jquery/jquery-ui.core.js"></script>
+  {% endif %}
+  {% if uses_jq_datetimepicker %}
+  <script type="text/javascript" src="/jquery/jquery-ui.datetimepicker.js"></script>
+  <script type="text/javascript" src="/soc/content/js/datetime-loader.js"></script>
+  {% endif %}
  </head>
+{% endblock %}
+
 {% block body_tag %}
  <body>
 {% endblock %}

@@ -15,7 +15,7 @@ limitations under the License.
 {% load forms_helpers %}
 
 {% block scripts %}
-	<script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+{{ block.super }}
 {% if gmaps_api_key %}
 	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ gmaps_api_key }}" type="text/javascript"></script>
 	<script type="text/javascript" src="/soc/content/js/map-090201.js"></script>

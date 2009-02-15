@@ -14,20 +14,11 @@ limitations under the License.
 {% endcomment %}
 
 {% block scripts %}
+{{ block.super }}
 {% if entity.feed_url %}
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="/soc/content/js/blog-081117.js"></script>
-    <script type="text/javascript">
-
-    google.load("feeds", "1");
-
-    function initialize() {
-      var blog = new BlogPreview(document.getElementById("blog"));
-      blog.show("{{ entity.feed_url }}", 3);
-    }
-    google.setOnLoadCallback(initialize);
-
-    </script>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="/soc/content/js/blog-081117.js"></script>
+  <script type="text/javascript" src="/soc/content/js/feed-loader.js"></script>
 {% endif %}
 {% endblock %}
 

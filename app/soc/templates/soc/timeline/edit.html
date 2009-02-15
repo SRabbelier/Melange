@@ -12,17 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% block scripts %}
-<script type="text/javascript" src="/jquery/jquery-ui.core.js"></script>
-<script type="text/javascript" src="/jquery/jquery-ui.datetimepicker.js"></script>
-<link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.datetimepicker.css">
-<script type="text/javascript" charset="utf-8">
-    $(function()
-    {
-		$('.datetime-pick').datetimepicker();
-    });
-</script>
-{% endblock %}
+
 {% block instructions %}
 {{ block.super }} Note that all times are in UTC.
 {% endblock %}

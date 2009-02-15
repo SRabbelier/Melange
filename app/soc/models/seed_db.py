@@ -1,3 +1,27 @@
+#!/usr/bin/python2.5
+#
+# Copyright 2008 the Melange authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Seeds or clears the datastore.
+"""
+
+__authors__ = [
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  ]
+
+
 import itertools
 
 from google.appengine.ext.db import users
@@ -8,6 +32,7 @@ from soc.models.sponsor import Sponsor
 from soc.models.program import Program
 from soc.models.timeline import Timeline
 from soc.models.org_app import OrgApplication
+from soc.models.organization import Organization
 from soc.models.notification import Notification
 
 
@@ -103,6 +128,30 @@ def seed(*args, **kwargs):
     entity = OrgApplication(**properties)
     entity.put()
 
+  properties = {
+    'key_name': 'google/gsoc2009/melange',
+    'link_id': 'melange',
+    'name': 'Melange Development Team',
+    'short_name': 'Melange',
+    'scope_path': 'google/gsoc2009',
+    'scope': gsoc2009,
+    'founder': current_user,
+    'contact_street': 'Some Street',
+    'contact_city': 'Some City',
+    'contact_country': 'United States',
+    'contact_postalcode': '12345',
+    'phone': '1-555-BANANA',
+    'home_page': 'http://code.google.com/p/soc',
+    'email': 'ospo@google.com',
+    'description': 'Melange, share the love!',
+    'status': 'active',
+    'license_name': 'Apache License',
+    'ideas': 'http://code.google.com/p/soc/issues',
+    }
+
+  melange = Organization(**properties)
+  melange.put()
+
   return
 
 
@@ -112,6 +161,7 @@ def clear(*args, **kwargs):
 
   entities = itertools.chain(*[
       Notification.all(),
+      Organization.all(),
       OrgApplication.all(),
       Timeline.all(),
       Program.all(),

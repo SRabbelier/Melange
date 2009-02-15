@@ -71,6 +71,14 @@ def getPublicRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
+def getAdminRedirect(entity, params):
+  """Returns the public redirect for the specified entity.
+  """
+
+  return '/%s/admin/%s' % (
+      params['url_name'], entity.key().name())
+
+
 def getListRedirect(entity, params):
   """Returns the public redirect for the specified entity.
   """

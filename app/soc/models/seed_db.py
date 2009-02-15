@@ -28,22 +28,33 @@ import itertools
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.models.site import Site
-from soc.models.user import User
-from soc.models.sponsor import Sponsor
+from soc.models.document import Document
 from soc.models.host import Host
-from soc.models.program import Program
-from soc.models.timeline import Timeline
-from soc.models.org_app import OrgApplication
-from soc.models.organization import Organization
-from soc.models.org_admin import OrgAdmin
 from soc.models.mentor import Mentor
 from soc.models.notification import Notification
+from soc.models.org_admin import OrgAdmin
+from soc.models.organization import Organization
+from soc.models.org_app import OrgApplication
+from soc.models.program import Program
+from soc.models.site import Site
+from soc.models.sponsor import Sponsor
+from soc.models.timeline import Timeline
+from soc.models.user import User
 
 
 def seed(*args, **kwargs):
   """Seeds the datastore with some default values.
   """
+
+
+  site_properties = {
+      'key_name': 'site',
+      'link_id': 'site',
+      }
+
+  site = Site(**site_properties)
+  site.put()
+
 
   account = users.get_current_user()
 
@@ -54,7 +65,6 @@ def seed(*args, **kwargs):
         'key_name': 'test',
         'link_id': 'test',
         'account': account,
-        'agreed_to_tos': True,
         'name': 'Test',
         }
 
@@ -194,6 +204,27 @@ def seed(*args, **kwargs):
   melange_mentor = Mentor(**role_properties)
   melange_mentor.put()
 
+
+  document_properties = {
+      'key_name': 'site/site/home',
+      'link_id': 'home',
+      'scope_path': 'site',
+      'scope': site,
+      'prefix': 'site',
+      'author': current_user,
+      'title': 'Home Page',
+      'short_name': 'Home',
+      'content': 'This is the Home Page',
+      'modified_by': current_user,
+      }
+
+  home_document = Document(**document_properties)
+  home_document.put()
+
+
+  site.home = home_document
+  site.put()
+
   return
 
 
@@ -213,6 +244,7 @@ def clear(*args, **kwargs):
       Sponsor.all(),
       User.all(),
       Site.all(),
+      Document.all(),
       ])
 
   for entity in entities:

@@ -129,14 +129,33 @@ def clean_existing_user(field_name):
   @check_field_is_empty(field_name)
   def wrapped(self):
     link_id = clean_link_id(field_name)(self)
-  
+
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
         unique=True)
-  
+
     if not user_entity:
       # user does not exist
       raise forms.ValidationError("This user does not exist.")
-  
+
+    return user_entity
+  return wrapped
+
+
+def clean_user_is_current(field_name):
+  """Check if the field_name value is a valid link_id and resembles the 
+     current user.
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapped(self):
+    link_id = clean_link_id(field_name)(self)
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    if not user_entity or user_entity.link_id != link_id:
+      # this user is not the current user
+      raise forms.ValidationError("This user is not you.")
+
     return user_entity
   return wrapped
 
@@ -149,14 +168,14 @@ def clean_user_not_exist(field_name):
   @check_field_is_empty(field_name)
   def wrapped(self):
     link_id = clean_link_id(field_name)(self)
-  
+
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
         unique=True)
-  
+
     if user_entity:
       # user exists already
       raise forms.ValidationError("There is already a user with this link id.")
-  
+
     return link_id
   return wrapped
 
@@ -168,16 +187,16 @@ def clean_users_not_same(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
-    
+
     clean_user_field = clean_existing_user(field_name)
     user_entity = clean_user_field(self)
-    
+
     current_user_entity = user_logic.logic.getForCurrentAccount()
-    
+
     if user_entity.key() == current_user_entity.key():
       # users are equal
       raise forms.ValidationError("You cannot enter yourself here.")
-    
+
     return user_entity
   return wrapped
 

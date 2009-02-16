@@ -7,7 +7,7 @@ function acceptOrgInit(bulk_accept_link) {
 	$.getJSON(bulk_accept_link,
 		function(data){
 			// If there are applications to accept...
-			if (data.nr_applications!=0) {
+			if (data.nr_applications != 0) {
 				//...then fade out the button, show the progress bar and call the function for acceptance
 				$("#button_accept").fadeOut("slow",
 					function() {
@@ -42,12 +42,12 @@ function acceptOrgs(data) {
 		var error_happened = false;
 
 		var application = data.applications[application_index];
-		var current_application = application_index+1;
+		var current_application = application_index + 1;
 		// regular expression to find a valid scope path inside matching parenthesis
 		var re = /\((\w*)\)/;
 		var scope_path = GLOBAL_LINK.match(re)[1];
 		// the URL is obtained by using the scope path found in the matching parenthesis
-		var url_to_call = GLOBAL_LINK.replace(re,eval("application."+scope_path));
+		var url_to_call = GLOBAL_LINK.replace(re, eval("application." + scope_path));
 		// now we can call the URL found
 		$.ajax({
 			async: false,
@@ -58,11 +58,11 @@ function acceptOrgs(data) {
 				if (data) {
 					// update progress bar percentage and description
 					var percentage = Math.floor(100 * (current_application) / (TOTAL_APPLICATIONS));
-					$("#description_progressbar").html(" Processed application "+application.name+" ("+(current_application)+"/"+TOTAL_APPLICATIONS+")");
+					$("#description_progressbar").html(" Processed application " + application.name + " (" + (current_application) + "/" + TOTAL_APPLICATIONS + ")");
 					$("#applications_progress_bar").progressBar(percentage);
 				}
 			},
-			error: function(XMLHttpRequest,textStatus,errorThrown) {
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
 				// if there is an error rename the button to Retry and show an error message
 				error_happened = true;
 				$("#button_accept").val("Retry");
@@ -75,8 +75,8 @@ function acceptOrgs(data) {
 		if (!error_happened) {
 			// prepare for new iteration and then recall this function
 			application_index++;
-			if (application_index<total_index) {
-				setTimeout(arguments.callee,0);
+			if (application_index < total_index) {
+				setTimeout(arguments.callee, 0);
 			}
 			else {
 				// all ok, tell the user we are done

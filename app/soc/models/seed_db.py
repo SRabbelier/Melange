@@ -167,9 +167,9 @@ def seed(*args, **kwargs):
     }
 
   for i in range(15):
-    org_app_properties['key_name'] = 'google/gsoc2009/org_%d' % i
-    org_app_properties['link_id'] = 'org_%d' % i
-    org_app_properties['name'] = 'Organization %d' % i
+    org_app_properties['key_name'] = 'google/gsoc2009/wannabee_%d' % i
+    org_app_properties['link_id'] = 'wannabe_%d' % i
+    org_app_properties['name'] = 'Wannabe %d' % i
     entity = OrgApplication(**org_app_properties)
     entity.put()
 
@@ -189,6 +189,19 @@ def seed(*args, **kwargs):
 
   melange = Organization(**group_properties)
   melange.put()
+
+
+  for i in range(15):
+    group_properties.update({
+        'key_name': 'google/gsoc2009/org_%d' % i,
+        'link_id': 'org_%d' % i,
+        'name': 'Organization %d' % i,
+        'short_name': 'Org %d' % i,
+        'description': 'Organization %d!' % i,
+        })
+
+    entity = Organization(**group_properties)
+    entity.put()
 
 
   role_properties.update({

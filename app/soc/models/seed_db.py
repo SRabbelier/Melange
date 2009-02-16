@@ -147,6 +147,30 @@ def seed(*args, **kwargs):
   gsoc2009.put()
 
 
+  timeline_properties = {
+        'key_name': 'google/ghop2009',
+        'scope_path': 'google/ghop2009',
+        }
+
+  ghop2009_timeline = Timeline(**timeline_properties)
+  ghop2009_timeline.put()
+
+
+  program_properties.update({
+      'key_name': 'google/ghop2009',
+      'link_id': 'ghop2009',
+      'name': 'Google Highly Open Participation Contest 2009',
+      'short_name': 'GHOP 2009',
+      'group_label': 'GHOP',
+      'description': 'This is the program for GHOP 2009.',
+      'workflow': 'ghop',
+      'timeline': ghop2009_timeline,
+      })
+
+  ghop2009 = Program(**program_properties)
+  ghop2009.put()
+
+
   org_app_properties = {
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
@@ -175,12 +199,12 @@ def seed(*args, **kwargs):
 
 
   group_properties.update({
-    'key_name': 'google/gsoc2009/melange',
+    'key_name': 'google/ghop2009/melange',
     'link_id': 'melange',
     'name': 'Melange Development Team',
     'short_name': 'Melange',
-    'scope_path': 'google/gsoc2009',
-    'scope': gsoc2009,
+    'scope_path': 'google/ghop2009',
+    'scope': ghop2009,
     'home_page': 'http://code.google.com/p/soc',
     'description': 'Melange, share the love!',
     'license_name': 'Apache License',
@@ -190,6 +214,11 @@ def seed(*args, **kwargs):
   melange = Organization(**group_properties)
   melange.put()
 
+
+  group_properties.update({
+    'scope_path': 'google/gsoc2009',
+    'scope': gsoc2009,
+    })
 
   for i in range(15):
     group_properties.update({

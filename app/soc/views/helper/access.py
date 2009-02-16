@@ -807,7 +807,7 @@ class Checker(object):
 
     fields = {
         'link_id': django_args['link_id'],
-        'status' : ['needs review', 'accepted', 'rejected', 'ignored',
+        'status': ['needs review', 'accepted', 'rejected', 'ignored',
             'pre-accepted']
         }
 

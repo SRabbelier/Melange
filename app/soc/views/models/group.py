@@ -133,7 +133,7 @@ class View(presence.View):
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
-    helper.responses.useJavaScript(context, params['js_uses_all'])
+    responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     if request.method == 'POST':

@@ -191,7 +191,7 @@ def seed(*args, **kwargs):
     }
 
   for i in range(15):
-    org_app_properties['key_name'] = 'google/gsoc2009/wannabee_%d' % i
+    org_app_properties['key_name'] = 'google/gsoc2009/wannabe_%d' % i
     org_app_properties['link_id'] = 'wannabe_%d' % i
     org_app_properties['name'] = 'Wannabe %d' % i
     entity = OrgApplication(**org_app_properties)

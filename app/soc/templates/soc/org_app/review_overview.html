@@ -14,10 +14,7 @@ limitations under the License.
 {% endcomment %}
 
 {% block body %}
-<span id="acceptance_text">
-  If you want to accept all pre-accepted organizations please 
-  <button id="button_accept" onclick="javascript:acceptOrgInit();">click here</button>
-</span>
+<input id="button_accept" type="button" class="button" onclick="javascript:acceptOrgInit('{{ bulk_accept_link|safe }}');" value="Bulk accept"/>
 <span class="progressBar" style="display:none;" id="applications_progress_bar"></span>
 <span id="description_progressbar"></span><span id="description_done"></span>
 

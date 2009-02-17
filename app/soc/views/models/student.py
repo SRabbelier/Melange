@@ -87,7 +87,7 @@ class View(role.View):
         'Become a %(name)s'),]
     new_params['extra_django_patterns'] = patterns
 
-    new_params['extra_dynaexclude'] = ['agreed_to_tos']
+    new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school']
 
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,

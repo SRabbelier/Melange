@@ -24,9 +24,15 @@ __authors__ = [
 from google.appengine.ext import db
 
 import soc.models.role
+import soc.models.school
 
 
 class Student(soc.models.role.Role):
   """Student details for a specific Program.
   """
-  pass
+
+  #: A many:1 relationship that ties multiple Students to the
+  #: School that they attend.
+  school = db.ReferenceProperty(reference_class=soc.models.school.School,
+                                required=False, collection_name='students')
+

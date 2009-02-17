@@ -48,11 +48,12 @@ from soc.logic.models.host import logic as host_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
+from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
-#from soc.logic.models.student import logic as student_logic
+from soc.logic.models.student import logic as student_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views.helper import redirects
@@ -89,6 +90,14 @@ DEF_NO_ACTIVE_GROUP_MSG = ugettext(
 
 DEF_NO_ACTIVE_ROLE_MSG = ugettext(
     'There is no such active role.')
+
+DEF_ALREADY_PARTICIPATING_MSG = ugettext(
+    'You cannot become a student because you are already participating '
+    'in this program.')
+
+DEF_ALREADY_STUDENT_ROLE_MSG = ugettext(
+    'You cannot become a Mentor or Organization Admin because you already are '
+    'a student in this program.')
 
 DEF_NO_ACTIVE_PROGRAM_MSG = ugettext(
     'There is no such active program.')
@@ -851,6 +860,89 @@ class Checker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
+
+  def checkIsNotParticipatingInProgramInScope(self, django_args):
+    """Checks if the current user has no roles for the given program in django_args.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the current user has a student, mentor or
+                                org admin role for the given program.
+    """
+
+    if not django_args.get('scope_path'):
+      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
+
+    program_entity = program_logic.getFromKeyName(django_args['scope_path'])
+    user_entity = user_logic.getForCurrentAccount()
+
+    filter = {'user': user_entity,
+              'scope': program_entity,
+              'status': 'active'}
+
+    # check if the current user is already a student for this program
+    student_role = student_logic.getForFields(filter, unique=True)
+
+    if student_role:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+
+    # fill the role_list with all the mentor and org admin roles for this user
+    role_list = []
+
+    filter = {'user': user_entity,
+              'status': 'active'}
+
+    mentor_roles = mentor_logic.getForFields(filter)
+    if mentor_roles:
+      role_list += mentor_roles
+
+    org_admin_roles = org_admin_logic.getForFields(filter)
+    if org_admin_roles:
+      role_list += org_admin_roles
+
+    # check if the user has a role for the retrieved program
+    for role in role_list:
+
+      if role.scope.scope.key() == program_entity.key():
+        # the current user has a role for the given program
+        raise out_of_band.AccessViolation(
+            message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+
+    # no roles found, access granted
+    return
+
+  def checkIsNotStudentForProgramOfOrg(self, django_args):
+    """Checks if the current user has no active Student role for the program
+       that the organization in the scope_path is participating in.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the current user is a student for the
+                                program the organization is in.
+    """
+
+    if not django_args.get('scope_path'):
+      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
+
+    org_entity = org_logic.getFromKeyName(django_args['scope_path'])
+    user_entity = user_logic.getForCurrentAccount()
+
+    filter = {'scope': org_entity.scope,
+              'user': user_entity,
+              'status': 'active'}
+
+    student_role = student_logic.getForFields(filter=filter, unique=True)
+
+    if student_role:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_ALREADY_STUDENT_ROLE_MSG)
+
+    return
 
   def checkIsMyEntity(self, django_args, logic,
                       field_name='user', user=False):

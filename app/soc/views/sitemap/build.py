@@ -39,6 +39,7 @@ from soc.views.models import program
 from soc.views.models import request
 from soc.views.models import site
 from soc.views.models import sponsor
+from soc.views.models import student
 from soc.views.models import timeline
 from soc.views.models import user
 from soc.views.models import user_self
@@ -67,6 +68,7 @@ sidebar.addMenu(host.view.getSidebarMenus)
 sidebar.addMenu(request.view.getSidebarMenus)
 sidebar.addMenu(program.view.getSidebarMenus)
 sidebar.addMenu(program.view.getExtraMenus)
+sidebar.addMenu(student.view.getSidebarMenus)
 sidebar.addMenu(organization.view.getSidebarMenus)
 sidebar.addMenu(organization.view.getExtraMenus)
 sidebar.addMenu(org_admin.view.getSidebarMenus)
@@ -88,6 +90,7 @@ sitemap.addPages(program.view.getDjangoURLPatterns())
 sitemap.addPages(request.view.getDjangoURLPatterns())
 sitemap.addPages(site.view.getDjangoURLPatterns())
 sitemap.addPages(sponsor.view.getDjangoURLPatterns())
+sitemap.addPages(student.view.getDjangoURLPatterns())
 sitemap.addPages(timeline.view.getDjangoURLPatterns())
 sitemap.addPages(user_self.view.getDjangoURLPatterns())
 sitemap.addPages(user.view.getDjangoURLPatterns())

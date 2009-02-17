@@ -187,6 +187,13 @@ def getListRolesRedirect(entity, params):
   return result
 
 
+def getUserRolesRedirect(_, __):
+  """Returns the redirect to the users Roles page.
+  """
+
+  return '/user/roles'
+
+
 def getProcessRequestRedirect(entity, _):
   """Returns the redirect for processing the specified request entity.
   """

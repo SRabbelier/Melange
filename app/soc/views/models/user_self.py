@@ -235,7 +235,6 @@ class View(base.View):
 
     user = user_logic.getForCurrentAccount()
 
-
     # only select the roles for the current user
     filter = {
         'link_id': user.link_id,

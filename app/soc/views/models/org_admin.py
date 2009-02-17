@@ -95,6 +95,7 @@ class View(role.View):
         }
 
     new_params['allow_invites'] = True
+    new_params['show_in_roles_overview'] = True
 
     params = dicts.merge(params, new_params)
 

@@ -155,6 +155,10 @@ class View(base.View):
     # add manage template
     params['manage_template'] = 'soc/%(module_name)s/manage.html' % params
 
+    if params.get('show_in_roles_overview'):
+      # add to roles overview
+      addRole(self)
+
   @decorators.merge_params
   @decorators.check_access
   def invite(self, request, access_type,

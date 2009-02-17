@@ -95,12 +95,6 @@ sitemap.addPages(timeline.view.getDjangoURLPatterns())
 sitemap.addPages(user_self.view.getDjangoURLPatterns())
 sitemap.addPages(user.view.getDjangoURLPatterns())
 
-#role.addRole(club_admin.view)
-#role.addRole(club_member.view)
-role.addRole(host.view)
-role.addRole(org_admin.view)
-role.addRole(mentor.view)
-
 
 def getPatterns():
   return defaults.patterns(None, *sitemap.SITEMAP)

@@ -99,6 +99,8 @@ class View(role.View):
             label=ugettext('I agree to the Student Agreement')),
         }
 
+    new_params['show_in_roles_overview'] = True
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -115,6 +117,8 @@ class View(role.View):
         dynafields = updated_fields)
 
     self._params['user_create_form'] = user_create_form
+
+    role.addRole(self)
 
   @decorators.merge_params
   @decorators.check_access

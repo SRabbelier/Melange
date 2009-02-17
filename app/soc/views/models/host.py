@@ -89,6 +89,7 @@ class View(role.View):
        'clean_photo_url': cleaning.clean_url('photo_url')}
 
     new_params['allow_invites'] = True
+    new_params['show_in_roles_overview'] = True
 
     params = dicts.merge(params, new_params)
 

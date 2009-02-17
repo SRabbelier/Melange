@@ -128,6 +128,7 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
+    new_params['manage_redirect'] = redirects.getListRolesRedirect
 
     new_params['create_template'] = 'soc/role/edit.html'
     new_params['edit_template'] = 'soc/role/edit.html'
@@ -413,7 +414,7 @@ class View(base.View):
     role_entity = logic.getForFields(kwargs, unique=True)
 
     # get the redirect for the cancel button or when the resignation is done
-    redirect = redirects.getListRolesRedirect(role_entity.scope, 
+    redirect = params['manage_redirect'](role_entity.scope,
         params['group_view'].getParams())
 
     # check to see if resign is true

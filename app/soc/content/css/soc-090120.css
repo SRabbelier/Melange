@@ -141,11 +141,13 @@ th, td {
 td.formfieldrequired {
   font-style: italic;
   font-size: small;
+  text-align: center;
 }
 
 td.formfieldhelptext {
   font-style: italic;
   font-size: small;
+  padding: 5px;
 }
 
 td.formfielderror {
@@ -161,6 +163,23 @@ td.formfieldheading {
 td.formfieldlabel {
   font-weight: bold;
   font-size: small;
+  text-align: right;
+}
+
+td.formfieldvalue {
+  text-align: left;
+}
+
+td.formfieldvalue input {
+  width: 100%;
+}
+
+td.formfieldvalue textarea {
+  width: 100%;
+}
+
+td.formfieldvalue select {
+  width: 100%;
 }
 
 td.formfielderrorlabel, td.warning, span.formfielderrorlabel {
@@ -461,7 +480,7 @@ span.unread {
   width: 450px;
   background:#fad163; 
   font-size: small;
-  font-weight: bold;
+  border: 1px solid black;
 }
 
 .rounded_ul { background: url(/soc/content/images/ul.gif) no-repeat top left; }

@@ -56,7 +56,8 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     # TODO accessCheck checkIsAdministratorForOrg
     rights['invite'] = ['checkIsDeveloper']
-    rights['accept_invite'] = [('checkCanCreateFromRequest', 'mentor')]
+    rights['accept_invite'] = [('checkCanCreateFromRequest', 'mentor'),
+        'checkIsNotStudentForProgramOfOrg']
     # TODO accessCheck checkIsAdministratorForOrg
     rights['process_request'] = ['checkIsDeveloper',
         ('checkCanProcessRequest', 'mentor')]

@@ -166,6 +166,11 @@ td.formfieldlabel {
   text-align: right;
 }
 
+td.twolineformfieldlabel {
+  font-weight: bold;
+  font-size: small;
+}
+
 td.formfieldvalue {
   text-align: left;
 }

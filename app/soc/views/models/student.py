@@ -118,7 +118,6 @@ class View(role.View):
 
     self._params['user_create_form'] = user_create_form
 
-    role.addRole(self)
 
   @decorators.merge_params
   @decorators.check_access

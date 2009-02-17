@@ -119,7 +119,7 @@ def isReferrerSelf(request,
     # no HTTP referrer, so cannot possibly start with expected prefix
     return False
 
-  http_host = 'http://%s/%s' %(os.environ['HTTP_HOST'],url_name)
+  http_host = 'http://%s/%s' %(os.environ['HTTP_HOST'], url_name)
 
   if http_from.startswith(http_host):
     return True

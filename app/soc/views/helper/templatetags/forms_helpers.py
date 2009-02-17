@@ -24,6 +24,9 @@ __authors__ = [
   ]
 
 
+import operator
+import re
+
 from google.appengine.ext import db
 
 from django import template
@@ -31,6 +34,7 @@ from django.forms import forms as forms_in
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 
+from soc.logic import dicts
 from soc.views.helper import widgets
 
 
@@ -174,8 +178,8 @@ def as_table_helper(context, form):
     # If the field is hidden we display it elsewhere
     if not bf.is_hidden:
       example_text = ''
-      group = 'main'
-      
+      group = '0. '
+
       if hasattr(field, 'group'):
         group = field.group
 
@@ -198,10 +202,14 @@ def as_table_helper(context, form):
         item = (name, force_unicode(e))
         hidden_fields_errors.append(item)
 
+  grouped = dicts.groupby(fields, 'group')
+  rexp = re.compile(r"\d+. ")
+  fields = [(rexp.sub('',key), grouped[key]) for key in sorted(grouped)]
+
   context.update({
       'top_errors': form.non_field_errors() or '',
       'hidden_field_errors': hidden_fields_errors or '',
-      'fields':  sorted(fields, key=lambda x: x.get('group')) or '',
+      'groups': fields if fields else '',
       'hidden_fields': hidden_fields or '',
       })
 

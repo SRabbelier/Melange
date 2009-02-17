@@ -412,15 +412,17 @@ class View(object):
 
     suffix = self._logic.getKeySuffix(entity)
 
-    # Remove the params from the request, this is relevant only if
+    # remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
-    is_self_referrer = helper.requests.isReferrerSelf(request, suffix=suffix)
+    is_self_referrer = helper.requests.isReferrerSelf(
+        request, suffix=suffix, url_name=params['url_name'])
+
     if request.GET.get(params['submit_msg_param_name']):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
     if entity:
-      # Note: no message will be displayed if parameter is not present
+      # note: no message will be displayed if parameter is not present
       context['notice'] = helper.requests.getSingleIndexedParamValue(
           request, params['submit_msg_param_name'],
           values=params['save_message'])

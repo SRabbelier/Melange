@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+import os
 import urlparse
 
 
@@ -91,7 +92,7 @@ def getSingleIndexedParamValueIfMissing(value, request, param_name,
 
 
 def isReferrerSelf(request,
-                   expected_prefix=None, suffix=None):
+                   expected_prefix=None, suffix=None, url_name=None):
   """Returns True if HTTP referrer path starts with the HTTP request path.
     
   Args:
@@ -103,6 +104,7 @@ def isReferrerSelf(request,
       it to the HTTP referrer path in the HTTP request object headers
       (this is often an link ID, for example, that may be changing from
       a POST referrer to a GET redirect target) 
+    url_name: url name of the entity that is being created
   
   Returns:
     True if HTTP referrer path begins with the HTTP request path (either
@@ -112,13 +114,18 @@ def isReferrerSelf(request,
        
   """
   http_from = request.META.get('HTTP_REFERER')
-      
+
   if not http_from:
     # no HTTP referrer, so cannot possibly start with expected prefix
     return False
 
+  http_host = 'http://%s/%s' %(os.environ['HTTP_HOST'],url_name)
+
+  if http_from.startswith(http_host):
+    return True
+
   from_path = urlparse.urlparse(http_from).path
-  
+
   if not expected_prefix:
     # use HTTP request path, since expected_prefix was not supplied
     expected_prefix = request.path
@@ -135,7 +142,7 @@ def isReferrerSelf(request,
   if not from_path.startswith(expected_prefix):
     # expected prefix did not match first part of HTTP referrer path
     return False
- 
+
   # HTTP referrer started with (possibly truncated) expected prefix
   return True
 

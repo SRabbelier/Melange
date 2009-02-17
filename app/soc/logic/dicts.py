@@ -181,3 +181,19 @@ def split(target):
     result = tmpresult
 
   return result
+
+def groupby(target, group_key):
+  """Groups a list of dictionaries by group_key.
+  """
+
+  result = {}
+
+  for value in target:
+    key_value = value[group_key]
+
+    if not key_value in result:
+      result[key_value] = []
+
+    result[key_value].append(value)
+
+  return result

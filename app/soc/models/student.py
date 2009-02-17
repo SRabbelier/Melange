@@ -23,28 +23,10 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.contributor
-import soc.models.school
+import soc.models.role
 
 
-class Student(soc.models.contributor.Contributor):
-  """Student Contributor details for a specific Program.
-
-  Some Students author Proposals to be reviewed by Reviewers (Mentors),
-  followed by Hosts, who then convert them into Tasks (usually a single
-  Task, in the case of GSoC).  In GSoC, this conversion of a Proposal into
-  a Task grants the Student entry into the Program for that year, and is
-  referred to as being "accepted".
-
-  Other Students claim Proposals that were written by Reviewers (Mentors),
-  converting them into Tasks (but only a single Task at a time can be
-  claimed by a Student, in the case of GHOP).
+class Student(soc.models.role.Role):
+  """Student details for a specific Program.
   """
-
-  #: A required many:1 relationship that ties multiple Students to the
-  #: School that they attend.  A Student cannot exist unassociated with
-  #: a School.  The back-reference in the School model is a Query
-  #: named 'students'.
-  school = db.ReferenceProperty(reference_class=soc.models.school.School,
-                                required=True, collection_name='students')
-
+  pass

@@ -60,7 +60,7 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['apply'] = [
         'checkIsUser',
-        ('checkIsActivePeriod', ['program', 'scope_path']),
+        ('checkIsActivePeriod', ['student_signup', 'scope_path']),
         'checkIsNotParticipatingInProgramInScope',
         ]
     rights['manage'] = [

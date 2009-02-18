@@ -54,12 +54,14 @@ class View(role.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasActiveRoleForScope', soc.logic.models.mentor.logic)]
     rights['delete'] = ['checkIsDeveloper']
-    # TODO accessCheck checkIsAdministratorForOrg
-    rights['invite'] = ['checkIsDeveloper']
+    rights['invite'] = [('checkHasActiveRoleForScope', 
+                         soc.logic.models.org_admin.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'mentor'),
         'checkIsNotStudentForProgramOfOrg']
-    # TODO accessCheck checkIsAdministratorForOrg
-    rights['process_request'] = ['checkIsDeveloper',
+    rights['request'] = ['checkIsNotStudentForProgramOfOrg',
+        ('checkCanMakeRequestToGroup', org_logic)]
+    rights['process_request'] = [
+        ('checkHasActiveRoleForScope', soc.logic.models.org_admin.logic),
         ('checkCanProcessRequest', 'mentor')]
     rights['manage'] = [
         ('checkIsAllowedToManageRole', [soc.logic.models.mentor.logic,

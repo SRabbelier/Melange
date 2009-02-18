@@ -59,16 +59,16 @@ class View(role.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasActiveRoleForScope', org_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
-    # TODO accessCheck checkIsAdministratorForOrg
-    rights['invite'] = ['checkIsDeveloper']
+    rights['invite'] = [('checkHasActiveRoleForScope', 
+                         org_admin_logic.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'org_admin'),
         'checkIsNotStudentForProgramOfOrg']
-    # TODO accessCheck checkIsAdministratorForOrg
-    rights['process_request'] = ['checkIsDeveloper',
+    rights['process_request'] = [
+        ('checkHasActiveRoleForScope', org_admin_logic.logic),
         ('checkCanProcessRequest', 'org_admin')]
     rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.org_admin.logic,
-             soc.logic.models.org_admin.logic])]
+        ('checkIsAllowedToManageRole', [org_admin_logic.logic,
+             org_admin_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.org_admin.logic

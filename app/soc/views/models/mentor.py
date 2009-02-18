@@ -79,7 +79,7 @@ class View(role.View):
     new_params['module_name'] = "mentor"
     new_params['sidebar_grouping'] = 'Organizations'
 
-    new_params['extra_dynaexclude'] = ['agreed_to_tos']
+    new_params['extra_dynaexclude'] = ['agreed_to_tos', 'program']
 
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
@@ -122,6 +122,10 @@ class View(role.View):
       fields['user'] = fields['link_id']
       fields['link_id'] = fields['user'].link_id
 
+      group_logic = params['group_logic']
+      group_entity = group_logic.getFromKeyName(fields['scope_path'])
+      fields['program'] = group_entity.scope
+
     fields['agreed_to_tos'] = fields['agreed_to_mentor_agreement']
 
     super(View, self)._editPost(request, entity, fields)
@@ -136,6 +140,10 @@ class View(role.View):
     fields['user'] = fields['link_id']
     fields['link_id'] = fields['user'].link_id
     fields['agreed_to_tos'] = fields['agreed_to_mentor_agreement']
+
+    group_logic = params['group_logic']
+    group_entity = group_logic.getFromKeyName(fields['scope_path'])
+    fields['program'] = group_entity.scope
 
   def _editGet(self, request, entity, form):
     """Sets the content of the agreed_to_tos_on field and replaces.

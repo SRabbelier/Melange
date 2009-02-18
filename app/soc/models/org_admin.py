@@ -17,14 +17,21 @@
 """This module contains the Organization Administrator Model."""
 
 __authors__ = [
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
 
+from google.appengine.ext import db
+
+import soc.models.program
 import soc.models.role
 
 
 class OrgAdmin(soc.models.role.Role):
   """Administrator details for a specific Organization.
   """
-  pass
+
+  #: A required property that defines the program that this org admin works for
+  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
+                              required=True, collection_name='org_admins')

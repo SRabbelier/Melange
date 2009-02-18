@@ -18,14 +18,19 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Lennard de Rijk" <ljdverijk@gmail.com>',
 ]
 
+from google.appengine.ext import db
 
+import soc.models.program
 import soc.models.role
 
 
 class Mentor(soc.models.role.Role):
   """Organization Mentor.
   """
-  pass
 
+  #: A required property that defines the program that this mentor works for
+  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
+                              required=True, collection_name='mentors')

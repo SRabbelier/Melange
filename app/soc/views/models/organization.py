@@ -65,6 +65,7 @@ class View(group.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
+    rights['apply_mentor'] = ['checkIsUser']
     rights['list_requests'] = [('checkHasActiveRoleForScope', 
                                 [org_admin_logic.logic, 'link_id'])]
     rights['list_roles'] = [('checkHasActiveRoleForScope', 
@@ -91,6 +92,14 @@ class View(group.View):
     new_params['application_logic'] = org_app_logic
     new_params['group_applicant_url'] = True
     new_params['sans_link_id_public_list'] = True
+
+    patterns = []
+
+    patterns += [(r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
+        'soc.views.models.%(module_name)s.apply_mentor', 
+        "List of all %(name_plural)s you can apply to"),]
+
+    new_params['extra_django_patterns'] = patterns
 
     new_params['create_extra_dynafields'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -120,6 +129,32 @@ class View(group.View):
         dynafields = updated_fields)
 
     params['applicant_create_form'] = applicant_create_form
+
+  @decorators.merge_params
+  @decorators.check_access
+  def applyMentor(self, request, access_type,
+                  page_name=None, params=None, **kwargs):
+    """Shows a list of all organizations and you can choose one to 
+       apply to become a mentor.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    list_params = params.copy()
+    list_params['list_action'] = (redirects.getRequestRedirectForRole, 'mentor')
+    list_params['list_description'] = ('Choose an Organization which '
+        'you want to become a Mentor for.')
+
+    filter = {'scope_path': kwargs['scope_path'],
+              'status' : 'active'}
+
+    return self.list(request, access_type, 
+        page_name, params=list_params, filter=filter)
 
   @decorators.merge_params
   @decorators.check_access
@@ -223,6 +258,7 @@ view = View()
 
 admin = view.admin
 applicant = view.applicant
+apply_mentor = view.applyMentor
 create = view.create
 delete = view.delete
 edit = view.edit

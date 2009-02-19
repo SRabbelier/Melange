@@ -75,6 +75,7 @@ class View(base.View):
     new_params['name'] = "Document"
 
     new_params['export_content_type'] = 'text/text'
+    new_params['export_extension'] = '.html'
 
     new_params['no_create_raw'] = True
     new_params['no_create_with_scope'] = True

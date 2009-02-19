@@ -26,6 +26,7 @@ from django import forms
 from django.utils.translation import ugettext
 
 from soc.logic import accounts
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views.helper import access
 from soc.views.helper import redirects
@@ -72,6 +73,7 @@ class View(presence_with_tos.View):
 
     new_params['create_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
+        'clean_noreply_email': cleaning.clean_empty_field('noreply_email'),
         }
     new_params['edit_extra_dynafields'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),

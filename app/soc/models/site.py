@@ -52,3 +52,10 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
   gmaps_api_key.help_text = ugettext(
       'Valid Google Maps API Key. This key is used for '
       'embedding Google Maps into the website.')
+
+  #: No Reply Email address used for sending notification emails to site users 
+  noreply_email = db.EmailProperty(verbose_name=ugettext('No reply email'))
+  noreply_email.help_text = ugettext(
+      'No reply email address is used for sending emails to site users. '
+      'Email address provided in this field needs to be added as Developer '
+      'in GAE admin console.')

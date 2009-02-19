@@ -61,8 +61,6 @@ class View(object):
   DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext(
       'Please select a %s for the new %s.')
 
-  DEF_EXPORT_EXTENSION = '.txt'
-
   def __init__(self, params=None):
     """
 
@@ -226,8 +224,8 @@ class View(object):
 
     response_args = {'mimetype': params['export_content_type']}
 
-    export_extension = params.get('export_extension',
-                                  self.DEF_EXPORT_EXTENSION)
+    export_extension = params['export_extension']
+
     response_headers = {
         'Content-Disposition': 'attachment; filename=%s%s' % (
             entity.link_id, export_extension),

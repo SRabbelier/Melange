@@ -180,7 +180,7 @@ class View(role.View):
     if not (program and program.student_agreement):
       return
 
-    content = entity.scope.student_agreement.content
+    content = program.student_agreement.content
     form.fields['student_agreement'].widget.text = content
 
 

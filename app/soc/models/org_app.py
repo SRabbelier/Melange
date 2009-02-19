@@ -25,6 +25,8 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.models import licenses
+
 import soc.models.document
 import soc.models.group_app
 import soc.models.user
@@ -49,8 +51,8 @@ class OrgApplication(soc.models.group_app.GroupApplication):
       'If your group has not previously participated, have you applied in'
       ' the past?  If so, for what sort of participation?'))
   
-  license_name = db.StringProperty(required=True, verbose_name=ugettext(
-      'What license does your organization use?'))
+  license_name = db.StringProperty(required=True, choices=licenses.LICENSES,
+      verbose_name=ugettext('What license does your organization use?'))
  
   ideas = db.LinkProperty(required=True, verbose_name=ugettext(
       'What is the URL to the ideas list of your organization?'))

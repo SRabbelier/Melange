@@ -31,14 +31,6 @@ import soc.models.group
 
 class Organization(soc.models.group.Group):
   """Organization details.
-
-  A Organization entity participates in the following relationships implemented 
-  as a db.ReferenceProperty elsewhere in another db.Model:
-
-   reviewers)  a many:1 relationship associating Reviewers with
-     a specific Organization. This relation is implemented as the
-     'reviewers' back-reference Query of the Organization model 'org'
-     reference.
   """
 
   #: Optional development mailing list.     

@@ -55,7 +55,7 @@ class View(base.View):
   """Views for User own profiles.
   """
 
-  DEF_ROLE_LIST_MSG_FMT = ugettext("An overview of your roles as %(name)s.")
+  DEF_ROLE_LIST_MSG_FMT = ugettext("Your roles as %(name)s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class

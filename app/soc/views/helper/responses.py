@@ -43,7 +43,8 @@ import soc.logic.models.user
 import soc.views.helper.requests
 
 
-def respond(request, template, context=None, response_args=None):
+def respond(request, template, context=None, response_args=None,
+            response_headers=None):
   """Helper to render a response, passing standard stuff to the response.
 
   Args:
@@ -53,6 +54,9 @@ def respond(request, template, context=None, response_args=None):
     response_args: keyword arguments passed to http.HttpResponse()
       (response_args['content'] is created with
       render_to_string(template, dictionary=context) if it is not present)
+    response_headers: optional dict containing HTTP response header names
+      and corresponding values to set in the HttpResponse object before it
+      is returned; default is None
 
   Returns:
     django.shortcuts.render_to_response(template, context) results
@@ -70,7 +74,13 @@ def respond(request, template, context=None, response_args=None):
 
   response_args['content'] = response_args.get(
       'content', loader.render_to_string(template, dictionary=context))
-  return http.HttpResponse(**response_args)
+  http_response = http.HttpResponse(**response_args)
+
+  if response_headers:
+    for key, value in response_headers.iteritems():
+      http_response[key] = value
+
+  return http_response
 
 
 def getUniversalContext(request):

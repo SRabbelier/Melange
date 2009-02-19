@@ -223,9 +223,13 @@ class View(object):
     template = params['export_template']
 
     response_args = {'mimetype': params['export_content_type']}
+    response_headers = {
+        'Content-Disposition': 'attachment; filename=%s.txt' % entity.link_id,
+        }
 
     return helper.responses.respond(request, template, context=context,
-                                    response_args=response_args)
+                                    response_args=response_args,
+                                    response_headers=response_headers)
 
   @decorators.check_access
   def create(self, request, access_type,

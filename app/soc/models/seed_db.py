@@ -238,6 +238,7 @@ def seed(*args, **kwargs):
       'link_id': 'test',
       'scope_path': 'google/gsoc2009/melange',
       'scope': melange,
+      'program': gsoc2009,
       })
 
   melange_admin = OrgAdmin(**role_properties)

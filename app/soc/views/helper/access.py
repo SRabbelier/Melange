@@ -906,7 +906,7 @@ class Checker(object):
     # check if the user has a role for the retrieved program
     for role in role_list:
 
-      if role.scope.scope.key() == program_entity.key():
+      if role.program.key() == program_entity.key():
         # the current user has a role for the given program
         raise out_of_band.AccessViolation(
             message_fmt=DEF_ALREADY_PARTICIPATING_MSG)

@@ -87,6 +87,7 @@ class Role(soc.models.linkable.Linkable):
   given_name = db.StringProperty(required=True,
       verbose_name=ugettext('First (given) name'))
   given_name.help_text = ugettext('lower ASCII characters only')
+  given_name.group=ugettext("1. Public Info")
 
   #: Required field storing the parts of the Role's name
   #: corresponding to the field names; displayed publicly.
@@ -96,6 +97,7 @@ class Role(soc.models.linkable.Linkable):
       required=True,
       verbose_name=ugettext('Last (family) name'))
   surname.help_text = ugettext('lower ASCII characters only')
+  surname.group=ugettext("1. Public Info")
 
   #: Optional field used as a display name, such as for awards
   #: certificates. Should be the entire name in the format
@@ -110,6 +112,7 @@ class Role(soc.models.linkable.Linkable):
       'the person would like it displayed (could be family name followed '
       'by given name in some cultures, for example). Name on documents can be '
       'any valid UTF-8 text.')
+  name_on_documents.group=ugettext("1. Public Info")
 
   #====================================================================
   #  (public) contact information
@@ -121,26 +124,31 @@ class Role(soc.models.linkable.Linkable):
   email = db.EmailProperty(
       required=True,
       verbose_name=ugettext('Email Address'))
+  email.group=ugettext("1. Public Info")
 
   #: Optional field storing Instant Messaging network; displayed publicly.
   im_network = db.StringProperty(
       verbose_name=ugettext('IM Network'))
   im_network.help_text = ugettext(
       'examples: irc:irc.freenode.org xmpp:gmail.com/Home')
+  im_network.group=ugettext("1. Public Info")
 
   #: Optional field storing Instant Messaging handle; displayed publicly.
   im_handle = db.StringProperty(
       verbose_name=ugettext('IM Handle'))
   im_handle.help_text = ugettext(
       'personal identifier, such as: screen name, IRC nick, user name')
+  im_handle.group=ugettext("1. Public Info")
 
   #: Optional field storing a home page URL; displayed publicly.
   home_page = db.LinkProperty(
       verbose_name=ugettext('Home Page URL'))
+  home_page.group=ugettext("1. Public Info")
 
   #: Optional field storing a blog URL; displayed publicly.
   blog = db.LinkProperty(
       verbose_name=ugettext('Blog URL'))
+  blog.group=ugettext("1. Public Info")
 
   #: Optional field storing a URL to an image, expected to be a
   #: personal photo (or cartoon avatar, perhaps); displayed publicly.
@@ -148,6 +156,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Thumbnail Photo URL'))
   photo_url.help_text = ugettext(
       'URL of 64x64 pixel thumbnail image')
+  photo_url.group=ugettext("1. Public Info")
 
   #: Optional field storing the latitude provided by the Role; displayed
   #: publicly.
@@ -155,6 +164,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Latitude'))
   latitude.help_text = ugettext(
       'decimal degrees northerly (N), use minus sign (-) for southerly (S)')
+  latitude.group=ugettext("1. Public Info")
 
   #: Optional field storing the longitude provided by the Role; displayed
   #: publicly.
@@ -162,6 +172,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Longitude'))
   longitude.help_text = ugettext(
       'decimal degrees easterly (E), use minus sign (-) for westerly (W)')
+  longitude.group=ugettext("1. Public Info")
 
   #====================================================================
   # (private) contact information
@@ -174,7 +185,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Street address'))
   res_street.help_text = ugettext(
       'street number and name, lower ASCII characters only')
-  res_street.group=ugettext("2. Contact Info")
+  res_street.group=ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address city; kept private.
   #: Residence city can only be lower ASCII, not UTF-8 text, because it
@@ -182,7 +193,7 @@ class Role(soc.models.linkable.Linkable):
   res_city = db.StringProperty(required=True,
       verbose_name=ugettext('City'))
   res_city.help_text = ugettext('lower ASCII characters only')
-  res_city.group=ugettext("2. Contact Info")
+  res_city.group=ugettext("2. Contact Info (Private)")
 
   #: Optional field containing residence address state or province; kept
   #: private.  Residence state/province can only be lower ASCII, not UTF-8
@@ -192,14 +203,14 @@ class Role(soc.models.linkable.Linkable):
   res_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       'lower ASCII characters only')
-  res_state.group=ugettext("2. Contact Info")
+  res_state.group=ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address country or territory; kept
   #: private.
   res_country = db.StringProperty(required=True,
       verbose_name=ugettext('Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
-  res_country.group=ugettext("2. Contact Info")
+  res_country.group=ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address postal code (ZIP code in
   #: the United States); kept private.  Residence postal code can only be
@@ -207,14 +218,23 @@ class Role(soc.models.linkable.Linkable):
   res_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext('ZIP/Postal Code'))
   res_postalcode.help_text = ugettext('lower ASCII characters only')
-  res_postalcode.group=ugettext("2. Contact Info")
+  res_postalcode.group=ugettext("2. Contact Info (Private)")
+
+  #: Required field containing a phone number that will be used to
+  #: contact the user, also supplied to shippers; kept private.
+  phone = db.PhoneNumberProperty(
+      required=True,
+      verbose_name=ugettext('Phone Number'))
+  phone.help_text = ugettext(
+      'include complete international calling number with country code')
+  phone.group=ugettext("2. Contact Info (Private)")
 
   #: field storing whether the User has agreed to publish his location
   publish_location = db.BooleanProperty(required=False, default=False,
       verbose_name=ugettext('Publish my location'))
   publish_location.help_text = ugettext(
       'Indicates whether the user agreed to publish location.')
-  publish_location.group=ugettext("3. Contact Info")
+  publish_location.group=ugettext("2. Contact Info (Private)")
 
   #: Optional field containing a separate shipping street address; kept
   #: private.  If shipping address is not present in its entirety, the
@@ -224,16 +244,18 @@ class Role(soc.models.linkable.Linkable):
   ship_street = db.StringProperty(
       verbose_name=ugettext('Shipping Street address'))
   ship_street.help_text = ugettext(
-      'street number and name, lower ASCII characters only')
-  ship_street.group=ugettext("4. Shipping Info")
+      'street number and name, lower ASCII characters only, '
+      'fill in only if not same as above')
+  ship_street.group=ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address city; kept private.
   #: Shipping city can only be lower ASCII, not UTF-8 text, because, if
   #: supplied, it is used as a shipping address.
   ship_city = db.StringProperty(
       verbose_name=ugettext('Shipping City'))
-  ship_city.help_text = ugettext('lower ASCII characters only')
-  ship_city.group=ugettext("4. Shipping Info")
+  ship_city.help_text = ugettext('lower ASCII characters only'
+                                 'fill in only if not same as above')
+  ship_city.group=ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address state or province; kept
   #: private.  Shipping state/province can only be lower ASCII, not UTF-8
@@ -242,15 +264,16 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping State/Province'))
   ship_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      'lower ASCII characters only')
-  ship_state.group=ugettext("4. Shipping Info")
+      'lower ASCII characters only, fill in only if not same as above')
+  ship_state.group=ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address country or territory; kept
   #: private.
   ship_country = db.StringProperty(
       verbose_name=ugettext('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
-  ship_country.group=ugettext("4. Shipping Info")
+  ship_country.help_text=ugettext('fill in only if not same as above')
+  ship_country.group=ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address postal code (ZIP code in
   #: the United States); kept private.  Shipping postal code can only be
@@ -258,17 +281,9 @@ class Role(soc.models.linkable.Linkable):
   #: shipping address.
   ship_postalcode = db.StringProperty(
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
-  ship_postalcode.help_text = ugettext('lower ASCII characters only')
-  ship_postalcode.group=ugettext("4. Shipping Info (Optional)")
-
-  #: Required field containing a phone number that will be supplied
-  #: to shippers; kept private.
-  phone = db.PhoneNumberProperty(
-      required=True,
-      verbose_name=ugettext('Phone Number'))
-  phone.help_text = ugettext(
-      'include complete international calling number with country code')
-  phone.group=ugettext("4. Shipping Info")
+  ship_postalcode.help_text = ugettext('lower ASCII characters only'
+                                       'fill in only if not same as above')
+  ship_postalcode.group=ugettext("3. Shipping Info (Private and Optional)")
   
 
   #====================================================================
@@ -282,20 +297,20 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Birth Date'))
   birth_date.help_text = ugettext(
       'required for determining program eligibility')
-  birth_date.group=ugettext("5. Private Info")
+  birth_date.group=ugettext("4. Private Info")
 
   #: Optional field indicating choice of t-shirt, from XXS to XXXL;
   #: kept private.
   tshirt_size = db.StringProperty(
       verbose_name=ugettext('T-shirt Size'),
       choices=('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'))
-  tshirt_size.group=ugettext("5. Private Info")
+  tshirt_size.group=ugettext("4. Private Info")
 
   #: Optional field indicating choice of t-shirt fit; kept private.
   tshirt_style = db.StringProperty(
       verbose_name=ugettext('T-shirt Style'),
       choices=('male', 'female'))
-  tshirt_style.group=ugettext("5. Private Info")
+  tshirt_style.group=ugettext("4. Private Info")
 
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
@@ -304,7 +319,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('I Agree to the Terms of Service'))
   agreed_to_tos.help_text = ugettext(
       'Indicates whether the user agreed to this role Terms of Service.')
-  agreed_to_tos.group=ugettext("6. Terms of Service")
+  agreed_to_tos.group=ugettext("5. Terms of Service")
 
   #: field storing when the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
@@ -313,7 +328,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Has agreed to the Terms of Service on'))
   agreed_to_tos_on.help_text = ugettext(
       'Indicates when the user agreed to this role Terms of Service.')
-  agreed_to_tos.group=ugettext("6. Terms of Service")
+  agreed_to_tos.group=ugettext("5. Terms of Service")
 
   #: field storing the status of this role
   #: Active means that this role can exercise all it's privileges.

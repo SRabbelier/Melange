@@ -29,7 +29,7 @@ limitations under the License.
 {% for group_name, fields in groups %}
   <tr><td>&nbsp;</td></tr>
   {% if group_name %}
-  <tr><td class="grouptitle">{{ group_name }}</td></tr>
+  <tr><td>&nbsp;</td><td class="grouptitle">{{ group_name }}</td></tr>
   {% endif %}
   {% for item in fields %}
     {% block grouped_fields_loop %}

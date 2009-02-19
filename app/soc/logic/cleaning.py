@@ -70,6 +70,17 @@ def check_field_is_empty(field_name):
   return decorator
 
 
+def clean_empty_field(field_name):
+  """Incorperates the check_field_is_empty as regular cleaner.
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    return self.cleaned_data.get(field_name)
+
+  return wrapper
+
+
 def clean_link_id(field_name):
   """Checks if the field_name value is in a valid link ID format.
   """

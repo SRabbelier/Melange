@@ -259,7 +259,7 @@ class Role(soc.models.linkable.Linkable):
   ship_postalcode = db.StringProperty(
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
   ship_postalcode.help_text = ugettext('lower ASCII characters only')
-  ship_postalcode.group=ugettext("4. Shipping Info")
+  ship_postalcode.group=ugettext("4. Shipping Info (Optional)")
 
   #: Required field containing a phone number that will be supplied
   #: to shippers; kept private.

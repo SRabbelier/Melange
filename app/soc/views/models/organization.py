@@ -172,6 +172,8 @@ class View(group.View):
     params = dicts.merge(new_params, params)
 
     new_filter = {}
+
+    new_filter['scope_path'] = kwargs['scope_path']
     new_filter['status'] = 'active'
     filter = dicts.merge(filter, new_filter)
 

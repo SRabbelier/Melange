@@ -53,6 +53,8 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   
   license_name = db.StringProperty(required=True, choices=licenses.LICENSES,
       verbose_name=ugettext('What license does your organization use?'))
+  license_name.example_text=ugettext('See '
+      '<a href="http://www.opensource.org/licenses/alphabetical"> the official list</a>.')
  
   ideas = db.LinkProperty(required=True, verbose_name=ugettext(
       'What is the URL to the ideas list of your organization?'))

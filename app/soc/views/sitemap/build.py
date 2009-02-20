@@ -44,8 +44,6 @@ from soc.views.models import timeline
 from soc.views.models import user
 from soc.views.models import user_self
 
-from soc.views.models import role
-
 from soc.views.sitemap import sidebar
 from soc.views.sitemap import sitemap
 

@@ -444,6 +444,7 @@ class View(object):
       self._editGet(request, entity, form)
     else:
       seed = seed if seed else {}
+      dicts.merge(seed, request.GET)
       self._editSeed(request, seed)
 
       if seed:
@@ -715,11 +716,9 @@ class View(object):
       except db.Error:
         pass
 
-    field = request.GET.get('field', None)
-    value = request.GET.get('value', None)
-
-    if field and value and field in form.fields:
-      form.fields[field].initial = value
+    for field, value in request.GET.iteritems():
+      if field in form.fields:
+        form.fields[field].initial = value
 
   def _editSeed(self, request, seed):
     """Performs any required processing on the form to get its edit page.
@@ -728,12 +727,7 @@ class View(object):
       request: the django request object
       seed: the fields to seed the create page with
     """
-
-    field = request.GET.get('field', None)
-    value = request.GET.get('value', None)
-
-    if field and value:
-      seed[field] = value
+    pass
 
   def _editContext(self, request, context):
     """Performs any required processing on the context for edit pages.

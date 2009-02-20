@@ -293,6 +293,7 @@ table#queues td {
   height: 53px;
   background-repeat: no-repeat;
   background-position: left center;
+  padding-left: 125px;
 }
 
 #footer .text {

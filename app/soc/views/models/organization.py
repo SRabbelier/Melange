@@ -55,21 +55,23 @@ class View(group.View):
       original_params: a dict with params for this View
     """
 
+    all = "%(scope_path)s/%(link_id)s"
+
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope', 
-                           [org_admin_logic.logic, 'link_id']),
+    rights['edit'] = [('checkHasActiveRoleForScope',
+                           [org_admin_logic.logic, all]),
                       ('checkIsActive', [org_logic.logic, None])]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
     rights['apply_mentor'] = ['checkIsUser']
     rights['list_requests'] = [('checkHasActiveRoleForScope', 
-                                [org_admin_logic.logic, 'link_id'])]
+                                [org_admin_logic.logic, all])]
     rights['list_roles'] = [('checkHasActiveRoleForScope', 
-                             [org_admin_logic.logic, 'link_id'])]
+                             [org_admin_logic.logic, all])]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
 

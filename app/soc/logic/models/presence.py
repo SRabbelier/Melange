@@ -50,6 +50,7 @@ class Logic(base.Logic):
       entity:  Presence (or one of its sub-classes) entity that may or may
         not have a ToS Document attached
     """
+
     if not entity:
       return None
 

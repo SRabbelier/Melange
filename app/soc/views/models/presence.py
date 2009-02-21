@@ -144,6 +144,10 @@ class View(base.View):
     if 'home_link_id' not in fields:
       return super(View, self)._editPost(request, entity, fields)
 
+    if not fields['home_link_id'] and entity.home:
+      properties = {'home_for': None}
+      document_logic.logic.updateEntityProperties(entity.home, properties)
+
     scope_path = self._logic.getKeyNameFromFields(fields)
 
     key_fields = {
@@ -156,5 +160,9 @@ class View(base.View):
     home_doc = document_logic.logic.getFromKeyFields(key_fields)
 
     fields['home'] = home_doc
+
+    if home_doc:
+      properties = {'home_for': entity}
+      document_logic.logic.updateEntityProperties(home_doc, properties)
 
     super(View, self)._editPost(request, entity, fields)

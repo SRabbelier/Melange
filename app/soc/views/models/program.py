@@ -29,7 +29,10 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
+from soc.logic.models import mentor as mentor_logic
+from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import program as program_logic
+from soc.logic.models import student as student_logic
 from soc.logic.models.document import logic as document_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -76,7 +79,6 @@ class View(presence_with_tos.View):
     new_params['sidebar_grouping'] = 'Programs'
     new_params['document_prefix'] = "program"
 
-
     new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement', 
         'mentor_agreement', 'student_agreement']
 
@@ -114,7 +116,6 @@ class View(presence_with_tos.View):
                                          required=True)
 
     new_params['edit_extra_dynaproperties'] = result
-
 
     references = [
         ('org_admin_agreement_link_id', 'org_admin_agreement', document_logic,
@@ -191,9 +192,6 @@ class View(presence_with_tos.View):
         items += document_view.view.getMenusForScope(entity, params)
         items += self._getTimeDependentEntries(entity, params, id, user)
 
-        url = redirects.getPublicListRedirect(entity, {'url_name': 'org'})
-        items += [(url, "List Organizations", 'any_access')]
-
       try:
         # check if the current user is a host for this program
         rights.doCachedCheck('checkIsHostForProgram', 
@@ -254,6 +252,70 @@ class View(presence_with_tos.View):
             (redirects.getListSelfRedirect(program_entity, 
                                            {'url_name' : 'org_app'}),
              "List My Organization Applications", 'any_access')]
+
+    # get the student entity for this user and program
+    filter = {'user': user,
+              'scope': program_entity}
+    student_entity = student_logic.logic.getForFields(filter, unique=True)
+
+    if student_entity:
+      items += self._getStudentEntries(program_entity, params, id, user)
+
+    # get mentor and org_admin entity for this user and program
+    filter = {'user': user,
+              'program': program_entity}
+    mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
+    org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
+
+    if mentor_entity or org_admin_entity:
+      items += self._getOrganizationEntries(program_entity, params, id, user)
+
+    if not (student_entity or mentor_entity or org_admin_entity):
+      if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+        # this user does not have a role yet for this program
+        items += [('/student/apply/%s' % (program_entity.key().name()),
+            "Register as a Student", 'any_access')]
+
+    if timeline_helper.isAfterEvent(timeline_entity,
+        'accepted_organization_announced_deadline'):
+      # add a link to list all the organizations
+      items += [(redirects.getPublicListRedirect(program_entity, {'url_name': 'org'}), 
+          "List participating Organizations", 'any_access')]
+
+      if not student_entity:
+        # add apply to become a mentor link
+        items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
+         "Apply to become a Mentor", 'any_access')]
+
+    return items
+
+  def _getStudentEntries(self, program_entity, params, id, user):
+    """Returns a list with menu items for students in a specific program.
+    """
+
+    items = []
+
+    timeline_entity = program_entity.timeline
+
+    # TODO(ljvderijk) add the student application links
+
+    if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+      #items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
+      #   "Send in your student proposal (N/A)", 'any_access')]
+      #items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
+      #   "List my student proposals (N/A)", 'any_access')]
+      pass
+
+    return items
+
+  def _getOrganizationEntries(self, program_entity, params, id, user):
+    """Returns a list with menu items for org admins and mentors in a 
+       specific program.
+    """
+
+    # TODO(ljvderijk) think about adding specific org items like submit review
+
+    items = []
 
     return items
 

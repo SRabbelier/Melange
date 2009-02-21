@@ -452,6 +452,11 @@ def validate_access(self, view, field):
 
   roles = checker.getMembership(access_level)
 
-  if not rights.hasMembership(roles, {'scope_path': scope_path}):
+  django_args = {
+      'scope_path': scope_path,
+      'prefix': prefix
+      }
+
+  if not rights.hasMembership(roles, django_args):
     self._errors[field] = ErrorList([DEF_NO_RIGHTS_FOR_ACL_MSG])
     del self.cleaned_data[field]

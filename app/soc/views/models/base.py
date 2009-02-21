@@ -672,9 +672,7 @@ class View(object):
     if 'scope_path' not in fields:
       return
 
-    if entity:
-      fields['scope'] = entity.scope
-    else:
+    if not entity:
       scope = self._params['scope_logic'].logic.getFromKeyName(
           fields['scope_path'])
       fields['scope'] = scope

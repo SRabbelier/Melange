@@ -18,36 +18,36 @@
 
 The following are the possible fields of an email message:
 
-  sender: The email address of the sender, the From address. This must be the 
+  sender: The email address of the sender, the From address. This must be the
     email address of a registered administrator for the application, or the
     address of the current signed-in user. Administrators can be added to
     an application using the Administration Console. The current user's email
     address can be determined with the Users API.
-  to: A recipient's email address (a string) or a list of email addresses to 
+  to: A recipient's email address (a string) or a list of email addresses to
     appear on the To: line in the message header.
-  cc: A recipient's email address (a string) or a list of email addresses to 
+  cc: A recipient's email address (a string) or a list of email addresses to
     appear on the Cc: line in the message header.
-  bcc: A recipient's email address (a string) or a list of email addresses to 
-    receive the message, but not appear in the message header ("blind carbon 
+  bcc: A recipient's email address (a string) or a list of email addresses to
+    receive the message, but not appear in the message header ("blind carbon
     copy").
-  reply_to: An email address to which a recipient should reply instead of the 
+  reply_to: An email address to which a recipient should reply instead of the
     sender address, the Reply-To: field.
   subject: The subject of the message, the Subject: line.
   body: The plaintext body content of the message.
-  html: An HTML version of the body content, for recipients that 
+  html: An HTML version of the body content, for recipients that
     prefer HTML email.
-  attachments: The file attachments for the message, as a list of two-value 
-    tuples, one tuple for each attachment. Each tuple contains a filename as 
+  attachments: The file attachments for the message, as a list of two-value
+    tuples, one tuple for each attachment. Each tuple contains a filename as
     the first element, and the file contents as the second element.
-    An attachment file must be one of the allowed file types, and the 
-    filename must end with an extension that corresponds with the type. 
-    For a list of allowed types and filename extensions, see Allowed 
+    An attachment file must be one of the allowed file types, and the
+    filename must end with an extension that corresponds with the type.
+    For a list of allowed types and filename extensions, see Allowed
     Attachment Types.
 
 Usage:
 
-  context = { 'sender': 'melange-noreply@foo.com',
-              'to': 'bob@bar.com',
+  context = { 'sender': 'melange-noreply@example.com',
+              'to': 'test@example.com',
               'subject': 'You have been invited to become a Host',
               'sender_name': 'Alice',
               'to_name': 'Melange Team',
@@ -73,21 +73,22 @@ from soc.logic import dicts
 
 def sendMailFromTemplate(template, context):
   """Sends out an email using a Django template.
-  
+
   If 'html' is present in context dictionary it is overwritten with
   template HTML output.
-  
+
   Args:
     template: the template (or search list of templates) to use
     context: The context supplied to the template and email (dictionary)
-  
+
   Raises:
-    Error that corresponds with the first problem it finds iff the message 
+    Error that corresponds with the first problem it finds iff the message
     is not properly initialized.
 
     List of all possible errors:
       http://code.google.com/appengine/docs/mail/exceptions.html
   """
+
   # render the template and put in context with 'html' as key
   context['html'] = loader.render_to_string(template, dictionary=context)
 
@@ -97,22 +98,21 @@ def sendMailFromTemplate(template, context):
 
 def sendMail(context):
   """Sends out an email using context to supply the needed information.
-  
+
   Args:
     context : The context supplied to the email message (dictionary)
 
   Raises:
-    Error that corresponds with the first problem it finds iff the message 
+    Error that corresponds with the first problem it finds iff the message
     is not properly initialized.
 
     List of all possible errors:
       http://code.google.com/appengine/docs/mail/exceptions.html
   """
-  
+
   # construct the EmailMessage from the given context
   message = mail.EmailMessage(**context)
-  
   message.check_initialized()
-  
+
   # send the message
   message.send()

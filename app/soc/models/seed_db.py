@@ -265,6 +265,22 @@ def seed(*args, **kwargs):
   home_document.put()
 
 
+  document_properties = {
+      'key_name': 'user/test/notes',
+      'link_id': 'notes',
+      'scope_path': 'test',
+      'scope': current_user,
+      'prefix': 'user',
+      'author': current_user,
+      'title': 'My Notes',
+      'short_name': 'Notes',
+      'content': 'These are my notes',
+      'modified_by': current_user,
+      }
+
+  notes_document = Document(**document_properties)
+  notes_document.put()
+
   site.home = home_document
   site.put()
 

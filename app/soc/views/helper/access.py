@@ -225,6 +225,14 @@ class Checker(object):
     'user_self': ('checkIsUserSelf', 'scope_path'),
     }
 
+  #: the depths of various scopes to other scopes
+  # the 0 entries are not used, and are for clarity purposes only
+  SCOPE_DEPTH = {
+      'sponsor': (sponsor_logic, {'sponsor': 0}),
+      'program': (program_logic, {'sponsor': 1, 'program': 0}),
+      'org': (org_logic, {'sponsor': 2, 'program': 1, 'org': 0}),
+      }
+
   def __init__(self, params):
     """Adopts base.rights as rights if base is set.
     """

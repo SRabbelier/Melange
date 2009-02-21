@@ -641,6 +641,35 @@ class Checker(object):
     django_args['user'] = self.user
     self.checkIsActive(django_args, logic, field_name, 'user')
 
+  def checkHasDocumentAccess(self, django_args, logic, target_scope):
+    """Checks that the user has access to the specified document scope.
+    """
+
+    prefix = django_args['prefix']
+    scope_logic, depths = self.SCOPE_DEPTH.get(prefix, (None, {}))
+    depth = depths.get(target_scope, 0)
+
+    # nothing to do
+    if not (scope_logic and depth):
+      return self.checkHasActiveRoleForScope(django_args, logic)
+
+    # we don't want to modify the original django args
+    django_args = django_args.copy()
+
+    entity = scope_logic.getFromKeyName(django_args['scope_path'])
+
+    # cannot have access to the specified scope if it is invalid
+    if not entity:
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
+
+    # walk up the scope to where we need to be
+    for _ in range(depth):
+      entity = entity.scope
+
+    django_args['scope_path'] = entity.key().name()
+
+    self.checkHasActiveRoleForScope(django_args, logic)
+
   def checkSeeded(self, django_args, checker_name, *args):
     """Wrapper to update the django_args with the contens of seed first.
     """

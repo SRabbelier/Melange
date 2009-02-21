@@ -85,6 +85,9 @@ DEF_NEED_ROLE_MSG = ugettext(
 DEF_NOT_YOUR_ENTITY_MSG = ugettext(
     'This entity does not belong to you.')
 
+DEF_NO_ACTIVE_ENTITY_MSG = ugettext(
+    'There is no such active entity.')
+
 DEF_NO_ACTIVE_GROUP_MSG = ugettext(
     'There is no such active group.')
 
@@ -582,10 +585,15 @@ class Checker(object):
   @denySidebar
   def checkIsActive(self, django_args, logic,
                     field_name='scope_path', filter_field='link_id'):
-    """Raises an alternate HTTP response if Group status is not active.
+    """Raises an alternate HTTP response if the entity is not active.
 
     Args:
       django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
+      field_name: the name of the field that should be copied verbatim
+                  If a format string is specified it will be formatted with
+                  the specified django_args.
+      filter_field: the name of the field to which scope_path should be set
 
     Raises:
       AccessViolationResponse:
@@ -595,23 +603,27 @@ class Checker(object):
 
     self.checkIsUser(django_args)
 
-    if field_name and (field_name not in django_args):
-      self.deny(django_args)
-
     fields = {
         filter_field: django_args[filter_field],
         'status': 'active',
         }
 
     if field_name:
-      fields['scope_path'] = django_args[field_name]
+      # convert to a format string if desired
+      if field_name.find('%') == -1:
+        field_name = ''.join(['%(', field_name, ')s'])
+
+      try:
+        fields['scope_path'] = field_name % django_args
+      except KeyError, e:
+        self.deny(django_args)
 
     entity = logic.getForFields(fields, unique=True)
 
     if entity:
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
   def checkHasActiveRoleForScope(self, django_args, logic, field_name=None):
     """Checks that the user has the specified active role.

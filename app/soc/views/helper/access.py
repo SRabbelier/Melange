@@ -597,8 +597,8 @@ class Checker(object):
 
     Raises:
       AccessViolationResponse:
-      * if no Group is found
-      * if the Group status is not active
+      * if no entity is found
+      * if the entity status is not active
     """
 
     self.checkIsUser(django_args)

@@ -149,3 +149,70 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
       dynainclude=dynainclude,
       dynaexclude=dynaexclude,
       dynaproperties=dynaproperties)
+
+
+class DynaFieldMetaclass(type):
+  """The DynaField Meta class, adding support for dynamic properties.
+
+  The new DynaField class that is created by class function is only
+  modified slightly. The only difference is that if the field class has
+  a dynaproperties property, it will be used to define additional properties
+  for the field.
+
+  The 'dynaproperties' property (if present), is expected to be iterable as a
+  dictionary (with iteritems). The keys are used as the property names,
+  and the values are used as the property value.
+  """
+
+  def __new__(cls, name, bases, attrs):
+    """See djangoforms.ModelFormMetaclass on how the __new__ method
+    is used, for an explanation on how this class modifies the default
+    behavior, see the DynaFormMetaclass's docstring.
+    """
+
+    # Retrieve the Meta class, if present
+    dynaproperties = attrs.get('dynaproperties', {})
+
+    for key, value in dynaproperties.iteritems():
+      attrs[key] = value
+
+    # Leave the rest to type
+    return super(DynaFieldMetaclass, cls).__new__(cls, name, bases, attrs)
+
+
+def newDynaField(field, base, passthrough):
+  """Creates a new form DynaField class.
+
+  The returned class extends base, but with the following additions:
+  * It has a dynaproperties attribute as extracted from field.
+  * It's __metaclass__ is set to DynaFieldMetaclass (which inherits from
+  the default type class).
+
+  See DynaFieldMetaclass for an explanation on how the dynaproperties
+  property is used to construct the DynaForm class.
+  """
+
+  # pass only known accepted arguments to super
+  init_args = dicts.filter(field, passthrough)
+
+  properties = field.copy()
+
+  # all pass through arguments are handled by super
+  for key in passthrough:
+    if key in properties:
+      del properties[key]
+
+  class DynaField(base):
+    """The dynamically created Field class.
+    """
+
+    __metaclass__ = DynaFieldMetaclass
+    dynaproperties = properties
+
+    def __init__(self):
+      """Pass through the init args to super.
+      """
+
+      super(DynaField, self).__init__(**init_args)
+
+  return DynaField

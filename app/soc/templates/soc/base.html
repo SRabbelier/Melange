@@ -90,6 +90,9 @@ limitations under the License.
 	{% if account %}
 	<b>{{ account.email }} ({{ account.nickname }})</b> | 
 	{% endif %}
+	{% if is_admin %}
+	Developer |
+	{% endif %}
 	{% if is_debug %}
 	<form id="flush_form" action="/_ah/admin/memcache" method="post" style="display: inline;">
       <input type="submit" class="button" name="action:flush" value="Flush Cache"/>

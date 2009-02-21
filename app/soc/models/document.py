@@ -26,6 +26,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+import soc.models.linkable
 import soc.models.work
 
 
@@ -79,3 +80,10 @@ class Document(soc.models.work.Work):
   is_featured.help_text = ugettext(
       'Field used to indicate if a Work should be featured, for example,'
       ' in the sidebar menu.')
+
+  #: Reference to Document containing the contents of the "/home" page
+  home_for = db.ReferenceProperty(
+    reference_class=soc.models.linkable.Linkable,
+    collection_name='home_docs')
+  home_for.help_text = ugettext(
+      'The Precense this document is the home document for.')

@@ -234,11 +234,11 @@ def seed(*args, **kwargs):
 
 
   role_properties.update({
-      'key_name': 'google/gsoc2009/melange/test',
+      'key_name': 'google/ghop2009/melange/test',
       'link_id': 'test',
-      'scope_path': 'google/gsoc2009/melange',
+      'scope_path': 'google/ghop2009/melange',
       'scope': melange,
-      'program': gsoc2009,
+      'program': ghop2009,
       })
 
   melange_admin = OrgAdmin(**role_properties)

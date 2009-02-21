@@ -24,6 +24,8 @@ __authors__ = [
     ]
 
 
+import feedparser
+
 from google.appengine.api import users
 
 from django import forms
@@ -45,7 +47,6 @@ DEF_NO_RIGHTS_FOR_ACL_MSG = ugettext(
 
 DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
     'This organization is not active/existent')
-
 
 def check_field_is_empty(field_name):
   """Returns decorator that bypasses cleaning for empty fields.
@@ -264,6 +265,16 @@ def clean_feed_url(self):
 
   return feed_url
 
+
+def clean_document_content(self):
+  content = self.cleaned_data.get('content')
+
+  sanitizer = feedparser._HTMLSanitizer('utf-8')
+  sanitizer.feed(content)
+  content = sanitizer.output()
+  content = content.strip().replace('\r\n', '\n')
+
+  return content
 
 def clean_url(field_name):
   """Clean method for cleaning a field belonging to a LinkProperty.

@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.cache import sidebar
+from soc.cache import home
 from soc.logic.models import work
 from soc.logic.models import linkable as linkable_logic
 
@@ -66,6 +67,11 @@ class Logic(work.Logic):
 
     if (name == 'is_featured') and (entity.is_featured != value):
       sidebar.flush()
+
+    home_for = entity.home_for
+
+    if (name != 'home_for') and home_for:
+      home.flush(home_for)
 
     return True
 

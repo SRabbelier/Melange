@@ -27,6 +27,7 @@ from google.appengine.ext import db
 from django import forms
 from django.utils.translation import ugettext
 
+from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import validate
@@ -93,6 +94,7 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
+  @home.cache
   @decorators.check_access
   def home(self, request, access_type,
              page_name=None, params=None, **kwargs):

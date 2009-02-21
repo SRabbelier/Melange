@@ -37,6 +37,11 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
   any "presence" on the site, such as a Group or Program).
   """
 
+  #: The official name of the site
+  site_name = db.StringProperty(default="Melange",
+      verbose_name=ugettext('Site Name'))
+  site_name.help_text = ugettext('The official name of the Site')
+
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.

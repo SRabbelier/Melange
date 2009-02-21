@@ -625,12 +625,10 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
-  def checkHasActiveRoleForScope(self, django_args, logic, field_name=None):
+  def checkHasActiveRoleForScope(self, django_args, logic,
+                                 field_name='scope_path'):
     """Checks that the user has the specified active role.
     """
-
-    if not field_name:
-      field_name = 'scope_path'
 
     django_args['user'] = self.user
     self.checkIsActive(django_args, logic, field_name, 'user')

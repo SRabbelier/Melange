@@ -181,7 +181,7 @@ def seed(*args, **kwargs):
     'why_applying': 'Because we can',
     'member_criteria': 'They need to be awesome',
     'status': 'pre-accepted',
-    'license_name': 'WTFPL',
+    'license_name': 'Apache License, 2.0',
     'ideas': 'http://code.google.com/p/soc/issues',
     'contrib_disappears': 'We use google to find them',
     'member_disappears': 'See above',

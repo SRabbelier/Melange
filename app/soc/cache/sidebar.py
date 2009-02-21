@@ -41,20 +41,19 @@ def get(id, user):
   """
 
   memcache_key = key(id)
-  return memcache.get(memcache_key)
+  return memcache.get(memcache_key), memcache_key
 
 
-def put(sidebar, id, user):
+def put(sidebar, memcache_key, id, user):
   """Sets the sidebar for the specified user in the memcache.
 
   Args:
     sidebar: the sidebar to be cached
   """
 
-  # Store sidebar for ten minutes since new programs might get added
+  # Store sidebar for just three minutes to force a refresh every so often
   retention = 3*60
 
-  memcache_key = key(id)
   memcache.add(memcache_key, sidebar, retention)
 
 

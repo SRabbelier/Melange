@@ -38,12 +38,15 @@ def getCacher(get, put):
   
     @wraps(func)
     def wrapper(*args, **kwargs):
-      result = get(*args, **kwargs)
+      result, key = get(*args, **kwargs)
       if result:
         return result
 
       result = func(*args, **kwargs)
-      put(result, *args, **kwargs)
+
+      if key:
+        put(result, key, *args, **kwargs)
+
       return result
 
     return wrapper

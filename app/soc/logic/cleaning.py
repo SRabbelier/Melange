@@ -41,7 +41,10 @@ DEF_LINK_ID_IN_USE_MSG = ugettext(
     'This link ID is already in use, please specify another one')
 
 DEF_NO_RIGHTS_FOR_ACL_MSG = ugettext(
-     'You do not have the required rights for that ACL.')
+    'You do not have the required rights for that ACL.')
+
+DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
+    'This organization is not active/existent')
 
 
 def check_field_is_empty(field_name):
@@ -364,6 +367,47 @@ def validate_new_group(link_id_field, scope_path_field,
       return cleaned_data
   return wrapper
 
+def validate_student_proposal(org_field, scope_field,
+                              student_logic, org_logic):
+  """Validates the form of a student proposal.
+  
+  Raises ValidationError if:
+    -The organization link_id does not match an active organization
+    -The hidden scope path is not a valid active student
+  """
+  
+  def wrapper(self):
+    cleaned_data = self.cleaned_data
+
+    org_link_id = cleaned_data.get(org_field)
+    scope_path = cleaned_data.get(scope_field)
+
+    # only if both fields are valid
+    if org_link_id and scope_path:
+      filter = {'scope_path': scope_path,
+                'status': 'active'}
+
+      student_entity = student_logic.logic.getFromKeyName(scope_path)
+
+      if not student_entity or student_entity.status != 'active':
+        # raise validation error, access checks should have prevented this
+        raise forms.ValidationError(
+            ugettext("The given student is not valid."))
+
+      filter = {'link_id': org_link_id,
+                'scope': student_entity.scope,
+                'status': 'active'}
+
+      org_entity = org_logic.logic.getForFields(filter, unique=True)
+
+      if not org_entity:
+        #raise validation error, non valid organization entered
+        self._errors['organization'] = ErrorList(
+            [DEF_ORGANZIATION_NOT_ACTIVE_MSG])
+        del cleaned_data['organization']
+
+    return cleaned_data
+  return wrapper
 
 def validate_document_acl(view):
   """Validates that the document ACL settings are correct.

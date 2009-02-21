@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Student Proposal Model."""
+"""This module contains the Student Proposal Model.
+"""
 
 __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -41,12 +42,17 @@ class StudentProposal(soc.models.linkable.Linkable):
   title.help_text = ugettext(
       'title of the proposal')
 
-  #: optional, indexed plain text field used for different purposes,
-  #: depending on the specific type of the work
-  abstract = db.StringProperty(multiline=True)
+  #: required, text field used for different purposes,
+  #: depending on the specific type of the proposal
+  abstract = db.StringProperty(required=True, multiline=True)
   abstract.help_text = ugettext(
       'short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')
+
+  #: Required field containing the content of the proposal.
+  content = db.StringProperty(required=True, multiline=True)
+  content.help_text = ugettext(
+      'This contains your actual proposal')
 
   #: an URL linking to more information about this students proposal
   additional_info = db.URLProperty(required=False)
@@ -64,13 +70,14 @@ class StudentProposal(soc.models.linkable.Linkable):
   score = db.IntegerProperty(required=True, default=0)
 
   #: the status of this proposal
+  #: new : the proposal has not been ranked/scored yet
   #: pending: the proposal is in the process of being ranked/scored
   #: accepted: the proposal has been assigned a project slot
   #: rejected: the proposal has not been assigned a slot or the organization
   #: does not want this proposal.
   #: invalid: the student or developer marked this as an invalid proposal.
-  status = db.StringProperty(required=True, default='pending',
-      choices=['pending','accepted', 'rejected', 'invalid'])
+  status = db.StringProperty(required=True, default='new',
+      choices=['new', 'pending', 'accepted', 'rejected', 'invalid'])
 
   #: organization to which this proposal is directed
   org = db.ReferenceProperty(reference_class=soc.models.organization.Organization,
@@ -84,4 +91,4 @@ class StudentProposal(soc.models.linkable.Linkable):
   created_on = db.DateTimeProperty(required=True, auto_now_add=True)
 
   #: date when the proposal was last modified, should be set manually on edit
-  modified_on = db.DateTimeProperty(required=True, auto_now_add=True)
+  last_modified_on = db.DateTimeProperty(required=True, auto_now_add=True)

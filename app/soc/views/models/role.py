@@ -133,7 +133,7 @@ class View(base.View):
     new_params['create_template'] = 'soc/role/edit.html'
     new_params['edit_template'] = 'soc/role/edit.html'
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
        'latitude':forms.fields.FloatField(widget=forms.HiddenInput,
                                           required=False),
        'longitude': forms.fields.FloatField(widget=forms.HiddenInput,

@@ -86,7 +86,7 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['org', 'program', 'score',
                                        'status', 'mentor', 'link_id']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(required=True,
             widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -99,7 +99,7 @@ class View(base.View):
             'scope_path', student_logic, org_logic),
         }
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'organization': forms.CharField(label='Organization Link ID',
             widget=widgets.ReadOnlyInput),
         'link_id': forms.CharField(widget=forms.HiddenInput)

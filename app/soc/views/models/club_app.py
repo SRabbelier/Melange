@@ -70,12 +70,12 @@ class View(group_app.View):
 
     new_params['sidebar_grouping'] = 'Clubs'
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             model_logic.club, club_app_logic)}
 
     # get rid of the clean method
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean': (lambda x: x.cleaned_data)}
 
     new_params['name'] = "Club Application"

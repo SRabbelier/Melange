@@ -86,7 +86,7 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'backup_admin_link_id': widgets.ReferenceField(
               reference_url='user', required=False,
               label=params['logic'].getModel().backup_admin.verbose_name),
@@ -94,7 +94,7 @@ class View(base.View):
             cleaning.clean_users_not_same('backup_admin_link_id'),
         }
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean_link_id' : cleaning.clean_link_id('link_id'),
         }
 

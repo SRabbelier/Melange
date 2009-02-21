@@ -65,7 +65,7 @@ class DynaFormMetaclass(djangoforms.ModelFormMetaclass):
 
 
 def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None, 
-                dynaexclude=None, dynafields=None):
+                dynaexclude=None, dynaproperties=None):
   """Creates a new form DynaForm class.
 
   The returned class extends dynabase, but with the following additions:
@@ -76,7 +76,7 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
   * The Meta class has an additional dynaconf field which is set to
   the dyanfields keyword argument passed to newDynaForm.
 
-  See DynaFormMetaclass for an explanation on how the dynafields
+  See DynaFormMetaclass for an explanation on how the dynaproperties
   property is used to construct the DynaForm class.
   """
 
@@ -93,16 +93,16 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
       model = dynamodel
       include = dynainclude
       exclude = dynaexclude
-      dynaconf = dynafields
+      dynaconf = dynaproperties
 
   return DynaForm
 
 
 def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None, 
-                   dynafields=None, append=False):
+                   dynaproperties=None, append=False):
   """Extends an existing dynaform.
 
-  If any of dynainclude, dynaexclude or dynafields are not present,
+  If any of dynainclude, dynaexclude or dynaproperties are not present,
   they are retrieved from dynaform (if present in it's Meta class).
 
   While it is rather useless to extend from a dynaform that does not have
@@ -137,10 +137,10 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
 
     # The most interesting parameter, the 'extra fields' dictionary
     dynaconf = getattr(meta, 'dynaconf', {})
-    if not dynafields:
-      dynafields = dynaconf
+    if not dynaproperties:
+      dynaproperties = dynaconf
     else:
-      dicts.merge(dynafields, dynaconf)
+      dicts.merge(dynaproperties, dynaconf)
 
   # Create a new DynaForm, using the properties we extracted
   return newDynaForm(
@@ -148,4 +148,4 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
       dynabase=dynaform,
       dynainclude=dynainclude,
       dynaexclude=dynaexclude,
-      dynafields=dynafields)
+      dynaproperties=dynaproperties)

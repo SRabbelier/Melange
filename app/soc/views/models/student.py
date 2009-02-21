@@ -89,7 +89,7 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
         'student_agreement': forms.fields.CharField(required=False,
@@ -114,7 +114,7 @@ class View(role.View):
 
     user_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     self._params['user_create_form'] = user_create_form
 

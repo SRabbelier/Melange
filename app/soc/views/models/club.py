@@ -94,12 +94,12 @@ class View(group.View):
     new_params['sidebar_additional'] = [
         ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'clean' : cleaning.validate_new_group('link_id', 'scope_path',
             club_logic, club_app_logic)}
 
     # get rid of the clean method
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean' : (lambda x: x.cleaned_data)}
 
     params = dicts.merge(params, new_params)
@@ -114,7 +114,7 @@ class View(group.View):
 
     applicant_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     params['applicant_create_form'] = applicant_create_form
 

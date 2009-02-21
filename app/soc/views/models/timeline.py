@@ -64,7 +64,7 @@ class View(base.View):
 
     new_params['django_patterns_defaults'] = patterns
 
-    new_params['edit_dynafields'] = []
+    new_params['edit_dynaproperties'] = []
 
     params = dicts.merge(params, new_params)
 
@@ -85,7 +85,7 @@ class View(base.View):
         dynaform = create_form,
         dynainclude = self._params['edit_dynainclude'],
         dynaexclude = self._params['edit_dynaexclude'],
-        dynafields = fields,
+        dynaproperties = fields,
         )
         
       self._params['edit_form_%s' % name] = edit_form

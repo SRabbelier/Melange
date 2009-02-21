@@ -53,7 +53,7 @@ class View(presence.View):
 
     new_params['extra_dynaexclude'] = ['tos']
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'tos_link_id': widgets.ReferenceField(
             reference_url='document', filter=['scope_path'], required=False,
             filter_fields={'prefix': params['document_prefix']},

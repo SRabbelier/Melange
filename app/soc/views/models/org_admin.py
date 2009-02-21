@@ -84,7 +84,7 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'program']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
         'admin_agreement': forms.fields.CharField(required=False,
@@ -114,7 +114,7 @@ class View(role.View):
 
     invited_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     params['invited_create_form'] = invited_create_form
 

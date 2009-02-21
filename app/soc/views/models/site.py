@@ -71,11 +71,11 @@ class View(presence_with_tos.View):
     new_params['edit_template'] = 'soc/site/edit.html'
     new_params['home_template'] = 'soc/site/home.html'
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'clean_noreply_email': cleaning.clean_empty_field('noreply_email'),
         }
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'home_link_id': widgets.ReferenceField(
             reference_url='document', required=False,

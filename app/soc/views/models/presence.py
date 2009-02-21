@@ -67,13 +67,13 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['home']
     new_params['home_template'] = 'soc/presence/home.html'
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         # add cleaning of the link id and feed url
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_feed_url': cleaning.clean_feed_url,
         }
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'home_link_id': widgets.ReferenceField(
             reference_url='document', filter=['scope_path'],
             filter_fields={'prefix': params['document_prefix']},

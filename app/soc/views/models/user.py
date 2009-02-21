@@ -74,7 +74,7 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['former_accounts', 'agreed_to_tos',
         'agreed_to_tos_on', 'status']
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),
         'clean_account': cleaning.clean_user_account_not_in_use('account')}
 
@@ -83,7 +83,7 @@ class View(base.View):
     for choice in user_logic.getModel().status.choices:
       status_choices.append((choice, choice))
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
             required=True),
         'clean_link_id': cleaning.clean_link_id('link_id'),

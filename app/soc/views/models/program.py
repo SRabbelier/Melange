@@ -81,7 +81,7 @@ class View(presence_with_tos.View):
         'mentor_agreement', 'student_agreement']
 
     # TODO add clean field to check for uniqueness in link_id and scope_path
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
@@ -113,7 +113,7 @@ class View(presence_with_tos.View):
     result['workflow'] = forms.CharField(widget=widgets.ReadOnlyInput(),
                                          required=True)
 
-    new_params['edit_extra_dynafields'] = result
+    new_params['edit_extra_dynaproperties'] = result
 
 
     references = [

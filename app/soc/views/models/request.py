@@ -87,14 +87,14 @@ class View(base.View):
     
     new_params['extra_dynaexclude'] = ['status', 'role_verbose']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'link_id': widgets.ReferenceField(reference_url='user'),
         'role': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=True),
         'clean_link_id': cleaning.clean_existing_user('link_id'),
         }
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                         required=True),
         }
@@ -123,7 +123,7 @@ class View(base.View):
 
     request_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     params['request_form'] = request_form
 

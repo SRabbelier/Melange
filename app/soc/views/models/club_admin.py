@@ -91,7 +91,7 @@ class View(role.View):
 
     invited_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     params['invited_create_form'] = invited_create_form
 

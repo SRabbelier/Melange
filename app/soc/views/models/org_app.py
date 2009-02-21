@@ -96,7 +96,7 @@ class View(group_app.View):
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
         'admin_agreement': forms.fields.Field(required=False,
@@ -109,7 +109,7 @@ class View(group_app.View):
             model_logic.organization, org_app_logic)}
 
     # get rid of the clean method
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean': (lambda x: x.cleaned_data)}
 
     new_params['name'] = "Organization Application"

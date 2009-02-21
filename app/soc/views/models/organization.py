@@ -101,7 +101,7 @@ class View(group.View):
 
     new_params['extra_django_patterns'] = patterns
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
         'clean_ideas': cleaning.clean_url('ideas'),
@@ -110,7 +110,7 @@ class View(group.View):
         }
 
     # get rid of the clean method
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean': (lambda x: x.cleaned_data)}
 
     params = dicts.merge(params, new_params)
@@ -126,7 +126,7 @@ class View(group.View):
 
     applicant_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynafields = updated_fields)
+        dynaproperties = updated_fields)
 
     params['applicant_create_form'] = applicant_create_form
 

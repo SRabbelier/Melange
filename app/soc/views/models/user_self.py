@@ -92,11 +92,11 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['former_accounts', 
         'account', 'is_developer', 'status', 'agreed_to_tos_on']
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'clean_agreed_to_tos': cleaning.clean_agrees_to_tos('agreed_to_tos'),
         'clean_link_id': cleaning.clean_user_not_exist('link_id'),}
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'agreed_to_tos_on': forms.DateTimeField(
           widget=widgets.ReadOnlyInput(attrs={'disabled':'true'}),

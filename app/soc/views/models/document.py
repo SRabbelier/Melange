@@ -84,7 +84,7 @@ class View(base.View):
     new_params['sans_link_id_create'] = True
     new_params['sans_link_id_list'] = True
 
-    new_params['create_extra_dynafields'] = {
+    new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(
             widget=helper.widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
@@ -99,7 +99,7 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['author', 'created', 'home_for',
                                        'modified_by', 'modified']
 
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'doc_key_name': forms.fields.CharField(widget=forms.HiddenInput),
         'created_by': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
                                              required=False),

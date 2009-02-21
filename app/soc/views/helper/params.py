@@ -240,27 +240,27 @@ def constructParams(params):
 
   new_params['dynabase'] = helper.forms.BaseForm
 
-  create_dynafields = {
+  create_dynaproperties = {
       'clean_link_id': cleaning.clean_link_id('link_id'),
       'clean_feed_url': cleaning.clean_feed_url,
       }
-  create_dynafields.update(params.get('create_extra_dynafields', {}))
+  create_dynaproperties.update(params.get('create_extra_dynaproperties', {}))
 
   new_params['references'] = []
   new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
   new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
       params.get('extra_dynaexclude', [])
-  new_params['create_dynafields'] = create_dynafields
+  new_params['create_dynaproperties'] = create_dynaproperties
 
-  edit_dynafields = {
+  edit_dynaproperties = {
       'clean_link_id': cleaning.clean_link_id('link_id'),
       'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
       }
-  edit_dynafields.update(params.get('edit_extra_dynafields', {}))
+  edit_dynaproperties.update(params.get('edit_extra_dynaproperties', {}))
 
   new_params['edit_dynainclude'] = None
   new_params['edit_dynaexclude'] = None
-  new_params['edit_dynafields'] = edit_dynafields
+  new_params['edit_dynaproperties'] = edit_dynaproperties
 
   params = dicts.merge(params, new_params)
 
@@ -293,7 +293,7 @@ def getCreateForm(params, model):
     logic: The logic value is used to get the model argument to newDynaForm.
     create_dynainclude: same as dynabase, but as dynainclude argument
     create_dynaexclude: same as dynabase, but as dynaexclude argument
-    create_dynafields: same as dynabase, but as dynafields argument
+    create_dynaproperties: same as dynabase, but as dynaproperties argument
   """
 
   create_form = dynaform.newDynaForm(
@@ -301,7 +301,7 @@ def getCreateForm(params, model):
     dynamodel = model,
     dynainclude = params['create_dynainclude'],
     dynaexclude = params['create_dynaexclude'],
-    dynafields = params['create_dynafields'],
+    dynaproperties = params['create_dynaproperties'],
     )
 
   if 'extra_key_order' in params:
@@ -321,14 +321,14 @@ def getEditForm(params, base_form):
       to dyanform.extendDynaForm.
     edit_dynainclude: same as create_form, but as dynainclude argument
     edit_dynaexclude: same as create_form, but as dynaexclude argument
-    edit_dynafields: same as create_form, but as dynafields argument
+    edit_dynaproperties: same as create_form, but as dynaproperties argument
   """
 
   edit_form = dynaform.extendDynaForm(
     dynaform = base_form,
     dynainclude = params['edit_dynainclude'],
     dynaexclude = params['edit_dynaexclude'],
-    dynafields = params['edit_dynafields'],
+    dynaproperties = params['edit_dynaproperties'],
     )
 
   return edit_form

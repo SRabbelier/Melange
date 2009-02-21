@@ -60,7 +60,7 @@ class View(presence.View):
 
     new_params['extra_dynaexclude'] = ['founder','home', 'tos',
                                        'member_template', 'status']
-    new_params['edit_extra_dynafields'] = {
+    new_params['edit_extra_dynaproperties'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
                                    required=False),
         }

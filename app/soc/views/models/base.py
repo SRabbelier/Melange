@@ -672,9 +672,12 @@ class View(object):
     if 'scope_path' not in fields:
       return
 
-    scope = self._params['scope_logic'].logic.getFromKeyName(
-        fields['scope_path'])
-    fields['scope'] = scope
+    if entity:
+      fields['scope'] = entity.scope
+    else:
+      scope = self._params['scope_logic'].logic.getFromKeyName(
+          fields['scope_path'])
+      fields['scope'] = scope
 
   def _public(self, request, entity, context):
     """Performs any required processing to get an entity's public page.

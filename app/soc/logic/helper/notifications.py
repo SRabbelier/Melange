@@ -50,7 +50,7 @@ DEF_INVITATION_MSG_FMT = ugettext(
 DEF_NEW_GROUP_MSG_FMT = ugettext(
     "Your %(application_type)s for %(group_name)s has been accepted.")
 
-DEF_WELCOME_MSG_FMT = ugettext("Welcome to Melange %(name)s,")
+DEF_WELCOME_MSG_FMT = ugettext("Welcome to %(site_name)s, %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
 
@@ -202,9 +202,16 @@ def sendWelcomeMessage(user_entity):
 
   # get user logic
   user_logic = model_logic.user
+  site_logic = model_logic.site
 
   # get the current user
   current_user_entity = user_logic.logic.getForCurrentAccount()
+  site_entity = site_logic.logic.getSingleton()
+  site_name = site_entity.site_name
+
+  email = site_entity.noreply_email
+  if not email:
+    email = current_user_entity.account.email()
 
   # TODO(Lennard): change the message sender to some sort of no-reply adress
   # that is probably a setting in sitesettings. (adress must be a developer).
@@ -215,10 +222,12 @@ def sendWelcomeMessage(user_entity):
   # create the message contents
   messageProperties = {
       'to_name': user_entity.name,
-      'sender_name': current_user_entity.name,
+      'sender_name': site_name,
+      'site_name': site_name,
       'to': user_entity.account.email(),
-      'sender': current_user_entity.account.email(),
+      'sender': email,
       'subject': DEF_WELCOME_MSG_FMT % {
+          'site_name': site_name,
           'name': user_entity.name
           }
       }

@@ -53,6 +53,7 @@ from soc.logic.models.program import logic as program_logic
 from soc.logic.models.request import logic as request_logic
 from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.student import logic as student_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic

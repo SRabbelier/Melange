@@ -63,6 +63,9 @@ DEF_JS_USES_LIST = [
     'tinymce',
     ]
 
+DEF_FIELD_INIT_PARAMS = ['required', 'widget', 'label', 'initial', 'help_text',
+                         'error_messages', 'show_hidden_initial']
+
 
 def constructParams(params):
   """Constructs a new params dictionary based on params.
@@ -246,6 +249,10 @@ def constructParams(params):
       }
   create_dynaproperties.update(params.get('create_extra_dynaproperties', {}))
 
+  # dynafields override any dynaproperties
+  create_dynafields = getDynaFields(params.get('create_dynafields', {}))
+  create_dynaproperties = dicts.merge(create_dynafields, create_dynaproperties)
+
   new_params['references'] = []
   new_params['create_dynainclude'] = [] + params.get('extra_dynainclude', [])
   new_params['create_dynaexclude'] = ['scope', 'scope_path'] + \
@@ -257,6 +264,10 @@ def constructParams(params):
       'link_id': forms.CharField(widget=helper.widgets.ReadOnlyInput()),
       }
   edit_dynaproperties.update(params.get('edit_extra_dynaproperties', {}))
+
+  # dynafields override any dynaproperties
+  edit_dynafields = getDynaFields(params.get('edit_dynafields', {}))
+  edit_dynaproperties = dicts.merge(edit_dynafields, edit_dynaproperties)
 
   new_params['edit_dynainclude'] = None
   new_params['edit_dynaexclude'] = None
@@ -282,6 +293,28 @@ def constructParams(params):
   params['rights'] = rights
 
   return params
+
+
+def getDynaFields(fields):
+  """Constructs a new DynaField using params.
+
+  Args:
+    params: the params dictionary used to extract the dyanfields
+    param_name: the name of the parameter to use
+  """
+
+  dynafields = {}
+
+  # generate the dynafields
+  for field in fields:
+    base = field.pop('base')
+    name = field.pop('name')
+    passthrough = field.pop('passthrough', DEF_FIELD_INIT_PARAMS)
+
+    dynafield = dynaform.newDynaField(field, base, passthrough)
+    dynafields[name] = dynafield()
+
+  return dynafields
 
 
 def getCreateForm(params, model):

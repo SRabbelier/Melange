@@ -248,8 +248,8 @@ class View(base.View):
 
     for name, view in sorted(role_view.ROLE_VIEWS.iteritems()):
       list_params = view.getParams().copy()
-      list_params['list_action'] = (redirects.getEditRedirect, params)
-      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % params
+      list_params['list_action'] = (redirects.getEditRedirect, list_params)
+      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
 
       list = helper.lists.getListContent(request, list_params, filter, i, True)
 

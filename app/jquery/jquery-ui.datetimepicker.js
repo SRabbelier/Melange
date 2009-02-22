@@ -1502,6 +1502,9 @@ $.extend(DateTimepickerInstance.prototype, {
 		}
 		var date = (day ? (typeof day == 'object' ? day : new Date(year, month, day, hour, minute)) :
 			new Date(this._currentYear, this._currentMonth, this._currentDay, this._currentHour, this._currentMinute));
+		
+		if (this._get('pickDateOnly'))
+			return $.datetimepicker.formatDate(this._get('dateFormat'), date, this._getFormatConfig());
 		return $.datetimepicker.formatDate(this._get('dateFormat')+' '+this._get('timeFormat'), date, this._getFormatConfig());
 	}
 });

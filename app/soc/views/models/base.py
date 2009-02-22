@@ -507,6 +507,7 @@ class View(object):
 
     context['entity_type'] = params['name']
     context['entity_type_plural'] = params['name_plural']
+    context['no_lists_msg'] = params['no_lists_msg']
 
     template = params['list_template']
 

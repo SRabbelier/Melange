@@ -14,10 +14,12 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 {% block body %}
+{% if list.empty %}
+{{ no_lists_msg }}
+{% endif %}
 {% for _ in list.lists %}
 <p>
 {% include list.nextList %}
 </p>
 {% endfor %}
-
 {% endblock %}

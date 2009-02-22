@@ -108,6 +108,12 @@ class Lists(object):
 
     return self.get('row')
 
+  def empty(self):
+    """Returns true iff there are no lists
+    """
+
+    return not self._lists
+
   def lists(self):
     """Returns a list of numbers the size of the amount of lists.
 

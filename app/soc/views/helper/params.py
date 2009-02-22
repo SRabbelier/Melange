@@ -38,7 +38,7 @@ from soc.views.helper import widgets
 
 
 DEF_LIST_DESCRIPTION_FMT = ugettext(
-    'List of %(name_plural)s in Google Open Source Programs.')
+    'List of %(name_plural)s.')
 
 DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext(
       'Please use this form to select a %(name).')

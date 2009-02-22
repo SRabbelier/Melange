@@ -133,9 +133,9 @@ def getUniversalContext(request):
 
   settings = site.logic.getSingleton()
 
-  if settings:
-    context['ga_tracking_num'] = settings.ga_tracking_num
-    context['gmaps_api_key'] = settings.gmaps_api_key
+  context['ga_tracking_num'] = settings.ga_tracking_num
+  context['gmaps_api_key'] = settings.gmaps_api_key
+  context['site_name'] = settings.site_name
   context['tos_link'] = redirects.getToSRedirect(settings)
  
   return context

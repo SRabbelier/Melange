@@ -112,7 +112,7 @@ limitations under the License.
   <div id="header">
    <div id="logo">
 	{% block logo %}
-<a href="/"><img src="/soc/content/images/gospo-logo.png" alt="Google Open Source Programs"/></a>
+<a href="/"><img src="/soc/content/images/gospo-logo.png" alt="{{ site_name }}"/></a>
    <span title=" TODO: logo updated in site sponsor interface " class="popup">
 <small>*</small>
    </span>
@@ -161,7 +161,7 @@ TODO(tlarsen): replace this with breadcrumbs
      <li>
 <a class="selected" href="/">
     {% block sidebar_menu_title %}
-    Google Open Source Programs
+    {{ site_name }}
     {% endblock %}
     </a>
 {% if sidebar_menu_items %}
@@ -192,24 +192,7 @@ target="_blank">(unreleased)</a>
 	
    <div style="line-height: 140%;">
 	{% block body %}
-<p class="todo">
-This is generic HTML that can be configured via the site administration
-interface.  It is unclear if the site admin can be trusted and allowed to enter
-any arbitrary HTML (more flexible and powerful) or if only a whitelist of "safe"
-HTML tags should be permitted (to prevent XSS, etc.).
-(<a href="http://www.feedparser.org/"><code>feedparser</code></a> is useful for
-this and is written in Python, should whitelisting be necessary.)
-</p>
-<p>
-Welcome to Google Open Source Programs, the home of
-<a href="/program/gsoc2009/home">Google Summer of Code</a>
-and the
-<a href="/program/ghop2008/home">Google Highly Open Participation</a> contest.
-</p>
-<p class="todo">
-The site administration interface will provide a mechanism to select a feed to
-be displayed here.
-</p>
+  &lt;Missing Page Body&gt;
 	{% endblock %}
    </div>
    <div id="footer" dir="ltr">

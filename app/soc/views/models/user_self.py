@@ -38,6 +38,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import models as model_logic
 from soc.logic.models.user import logic as user_logic
+from soc.logic.models.site import logic as site_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -56,6 +57,7 @@ class View(base.View):
   """
 
   DEF_ROLE_LIST_MSG_FMT = ugettext("Your roles as %(name)s.")
+  DEF_NO_ROLES_MSG_FMT = ugettext("You don't have any Roles in %s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -245,13 +247,21 @@ class View(base.View):
     i = 0
 
     for name, view in sorted(role_view.ROLE_VIEWS.iteritems()):
-      params = view.getParams().copy()
-      params['list_action'] = (redirects.getEditRedirect, params)
-      params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % params
+      list_params = view.getParams().copy()
+      list_params['list_action'] = (redirects.getEditRedirect, params)
+      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % params
 
-      list = helper.lists.getListContent(request, params, filter, i)
-      contents.append(list)
-      i += 1
+      list = helper.lists.getListContent(request, list_params, filter, i, True)
+
+      if list:
+        contents.append(list)
+        i += 1
+
+    site = site_logic.getSingleton()
+    site_name = site.site_name
+
+    params = params.copy()
+    params['no_lists_msg'] = self.DEF_NO_ROLES_MSG_FMT % site_name
 
     return self._list(request, params, contents, page_name)
 

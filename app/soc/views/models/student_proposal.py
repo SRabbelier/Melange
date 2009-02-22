@@ -53,15 +53,20 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    # TODO(ljvderijk) Access checks for different views
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsDeveloper']
+    rights['edit'] = [('checkCanStudentPropose', 'scope_path'),
+        ('checkRoleAndStatusForStudentProposal',
+            [['proposer'], ['active'], ['new', 'pending']])]
     rights['delete'] = ['checkIsDeveloper']
-    # TODO(ljvderijk) public should be host/org/student only
-    rights['public'] = ['checkIsDeveloper']
+    rights['show'] = [
+        ('checkRoleAndStatusForStudentProposal',
+            [['proposer', 'org_admin', 'mentor', 'host'], 
+            ['active', 'inactive'], ['new', 'pending', 'accepted', 'rejected']])]
     rights['list'] = ['checkIsDeveloper']
-    rights['apply'] = ['checkIsDeveloper']
+    rights['apply'] = [
+        ('checkIsStudent', ['scope_path', ['active']]),
+        ('checkCanStudentPropose', 'scope_path')]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_proposal.logic
@@ -105,7 +110,7 @@ class View(base.View):
         'link_id': forms.CharField(widget=forms.HiddenInput)
         }
 
-    # TODO(ljvderijk) students should be able to withdraw their proposal
+    # TODO(ljvderijk) students should be able to withdraw their proposals
 
     params = dicts.merge(params, new_params)
 

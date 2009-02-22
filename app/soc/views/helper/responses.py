@@ -67,7 +67,9 @@ def respond(request, template, context=None, response_args=None,
   """
 
   if not context:
+    from soc.views.helper import params
     context = getUniversalContext(request)
+    useJavaScript(context, params.DEF_JS_USES_LIST)
 
   if response_args is None:
     response_args = {}
@@ -177,7 +179,9 @@ def errorResponse(error, request, template=None, context=None):
     context = error.context
 
   if not context:
+    from soc.views.helper import params
     context = getUniversalContext(request)
+    useJavaScript(context, params.DEF_JS_USES_LIST)
 
   if not template:
     template = []

@@ -96,6 +96,7 @@ def check_access(func):
 
     check_kwargs = kwargs.copy()
     context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, self._params['js_uses_all'])
 
     id = context['account']
     user = context['user']

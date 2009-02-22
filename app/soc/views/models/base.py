@@ -457,7 +457,7 @@ class View(object):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None):
+           page_name=None, params=None, filter=None, **kwargs):
     """Displays the list page for the entity type.
 
     Args:

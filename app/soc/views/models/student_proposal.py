@@ -31,6 +31,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import organization as org_logic
 from soc.logic.models import student as student_logic
+from soc.logic.models import user as user_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
@@ -64,6 +65,8 @@ class View(base.View):
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], ['new', 'pending', 'accepted', 'rejected']])]
     rights['list'] = ['checkIsDeveloper']
+    rights['list_self'] = [
+        ('checkIsStudent', ['scope_path', ['active', 'inactive']])]
     rights['apply'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
         ('checkCanStudentPropose', 'scope_path')]
@@ -84,6 +87,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         'soc.views.models.%(module_name)s.create',
         'Create a new %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>list_self)/%(scope)s$',
+        'soc.views.models.%(module_name)s.list_self',
+        'List my %(name_plural)s')
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -159,6 +165,27 @@ class View(base.View):
     else:
       context['mentor_name'] = "No mentor assigned"
 
+  @decorators.merge_params
+  def listSelf(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Lists all proposals from the current logged-in user.
+
+    For params see base.View.public().
+    """
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+    filter = {'user': user_entity}
+    student_entity = student_logic.logic.getForFields(filter, unique=True)
+
+    filter = {'scope' : student_entity,
+              'status': ['new', 'pending', 'accepted', 'rejected']}
+
+    list_params = params.copy()
+    list_params['list_description'] = 'List of my %(name_plural)s' % list_params
+
+    return self.list(request, access_type=access_type, page_name=page_name,
+                     params=list_params, filter=filter, **kwargs)
+
 view = View()
 
 admin = view.admin
@@ -166,6 +193,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
+list_self = view.listSelf
 public = view.public
 export = view.export
 pick = view.pick

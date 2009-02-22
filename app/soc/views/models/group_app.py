@@ -86,10 +86,18 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
 
+    new_params['create_dynafields'] = [
+        {'name': 'backup_admin_link_id',
+         'base': widgets.ReferenceField,
+         'passthrough': ['reference_url', 'required', 'label'],
+         'reference_url': 'user',
+         'required': False,
+         'label': params['logic'].getModel().backup_admin.verbose_name,
+         'example_text': ugettext('The link_id of the backup admin'),
+         },
+         ]
+
     new_params['create_extra_dynaproperties'] = {
-        'backup_admin_link_id': widgets.ReferenceField(
-              reference_url='user', required=False,
-              label=params['logic'].getModel().backup_admin.verbose_name),
         'clean_backup_admin_link_id': 
             cleaning.clean_users_not_same('backup_admin_link_id'),
         }

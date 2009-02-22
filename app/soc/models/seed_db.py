@@ -26,6 +26,7 @@ import datetime
 import itertools
 
 from google.appengine.api import users
+from google.appengine.api import memcache
 from google.appengine.ext import db
 
 from soc.models.document import Document
@@ -284,6 +285,8 @@ def seed(*args, **kwargs):
   site.home = home_document
   site.put()
 
+  memcache.flush_all()
+
   return
 
 
@@ -308,6 +311,8 @@ def clear(*args, **kwargs):
 
   for entity in entities:
     entity.delete()
+
+  memcache.flush_all()
 
   return
 

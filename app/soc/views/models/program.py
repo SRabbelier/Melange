@@ -259,7 +259,8 @@ class View(presence_with_tos.View):
     student_entity = student_logic.logic.getForFields(filter, unique=True)
 
     if student_entity:
-      items += self._getStudentEntries(program_entity, params, id, user)
+      items += self._getStudentEntries(program_entity, student_entity,
+                                       params, id, user)
 
     # get mentor and org_admin entity for this user and program
     filter = {'user': user,
@@ -268,7 +269,8 @@ class View(presence_with_tos.View):
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
 
     if mentor_entity or org_admin_entity:
-      items += self._getOrganizationEntries(program_entity, params, id, user)
+      items += self._getOrganizationEntries(program_entity, org_admin_entity,
+                                            mentor_entity, params, id, user)
 
     if not (student_entity or mentor_entity or org_admin_entity):
       if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
@@ -289,7 +291,7 @@ class View(presence_with_tos.View):
 
     return items
 
-  def _getStudentEntries(self, program_entity, params, id, user):
+  def _getStudentEntries(self, program_entity, student_entity, params, id, user):
     """Returns a list with menu items for students in a specific program.
     """
 
@@ -302,13 +304,14 @@ class View(presence_with_tos.View):
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
       #items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
       #   "Send in your student proposal (N/A)", 'any_access')]
-      #items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
-      #   "List my student proposals (N/A)", 'any_access')]
-      pass
+      items += [(redirects.getListSelfRedirect(student_entity,
+             {'url_name':'student_proposal'}),
+         "List my Student Proposals", 'any_access')]
 
     return items
 
-  def _getOrganizationEntries(self, program_entity, params, id, user):
+  def _getOrganizationEntries(self, program_entity, org_admin_entity,
+                              mentor_entity, params, id, user):
     """Returns a list with menu items for org admins and mentors in a 
        specific program.
     """

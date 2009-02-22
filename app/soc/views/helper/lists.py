@@ -100,7 +100,7 @@ def generateLinkFromGetArgs(request, offset_and_limits):
   return request.path + link_suffix
 
 
-def getListContent(request, params, filter=None, idx=0):
+def getListContent(request, params, filter=None, idx=0, need_content=False):
   """Returns a dict with fields used for rendering lists.
 
   Args:
@@ -137,6 +137,9 @@ def getListContent(request, params, filter=None, idx=0):
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset)
+
+  if need_content and not data:
+    return None
 
   more = len(data) > limit
 

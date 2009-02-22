@@ -79,7 +79,7 @@
 	background: #944;
 	text-align: center;
 	font-weight: bold;
-	height: 3em;
+	/*height: 3em;*/
 }
  .datetimepicker_header select {
 	background: #944;

@@ -71,23 +71,13 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
     for name, logic_value in program_logic.logic.TIMELINE_LOGIC.iteritems():
-      fields = {}
-      
-      # add class 'datetime-pick' for each DateTimeField
-      # this is used with datetimepicker js widget
-      for prop_key, prop_value in logic_value.getModel().properties().iteritems():
-        if isinstance(prop_value, db.DateTimeProperty):
-          fields[prop_key] = forms.DateTimeField(required=False,
-            widget=forms.TextInput(attrs={'class':'datetime-pick'}))
-      
       create_form = params_helper.getCreateForm(self._params, logic_value.getModel())
       edit_form = dynaform.extendDynaForm(
         dynaform = create_form,
         dynainclude = self._params['edit_dynainclude'],
         dynaexclude = self._params['edit_dynaexclude'],
-        dynaproperties = fields,
         )
-        
+
       self._params['edit_form_%s' % name] = edit_form
 
   def edit(self, request, access_type,

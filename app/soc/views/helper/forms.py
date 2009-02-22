@@ -49,6 +49,8 @@ class BaseForm(djangoforms.ModelForm):
   ugettext() proxies used for internationalization in the Model will
   still work correctly with this new behavior, as long as the original
   strings are used as the translation keys.
+
+  Also set class date-pick or datetime-pick for DateField or DateTimeField.
   """
 
   def __init__(self, *args, **kwargs):
@@ -76,6 +78,12 @@ class BaseForm(djangoforms.ModelForm):
 
         if hasattr(model_prop, 'group'):
           self.fields[field_name].group = model_prop.group
+
+      if isinstance(self.fields[field_name], forms.DateField):
+        self.fields[field_name].widget.attrs['class'] = 'date-pick'
+
+      if isinstance(self.fields[field_name], forms.DateTimeField):
+        self.fields[field_name].widget.attrs['class'] = 'datetime-pick'
 
 
 class SelectQueryArgForm(forms.Form):

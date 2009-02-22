@@ -9,6 +9,10 @@
  * Time functionality added by Stanislav Dobry (stanislav.dobry@datesoft.cz)
  * Date: 2008-06-04
  */
+/*
+ * Patched by Haoyu Bai (baihaoyu@gmail.com) for date-picker only mode,
+ * and better behavior. (Sync Year/Month select with input box)
+ */
 
 ;(function($) { // hide the namespace
 
@@ -56,6 +60,7 @@ function DateTimepicker() {
 		isRTL: false // True if right-to-left language, false if left-to-right
 	};
 	this._defaults = { // Global defaults for all the date picker instances
+        pickDateOnly: false, // If true, work as datepicker, no time-picker
 		showOn: 'focus', // 'focus' for popup on focus,
 			// 'button' for trigger button, or 'both' for either
 		showAnim: 'show', // Name of jQuery animation for popup
@@ -607,6 +612,13 @@ $.extend(DateTimepicker.prototype, {
 		inst[period == 'M' ? '_drawMonth' : '_drawYear'] =
 			select.options[select.selectedIndex].value - 0;
 		this._adjustDate(inst);
+
+
+        this._doNotHide = true;
+		$('td.datetimepicker_currentDay').each(function(){
+			$.datetimepicker._selectDay(inst, inst._selectedMonth, inst._selectedYear,$(this));
+		});
+		this._doNotHide = false;
 	},
 	_selectTime: function(id, select, period) {
 		var inst = this._getInst(id);
@@ -660,8 +672,16 @@ $.extend(DateTimepicker.prototype, {
 		inst._selectedDay = inst._currentDay = $('a', td).html();
 		inst._selectedMonth = inst._currentMonth = month;
 		inst._selectedYear = inst._currentYear = year;
-		inst._selectedHour = inst._currentHour = $('select.datetimepicker_newHour option:selected').val();
-		inst._selectedMinute = inst._currentMinute = $('select.datetimepicker_newMinute option:selected').val();
+
+        inst._currentHour = $('select.datetimepicker_newHour option:selected').val();
+        if (inst._currentHour==undefined)
+            inst._currentHour = 0;
+		inst._selectedHour = inst._currentHour;
+        inst._currentMinute = $('select.datetimepicker_newMinute option:selected').val();
+        if (inst._currentMinute==undefined)
+            inst._currentMinute = 0;
+		inst._selectedMinute = inst._currentMinute;
+
 		this._selectDate(id, inst._formatDateTime(
 			inst._currentDay, inst._currentMonth, inst._currentYear, inst._currentHour, inst._currentMinute));
 		if (this._stayOpen) {
@@ -793,8 +813,8 @@ $.extend(DateTimepicker.prototype, {
 		var year = -1;
 		var month = -1;
 		var day = -1;
-		var hour = -1;
-		var minute = -1;
+		var hour = 0;
+		var minute = 0;
 		var literal = false;
 		// Check whether a format character is doubled
 		var lookAhead = function(match) {
@@ -1358,7 +1378,7 @@ $.extend(DateTimepickerInstance.prototype, {
 			}
 			html += '</select>';
 		}
-		// if (this._get('changeTime'))
+		if (!this._get('pickDateOnly'))
 		{
 			html += '<br />';
 			html += '<select class="datetimepicker_newHour" ' +
@@ -1408,10 +1428,10 @@ $.extend(DateTimepickerInstance.prototype, {
 		date = (minDate && date < minDate ? minDate : date);
 		date = (maxDate && date > maxDate ? maxDate : date);
 		this._selectedDay = date.getDate();
-		this._drawMonth = this._selectedMonth = date.getMonth();
-		this._drawYear = this._selectedYear = date.getFullYear();
-		this._drawHour = this._selectedHour = date.getHours();
-		this._drawMinute = this._selectedMinute = date.getMinutes();
+		this._currentMonth = this._drawMonth = this._selectedMonth = date.getMonth();
+		this._currentYear = this._drawYear = this._selectedYear = date.getFullYear();
+		this._currentHour = this._drawHour = this._selectedHour = date.getHours();
+		this._currentMinute = this._drawMinute = this._selectedMinute = date.getMinutes();
 	},
 
 	/* Determine the number of months to show. */

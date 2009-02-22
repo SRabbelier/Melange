@@ -202,7 +202,7 @@ class View(group.View):
 
       # add a link to invite an org admin
       submenu = (redirects.getInviteRedirectForRole(group_entity, 'org_admin'),
-          "Invite an Org Admin", 'any_access')
+          "Invite an Admin", 'any_access')
       submenus.append(submenu)
 
       # add a link to invite a member
@@ -233,13 +233,13 @@ class View(group.View):
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['org_admin'], 
           {'url_name': 'org_admin'}), 
-          "Resign as Org Admin", 'any_access')
+          "Resign as Admin", 'any_access')
       submenus.append(submenu)
 
       # add a link to the edit page
       submenu = (redirects.getEditRedirect(roles['org_admin'],
           {'url_name': 'org_admin'}),
-          "Edit My Org Admin Profile", 'any_access')
+          "Edit My Admin Profile", 'any_access')
       submenus.append(submenu)
 
     if roles.get('mentor'):
@@ -252,7 +252,7 @@ class View(group.View):
       # add a link to the edit page
       submenu = (redirects.getEditRedirect(roles['mentor'],
           {'url_name': 'mentor'}),
-          "Edit My Org Mentor Profile", 'any_access')
+          "Edit My Mentor Profile", 'any_access')
       submenus.append(submenu)
 
     return submenus

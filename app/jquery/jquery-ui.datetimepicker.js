@@ -672,14 +672,13 @@ $.extend(DateTimepicker.prototype, {
 		inst._selectedDay = inst._currentDay = $('a', td).html();
 		inst._selectedMonth = inst._currentMonth = month;
 		inst._selectedYear = inst._currentYear = year;
-
-        inst._currentHour = $('select.datetimepicker_newHour option:selected').val();
-        if (inst._currentHour==undefined)
-            inst._currentHour = 0;
+    inst._currentHour = $('select.datetimepicker_newHour option:selected').val();
+    if (inst._currentHour == undefined)
+      inst._currentHour = 0;
 		inst._selectedHour = inst._currentHour;
-        inst._currentMinute = $('select.datetimepicker_newMinute option:selected').val();
-        if (inst._currentMinute==undefined)
-            inst._currentMinute = 0;
+    inst._currentMinute = $('select.datetimepicker_newMinute option:selected').val();
+    if (inst._currentMinute == undefined)
+      inst._currentMinute = 0;
 		inst._selectedMinute = inst._currentMinute;
 
 		this._selectDate(id, inst._formatDateTime(

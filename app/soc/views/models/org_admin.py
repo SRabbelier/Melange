@@ -32,6 +32,7 @@ from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
+from soc.views.helper import params as params_helper
 from soc.views.helper import widgets
 from soc.views.models import organization as org_view
 from soc.views.models import role
@@ -84,15 +85,26 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'program']
 
-    new_params['create_extra_dynaproperties'] = {
-        'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
-                                             required=True),
-        'admin_agreement': forms.fields.CharField(required=False,
-            widget=widgets.AgreementField),
-        'agreed_to_admin_agreement': forms.fields.BooleanField(
-            initial=False, required=True,
-            label=ugettext('I agree to the Admin Agreement')),
-        }
+    new_params['create_dynafields'] = [
+        {'name': 'scope_path',
+         'base': forms.fields.CharField,
+         'widget': forms.HiddenInput,
+         'required': True,
+         },
+        {'name': 'admin_agreement',
+         'base': forms.fields.CharField,
+         'required': False,
+         'widget': widgets.AgreementField,
+         'group': ugettext("5. Terms of Service"),
+         },
+        {'name': 'agreed_to_admin_agreement',
+         'base': forms.fields.BooleanField,
+         'initial': False,
+         'required':True,
+         'label': ugettext('I agree to the Admin Agreement'),
+         'group': ugettext("5. Terms of Service"),
+         },
+        ]
 
     new_params['allow_invites'] = True
     new_params['show_in_roles_overview'] = True
@@ -105,16 +117,25 @@ class View(role.View):
     params['group_view'].registerRole(params['module_name'], self)
 
     # create and store the special form for invited users
-    updated_fields = {
-        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=False),
-        'admin_agreement': forms.fields.Field(required=False,
-            widget=widgets.AgreementField),
-        }
+    dynafields = [
+        {'name': 'link_id',
+         'base': forms.CharField,
+         'widget': widgets.ReadOnlyInput(),
+         'required': False,
+         },
+        {'name': 'admin_agreement',
+         'base': forms.fields.Field,
+         'required': False,
+         'widget': widgets.AgreementField,
+         'group': ugettext("5. Terms of Service"),
+        },
+        ]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
 
     invited_create_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
-        dynaproperties = updated_fields)
+        dynaproperties = dynaproperties)
 
     params['invited_create_form'] = invited_create_form
 

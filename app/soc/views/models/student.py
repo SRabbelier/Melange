@@ -89,15 +89,26 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school']
 
-    new_params['create_extra_dynaproperties'] = {
-        'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
-                                             required=True),
-        'student_agreement': forms.fields.CharField(required=False,
-            widget=widgets.AgreementField),
-        'agreed_to_student_agreement': forms.fields.BooleanField(
-            initial=False, required=True,
-            label=ugettext('I agree to the Student Agreement')),
-        }
+    new_params['create_dynafields'] = [
+        {'name': 'scope_path',
+         'base': forms.fields.CharField,
+         'widget': forms.HiddenInput,
+         'required': True,
+         },
+        {'name': 'student_agreement',
+         'base': forms.fields.CharField,
+         'required': False,
+         'widget': widgets.AgreementField,
+         'group': ugettext("5. Terms of Service"),
+         },
+        {'name': 'agreed_to_student_agreement',
+         'base': forms.fields.BooleanField,
+         'initial': False,
+         'required':True,
+         'label': ugettext('I agree to the Student Agreement'),
+         'group': ugettext("5. Terms of Service"),
+         },
+        ]
 
     new_params['show_in_roles_overview'] = True
 

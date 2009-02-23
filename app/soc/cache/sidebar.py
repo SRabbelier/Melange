@@ -36,7 +36,7 @@ def key(id):
   return 'sidebar_for_%s' % repr(id)
 
 
-def get(id, user):
+def get(id, *args, **kwargs):
   """Retrieves the sidebar for the specified user from the memcache.
   """
 
@@ -44,7 +44,7 @@ def get(id, user):
   return memcache.get(memcache_key), memcache_key
 
 
-def put(sidebar, memcache_key, id, user):
+def put(sidebar, memcache_key, *args, **kwargs):
   """Sets the sidebar for the specified user in the memcache.
 
   Args:

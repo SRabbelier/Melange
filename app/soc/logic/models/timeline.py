@@ -23,7 +23,7 @@ __authors__ = [
 
 
 from soc.logic.models import base
-from soc.logic.models import presence_with_tos as tos_logic
+from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.timeline
 
@@ -32,7 +32,7 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.timeline.Timeline,
-               base_model=None, scope_logic=tos_logic):
+               base_model=None, scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
 

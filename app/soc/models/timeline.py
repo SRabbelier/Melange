@@ -26,15 +26,12 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-from soc.models import base
+from soc.models import linkable
 
 
-class Timeline(base.ModelWithFieldAttributes):
+class Timeline(linkable.Linkable):
   """The Timeline Model, representing the timeline for a Program.
   """
-
-  scope_path = db.StringProperty(required=True,
-      verbose_name=ugettext('Scope Path'))
 
   program_start = db.DateTimeProperty(
       verbose_name=ugettext('Program Start date'))

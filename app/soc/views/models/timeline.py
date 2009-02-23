@@ -62,6 +62,9 @@ class View(base.View):
                   'soc.views.models.%(module_name)s.edit', 
                   "Edit %(name_short)s")]
 
+    new_params['create_extra_dynaproperties'] = {
+        'link_id': forms.CharField(widget=forms.HiddenInput)
+        }
     new_params['django_patterns_defaults'] = patterns
 
     new_params['edit_dynaproperties'] = []
@@ -88,8 +91,10 @@ class View(base.View):
     
     # TODO(pawel.solyga): If program doesn't exist for timeline display
     # customized error message without pointing to 'Create Timeline'
-    
-    program = program_logic.logic.getFromKeyName(kwargs['scope_path'])
+
+    key_fields = program_logic.logic.getKeyFieldsFromFields(kwargs)
+
+    program = program_logic.logic.getFromKeyFields(key_fields)
     if program:
       params['edit_form'] = params["edit_form_%s" % program.workflow]
 

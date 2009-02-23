@@ -1274,18 +1274,12 @@ class Checker(object):
     """Checks whether this program's timeline may be edited.
     """
 
-    time_line_keyname = django_args['scope_path']
+    time_line_keyname = timeline_logic.getKeyFieldsFromFields(django_args)
     timeline_entity = timeline_logic.getFromKeyName(time_line_keyname)
 
     if not timeline_entity:
       # timeline does not exists so deny
       self.deny(django_args)
 
-    split_keyname = time_line_keyname.rsplit('/')
-
-    fields = {
-        'scope_path' : split_keyname[0],
-        'link_id' : split_keyname[1],
-        }
-
+    fields = program_logic.getKeyFieldsFromFields(django_args)
     self.checkIsHostForProgram(fields)

@@ -136,14 +136,14 @@ class View(presence_with_tos.View):
     """See base._editPost().
     """
 
+    super(View, self)._editPost(request, entity, fields)
+
     if not entity:
       # there is no existing entity so create a new timeline
       fields['timeline'] = self._createTimelineForType(fields)
     else:
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
-
-    super(View, self)._editPost(request, entity, fields)
 
   def _createTimelineForType(self, fields):
     """Creates and stores a timeline model for the given type of program.
@@ -153,9 +153,9 @@ class View(presence_with_tos.View):
 
     timeline_logic = program_logic.logic.TIMELINE_LOGIC[workflow]
 
-    key_name = self._logic.getKeyNameFromFields(fields)
-
-    properties = {'scope_path': key_name}
+    key_fields = timeline_logic.getKeyFieldsFromFields(fields)
+    properties = key_fields.copy()
+    properties['scope'] = fields['scope']
 
     timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
     return timeline

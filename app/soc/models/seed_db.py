@@ -121,7 +121,9 @@ def seed(*args, **kwargs):
 
   timeline_properties = {
         'key_name': 'google/gsoc2009',
-        'scope_path': 'google/gsoc2009',
+        'link_id': 'gsoc2009',
+        'scope_path': 'google',
+        'scope': google,
         }
 
   gsoc2009_timeline = Timeline(**timeline_properties)
@@ -150,7 +152,9 @@ def seed(*args, **kwargs):
 
   timeline_properties = {
         'key_name': 'google/ghop2009',
-        'scope_path': 'google/ghop2009',
+        'link_id': 'ghop2009',
+        'scope_path': 'google',
+        'scope': google,
         }
 
   ghop2009_timeline = Timeline(**timeline_properties)

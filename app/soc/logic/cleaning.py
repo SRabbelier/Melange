@@ -46,7 +46,7 @@ DEF_NO_RIGHTS_FOR_ACL_MSG = ugettext(
     'You do not have the required rights for that ACL.')
 
 DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
-    'This organization is not active/existent')
+    "This organization is not active or doesn't exist.")
 
 def check_field_is_empty(field_name):
   """Returns decorator that bypasses cleaning for empty fields.

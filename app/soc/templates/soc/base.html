@@ -196,9 +196,6 @@ target="_blank">(unreleased)</a>
 	{% endblock %}
    </div>
    <div id="footer" dir="ltr">
-    {% if ga_tracking_num %}
-    {% include 'soc/site/ga.html' %}
-    {% endif %}
     <div class="text">
 	{% block footer %}
 &copy;2009 Google -
@@ -210,5 +207,8 @@ Version {{ gae_version }}
     </div>
    </div>
   </div>
+  {% if ga_tracking_num %}
+    {% include 'soc/site/ga.html' %}
+  {% endif %}
  </body>
 </html>

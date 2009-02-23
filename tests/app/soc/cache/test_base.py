@@ -47,10 +47,10 @@ class CacheDecoratorTest(unittest.TestCase):
     memcache.flush_all()
 
   def get(self):
-    return memcache.get('answer_to_life')
+    return memcache.get('answer_to_life'), 'answer_to_life'
 
-  def put(self, answer):
-    memcache.add('answer_to_life', 42)
+  def put(self, answer, memcache_key):
+    memcache.add(memcache_key, 42)
 
   def testMemcache(self):
     """Sanity check to see if memcache is working.

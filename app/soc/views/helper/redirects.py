@@ -248,6 +248,16 @@ def getApplicantRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
+def getStudentProposalRedirect(entity, params):
+  """Returns the student proposal redirect for the given org and student.
+  """
+
+  result ='/%s/apply/%s?organization=%s' % (
+      params['url_name'], params['student_key'], entity.link_id)
+
+  return result
+
+
 def getCreateDocumentRedirect(entity, prefix):
   """Returns the redirect for new documents.
   """

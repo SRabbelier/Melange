@@ -94,7 +94,7 @@ class View(base.View):
         'soc.views.models.%(module_name)s.list_self',
         'List my %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>list_orgs)/%(scope)s$',
-        'soc.views.models.%(module_name)s.list_org',
+        'soc.views.models.%(module_name)s.list_orgs',
         'List my %(name_plural)s')
     ]
 
@@ -173,7 +173,7 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def listOrg(self, request, access_type,
+  def listOrgs(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Lists all organization which the given student can propose to.
 
@@ -224,7 +224,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
-list_org = view.listOrg
+list_orgs = view.listOrgs
 list_self = view.listSelf
 public = view.public
 export = view.export

@@ -1126,6 +1126,11 @@ class Checker(object):
   def checkIsMyEntity(self, django_args, logic,
                       field_name='user', user=False):
     """Checks whether the entity belongs to the user.
+
+    Args:
+      logic: the logic that should be used to fetch the entity
+      field_name: the name of the field the entity uses to store it's owner
+      user: whether the entity stores the user's key name, or a reference
     """
 
     self.checkIsUser(django_args)

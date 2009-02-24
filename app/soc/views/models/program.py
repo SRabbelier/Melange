@@ -299,11 +299,9 @@ class View(presence_with_tos.View):
 
     timeline_entity = program_entity.timeline
 
-    # TODO(ljvderijk) add the student application links
-
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-      #items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
-      #   "Send in your student proposal (N/A)", 'any_access')]
+      items += [('/student_proposal/list_orgs/%s' % (student_entity.key().name()),
+          "Send in your student proposal", 'any_access')]
       items += [(redirects.getListSelfRedirect(student_entity,
              {'url_name':'student_proposal'}),
          "List my Student Proposals", 'any_access')]

@@ -426,6 +426,29 @@ class Checker(object):
     if not self.hasMembership(roles, django_args):
       raise out_of_band.AccessViolation(message_fmt)
 
+  def checkHasAny(self, django_args, checks):
+    """Checks if any of the checks passes.
+
+    If none of the specified checks passes, the exception that the first of the
+    checks raised is reraised.
+    """
+
+    first = None
+
+    for checker_name, args in checks:
+      try:
+        self.doCheck(checker_name, django_args, args)
+        break
+      except out_of_band.Error, e:
+        # store the first esception
+        first = first if first else e
+    else:
+      # one check passed, all is well
+      return
+
+    # none passed, re-raise the first exception
+    raise first
+
   def allow(self, django_args):
     """Never raises an alternate HTTP response.  (an access no-op, basically).
 

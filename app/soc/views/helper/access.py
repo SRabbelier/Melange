@@ -1222,28 +1222,36 @@ class Checker(object):
 
   @allowSidebar
   @allowDeveloper
-  def checkIsDocumentReadable(self, django_args):
+  def checkIsDocumentReadable(self, django_args, key_name_field=None):
     """Checks whether a document is readable.
 
     Args:
       django_args: a dictionary with django's arguments
     """
 
-    document = document_logic.getFromKeyFieldsOr404(django_args)
+    if key_name_field:
+      key_name = django_args[key_name_field]
+      document = document_logic.getFromKeyName(key_name)
+    else:
+      document = document_logic.getFromKeyFieldsOr404(django_args)
 
     self.checkMembership('read', document.prefix,
                          document.read_access, django_args)
 
   @denySidebar
   @allowDeveloper
-  def checkIsDocumentWritable(self, django_args):
+  def checkIsDocumentWritable(self, django_args, key_name_field=None):
     """Checks whether a document is writable.
 
     Args:
       django_args: a dictionary with django's arguments
     """
 
-    document = document_logic.getFromKeyFieldsOr404(django_args)
+    if key_name_field:
+      key_name = django_args[key_name_field]
+      document = document_logic.getFromKeyName(key_name)
+    else:
+      document = document_logic.getFromKeyFieldsOr404(django_args)
 
     self.checkMembership('write', document.prefix,
                          document.write_access, django_args)

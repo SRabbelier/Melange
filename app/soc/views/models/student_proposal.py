@@ -65,6 +65,9 @@ class View(base.View):
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], ['new', 'pending', 'accepted', 'rejected']])]
     rights['list'] = ['checkIsDeveloper']
+    rights['list_orgs'] = [
+        ('checkIsStudent', ['scope_path', ['active']]),
+        ('checkCanStudentPropose', 'scope_path')]
     rights['list_self'] = [
         ('checkIsStudent', ['scope_path', ['active', 'inactive']])]
     rights['apply'] = [
@@ -89,6 +92,9 @@ class View(base.View):
         'Create a new %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_self)/%(scope)s$',
         'soc.views.models.%(module_name)s.list_self',
+        'List my %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>list_orgs)/%(scope)s$',
+        'soc.views.models.%(module_name)s.list_org',
         'List my %(name_plural)s')
     ]
 
@@ -166,16 +172,41 @@ class View(base.View):
       context['mentor_name'] = "No mentor assigned"
 
   @decorators.merge_params
-  def listSelf(self, request, access_type,
+  @decorators.check_access
+  def listOrg(self, request, access_type,
              page_name=None, params=None, **kwargs):
-    """Lists all proposals from the current logged-in user.
+    """Lists all organization which the given student can propose to.
 
     For params see base.View.public().
     """
 
-    user_entity = user_logic.logic.getForCurrentAccount()
-    filter = {'user': user_entity}
-    student_entity = student_logic.logic.getForFields(filter, unique=True)
+    from soc.views.models import organization as org_view
+
+    student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
+
+    filter = {'scope' : student_entity.scope,
+              'status': 'active'}
+
+    list_params = org_view.view.getParams().copy()
+    list_params['list_description'] = ('List of %(name_plural)s you can send '
+        'your proposal to.') % list_params
+    list_params['list_action'] = (redirects.getStudentProposalRedirect,
+        {'student_key': student_entity.key().name(),
+            'url_name': params['url_name']})
+
+    return self.list(request, access_type=access_type, page_name=page_name,
+                     params=list_params, filter=filter, **kwargs)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listSelf(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Lists all proposals from the current logged-in user for the given student.
+
+    For params see base.View.public().
+    """
+
+    student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
 
     filter = {'scope' : student_entity,
               'status': ['new', 'pending', 'accepted', 'rejected']}
@@ -193,6 +224,7 @@ create = view.create
 delete = view.delete
 edit = view.edit
 list = view.list
+list_org = view.listOrg
 list_self = view.listSelf
 public = view.public
 export = view.export

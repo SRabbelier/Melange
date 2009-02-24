@@ -438,13 +438,11 @@ class Checker(object):
     for checker_name, args in checks:
       try:
         self.doCheck(checker_name, django_args, args)
-        break
+        # one check passed, all is well
+        return
       except out_of_band.Error, e:
         # store the first esception
         first = first if first else e
-    else:
-      # one check passed, all is well
-      return
 
     # none passed, re-raise the first exception
     raise first

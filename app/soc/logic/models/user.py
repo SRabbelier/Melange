@@ -154,8 +154,16 @@ class Logic(base.Logic):
     if (name == 'agreed_to_tos') and (entity.agreed_to_tos != value):
       sidebar.flush(entity.account)
 
-    if (name == 'account') and (str(entity.account) != str(value)):
-      entity.former_accounts.append(entity.account)
+    if (name == 'account'):
+      if (str(entity.account) != str(value)):
+        entity.former_accounts.append(entity.account)
+      elif entity.account != value:
+        # this occurs when the account ends in the auth domain, e.g.:
+        # if the auth domain is "example.com", then the following would
+        # would put us here:
+        # entity.account = users.User('foo@example.com')
+        # value = 'foo'
+        return False
 
     return True
   

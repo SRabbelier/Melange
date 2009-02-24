@@ -174,7 +174,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def listOrgs(self, request, access_type,
-             page_name=None, params=None, **kwargs):
+               page_name=None, params=None, **kwargs):
     """Lists all organization which the given student can propose to.
 
     For params see base.View.public().

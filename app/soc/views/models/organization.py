@@ -169,7 +169,7 @@ class View(group.View):
   @decorators.merge_params
   @decorators.check_access
   def listProposals(self, request, access_type,
-             page_name=None, params=None, **kwargs):
+                    page_name=None, params=None, **kwargs):
     """Lists all proposals for the organization given in kwargs.
 
     For params see base.View.public().
@@ -193,7 +193,7 @@ class View(group.View):
   @decorators.merge_params
   @decorators.check_access
   def listPublic(self, request, access_type, page_name=None,
-           params=None, filter=None, **kwargs):
+                 params=None, filter=None, **kwargs):
     """See base.View.list.
     """
 

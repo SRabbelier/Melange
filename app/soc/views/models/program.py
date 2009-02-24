@@ -301,7 +301,7 @@ class View(presence_with_tos.View):
 
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
       items += [('/student_proposal/list_orgs/%s' % (student_entity.key().name()),
-          "Send in your Student Proposal", 'any_access')]
+          "Submit your Student Proposal", 'any_access')]
       items += [(redirects.getListSelfRedirect(student_entity,
              {'url_name':'student_proposal'}),
          "List my Student Proposals", 'any_access')]

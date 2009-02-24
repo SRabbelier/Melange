@@ -155,6 +155,17 @@ def getInviteRedirectForRole(entity, role_name):
   return result
 
 
+def getListProposalsRedirect(entity, params):
+  """Returns the redirect for the List page for the given
+  Org entity and Org View params.
+  """
+
+  result = '/%s/list_proposals/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
 def getListRequestsRedirect(entity, params):
   """Returns the redirect for the List Requests paged for the given
   Group entity and Group View params.

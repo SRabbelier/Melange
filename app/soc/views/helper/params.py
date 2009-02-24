@@ -147,20 +147,27 @@ def constructParams(params):
 
   new_params['django_patterns'] = None
   new_params['extra_django_patterns'] = []
-  new_params['django_patterns_defaults'] = [
-      (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>admin)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.admin', 'Show %(name_short)s (admin)'),
-      (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.export', 'Export %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s'),
-      (r'^%(url_name)s/(?P<access_type>pick)$',
-          'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s'),
-      ]
+  new_params['django_patterns_defaults'] = []
+
+  if not params.get('no_edit'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s')]
+
+  if not params.get('no_delete'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s')]
+
+  if not params.get('no_show'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s')]
+
+  if not params.get('no_admin'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>admin)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.admin', 'Show %(name_short)s (admin)')]
 
   if not params.get('no_create_raw'):
     new_params['django_patterns_defaults'] += [
@@ -181,6 +188,16 @@ def constructParams(params):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list)$',
           'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
+
+  if params.get('pickable'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>pick)$',
+          'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s')]
+
+  if params.get('export_content_type'):
+    new_params['django_patterns_defaults'] += [
+        (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.export', 'Export %(name_short)s')]
 
   if params.get('sans_link_id_create'):
     new_params['django_patterns_defaults'] += [

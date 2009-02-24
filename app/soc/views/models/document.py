@@ -73,6 +73,7 @@ class View(base.View):
     new_params['rights'] = rights
 
     new_params['name'] = "Document"
+    new_params['pickable'] = True
 
     new_params['export_content_type'] = 'text/text'
     new_params['export_extension'] = '.html'

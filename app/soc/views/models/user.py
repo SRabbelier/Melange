@@ -69,6 +69,7 @@ class View(base.View):
     new_params['name'] = "User"
 
     new_params['edit_template'] = 'soc/user/edit.html'
+    new_params['pickable'] = True
 
     new_params['sidebar_heading'] = 'Users'
 

@@ -448,6 +448,9 @@ class View(object):
       self._editSeed(request, seed)
 
       if seed:
+        # pass the seed through the  context to _constructResponse
+        # it will be popped before dispatching to Django
+        context['seed'] = seed
         form = params['create_form'](initial=seed)
       else:
         form = params['create_form']()
@@ -788,6 +791,10 @@ class View(object):
         template = params['create_template']
 
     self._editContext(request, context)
+
+    # remove the seed from the context before dispatching to Django
+    context.pop('seed', None)
+
     return helper.responses.respond(request, template, context)
 
   def getParams(self):

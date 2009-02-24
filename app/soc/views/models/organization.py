@@ -229,7 +229,7 @@ class View(group.View):
     if roles.get('org_admin') or roles.get('mentor'):
       # add a link to view all the student proposals
       submenu = (redirects.getListProposalsRedirect(group_entity, params),
-          "View all student proposals", 'any_access')
+          "View all Student Proposals", 'any_access')
       submenus.append(submenu)
 
 

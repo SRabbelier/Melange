@@ -28,6 +28,7 @@ from django import forms
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import accounts
+from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
@@ -74,6 +75,10 @@ class View(group.View):
                              [org_admin_logic.logic, all])]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
+    rights['list_proposals'] = [('checkHasAny', [
+        [('checkHasActiveRoleForScope', [org_admin_logic.logic, all]),
+        ('checkHasActiveRoleForScope', [mentor_logic.logic, all])]
+        ])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic
@@ -99,7 +104,10 @@ class View(group.View):
 
     patterns += [(r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
         'soc.views.models.%(module_name)s.apply_mentor', 
-        "List of all %(name_plural)s you can apply to"),]
+        "List of all %(name_plural)s you can apply to"),
+        (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.list_proposals', 
+        "List of all Student Proposals for this %(name)s"),]
 
     new_params['extra_django_patterns'] = patterns
 
@@ -160,6 +168,30 @@ class View(group.View):
 
   @decorators.merge_params
   @decorators.check_access
+  def listProposals(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Lists all proposals for the organization given in kwargs.
+
+    For params see base.View.public().
+    """
+
+    from soc.views.models import student_proposal as student_proposal_view
+
+    org_entity = org_logic.logic.getFromKeyFields(kwargs)
+
+    filter = {'org' : org_entity,
+              'status': ['new', 'pending', 'accepted']}
+
+    list_params = student_proposal_view.view.getParams().copy()
+    list_params['list_description'] = 'List of %s send to %s ' %(
+        list_params['name_plural'], org_entity.name)
+    list_params['list_action'] = (redirects.getPublicRedirect, list_params)
+
+    return self.list(request, access_type=access_type, page_name=page_name,
+                     params=list_params, filter=filter, **kwargs)
+
+  @decorators.merge_params
+  @decorators.check_access
   def listPublic(self, request, access_type, page_name=None,
            params=None, filter=None, **kwargs):
     """See base.View.list.
@@ -193,6 +225,13 @@ class View(group.View):
 
     group_entity = role_description['group']
     roles = role_description['roles']
+
+    if roles.get('org_admin') or roles.get('mentor'):
+      # add a link to view all the student proposals
+      submenu = (redirects.getListProposalsRedirect(group_entity, params),
+          "View all student proposals", 'any_access')
+      submenus.append(submenu)
+
 
     if roles.get('org_admin'):
       # add a link to the management page
@@ -229,6 +268,7 @@ class View(group.View):
           "List Documents", 'any_access')
       submenus.append(submenu)
 
+
     if roles.get('org_admin'):
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['org_admin'], 
@@ -241,6 +281,7 @@ class View(group.View):
           {'url_name': 'org_admin'}),
           "Edit My Admin Profile", 'any_access')
       submenus.append(submenu)
+
 
     if roles.get('mentor'):
       # add a link to the resign page
@@ -268,6 +309,7 @@ delete = view.delete
 edit = view.edit
 home = view.home
 list = view.list
+list_proposals = view.listProposals
 list_public = view.listPublic
 list_requests = view.listRequests
 list_roles = view.listRoles

@@ -26,6 +26,7 @@ import datetime
 import time
 
 from django import forms
+from django import http
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -122,7 +123,7 @@ class View(base.View):
         'link_id': forms.CharField(widget=forms.HiddenInput)
         }
 
-    # TODO(ljvderijk) students should be able to withdraw their proposals
+    new_params['edit_template'] = 'soc/student_proposal/edit.html'
 
     params = dicts.merge(params, new_params)
 
@@ -170,6 +171,39 @@ class View(base.View):
       context['mentor_name'] = entity.mentor.name()
     else:
       context['mentor_name'] = "No mentor assigned"
+
+  @decorators.merge_params
+  @decorators.check_access
+  def edit(self, request, access_type,
+           page_name=None, params=None, seed=None, **kwargs):
+    """If the POST contains (action, Withdraw) the proposal in kwargs
+       will be marked as invalid.
+
+    For params see base.View.edit()
+    """
+
+    # check if request.POST contains action
+    post_dict = request.POST
+    if 'action' in post_dict and post_dict['action'] == 'Withdraw':
+      # withdraw this proposal
+      filter = {'scope_path': kwargs['scope_path'],
+                'link_id': kwargs['link_id']}
+
+      proposal_logic = params['logic']
+      student_proposal_entity = proposal_logic.getForFields(filter, unique=True)
+
+      # update the entity mark it as invalid
+      proposal_logic.updateEntityProperties(student_proposal_entity,
+          {'status': 'invalid'})
+
+      # redirect to the program's homepage
+      redirect_url = redirects.getHomeRedirect(student_proposal_entity.program,
+          {'url_name': 'program'})
+
+      return http.HttpResponseRedirect(redirect_url)
+
+    return super(View, self).edit(request=request, access_type=access_type,
+           page_name=page_name, params=params, seed=seed, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

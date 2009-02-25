@@ -120,6 +120,7 @@ class View(object):
 
     context['entity'] = entity
     context['entity_type'] = params['name']
+    context['entity_type_url'] = params['url_name']
 
     template = params['public_template']
 

@@ -52,7 +52,7 @@ limitations under the License.
   {{ home_document.content|safe }}
  {% else %}
 {% block missing_doc %}
-This is the default home page, it can be edited via <a href="/{{ entity_type|lower }}/edit/{{ entity.key.name }}">Edit {{ entity_type }} Settings</a>.<br />
+This is the default home page, it can be edited via <a href="/{{ entity_type_url|lower }}/edit/{{ entity.key.name }}">Edit {{ entity_type }} Settings</a>.<br />
 {% endblock %}
  {% endif %}
  {% if entity.feed_url %}

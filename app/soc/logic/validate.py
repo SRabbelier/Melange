@@ -36,13 +36,31 @@ def isFeedURLValid(feed_url=None):
   Args:
     feed_url: ATOM or RSS feed url
   """
-  if feed_url:
+
+  # a missing or empty feed url is never valid
+  if not feed_url:
+    return False
+
+  try:
     result = urlfetch.fetch(feed_url)
-    if result.status_code == 200:
-      parsed_feed = feedparser.parse(result.content)
-      if parsed_feed.version and (parsed_feed.version != ''):
-        return True
-  return False
+  except urlfetch_errors.Error, e:
+    return False
+
+  # 200 is the status code for 'all ok'
+  if result.status_code != 200:
+    return False
+
+  parsed_feed = feedparser.parse(result.content)
+
+  # version is always present if the feed is valid
+  if not parsed_feed.version:
+    return False
+
+  # TODO: isn't this check redunant?
+  if parsed_feed.version == '':
+    return False
+
+  return True
 
 
 def isLinkIdFormatValid(link_id):

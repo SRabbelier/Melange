@@ -62,10 +62,10 @@ Please use this form to edit the {{ entity_type }}.
    {% block delete_button %}
    <td>
 
-   <input type="submit" class="button" value="Delete"
+   <input type="button" class="button" value="Delete"
     onclick="if(confirm('Are you sure you want to delete this {{ entity_type }}?')) {
-                location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'
-                };"/>
+                location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}';
+                }"/>
 
    </td>
    {% endblock %}

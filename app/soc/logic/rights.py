@@ -33,7 +33,7 @@ class Checker(object):
       'admin': [],
       'restricted': ['host'],
       'member': ['user'],
-      'list': [],
+      'list': ['host'],
       }
 
   CLUB_MEMBERSHIP = {

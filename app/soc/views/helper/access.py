@@ -233,6 +233,7 @@ class Checker(object):
   #: the depths of various scopes to other scopes
   # the 0 entries are not used, and are for clarity purposes only
   SCOPE_DEPTH = {
+      'site': None,
       'sponsor': (sponsor_logic, {'sponsor': 0}),
       'program': (program_logic, {'sponsor': 1, 'program': 0}),
       'org': (org_logic, {'sponsor': 2, 'program': 1, 'org': 0}),
@@ -730,7 +731,11 @@ class Checker(object):
     """
 
     prefix = django_args['prefix']
-    scope_logic, depths = self.SCOPE_DEPTH.get(prefix, (None, {}))
+    if self.SCOPE_DEPTH.get(prefix):
+      scope_logic, depths = self.SCOPE_DEPTH[prefix]
+    else:
+      return self.checkHasActiveRole(django_args, logic)
+
     depth = depths.get(target_scope, 0)
 
     # nothing to do

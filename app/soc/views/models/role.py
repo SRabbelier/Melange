@@ -256,8 +256,8 @@ class View(base.View):
     key_name = request_logic.logic.getKeyNameFromFields(request_fields)
 
     # create the request entity
-    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, 
-        key_name)
+    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields,
+                                                           key_name)
 
     # send out an invite notification
     notifications_helper.sendInviteNotification(entity)

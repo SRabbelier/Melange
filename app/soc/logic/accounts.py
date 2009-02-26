@@ -20,14 +20,11 @@
 __authors__ = [
   '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
 from google.appengine.api import users
-
-from soc.logic import models
-
-import soc.logic.models.user
 
 
 def normalizeAccount(account):
@@ -41,51 +38,38 @@ def normalizeAccount(account):
 
   return users.User(email=normalized)
 
-def isDeveloper(account=None, user=None):
+def isDeveloper(account=None):
   """Returns True if a Google Account is a Developer with special privileges.
-  
+
   Since it only works on the current logged-in user, if account matches the
   current logged-in Google Account, the App Engine Users API function
   user.is_current_user_admin() is checked.  If that returns False, or
-  account is not the currently logged-in user, the is_developer property of
-  the User entity corresponding to the Google Account is checked next.
-  
+  account is not the currently logged-in user, False is returned.
+
   This solves the "chicken-and-egg" problem of no User entity having its
   is_developer property set, but no one being able to set it.
-  
-  Args:
-    account: a Google Account (users.User) object; if not supplied,
-      the current logged-in user is checked
-  """
 
-  if user and (not account):
-    account = user.account
+  Args:
+    account: a Google Account (users.User) object;
+      if not supplied, the current logged-in user is checked
+  """
 
   # Get the currently logged in user
   current = users.get_current_user()
 
-  if not (account or current):
+  if current and (not account):
+    # default to the current user
+    account = current
+
+  if not account:
     # no Google Account was supplied or is logged in, so an unspecified
     # User is definitely *not* a Developer
     return False
 
-  if (((not account) or (account == current))
-      and users.is_current_user_admin()):
-    # no account supplied, or current logged-in user, and that user is in the
+  if (account == current) and users.is_current_user_admin():
+    # the current account should be checked, and it is in the
     # Administration->Developers list in the App Engine console
     return True
 
-  if not account:
-    account = current
-
-  if not user:
-    user = models.user.logic.getForFields(
-        {'account': account, 'status': 'valid'}, unique=True)
-
-  if not user:
-    # no User entity for this Google Account, and account is not the
-    # currently logged-in user, so there is no conclusive way to check the
-    # Administration->Developers list in the App Engine console
-    return False
-  
-  return user.is_developer
+  # account is not current user, or current user is not an admin
+  return False

@@ -32,13 +32,13 @@ from django.template import loader
 from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site
+from soc.logic.models.user import logic as user_logic
 from soc.views import helper
 from soc.views.helper import redirects
 from soc.views.helper import templates
 from soc.views.sitemap import sidebar
 
 import soc.logic
-import soc.logic.models.user
 import soc.views.helper.requests
 
 
@@ -114,8 +114,8 @@ def getUniversalContext(request):
   context['request'] = request
 
   if account:
-    user = soc.logic.models.user.logic.getForCurrentAccount()
-    is_admin = accounts.isDeveloper(account=account)
+    user = user_logic.getForAccount(account)
+    is_admin = user_logic.isDeveloper(account=account, user=user)
 
   context['account'] = account
   context['user'] = user

@@ -28,6 +28,7 @@ from django.utils.translation import ugettext
 from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
 from soc.views.helper import widgets
@@ -118,7 +119,16 @@ class View(presence_with_tos.View):
 
     if entity:
       submenus += document_view.view.getMenusForScope(entity, self._params)
-      if user and accounts.isDeveloper(id, user):
+
+      try:
+        rights = self._params['rights']
+        rights.setCurrentUser(id, user)
+        rights.checkIsHost()
+        is_host = True
+      except out_of_band.Error:
+        is_host = False
+
+      if is_host:
         submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
             "Create a New Document", 'any_access')]
 

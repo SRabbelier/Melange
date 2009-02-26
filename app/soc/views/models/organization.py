@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from django import forms
 
 from soc.logic import cleaning
@@ -32,6 +34,7 @@ from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import user as user_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -56,28 +59,26 @@ class View(group.View):
       original_params: a dict with params for this View
     """
 
-    all = "%(scope_path)s/%(link_id)s"
-
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope',
-                           [org_admin_logic.logic, all]),
-                      ('checkIsActive', [org_logic.logic, None])]
+    rights['edit'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+                           org_admin_logic.logic,),
+                      ('checkGroupIsActiveForLinkId', org_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
     rights['apply_mentor'] = ['checkIsUser']
-    rights['list_requests'] = [('checkHasActiveRoleForScope', 
-                                [org_admin_logic.logic, all])]
-    rights['list_roles'] = [('checkHasActiveRoleForScope', 
-                             [org_admin_logic.logic, all])]
+    rights['list_requests'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+                                org_admin_logic.logic)]
+    rights['list_roles'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+                             org_admin_logic.logic)]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
     rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasActiveRoleForScope', [org_admin_logic.logic, all]),
-        ('checkHasActiveRoleForScope', [mentor_logic.logic, all])]
+        [('checkHasActiveRoleForKeyFieldsAsScope', org_admin_logic.logic),
+         ('checkHasActiveRoleForKeyFieldsAsScope', mentor_logic.logic)]
         ])]
 
     new_params = {}
@@ -197,8 +198,18 @@ class View(group.View):
     """See base.View.list.
     """
 
-    new_params = {}
-    if accounts.isDeveloper():
+    account = users.get_current_user()
+    user = user_logic.getForAccount(account) if account else None
+
+    try:
+      rights = self._params['rights']
+      rights.setCurrentUser(account, user)
+      rights.checkIsHost()
+      is_host = True
+    except out_of_band.Error:
+      is_host = False
+
+    if is_host:
       new_params['list_action'] = (redirects.getAdminRedirect, params)
     else:
       new_params['list_action'] = (redirects.getPublicRedirect, params)

@@ -60,9 +60,11 @@ class Logic(base.Logic):
 
     super(Logic, self)._onCreate(entity)
 
-  def _updateField(self, entity, name, value):
+  def _updateField(self, entity, entity_properties, name):
     """If unread changes we flush the sidebar cache.
     """
+
+    value = entity_properties[name]
 
     if (name == 'unread') and (entity.unread != value):
       # in case that the unread value changes we flush the sidebar.

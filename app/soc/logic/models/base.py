@@ -358,7 +358,8 @@ class Logic(object):
       if name in self._skip_properties or (name not in entity_properties):
         continue
 
-      if self._updateField(entity, name, value):
+      if self._updateField(entity, entity_properties, name):
+        value = entity_properties[name]
         prop.__set__(entity, value)
 
     entity.put()
@@ -418,7 +419,7 @@ class Logic(object):
     # entity has been deleted call _onDelete
     self._onDelete(entity)
 
-  def _updateField(self, entity, name, value):
+  def _updateField(self, entity, entity_properties, name):
     """Hook called when a field is updated.
 
     Base classes should override if any special actions need to be

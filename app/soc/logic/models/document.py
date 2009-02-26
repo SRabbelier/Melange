@@ -61,9 +61,11 @@ class Logic(work.Logic):
 
     return ['prefix', 'scope_path', 'link_id']
 
-  def _updateField(self, entity, name, value):
+  def _updateField(self, entity, entity_properties, name):
     """Special logic for role. If state changes to active we flush the sidebar.
     """
+
+    value = entity_properties[name]
 
     if (name == 'is_featured') and (entity.is_featured != value):
       sidebar.flush()

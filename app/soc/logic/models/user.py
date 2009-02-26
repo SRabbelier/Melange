@@ -129,7 +129,7 @@ class Logic(base.Logic):
 
     return ['link_id']
 
-  def _updateField(self, entity, name, value):
+  def _updateField(self, entity, entity_properties, name):
     """Special case logic for account.
 
     When the account is changed, the former_accounts field should be appended
@@ -138,6 +138,8 @@ class Logic(base.Logic):
     rights have changed, so we need to flush the sidebar.
     Make sure once the user agreed ToS, the ToS fields can't be changed.
     """
+
+    value = entity_properties[name]
 
     # iff the agreed_to_tos is True and we want to set it to False 
     if (name == 'agreed_to_tos') and (not value) and entity.agreed_to_tos:

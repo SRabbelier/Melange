@@ -63,9 +63,11 @@ class Logic(base.Logic):
 
     return group
 
-  def _updateField(self, entity, name, value):
+  def _updateField(self, entity, entity_properties, name):
     """Special logic for role. If status changes to active we flush the sidebar.
     """
+
+    value = entity_properties[name]
 
     if (name == 'status') and (entity.status != value) and value == 'active':
       # in case the status of the role changes to active we flush the sidebar

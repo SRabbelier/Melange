@@ -30,6 +30,17 @@ from soc.logic import models
 import soc.logic.models.user
 
 
+def normalizeAccount(account):
+  """Returns a normalized version of the specified account.
+  """
+
+  normalized = str(account).lower()
+
+  if account.email() == normalized:
+    return account
+
+  return users.User(email=normalized)
+
 def isDeveloper(account=None, user=None):
   """Returns True if a Google Account is a Developer with special privileges.
   

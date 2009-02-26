@@ -14,7 +14,8 @@
 
 # TODO(proto): uncomment and supply a Google App Engine application instance
 # application: FIXME
-version: 1
+# TODO(release): see the instructions in README about the "version:" field
+version: 0-5-20090224
 runtime: python
 api_version: 1
 

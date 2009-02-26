@@ -1,3 +1,5 @@
+= WHAT BELONGS IN trunk/app =
+
 trunk/app should contain only the files needed for the actual Google App
 Engine application "image".  Support code that is not part of the application
 image belongs elsewhere, such as in trunk/scripts, for example.
@@ -28,4 +30,70 @@ removes files, such as license text files, that were added later to the
 "target" directory), place the license text file in the trunk/app directory
 and add the package name as a suffix (LICENSE.django is an example of this
 case).
+
+= CREATING AN OFFICIAL RELEASE =
+
+== CREATING THE RELEASE CANDIDATE BRANCH AND TAGGING A RELEASE ==
+
+Steps (currently done by hand, but too be scripted in the future) to make
+a release:
+
+1) Set the "version:" field in the app.yaml.template file to a "release
+   candidate" release string.  Version strings cannot contain dots
+   (periods) and have some other restrictions.  As a result, the format
+   of the release-candidate "version:" field needs to be:
+
+     A-B-YYYYMMDD
+
+   where:
+   * A is a major number (currently '0' until at least GSoC functionality
+     is completely implemented)
+   * B is a (possibly multi-digit) minor number that is increased whenever
+     there is a major increase in functionality (some major GSoC or GHOP
+     feature, e.g. student sign-ups and proposals, is implemented)
+   * YYYY is the four digit year of the release date
+   * MM is the (always) two digit month of the release date (zero-padded)
+   * DD is the (always) two digit day of the release date (zero-padded)
+
+2) Commit this file *by itself* in its own commit.
+
+3) Use 'svn cp' to create a release branch of /trunk/ in /branches/ with
+   exactly the same name as the contents of the "version:" field in the
+   app.yaml.template file.  Branch on the specific revision of the commit
+
+4) Finalize the release candidate branch for a push to the live web site.
+   Use 'svn cp' to create a tag in /tags/ with exactly the same name as the
+   contents of the "version:" field in the app.yaml.template file.  Specify
+   the *specific revision* of the commit in step #2 above.
+
+Step #4 might actually be delayed for one or more patch releases, once there
+is some sort of User Acceptance Testing (UAT) checklist for a release
+candidate, because defects would be patched in the release candidate branch
+one or more times before an actual release is tagged.  See the next section
+for details.
+
+== PATCHING AND RE-RELEASING AN EXISTING RELEASE CANDIDATE BRANCH ==
+
+To re-release a previously-tagged release branch after a patch for a push to
+the live web site:
+
+1) Increment the "patch suffix" of the "version:" field value to the next
+   integer (for example, "p1" becomes "p2"), or append "p1" to the end of
+   the existing string if this is the first patch release (so the first tagged
+   patch release will always be "p1").  For example:
+
+     A-B-YYYYMMDD becomes A-B-YYYYMMDDp1
+
+   and:
+
+     A-B-YYYYMMDDp1 becomes A-B-YYYYMMDDp2
+
+   etc.
+
+2) Commit this file *by itself* in its own commit (after the last batch
+   of patches being made to the existing /branches/ release branch).
+
+3) Use 'svn cp' to create a tag in /tags/ with exactly the same name as the
+   contents of the new, patched "version:" field in the app.yaml.template
+   file.  Specify the *specific revision* of the commit in step #2 above.
 

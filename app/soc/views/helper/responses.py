@@ -29,7 +29,6 @@ from google.appengine.ext import db
 from django import http
 from django.template import loader
 
-from soc import release
 from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site
@@ -128,8 +127,9 @@ def getUniversalContext(request):
 
   context['sidebar_menu_items'] = sidebar.getSidebar(account, user)
 
-  context['soc_release'] = release.RELEASE_TAG
-  context['gae_version'] = system.getAppVersion()
+  gae_version = system.getAppVersion()
+  context['gae_version'] = gae_version
+  context['soc_release'] = gae_version.split('.', 1)[0]
 
   settings = site.logic.getSingleton()
 

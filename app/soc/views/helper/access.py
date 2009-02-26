@@ -889,8 +889,8 @@ class Checker(object):
 
     fields = {
         'link_id': django_args['link_id'],
-        'status': ['needs review', 'accepted', 'rejected', 'ignored',
-            'pre-accepted']
+        'status': ['needs review', 'accepted', 'ignored', 'pre-accepted',
+            'pre-rejected']
         }
 
     if 'scope_path' in django_args:

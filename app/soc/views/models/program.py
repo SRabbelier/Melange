@@ -153,11 +153,12 @@ class View(presence_with_tos.View):
 
     timeline_logic = program_logic.logic.TIMELINE_LOGIC[workflow]
 
-    key_fields = timeline_logic.getKeyFieldsFromFields(fields)
-    properties = key_fields.copy()
+    properties = timeline_logic.getKeyFieldsFromFields(fields)
+    key_name = timeline_logic.getKeyNameFromFields(properties)
+
     properties['scope'] = fields['scope']
 
-    timeline = timeline_logic.updateOrCreateFromFields(properties, properties)
+    timeline = timeline_logic.updateOrCreateFromKeyName(properties, key_name)
     return timeline
 
   @decorators.merge_params

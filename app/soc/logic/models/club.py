@@ -69,8 +69,8 @@ class Logic(group.Logic):
           continue
 
         properties['link_id'] = admin.link_id
-        key_fields = request_logic.logic.getKeyFieldsFromFields(properties)
-        request_logic.logic.updateOrCreateFromFields(properties, key_fields)
+        key_name = request_logic.logic.getKeyNameFromFields(properties)
+        request_logic.logic.updateOrCreateFromKeyName(properties, key_name)
 
       # set the application to completed
       fields = {'status' : 'completed'}

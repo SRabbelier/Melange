@@ -82,6 +82,7 @@ class View(group_app.View):
     new_params['name_plural'] = "Club Applications"
     new_params['name_short'] = "Club App"
     new_params['url_name'] = "club_app"
+    new_params['group_name'] = "Club"
     new_params['group_url_name'] = 'club'
 
     new_params['review_template'] = 'soc/club_app/review.html'

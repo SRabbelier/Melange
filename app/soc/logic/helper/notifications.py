@@ -105,6 +105,8 @@ def sendNewGroupNotification(entity, params):
       }
 
   message_properties = {
+      'application_type': params['name'],
+      'group_type': params['group_name'],
       'group_name': entity.name,
       'url': url,
       }

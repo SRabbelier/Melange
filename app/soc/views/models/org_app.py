@@ -116,6 +116,7 @@ class View(group_app.View):
     new_params['name_plural'] = "Organization Applications"
     new_params['name_short'] = "Org App"
     new_params['url_name'] = "org_app"
+    new_params['group_name'] = "Organization"
     new_params['group_url_name'] = 'org'
 
     new_params['review_template'] = 'soc/org_app/review.html'

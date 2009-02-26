@@ -26,6 +26,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 
 from soc.cache import sidebar
+from soc.logic import accounts
 from soc.logic.helper import notifications
 from soc.logic.models import base
 from soc.logic.models.site import logic as site_logic
@@ -72,10 +73,26 @@ class Logic(base.Logic):
     if not account:
       return None
 
-    user = self.getForFields({'account': account, 'status':'valid'}, 
-        unique=True)
+    return self.getForAccount(account)
 
-    return user
+  def getForAccount(self, account):
+    """Retrieves the user entity for the specified account.
+
+    If there is no user logged in, or they have no valid associated User
+    entity, None is returned.
+    """
+
+    if not account:
+      raise base.InvalidArgumentError
+
+    account = accounts.normalizeAccount(account)
+
+    fields = {
+        'account': account,
+        'status':'valid',
+        }
+
+    return self.getForFields(filter=fields, unique=True)
 
   def agreesToSiteToS(self, entity):
     """Returns indication of User's answer to the site-wide Terms of Service.

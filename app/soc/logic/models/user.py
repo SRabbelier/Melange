@@ -110,8 +110,8 @@ class Logic(base.Logic):
       # default user to the current logged in user
       user = self.getForAccount(account)
 
-    if user:
-      return user.is_developer
+    if user and user.is_developer:
+      return True
 
     if account and (account == users.get_current_user()):
       return users.is_current_user_admin()

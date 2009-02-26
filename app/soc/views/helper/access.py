@@ -1157,7 +1157,7 @@ class Checker(object):
 
     self.checkIsUser(django_args)
 
-    if 'seed' in django_args:
+    if django_args.get('seed'):
       key_name = django_args['seed'][key_location]
     else:
       key_name = django_args[key_location]

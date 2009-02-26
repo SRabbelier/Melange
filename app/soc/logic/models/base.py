@@ -384,12 +384,10 @@ class Logic(object):
     if create_entity:
       # entity did not exist, so create one in a transaction
       entity = self._model.get_or_insert(key_name, **properties)
-
-
-    # there is no way to be sure if get_or_insert() returned a new entity or
-    # got an existing one due to a race, so update with properties anyway,
-    # in a transaction
-    entity = self.updateEntityProperties(entity, properties, silent=True)
+    else:
+      # If someone else already created the entity (due to a race), we
+      # should not update the propties (as they 'won' the race).
+      entity = self.updateEntityProperties(entity, properties, silent=True)
 
     if create_entity:
       # a new entity has been created call _onCreate

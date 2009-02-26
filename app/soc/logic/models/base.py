@@ -300,9 +300,7 @@ class Logic(object):
       out_of_band.Error if no entity is found
     """
 
-    key_fields = self.getKeyFieldsFromFields(fields)
-
-    entity = self.getFromKeyFields(key_fields)
+    entity = self.getFromKeyFields(fields)
 
     if entity:
       return entity
@@ -403,16 +401,15 @@ class Logic(object):
     Like updateEntityProperties(), but not run within a transaction.
     """
 
-    properties = entity.properties()
+    properties = self._model.properties()
 
-    for prop in properties.values():
-      name = prop.name
+    for name, prop in properties.iteritems():
+      # if the property is not updatable or is not updated, skip it
+      if name in self._skip_properties or (name not in entity_properties):
+        continue
 
-      if not name in self._skip_properties and name in entity_properties:
-        value = entity_properties[prop.name]
-
-        if self._updateField(entity, name, value):
-          prop.__set__(entity, value)
+      if self._updateField(entity, name, value):
+        prop.__set__(entity, value)
 
     entity.put()
     return entity

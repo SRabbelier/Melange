@@ -110,16 +110,6 @@ def readonly_field_as_twoline_table_row(field_label, field_value):
   return {'field_label': field_label,
           'field_value': field_value}
 
-
-@register.inclusion_tag(
-    'soc/templatetags/_readonly_multiline_field_as_table_row.html')
-def readonly_multiline_field_as_table_row(field_label, field_value):
-  """See readonly_field_as_table_row, but with a different template tag.
-  """
-  return {'field_label': field_label,
-          'field_value': field_value}
-
-
 @register.inclusion_tag('soc/templatetags/_as_readonly_table.html',
                         takes_context=True)
 def as_readonly_table(context, form):

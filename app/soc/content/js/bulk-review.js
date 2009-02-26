@@ -2,19 +2,18 @@ $(document).ready(function() {
 	$("#applications_progress_bar").progressBar({showText: false});
 });
 
-function acceptOrgInit(bulk_accept_link) {
+function bulkReviewInit(bulk_review_link) {
 	// get the JSON object with details of every application for bulk acceptance
-	$.getJSON(bulk_accept_link+"?_="+(new Date().getTime()),
+	$.getJSON(bulk_review_link+"?_="+(new Date().getTime()),
 		function(data){
-			// If there are applications to accept...
+			// If there are applications to review...
 			if (data.nr_applications != 0) {
-				//...then fade out the button, show the progress bar and call the function for acceptance
-				$("#button_accept").fadeOut("slow",
+				//...then fade out the button, show the progress bar and call the function for review
+				$("#button_bulk_review").fadeOut("slow",
 					function() {
 						$("#applications_progress_bar").progressBar(0);
-						$("#button_accept").val("Bulk accept");
 						$("#description_done").html("");
-						$("#applications_progress_bar").fadeIn("slow", acceptOrgs(data));
+						$("#applications_progress_bar").fadeIn("slow", bulkReview(data));
 					}
 				);
 			}else {
@@ -24,7 +23,7 @@ function acceptOrgInit(bulk_accept_link) {
 	);
 }
 
-function acceptOrgs(data) {
+function bulkReview(data) {
 	// some global constants
 	var GLOBAL_LINK = data.link;
 	var TOTAL_APPLICATIONS = data.nr_applications;
@@ -36,7 +35,7 @@ function acceptOrgs(data) {
 	var total_index = data.applications.length;
 
 
-	// call immediately the function for acceptance
+	// call immediately the function for review
 	// real iteration is inside
 	setTimeout(function(){
 		var error_happened = false;
@@ -63,10 +62,9 @@ function acceptOrgs(data) {
 				}
 			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				// if there is an error rename the button to Retry and show an error message
+				// if there is an error return the button and leave a try again message
 				error_happened = true;
-				$("#button_accept").val("Retry");
-				$("#button_accept").fadeIn("slow", function() {
+				$("#button_bulk_review").fadeIn("slow", function() {
 					$("#description_done").html("<strong class='error'> Error encountered, try again</strong>");
 				});
 			}
@@ -83,7 +81,7 @@ function acceptOrgs(data) {
 				$("#applications_progress_bar").fadeOut("slow",
 					function() {
 						$("#applications_progress_bar").progressBar(0);
-						$("#button_accept").fadeIn("slow");
+						$("#button_bulk_review").fadeIn("slow");
 					}
 				);
 				$("#description_progressbar").html("");

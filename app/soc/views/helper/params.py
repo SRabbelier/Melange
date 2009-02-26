@@ -59,7 +59,7 @@ DEF_JS_USES_LIST = [
     'jq_thickbox',
     'jq_ui_core',
     'menu',
-    'orgaccept',
+    'bulk_review',
     'tinymce',
     ]
 
@@ -121,7 +121,7 @@ def constructParams(params):
   if 'document_prefix' not in params:
     params['document_prefix'] = params['url_name']
 
-  # Do not expand edit_redirect to allow it to be overriden without suffix
+  # Do not expand edit_redirect to allow it to be overwritten without suffix
   new_params['edit_redirect'] = '/%(url_name)s/edit/%(suffix)s'
   new_params['missing_redirect'] = '/%(url_name)s/create' % params
   new_params['delete_redirect'] = '/%(url_name)s/list' % params

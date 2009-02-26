@@ -537,6 +537,19 @@ class Checker(object):
     raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
 
   @allowDeveloper
+  def checkIsHost(self, django_args=None):
+    """Checks whether the current user has a role entity.
+
+    Args:
+      django_args: the keyword args from django, not used
+    """
+
+    if not django_args:
+      django_args = {}
+
+    return self.checkHasActiveRole(django_args, host_logic)
+
+  @allowDeveloper
   def checkIsUserSelf(self, django_args, field_name):
     """Checks whether the specified user is the logged in user.
 
@@ -566,16 +579,16 @@ class Checker(object):
       * if a User has this Gooogle Account in their formerAccounts list
     """
 
-    self.checkIsLoggedIn(django_args)
+    self.checkIsLoggedIn()
 
-    user_entity = user_logic.getForFields({'account':self.id}, unique=True)
-
-    if not user_entity and not user_logic.isFormerAccount(self.id):
+    if not self.user and not user_logic.isFormerAccount(self.id):
       # this account has not been used yet
       return
 
     message_fmt = DEF_USER_ACCOUNT_INVALID_MSG_FMT % {
-        'email' : self.id.email()}
+        'email' : self.id.email()
+        }
+
     raise out_of_band.LoginRequest(message_fmt=message_fmt)
 
   def checkHasUserEntity(self, django_args=None):
@@ -610,29 +623,27 @@ class Checker(object):
       * if no Google Account is logged in at all
     """
 
-    self.checkIsUser(django_args)
+    self.checkIsUser()
 
-    if accounts.isDeveloper(account=self.id, user=self.user):
+    if user_logic.isDeveloper(account=self.id, user=self.user):
       return
 
     login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Site Developer '}
+        'role': 'a Site Developer ',
+        }
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
   @allowDeveloper
   @denySidebar
-  def checkIsActive(self, django_args, logic,
-                    field_name='scope_path', filter_field='link_id'):
+  def _checkIsActive(self, django_args, logic, fields):
     """Raises an alternate HTTP response if the entity is not active.
 
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
-      field_name: the name of the field that should be copied verbatim
-                  If a format string is specified it will be formatted with
-                  the specified django_args.
-      filter_field: the name of the field to which scope_path should be set
+      fields: the name of the fields that should be copied verbatim
+              from the django_args as filter
 
     Raises:
       AccessViolationResponse:
@@ -640,22 +651,10 @@ class Checker(object):
       * if the entity status is not active
     """
 
-    self.checkIsUser(django_args)
+    self.checkIsUser()
 
-    fields = {
-        filter_field: django_args[filter_field],
-        'status': 'active',
-        }
-
-    if field_name:
-      # convert to a format string if desired
-      if field_name.find('%') == -1:
-        field_name = ''.join(['%(', field_name, ')s'])
-
-      try:
-        fields['scope_path'] = field_name % django_args
-      except KeyError, e:
-        self.deny(django_args)
+    fields = dicts.filter(django_args, fields)
+    fields['status'] = 'active'
 
     entity = logic.getForFields(fields, unique=True)
 
@@ -664,13 +663,67 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
-  def checkHasActiveRoleForScope(self, django_args, logic,
-                                 field_name='scope_path'):
+  def checkGroupIsActiveForScopeAndLinkId(self, django_args, logic):
+    """Checks that the specified group is active.
+
+    Only group where both the link_id and the scope_path match the value
+    of the link_id and the scope_path from the django_args are considered.
+    """
+
+    fields = ['scope_path', 'link_id']
+    self._checkIsActive(django_args, logic, fields)
+
+  def checkGroupIsActiveForLinkId(self, django_args, logic):
+    """Checks that the specified group is active.
+
+    Only group where the link_id matches the value of the link_id
+    from the django_args are considered.
+    """
+
+    self._checkIsActive(django_args, logic, ['link_id'])
+
+  def checkHasActiveRole(self, django_args, logic):
     """Checks that the user has the specified active role.
     """
 
     django_args['user'] = self.user
-    self.checkIsActive(django_args, logic, field_name, 'user')
+    self._checkIsActive(django_args, logic, ['user'])
+
+  def _checkHasActiveRoleFor(self, django_args, logic, field_name):
+    """Checks that the user has the specified active role.
+
+    Only roles where the field as specified by field_name matches the
+    scope_path from the django_args are considered.
+    """
+
+    fields = ['scope_path', 'user']
+    django_args['user'] = self.user
+    self._checkIsActive(django_args, logic, fields)
+
+  def checkHasActiveRoleForKeyFieldsAsScope(self, django_args, logic):
+    """
+    """
+
+    key_fields = "%(scope_path)s/%(link_id)s" % django_args
+    new_args = {'scope_path': key_fields}
+    self._checkHasActiveRoleFor(new_args, logic, 'scope_path')
+
+  def checkHasActiveRoleForScope(self, django_args, logic):
+    """Checks that the user has the specified active role.
+
+    Only roles where the scope_path matches the scope_path from the
+    django_args are considered.
+    """
+
+    self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
+
+  def checkHasActiveRoleForLinkId(self, django_args, logic):
+    """Checks that the user has the specified active role.
+
+    Only roles where the link_id matches the link_id from the
+    django_args are considered.
+    """
+    self._checkHasActiveRoleFor(django_args, logic, 'link_id')
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.

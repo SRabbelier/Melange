@@ -69,6 +69,7 @@ class View(group_app.View):
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]
     rights['review_overview'] = ['checkIsHostForProgramInScope']
     rights['bulk_accept'] = ['checkIsHostForProgramInScope']
+    rights['bulk_reject'] = ['checkIsHostForProgramInScope']
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', ['org_signup'])]
 
@@ -87,7 +88,10 @@ class View(group_app.View):
         'Create an %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>bulk_accept)/%(scope)s$',
         'soc.views.models.%(module_name)s.bulk_accept',
-        'Bulk Acceptation of %(name_plural)s'),]
+        'Bulk Acceptation of %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>bulk_reject)/%(scope)s$',
+        'soc.views.models.%(module_name)s.bulk_reject',
+        'Bulk Rejection of %(name_plural)s'),]
 
     new_params['extra_django_patterns'] = patterns
     new_params['extra_key_order'] = ['admin_agreement',
@@ -130,8 +134,9 @@ class View(group_app.View):
                page_name=None, params=None, **kwargs):
 
     params['list_template'] = 'soc/org_app/review_overview.html'
-    context = {'bulk_accept_link': '/org_app/bulk_accept/%(scope_path)s' %(
-        kwargs)}
+    context = {
+        'bulk_accept_link': '/org_app/bulk_accept/%(scope_path)s' %(kwargs),
+        'bulk_reject_link': '/org_app/bulk_reject/%(scope_path)s' %(kwargs),}
 
     return super(View, self).reviewOverview(request, access_type,
         page_name=page_name, params=params, context=context, **kwargs)
@@ -162,7 +167,6 @@ class View(group_app.View):
 
     form.fields['admin_agreement'].widget.text = content
 
-
   def _review(self, request, params, app_entity, status, **kwargs):
     """Sends out an email if an org_app has been reviewed and accepted.
 
@@ -172,22 +176,57 @@ class View(group_app.View):
     if status == 'accepted':
       #TODO(ljvderijk) create the email template
       pass
-
+    elif status == 'rejected':
+      #TODO(ljvderijk) create the rejected email template
+      pass
 
   @decorators.merge_params
   @decorators.check_access
   def bulkAccept(self, request, access_type,
                page_name=None, params=None, **kwargs):
-    """Returns a HTTP Response containing JSON information needed 
+    """Returns a HTTP Response containing JSON information needed
        to bulk-accept orgs.
     """
 
-    program_entity = program_logic.logic.getFromKeyName(kwargs['scope_path'])
+    program_keyname = kwargs['scope_path']
+    return self._bulkReview(request, params, 'pre-accepted', 'accepted',
+        program_keyname)
 
-    # get all pre-accepted organization applications for the given program
-    filter = {'scope' : program_entity,
-              'status' : 'pre-accepted'}
-    org_app_entities = org_app_logic.logic.getForFields(filter=filter)
+  @decorators.merge_params
+  @decorators.check_access
+  def bulkReject(self, request, access_type,
+               page_name=None, params=None, **kwargs):
+    """Returns a HTTP Response containing JSON information needed
+       to bulk-accept orgs.
+    """
+
+    program_keyname = kwargs['scope_path']
+    return self._bulkReview(request, params, 'pre-rejected', 'rejected',
+                            program_keyname)
+
+  def _bulkReview(self, request, params, from_status, to_status,
+                  program_keyname):
+    """Returns a HTTP Response containing JSON information needed
+       to bulk-review organization applications.
+
+       Args:
+         request: Standard Django HTTP Request object
+         params: Params for this view
+         from_status: The status for the applications which should
+                      be reviewed (can be a list)
+         to_status: The status to which all applications should be changed to
+         program_keyname: The keyname for the program to which
+                          the application belongs
+    """
+
+    # get the program entity from the keyname
+    program_entity = program_logic.logic.getFromKeyName(program_keyname)
+
+    # get all the organization applications for the given program and from_status
+    filter = {'scope': program_entity,
+              'status': from_status}
+
+    org_app_entities = params['logic'].getForFields(filter=filter)
 
     # convert each application into a dictionary containing only the fields
     # given by the dict_filter
@@ -199,8 +238,8 @@ class View(group_app.View):
         'nr_applications' : len(org_apps),
         'application_type' : params['name_plural'],
         'applications': org_apps,
-        'link' : '/org_app/review/%s/(link_id)?status=accepted' %(
-            program_entity.key().name()),
+        'link' : '/%s/review/%s/(link_id)?status=%s' %(
+            params['url_name'] ,program_entity.key().name(), to_status),
         }
 
     json = simplejson.dumps(to_json)
@@ -216,6 +255,7 @@ view = View()
 
 admin = view.admin
 bulk_accept = view.bulkAccept
+bulk_reject = view.bulkReject
 create = view.create
 delete = view.delete
 edit = view.edit
@@ -225,4 +265,3 @@ public = view.public
 export = view.export
 review = view.review
 review_overview = view.reviewOverview
-

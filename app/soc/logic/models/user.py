@@ -94,6 +94,28 @@ class Logic(base.Logic):
 
     return self.getForFields(filter=fields, unique=True)
 
+  def isDeveloper(self, account=None, user=None):
+    """Returns true iff the specified user is a Developer.
+
+    Args:
+      account: if not supplied, defaults to the current account
+      user: if not specified, defaults to the current user
+    """
+
+    if not account:
+      # default account to the current logged in account
+      account = users.get_current_user()
+
+    if account and (not user):
+      # default user to the current logged in user
+      user = self.getForAccount(account)
+
+    if user:
+      return user.is_developer
+
+    if account and (account == users.get_current_user()):
+      return users.is_current_user_admin()
+
   def agreesToSiteToS(self, entity):
     """Returns indication of User's answer to the site-wide Terms of Service.
 

@@ -323,7 +323,7 @@ class Logic(object):
 
     return result
 
-  def updateEntityProperties(self, entity, entity_properties):
+  def updateEntityProperties(self, entity, entity_properties, silent=False):
     """Update existing entity using supplied properties.
 
     Args:
@@ -341,20 +341,10 @@ class Logic(object):
     entity = db.run_in_transaction(update)
 
     # call the _onUpdate method
-    self._onUpdate(entity)
+    if not silent:
+      self._onUpdate(entity)
 
     return entity
-
-  def _silentUpdateEntityProperties(self, entity, entity_properties):
-    """See _unsafeUpdateEntityProperties.
-
-    Does not call _onUpdate.
-    """
-    
-    def update():
-      return self._unsafeUpdateEntityProperties(entity, entity_properties)
-
-    return db.run_in_transaction(update)
 
   def _unsafeUpdateEntityProperties(self, entity, entity_properties):
     """See updateEntityProperties.
@@ -401,8 +391,8 @@ class Logic(object):
     # there is no way to be sure if get_or_insert() returned a new entity or
     # got an existing one due to a race, so update with properties anyway,
     # in a transaction
-    entity = self._silentUpdateEntityProperties(entity, properties)
-    
+    entity = self.updateEntityProperties(entity, properties, silent=True)
+
     if create_entity:
       # a new entity has been created call _onCreate
       self._onCreate(entity)

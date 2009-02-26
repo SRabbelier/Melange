@@ -4,7 +4,7 @@ $(document).ready(function() {
 
 function acceptOrgInit(bulk_accept_link) {
 	// get the JSON object with details of every application for bulk acceptance
-	$.getJSON(bulk_accept_link,
+	$.getJSON(bulk_accept_link+"?_="+(new Date().getTime()),
 		function(data){
 			// If there are applications to accept...
 			if (data.nr_applications != 0) {

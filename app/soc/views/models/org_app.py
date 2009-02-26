@@ -208,15 +208,7 @@ class View(group_app.View):
     context = {'json': json}
     template = 'soc/json.html'
 
-    response = responses.respond(request, template, context)
-    
-    # if the browser supports HTTP/1.1
-    # post-check and pre-check and no-store for IE7
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
-    # if the browser supports HTTP/1.0
-    response['Pragma'] = 'no-cache'
-    
-    return response
+    return responses.respond(request, template, context)
 
 
 view = View()

@@ -211,6 +211,7 @@ def sendWelcomeMessage(user_entity):
 
   email = site_entity.noreply_email
   if not email:
+    # TODO(Lennard): What if current_user_entity is None?
     email = current_user_entity.account.email()
 
   # TODO(Lennard): change the message sender to some sort of no-reply adress

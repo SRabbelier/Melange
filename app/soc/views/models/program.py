@@ -79,7 +79,7 @@ class View(presence_with_tos.View):
     new_params['sidebar_grouping'] = 'Programs'
     new_params['document_prefix'] = "program"
 
-    new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement', 
+    new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement',
         'mentor_agreement', 'student_agreement']
 
     # TODO add clean field to check for uniqueness in link_id and scope_path
@@ -176,7 +176,7 @@ class View(presence_with_tos.View):
     rights = params['rights']
 
     # only get all invisible and visible programs
-    fields = {'status':['invisible', 'visible']}
+    fields = {'status': ['invisible', 'visible']}
     entities = logic.getForFields(fields)
 
     menus = []
@@ -194,7 +194,7 @@ class View(presence_with_tos.View):
 
       try:
         # check if the current user is a host for this program
-        rights.doCachedCheck('checkIsHostForProgram', 
+        rights.doCachedCheck('checkIsHostForProgram',
                              {'scope_path': entity.scope_path,
                               'link_id': entity.link_id}, [])
 
@@ -249,7 +249,7 @@ class View(presence_with_tos.View):
       if user:
         # add the 'List my Organization Applications' link
         items += [
-            (redirects.getListSelfRedirect(program_entity, 
+            (redirects.getListSelfRedirect(program_entity,
                                            {'url_name' : 'org_app'}),
              "List My Organization Applications", 'any_access')]
 
@@ -281,7 +281,7 @@ class View(presence_with_tos.View):
     if timeline_helper.isAfterEvent(timeline_entity,
         'accepted_organization_announced_deadline'):
       # add a link to list all the organizations
-      items += [(redirects.getPublicListRedirect(program_entity, {'url_name': 'org'}), 
+      items += [(redirects.getPublicListRedirect(program_entity, {'url_name': 'org'}),
           "List participating Organizations", 'any_access')]
 
       if not student_entity:
@@ -310,7 +310,7 @@ class View(presence_with_tos.View):
 
   def _getOrganizationEntries(self, program_entity, org_admin_entity,
                               mentor_entity, params, id, user):
-    """Returns a list with menu items for org admins and mentors in a 
+    """Returns a list with menu items for org admins and mentors in a
        specific program.
     """
 

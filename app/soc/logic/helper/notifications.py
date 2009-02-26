@@ -99,7 +99,7 @@ def sendNewGroupNotification(entity, params):
   to_user = entity.applicant
 
   url = "http://%(host)s%(redirect)s" % {
-      'redirect': redirects.getApplicantRedirect(entity, 
+      'redirect': redirects.getApplicantRedirect(entity,
       {'url_name': params['group_url_name']}),
       'host': os.environ['HTTP_HOST'],
       }

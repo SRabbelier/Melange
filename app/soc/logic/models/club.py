@@ -72,7 +72,7 @@ class Logic(group.Logic):
         key_fields = request_logic.logic.getKeyFieldsFromFields(properties)
         request_logic.logic.updateOrCreateFromFields(properties, key_fields)
 
-      # set the application to completed  
+      # set the application to completed
       fields = {'status' : 'completed'}
       club_app_logic.logic.updateEntityProperties(application, fields)
 

@@ -196,7 +196,7 @@ def allowIfCheckPasses(checker_name):
     """
 
     @wraps(fun)
-    def wrapper(self, django_args, *args, **kwargs):
+    def wrapper(self, django_args=None, *args, **kwargs):
       try:
         # if the check passes we allow access regardless
         return self.doCheck(checker_name, django_args, [])
@@ -379,8 +379,13 @@ class Checker(object):
   def hasMembership(self, roles, django_args):
     """Checks whether the user has access to any of the specified roles.
 
+    Makes use of self.MEMBERSHIP, which defines checkers specific to
+    document access, as such this method should only be used when checking
+    document access.
+
     Args:
       roles: a list of roles to check
+      django_args: the django args that should be passed to doCheck
     """
 
     try:
@@ -456,7 +461,7 @@ class Checker(object):
 
     return
 
-  def deny(self, django_args):
+  def deny(self, django_args=None):
     """Always raises an alternate HTTP response.
 
     Args:
@@ -471,11 +476,11 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(DEF_PAGE_DENIED_MSG, context=context)
 
-  def checkIsLoggedIn(self, django_args):
+  def checkIsLoggedIn(self, django_args=None):
     """Raises an alternate HTTP response if Google Account is not logged in.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments, not used
 
     Raises:
       AccessViolationResponse:
@@ -487,11 +492,11 @@ class Checker(object):
 
     raise out_of_band.LoginRequest()
 
-  def checkNotLoggedIn(self, django_args):
+  def checkNotLoggedIn(self, django_args=None):
     """Raises an alternate HTTP response if Google Account is logged in.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments, not used
 
     Raises:
       AccessViolationResponse:
@@ -503,11 +508,11 @@ class Checker(object):
 
     raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
 
-  def checkIsUser(self, django_args):
+  def checkIsUser(self, django_args=None):
     """Raises an alternate HTTP response if Google Account has no User entity.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments, not used
 
     Raises:
       AccessViolationResponse:
@@ -516,7 +521,7 @@ class Checker(object):
       * if User has not agreed to the site-wide ToS, if one exists
     """
 
-    self.checkIsLoggedIn(django_args)
+    self.checkIsLoggedIn()
 
     if not self.user:
       raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
@@ -536,24 +541,24 @@ class Checker(object):
     """Checks whether the specified user is the logged in user.
 
     Args:
-      django_args: the keyword args from django, only scope_path is used
+      django_args: the keyword args from django, only field_name is used
     """
 
-    self.checkIsUser(django_args)
+    self.checkIsUser()
 
     if not field_name in django_args:
-      self.deny(django_args)
+      self.deny()
 
     if self.user.link_id == django_args[field_name]:
       return
 
     raise out_of_band.AccessViolation(DEF_NOT_YOUR_ENTITY_MSG)
 
-  def checkIsUnusedAccount(self, django_args):
+  def checkIsUnusedAccount(self, django_args=None):
     """Raises an alternate HTTP response if Google Account has a User entity.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments, not used
 
     Raises:
       AccessViolationResponse:
@@ -573,7 +578,7 @@ class Checker(object):
         'email' : self.id.email()}
     raise out_of_band.LoginRequest(message_fmt=message_fmt)
 
-  def checkHasUserEntity(self, django_args):
+  def checkHasUserEntity(self, django_args=None):
     """Raises an alternate HTTP response if Google Account has no User entity.
 
     Args:
@@ -585,18 +590,18 @@ class Checker(object):
       * if no Google Account is logged in at all
     """
 
-    self.checkIsLoggedIn(django_args)
+    self.checkIsLoggedIn()
 
-    if not self.user:
-      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
+    if self.user:
+      return
 
-    return
+    raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
 
-  def checkIsDeveloper(self, django_args):
+  def checkIsDeveloper(self, django_args=None):
     """Raises an alternate HTTP response if Google Account is not a Developer.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments, not used
 
     Raises:
       AccessViolationResponse:
@@ -809,7 +814,7 @@ class Checker(object):
   @denySidebar
   def checkIsActivePeriod(self, django_args, period_name, key_name_arg):
     """Checks if the given period is active for the given program.
-    
+
     Args:
       django_args: a dictionary with django's arguments.
       period_name: the name of the period which is checked.
@@ -844,7 +849,7 @@ class Checker(object):
     """
 
     if 'seed' in django_args:
-      return self.checkIsActivePeriod(django_args['seed'], 
+      return self.checkIsActivePeriod(django_args['seed'],
           period_name, 'scope_path')
     else:
       return
@@ -1088,7 +1093,7 @@ class Checker(object):
 
     Args:
       django_args: a dictionary with django's arguments
-      key_location: the key for django_args in which the key_name 
+      key_location: the key for django_args in which the key_name
                     from the student is stored
     """
 
@@ -1119,7 +1124,7 @@ class Checker(object):
 
     Args:
       django_args: a dictionary with django's arguments
-      key_location: the key for django_args in which the key_name 
+      key_location: the key for django_args in which the key_name
                     from the student is stored
       status: the allowed status for the student
     """
@@ -1175,11 +1180,11 @@ class Checker(object):
   @denySidebar
   def checkIsAllowedToManageRole(self, django_args, role_logic, manage_role_logic):
     """Returns an alternate HTTP response if the user is not allowed to manage
-       the role given in args. 
+       the role given in args.
 
      Args:
        role_logic: determines the logic for the role in args.
-       manage_role_logic: determines the logic for the role which is allowed 
+       manage_role_logic: determines the logic for the role which is allowed
            to manage this role.
 
      Raises:
@@ -1187,7 +1192,7 @@ class Checker(object):
 
     Returns:
       None if the given role is active and belongs to the current user.
-      None if the current User has an active role (from manage_role_logic) 
+      None if the current User has an active role (from manage_role_logic)
            that belongs to the same scope as the role that needs to be managed
     """
 

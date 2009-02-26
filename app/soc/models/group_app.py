@@ -99,11 +99,13 @@ class GroupApplication(soc.models.linkable.Linkable):
 
   # property containing the status of the application
   # completed means that the application has been processed into a real group
-  # pre-accepted is used to indicate that the application has been accepted
+  # pre-accepted: used to indicate that the application has been accepted
   # but the group cannot be made yet.
-  status = db.StringProperty(required=True, 
+  # pre-rejected: used to indicate that the application has been rejected
+  # but the applicant has not been informed yet.
+  status = db.StringProperty(required=True,
       choices=['accepted','rejected','ignored','needs review','completed',
-          'pre-accepted'],
+          'pre-accepted', 'pre-rejected'],
       default='needs review',
       verbose_name=ugettext('Application Status'))
 

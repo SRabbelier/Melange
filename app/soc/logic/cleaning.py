@@ -222,12 +222,9 @@ def clean_user_account(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
-    email_adress = self.cleaned_data.get(field_name).lower()
+    email_adress = self.cleaned_data[field_name]
+    return users.User(email_adress)
 
-    # get the user account for this email
-    user_account = users.User(email_adress)
-
-    return user_account
   return wrapped
 
 

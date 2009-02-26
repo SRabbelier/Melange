@@ -146,6 +146,17 @@ class Logic(base.Logic):
 
     return ['link_id']
 
+  def _createField(self, entity_properties, name):
+    """Normalize the account before storing it.
+    """
+
+    value = entity_properties[name]
+
+    if (name == 'account'):
+      # normalize all accounts before doing anything with the value
+      value = accounts.normalizeAccount(value)
+      entity_properties[name] = value
+
   def _updateField(self, entity, entity_properties, name):
     """Special case logic for account.
 
@@ -174,15 +185,12 @@ class Logic(base.Logic):
       sidebar.flush(entity.account)
 
     if (name == 'account'):
-      if (str(entity.account) != str(value)):
+      # normalize all accounts before doing anything with the value
+      value = accounts.normalizeAccount(value)
+      entity_properties[name] = value
+
+      if entity.account != value:
         entity.former_accounts.append(entity.account)
-      elif entity.account != value:
-        # this occurs when the account ends in the auth domain, e.g.:
-        # if the auth domain is "example.com", then the following would
-        # would put us here:
-        # entity.account = users.User('foo@example.com')
-        # value = 'foo'
-        return False
 
     return True
   

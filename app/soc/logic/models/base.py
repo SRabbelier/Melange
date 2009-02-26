@@ -383,6 +383,9 @@ class Logic(object):
     create_entity = not entity
 
     if create_entity:
+      for property_name in properties:
+        self._createField(properties, property_name)
+
       # entity did not exist, so create one in a transaction
       entity = self._model.get_or_insert(key_name, **properties)
     else:
@@ -418,6 +421,23 @@ class Logic(object):
     entity.delete()
     # entity has been deleted call _onDelete
     self._onDelete(entity)
+
+  def _createField(self, entity_properties, name):
+    """Hook called when a field is created.
+
+    To be exact, this method is called for each field (that has a value
+    specified) on an entity that is being created.
+
+    Base classes should override if any special actions need to be
+    taken when a field is updated.
+
+    Args:
+      name: the name of the field to be created
+      value: the value
+    """
+
+    if not entity_properties or (name not in entity_properties):
+      raise InvalidArgumentError
 
   def _updateField(self, entity, entity_properties, name):
     """Hook called when a field is updated.

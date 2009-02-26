@@ -151,7 +151,7 @@ class View(base.View):
   @decorators.check_access
   def list(self, request, access_type,
            page_name=None, params=None, filter={}, **kwargs):
-    """Lists all notifications in seperate tables, depending on their status.
+    """Lists all notifications in separate tables, depending on their status.
 
     for parameters see base.list()
     """
@@ -160,6 +160,7 @@ class View(base.View):
     selection=[('needs review',(redirects.getEditRedirect, params)), 
                ('pre-accepted', (redirects.getEditRedirect, params)),
                ('accepted', (redirects.getEditRedirect, params)),
+               ('pre-rejected', (redirects.getEditRedirect, params)),
                ('rejected', (redirects.getEditRedirect, params)),
                ('ignored', (redirects.getEditRedirect, params)),]
 
@@ -260,7 +261,8 @@ class View(base.View):
     if 'status' in get_dict.keys():
       status_value = get_dict['status']
 
-      if status_value in ['accepted', 'rejected', 'ignored', 'pre-accepted']:
+      if status_value in ['accepted', 'rejected', 'ignored', 'pre-accepted',
+          'pre-rejected']:
         # this application has been properly reviewed update the status
 
         # only update if the status changes
@@ -318,8 +320,9 @@ class View(base.View):
     """
 
     selection = [('needs review',(redirects.getReviewRedirect, params)),
-                 ('accepted', (redirects.getReviewRedirect, params)),
                  ('pre-accepted', (redirects.getReviewRedirect, params)),
+                 ('accepted', (redirects.getReviewRedirect, params)),
+                 ('pre-rejected', (redirects.getReviewRedirect, params)),
                  ('rejected', (redirects.getReviewRedirect, params)),
                  ('ignored', (redirects.getReviewRedirect, params)),]
 

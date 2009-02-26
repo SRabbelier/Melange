@@ -107,56 +107,6 @@ class Logic(object):
     depth = self._scope_logic.logic.getScopeDepth()
     return None if (depth is None) else (depth + 1)
 
-  def _updateField(self, entity, name, value):
-    """Hook called when a field is updated.
-
-    Base classes should override if any special actions need to be
-    taken when a field is updated. The field is not updated if the
-    method does not return a True value.
-
-    Args:
-      entity: the unaltered entity
-      name: the name of the field to be changed
-      value: the new value
-    """
-
-    if not entity:
-      raise NoEntityError
-
-    if not entity_properties or (name not in entity_properties):
-      raise InvalidArgumentError
-
-    return True
-
-  def _onCreate(self, entity):
-    """Called when an entity has been created.
-
-    Classes that override this can use it to do any post-creation operations.
-    """
-
-    if not entity:
-      raise NoEntityError
-
-    sidebar.flush()
-
-  def _onUpdate(self, entity):
-    """Called when an entity has been updated.
-
-    Classes that override this can use it to do any post-update operations.
-    """
-
-    if not entity:
-      raise NoEntityError
-
-  def _onDelete(self, entity):
-    """Called when an entity has been deleted.
-
-    Classes that override this can use it to do any post-deletion operations.
-    """
-
-    if not entity:
-      raise NoEntityError
-
   def getKeyNameFromFields(self, fields):
     """Returns the KeyName constructed from fields dict for this type of entity.
 
@@ -469,3 +419,53 @@ class Logic(object):
     entity.delete()
     # entity has been deleted call _onDelete
     self._onDelete(entity)
+
+  def _updateField(self, entity, name, value):
+    """Hook called when a field is updated.
+
+    Base classes should override if any special actions need to be
+    taken when a field is updated. The field is not updated if the
+    method does not return a True value.
+
+    Args:
+      entity: the unaltered entity
+      name: the name of the field to be changed
+      value: the new value
+    """
+
+    if not entity:
+      raise NoEntityError
+
+    if not entity_properties or (name not in entity_properties):
+      raise InvalidArgumentError
+
+    return True
+
+  def _onCreate(self, entity):
+    """Called when an entity has been created.
+
+    Classes that override this can use it to do any post-creation operations.
+    """
+
+    if not entity:
+      raise NoEntityError
+
+    sidebar.flush()
+
+  def _onUpdate(self, entity):
+    """Called when an entity has been updated.
+
+    Classes that override this can use it to do any post-update operations.
+    """
+
+    if not entity:
+      raise NoEntityError
+
+  def _onDelete(self, entity):
+    """Called when an entity has been deleted.
+
+    Classes that override this can use it to do any post-deletion operations.
+    """
+
+    if not entity:
+      raise NoEntityError

@@ -412,12 +412,12 @@ class Logic(object):
       
     return entity
 
-  def updateOrCreateFromFields(self, properties, fields):
+  def updateOrCreateFromFields(self, properties, key_fields):
     """Like updateOrCreateFromKeyName, but resolves fields to a key_name first.
     """
 
     # attempt to retrieve the existing entity
-    key_name  = self.getKeyNameFromFields(fields)
+    key_name  = self.getKeyNameFromFields(key_fields)
 
     return self.updateOrCreateFromKeyName(properties, key_name)
 

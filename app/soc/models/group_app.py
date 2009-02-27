@@ -95,7 +95,7 @@ class GroupApplication(soc.models.linkable.Linkable):
       'What criteria do you use to select the members of your group?'
       ' Please be as specific as possible.'))
   member_criteria.help_text = ugettext(
-    'Members include mentors, admininstrators, and the like.')
+    'Members include mentors, administrators, and the like.')
 
   # property containing the status of the application
   # completed means that the application has been processed into a real group

@@ -30,6 +30,25 @@ Please use this form to set basic site-wide settings for your participation in {
 </p>
 <form method="POST">
  <table>
+  {% field_as_table_row form.link_id %}
+{% if not user %}
+  <tr>
+   <td class="fieldhelptext" colspan="4">
+This <i>Link ID</i> is used throughout the site when creating various URL
+links related to you and content you create.  As a result, it may only
+consist of lower ASCII characters, digits, and underscores.  Also, it must
+be unique and not in use by any other user of the site.<br>
+<br>
+<div style="text-align: center; font-size: 14pt;"><b>The Link ID can NOT be changed.</b></div>
+<br>
+   </td>
+  </tr>
+  <tr><td colspan="4">&nbsp;</td></tr>
+  {% else %}
+    </td>
+  </tr>
+  {% endif %}
+
   {% field_as_table_row form.name %}
   <tr>
    <td class="fieldhelptext" colspan="4">
@@ -41,17 +60,6 @@ time.<br>
 <br>
 <b><i>Please</i> do not <i>use your real name if you are a minor (not an
 adult) where you live.</i></b>
-   </td>
-  </tr>
-  <tr><td colspan="4">&nbsp;</td></tr>
-
-  {% field_as_table_row form.link_id %}
-  <tr>
-   <td class="fieldhelptext" colspan="4">
-This <i>Link ID</i> is used throughout the site when creating various URL
-links related to you and content you create.  As a result, it may only
-consist of lower ASCII characters, digits, and underscores.  Also, it must
-be unique and not in use by any other user of the site.
    </td>
   </tr>
   <tr><td colspan="4">&nbsp;</td></tr>

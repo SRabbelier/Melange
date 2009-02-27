@@ -176,15 +176,18 @@ def sendNewNotificationMessage(notification_entity):
       'index': redirects.getPublicRedirect(notification_entity,
           model_view.notification.view.getParams())}
 
+  sender = mail_dispatcher.getDefaultMailSender()
 
-  # TODO(Lennard): Change the sender to the no-reply address
+  if not sender:
+    # no valid sender found, abort
+    return
 
   # create the message contents
   messageProperties = {
       'to_name': notification_entity.scope.name,
       'sender_name': current_user_entity.name,
       'to': notification_entity.scope.account.email(),
-      'sender': current_user_entity.account.email(),
+      'sender': sender,
       'subject': force_unicode(DEF_NEW_NOTIFICATION_MSG),
       'notification' : notification_entity,
       'notification_url' : notification_url
@@ -202,25 +205,16 @@ def sendWelcomeMessage(user_entity):
       user_entity: User entity which the message should be send to
   """
 
-  # get user logic
-  user_logic = model_logic.user
-  site_logic = model_logic.site
-
-  # get the current user
-  current_user_entity = user_logic.logic.getForCurrentAccount()
-  site_entity = site_logic.logic.getSingleton()
+  # get site name
+  site_entity = model_logic.site.logic.getSingleton()
   site_name = site_entity.site_name
 
-  email = site_entity.noreply_email
-  if not email:
-    # TODO(Lennard): What if current_user_entity is None?
-    email = current_user_entity.account.email()
+  # get the default mail sender
+  sender = mail_dispatcher.getDefaultMailSender()
 
-  # TODO(Lennard): change the message sender to some sort of no-reply adress
-  # that is probably a setting in sitesettings. (adress must be a developer).
-  # This is due to a GAE limitation that allows only devs or the current user
-  # to send an email. Currently this results in a user receiving the same
-  # email twice.
+  if not sender:
+    # no valid sender found, should not happen but abort anyway
+    return
 
   # create the message contents
   messageProperties = {
@@ -228,7 +222,7 @@ def sendWelcomeMessage(user_entity):
       'sender_name': site_name,
       'site_name': site_name,
       'to': user_entity.account.email(),
-      'sender': email,
+      'sender': sender,
       'subject': DEF_WELCOME_MSG_FMT % {
           'site_name': site_name,
           'name': user_entity.name

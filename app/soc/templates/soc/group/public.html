@@ -23,7 +23,6 @@ limitations under the License.
  <table>
   {% block fields %}
   {% readonly_field_as_table_row entity.fields.name.label entity.name %}
-  {% readonly_field_as_table_row entity.fields.description.label entity.description %}
   {% readonly_field_as_table_row entity.fields.founder.label entity.founder.link_id %}
   {% readonly_field_as_table_row entity.fields.home_page.label entity.home_page %}
   {% readonly_field_as_table_row entity.fields.email.label entity.email %}

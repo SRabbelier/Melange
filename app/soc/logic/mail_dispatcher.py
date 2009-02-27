@@ -116,3 +116,33 @@ def sendMail(context):
 
   # send the message
   message.send()
+
+def getDefaultMailSender():
+  """Returns the email address that currently can be used to send emails.
+  
+  Returns:
+    - If available the noreply email address from the site singleton
+    - Or the email address of the current logged in User
+    - None if there is no address to return
+  """
+
+  import logging
+
+  from google.appengine.api import users
+
+  from soc.logic.models import site as site_logic
+
+
+  site_entity = site_logic.logic.getSingleton()
+
+  if site_entity.noreply_email:
+    return site_entity.noreply_email
+
+  # use the email address of the current logged in user
+  account_entity = users.get_current_user()
+
+  if not account_entity:
+    logging.warning('Non-Authenticated user triggered getDefaultMailSender')
+    return None
+
+  return account_entity.email()

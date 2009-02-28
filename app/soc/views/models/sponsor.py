@@ -50,13 +50,13 @@ class View(group.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForLinkId', host_logic),
+    rights['edit'] = [('checkHasActiveRoleForLinkIdAsScope', host_logic),
                       ('checkGroupIsActiveForLinkId', sponsor_logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = [('checkHasActiveRoleForScope', host_logic)]
     rights['list'] = ['checkIsDeveloper']
-    rights['list_requests'] = [('checkHasActiveRoleForScope', host_logic)]
-    rights['list_roles'] = [('checkHasActiveRoleForScope', host_logic)]
+    rights['list_requests'] = [('checkHasActiveRoleForLinkIdAsScope', host_logic)]
+    rights['list_roles'] = [('checkHasActiveRoleForLinkIdAsScope', host_logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.sponsor.logic

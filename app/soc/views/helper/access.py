@@ -726,7 +726,19 @@ class Checker(object):
     Only roles where the link_id matches the link_id from the
     django_args are considered.
     """
+
     self._checkHasActiveRoleFor(django_args, logic, 'link_id')
+
+  def checkHasActiveRoleForLinkIdAsScope(self, django_args, logic):
+    """Checks that the user has the specified active role.
+
+    Only roles where the link_id matches the link_id from the
+    django_args are considered.
+    """
+
+    django_args = django_args.copy()
+    django_args['scope_path'] = django_args['link_id']
+    self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.

@@ -334,23 +334,6 @@ class Logic(object):
     if not entity_properties:
       raise InvalidArgumentError
 
-    def update():
-      return self._unsafeUpdateEntityProperties(entity, entity_properties)
-
-    entity = db.run_in_transaction(update)
-
-    # call the _onUpdate method
-    if not silent:
-      self._onUpdate(entity)
-
-    return entity
-
-  def _unsafeUpdateEntityProperties(self, entity, entity_properties):
-    """See updateEntityProperties.
-
-    Like updateEntityProperties(), but not run within a transaction.
-    """
-
     properties = self._model.properties()
 
     for name, prop in properties.iteritems():
@@ -363,6 +346,11 @@ class Logic(object):
         prop.__set__(entity, value)
 
     entity.put()
+
+    # call the _onUpdate method
+    if not silent:
+      self._onUpdate(entity)
+
     return entity
 
   def updateOrCreateFromKeyName(self, properties, key_name):

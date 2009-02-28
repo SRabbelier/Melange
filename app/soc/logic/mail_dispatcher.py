@@ -68,6 +68,7 @@ from django.template import loader
 
 from google.appengine.api import mail
 
+from soc.logic import accounts
 from soc.logic import dicts
 
 
@@ -145,4 +146,4 @@ def getDefaultMailSender():
     logging.warning('Non-Authenticated user triggered getDefaultMailSender')
     return None
 
-  return account_entity.email()
+  return accounts.denormalizeAccount(account_entity).email()

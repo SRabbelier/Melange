@@ -33,6 +33,7 @@ from django.utils.translation import ugettext
 
 # We cannot import soc.logic.models notification nor user here
 # due to cyclic imports
+from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic import mail_dispatcher
 from soc.views.helper import redirects
@@ -182,11 +183,13 @@ def sendNewNotificationMessage(notification_entity):
     # no valid sender found, abort
     return
 
+  to = accounts.denormalizeAccount(notification_entity.scope.account).email()
+
   # create the message contents
   messageProperties = {
       'to_name': notification_entity.scope.name,
       'sender_name': current_user_entity.name,
-      'to': notification_entity.scope.account.email(),
+      'to': to,
       'sender': sender,
       'subject': force_unicode(DEF_NEW_NOTIFICATION_MSG),
       'notification' : notification_entity,
@@ -216,12 +219,14 @@ def sendWelcomeMessage(user_entity):
     # no valid sender found, should not happen but abort anyway
     return
 
+  to = accounts.denormalizeAccount(user_entity.account).email()
+
   # create the message contents
   messageProperties = {
       'to_name': user_entity.name,
       'sender_name': site_name,
       'site_name': site_name,
-      'to': user_entity.account.email(),
+      'to': to,
       'sender': sender,
       'subject': DEF_WELCOME_MSG_FMT % {
           'site_name': site_name,

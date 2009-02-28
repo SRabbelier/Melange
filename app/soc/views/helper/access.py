@@ -697,7 +697,7 @@ class Checker(object):
     scope_path from the django_args are considered.
     """
 
-    fields = ['scope_path', 'user']
+    fields = [field_name, 'user']
     django_args['user'] = self.user
     self._checkIsActive(django_args, logic, fields)
 

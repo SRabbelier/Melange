@@ -687,6 +687,7 @@ class Checker(object):
     """Checks that the user has the specified active role.
     """
 
+    django_args = django_args.copy()
     django_args['user'] = self.user
     self._checkIsActive(django_args, logic, ['user'])
 
@@ -698,6 +699,7 @@ class Checker(object):
     """
 
     fields = [field_name, 'user']
+    django_args = django_args.copy()
     django_args['user'] = self.user
     self._checkIsActive(django_args, logic, fields)
 

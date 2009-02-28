@@ -35,6 +35,7 @@ from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import user as user_logic
+from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -115,6 +116,9 @@ class View(group.View):
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),
+        'contrib_template': forms.fields.CharField(
+            widget=helper.widgets.FullTinyMCE(
+                attrs={'rows': 25, 'cols': 100})),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             soc.logic.models.organization, org_app_logic)

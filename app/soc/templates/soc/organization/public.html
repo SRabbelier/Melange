@@ -17,6 +17,6 @@ limitations under the License.
 {% block fields %}
   {{ block.super }}
   {% readonly_field_as_table_row entity.fields.dev_mailing_list.label entity.dev_mailing_list %}
-  {% readonly_field_as_table_row entity.fields.member_template.label entity.member_template %}
+  {% readonly_field_as_table_row entity.fields.contrib_template.label entity.contrib_template %}
   {% readonly_field_as_table_row entity.fields.ideas.label entity.ideas %}
 {% endblock %}

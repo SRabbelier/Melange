@@ -39,13 +39,12 @@ class Organization(soc.models.group.Group):
   dev_mailing_list.help_text = ugettext(
     'Mailing list email address, URL to sign-up page, etc.')
 
-  member_template = db.ReferenceProperty(
-    reference_class=soc.models.document.Document, required=False,
-    collection_name='org_app_member_template',
-    verbose_name=ugettext('Application template'))
-  member_template.help_text = ugettext(
-    'This template will be presented to potential members when they'
-    ' apply to the organization.')
+  contrib_template = db.TextProperty(required=False, verbose_name=ugettext(
+      'Application template'))
+  contrib_template.help_text = ugettext(
+      'This template can be used by contributors, such as students'
+      ' and other non-member participants, when they apply to contribute'
+      ' to the organization.')
 
   ideas = db.LinkProperty(required=False, verbose_name=ugettext('Idea list'))
   ideas.help_text = ugettext(

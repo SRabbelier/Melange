@@ -179,16 +179,21 @@ def sendNewNotificationMessage(notification_entity):
 
   sender = mail_dispatcher.getDefaultMailSender()
 
-  if not sender:
+  # get the default mail sender
+  default_sender = mail_dispatcher.getDefaultMailSender()
+
+  if not default_sender:
     # no valid sender found, abort
     return
+  else:
+    (sender_name, sender) = default_sender
 
   to = accounts.denormalizeAccount(notification_entity.scope.account).email()
 
   # create the message contents
   messageProperties = {
       'to_name': notification_entity.scope.name,
-      'sender_name': current_user_entity.name,
+      'sender_name': sender_name,
       'to': to,
       'sender': sender,
       'subject': force_unicode(DEF_NEW_NOTIFICATION_MSG),
@@ -213,18 +218,20 @@ def sendWelcomeMessage(user_entity):
   site_name = site_entity.site_name
 
   # get the default mail sender
-  sender = mail_dispatcher.getDefaultMailSender()
+  default_sender = mail_dispatcher.getDefaultMailSender()
 
-  if not sender:
+  if not default_sender:
     # no valid sender found, should not happen but abort anyway
     return
+  else:
+    (sender_name, sender) = default_sender
 
   to = accounts.denormalizeAccount(user_entity.account).email()
 
   # create the message contents
   messageProperties = {
       'to_name': user_entity.name,
-      'sender_name': site_name,
+      'sender_name': sender_name,
       'site_name': site_name,
       'to': to,
       'sender': sender,

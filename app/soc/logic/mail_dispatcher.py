@@ -68,7 +68,6 @@ from django.template import loader
 
 from google.appengine.api import mail
 
-from soc.logic import accounts
 from soc.logic import dicts
 
 
@@ -119,31 +118,36 @@ def sendMail(context):
   message.send()
 
 def getDefaultMailSender():
-  """Returns the email address that currently can be used to send emails.
+  """Returns the sender that currently can be used to send emails.
   
   Returns:
-    - If available the noreply email address from the site singleton
-    - Or the email address of the current logged in User
+    - A tuple containing (sender_name, sender_address)
+    Consisting of:
+    - If available the site name and noreply address from the site singleton
+    - Or the public name and email address of the current logged in User
     - None if there is no address to return
   """
 
   import logging
 
-  from google.appengine.api import users
-
+  from soc.logic import accounts
+  from soc.logic.models import user as user_logic
   from soc.logic.models import site as site_logic
 
-
+  # check if there is a noreply email address set
   site_entity = site_logic.logic.getSingleton()
 
   if site_entity.noreply_email:
-    return site_entity.noreply_email
+    return (site_entity.site_name, site_entity.noreply_email)
 
   # use the email address of the current logged in user
-  account_entity = users.get_current_user()
+  user_entity = user_logic.logic.getForCurrentAccount()
 
-  if not account_entity:
+  if not user_entity:
     logging.warning('Non-Authenticated user triggered getDefaultMailSender')
     return None
 
-  return accounts.denormalizeAccount(account_entity).email()
+  # denormalize the account and retrieve the email
+  sender = accounts.denormalizeAccount(account_entity).email()
+
+  return (user_entity.name, sender)

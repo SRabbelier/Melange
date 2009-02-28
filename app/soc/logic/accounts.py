@@ -38,6 +38,19 @@ def normalizeAccount(account):
 
   return users.User(email=normalized)
 
+def denormalizeAccount(account):
+  """Returns a denormalized version of the specified account.
+  """
+
+  if account.email().find('@') != -1:
+    return account
+
+  normalized = normalizeAccount(account)
+  domain = account.auth_domain()
+  denormalized = ''.join([account.email(), '@', domain])
+
+  return users.User(email=denormalized)
+
 def isDeveloper(account=None):
   """Returns True if a Google Account is a Developer with special privileges.
 

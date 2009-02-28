@@ -25,6 +25,7 @@ import unittest
 from google.appengine.api import users
 
 from soc.models import user
+from soc.logic import accounts
 from soc.logic.models.user import logic as user_logic
 
 
@@ -69,6 +70,9 @@ class UserTest(unittest.TestCase):
     self.failUnlessEqual(link_id, entity.link_id)
     self.failUnlessEqual(name, entity.name)
 
+    denormalized = accounts.denormalizeAccount(entity.account)
+    self.failUnlessEqual(account.email().lower(), denormalized.email())
+
   def testAuthEntity(self):
     """
     """
@@ -93,6 +97,9 @@ class UserTest(unittest.TestCase):
     self.failUnlessEqual(link_id, entity.link_id)
     self.failUnlessEqual(name, entity.name)
 
+    denormalized = accounts.denormalizeAccount(entity.account)
+    self.failUnlessEqual(account.email().lower(), denormalized.email())
+
   def testCapsAuthEntity(self):
     """
     """
@@ -116,3 +123,6 @@ class UserTest(unittest.TestCase):
     self.failUnlessEqual('caps@example.com', entity.account.email())
     self.failUnlessEqual(link_id, entity.link_id)
     self.failUnlessEqual(name, entity.name)
+
+    denormalized = accounts.denormalizeAccount(entity.account)
+    self.failUnlessEqual(account.email().lower(), denormalized.email())

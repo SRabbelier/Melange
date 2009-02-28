@@ -256,7 +256,8 @@ class View(presence_with_tos.View):
 
     # get the student entity for this user and program
     filter = {'user': user,
-              'scope': program_entity}
+              'scope': program_entity,
+              'status': 'active'}
     student_entity = student_logic.logic.getForFields(filter, unique=True)
 
     if student_entity:
@@ -265,7 +266,8 @@ class View(presence_with_tos.View):
 
     # get mentor and org_admin entity for this user and program
     filter = {'user': user,
-              'program': program_entity}
+              'program': program_entity,
+              'status': 'active'}
     mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
 

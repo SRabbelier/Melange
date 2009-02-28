@@ -1064,6 +1064,39 @@ class Checker(object):
     # no roles found, access granted
     return
 
+  def checkIsNotStudentForProgramInScope(self, django_args):
+    """Checks if the current user is not a student for the given
+       program in django_args.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse: if the current user has a student
+                                role for the given program.
+    """
+
+    if django_args.get('seed'):
+      key_name = django_args['seed']['scope_path']
+    else:
+      key_name = django_args['scope_path']
+
+    program_entity = program_logic.getFromKeyName(key_name)
+    user_entity = user_logic.getForCurrentAccount()
+
+    filter = {'user': user_entity,
+              'scope': program_entity,
+              'status': 'active'}
+
+    # check if the current user is already a student for this program
+    student_role = student_logic.getForFields(filter, unique=True)
+
+    if student_role:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+
+    return
+
   def checkIsNotStudentForProgramOfOrg(self, django_args):
     """Checks if the current user has no active Student role for the program
        that the organization in the scope_path is participating in.

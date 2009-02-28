@@ -75,7 +75,8 @@ class View(group_app.View):
     rights['bulk_accept'] = ['checkIsHostForProgramInScope']
     rights['bulk_reject'] = ['checkIsHostForProgramInScope']
     rights['apply'] = ['checkIsUser',
-                             ('checkCanCreateOrgApp', ['org_signup'])]
+                             ('checkCanCreateOrgApp', ['org_signup']),
+                       'checkIsNotStudentForProgramInScope']
 
     new_params = {}
 

@@ -34,6 +34,7 @@ from soc.logic import mail_dispatcher
 from soc.logic import models as model_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import org_app as org_app_logic
+from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
@@ -108,12 +109,14 @@ class View(group_app.View):
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
+        'contrib_template': forms.fields.CharField(
+            widget=helper.widgets.FullTinyMCE(
+                attrs={'rows': 25, 'cols': 100})),
         'admin_agreement': forms.fields.Field(required=False,
             widget=widgets.AgreementField),
         'agreed_to_admin_agreement': forms.fields.BooleanField(
             initial=False, required=True),
         'clean_ideas': cleaning.clean_url('ideas'),
-        'clean_contrib_template': cleaning.clean_url('contrib_template'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             model_logic.organization, org_app_logic)}
 

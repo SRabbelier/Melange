@@ -68,15 +68,13 @@ class OrgApplication(soc.models.group_app.GroupApplication):
     'list is not used please specify another method of communication used '
     'within the group.')
 
-  contrib_template = db.LinkProperty(required=False, verbose_name=ugettext(
-      'What is the URL to the application template would you like contributors'
+  contrib_template = db.TextProperty(required=False, verbose_name=ugettext(
+      'What is the application template you would like contributors'
       ' to your organization to use.'))
   contrib_template.help_text = ugettext(
       'This template can be used by contributors, such as students'
       ' and other non-member participants, when they apply to contribute'
       ' to the organization.')
-  contrib_template.help_text = ugettext('For instance a link to a Melange '
-      'public document or some other URL')
 
   contrib_disappears = db.TextProperty(required=True, verbose_name=ugettext(
       'What is your plan for dealing with disappearing contributors?'))

@@ -22,11 +22,15 @@ __authors__ = [
   ]
 
 
+import os
+
 from django import forms
 from django.utils import simplejson
 
+from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic import mail_dispatcher
 from soc.logic import models as model_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import org_app as org_app_logic
@@ -124,6 +128,8 @@ class View(group_app.View):
     new_params['group_url_name'] = 'org'
 
     new_params['review_template'] = 'soc/org_app/review.html'
+    new_params['accepted_mail_template'] = 'soc/org_app/mail/accepted.html'
+    new_params['rejected_mail_template'] = 'soc/org_app/mail/rejected.html'
 
     params = dicts.merge(params, new_params)
 
@@ -168,17 +174,43 @@ class View(group_app.View):
     form.fields['admin_agreement'].widget.text = content
 
   def _review(self, request, params, app_entity, status, **kwargs):
-    """Sends out an email if an org_app has been reviewed and accepted.
+    """Sends out an email if an org_app has been accepted or rejected.
 
     For params see group_app.View._review().
     """
 
-    if status == 'accepted':
-      #TODO(ljvderijk) create the email template
-      pass
-    elif status == 'rejected':
-      #TODO(ljvderijk) create the rejected email template
-      pass
+    if status == 'accepted' or status == 'rejected':
+
+      default_sender = mail_dispatcher.getDefaultMailSender()
+
+      if not default_sender:
+        # no default sender abort
+        return
+      else:
+        (sender_name, sender) = default_sender
+
+      # construct the contents of the email
+      user_entity = app_entity.applicant
+      to = accounts.denormalizeAccount(user_entity.account).email()
+
+      context = {'sender': sender,
+              'to': to,
+              'sender_name': sender_name,
+              'to_name': user_entity.name,
+              'program_name': app_entity.scope.name}
+
+      if status == 'accepted':
+        # use the accepted template and subject
+        template = params['accepted_mail_template']
+        context['subject'] = 'Congratulations!'
+        context['HTTP_host'] = os.environ['HTTP_HOST']
+      elif status == 'rejected':
+        # use the rejected template and subject
+        template = params['rejected_mail_template']
+        context['subject'] = 'Thank you for your application'
+
+      # send out the constructed email
+      mail_dispatcher.sendMailFromTemplate(template, context)
 
   @decorators.merge_params
   @decorators.check_access

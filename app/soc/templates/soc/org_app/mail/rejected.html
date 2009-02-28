@@ -1,0 +1,25 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block content %}
+Thank you for submitting an application as a mentoring organization for {{ program_name }}.
+Unfortunately, we were not able to accept your organization's application at this time.
+We received many more applications for the program than we are able to accommodate,
+and we would encourage you to reapply for future instances of the program.
+{% endblock %}
+
+{% block signature %}
+  Best regards, <br />{{ sender_name }}
+{% endblock %}

@@ -224,7 +224,7 @@ def sendWelcomeMessage(user_entity):
     # no valid sender found, should not happen but abort anyway
     return
   else:
-    (sender_name, sender) = default_sender
+    sender_name, sender = default_sender
 
   to = accounts.denormalizeAccount(user_entity.account).email()
 

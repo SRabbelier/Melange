@@ -67,6 +67,7 @@ __authors__ = [
 from django.template import loader
 
 from google.appengine.api import mail
+from google.appengine.api import users
 
 from soc.logic import dicts
 
@@ -114,8 +115,13 @@ def sendMail(context):
   message = mail.EmailMessage(**context)
   message.check_initialized()
 
-  # send the message
-  message.send()
+  try:
+    # send the message
+    message.send()
+  except Exception, e:
+    import logging
+    logging.info(context)
+    logging.exception(e)
 
 def getDefaultMailSender():
   """Returns the sender that currently can be used to send emails.
@@ -141,13 +147,14 @@ def getDefaultMailSender():
     return (site_entity.site_name, site_entity.noreply_email)
 
   # use the email address of the current logged in user
-  user_entity = user_logic.logic.getForCurrentAccount()
+  account = users.get_current_user()
 
-  if not user_entity:
+  # we need to retrieve account seperately, as user_logic normalizes it
+  # and the GAE admin API is case sensitive
+  user_entity = user_logic.logic.getForAccount(account)
+
+  if not account:
     logging.warning('Non-Authenticated user triggered getDefaultMailSender')
     return None
 
-  # denormalize the account and retrieve the email
-  sender = accounts.denormalizeAccount(user_entity.account).email()
-
-  return (user_entity.name, sender)
+  return (user_entity.name, account.email())

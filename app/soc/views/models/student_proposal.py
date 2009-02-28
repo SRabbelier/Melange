@@ -35,6 +35,8 @@ from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import dynaform
+from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
@@ -89,7 +91,7 @@ class View(base.View):
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
-        'soc.views.models.%(module_name)s.create',
+        'soc.views.models.%(module_name)s.apply',
         'Create a new %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_self)/%(scope)s$',
         'soc.views.models.%(module_name)s.list_self',
@@ -102,7 +104,7 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['org', 'program', 'score',
-                                       'status', 'mentor', 'link_id']
+                                       'status', 'mentor', 'link_id',]
 
     new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(required=True,
@@ -128,6 +130,25 @@ class View(base.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    # create the special form for students
+    dynafields = [
+        {'name': 'organization',
+         'base': forms.CharField,
+         'label': 'Organization Link ID',
+         'widget': widgets.ReadOnlyInput(),
+         'required': False,
+         },
+        ]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    student_create_form = dynaform.extendDynaForm(
+        dynaform=self._params['create_form'],
+        dynaproperties=dynaproperties)
+
+    params['student_create_form'] = student_create_form
+
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -171,6 +192,43 @@ class View(base.View):
       context['mentor_name'] = entity.mentor.name()
     else:
       context['mentor_name'] = "No mentor assigned"
+
+  @decorators.merge_params
+  @decorators.check_access
+  def apply(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Special view used to prepopulate the form with the organization
+       contributors template.
+
+       For params see base.View.public()
+    """
+    get_dict = request.GET
+
+    if get_dict.get('organization'):
+      # organization chosen, prepopulate with template
+
+      # get the organization
+      student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
+      program_entity = student_entity.scope
+
+      filter = {'link_id': get_dict['organization'],
+                'scope': program_entity}
+
+      org_entity = org_logic.logic.getForFields(filter, unique=True)
+
+      if org_entity:
+        # organization found use special form
+        params['create_form'] = params['student_create_form']
+        kwargs['content'] = org_entity.contrib_template
+
+    # Create page is an edit page with no key fields
+    empty_kwargs = {}
+    fields = self._logic.getKeyFieldNames()
+    for field in fields:
+      empty_kwargs[field] = None
+
+    return super(View, self).edit(request, access_type, page_name=page_name,
+                     params=params, seed=kwargs, **empty_kwargs)
 
   @decorators.merge_params
   @decorators.check_access
@@ -254,6 +312,7 @@ class View(base.View):
 view = View()
 
 admin = view.admin
+apply = view.apply
 create = view.create
 delete = view.delete
 edit = view.edit

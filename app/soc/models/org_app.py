@@ -41,7 +41,7 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   approach.  At that time, existing OrgApplication entities will be migrated
   (converted) to their new representations in the Datastore.
   """
-  
+
   prior_participation = db.TextProperty(required=False, verbose_name=ugettext(
       'Has your group participated previously?'
       ' If so, please summarize your involvement and any past successes'
@@ -50,21 +50,23 @@ class OrgApplication(soc.models.group_app.GroupApplication):
   prior_application = db.TextProperty(required=False, verbose_name=ugettext(
       'If your group has not previously participated, have you applied in'
       ' the past?  If so, for what sort of participation?'))
-  
+
   license_name = db.StringProperty(required=True, choices=licenses.LICENSES,
       verbose_name=ugettext('What license does your organization use?'))
   license_name.example_text=ugettext('See '
       '<a href="http://www.opensource.org/licenses/alphabetical"> the official list</a>.')
- 
+
   ideas = db.LinkProperty(required=True, verbose_name=ugettext(
       'What is the URL to the ideas list of your organization?'))
   ideas.help_text = ugettext('For instance a link to a Melange public '
       'document or some other URL')
 
-  dev_mailing_list = db.StringProperty(required=False, verbose_name=ugettext(
+  dev_mailing_list = db.StringProperty(required=True, verbose_name=ugettext(
       'What is the main development mailing list for your group?'))
   dev_mailing_list.help_text = ugettext(
-      'Mailing list email address, URL to sign-up page, etc.')
+    'Mailing list email address, URL to sign-up page, etc. If a mailing '
+    'list is not used please specify another method of communication used '
+    'within the group.')
 
   contrib_template = db.LinkProperty(required=False, verbose_name=ugettext(
       'What is the URL to the application template would you like contributors'

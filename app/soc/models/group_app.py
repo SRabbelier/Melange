@@ -74,16 +74,19 @@ class GroupApplication(soc.models.linkable.Linkable):
       'Why is your group applying to participate?'
       ' What do you hope to gain by participating?'))
 
-  pub_mailing_list = db.StringProperty(required=False,
+  pub_mailing_list = db.StringProperty(required=True,
     verbose_name=ugettext(
       'What is the main public mailing list for your group?'))
   pub_mailing_list.help_text = ugettext(
-    'Mailing list email address, URL to sign-up page, etc.')
+    'Mailing list email address, URL to sign-up page, etc. If a mailing '
+    'list is not used please specify another method of communication used '
+    'within the group.')
 
-  irc_channel = db.StringProperty(required=False,
+  irc_channel = db.StringProperty(required=True,
     verbose_name=ugettext(
       'Where is the main IRC channel for your group?'))
-  irc_channel.help_text = ugettext('IRC network and channel.')
+  irc_channel.help_text = ugettext('IRC network and channel. If IRC is '
+      'not used please write something like not applicable.')
 
   backup_admin = db.ReferenceProperty(reference_class=soc.models.user.User,
     required=False, collection_name='group_app_backup_admin',

@@ -58,17 +58,17 @@ class Group(soc.models.presence.Presence):
   #: Required field storing a home page URL of the group.
   home_page = db.LinkProperty(required=True,
       verbose_name=ugettext('Home Page URL'))
-  
+
   #: Required email address used as the "public" contact mechanism for
   #: the Group (as opposed to the founder.account email address which is
   #: kept secret, revealed only to Developers).
   email = db.EmailProperty(required=True,
       verbose_name=ugettext('Email'))  
-  
+
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,
       verbose_name=ugettext('Description'))
- 
+
   #: Optional public mailing list.     
   pub_mailing_list = db.StringProperty(required=False,
     verbose_name=ugettext('Public Mailing List'))

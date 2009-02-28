@@ -148,6 +148,6 @@ def getDefaultMailSender():
     return None
 
   # denormalize the account and retrieve the email
-  sender = accounts.denormalizeAccount(account_entity).email()
+  sender = accounts.denormalizeAccount(user_entity.account).email()
 
   return (user_entity.name, sender)

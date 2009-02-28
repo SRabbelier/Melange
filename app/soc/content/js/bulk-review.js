@@ -2,14 +2,14 @@ $(document).ready(function() {
 	$("#applications_progress_bar").progressBar({showText: false});
 });
 
-function bulkReviewInit(bulk_review_link) {
+function bulkReviewInit(bulk_review_link,button) {
 	// get the JSON object with details of every application for bulk acceptance
 	$.getJSON(bulk_review_link+"?_="+(new Date().getTime()),
 		function(data){
 			// If there are applications to review...
 			if (data.nr_applications != 0) {
 				//...then fade out the button, show the progress bar and call the function for review
-				$("#button_bulk_review").fadeOut("slow",
+				$("[id^=button_bulk_]").fadeOut("slow",
 					function() {
 						$("#applications_progress_bar").progressBar(0);
 						$("#description_done").html("");
@@ -17,7 +17,14 @@ function bulkReviewInit(bulk_review_link) {
 					}
 				);
 			}else {
-				$("#description_done").html("<strong>No organizations to accept</strong>");
+				var no_organization_text="No organizations to ";
+				if ($(button).attr("id").indexOf("reject")!=-1) {
+					no_organization_text+="reject";
+				}
+				else {
+					no_organization_text+="accept";
+				}
+				$("#description_done").html("<strong>"+no_organization_text+"</strong>");
 			}
 		}
 	);
@@ -64,7 +71,7 @@ function bulkReview(data) {
 			error: function(XMLHttpRequest, textStatus, errorThrown) {
 				// if there is an error return the button and leave a try again message
 				error_happened = true;
-				$("#button_bulk_review").fadeIn("slow", function() {
+				$("[id^=button_bulk_]").fadeIn("slow", function() {
 					$("#description_done").html("<strong class='error'> Error encountered, try again</strong>");
 				});
 			}
@@ -81,7 +88,7 @@ function bulkReview(data) {
 				$("#applications_progress_bar").fadeOut("slow",
 					function() {
 						$("#applications_progress_bar").progressBar(0);
-						$("#button_bulk_review").fadeIn("slow");
+						$("[id^=button_bulk_]").fadeIn("slow");
 					}
 				);
 				$("#description_progressbar").html("");

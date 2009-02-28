@@ -14,15 +14,12 @@ limitations under the License.
 {% endcomment %}
 
 {% block body %}
-<input id="button_bulk_review" type="button" class="button" 
-  onclick="javascript:bulkReviewInit('{{ bulk_accept_link|safe }}');" value="Bulk Accept"
+<input id="button_bulk_accept" type="button" class="button" 
+  onclick="javascript:bulkReviewInit('{{ bulk_accept_link|safe }}',this);" value="Bulk Accept"
 />
-{% comment %}
-TODO(ljvderijk) also make this button disappear
-{% endcomment %}
 
-<input id="button_bulk_review" type="button" class="button" 
-  onclick="javascript:bulkReviewInit('{{ bulk_reject_link|safe }}');" value="Bulk Reject"
+<input id="button_bulk_reject" type="button" class="button" 
+  onclick="javascript:bulkReviewInit('{{ bulk_reject_link|safe }}',this);" value="Bulk Reject"
 />
 <span class="progressBar" style="display:none;" id="applications_progress_bar"></span>
 <span id="description_progressbar"></span><span id="description_done"></span>

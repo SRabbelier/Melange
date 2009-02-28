@@ -46,7 +46,7 @@ import soc.logic.models.group_app
 
 
 DEF_APPLICATION_LIST_DESCRIPTION_FMT = ugettext(
-    'Overview of %(name_plural)s which status is %(status)s')
+    'Overview of %(name_plural)s whose status is "%(status)s"')
 
 
 class View(base.View):

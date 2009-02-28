@@ -178,7 +178,7 @@ def sendNewNotificationMessage(notification_entity):
           model_view.notification.view.getParams())}
 
   sender = mail_dispatcher.getDefaultMailSender()
-  site_entity = site_logic.logic.getSingleton()
+  site_entity = model_logic.site.logic.getSingleton()
   site_name = site_entity.site_name
 
   # get the default mail sender

@@ -136,6 +136,7 @@ def getUniversalContext(request):
   context['ga_tracking_num'] = settings.ga_tracking_num
   context['gmaps_api_key'] = settings.gmaps_api_key
   context['site_name'] = settings.site_name
+  context['site_notice'] = settings.site_notice
   context['tos_link'] = redirects.getToSRedirect(settings)
  
   return context

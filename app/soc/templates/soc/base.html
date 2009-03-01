@@ -109,6 +109,22 @@ limitations under the License.
 	{% endblock %}
   </div>
 
+  <div id="notice">
+  {% if site_notice %}
+  <table align="center">
+      <tr>
+          <td>
+          <div class="notice">
+          <div class="rounded_ul"><div class="rounded_ur"><div class="rounded_ll"><div class="rounded_lr">
+          <div style="padding: 5px 10px;"><b>{{ site_notice }}</b></div>
+          </div></div></div></div>
+          </div>
+          <td>
+      </tr>
+  </table>
+  {% endif %}
+  </div>
+
   <div id="header">
    <div id="logo">
 	{% block logo %}
@@ -152,6 +168,7 @@ TODO(tlarsen): replace this with breadcrumbs
 	{% endif %}
 	</div>
 	{% endblock %}
+
   </div>
 
   <div id="side" dir="ltr">

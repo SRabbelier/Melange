@@ -42,6 +42,10 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       verbose_name=ugettext('Site Name'))
   site_name.help_text = ugettext('The official name of the Site')
 
+  #: A notice that should be displayed site-wide
+  site_notice = db.StringProperty(verbose_name=ugettext('Site Notice'))
+  site_notice.help_text = ugettext('A notice that will be displayed site-wide')
+
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.

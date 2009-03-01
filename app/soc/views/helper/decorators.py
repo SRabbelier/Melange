@@ -45,15 +45,15 @@ def view(func):
   def view_wrapper(*args, **kwds):
     try:
       return func(*args, **kwds)
-    except DeadlineExceededError:
-      logging.exception('DeadlineExceededError')
-      return http.HttpResponse('DeadlineExceededError')
-    except MemoryError:
-      logging.exception('MemoryError')
-      return http.HttpResponse('MemoryError')
-    except AssertionError:
-      logging.exception('AssertionError')
-      return http.HttpResponse('AssertionError')
+    except DeadlineExceededError, e:
+      logging.exception(e)
+      return http.HttpResponseRedirect('/soc/content/deadline_exceeded.html')
+    except MemoryError, e:
+      logging.exception(e)
+      return http.HttpResponseRedirect('/soc/content/memory_error.html')
+    except AssertionError, e:
+      logging.exception(e)
+      return http.HttpResponseRedirect('/soc/content/assertion_error.html')
 
   return view_wrapper
 

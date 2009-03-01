@@ -88,13 +88,17 @@ class FullTinyMCE(forms.widgets.Textarea):
       "sub,sup,|,charmap,"
       "")
 
-  DEF_MCE_SETTINGS = {'mode': "exact",
-                      'theme': "advanced",
-                      'theme_advanced_buttons1': features1,
-                      'theme_advanced_buttons2': features2,
-                      'theme_advanced_buttons3': '',
-                      'theme_advanced_toolbar_location': "top",
-                      'theme_advanced_toolbar_align': "left"}
+  DEF_MCE_SETTINGS = {
+      'mode': "exact",
+      'theme': "advanced",
+      'theme_advanced_buttons1': features1,
+      'theme_advanced_buttons2': features2,
+      'theme_advanced_buttons3': '',
+      'theme_advanced_toolbar_location': "top",
+      'theme_advanced_toolbar_align': "left",
+      'relative_urls': 0,
+      'remove_script_host': 0,
+      }
 
 
   TINY_MCE_HTML_FMT = u'''\
@@ -143,7 +147,8 @@ class TinyMCE(FullTinyMCE):
 
     super(TinyMCE, self).__init__(*args, **kwargs)
     keys = ['mode', 'theme', 'theme_advanced_toolbar_location',
-            'theme_advanced_toolbar_align']
+            'theme_advanced_toolbar_align', 'relative_urls',
+            'remove_script_host']
     self.mce_settings = dicts.filter(self.mce_settings, keys)
 
 class ReferenceField(forms.CharField):

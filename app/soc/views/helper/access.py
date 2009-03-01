@@ -743,7 +743,7 @@ class Checker(object):
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.
     """
-
+    
     prefix = django_args['prefix']
     if self.SCOPE_DEPTH.get(prefix):
       scope_logic, depths = self.SCOPE_DEPTH[prefix]
@@ -1399,6 +1399,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_PREFIX_NOT_IN_ARGS_MSG)
 
     prefix = get_args['prefix']
+    django_args['prefix'] = prefix
 
     checker = rights_logic.Checker(prefix)
     memberships = checker.getMemberships()

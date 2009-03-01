@@ -323,6 +323,7 @@ class Logic(object):
       model: a model entity
       model_properties: keyword arguments that correspond to entity
         properties and their values
+      silent: iff True does not call _onUpdate method
 
     Returns:
       The original entity with any supplied properties changed.

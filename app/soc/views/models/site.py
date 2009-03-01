@@ -31,6 +31,7 @@ from soc.logic import dicts
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import presence_with_tos
@@ -43,6 +44,10 @@ import soc.logic.dicts
 class View(presence_with_tos.View):
   """View methods for the Document model.
   """
+
+  DEF_DOWN_FOR_MAINTENANCE_MSG = ugettext("Down for maintenance")
+  DEF_NOT_IN_MAINTENANCE_MSG = ugettext(
+      "The site is currently not in maintenance mode.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -96,6 +101,10 @@ class View(presence_with_tos.View):
     patterns += [(r'^$', 'soc.views.models.%(module_name)s.main_public', 
                   page_name)]
 
+    page_name = "Maintenance"
+    patterns += [(r'^maintenance$', 'soc.views.models.%(module_name)s.maintenance',
+                  page_name)]
+
     page_name = "Edit Site"
     patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',
                   'soc.views.models.%(module_name)s.main_edit',
@@ -140,6 +149,29 @@ class View(presence_with_tos.View):
 
     params = dicts.merge(params, new_params)
     return super(View, self).getSidebarMenus(id, user, params=params)
+
+  def maintenance(self, request, page_name):
+    """Returns a 'down for maintenance' view.
+    """
+
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    notice = context.pop('site_notice')
+
+    if not notice:
+      context['body_content'] = self.DEF_NOT_IN_MAINTENANCE_MSG
+    else:
+      context['body_content'] = notice
+      context['header_title'] = self.DEF_DOWN_FOR_MAINTENANCE_MSG
+      context['sidebar_menu_items'] = [
+            {'heading': self.DEF_DOWN_FOR_MAINTENANCE_MSG,
+             'group': ''},
+            ]
+
+    template = 'soc/base.html'
+
+    return responses.respond(request, template, context=context)
 
   def mainPublic(self, request, page_name=None, **kwargs):
     """Displays the main site settings page.
@@ -189,4 +221,5 @@ public = view.public
 export = view.export
 main_public = view.mainPublic
 main_edit = view.mainEdit
+maintenance = view.maintenance
 home = view.home

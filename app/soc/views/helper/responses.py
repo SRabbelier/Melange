@@ -20,6 +20,7 @@
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 

@@ -46,6 +46,9 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
   site_notice = db.StringProperty(verbose_name=ugettext('Site Notice'))
   site_notice.help_text = ugettext('A notice that will be displayed site-wide')
 
+  maintenance_start = db.DateTimeProperty(
+      verbose_name=ugettext('Maintenance start date'))
+
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.

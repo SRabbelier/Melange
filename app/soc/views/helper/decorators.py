@@ -27,7 +27,10 @@ import logging
 
 from functools import wraps
 
+from google.appengine.api import users
 from google.appengine.runtime import DeadlineExceededError
+from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
+
 
 from django import http
 
@@ -41,13 +44,29 @@ class Error(Exception):
 def view(func):
   """Decorator that insists that exceptions are handled by view.
   """
+
+  from soc.logic.helper import timeline
+  from soc.logic.models.site import logic as site_logic
+
   @wraps(func)
-  def view_wrapper(*args, **kwds):
+  def view_wrapper(request, *args, **kwds):
+    site = site_logic.getSingleton()
+
+    # don't redirect admins, or if we're at /maintenance already
+    no_redirect = users.is_current_user_admin() or request.path == '/maintenance'
+
+    if (not no_redirect) and timeline.isAfterEvent(site, 'maintenance_start'):
+      return http.HttpResponseRedirect('/maintenance')
+
     try:
-      return func(*args, **kwds)
+      return func(request, *args, **kwds)
     except DeadlineExceededError, e:
       logging.exception(e)
       return http.HttpResponseRedirect('/soc/content/deadline_exceeded.html')
+    except CapabilityDisabledError, e:
+      logging.exception(e)
+      # assume the site is in maintenance if we get CDE
+      return http.HttpResponseRedirect('/maintenance')
     except MemoryError, e:
       logging.exception(e)
       return http.HttpResponseRedirect('/soc/content/memory_error.html')

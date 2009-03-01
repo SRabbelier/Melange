@@ -206,11 +206,15 @@ target="_blank">(unreleased)</a>
   </div>
 
   <div id="body">
-	
+
    <div style="line-height: 140%;">
-	{% block body %}
+  {% block body %}
+  {% if body_content %}
+  {{ body_content }}
+  {% else %}
   &lt;Missing Page Body&gt;
-	{% endblock %}
+  {% endif %}
+  {% endblock %}
    </div>
    <div id="footer" dir="ltr">
     <div class="text">

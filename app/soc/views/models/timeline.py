@@ -30,6 +30,7 @@ from django import forms
 from soc.logic import dicts
 from soc.logic.models import program as program_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.models import base

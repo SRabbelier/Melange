@@ -36,6 +36,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.models import linkable
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.models import base

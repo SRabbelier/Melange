@@ -32,6 +32,7 @@ from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
 from soc.views.models import role

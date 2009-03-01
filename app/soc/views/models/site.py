@@ -30,6 +30,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views import out_of_band
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets

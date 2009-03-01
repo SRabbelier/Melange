@@ -31,6 +31,7 @@ from soc.logic import models as model_logic
 from soc.logic.models import host as host_logic
 from soc.logic.models import club_app as club_app_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.models import group_app
 
 import soc.logic.dicts

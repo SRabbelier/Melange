@@ -31,6 +31,7 @@ from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.helper import widgets

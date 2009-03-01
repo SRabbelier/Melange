@@ -29,6 +29,7 @@ from soc.logic import dicts
 from soc.logic.models import club as club_logic
 from soc.logic.models import club_admin as club_admin_logic
 from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import widgets
 from soc.views.models import club as club_view

@@ -101,14 +101,14 @@ class View(group_app.View):
 
 view = View()
 
-admin = view.admin
-create = view.create
-delete = view.delete
-edit = view.edit
-list = view.list
-list_self = view.listSelf
-public = view.public
-export = view.export
-review = view.review
-review_overview = view.reviewOverview
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+list = decorators.view(view.list)
+list_self = decorators.view(view.listSelf)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+review = decorators.view(view.review)
+review_overview = decorators.view(view.reviewOverview)
 

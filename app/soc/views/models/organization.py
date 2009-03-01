@@ -316,18 +316,18 @@ class View(group.View):
 
 view = View()
 
-admin = view.admin
-applicant = view.applicant
-apply_mentor = view.applyMentor
-create = view.create
-delete = view.delete
-edit = view.edit
-home = view.home
-list = view.list
-list_proposals = view.listProposals
-list_public = view.listPublic
-list_requests = view.listRequests
-list_roles = view.listRoles
-public = view.public
-export = view.export
-pick = view.pick
+admin = decorators.view(view.admin)
+applicant = decorators.view(view.applicant)
+apply_mentor = decorators.view(view.applyMentor)
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+home = decorators.view(view.home)
+list = decorators.view(view.list)
+list_proposals = decorators.view(view.listProposals)
+list_public = decorators.view(view.listPublic)
+list_requests = decorators.view(view.listRequests)
+list_roles = decorators.view(view.listRoles)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+pick = decorators.view(view.pick)

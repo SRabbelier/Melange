@@ -213,14 +213,14 @@ class View(presence_with_tos.View):
 
 view = View()
 
-admin = view.admin
-create = view.create
-edit = view.edit
-delete = view.delete
-list = view.list
-public = view.public
-export = view.export
-main_public = view.mainPublic
-main_edit = view.mainEdit
-maintenance = view.maintenance
-home = view.home
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+edit = decorators.view(view.edit)
+delete = decorators.view(view.delete)
+list = decorators.view(view.list)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+main_public = decorators.view(view.mainPublic)
+main_edit = decorators.view(view.mainEdit)
+maintenance = decorators.view(view.maintenance)
+home = decorators.view(view.home)

@@ -120,15 +120,15 @@ class View(role.View):
 
 view = View()
 
-accept_invite = view.acceptInvite
-admin = view.admin
-create = view.create
-delete = view.delete
-edit = view.edit
-invite = view.invite
-list = view.list
-manage = view.manage
-process_request = view.processRequest
-request = view.request
-public = view.public
-export = view.export
+accept_invite = decorators.view(view.acceptInvite)
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+invite = decorators.view(view.invite)
+list = decorators.view(view.list)
+manage = decorators.view(view.manage)
+process_request = decorators.view(view.processRequest)
+request = decorators.view(view.request)
+public = decorators.view(view.public)
+export = decorators.view(view.export)

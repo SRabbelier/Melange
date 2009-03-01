@@ -326,12 +326,12 @@ class View(presence_with_tos.View):
 
 view = View()
 
-admin = view.admin
-create = view.create
-delete = view.delete
-edit = view.edit
-list = view.list
-public = view.public
-export = view.export
-home = view.home
-pick = view.pick
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+list = decorators.view(view.list)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+home = decorators.view(view.home)
+pick = decorators.view(view.pick)

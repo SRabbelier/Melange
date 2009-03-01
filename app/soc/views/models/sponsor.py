@@ -130,14 +130,14 @@ class View(group.View):
 
 view = View()
 
-admin = view.admin
-create = view.create
-delete = view.delete
-edit = view.edit
-home = view.home
-list = view.list
-list_requests = view.listRequests
-list_roles = view.listRoles
-public = view.public
-export = view.export
-pick = view.pick
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+home = decorators.view(view.home)
+list = decorators.view(view.list)
+list_requests = decorators.view(view.listRequests)
+list_roles = decorators.view(view.listRoles)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+pick = decorators.view(view.pick)

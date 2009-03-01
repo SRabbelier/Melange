@@ -301,7 +301,7 @@ class View(base.View):
 
 view = View()
 
-create = view.create
-edit = view.editProfile
-export = view.export
-roles = view.roles
+create = decorators.view(view.create)
+edit = decorators.view(view.editProfile)
+export = decorators.view(view.export)
+roles = decorators.view(view.roles)

@@ -183,11 +183,11 @@ class View(base.View):
 
 view = View()
 
-admin = view.admin
-create = view.create
-edit = view.edit
-delete = view.delete
-list = view.list
-public = view.public
-export = view.export
-pick = view.pick
+admin = decorators.view(view.admin)
+create = decorators.view(view.create)
+edit = decorators.view(view.edit)
+delete = decorators.view(view.delete)
+list = decorators.view(view.list)
+public = decorators.view(view.public)
+export = decorators.view(view.export)
+pick = decorators.view(view.pick)

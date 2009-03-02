@@ -23,8 +23,8 @@ limitations under the License.
  <table>
   {% readonly_field_as_twoline_table_row entity.fields.name.label entity.name %}
   {% readonly_field_as_twoline_table_row entity.fields.applicant.label entity.applicant.link_id %}
-  {% readonly_field_as_twoline_table_row entity.fields.home_page.label entity.home_page %}
-  {% readonly_field_as_twoline_table_row entity.fields.email.label entity.email %}
+  {% readonly_url_field_as_twoline_table_row entity.fields.home_page.label entity.home_page %}
+  {% readonly_url_field_as_twoline_table_row entity.fields.email.label entity.email %}
   {% readonly_field_as_twoline_table_row entity.fields.description.label entity.description %}
   {% readonly_field_as_twoline_table_row entity.fields.why_applying.label entity.why_applying %}
   {% block group_details %}{% endblock %}

@@ -25,7 +25,7 @@ limitations under the License.
   {% if entity.home %}
   {% readonly_field_as_table_row entity.fields.home.label entity.home.key.name %}
   {% endif %}
-  {% readonly_field_as_table_row entity.fields.feed_url.label entity.feed_url %}
+  {% readonly_url_field_as_table_row entity.fields.feed_url.label entity.feed_url %}
   {% if entity.tos %}
     {% readonly_field_as_table_row entity.fields.tos.label entity.tos.key.name %}
   {% endif %}

@@ -83,7 +83,6 @@ class View(base.View):
     new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
 
     new_params['create_template'] = ['soc/request/create.html']
-    new_params['save_message'] = [ugettext('Request saved.')]
     
     new_params['extra_dynaexclude'] = ['status', 'role_verbose']
 

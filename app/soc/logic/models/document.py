@@ -61,6 +61,12 @@ class Logic(work.Logic):
 
     return ['prefix', 'scope_path', 'link_id']
 
+  def isDeletable(self, entity):
+    """See base.Logic.isDeletable.
+    """
+
+    return not entity.home
+
   def _updateField(self, entity, entity_properties, name):
     """Special logic for role. If state changes to active we flush the sidebar.
     """

@@ -555,9 +555,14 @@ class View(object):
           error, request, template=params['error_edit'])
 
     if not self._logic.isDeletable(entity):
-      # TODO: Update the notice area telling the user that they
-      # can't delete the entity
-      pass
+      page_params = params['cannot_delete_params']
+      params['suffix'] = entity.key().name()
+      request.path = params['edit_redirect'] % params
+
+      # redirect to the edit page
+      # display notice that entity could not be deleted
+      return helper.responses.redirectToChangedSuffix(
+          request, None, params=page_params)
 
     self._logic.delete(entity)
     redirect = params['delete_redirect']

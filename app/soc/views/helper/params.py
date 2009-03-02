@@ -45,6 +45,7 @@ DEF_CREATE_INSTRUCTION_MSG_FMT = ugettext(
 
 DEF_SUBMIT_MSG_PARAM_NAME = 's'
 DEF_SUBMIT_MSG_PROFILE_SAVED = 0
+DEF_SUBMIT_MSG_CANNOT_DELETE_ENTITY = 1
 
 
 # list with all js scripts used for documentary purposes
@@ -253,10 +254,15 @@ def constructParams(params):
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
   new_params['no_lists_msg'] = ""
-  new_params['save_message'] = [ugettext('%(name)s saved.' % params)]
+  new_params['save_message'] = [ugettext('%(name)s saved.' % params),
+                                ugettext('Cannot delete %(name)s.' % params)]
   new_params['submit_msg_param_name'] = DEF_SUBMIT_MSG_PARAM_NAME
   new_params['edit_params'] = {
       DEF_SUBMIT_MSG_PARAM_NAME: DEF_SUBMIT_MSG_PROFILE_SAVED,
+      }
+
+  new_params['cannot_delete_params'] = {
+      DEF_SUBMIT_MSG_PARAM_NAME: DEF_SUBMIT_MSG_CANNOT_DELETE_ENTITY,
       }
 
   new_params['dynabase'] = helper.forms.BaseForm

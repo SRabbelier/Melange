@@ -173,7 +173,7 @@ class AgreementField(widgets.Widget):
 
   HTML_CODE = """
   <span style="width:450px" colspan="4">
-    <div id="ToS" style="overflow:auto;height:800px">
+    <div id="ToS" style="overflow:auto;height:500px">
       %s
     </div>
   </span>

@@ -116,7 +116,7 @@ limitations under the License.
           <td>
           <div class="notice">
           <div class="rounded_ul"><div class="rounded_ur"><div class="rounded_ll"><div class="rounded_lr">
-          <div style="padding: 5px 10px;"><b>{{ site_notice }}</b></div>
+          <div style="padding: 5px 10px;"><b>{{ site_notice|safe }}</b></div>
           </div></div></div></div>
           </div>
           <td>
@@ -210,7 +210,7 @@ target="_blank">(unreleased)</a>
    <div style="line-height: 140%;">
   {% block body %}
   {% if body_content %}
-  {{ body_content }}
+  {{ body_content|safe }}
   {% else %}
   &lt;Missing Page Body&gt;
   {% endif %}

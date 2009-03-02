@@ -130,7 +130,7 @@ class Role(soc.models.linkable.Linkable):
   im_network = db.StringProperty(
       verbose_name=ugettext('IM Network'))
   im_network.help_text = ugettext(
-      'examples: irc:irc.freenode.org xmpp:gmail.com/Home')
+      'examples: irc:irc.freenode.net xmpp:gmail.com/Home')
   im_network.group=ugettext("1. Public Info")
 
   #: Optional field storing Instant Messaging handle; displayed publicly.

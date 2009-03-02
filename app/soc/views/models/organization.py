@@ -203,7 +203,7 @@ class View(group.View):
     """
 
     account = users.get_current_user()
-    user = user_logic.getForAccount(account) if account else None
+    user = user_logic.logic.getForAccount(account) if account else None
 
     try:
       rights = self._params['rights']

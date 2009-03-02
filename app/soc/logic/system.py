@@ -37,5 +37,5 @@ def isDebug():
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.
   """
-  return os.environ.get('CURRENT_VERSION_ID')
 
+  return os.environ.get('CURRENT_VERSION_ID')

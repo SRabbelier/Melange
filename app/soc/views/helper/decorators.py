@@ -47,15 +47,16 @@ def view(func):
 
   from soc.logic.helper import timeline
   from soc.logic.models.site import logic as site_logic
+  from soc.logic.models.user import logic as user_logic
 
   @wraps(func)
   def view_wrapper(request, *args, **kwds):
     site = site_logic.getSingleton()
 
     # don't redirect admins, or if we're at /maintenance already
-    no_redirect = users.is_current_user_admin() or request.path == '/maintenance'
+    no_redirect = user_logic.isDeveloper() or request.path == '/maintenance'
 
-    if (not no_redirect) and timeline.isAfterEvent(site, 'maintenance_start'):
+    if (not no_redirect) and timeline.isActivePeriod(site, 'maintenance'):
       return http.HttpResponseRedirect('/maintenance')
 
     try:

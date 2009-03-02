@@ -49,6 +49,9 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
   maintenance_start = db.DateTimeProperty(
       verbose_name=ugettext('Maintenance start date'))
 
+  maintenance_end = db.DateTimeProperty(
+      verbose_name=ugettext('Maintenance end date'))
+
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in 
   #: the footer with the given tracking number.

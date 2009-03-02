@@ -28,7 +28,7 @@ limitations under the License.
   {% readonly_url_field_as_table_row entity.fields.email.label entity.email %}
   {% readonly_url_field_as_table_row entity.fields.pub_mailing_list.label entity.pub_mailing_list %}
   {% readonly_field_as_table_row entity.fields.irc_channel.label entity.irc_channel %}
-  {% readonly_field_as_table_row entity.fields.description.label entity.description %}
+  {% readonly_safe_field_as_table_row entity.fields.description.label entity.description %}
   {% endblock %}
  </table>
 </p>

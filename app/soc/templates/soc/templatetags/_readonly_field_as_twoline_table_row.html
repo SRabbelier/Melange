@@ -20,7 +20,9 @@ limitations under the License.
  </tr>
 <tr title="{{ field.help_text }}">
  <td class="formfieldvalue">
+  {% block field_value_column %}
 	{{ field_value }}
+	{% endblock %}
  </td>
 </tr>
 {% endif %}

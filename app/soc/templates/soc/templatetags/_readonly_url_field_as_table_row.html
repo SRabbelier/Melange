@@ -1,3 +1,4 @@
+{% extends "soc/templatetags/_readonly_field_as_table_row.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,15 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% if field_value %}
-<tr title="{{ field.help_text }}">
- <td class="formfieldlabel">
-	{{ field_label }}:
- </td>
- <td class="formfieldvalue">
-  {% block field_value_column %}
-	{{ field_value }}
-	{% endblock %}
- </td>
-</tr>
-{% endif %}
+{% block field_value_column %}
+{{ field_value|urlize }}
+{% endblock %}

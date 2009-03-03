@@ -27,11 +27,11 @@ from soc.logic.models import base
 from soc.logic.models import group
 from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import program as program_logic
+from soc.logic.models import rankerroot as ranker_root_logic
 from soc.logic.models import request as request_logic
 
 import soc.models.group
 import soc.models.organization
-
 
 class Logic(group.Logic):
   """Logic methods for the Organization model.
@@ -52,8 +52,14 @@ class Logic(group.Logic):
 
 
   def _onCreate(self, entity):
-    """Invites the group admin and backup admin.
+    """Invites the group admin and backup admin and creates a rankerroot entity.
     """
+
+    from soc.models import student_proposal
+
+    # create a new ranker
+    ranker_root_logic.logic.create(student_proposal.DEF_RANKER_NAME, entity,
+        student_proposal.DEF_SCORE, 100)
 
     fields = {
         'link_id': entity.link_id,

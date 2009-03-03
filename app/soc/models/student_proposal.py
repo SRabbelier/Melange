@@ -32,6 +32,11 @@ import soc.models.organization
 import soc.models.program
 
 
+# define the [min_score, max_score] and the name for the RankList
+DEF_SCORE = [-1000, 1000]
+DEF_RANKER_NAME = 'student_app_ranker'
+
+
 class StudentProposal(soc.models.linkable.Linkable):
   """Model for a student proposal used in the GSoC workflow.
   """
@@ -64,6 +69,10 @@ class StudentProposal(soc.models.linkable.Linkable):
   #: A proposal can only have one mentor
   mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
                               required=False, collection_name='student_proposals')
+
+  #: A property containing a list of possible Mentors for this proposal
+  possible_mentors = db.ListProperty(item_type=db.Key,
+      default=[])
 
   #: the current score of this proposal, used to determine which proposals
   #: should be assigned a project slot.

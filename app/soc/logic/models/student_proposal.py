@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.logic.models import base
+from soc.logic.models import rankerroot as ranker_logic
 from soc.logic.models import student as student_logic
 
 import soc.models.linkable
@@ -40,6 +41,35 @@ class Logic(base.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def _onCreate(self, entity):
+    """Adds this proposal to the organization ranker entity
+    """
+
+    fields = {'link_id': self_model.DEF_RANKER_NAME,
+              'scope': entity.org}
+
+    ranker_root = ranker_logic.logic.getForFields(fields, unique=True)
+    ranker = ranker_logic.logic.getRootFromEntity(ranker_root) 
+    ranker.SetScore(entity.key().name(), [entity.score])
+
+    super(Logic, self)._onCreate(entity)
+
+  def _updateField(self, entity, entity_properties, name):
+    """Update the ranker if the score changes
+    """
+
+    value = entity_properties[name]
+
+    if name == 'score':
+      fields = {'link_id': self_model.DEF_RANKER_NAME,
+                'scope': entity.org}
+
+      ranker_root = ranker_logic.logic.getForFields(fields, unique=True)
+      ranker = ranker_logic.logic.getRootFromEntity(ranker_root)
+      ranker.SetScore(entity.key().name(), [value])
+
+    return super(Logic, self)._updateField(entity, entity_properties, name)
 
 
 logic = Logic()

@@ -1400,6 +1400,7 @@ class Checker(object):
 
     prefix = get_args['prefix']
     django_args['prefix'] = prefix
+    django_args['scope_path'] = get_args['scope_path']
 
     checker = rights_logic.Checker(prefix)
     memberships = checker.getMemberships()

@@ -1,0 +1,67 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+
+{% block header_title %}
+{{ page_name }} "{{ entity.title }}" from {{ student_name }} (Score: {{ entity.score }})
+{% endblock %}
+
+{% block body %}
+<p>
+ <table>
+  {% readonly_field_as_table_row entity.fields.title.label entity.title %}
+  {% readonly_field_as_table_row "Student" student_name %}
+  {% readonly_field_as_table_row "Mentor" mentor_name %}
+  {% readonly_field_as_table_row "Possible Mentors" possible_mentors %}
+  {% readonly_field_as_twoline_table_row entity.fields.abstract.label entity.abstract %}
+  {% readonly_field_as_twoline_table_row entity.fields.content.label entity.content %}
+  {% readonly_field_as_table_row "Created on" entity.created_on %}
+  {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
+ </table>
+</p>
+<hr>
+<b>Public Comments</b>
+<hr>
+<b>Private Comments</b>
+<hr>
+
+<form method="POST">
+  <table>
+    {% block form_table %}
+      {% as_table form %}
+    {% endblock %}
+  </table>
+ <table>
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td> 
+    <input style="font-weight: bold" type="submit" value="Submit"/></span>
+   </td>
+   {% if mentor %}
+   <td>
+   <input style="font-weight: bold" type="button" value="Want to be Possible Mentor"
+     onclick="location.href='?mentor=1'"/>
+   </td>
+   <td>
+   <input style="font-weight: bold" type="button" value="Do not want to be Possible Mentor"
+     onclick="location.href='?mentor=0'"/>
+   </td>
+   {% endif %}
+ </table>
+</form>
+
+{% endblock %}

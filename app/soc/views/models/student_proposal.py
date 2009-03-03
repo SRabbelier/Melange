@@ -30,14 +30,19 @@ from django import http
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
+from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
+from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import student as student_view
@@ -76,6 +81,8 @@ class View(base.View):
     rights['apply'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
         ('checkCanStudentPropose', 'scope_path')]
+    # TODO(ljvderijk) access check for review view
+    rights['review'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_proposal.logic
@@ -98,13 +105,17 @@ class View(base.View):
         'List my %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>list_orgs)/%(scope)s$',
         'soc.views.models.%(module_name)s.list_orgs',
-        'List my %(name_plural)s')
+        'List my %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.review',
+        'Review %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['org', 'program', 'score',
-                                       'status', 'mentor', 'link_id',]
+                                       'status', 'mentor', 'link_id',
+                                       'possible_mentors']
 
     new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(required=True,
@@ -126,6 +137,7 @@ class View(base.View):
         }
 
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
+    new_params['review_template'] = 'soc/student_proposal/review.html'
 
     params = dicts.merge(params, new_params)
 
@@ -149,6 +161,58 @@ class View(base.View):
 
     params['student_create_form'] = student_create_form
 
+    # create the special form for mentors
+    dynafields = [
+        {'name': 'score',
+         'base': forms.ChoiceField,
+         'label': 'Score',
+         'initial': 0,
+         'required': False,
+         'passthrough': ['initial', 'required', 'choices'],
+         'choices': [(-4,'-4: Wow. This. Sucks.'),
+                     (-3,'-3: Needs a lot of work'),
+                     (-2,'-2: This is bad'),
+                     (-1,'-1: I dont like this'),
+                     (0,'0: No score'),
+                     (1,'1: Might have potential'),
+                     (2,'2: Good'),
+                     (3,'3: Almost there'),
+                     (4,'4: Made. Of. Awesome.')]
+        },
+        {'name': 'comment',
+         'base': forms.CharField,
+         'widget': forms.Textarea,
+         'label': 'Comment',
+         'required': False,
+         },
+        {'name': 'public',
+         'base': forms.BooleanField,
+         'label': 'Public comment',
+         'initial': False,
+         'required': False,
+         },
+         ]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    mentor_review_form = dynaform.newDynaForm(dynamodel=None, dynabase=helper.forms.BaseForm,
+        dynainclude=None, dynaexclude=None, dynaproperties=dynaproperties)
+    params['mentor_review_form'] = mentor_review_form
+
+    # TODO see if autocomplete can be used for this field
+    dynafields = [
+      {'name': 'mentor',
+       'base': forms.CharField,
+       'label': 'Assign Mentor (Link ID)',
+       'required': False
+      },
+      ]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, dynaproperties=dynaproperties)
+
+    params['admin_review_form'] = admin_review_form
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -309,6 +373,207 @@ class View(base.View):
     return self.list(request, access_type=access_type, page_name=page_name,
                      params=list_params, filter=filter, **kwargs)
 
+
+  @decorators.merge_params
+  @decorators.check_access
+  def review(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """View that allows Organization Admins and Mentors to review the proposal.
+
+       For Args see base.View.public().
+    """
+
+    try:
+        entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
+    context['student_name'] = entity.scope.name()
+
+    if entity.mentor:
+      context['mentor_name'] = entity.mentor.name()
+    else:
+      context['mentor_name'] = "No mentor assigned"
+
+    context['entity'] = entity
+    context['entity_type'] = params['name']
+    context['entity_type_url'] = params['url_name']
+
+    # get the roles important for reviewing an application
+    filter = {'user': user_logic.logic.getForCurrentAccount(),
+        'scope': entity.org,
+        'status': 'active',}
+
+    org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
+    mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
+
+    # check if the current user is a mentor and wants to change his role for this app
+    choice = request.GET.get('mentor')
+    if mentor_entity and choice:
+      self._adjustPossibleMentors(entity, mentor_entity, choice)
+
+    # set the possible mentors in the context
+    possible_mentors = entity.possible_mentors
+
+    if not possible_mentors:
+      context['possible_mentors'] = "None"
+    else:
+      mentor_names = []
+
+      for mentor_key in possible_mentors:
+        mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
+        mentor_names.append(mentor.name())
+
+      context['possible_mentors'] = ', '.join(mentor_names)
+
+    # decide which form to use
+    if org_admin_entity:
+      form = params['admin_review_form']
+    else:
+      form = params['mentor_review_form']
+
+    if request.method == 'POST':
+      return self.reviewPost(request, context, params, entity,
+                             form, org_admin_entity, mentor_entity, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.reviewGet(request, context, params, entity,
+                            form, org_admin_entity, mentor_entity, **kwargs)
+
+  def reviewPost(self, request, context, params, entity, form,
+                 org_admin, mentor, **kwargs):
+    """Handles the POST request for the proposal review view.
+
+    Args:
+        entity: the student proposal entity
+        form: the form to use in this view
+        org_admin: org admin entity for the current user/proposal (iff available)
+        mentor: mentor entity for the current user/proposal (iff available)
+        rest: see base.View.public()
+    """
+    # populate the form using the POST data
+    form = form(request.POST)
+
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=entity, context=context,
+          form=form, params=params, template=params['review_template'])
+
+    fields = form.cleaned_data
+
+    if org_admin:
+      # org admin found, try to adjust the assigned mentor
+      self._adjustMentor(entity, fields['mentor'])
+
+    is_public = fields['public']
+    comment = fields['comment']
+    given_score = int(fields['score'])
+
+    if not is_public and given_score is not 0:
+      # if it is not a public comment we use the score and display
+      # an additional message in the comment
+      new_score = given_score + entity.score
+
+      name = 'Someone'
+
+      if org_admin:
+        name = org_admin.name()
+      elif mentor:
+        name = mentor.name()
+
+      # TODO(ljvderijk) hook up comments
+      comment = '%s has given %i points \n %s' %(name, given_score, comment)
+
+      # update the proposal with the new score
+      self._logic.updateEntityProperties(entity, {'score': new_score})
+
+    # redirect to the same page
+    return http.HttpResponseRedirect('')
+
+  def reviewGet(self, request, context, params, entity, form,
+                 org_admin, mentor, **kwargs):
+    """Handles the GET request for the proposal review view.
+
+    Args:
+        entity: the student proposal entity
+        form: the form to use in this view
+        org_admin: org admin entity for the current user/proposal (iff available)
+        mentor: mentor entity for the current user/proposal (iff available)
+        rest: see base.View.public()
+    """
+
+    initial = {}
+
+    if org_admin and entity.mentor:
+      initial['mentor'] = entity.mentor.link_id
+
+    context['form'] = form(initial)
+    template = params['review_template']
+    context['mentor'] = mentor
+
+    return responses.respond(request, template, context=context)
+
+  def _adjustPossibleMentors(self, entity, mentor, choice):
+    """Adjusts the possible mentors list for a proposal.
+
+    Args:
+      entity: Student Proposal entity
+      mentor: Mentor entity
+      choice: 1 means want to mentor, 0 do not want to mentor
+    """
+    possible_mentors = entity.possible_mentors
+
+    if choice == '1':
+      # add the mentor to possible mentors list if not already in
+      if mentor.key() not in possible_mentors:
+        possible_mentors.append(mentor.key())
+        fields = {'possible_mentors': possible_mentors}
+        self._logic.updateEntityProperties(entity, fields)
+    elif choice == '0':
+      # remove the mentor from the possible mentors list
+      if mentor.key() in possible_mentors:
+        possible_mentors.remove(mentor.key())
+        fields = {'possible_mentors': possible_mentors}
+        self._logic.updateEntityProperties(entity, fields)
+
+  def _adjustMentor(self, entity, mentor_id):
+    """Changes the mentor to the given link_id.
+
+    Args:
+      entity: Student Proposal entity
+      mentor_id: Link ID of the mentor that needs to be assigned
+                 Iff not given then removes the assigned mentor
+    """
+
+    if entity.mentor and entity.mentor.link_id == mentor_id:
+      # no need to change
+      return
+
+    if mentor_id:
+      # try to locate the mentor
+      fields = {'link_id': mentor_id,
+                'scope': entity.org,
+                'status': 'active'}
+
+      mentor_entity = mentor_logic.logic.getForFields(fields, unique=True)
+
+      if not mentor_entity:
+        # no mentor found, do not update
+        return
+    else:
+      # reset to None
+      mentor_entity = None
+
+    # update the proposal
+    properties = {'mentor': mentor_entity}
+    self._logic.updateEntityProperties(entity, properties)
+
 view = View()
 
 admin = decorators.view(view.admin)
@@ -320,5 +585,6 @@ list = decorators.view(view.list)
 list_orgs = decorators.view(view.listOrgs)
 list_self = decorators.view(view.listSelf)
 public = decorators.view(view.public)
+review = decorators.view(view.review)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)

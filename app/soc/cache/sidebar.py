@@ -23,10 +23,10 @@ __authors__ = [
 
 
 from google.appengine.api import memcache
-from google.appengine.api import users
 
 import soc.cache.base
 import soc.cache.rights
+import soc.logic.accounts
 
 
 def key(id):
@@ -67,7 +67,7 @@ def flush(id=None):
   """
 
   if not id:
-    id = users.get_current_user()
+    id = soc.logic.accounts.getCurrentAccount()
 
   memcache_key = key(id)
   memcache.delete(memcache_key)

@@ -27,6 +27,14 @@ __authors__ = [
 from google.appengine.api import users
 
 
+def getCurrentAccount(normalize=True):
+  """Returns an optionally normalized version of the current account.
+  """
+
+  account = users.get_current_user()
+  return normalizeAccount(account) if (account and normalize) else account
+
+
 def normalizeAccount(account):
   """Returns a normalized version of the specified account.
   """
@@ -68,7 +76,7 @@ def isDeveloper(account=None):
   """
 
   # Get the currently logged in user
-  current = users.get_current_user()
+  current = getCurrentAccount()
 
   if current and (not account):
     # default to the current user

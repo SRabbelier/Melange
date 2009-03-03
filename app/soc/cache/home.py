@@ -25,7 +25,8 @@ __authors__ = [
 import logging
 
 from google.appengine.api import memcache
-from google.appengine.api import users
+
+from soc.logic import accounts
 
 import soc.cache.base
 
@@ -43,7 +44,8 @@ def get(self, *args, **kwargs):
 
   # only cache the page for non-logged-in users
   # TODO: figure out how to cache everything but the sidebar
-  if users.get_current_user():
+  # also, no need to normalize as we don't use it anyway
+  if accounts.getCurrentAccount(normalize=False):
     return (None, None)
 
   entity = self._logic.getFromKeyFields(kwargs)
@@ -64,7 +66,8 @@ def put(result, memcache_key, *args, **kwargs):
   """
 
   # no sense in storing anything if we won't query it later on
-  if users.get_current_user():
+  # also, no need to normalize as we don't use it anyway
+  if accounts.getCurrentAccount(normalize=False):
     return
 
   # Store sidebar for just ten minutes to force a refresh every so often

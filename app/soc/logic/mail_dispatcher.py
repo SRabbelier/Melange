@@ -67,7 +67,6 @@ __authors__ = [
 from django.template import loader
 
 from google.appengine.api import mail
-from google.appengine.api import users
 
 from soc.logic import dicts
 
@@ -147,7 +146,7 @@ def getDefaultMailSender():
     return (site_entity.site_name, site_entity.noreply_email)
 
   # use the email address of the current logged in user
-  account = users.get_current_user()
+  account = accounts.getCurrentAccount(normalize=False)
 
   # we need to retrieve account seperately, as user_logic normalizes it
   # and the GAE admin API is case sensitive

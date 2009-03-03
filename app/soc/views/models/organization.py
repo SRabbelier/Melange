@@ -204,7 +204,7 @@ class View(group.View):
     """See base.View.list.
     """
 
-    account = users.get_current_user()
+    account = accounts.getCurrentAccount()
     user = user_logic.logic.getForAccount(account) if account else None
 
     try:

@@ -68,7 +68,7 @@ class Logic(base.Logic):
     entity, None is returned.
     """
 
-    account = users.get_current_user()
+    account = accounts.getCurrentAccount()
 
     if not account:
       return None
@@ -102,9 +102,11 @@ class Logic(base.Logic):
       user: if not specified, defaults to the current user
     """
 
+    current = accounts.getCurrentAccount()
+
     if not account:
       # default account to the current logged in account
-      account = users.get_current_user()
+      account = current
 
     if account and (not user):
       # default user to the current logged in user
@@ -113,7 +115,7 @@ class Logic(base.Logic):
     if user and user.is_developer:
       return True
 
-    if account and (account == users.get_current_user()):
+    if account and (account == current):
       return users.is_current_user_admin()
 
   def agreesToSiteToS(self, entity):

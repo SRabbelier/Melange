@@ -107,7 +107,7 @@ def getUniversalContext(request):
     }
   """
 
-  account = users.get_current_user()
+  account = accounts.getCurrentAccount()
   user = None
   is_admin = False
 

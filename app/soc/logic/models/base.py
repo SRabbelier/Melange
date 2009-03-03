@@ -411,6 +411,28 @@ class Logic(object):
     # entity has been deleted call _onDelete
     self._onDelete(entity)
 
+  def getAll(self, query):
+    """Retrieves all entities for the specified query.
+    """
+
+    chunk = 999
+    offset = 0
+    result = []
+    more = True
+
+    while(more):
+      data = query.fetch(chunk+1, offset)
+
+      more = len(data) > chunk
+
+      if more:
+        del data[chunk]
+
+      result.extend(data)
+      offset = offset + chunk
+
+    return result
+
   def _createField(self, entity_properties, name):
     """Hook called when a field is created.
 

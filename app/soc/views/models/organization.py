@@ -80,8 +80,8 @@ class View(group.View):
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
     rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasActiveRoleForKeyFieldsAsScope', org_admin_logic.logic),
-         ('checkHasActiveRoleForKeyFieldsAsScope', mentor_logic.logic)]
+        [('checkHasActiveRoleForKeyFieldsAsScope', [org_admin_logic.logic]),
+         ('checkHasActiveRoleForKeyFieldsAsScope', [mentor_logic.logic])]
         ])]
 
     new_params = {}
@@ -214,6 +214,8 @@ class View(group.View):
       is_host = True
     except out_of_band.Error:
       is_host = False
+
+    new_params = {}
 
     if is_host:
       new_params['list_action'] = (redirects.getAdminRedirect, params)

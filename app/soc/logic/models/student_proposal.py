@@ -25,6 +25,7 @@ __authors__ = [
 from soc.logic.models import base
 from soc.logic.models import rankerroot as ranker_logic
 from soc.logic.models import student as student_logic
+from soc.models import student_proposal
 
 import soc.models.linkable
 import soc.models.student_proposal
@@ -46,7 +47,7 @@ class Logic(base.Logic):
     """Adds this proposal to the organization ranker entity
     """
 
-    fields = {'link_id': self_model.DEF_RANKER_NAME,
+    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
               'scope': entity.org}
 
     ranker_root = ranker_logic.logic.getForFields(fields, unique=True)
@@ -62,7 +63,7 @@ class Logic(base.Logic):
     value = entity_properties[name]
 
     if name == 'score':
-      fields = {'link_id': self_model.DEF_RANKER_NAME,
+      fields = {'link_id': student_proposal.DEF_RANKER_NAME,
                 'scope': entity.org}
 
       ranker_root = ranker_logic.logic.getForFields(fields, unique=True)

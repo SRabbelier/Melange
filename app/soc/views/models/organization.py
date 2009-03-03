@@ -36,6 +36,7 @@ from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform

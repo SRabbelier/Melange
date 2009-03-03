@@ -108,6 +108,7 @@ def getListContent(request, params, filter=None, idx=0, need_content=False):
     params: a dict with params for the View this list belongs to
     filter: a filter for this list
     idx: the index of this list
+    need_content: iff True will return None if there is no data
 
   Returns:
     A a dictionary with the following values set:

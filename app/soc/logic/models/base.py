@@ -440,7 +440,7 @@ class Logic(object):
     specified) on an entity that is being created.
 
     Base classes should override if any special actions need to be
-    taken when a field is updated.
+    taken when a field is created.
 
     Args:
       name: the name of the field to be created

@@ -57,18 +57,26 @@ class Logic(base.Logic):
     super(Logic, self)._onCreate(entity)
 
   def _updateField(self, entity, entity_properties, name):
-    """Update the ranker if the score changes
+    """Update the ranker if the score changes and keep the score within bounds.
     """
 
     value = entity_properties[name]
 
     if name == 'score':
+      # keep the score within bounds
+      min_score, max_score = student_proposal.DEF_SCORE
+
+      value = max(min_score, min(value, max_score-1))
+      entity_properties[name] = value
+
+      # update the ranker
       fields = {'link_id': student_proposal.DEF_RANKER_NAME,
                 'scope': entity.org}
 
       ranker_root = ranker_logic.logic.getForFields(fields, unique=True)
       ranker = ranker_logic.logic.getRootFromEntity(ranker_root)
       ranker.SetScore(entity.key().name(), [value])
+
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 

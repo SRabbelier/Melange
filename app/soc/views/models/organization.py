@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Augie Fackler" <durin42@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -106,10 +107,10 @@ class View(group.View):
     patterns = []
 
     patterns += [(r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
-        'soc.views.models.%(module_name)s.apply_mentor', 
+        'soc.views.models.%(module_name)s.apply_mentor',
         "List of all %(name_plural)s you can apply to"),
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.list_proposals', 
+        'soc.views.models.%(module_name)s.list_proposals',
         "List of all Student Proposals for this %(name)s"),]
 
     new_params['extra_django_patterns'] = patterns
@@ -150,7 +151,7 @@ class View(group.View):
   @decorators.check_access
   def applyMentor(self, request, access_type,
                   page_name=None, params=None, **kwargs):
-    """Shows a list of all organizations and you can choose one to 
+    """Shows a list of all organizations and you can choose one to
        apply to become a mentor.
 
     Args:
@@ -169,7 +170,7 @@ class View(group.View):
     filter = {'scope_path': kwargs['scope_path'],
               'status' : 'active'}
 
-    return self.list(request, access_type, 
+    return self.list(request, access_type,
         page_name, params=list_params, filter=filter)
 
   @decorators.merge_params
@@ -266,12 +267,12 @@ class View(group.View):
       submenus.append(submenu)
 
       # add a link to the request page
-      submenu = (redirects.getListRequestsRedirect(group_entity, params), 
+      submenu = (redirects.getListRequestsRedirect(group_entity, params),
           "List Requests and Invites", 'any_access')
       submenus.append(submenu)
 
       # add a link to the edit page
-      submenu = (redirects.getEditRedirect(group_entity, params), 
+      submenu = (redirects.getEditRedirect(group_entity, params),
           "Edit Organization Profile", 'any_access')
       submenus.append(submenu)
 
@@ -287,8 +288,8 @@ class View(group.View):
 
     if roles.get('org_admin'):
       # add a link to the resign page
-      submenu = (redirects.getManageRedirect(roles['org_admin'], 
-          {'url_name': 'org_admin'}), 
+      submenu = (redirects.getManageRedirect(roles['org_admin'],
+          {'url_name': 'org_admin'}),
           "Resign as Admin", 'any_access')
       submenus.append(submenu)
 
@@ -301,8 +302,8 @@ class View(group.View):
 
     if roles.get('mentor'):
       # add a link to the resign page
-      submenu = (redirects.getManageRedirect(roles['mentor'], 
-          {'url_name' : 'mentor'}), 
+      submenu = (redirects.getManageRedirect(roles['mentor'],
+          {'url_name' : 'mentor'}),
           "Resign as Mentor", 'any_access')
       submenus.append(submenu)
 

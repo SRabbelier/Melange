@@ -268,7 +268,8 @@ class Logic(object):
 
     raise out_of_band.Error(msg, status=404)
 
-  def getForFields(self, filter=None, unique=False, limit=1000, offset=0):
+  def getForFields(self, filter=None, unique=False,
+                   limit=1000, offset=0, order=None):
     """Returns all entities that have the specified properties.
 
     Args:
@@ -276,38 +277,31 @@ class Logic(object):
       unique: if set, only the first item from the resultset will be returned
       limit: the amount of entities to fetch at most
       offset: the position to start at
+      order: a list with the sort order
     """
 
+    if not filter:
+      filter = {}
     if unique:
       limit = 1
+    if not order:
+      order = []
 
-    if filter:
-      format_eq = '%(key)s = :%(num)d'
-      format_in = '%(key)s IN (%(values)s)'
+    orderset = set([i.strip('-') for i in order])
+    if len(orderset) != len(order):
+      raise InvalidArgumentError
 
-      n = 1
-      conditionals = []
-      args = []
+    q = db.Query(self._model)
 
-      for key, value in filter.iteritems():
-        if isinstance(value, list):
-          count = len(value)
-          args.extend(value)
-          values = ', '.join([':%d' % i for i in range(n, n + count)])
-          sub = format_in % {'key': key, 'values': values}
-          n = n + count
-        else:
-          sub = format_eq % {'key': key, 'num': n}
-          args.append(value)
-          n = n + 1
-        conditionals.append(sub)
+    for key, value in filter.iteritems():
+      if isinstance(value, list):
+        op = '%s IN' % key
+        q.filter(op, value)
+      else:
+        q.filter(key, value)
 
-      joined_pairs = ' AND '.join(conditionals)
-      condition = 'WHERE ' + joined_pairs
-
-      q = self._model.gql(condition, *args)
-    else:
-      q = self._model.all()
+    for key in order:
+      q.order(key)
 
     result = q.fetch(limit, offset)
 

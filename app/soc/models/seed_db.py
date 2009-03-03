@@ -63,14 +63,36 @@ def seed(*args, **kwargs):
     account = users.User(email='test@example.com')
 
   user_properties = {
-        'key_name': 'test',
-        'link_id': 'test',
-        'account': account,
-        'name': 'Test',
-        }
+      'key_name': 'test',
+      'link_id': 'test',
+      'account': account,
+      'name': 'Test',
+      }
 
   current_user = User(**user_properties)
   current_user.put()
+
+
+  for i in range(100):
+    user_properties = {
+        'key_name': 'user_%d' % i,
+        'link_id': 'user_%d' % i,
+        'account': users.User(email='user_%d@example.com' % i),
+        'name': 'User %d' % i,
+        }
+    entity = User(**user_properties)
+    entity.put()
+
+
+  for i in range(100, 200):
+    user_properties = {
+        'key_name': 'user_%d' % i,
+        'link_id': 'user_%d' % i,
+        'account': users.User(email='user_%d' % i),
+        'name': 'User %d' % i,
+        }
+    entity = User(**user_properties)
+    entity.put()
 
 
   group_properties = {

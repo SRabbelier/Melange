@@ -24,28 +24,17 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import validate
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.user import logic as user_logic
-from soc.models import linkable
-from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
-from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
+from soc.views.helper import widgets
 from soc.views.models import base
-
-import soc.models.document
-import soc.logic.models.document
-import soc.logic.dicts
-import soc.views.helper
-import soc.views.helper.widgets
 
 
 class View(base.View):
@@ -88,10 +77,10 @@ class View(base.View):
 
     new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(
-            widget=helper.widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
+            widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),
-        'prefix': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
+        'prefix': forms.fields.CharField(widget=widgets.ReadOnlyInput(),
                                         required=True),
 
         'clean_content': cleaning.clean_document_content,
@@ -104,10 +93,10 @@ class View(base.View):
 
     new_params['edit_extra_dynaproperties'] = {
         'doc_key_name': forms.fields.CharField(widget=forms.HiddenInput),
-        'created_by': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
-                                             required=False),
+        'created_by': forms.fields.CharField(
+            widget=widgets.ReadOnlyInput(), required=False),
         'last_modified_by': forms.fields.CharField(
-            widget=helper.widgets.ReadOnlyInput(), required=False),
+            widget=widgets.ReadOnlyInput(), required=False),
         }
 
     params = dicts.merge(params, new_params)

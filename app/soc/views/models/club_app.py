@@ -51,8 +51,7 @@ class View(group_app.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsUser']
-    rights['delete'] = [('checkCanEditGroupApp',
-                         [club_app_logic.logic])]
+    rights['delete'] = ['checkIsDeveloper']
     rights['edit'] = [('checkCanEditGroupApp',
                        [club_app_logic.logic])]
     rights['list'] = ['checkIsDeveloper']

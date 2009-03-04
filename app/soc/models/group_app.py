@@ -116,7 +116,7 @@ class GroupApplication(soc.models.linkable.Linkable):
   created_on = db.DateTimeProperty(required=True, auto_now_add=True,
       verbose_name=ugettext('Created on'))
   
-  # timestamp to record the time on which this application has been last modified
-  # also changes when the review properties change
+  # timestamp to record the time on which this application has been 
+  # last modified also changes when the review properties change
   last_modified_on = db.DateTimeProperty(required=True, auto_now=True,
       verbose_name=ugettext('Last modified on'))

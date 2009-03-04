@@ -109,7 +109,8 @@ class User(soc.models.linkable.Linkable):
 
   #: field storing the status of this User.
   #: valid: Is just that, it's a valid User.
-  #: invalid: This means that this User has been excluded from using the website.
+  #: invalid: This means that this User has been excluded 
+  #:          from using the website.
   status = db.StringProperty(required=True, default='valid',
       choices=['valid', 'invalid'],)
   status.help_text = ugettext(

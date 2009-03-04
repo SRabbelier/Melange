@@ -24,10 +24,10 @@ __authors__ = [
 
 from django.conf.urls import defaults
 
-from soc.views.models import club
-from soc.views.models import club_app
-from soc.views.models import club_admin
-from soc.views.models import club_member
+#from soc.views.models import club
+#from soc.views.models import club_app
+#from soc.views.models import club_admin
+#from soc.views.models import club_member
 from soc.views.models import document
 from soc.views.models import host
 from soc.views.models import mentor
@@ -98,4 +98,6 @@ sitemap.addPages(user.view.getDjangoURLPatterns())
 
 
 def getPatterns():
+  """Retrieves all the url patterns of this site.
+  """
   return defaults.patterns(None, *sitemap.SITEMAP)

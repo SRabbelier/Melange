@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.ext import db
-
 from django import forms
 
 from soc.logic import dicts
@@ -75,7 +73,8 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
     for name, logic_value in program_logic.logic.TIMELINE_LOGIC.iteritems():
-      create_form = params_helper.getCreateForm(self._params, logic_value.getModel())
+      create_form = params_helper.getCreateForm(self._params, 
+          logic_value.getModel())
       edit_form = dynaform.extendDynaForm(
         dynaform = create_form,
         dynainclude = self._params['edit_dynainclude'],

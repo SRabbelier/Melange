@@ -424,20 +424,6 @@ class View(base.View):
     if mentor_entity and choice:
       self._adjustPossibleMentors(entity, mentor_entity, choice)
 
-    # set the possible mentors in the context
-    possible_mentors = entity.possible_mentors
-
-    if not possible_mentors:
-      context['possible_mentors'] = "None"
-    else:
-      mentor_names = []
-
-      for mentor_key in possible_mentors:
-        mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
-        mentor_names.append(mentor.name())
-
-      context['possible_mentors'] = ', '.join(mentor_names)
-
     # decide which form to use
     if org_admin_entity:
       form = params['admin_review_form']
@@ -527,7 +513,28 @@ class View(base.View):
 
     context['form'] = form(initial)
     template = params['review_template']
-    context['mentor'] = mentor
+
+    # set the possible mentors in the context
+    possible_mentors = entity.possible_mentors
+
+    if not possible_mentors:
+      context['possible_mentors'] = "None"
+    else:
+      mentor_names = []
+
+      for mentor_key in possible_mentors:
+        mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
+        mentor_names.append(mentor.name())
+
+      context['possible_mentors'] = ', '.join(mentor_names)
+
+    if mentor:
+      if mentor.key() in possible_mentors:
+        # show "No longer willing to mentor"
+        context['remove_me_as_mentor'] = True
+      else:
+        # show "I am willing to mentor"
+        context['add_me_as_mentor'] = True
 
     return responses.respond(request, template, context=context)
 

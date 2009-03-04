@@ -51,15 +51,18 @@ limitations under the License.
    <td> 
     <input style="font-weight: bold" type="submit" value="Submit"/></span>
    </td>
-   {% if mentor %}
+   {% if add_me_as_mentor %}
    <td>
-   <input style="font-weight: bold" type="button" value="Want to be Possible Mentor"
+   <input style="font-weight: bold" type="button" value="I am willing to mentor this student"
      onclick="location.href='?mentor=1'"/>
    </td>
-   <td>
-   <input style="font-weight: bold" type="button" value="Do not want to be Possible Mentor"
-     onclick="location.href='?mentor=0'"/>
-   </td>
+   {% else %} 
+     {% if remove_me_as_mentor %}
+     <td>
+       <input style="font-weight: bold" type="button" value="I am no longer willing to mentor this student"
+       onclick="location.href='?mentor=0'"/>
+     </td>
+     {% endif %}
    {% endif %}
  </table>
 </form>

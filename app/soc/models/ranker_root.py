@@ -28,7 +28,8 @@ import soc.models.linkable
 
 
 class RankerRoot(soc.models.linkable.Linkable):
-  """Links the Root of a RankList tree to an owner and also gives it an unique ID.
+  """Links the Root of a RankList tree to an owner and also 
+     gives it an unique ID.
   """
 
   #: A required reference property to the root of the RankList tree

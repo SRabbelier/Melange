@@ -43,8 +43,6 @@ from soc.views.helper import widgets
 from soc.views.models import group_app
 from soc.views.models import program as program_view
 
-import soc.logic.dicts
-
 
 class View(group_app.View):
   """View methods for the Organization Application model.
@@ -140,11 +138,15 @@ class View(group_app.View):
   @ decorators.merge_params
   def reviewOverview(self, request, access_type,
                page_name=None, params=None, **kwargs):
+    """View that allows to see organization application review overview.
+
+       For Args see base.View.public().
+    """
 
     params['list_template'] = 'soc/org_app/review_overview.html'
     context = {
-        'bulk_accept_link': '/org_app/bulk_accept/%(scope_path)s' %(kwargs),
-        'bulk_reject_link': '/org_app/bulk_reject/%(scope_path)s' %(kwargs),}
+        'bulk_accept_link': '/org_app/bulk_accept/%(scope_path)s' % (kwargs),
+        'bulk_reject_link': '/org_app/bulk_reject/%(scope_path)s' % (kwargs),}
 
     return super(View, self).reviewOverview(request, access_type,
         page_name=page_name, params=params, context=context, **kwargs)
@@ -256,7 +258,8 @@ class View(group_app.View):
     # get the program entity from the keyname
     program_entity = program_logic.logic.getFromKeyName(program_keyname)
 
-    # get all the organization applications for the given program and from_status
+    # get all the organization applications for the 
+    # given program and from_status
     filter = {'scope': program_entity,
               'status': from_status}
 

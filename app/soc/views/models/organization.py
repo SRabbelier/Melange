@@ -24,9 +24,8 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -164,7 +163,7 @@ class View(group.View):
 
     list_params = params.copy()
     list_params['list_action'] = (redirects.getRequestRedirectForRole, 'mentor')
-    list_params['list_description'] = ('Choose an Organization which '
+    list_params['list_description'] = ugettext('Choose an Organization which '
         'you want to become a Mentor for.')
 
     filter = {'scope_path': kwargs['scope_path'],
@@ -190,7 +189,7 @@ class View(group.View):
               'status': ['new', 'pending', 'accepted']}
 
     list_params = student_proposal_view.view.getParams().copy()
-    list_params['list_description'] = 'List of %s send to %s ' %(
+    list_params['list_description'] = 'List of %s send to %s ' % (
         list_params['name_plural'], org_entity.name)
     list_params['list_action'] = (redirects.getPublicRedirect, list_params)
 

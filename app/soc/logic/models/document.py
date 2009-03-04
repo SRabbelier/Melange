@@ -65,7 +65,7 @@ class Logic(work.Logic):
     """See base.Logic.isDeletable.
     """
 
-    return not entity.home
+    return not entity.home_for
 
   def _updateField(self, entity, entity_properties, name):
     """Special logic for role. If state changes to active we flush the sidebar.

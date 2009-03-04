@@ -183,18 +183,47 @@ class View(group.View):
 
     from soc.views.models import student_proposal as student_proposal_view
 
-    org_entity = org_logic.logic.getFromKeyFields(kwargs)
-
-    filter = {'org' : org_entity,
-              'status': ['new', 'pending', 'accepted']}
+    try:
+      org_entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
 
     list_params = student_proposal_view.view.getParams().copy()
-    list_params['list_description'] = 'List of %s send to %s ' % (
-        list_params['name_plural'], org_entity.name)
-    list_params['list_action'] = (redirects.getPublicRedirect, list_params)
+    list_params['list_row'] = ('soc/%(module_name)s/list/'
+        'detailed_row.html' % list_params)
+    list_params['list_heading'] = ('soc/%(module_name)s/list/'
+        'detailed_heading.html' % list_params)
 
-    return self.list(request, access_type=access_type, page_name=page_name,
-                     params=list_params, filter=filter, **kwargs)
+    ranked_params = list_params.copy()# ranked proposals
+    ranked_params['list_description'] = 'List of %s send to %s ' % (
+        ranked_params['name_plural'], org_entity.name)
+    ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
+
+    filter = {'org' : org_entity,
+              'status': ['pending', 'accepted']}
+
+    # order by descending score
+    order = ['-score']
+
+    prop_list = lists.getListContent(
+        request, ranked_params, filter, order=order, idx=0)
+
+    new_params = list_params.copy() # new proposals
+    new_params['list_description'] = 'List of new %s send to %s ' %(
+        new_params['name_plural'], org_entity.name)
+    new_params['list_action'] = (redirects.getReviewRedirect, new_params)
+
+    filter['status'] = 'new'
+
+    new_list = lists.getListContent(
+        request, new_params, filter, idx=1)
+
+    # fill contents with all the needed lists
+    contents = [prop_list, new_list]
+
+    # call the _list method from base to display the list
+    return self._list(request, list_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

@@ -25,8 +25,6 @@ __authors__ = [
 import os
 import time
 
-from google.appengine.api import users
-
 from django.template import loader
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext
@@ -53,7 +51,8 @@ DEF_NEW_GROUP_MSG_FMT = ugettext(
 
 DEF_WELCOME_MSG_FMT = ugettext("Welcome to %(site_name)s, %(name)s,")
 
-DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/invitation.html'
+DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
+    'invitation.html'
 
 DEF_NEW_GROUP_TEMPLATE = 'soc/group/messages/accepted.html'
 
@@ -164,12 +163,6 @@ def sendNewNotificationMessage(notification_entity):
     Args:
       notification_entity: Notification about which the message should be sent
   """
-
-  # get user logic
-  user_logic = model_logic.user
-
-  # get the current user
-  current_user_entity = user_logic.logic.getForCurrentAccount()
 
   # create the url to show this notification
   notification_url = "http://%(host)s%(index)s" % {

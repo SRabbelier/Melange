@@ -54,7 +54,8 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope', soc.logic.models.mentor.logic)]
+    rights['edit'] = [('checkHasActiveRoleForScope', 
+                       soc.logic.models.mentor.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          soc.logic.models.org_admin.logic)]
@@ -144,7 +145,7 @@ class View(role.View):
       fields['user'] = fields['link_id']
       fields['link_id'] = fields['user'].link_id
 
-      group_logic = params['group_logic']
+      group_logic = self._params['group_logic']
       group_entity = group_logic.getFromKeyName(fields['scope_path'])
       fields['program'] = group_entity.scope
 

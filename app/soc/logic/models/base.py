@@ -255,10 +255,11 @@ class Logic(object):
     if entity:
       return entity
 
+    key_fields = self.getKeyFieldsFromFields(fields)
     format_text = ugettext('"%(key)s" is "%(value)s"')
 
     msg_pairs = [format_text % {'key': key, 'value': value}
-      for key, value in fields.iteritems()]
+      for key, value in key_fields.iteritems()]
 
     joined_pairs = ' and '.join(msg_pairs)
 

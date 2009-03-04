@@ -36,7 +36,8 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.student_proposal.StudentProposal,
-               base_model=soc.models.linkable.Linkable, scope_logic=student_logic):
+               base_model=soc.models.linkable.Linkable, 
+               scope_logic=student_logic):
     """Defines the name, key_name and model for this entity.
     """
 

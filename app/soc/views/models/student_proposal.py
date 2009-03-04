@@ -81,8 +81,9 @@ class View(base.View):
     rights['apply'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
         ('checkCanStudentPropose', 'scope_path')]
-    # TODO(ljvderijk) access check for review view
-    rights['review'] = ['checkIsDeveloper']
+    rights['review'] = [('checkRoleAndStatusForStudentProposal',
+            [['org_admin', 'mentor', 'host'], 
+            ['active'], ['new', 'pending']])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_proposal.logic
@@ -408,7 +409,7 @@ class View(base.View):
     # get the roles important for reviewing an application
     filter = {'user': user_logic.logic.getForCurrentAccount(),
         'scope': entity.org,
-        'status': 'active',}
+        'status': 'active'}
 
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
     mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
@@ -475,12 +476,10 @@ class View(base.View):
     comment = fields['comment']
     given_score = int(fields['score'])
 
-    if not is_public and given_score is not 0:
-      # if it is not a public comment we use the score and display
-      # an additional message in the comment
+    if (org_admin or mentor) and (not is_public) and (given_score is not 0):
+      # if it is not a public comment and it's made by a member of the
+      # organization we score and display an additional message in the comment
       new_score = given_score + entity.score
-
-      name = 'Someone'
 
       if org_admin:
         name = org_admin.name()
@@ -490,8 +489,14 @@ class View(base.View):
       # TODO(ljvderijk) hook up comments
       comment = '%s has given %i points \n %s' %(name, given_score, comment)
 
+      properties = {'score': new_score}
+
+      # if the proposal is new we change it status to pending
+      if entity.status == 'new':
+        properties['status'] = 'pending'
+
       # update the proposal with the new score
-      self._logic.updateEntityProperties(entity, {'score': new_score})
+      self._logic.updateEntityProperties(entity, properties)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
@@ -508,9 +513,11 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    initial = {}
+    # set the initial score since the default is ignored
+    initial = {'score': 0}
 
     if org_admin and entity.mentor:
+      # set the mentor field to the current mentor
       initial['mentor'] = entity.mentor.link_id
 
     context['form'] = form(initial)

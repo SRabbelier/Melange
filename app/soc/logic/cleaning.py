@@ -61,6 +61,8 @@ def check_field_is_empty(field_name):
 
     @wraps(fun)
     def wrapper(self):
+      """Decorator wrapper method.
+      """
       field_content = self.cleaned_data.get(field_name)
 
       if not field_content:
@@ -80,6 +82,8 @@ def clean_empty_field(field_name):
 
   @check_field_is_empty(field_name)
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     return self.cleaned_data.get(field_name)
 
   return wrapper
@@ -91,6 +95,8 @@ def clean_link_id(field_name):
 
   @check_field_is_empty(field_name)
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     # convert to lowercase for user comfort
     link_id = self.cleaned_data.get(field_name).lower()
     if not validate.isLinkIdFormatValid(link_id):
@@ -105,6 +111,8 @@ def clean_scope_path(field_name):
 
   @check_field_is_empty(field_name)
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     # convert to lowercase for user comfort
     scope_path = self.cleaned_data.get(field_name).lower()
     if not validate.isScopePathFormatValid(scope_path):
@@ -120,6 +128,8 @@ def clean_agrees_to_tos(field_name):
 
   @check_field_is_empty(field_name)
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     agrees_to_tos = self.cleaned_data.get(field_name)
 
     if not site_logic.logic.getToS(site_logic.logic.getSingleton()):
@@ -143,6 +153,8 @@ def clean_existing_user(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
+    """Decorator wrapper method.
+    """
     link_id = clean_link_id(field_name)(self)
 
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
@@ -163,6 +175,8 @@ def clean_user_is_current(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
+    """Decorator wrapper method.
+    """
     link_id = clean_link_id(field_name)(self)
 
     user_entity = user_logic.logic.getForCurrentAccount()
@@ -182,6 +196,8 @@ def clean_user_not_exist(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
+    """Decorator wrapper method.
+    """
     link_id = clean_link_id(field_name)(self)
 
     user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
@@ -202,7 +218,8 @@ def clean_users_not_same(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
-
+    """Decorator wrapper method.
+    """
     clean_user_field = clean_existing_user(field_name)
     user_entity = clean_user_field(self)
 
@@ -222,6 +239,8 @@ def clean_user_account(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
+    """Decorator wrapper method.
+    """
     email_adress = self.cleaned_data[field_name]
     return users.User(email_adress)
 
@@ -235,6 +254,8 @@ def clean_user_account_not_in_use(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
+    """Decorator wrapper method.
+    """
     email_adress = self.cleaned_data.get(field_name).lower()
 
     # get the user account for this email and check if it's in use
@@ -244,13 +265,16 @@ def clean_user_account_not_in_use(field_name):
     user_entity = user_logic.logic.getForFields(fields, unique=True)
 
     if user_entity or user_logic.logic.isFormerAccount(user_account):
-      raise forms.ValidationError("There is already a user with this email adress.")
+      raise forms.ValidationError("There is already a user "
+          "with this email adress.")
 
     return user_account
   return wrapped
 
 
 def clean_feed_url(self):
+  """Clean method for cleaning feed url.
+  """
   feed_url = self.cleaned_data.get('feed_url')
 
   if feed_url == '':
@@ -264,6 +288,8 @@ def clean_feed_url(self):
 
 
 def clean_document_content(self):
+  """Clean method for cleaning document content.
+  """
   content = self.cleaned_data.get('content')
 
   sanitizer = feedparser._HTMLSanitizer('utf-8')
@@ -279,10 +305,12 @@ def clean_url(field_name):
 
   @check_field_is_empty(field_name)
   def wrapped(self):
-
+    """Decorator wrapper method.
+    """
     value = self.cleaned_data.get(field_name)
 
-    # call the Django URLField cleaning method to properly clean/validate this field
+    # call the Django URLField cleaning method to 
+    # properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)
   return wrapped
 
@@ -296,6 +324,8 @@ def validate_user_edit(link_id_field, account_field):
   """
 
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     cleaned_data = self.cleaned_data
 
     link_id = cleaned_data.get(link_id_field)
@@ -316,9 +346,11 @@ def validate_user_edit(link_id_field, account_field):
             unique=True)
 
         # if there is a user with the given account or it's a former account
-        if user_from_account_entity or user_logic.logic.isFormerAccount(user_account):
+        if user_from_account_entity or \
+            user_logic.logic.isFormerAccount(user_account):
           # raise an error because this email address can't be used
-          raise forms.ValidationError("There is already a user with this email address.")
+          raise forms.ValidationError("There is already a user with "
+              "this email address.")
 
     return cleaned_data
   return wrapper
@@ -334,45 +366,47 @@ def validate_new_group(link_id_field, scope_path_field,
   """
 
   def wrapper(self):
-      cleaned_data = self.cleaned_data
+    """Decorator wrapper method.
+    """
+    cleaned_data = self.cleaned_data
 
-      fields = {}
+    fields = {}
 
-      link_id = cleaned_data.get(link_id_field)
+    link_id = cleaned_data.get(link_id_field)
 
-      if link_id:
-        fields['link_id'] = link_id
+    if link_id:
+      fields['link_id'] = link_id
 
-        scope_path = cleaned_data.get(scope_path_field)
-        if scope_path:
-          fields['scope_path'] = scope_path
+      scope_path = cleaned_data.get(scope_path_field)
+      if scope_path:
+        fields['scope_path'] = scope_path
 
-        # get the application
-        group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
+      # get the application
+      group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
 
-        # get the current user
-        user_entity = user_logic.logic.getForCurrentAccount()
+      # get the current user
+      user_entity = user_logic.logic.getForCurrentAccount()
 
-        # make sure it's not the applicant creating the new group
-        if group_app_entity and (
-            group_app_entity.applicant.key() != user_entity.key()):
-          # add the error message to the link id field
-          self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
-          del cleaned_data[link_id_field]
-          # return the new cleaned_data
-          return cleaned_data
+      # make sure it's not the applicant creating the new group
+      if group_app_entity and (
+          group_app_entity.applicant.key() != user_entity.key()):
+        # add the error message to the link id field
+        self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
+        del cleaned_data[link_id_field]
+        # return the new cleaned_data
+        return cleaned_data
 
-        # check if there is already a group for the given fields
-        group_entity = group_logic.logic.getForFields(fields, unique=True)
+      # check if there is already a group for the given fields
+      group_entity = group_logic.logic.getForFields(fields, unique=True)
 
-        if group_entity:
-          # add the error message to the link id field
-          self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
-          del cleaned_data[link_id_field]
-          # return the new cleaned_data
-          return cleaned_data
+      if group_entity:
+        # add the error message to the link id field
+        self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
+        del cleaned_data[link_id_field]
+        # return the new cleaned_data
+        return cleaned_data
 
-      return cleaned_data
+    return cleaned_data
   return wrapper
 
 def validate_student_proposal(org_field, scope_field,
@@ -385,6 +419,8 @@ def validate_student_proposal(org_field, scope_field,
   """
   
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     cleaned_data = self.cleaned_data
 
     org_link_id = cleaned_data.get(org_field)
@@ -422,6 +458,8 @@ def validate_document_acl(view):
   """
 
   def wrapper(self):
+    """Decorator wrapper method.
+    """
     cleaned_data = self.cleaned_data
     read_access = cleaned_data.get('read_access')
     write_access = cleaned_data.get('write_access')

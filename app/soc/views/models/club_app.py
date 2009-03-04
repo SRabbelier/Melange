@@ -61,7 +61,8 @@ class View(group_app.View):
     # TODO(ljvderijk) make sure host role check is fixed
     rights['review'] = [('checkHasActiveRoleForScope', host_logic.logic),
                         ('checkCanReviewGroupApp', [club_app_logic.logic])]
-    rights['review_overview'] = [('checkHasActiveRoleForScope', host_logic.logic)]
+    rights['review_overview'] = [('checkHasActiveRoleForScope', 
+                                  host_logic.logic)]
 
     new_params = {}
 

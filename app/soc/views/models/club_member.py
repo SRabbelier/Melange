@@ -58,8 +58,9 @@ class View(role.View):
     rights['accept_invite'] = [('checkCanCreateFromRequest','club_member')]
     rights['request'] = ['checkIsUser',
                          ('checkCanMakeRequestToGroup', club_logic)]
-    rights['process_request'] = [('checkHasActiveRoleForScope', club_admin_logic.logic),
-                                 ('checkCanProcessRequest','club_member')]
+    rights['process_request'] = [('checkHasActiveRoleForScope', 
+                                  club_admin_logic.logic),
+                                  ('checkCanProcessRequest','club_member')]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [soc.logic.models.club_member.logic,
                           club_admin_logic.logic])]

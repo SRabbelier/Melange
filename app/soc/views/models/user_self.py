@@ -29,7 +29,6 @@ import datetime
 from google.appengine.api import users
 
 from django import forms
-from django import http
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
@@ -42,14 +41,10 @@ from soc.logic.models.site import logic as site_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
-from soc.views.helper import dynaform
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
-from soc.views.models import user as user_view
 from soc.views.models import role as role_view
-
-import soc.models.user
 
 
 class View(base.View):
@@ -108,8 +103,10 @@ class View(base.View):
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         (users.create_login_url("/"), 'Sign In', 'signIn'),
-        ('/' + new_params['url_name'] + '/create_profile', 'Create Profile', 'create_profile'),
-        ('/' + new_params['url_name'] + '/edit_profile', 'Edit Profile', 'edit_profile'),
+        ('/' + new_params['url_name'] + '/create_profile', 
+            'Create Profile', 'create_profile'),
+        ('/' + new_params['url_name'] + '/edit_profile', 
+            'Edit Profile', 'edit_profile'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
         ('/' + new_params['url_name'] + '/requests', 'Requests', 'requests'),
         ]
@@ -155,8 +152,8 @@ class View(base.View):
     user_entity = user_logic.getForCurrentAccount()
     link_id = user_entity.link_id
 
-    return self.edit(request, access_type,
-         page_name=page_name, params=params, seed=seed, link_id=link_id, **kwargs)
+    return self.edit(request, access_type, page_name=page_name, 
+        params=params, seed=seed, link_id=link_id, **kwargs)
 
   def editGet(self, request, entity, context, seed, params=None):
     """Overwrite so we can add the contents of the ToS.
@@ -168,7 +165,8 @@ class View(base.View):
     if site_tos:
       context['tos_contents'] = site_tos.content
 
-    return super(View, self).editGet(request, entity, context, seed, params=params)
+    return super(View, self).editGet(request, entity, context, 
+        seed, params=params)
 
   def _editGet(self, request, entity, form):
     """Sets the content of the agreed_to_tos_on field and replaces.
@@ -181,8 +179,8 @@ class View(base.View):
       form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
       # replace the 'agreed_to_tos' field with a hidden field so 
       # that the form checks still pass
-      form.fields['agreed_to_tos'] = forms.fields.BooleanField(widget=forms.HiddenInput,
-      initial=entity.agreed_to_tos, required=True)
+      form.fields['agreed_to_tos'] = forms.fields.BooleanField(
+          widget=forms.HiddenInput, initial=entity.agreed_to_tos, required=True)
 
   def editPost(self, request, entity, context, params=None):
     """Overwrite so we can add the contents of the ToS.
@@ -246,8 +244,8 @@ class View(base.View):
 
     i = 0
 
-    for name, view in sorted(role_view.ROLE_VIEWS.iteritems()):
-      list_params = view.getParams().copy()
+    for name, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
+      list_params = loop_view.getParams().copy()
       list_params['list_action'] = (redirects.getEditRedirect, list_params)
       list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
 
@@ -280,7 +278,8 @@ class View(base.View):
     count = len(list(notifications))
 
     if count > 0:
-      link_title = '<span class="unread">%s (%d)</span>' % (force_unicode(link_title), count)
+      link_title = '<span class="unread">%s (%d)</span>' % (
+          force_unicode(link_title), count)
       link_title = mark_safe(link_title)
 
     items = [('/' + 'notification/list', link_title, 'notification')]

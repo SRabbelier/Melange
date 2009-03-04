@@ -50,7 +50,7 @@ def getSingleIndexedParamValue(request, param_name, values=()):
 
   try:
     # GET parameter 'param_name' should be an integer value index
-    value_idx = int(value_idx)
+    value_idx = int(value_idx) if value_idx is not None else -1
   except ValueError:
     # ignore bogus or missing parameter values, so return None (no message)
     return None

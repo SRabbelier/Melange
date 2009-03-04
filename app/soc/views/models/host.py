@@ -26,10 +26,8 @@ __authors__ = [
 from django import forms
 
 from soc.logic import cleaning
-from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
-from soc.logic.models import user as user_logic
 from soc.logic.models import sponsor as sponsor_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -62,7 +60,8 @@ class View(role.View):
     rights['invite'] = [('checkHasActiveRoleForScope', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
     rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
-    rights['process_request'] = [('checkHasActiveRoleForScope', host_logic.logic),
+    rights['process_request'] = [('checkHasActiveRoleForScope', 
+                                 host_logic.logic),
                                  ('checkCanProcessRequest','host')]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [host_logic.logic, host_logic.logic])]

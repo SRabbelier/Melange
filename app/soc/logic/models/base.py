@@ -25,8 +25,6 @@ __authors__ = [
   ]
 
 
-import itertools
-
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext
@@ -42,6 +40,7 @@ class Error(Exception):
 
   pass
 
+
 class InvalidArgumentError(Error):
   """Raised when an invalid argument is passed to a method.
 
@@ -49,6 +48,7 @@ class InvalidArgumentError(Error):
   """
 
   pass
+
 
 class NoEntityError(InvalidArgumentError):
   """Raised when no entity is passed to a method that requires one.
@@ -291,19 +291,19 @@ class Logic(object):
     if len(orderset) != len(order):
       raise InvalidArgumentError
 
-    q = db.Query(self._model)
+    query = db.Query(self._model)
 
     for key, value in filter.iteritems():
       if isinstance(value, list):
         op = '%s IN' % key
-        q.filter(op, value)
+        query.filter(op, value)
       else:
-        q.filter(key, value)
+        query.filter(key, value)
 
     for key in order:
-      q.order(key)
+      query.order(key)
 
-    result = q.fetch(limit, offset)
+    result = query.fetch(limit, offset)
 
     if unique:
       return result[0] if result else None
@@ -314,8 +314,8 @@ class Logic(object):
     """Update existing entity using supplied properties.
 
     Args:
-      model: a model entity
-      model_properties: keyword arguments that correspond to entity
+      entity: a model entity
+      entity_properties: keyword arguments that correspond to entity
         properties and their values
       silent: iff True does not call _onUpdate method
 
@@ -437,8 +437,9 @@ class Logic(object):
     taken when a field is created.
 
     Args:
+      entity_properties: keyword arguments that correspond to entity
+        properties and their values
       name: the name of the field to be created
-      value: the value
     """
 
     if not entity_properties or (name not in entity_properties):
@@ -453,8 +454,9 @@ class Logic(object):
 
     Args:
       entity: the unaltered entity
+      entity_properties: keyword arguments that correspond to entity
+        properties and their values
       name: the name of the field to be changed
-      value: the new value
     """
 
     if not entity:

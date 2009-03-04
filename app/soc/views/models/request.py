@@ -24,19 +24,14 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
 from django import http
-from django.core import urlresolvers
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
-from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -80,7 +75,8 @@ class View(base.View):
 
     new_params['name'] = "Request"
 
-    new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 'list')]
+    new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 
+        'list')]
 
     new_params['create_template'] = ['soc/request/create.html']
     
@@ -98,14 +94,16 @@ class View(base.View):
                                         required=True),
         }
 
-    patterns = [(r'^%(url_name)s/(?P<access_type>process_invite)/%(key_fields)s$',
+    patterns = [(r'^%(url_name)s/(?P<access_type>process_invite)/'
+          '%(key_fields)s$',
           'soc.views.models.%(module_name)s.process_invite',
           'Process Invite to become')]
 
     new_params['extra_django_patterns'] = patterns
     
     new_params['invite_processing_template'] = 'soc/request/process_invite.html'
-    new_params['request_processing_template'] = 'soc/request/process_request.html'
+    new_params['request_processing_template'] = \
+        'soc/request/process_request.html'
 
     params = dicts.merge(params, new_params)
 

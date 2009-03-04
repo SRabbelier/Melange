@@ -244,7 +244,7 @@ class View(base.View):
 
     i = 0
 
-    for name, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
+    for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
       list_params = loop_view.getParams().copy()
       list_params['list_action'] = (redirects.getEditRedirect, list_params)
       list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params

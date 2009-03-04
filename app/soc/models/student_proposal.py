@@ -71,8 +71,7 @@ class StudentProposal(soc.models.linkable.Linkable):
                               required=False, collection_name='student_proposals')
 
   #: A property containing a list of possible Mentors for this proposal
-  possible_mentors = db.ListProperty(item_type=db.Key,
-      default=[])
+  possible_mentors = db.ListProperty(item_type=db.Key, default=[])
 
   #: the current score of this proposal, used to determine which proposals
   #: should be assigned a project slot.

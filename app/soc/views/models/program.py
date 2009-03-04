@@ -64,7 +64,8 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
-    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope', host_logic.logic])]
+    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope', 
+        host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
 
@@ -183,7 +184,6 @@ class View(presence_with_tos.View):
     menus = []
 
     rights.setCurrentUser(id, user)
-    filter_args = {}
 
     for entity in entities:
       items = []
@@ -236,6 +236,8 @@ class View(presence_with_tos.View):
     return menus
 
   def _getTimeDependentEntries(self, program_entity, params, id, user):
+    """Returns a list with time dependent menu items.
+    """
     items = []
 
     #TODO(ljvderijk) Add more timeline dependent entries
@@ -284,7 +286,8 @@ class View(presence_with_tos.View):
     if timeline_helper.isAfterEvent(timeline_entity,
         'accepted_organization_announced_deadline'):
       # add a link to list all the organizations
-      items += [(redirects.getPublicListRedirect(program_entity, {'url_name': 'org'}),
+      items += [(redirects.getPublicListRedirect(program_entity, 
+          {'url_name': 'org'}),
           "List participating Organizations", 'any_access')]
 
       if not student_entity:
@@ -294,7 +297,8 @@ class View(presence_with_tos.View):
 
     return items
 
-  def _getStudentEntries(self, program_entity, student_entity, params, id, user):
+  def _getStudentEntries(self, program_entity, student_entity, 
+                         params, id, user):
     """Returns a list with menu items for students in a specific program.
     """
 
@@ -303,10 +307,11 @@ class View(presence_with_tos.View):
     timeline_entity = program_entity.timeline
 
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-      items += [('/student_proposal/list_orgs/%s' % (student_entity.key().name()),
+      items += [('/student_proposal/list_orgs/%s' % (
+          student_entity.key().name()),
           "Submit your Student Proposal", 'any_access')]
       items += [(redirects.getListSelfRedirect(student_entity,
-             {'url_name':'student_proposal'}),
+          {'url_name':'student_proposal'}),
          "List my Student Proposals", 'any_access')]
 
     return items

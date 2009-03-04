@@ -150,3 +150,15 @@ class UserTest(unittest.TestCase):
     expected.reverse()
     actual = [i.value for i in self.logic.getForFields(order=order)]
     self.assertEqual(expected, actual)
+
+  def testGetFieldsFilteredOrdened(self):
+    """Test that fields can be filtered and ordened.
+    """
+
+    order = ['-value']
+
+    fields = {'value': [1,2, 3, 4]}
+
+    expected = [4, 3, 2, 1]
+    actual = [i.value for i in self.logic.getForFields(fields, order=order)]
+    self.assertEqual(expected, actual)

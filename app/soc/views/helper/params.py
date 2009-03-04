@@ -402,7 +402,7 @@ def getAdminForm(base_form):
   admin_form.base_fields = copy.deepcopy(admin_form.base_fields)
 
   # replace all widgets with PTW's
-  for key, value in admin_form.base_fields.iteritems():
+  for _, value in admin_form.base_fields.iteritems():
     if not isinstance(value, forms.fields.Field):
       continue
 
@@ -451,6 +451,6 @@ def getScopePattern(params):
   if depth is None:
     return linkable.SCOPE_PATH_ARG_PATTERN
 
-  regexps = [linkable.LINK_ID_PATTERN_CORE for i in range(depth)]
+  regexps = [linkable.LINK_ID_PATTERN_CORE for _ in range(depth)]
   regexp = '/'.join(regexps)
   return r'(?P<scope_path>%s)' % regexp

@@ -117,10 +117,10 @@ def sendMail(context):
   try:
     # send the message
     message.send()
-  except Exception, e:
+  except Exception, exception:
     import logging
     logging.info(context)
-    logging.exception(e)
+    logging.exception(exception)
 
 def getDefaultMailSender():
   """Returns the sender that currently can be used to send emails.

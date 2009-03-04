@@ -27,14 +27,14 @@ from ranklist.ranker import Ranker
 
 from soc.logic.models import base
 
-import soc.models.rankerroot
+import soc.models.ranker_root
 
 
 class Logic(base.Logic):
   """Logic methods for the RankerRoot model.
   """
 
-  def __init__(self, model=soc.models.rankerroot.RankerRoot, 
+  def __init__(self, model=soc.models.ranker_root.RankerRoot, 
                base_model=None, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """

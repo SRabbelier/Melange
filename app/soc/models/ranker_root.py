@@ -26,6 +26,7 @@ from google.appengine.ext import db
 
 import soc.models.linkable
 
+
 class RankerRoot(soc.models.linkable.Linkable):
   """Links the Root of a RankList tree to an owner and also gives it an unique ID.
   """

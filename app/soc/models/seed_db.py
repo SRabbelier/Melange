@@ -29,7 +29,7 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
-from soc.logic.models import rankerroot
+from soc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.models import student_proposal
 from soc.models.document import Document
 from soc.models.host import Host
@@ -246,7 +246,7 @@ def seed(*args, **kwargs):
   melange = Organization(**group_properties)
   melange.put()
   # create a new ranker
-  rankerroot.logic.create(student_proposal.DEF_RANKER_NAME, melange,
+  ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
       student_proposal.DEF_SCORE, 100)
 
   group_properties.update({
@@ -266,7 +266,7 @@ def seed(*args, **kwargs):
     entity = Organization(**group_properties)
     entity.put()
     # create a new ranker
-    rankerroot.logic.create(student_proposal.DEF_RANKER_NAME, entity,
+    ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,
         student_proposal.DEF_SCORE, 100)
 
 

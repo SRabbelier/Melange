@@ -25,7 +25,6 @@ __authors__ = [
 from django import forms
 from django.utils.translation import ugettext
 
-from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views import out_of_band
@@ -103,8 +102,8 @@ class View(presence_with_tos.View):
                   page_name)]
 
     page_name = "Maintenance"
-    patterns += [(r'^maintenance$', 'soc.views.models.%(module_name)s.maintenance',
-                  page_name)]
+    patterns += [(r'^maintenance$', 
+                  'soc.views.models.%(module_name)s.maintenance', page_name)]
 
     page_name = "Edit Site"
     patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',

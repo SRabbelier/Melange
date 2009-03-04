@@ -53,8 +53,9 @@ class OrgApplication(soc.models.group_app.GroupApplication):
 
   license_name = db.StringProperty(required=True, choices=licenses.LICENSES,
       verbose_name=ugettext('What license does your organization use?'))
-  license_name.example_text=ugettext('See '
-      '<a href="http://www.opensource.org/licenses/alphabetical"> the official list</a>.')
+  license_name.example_text = ugettext('See '
+      '<a href="http://www.opensource.org/licenses/alphabetical"> '
+      'the official list</a>.')
 
   ideas = db.LinkProperty(required=True, verbose_name=ugettext(
       'What is the URL to the ideas list of your organization?'))
@@ -96,9 +97,10 @@ class OrgApplication(soc.models.group_app.GroupApplication):
       ' with the project after the program concludes?'))
   continued_contribs.help_text = contrib_disappears.help_text
 
-  #: field storing whether the User has agreed to the site-wide Terms of Service.
-  #: (Not a required field because the Terms of Service might not be present
-  #: when the first User profile is created when bootstrapping the site.)
+  #: field storing whether the User has agreed to the site-wide 
+  #: Terms of Service. (Not a required field because the Terms of 
+  #: Service might not be present when the first User profile is 
+  #: created when bootstrapping the site.)
   agreed_to_admin_agreement = db.BooleanProperty(required=False, default=False,
       verbose_name=ugettext('I Agree to the Admin Agreement'))
   agreed_to_admin_agreement.help_text = ugettext(

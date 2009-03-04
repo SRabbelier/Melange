@@ -44,7 +44,7 @@ def isFeedURLValid(feed_url=None):
 
   try:
     result = urlfetch.fetch(feed_url)
-  except urlfetch_errors.Error, e:
+  except urlfetch_errors.Error:
     return False
 
   # 200 is the status code for 'all ok'

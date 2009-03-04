@@ -147,7 +147,7 @@ class View(role.View):
     if not entity:
       fields['user'] = fields['link_id']
       fields['link_id'] = fields['user'].link_id
-      group_logic = params['group_logic']
+      group_logic = self._params['group_logic']
       group_entity = group_logic.getFromKeyName(fields['scope_path'])
       fields['program'] = group_entity.scope
 

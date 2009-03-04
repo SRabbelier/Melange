@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
 from django import http
 from django.utils.translation import ugettext
@@ -58,7 +56,7 @@ class View(presence.View):
 
     new_params = {}
 
-    new_params['extra_dynaexclude'] = ['founder','home', 'tos',
+    new_params['extra_dynaexclude'] = ['founder', 'home', 'tos',
                                        'member_template', 'status']
     new_params['edit_extra_dynaproperties'] = {
         'founded_by': forms.CharField(widget=widgets.ReadOnlyInput(),
@@ -197,7 +195,7 @@ class View(presence.View):
       key_name = self._logic.getKeyNameFromFields(fields)
 
     # create the group entity
-    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+    self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     # redirect to notifications list to see the admin invite
     return http.HttpResponseRedirect('/notification/list')
@@ -243,7 +241,7 @@ class View(presence.View):
     """
 
     # set the pagename to include the link_id
-    page_name = '%s %s' %(page_name, kwargs['link_id'])
+    page_name = '%s %s' % (page_name, kwargs['link_id'])
 
     # get the group from the request
     group_logic = params['logic']
@@ -326,7 +324,7 @@ class View(presence.View):
     """
 
     # set the pagename to include the link_id
-    page_name = '%s %s' %(page_name, kwargs['link_id'])
+    page_name = '%s %s' % (page_name, kwargs['link_id'])
 
     # get the group from the request
     group_logic = params['logic']
@@ -386,7 +384,6 @@ class View(presence.View):
     """
 
     params = dicts.merge(params, self._params)
-    logic = params['logic']
 
     # set fields to match every active role this user has
     fields = {'user': user,

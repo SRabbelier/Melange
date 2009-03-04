@@ -44,8 +44,7 @@ class StudentProposal(soc.models.linkable.Linkable):
   #: Required field indicating the "title" of the proposal
   title = db.StringProperty(required=True,
       verbose_name=ugettext('Title'))
-  title.help_text = ugettext(
-      'title of the proposal')
+  title.help_text = ugettext('title of the proposal')
 
   #: required, text field used for different purposes,
   #: depending on the specific type of the proposal
@@ -56,19 +55,19 @@ class StudentProposal(soc.models.linkable.Linkable):
 
   #: Required field containing the content of the proposal.
   content = db.TextProperty(required=True)
-  content.help_text = ugettext(
-      'This contains your actual proposal')
+  content.help_text = ugettext('This contains your actual proposal')
 
   #: an URL linking to more information about this students proposal
   additional_info = db.URLProperty(required=False)
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about your proposal')
 
-  #: A property containing which mentor has assigned himself to this proposal
-  #: Only a proposal with an assigned mentor can be turned into a accepted proposal
-  #: A proposal can only have one mentor
+  #: A property containing which mentor has assigned himself to this proposal.
+  #: Only a proposal with an assigned mentor can be turned into 
+  #: a accepted proposal. A proposal can only have one mentor.
   mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
-                              required=False, collection_name='student_proposals')
+                                required=False, 
+                                collection_name='student_proposals')
 
   #: A property containing a list of possible Mentors for this proposal
   possible_mentors = db.ListProperty(item_type=db.Key, default=[])
@@ -88,12 +87,14 @@ class StudentProposal(soc.models.linkable.Linkable):
       choices=['new', 'pending', 'accepted', 'rejected', 'invalid'])
 
   #: organization to which this proposal is directed
-  org = db.ReferenceProperty(reference_class=soc.models.organization.Organization,
-                              required=True, collection_name='student_proposals')
+  org = db.ReferenceProperty(
+      reference_class=soc.models.organization.Organization,
+      required=True, collection_name='student_proposals')
 
   #: program in which this proposal has been created
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
-                              required=True, collection_name='student_proposals')
+                                 required=True, 
+                                 collection_name='student_proposals')
 
   #: date when the proposal was created
   created_on = db.DateTimeProperty(required=True, auto_now_add=True)

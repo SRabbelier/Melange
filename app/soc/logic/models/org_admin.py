@@ -42,7 +42,8 @@ class Logic(role.Logic):
                                 scope_logic=scope_logic)
 
   def _onCreate(self, entity):
-    """Marks the Organization for this Org Admin as active if it's status is new.
+    """Marks the Organization for this Org Admin as active 
+       if it's status is new.
     """
 
     org_entity = entity.scope

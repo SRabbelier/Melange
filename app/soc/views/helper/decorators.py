@@ -27,7 +27,6 @@ import logging
 
 from functools import wraps
 
-from google.appengine.api import users
 from google.appengine.runtime import DeadlineExceededError
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
@@ -61,18 +60,18 @@ def view(func):
 
     try:
       return func(request, *args, **kwds)
-    except DeadlineExceededError, e:
-      logging.exception(e)
+    except DeadlineExceededError, exception:
+      logging.exception(exception)
       return http.HttpResponseRedirect('/soc/content/deadline_exceeded.html')
-    except CapabilityDisabledError, e:
-      logging.exception(e)
+    except CapabilityDisabledError, exception:
+      logging.exception(exception)
       # assume the site is in maintenance if we get CDE
       return http.HttpResponseRedirect('/maintenance')
-    except MemoryError, e:
-      logging.exception(e)
+    except MemoryError, exception:
+      logging.exception(exception)
       return http.HttpResponseRedirect('/soc/content/memory_error.html')
-    except AssertionError, e:
-      logging.exception(e)
+    except AssertionError, exception:
+      logging.exception(exception)
       return http.HttpResponseRedirect('/soc/content/assertion_error.html')
 
   return view_wrapper
@@ -101,7 +100,6 @@ def check_access(func):
   # Do not pollute helper.decorators with access specific imports
   from soc.views import out_of_band
   from soc.views import helper
-  from soc.views.helper import access
   from soc.views.helper import responses
 
   @wraps(func)

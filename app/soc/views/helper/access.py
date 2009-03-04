@@ -31,13 +31,10 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
 from google.appengine.api import memcache
 
-from django.core import urlresolvers
 from django.utils.translation import ugettext
 
-from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic import rights as rights_logic
 from soc.logic.helper import timeline as timeline_helper
@@ -46,7 +43,6 @@ from soc.logic.models.club_member import logic as club_member_logic
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.mentor import logic as mentor_logic
-from soc.logic.models.notification import logic as notification_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
@@ -59,11 +55,10 @@ from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views.helper import redirects
-from soc.views import helper
 from soc.views import out_of_band
 
 
-DEF_NO_USER_LOGIN_MSG= ugettext(
+DEF_NO_USER_LOGIN_MSG = ugettext(
     'Please create <a href="/user/create_profile">User Profile</a>'
     ' in order to view this page.')
 
@@ -116,8 +111,8 @@ DEF_NO_APPLICATION_MSG = ugettext(
 DEF_NEED_PICK_ARGS_MSG = ugettext(
     'The "continue" and "field" args are not both present.')
 
-DEF_REVIEW_COMPLETED_MSG = ugettext(
-    'This Application can not be reviewed anymore (it has been completed or rejected).')
+DEF_REVIEW_COMPLETED_MSG = ugettext('This Application can not be reviewed '
+    'anymore (it has been completed or rejected).')
 
 DEF_REQUEST_COMPLETED_MSG = ugettext(
     'This request cannot be accepted (it is either completed or denied).')
@@ -128,8 +123,8 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 DEF_SIGN_UP_AS_STUDENT_MSG = ugettext(
     'You need to sign up as a Student first.')
 
-DEF_NO_LIST_ACCESS_MSG = ugettext(
-    'You do not have the required rights to list documents for this scope and prefix.')
+DEF_NO_LIST_ACCESS_MSG = ugettext('You do not have the required rights to '
+    'list documents for this scope and prefix.')
 
 DEF_PAGE_DENIED_MSG = ugettext(
     'Access to this page has been restricted.')
@@ -317,8 +312,8 @@ class Checker(object):
         self.doCheck(checker_name, django_args, args)
         self.put(checker_name, True)
         return
-      except out_of_band.Error, e:
-        self.put(checker_name, e)
+      except out_of_band.Error, exception:
+        self.put(checker_name, exception)
         raise
 
     if cached is True:
@@ -446,9 +441,9 @@ class Checker(object):
         self.doCheck(checker_name, django_args, args)
         # one check passed, all is well
         return
-      except out_of_band.Error, e:
+      except out_of_band.Error, exception:
         # store the first esception
-        first = first if first else e
+        first = first if first else exception
 
     # none passed, re-raise the first exception
     raise first
@@ -669,6 +664,10 @@ class Checker(object):
 
     Only group where both the link_id and the scope_path match the value
     of the link_id and the scope_path from the django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     fields = ['scope_path', 'link_id']
@@ -679,12 +678,20 @@ class Checker(object):
 
     Only group where the link_id matches the value of the link_id
     from the django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     self._checkIsActive(django_args, logic, ['link_id'])
 
   def checkHasActiveRole(self, django_args, logic):
     """Checks that the user has the specified active role.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     django_args = django_args.copy()
@@ -696,6 +703,10 @@ class Checker(object):
 
     Only roles where the field as specified by field_name matches the
     scope_path from the django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     fields = [field_name, 'user']
@@ -716,6 +727,10 @@ class Checker(object):
 
     Only roles where the scope_path matches the scope_path from the
     django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
@@ -725,6 +740,10 @@ class Checker(object):
 
     Only roles where the link_id matches the link_id from the
     django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     self._checkHasActiveRoleFor(django_args, logic, 'link_id')
@@ -734,6 +753,10 @@ class Checker(object):
 
     Only roles where the scope_path matches the link_id from the
     django_args are considered.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     django_args = django_args.copy()
@@ -742,6 +765,10 @@ class Checker(object):
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
     
     prefix = django_args['prefix']
@@ -785,6 +812,7 @@ class Checker(object):
     active status.
 
     Args:
+      django_args: a dictionary with django's arguments
       group_logic: Logic module for the type of group which the request is for
     """
 
@@ -806,6 +834,10 @@ class Checker(object):
     """Raises an alternate HTTP response if the specified request does not exist
        or if it's status is not group_accepted. Also when the group this request
        is from is in an inactive or invalid status access will be denied.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      role_name: name of the role
     """
 
     self.checkIsUserSelf(django_args, 'link_id')
@@ -826,6 +858,9 @@ class Checker(object):
 
   def checkIsMyGroupAcceptedRequest(self, django_args):
     """Checks whether the user can accept the specified request.
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
 
     self.checkCanCreateFromRequest(django_args, django_args['role'])
@@ -834,6 +869,10 @@ class Checker(object):
     """Raises an alternate HTTP response if the specified request does not exist
        or if it's status is completed or denied. Also Raises an alternate HTTP response
        whenever the group in the request is not active.
+       
+    Args:
+      django_args: a dictionary with django's arguments
+      role_name: name of the role
     """
 
     self.checkIsUser(django_args)
@@ -858,6 +897,9 @@ class Checker(object):
   @denySidebar
   def checkIsHostForProgram(self, django_args):
     """Checks if the user is a host for the specified program.
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
 
     program = program_logic.getFromKeyFields(django_args)
@@ -872,6 +914,9 @@ class Checker(object):
   @denySidebar
   def checkIsHostForProgramInScope(self, django_args):
     """Checks if the user is a host for the specified program.
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
 
     program = program_logic.getFromKeyName(django_args['scope_path'])
@@ -888,8 +933,8 @@ class Checker(object):
     """Checks if the given period is active for the given program.
 
     Args:
-      django_args: a dictionary with django's arguments.
-      period_name: the name of the period which is checked.
+      django_args: a dictionary with django's arguments
+      period_name: the name of the period which is checked
       key_name_arg: the entry in django_args that specifies the given program
         keyname. If none is given the key_name is constructed from django_args
         itself.
@@ -918,6 +963,10 @@ class Checker(object):
 
   def checkCanCreateOrgApp(self, django_args, period_name):
     """Checks to see if the program in the scope_path is accepting org apps
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      period_name: the name of the period which is checked
     """
 
     if 'seed' in django_args:
@@ -928,9 +977,11 @@ class Checker(object):
 
   @allowDeveloper
   def checkCanEditGroupApp(self, django_args, group_app_logic):
-    """Checks if the group_app in args is valid to be edited by the current user.
+    """Checks if the group_app in args is valid to be edited by 
+       the current user.
 
     Args:
+      django_args: a dictionary with django's arguments
       group_app_logic: A logic instance for the Group Application
     """
 
@@ -957,6 +1008,7 @@ class Checker(object):
     """Checks if the group_app in args is valid to be reviewed.
 
     Args:
+      django_args: a dictionary with django's arguments
       group_app_logic: A logic instance for the Group Application
     """
 
@@ -1012,7 +1064,8 @@ class Checker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
 
   def checkIsNotParticipatingInProgramInScope(self, django_args):
-    """Checks if the current user has no roles for the given program in django_args.
+    """Checks if the current user has no roles for the given 
+       program in django_args.
 
     Args:
       django_args: a dictionary with django's arguments
@@ -1259,6 +1312,7 @@ class Checker(object):
     """Checks whether the entity belongs to the user.
 
     Args:
+      django_args: a dictionary with django's arguments
       logic: the logic that should be used to fetch the entity
       field_name: the name of the field the entity uses to store it's owner
       user: whether the entity stores the user's key name, or a reference
@@ -1288,6 +1342,7 @@ class Checker(object):
        the role given in args.
 
      Args:
+       django_args: a dictionary with django's arguments
        role_logic: determines the logic for the role in args.
        manage_role_logic: determines the logic for the role which is allowed
            to manage this role.
@@ -1337,6 +1392,7 @@ class Checker(object):
 
     Args:
       django_args: a dictionary with django's arguments
+      key_name_field: key name field
     """
 
     if key_name_field:
@@ -1355,6 +1411,7 @@ class Checker(object):
 
     Args:
       django_args: a dictionary with django's arguments
+      key_name_field: key name field
     """
 
     if key_name_field:
@@ -1369,12 +1426,13 @@ class Checker(object):
   @allowDeveloper
   def checkDocumentList(self, django_args):
     """Checks whether the user is allowed to list documents.
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
 
     filter = django_args['filter']
-
     prefix = filter['prefix']
-    scope_path = filter['scope_path']
 
     checker = rights_logic.Checker(prefix)
     roles = checker.getMembership('list')
@@ -1387,10 +1445,12 @@ class Checker(object):
     """Checks whether the user has access to the specified pick url.
 
     Will update the 'read_access' field of django_args['GET'].
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
 
     get_args = django_args['GET']
-
     # make mutable in order to inject the proper read_access filter
     mutable = get_args._mutable
     get_args._mutable = True
@@ -1418,8 +1478,11 @@ class Checker(object):
 
   def checkCanEditTimeline(self, django_args):
     """Checks whether this program's timeline may be edited.
+    
+    Args:
+      django_args: a dictionary with django's arguments
     """
-
+    
     time_line_keyname = timeline_logic.getKeyFieldsFromFields(django_args)
     timeline_entity = timeline_logic.getFromKeyName(time_line_keyname)
 

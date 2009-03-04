@@ -24,20 +24,17 @@ __authors__ = [
 
 
 from django import forms
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import user as user_logic
 from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import club  as club_logic
 from soc.logic.models import club_admin as club_admin_logic
-from soc.logic.models import request as request_logic
-from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import group
 
@@ -64,9 +61,12 @@ class View(group.View):
     rights['home'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
     rights['apply_member'] = ['checkIsUser',
-                              ('checkGroupIsActiveForScopeAndLinkId', club_logic.logic)]
-    rights['list_requests'] = [('checkHasActiveRoleForLinkId', club_admin_logic.logic)]
-    rights['list_roles'] = [('checkHasActiveRoleForLinkId', club_admin_logic.logic)]
+                              ('checkGroupIsActiveForScopeAndLinkId', 
+                               club_logic.logic)]
+    rights['list_requests'] = [('checkHasActiveRoleForLinkId', 
+                                club_admin_logic.logic)]
+    rights['list_roles'] = [('checkHasActiveRoleForLinkId', 
+                             club_admin_logic.logic)]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             club_app_logic.logic)]
 
@@ -92,7 +92,8 @@ class View(group.View):
     new_params['group_applicant_url'] = True
 
     new_params['sidebar_additional'] = [
-        ('/' + new_params['url_name'] + '/apply_member', 'Join a Club', 'apply_member'),]
+        ('/' + new_params['url_name'] + '/apply_member', 
+         'Join a Club', 'apply_member'),]
 
     new_params['create_extra_dynaproperties'] = {
         'clean' : cleaning.validate_new_group('link_id', 'scope_path',
@@ -122,7 +123,8 @@ class View(group.View):
   @decorators.check_access
   def applyMember(self, request, access_type,
                   page_name=None, params=None, **kwargs):
-    """Shows a list of all clubs and you can choose one to apply to become a member.
+    """Shows a list of all clubs and you can choose one to 
+       apply to become a member.
 
     Args:
       request: the standard Django HTTP request object
@@ -133,8 +135,10 @@ class View(group.View):
     """
 
     list_params = params.copy()
-    list_params['list_action'] = (redirects.getRequestRedirectForRole, 'club_member')
-    list_params['list_description'] = 'Choose a club to apply to become a Club Member'
+    list_params['list_action'] = (redirects.getRequestRedirectForRole, 
+                                  'club_member')
+    list_params['list_description'] = ugettext('Choose a club to ' 
+                                               'apply to become a Club Member.')
 
     return self.list(request, access_type, 
         page_name, params=list_params, filter=None)
@@ -163,8 +167,8 @@ class View(group.View):
       submenus.append(submenu)
 
       # add a link to invite a member
-      submenu = (redirects.getInviteRedirectForRole(group_entity, 'club_member'),
-          "Invite a Member", 'any_access')
+      submenu = (redirects.getInviteRedirectForRole(group_entity, 
+          'club_member'), "Invite a Member", 'any_access')
       submenus.append(submenu)
 
       # add a link to the request page

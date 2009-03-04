@@ -642,7 +642,8 @@ class View(object):
     response = responses.respond(request, template, context)
     # if the browser supports HTTP/1.1
     # post-check and pre-check and no-store for IE7
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
+        'post-check=0, pre-check=0'
     # if the browser supports HTTP/1.0
     response['Pragma'] = 'no-cache'
     
@@ -720,7 +721,7 @@ class View(object):
     if 'scope_path' in form.fields:
       form.fields['scope_path'].initial = entity.scope_path
 
-    for field_name, original_name, _, getter in self._params['references']:
+    for field_name, _, _, getter in self._params['references']:
       try:
         field = getter(entity)
         form.fields[field_name].initial = field.link_id if field else None

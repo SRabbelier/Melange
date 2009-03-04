@@ -49,7 +49,7 @@ class Logic(base.Logic):
       group_logic: logic for the group which should be retrieved
       scope_path : the scope path of the entity
     """
-    group_key_fields = scope_path.rsplit('/',1)
+    group_key_fields = scope_path.rsplit('/', 1)
 
     if len(group_key_fields) == 1:
       # there is only a link_id

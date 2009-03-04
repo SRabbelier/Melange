@@ -24,10 +24,7 @@ __authors__ = [
   ]
 
 
-import operator
 import re
-
-from google.appengine.ext import db
 
 from django import template
 from django.forms import forms as forms_in
@@ -103,7 +100,8 @@ def readonly_field_as_table_row(field_label, field_value):
           'field_value': field_value}
 
 
-@register.inclusion_tag('soc/templatetags/_readonly_field_as_twoline_table_row.html')
+@register.inclusion_tag(
+    'soc/templatetags/_readonly_field_as_twoline_table_row.html')
 def readonly_field_as_twoline_table_row(field_label, field_value):
   """See readonly_field_as_table_row().
   """
@@ -111,7 +109,8 @@ def readonly_field_as_twoline_table_row(field_label, field_value):
           'field_value': field_value}
 
 
-@register.inclusion_tag('soc/templatetags/_readonly_url_field_as_table_row.html')
+@register.inclusion_tag(
+    'soc/templatetags/_readonly_url_field_as_table_row.html')
 def readonly_url_field_as_table_row(field_label, field_value):
   """See readonly_field_as_table_row().
   """
@@ -128,7 +127,8 @@ def readonly_url_field_as_twoline_table_row(field_label, field_value):
           'field_value': field_value}
 
 
-@register.inclusion_tag('soc/templatetags/_readonly_safe_field_as_table_row.html')
+@register.inclusion_tag(
+    'soc/templatetags/_readonly_safe_field_as_table_row.html')
 def readonly_safe_field_as_table_row(field_label, field_value):
   """See readonly_field_as_table_row().
   """
@@ -184,10 +184,14 @@ def as_twoline_table(context, form):
 
 
 def as_table_helper(context, form):
+  """See as_table().
+  """
+  
   fields = []
   hidden_fields = []
   hidden_fields_errors = []
-  entity = context['entity']
+  
+  # entity = context['entity']
 
   # Iterate over all fields and prepare it for adding 
   for name, field in form.fields.items():
@@ -223,13 +227,13 @@ def as_table_helper(context, form):
     else:
       hidden_fields.append(unicode(bf))
 
-      for e in bf.errors:
-        item = (name, force_unicode(e))
+      for error in bf.errors:
+        item = (name, force_unicode(error))
         hidden_fields_errors.append(item)
 
   grouped = dicts.groupby(fields, 'group')
   rexp = re.compile(r"\d+. ")
-  fields = [(rexp.sub('',key), grouped[key]) for key in sorted(grouped)]
+  fields = [(rexp.sub('', key), grouped[key]) for key in sorted(grouped)]
 
   context.update({
       'top_errors': form.non_field_errors() or '',

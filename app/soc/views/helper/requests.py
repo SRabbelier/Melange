@@ -51,7 +51,7 @@ def getSingleIndexedParamValue(request, param_name, values=()):
   try:
     # GET parameter 'param_name' should be an integer value index
     value_idx = int(value_idx)
-  except:
+  except ValueError:
     # ignore bogus or missing parameter values, so return None (no message)
     return None
     
@@ -119,7 +119,7 @@ def isReferrerSelf(request,
     # no HTTP referrer, so cannot possibly start with expected prefix
     return False
 
-  http_host = 'http://%s/%s' %(os.environ['HTTP_HOST'], url_name)
+  http_host = 'http://%s/%s' % (os.environ['HTTP_HOST'], url_name)
 
   if http_from.startswith(http_host):
     return True

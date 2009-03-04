@@ -23,17 +23,14 @@ __authors__ = [
   ]
 
 
-from django import forms
 from django import http
 from django.utils.translation import ugettext
 
-from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import notifications
-from soc.logic.models import group_app as group_app_logic
-from soc.logic.models import user as user_logic
-from soc.views import helper
+from soc.logic.models.group_app import logic as group_app_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
@@ -41,8 +38,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
-
-import soc.logic.models.group_app
 
 
 DEF_APPLICATION_LIST_DESCRIPTION_FMT = ugettext(
@@ -62,7 +57,7 @@ class View(base.View):
     """
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.group_app.logic
+    new_params['logic'] = group_app_logic
 
     new_params['name'] = "Group Application"
     new_params['name_short'] = "Group App"
@@ -126,7 +121,7 @@ class View(base.View):
 
     if not entity:
       # set the applicant field to the current user
-      fields['applicant'] = user_logic.logic.getForCurrentAccount()
+      fields['applicant'] = user_logic.getForCurrentAccount()
 
     #set the backup_admin field with the cleaned link_id
     fields['backup_admin'] = fields['backup_admin_link_id']
@@ -157,12 +152,12 @@ class View(base.View):
     """
 
     # create the selection list
-    selection=[('needs review',(redirects.getEditRedirect, params)), 
-               ('pre-accepted', (redirects.getEditRedirect, params)),
-               ('accepted', (redirects.getEditRedirect, params)),
-               ('pre-rejected', (redirects.getEditRedirect, params)),
-               ('rejected', (redirects.getEditRedirect, params)),
-               ('ignored', (redirects.getEditRedirect, params)),]
+    selection = [('needs review', (redirects.getEditRedirect, params)), 
+                 ('pre-accepted', (redirects.getEditRedirect, params)),
+                 ('accepted', (redirects.getEditRedirect, params)),
+                 ('pre-rejected', (redirects.getEditRedirect, params)),
+                 ('rejected', (redirects.getEditRedirect, params)),
+                 ('ignored', (redirects.getEditRedirect, params)),]
 
     return self._applicationListConstructor(request, params, page_name, 
         filter=filter, selection=selection, **kwargs)
@@ -221,17 +216,17 @@ class View(base.View):
     For params see base.View.public().
     """
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.getForCurrentAccount()
     filter = {'applicant' : user_entity}
 
     if kwargs['scope_path']:
       filter['scope_path'] = kwargs['scope_path']
 
     # create the selection list
-    selection=[('needs review',(redirects.getEditRedirect, params)), 
-               ('accepted', (redirects.getApplicantRedirect,
-                   {'url_name': params['group_url_name']})),
-               ('rejected', (redirects.getEditRedirect, params))]
+    selection = [('needs review', (redirects.getEditRedirect, params)), 
+                 ('accepted', (redirects.getApplicantRedirect, 
+                    {'url_name': params['group_url_name']})),
+                 ('rejected', (redirects.getEditRedirect, params))]
 
     return self._applicationListConstructor(request, params, page_name,
         filter=filter, selection=selection, **kwargs)
@@ -252,7 +247,7 @@ class View(base.View):
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
-      return helper.responses.errorResponse(
+      return responses.errorResponse(
           error, request, template=params['error_public'])
 
     get_dict = request.GET
@@ -319,7 +314,7 @@ class View(base.View):
     status of the application process.
     """
 
-    selection = [('needs review',(redirects.getReviewRedirect, params)),
+    selection = [('needs review', (redirects.getReviewRedirect, params)),
                  ('pre-accepted', (redirects.getReviewRedirect, params)),
                  ('accepted', (redirects.getReviewRedirect, params)),
                  ('pre-rejected', (redirects.getReviewRedirect, params)),

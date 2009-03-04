@@ -543,9 +543,10 @@ class View(base.View):
     key_name = request_logic.logic.getKeyNameFromFields(request_fields)
 
     # create the request entity
-    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
+    request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
 
-    # TODO(ljvderijk) send out a message to alert the users able to process this request
+    # TODO(ljvderijk): send out a message to alert the users 
+    # able to process this request
 
     # redirect to roles overview
     return http.HttpResponseRedirect('/user/roles')

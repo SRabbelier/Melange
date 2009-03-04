@@ -53,7 +53,6 @@ def denormalizeAccount(account):
   if account.email().find('@') != -1:
     return account
 
-  normalized = normalizeAccount(account)
   domain = account.auth_domain()
   denormalized = ''.join([account.email(), '@', domain])
 

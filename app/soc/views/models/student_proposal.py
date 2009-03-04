@@ -71,7 +71,8 @@ class View(base.View):
     rights['show'] = [
         ('checkRoleAndStatusForStudentProposal',
             [['proposer', 'org_admin', 'mentor', 'host'], 
-            ['active', 'inactive'], ['new', 'pending', 'accepted', 'rejected']])]
+            ['active', 'inactive'], 
+            ['new', 'pending', 'accepted', 'rejected']])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
@@ -196,8 +197,9 @@ class View(base.View):
 
     dynaproperties = params_helper.getDynaFields(dynafields)
 
-    mentor_review_form = dynaform.newDynaForm(dynamodel=None, dynabase=helper.forms.BaseForm,
-        dynainclude=None, dynaexclude=None, dynaproperties=dynaproperties)
+    mentor_review_form = dynaform.newDynaForm(dynamodel=None, 
+        dynabase=helper.forms.BaseForm, dynainclude=None, 
+        dynaexclude=None, dynaproperties=dynaproperties)
     params['mentor_review_form'] = mentor_review_form
 
     # TODO see if autocomplete can be used for this field
@@ -211,7 +213,8 @@ class View(base.View):
 
     dynaproperties = params_helper.getDynaFields(dynafields)
 
-    admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, dynaproperties=dynaproperties)
+    admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, 
+        dynaproperties=dynaproperties)
 
     params['admin_review_form'] = admin_review_form
 
@@ -358,7 +361,8 @@ class View(base.View):
   @decorators.check_access
   def listSelf(self, request, access_type,
              page_name=None, params=None, **kwargs):
-    """Lists all proposals from the current logged-in user for the given student.
+    """Lists all proposals from the current logged-in user 
+       for the given student.
 
     For params see base.View.public().
     """
@@ -385,7 +389,7 @@ class View(base.View):
     """
 
     try:
-        entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'])
@@ -414,7 +418,8 @@ class View(base.View):
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
     mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
 
-    # check if the current user is a mentor and wants to change his role for this app
+    # check if the current user is a mentor and wants 
+    # to change his role for this app
     choice = request.GET.get('mentor')
     if mentor_entity and choice:
       self._adjustPossibleMentors(entity, mentor_entity, choice)
@@ -487,7 +492,7 @@ class View(base.View):
         name = mentor.name()
 
       # TODO(ljvderijk) hook up comments
-      comment = '%s has given %i points \n %s' %(name, given_score, comment)
+      comment = '%s has given %i points \n %s' % (name, given_score, comment)
 
       properties = {'score': new_score}
 

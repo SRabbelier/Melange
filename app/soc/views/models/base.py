@@ -461,7 +461,7 @@ class View(object):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None, **kwargs):
+           page_name=None, params=None, filter=None, order=None, **kwargs):
     """Displays the list page for the entity type.
 
     Args:
@@ -478,7 +478,7 @@ class View(object):
       the _list method. See the docstring for _list on how it uses it.
     """
 
-    content = helper.lists.getListContent(request, params, filter)
+    content = helper.lists.getListContent(request, params, filter, order=order)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

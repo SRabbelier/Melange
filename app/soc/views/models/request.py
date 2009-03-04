@@ -207,7 +207,7 @@ class View(base.View):
         "An overview of your unhandled invites.")
 
     uh_list = helper.lists.getListContent(
-        request, uh_params, filter, 0)
+        request, uh_params, filter, idx=0)
 
     # construct the Open Requests list
 
@@ -221,7 +221,7 @@ class View(base.View):
         "List of your pending requests.")
 
     ar_list = helper.lists.getListContent(
-        request, ar_params, filter, 1)
+        request, ar_params, filter, idx=1)
 
     # fill contents with all the needed lists
     contents = [uh_list, ar_list]

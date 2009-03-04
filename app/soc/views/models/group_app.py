@@ -192,7 +192,7 @@ class View(base.View):
       list_params['list_action'] = choice[1]
 
       list_content = list_helper.getListContent(
-          request, list_params, filter, index)
+          request, list_params, filter, idx=index)
 
       contents += [list_content]
 

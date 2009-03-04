@@ -249,7 +249,8 @@ class View(base.View):
       list_params['list_action'] = (redirects.getEditRedirect, list_params)
       list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
 
-      list = helper.lists.getListContent(request, list_params, filter, i, True)
+      list = helper.lists.getListContent(request, list_params, filter,
+                                         idx=i, need_content=True)
 
       if list:
         contents.append(list)

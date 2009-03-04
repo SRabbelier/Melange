@@ -266,7 +266,7 @@ class View(presence.View):
         "An overview of the %(name)s's incoming requests." % params)
     
     inc_req_content = list_helper.getListContent(
-        request, inc_req_params, filter, 0)
+        request, inc_req_params, filter, idx=0)
 
     # list all outstanding invites
     filter = {
@@ -284,7 +284,7 @@ class View(presence.View):
         "An overview of the %(name)s's outstanding invites." % params)
 
     out_inv_content = list_helper.getListContent(
-        request, out_inv_params, filter, 1)
+        request, out_inv_params, filter, idx=1)
 
     # list all ignored requests
     filter = {
@@ -302,7 +302,7 @@ class View(presence.View):
         "An overview of the %(name)s's ignored requests." % params)
     
     ignored_content = list_helper.getListContent(
-        request, ignored_params, filter, 2)
+        request, ignored_params, filter, idx=2)
 
     contents = [inc_req_content, out_inv_content, ignored_content]
 
@@ -352,7 +352,7 @@ class View(presence.View):
           list_params['name_plural'], params['name']))
     
       new_list_content = list_helper.getListContent(
-          request, list_params, filter, index)
+          request, list_params, filter, idx=index)
 
       contents += [new_list_content]
 

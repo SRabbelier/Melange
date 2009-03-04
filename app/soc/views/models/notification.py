@@ -134,7 +134,7 @@ class View(base.View):
 
     # TODO(Lennard) when list sorting is implemented sort on descending date
     un_list = list_helper.getListContent(
-        request, un_params, filter, 0)
+        request, un_params, filter, idx=0)
 
     # Now get the read list
 
@@ -148,7 +148,7 @@ class View(base.View):
         "An overview of your read Notifications.")
 
     rn_list = list_helper.getListContent(
-        request, rn_params, filter, 1)
+        request, rn_params, filter, idx=1)
 
     # fill contents with all the needed lists
     contents = [un_list, rn_list]

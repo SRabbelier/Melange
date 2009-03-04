@@ -100,13 +100,15 @@ def generateLinkFromGetArgs(request, offset_and_limits):
   return request.path + link_suffix
 
 
-def getListContent(request, params, filter=None, idx=0, need_content=False):
+def getListContent(request, params, filter=None, order=None,
+                   idx=0, need_content=False):
   """Returns a dict with fields used for rendering lists.
 
   Args:
     request: the Django HTTP request object
     params: a dict with params for the View this list belongs to
     filter: a filter for this list
+    order: the order which should be used for the list (in getForFields format)
     idx: the index of this list
     need_content: iff True will return None if there is no data
 
@@ -137,7 +139,8 @@ def getListContent(request, params, filter=None, idx=0, need_content=False):
   pagination_form = makePaginationForm(request, limit, limit_key)
 
   # Fetch one more to see if there should be a 'next' link
-  data = logic.getForFields(filter=filter, limit=limit+1, offset=offset)
+  data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
+                            order=order)
 
   if need_content and not data:
     return None

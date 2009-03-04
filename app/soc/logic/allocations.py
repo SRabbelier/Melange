@@ -60,7 +60,12 @@ class Allocator(object):
 
     for _, value in applications.iteritems():
       all_applications += value
-
+    
+    self.locked_slots = {}
+    self.adjusted_slots = {}
+    self.adjusted_orgss = []
+    self.locked_orgs = []
+    self.unlocked_applications = []
     self.slots = slots
     self.max_slots_per_org = max_slots_per_org
     self.orgs = set(orgs)
@@ -96,12 +101,13 @@ class Allocator(object):
     adjusted_orgs = set(adjusted_slots.keys())
 
     # set a' and b'
-    unlocked_orgs = self.orgs.difference(locked_orgs)
-    unadjusted_orgs = self.orgs.difference(adjusted_orgs)
+    # unlocked_orgs = self.orgs.difference(locked_orgs)
+    # unadjusted_orgs = self.orgs.difference(adjusted_orgs)
 
     # set a*b and a'*b'
     locked_and_adjusted_orgs = locked_orgs.intersection(adjusted_orgs)
-    unlocked_and_unadjusted_orgs = unlocked_orgs.intersection(unadjusted_orgs)
+    
+    # unlocked_and_unadjusted_orgs = unlocked_orgs.intersection(unadjusted_orgs)
 
     # a+o and b+o should be o
     locked_orgs_or_orgs = self.orgs.union(locked_orgs)

@@ -168,7 +168,8 @@ def constructParams(params):
   if not params.get('no_admin'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>admin)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.admin', 'Show %(name_short)s (admin)')]
+          'soc.views.models.%(module_name)s.admin', 
+          'Show %(name_short)s (admin)')]
 
   if not params.get('no_create_raw'):
     new_params['django_patterns_defaults'] += [
@@ -213,7 +214,8 @@ def constructParams(params):
   if params.get('sans_link_id_public_list'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list_public)/%(sans_link_id)s$',
-         'soc.views.models.%(module_name)s.list_public', 'List %(name_plural)s')]
+         'soc.views.models.%(module_name)s.list_public', 
+         'List %(name_plural)s')]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params
   new_params['export_template'] = 'soc/%(module_name)s/export.html' % params

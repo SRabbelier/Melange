@@ -360,11 +360,16 @@ table#queues td {
   margin-bottom: 1em;
 }
 
+/*  */
+
 span.unread {
   font-weight: bold;
   color: #FF0000;
 }
 
+span.edited {
+  color: #808080;
+}
  
 /* SEARCH FIELD */ 
 #search {

@@ -39,6 +39,10 @@ class Work(soc.models.linkable.Linkable):
     reviews)  a 1:many relationship between a Work and the zero or more
       Reviews of that Work.  This relation is implemented as the 'reviews'
       back-reference Query of the Review model 'reviewed' reference.
+
+    comments)  a 1:many relationship between a work and zero or more comments
+      about that work.  This is implemented as the 'comments' back-reference
+      of the Comment.commented reference property.
   """
 
   #: Required 1:1 relationship indicating the User who initially authored the
@@ -84,4 +88,3 @@ class Work(soc.models.linkable.Linkable):
     """Alias 'title' Property as 'name' for use in common templates.
     """
     return self.title
-

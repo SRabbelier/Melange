@@ -122,6 +122,8 @@ class View(object):
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
 
+    context = dicts.merge(params['context'], context)
+
     template = params['public_template']
 
     return helper.responses.respond(request, template, context=context)

@@ -225,6 +225,8 @@ def constructParams(params):
   new_params['list_template'] = 'soc/models/list.html'
   new_params['invite_template'] = 'soc/models/invite.html'
 
+  new_params['context'] = None
+
   new_params['export_content_type'] = None
   new_params['export_extension'] = '.txt'
 

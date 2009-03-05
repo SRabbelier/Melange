@@ -34,8 +34,8 @@ from django.utils.translation import ugettext
 
 from soc.logic import rights as rights_logic
 from soc.logic import validate
-from soc.logic.models import site as site_logic
-from soc.logic.models import user as user_logic
+from soc.logic.models.site import logic as site_logic
+from soc.logic.models.user import logic as user_logic
 from soc.models import document as document_model
 
 
@@ -132,7 +132,7 @@ def clean_agrees_to_tos(field_name):
     """
     agrees_to_tos = self.cleaned_data.get(field_name)
 
-    if not site_logic.logic.getToS(site_logic.logic.getSingleton()):
+    if not site_logic.getToS(site_logic.logic.getSingleton()):
       return agrees_to_tos
 
     # Site settings specify a site-wide ToS, so agreement is *required*
@@ -157,7 +157,7 @@ def clean_existing_user(field_name):
     """
     link_id = clean_link_id(field_name)(self)
 
-    user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
+    user_entity = user_logic.getForFields({'link_id': link_id},
         unique=True)
 
     if not user_entity:
@@ -179,7 +179,7 @@ def clean_user_is_current(field_name):
     """
     link_id = clean_link_id(field_name)(self)
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.getForCurrentAccount()
 
     if not user_entity or user_entity.link_id != link_id:
       # this user is not the current user
@@ -200,7 +200,7 @@ def clean_user_not_exist(field_name):
     """
     link_id = clean_link_id(field_name)(self)
 
-    user_entity = user_logic.logic.getForFields({'link_id': link_id}, 
+    user_entity = user_logic.getForFields({'link_id': link_id},
         unique=True)
 
     if user_entity:
@@ -223,7 +223,7 @@ def clean_users_not_same(field_name):
     clean_user_field = clean_existing_user(field_name)
     user_entity = clean_user_field(self)
 
-    current_user_entity = user_logic.logic.getForCurrentAccount()
+    current_user_entity = user_logic.getForCurrentAccount()
 
     if user_entity.key() == current_user_entity.key():
       # users are equal
@@ -262,9 +262,9 @@ def clean_user_account_not_in_use(field_name):
     user_account = users.User(email_adress)
 
     fields = {'account': user_account}
-    user_entity = user_logic.logic.getForFields(fields, unique=True)
+    user_entity = user_logic.getForFields(fields, unique=True)
 
-    if user_entity or user_logic.logic.isFormerAccount(user_account):
+    if user_entity or user_logic.isFormerAccount(user_account):
       raise forms.ValidationError("There is already a user "
           "with this email adress.")
 
@@ -335,19 +335,19 @@ def validate_user_edit(link_id_field, account_field):
     if link_id and user_account:
       # get the user from the link_id in the form
       fields = {'link_id': link_id}
-      user_entity = user_logic.logic.getForFields(fields, unique=True)
+      user_entity = user_logic.getForFields(fields, unique=True)
 
       # if it's not the user's current account
       if user_entity.account != user_account:
 
         # get the user having the given account
         fields = {'account': user_account}
-        user_from_account_entity = user_logic.logic.getForFields(fields, 
+        user_from_account_entity = user_logic.getForFields(fields,
             unique=True)
 
         # if there is a user with the given account or it's a former account
         if user_from_account_entity or \
-            user_logic.logic.isFormerAccount(user_account):
+            user_logic.isFormerAccount(user_account):
           # raise an error because this email address can't be used
           raise forms.ValidationError("There is already a user with "
               "this email address.")
@@ -385,7 +385,7 @@ def validate_new_group(link_id_field, scope_path_field,
       group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
 
       # get the current user
-      user_entity = user_logic.logic.getForCurrentAccount()
+      user_entity = user_logic.getForCurrentAccount()
 
       # make sure it's not the applicant creating the new group
       if group_app_entity and (
@@ -491,7 +491,7 @@ def validate_access(self, view, field):
   params = view.getParams()
   rights = params['rights']
 
-  user = user_logic.logic.getForCurrentAccount()
+  user = user_logic.getForCurrentAccount()
 
   rights.setCurrentUser(user.account, user)
   checker = rights_logic.Checker(prefix)

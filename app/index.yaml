@@ -10,8 +10,10 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Unused in query history -- copied from input.
-- kind: Work
+# Used once in query history.
+- kind: StudentProposal
   properties:
-  - name: inheritance_line
-  - name: title
+  - name: org
+  - name: status
+  - name: score
+    direction: desc

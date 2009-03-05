@@ -200,8 +200,10 @@ class View(group.View):
         ranked_params['name_plural'], org_entity.name)
     ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
 
-    filter = {'org' : org_entity,
-              'status': ['pending', 'accepted']}
+    # TODO(ljvderijk) once sorting with IN operator is fixed, 
+    # make this list show more
+    filter = {'org': org_entity,
+              'status': 'pending'}
 
     # order by descending score
     order = ['-score']

@@ -84,7 +84,7 @@ class View(base.View):
         'prefix': forms.fields.CharField(widget=widgets.ReadOnlyInput(),
                                         required=True),
 
-        'clean_content': cleaning.clean_document_content,
+        'clean_content': cleaning.clean_html_content('content'),
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_scope_path': cleaning.clean_scope_path('scope_path'),
         'clean': cleaning.validate_document_acl(self),

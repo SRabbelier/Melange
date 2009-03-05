@@ -288,17 +288,28 @@ def clean_feed_url(self):
   return feed_url
 
 
-def clean_document_content(self):
-  """Clean method for cleaning document content.
+def clean_html_content(field_name):
+  """Clean method for cleaning HTML content.
   """
-  content = self.cleaned_data.get('content')
 
-  sanitizer = feedparser._HTMLSanitizer('utf-8')
-  sanitizer.feed(content)
-  content = sanitizer.output()
-  content = content.strip().replace('\r\n', '\n')
+  @check_field_is_empty(field_name)
+  def wrapped(self):
+    """Decorator wrapper method.
+    """
 
-  return content
+    content = self.cleaned_data.get(field_name)
+
+    if user_logic.isDeveloper():
+      return content
+
+    sanitizer = feedparser._HTMLSanitizer('utf-8')
+    sanitizer.feed(content)
+    content = sanitizer.output()
+    content = content.strip().replace('\r\n', '\n')
+
+    return content
+
+  return wrapped
 
 def clean_url(field_name):
   """Clean method for cleaning a field belonging to a LinkProperty.

@@ -122,7 +122,7 @@ def clean_scope_path(field_name):
 
 
 def clean_agrees_to_tos(field_name):
-  """Checks if there is a ToS to see if it is allowed to leave 
+  """Checks if there is a ToS to see if it is allowed to leave
      the field_name field false.
   """
 
@@ -138,7 +138,7 @@ def clean_agrees_to_tos(field_name):
     # Site settings specify a site-wide ToS, so agreement is *required*
     if agrees_to_tos:
       return True
-    
+
     # there was no agreement made so raise an error
     raise forms.ValidationError(
         'The site-wide Terms of Service must be accepted to participate'
@@ -169,7 +169,7 @@ def clean_existing_user(field_name):
 
 
 def clean_user_is_current(field_name):
-  """Check if the field_name value is a valid link_id and resembles the 
+  """Check if the field_name value is a valid link_id and resembles the
      current user.
   """
 
@@ -192,7 +192,7 @@ def clean_user_is_current(field_name):
 def clean_user_not_exist(field_name):
   """Check if the field_name value is a valid link_id and a user with the
      link id does not exist.
-  """ 
+  """
 
   @check_field_is_empty(field_name)
   def wrapped(self):
@@ -212,7 +212,7 @@ def clean_user_not_exist(field_name):
 
 
 def clean_users_not_same(field_name):
-  """Check if the field_name field is a valid user and is not 
+  """Check if the field_name field is a valid user and is not
      equal to the current user.
   """
 
@@ -248,9 +248,9 @@ def clean_user_account(field_name):
 
 
 def clean_user_account_not_in_use(field_name):
-  """Check if the field_name value contains an email 
+  """Check if the field_name value contains an email
      address that hasn't been used for an existing account.
-  """ 
+  """
 
   @check_field_is_empty(field_name)
   def wrapped(self):
@@ -275,12 +275,13 @@ def clean_user_account_not_in_use(field_name):
 def clean_feed_url(self):
   """Clean method for cleaning feed url.
   """
+
   feed_url = self.cleaned_data.get('feed_url')
 
   if feed_url == '':
     # feed url not supplied (which is OK), so do not try to validate it
     return None
-  
+
   if not validate.isFeedURLValid(feed_url):
     raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
@@ -307,9 +308,10 @@ def clean_url(field_name):
   def wrapped(self):
     """Decorator wrapper method.
     """
+
     value = self.cleaned_data.get(field_name)
 
-    # call the Django URLField cleaning method to 
+    # call the Django URLField cleaning method to
     # properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)
   return wrapped
@@ -317,7 +319,7 @@ def clean_url(field_name):
 
 def validate_user_edit(link_id_field, account_field):
   """Clean method for cleaning user edit form.
-  
+
   Raises ValidationError if:
     -Another User has the given email address as account
     -Another User has the given email address in it's FormerAccounts list
@@ -356,10 +358,10 @@ def validate_user_edit(link_id_field, account_field):
   return wrapper
 
 
-def validate_new_group(link_id_field, scope_path_field, 
+def validate_new_group(link_id_field, scope_path_field,
                        group_logic, group_app_logic):
   """Clean method used to clean the group application or new group form.
-  
+
     Raises ValidationError if:
     -A application with this link id and scope path already exists
     -A group with this link id and scope path already exists
@@ -412,12 +414,12 @@ def validate_new_group(link_id_field, scope_path_field,
 def validate_student_proposal(org_field, scope_field,
                               student_logic, org_logic):
   """Validates the form of a student proposal.
-  
+
   Raises ValidationError if:
     -The organization link_id does not match an active organization
     -The hidden scope path is not a valid active student
   """
-  
+
   def wrapper(self):
     """Decorator wrapper method.
     """

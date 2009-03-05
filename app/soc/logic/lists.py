@@ -140,6 +140,13 @@ class Lists(object):
 
     return self._row_data
 
+  def info(self):
+    """Returns additional info on the current row item in the current list.
+    """
+
+    action, args = self.get('info')
+    return action(self._row_data, args)
+
   def redirect(self):
     """Returns the redirect for the current row item in the current list.
     """

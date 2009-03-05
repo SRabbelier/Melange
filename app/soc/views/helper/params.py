@@ -250,6 +250,7 @@ def constructParams(params):
   new_params['list_params'] = {
       'list_action': 'action',
       'list_description': 'description',
+      'list_info': 'info',
       'list_main': 'main',
       'list_pagination': 'pagination',
       'list_row': 'row',

@@ -34,6 +34,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import rights as rights_logic
 from soc.logic import validate
+from soc.logic.models import document as document_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models import document as document_model
@@ -47,6 +48,10 @@ DEF_NO_RIGHTS_FOR_ACL_MSG = ugettext(
 
 DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
     "This organization is not active or doesn't exist.")
+
+DEF_NO_SUCH_DOCUMENT_MSG = ugettext(
+    "There is no such document with that link_id under this entity.")
+
 
 def check_field_is_empty(field_name):
   """Returns decorator that bypasses cleaning for empty fields.
@@ -325,6 +330,43 @@ def clean_url(field_name):
     # call the Django URLField cleaning method to
     # properly clean/validate this field
     return forms.URLField.clean(self.fields[field_name], value)
+  return wrapped
+
+
+def clean_refs(params, fields):
+  """Cleans all references to make sure they are valid.
+  """
+
+  logic = params['logic']
+
+  def wrapped(self):
+    """Decorator wrapper method.
+    """
+
+    scope_path = logic.getKeyNameFromFields(self.cleaned_data)
+
+    key_fields = {
+        'scope_path': scope_path,
+        'prefix': params['document_prefix'],
+        }
+
+    for field in fields:
+      link_id = self.cleaned_data.get(field)
+
+      if not link_id:
+        continue
+
+      key_fields['link_id'] = link_id
+      ref = document_logic.logic.getFromKeyFields(key_fields)
+
+      if not ref:
+        self._errors[field] = ErrorList([DEF_NO_SUCH_DOCUMENT_MSG])
+        del self.cleaned_data[field]
+      else:
+        self.cleaned_data['resolved_%s' % field] = ref
+
+    return self.cleaned_data
+
   return wrapped
 
 

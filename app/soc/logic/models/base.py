@@ -317,6 +317,8 @@ class Logic(object):
     query = db.Query(self._model)
 
     for key, value in filter.iteritems():
+      if isinstance(value, list) and len(value) == 1:
+        value = value[0]
       if isinstance(value, list):
         op = '%s IN' % key
         query.filter(op, value)

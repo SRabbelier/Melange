@@ -107,7 +107,7 @@ class View(group.View):
 
       # add a link to the edit page
       submenu = (redirects.getEditRedirect(group_entity, params), 
-          "Edit Sponsor Profile", 'any_access')
+          "Edit Program Owner Profile", 'any_access')
       submenus.append(submenu)
 
       # add a link to resign as a host

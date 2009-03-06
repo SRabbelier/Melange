@@ -79,8 +79,8 @@ class View(base.View):
         'list')]
 
     new_params['create_template'] = ['soc/request/create.html']
-    
-    new_params['extra_dynaexclude'] = ['status', 'role_verbose']
+
+    new_params['extra_dynaexclude'] = ['status', 'role_verbose', 'created_on']
 
     new_params['create_extra_dynaproperties'] = {
         'link_id': widgets.ReferenceField(reference_url='user'),
@@ -100,7 +100,7 @@ class View(base.View):
           'Process Invite to become')]
 
     new_params['extra_django_patterns'] = patterns
-    
+
     new_params['invite_processing_template'] = 'soc/request/process_invite.html'
     new_params['request_processing_template'] = \
         'soc/request/process_request.html'

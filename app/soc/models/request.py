@@ -54,4 +54,5 @@ class Request(soc.models.linkable.Linkable):
       choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
   status.help_text = ugettext('Shows the status of the request')
 
-
+  #: DateTime when the request was created
+  created_on = db.DateTimeProperty(auto_now_add=True)

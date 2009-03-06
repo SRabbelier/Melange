@@ -14,6 +14,14 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
+{% block header_title %}
+{{ page_name }} for {{ entity.name }}
+{% if entity.home %}
+<a href="/{{ entity_type_url }}/home/{{ entity.key.name }}">(Home Page)</a>
+{% endif %}
+{% endblock %}
+
+
 {% block fields %}
   {{ block.super }}
   {% readonly_field_as_table_row entity.fields.dev_mailing_list.label entity.dev_mailing_list %}

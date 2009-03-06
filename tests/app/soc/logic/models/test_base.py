@@ -23,24 +23,9 @@ __authors__ = [
 import unittest
 
 from google.appengine.api import users
-from google.appengine.ext import db
 
-from soc.logic.models import base
-
-
-class TestModel(db.Model):
-  """Simpel test model.
-  """
-
-  value = db.IntegerProperty()
-
-
-class TestModelLogic(base.Logic):
-  """Simple test logic.
-  """
-
-  def __init__(self):
-    super(TestModelLogic, self).__init__(TestModel)
+from tests.app.soc.logic.models.test_model import TestModelLogic
+from tests.app.soc.models.test_model import TestModel
 
 
 class UserTest(unittest.TestCase):

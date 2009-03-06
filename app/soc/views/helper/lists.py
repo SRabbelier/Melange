@@ -30,7 +30,7 @@ from soc.logic import dicts
 import soc.views.helper.forms
 
 
-DEF_PAGINATION = 10
+DEF_PAGINATION = 50
 MAX_PAGINATION = 100
 
 DEF_PAGINATION_CHOICES = (

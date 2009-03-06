@@ -97,12 +97,12 @@ class View(group.View):
 
       # add a link to invite an a host
       submenu = (redirects.getInviteRedirectForRole(group_entity, 'host'), 
-          "Invite a Host", 'any_access')
+          "Invite a Program Administrator", 'any_access')
       submenus.append(submenu)
 
       # add a link to the request page
       submenu = (redirects.getListRequestsRedirect(group_entity, params), 
-          "List Host Invites", 'any_access')
+          "List Program Administrator Invites", 'any_access')
       submenus.append(submenu)
 
       # add a link to the edit page
@@ -113,7 +113,7 @@ class View(group.View):
       # add a link to resign as a host
       submenu = (redirects.getManageRedirect(roles['host'], 
           {'url_name': 'host'}), 
-          "Resign as Host", 'any_access')
+          "Resign as Program Administrator", 'any_access')
       submenus.append(submenu)
 
       # add a link to create a new document

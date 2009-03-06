@@ -75,7 +75,7 @@ class View(base.View):
 
     new_params['edit_extra_dynaproperties'] = {
         'home_link_id': widgets.ReferenceField(
-            reference_url='document', filter=['scope_path'],
+            reference_url='document', filter=['__scoped__'],
             filter_fields={'prefix': params['document_prefix']},
             required=False, label=ugettext('Home page Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),

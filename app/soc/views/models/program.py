@@ -40,7 +40,7 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import widgets
-from soc.views.models import presence_with_tos
+from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
@@ -49,7 +49,7 @@ import soc.logic.models.program
 import soc.models.work
 
 
-class View(presence_with_tos.View):
+class View(presence.View):
   """View methods for the Program model.
   """
 
@@ -101,8 +101,6 @@ class View(presence_with_tos.View):
          ugettext('Student Agreement Document link ID')),
         ('home_link_id', soc.models.work.Work.link_id.help_text,
          ugettext('Home page Document link ID')),
-        ('tos_link_id', soc.models.work.Work.link_id.help_text,
-         ugettext('Terms of Service Document link ID'))
         ]
 
     result = {}

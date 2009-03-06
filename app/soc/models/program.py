@@ -26,11 +26,11 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.presence_with_tos
+import soc.models.presence
 import soc.models.timeline
 
 
-class Program(soc.models.presence_with_tos.PresenceWithToS):
+class Program(soc.models.presence.Presence):
   """The Program model, representing a Program ran by a Sponsor.
   """
 

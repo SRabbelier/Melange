@@ -281,10 +281,32 @@ class Logic(object):
       order: a list with the sort order
     """
 
-    if not filter:
-      filter = {}
     if unique:
       limit = 1
+
+    query = self.getQueryForFields(filter=filter, order=order)
+
+    result = query.fetch(limit, offset)
+
+    if unique:
+      return result[0] if result else None
+
+    return result
+
+  def getQueryForFields(self, filter=None, order=None):
+    """Returns a query with the specified properties.
+
+    Args:
+      filter: a dict for the properties that the entities should have
+      order: a list with the sort order
+
+    Returns:
+      - Query object instantiated with the given properties
+    """
+
+    if not filter:
+      filter = {}
+
     if not order:
       order = []
 
@@ -304,12 +326,7 @@ class Logic(object):
     for key in order:
       query.order(key)
 
-    result = query.fetch(limit, offset)
-
-    if unique:
-      return result[0] if result else None
-
-    return result
+    return query
 
   def updateEntityProperties(self, entity, entity_properties, silent=False):
     """Update existing entity using supplied properties.

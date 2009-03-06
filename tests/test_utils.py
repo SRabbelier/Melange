@@ -23,6 +23,6 @@ __authors__ = [
 class MockRequest(object):
   """Shared dummy request object to mock common aspects of a request.
   """
-  def __init__(self):
+  def __init__(self, path=None):
     self.REQUEST = self.GET = self.POST = {}
-
+    self.path = path

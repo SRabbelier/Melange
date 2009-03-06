@@ -91,7 +91,7 @@ class View(base.View):
             widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         }
-    new_params['extra_dynaexclude'] = ['author', 'commented', 'link_id', 'modified_by']
+    new_params['extra_dynaexclude'] = ['author', 'link_id', 'modified_by']
 
     new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
@@ -109,7 +109,7 @@ class View(base.View):
     entity = context['entity']
 
     if entity:
-      on = entity.commented
+      on = entity.scope
     else:
       seed = context['seed']
       on =  seed['commented']
@@ -145,7 +145,7 @@ class View(base.View):
     """
 
     form.fields['created_by'].initial = entity.author.name
-    form.fields['on'].initial = entity.commented.name
+    form.fields['on'].initial = entity.scope.name
     form.fields['link_id'].initial = entity.link_id
     form.fields['scope_path'].initial = entity.scope_path
 

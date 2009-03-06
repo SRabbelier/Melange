@@ -41,13 +41,6 @@ class Comment(soc.models.linkable.Linkable):
   commented on.
   """
 
-  #: A required many:1 relationship with a Work, where the comment entity
-  #: provides additional textual information about the commented work.
-  #: There is a backreference in Work called comments, which is a db.Query
-  #: instance
-  commented = db.ReferenceProperty(reference_class=soc.models.work.Work,
-                                  required=False, collection_name="comments")
-
   #: A required many:1 relationship with a comment entity indicating
   #: the user who provided that comment.  There is a backreference in Work
   #: called comments, which is a db.Query instance.

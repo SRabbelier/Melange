@@ -26,6 +26,7 @@ __authors__ = [
 from django import forms
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
@@ -113,19 +114,21 @@ class View(presence.View):
 
     result['workflow'] = forms.CharField(widget=widgets.ReadOnlyInput(),
                                          required=True)
+    result['clean'] = cleaning.clean_refs(new_params,
+                                          [i for i,_,_ in reference_fields])
 
     new_params['edit_extra_dynaproperties'] = result
 
-    references = [
-        ('org_admin_agreement_link_id', 'org_admin_agreement', document_logic,
+    document_references = [
+        ('org_admin_agreement_link_id', 'org_admin_agreement',
          lambda x: x.org_admin_agreement),
-        ('mentor_agreement_link_id', 'mentor_agreement', document_logic,
+        ('mentor_agreement_link_id', 'mentor_agreement',
          lambda x: x.mentor_agreement),
-        ('student_agreement_link_id', 'student_agreement', document_logic,
+        ('student_agreement_link_id', 'student_agreement',
          lambda x: x.student_agreement),
         ]
 
-    new_params['references'] = references
+    new_params['references'] = document_references
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

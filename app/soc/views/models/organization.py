@@ -132,9 +132,9 @@ class View(group.View):
             soc.logic.models.organization, org_app_logic)
         }
 
-    # get rid of the clean method
     new_params['edit_extra_dynaproperties'] = {
-        'clean': (lambda x: x.cleaned_data)}
+        'clean': cleaning.clean_refs(new_params, ['home_link_id'])
+        }
 
     params = dicts.merge(params, new_params)
 

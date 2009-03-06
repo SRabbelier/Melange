@@ -27,6 +27,7 @@ from google.appengine.ext import db
 from django import forms
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import document as document_logic
 from soc.views.models import presence
@@ -49,8 +50,6 @@ class View(presence.View):
     """
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.presence_with_tos.logic
-
     new_params['extra_dynaexclude'] = ['tos']
 
     new_params['edit_extra_dynaproperties'] = {
@@ -59,6 +58,8 @@ class View(presence.View):
             filter_fields={'prefix': params['document_prefix']},
             label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
+        'clean': cleaning.clean_refs(params,
+                                     ['home_link_id', 'tos_link_id']),
         }
 
     params = dicts.merge(params, new_params, sub_merge=True)
@@ -84,17 +85,7 @@ class View(presence.View):
     if 'tos_link_id' not in fields:
       return super(View, self)._editPost(request, entity, fields)
 
-    scope_path = self._logic.getKeyNameFromFields(fields)
-
-    key_fields = {
-        'scope_path': scope_path,
-        'link_id': fields['tos_link_id'],
-        'prefix': self._params['document_prefix'],
-        }
-
-    # TODO notify the user if tos_doc is not found
-    tos_doc = document_logic.logic.getFromKeyFields(key_fields)
-
+    tos_doc = fields.get('resolved_tos_link_id')
     fields['tos'] = tos_doc
 
     super(View, self)._editPost(request, entity, fields)

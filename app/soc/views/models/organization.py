@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+import itertools
+
 from django import forms
 from django.utils.translation import ugettext
 
@@ -186,6 +188,8 @@ class View(group.View):
     For params see base.View.public().
     """
 
+    from soc.logic.models.ranker_root import logic as ranker_root_logic
+    from soc.models import student_proposal
     from soc.views.models import student_proposal as student_proposal_view
 
     try:
@@ -195,12 +199,12 @@ class View(group.View):
           error, request, template=params['error_public'])
 
     list_params = student_proposal_view.view.getParams().copy()
-    list_params['list_row'] = ('soc/%(module_name)s/list/'
-        'detailed_row.html' % list_params)
-    list_params['list_heading'] = ('soc/%(module_name)s/list/'
-        'detailed_heading.html' % list_params)
 
     ranked_params = list_params.copy()# ranked proposals
+    ranked_params['list_row'] = ('soc/%(module_name)s/list/'
+        'detailed_row.html' % list_params)
+    ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
+        'detailed_heading.html' % list_params)
     ranked_params['list_description'] = 'List of %s send to %s ' % (
         ranked_params['name_plural'], org_entity.name)
     ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
@@ -216,12 +220,34 @@ class View(group.View):
     prop_list = lists.getListContent(
         request, ranked_params, filter, order=order, idx=0)
 
+    proposals = prop_list['data']
+
+    # get a list of scores
+    scores = [[proposal.score] for proposal in proposals]
+
+    # retrieve the ranker
+    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
+                'scope': org_entity}
+
+    ranker_root = ranker_root_logic.getForFields(fields, unique=True)
+    ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+
+    # retrieve the ranks for these scores
+    ranks = [rank+1 for rank in ranker.FindRanks(scores)]
+
+    # link the proposals to the rank
+    ranking = dict([i for i in itertools.izip(proposals, ranks)])
+
+    # update the prop_list with the ranking information
+    prop_list['info'] = ((lambda item, cache: {'rank': cache[item]}), ranking)
+
     new_params = list_params.copy() # new proposals
     new_params['list_description'] = 'List of new %s send to %s ' %(
         new_params['name_plural'], org_entity.name)
     new_params['list_action'] = (redirects.getReviewRedirect, new_params)
 
-    filter['status'] = 'new'
+    filter = {'org': org_entity,
+        'status': 'new'}
 
     new_list = lists.getListContent(
         request, new_params, filter, idx=1)

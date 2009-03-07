@@ -33,6 +33,7 @@ from soc.logic.models import org_app as org_app_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import redirects
 from soc.views.helper import params as params_helper
 from soc.views.helper import widgets
 from soc.views.models import organization as org_view
@@ -194,10 +195,8 @@ class View(role.View):
     if 'scope_path' in form.initial:
       scope_path = form.initial['scope_path']
     elif 'scope_path' in request.POST:
-      # TODO: do this nicely
       scope_path = request.POST['scope_path']
     else:
-      # TODO: is this always sufficient?
       form.fields['admin_agreement'] = None
       return
 
@@ -214,9 +213,17 @@ class View(role.View):
     if not (entity and entity.scope and entity.scope.org_admin_agreement):
       return
 
-    content = entity.scope.org_admin_agreement.content
+    agreement = entity.scope.org_admin_agreement
 
-    form.fields['admin_agreement'].widget.text = content
+    if not (entity and agreement):
+      return
+
+    content = agreement.content
+    params = {'url_name': 'document'}
+
+    widget = form.fields['admin_agreement'].widget
+    widget.text = content
+    widget.url = redirects.getPublicRedirect(agreement, params)
 
 
 view = View()

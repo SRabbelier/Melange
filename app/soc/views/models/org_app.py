@@ -161,21 +161,24 @@ class View(group_app.View):
     if 'scope_path' in form.initial:
       scope_path = form.initial['scope_path']
     elif 'scope_path' in request.POST:
-      # TODO: do this nicely
       scope_path = request.POST['scope_path']
     else:
-      # TODO: is this always sufficient?
       del form.fields['admin_agreement']
       return
 
     entity = program_logic.logic.getFromKeyName(scope_path)
 
-    if not entity or not entity.org_admin_agreement:
+    agreement = entity.org_admin_agreement
+
+    if not (entity and agreement):
       return
 
-    content = entity.org_admin_agreement.content
+    content = agreement.content
+    params = {'url_name': 'document'}
 
-    form.fields['admin_agreement'].widget.text = content
+    widget = form.fields['admin_agreement'].widget
+    widget.text = content
+    widget.url = redirects.getPublicRedirect(agreement, params)
 
   def _review(self, request, params, app_entity, status, **kwargs):
     """Sends out an email if an org_app has been accepted or rejected.

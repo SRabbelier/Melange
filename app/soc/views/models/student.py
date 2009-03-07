@@ -178,10 +178,8 @@ class View(role.View):
     if 'scope_path' in form.initial:
       scope_path = form.initial['scope_path']
     elif 'scope_path' in request.POST:
-      # TODO do this nicely
       scope_path = request.POST['scope_path']
     else:
-      # TODO is this always sufficient?
       form.fields['student_agreement'] = None
       return
 
@@ -190,8 +188,14 @@ class View(role.View):
     if not (program and program.student_agreement):
       return
 
-    content = program.student_agreement.content
-    form.fields['student_agreement'].widget.text = content
+    agreement = program.student_agreement
+
+    content = agreement.content
+    params = {'url_name': 'document'}
+
+    widget = form.fields['student_agreement'].widget
+    widget.text = content
+    widget.url = redirects.getPublicRedirect(agreement, params)
 
 
 view = View()

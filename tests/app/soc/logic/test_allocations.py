@@ -220,7 +220,7 @@ class AllocationsTest(unittest.TestCase):
     with_adjusting = self.allocater.allocate(locked_slots, adjusted_slots)
     without_adjusting = self.allocater.allocate(locked_slots, {})
 
-    expected = without_adjusting['gcc'] + 10
+    expected = without_adjusting['gcc']
     actual = with_adjusting['gcc']
 
-    self.failUnlessEqual(expected, actual)
+    self.failUnless(actual > expected)

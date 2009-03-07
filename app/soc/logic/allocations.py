@@ -147,6 +147,17 @@ class Allocator(object):
     popularity = ((k, len(v)) for k, v in self.applications.iteritems())
     self.popularity = dict(popularity)
 
+  def rangeSlots(self, slots, org):
+    """Returns the amount of slots for the org within the required bounds.
+    """
+
+    slots = int(math.floor(slots))
+    slots = min(slots, self.max_slots_per_org)
+    slots = max(slots, self.min_slots_per_org)
+    slots = min(slots, self.mentors[org])
+
+    return slots
+
   def iterativeAllocation(self):
     """A simple iterative algorithm.
     """
@@ -206,9 +217,8 @@ class Allocator(object):
 
     for org in locked_orgs:
       popularity = self.popularity[org]
-      mentors = self.mentors[org]
       slots = locked_slots[org]
-      slots = min(slots, mentors)
+      slots = self.rangeSlots(slots, org)
 
       total_popularity -= popularity
       available_slots -= slots
@@ -228,13 +238,13 @@ class Allocator(object):
       mentors = self.mentors[org]
 
       slots = (float(popularity)/float(total_popularity))*available_slots
-      slots = min(slots, self.max_slots_per_org)
-      slots = max(slots, self.min_slots_per_org)
-      slots = min(slots, mentors)
+      slots = self.rangeSlots(slots, org)
 
       popularity = (float(total_popularity)/float(available_slots))*slots
 
       self.popularity[org] = popularity
+
+    total_popularity = sum(self.popularity.values())
 
     # do the actual calculation
     for org in unlocked_orgs:
@@ -255,7 +265,10 @@ class Allocator(object):
       if slots_left < 1:
         break
 
-      slots_left -= 1
-      allocations[org] += 1
+      current = allocations[org]
+      slots = self.rangeSlots(current + 1, org)
+
+      slots_left += slots - current
+      allocations[org] = slots
 
     return allocations

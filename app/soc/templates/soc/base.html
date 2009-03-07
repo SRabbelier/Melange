@@ -47,6 +47,9 @@ limitations under the License.
   {% if uses_menu %}
   <script type='text/javascript' src="/soc/content/js/menu-081108.js"></script>
   {% endif %}
+  {% if uses_jq_purr %}
+    <script type='text/javascript' src="/jquery/jquery-purr.js"></script>
+  {% endif %}
   {% if uses_jq_bt %}
   <script type='text/javascript' src="/soc/content/js/tips-081027.js"></script>
   {% endif %}
@@ -206,6 +209,10 @@ target="_blank">(unreleased)</a>
   </div>
 
   <div id="body">
+
+  {% if uses_jq_purr %}
+    <div id="purr-container"></div>
+  {% endif %}
 
    <div style="line-height: 140%;">
   {% block body %}

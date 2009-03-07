@@ -51,3 +51,8 @@ class Organization(soc.models.group.Group):
       'The URL to the ideas list of your organization.')
   ideas.example_text = ugettext('For instance a link to a Melange public '
       'document or some other URL')
+
+  slots = db.IntegerProperty(required=False,
+      verbose_name=ugettext('Slots allocated'))
+  slots.help_text = ugettext(
+      'The amount of slots allocated to this organization.')

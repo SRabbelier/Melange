@@ -64,22 +64,28 @@ class AllocationsTest(unittest.TestCase):
 
     self.slots = 60
     self.max_slots_per_org = 40
+    self.min_slots_per_org = 2
     self.allocated = 0
+    self.iterative = True
 
-    self.applications = {
-        'asf': self.allocate(20),
-        'gcc': self.allocate(15),
-        'git': self.allocate(6),
-        'google': self.allocate(3),
-        'melange': self.allocate(100),
+    apps = {
+        'asf': self.allocate(20, 20),
+        'gcc': self.allocate(15, 30),
+        'git': self.allocate(6, 6),
+        'google': self.allocate(3, 10),
+        'melange': self.allocate(100, 3),
         }
+
+    self.applications = dict([(k,a) for k, (m, a) in apps.iteritems()])
+    self.mentors = dict([(k,m) for k, (m, a) in apps.iteritems()])
 
     self.orgs = self.applications.keys()
 
-    self.allocater = allocations.Allocator(self.orgs, self.applications,
-                                           self.slots, self.max_slots_per_org)
+    self.allocater = allocations.Allocator(
+        self.orgs, self.applications, self.mentors, self.slots,
+        self.max_slots_per_org, self.min_slots_per_org, self.iterative)
 
-  def allocate(self, count):
+  def allocate(self, count, max):
     """Returns a list with count new student objects.
     """
 
@@ -87,7 +93,7 @@ class AllocationsTest(unittest.TestCase):
     j = i + count
     self.allocated += count
 
-    return [Student(i) for i in range(i,j)]
+    return max, [Student(i) for i in range(i,j)]
 
   def testAllocate(self):
     """Test that the allocate helper works properly.
@@ -99,16 +105,19 @@ class AllocationsTest(unittest.TestCase):
     self.allocated = 0
 
     expected = [Student(0), Student(1), Student(2)]
-    actual = self.allocate(3)
+    count, actual = self.allocate(3, 0)
     self.failUnlessEqual(expected, actual)
+    self.failUnlessEqual(count, 0)
 
     expected = []
-    actual = self.allocate(0)
+    count, actual = self.allocate(0, 10)
     self.failUnlessEqual(expected, actual)
+    self.failUnlessEqual(count, 10)
 
     expected = [Student(3)]
-    actual = self.allocate(1)
+    count, actual = self.allocate(1, 5)
     self.failUnlessEqual(expected, actual)
+    self.failUnlessEqual(count, 5)
 
     self.allocated = stash
 
@@ -206,12 +215,12 @@ class AllocationsTest(unittest.TestCase):
     """
 
     locked_slots = {}
-    adjusted_slots = {'google': 1}
+    adjusted_slots = {'gcc': 10}
 
     with_adjusting = self.allocater.allocate(locked_slots, adjusted_slots)
     without_adjusting = self.allocater.allocate(locked_slots, {})
 
-    expected = without_adjusting['google'] + 1
-    actual = with_adjusting['google']
+    expected = without_adjusting['gcc'] + 10
+    actual = with_adjusting['gcc']
 
     self.failUnlessEqual(expected, actual)

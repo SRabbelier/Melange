@@ -47,13 +47,17 @@ class Allocator(object):
   # the convenience of any mathematicians that happen to read this
   # piece of code ;).
 
-  def __init__(self, orgs, applications, slots, max_slots_per_org):
+  def __init__(self, orgs, applications, mentors, slots,
+               max_slots_per_org, min_slots_per_org, iterative):
     """Initializes the allocator.
 
     Args:
       orgs: a list of all the orgs that need to be allocated
       applications: a dictionary with for each org a list of applicants
+      mentors: the amount of assigned mentors per org
       slots: the total amount of available slots
+      max_slots_per_org: how many slots an org should get at most
+      min_slots_per_org: how many slots an org should at least get
     """
 
     all_applications = []
@@ -63,14 +67,17 @@ class Allocator(object):
     
     self.locked_slots = {}
     self.adjusted_slots = {}
-    self.adjusted_orgss = []
+    self.adjusted_orgs = []
     self.locked_orgs = []
     self.unlocked_applications = []
     self.slots = slots
     self.max_slots_per_org = max_slots_per_org
+    self.min_slots_per_org = min_slots_per_org
     self.orgs = set(orgs)
     self.applications = applications
+    self.mentors = mentors
     self.all_applications = set(all_applications)
+    self.iterative = iterative
 
   def allocate(self, locked_slots, adjusted_slots):
     """Allocates the slots and returns the result.
@@ -101,7 +108,7 @@ class Allocator(object):
     adjusted_orgs = set(adjusted_slots.keys())
 
     # set a' and b'
-    # unlocked_orgs = self.orgs.difference(locked_orgs)
+    unlocked_orgs = self.orgs.difference(locked_orgs)
     # unadjusted_orgs = self.orgs.difference(adjusted_orgs)
 
     # set a*b and a'*b'
@@ -129,15 +136,19 @@ class Allocator(object):
     locked_applications = set(itertools.chain(*locked_slots.keys()))
     unlocked_applications = all_applications.difference(locked_applications)
 
-    self.adjusted_orgss = adjusted_orgs
+    self.adjusted_orgs = adjusted_orgs
+    self.unlocked_orgs = unlocked_orgs
     self.locked_orgs = locked_orgs
     self.unlocked_applications = unlocked_applications
+
+    popularity = ((k, len(v)) for k, v in self.applications.iteritems())
+    self.popularity = dict(popularity)
 
   def iterativeAllocation(self):
     """A simple iterative algorithm.
     """
 
-    adjusted_orgs = self.adjusted_orgss
+    adjusted_orgs = self.adjusted_orgs
     adjusted_slots = self.adjusted_slots
     locked_orgs = self.locked_orgs
     locked_slots = self.locked_slots
@@ -152,6 +163,7 @@ class Allocator(object):
     for org in self.orgs:
       org_applications = self.applications[org]
       org_applications_count = len(org_applications)
+      mentors = self.mentors[org]
 
       if org in locked_orgs:
         slots = locked_slots[org]
@@ -163,7 +175,7 @@ class Allocator(object):
         slots += adjusted_slots[org]
 
       slots = min(slots, self.max_slots_per_org)
-      slots = min(slots, org_applications_count)
+      slots = min(slots, mentors)
       slots = min(slots, available_slots)
 
       allocations[org] = slots

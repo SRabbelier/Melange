@@ -34,16 +34,15 @@ from django.utils.translation import ugettext as _
 class Comment(soc.models.linkable.Linkable):
   """Model of a comment on a work.
 
-  A comment is associated with a Work, for example a Document or a Proposal,
-  and with a user, the author.  There are two types of comment, public (i.e.
-  visible to the student), or private (i.e. visible to programme/club staff).
-  Neither type are visible to people who are not connected to the work being
-  commented on.
+  A comment is usually associated with a Work or a Proposal,
+  for example a Document or a Student Proposal, and with a user, the author.
+  There are two types of comment, public (i.e. visible to the student), 
+  or private (i.e. visible to programme/club staff). Neither type are 
+  visible to people who are not connected to the work being commented on.
   """
 
   #: A required many:1 relationship with a comment entity indicating
-  #: the user who provided that comment.  There is a backreference in Work
-  #: called comments, which is a db.Query instance.
+  #: the user who provided that comment.
   author = db.ReferenceProperty(reference_class=soc.models.user.User,
                                   required=True, collection_name="commented")
 

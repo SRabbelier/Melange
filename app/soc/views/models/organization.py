@@ -36,6 +36,7 @@ from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import program as program_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -107,12 +108,14 @@ class View(group.View):
 
     patterns = []
 
-    patterns += [(r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
+    patterns += [
+        (r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
         'soc.views.models.%(module_name)s.apply_mentor',
         "List of all %(name_plural)s you can apply to"),
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.list_proposals',
-        "List of all Student Proposals for this %(name)s"),]
+        "List of all Student Proposals for this %(name)s"),
+        ]
 
     new_params['extra_django_patterns'] = patterns
 

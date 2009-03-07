@@ -27,6 +27,7 @@ from django import forms
 from django import http
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.views.helper import decorators
@@ -88,6 +89,18 @@ class View(presence.View):
 
     new_params['list_row'] = 'soc/group/list/row.html'
     new_params['list_heading'] = 'soc/group/list/heading.html'
+
+    new_params['create_extra_dynaproperties'] = {
+       'clean_contact_street': cleaning.clean_ascii_only('contact_street'),
+       'clean_contact_city': cleaning.clean_ascii_only('contact_city'),
+       'clean_contact_state': cleaning.clean_ascii_only('contact_state'),
+       'clean_contact_postalcode': cleaning.clean_ascii_only('contact_postalcode'),
+       'clean_shipping_street': cleaning.clean_ascii_only('shipping_street'),
+       'clean_shipping_city': cleaning.clean_ascii_only('shipping_city'),
+       'clean_shipping_state': cleaning.clean_ascii_only('shipping_state'),
+       'clean_shipping_postalcode': cleaning.clean_ascii_only('shipping_postalcode'),
+       }
+
 
     new_params['role_views'] = {}
 

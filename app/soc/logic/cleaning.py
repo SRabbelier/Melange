@@ -277,6 +277,26 @@ def clean_user_account_not_in_use(field_name):
   return wrapped
 
 
+def clean_ascii_only(field_name):
+  """Clean method for cleaning a field that may only contain ASCII-characters.
+  """
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    """Decorator wrapper method.
+    """
+    value = self.cleaned_data.get(field_name)
+
+    try:
+      # encode to ASCII
+      value = value.encode("ascii")
+    except UnicodeEncodeError:
+      # can not encode as ASCII
+      raise forms.ValidationError("Only ASCII characters are allowed")
+
+    return value
+  return wrapper
+
+
 def clean_feed_url(self):
   """Clean method for cleaning feed url.
   """
@@ -315,6 +335,7 @@ def clean_html_content(field_name):
     return content
 
   return wrapped
+
 
 def clean_url(field_name):
   """Clean method for cleaning a field belonging to a LinkProperty.

@@ -139,6 +139,14 @@ class View(base.View):
        'longitude': forms.fields.FloatField(widget=forms.HiddenInput,
                                             required=False),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
+       'clean_res_street': cleaning.clean_ascii_only('res_street'),
+       'clean_res_city': cleaning.clean_ascii_only('res_city'),
+       'clean_res_state': cleaning.clean_ascii_only('res_state'),
+       'clean_res_postalcode': cleaning.clean_ascii_only('res_postalcode'),
+       'clean_ship_street': cleaning.clean_ascii_only('ship_street'),
+       'clean_ship_city': cleaning.clean_ascii_only('ship_city'),
+       'clean_ship_state': cleaning.clean_ascii_only('ship_state'),
+       'clean_ship_postalcode': cleaning.clean_ascii_only('ship_postalcode'),
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),
        'clean_photo_url': cleaning.clean_url('photo_url'),
@@ -147,6 +155,8 @@ class View(base.View):
        }
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
+
+    new_params['disallow_last_resign'] = False
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -426,12 +436,29 @@ class View(base.View):
     resign = get_dict.get('resign')
 
     if resign == 'true':
-      # change the status of this role_entity to invalid
-      fields = {'status': 'invalid'}
-      logic.updateEntityProperties(role_entity, fields)
 
-      # redirect to the roles listing
-      return http.HttpResponseRedirect(redirect)
+      if params.get('disallow_last_resign'):
+        # check if the current role is the last for this scope
+        fields = {'scope': role_entity.scope,
+            'status': 'active'}
+        roles = logic.getForFields(fields, limit=2)
+
+        # if there is more then one left we can safely resign
+        resign = len(roles) > 1
+      else:
+        resign = True
+
+      if resign:
+        # change the status of this role_entity to invalid
+        fields = {'status': 'invalid'}
+        logic.updateEntityProperties(role_entity, fields)
+
+        # redirect to the roles listing
+        return http.HttpResponseRedirect(redirect)
+      else:
+        # show error to the user
+        context['not_allowed_to_resign'] = ugettext("This user can't be "
+            "resigned, please make sure it's not the last %(name)s." % params)
 
     # set the appropriate context
     context['entity'] = role_entity

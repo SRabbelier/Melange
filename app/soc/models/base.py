@@ -56,8 +56,8 @@ class ModelWithFieldAttributes(db.Model):
     props = self.properties()
 
     for key, value in props.iteritems():
-      # Skip everything but StringProperties
-      if not isinstance(value, db.StringProperty):
+      # Skip everything but StringProperties and IntegerProperties
+      if not isinstance(value, (db.StringProperty, db.IntegerProperty)):
         continue
       result[key] = getattr(self, key)
 

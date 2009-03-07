@@ -66,7 +66,7 @@ class AllocationsTest(unittest.TestCase):
     self.max_slots_per_org = 40
     self.min_slots_per_org = 2
     self.allocated = 0
-    self.iterative = True
+    self.iterative = False
 
     apps = {
         'asf': self.allocate(20, 20),

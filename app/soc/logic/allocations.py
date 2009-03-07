@@ -92,7 +92,10 @@ class Allocator(object):
 
     self.buildSets()
 
-    return self.iterativeAllocation()
+    if self.iterative:
+      return self.iterativeAllocation()
+    else:
+      return self.preprocessingAllocation()
 
   def buildSets(self):
     """Allocates slots with the specified constraints
@@ -181,5 +184,78 @@ class Allocator(object):
       allocations[org] = slots
       available_slots -= slots
       unallocated_applications_count -= org_applications_count
+
+    return allocations
+
+  def preprocessingAllocation(self):
+    """An algorithm that pre-processes the input before running as normal.
+    """
+
+    adjusted_orgs = self.adjusted_orgs
+    adjusted_slots = self.adjusted_slots
+    locked_orgs = self.locked_orgs
+    locked_slots = self.locked_slots
+    unlocked_orgs = self.unlocked_orgs
+    unlocked_applications = self.unlocked_applications
+
+    total_popularity = sum(self.popularity.values())
+
+    available_slots = self.slots
+    allocations = {}
+    slack = {}
+
+    for org in locked_orgs:
+      popularity = self.popularity[org]
+      mentors = self.mentors[org]
+      slots = locked_slots[org]
+      slots = min(slots, mentors)
+
+      total_popularity -= popularity
+      available_slots -= slots
+      allocations[org] = slots
+
+    # adjust the orgs in need of adjusting
+    for org in adjusted_orgs:
+      slots = adjusted_slots[org]
+
+      adjustment = (float(total_popularity)/float(available_slots))*slots
+      adjustment = int(math.ceil(adjustment))
+      self.popularity[org] += adjustment
+
+    # adjust the popularity so that the invariants are always met
+    for org in unlocked_orgs:
+      popularity = self.popularity[org]
+      mentors = self.mentors[org]
+
+      slots = (float(popularity)/float(total_popularity))*available_slots
+      slots = min(slots, self.max_slots_per_org)
+      slots = max(slots, self.min_slots_per_org)
+      slots = min(slots, mentors)
+
+      popularity = (float(total_popularity)/float(available_slots))*slots
+
+      self.popularity[org] = popularity
+
+    # do the actual calculation
+    for org in unlocked_orgs:
+      org_applications = self.applications[org]
+      org_applications_count = len(org_applications)
+
+      popularity = self.popularity[org]
+      raw_slots = (float(popularity)/float(total_popularity))*available_slots
+      slots = int(math.floor(raw_slots))
+
+      slack[org] = raw_slots - slots
+      allocations[org] = slots
+
+    slots_left = available_slots - sum(allocations.values())
+
+    # add leftover slots, sorted by slack, decending
+    for org, slack in sorted(slack.iteritems(), key=lambda (k,v): v, reverse=True):
+      if slots_left < 1:
+        break
+
+      slots_left -= 1
+      allocations[org] += 1
 
     return allocations

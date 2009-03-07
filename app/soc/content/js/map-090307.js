@@ -130,7 +130,7 @@ role_profile_gmap = new function(){
       saveOldAddress();
       var starting_point;
       var zoom_selected = world_zoom;
-      var show_marker = false;
+      var show_marker = true;
 
       // Create the map and add small controls
       map = new GMap2(document.getElementById(map_div));

@@ -64,8 +64,7 @@ class View(role.View):
         'checkIsNotParticipatingInProgramInScope',
         ]
     rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.host.logic,
-             soc.logic.models.org_admin.logic])]
+        ('checkIsAllowedToManageRole', [soc.logic.models.host.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student.logic

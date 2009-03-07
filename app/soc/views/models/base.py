@@ -632,6 +632,12 @@ class View(object):
     entities = self._logic.getForFields(filter=filter, limit=1000)
     data = [i.toDict() for i in entities]
 
+    return self.json(request, data)
+
+  def json(self, request, data):
+    """Returns data as a json object.
+    """
+
     to_json = {
         'data': data,
         }
@@ -642,13 +648,15 @@ class View(object):
     template = 'soc/json.html'
 
     response = responses.respond(request, template, context)
+
     # if the browser supports HTTP/1.1
     # post-check and pre-check and no-store for IE7
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
         'post-check=0, pre-check=0'
+
     # if the browser supports HTTP/1.0
     response['Pragma'] = 'no-cache'
-    
+
     return response
 
   def _editPost(self, request, entity, fields):

@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
+{% load comments_helpers %}
 
 {% block header_title %}
 {{ page_name }} "{{ entity.title }}" from {{ student_name }} (Score: {{ entity.score }})
@@ -26,15 +27,21 @@ limitations under the License.
   {% readonly_field_as_table_row "Mentor" mentor_name %}
   {% readonly_field_as_table_row "Possible Mentors" possible_mentors %}
   {% readonly_field_as_twoline_table_row entity.fields.abstract.label entity.abstract %}
-  {% readonly_field_as_twoline_table_row entity.fields.content.label entity.content %}
+  {% readonly_safe_field_as_twoline_table_row entity.fields.content.label entity.content %}
   {% readonly_field_as_table_row "Created on" entity.created_on %}
   {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
  </table>
 </p>
 <hr>
-<b>Public Comments</b>
+<b>Public Reviews</b>
+{% for review in public_reviews %}
+  {% as_review review %}
+{% endfor %}
 <hr>
-<b>Private Comments</b>
+<b>Private Reviews</b>
+{% for review in private_reviews %}
+  {% as_review review %}
+{% endfor %}
 <hr>
 
 <form method="POST">

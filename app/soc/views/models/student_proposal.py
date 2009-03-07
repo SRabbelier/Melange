@@ -183,7 +183,7 @@ class View(base.View):
         },
         {'name': 'comment',
          'base': forms.CharField,
-         'widget': forms.Textarea,
+         'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
          'label': 'Comment',
          'required': False,
          },
@@ -398,14 +398,6 @@ class View(base.View):
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
-
-    context['student_name'] = entity.scope.name()
-
-    if entity.mentor:
-      context['mentor_name'] = entity.mentor.name()
-    else:
-      context['mentor_name'] = "No mentor assigned"
-
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
@@ -454,6 +446,10 @@ class View(base.View):
 
     if not form.is_valid():
       # return the invalid form response
+      # get all the extra information that should be in the context
+      review_context = self._getDefaultReviewContext(entity, org_admin, mentor)
+      context = dicts.merge(context, review_context)
+
       return self._constructResponse(request, entity=entity, context=context,
           form=form, params=params, template=params['review_template'])
 
@@ -462,23 +458,19 @@ class View(base.View):
     if org_admin:
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
+      reviewer = org_admin
+    else:
+      # might be None (if Host or Developer is commenting)
+      reviewer = mentor
 
     is_public = fields['public']
     comment = fields['comment']
     given_score = int(fields['score'])
 
-    if (org_admin or mentor) and (not is_public) and (given_score is not 0):
+    if reviewer and (not is_public) and (given_score is not 0):
       # if it is not a public comment and it's made by a member of the
-      # organization we score and display an additional message in the comment
+      # organization we update the score of the proposal
       new_score = given_score + entity.score
-
-      if org_admin:
-        name = org_admin.name()
-      elif mentor:
-        name = mentor.name()
-
-      # TODO(ljvderijk) hook up comments
-      comment = '%s has given %i points \n %s' % (name, given_score, comment)
 
       properties = {'score': new_score}
 
@@ -488,6 +480,10 @@ class View(base.View):
 
       # update the proposal with the new score
       self._logic.updateEntityProperties(entity, properties)
+
+    # create the review entity
+    if comment or (given_score is not 0):
+      self._createReviewFor(entity, reviewer, comment, given_score, is_public)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
@@ -512,7 +508,35 @@ class View(base.View):
       initial['mentor'] = entity.mentor.link_id
 
     context['form'] = form(initial)
+
+    # get all the extra information that should be in the context
+    review_context = self._getDefaultReviewContext(entity, org_admin, mentor)
+    context = dicts.merge(context, review_context)
+
     template = params['review_template']
+
+    return responses.respond(request, template, context=context)
+
+  def _getDefaultReviewContext(self, entity, org_admin,
+                               mentor):
+    """Returns the default context for the review page
+
+    Args:
+      entity: Student Proposal entity
+      org_admin: org admin entity for the current user/proposal (iff available)
+      mentor: mentor entity for the current user/proposal (iff available)
+    """
+
+    from soc.logic.models.review import logic as review_logic
+
+    context = {}
+
+    context['student_name'] = entity.scope.name()
+
+    if entity.mentor:
+      context['mentor_name'] = entity.mentor.name()
+    else:
+      context['mentor_name'] = "No mentor assigned"
 
     # set the possible mentors in the context
     possible_mentors = entity.possible_mentors
@@ -523,11 +547,30 @@ class View(base.View):
       mentor_names = []
 
       for mentor_key in possible_mentors:
-        mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
-        mentor_names.append(mentor.name())
+        possible_mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
+        mentor_names.append(possible_mentor.name())
 
       context['possible_mentors'] = ', '.join(mentor_names)
 
+    # TODO(ljvderijk) listing of total given scores per mentor
+    # a dict with key as role.user ?
+
+    # get the public reviews
+    fields = {'scope': entity,
+              'is_public': True}
+
+    order = ['modified']
+
+    query = review_logic.getQueryForFields(filter=fields, order=order)
+    context['public_reviews'] = review_logic.getAll(query)
+
+    # get the private reviews
+    fields['is_public'] = False
+
+    query = review_logic.getQueryForFields(filter=fields, order=order)
+    context['private_reviews'] = review_logic.getAll(query)
+
+    # which button should we show to the mentor?
     if mentor:
       if mentor.key() in possible_mentors:
         # show "No longer willing to mentor"
@@ -536,7 +579,7 @@ class View(base.View):
         # show "I am willing to mentor"
         context['add_me_as_mentor'] = True
 
-    return responses.respond(request, template, context=context)
+    return context
 
   def _adjustPossibleMentors(self, entity, mentor, choice):
     """Adjusts the possible mentors list for a proposal.
@@ -592,6 +635,43 @@ class View(base.View):
     # update the proposal
     properties = {'mentor': mentor_entity}
     self._logic.updateEntityProperties(entity, properties)
+
+  def _createReviewFor(self, entity, reviewer, comment, score, is_public):
+    """Creates a review for the given proposal.
+
+    Args:
+      entity: Student Proposal entity for which the review should be created
+      reviewer: A role entity of the reviewer (if possible, else None)
+      comment: The textual contents of the review
+      score: The score of the review (only used if the review is not public)
+      is_public: Determines if the review is a public review
+
+    Returns:
+      - The newly created review
+    """
+
+    import time
+
+    from soc.logic.models.review import logic as review_logic
+
+    # create the fields for the review entity
+    fields = {'link_id': 't%i' %(time.time()),
+        'scope': entity,
+        'scope_path': entity.key().name(),
+        'author': user_logic.logic.getForCurrentAccount(),
+        'content': comment,
+        'is_public': is_public,
+        'reviewer': reviewer
+        }
+
+    # add the given score if the review is not public
+    if not is_public:
+      fields['score'] = score
+
+    key_name = review_logic.getKeyNameFromFields(fields)
+
+    return review_logic.updateOrCreateFromKeyName(fields, key_name)
+
 
 view = View()
 

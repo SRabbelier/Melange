@@ -91,6 +91,9 @@ class View(presence.View):
         (r'^%(url_name)s/(?P<access_type>assign_slots)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.assign_slots',
           'Assign slots'),
+        (r'^%(url_name)s/(?P<access_type>slots)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.slots',
+          'Assign slots'),
         ]
 
     new_params['extra_django_patterns'] = patterns
@@ -145,6 +148,30 @@ class View(presence.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def slots(self, request, acces_type, page_name=None, params=None, **kwargs):
+    """Returns a JSON object with all orgs allocation.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View, not used
+    """
+
+    program = program_logic.logic.getFromKeyFields(kwargs)
+
+    filter = {
+        'scope': program,
+        }
+
+    query = org_logic.logic.getQueryForFields(filter=filter)
+    entities = org_logic.logic.getAll(query)
+    data = [i.toDict() for i in entities]
+
+    return self.json(request, data)
 
   @decorators.merge_params
   @decorators.check_access
@@ -375,5 +402,6 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
+slots = decorators.view(view.slots)
 home = decorators.view(view.home)
 pick = decorators.view(view.pick)

@@ -52,7 +52,7 @@ class Organization(soc.models.group.Group):
   ideas.example_text = ugettext('For instance a link to a Melange public '
       'document or some other URL')
 
-  slots = db.IntegerProperty(required=False,
+  slots = db.IntegerProperty(required=False, default=0,
       verbose_name=ugettext('Slots allocated'))
   slots.help_text = ugettext(
       'The amount of slots allocated to this organization.')

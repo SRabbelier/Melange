@@ -156,6 +156,8 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
 
+    new_params['disallow_last_resign'] = False
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -434,12 +436,29 @@ class View(base.View):
     resign = get_dict.get('resign')
 
     if resign == 'true':
-      # change the status of this role_entity to invalid
-      fields = {'status': 'invalid'}
-      logic.updateEntityProperties(role_entity, fields)
 
-      # redirect to the roles listing
-      return http.HttpResponseRedirect(redirect)
+      if params.get('disallow_last_resign'):
+        # check if the current role is the last for this scope
+        fields = {'scope': role_entity.scope,
+            'status': 'active'}
+        roles = logic.getForFields(fields, limit=2)
+
+        # if there is more then one left we can safely resign
+        resign = len(roles) > 1
+      else:
+        resign = True
+
+      if resign:
+        # change the status of this role_entity to invalid
+        fields = {'status': 'invalid'}
+        logic.updateEntityProperties(role_entity, fields)
+
+        # redirect to the roles listing
+        return http.HttpResponseRedirect(redirect)
+      else:
+        # show error to the user
+        context['not_allowed_to_resign'] = ugettext("This user can't be "
+            "resigned, please make sure it's not the last %(name)s." % params)
 
     # set the appropriate context
     context['entity'] = role_entity

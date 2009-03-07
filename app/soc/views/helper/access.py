@@ -577,7 +577,10 @@ class Checker(object):
 
     self.checkIsLoggedIn()
 
-    if not self.user and not user_logic.isFormerAccount(self.id):
+    fields = {'account': self.id}
+    user_entity = user_logic.getForFields(fields, unique=True)
+
+    if not user_entity and not user_logic.isFormerAccount(self.id):
       # this account has not been used yet
       return
 

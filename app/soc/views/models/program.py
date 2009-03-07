@@ -31,6 +31,7 @@ from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import mentor as mentor_logic
+from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
@@ -39,6 +40,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import presence
@@ -83,6 +85,16 @@ class View(presence.View):
 
     new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement',
         'mentor_agreement', 'student_agreement']
+
+    patterns = []
+    patterns += [
+        (r'^%(url_name)s/(?P<access_type>assign_slots)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.assign_slots',
+          'Assign slots'),
+        ]
+
+    new_params['extra_django_patterns'] = patterns
+
 
     # TODO add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynaproperties'] = {
@@ -133,6 +145,29 @@ class View(presence.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def assignSlots(self, request, access_type, page_name=None,
+           params=None, **kwargs):
+    """View that allows to assign slots to orgs.
+    """
+
+    from soc.views.models import organization as organization_view
+    params = organization_view.view.getParams()
+    params['list_heading'] = 'soc/program/allocation/heading.html'
+    params['list_row'] = 'soc/program/allocation/row.html'
+
+    program = program_logic.logic.getFromKeyFields(kwargs)
+
+    filter = {
+        'scope': program,
+        }
+
+    content = lists.getListContent(request, params, filter=filter)
+    contents = [content]
+
+    return self._list(request, params, contents, page_name)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().
@@ -333,6 +368,7 @@ class View(presence.View):
 view = View()
 
 admin = decorators.view(view.admin)
+assign_slots = decorators.view(view.assignSlots)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)

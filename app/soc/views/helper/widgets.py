@@ -174,19 +174,22 @@ class AgreementField(widgets.Widget):
   HTML_CODE = """
   <span style="width:450px" colspan="4">
     <div id="ToS" style="overflow:auto;height:500px">
-      %s
+      %(text)s
     </div>
   </span>
+  %(url)s
   """
 
   def __init__(self, *args, **kwargs):
     self.text = "No Agreement Text Specified"
+    self.url = ""
     super(AgreementField, self).__init__(*args, **kwargs)
 
   def render(self, name, value, attrs=None):
     """
     """
 
+    url = '<a href="%s">Full Text</a>' % self.url if self.url else ""
     value = self.text.replace('\n', '<BR />')
-    result = self.HTML_CODE % value
+    result = self.HTML_CODE % {'url': url, 'text': value}
     return result

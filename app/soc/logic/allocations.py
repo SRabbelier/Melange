@@ -181,8 +181,8 @@ class Allocator(object):
 
       if org in locked_orgs:
         slots = locked_slots[org]
-      else:
-        weight = float(org_applications_count) / unallocated_applications_count
+      elif unallocated_applications_count:
+        weight = float(org_applications_count) / float(unallocated_applications_count)
         slots = int(math.floor(weight*available_slots))
 
       if org in adjusted_orgs:
@@ -226,7 +226,7 @@ class Allocator(object):
 
     # adjust the orgs in need of adjusting
     for org in adjusted_orgs:
-      slots = adjusted_slots[org]
+      slots = float(adjusted_slots[org])
 
       adjustment = (float(total_popularity)/float(available_slots))*slots
       adjustment = int(math.ceil(adjustment))

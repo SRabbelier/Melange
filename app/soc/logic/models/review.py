@@ -42,4 +42,20 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+  def getReviewsForEntity(self, entity, is_public, order=None):
+    """Returns the reviews that have the given entity as scope.
+    
+    Args:
+      entity: the entity which is the scope of the review
+      is_public: determines if the public or non-public reviews are returned
+      order: the optional ordering in which the reviews are returned
+    """
+
+    fields = {'scope': entity,
+              'is_public': is_public}
+
+    query = self.getQueryForFields(fields, order)
+
+    return self.getAll(query)
+
 logic = Logic()

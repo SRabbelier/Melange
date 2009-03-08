@@ -238,11 +238,11 @@ class View(presence.View):
 
     from soc.views.models import organization as organization_view
 
-    params = organization_view.view.getParams()
-    params['list_template'] = 'soc/program/allocation/allocation.html'
-    params['list_heading'] = 'soc/program/allocation/heading.html'
-    params['list_row'] = 'soc/program/allocation/row.html'
-    params['list_pagination'] = 'soc/list/no_pagination.html'
+    org_params = organization_view.view.getParams()
+    org_params['list_template'] = 'soc/program/allocation/allocation.html'
+    org_params['list_heading'] = 'soc/program/allocation/heading.html'
+    org_params['list_row'] = 'soc/program/allocation/row.html'
+    org_params['list_pagination'] = 'soc/list/no_pagination.html'
 
     program = program_logic.logic.getFromKeyFields(kwargs)
 
@@ -251,7 +251,7 @@ class View(presence.View):
         'status': 'active',
         }
 
-    content = lists.getListContent(request, params, filter=filter)
+    content = lists.getListContent(request, org_params, filter=filter)
     contents = [content]
 
     context = {
@@ -260,7 +260,7 @@ class View(presence.View):
         'uses_slot_allocator': True
         }
 
-    return self._list(request, params, contents, page_name, context)
+    return self._list(request, org_params, contents, page_name, context)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().

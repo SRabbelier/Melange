@@ -363,7 +363,7 @@ class View(base.View):
     return responses.respond(request, template, context=context)
 
   def updatePublicContext(self, context, entity, params):
-    """Updates the context for the public page with information from the entity
+    """Updates the context for the public page with information from the entity.
 
     Args:
       context: the context that should be updated
@@ -636,7 +636,7 @@ class View(base.View):
 
   def _getDefaultReviewContext(self, entity, org_admin,
                                mentor):
-    """Returns the default context for the review page
+    """Returns the default context for the review page.
 
     Args:
       entity: Student Proposal entity

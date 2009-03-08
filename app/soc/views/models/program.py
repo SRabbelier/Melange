@@ -74,6 +74,8 @@ class View(presence.View):
         host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
+    rights['assign_slots'] = ['checkIsDeveloper']
+    rights['slots'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic

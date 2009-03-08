@@ -197,3 +197,13 @@ def groupby(target, group_key):
     result[key_value].append(value)
 
   return result
+
+def groupDictBy(target, key, new_key=None):
+  """Groups a dictionary by a key.
+  """
+
+  if not new_key:
+    new_key = key
+
+  result = ((k, v[new_key]) for k, v in target.iteritems() if v[key])
+  return dict(result)

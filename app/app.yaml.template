@@ -35,9 +35,12 @@ handlers:
 
 - url: /ghop/content
   static_dir: ghop/content
- 
+
 - url: /jquery
   static_dir: jquery
+
+- url: /json
+  static_dir: json
 
 - url: /.*
   script: main.py

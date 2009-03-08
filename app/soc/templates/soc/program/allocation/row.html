@@ -1,5 +1,6 @@
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" name="name">
   <td><div class="name">{{ list.item.name }}</div></td>
+  <td><div class="desired">{{ list.item.slots_desired }}</div></td>
   <td>
       <div class="locked" id="locked_slot_count_{{ list.item.link_id }}">
       <input type="checkbox" id="id_locked_slot_{{ list.item.link_id }}"

@@ -30,7 +30,7 @@ import soc.models.review
 
 
 class Logic(base.Logic):
-  """Logic methods for the comment model
+  """Logic methods for the review model.
   """
 
   def __init__(self, model=soc.models.review.Review,

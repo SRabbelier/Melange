@@ -22,9 +22,11 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
+
 from google.appengine.ext import db
 
 import soc.models.comment
+
 
 class Review(soc.models.comment.Comment):
   """Model of a Review.

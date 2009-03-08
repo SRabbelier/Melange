@@ -179,16 +179,8 @@ class View(presence.View):
       # filter out all orgs where the link_id is 'undefined'
       orgs = dict( ((k,v) for k, v in from_json if k != 'undefined'))
 
-      items = orgs.iteritems()
-
-      # whether the org has it's allocations locked
-      locked = ((k, v['slots']) for k, v in items if v['locked'])
-
-      # the adjustement for the org
-      adjusted = ((k, v['adjustment']) for k, v in items if v['adjustment'])
-
-      locked_slots = dict(locked)
-      adjusted_slots = dict(adjusted)
+      locked_slots = dicts.groupDictBy(orgs, 'locked', 'slots')
+      adjusted_slots = dicts.groupDictBy(orgs, 'adjustment')
     else:
       filter = {
           'scope': program,

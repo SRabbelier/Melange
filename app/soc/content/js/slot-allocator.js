@@ -19,6 +19,7 @@ $.postJSON = function (post_url, to_json, callback) {
         processData: true,
         data: {result: JSON.stringify(to_json)},
         contentType: 'application/json',
+        dataType: 'json',
         success: callback,
     });
 };

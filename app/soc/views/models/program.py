@@ -23,9 +23,12 @@ __authors__ = [
   ]
 
 
+from django import http
 from django import forms
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
+from soc.logic import allocations
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
@@ -162,14 +165,65 @@ class View(presence.View):
     """
 
     program = program_logic.logic.getFromKeyFields(kwargs)
+    slots = program.slots
 
-    filter = {
-        'scope': program,
-        }
+    if request.method == 'POST' and 'result' in request.POST:
+      result = request.POST['result']
 
-    query = org_logic.logic.getQueryForFields(filter=filter)
-    entities = org_logic.logic.getAll(query)
-    data = [i.toDict() for i in entities]
+      from_json = simplejson.loads(result).iteritems()
+
+      # filter out all orgs where the link_id is 'undefined'
+      orgs = dict( ((k,v) for k, v in from_json if k != 'undefined'))
+
+      items = orgs.iteritems()
+
+      # whether the org has it's allocations locked
+      locked = ((k, v['slots']) for k, v in items if v['locked'])
+
+      # the adjustement for the org
+      adjusted = ((k, v['adjustment']) for k, v in items if v['adjustment'])
+
+      locked_slots = dict(locked)
+      adjusted_slots = dict(adjusted)
+    else:
+      filter = {
+          'scope': program,
+          }
+
+      query = org_logic.logic.getQueryForFields(filter=filter)
+      entities = [i.toDict() for i in org_logic.logic.getAll(query)]
+
+      # group orgs by link_id
+      orgs = dict( ((i['link_id'], i) for i in entities) )
+
+      # default to no orgs locked nor adjusted
+      locked_slots = adjusted_slots = {}
+
+    # TODO(Lennard): use real data here
+    applications = dict( ((i, [1, 2]) for i in orgs.keys()) )
+    mentors = dict( ((i, 1000) for i in orgs.keys()) )
+
+    # TODO: Use configuration variables here
+    max_slots_per_org = 40
+    min_slots_per_org = 2
+    iterative = False
+
+    allocator = allocations.Allocator(orgs, applications, mentors,
+                                      slots, max_slots_per_org,
+                                      min_slots_per_org, iterative)
+
+    result = allocator.allocate(locked_slots, adjusted_slots)
+
+    data = []
+
+    for link_id, count in result.iteritems():
+      org = orgs[link_id]
+      data.append({
+          'link_id': link_id,
+          'slots': count,
+          'locked': org['locked'] if 'locked' in org else 0,
+          'adjustment': org['adjustment'] if 'adjustment' in org else 0,
+          })
 
     return self.json(request, data)
 
@@ -181,20 +235,30 @@ class View(presence.View):
     """
 
     from soc.views.models import organization as organization_view
+
     params = organization_view.view.getParams()
+    params['list_template'] = 'soc/program/allocation/allocation.html'
     params['list_heading'] = 'soc/program/allocation/heading.html'
     params['list_row'] = 'soc/program/allocation/row.html'
+    params['list_pagination'] = 'soc/list/no_pagination.html'
 
     program = program_logic.logic.getFromKeyFields(kwargs)
 
     filter = {
         'scope': program,
+        'status': 'active',
         }
 
     content = lists.getListContent(request, params, filter=filter)
     contents = [content]
 
-    return self._list(request, params, contents, page_name)
+    context = {
+        'total_slots': program.slots,
+        'uses_json': True,
+        'uses_slot_allocator': True
+        }
+
+    return self._list(request, params, contents, page_name, context)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().

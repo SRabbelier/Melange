@@ -269,6 +269,14 @@ def getStudentProposalRedirect(entity, params):
   return result
 
 
+def getSlotsRedirect(entity, params):
+  """Returns the student proposal redirect for the given org and student.
+  """
+
+  return'/%s/slots/%s' % (
+      params['url_name'], entity.key().name())
+
+
 def getCreateDocumentRedirect(entity, prefix):
   """Returns the redirect for new documents.
   """

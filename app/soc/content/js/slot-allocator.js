@@ -39,14 +39,14 @@ function updateFromJSON(data) {
 }
 
 function retrieveJSON() {
-  $.getJSON("http://localhost:8080/program/slots/google/gsoc2009?_="+(new Date().getTime()),
+  $.getJSON(RETURN_URL+"?_="+(new Date().getTime()),
     updateFromJSON
   );
 }
 
 function reCalculate() {
-  url = "http://localhost:8080/program/slots/google/gsoc2009?_="+(new Date().getTime())
-   $.postJSON(url, current_slots, updateFromJSON);
+  url = RETURN_URL+"?_="+(new Date().getTime())
+  $.postJSON(url, current_slots, updateFromJSON);
 }
 
 function updateOverlay() {

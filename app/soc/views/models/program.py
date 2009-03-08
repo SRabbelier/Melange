@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+import os
+
 from django import http
 from django import forms
 from django.utils import simplejson
@@ -254,10 +256,16 @@ class View(presence.View):
     content = lists.getListContent(request, org_params, filter=filter)
     contents = [content]
 
+    return_url =  "http://%(host)s%(index)s" % {
+      'host' : os.environ['HTTP_HOST'],
+      'index': redirects.getSlotsRedirect(program, params)
+      }
+
     context = {
         'total_slots': program.slots,
         'uses_json': True,
-        'uses_slot_allocator': True
+        'uses_slot_allocator': True,
+        'return_url': return_url,
         }
 
     return self._list(request, org_params, contents, page_name, context)

@@ -5,6 +5,7 @@
 
 <script type="text/javascript">
   var MAX_AVAILABLE_SLOTS = {{ total_slots }};
+  var RETURN_URL = "{{ return_url }}";
   $(document).ready(function(){
     $('[id^=id_spin_slot_count_]').spin({min:0, max:MAX_AVAILABLE_SLOTS});
     $('[id^=id_spin_adjustment_count_]').spin();

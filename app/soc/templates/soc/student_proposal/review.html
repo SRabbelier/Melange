@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
 {% load comments_helpers %}
+{% load forms_helpers %}
 
 {% block header_title %}
 {{ page_name }} "{{ entity.title }}" from {{ student_name }} (Score: {{ entity.score }})
@@ -32,17 +32,17 @@ limitations under the License.
   {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
  </table>
 </p>
-<hr>
+<hr/>
 <b>Public Reviews</b>
 {% for review in public_reviews %}
   {% as_review review %}
 {% endfor %}
-<hr>
+<hr/>
 <b>Private Reviews</b>
 {% for review in private_reviews %}
   {% as_review review %}
 {% endfor %}
-<hr>
+<hr/>
 
 <form method="POST">
   <table>

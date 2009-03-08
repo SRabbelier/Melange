@@ -58,7 +58,10 @@ class Logic(base.Logic):
     super(Logic, self)._onCreate(entity)
 
   def _updateField(self, entity, entity_properties, name):
-    """Update the ranker if the score changes and keep the score within bounds.
+    """Called when the fields of the student_proposal are updated.
+
+      - Update the ranker if the score changes and keep the score within bounds
+      - Remove the entity from the ranker when the status changes to invalid or rejected
     """
 
     value = entity_properties[name]
@@ -78,6 +81,19 @@ class Logic(base.Logic):
       ranker = ranker_root_logic.getRootFromEntity(ranker_root)
       ranker.SetScore(entity.key().name(), [value])
 
+    if name == 'status':
+
+      if value in ['invalid', 'rejected'] and entity.status != value:
+        # the proposal is going into invalid or rejected state
+        # remove the score from the ranker
+        fields = {'link_id': student_proposal.DEF_RANKER_NAME,
+                  'scope': entity.org}
+
+        ranker_root = ranker_root_logic.getForFields(fields, unique=True)
+        ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+
+        # entries in the ranker can be removed by setting the score to None
+        ranker.SetScore(entity.key().name(), None)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 

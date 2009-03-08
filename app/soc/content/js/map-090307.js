@@ -17,7 +17,7 @@ role_profile_gmap = new function(){
   var country_zoom = 4;
   var state_zoom = 6;
   var city_zoom = 10;
-  var postalcode_zoom = 12;
+  var address_zoom = 13;
 
   // Do not add a starting # as this JQuery selector seems 
   // incompatible with GMap API
@@ -28,6 +28,10 @@ role_profile_gmap = new function(){
   // Need to save old values to avoid unwanted updating 
   // of lat and lot if marker dragged and blur another time an address field
   var address = {
+    street: {
+      id: "#id_res_street",
+      old_value: ""
+    },
     city: {
       id: "#id_res_city",
       old_value: ""
@@ -96,7 +100,7 @@ role_profile_gmap = new function(){
             saveOldAddress();
             // Set the new zoom, map center and marker coords
             var zoom_set = world_zoom;
-            if ($(address.postalcode.id).val()!="") zoom_set = postalcode_zoom;
+            if ($(address.street.id).val()!="") zoom_set = address_zoom;
             else if ($(address.city.id).val()!="") zoom_set = city_zoom;
             else if ($(address.state.id).val()!="") zoom_set = state_zoom;
             else if ($(address.country.id).val()!="") zoom_set = country_zoom;

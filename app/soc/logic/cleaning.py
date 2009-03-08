@@ -463,9 +463,10 @@ def validate_new_group(link_id_field, scope_path_field,
       # get the current user
       user_entity = user_logic.getForCurrentAccount()
 
-      # make sure it's not the applicant creating the new group
-      if group_app_entity and (
-          group_app_entity.applicant.key() != user_entity.key()):
+      # if the proposal has not been accepted or it's not the applicant
+      # creating the new group then show link ID in use message
+      if group_app_entity and (group_app_entity.status != 'accepted' or (
+          group_app_entity.applicant.key() != user_entity.key())):
         # add the error message to the link id field
         self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
         del cleaned_data[link_id_field]

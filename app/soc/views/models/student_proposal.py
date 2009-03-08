@@ -163,6 +163,23 @@ class View(base.View):
 
     params['student_create_form'] = student_create_form
 
+    # create the special form for public review
+    dynafields = [
+        {'name': 'comment',
+         'base': forms.CharField,
+         'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
+         'label': 'Comment',
+         'required': False,
+         },
+         ]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    public_review_form = dynaform.newDynaForm(dynamodel=None, 
+        dynabase=helper.forms.BaseForm, dynainclude=None, 
+        dynaexclude=None, dynaproperties=dynaproperties)
+    params['public_review_form'] = public_review_form
+
     # create the special form for mentors
     dynafields = [
         {'name': 'score',
@@ -250,8 +267,108 @@ class View(base.View):
     # explicitly change the last_modified_on since the content has been edited
     fields['last_modified_on'] = datetime.datetime.now()
 
-  def _public(self, request, entity, context):
-    """See base.View._public().
+  @decorators.merge_params
+  @decorators.check_access
+  def public(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """View in which the student can see and reply to the comments on the
+       Student Proposal.
+
+    For params see base.view.Public().
+    """
+
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'], context=context)
+
+    context['entity'] = entity
+    context['entity_type'] = params['name']
+    context['entity_type_url'] = params['url_name']
+
+    if request.method == 'POST':
+      return self.publicPost(request, context, params, entity, **kwargs)
+    else: # request.method == 'GET'
+      return self.publicGet(request, context, params, entity, **kwargs)
+
+  def publicPost(self, request, context, params, entity, **kwargs):
+    """Handles the POST request for the entity's public page.
+
+    Args:
+        entity: the student proposal entity
+        rest: see base.View.public()
+    """
+
+    # populate the form using the POST data
+    form = params['public_review_form'](request.POST)
+
+    if not form.is_valid():
+      # get some entity specific context
+      self.updatePublicContext(context, entity, params)
+
+      # return the invalid form response
+      return self._constructResponse(request, entity=entity, context=context,
+          form=form, params=params, template=params['public_template'])
+
+    # get the commentary
+    fields = form.cleaned_data
+    comment = fields['comment']
+
+    if comment:
+      # create a new public review containing the comment
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      if user_entity.key() == entity.scope.user.key():
+        # student is posting
+        reviewer = entity.scope
+      else:
+        # check if the person commenting is an org_admin
+        # or a mentor for the given proposal
+        fields = {'user': user_entity,
+                  'scope': entity.org,
+                  'status': 'active',
+                  }
+
+        reviewer = org_admin_logic.logic.getForFields(fields, unique=True)
+
+        if not reviewer:
+          # no org_admin found, maybe it's a mentor?
+          reviewer = mentor_logic.logic.getForFields(filter, unique=True)
+
+      # create the review (reviewer might be None if a Host or Developer is posting)
+      self._createReviewFor(entity, reviewer, comment, is_public=True)
+
+    # redirect to the same page
+    return http.HttpResponseRedirect('')
+
+  def publicGet(self, request, context, params, entity, **kwargs):
+    """Handles the GET request for the entity's public page.
+
+    Args:
+        entity: the student proposal entity
+        rest see base.View.public()
+    """
+
+    # get some entity specific context
+    self.updatePublicContext(context, entity, params)
+
+    context['form'] = params['public_review_form']()
+    template = params['public_template']
+
+    return responses.respond(request, template, context=context)
+
+  def updatePublicContext(self, context, entity, params):
+    """Updates the context for the public page with information from the entity
+
+    Args:
+      context: the context that should be updated
+      entity: a student proposal_entity used to set context
+      params: dict with params for the view using this context
     """
 
     from soc.logic.models.review import logic as review_logic
@@ -632,7 +749,7 @@ class View(base.View):
     properties = {'mentor': mentor_entity}
     self._logic.updateEntityProperties(entity, properties)
 
-  def _createReviewFor(self, entity, reviewer, comment, score, is_public):
+  def _createReviewFor(self, entity, reviewer, comment, score=0, is_public=True):
     """Creates a review for the given proposal.
 
     Args:

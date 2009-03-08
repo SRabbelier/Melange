@@ -21,11 +21,14 @@ limitations under the License.
 {% block body %}
 <p>
 <div="text"> 
-This is a request from {{ entity.link_id }} to become a {{ entity.role_verbose }} for {{entity.scope.name }}. 
-Please select your response.
+{% ifequal request_status "new" %}
+  This is a request from <b>{{ entity.link_id }}</b> to become a 
+  <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.</br>
+  Please select your response by using the buttons below.
 </div>
 </p>
 
+<table>
 <tr>
   <td>
     <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=group_accepted'" value="Accept"/>
@@ -34,5 +37,22 @@ Please select your response.
   </td>
 </tr>
 </table>
+{% else %}
+<p>
+<div="text"> 
+  This is a invite to <b>{{ entity.link_id }}</b> to become a 
+  <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.<br/> 
+  If you would like to withdraw this invite please press the withdraw button below.
+</div>
+</p>
 
-{% endblock %}
+<table>
+<tr>
+  <td>
+    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Withdraw"/>
+    <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
+  </td>
+</tr>
+</table>
+{% endifequal %}
+{% endblock body %}

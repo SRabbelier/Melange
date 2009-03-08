@@ -603,9 +603,9 @@ class View(base.View):
         'scope_path': kwargs['scope_path'],
         'role': params['module_name']}
     request_entity = request_logic.logic.getForFields(fields, unique=True)
-    
+
     get_dict = request.GET
-    
+
     if 'status' in get_dict.keys():
       if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
         # update the request_entity and redirect away from this page
@@ -630,6 +630,7 @@ class View(base.View):
 
     # put the entity in the context
     context['entity'] = request_entity
+    context['request_status'] = request_entity.status 
     context['module_name'] = params['module_name']
 
     #display the request processing page using the appropriate template

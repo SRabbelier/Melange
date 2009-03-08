@@ -254,12 +254,12 @@ class View(base.View):
     """See base.View._public().
     """
 
+    from soc.logic.models.review import logic as review_logic
+
     context['student_name'] = entity.scope.name()
 
-    if entity.mentor:
-      context['mentor_name'] = entity.mentor.name()
-    else:
-      context['mentor_name'] = "No mentor assigned"
+    context['public_reviews'] = review_logic.getReviewsForEntity(entity,
+        is_public=True, order=['created'])
 
   @decorators.merge_params
   @decorators.check_access
@@ -555,20 +555,16 @@ class View(base.View):
     # TODO(ljvderijk) listing of total given scores per mentor
     # a dict with key as role.user ?
 
+    # order the reviews by ascending creation date
+    order = ['created']
+
     # get the public reviews
-    fields = {'scope': entity,
-              'is_public': True}
-
-    order = ['modified']
-
-    query = review_logic.getQueryForFields(filter=fields, order=order)
-    context['public_reviews'] = review_logic.getAll(query)
+    context['public_reviews'] = review_logic.getReviewsForEntity(entity,
+        is_public=True, order=order)
 
     # get the private reviews
-    fields['is_public'] = False
-
-    query = review_logic.getQueryForFields(filter=fields, order=order)
-    context['private_reviews'] = review_logic.getAll(query)
+    context['private_reviews'] = review_logic.getReviewsForEntity(entity,
+        is_public=False, order=order)
 
     # which button should we show to the mentor?
     if mentor:

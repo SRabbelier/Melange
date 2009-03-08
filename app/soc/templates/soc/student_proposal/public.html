@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load comments_helpers %}
 {% load forms_helpers %}
 
 {% block header_title %}
@@ -23,11 +24,17 @@ limitations under the License.
  <table>
   {% readonly_field_as_table_row entity.fields.title.label entity.title %}
   {% readonly_field_as_table_row "Student" student_name %}
-  {% readonly_field_as_table_row "Mentor" mentor_name %}
   {% readonly_field_as_twoline_table_row entity.fields.abstract.label entity.abstract %}
   {% readonly_safe_field_as_twoline_table_row entity.fields.content.label entity.content %}
   {% readonly_field_as_table_row "Created on" entity.created_on %}
   {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
  </table>
 </p>
+
+<hr/>
+<b>Public Reviews</b>
+{% for review in public_reviews %}
+  {% as_review review %}
+{% endfor %}
+<hr/>
 {% endblock %}

@@ -210,7 +210,7 @@ class View(group_app.View):
         # use the accepted template and subject
         template = params['accepted_mail_template']
         context['subject'] = 'Congratulations!'
-        context['HTTP_host'] = os.environ['HTTP_HOST']
+        context['HTTP_host'] = 'http://%s' %(os.environ['HTTP_HOST'])
       elif status == 'rejected':
         # use the rejected template and subject
         template = params['rejected_mail_template']

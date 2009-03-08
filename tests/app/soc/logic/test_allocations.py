@@ -69,57 +69,21 @@ class AllocationsTest(unittest.TestCase):
     self.iterative = False
 
     apps = {
-        'asf': self.allocate(20, 20),
-        'gcc': self.allocate(15, 30),
-        'git': self.allocate(6, 6),
-        'google': self.allocate(3, 10),
-        'melange': self.allocate(100, 3),
+        'asf': (20, 20),
+        'gcc': (15, 50),
+        'git': (6, 6),
+        'google': (3, 10),
+        'melange': (100, 3),
         }
 
-    self.applications = dict([(k,a) for k, (m, a) in apps.iteritems()])
-    self.mentors = dict([(k,m) for k, (m, a) in apps.iteritems()])
+    self.popularity = dict([(k,a) for k, (a, m) in apps.iteritems()])
+    self.mentors = dict([(k,m) for k, (a, m) in apps.iteritems()])
 
-    self.orgs = self.applications.keys()
+    self.orgs = self.popularity.keys()
 
     self.allocater = allocations.Allocator(
-        self.orgs, self.applications, self.mentors, self.slots,
+        self.orgs, self.popularity, self.mentors, self.slots,
         self.max_slots_per_org, self.min_slots_per_org, self.iterative)
-
-  def allocate(self, count, max):
-    """Returns a list with count new student objects.
-    """
-
-    i = self.allocated
-    j = i + count
-    self.allocated += count
-
-    return max, [Student(i) for i in range(i,j)]
-
-  def testAllocate(self):
-    """Test that the allocate helper works properly.
-
-    A meta-test, it never hurts to be certain.
-    """
-
-    stash = self.allocated
-    self.allocated = 0
-
-    expected = [Student(0), Student(1), Student(2)]
-    count, actual = self.allocate(3, 0)
-    self.failUnlessEqual(expected, actual)
-    self.failUnlessEqual(count, 0)
-
-    expected = []
-    count, actual = self.allocate(0, 10)
-    self.failUnlessEqual(expected, actual)
-    self.failUnlessEqual(count, 10)
-
-    expected = [Student(3)]
-    count, actual = self.allocate(1, 5)
-    self.failUnlessEqual(expected, actual)
-    self.failUnlessEqual(count, 5)
-
-    self.allocated = stash
 
   def testInitialAllocation(self):
     """Test that an allocation with no arguments does not crash.
@@ -220,7 +184,7 @@ class AllocationsTest(unittest.TestCase):
     with_adjusting = self.allocater.allocate(locked_slots, adjusted_slots)
     without_adjusting = self.allocater.allocate(locked_slots, {})
 
-    expected = without_adjusting['gcc']
+    expected = without_adjusting['gcc'] + 10
     actual = with_adjusting['gcc']
 
-    self.failUnless(actual > expected)
+    self.failIf(actual < expected, "%d < %d" % (actual, expected))

@@ -38,6 +38,7 @@ from soc.logic.models import host as host_logic
 from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
+from soc.logic.models import student_proposal as student_proposal_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models.document import logic as document_logic
@@ -171,33 +172,37 @@ class View(presence.View):
     program = program_logic.logic.getFromKeyFields(kwargs)
     slots = program.slots
 
+    filter = {
+          'scope': program,
+          'status': 'active',
+          }
+
+    query = org_logic.logic.getQueryForFields(filter=filter)
+    organizations = org_logic.logic.getAll(query)
+
+    locked_slots = adjusted_slots = {}
+
     if request.method == 'POST' and 'result' in request.POST:
       result = request.POST['result']
 
-      from_json = simplejson.loads(result).iteritems()
+      from_json = simplejson.loads(result)
 
-      # filter out all orgs where the link_id is 'undefined'
-      orgs = dict( ((k,v) for k, v in from_json if k != 'undefined'))
+      locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
+      adjusted_slots = dicts.groupDictBy(from_json, 'adjustment')
 
-      locked_slots = dicts.groupDictBy(orgs, 'locked', 'slots')
-      adjusted_slots = dicts.groupDictBy(orgs, 'adjustment')
-    else:
+    orgs = [i.link_id for i in organizations]
+    applications = {}
+    mentors = {}
+
+    for org in organizations:
       filter = {
-          'scope': program,
+          'org': org,
+          'status': ['new', 'pending']
           }
-
-      query = org_logic.logic.getQueryForFields(filter=filter)
-      entities = [i.toDict() for i in org_logic.logic.getAll(query)]
-
-      # group orgs by link_id
-      orgs = dict( ((i['link_id'], i) for i in entities) )
-
-      # default to no orgs locked nor adjusted
-      locked_slots = adjusted_slots = {}
-
-    # TODO(Lennard): use real data here
-    applications = dict( ((i, [1, 2]) for i in orgs.keys()) )
-    mentors = dict( ((i, 1000) for i in orgs.keys()) )
+      query = student_proposal_logic.logic.getQueryForFields(filter=filter)
+      proposals = student_proposal_logic.logic.getAll(query)
+      applications[org.link_id] = len(proposals)
+      mentors[org.link_id] = len([i for i in proposals if i.mentor != None])
 
     # TODO: Use configuration variables here
     max_slots_per_org = 40

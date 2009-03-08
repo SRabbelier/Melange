@@ -47,24 +47,19 @@ class Allocator(object):
   # the convenience of any mathematicians that happen to read this
   # piece of code ;).
 
-  def __init__(self, orgs, applications, mentors, slots,
+  def __init__(self, orgs, popularity, mentors, slots,
                max_slots_per_org, min_slots_per_org, iterative):
     """Initializes the allocator.
 
     Args:
       orgs: a list of all the orgs that need to be allocated
-      applications: a dictionary with for each org a list of applicants
+      popularity: the amount of applications per org
       mentors: the amount of assigned mentors per org
       slots: the total amount of available slots
       max_slots_per_org: how many slots an org should get at most
       min_slots_per_org: how many slots an org should at least get
     """
 
-    all_applications = []
-
-    for _, value in applications.iteritems():
-      all_applications += value
-    
     self.locked_slots = {}
     self.adjusted_slots = {}
     self.adjusted_orgs = []
@@ -74,9 +69,8 @@ class Allocator(object):
     self.max_slots_per_org = max_slots_per_org
     self.min_slots_per_org = min_slots_per_org
     self.orgs = set(orgs)
-    self.applications = applications
+    self.initial_popularity = popularity
     self.mentors = mentors
-    self.all_applications = set(all_applications)
     self.iterative = iterative
 
   def allocate(self, locked_slots, adjusted_slots):
@@ -92,6 +86,9 @@ class Allocator(object):
 
     self.buildSets()
 
+    if not sum(self.popularity.values()) or not sum(self.mentors.values()):
+      return {}
+
     if self.iterative:
       return self.iterativeAllocation()
     else:
@@ -101,8 +98,9 @@ class Allocator(object):
     """Allocates slots with the specified constraints
     """
 
+    popularity = self.initial_popularity.copy()
+
     # set s
-    all_applications = self.all_applications
     locked_slots = self.locked_slots
     adjusted_slots = self.adjusted_slots
 
@@ -112,16 +110,15 @@ class Allocator(object):
 
     # set a' and b'
     unlocked_orgs = self.orgs.difference(locked_orgs)
-    # unadjusted_orgs = self.orgs.difference(adjusted_orgs)
 
     # set a*b and a'*b'
     locked_and_adjusted_orgs = locked_orgs.intersection(adjusted_orgs)
-    
-    # unlocked_and_unadjusted_orgs = unlocked_orgs.intersection(unadjusted_orgs)
 
     # a+o and b+o should be o
     locked_orgs_or_orgs = self.orgs.union(locked_orgs)
     adjusted_orgs_or_orgs = self.orgs.union(adjusted_orgs)
+
+    total_popularity = sum(popularity.values())
 
     # an item can be only a or b, so a*b should be empty
     if locked_and_adjusted_orgs:
@@ -135,17 +132,11 @@ class Allocator(object):
     if len(adjusted_orgs_or_orgs) != len(self.orgs):
       raise Error("Unknown org as adjusted slot")
 
-    # set l and l'
-    locked_applications = set(itertools.chain(*locked_slots.keys()))
-    unlocked_applications = all_applications.difference(locked_applications)
-
     self.adjusted_orgs = adjusted_orgs
     self.unlocked_orgs = unlocked_orgs
     self.locked_orgs = locked_orgs
-    self.unlocked_applications = unlocked_applications
-
-    popularity = ((k, len(v)) for k, v in self.applications.iteritems())
-    self.popularity = dict(popularity)
+    self.popularity = popularity
+    self.total_popularity = total_popularity
 
   def rangeSlots(self, slots, org):
     """Returns the amount of slots for the org within the required bounds.
@@ -166,23 +157,20 @@ class Allocator(object):
     adjusted_slots = self.adjusted_slots
     locked_orgs = self.locked_orgs
     locked_slots = self.locked_slots
-    unlocked_applications = self.unlocked_applications
 
-    unlocked_applications_count = len(unlocked_applications)
-    unallocated_applications_count = unlocked_applications_count
+    unallocated_popularity = self.total_popularity - len(locked_slots)
 
     available_slots = self.slots
     allocations = {}
 
     for org in self.orgs:
-      org_applications = self.applications[org]
-      org_applications_count = len(org_applications)
+      popularity = self.popularity[org]
       mentors = self.mentors[org]
 
       if org in locked_orgs:
         slots = locked_slots[org]
-      elif unallocated_applications_count:
-        weight = float(org_applications_count) / float(unallocated_applications_count)
+      elif unallocated_popularity:
+        weight = float(popularity) / float(unallocated_popularity)
         slots = int(math.floor(weight*available_slots))
 
       if org in adjusted_orgs:
@@ -194,7 +182,7 @@ class Allocator(object):
 
       allocations[org] = slots
       available_slots -= slots
-      unallocated_applications_count -= org_applications_count
+      unallocated_popularity -= popularity
 
     return allocations
 
@@ -207,9 +195,7 @@ class Allocator(object):
     locked_orgs = self.locked_orgs
     locked_slots = self.locked_slots
     unlocked_orgs = self.unlocked_orgs
-    unlocked_applications = self.unlocked_applications
-
-    total_popularity = sum(self.popularity.values())
+    total_popularity = self.total_popularity
 
     available_slots = self.slots
     allocations = {}
@@ -223,6 +209,7 @@ class Allocator(object):
       total_popularity -= popularity
       available_slots -= slots
       allocations[org] = slots
+      del self.popularity[org]
 
     # adjust the orgs in need of adjusting
     for org in adjusted_orgs:
@@ -231,6 +218,7 @@ class Allocator(object):
       adjustment = (float(total_popularity)/float(available_slots))*slots
       adjustment = int(math.ceil(adjustment))
       self.popularity[org] += adjustment
+      total_popularity += adjustment
 
     # adjust the popularity so that the invariants are always met
     for org in unlocked_orgs:
@@ -248,9 +236,6 @@ class Allocator(object):
 
     # do the actual calculation
     for org in unlocked_orgs:
-      org_applications = self.applications[org]
-      org_applications_count = len(org_applications)
-
       popularity = self.popularity[org]
       raw_slots = (float(popularity)/float(total_popularity))*available_slots
       slots = int(math.floor(raw_slots))

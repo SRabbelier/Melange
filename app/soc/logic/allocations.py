@@ -151,7 +151,7 @@ class Allocator(object):
     """Returns the amount of slots for the org within the required bounds.
     """
 
-    slots = int(math.floor(slots))
+    slots = int(math.floor(float(slots)))
     slots = min(slots, self.max_slots_per_org)
     slots = max(slots, self.min_slots_per_org)
     slots = min(slots, self.mentors[org])

@@ -1,0 +1,23 @@
+{% extends "soc/models/list.html" %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script type="text/javascript">
+  var MAX_AVAILABLE_SLOTS = {{ total_slots }};
+  $(document).ready(function(){
+    $('[id^=id_spin_slot_count_]').spin({min:0, max:MAX_AVAILABLE_SLOTS});
+    $('[id^=id_spin_adjustment_count_]').spin();
+    $(tooltip).purr({usingTransparentPNG: true, isSticky: true});
+    $("#p_total_slots").html("<strong>Max slots:</strong> "+MAX_AVAILABLE_SLOTS);
+    retrieveJSON();
+  });
+</script>
+{% endblock %}
+
+{% block body %}
+
+<input type="button" class="button" onclick="javascript:reCalculate()" value="Recalculate slots" />
+
+{{ block.super }}
+{% endblock %}

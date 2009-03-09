@@ -108,10 +108,16 @@ class View(group_app.View):
         'contrib_template': forms.fields.CharField(
             widget=helper.widgets.FullTinyMCE(
                 attrs={'rows': 25, 'cols': 100})),
+        'description': forms.fields.CharField(
+            widget=helper.widgets.FullTinyMCE(
+                attrs={'rows': 25, 'cols': 100})),
         'admin_agreement': forms.fields.Field(required=False,
             widget=widgets.AgreementField),
         'agreed_to_admin_agreement': forms.fields.BooleanField(
             initial=False, required=True),
+
+        'clean_description': cleaning.clean_html_content('description'),
+        'clean_contrib_template': cleaning.clean_html_content('contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             model_logic.organization, org_app_logic)}

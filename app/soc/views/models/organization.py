@@ -252,7 +252,7 @@ class View(group.View):
     new_params['list_action'] = (redirects.getReviewRedirect, new_params)
 
     filter = {'org': org_entity,
-        'status': 'new'}
+              'status': 'new'}
 
     new_list = lists.getListContent(
         request, new_params, filter, idx=1)

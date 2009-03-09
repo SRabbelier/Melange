@@ -25,8 +25,8 @@ __authors__ = [
 
 import os
 
-from django import http
 from django import forms
+from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
@@ -169,7 +169,7 @@ class View(presence.View):
       params: a dict with params for this View, not used
     """
 
-    program = program_logic.logic.getFromKeyFields(kwargs)
+    program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
     slots = program.slots
 
     filter = {
@@ -243,7 +243,7 @@ class View(presence.View):
     org_params['list_row'] = 'soc/program/allocation/row.html'
     org_params['list_pagination'] = 'soc/list/no_pagination.html'
 
-    program = program_logic.logic.getFromKeyFields(kwargs)
+    program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
     filter = {
         'scope': program,

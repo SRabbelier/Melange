@@ -222,6 +222,23 @@ class Logic(object):
 
     return self._model.get_by_key_name(key_name)
 
+  def getFromKeyNameOr404(self, key_name):
+    """Like getFromKeyName but expects to find an entity.
+
+    Raises:
+      out_of_band.Error if no entity is found
+    """
+
+    entity = self.getFromKeyName(key_name)
+
+    if entity:
+      return entity
+
+    msg = ugettext('There is no "%(name)s" named %(key_name)s.') % {
+        'name': self._name, 'key_name': key_name}
+
+    raise out_of_band.Error(msg, status=404)
+
   def getFromKeyFields(self, fields):
     """Returns the entity for the specified key names, or None if not found.
 

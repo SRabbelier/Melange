@@ -159,9 +159,7 @@ class View(base.View):
     return logic.getFromKeyName(keyname)
 
   def _editSeed(self, request, seed):
-    """Checks if scope_path is seeded and puts it into to_user.
-
-    For parameters see base._editSeed()
+    """See base._editSeed().
     """
 
     scope_path = seed['scope_path']

@@ -50,7 +50,7 @@ DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
     "This organization is not active or doesn't exist.")
 
 DEF_NO_SUCH_DOCUMENT_MSG = ugettext(
-    "There is no such document with that link_id under this entity.")
+    "There is no such document with that link ID under this entity.")
 
 
 def check_field_is_empty(field_name):

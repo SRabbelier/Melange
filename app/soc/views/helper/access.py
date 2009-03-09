@@ -1081,7 +1081,7 @@ class Checker(object):
     if not django_args.get('scope_path'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
 
-    program_entity = program_logic.getFromKeyName(django_args['scope_path'])
+    program_entity = program_logic.getFromKeyNameOr404(django_args['scope_path'])
     user_entity = user_logic.getForCurrentAccount()
 
     filter = {'user': user_entity,
@@ -1137,7 +1137,7 @@ class Checker(object):
     else:
       key_name = django_args['scope_path']
 
-    program_entity = program_logic.getFromKeyName(key_name)
+    program_entity = program_logic.getFromKeyNameOr404(key_name)
     user_entity = user_logic.getForCurrentAccount()
 
     filter = {'user': user_entity,
@@ -1168,7 +1168,7 @@ class Checker(object):
     if not django_args.get('scope_path'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
 
-    org_entity = org_logic.getFromKeyName(django_args['scope_path'])
+    org_entity = org_logic.getFromKeyNameOr404(django_args['scope_path'])
     user_entity = user_logic.getForCurrentAccount()
 
     filter = {'scope': org_entity.scope,
@@ -1400,7 +1400,7 @@ class Checker(object):
 
     if key_name_field:
       key_name = django_args[key_name_field]
-      document = document_logic.getFromKeyName(key_name)
+      document = document_logic.getFromKeyNameOr404(key_name)
     else:
       document = document_logic.getFromKeyFieldsOr404(django_args)
 
@@ -1419,7 +1419,7 @@ class Checker(object):
 
     if key_name_field:
       key_name = django_args[key_name_field]
-      document = document_logic.getFromKeyName(key_name)
+      document = document_logic.getFromKeyNameOr404(key_name)
     else:
       document = document_logic.getFromKeyFieldsOr404(django_args)
 

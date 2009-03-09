@@ -168,10 +168,10 @@ class View(group_app.View):
 
     entity = program_logic.logic.getFromKeyName(scope_path)
 
-    agreement = entity.org_admin_agreement
-
-    if not (entity and agreement):
+    if not (entity and entity.org_admin_agreement):
       return
+
+    agreement = entity.org_admin_agreement
 
     content = agreement.content
     params = {'url_name': 'document'}

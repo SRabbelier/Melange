@@ -205,9 +205,6 @@ class View(role.View):
 
     agreement = entity.scope.mentor_agreement
 
-    if not (entity and agreement):
-      return
-
     content = agreement.content
     params = {'url_name': 'document'}
 

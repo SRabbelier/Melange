@@ -216,9 +216,6 @@ class View(role.View):
 
     agreement = entity.scope.org_admin_agreement
 
-    if not (entity and agreement):
-      return
-
     content = agreement.content
     params = {'url_name': 'document'}
 

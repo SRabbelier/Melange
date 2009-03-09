@@ -80,9 +80,8 @@ class StudentProposal(soc.models.linkable.Linkable):
   #: new : the proposal has not been ranked/scored yet
   #: pending: the proposal is in the process of being ranked/scored
   #: accepted: the proposal has been assigned a project slot
-  #: rejected: the proposal has not been assigned a slot or the organization
-  #: does not want this proposal.
-  #: invalid: the student or developer marked this as an invalid proposal.
+  #: rejected: the proposal has not been assigned a slot
+  #: invalid: the student or org admin marked this as an invalid proposal.
   status = db.StringProperty(required=True, default='new',
       choices=['new', 'pending', 'accepted', 'rejected', 'invalid'])
 

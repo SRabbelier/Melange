@@ -533,6 +533,16 @@ class View(base.View):
     if mentor_entity and choice:
       self._adjustPossibleMentors(entity, mentor_entity, choice)
 
+    is_ineligible = request.GET.get('ineligible')
+    if org_admin_entity and is_ineligible:
+      # mark the proposal invalid and return to the list
+      properties = {'status': 'invalid'}
+      self._logic.updateEntityProperties(entity, properties)
+
+      redirect = redirects.getListProposalsRedirect(entity.org,
+                                                    {'url_name': 'org'})
+      return http.HttpResponseRedirect(redirect)
+
     # decide which form to use
     if org_admin_entity:
       form = params['admin_review_form']
@@ -691,6 +701,9 @@ class View(base.View):
       else:
         # show "I am willing to mentor"
         context['add_me_as_mentor'] = True
+
+    if org_admin:
+      context['is_org_admin'] = True
 
     return context
 

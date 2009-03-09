@@ -189,7 +189,7 @@ class AgreementField(widgets.Widget):
     """
     """
 
-    url = '<a href="%s">Full Text</a>' % self.url if self.url else ""
+    url = '<a href="%s" target="_blank">Full Text</a>' % self.url if self.url else ""
     value = self.text.replace('\n', '<BR />')
     result = self.HTML_CODE % {'url': url, 'text': value}
     return result

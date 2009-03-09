@@ -137,7 +137,7 @@ def clean_agrees_to_tos(field_name):
     """
     agrees_to_tos = self.cleaned_data.get(field_name)
 
-    if not site_logic.getToS(site_logic.logic.getSingleton()):
+    if not site_logic.getToS(site_logic.getSingleton()):
       return agrees_to_tos
 
     # Site settings specify a site-wide ToS, so agreement is *required*

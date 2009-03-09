@@ -64,7 +64,7 @@ class View(group_app.View):
                        ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_self'] = ['checkIsUser']
-    rights['public'] = [('checkCanEditGroupApp',
+    rights['show'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic])]
     rights['review'] = ['checkIsHostForProgramInScope',
                         ('checkCanReviewGroupApp', [org_app_logic.logic])]

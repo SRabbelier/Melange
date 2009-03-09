@@ -56,7 +56,7 @@ class View(group_app.View):
                        [club_app_logic.logic])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_self'] = ['checkIsUser']
-    rights['public'] = [('checkCanEditGroupApp',
+    rights['show'] = [('checkCanEditGroupApp',
                          [club_app_logic.logic])]
     # TODO(ljvderijk) make sure host role check is fixed
     rights['review'] = [('checkHasActiveRoleForScope', host_logic.logic),

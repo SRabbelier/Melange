@@ -16,9 +16,11 @@
 """Common testing utilities.
 """
 
+
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
   ]
+
 
 class MockRequest(object):
   """Shared dummy request object to mock common aspects of a request.

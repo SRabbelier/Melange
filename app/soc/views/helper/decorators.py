@@ -47,6 +47,8 @@ def view(func):
   from soc.logic.helper import timeline
   from soc.logic.models.site import logic as site_logic
   from soc.logic.models.user import logic as user_logic
+  from soc.views import out_of_band
+  from soc.views.helper import responses
 
   @wraps(func)
   def view_wrapper(request, *args, **kwds):
@@ -73,6 +75,8 @@ def view(func):
     except AssertionError, exception:
       logging.exception(exception)
       return http.HttpResponseRedirect('/soc/content/assertion_error.html')
+    except out_of_band.Error, error:
+      return responses.errorResponse(error, request)
 
   return view_wrapper
 

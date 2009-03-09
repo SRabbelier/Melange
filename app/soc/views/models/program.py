@@ -101,7 +101,7 @@ class View(presence.View):
           'Assign slots'),
         (r'^%(url_name)s/(?P<access_type>slots)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.slots',
-          'Assign slots'),
+          'Assign slots (JSON)'),
         ]
 
     new_params['extra_django_patterns'] = patterns

@@ -48,7 +48,7 @@ class StudentProposal(soc.models.linkable.Linkable):
 
   #: required, text field used for different purposes,
   #: depending on the specific type of the proposal
-  abstract = db.StringProperty(required=True, multiline=True)
+  abstract = db.TextProperty(required=True)
   abstract.help_text = ugettext(
       'short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')

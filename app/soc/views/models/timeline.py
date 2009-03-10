@@ -87,8 +87,9 @@ class View(base.View):
            page_name=None, params=None, seed=None, **kwargs):
     """See base.View.edit.
     """
+
     params = dicts.merge(params, self._params)
-    
+
     # TODO(pawel.solyga): If program doesn't exist for timeline display
     # customized error message without pointing to 'Create Timeline'
 
@@ -96,7 +97,9 @@ class View(base.View):
 
     program = program_logic.logic.getFromKeyFields(key_fields)
     if program:
-      params['edit_form'] = params["edit_form_%s" % program.workflow]
+      workflow = program.workflow
+      params['edit_form'] = params["edit_form_%s" % workflow]
+      params['logic'] = program_logic.logic.TIMELINE_LOGIC[workflow]
 
     return super(View, self).edit(request, access_type, page_name=page_name,
                                   params=params, seed=seed, **kwargs)

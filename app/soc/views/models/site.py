@@ -39,6 +39,7 @@ from soc.views.models import presence_with_tos
 import soc.models.site
 import soc.logic.models.site
 import soc.logic.dicts
+import soc.logic.system
 
 
 class View(presence_with_tos.View):
@@ -109,6 +110,11 @@ class View(presence_with_tos.View):
     patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',
                   'soc.views.models.%(module_name)s.main_edit',
                   page_name)]
+
+    if soc.logic.system.isDebug():
+      patterns += [('^seed_db$', 'soc.models.seed_db.seed', "Seed DB"),
+                   ('^clear_db$', 'soc.models.seed_db.clear', "Clear DB"),
+                   ('^reseed_db$', 'soc.models.seed_db.reseed', "Reseed DB")]
 
     new_params['extra_django_patterns'] = patterns
 

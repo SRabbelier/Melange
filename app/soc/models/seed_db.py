@@ -29,6 +29,8 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
+from django import http
+
 from soc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.models import student_proposal
 from soc.models.document import Document
@@ -323,7 +325,7 @@ def seed(*args, **kwargs):
 
   memcache.flush_all()
 
-  return
+  return http.HttpResponse('Done')
 
 
 def clear(*args, **kwargs):
@@ -350,7 +352,8 @@ def clear(*args, **kwargs):
 
   memcache.flush_all()
 
-  return
+  return http.HttpResponse('Done')
+
 
 def reseed(*args, **kwargs):
   """Clears and seeds the datastore.
@@ -358,3 +361,5 @@ def reseed(*args, **kwargs):
 
   clear(*args, **kwargs)
   seed(*args, **kwargs)
+
+  return http.HttpResponse('Done')

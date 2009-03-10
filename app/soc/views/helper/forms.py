@@ -59,31 +59,34 @@ class BaseForm(djangoforms.ModelForm):
     Args:
       *args, **kwargs:  passed through to parent __init__() constructor
     """
+
     super(djangoforms.ModelForm, self).__init__(*args, **kwargs)
 
+    renames = {
+        'verbose_name': 'label',
+        'help_text': 'help_text',
+        'example_text': 'example_text',
+        'group': 'group',
+        }
+
     for field_name in self.fields.iterkeys():
+      field = self.fields[field_name]
+
       # Since fields can be added only to the ModelForm subclass, check to
       # see if the Model has a corresponding field first.
       if hasattr(self.Meta.model, field_name):
         model_prop = getattr(self.Meta.model, field_name)
 
-        if hasattr(model_prop, 'verbose_name'):
-          self.fields[field_name].label = model_prop.verbose_name
-
-        if hasattr(model_prop, 'help_text'):
-          self.fields[field_name].help_text = model_prop.help_text
-
-        if hasattr(model_prop, 'example_text'):
-          self.fields[field_name].example_text = model_prop.example_text
-
-        if hasattr(model_prop, 'group'):
-          self.fields[field_name].group = model_prop.group
+        for old, new in renames.iteritems():
+          value = getattr(model_prop, old, None)
+          if value and not getattr(field, new, None):
+            setattr(field, new, value)
 
       if isinstance(self.fields[field_name], forms.DateField):
-        self.fields[field_name].widget.attrs['class'] = 'date-pick'
+        field.widget.attrs['class'] = 'date-pick'
 
       if isinstance(self.fields[field_name], forms.DateTimeField):
-        self.fields[field_name].widget.attrs['class'] = 'datetime-pick'
+        field.widget.attrs['class'] = 'datetime-pick'
 
 
 class SelectQueryArgForm(forms.Form):

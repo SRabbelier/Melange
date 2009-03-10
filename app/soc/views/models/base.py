@@ -642,7 +642,9 @@ class View(object):
       # need to use getlist as we want to support multiple values
       filter[key] = request.GET.getlist(key)
 
-    entities = logic.getForFields(filter=filter, limit=1000)
+    query = logic.getQueryForFields(filter=filter)
+    entities = logic.getAll(query)
+
     data = [i.toDict() for i in entities]
 
     return self.json(request, data)

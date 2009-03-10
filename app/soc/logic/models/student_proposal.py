@@ -24,7 +24,6 @@ __authors__ = [
 
 from soc.logic.models import base
 from soc.logic.models import student as student_logic
-from soc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.models import student_proposal
 
 import soc.models.linkable
@@ -44,15 +43,32 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+
+  def getRankerFor(self, entity):
+    """Returns the ranker for the given Student Proposal.
+
+    Args:
+      entity: Student Proposal entity for which the ranker should be returned
+
+    Returns:
+      Ranker object which is used to rank the given entity
+    """
+
+    from soc.logic.models.ranker_root import logic as ranker_root_logic
+
+    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
+        'scope': entity.org}
+
+    ranker_root = ranker_root_logic.getForFields(fields, unique=True)
+    ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+
+    return ranker
+
   def _onCreate(self, entity):
     """Adds this proposal to the organization ranker entity.
     """
 
-    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-              'scope': entity.org}
-
-    ranker_root = ranker_root_logic.getForFields(fields, unique=True)
-    ranker = ranker_root_logic.getRootFromEntity(ranker_root) 
+    ranker = self.getRankerFor(entity)
     ranker.SetScore(entity.key().name(), [entity.score])
 
     super(Logic, self)._onCreate(entity)
@@ -74,11 +90,7 @@ class Logic(base.Logic):
       entity_properties[name] = value
 
       # update the ranker
-      fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-                'scope': entity.org}
-
-      ranker_root = ranker_root_logic.getForFields(fields, unique=True)
-      ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+      ranker = self.getRankerFor(entity)
       ranker.SetScore(entity.key().name(), [value])
 
     if name == 'status':
@@ -86,11 +98,7 @@ class Logic(base.Logic):
       if value in ['invalid', 'rejected'] and entity.status != value:
         # the proposal is going into invalid or rejected state
         # remove the score from the ranker
-        fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-                  'scope': entity.org}
-
-        ranker_root = ranker_root_logic.getForFields(fields, unique=True)
-        ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+        ranker = self.getRankerFor(entity)
 
         # entries in the ranker can be removed by setting the score to None
         ranker.SetScore(entity.key().name(), None)

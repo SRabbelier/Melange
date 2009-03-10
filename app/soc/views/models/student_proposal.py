@@ -219,8 +219,16 @@ class View(base.View):
         dynaexclude=None, dynaproperties=dynaproperties)
     params['mentor_review_form'] = mentor_review_form
 
-    # TODO see if autocomplete can be used for this field
+    # TODO see if autocomplete can be used for mentor field
     dynafields = [
+      {'name': 'rank',
+         'base': forms.IntegerField,
+         'label': 'Set to rank',
+         'help_text': 'Set this proposal to the given rank (ignores the given score)',
+         'min_value': 1,
+         'required': False,
+         'passthrough': ['min_value', 'required', 'help_text'],
+      },
       {'name': 'mentor',
        'base': forms.CharField,
        'label': 'Assign Mentor (Link ID)',
@@ -495,7 +503,6 @@ class View(base.View):
     return self.list(request, access_type=access_type, page_name=page_name,
                      params=list_params, filter=filter, **kwargs)
 
-
   @decorators.merge_params
   @decorators.check_access
   def review(self, request, access_type,
@@ -581,18 +588,30 @@ class View(base.View):
           form=form, params=params, template=params['review_template'])
 
     fields = form.cleaned_data
+    is_public = fields['public']
+    comment = fields['comment']
+    given_score = int(fields['score'])
 
     if org_admin:
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
       reviewer = org_admin
+
+      # try to see if the rank is given and adjust the given_score if needed
+      rank = fields['rank']
+      if rank:
+        ranker = self._logic.getRankerFor(entity)
+        # if a very high rank is filled in use the highest one that returns a score
+        rank = min(ranker.TotalRankedScores(), rank)
+        # ranker uses zero-based ranking
+        score_and_rank = ranker.FindScore(rank-1)
+        # get the score at the requested rank
+        score_at_rank = score_and_rank[0][0]
+        # calculate the score that should be given to end up at the given rank
+        given_score = score_at_rank - entity.score
     else:
       # might be None (if Host or Developer is commenting)
       reviewer = mentor
-
-    is_public = fields['public']
-    comment = fields['comment']
-    given_score = int(fields['score'])
 
     if reviewer and (not is_public) and (given_score is not 0):
       # if it is not a public comment and it's made by a member of the

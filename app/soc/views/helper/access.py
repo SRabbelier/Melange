@@ -1037,8 +1037,8 @@ class Checker(object):
 
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):
-    """Returns an alternate HTTP response if Google Account has no Club App
-       entity for the specified Club.
+    """Returns an alternate HTTP response if Google Account has no accepted
+       Group Application entity for the specified arguments.
 
     Args:
       django_args: a dictionary with django's arguments
@@ -1047,21 +1047,18 @@ class Checker(object):
        AccessViolationResponse: if the required authorization is not met
 
     Returns:
-      None if Club App  exists for the specified program, or a subclass
+      None if the Accepted Group App exists for the specified program, or a subclass
       of django.http.HttpResponse which contains the alternate response
       should be returned by the calling view.
     """
 
     self.checkIsUser(django_args)
 
-    properties = {
-        'applicant': self.user,
-        'status': 'accepted'
-        }
+    application = app_logic.getFromKeyFieldsOr404(django_args)
 
-    application = app_logic.getForFields(properties, unique=True)
-
-    if application:
+    # check if the application is accepted and the applicant is the current user
+    if (application.applicant.key() == self.user.key()) and (
+        application.status == 'accepted'):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)

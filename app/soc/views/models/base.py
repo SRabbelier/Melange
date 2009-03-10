@@ -105,13 +105,14 @@ class View(object):
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     entity = None
+    logic = params['logic']
 
     if not all(kwargs.values()):
       #TODO: Change this into a proper redirect
       return http.HttpResponseRedirect('/')
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
@@ -156,9 +157,10 @@ class View(object):
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
+    logic = params['logic']
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(error, request, context=context)
 
@@ -207,13 +209,14 @@ class View(object):
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     entity = None
+    logic = params['logic']
 
     if not all(kwargs.values()):
       #TODO: Change this into a proper redirect
       return http.HttpResponseRedirect('/')
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_export'], context=context)
@@ -264,10 +267,11 @@ class View(object):
                          params=params, page_name=page_name, **kwargs)
 
     params = new_params
+    logic = params['logic']
 
     # Create page is an edit page with no key fields
     empty_kwargs = {}
-    fields = self._logic.getKeyFieldNames()
+    fields = logic.getKeyFieldNames()
     for field in fields:
       empty_kwargs[field] = None
 
@@ -306,6 +310,8 @@ class View(object):
       kwargs: The Key Fields for the specified entity
     """
 
+    logic = params['logic']
+
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
@@ -313,7 +319,7 @@ class View(object):
 
     try:
       if all(kwargs.values()):
-        entity = self._logic.getFromKeyFieldsOr404(kwargs)
+        entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       if not seed:
         error.message_fmt = (
@@ -359,6 +365,8 @@ class View(object):
       params: required, a dict with params for this View
     """
 
+    logic = params['logic']
+
     if entity:
       form = params['edit_form'](request.POST)
     else:
@@ -372,15 +380,15 @@ class View(object):
     self._editPost(request, entity, fields)
 
     if not key_name:
-      key_name = self._logic.getKeyNameFromFields(fields)
+      key_name = logic.getKeyNameFromFields(fields)
 
-    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+    entity = logic.updateOrCreateFromKeyName(fields, key_name)
 
     if not entity:
       return http.HttpResponseRedirect('/')
 
     page_params = params['edit_params']
-    params['suffix'] = self._logic.getKeySuffix(entity)
+    params['suffix'] = logic.getKeySuffix(entity)
 
     request.path = params['edit_redirect'] % params
 
@@ -421,7 +429,8 @@ class View(object):
       params: required, a dict with params for this View
     """
 
-    suffix = self._logic.getKeySuffix(entity)
+    logic = params['logic']
+    suffix = logic.getKeySuffix(entity)
 
     # remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
@@ -545,8 +554,10 @@ class View(object):
         redirect to after having successfully deleted the entity.
     """
 
+    logic = params['logic']
+
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       error.message_fmt = (
         error.message_fmt + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
@@ -556,7 +567,7 @@ class View(object):
       return helper.responses.errorResponse(
           error, request, template=params['error_edit'])
 
-    if not self._logic.isDeletable(entity):
+    if not logic.isDeletable(entity):
       page_params = params['cannot_delete_params']
       params['suffix'] = entity.key().name()
       request.path = params['edit_redirect'] % params
@@ -566,7 +577,7 @@ class View(object):
       return helper.responses.redirectToChangedSuffix(
           request, None, params=page_params)
 
-    self._logic.delete(entity)
+    logic.delete(entity)
     redirect = params['delete_redirect']
 
     return http.HttpResponseRedirect(redirect)
@@ -623,13 +634,15 @@ class View(object):
       params: a dict with params for this View
     """
 
+    logic = params['logic']
+
     # convert to a regular dict
     filter = {}
     for key in request.GET.keys():
       # need to use getlist as we want to support multiple values
       filter[key] = request.GET.getlist(key)
 
-    entities = self._logic.getForFields(filter=filter, limit=1000)
+    entities = logic.getForFields(filter=filter, limit=1000)
     data = [i.toDict() for i in entities]
 
     return self.json(request, data)
@@ -777,7 +790,8 @@ class View(object):
         there is no existing entity.
     """
 
-    suffix = self._logic.getKeySuffix(entity)
+    logic = params['logic']
+    suffix = logic.getKeySuffix(entity)
 
     context['form'] = form
     context['entity'] = entity

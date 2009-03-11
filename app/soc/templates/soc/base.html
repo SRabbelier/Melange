@@ -110,6 +110,9 @@ limitations under the License.
 	Developer |
 	{% endif %}
 	{% if is_debug %}
+	Debug Mode |
+	{% endif %}
+	{% if is_local %}
 	<form id="flush_form" action="/_ah/admin/memcache" method="post" style="display: inline;">
       <input type="submit" class="button" name="action:flush" value="Flush Cache"/>
     </form> | 

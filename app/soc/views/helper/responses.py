@@ -122,15 +122,15 @@ def getUniversalContext(request):
   context['user'] = user
   context['is_admin'] = is_admin
 
+  context['is_local'] = system.isLocal()
   context['is_debug'] = system.isDebug()
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
 
   context['sidebar_menu_items'] = sidebar.getSidebar(account, user)
 
-  gae_version = system.getAppVersion()
-  context['gae_version'] = gae_version
-  context['soc_release'] = gae_version.split('.', 1)[0]
+  context['gae_version'] = system.getAppVersion()
+  context['soc_release'] = system.getMelangeVersion()
 
   settings = site.logic.getSingleton()
 

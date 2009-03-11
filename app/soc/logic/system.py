@@ -26,16 +26,35 @@ import os
 import settings
 
 
-def isDebug():
-  """Returns True if Melange application is running in "debug mode".
-  
-  "Debug mode" is currently determined from settings.DEBUG but may become
-  more sophisticated in the future.
-  """
-  return settings.DEBUG
-
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.
   """
 
   return os.environ.get('CURRENT_VERSION_ID')
+
+
+def getMelangeVersion():
+  """Returns the Melange part of the GAE version.
+  """
+
+  return getAppVersion().split('.', 1)[0]
+
+
+def isLocal():
+  """Returns True if Melange application is running locally.
+  
+  "Local mode" is currently determined from settings.DEBUG but may become
+  more sophisticated in the future.
+  """
+
+  return settings.DEBUG
+
+
+def isDebug():
+  """Returns True if Melange application is running in "debug mode".
+
+  "Debug mode" is currently enabled if running locally or if the
+  current Melange version is 'devvin'.
+  """
+
+  return isLocal() or getMelangeVersion() == 'devvin'

@@ -413,8 +413,11 @@ def clear(*args, **kwargs):
       Document.all(),
       ])
 
-  for entity in entities:
-    entity.delete()
+  try:
+    for entity in entities:
+      entity.delete()
+  except db.Timeout:
+    return http.HttpResponseRedirect('#')
 
   memcache.flush_all()
 

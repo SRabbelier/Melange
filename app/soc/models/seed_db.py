@@ -41,6 +41,7 @@ from soc.models.org_admin import OrgAdmin
 from soc.models.organization import Organization
 from soc.models.org_app import OrgApplication
 from soc.models.program import Program
+from soc.models.ranker_root import RankerRoot
 from soc.models.site import Site
 from soc.models.sponsor import Sponsor
 from soc.models.timeline import Timeline
@@ -389,10 +390,17 @@ def clear(*args, **kwargs):
   """Removes all entities from the datastore.
   """
 
+  # there no explicit ranker model anywhere, so make one for
+  # our own convenience to delete all rankers
+  class ranker(db.Model):
+    pass
+
   entities = itertools.chain(*[
       Notification.all(),
       Mentor.all(),
       OrgAdmin.all(),
+      ranker.all(),
+      RankerRoot.all(),
       Organization.all(),
       OrgApplication.all(),
       Timeline.all(),

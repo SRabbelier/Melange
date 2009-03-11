@@ -38,6 +38,7 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views import sitemap
 
+import soc.cache.logic
 import soc.logic
 import soc.logic.lists
 import soc.views.helper.lists
@@ -615,6 +616,19 @@ class View(object):
 
     return self._list(request, params, contents, page_name)
 
+  def _getPickData(self, model, filter, logic):
+    """Retrieves the pick data for this query.
+
+    Args:
+      model: the model that is being queried
+      filter: the filters that apply
+      logic: the logic that will be used for the query
+    """
+
+    query = logic.getQueryForFields(filter=filter)
+    entities = logic.getAll(query)
+    return entities
+
   @decorators.merge_params
   @decorators.check_access
   def pick(self, request, acces_type, page_name=None, params=None):
@@ -642,8 +656,12 @@ class View(object):
       # need to use getlist as we want to support multiple values
       filter[key] = request.GET.getlist(key)
 
-    query = logic.getQueryForFields(filter=filter)
-    entities = logic.getAll(query)
+    if params['cache_pick']:
+      fun =  soc.cache.logic.cache(self._getPickData)
+    else:
+      fun = self._getPickData
+
+    entities = fun(logic._model, filter, logic)
 
     data = [i.toDict() for i in entities]
 

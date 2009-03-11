@@ -229,6 +229,8 @@ def constructParams(params):
 
   new_params['context'] = None
 
+  new_params['cache_pick'] = False
+
   new_params['export_content_type'] = None
   new_params['export_extension'] = '.txt'
 

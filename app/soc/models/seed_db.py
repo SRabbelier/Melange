@@ -55,8 +55,9 @@ def seed(request, *args, **kwargs):
         a e-mail address in the auth domain
     user_start: where to start adding new users at
     user_end: where to stop adding new users at
-    user_goal: how many users to add in total
+    user_goal: how many users to add in total, implies user_only
     user_step: how many users to add per request, defaults to 15
+    user_only: stop after adding new users
     many_orgs: create 200 pre-accepted and 200 pre-denied org apps
         instead of just 1- pre-accepted ones, also create 200
         orgs instead of just 15.
@@ -98,6 +99,7 @@ def seed(request, *args, **kwargs):
   user_start = int(get_args.get('user_start', '0'))
   user_end = int(get_args.get('user_end', '0'))
   user_step = int(get_args.get('user_step', '15'))
+  user_only = get_args.get('user_only') or user_goal
 
   for i in range(100 if many_users else 15):
     user_properties = {
@@ -136,6 +138,9 @@ def seed(request, *args, **kwargs):
     url = '/seed_db?user_start=%d&user_end=%d&user_goal=%d' % (
         user_start+user_step, user_end+user_step, user_goal)
     return http.HttpResponseRedirect(url)
+
+  if user_only:
+    return http.HttpResponse('Done with users')
 
 
   group_properties = {

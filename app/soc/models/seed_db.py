@@ -53,9 +53,16 @@ def seed(request, *args, **kwargs):
   Understands the following GET args:
     many_users: create 200 users instead of 15, out of which 100 have
         a e-mail address in the auth domain
+    user_start: where to start adding new users at
+    user_end: where to stop adding new users at
+    user_goal: how many users to add in total
+    user_step: how many users to add per request, defaults to 15
     many_orgs: create 200 pre-accepted and 200 pre-denied org apps
         instead of just 1- pre-accepted ones, also create 200
         orgs instead of just 15.
+
+    user is redirected to if user_end < user_goal, incrementing both
+    user_start and user_end with user_step.
   """
 
   get_args = request.GET
@@ -87,6 +94,10 @@ def seed(request, *args, **kwargs):
 
 
   many_users = get_args.get('many_users')
+  user_goal = int(get_args.get('user_goal', '0'))
+  user_start = int(get_args.get('user_start', '0'))
+  user_end = int(get_args.get('user_end', '0'))
+  user_step = int(get_args.get('user_step', '15'))
 
   for i in range(100 if many_users else 15):
     user_properties = {
@@ -108,6 +119,23 @@ def seed(request, *args, **kwargs):
         }
     entity = User(**user_properties)
     entity.put()
+
+
+  for i in range(user_start, user_end) if (user_start and user_end) else []:
+    user_properties = {
+        'key_name': 'lots_user_%d' % i,
+        'link_id': 'lots_user_%d' % i,
+        'account': users.User(email='lots_user_%d@example.com' % i),
+        'name': 'Lots User %d' % i,
+        }
+    entity = User(**user_properties)
+    entity.put()
+
+
+  if user_end < user_goal:
+    url = '/seed_db?user_start=%d&user_end=%d&user_goal=%d' % (
+        user_start+user_step, user_end+user_step, user_goal)
+    return http.HttpResponseRedirect(url)
 
 
   group_properties = {

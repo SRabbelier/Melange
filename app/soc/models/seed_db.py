@@ -47,9 +47,18 @@ from soc.models.timeline import Timeline
 from soc.models.user import User
 
 
-def seed(*args, **kwargs):
+def seed(request, *args, **kwargs):
   """Seeds the datastore with some default values.
+
+  Understands the following GET args:
+    many_users: create 200 users instead of 15, out of which 100 have
+        a e-mail address in the auth domain
+    many_orgs: create 200 pre-accepted and 200 pre-denied org apps
+        instead of just 1- pre-accepted ones, also create 200
+        orgs instead of just 15.
   """
+
+  get_args = request.GET
 
 
   site_properties = {
@@ -77,7 +86,9 @@ def seed(*args, **kwargs):
   current_user.put()
 
 
-  for i in range(100):
+  many_users = get_args.get('many_users')
+
+  for i in range(100 if many_users else 15):
     user_properties = {
         'key_name': 'user_%d' % i,
         'link_id': 'user_%d' % i,
@@ -88,7 +99,7 @@ def seed(*args, **kwargs):
     entity.put()
 
 
-  for i in range(100, 200):
+  for i in range(100, 200) if many_users else []:
     user_properties = {
         'key_name': 'user_%d' % i,
         'link_id': 'user_%d' % i,
@@ -202,6 +213,8 @@ def seed(*args, **kwargs):
   ghop2009.put()
 
 
+  many_orgs = get_args.get('many_orgs')
+
   org_app_properties = {
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
@@ -224,10 +237,20 @@ def seed(*args, **kwargs):
     'agreed_to_admin_agreement': True,
     }
 
-  for i in range(15):
+  for i in range(200 if many_orgs else 10):
     org_app_properties['key_name'] = 'google/gsoc2009/wannabe_%d' % i
     org_app_properties['link_id'] = 'wannabe_%d' % i
     org_app_properties['name'] = 'Wannabe %d' % i
+    entity = OrgApplication(**org_app_properties)
+    entity.put()
+
+
+  org_app_properties['status'] = 'pre-rejected'
+
+  for i in range(200, 400) if many_orgs else []:
+    org_app_properties['key_name'] = 'google/gsoc2009/loser_%d' % i
+    org_app_properties['link_id'] = 'loser_%d' % i
+    org_app_properties['name'] = 'Loser %d' % i
     entity = OrgApplication(**org_app_properties)
     entity.put()
 
@@ -251,12 +274,13 @@ def seed(*args, **kwargs):
   ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
       student_proposal.DEF_SCORE, 100)
 
+
   group_properties.update({
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
     })
 
-  for i in range(15):
+  for i in range(200 if many_orgs else 15):
     group_properties.update({
         'key_name': 'google/gsoc2009/org_%d' % i,
         'link_id': 'org_%d' % i,

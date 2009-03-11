@@ -32,6 +32,7 @@ from google.appengine.ext import db
 from django import http
 
 from soc.logic.models.ranker_root import logic as ranker_root_logic
+from soc.logic import accounts
 from soc.models import student_proposal
 from soc.models.document import Document
 from soc.models.host import Host
@@ -79,7 +80,7 @@ def seed(request, *args, **kwargs):
   site.put()
 
 
-  account = users.get_current_user()
+  account = accounts.getCurrentAccount()
 
   if not account:
     account = users.User(email='test@example.com')

@@ -198,6 +198,7 @@ def as_table_helper(context, form):
   fields = []
   hidden_fields = []
   hidden_fields_errors = []
+  errors = False
   
   # entity = context['entity']
 
@@ -214,6 +215,9 @@ def as_table_helper(context, form):
 
     # If the field is hidden we display it elsewhere
     if not bf.is_hidden:
+      if bf.errors:
+        errors = True
+
       example_text = ''
       group = '0. '
 
@@ -246,6 +250,7 @@ def as_table_helper(context, form):
   context.update({
       'top_errors': form.non_field_errors() or '',
       'hidden_field_errors': hidden_fields_errors or '',
+      'errors': errors,
       'groups': fields if fields else '',
       'hidden_fields': hidden_fields or '',
       })

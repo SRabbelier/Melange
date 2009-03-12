@@ -13,6 +13,13 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
+{% if errors %}
+<span class="formfielderrorlabel">
+There are errors on this form, please scroll down to see them. <br />
+Your changes have <i>not</i> been saved.
+</span>
+{% endif %}
+
 {% if hidden_field_errors or top_errors %}
 <ul class="errorlist">
 {% for field, error in hidden_field_errors %}

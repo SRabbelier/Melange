@@ -31,9 +31,9 @@ from soc.logic.models.user import logic as user_logic
 import soc.views.helper.forms
 
 
-DEF_PAGINATION = 50
-MAX_PAGINATION = 100
-MAX_DEV_PAGINATION = 1000
+DEF_DEFAULT_PAGINATION = 50
+DEF_MAX_PAGINATION = 100
+DEF_MAX_DEV_PAGINATION = 1000
 
 DEF_PAGINATION_CHOICES = (
   ('10', '10 items per page'),
@@ -52,7 +52,7 @@ def getPreferredListPagination(user=None):
   """
   # TODO: eventually this limit should be a User profile preference
   #   (stored in the site-wide User Model) preference 
-  return DEF_PAGINATION
+  return DEF_DEFAULT_PAGINATION
 
 
 def getLimitAndOffset(request, offset_key, limit_key):
@@ -88,8 +88,10 @@ def getLimitAndOffset(request, offset_key, limit_key):
   offset = max(0, offset)
   limit = max(1, limit)
 
-  maximum = MAX_DEV_PAGINATION if user_logic.isDeveloper() else MAX_PAGINATION
-  limit = min(maximum, limit)
+  if user_logic.isDeveloper():
+    limit = min(DEF_MAX_DEV_PAGINATION, limit)
+  else:
+    limit = min(DEF_MAX_PAGINATION, limit)
 
   return limit, offset
 
@@ -221,13 +223,13 @@ def makePaginationForm(
       request, arg_name, limit, choices)
 
 
-def makeNewPaginationChoices(limit=DEF_PAGINATION,
+def makeNewPaginationChoices(limit=DEF_DEFAULT_PAGINATION,
                              choices=DEF_PAGINATION_CHOICES):
   """Updates the pagination limit selection form.
 
   Args:
     limit: the initial value of the selection control;
-      default is DEF_PAGINATION
+      default is DEF_DEFAULT_PAGINATION
     choices: see soc.views.helper.forms.makeSelectQueryArgForm();
       default is DEF_PAGINATION_CHOICES
 

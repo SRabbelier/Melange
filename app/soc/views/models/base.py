@@ -625,8 +625,7 @@ class View(object):
       logic: the logic that will be used for the query
     """
 
-    query = logic.getQueryForFields(filter=filter)
-    entities = logic.getAll(query)
+    entities = logic.getForFields(filter=filter, limit=1000)
     return entities
 
   @decorators.merge_params

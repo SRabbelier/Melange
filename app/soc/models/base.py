@@ -47,18 +47,27 @@ class ModelWithFieldAttributes(db.Model):
   """
 
   _fields_cache = None
+  DICT_TYPES = (db.StringProperty, db.IntegerProperty)
 
-  def toDict(self):
-    """Returns a dict with all StringProperty values of this entity.
+  def toDict(self, field_names=None):
+    """Returns a dict with all specified values of this entity.
+
+    Args:
+      field_names: the fields that should be included, defaults to
+        all fields that are of a type that is in DICT_TYPES.
     """
 
     result = {}
     props = self.properties()
 
+    if not field_names:
+      field_names = [i for i in props.keys() if isinstance(i, self.DICT_TYPES)]
+
     for key, value in props.iteritems():
-      # Skip everything but StringProperties and IntegerProperties
-      if not isinstance(value, (db.StringProperty, db.IntegerProperty)):
+      # Skip everything that is not valid
+      if key not in field_names:
         continue
+
       result[key] = getattr(self, key)
 
     if hasattr(self, 'name'):

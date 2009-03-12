@@ -172,9 +172,14 @@ td.twolineformfieldlabel {
   text-align: left;
 }
 
-
 td.twolineformfieldlabel {
   font-weight: bold;
+  font-size: small;
+}
+
+td.twolineformfielderrorlabel {
+  font-weight: bold;
+  color: #FF0000;
   font-size: small;
 }
 
@@ -203,6 +208,7 @@ td.formfielderrorlabel, td.warning, span.formfielderrorlabel {
   font-weight: bold;
   color: #FF0000;
   font-size: small;
+  text-align: right;
 }
 
 /* TABLE QUEUES (used with .list) */

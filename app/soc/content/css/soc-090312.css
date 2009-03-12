@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
- 
-/* 
- * STANDARD HTML TAGS 
- */ 
+
+/*
+ * STANDARD HTML TAGS
+ */
 
 body {
   background-color: white;
@@ -81,7 +81,7 @@ pre ins {
   text-decoration: none;
 }
 
-/* LINKS AND ANCHORS */ 
+/* LINKS AND ANCHORS */
 a:link {
   color: #0000cc;
 }
@@ -137,7 +137,7 @@ th, td {
   text-align: left;
 }
 
-/* FORM FIELDS */ 
+/* FORM FIELDS */
 td.formfieldrequired {
   font-style: italic;
   font-size: small;
@@ -223,10 +223,10 @@ table#queues tr {
 
 table#queues td {
   padding: 2px;
-}  
+}
 
-/* 
- * PAGE ELEMENTS 
+/*
+ * PAGE ELEMENTS
  */
 
 #title {
@@ -279,7 +279,7 @@ table#queues td {
   margin-right: 4px;
   margin-top: 20px;
 }
-  
+
 #body a.button, input[type^="submit"], input[type^="button"] {
   margin: 0;
   padding: 2px 5px 2px 5px;
@@ -381,8 +381,8 @@ span.unread {
 span.edited {
   color: #808080;
 }
- 
-/* SEARCH FIELD */ 
+
+/* SEARCH FIELD */
 #search {
   margin-top: 2em;
 }
@@ -457,7 +457,7 @@ span.edited {
 .list table{
   background-color: white;
 }
-  
+
 .list table th {
   background-color: #eeeeec;
   border-right: 1px solid lightgray;
@@ -480,8 +480,8 @@ span.edited {
   border-left: 1px solid lightgray;
 }
 
-/* 
- * CUSTOM CLASSES 
+/*
+ * CUSTOM CLASSES
  */
 
 .todo {
@@ -500,14 +500,14 @@ span.edited {
 }
 
 .notice {
-  background:#fad163; 
+  background:#fad163;
   font-size: small;
   font-weight: bold;
 }
 
 .fieldhelptext {
   width: 450px;
-  background:#fad163; 
+  background:#fad163;
   font-size: small;
   border: 1px solid black;
 }

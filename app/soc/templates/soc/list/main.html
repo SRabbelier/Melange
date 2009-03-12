@@ -8,7 +8,7 @@
       <tr><td colspan="9"><span class="disabled">(None)</span></td></tr>
     {% else %}
       {% include list.heading %}
-      {% for _ in list.rows %}
+      {% for row_number in list.rows %}
         {% include list.nextRow %}
       {% endfor %}
     {% endif %}

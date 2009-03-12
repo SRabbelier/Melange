@@ -21,7 +21,7 @@ limitations under the License.
 <tr title="{{ field.help_text }}">
  <td class="formfieldvalue">
   {% block field_value_column %}
-    {{ field_value }}
+    {{ field_value|linebreaksbr }}
   {% endblock %}
  </td>
 </tr>

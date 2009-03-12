@@ -70,7 +70,7 @@ def field_as_table_row(field):
 
 
 @register.inclusion_tag('soc/templatetags/_readonly_field_as_table_row.html')
-def readonly_field_as_table_row(field_label, field_value):
+def readonly_field_as_table_row(label, value):
   """Prints a field value and it's verbose name as a table row.
 
   This function actually does very little, simply passing the 
@@ -98,17 +98,23 @@ def readonly_field_as_table_row(field_label, field_value):
       { 'field_label': field_label',
         'field_value': field_value'}
   """
-  return {'field_label': field_label,
-          'field_value': field_value}
+
+  value = value.strip() if isinstance(value, basestring) else value
+
+  return {'field_label': label,
+          'field_value': value}
 
 
 @register.inclusion_tag(
     'soc/templatetags/_readonly_field_as_twoline_table_row.html')
-def readonly_field_as_twoline_table_row(field_label, field_value):
+def readonly_field_as_twoline_table_row(label, value):
   """See readonly_field_as_table_row().
   """
-  return {'field_label': field_label,
-          'field_value': field_value}
+
+  value = value.strip() if  isinstance(value, basestring) else value
+
+  return {'field_label': label,
+          'field_value': value}
 
 
 @register.inclusion_tag(

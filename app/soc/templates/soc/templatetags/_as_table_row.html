@@ -14,7 +14,10 @@ limitations under the License.
 
 {% if errors %}
 <tr>
-  <td colspan="4" class="formfielderror">
+  {% block error_td %}
+  <td>&nbsp;</td>
+  <td colspan="3" class="formfielderror">
+  {% endblock error_td %}
   {% for error in errors %}
     <span class="formfielderrorlabel">{{ error }}</span> <br />
   {% endfor %}

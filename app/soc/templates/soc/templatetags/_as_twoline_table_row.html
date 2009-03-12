@@ -14,6 +14,10 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
+{% block error_td %}
+  <td colspan="4" class="formfielderror">
+{% endblock error_td %}
+
 {% block label_row %}
 <tr>
 <td class="twoline{{ field_class_type }}" colspan=4>

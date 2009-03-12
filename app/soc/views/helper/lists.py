@@ -26,12 +26,14 @@ __authors__ = [
 import itertools
 
 from soc.logic import dicts
+from soc.logic.models.user import logic as user_logic
 
 import soc.views.helper.forms
 
 
 DEF_PAGINATION = 50
 MAX_PAGINATION = 100
+MAX_DEV_PAGINATION = 1000
 
 DEF_PAGINATION_CHOICES = (
   ('10', '10 items per page'),
@@ -85,7 +87,9 @@ def getLimitAndOffset(request, offset_key, limit_key):
 
   offset = max(0, offset)
   limit = max(1, limit)
-  limit = min(MAX_PAGINATION, limit)
+
+  maximum = MAX_DEV_PAGINATION if user_logic.isDeveloper() else MAX_PAGINATION
+  limit = min(maximum, limit)
 
   return limit, offset
 

@@ -42,7 +42,11 @@ limitations under the License.
 
 {% block scripts %}
   {% if uses_jq %}
+  {% if is_local %}
   <script type='text/javascript' src="/jquery/jquery-1.2.6.js"></script>
+  {% else %}
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+  {% endif %}
   {% endif %}
   {% if uses_json %}
   <script type='text/javascript' src="/json/json2.js"></script>

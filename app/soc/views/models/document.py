@@ -67,6 +67,7 @@ class View(base.View):
 
     new_params['export_content_type'] = 'text/text'
     new_params['export_extension'] = '.html'
+    new_params['export_function'] = lambda x: (x.content, x.link_id)
     new_params['delete_redirect'] = '/'
 
     new_params['no_create_raw'] = True

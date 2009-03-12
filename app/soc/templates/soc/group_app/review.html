@@ -34,15 +34,16 @@ limitations under the License.
  </table>
 </p>
 
-{% block buttons %}
 <tr>
   <td>
+{% block buttons %}
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=accepted'" value="Accept"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=rejected'" value="Reject"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=ignored'" value="Ignore"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity.key.name }}'" value="Delete"/>
+{% endblock buttons %}
   </td>
 </tr>
 </table>
-{% endblock buttons %}
+
 {% endblock body %}

@@ -31,15 +31,9 @@ limitations under the License.
   {% readonly_field_as_twoline_table_row entity.fields.ideas.label entity.ideas %}
   {% readonly_safe_field_as_twoline_table_row entity.fields.contrib_template.label entity.contrib_template %}
 {% endblock %}
+
 {% block buttons %}
-<tr>
-  <td>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-accepted'" value="Pre-Accept"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=accepted'" value="Accept"/>
     <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-rejected'" value="Pre-Reject"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=ignored'" value="Ignore"/>
-  </td>
-</tr>
-</table>
+    {{ block.super }}
 {% endblock buttons %}

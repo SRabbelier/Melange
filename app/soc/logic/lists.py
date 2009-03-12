@@ -144,12 +144,18 @@ class Lists(object):
     """Returns additional info on the current row item in the current list.
     """
 
+    if 'info' not in self._content:
+      return ""
+
     action, args = self.get('info')
     return action(self._row_data, args)
 
   def redirect(self):
     """Returns the redirect for the current row item in the current list.
     """
+
+    if 'action' not in self._content:
+      return ""
 
     action, args = self.get('action')
     return action(self._row_data, args)

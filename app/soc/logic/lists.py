@@ -30,6 +30,7 @@ class Lists(object):
       'pagination',
       'pagination_form',
       'description',
+      'export',
       'heading',
       'row',
       'limit',

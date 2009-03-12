@@ -1,5 +1,11 @@
 <div class="pagination">
 
+{% with list.export as export_link %}
+{% if export_link %}
+<a href="{{ export_link }}" class="button" target="_blank">csv export</a>
+{% endif %}
+{% endwith %}
+
   {{ list.pagination_form.as_table }}
  
   {% if list.newest %}

@@ -163,6 +163,10 @@ def getListContent(request, params, filter=None, order=None,
     if key.startswith('offset_') or key.startswith('limit_'):
       offset_and_limits[key] = value
 
+  offset_and_limits['export'] = idx
+  export_link = generateLinkFromGetArgs(request, offset_and_limits)
+  del offset_and_limits['export']
+
   if more:
     offset_and_limits[offset_key] = offset+limit
     offset_and_limits[limit_key] = limit
@@ -181,6 +185,7 @@ def getListContent(request, params, filter=None, order=None,
 
   content = {
       'data': data,
+      'export': export_link,
       'first': offset+1,
       'last': len(data) > 1 and offset+len(data) or None,
       'logic': logic,

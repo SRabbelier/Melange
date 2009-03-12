@@ -35,12 +35,17 @@ DEF_DEFAULT_PAGINATION = 50
 DEF_MAX_PAGINATION = 100
 DEF_MAX_DEV_PAGINATION = 1000
 
-DEF_PAGINATION_CHOICES = (
-  ('10', '10 items per page'),
-  ('25', '25 items per page'),
-  ('50', '50 items per page'),
-  ('100', '100 items per page'),
-)
+DEF_PAGINATION_CHOICES = [
+    ('10', '10 items per page'),
+    ('25', '25 items per page'),
+    ('50', '50 items per page'),
+    ('100', '100 items per page'),
+]
+
+DEF_DEVELOPER_CHOICES = [
+    ('500', '500 items per page'),
+    ('1000', '1000 items per page'),
+    ]
 
 
 def getPreferredListPagination(user=None):
@@ -237,32 +242,16 @@ def makeNewPaginationChoices(limit=DEF_DEFAULT_PAGINATION,
     a new pagination choices list if limit is not in
     DEF_PAGINATION_CHOICES, or DEF_PAGINATION_CHOICES otherwise
   """
-  # determine where to insert the new limit into choices
+
   new_choices = []
-  
-  for index, (pagination, label) in enumerate(choices):
-    items = int(pagination)
+  new_choice = (str(limit), '%s items per page' % limit)
 
-    if limit == items:
-      # limit is already present, so just return existing choices
-      return choices
+  new_choices.append(new_choice)
+  new_choices.extend(choices)
 
-    if limit < items:
-      # limit needs to be inserted before the current pagination,
-      # so assemble a new choice tuple and append it 
-      choice = (str(limit), '%s items per page' % limit)
-      new_choices.append(choice)
-      
-      # append the remainder of the original list and exit early
-      # (avoiding unnecessary remaining type conversions, etc.)
-      new_choices.extend(choices[index:])
-      return new_choices
+  if user_logic.isDeveloper():
+    new_choices.extend(DEF_DEVELOPER_CHOICES)
 
-    # append the existing choice
-    new_choices.append((pagination, label))
+  new_choices = set(new_choices)
 
-  # new choice must go last, past all other existing choices
-  choice = (str(limit), '%s items per page' % limit)
-  new_choices.append(choice)
-      
-  return new_choices
+  return sorted(new_choices, key=lambda (x, y): int(x))

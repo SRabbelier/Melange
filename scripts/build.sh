@@ -20,7 +20,12 @@ APP_FILES=${APP_FILES:-"${DEFAULT_APP_FILES}"}
 APP_DIRS=${APP_DIRS:-"${DEFAULT_APP_DIRS}"}
 ZIP_FILES=${ZIP_FILES:-"${DEFAULT_ZIP_FILES}"}
 
-cd $APP_FOLDER
+if [ -e $APP_FOLDER ] ; then
+    cd $APP_FOLDER
+else
+    echo 'This script must be run from within the scripts directory!'
+    exit 1
+fi
 
 # Remove old zip files (and django.zip in its old location)
 rm -rf $ZIP_FILES django.zip
@@ -75,4 +80,3 @@ do
 done
 
 echo "Build results in $APP_BUILD."
-

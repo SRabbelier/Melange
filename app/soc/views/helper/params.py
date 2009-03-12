@@ -233,6 +233,7 @@ def constructParams(params):
 
   new_params['export_content_type'] = None
   new_params['export_extension'] = '.txt'
+  new_params['csv_fieldnames'] = []
 
   # TODO: Use only the js modules needed instead of js_uses_all
   new_params['js_uses_all'] = DEF_JS_USES_LIST

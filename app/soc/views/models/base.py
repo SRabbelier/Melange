@@ -23,6 +23,10 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+
+import csv
+import StringIO
+
 from google.appengine.ext import db
 
 from django import http
@@ -512,6 +516,9 @@ class View(object):
   def _list(self, request, params, contents, page_name, context=None):
     """Returns the list page for the specified contents.
 
+    If the export parameter is present in request.GET a csv export of
+    the specified list is returned instead, see csv().
+
     Args:
       request: the standard Django HTTP request object
       params: a dict with params for this View
@@ -528,6 +535,24 @@ class View(object):
       list_template: The list_template value is used as template for
         to display the list of all entities for this View.
     """
+
+    try:
+      export = int(request.GET.get('export', -1))
+      export = export if export >= 0 else None
+    except ValueError:
+      export = None
+
+    if export is not None and export < len(contents):
+      content = contents[export]
+      key_order = content.get('key_order')
+
+      data = [i.toDict() for i in content['data']]
+
+      if not key_order:
+        data = [i.values() for i in data]
+
+      filename = "export_%d" % export
+      return self.csv(request, data, filename, params, key_order)
 
     context = dicts.merge(context,
         helper.responses.getUniversalContext(request))
@@ -704,6 +729,31 @@ class View(object):
     response['Pragma'] = 'no-cache'
 
     return response
+
+  def csv(self, request, data, filename, params, key_order=None):
+    """Returns data as a csv file
+
+    If key_order is set data should be a sequence of dicts, otherwise
+    data should be a sequence of lists,s ee csv.writer and
+    csv.DictWriter for more information.
+    """
+
+    params = params.copy()
+    params['export_extension'] = '.csv'
+    fieldnames = params['csv_fieldnames']
+
+    f = StringIO.StringIO()
+
+    if key_order:
+      writer = csv.DictWriter(f, key_order, dialect='excel')
+    else:
+      writer = csv.writer(f, dialect='excel')
+
+    writer.writerows(data)
+
+    data = f.getvalue()
+
+    return self.download(request, data, filename, params)
 
   def _editPost(self, request, entity, fields):
     """Performs any required processing on the entity to post its edit page.

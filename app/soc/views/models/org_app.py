@@ -85,6 +85,14 @@ class View(group_app.View):
 
     new_params['sidebar_grouping'] = 'Organizations'
 
+    new_params['list_key_order'] = [
+        'link_id', 'scope_path', 'name', 'home_page', 'email',
+        'description', 'why_applying','pub_mailing_list','irc_channel',
+        'member_criteria', 'prior_participation', 'prior_application',
+        'license_name', 'ideas', 'dev_mailing_list', 'contrib_template',
+        'contrib_disappears', 'member_disappears', 'encourage_contribs',
+        'continued_contribs']
+
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         'soc.views.models.%(module_name)s.create',
         'Create an %(name_plural)s'),

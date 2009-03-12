@@ -69,6 +69,9 @@ class View(base.View):
     new_params['export_extension'] = '.html'
     new_params['export_function'] = lambda x: (x.content, x.link_id)
     new_params['delete_redirect'] = '/'
+    new_params['list_key_order'] = [
+        'link_id', 'scope_path', 'name', 'short_name', 'title',
+        'content', 'prefix','read_access','write_access']
 
     new_params['no_create_raw'] = True
     new_params['no_create_with_scope'] = True

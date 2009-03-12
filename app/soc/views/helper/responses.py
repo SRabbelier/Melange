@@ -74,8 +74,10 @@ def respond(request, template, context=None, response_args=None,
   if response_args is None:
     response_args = {}
 
-  response_args['content'] = response_args.get(
-      'content', loader.render_to_string(template, dictionary=context))
+  if 'content' not in response_args:
+    content = loader.render_to_string(template, dictionary=context)
+    response_args['content'] = content.strip('\n')
+
   http_response = http.HttpResponse(**response_args)
 
   if response_headers:

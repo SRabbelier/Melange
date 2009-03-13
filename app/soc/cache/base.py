@@ -35,7 +35,7 @@ def getCacher(get, put):
   def cache(func):
     """Decorator that caches the result from func.
     """
-  
+
     @wraps(func)
     def wrapper(*args, **kwargs):
       result, key = get(*args, **kwargs)

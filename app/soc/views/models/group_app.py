@@ -226,7 +226,7 @@ class View(base.View):
     selection = [('needs review', (redirects.getEditRedirect, params)), 
                  ('accepted', (redirects.getApplicantRedirect, 
                     {'url_name': params['group_url_name']})),
-                 ('rejected', (redirects.getEditRedirect, params))]
+                 ('rejected', (redirects.getPublicRedirect, params))]
 
     return self._applicationListConstructor(request, params, page_name,
         filter=filter, selection=selection, **kwargs)

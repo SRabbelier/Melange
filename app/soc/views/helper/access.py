@@ -92,12 +92,12 @@ DEF_NO_ACTIVE_ROLE_MSG = ugettext(
     'There is no such active role.')
 
 DEF_ALREADY_PARTICIPATING_MSG = ugettext(
-    'You cannot become a student because you are already participating '
+    'You cannot become a Student because you are already participating '
     'in this program.')
 
 DEF_ALREADY_STUDENT_ROLE_MSG = ugettext(
     'You cannot become a Mentor or Organization Admin because you already are '
-    'a student in this program.')
+    'a Student in this program.')
 
 DEF_NO_ACTIVE_PROGRAM_MSG = ugettext(
     'There is no such active program.')
@@ -1096,22 +1096,19 @@ class Checker(object):
     role_list = []
 
     filter = {'user': user_entity,
+              'program': program_entity,
               'status': 'active'}
 
-    mentor_roles = mentor_logic.getForFields(filter)
-    if mentor_roles:
-      role_list += mentor_roles
+    mentor_role = mentor_logic.getForFields(filter, unique=True)
+    if mentor_role:
+      # the current user has a role for the given program
+      raise out_of_band.AccessViolation(
+            message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
-    org_admin_roles = org_admin_logic.getForFields(filter)
-    if org_admin_roles:
-      role_list += org_admin_roles
-
-    # check if the user has a role for the retrieved program
-    for role in role_list:
-
-      if role.program.key() == program_entity.key():
-        # the current user has a role for the given program
-        raise out_of_band.AccessViolation(
+    org_admin_role = org_admin_logic.getForFields(filter, unique=True)
+    if org_admin_role:
+      # the current user has a role for the given program
+      raise out_of_band.AccessViolation(
             message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
     # no roles found, access granted
@@ -1146,7 +1143,7 @@ class Checker(object):
 
     if student_role:
       raise out_of_band.AccessViolation(
-          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+          message_fmt=DEF_ALREADY_STUDENT_ROLE_MSG)
 
     return
 

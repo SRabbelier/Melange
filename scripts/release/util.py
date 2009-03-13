@@ -27,9 +27,15 @@ __authors__ = [
 
 import os.path
 import re
+try:
+  import cStringIO as StringIO
+except ImportError:
+  import StringIO
 import subprocess
+import threading
 
 import error
+import log
 
 
 class Error(error.Error):
@@ -129,7 +135,26 @@ class Paths(object):
     return os.path.exists(self.path(path))
 
 
-def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
+class _PipeAdapter(threading.Thread):
+  """A thread that connects one file-like object to another"""
+  def __init__(self, pipe, logfile):
+    threading.Thread.__init__(self)
+    self.pipe, self.logfile = pipe, logfile
+    self.setDaemon(True)
+    self.start()
+
+  def run(self):
+    try:
+      while True:
+        data = self.pipe.read(512)  # Small to retain interactivity
+        if not data:
+          return
+        self.logfile.write(data)
+    except (EOFError, OSError):
+      pass
+
+
+def run(argv, cwd=None, capture=False, split_capture=True, stdin=None):
   """Run the given command and optionally return its output.
 
   Note that if you set capture=True, the command's output is
@@ -156,19 +181,46 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
     SubprocessFailed: The subprocess exited with a non-zero exit
             code.
   """
-  print colorize('# ' + ' '.join(argv), WHITE, bold=True)
+  log.debug(colorize('# ' + ' '.join(argv), WHITE, bold=True))
 
   process = subprocess.Popen(argv,
                              shell=False,
                              cwd=cwd,
-                             stdin=subprocess.PIPE,
-                             stdout=(subprocess.PIPE if capture else None),
-                             stderr=None)
-  output, _ = process.communicate(input=stdin)
+                             stdin=(subprocess.PIPE if stdin else None),
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+
+  # Spin up threads to capture stdout and stderr. Depending on the
+  # value of the capture parameter, stdout is pushed either into the
+  # log or into a string for processing. stderr always goes
+  # into the log.
+  #
+  # Threads are necessary because all of writing to stdin, reading
+  # from stdout and reading from stderr must all happen
+  # simultaneously. Otherwise, there is a risk that one of the pipes
+  # will fill up, causing the subprocess and us to deadlock. So,
+  # threads are used to keep the pipes safely flowing.
+  stdout = StringIO.StringIO() if capture else log.FileLikeLogger()
+  out_adapter = _PipeAdapter(process.stdout, stdout)
+  err_adapter = _PipeAdapter(process.stderr, log.FileLikeLogger())
+  if stdin:
+    process.stdin.write(stdin)
+
+  out_adapter.join()
+  err_adapter.join()
+  process.wait()
+
   if process.returncode != 0:
-    raise SubprocessFailed('Process %s failed with output: %s' %
-                           (argv[0], output))
-  if output is not None and split_capture:
-    return output.strip().split('\n')
-  else:
-    return output
+    if capture:
+      raise SubprocessFailed('Process %s failed with output: %s' %
+                             (argv[0], stdout.getvalue()))
+    else:
+      raise SubprocessFailed('Process %s failed' % argv[0])
+
+  if capture:
+    out = stdout.getvalue()
+    stdout.close()
+
+    if split_capture:
+      out = out.strip().split('\n')
+    return out

@@ -46,6 +46,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 
 import error
 import log
@@ -83,6 +84,20 @@ class FileAccessError(Error):
   """An error occured while accessing a file."""
 
 
+def getString(prompt):
+  """Prompt for and return a string."""
+  prompt += ' '
+  log.stdout.write(prompt)
+  log.stdout.flush()
+
+  response = sys.stdin.readline()
+  log.terminal_echo(prompt + response.strip())
+  if not response:
+    raise AbortedByUser('Aborted by ctrl+D')
+
+  return response.strip()
+
+
 def confirm(prompt, default=False):
   """Ask a yes/no question and return the answer.
 
@@ -97,14 +112,11 @@ def confirm(prompt, default=False):
     True if the user answered affirmatively, False otherwise.
   """
   if default:
-    question = prompt + ' [Yn] '
+    question = prompt + ' [Yn]'
   else:
-    question = prompt + ' [yN] '
+    question = prompt + ' [yN]'
   while True:
-    try:
-      answer = raw_input(question).strip().lower()
-    except EOFError:
-      raise AbortedByUser('Aborted by ctrl+D')
+    answer = getString(question)
     if not answer:
       return default
     elif answer in ('y', 'yes'):
@@ -113,14 +125,6 @@ def confirm(prompt, default=False):
       return False
     else:
       log.error('Please answer yes or no.')
-
-
-def getString(prompt):
-  """Prompt for and return a string."""
-  try:
-    return raw_input(prompt + ' ').strip()
-  except EOFError:
-    raise AbortedByUser('Aborted by ctrl+D')
 
 
 def getNumber(prompt):

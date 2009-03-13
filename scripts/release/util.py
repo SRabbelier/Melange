@@ -17,6 +17,7 @@
 Current contents:
  - Text colorization using ANSI color codes
  - A class to construct and manage paths under a root path.
+ - A helper to manage running subprocesses, wrapping the subprocess module.
 """
 
 __authors__ = [
@@ -25,6 +26,17 @@ __authors__ = [
     ]
 
 import os.path
+import subprocess
+
+import error
+
+
+class Error(error.Error):
+    pass
+
+
+class SubprocessFailed(Error):
+    """A subprocess returned a non-zero error code."""
 
 
 # The magic escape sequence understood by modern terminal emulators to
@@ -108,3 +120,48 @@ class Paths(object):
           True if the path exists, False otherwise.
         """
         return os.path.exists(self.path(path))
+
+
+def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
+    """Run the given command and optionally return its output.
+
+    Note that if you set capture=True, the command's output is
+    buffered in memory. Output capture should only be used with
+    commands that output small amounts of data. O(kB) is fine, O(MB)
+    is starting to push it a little.
+
+    Args:
+      argv: A list containing the name of the program to run, followed
+            by its argument vector.
+      cwd: Run the program from this directory.
+      capture: If True, capture the program's stdout stream. If False,
+               stdout will output to sys.stdout.
+      split_capture: If True, return the captured output as a list of
+                     lines. Else, return as a single unaltered string.
+      stdin: The string to feed to the program's stdin stream.
+
+    Returns:
+      If capture is True, a string containing the combined
+      stdout/stderr output of the program. If capture is False,
+      nothing is returned.
+
+    Raises:
+      SubprocessFailed: The subprocess exited with a non-zero exit
+                        code.
+    """
+    print colorize('# ' + ' '.join(argv), WHITE, bold=True)
+
+    process = subprocess.Popen(argv,
+                               shell=False,
+                               cwd=cwd,
+                               stdin=subprocess.PIPE,
+                               stdout=(subprocess.PIPE if capture else None),
+                               stderr=None)
+    output, _ = process.communicate(input=stdin)
+    if process.returncode != 0:
+        raise SubprocessFailed('Process %s failed with output: %s' %
+                               (argv[0], output))
+    if output is not None and split_capture:
+        return output.strip().split('\n')
+    else:
+        return output

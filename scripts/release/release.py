@@ -66,10 +66,6 @@ class Error(error.Error):
     pass
 
 
-class SubprocessFailed(Error):
-    """A subprocess returned a non-zero error code."""
-
-
 class AbortedByUser(Error):
     """The operation was aborted by the user."""
 
@@ -84,51 +80,6 @@ class ExpectationFailed(Error):
 
 class FileAccessError(Error):
     """An error occured while accessing a file."""
-
-
-def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
-    """Run the given command and optionally return its output.
-
-    Note that if you set capture=True, the command's output is
-    buffered in memory. Output capture should only be used with
-    commands that output small amounts of data. O(kB) is fine, O(MB)
-    is starting to push it a little.
-
-    Args:
-      argv: A list containing the name of the program to run, followed
-            by its argument vector.
-      cwd: Run the program from this directory.
-      capture: If True, capture the program's stdout stream. If False,
-               stdout will output to sys.stdout.
-      split_capture: If True, return the captured output as a list of
-                     lines. Else, return as a single unaltered string.
-      stdin: The string to feed to the program's stdin stream.
-
-    Returns:
-      If capture is True, a string containing the combined
-      stdout/stderr output of the program. If capture is False,
-      nothing is returned.
-
-    Raises:
-      SubprocessFailed: The subprocess exited with a non-zero exit
-                        code.
-    """
-    print util.colorize('# ' + ' '.join(argv), util.WHITE, bold=True)
-
-    process = subprocess.Popen(argv,
-                               shell=False,
-                               cwd=cwd,
-                               stdin=subprocess.PIPE,
-                               stdout=(subprocess.PIPE if capture else None),
-                               stderr=None)
-    output, _ = process.communicate(input=stdin)
-    if process.returncode != 0:
-        raise SubprocessFailed('Process %s failed with output: %s' %
-                               (argv[0], output))
-    if output is not None and split_capture:
-        return output.strip().split('\n')
-    else:
-        return output
 
 
 def error(msg):
@@ -307,7 +258,7 @@ class Subversion(util.Paths):
           depth: The depth of the working copy root.
         """
         assert not self.exists()
-        run(['svn', 'checkout', '--depth=' + depth, url, self.path()])
+        util.run(['svn', 'checkout', '--depth=' + depth, url, self.path()])
 
     def update(self, path='', depth=None):
         """Update a working copy path, optionally changing depth.
@@ -318,9 +269,9 @@ class Subversion(util.Paths):
         """
         assert self.exists()
         if depth is None:
-            run(['svn', 'update', self.path(path)])
+            util.run(['svn', 'update', self.path(path)])
         else:
-            run(['svn', 'update', '--set-depth=' + depth, self.path(path)])
+            util.run(['svn', 'update', '--set-depth=' + depth, self.path(path)])
 
     def revert(self, path=''):
         """Recursively revert a working copy path.
@@ -329,7 +280,7 @@ class Subversion(util.Paths):
         command, as it will also delete any files which subversion
         does not know about.
         """
-        run(['svn', 'revert', '-R', self.path(path)])
+        util.run(['svn', 'revert', '-R', self.path(path)])
 
         unknown, missing = self._unknownAndMissing(path)
         unknown = [os.path.join(self.path(path), p) for p in unknown]
@@ -340,7 +291,7 @@ class Subversion(util.Paths):
             for p in unknown:
                 assert p.startswith(self.path())
 
-            run(['rm', '-rf', '--'] + unknown)
+            util.run(['rm', '-rf', '--'] + unknown)
 
     def ls(self, dir=''):
         """List the contents of a working copy directory.
@@ -350,7 +301,7 @@ class Subversion(util.Paths):
         local path.
         """
         assert self.exists()
-        return run(['svn', 'ls', self.path(dir)], capture=True)
+        return util.run(['svn', 'ls', self.path(dir)], capture=True)
 
     def copy(self, src, dest):
         """Copy a working copy path.
@@ -362,7 +313,7 @@ class Subversion(util.Paths):
           dst: The destination working copy path.
         """
         assert self.exists()
-        run(['svn', 'cp', self.path(src), self.path(dest)])
+        util.run(['svn', 'cp', self.path(src), self.path(dest)])
 
     def propget(self, prop_name, path):
         """Get the value of a property on a working copy path.
@@ -372,7 +323,8 @@ class Subversion(util.Paths):
           path: The working copy path on which the property is set.
         """
         assert self.exists()
-        return run(['svn', 'propget', prop_name, self.path(path)], capture=True)
+        return util.run(['svn', 'propget', prop_name, self.path(path)],
+                        capture=True)
 
     def propset(self, prop_name, prop_value, path):
         """Set the value of a property on a working copy path.
@@ -385,7 +337,7 @@ class Subversion(util.Paths):
           path: The working copy path on which to set the property.
         """
         assert self.exists()
-        run(['svn', 'propset', prop_name, prop_value, self.path(path)])
+        util.run(['svn', 'propset', prop_name, prop_value, self.path(path)])
 
     def add(self, paths):
         """Schedule working copy paths for addition.
@@ -397,7 +349,7 @@ class Subversion(util.Paths):
         """
         assert self.exists()
         paths = [self.path(p) for p in paths]
-        run(['svn', 'add'] + paths)
+        util.run(['svn', 'add'] + paths)
 
     def remove(self, paths):
         """Schedule working copy paths for deletion.
@@ -409,7 +361,7 @@ class Subversion(util.Paths):
         """
         assert self.exists()
         paths = [self.path(p) for p in paths]
-        run(['svn', 'rm'] + paths)
+        util.run(['svn', 'rm'] + paths)
 
     def status(self, path=''):
         """Return the status of a working copy path.
@@ -421,7 +373,7 @@ class Subversion(util.Paths):
           path: The path to examine.
         """
         assert self.exists()
-        return run(['svn', 'status', self.path(path)], capture=True)
+        return util.run(['svn', 'status', self.path(path)], capture=True)
 
     def addRemove(self, path=''):
         """Perform an "addremove" operation a working copy path.
@@ -451,7 +403,7 @@ class Subversion(util.Paths):
           path: The path to commit.
         """
         assert self.exists()
-        run(['svn', 'commit', '-m', message, self.path(path)])
+        util.run(['svn', 'commit', '-m', message, self.path(path)])
 
     @staticmethod
     def export(url, revision, dest_path):
@@ -472,7 +424,7 @@ class Subversion(util.Paths):
         if os.path.exists(dest_path):
             raise ObstructionError('Cannot export to obstructed path %s' %
                                    dest_path)
-        run(['svn', 'export', '-r', str(revision), url, dest_path])
+        util.run(['svn', 'export', '-r', str(revision), url, dest_path])
 
     @staticmethod
     def find_tag_rev(url):
@@ -495,9 +447,9 @@ class Subversion(util.Paths):
           url: The repository URL of the tag to examine.
         """
         try:
-            output = run(['svn', 'log', '-q', '--stop-on-copy', url],
-                         capture=True)
-        except SubprocessFailed:
+            output = util.run(['svn', 'log', '-q', '--stop-on-copy', url],
+                              capture=True)
+        except util.SubprocessFailed:
             raise ExpectationFailed('No tag at URL ' + url)
         first_rev_line = output[-2]
         first_rev = int(first_rev_line.split()[0][1:])
@@ -517,9 +469,9 @@ class Subversion(util.Paths):
           using 'patch'.
         """
         try:
-            return run(['svn', 'diff', '-c', str(revision), url],
-                       capture=True, split_capture=False)
-        except SubprocessFailed:
+            return util.run(['svn', 'diff', '-c', str(revision), url],
+                            capture=True, split_capture=False)
+        except util.SubprocessFailed:
             raise ExpectationFailed('Could not get diff for r%d '
                                     'from remote repository' % revision)
 
@@ -791,7 +743,8 @@ class ReleaseEnvironment(util.Paths):
             raise ExpectationFailed(
                 'Retrieved diff is empty. '
                 'Did you accidentally cherry-pick a branch change?')
-        run(['patch', '-p0'], cwd=self.wc.path(self.branch_dir), stdin=diff)
+        util.run(['patch', '-p0'], cwd=self.wc.path(self.branch_dir),
+                 stdin=diff)
         self.wc.addRemove(self.branch_dir)
 
         yaml_path = self.wc.path(self._branchPath('app/app.yaml'))

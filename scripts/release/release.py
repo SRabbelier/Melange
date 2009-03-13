@@ -246,47 +246,7 @@ def linesToFile(path, lines):
         raise FileAccessError(str(e))
 
 
-class Paths(object):
-    """A helper to construct and check paths under a given root."""
-
-    def __init__(self, root):
-        """Initializer.
-
-        Args:
-          root: The root of all paths this instance will consider.
-        """
-        self._root = os.path.abspath(
-            os.path.expandvars(os.path.expanduser(root)))
-
-    def path(self, path=''):
-        """Construct and return a path under the path root.
-
-        Args:
-          path: The desired path string relative to the root.
-
-        Returns:
-          The absolute path corresponding to the relative input path.
-        """
-        assert not os.path.isabs(path)
-        return os.path.abspath(os.path.join(self._root, path))
-
-    def exists(self, path=''):
-        """Check for the existence of a path under the path root.
-
-        Does not discriminate on the path type (ie. it could be a
-        directory, a file, a symbolic link...), just checks for the
-        existence of the path.
-
-        Args:
-          path: The path string relative to the root.
-
-        Returns:
-          True if the path exists, False otherwise.
-        """
-        return os.path.exists(self.path(path))
-
-
-class Subversion(Paths):
+class Subversion(util.Paths):
     """Wrapper for operations on a Subversion working copy.
 
     An instance of this class is bound to a specific working copy
@@ -587,7 +547,7 @@ def requires_branch(f):
     return check_branch
 
 
-class ReleaseEnvironment(Paths):
+class ReleaseEnvironment(util.Paths):
     """Encapsulates the state of a Melange release rolling environment.
 
     This class contains the actual releasing logic, and makes use of

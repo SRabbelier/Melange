@@ -16,12 +16,16 @@
 
 Current contents:
  - Text colorization using ANSI color codes
+ - A class to construct and manage paths under a root path.
 """
 
 __authors__ = [
     # alphabetical order by last name, please
     '"David Anderson" <dave@natulte.net>',
     ]
+
+import os.path
+
 
 # The magic escape sequence understood by modern terminal emulators to
 # configure fore/background colors and other basic text display
@@ -64,3 +68,43 @@ def colorize(text, color, bold=False):
     bold = _ansi_escape(_BOLD) if bold else ''
     return '%s%s%s%s' % (bold, _ansi_escape(color),
                          text, _ansi_escape(_RESET))
+
+
+class Paths(object):
+    """A helper to construct and check paths under a given root."""
+
+    def __init__(self, root):
+        """Initializer.
+
+        Args:
+          root: The root of all paths this instance will consider.
+        """
+        self._root = os.path.abspath(
+            os.path.expandvars(os.path.expanduser(root)))
+
+    def path(self, path=''):
+        """Construct and return a path under the path root.
+
+        Args:
+          path: The desired path string relative to the root.
+
+        Returns:
+          The absolute path corresponding to the relative input path.
+        """
+        assert not os.path.isabs(path)
+        return os.path.abspath(os.path.join(self._root, path))
+
+    def exists(self, path=''):
+        """Check for the existence of a path under the path root.
+
+        Does not discriminate on the path type (ie. it could be a
+        directory, a file, a symbolic link...), just checks for the
+        existence of the path.
+
+        Args:
+          path: The path string relative to the root.
+
+        Returns:
+          True if the path exists, False otherwise.
+        """
+        return os.path.exists(self.path(path))

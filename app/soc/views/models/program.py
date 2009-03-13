@@ -79,6 +79,8 @@ class View(presence.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['assign_slots'] = ['checkIsDeveloper']
     rights['slots'] = ['checkIsDeveloper']
+    rights['show_duplicates'] = ['checkIsHostForProgram']
+    rights['assigned_proposals'] = ['checkIsHostForProgram']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
@@ -102,10 +104,15 @@ class View(presence.View):
         (r'^%(url_name)s/(?P<access_type>slots)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.slots',
           'Assign slots (JSON)'),
+        (r'^%(url_name)s/(?P<access_type>show_duplicates)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.show_duplicates',
+          'Show duplicate slot assignments'),
+        (r'^%(url_name)s/(?P<access_type>assigned_proposals)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.assigned_proposals',
+        "Assigned proposals for multiple orgs"),
         ]
 
     new_params['extra_django_patterns'] = patterns
-
 
     # TODO add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynaproperties'] = {
@@ -266,6 +273,143 @@ class View(presence.View):
         }
 
     return self._list(request, org_params, contents, page_name, context)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def showDuplicates(self, request, access_type, page_name=None,
+           params=None, **kwargs):
+    """View in which a host can see which students have been assigned multiple slots.
+
+    For params see base.view.Public().
+    """
+
+    from django.utils import simplejson
+
+    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
+
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    # get all orgs for this program who are active and have slots assigned
+    fields = {'scope': program_entity,
+              'slots >': 0,
+              'status': 'active'}
+
+    query = org_logic.logic.getQueryForFields(fields)
+
+    to_json = {
+        'nr_of_orgs': query.count(),
+        'program_key': program_entity.key().name()}
+    json = simplejson.dumps(to_json)
+    context['info'] = json
+
+    # TODO(ljvderijk) cache the result of the duplicate calculation
+    context['duplicate_cache_content'] = simplejson.dumps({})
+
+    template = 'soc/program/show_duplicates.html'
+
+    return helper.responses.respond(request, template=template, context=context)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def assignedProposals(self, request, access_type, page_name=None,
+                 params=None, filter=None, **kwargs):
+    """Returns a JSON dict containing all the proposals that would have
+    a slot assigned for a specific set of orgs.
+
+    The request.GET limit and offset determines how many and which
+    organizations should be returned.
+
+    For params see base.View.public().
+
+    Returns: JSON object with a collection of orgs and proposals. Containing
+             identification information and contact information.
+    """
+
+    get_dict = request.GET
+
+    if not (get_dict.get('limit') or get_dict.get('offset')):
+      return self.json(request, {})
+
+    try:
+      limit = max(0, int(get_dict['limit']))
+      offset = max(0, int(get_dict['offset']))
+    except ValueError:
+      return self.json(request, {})
+
+    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
+
+    fields = {'scope': program_entity,
+              'slots >': 0,
+              'status': 'active'}
+
+    org_entities = org_logic.logic.getForFields(fields, limit=limit, offset=offset)
+
+    orgs_data = {}
+    proposals_data = {}
+
+    # for each org get the proposals who will be assigned a slot
+    for org in org_entities:
+
+      org_data = {'name': org.name}
+
+      fields = {'scope': org,
+                'status': 'active',
+                'user': org.founder}
+
+      org_admin = org_admin_logic.logic.getForFields(fields, unique=True)
+
+      if org_admin:
+        org_data['admin_name'] = org_admin.name()
+        org_data['admin_email'] = org_admin.email
+
+      # check if there are already slots taken by this org
+      fields = {'org': org,
+                'status': 'accepted'}
+
+      query = student_proposal_logic.logic.getQueryForFields(fields)
+      test = query.count()
+
+      slots_left_to_assign = max(0, org.slots - query.count())
+
+      if slots_left_to_assign == 0:
+        # no slots left so next org
+        continue
+
+      # store information about the org
+      orgs_data[org.key().name()] = org_data
+
+      fields = {'org': org,
+                'mentor !=': None,
+                'status': 'pending'}
+      order = ['-score']
+
+      # get the the number of proposals that would be assigned a slot
+      student_proposal_entities = student_proposal_logic.logic.getForFields(
+          fields, limit=slots_left_to_assign, order=order)
+
+      proposal_data = {}
+
+      # store each proposal in the dictionary
+      for proposal in student_proposal_entities:
+        student_entity = proposal.scope
+
+        proposals_data[proposal.key().name()] = {
+            'proposal_title': proposal.title,
+            'student_key': student_entity.key().name(),
+            'student_name': student_entity.name(),
+            'student_contact': student_entity.email,
+            'org_key': org.key().name()
+            }
+
+      # store it with the other org data
+      proposals_data['proposals'] = proposal_data
+
+    # return all the data in JSON format
+    data = {'orgs': orgs_data,
+            'proposals': proposals_data}
+
+    return self.json(request, data)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().
@@ -467,12 +611,14 @@ view = View()
 
 admin = decorators.view(view.admin)
 assign_slots = decorators.view(view.assignSlots)
+assigned_proposals = decorators.view(view.assignedProposals)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
+show_duplicates = decorators.view(view.showDuplicates)
 slots = decorators.view(view.slots)
 home = decorators.view(view.home)
 pick = decorators.view(view.pick)

@@ -19,4 +19,4 @@ __authors__ = [
 
 
 class Error(Exception):
-    """Base class for release script exceptions."""
+  """Base class for release script exceptions."""

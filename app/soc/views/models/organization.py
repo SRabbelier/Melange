@@ -210,7 +210,7 @@ class View(group.View):
         'detailed_row.html' % list_params)
     ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
         'detailed_heading.html' % list_params)
-    ranked_params['list_description'] = 'List of %s send to %s ' % (
+    ranked_params['list_description'] = '%s already under review sent to %s' %(
         ranked_params['name_plural'], org_entity.name)
     ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
 

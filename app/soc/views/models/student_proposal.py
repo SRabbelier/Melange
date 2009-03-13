@@ -188,6 +188,7 @@ class View(base.View):
          'initial': 0,
          'required': False,
          'passthrough': ['initial', 'required', 'choices'],
+         'help_text': 'A score will only be assigned if the review is private!',
          'choices': [(-4,'-4: Wow. This. Sucks.'),
                      (-3,'-3: Needs a lot of work'),
                      (-2,'-2: This is bad'),
@@ -206,9 +207,11 @@ class View(base.View):
          },
         {'name': 'public',
          'base': forms.BooleanField,
-         'label': 'Public comment',
+         'label': 'Public review',
          'initial': False,
          'required': False,
+         'help_text': 'By ticking this box the score will not be assigned, '
+             'and the review will be public.',
          },
          ]
 

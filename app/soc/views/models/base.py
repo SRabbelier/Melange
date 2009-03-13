@@ -740,6 +740,7 @@ class View(object):
 
     params = params.copy()
     params['export_extension'] = '.csv'
+    params['export_content_type'] = 'text/csv'
     fieldnames = params['csv_fieldnames']
 
     f = StringIO.StringIO()

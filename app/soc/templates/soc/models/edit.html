@@ -47,9 +47,15 @@ Please use this form to edit the {{ entity_type }}.
   <tr>
     {% block submit_buttons %}
     {% block save_button %}
+    {% if entity %}
    <td> 
     <input style="font-weight: bold" type="submit" value="Save Changes"/></span>
    </td>
+    {% else %}
+       <td> 
+    <input style="font-weight: bold" type="submit" value="Submit"/></span>
+   </td>
+   {% endif %}
    {% endblock %}
    <td>
    {% if edit_cancel_redirect %}

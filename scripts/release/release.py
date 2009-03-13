@@ -48,6 +48,7 @@ import subprocess
 import sys
 
 import error
+import util
 
 
 # Default repository URLs for Melange and the Google release
@@ -112,7 +113,7 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
       SubprocessFailed: The subprocess exited with a non-zero exit
                         code.
     """
-    print '\x1b[1m# %s\x1b[22m' % ' '.join(argv)
+    print util.colorize('# ' + ' '.join(argv), util.WHITE, bold=True)
 
     process = subprocess.Popen(argv,
                                shell=False,
@@ -131,13 +132,13 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=''):
 
 
 def error(msg):
-    """Print an error message, with appropriate formatting."""
-    print '\x1b[1m\x1b[31m%s\x1b[0m' % msg
+    """Log an error message."""
+    print util.colorize(msg, util.RED, bold=True)
 
 
 def info(msg):
-    """Print an informational message, with appropriate formatting."""
-    print '\x1b[32m%s\x1b[0m' % msg
+    """Log an informational message."""
+    print util.colorize(msg, util.GREEN)
 
 
 def confirm(prompt, default=False):

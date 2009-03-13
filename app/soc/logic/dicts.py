@@ -207,3 +207,10 @@ def groupDictBy(target, key, new_key=None):
 
   result = ((k, v[new_key]) for k, v in target.iteritems() if v[key])
   return dict(result)
+
+def identity(target):
+  """Returns a dictionary with the values equal to the keys.
+  """
+
+  result = [(i, i) for i in target]
+  return dict(result)

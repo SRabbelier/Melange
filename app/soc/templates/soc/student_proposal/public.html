@@ -17,6 +17,9 @@ limitations under the License.
 
 {% block header_title %}
 {{ page_name }} "{{ entity.title }}" from {{ student_name }}
+{% if edit_link %}
+<a href='{{ edit_link }}'>(Edit my Proposal)</a>
+{% endif %}
 {% endblock %}
 
 {% block body %}

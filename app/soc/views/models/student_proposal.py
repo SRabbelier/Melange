@@ -390,7 +390,16 @@ class View(base.View):
 
     from soc.logic.models.review import logic as review_logic
 
-    context['student_name'] = entity.scope.name()
+    student_entity = entity.scope
+
+    context['student_name'] = student_entity.name()
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    # check if the current user is the student
+    if user_entity.key() == student_entity.user.key():
+      # show the proposal edit link
+      context['edit_link'] = redirects.getEditRedirect(entity, params)
 
     context['public_reviews'] = review_logic.getReviewsForEntity(entity,
         is_public=True, order=['created'])

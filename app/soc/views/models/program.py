@@ -244,7 +244,7 @@ class View(presence.View):
 
     from soc.views.models import organization as organization_view
 
-    org_params = organization_view.view.getParams()
+    org_params = organization_view.view.getParams().copy()
     org_params['list_template'] = 'soc/program/allocation/allocation.html'
     org_params['list_heading'] = 'soc/program/allocation/heading.html'
     org_params['list_row'] = 'soc/program/allocation/row.html'

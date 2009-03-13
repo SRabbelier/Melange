@@ -58,7 +58,7 @@ GOOGLE_SOC_REPOS = 'https://soc-google.googlecode.com/svn'
 
 # Regular expression matching an apparently well formed Melange
 # release number.
-MELANGE_RELEASE_RE = re.compile(r'\d-\d-\d{8}')
+MELANGE_RELEASE_RE = re.compile(r'\d-\d-\d{8}p\d+')
 
 
 class Error(error.Error):

@@ -44,13 +44,13 @@ class StudentProposal(soc.models.linkable.Linkable):
   #: Required field indicating the "title" of the proposal
   title = db.StringProperty(required=True,
       verbose_name=ugettext('Title'))
-  title.help_text = ugettext('title of the proposal')
+  title.help_text = ugettext('Title of the proposal')
 
   #: required, text field used for different purposes,
   #: depending on the specific type of the proposal
   abstract = db.TextProperty(required=True)
   abstract.help_text = ugettext(
-      'short abstract, summary, or snippet;'
+      'Short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')
 
   #: Required field containing the content of the proposal.

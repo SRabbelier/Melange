@@ -48,6 +48,7 @@ import subprocess
 import sys
 
 import error
+import log
 import util
 
 
@@ -82,16 +83,6 @@ class FileAccessError(Error):
     """An error occured while accessing a file."""
 
 
-def error(msg):
-    """Log an error message."""
-    print util.colorize(msg, util.RED, bold=True)
-
-
-def info(msg):
-    """Log an informational message."""
-    print util.colorize(msg, util.GREEN)
-
-
 def confirm(prompt, default=False):
     """Ask a yes/no question and return the answer.
 
@@ -121,7 +112,7 @@ def confirm(prompt, default=False):
         elif answer in ('n', 'no'):
             return False
         else:
-            error('Please answer yes or no.')
+            log.error('Please answer yes or no.')
 
 
 def getString(prompt):
@@ -142,7 +133,7 @@ def getNumber(prompt):
         try:
             return int(value_str)
         except ValueError:
-            error('Please enter a number. You entered "%s".' % value_str)
+            log.error('Please enter a number. You entered "%s".' % value_str)
 
 
 def getChoice(intro, prompt, choices, done=None, suggest=None):
@@ -174,8 +165,8 @@ def getChoice(intro, prompt, choices, done=None, suggest=None):
         choice = getNumber(prompt)
         if 0 < choice <= len(choices):
             return choice-1
-        error('%d is not a valid choice between %d and %d' %
-              (choice, 1, len(choices)))
+        log.error('%d is not a valid choice between %d and %d' %
+                  (choice, 1, len(choices)))
         print
 
 
@@ -544,7 +535,7 @@ class ReleaseEnvironment(util.Paths):
         the end state is a fully ready to function release
         environment.
         """
-        info('Checking out the release repository')
+        log.info('Checking out the release repository')
 
         # Check out a sparse view of the relevant repository paths.
         self.wc.checkout(self.release_repos, depth='immediates')
@@ -598,7 +589,7 @@ class ReleaseEnvironment(util.Paths):
         if release is None:
             self.branch = None
             self.branch_dir = None
-            info('No release branch available')
+            log.info('No release branch available')
         else:
             self.wc.update()
             assert self.wc.exists('branches/' + release)
@@ -606,7 +597,7 @@ class ReleaseEnvironment(util.Paths):
             self.branch = release
             self.branch_dir = 'branches/' + release
             self.wc.update(self.branch_dir, depth='infinity')
-            info('Working on branch ' + self.branch)
+            log.info('Working on branch ' + self.branch)
 
     def _branchPath(self, path):
         """Return the given path with the release branch path prepended."""
@@ -729,7 +720,7 @@ class ReleaseEnvironment(util.Paths):
             self._applyGooglePatches()
 
             # All done!
-            info('Melange release %s imported and googlified' % self.branch)
+            log.info('Melange release %s imported and googlified' % self.branch)
 
     @requires_branch
     @pristine_wc
@@ -764,17 +755,17 @@ class ReleaseEnvironment(util.Paths):
                 out.append(line)
 
         if not updated_patchlevel:
-            error('Failed to update Google patch revision')
-            error('Cherry-picking failed')
+            log.error('Failed to update Google patch revision')
+            log.error('Cherry-picking failed')
 
         linesToFile(yaml_path, out)
 
-        info('Check the diff about to be committed with:')
-        info('svn diff ' + self.wc.path(self.branch_dir))
+        log.info('Check the diff about to be committed with:')
+        log.info('svn diff ' + self.wc.path(self.branch_dir))
         if not confirm('Commit this change?'):
             raise AbortedByUser('Cherry-pick aborted')
         self.wc.commit(message)
-        info('Cherry-picked r%d from the Melange trunk.' % rev)
+        log.info('Cherry-picked r%d from the Melange trunk.' % rev)
 
     MENU_ORDER = [
         update,
@@ -813,12 +804,12 @@ class ReleaseEnvironment(util.Paths):
                                    self.MENU_STRINGS, done=done,
                                    suggest=suggested_next)
             except (KeyboardInterrupt, AbortedByUser):
-                info('Exiting.')
+                log.info('Exiting.')
                 return
             try:
                 self.MENU_ORDER[choice](self)
             except Error, e:
-                error(str(e))
+                log.error(str(e))
             else:
                 done.append(choice)
                 last_choice = choice
@@ -836,8 +827,10 @@ def main(argv):
     if len(argv) == 3:
         upstream_repos = argv[2]
 
-    info('Release repository: ' + release_repos)
-    info('Upstream repository: ' + upstream_repos)
+    log.init('release.log')
+
+    log.info('Release repository: ' + release_repos)
+    log.info('Upstream repository: ' + upstream_repos)
 
     r = ReleaseEnvironment(os.path.abspath('_release_'),
                            release_repos,

@@ -746,6 +746,7 @@ class View(object):
 
     if key_order:
       writer = csv.DictWriter(f, key_order, dialect='excel')
+      writer.writerow(dicts.identity(key_order))
     else:
       writer = csv.writer(f, dialect='excel')
 

@@ -33,7 +33,7 @@ import os.path
 _ANSI_ESCAPE = '\x1b[%dm'
 
 
-# Some intrnal non-color settings that we use.
+# Some internal non-color settings that we use.
 _RESET = 0  # Reset to terminal defaults.
 _BOLD = 1   # Brighter colors.
 

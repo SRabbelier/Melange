@@ -271,7 +271,7 @@ class Subversion(util.Paths):
     """
 
     def __init__(self, wc_dir):
-        Paths.__init__(self, wc_dir)
+        util.Paths.__init__(self, wc_dir)
 
     def _unknownAndMissing(self, path):
         """Returns lists of unknown and missing files in the working copy.
@@ -569,7 +569,7 @@ class ReleaseEnvironment(util.Paths):
           release_repos: The URL to the Google release repository root.
           upstream_repos: The URL to the Melange upstream repository root.
         """
-        Paths.__init__(self, root)
+        util.Paths.__init__(self, root)
         self.wc = Subversion(self.path('google-soc'))
         self.release_repos = release_repos.strip('/')
         self.upstream_repos = upstream_repos.strip('/')

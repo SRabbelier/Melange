@@ -47,6 +47,8 @@ import re
 import subprocess
 import sys
 
+import error
+
 
 # Default repository URLs for Melange and the Google release
 # repository.
@@ -59,7 +61,7 @@ GOOGLE_SOC_REPOS = 'https://soc-google.googlecode.com/svn'
 MELANGE_RELEASE_RE = re.compile(r'\d-\d-\d{8}')
 
 
-class Error(Exception):
+class Error(error.Error):
     pass
 
 

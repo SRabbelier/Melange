@@ -26,6 +26,7 @@ __authors__ = [
     ]
 
 import os.path
+import re
 import subprocess
 
 import error
@@ -43,6 +44,7 @@ class SubprocessFailed(Error):
 # configure fore/background colors and other basic text display
 # settings.
 _ANSI_ESCAPE = '\x1b[%dm'
+_ANSI_ESCAPE_RE = re.compile(r'\x1b\[\d+m')
 
 
 # Some internal non-color settings that we use.
@@ -80,6 +82,11 @@ def colorize(text, color, bold=False):
     bold = _ansi_escape(_BOLD) if bold else ''
     return '%s%s%s%s' % (bold, _ansi_escape(color),
                          text, _ansi_escape(_RESET))
+
+
+def decolorize(text):
+    """Remove ANSI color codes from text."""
+    return _ANSI_ESCAPE_RE.sub('', text)
 
 
 class Paths(object):

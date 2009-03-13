@@ -188,7 +188,8 @@ class View(base.View):
          'initial': 0,
          'required': False,
          'passthrough': ['initial', 'required', 'choices'],
-         'help_text': 'A score will only be assigned if the review is private!',
+         'example_text':
+             'A score will only be assigned if the review is private!',
          'choices': [(-4,'-4: Wow. This. Sucks.'),
                      (-3,'-3: Needs a lot of work'),
                      (-2,'-2: This is bad'),
@@ -227,7 +228,9 @@ class View(base.View):
       {'name': 'rank',
          'base': forms.IntegerField,
          'label': 'Set to rank',
-         'help_text': 'Set this proposal to the given rank (ignores the given score)',
+         'help_text':
+             'Set this proposal to the given rank (ignores the given score)',
+         'example_text': 'A rank will only be assigned if the review is private!',
          'min_value': 1,
          'required': False,
          'passthrough': ['min_value', 'required', 'help_text'],
@@ -235,7 +238,10 @@ class View(base.View):
       {'name': 'mentor',
        'base': forms.CharField,
        'label': 'Assign Mentor (Link ID)',
-       'required': False
+       'required': False,
+       'help_text': 'Fill in the Link ID of the Mentor '
+           'you would like to assign to this Proposal. '
+           'Leave this box empty if you don\'t want any mentor assigned.',
       },
       ]
 
@@ -502,6 +508,7 @@ class View(base.View):
 
     list_params = params.copy()
     list_params['list_description'] = 'List of my %(name_plural)s' % list_params
+    list_params['list_action'] = (redirects.getPublicRedirect, list_params)
 
     return self.list(request, access_type=access_type, page_name=page_name,
                      params=list_params, filter=filter, **kwargs)

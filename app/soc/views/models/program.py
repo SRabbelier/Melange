@@ -198,7 +198,7 @@ class View(presence.View):
       locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
       adjusted_slots = dicts.groupDictBy(from_json, 'adjustment')
 
-    orgs = [i.link_id for i in organizations]
+    orgs = {}
     applications = {}
     mentors = {}
 
@@ -207,6 +207,7 @@ class View(presence.View):
           'org': org,
           'status': ['new', 'pending']
           }
+      orgs[org.link_id] = org
       query = student_proposal_logic.logic.getQueryForFields(filter=filter)
       proposals = student_proposal_logic.logic.getAll(query)
       applications[org.link_id] = len(proposals)
@@ -217,7 +218,7 @@ class View(presence.View):
     min_slots_per_org = 2
     iterative = False
 
-    allocator = allocations.Allocator(orgs, applications, mentors,
+    allocator = allocations.Allocator(orgs.keys(), applications, mentors,
                                       slots, max_slots_per_org,
                                       min_slots_per_org, iterative)
 
@@ -230,8 +231,8 @@ class View(presence.View):
       data.append({
           'link_id': link_id,
           'slots': count,
-          'locked': org['locked'] if 'locked' in org else 0,
-          'adjustment': org['adjustment'] if 'adjustment' in org else 0,
+          'locked': locked_slots.get(link_id, 0),
+          'adjustment': adjusted_slots.get(link_id, 0),
           })
 
     return self.json(request, data)

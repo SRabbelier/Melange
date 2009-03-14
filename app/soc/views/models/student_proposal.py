@@ -91,7 +91,7 @@ class View(base.View):
     new_params['rights'] = rights
     new_params['name'] = "Student Proposal"
     new_params['url_name'] = "student_proposal"
-    new_params['sidebar_grouping'] = 'Student Proposal'
+    new_params['sidebar_grouping'] = 'Students'
 
     new_params['scope_view'] = student_view
     new_params['scope_redirect'] = redirects.getCreateRedirect

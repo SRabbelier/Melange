@@ -182,14 +182,16 @@ class View(base.View):
     list_params = params.copy()
     index = 0
 
-    for choice in selection:
+    for status, action in selection:
       # only select the requests that have been pre-accpeted
-      filter['status'] = choice[0]
+      filter['status'] = status
+
+      name = status[0] if isinstance(status, list) else status
 
       list_params['list_description'] = (
           DEF_APPLICATION_LIST_DESCRIPTION_FMT % (
-          {'name_plural': params['name_plural'], 'status': choice[0]}))
-      list_params['list_action'] = choice[1]
+          {'name_plural': params['name_plural'], 'status': name}))
+      list_params['list_action'] = action
 
       list_content = list_helper.getListContent(
           request, list_params, filter, idx=index)
@@ -223,7 +225,8 @@ class View(base.View):
       filter['scope_path'] = kwargs['scope_path']
 
     # create the selection list
-    selection = [('needs review', (redirects.getEditRedirect, params)), 
+    selection = [(['needs review', 'pre-accepted', 'pre-rejected'],
+                  (redirects.getEditRedirect, params)),
                  ('accepted', (redirects.getApplicantRedirect, 
                     {'url_name': params['group_url_name']})),
                  ('rejected', (redirects.getPublicRedirect, params))]

@@ -62,6 +62,7 @@ class View(base.View):
     rights['edit'] = ['checkIsDeveloper']
     rights['delete'] = ['checkIsDeveloper']
     rights['list'] = ['checkIsDeveloper']
+    rights['list_developers'] = ['checkIsDeveloper']
 
     new_params = {}
     new_params['logic'] = soc.logic.models.user.logic
@@ -98,10 +99,30 @@ class View(base.View):
         'clean': cleaning.validate_user_edit('link_id', 'account'),
     }
 
+    patterns = []
+
+    patterns += [(r'^%(url_name)s/(?P<access_type>list_developers)$',
+                  'soc.views.models.%(module_name)s.list_developers', 
+                  "List Developers")]
+
+    new_params['extra_django_patterns'] = patterns
+
+    new_params['sidebar_additional'] = [
+        ('/user/list_developers' % new_params,
+         'List Developers', 'list_developers'),]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
 
+  def listDevelopers(self, request, access_type, page_name=None, params=None):
+    """See base.View.list.
+    """
+
+    filter = {'is_developer': True}
+
+    return self.list(request, access_type, page_name=page_name,
+                     params=params, filter=filter)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -136,6 +157,7 @@ create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
+list_developers = decorators.view(view.listDevelopers)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)

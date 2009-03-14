@@ -38,6 +38,7 @@ from soc.logic.models import host as host_logic
 from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
+from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import student_proposal as student_proposal_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
@@ -529,11 +530,17 @@ class View(presence.View):
           "Apply to become an Organization", 'any_access')]
 
     if user and timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
-      # add the 'List my Organization Applications' link
-      items += [
-          (redirects.getListSelfRedirect(program_entity,
-                                         {'url_name' : 'org_app'}),
-           "List My Organization Applications", 'any_access')]
+      filter = {
+          'applicant': user,
+          'scope': program_entity,
+          }
+
+      if org_app_logic.logic.getForFields(filter, unique=True):
+        # add the 'List my Organization Applications' link
+        items += [
+            (redirects.getListSelfRedirect(program_entity,
+                                           {'url_name' : 'org_app'}),
+             "List My Organization Applications", 'any_access')]
 
     # get the student entity for this user and program
     filter = {'user': user,

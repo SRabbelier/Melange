@@ -288,6 +288,7 @@ class View(presence.View):
     program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
     context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
     # get all orgs for this program who are active and have slots assigned

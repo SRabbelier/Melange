@@ -87,7 +87,7 @@ class Allocator(object):
     self.buildSets()
 
     if not sum(self.popularity.values()) or not sum(self.mentors.values()):
-      return {}
+      return self.popularity
 
     if self.iterative:
       return self.iterativeAllocation()

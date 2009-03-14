@@ -527,12 +527,12 @@ class View(presence.View):
           (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
-      if user:
-        # add the 'List my Organization Applications' link
-        items += [
-            (redirects.getListSelfRedirect(program_entity,
-                                           {'url_name' : 'org_app'}),
-             "List My Organization Applications", 'any_access')]
+    if user and timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
+      # add the 'List my Organization Applications' link
+      items += [
+          (redirects.getListSelfRedirect(program_entity,
+                                         {'url_name' : 'org_app'}),
+           "List My Organization Applications", 'any_access')]
 
     # get the student entity for this user and program
     filter = {'user': user,

@@ -20,3 +20,11 @@ __authors__ = [
 
 class Error(Exception):
   """Base class for release script exceptions."""
+
+
+class ObstructionError(Error):
+  """An operation was obstructed by existing data."""
+
+
+class ExpectationFailed(Error):
+  """An unexpected state was encountered by an automated step."""

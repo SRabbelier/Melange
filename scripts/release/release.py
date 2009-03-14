@@ -49,6 +49,7 @@ import sys
 
 import error
 import log
+import subversion
 import util
 
 
@@ -69,14 +70,6 @@ class Error(error.Error):
 
 class AbortedByUser(Error):
   """The operation was aborted by the user."""
-
-
-class ObstructionError(Error):
-  """An operation was obstructed by existing data."""
-
-
-class ExpectationFailed(Error):
-  """An unexpected state was encountered by an automated step."""
 
 
 class FileAccessError(Error):
@@ -191,285 +184,6 @@ def linesToFile(path, lines):
     raise FileAccessError(str(e))
 
 
-class Subversion(util.Paths):
-  """Wrapper for operations on a Subversion working copy.
-
-  An instance of this class is bound to a specific working copy
-  directory, and provides an API to perform various Subversion
-  operations on this working copy.
-
-  Some methods take a 'depth' argument. Depth in Subversion is a
-  feature that allows the creation of arbitrarily shallow or deep
-  working copies on a per-directory basis. Possible values are
-  'none' (no files or directories), 'files' (only files in .),
-  'immediates' (files and directories in ., directories checked out
-  at depth 'none') or 'infinity' (a normal working copy with
-  everything).
-
-  This class also provides a few static functions that run the 'svn'
-  tool against remote repositories to gather information or retrieve
-  data.
-
-  Note that this wrapper also doubles as a Paths object, offering an
-  easy way to get or check the existence of paths in the working
-  copy.
-  """
-
-  def __init__(self, wc_dir):
-    util.Paths.__init__(self, wc_dir)
-
-  def _unknownAndMissing(self, path):
-    """Returns lists of unknown and missing files in the working copy.
-
-    Args:
-      path: The working copy path to scan.
-
-    Returns:
-
-      Two lists. The first is a list of all unknown paths
-      (subversion has no knowledge of them), the second is a list
-      of missing paths (subversion knows about them, but can't
-      find them). Paths in either list are relative to the input
-      path.
-    """
-    assert self.exists()
-    unknown = []
-    missing = []
-    for line in self.status(path):
-      if not line.strip():
-        continue
-      if line[0] == '?':
-        unknown.append(line[7:])
-      elif line[0] == '!':
-        missing.append(line[7:])
-    return unknown, missing
-
-  def checkout(self, url, depth='infinity'):
-    """Check out a working copy from the given URL.
-
-    Args:
-      url: The Subversion repository URL to check out.
-      depth: The depth of the working copy root.
-    """
-    assert not self.exists()
-    util.run(['svn', 'checkout', '--depth=' + depth, url, self.path()])
-
-  def update(self, path='', depth=None):
-    """Update a working copy path, optionally changing depth.
-
-    Args:
-      path: The working copy path to update.
-      depth: If set, change the depth of the path before updating.
-    """
-    assert self.exists()
-    if depth is None:
-      util.run(['svn', 'update', self.path(path)])
-    else:
-      util.run(['svn', 'update', '--set-depth=' + depth, self.path(path)])
-
-  def revert(self, path=''):
-    """Recursively revert a working copy path.
-
-    Note that this command is more zealous than the 'svn revert'
-    command, as it will also delete any files which subversion
-    does not know about.
-    """
-    util.run(['svn', 'revert', '-R', self.path(path)])
-
-    unknown, missing = self._unknownAndMissing(path)
-    unknown = [os.path.join(self.path(path), p) for p in unknown]
-
-    if unknown:
-      # rm -rf makes me uneasy. Verify that all paths to be deleted
-      # are within the release working copy.
-      for p in unknown:
-        assert p.startswith(self.path())
-
-      util.run(['rm', '-rf', '--'] + unknown)
-
-  def ls(self, dir=''):
-    """List the contents of a working copy directory.
-
-    Note that this returns the contents of the directory as seen
-    by the server, not constrained by the depth settings of the
-    local path.
-    """
-    assert self.exists()
-    return util.run(['svn', 'ls', self.path(dir)], capture=True)
-
-  def copy(self, src, dest):
-    """Copy a working copy path.
-
-    The copy is only scheduled for commit, not committed.
-
-    Args:
-      src: The source working copy path.
-      dst: The destination working copy path.
-    """
-    assert self.exists()
-    util.run(['svn', 'cp', self.path(src), self.path(dest)])
-
-  def propget(self, prop_name, path):
-    """Get the value of a property on a working copy path.
-
-    Args:
-      prop_name: The property name, eg. 'svn:externals'.
-      path: The working copy path on which the property is set.
-    """
-    assert self.exists()
-    return util.run(['svn', 'propget', prop_name, self.path(path)],
-            capture=True)
-
-  def propset(self, prop_name, prop_value, path):
-    """Set the value of a property on a working copy path.
-
-    The property change is only scheduled for commit, not committed.
-
-    Args:
-      prop_name: The property name, eg. 'svn:externals'.
-      prop_value: The value that should be set.
-      path: The working copy path on which to set the property.
-    """
-    assert self.exists()
-    util.run(['svn', 'propset', prop_name, prop_value, self.path(path)])
-
-  def add(self, paths):
-    """Schedule working copy paths for addition.
-
-    The paths are only scheduled for addition, not committed.
-
-    Args:
-      paths: The list of working copy paths to add.
-    """
-    assert self.exists()
-    paths = [self.path(p) for p in paths]
-    util.run(['svn', 'add'] + paths)
-
-  def remove(self, paths):
-    """Schedule working copy paths for deletion.
-
-    The paths are only scheduled for deletion, not committed.
-
-    Args:
-      paths: The list of working copy paths to delete.
-    """
-    assert self.exists()
-    paths = [self.path(p) for p in paths]
-    util.run(['svn', 'rm'] + paths)
-
-  def status(self, path=''):
-    """Return the status of a working copy path.
-
-    The status returned is the verbatim output of 'svn status' on
-    the path.
-
-    Args:
-      path: The path to examine.
-    """
-    assert self.exists()
-    return util.run(['svn', 'status', self.path(path)], capture=True)
-
-  def addRemove(self, path=''):
-    """Perform an "addremove" operation a working copy path.
-
-    An "addremove" runs 'svn status' and schedules all the unknown
-    paths (listed as '?') for addition, and all the missing paths
-    (listed as '!') for deletion. Its main use is to synchronize
-    working copy state after applying a patch in unified diff
-    format.
-
-    Args:
-      path: The path under which unknown/missing files should be
-        added/removed.
-    """
-    assert self.exists()
-    unknown, missing = self._unknownAndMissing(path)
-    if unknown:
-      self.add(unknown)
-    if missing:
-      self.remove(missing)
-
-  def commit(self, message, path=''):
-    """Commit scheduled changes to the source repository.
-
-    Args:
-      message: The commit message to use.
-      path: The path to commit.
-    """
-    assert self.exists()
-    util.run(['svn', 'commit', '-m', message, self.path(path)])
-
-  @staticmethod
-  def export(url, revision, dest_path):
-    """Export the contents of a repository to a local path.
-
-    Note that while the underlying 'svn export' only requires a
-    URL, we require that both a URL and a revision be specified,
-    to fully qualify the data to export.
-
-    Args:
-      url: The repository URL to export.
-      revision: The revision to export.
-      dest_path: The destination directory for the export. Note
-           that this is an absolute path, NOT a working copy
-           relative path.
-    """
-    assert os.path.isabs(dest_path)
-    if os.path.exists(dest_path):
-      raise ObstructionError('Cannot export to obstructed path %s' %
-                   dest_path)
-    util.run(['svn', 'export', '-r', str(revision), url, dest_path])
-
-  @staticmethod
-  def find_tag_rev(url):
-    """Return the revision at which a remote tag was created.
-
-    Since tags are immutable by convention, usually the HEAD of a
-    tag should be the tag creation revision. However, mistakes can
-    happen, so this function will walk the history of the given
-    tag URL, stopping on the first revision that was created by
-    copy.
-
-    This detection is not foolproof. For example: it will be
-    fooled by a tag that was created, deleted, and recreated by
-    copy at a different revision. It is not clear what the desired
-    behavior in these edge cases are, and no attempt is made to
-    handle them. You should request user confirmation before using
-    the result of this function.
-
-    Args:
-      url: The repository URL of the tag to examine.
-    """
-    try:
-      output = util.run(['svn', 'log', '-q', '--stop-on-copy', url],
-                capture=True)
-    except util.SubprocessFailed:
-      raise ExpectationFailed('No tag at URL ' + url)
-    first_rev_line = output[-2]
-    first_rev = int(first_rev_line.split()[0][1:])
-    return first_rev
-
-  @staticmethod
-  def diff(url, revision):
-    """Retrieve a revision from a remote repository as a unified diff.
-
-    Args:
-      url: The repository URL on which to perform the diff.
-      revision: The revision to extract at the given url.
-
-    Returns:
-      A string containing the changes extracted from the remote
-      repository, in unified diff format suitable for application
-      using 'patch'.
-    """
-    try:
-      return util.run(['svn', 'diff', '-c', str(revision), url],
-              capture=True, split_capture=False)
-    except util.SubprocessFailed:
-      raise ExpectationFailed('Could not get diff for r%d '
-                  'from remote repository' % revision)
-
-
 #
 # Decorators for use in ReleaseEnvironment.
 #
@@ -487,7 +201,7 @@ def requires_branch(f):
   @functools.wraps(f)
   def check_branch(self, *args, **kwargs):
     if self.branch is None:
-      raise ExpectationFailed(
+      raise error.ExpectationFailed(
         'This operation requires an active release branch')
     return f(self, *args, **kwargs)
   return check_branch
@@ -516,7 +230,7 @@ class ReleaseEnvironment(util.Paths):
       upstream_repos: The URL to the Melange upstream repository root.
     """
     util.Paths.__init__(self, root)
-    self.wc = Subversion(self.path('google-soc'))
+    self.wc = subversion.WorkingCopy(self.path('google-soc'))
     self.release_repos = release_repos.strip('/')
     self.upstream_repos = upstream_repos.strip('/')
 
@@ -621,7 +335,7 @@ class ReleaseEnvironment(util.Paths):
     """Switch to another Melange release branch"""
     branches = self._listBranches()
     if not branches:
-      raise ExpectationFailed(
+      raise error.ExpectationFailed(
         'No branches available. Please import one.')
 
     choice = getChoice('Available release branches:',
@@ -677,7 +391,7 @@ class ReleaseEnvironment(util.Paths):
         tmpl[i] = line.replace('/p/soc/', '/p/soc-google/')
         break
     else:
-      raise ExpectationFailed(
+      raise error.ExpectationFailed(
         'No source code link found in base.html')
     linesToFile(tmpl_file, tmpl)
 
@@ -696,7 +410,7 @@ class ReleaseEnvironment(util.Paths):
       raise ObstructionError('Release %s already imported' % release)
 
     tag_url = '%s/tags/%s' % (self.upstream_repos, release)
-    release_rev = Subversion.find_tag_rev(tag_url)
+    release_rev = subversion.find_tag_rev(tag_url)
 
     if confirm('Confirm import of release %s, tagged at r%d?' %
            (release, release_rev)):
@@ -709,7 +423,7 @@ class ReleaseEnvironment(util.Paths):
                'release %s at r%d.' % (release, release_rev))
 
       # Export the tag into the release repository's branches
-      Subversion.export(tag_url, release_rev, self.wc.path(branch_dir))
+      subversion.export(tag_url, release_rev, self.wc.path(branch_dir))
 
       # Add and commit the branch add (very long operation!)
       self.wc.add([branch_dir])
@@ -732,9 +446,9 @@ class ReleaseEnvironment(util.Paths):
     rev = getNumber('Revision number to cherry-pick:')
     bug = getNumber('Issue fixed by this change:')
 
-    diff = self.wc.diff(self.upstream_repos + '/trunk', rev)
+    diff = subversion.diff(self.upstream_repos + '/trunk', rev)
     if not diff.strip():
-      raise ExpectationFailed(
+      raise error.ExpectationFailed(
         'Retrieved diff is empty. '
         'Did you accidentally cherry-pick a branch change?')
     util.run(['patch', '-p0'], cwd=self.wc.path(self.branch_dir),
@@ -811,7 +525,7 @@ class ReleaseEnvironment(util.Paths):
         return
       try:
         self.MENU_ORDER[choice](self)
-      except Error, e:
+      except error.Error, e:
         log.error(str(e))
       else:
         done.append(choice)

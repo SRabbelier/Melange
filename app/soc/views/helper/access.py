@@ -1005,6 +1005,14 @@ class Checker(object):
     if entity:
       return
 
+    del fields['applicant']
+    fields['backup_admin'] = self.user
+
+    entity = group_app_logic.getForFields(fields)
+
+    if entity:
+      return
+
     raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
   @allowSidebar

@@ -729,10 +729,10 @@ class View(object):
     return response
 
   def csv(self, request, data, filename, params, key_order=None):
-    """Returns data as a csv file
+    """Returns data as a csv file.
 
     If key_order is set data should be a sequence of dicts, otherwise
-    data should be a sequence of lists,s ee csv.writer and
+    data should be a sequence of lists, see csv.writer and
     csv.DictWriter for more information.
     """
 
@@ -746,14 +746,16 @@ class View(object):
     if key_order:
       writer = csv.DictWriter(f, key_order, dialect='excel')
       writer.writerow(dicts.identity(key_order))
-      
+
+      # encode the data to UTF-8 to ensure compatibiliy
       for row_dict in data:
         for key in row_dict.keys():
           row_dict[key] = row_dict[key].encode("utf-8")
         writer.writerow(row_dict)
     else:
       writer = csv.writer(f, dialect='excel')
-      
+
+      # encode the data to UTF-8 to ensure compatibiliy
       for row in data:
         writer.writerow(row.encode("utf-8"))
 

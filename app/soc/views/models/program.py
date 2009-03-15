@@ -240,7 +240,7 @@ class View(presence.View):
   @decorators.merge_params
   @decorators.check_access
   def assignSlots(self, request, access_type, page_name=None,
-           params=None, **kwargs):
+                  params=None, **kwargs):
     """View that allows to assign slots to orgs.
     """
 
@@ -279,7 +279,7 @@ class View(presence.View):
   @decorators.merge_params
   @decorators.check_access
   def showDuplicates(self, request, access_type, page_name=None,
-           params=None, **kwargs):
+                     params=None, **kwargs):
     """View in which a host can see which students have been assigned multiple slots.
 
     For params see base.view.Public().
@@ -316,7 +316,7 @@ class View(presence.View):
   @decorators.merge_params
   @decorators.check_access
   def assignedProposals(self, request, access_type, page_name=None,
-                 params=None, filter=None, **kwargs):
+                        params=None, filter=None, **kwargs):
     """Returns a JSON dict containing all the proposals that would have
     a slot assigned for a specific set of orgs.
 

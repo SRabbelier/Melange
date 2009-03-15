@@ -36,5 +36,5 @@ class Club(soc.models.group.Group):
      relation is implemented as the 'members' back-reference Query of the
      Member model 'club' reference.
   """
-  
+
   pass

@@ -45,4 +45,3 @@ class Follower(soc.models.linkable.Linkable):
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name='following')
 
-  pass

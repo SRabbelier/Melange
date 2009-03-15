@@ -50,8 +50,7 @@ class Comment(soc.models.linkable.Linkable):
   content = db.TextProperty(verbose_name=_('Content'))
 
   #: Indicated if the comment should be visible to the appropriate student
-  is_public = db.BooleanProperty(
-    verbose_name=_('Public comment'))
+  is_public = db.BooleanProperty(verbose_name=_('Public comment'))
 
   #: Date when the comment was added
   created = db.DateTimeProperty(auto_now_add=True)

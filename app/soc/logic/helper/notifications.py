@@ -86,7 +86,9 @@ def sendInviteNotification(entity):
 
   template = DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE
 
-  sendNotification(to_user, message_properties, subject, template)
+  from_user = model_logic.user.logic.getForCurrentAccount()
+
+  sendNotification(to_user, from_user, message_properties, subject, template)
 
 
 def sendNewGroupNotification(entity, params):
@@ -118,23 +120,28 @@ def sendNewGroupNotification(entity, params):
 
   template = DEF_NEW_GROUP_TEMPLATE
 
-  sendNotification(to_user, message_properties, subject, template)
+  sendNotification(to_user, None, message_properties, subject, template)
 
 
-def sendNotification(to_user, message_properties, subject, template):
-  """Sends out an notification to the specified user.
+def sendNotification(to_user, from_user, message_properties, subject, template):
+  """Sends out a notification to the specified user.
 
   Args:
     to_user : user to which the notification will be send
-    message_properties : email message properties
+    from_user: user from who sends the notifications (None iff sent by site)
+    message_properties : message properties
     subject : subject of notification email
     template : template used for generating notification
   """
 
-  from_user = model_logic.user.logic.getForCurrentAccount()
+  if from_user:
+    sender_name = from_user.name
+  else:
+    site_entity = model_logic.site.logic.getSingleton()
+    sender_name = 'The %s Team' %(site_entity.site_name)
 
   new_message_properties = {
-      'sender_name': from_user.name,
+      'sender_name': sender_name,
       'to_name': to_user.name,
       }
 

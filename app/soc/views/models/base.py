@@ -746,10 +746,16 @@ class View(object):
     if key_order:
       writer = csv.DictWriter(f, key_order, dialect='excel')
       writer.writerow(dicts.identity(key_order))
+      
+      for row_dict in data:
+        for key in row_dict.keys():
+          row_dict[key] = row_dict[key].encode("utf-8")
+        writer.writerow(row_dict)
     else:
       writer = csv.writer(f, dialect='excel')
-
-    writer.writerows(data)
+      
+      for row in data:
+        writer.writerow(row.encode("utf-8"))
 
     data = f.getvalue()
 

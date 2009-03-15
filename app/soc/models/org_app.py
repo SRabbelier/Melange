@@ -72,7 +72,7 @@ class OrgApplication(soc.models.group_app.GroupApplication):
 
   contrib_template = db.TextProperty(required=False, verbose_name=ugettext(
       'What is the application template you would like contributors'
-      ' to your organization to use.'))
+      ' to your organization to use?'))
   contrib_template.help_text = ugettext(
       'This template can be used by contributors, such as students'
       ' and other non-member participants, when they apply to contribute'

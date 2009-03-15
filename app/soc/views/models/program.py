@@ -192,7 +192,10 @@ class View(presence.View):
     del aa_params['list_key_order']
     aa_params['list_action'] = (redirects.getPublicRedirect, aa_params)
     aa_params['list_description'] = ugettext(
-        "An overview of accepted org applications.")
+        "An overview of accepted organization applications that have"
+        " not yet created their organization profile. Students can"
+        " only apply to organizations that created their organization"
+        " profile.")
 
     aa_list = lists.getListContent(request, aa_params, filter, idx=0,
                                    need_content=True)
@@ -207,7 +210,7 @@ class View(presence.View):
 
     ao_params['list_action'] = (redirects.getHomeRedirect, ao_params)
     ao_params['list_description'] = ugettext(
-        "An overview of all organizations.")
+        "An overview of all accepted organizations.")
 
     ao_list = lists.getListContent(request, ao_params, filter, idx=1,
                                    need_content=True)

@@ -166,6 +166,16 @@ def getListProposalsRedirect(entity, params):
   return result
 
 
+def getAcceptedOrgsRedirect(entity, params):
+  """Returns the redirect for the List of accepted orgs.
+  """
+
+  result = '/%s/accepted_orgs/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
 def getListRequestsRedirect(entity, params):
   """Returns the redirect for the List Requests paged for the given
   Group entity and Group View params.

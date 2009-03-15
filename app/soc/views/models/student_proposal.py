@@ -371,6 +371,36 @@ class View(base.View):
         rest see base.View.public()
     """
 
+    from soc.logic.models.review_follower import logic as review_follower_logic
+
+    get_dict = request.GET
+
+    if get_dict.get('subscription') and (
+      get_dict['subscription'] in ['on', 'off']):
+
+      subscription = get_dict['subscription']
+
+      # get the current user
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      # create the fields that should be in the ReviewFollower entity
+      fields = {'link_id': user_entity.link_id,
+                'scope': entity,
+                'scope_path': entity.key().name(),
+                'user': user_entity
+               }
+      # get the keyname for the ReviewFollower entity
+      key_name = review_follower_logic.getKeyNameFromFields(fields)
+
+      # determine if we should set subscribed_public to True or False
+      if subscription == 'on':
+        fields['subscribed_public'] = True
+      elif subscription == 'off':
+        fields['subscribed_public'] = False
+
+      # update the ReviewFollower
+      review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
+
     # get some entity specific context
     self.updatePublicContext(context, entity, params)
 
@@ -389,6 +419,7 @@ class View(base.View):
     """
 
     from soc.logic.models.review import logic as review_logic
+    from soc.logic.models.review_follower import logic as review_follower_logic
 
     student_entity = entity.scope
 
@@ -400,6 +431,14 @@ class View(base.View):
     if user_entity.key() == student_entity.user.key():
       # show the proposal edit link
       context['edit_link'] = redirects.getEditRedirect(entity, params)
+
+    # check if the current user is subscribed to this proposal's public reviews
+    fields = {'user': user_entity,
+        'scope': entity,
+        'subscribed_public': True}
+
+    context['is_subscribed'] = review_follower_logic.getForFields(fields,
+                                                                  unique=True)
 
     context['public_reviews'] = review_logic.getReviewsForEntity(entity,
         is_public=True, order=['created'])

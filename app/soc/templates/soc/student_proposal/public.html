@@ -55,6 +55,17 @@ limitations under the License.
    <td> 
     <input style="font-weight: bold" type="submit" value="Submit"/></span>
    </td>
+   {% if is_subscribed %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Unsubscribe from updates"
+       onclick="location.href='?subscription=off'"/>
+   </td>
+   {% else %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Subscribe to updates"
+       onclick="location.href='?subscription=on'"/>
+   </td>
+   {% endif %}
   </tr>
  </table>
 </form>

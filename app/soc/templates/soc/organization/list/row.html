@@ -4,8 +4,7 @@ onclick="document.location.href='{{ list.redirect }}'" name="name">
          href="{{ list.redirect }}">{{ list.item.name }}</a>
      </div>
   </td>
-  <td><div class="link_id">{{ list.item.scope.key.name }}</a></div></td>
   <td><div class="link_id">{{ list.item.link_id }}</a></div></td>
   <td><div class="short_name">{{ list.item.short_name }}</a></div></td>
-  <td><div class="idea_url">{{ list.item.ideas|urlizetrunc:25 }}</div></td>
+  <td><div class="idea_url">{{ list.item.ideas|urlizetrunc:35 }}</div></td>
 </tr>

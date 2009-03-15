@@ -546,13 +546,11 @@ class View(object):
       content = contents[export]
       key_order = content.get('key_order')
 
-      data = [i.toDict(key_order) for i in content['data']]
+      if key_order:
+        data = [i.toDict(key_order) for i in content['data']]
 
-      if not key_order:
-        data = [i.values() for i in data]
-
-      filename = "export_%d" % export
-      return self.csv(request, data, filename, params, key_order)
+        filename = "export_%d" % export
+        return self.csv(request, data, filename, params, key_order)
 
     context = dicts.merge(context,
         helper.responses.getUniversalContext(request))

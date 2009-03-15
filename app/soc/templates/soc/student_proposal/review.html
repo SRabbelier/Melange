@@ -77,6 +77,28 @@ limitations under the License.
        onclick="location.href='?ineligible=1'"/>
      </td>
    {% endif %}
+   {% if is_subscribed_public %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Unsubscribe from public updates"
+       onclick="location.href='?public_subscription=off'"/>
+   </td>
+   {% else %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Subscribe to public updates"
+       onclick="location.href='?public_subscription=on'"/>
+   </td>
+   {% endif %}
+   {% if is_subscribed_private %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Unsubscribe from private updates"
+       onclick="location.href='?private_subscription=off'"/>
+   </td>
+   {% else %}
+   <td>
+     <input style="font-weight: bold" type="button" value="Subscribe to private updates"
+       onclick="location.href='?private_subscription=on'"/>
+   </td>
+   {% endif %}
  </table>
 </form>
 

@@ -592,22 +592,6 @@ class View(base.View):
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
     mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
 
-    # check if the current user is a mentor and wants 
-    # to change his role for this app
-    choice = request.GET.get('mentor')
-    if mentor_entity and choice:
-      self._adjustPossibleMentors(entity, mentor_entity, choice)
-
-    is_ineligible = request.GET.get('ineligible')
-    if org_admin_entity and is_ineligible:
-      # mark the proposal invalid and return to the list
-      properties = {'status': 'invalid'}
-      self._logic.updateEntityProperties(entity, properties)
-
-      redirect = redirects.getListProposalsRedirect(entity.org,
-                                                    {'url_name': 'org'})
-      return http.HttpResponseRedirect(redirect)
-
     # decide which form to use
     if org_admin_entity:
       form = params['admin_review_form']
@@ -704,6 +688,62 @@ class View(base.View):
         rest: see base.View.public()
     """
 
+    from soc.logic.models.review_follower import logic as review_follower_logic
+
+    get_dict = request.GET
+
+    # check if the current user is a mentor and wants 
+    # to change his role for this app
+    choice = get_dict.get('mentor')
+    if mentor and choice:
+      self._adjustPossibleMentors(entity, mentor, choice)
+
+    is_ineligible = get_dict.get('ineligible')
+    if org_admin and is_ineligible:
+      # mark the proposal invalid and return to the list
+      properties = {'status': 'invalid'}
+      self._logic.updateEntityProperties(entity, properties)
+
+      redirect = redirects.getListProposalsRedirect(entity.org,
+                                                    {'url_name': 'org'})
+      return http.HttpResponseRedirect(redirect)
+
+    # check if we should change the subscription state for the current user
+    public_subscription = None
+    private_subscription = None
+
+    if get_dict.get('public_subscription') and (
+      get_dict['public_subscription'] in ['on', 'off']):
+
+      public_subscription = get_dict['public_subscription'] == 'on'
+
+    if get_dict.get('private_subscription') and (
+      get_dict['private_subscription'] in ['on', 'off']):
+      private_subscription = get_dict['private_subscription'] == 'on'
+
+    if public_subscription != None or private_subscription != None:
+      # get the current user
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      # create the fields that should be in the ReviewFollower entity
+      fields = {'link_id': user_entity.link_id,
+                'scope': entity,
+                'scope_path': entity.key().name(),
+                'user': user_entity
+               }
+      # get the keyname for the ReviewFollower entity
+      key_name = review_follower_logic.getKeyNameFromFields(fields)
+
+      # determine which subscription properties we should change
+      if public_subscription != None:
+        fields['subscribed_public'] = public_subscription
+
+      if private_subscription != None:
+        fields['subscribed_private'] = private_subscription
+
+      # update the ReviewFollower
+      review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
+
     # set the initial score since the default is ignored
     initial = {'score': 0}
 
@@ -732,6 +772,7 @@ class View(base.View):
     """
 
     from soc.logic.models.review import logic as review_logic
+    from soc.logic.models.review_follower import logic as review_follower_logic
 
     context = {}
 
@@ -781,6 +822,17 @@ class View(base.View):
 
     if org_admin:
       context['is_org_admin'] = True
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    # check if the current user is subscribed to public or private reviews
+    fields = {'scope': entity,
+              'user': user_entity,}
+    follower_entity = review_follower_logic.getForFields(fields, unique=True)
+
+    if follower_entity:
+      context['is_subscribed_public'] =  follower_entity.subscribed_public
+      context['is_subscribed_private'] = follower_entity.subscribed_private
 
     return context
 

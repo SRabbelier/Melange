@@ -80,6 +80,13 @@ class View(base.View):
     new_params['sans_link_id_create'] = True
     new_params['sans_link_id_list'] = True
 
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Document Link ID',
+         },
+        ]
+
     new_params['create_extra_dynaproperties'] = {
         'content': forms.fields.CharField(
             widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),

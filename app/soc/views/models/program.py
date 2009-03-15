@@ -118,6 +118,13 @@ class View(presence.View):
 
     new_params['extra_django_patterns'] = patterns
 
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Program Link ID',
+         },
+        ]
+
     # TODO add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynaproperties'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(

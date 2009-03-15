@@ -121,6 +121,13 @@ class View(group.View):
 
     new_params['extra_django_patterns'] = patterns
 
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Organization Link ID',
+         },
+        ]
+
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
                                    required=True),

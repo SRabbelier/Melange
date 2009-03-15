@@ -109,6 +109,13 @@ class View(group_app.View):
     new_params['extra_dynaexclude'] = ['applicant', 'backup_admin', 'status',
         'created_on', 'last_modified_on']
 
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Organization Link ID',
+         },
+        ]
+
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
                                              required=True),

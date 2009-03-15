@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+from django import forms
+
 from soc.logic import dicts
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.sponsor import logic as sponsor_logic
@@ -68,6 +70,13 @@ class View(group.View):
     new_params['module_name'] = "sponsor"
     new_params['document_prefix'] = "sponsor"
     new_params['sidebar_grouping'] = 'Programs'
+
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Sponsor Link ID',
+         },
+        ]
 
     params = dicts.merge(params, new_params)
 

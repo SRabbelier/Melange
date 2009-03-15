@@ -95,6 +95,13 @@ class View(group.View):
         ('/' + new_params['url_name'] + '/apply_member', 
          'Join a Club', 'apply_member'),]
 
+    new_params['create_dynafields'] = [
+        {'name': 'link_id',
+         'base': forms.fields.CharField,
+         'label': 'Club Link ID',
+         },
+        ]
+
     new_params['create_extra_dynaproperties'] = {
         'clean' : cleaning.validate_new_group('link_id', 'scope_path',
             club_logic, club_app_logic)}

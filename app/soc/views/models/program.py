@@ -189,6 +189,7 @@ class View(presence.View):
     aa_params = org_app_view.view.getParams().copy() # accepted applications
 
     # define the list redirect action to show the notification
+    del aa_params['list_key_order']
     aa_params['list_action'] = (redirects.getPublicRedirect, aa_params)
     aa_params['list_description'] = ugettext(
         "An overview of accepted org applications.")

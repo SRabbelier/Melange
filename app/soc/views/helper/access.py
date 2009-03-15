@@ -103,7 +103,8 @@ DEF_NO_ACTIVE_PROGRAM_MSG = ugettext(
     'There is no such active program.')
 
 DEF_NO_REQUEST_MSG = ugettext(
-    'There is no accepted request that would allow you to visit this page.')
+    'There is no accepted request that would allow you to visit this page. '
+    'Perhaps you already accepted this request?')
 
 DEF_NO_APPLICATION_MSG = ugettext(
     'There is no application that would allow you to visit this page.')

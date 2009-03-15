@@ -112,7 +112,7 @@ class Logic(base.Logic):
       entity: an existing entity in datastore
     """
 
-    from soc.models.logic.review_follower import logic as review_follower_logic
+    from soc.logic.models.review_follower import logic as review_follower_logic
 
     # entries in the ranker can be removed by setting the score to None
     ranker = self.getRankerFor(entity)

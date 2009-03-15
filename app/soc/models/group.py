@@ -63,7 +63,11 @@ class Group(soc.models.presence.Presence):
   #: the Group (as opposed to the founder.account email address which is
   #: kept secret, revealed only to Developers).
   email = db.EmailProperty(required=True,
-      verbose_name=ugettext('Email'))  
+      verbose_name=ugettext('Email'))
+  email.help_text = ugettext(
+      "Enter an email address to be used by would-be members seeking "
+      "additional information. This can be an individual's email address or a "
+      "mailing list address; use whichever will work best for you.")
 
   #: Required field storing description of the group.
   description = db.TextProperty(required=True,

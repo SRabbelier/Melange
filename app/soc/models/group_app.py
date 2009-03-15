@@ -64,7 +64,11 @@ class GroupApplication(soc.models.linkable.Linkable):
   #: See also:  soc.models.group.Group.email
   email = db.EmailProperty(required=True,
     verbose_name=ugettext('Public Email'))
-  
+  email.help_text = ugettext(
+      "Enter an email address to be used by would-be members seeking "
+      "additional information. This can be an individual's email address or a "
+      "mailing list address; use whichever will work best for you.")
+
   #: Required description of the Group.
   description = db.TextProperty(required=True,
       verbose_name=ugettext('Description'))

@@ -105,5 +105,30 @@ class Logic(base.Logic):
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 
+  def delete(self, entity):
+    """Removes Ranker entry and all ReviewFollowers before deleting the entity.
+
+    Args:
+      entity: an existing entity in datastore
+    """
+
+    from soc.models.logic.review_follower import logic as review_follower_logic
+
+    # entries in the ranker can be removed by setting the score to None
+    ranker = self.getRankerFor(entity)
+    ranker.SetScore(entity.key().name(), None)
+
+    # get all the ReviewFollwers that have this entity as it's scope
+    fields = {'scope': entity}
+
+    # TODO be sure that this captures all the followers
+    followers = review_follower_logic.getForFields(fields)
+
+    for follower in followers:
+      review_follower_logic.delete(follower)
+
+    # call to super to complete the deletion
+    super(Logic, self).delete(entity)
+
 
 logic = Logic()

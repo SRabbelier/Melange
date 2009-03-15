@@ -1,0 +1,46 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block content %}
+<p>
+  Your organization application for {{ program_name }} has been
+  accepted. Please take a moment *now* to log in to
+  {{ HTTP_host }} and review your Notifications (accessible in the
+  left hand navigation menu). You will need to follow the instructions
+  provided there to finish updating your organization's profile and to create
+  a home page for your organization on {{ HTTP_host }}. These changes
+  must be taken care of *immediately* so that student applicants have access
+  to the necessary information they'll require to review your organization
+  before applying.
+</p>
+
+<p>
+  For full instructions on how to create a home page and best practices for creating it, please see our User's 
+  Guide at http://socghop.appspot.com/document/show/program/google/gsoc2009/userguide
+</p>
+
+<p>
+  It is worth taking a look at the in-depth documentation for tips even if you are familiar with the program or a 
+  past participant.<br />
+  You will now also be able to review and accept mentor applications for your
+  organization.
+</p>
+
+Congratulations! We look forward to having you with us for {{ program_name }}.
+{% endblock %}
+
+{% block signature %}
+  Best regards, <br />{{ sender_name }}
+{% endblock %}

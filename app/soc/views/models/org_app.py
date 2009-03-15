@@ -141,7 +141,8 @@ class View(group_app.View):
     new_params['group_url_name'] = 'org'
 
     new_params['review_template'] = 'soc/org_app/review.html'
-    new_params['accepted_mail_template'] = 'soc/org_app/mail/accepted.html'
+    # TODO use a proper template that works for each program
+    new_params['accepted_mail_template'] = 'soc/org_app/mail/accepted_gsoc2009.html'
     new_params['rejected_mail_template'] = 'soc/org_app/mail/rejected.html'
 
     params = dicts.merge(params, new_params)

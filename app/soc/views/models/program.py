@@ -109,8 +109,11 @@ class View(presence.View):
           'soc.views.models.%(module_name)s.show_duplicates',
           'Show duplicate slot assignments'),
         (r'^%(url_name)s/(?P<access_type>assigned_proposals)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.assigned_proposals',
-        "Assigned proposals for multiple orgs"),
+          'soc.views.models.%(module_name)s.assigned_proposals',
+          "Assigned proposals for multiple orgs"),
+        (r'^%(url_name)s/(?P<access_type>accepted_orgs)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.accepted_orgs',
+          "List all accepted orgs"),
         ]
 
     new_params['extra_django_patterns'] = patterns
@@ -164,6 +167,54 @@ class View(presence.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptedOrgs(self, request, access_type,
+                   page_name=None, params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+
+    contents = []
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    filter = {
+        'status': 'accepted',
+        'scope': program_entity,
+        }
+
+    from soc.views.models import org_app as org_app_view
+    aa_params = org_app_view.view.getParams().copy() # accepted applications
+
+    # define the list redirect action to show the notification
+    aa_params['list_action'] = (redirects.getPublicRedirect, aa_params)
+    aa_params['list_description'] = ugettext(
+        "An overview of accepted org applications.")
+
+    aa_list = lists.getListContent(request, aa_params, filter, idx=0,
+                                   need_content=True)
+
+    if aa_list:
+      contents.append(aa_list)
+
+    filter['status'] = ['new', 'active']
+
+    from soc.views.models import organization as org_view
+    ao_params = org_view.view.getParams().copy() # active orgs
+
+    ao_params['list_action'] = (redirects.getHomeRedirect, ao_params)
+    ao_params['list_description'] = ugettext(
+        "An overview of all organizations.")
+
+    ao_list = lists.getListContent(request, ao_params, filter, idx=1,
+                                   need_content=True)
+
+    if ao_list:
+      contents.append(ao_list)
+
+    return self._list(request, params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access
@@ -570,12 +621,12 @@ class View(presence.View):
         items += [('/student/apply/%s' % (program_entity.key().name()),
             "Register as a Student", 'any_access')]
 
-    if timeline_helper.isAfterEvent(timeline_entity,
-        'accepted_organization_announced_deadline'):
+    deadline = 'accepted_organization_announced_deadline'
+
+    if timeline_helper.isAfterEvent(timeline_entity, deadline):
+      url = redirects.getAcceptedOrgsRedirect(program_entity, params)
       # add a link to list all the organizations
-      items += [(redirects.getPublicListRedirect(program_entity, 
-          {'url_name': 'org'}),
-          "List participating Organizations", 'any_access')]
+      items += [(url, "List participating Organizations", 'any_access')]
 
       if not student_entity:
         # add apply to become a mentor link
@@ -618,6 +669,7 @@ class View(presence.View):
 
 view = View()
 
+accepted_orgs = decorators.view(view.acceptedOrgs)
 admin = decorators.view(view.admin)
 assign_slots = decorators.view(view.assignSlots)
 assigned_proposals = decorators.view(view.assignedProposals)

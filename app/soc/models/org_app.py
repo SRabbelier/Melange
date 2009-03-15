@@ -49,7 +49,8 @@ class OrgApplication(soc.models.group_app.GroupApplication):
 
   prior_application = db.TextProperty(required=False, verbose_name=ugettext(
       'If your group has not previously participated, have you applied in'
-      ' the past?  If so, for what sort of participation?'))
+      ' the past?  If so, for what programs/initiatives?'
+      ' (e.g. Google Summer of Code 2007)'))
 
   license_name = db.StringProperty(required=True, choices=licenses.LICENSES,
       verbose_name=ugettext('What license does your organization use?'))

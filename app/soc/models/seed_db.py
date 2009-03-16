@@ -375,6 +375,39 @@ def seed_user(request, i):
   return properties
 
 
+def seed_org(request, i):
+  """Returns the properties for a new org entity.
+  """
+
+  account, current_user = ensureUser()
+  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+
+  if not gsoc2009:
+    raise Error('Run seed_db first')
+
+  properties = {
+      'key_name': 'google/gsoc2009/%d' % i,
+      'link_id': 'org_%d' % i,
+      'name': 'Organization %d' % i,
+      'short_name': 'Org %d' % i,
+      'founder': current_user,
+      'scope_path': 'google/gsoc2009',
+      'scope': gsoc2009,
+      'email': 'org_%i@example.com' % i,
+      'home_page': 'http://code.google.com/p/soc',
+      'description': 'Melange, share the love!',
+      'license_name': 'Apache License',
+      'contact_street': 'Some Street',
+      'contact_city': 'Some City',
+      'contact_country': 'United States',
+      'contact_postalcode': '12345',
+      'phone': '1-555-BANANA',
+      'ideas': 'http://code.google.com/p/soc/issues',
+      }
+
+  return properties
+
+
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
   """
@@ -386,6 +419,7 @@ def seed_many(request, *args, **kwargs):
 
   seed_types = {
     'user': (seed_user, User),
+    'org': (seed_org, Organization),
     }
 
   goal = int(get_args['goal'])

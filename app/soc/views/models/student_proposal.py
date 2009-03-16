@@ -945,7 +945,7 @@ class View(base.View):
 
     for follower in followers:
       # sent to every follower except the reviewer
-      #if follower.user.key() != review_entity.author.key():
+      if follower.user.key() != review_entity.author.key():
         notifications_helper.sendNewReviewNotification(follower.user,
             review_entity, entity.title, redirect_url)
 

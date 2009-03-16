@@ -423,6 +423,7 @@ class View(base.View):
 
     student_entity = entity.scope
 
+    context['student'] = student_entity
     context['student_name'] = student_entity.name()
 
     user_entity = user_logic.logic.getForCurrentAccount()
@@ -776,6 +777,7 @@ class View(base.View):
 
     context = {}
 
+    context['student'] = entity.scope
     context['student_name'] = entity.scope.name()
 
     if entity.mentor:

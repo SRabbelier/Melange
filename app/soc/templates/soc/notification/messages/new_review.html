@@ -1,3 +1,4 @@
+{% extends "soc/notification/messages/base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -11,23 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-
-<div id="greeting">
-  <p>
-	{% block greeting %}
-	Hi {{ to_name }},
-	{% endblock %}
-  </p>
-</div>
-
-<div id="content">
-  <p>
-	{% block content %}{% endblock %}
-  </p>
-</div>
-
-<div id="signature">
-  <p>
-	{% block signature %}Greetings, <br />{{ sender_name }}{% endblock %}
-  </p>
-</div>
+{% block content %}
+You are receiving this message because you have subscribed to updates on "{{ reviewed_name }}".<br />
+{{ reviewer_name }} has left a new review click <a href={{ redirect_url }}>here</a> to view it.
+{% endblock %}

@@ -484,6 +484,14 @@ span.edited {
  * CUSTOM CLASSES
  */
 
+.studentproposalreview .student{
+  background: #d0f5a9;
+}
+
+.studentproposalreview .other {
+  background: #f5f6ce;
+}
+
 .todo {
   color: #cc0000;
   font-size: 80%;

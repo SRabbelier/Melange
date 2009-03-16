@@ -41,7 +41,7 @@ import soc.logic.models as model_logic
 
 
 DEF_NEW_NOTIFICATION_MSG = ugettext(
-  "You have received a new Notification.")
+    "You have received a new Notification.")
 
 DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
@@ -49,10 +49,16 @@ DEF_INVITATION_MSG_FMT = ugettext(
 DEF_NEW_GROUP_MSG_FMT = ugettext(
     "Your %(application_type)s for %(group_name)s has been accepted.")
 
+DEF_NEW_REVIEW_SUBJECT_FMT = ugettext(
+    "New %s Review on %s")
+
 DEF_WELCOME_MSG_FMT = ugettext("Welcome to %(site_name)s, %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
     'invitation.html'
+
+DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
+    'new_review.html'
 
 DEF_NEW_GROUP_TEMPLATE = 'soc/group/messages/accepted.html'
 
@@ -120,6 +126,31 @@ def sendNewGroupNotification(entity, params):
 
   template = DEF_NEW_GROUP_TEMPLATE
 
+  sendNotification(to_user, None, message_properties, subject, template)
+
+
+def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
+  """Sends out a notification to the follower with the given redirect URL.
+
+  Args:
+    to_user: The user who should receive a notification
+    review: The review which triggers this notification
+    reviewed_name: Name of the entity reviewed
+    redirect_url: URL to which the follower should be sent for more information
+  """
+
+  message_properties = {'redirect_url': redirect_url,
+      'reviewer_name': review.author_name(),
+      'reviewed_name': reviewed_name,
+      }
+
+  # determine the subject
+  review_type = 'public' if review.is_public else 'private'
+  subject =  DEF_NEW_REVIEW_SUBJECT_FMT %(review_type, reviewed_name)
+
+  template = DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE
+
+  # send the notification from the system
   sendNotification(to_user, None, message_properties, subject, template)
 
 

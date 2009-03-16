@@ -114,7 +114,9 @@ class View(presence_with_tos.View):
     if soc.logic.system.isDebug():
       patterns += [('^seed_db$', 'soc.models.seed_db.seed', "Seed DB"),
                    ('^clear_db$', 'soc.models.seed_db.clear', "Clear DB"),
-                   ('^reseed_db$', 'soc.models.seed_db.reseed', "Reseed DB")]
+                   ('^reseed_db$', 'soc.models.seed_db.reseed', "Reseed DB"),
+                   ('^seed_many$', 'soc.models.seed_db.seed_many', "Seed Many"),
+                   ]
 
     new_params['extra_django_patterns'] = patterns
 

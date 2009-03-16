@@ -361,6 +361,55 @@ def seed(request, *args, **kwargs):
   return http.HttpResponse('Done')
 
 
+def seed_many(request, *args, **kwargs):
+  """Seeds many instances of the specified type.
+  """
+
+  get_args = request.GET
+
+  if not dicts.containsAll(get_args, ['goal', 'start', 'end', 'seed_type']):
+    return http.HttpResponse('Missing get args.')
+
+  seed_types = {
+    }
+
+  goal = int(get_args['goal'])
+  start = int(get_args['start'])
+  end = int(get_args['end'])
+  step = int(get_args.get('step', '15'))
+  seed_type = get_args['seed_type']
+
+  if not seed_type in seed_types:
+    return http.HttpResponse('Unknown seed_type: "%s".' % seed_type)
+
+  action, model = seed_types[seed_type]
+
+  for i in range(start, end):
+    try:
+      props = action(request, i)
+    except Error, error:
+      return http.HttpResponse(error.message)
+
+    for properties in props if isinstance(props, list) else [props]:
+      entity = model(**properties)
+      entity.put()
+
+  if end < goal:
+    info = {
+        'start': start + step,
+        'end': end + step,
+        'goal': goal,
+        'step': step,
+        'seed_type': seed_type,
+        }
+
+    args = ["%s=%s" % (k, v) for k, v in info.iteritems()]
+    url = '/seed_many?' + '&'.join(args)
+    return http.HttpResponseRedirect(url)
+
+  return http.HttpResponse('Done.')
+
+
 def clear(*args, **kwargs):
   """Removes all entities from the datastore.
   """

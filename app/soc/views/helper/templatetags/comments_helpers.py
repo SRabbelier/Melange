@@ -85,3 +85,21 @@ def as_review(context, review):
 
   return context
 
+@register.inclusion_tag('soc/templatetags/_as_student_proposal_review.html',
+                        takes_context=True)
+def as_student_proposal_review(context, review, student):
+  """Returns a HTML representation of a student proposal review.
+  """
+
+  # TODO(ljvderijk) once review editing is allowed redo this
+
+  context.update({
+      'author': review.author_name(),
+      'content': review.content,
+      'created': review.created,
+      'score': review.score,
+      'is_public': review.is_public,
+      'from_student': review.author.key() == student.user.key()
+      })
+
+  return context

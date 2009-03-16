@@ -550,6 +550,7 @@ def clear(*args, **kwargs):
       OrgAdmin.all(),
       ranker.all(),
       RankerRoot.all(),
+      StudentProposal.all(),
       Organization.all(),
       OrgApplication.all(),
       Timeline.all(),

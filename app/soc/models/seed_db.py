@@ -24,6 +24,7 @@ __authors__ = [
 
 import datetime
 import itertools
+import random
 
 from google.appengine.api import users
 from google.appengine.api import memcache
@@ -45,6 +46,7 @@ from soc.models.org_app import OrgApplication
 from soc.models.program import Program
 from soc.models.ranker_root import RankerRoot
 from soc.models.site import Site
+from soc.models.student_proposal import StudentProposal
 from soc.models.sponsor import Sponsor
 from soc.models.timeline import Timeline
 from soc.models.user import User
@@ -441,6 +443,44 @@ def seed_mentor(request, i):
 
   return properties
 
+def seed_student_proposal(request, i):
+  """Returns the properties of a new student proposal.
+  """
+
+  account, current_user = ensureUser()
+  org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
+  mentor = Mentor.get_by_key_name('google/gsoc2009/org_%d/mentor' % i)
+
+  if not org:
+    raise Error('Run seed_many for at least %d orgs first.' % i)
+
+  if not mentor:
+    raise Error('Run seed_many for at least %d mentors first.' % i)
+
+  all_properties = []
+
+  for i in range(random.randint(5, 20)):
+    link_id = 'proposal_%s_%d' % (org.key().name(), i)
+    scope_path = current_user.key().name()
+
+    properties = {
+        'link_id': link_id,
+        'scope_path': scope_path,
+        'scope': current_user,
+        'key_name': '%s/%s' % (scope_path, link_id),
+        'title':'The Awesome Proposal',
+        'abstract': 'This is an Awesome Proposal, look at its awesomeness!',
+        'content': 'Sorry, too Awesome for you to read!',
+        'additional_info': 'http://www.zipit.com',
+        'mentor': mentor,
+        'status': 'pending',
+        'org': org,
+        'program': org.scope,
+        }
+
+    all_properties.append(properties)
+
+  return all_properties
 
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
@@ -455,6 +495,7 @@ def seed_many(request, *args, **kwargs):
     'user': (seed_user, User),
     'org': (seed_org, Organization),
     'mentor': (seed_mentor, Mentor),
+    'student_proposal': (seed_student_proposal, StudentProposal),
     }
 
   goal = int(get_args['goal'])

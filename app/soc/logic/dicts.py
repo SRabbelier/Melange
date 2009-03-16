@@ -182,6 +182,7 @@ def split(target):
 
   return result
 
+
 def groupby(target, group_key):
   """Groups a list of dictionaries by group_key.
   """
@@ -198,6 +199,7 @@ def groupby(target, group_key):
 
   return result
 
+
 def groupDictBy(target, key, new_key=None):
   """Groups a dictionary by a key.
   """
@@ -208,9 +210,26 @@ def groupDictBy(target, key, new_key=None):
   result = ((k, v[new_key]) for k, v in target.iteritems() if v[key])
   return dict(result)
 
+
 def identity(target):
   """Returns a dictionary with the values equal to the keys.
   """
 
-  result = [(i, i) for i in target]
+  result = ((i, i) for i in target)
   return dict(result)
+
+
+def format(target, input):
+  """Returns a dictionary with the values formatted with input.
+  """
+
+  result = ((k, v % input) for k, v in target.iteritems())
+  return dict(result)
+
+
+def containsAll(target, keys):
+  """Returns true iff target contains all keys.
+  """
+
+  result = ((i in target) for i in keys)
+  return all(result)

@@ -28,7 +28,7 @@ Notification about: {{ entity.subject }}
 {% if entity.from_user %}
 {% readonly_field_as_table_row entity.fields.from_user.label entity.from_user.name %}
 {% else %}
-{% readonly_field_as_table_row entity.fields.from_user.label "Anonymous" %}
+{% readonly_field_as_table_row entity.fields.from_user.label site_name %}
 {% endif %}
 
 {% readonly_field_as_table_row "To" entity.scope.name %}

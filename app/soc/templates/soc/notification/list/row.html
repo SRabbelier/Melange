@@ -5,7 +5,7 @@ onclick="document.location.href='{{ list.redirect }}'" name="name">
          {% if list.item.from_user %}
            {{ list.item.from_user.name }}
          {% else %}
-           Anonymous
+           {{ site_name }}
          {% endif %}
          </a>
      </div>

@@ -361,6 +361,20 @@ def seed(request, *args, **kwargs):
   return http.HttpResponse('Done')
 
 
+def seed_user(request, i):
+  """Returns the properties for a new user entity.
+  """
+
+  properties = {
+      'key_name': 'user_%(num)d' % i,
+      'link_id': 'user_%(num)d' % i,
+      'account': users.User(email='user_%(num)d@example.com' % i),
+      'name': 'User %(num)d' % i,
+      }
+
+  return properties
+
+
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
   """
@@ -371,6 +385,7 @@ def seed_many(request, *args, **kwargs):
     return http.HttpResponse('Missing get args.')
 
   seed_types = {
+    'user': (seed_user, User),
     }
 
   goal = int(get_args['goal'])

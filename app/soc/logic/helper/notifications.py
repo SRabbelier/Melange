@@ -150,12 +150,12 @@ def sendNotification(to_user, from_user, message_properties, subject, template):
   message = loader.render_to_string(template, dictionary=message_properties)
 
   fields = {
-      'from_user' : from_user,
+      'from_user': from_user,
       'subject': subject,
-      'message' : message,
-      'scope' : to_user,
-      'link_id' :'t%i' % (time.time()),
-      'scope_path' : to_user.link_id
+      'message': message,
+      'scope': to_user,
+      'link_id': 't%i' %(int(time.time()*100)),
+      'scope_path': to_user.link_id
   }
 
   key_name = model_logic.notification.logic.getKeyNameFromFields(fields)

@@ -130,7 +130,7 @@ class View(base.View):
 
     if not entity:
       fields['author'] = user
-      fields['link_id'] = 't%i' % (time.time())
+      fields['link_id'] = 't%i' %(int(time.time()*100))
     else:
       fields['author'] = entity.author
       fields['link_id'] = entity.link_id

@@ -266,7 +266,7 @@ class View(base.View):
     """
 
     if not entity:
-      fields['link_id'] = 't%i' % (time.time())
+      fields['link_id'] = 't%i' %(int(time.time()*100))
     else:
       fields['link_id'] = entity.link_id
 
@@ -910,7 +910,7 @@ class View(base.View):
     from soc.logic.models.review import logic as review_logic
 
     # create the fields for the review entity
-    fields = {'link_id': 't%i' %(time.time()),
+    fields = {'link_id': 't%i' %(int(time.time()*100)),
         'scope': entity,
         'scope_path': entity.key().name(),
         'author': user_logic.logic.getForCurrentAccount(),

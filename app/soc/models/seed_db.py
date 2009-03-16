@@ -377,6 +377,45 @@ def seed_user(request, i):
   return properties
 
 
+def seed_org_app(request, i):
+  """Returns the properties for a new org proposal,
+  """
+
+  account, current_user = ensureUser()
+  status = request.GET.get('status', 'pre-accepted')
+  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+
+  if not gsoc2009:
+    raise Error('Run seed_db first')
+
+  properties = {
+      'key_name': 'google/gsoc2009/org_app_%d' % i,
+      'link_id': 'org_app_%d' % i,
+      'name': 'Org App %d' % i,
+      'scope_path': 'google/gsoc2009',
+      'scope': gsoc2009,
+      'status': status,
+      'applicant': current_user,
+      'home_page': 'http://www.google.com',
+      'email': 'org@example.com',
+      'irc_channel': '#care',
+      'pub_mailing_list': 'http://groups.google.com',
+      'dev_mailing_list': 'http://groups.google.com',
+      'description': 'This is an awesome org!',
+      'why_applying': 'Because we can',
+      'member_criteria': 'They need to be awesome',
+      'license_name': 'Apache License, 2.0',
+      'ideas': 'http://code.google.com/p/soc/issues',
+      'contrib_disappears': 'We use google to find them',
+      'member_disappears': 'See above',
+      'encourage_contribs': 'We offer them cookies.',
+      'continued_contribs': 'We promise them a cake.',
+      'agreed_to_admin_agreement': True,
+      }
+
+  return properties
+
+
 def seed_org(request, i):
   """Returns the properties for a new org entity.
   """
@@ -494,6 +533,7 @@ def seed_many(request, *args, **kwargs):
   seed_types = {
     'user': (seed_user, User),
     'org': (seed_org, Organization),
+    'org_app': (seed_org_app, OrgApplication),
     'mentor': (seed_mentor, Mentor),
     'student_proposal': (seed_student_proposal, StudentProposal),
     }

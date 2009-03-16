@@ -28,6 +28,7 @@ __authors__ = [
     '"David Anderson" <dave@natulte.net>',
     ]
 
+
 import error
 import util
 
@@ -35,16 +36,15 @@ import util
 def export(url, revision, dest_path):
   """Export the contents of a repository to a local path.
 
-  Note that while the underlying 'svn export' only requires a URL, we
-  require that both a URL and a revision be specified, to fully
+  Note that while the underlying 'svn export' only requires a URL, 
+  we require that both a URL and a revision be specified, to fully
   qualify the data to export.
 
   Args:
     url: The repository URL to export.
     revision: The revision to export.
     dest_path: The destination directory for the export. Note that
-               this is an absolute path, NOT a working copy relative
-               path.
+      this is an absolute path, NOT a working copy relative path.
     """
   assert os.path.isabs(dest_path)
   if os.path.exists(dest_path):
@@ -130,7 +130,6 @@ class WorkingCopy(util.Paths):
       path: The working copy path to scan.
 
     Returns:
-
       Two lists. The first is a list of all unknown paths
       (subversion has no knowledge of them), the second is a list
       of missing paths (subversion knows about them, but can't

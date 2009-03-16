@@ -41,6 +41,7 @@ __authors__ = [
     '"David Anderson" <dave@natulte.net>',
     ]
 
+
 import functools
 import os
 import re
@@ -70,10 +71,12 @@ class Error(error.Error):
 
 class AbortedByUser(Error):
   """The operation was aborted by the user."""
+  pass
 
 
 class FileAccessError(Error):
   """An error occured while accessing a file."""
+  pass
 
 
 def getString(prompt):
@@ -142,9 +145,9 @@ def getChoice(intro, prompt, choices, done=None, suggest=None):
     prompt: The prompt to print right before accepting input.
     choices: The list of string choices to display.
     done: If not None, the list of indices of previously
-          selected/completed choices.
+      selected/completed choices.
     suggest: If not None, the index of the choice to highlight as
-             the suggested choice.
+      the suggested choice.
 
   Returns:
     The index in the choices list of the selection the user made.
@@ -249,8 +252,7 @@ class ReleaseEnvironment(util.Paths):
     """Check out the initial release repository.
 
     Will also select the latest release branch, if any, so that
-    the end state is a fully ready to function release
-    environment.
+    the end state is a fully ready to function release environment.
     """
     log.info('Checking out the release repository')
 
@@ -299,8 +301,8 @@ class ReleaseEnvironment(util.Paths):
 
     Args:
       release: The version number of a Melange release already
-           imported in the release repository, or None to
-           activate no branch.
+        imported in the release repository, or None to activate 
+        no branch.
 
     """
     if release is None:
@@ -367,8 +369,7 @@ class ReleaseEnvironment(util.Paths):
         out.append('application: socghop')
       elif stripped_line.startswith('version:'):
         out.append(line.lstrip() + 'g0')
-        out.append('# * initial Google fork of Melange ' +
-               self.branch)
+        out.append('# * initial Google fork of Melange ' + self.branch)
       else:
         out.append(line)
     linesToFile(self.wc.path(yaml_path), out)
@@ -420,15 +421,14 @@ class ReleaseEnvironment(util.Paths):
       externals.append('%s -r %d %s' % (release, release_rev, tag_url))
       self.wc.propset('svn:externals', '\n'.join(externals), 'vendor/soc')
       self.wc.commit('Add svn:externals entry to pull in Melange '
-               'release %s at r%d.' % (release, release_rev))
+          'release %s at r%d.' % (release, release_rev))
 
       # Export the tag into the release repository's branches
       subversion.export(tag_url, release_rev, self.wc.path(branch_dir))
 
       # Add and commit the branch add (very long operation!)
       self.wc.add([branch_dir])
-      self.wc.commit('Branch of Melange release %s' % release,
-               branch_dir)
+      self.wc.commit('Branch of Melange release %s' % release, branch_dir)
       self._switchBranch(release)
 
       # Commit the production GSoC configuration and
@@ -451,8 +451,7 @@ class ReleaseEnvironment(util.Paths):
       raise error.ExpectationFailed(
         'Retrieved diff is empty. '
         'Did you accidentally cherry-pick a branch change?')
-    util.run(['patch', '-p0'], cwd=self.wc.path(self.branch_dir),
-         stdin=diff)
+    util.run(['patch', '-p0'], cwd=self.wc.path(self.branch_dir), stdin=diff)
     self.wc.addRemove(self.branch_dir)
 
     yaml_path = self.wc.path(self._branchPath('app/app.yaml'))
@@ -464,7 +463,7 @@ class ReleaseEnvironment(util.Paths):
         base, patch = line.rsplit('g', 1)
         new_version = '%sg%d' % (base, int(patch) + 1)
         message = ('Cherry-picked r%d from /p/soc/ to fix issue %d' %
-               (rev, bug))
+            (rev, bug))
         out.append('version: ' + new_version)
         out.append('# * ' + message)
         updated_patchlevel = True
@@ -518,8 +517,7 @@ class ReleaseEnvironment(util.Paths):
 
       try:
         choice = getChoice('Main menu:', 'Your choice?',
-                   self.MENU_STRINGS, done=done,
-                   suggest=suggested_next)
+          self.MENU_STRINGS, done=done, suggest=suggested_next)
       except (KeyboardInterrupt, AbortedByUser):
         log.info('Exiting.')
         return

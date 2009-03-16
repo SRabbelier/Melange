@@ -25,6 +25,7 @@ __authors__ = [
     '"David Anderson" <dave@natulte.net>',
     ]
 
+
 import os.path
 import re
 try:
@@ -44,6 +45,7 @@ class Error(error.Error):
 
 class SubprocessFailed(Error):
   """A subprocess returned a non-zero error code."""
+  pass
 
 
 # The magic escape sequence understood by modern terminal emulators to
@@ -167,9 +169,9 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=None):
       by its argument vector.
     cwd: Run the program from this directory.
     capture: If True, capture the program's stdout stream. If False,
-         stdout will output to sys.stdout.
+      stdout will output to sys.stdout.
     split_capture: If True, return the captured output as a list of
-           lines. Else, return as a single unaltered string.
+      lines. Else, return as a single unaltered string.
     stdin: The string to feed to the program's stdin stream.
 
   Returns:
@@ -178,8 +180,7 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=None):
     nothing is returned.
 
   Raises:
-    SubprocessFailed: The subprocess exited with a non-zero exit
-            code.
+    SubprocessFailed: The subprocess exited with a non-zero exit code.
   """
   log.debug(colorize('# ' + ' '.join(argv), WHITE, bold=True))
 
@@ -203,6 +204,7 @@ def run(argv, cwd=None, capture=False, split_capture=True, stdin=None):
   stdout = StringIO.StringIO() if capture else log.FileLikeLogger()
   out_adapter = _PipeAdapter(process.stdout, stdout)
   err_adapter = _PipeAdapter(process.stderr, log.FileLikeLogger())
+  
   if stdin:
     process.stdin.write(stdin)
 

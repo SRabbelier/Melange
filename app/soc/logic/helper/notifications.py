@@ -130,7 +130,7 @@ def sendNewGroupNotification(entity, params):
 
 
 def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
-  """Sends out a notification to the follower with the given redirect URL.
+  """Sends out a notification to alert the user of a new Review.
 
   Args:
     to_user: The user who should receive a notification

@@ -892,7 +892,7 @@ class View(base.View):
     self._logic.updateEntityProperties(entity, properties)
 
   def _createReviewFor(self, entity, reviewer, comment, score=0, is_public=True):
-    """Creates a review for the given proposal.
+    """Creates a review for the given proposal and sends out a message to all followers.
 
     Args:
       entity: Student Proposal entity for which the review should be created
@@ -900,14 +900,13 @@ class View(base.View):
       comment: The textual contents of the review
       score: The score of the review (only used if the review is not public)
       is_public: Determines if the review is a public review
-
-    Returns:
-      - The newly created review
     """
 
     import time
 
+    from soc.logic.helper import notifications as notifications_helper
     from soc.logic.models.review import logic as review_logic
+    from soc.logic.models.review_follower import logic as review_follower_logic
 
     # create the fields for the review entity
     fields = {'link_id': 't%i' %(int(time.time()*100)),
@@ -923,9 +922,32 @@ class View(base.View):
     if not is_public:
       fields['score'] = score
 
+    # create a new Review
     key_name = review_logic.getKeyNameFromFields(fields)
+    review_entity = review_logic.updateOrCreateFromKeyName(fields, key_name)
 
-    return review_logic.updateOrCreateFromKeyName(fields, key_name)
+    # get all followers
+    fields = {'scope': entity}
+
+    if is_public:
+      fields['subscribed_public'] = True
+    else:
+      fields['subscribed_private'] = True
+
+    followers = review_follower_logic.getForFields(fields)
+
+    if is_public:
+      # redirect to public page
+      redirect_url = redirects.getPublicRedirect(entity, self._params)
+    else:
+      # redirect to review page
+      redirect_url = redirects.getReviewRedirect(entity, self._params)
+
+    for follower in followers:
+      # sent to every follower except the reviewer
+      #if follower.user.key() != review_entity.author.key():
+        notifications_helper.sendNewReviewNotification(follower.user,
+            review_entity, entity.title, redirect_url)
 
 
 view = View()

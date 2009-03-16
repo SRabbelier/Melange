@@ -408,6 +408,40 @@ def seed_org(request, i):
   return properties
 
 
+def seed_mentor(request, i):
+  """Returns the properties of a new student proposal.
+  """
+
+  account, current_user = ensureUser()
+  org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
+
+  if not org:
+    raise Error('Run seed_many for at least %d orgs first.' % i)
+
+  properties = {
+      'key_name': 'google/gsoc2009/org_%d/mentor' % i,
+      'link_id': 'mentor',
+      'scope': org,
+      'scope_path': org.key().name(),
+      'user': current_user,
+      'given_name': 'Mentor',
+      'surname': 'Man',
+      'name_on_documents': 'Mentor Man',
+      'email': 'mentor@example.com',
+      'res_street': 'Some Street',
+      'res_city': 'Some City',
+      'res_state': 'Some State',
+      'res_country': 'United States',
+      'res_postalcode': '12345',
+      'phone': '1-555-BANANA',
+      'birth_date': db.DateProperty.now(),
+      'agreed_to_tos': True,
+      'program': org.scope,
+      }
+
+  return properties
+
+
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
   """
@@ -420,6 +454,7 @@ def seed_many(request, *args, **kwargs):
   seed_types = {
     'user': (seed_user, User),
     'org': (seed_org, Organization),
+    'mentor': (seed_mentor, Mentor),
     }
 
   goal = int(get_args['goal'])

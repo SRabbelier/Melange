@@ -33,6 +33,7 @@ from django import http
 
 from soc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.logic import accounts
+from soc.logic import dicts
 from soc.models import student_proposal
 from soc.models.document import Document
 from soc.models.host import Host
@@ -47,6 +48,32 @@ from soc.models.site import Site
 from soc.models.sponsor import Sponsor
 from soc.models.timeline import Timeline
 from soc.models.user import User
+
+
+class Error(Exception):
+  pass
+
+
+def ensureUser():
+  """Returns the current user account and associated user object.
+  """
+
+  account = accounts.getCurrentAccount()
+
+  if not account:
+    account = users.User(email='test@example.com')
+
+  user_properties = {
+      'key_name': 'test',
+      'link_id': 'test',
+      'account': account,
+      'name': 'Test',
+      }
+
+  current_user = User(**user_properties)
+  current_user.put()
+
+  return account, current_user
 
 
 def seed(request, *args, **kwargs):
@@ -80,30 +107,10 @@ def seed(request, *args, **kwargs):
   site.put()
 
 
-  account = accounts.getCurrentAccount()
-
-  if not account:
-    account = users.User(email='test@example.com')
-
-  user_properties = {
-      'key_name': 'test',
-      'link_id': 'test',
-      'account': account,
-      'name': 'Test',
-      }
-
-  current_user = User(**user_properties)
-  current_user.put()
+  account, current_user = ensureUser()
 
 
-  many_users = get_args.get('many_users')
-  user_goal = int(get_args.get('user_goal', '0'))
-  user_start = int(get_args.get('user_start', '0'))
-  user_end = int(get_args.get('user_end', '0'))
-  user_step = int(get_args.get('user_step', '15'))
-  user_only = get_args.get('user_only') or user_goal
-
-  for i in range(100 if many_users else 15):
+  for i in range(15):
     user_properties = {
         'key_name': 'user_%d' % i,
         'link_id': 'user_%d' % i,
@@ -112,37 +119,6 @@ def seed(request, *args, **kwargs):
         }
     entity = User(**user_properties)
     entity.put()
-
-
-  for i in range(100, 200) if many_users else []:
-    user_properties = {
-        'key_name': 'user_%d' % i,
-        'link_id': 'user_%d' % i,
-        'account': users.User(email='user_%d' % i),
-        'name': 'User %d' % i,
-        }
-    entity = User(**user_properties)
-    entity.put()
-
-
-  for i in range(user_start, user_end) if (user_start and user_end) else []:
-    user_properties = {
-        'key_name': 'lots_user_%d' % i,
-        'link_id': 'lots_user_%d' % i,
-        'account': users.User(email='lots_user_%d@example.com' % i),
-        'name': 'Lots User %d' % i,
-        }
-    entity = User(**user_properties)
-    entity.put()
-
-
-  if user_end < user_goal:
-    url = '/seed_db?user_start=%d&user_end=%d&user_goal=%d' % (
-        user_start+user_step, user_end+user_step, user_goal)
-    return http.HttpResponseRedirect(url)
-
-  if user_only:
-    return http.HttpResponse('Done with users')
 
 
   group_properties = {
@@ -248,8 +224,6 @@ def seed(request, *args, **kwargs):
   ghop2009.put()
 
 
-  many_orgs = get_args.get('many_orgs')
-
   org_app_properties = {
     'scope_path': 'google/gsoc2009',
     'scope': gsoc2009,
@@ -272,7 +246,7 @@ def seed(request, *args, **kwargs):
     'agreed_to_admin_agreement': True,
     }
 
-  for i in range(200 if many_orgs else 10):
+  for i in range(10):
     org_app_properties['key_name'] = 'google/gsoc2009/wannabe_%d' % i
     org_app_properties['link_id'] = 'wannabe_%d' % i
     org_app_properties['name'] = 'Wannabe %d' % i
@@ -282,7 +256,7 @@ def seed(request, *args, **kwargs):
 
   org_app_properties['status'] = 'pre-rejected'
 
-  for i in range(200, 400) if many_orgs else []:
+  for i in range(10, 20):
     org_app_properties['key_name'] = 'google/gsoc2009/loser_%d' % i
     org_app_properties['link_id'] = 'loser_%d' % i
     org_app_properties['name'] = 'Loser %d' % i
@@ -315,7 +289,7 @@ def seed(request, *args, **kwargs):
     'scope': gsoc2009,
     })
 
-  for i in range(200 if many_orgs else 15):
+  for i in range(15):
     group_properties.update({
         'key_name': 'google/gsoc2009/org_%d' % i,
         'link_id': 'org_%d' % i,

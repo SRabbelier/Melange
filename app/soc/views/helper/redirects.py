@@ -287,7 +287,7 @@ def getSlotsRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
-def getSlotsRedirect(entity, params):
+def getAssignSlotsRedirect(entity, params):
   """Returns the assign slots redirect for the specified entity.
   """
 

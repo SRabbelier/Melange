@@ -553,6 +553,9 @@ class View(presence.View):
         # add link to edit Program Profile
         items += [(redirects.getEditRedirect(entity, params),
             'Edit Program Profile','any_access')]
+        # add link to Assign Slots
+        items += [(redirects.getAssignSlotsRedirect(entity, params),
+            'Assign Slots','any_access')]
         # add link to edit Program Timeline
         items += [(redirects.getEditRedirect(entity, {'url_name': 'timeline'}),
             "Edit Program Timeline", 'any_access')]

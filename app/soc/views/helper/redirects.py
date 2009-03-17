@@ -280,10 +280,18 @@ def getStudentProposalRedirect(entity, params):
 
 
 def getSlotsRedirect(entity, params):
-  """Returns the student proposal redirect for the given org and student.
+  """Returns the slots redirect for the specified entity.
   """
 
   return'/%s/slots/%s' % (
+      params['url_name'], entity.key().name())
+
+
+def getSlotsRedirect(entity, params):
+  """Returns the assign slots redirect for the specified entity.
+  """
+
+  return'/%s/assign_slots/%s' % (
       params['url_name'], entity.key().name())
 
 

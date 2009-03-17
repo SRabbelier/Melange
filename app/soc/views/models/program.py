@@ -393,7 +393,7 @@ class View(presence.View):
 
     get_dict = request.GET
 
-    if not (get_dict.get('limit') or get_dict.get('offset')):
+    if not (get_dict.get('limit') and get_dict.get('offset')):
       return self.json(request, {})
 
     try:

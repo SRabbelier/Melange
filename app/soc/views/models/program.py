@@ -453,8 +453,6 @@ class View(presence.View):
       student_proposal_entities = student_proposal_logic.logic.getForFields(
           fields, limit=slots_left_to_assign, order=order)
 
-      proposal_data = {}
-
       # store each proposal in the dictionary
       for proposal in student_proposal_entities:
         student_entity = proposal.scope
@@ -466,9 +464,6 @@ class View(presence.View):
             'student_contact': student_entity.email,
             'org_key': org.key().name()
             }
-
-      # store it with the other org data
-      proposals_data['proposals'] = proposal_data
 
     # return all the data in JSON format
     data = {'orgs': orgs_data,

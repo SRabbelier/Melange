@@ -215,7 +215,7 @@ class View(presence.View):
     from soc.views.models import organization as org_view
     ao_params = org_view.view.getParams().copy() # active orgs
 
-    ao_params['list_action'] = (redirects.getHomeRedirect, ao_params)
+    ao_params['list_action'] = (redirects.getPublicRedirect, ao_params)
     ao_params['list_description'] = ugettext(
         "An overview of all accepted organizations.")
 

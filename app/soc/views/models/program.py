@@ -411,7 +411,7 @@ class View(presence.View):
     org_entities = org_logic.logic.getForFields(fields, limit=limit, offset=offset)
 
     orgs_data = {}
-    proposals_data = {}
+    proposals_data = []
 
     # for each org get the proposals who will be assigned a slot
     for org in org_entities:
@@ -457,13 +457,14 @@ class View(presence.View):
       for proposal in student_proposal_entities:
         student_entity = proposal.scope
 
-        proposals_data[proposal.key().name()] = {
+        proposals_data.append(
+            {'key_name': proposal.key().name(),
             'proposal_title': proposal.title,
             'student_key': student_entity.key().name(),
             'student_name': student_entity.name(),
             'student_contact': student_entity.email,
             'org_key': org.key().name()
-            }
+            })
 
     # return all the data in JSON format
     data = {'orgs': orgs_data,

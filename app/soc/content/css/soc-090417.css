@@ -481,8 +481,15 @@ span.edited {
 }
 
 /*
- * CUSTOM CLASSES
+ * STUDENT PROPOSAL REVIEWS
  */
+.studentproposalreview {
+  font-size: small;
+}
+
+.studentproposalreview .title {
+  background-color: #e5ecf9;
+}
 
 .studentproposalreview .student{
   background: #d0f5a9;
@@ -491,6 +498,11 @@ span.edited {
 .studentproposalreview .other {
   background: #f5f6ce;
 }
+
+
+/*
+ * CUSTOM CLASSES
+ */
 
 .todo {
   color: #cc0000;

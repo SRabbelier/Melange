@@ -12,18 +12,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-<li class="studentproposalreview">
-{% if from_student %}
-  <div class="student">
-{% else %}
-  <div class="other">
-{% endif %}
-On {{ created|date:"jS F Y H:i" }}
-{% if is_public %}
-{{ author }} wrote:
-{% else %}
-{{ author }} gave a score of <b>{{ score }}</b> and wrote:
-{% endif %}
-<p>{{ content|safe }}</p>
+<div class="studentproposalreview">
+  <div class="title">
+    On {{ created|date:"jS F Y H:i" }}
+    {% if is_public %}
+      {{ author }} wrote:
+    {% else %}
+      {{ author }} gave a score of <b>{{ score }}</b> and wrote:
+    {% endif %}
+  </div>
+  {% if from_student %}
+    <div class="student">
+  {% else %}
+    <div class="other">
+  {% endif %}
+    <p>{{ content|safe }}</p>
+  </div>
 </div>
-</li>

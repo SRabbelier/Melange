@@ -225,7 +225,7 @@ class View(group_app.View):
               'to': to,
               'sender_name': sender_name,
               'to_name': user_entity.name,
-              'program_name': app_entity.scope.name
+              'program_name': app_entity.scope.name,
               'org_app_name': app_entity.name}
 
       if status == 'accepted':

@@ -82,6 +82,8 @@ class View(presence.View):
     rights['slots'] = ['checkIsDeveloper']
     rights['show_duplicates'] = ['checkIsHostForProgram']
     rights['assigned_proposals'] = ['checkIsHostForProgram']
+    rights['accepted_orgs'] = [('checkisAfterEvent',
+        ['accepted_organization_announced_deadline', '__all__'])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic

@@ -217,7 +217,7 @@ class View(group.View):
         'detailed_row.html' % list_params)
     ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
         'detailed_heading.html' % list_params)
-    ranked_params['list_description'] = '%s already under review sent to %s' %(
+    ranked_params['list_description'] = '%s already under review sent to %s' % (
         ranked_params['name_plural'], org_entity.name)
     ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
 
@@ -254,18 +254,21 @@ class View(group.View):
     prop_list['info'] = ((lambda item, cache: {'rank': cache[item]}), ranking)
 
     new_params = list_params.copy() # new proposals
-    new_params['list_description'] = 'List of new %s send to %s ' %(
+    new_params['list_description'] = 'List of new %s send to %s ' % (
         new_params['name_plural'], org_entity.name)
     new_params['list_action'] = (redirects.getReviewRedirect, new_params)
 
     filter = {'org': org_entity,
               'status': 'new'}
 
+    contents = []
     new_list = lists.getListContent(
-        request, new_params, filter, idx=1)
-
+        request, new_params, filter, idx=1, need_content=True)
+    
     # fill contents with all the needed lists
-    contents = [prop_list, new_list]
+    if new_list != None:
+      contents.append(new_list)
+    contents.append(prop_list)
 
     # call the _list method from base to display the list
     return self._list(request, list_params, contents, page_name)

@@ -221,11 +221,8 @@ class View(presence.View):
     ao_params['list_description'] = ugettext(
         "An overview of all accepted organizations.")
 
-    ao_list = lists.getListContent(request, ao_params, filter, idx=1,
-                                   need_content=True)
-
-    if ao_list:
-      contents.append(ao_list)
+    ao_list = lists.getListContent(request, ao_params, filter, idx=1)
+    contents.append(ao_list)
 
     return self._list(request, params, contents, page_name)
 

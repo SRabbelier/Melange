@@ -1,4 +1,8 @@
-<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+{% ifequal list.info.item_class "selected" %}
+  <tr class="assignedslot" onmouseover="this.className='on'" onmouseout="this.className='assignedslot'" 
+{% else %}
+  <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+{% endifequal %}
 onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td><div class="rank">{{ list.info.rank }}</a></div></td>
   <td align="right"><div class="name"><a class="noul"

@@ -202,6 +202,7 @@ class View(group.View):
 
     from soc.logic.models.ranker_root import logic as ranker_root_logic
     from soc.models import student_proposal
+    from soc.views.helper import list_info as list_info_helper
     from soc.views.models import student_proposal as student_proposal_view
 
     try:
@@ -210,7 +211,11 @@ class View(group.View):
       return helper.responses.errorResponse(
           error, request, template=params['error_public'])
 
+    context = {}
+    context['entity'] = org_entity
+
     list_params = student_proposal_view.view.getParams().copy()
+    list_params['list_template'] = 'soc/student_proposal/list_for_org.html'
 
     ranked_params = list_params.copy()# ranked proposals
     ranked_params['list_row'] = ('soc/%(module_name)s/list/'
@@ -250,8 +255,23 @@ class View(group.View):
     # link the proposals to the rank
     ranking = dict([i for i in itertools.izip(proposals, ranks)])
 
-    # update the prop_list with the ranking information
-    prop_list['info'] = ((lambda item, cache: {'rank': cache[item]}), ranking)
+    assigned_proposals = []
+
+    # only when the program allows allocations to be seen we should color the list
+    if org_entity.scope.allocations_visible:
+      # get the limit and offset for the list
+      limit, offset = lists.getLimitAndOffset(request, 'offset_0', 'limit_0')
+
+      # determine the amount of proposals to color
+      to_color = max(0, org_entity.slots - offset)
+      assigned_proposals = proposals[0:to_color]
+
+      # show the amount of slots assigned on the webpage
+      context['slots_visible'] = True
+
+    # update the prop_list with the ranking and coloring information
+    prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking,
+        assigned_proposals), None)
 
     new_params = list_params.copy() # new proposals
     new_params['list_description'] = 'List of new %s send to %s ' % (
@@ -264,14 +284,14 @@ class View(group.View):
     contents = []
     new_list = lists.getListContent(
         request, new_params, filter, idx=1, need_content=True)
-    
+
     # fill contents with all the needed lists
     if new_list != None:
       contents.append(new_list)
     contents.append(prop_list)
 
     # call the _list method from base to display the list
-    return self._list(request, list_params, contents, page_name)
+    return self._list(request, list_params, contents, page_name, context)
 
   @decorators.merge_params
   @decorators.check_access

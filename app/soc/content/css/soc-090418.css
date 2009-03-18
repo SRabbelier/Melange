@@ -499,10 +499,13 @@ span.edited {
   background: #f5f6ce;
 }
 
-
 /*
  * CUSTOM CLASSES
  */
+
+.assignedslot {
+  background-color: #d0f5a9;
+}
 
 .todo {
   color: #cc0000;

@@ -82,7 +82,7 @@ def check_field_is_empty(field_name):
 
 
 def clean_empty_field(field_name):
-  """Incorperates the check_field_is_empty as regular cleaner.
+  """Incorporates the check_field_is_empty as regular cleaner.
   """
 
   @check_field_is_empty(field_name)
@@ -528,6 +528,70 @@ def validate_student_proposal(org_field, scope_field,
         del cleaned_data['organization']
 
     return cleaned_data
+  return wrapper
+
+def validate_new_student_project(org_field, mentor_field, student_field):
+  """Validates the form of a student proposal.
+
+  Args:
+    org_field: Field containing key_name for org
+    mentor_field: Field containing the link_id of the mentor
+    student_field: Field containing the student link_id
+
+  Raises ValidationError if:
+    -A valid Organization does not exist for the given keyname
+    -The mentor link_id does not match the mentors for the active organization
+    -The student link_id does not match a student in the org's Program
+  """
+
+  def wrapper(self):
+
+    from soc.logic.models.mentor import logic as mentor_logic
+    from soc.logic.models.organization import logic as org_logic
+    from soc.logic.models.student import logic as student_logic
+
+    cleaned_data = self.cleaned_data
+
+    org_key_name = cleaned_data.get(org_field)
+    mentor_link_id = cleaned_data.get(mentor_field)
+    student_link_id = cleaned_data.get(student_field)
+
+    if not (org_key_name and mentor_link_id and student_link_id):
+      # we can't do the check the other cleaners will pickup empty fields
+      return cleaned_data
+
+    org_entity = org_logic.getFromKeyName(org_key_name)
+
+    if not org_entity:
+      # show error message
+      raise forms.ValidationError(
+          ugettext("The given Organization is not valid."))
+
+    fields = {'link_id': mentor_link_id,
+              'scope': org_entity,
+              'status': 'active'}
+
+    mentor_entity = mentor_logic.getForFields(fields, unique=True,)
+
+    if not mentor_entity:
+      # show error message
+      raise forms.ValidationError(
+          ugettext("The given Mentor is not valid."))
+
+    fields = {'link_id': student_link_id,
+              'scope': org_entity.scope,
+              'status': 'active'}
+
+    student_entity = student_logic.getForFields(fields, unique=True)
+
+    if not student_entity:
+      #show error message
+      raise forms.ValidationError(
+          ugettext("The given Student is not valid."))
+
+    # successfully validated
+    return cleaned_data
+
   return wrapper
 
 def validate_document_acl(view):

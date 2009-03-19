@@ -1,0 +1,9 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
+onclick="document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right"><div class="name"><a class="noul"
+         href="{{ list.redirect }}">{{ list.item.student.link_id }}</a>
+     </div>
+  </td>
+  <td><div class="title">{{ list.item.title }}</a></div></td>
+  <td><div class="status">{{ list.item.status }}</a></div></td>
+</tr>

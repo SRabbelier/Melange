@@ -434,6 +434,7 @@ def seed_org(request, i):
       'founder': current_user,
       'scope_path': 'google/gsoc2009',
       'scope': gsoc2009,
+      'status': 'active',
       'email': 'org_%i@example.com' % i,
       'home_page': 'http://code.google.com/p/soc',
       'description': 'Melange, share the love!',

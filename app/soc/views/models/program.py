@@ -63,6 +63,16 @@ class View(presence.View):
   """View methods for the Program model.
   """
 
+  DEF_ACCEPTED_ORGS_MSG_FMT = ugettext("These organizations have"
+      " been accepted into %(name)s, but they have not yet completed"
+      " their organization profile. You can still learn more about"
+      " each organization by visiting the links below.")
+
+  DEF_CREATED_ORGS_MSG_FMT = ugettext("These organizations have been"
+      " accepted into %(name)s and have completed their organization"
+      " profiles. You can learn more about each organization by"
+      " visiting the links below.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -189,6 +199,9 @@ class View(presence.View):
 
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
+    fmt = {'name': program_entity.name}
+    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
+
     filter = {
         'status': 'accepted',
         'scope': program_entity,
@@ -200,11 +213,7 @@ class View(presence.View):
     # define the list redirect action to show the notification
     del aa_params['list_key_order']
     aa_params['list_action'] = (redirects.getPublicRedirect, aa_params)
-    aa_params['list_description'] = ugettext(
-        "An overview of accepted organization applications that have"
-        " not yet created their organization profile. Students can"
-        " only apply to organizations that created their organization"
-        " profile.")
+    aa_params['list_description'] = description
 
     aa_list = lists.getListContent(request, aa_params, filter, idx=0,
                                    need_content=True)
@@ -212,14 +221,15 @@ class View(presence.View):
     if aa_list:
       contents.append(aa_list)
 
+    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+
     filter['status'] = ['new', 'active']
 
     from soc.views.models import organization as org_view
     ao_params = org_view.view.getParams().copy() # active orgs
 
     ao_params['list_action'] = (redirects.getPublicRedirect, ao_params)
-    ao_params['list_description'] = ugettext(
-        "An overview of all accepted organizations.")
+    ao_params['list_description'] = description
 
     ao_list = lists.getListContent(request, ao_params, filter, idx=1)
     contents.append(ao_list)

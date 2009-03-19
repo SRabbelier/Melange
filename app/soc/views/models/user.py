@@ -61,6 +61,7 @@ class View(base.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = ['checkIsDeveloper']
     rights['delete'] = ['checkIsDeveloper']
+    rights['show'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
     rights['list_developers'] = ['checkIsDeveloper']
 

@@ -604,6 +604,8 @@ class View(base.View):
         'role': params['module_name']}
     request_entity = request_logic.logic.getForFields(fields, unique=True)
 
+    user_entity = user_logic.logic.getFromKeyNameOr404(request_entity.link_id)
+
     get_dict = request.GET
 
     if 'status' in get_dict.keys():
@@ -630,6 +632,7 @@ class View(base.View):
 
     # put the entity in the context
     context['entity'] = request_entity
+    context['user_in_request'] = user_entity
     context['request_status'] = request_entity.status 
     context['module_name'] = params['module_name']
 

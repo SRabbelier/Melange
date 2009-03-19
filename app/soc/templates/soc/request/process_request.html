@@ -22,8 +22,8 @@ limitations under the License.
 <p>
 <div="text"> 
 {% ifequal request_status "new" %}
-  This is the request from <b>{{ entity.link_id }}</b> to become a 
-  <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.</br>
+  This is the request from <b>{{ user_in_request.name }}({{ entity.link_id }})</b> 
+  to become a <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.</br>
   Please select your response by using the buttons below.
 </div>
 </p>
@@ -40,7 +40,7 @@ limitations under the License.
 {% else %}
 <p>
 <div="text"> 
-  This is the invitation to <b>{{ entity.link_id }}</b> to become a 
+  This is the invitation to <b>{{ user_in_request.name }}({{ entity.link_id }})</b> to become a 
   <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.<br/> 
   If you would like to withdraw this invite please press the withdraw button below.
 </div>

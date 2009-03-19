@@ -112,10 +112,10 @@ class View(presence.View):
           'Show duplicate slot assignments'),
         (r'^%(url_name)s/(?P<access_type>assigned_proposals)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.assigned_proposals',
-          "Assigned proposals for multiple orgs"),
+          "Assigned proposals for multiple organizations"),
         (r'^%(url_name)s/(?P<access_type>accepted_orgs)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.accepted_orgs',
-          "List all accepted orgs"),
+          "List all accepted organizations"),
         ]
 
     new_params['extra_django_patterns'] = patterns

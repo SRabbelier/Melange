@@ -157,7 +157,7 @@ class View(base.View):
         request_entity.role_verbose)
 
     get_dict = request.GET
-    
+
     if 'status' in get_dict.keys():
       if get_dict['status'] == 'rejected':
         # this invite has been rejected mark as rejected

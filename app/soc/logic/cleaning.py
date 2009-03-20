@@ -280,10 +280,12 @@ def clean_user_account_not_in_use(field_name):
 def clean_ascii_only(field_name):
   """Clean method for cleaning a field that may only contain ASCII-characters.
   """
+
   @check_field_is_empty(field_name)
   def wrapper(self):
     """Decorator wrapper method.
     """
+
     value = self.cleaned_data.get(field_name)
 
     try:
@@ -292,6 +294,24 @@ def clean_ascii_only(field_name):
     except UnicodeEncodeError:
       # can not encode as ASCII
       raise forms.ValidationError("Only ASCII characters are allowed")
+
+    return value
+  return wrapper
+
+
+def clean_numeric_only(field_name):
+  """Clean method for cleaning a field that may only contain numerical values.
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    """Decorator wrapped method.
+    """
+
+    value = self.cleaned_data.get(field_name)
+
+    if not value.isdigit():
+      raise forms.ValidationError("Only numerical characters are allowed")
 
     return value
   return wrapper

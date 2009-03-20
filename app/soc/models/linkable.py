@@ -115,7 +115,8 @@ class Linkable(base.ModelWithFieldAttributes):
       verbose_name=ugettext('Link ID'))
   link_id.help_text = ugettext(
       'Link ID is used as part of various URL links throughout the site.'
-      ' Lower ASCII characters, digits, and underscores only.')
+      ' Lowercase ASCII characters, digits, and underscores only.'
+      ' The regexp used to validate is "%s".') % LINK_ID_PATTERN_CORE
 
   #: Optional Self Reference property to another Linkable entity which defines
   #: the "scope" of this Linkable entity. The back-reference in the Linkable 

@@ -1,10 +1,12 @@
+{% load forms_helpers %}
+
 <tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
 onclick="document.location.href='{{ list.redirect }}'" name="name">
-  <td align="right"><div class="user_link_id"><a class="noul"
-         href="{{ list.redirect }}">{{ list.item.link_id }}</a>
+  <td align="right"><div class="role"><a class="noul"
+         href="{{ list.redirect }}">{{ list.item.role_verbose }}</a>
      </div>
   </td>
-  <td><div class="role">{{ list.item.role_verbose }}</div></td>
+  <td><div class="user_link_id">{% as_user list.item.link_id %}</div></td>
   <td><div class="for">{{ list.item.scope_path }}</div></td>
   <td><div class="status">{{ list.item.status }}</div></td>
   <td><div class="created">{{ list.item.created_on|date:"jS F Y H:i" }}</div></td>

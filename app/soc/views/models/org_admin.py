@@ -108,7 +108,6 @@ class View(role.View):
          },
         ]
 
-    new_params['disallow_last_resign'] = True
     new_params['allow_invites'] = True
     new_params['show_in_roles_overview'] = True
 

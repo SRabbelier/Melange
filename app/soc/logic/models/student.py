@@ -34,12 +34,14 @@ class Logic(role.Logic):
   """
 
   def __init__(self, model=soc.models.student.Student,
-               base_model=soc.models.role.Role, scope_logic=program_logic):
+               base_model=soc.models.role.Role, scope_logic=program_logic,
+               disallow_last_resign=False):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                scope_logic=scope_logic,
+                                disallow_last_resign=disallow_last_resign)
 
 
 logic = Logic()

@@ -88,7 +88,6 @@ class View(role.View):
        'clean_blog': cleaning.clean_url('blog'),
        'clean_photo_url': cleaning.clean_url('photo_url')}
 
-    new_params['disallow_last_resign'] = False
     new_params['allow_invites'] = True
     new_params['show_in_roles_overview'] = True
 

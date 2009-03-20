@@ -76,7 +76,6 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos']
 
-    new_params['disallow_last_resign'] = False
     new_params['allow_invites'] = True
     new_params['show_in_roles_overview'] = False
 

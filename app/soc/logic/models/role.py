@@ -29,17 +29,23 @@ from soc.logic.models import base
 import soc.models.role
 
 
+DEF_LAST_RESIGN_ERROR_FMT = "This user can't be " \
+    "resigned, please make sure it's not the last %(name)s."
+
+
 class Logic(base.Logic):
   """Logic methods for the Role model.
   """
 
   def __init__(self, model=soc.models.role.Role,
-               base_model=None, scope_logic=None):
+               base_model=None, scope_logic=None, disallow_last_resign=False):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+    self.dissalow_last_resign = disallow_last_resign
 
 
   def getGroupEntityFromScopePath(self, group_logic, scope_path):
@@ -75,7 +81,7 @@ class Logic(base.Logic):
       sidebar.flush(entity.user.account)
 
     return True
-  
+
   def _onCreate(self, entity):
     """Flush the sidebar cache when a new active role entity has been created.
     """
@@ -85,5 +91,25 @@ class Logic(base.Logic):
 
     super(Logic, self)._onCreate(entity)
 
+  def canResign(self, entity):
+    """Checks if the current entity is allowed to be resigned.
+
+    Returns:
+      - None if the entity is allowed to resign.
+      - Error message otherwise.
+    """
+
+    if self.dissalow_last_resign:
+     # check if this is the last active role for it's scope
+     fields = {'scope': entity.scope,
+          'status': 'active'}
+     roles = self.getForFields(fields, limit=2)
+
+     # if this it the last one return error message
+     if len(roles) <= 1:
+       return DEF_LAST_RESIGN_ERROR_FMT
+
+    # resignation is possible
+    return None
 
 logic = Logic()

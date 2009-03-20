@@ -109,6 +109,14 @@ class View(role.View):
          },
         ]
 
+    new_params['edit_extra_dynaproperties'] = {
+        'program_knowledge': forms.CharField(required=True,
+            widget=forms.Textarea(attrs={
+                'readonly': 'readonly',
+                'class': 'plaintext',}
+                ))
+        }
+
     new_params['show_in_roles_overview'] = True
 
     params = dicts.merge(params, new_params)

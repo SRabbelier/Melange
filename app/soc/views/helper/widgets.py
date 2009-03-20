@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
@@ -78,10 +79,9 @@ class FullTinyMCE(forms.widgets.Textarea):
     {% endblock %}
   """ 
 
-  features1 = ("bold,italic,underline,strikethrough,|,"
-               "forecolor,backcolor,blockquote,|"
+  features1 = ("bold,italic,underline,strikethrough,blockquote,|,"
               ",justifyleft,justifycenter,justifyright,justifyfull,|,"
-              "fontselect, fontsizeselect,formatselect")
+              "formatselect")
 
   features2 = ("newdocument,|,bullist,numlist,|,outdent,indent,|,undo,redo,|"
       ",link,unlink,anchor,image,cleanup,help,code,hr,removeformat,visualaid,|,"

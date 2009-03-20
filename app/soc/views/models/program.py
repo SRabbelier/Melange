@@ -142,6 +142,8 @@ class View(presence.View):
     new_params['create_extra_dynaproperties'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
+        'accepted_orgs_msg': forms.fields.CharField(
+            widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         'workflow': forms.ChoiceField(choices=[('gsoc','Project-based'),
             ('ghop','Task-based')], required=True),

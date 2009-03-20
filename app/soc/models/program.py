@@ -66,7 +66,16 @@ class Program(soc.models.presence.Presence):
       '<tt><b>GSoC 2009</b> is the <i>Google Summer of Code</i>,'
       ' but in <u>2009</u>!</tt><br><br>'
       '<small><i>(rich text formatting is supported)</i></small>')
-  
+
+  #: Required field storing description of the group.
+  accepted_orgs_msg = db.TextProperty(required=False,
+      verbose_name=ugettext('Accepted Organizations Message'))
+  accepted_orgs_msg.help_text = ugettext(
+      '<small><i>for example:</i></small><br>'
+      '<tt>Students who wish to participate can find out more about'
+      ' each mentoring organization below.</tt><br><br>'
+      '<small><i>(rich text formatting is supported)</i></small>')
+
   #: Required field storing application/tasks limit of the program.
   apps_tasks_limit = db.IntegerProperty(required=True,
       verbose_name=ugettext('Application/Tasks Limit'))

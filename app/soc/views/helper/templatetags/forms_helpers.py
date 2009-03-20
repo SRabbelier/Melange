@@ -40,6 +40,14 @@ from soc.views.helper import widgets
 register = template.Library()
 
 
+@register.inclusion_tag('soc/templatetags/_as_user.html')
+def as_user(user):
+  """Prints a user as a hyperlinked link_id.
+  """
+
+  return {'user': user}
+
+
 @register.inclusion_tag('soc/templatetags/_field_as_table_row.html')
 def field_as_table_row(field):
   """Prints a newforms field as a table row.

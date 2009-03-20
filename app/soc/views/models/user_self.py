@@ -238,6 +238,7 @@ class View(base.View):
     # only select the roles for the current user
     filter = {
         'link_id': user.link_id,
+        'status': ['active', 'inactive']
         }
 
     contents = []

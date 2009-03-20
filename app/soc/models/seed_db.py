@@ -80,25 +80,7 @@ def ensureUser():
 
 def seed(request, *args, **kwargs):
   """Seeds the datastore with some default values.
-
-  Understands the following GET args:
-    many_users: create 200 users instead of 15, out of which 100 have
-        a e-mail address in the auth domain
-    user_start: where to start adding new users at
-    user_end: where to stop adding new users at
-    user_goal: how many users to add in total, implies user_only
-    user_step: how many users to add per request, defaults to 15
-    user_only: stop after adding new users
-    many_orgs: create 200 pre-accepted and 200 pre-denied org apps
-        instead of just 1- pre-accepted ones, also create 200
-        orgs instead of just 15.
-
-    user is redirected to if user_end < user_goal, incrementing both
-    user_start and user_end with user_step.
   """
-
-  get_args = request.GET
-
 
   site_properties = {
       'key_name': 'site',
@@ -524,6 +506,17 @@ def seed_student_proposal(request, i):
 
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
+
+    Understands the following GET args:
+    start: where to start adding new users at
+    end: where to stop adding new users at
+    goal: how many users to add in total, implies user_only
+    step: how many users to add per request, defaults to 15
+    seed_type: the type of entity to seed, should be one of:
+      user, org, org_app, mentor, student_proposal
+
+    Redirects if end < goal, incrementing both start and end with step.
+
   """
 
   get_args = request.GET

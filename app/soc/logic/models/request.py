@@ -58,7 +58,7 @@ class Logic(base.Logic):
     """
 
     return ['scope_path', 'role', 'link_id']
-  
+
   def _onCreate(self, entity):
     """Sends out a message notifying users about the new invite/request.
     """
@@ -72,6 +72,25 @@ class Logic(base.Logic):
       pass
 
     super(Logic, self)._onCreate(entity)
+
+  def _updateField(self, entity, entity_properties, name):
+    """Called when the fields of the request are updated.
+
+      - Sends out a message depending on the change of status
+    """
+
+    value = entity_properties[name]
+
+    if name == 'status' and entity.status != value:
+      if value == 'group_accepted':
+       # this is an invite
+        notifications.sendInviteNotification(entity)
+      elif value == 'new':
+        # this is a request
+        # TODO(Lennard) Create a new request message
+        pass
+
+    return super(Logic, self)._updateField(entity, entity_properties, name)
 
 
 logic = Logic()

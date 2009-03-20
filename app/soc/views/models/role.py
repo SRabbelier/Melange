@@ -269,9 +269,6 @@ class View(base.View):
     entity = request_logic.logic.updateOrCreateFromKeyName(request_fields,
                                                            key_name)
 
-    # send out an invite notification
-    notifications_helper.sendInviteNotification(entity)
-
     group_view = params.get('group_view')
     if not group_view:
       return http.HttpResponseRedirect('/')
@@ -617,9 +614,6 @@ class View(base.View):
         if request_status != request_entity.status:
           request_logic.logic.updateEntityProperties(request_entity, {
               'status': get_dict['status']})
-
-          if request_status == 'group_accepted':
-            notifications_helper.sendInviteNotification(request_entity)
 
         group_view = params.get('group_view')
         if not group_view:

@@ -227,6 +227,8 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Phone Number'))
   phone.help_text = ugettext(
       'include complete international calling number with country code')
+  phone.example_text = ugettext(
+      "e.g. 1650253000 for Google's Corp HQ number in the United States")
   phone.group = ugettext("2. Contact Info (Private)")
 
   #: field storing whether the User has agreed to publish his location

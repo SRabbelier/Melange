@@ -249,6 +249,9 @@ class View(presence.View):
 
     contents.append(ao_list)
 
+    params = params.copy()
+    params['list_msg'] = program_entity.accepted_orgs_msg
+
     return self._list(request, params, contents, page_name)
 
   @decorators.merge_params

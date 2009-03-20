@@ -652,7 +652,7 @@ class View(presence.View):
       items += self._getOrganizationEntries(program_entity, org_admin_entity,
                                             mentor_entity, params, id, user)
 
-    if not (student_entity or mentor_entity or org_admin_entity):
+    if user and not (student_entity or mentor_entity or org_admin_entity):
       if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
         # this user does not have a role yet for this program
         items += [('/student/apply/%s' % (program_entity.key().name()),

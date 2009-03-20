@@ -575,8 +575,8 @@ class View(base.View):
     # TODO(ljvderijk): send out a message to alert the users 
     # able to process this request
 
-    # redirect to roles overview
-    return http.HttpResponseRedirect('/user/roles')
+    # redirect to requests overview
+    return http.HttpResponseRedirect('/user/requests')
 
 
   @decorators.merge_params

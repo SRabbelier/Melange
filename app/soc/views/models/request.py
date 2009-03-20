@@ -164,8 +164,8 @@ class View(base.View):
         request_logic.updateEntityProperties(request_entity, {
             'status': 'rejected'})
 
-        # redirect to user role overview
-        return http.HttpResponseRedirect('/user/roles')
+        # redirect to user request overview
+        return http.HttpResponseRedirect('/user/requests')
 
     # put the entity in the context
     context['entity'] = request_entity

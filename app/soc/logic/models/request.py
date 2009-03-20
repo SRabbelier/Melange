@@ -76,7 +76,7 @@ class Logic(base.Logic):
   def _updateField(self, entity, entity_properties, name):
     """Called when the fields of the request are updated.
 
-      - Sends out a message depending on the change of status
+      Sends out a message depending on the change of status.
     """
 
     value = entity_properties[name]

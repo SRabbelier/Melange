@@ -55,6 +55,7 @@ from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
 
+import soc.cache.logic
 import soc.logic.models.program
 import soc.models.work
 
@@ -225,13 +226,25 @@ class View(presence.View):
 
     filter['status'] = ['new', 'active']
 
-    from soc.views.models import organization as org_view
-    ao_params = org_view.view.getParams().copy() # active orgs
+    from soc.views.models.organization import view as org_view
+    ao_params = org_view.getParams().copy() # active orgs
+    ao_logic = ao_params['logic']
 
-    ao_params['list_action'] = (redirects.getPublicRedirect, ao_params)
-    ao_params['list_description'] = description
+    order = ['name']
 
-    ao_list = lists.getListContent(request, ao_params, filter, idx=1)
+    if aa_list:
+      fun = self._getData
+    else:
+      # only cache if all profiles are created
+      fun =  soc.cache.logic.cache(self._getData)
+    entities = fun(ao_logic.getModel(), filter, order, ao_logic)
+
+    ao_list = dicts.rename(ao_params, ao_params['list_params'])
+    ao_list['action'] = (redirects.getPublicRedirect, ao_params)
+    ao_list['description'] = description
+    ao_list['pagination'] = 'soc/list/no_pagination.html'
+    ao_list['data'] = entities
+
     contents.append(ao_list)
 
     return self._list(request, params, contents, page_name)

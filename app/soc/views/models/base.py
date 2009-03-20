@@ -653,7 +653,7 @@ class View(object):
 
     return self._list(request, params, contents, page_name)
 
-  def _getPickData(self, model, filter, logic):
+  def _getData(self, model, filter, order, logic):
     """Retrieves the pick data for this query.
 
     Args:
@@ -662,7 +662,7 @@ class View(object):
       logic: the logic that will be used for the query
     """
 
-    entities = logic.getForFields(filter=filter, limit=1000)
+    entities = logic.getForFields(filter=filter, order=order, limit=1000)
     return entities
 
   @decorators.merge_params
@@ -693,11 +693,12 @@ class View(object):
       filter[key] = request.GET.getlist(key)
 
     if params['cache_pick']:
-      fun =  soc.cache.logic.cache(self._getPickData)
+      fun =  soc.cache.logic.cache(self._getData)
     else:
-      fun = self._getPickData
+      fun = self._getData
 
-    entities = fun(logic._model, filter, logic)
+    order = []
+    entities = fun(logic.getModel(), filter, order, logic)
 
     data = [i.toDict() for i in entities]
 

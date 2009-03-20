@@ -23,23 +23,33 @@ __authors__ = [
 
 
 from google.appengine.api import memcache
+from google.appengine.ext import db
 
 import soc.cache.base
 
 
-def key(model, filter):
+def key(model, filter, order):
   """Returns the memcache key for this query.
   """
 
-  return 'query_for_%s_%s' % (repr(model.kind()), repr(filter))
+  new_filter = {}
+
+  for key, value in filter.iteritems():
+    new_value = value.key().name() if isinstance(value, db.Model) else value
+    new_filter[key] = new_value
+
+  return 'query_for_%(kind)s_%(filter)s_%(order)s' % {
+      'kind': repr(model.kind()),
+      'filter': repr(new_filter),
+      'order': repr(order),
+      }
 
 
-def get(model, filter, *args, **kwargs):
+def get(model, filter, order, *args, **kwargs):
   """Retrieves the data for the specified query from the memcache.
   """
 
-  memcache_key = key(model, filter)
-  import logging; logging.info(memcache_key)
+  memcache_key = key(model, filter, order)
   return memcache.get(memcache_key), memcache_key
 
 
@@ -52,7 +62,6 @@ def put(data, memcache_key, *args, **kwargs):
 
   # Store data for fifteen minutes to force a refresh every so often
   retention = 15*60
-
   memcache.add(memcache_key, data, retention)
 
 

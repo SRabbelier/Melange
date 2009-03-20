@@ -80,9 +80,10 @@ class FullTinyMCE(forms.widgets.Textarea):
     {% endblock %}
   """ 
 
-  features1 = ("bold,italic,underline,strikethrough,blockquote,|,"
+  features1 = ("bold,italic,underline,strikethrough,|,"
+               "forecolor,backcolor,blockquote,|"
               ",justifyleft,justifycenter,justifyright,justifyfull,|,"
-              "formatselect")
+              "fontselect, fontsizeselect,formatselect")
 
   features2 = ("newdocument,|,bullist,numlist,|,outdent,indent,|,undo,redo,|"
       ",link,unlink,anchor,image,cleanup,help,code,hr,removeformat,visualaid,|,"

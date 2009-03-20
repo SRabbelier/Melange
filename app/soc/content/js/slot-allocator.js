@@ -39,8 +39,11 @@ function updateFromJSON(data) {
 }
 
 function retrieveJSON() {
-  $.getJSON(RETURN_URL+"?_="+(new Date().getTime()),
-    updateFromJSON
+  $.getJSON(RETURN_URL+"?_="+(new Date().getTime()), function(data) {
+    if (data) {
+      updateFromJSON(data);
+    }
+  }
   );
 }
 

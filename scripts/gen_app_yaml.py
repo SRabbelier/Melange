@@ -34,6 +34,7 @@ __authors__ = [
     '"Dan Bentley" <dbentley@google.com>',
     ]
 
+
 import os
 import sys
 
@@ -45,47 +46,59 @@ def generateAppYaml(application_name, force=False):
     application_name: str, the name to write into the application filed
     force: bool, whether to overwrite an existing app.yaml
   """
+
   scripts_directory = os.path.dirname(__file__)
   app_dir = os.path.abspath(os.path.join(scripts_directory, '../app'))
   template_path = os.path.join(app_dir, 'app.yaml.template')
   app_yaml_path = os.path.join(app_dir, 'app.yaml')
+
   if not os.path.exists(template_path):
     sys.exit("Template file %s non-existent. Corrupt client?" % template_path)
+
   if os.path.exists(app_yaml_path):
     if not force:
       sys.exit("%s exists; exiting. To overwrite, pass -f on the command-line"
                % app_yaml_path)
+
   with open(template_path) as infile:
     template_contents = infile.read()
+
   app_yaml_contents = template_contents.replace(
       '# application: FIXME',
       'application: '+ application_name)
+
   with open(app_yaml_path, 'w') as outfile:
     outfile.write(app_yaml_contents)
-  # TODO(dbentley): should this be done via logging?
+
   print "Wrote application name %s to %s." % (application_name, app_yaml_path)
 
 
 def usage(msg):
   """Print an error message and the usage of the program; then quit.
   """
+
   sys.exit('Error: %s\n\n%s' % (msg, __doc__))
 
 
 def main(args):
-  args = args[1:] # strip off the binary name
+  """Main program.
+  """
+
   if not args:
     usage("No arguments supplied.")
+
   if args[0] == '-f':
     force = True
     args = args[1:]
   else:
     force = False
+
   if len(args) != 1:
     usage("No application name supplied.")
+
   application_name = args[0]
   generateAppYaml(application_name, force=force)
 
 
 if __name__ == '__main__':
-  main(sys.argv)
+  main(sys.argv[1:]) # strip off the binary name

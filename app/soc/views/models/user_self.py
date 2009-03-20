@@ -223,7 +223,7 @@ class View(base.View):
   @decorators.check_access
   def roles(self, request, access_type,
                page_name=None, params=None, **kwargs):
-    """Displays the unhandled requests for this user.
+    """Displays the valid roles for this user.
 
     Args:
       request: the standard Django HTTP request object

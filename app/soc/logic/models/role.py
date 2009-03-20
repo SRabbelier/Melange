@@ -94,6 +94,9 @@ class Logic(base.Logic):
   def canResign(self, entity):
     """Checks if the current entity is allowed to be resigned.
 
+    Args:
+      entity: a Role entity
+
     Returns:
       - None if the entity is allowed to resign.
       - Error message otherwise.

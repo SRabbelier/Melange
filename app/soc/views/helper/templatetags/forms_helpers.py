@@ -31,6 +31,7 @@ from django.forms import forms as forms_in
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 
+from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.views.helper import redirects
@@ -46,6 +47,16 @@ def as_user(user):
   """
 
   return {'user': user}
+
+
+@register.inclusion_tag('soc/templatetags/_as_email.html')
+def as_email(account):
+  """Prints a user as a hyperlinked link_id.
+  """
+
+  denormalized = accounts.denormalizeAccount(account)
+
+  return {'email': denormalized.email()}
 
 
 @register.inclusion_tag('soc/templatetags/_field_as_table_row.html')

@@ -321,7 +321,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('I Agree to the Terms of Service'))
   agreed_to_tos.help_text = ugettext(
       'Indicates whether the user agreed to this role Terms of Service.')
-  agreed_to_tos.group = ugettext("5. Terms of Service")
+  agreed_to_tos.group = ugettext("99. Terms of Service")
 
   #: field storing when the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
@@ -330,7 +330,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Has agreed to the Terms of Service on'))
   agreed_to_tos_on.help_text = ugettext(
       'Indicates when the user agreed to this role Terms of Service.')
-  agreed_to_tos.group = ugettext("5. Terms of Service")
+  agreed_to_tos.group = ugettext("99. Terms of Service")
 
   #: field storing the status of this role
   #: Active means that this role can exercise all it's privileges.

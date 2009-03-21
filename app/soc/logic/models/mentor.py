@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.logic.models import role
 from soc.logic.models import organization as org_logic
 
@@ -78,6 +80,38 @@ class Logic(role.Logic):
       return DEF_ALREADY_MENTORING_PROPOSAL_MSG
 
     return super(Logic, self).canResign(entity)
+
+  def _updateField(self, entity, entity_properties, name):
+    """Called when the fields of the mentor are updated
+
+      When status is changed to invalid, removes the Mentor from all Student
+      Proposals possible mentor lists.
+    """
+
+    from soc.logic.models.student_proposal import logic as student_proposal_logic
+
+    value = entity_properties[name]
+
+    if name == 'status' and value != entity.status and value == 'invalid':
+      fields = {'org': entity.scope}
+
+      # TODO make this work for more then 1000 entities
+      proposals_query = student_proposal_logic.getQueryForFields(fields)
+
+      # store all updated proposals
+      changed = []
+
+      for proposal in proposals_query:
+
+        if proposal.possible_mentors.count(entity.key()):
+          # remove from list and add to changed
+          proposal.possible_mentors.remove(entity.key())
+          changed.append(proposal)
+
+      # store all changed proposals
+      db.put(changed)
+
+    return super(Logic, self)._updateField(entity, entity_properties, name)
 
 
 logic = Logic()

@@ -88,6 +88,12 @@ class View(role.View):
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school']
 
+    new_params['create_extra_dynaproperties'] = {
+        'expected_graduation': forms.IntegerField(required=True,
+                                                  max_value=2030,
+                                                  min_value=2009)
+        }
+
     new_params['create_dynafields'] = [
         {'name': 'scope_path',
          'base': forms.fields.CharField,

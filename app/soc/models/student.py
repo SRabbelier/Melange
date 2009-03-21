@@ -38,11 +38,25 @@ class Student(soc.models.role.Role):
 
   school_name = db.StringProperty(required=True, 
       verbose_name=ugettext('School Name'))
-  school_name.group = ugettext("4. Private Info")
+  school_name.group = ugettext("5. Education")
   school_country = db.StringProperty(required=True,
       verbose_name=ugettext('School Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
-  school_country.group = ugettext("4. Private Info")
+  school_country.group = ugettext("5. Education")
+
+  major = db.StringProperty(required=True,
+      verbose_name=ugettext('Major Subject'))
+  major.group = ugettext("5. Education")
+  # TODO add more degrees because this should be used in GHOP as well
+  degree = db.StringProperty(required=True,
+      verbose_name=ugettext('Degree'),
+      choices=['Undergraduate', 'Master', 'PhD'])
+  degree.group = ugettext("5. Education")
+  expected_graduation = db.IntegerProperty(required=True,
+      verbose_name=ugettext('Expected Graduation Year'))
+  expected_graduation.help_text = ugettext("Year in integer format only!")
+  expected_graduation.example_text = ugettext('Year only, for example "2012"')
+  expected_graduation.group = ugettext("5. Education")
 
   #: Property to gain insight into where students heard about this program
   program_knowledge = db.TextProperty(required=True, verbose_name=ugettext(
@@ -52,7 +66,7 @@ class Student(soc.models.role.Role):
       "list (please include list address), information session (please include "
       "location and speakers if you can), etc.")
   program_knowledge.group = ugettext("4. Private Info")
-      
+
   #: A many:1 relationship that ties multiple Students to the
   #: School that they attend.
   school = db.ReferenceProperty(reference_class=soc.models.school.School,

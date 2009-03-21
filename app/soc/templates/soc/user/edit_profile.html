@@ -12,15 +12,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+
 {% load forms_helpers %}
+
 {% block page_title %}User Profile{% endblock %}
+
 {% block header_title %}
 {% if user %}
-Modify Existing User Profile for {{ user.name }} <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
+Modify Existing User Profile for {{ user.name }} ({% as_email account %})</a>
 {% else %}
-Create a New User Profile for <a href="mailto:{{ account.email }} ">&lt;{{ account.email }}&gt;</a>
+Create a New User Profile for {% as_email account %}</a>
 {% endif %}
 {% endblock %}
+
 {% block body %}
 <p>
 <p>

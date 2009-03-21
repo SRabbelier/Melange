@@ -19,21 +19,16 @@ from __future__ import with_statement
 """Google Summer of Code Melange release script.
 
 This script provides automation for the various tasks involved in
-pushing a new release of Melange to the official Google Summer of Code
-app engine instance.
+releasing a new version of Melange and pushing it to various app
+engine instances.
 
 It does not provide a turnkey autopilot solution. Notably, each stage
 of the release process must be started by a human operator, and some
 commands will request confirmation or extra details before
-proceeding. It is not a replacement for a cautious human
-operator.
+proceeding. It is not a replacement for a cautious human operator.
 
-Note that this script requires:
- - Python 2.5 or better (for various language features)
-
- - Subversion 1.5.0 or better (for working copy depth control, which
-     cuts down checkout/update times by several orders of
-     magnitude).
+Note that this script requires Python 2.5 or better (for various
+language features)
 """
 
 __authors__ = [
@@ -49,6 +44,7 @@ import subprocess
 import sys
 
 import error
+import io
 import log
 import subversion
 import util
@@ -57,7 +53,6 @@ import util
 # Default repository URLs for Melange and the Google release
 # repository.
 MELANGE_REPOS = 'http://soc.googlecode.com/svn'
-GOOGLE_SOC_REPOS = 'https://soc-google.googlecode.com/svn'
 
 
 # Regular expression matching an apparently well formed Melange
@@ -67,124 +62,6 @@ MELANGE_RELEASE_RE = re.compile(r'\d-\d-\d{8}p\d+')
 
 class Error(error.Error):
   pass
-
-
-class AbortedByUser(Error):
-  """The operation was aborted by the user."""
-  pass
-
-
-class FileAccessError(Error):
-  """An error occured while accessing a file."""
-  pass
-
-
-def getString(prompt):
-  """Prompt for and return a string."""
-  prompt += ' '
-  log.stdout.write(prompt)
-  log.stdout.flush()
-
-  response = sys.stdin.readline()
-  log.terminal_echo(prompt + response.strip())
-  if not response:
-    raise AbortedByUser('Aborted by ctrl+D')
-
-  return response.strip()
-
-
-def confirm(prompt, default=False):
-  """Ask a yes/no question and return the answer.
-
-  Will reprompt the user until one of "yes", "no", "y" or "n" is
-  entered. The input is case insensitive.
-
-  Args:
-    prompt: The question to ask the user.
-    default: The answer to return if the user just hits enter.
-
-  Returns:
-    True if the user answered affirmatively, False otherwise.
-  """
-  if default:
-    question = prompt + ' [Yn]'
-  else:
-    question = prompt + ' [yN]'
-  while True:
-    answer = getString(question)
-    if not answer:
-      return default
-    elif answer in ('y', 'yes'):
-      return True
-    elif answer in ('n', 'no'):
-      return False
-    else:
-      log.error('Please answer yes or no.')
-
-
-def getNumber(prompt):
-  """Prompt for and return a number.
-
-  Will reprompt the user until a number is entered.
-  """
-  while True:
-    value_str = getString(prompt)
-    try:
-      return int(value_str)
-    except ValueError:
-      log.error('Please enter a number. You entered "%s".' % value_str)
-
-
-def getChoice(intro, prompt, choices, done=None, suggest=None):
-  """Prompt for and return a choice from a menu.
-
-  Will reprompt the user until a valid menu entry is chosen.
-
-  Args:
-    intro: Text to print verbatim before the choice menu.
-    prompt: The prompt to print right before accepting input.
-    choices: The list of string choices to display.
-    done: If not None, the list of indices of previously
-      selected/completed choices.
-    suggest: If not None, the index of the choice to highlight as
-      the suggested choice.
-
-  Returns:
-    The index in the choices list of the selection the user made.
-  """
-  done = set(done or [])
-  while True:
-    print intro
-    print
-    for i, entry in enumerate(choices):
-      done_text = ' (done)' if i in done else ''
-      indent = '--> ' if i == suggest else '    '
-      print '%s%2d. %s%s' % (indent, i+1, entry, done_text)
-    print
-    choice = getNumber(prompt)
-    if 0 < choice <= len(choices):
-      return choice-1
-    log.error('%d is not a valid choice between %d and %d' %
-              (choice, 1, len(choices)))
-    print
-
-
-def fileToLines(path):
-  """Read a file and return it as a list of lines."""
-  try:
-    with file(path) as f:
-      return f.read().split('\n')
-  except (IOError, OSError), e:
-    raise FileAccessError(str(e))
-
-
-def linesToFile(path, lines):
-  """Write a list of lines to a file."""
-  try:
-    with file(path, 'w') as f:
-      f.write('\n'.join(lines))
-  except (IOError, OSError), e:
-    raise FileAccessError(str(e))
 
 
 #
@@ -243,7 +120,7 @@ class ReleaseEnvironment(util.Paths):
       self.wc.revert()
 
       if self.exists(self.BRANCH_FILE):
-        branch = fileToLines(self.path(self.BRANCH_FILE))[0]
+        branch = io.fileToLines(self.path(self.BRANCH_FILE))[0]
         self._switchBranch(branch)
       else:
         self._switchBranch(None)
@@ -312,7 +189,7 @@ class ReleaseEnvironment(util.Paths):
     else:
       self.wc.update()
       assert self.wc.exists('branches/' + release)
-      linesToFile(self.path(self.BRANCH_FILE), [release])
+      io.linesToFile(self.path(self.BRANCH_FILE), [release])
       self.branch = release
       self.branch_dir = 'branches/' + release
       self.wc.update(self.branch_dir, depth='infinity')
@@ -340,10 +217,10 @@ class ReleaseEnvironment(util.Paths):
       raise error.ExpectationFailed(
         'No branches available. Please import one.')
 
-    choice = getChoice('Available release branches:',
-               'Your choice?',
-               branches,
-               suggest=len(branches)-1)
+    choice = io.getChoice('Available release branches:',
+                          'Your choice?',
+                          branches,
+                          suggest=len(branches)-1)
     self._switchBranch(branches[choice])
 
   def _addAppYaml(self):
@@ -359,7 +236,7 @@ class ReleaseEnvironment(util.Paths):
     yaml_path = self._branchPath('app/app.yaml')
     self.wc.copy(yaml_path + '.template', yaml_path)
 
-    yaml = fileToLines(self.wc.path(yaml_path))
+    yaml = io.fileToLines(self.wc.path(yaml_path))
     out = []
     for i, line in enumerate(yaml):
       stripped_line = line.strip()
@@ -372,7 +249,7 @@ class ReleaseEnvironment(util.Paths):
         out.append('# * initial Google fork of Melange ' + self.branch)
       else:
         out.append(line)
-    linesToFile(self.wc.path(yaml_path), out)
+    io.linesToFile(self.wc.path(yaml_path), out)
 
     self.wc.commit('Create app.yaml with Google patch version g0 '
              'in branch ' + self.branch)
@@ -386,7 +263,7 @@ class ReleaseEnvironment(util.Paths):
     # of the Melange codebase instead of the vanilla release.
     tmpl_file = self.wc.path(
       self._branchPath('app/soc/templates/soc/base.html'))
-    tmpl = fileToLines(tmpl_file)
+    tmpl = io.fileToLines(tmpl_file)
     for i, line in enumerate(tmpl):
       if 'http://code.google.com/p/soc/source/browse/tags/' in line:
         tmpl[i] = line.replace('/p/soc/', '/p/soc-google/')
@@ -394,7 +271,7 @@ class ReleaseEnvironment(util.Paths):
     else:
       raise error.ExpectationFailed(
         'No source code link found in base.html')
-    linesToFile(tmpl_file, tmpl)
+    io.linesToFile(tmpl_file, tmpl)
 
     self.wc.commit(
       'Customize the Melange release link in the sidebar menu')
@@ -402,9 +279,9 @@ class ReleaseEnvironment(util.Paths):
   @pristine_wc
   def importTag(self):
     """Import a new Melange release"""
-    release = getString('Enter the Melange release to import:')
+    release = io.getString('Enter the Melange release to import:')
     if not release:
-      AbortedByUser('No release provided, import aborted')
+      error.AbortedByUser('No release provided, import aborted')
 
     branch_dir = 'branches/' + release
     if self.wc.exists(branch_dir):
@@ -413,8 +290,8 @@ class ReleaseEnvironment(util.Paths):
     tag_url = '%s/tags/%s' % (self.upstream_repos, release)
     release_rev = subversion.find_tag_rev(tag_url)
 
-    if confirm('Confirm import of release %s, tagged at r%d?' %
-           (release, release_rev)):
+    if io.confirm('Confirm import of release %s, tagged at r%d?' %
+                  (release, release_rev)):
       # Add an entry to the vendor externals for the Melange
       # release.
       externals = self.wc.propget('svn:externals', 'vendor/soc')
@@ -443,8 +320,8 @@ class ReleaseEnvironment(util.Paths):
   @pristine_wc
   def cherryPickChange(self):
     """Cherry-pick a change from the Melange trunk"""
-    rev = getNumber('Revision number to cherry-pick:')
-    bug = getNumber('Issue fixed by this change:')
+    rev = io.getNumber('Revision number to cherry-pick:')
+    bug = io.getNumber('Issue fixed by this change:')
 
     diff = subversion.diff(self.upstream_repos + '/trunk', rev)
     if not diff.strip():
@@ -457,7 +334,7 @@ class ReleaseEnvironment(util.Paths):
     yaml_path = self.wc.path(self._branchPath('app/app.yaml'))
     out = []
     updated_patchlevel = False
-    for line in fileToLines(yaml_path):
+    for line in io.fileToLines(yaml_path):
       if line.strip().startswith('version: '):
         version = line.strip().split()[-1]
         base, patch = line.rsplit('g', 1)
@@ -474,12 +351,12 @@ class ReleaseEnvironment(util.Paths):
       log.error('Failed to update Google patch revision')
       log.error('Cherry-picking failed')
 
-    linesToFile(yaml_path, out)
+    io.linesToFile(yaml_path, out)
 
     log.info('Check the diff about to be committed with:')
     log.info('svn diff ' + self.wc.path(self.branch_dir))
-    if not confirm('Commit this change?'):
-      raise AbortedByUser('Cherry-pick aborted')
+    if not io.confirm('Commit this change?'):
+      raise error.AbortedByUser('Cherry-pick aborted')
     self.wc.commit(message)
     log.info('Cherry-picked r%d from the Melange trunk.' % rev)
 
@@ -516,9 +393,10 @@ class ReleaseEnvironment(util.Paths):
         self.MENU_SUGGESTIONS[last_command])
 
       try:
-        choice = getChoice('Main menu:', 'Your choice?',
-          self.MENU_STRINGS, done=done, suggest=suggested_next)
-      except (KeyboardInterrupt, AbortedByUser):
+        choice = io.getChoice('Main menu:', 'Your choice?',
+                              self.MENU_STRINGS, done=done,
+                              suggest=suggested_next)
+      except (KeyboardInterrupt, error.AbortedByUser):
         log.info('Exiting.')
         return
       try:

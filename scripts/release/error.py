@@ -31,3 +31,8 @@ class ObstructionError(Error):
 class ExpectationFailed(Error):
   """An unexpected state was encountered by an automated step."""
   pass
+
+
+class AbortedByUser(Error):
+  """The operation was aborted by the user."""
+  pass

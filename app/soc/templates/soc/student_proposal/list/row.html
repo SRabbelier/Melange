@@ -5,6 +5,6 @@ onclick="document.location.href='{{ list.redirect }}'" name="name">
      </div>
   </td>
   <td><div class="title">{{ list.item.title }}</a></div></td>
-  <td><div class="status">{{ list.item.status }}</a></div></td>
-  <td><div class="date">{{ list.item.last_modified_on }}</a></div></td>
+  <td><div class="status">{{ list.item.org.name }}</a></div></td>
+  <td><div class="date">{{ list.item.last_modified_on|date:"jS F Y H:i" }}</a></div></td>
 </tr>

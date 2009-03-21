@@ -45,7 +45,7 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
 
-    self.dissalow_last_resign = disallow_last_resign
+    self.disallow_last_resign = disallow_last_resign
 
 
   def getGroupEntityFromScopePath(self, group_logic, scope_path):
@@ -102,7 +102,7 @@ class Logic(base.Logic):
       - Error message otherwise.
     """
 
-    if self.dissalow_last_resign:
+    if self.disallow_last_resign:
      # check if this is the last active role for it's scope
      fields = {'scope': entity.scope,
           'status': 'active'}

@@ -26,6 +26,8 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.models import countries
+
 import soc.models.role
 import soc.models.school
 
@@ -33,6 +35,14 @@ import soc.models.school
 class Student(soc.models.role.Role):
   """Student details for a specific Program.
   """
+
+  school_name = db.StringProperty(required=True, 
+      verbose_name=ugettext('School Name'))
+  school_name.group = ugettext("4. Private Info")
+  school_country = db.StringProperty(required=True,
+      verbose_name=ugettext('School Country/Territory'),
+      choices=countries.COUNTRIES_AND_TERRITORIES)
+  school_country.group = ugettext("4. Private Info")
 
   #: Property to gain insight into where students heard about this program
   program_knowledge = db.TextProperty(required=True, verbose_name=ugettext(
@@ -42,7 +52,7 @@ class Student(soc.models.role.Role):
       "list (please include list address), information session (please include "
       "location and speakers if you can), etc.")
   program_knowledge.group = ugettext("4. Private Info")
-
+      
   #: A many:1 relationship that ties multiple Students to the
   #: School that they attend.
   school = db.ReferenceProperty(reference_class=soc.models.school.School,

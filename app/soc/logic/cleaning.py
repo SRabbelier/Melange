@@ -172,7 +172,7 @@ def clean_existing_user(field_name):
   return wrapped
 
 
-def clean_user_is_current(field_name):
+def clean_user_is_current(field_name, as_user=True):
   """Check if the field_name value is a valid link_id and resembles the
      current user.
   """
@@ -189,7 +189,7 @@ def clean_user_is_current(field_name):
       # this user is not the current user
       raise forms.ValidationError("This user is not you.")
 
-    return user_entity
+    return user_entity if as_user else link_id
   return wrapped
 
 

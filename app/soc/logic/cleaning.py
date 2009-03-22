@@ -162,8 +162,7 @@ def clean_existing_user(field_name):
     """
     link_id = clean_link_id(field_name)(self)
 
-    user_entity = user_logic.getForFields({'link_id': link_id},
-        unique=True)
+    user_entity = user_logic.getFromKeyFields({'link_id': link_id})
 
     if not user_entity:
       # user does not exist
@@ -205,8 +204,7 @@ def clean_user_not_exist(field_name):
     """
     link_id = clean_link_id(field_name)(self)
 
-    user_entity = user_logic.getForFields({'link_id': link_id},
-        unique=True)
+    user_entity = user_logic.getFromKeyFields({'link_id': link_id})
 
     if user_entity:
       # user exists already
@@ -430,8 +428,8 @@ def validate_user_edit(link_id_field, account_field):
     # if both fields were valid do this check
     if link_id and user_account:
       # get the user from the link_id in the form
-      fields = {'link_id': link_id}
-      user_entity = user_logic.getForFields(fields, unique=True)
+
+      user_entity = user_logic.getFromKeyFields({'link_id': link_id})
 
       # if it's not the user's current account
       if user_entity.account != user_account:

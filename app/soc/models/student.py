@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
@@ -71,3 +72,14 @@ class Student(soc.models.role.Role):
   #: School that they attend.
   school = db.ReferenceProperty(reference_class=soc.models.school.School,
                                 required=False, collection_name='students')
+
+  can_we_contact_you = db.BooleanProperty(verbose_name=ugettext(
+      'Can we contact you?'))
+  can_we_contact_you.help_text = ugettext(
+      'Please check here if you would not mind being contacted by the Program'
+      ' Administrators for follow up with members of the press who would like'
+      ' to interview you about the program. You will not be contacted unless '
+      ' you successfully complete your project. <br />'
+      '<b>Please note that checking this  box has no effect on your chances'
+      ' of being accepted into the program</b>.')
+  can_we_contact_you.group = ugettext("2. Contact Info (Private)")

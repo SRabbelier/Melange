@@ -18,10 +18,13 @@
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljdverijk@gmail.com>',
 ]
 
 from google.appengine.ext import db
+
+from django.utils.translation import ugettext
 
 import soc.models.program
 import soc.models.role
@@ -34,3 +37,11 @@ class Mentor(soc.models.role.Role):
   #: A required property that defines the program that this mentor works for
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
                               required=True, collection_name='mentors')
+
+  can_we_contact_you = db.BooleanProperty(verbose_name=ugettext(
+      'Can we contact you?'))
+  can_we_contact_you.help_text = ugettext(
+      'Please check here if you would not mind being contacted by the Program'
+      ' Administrators for follow up with members of the press who would like'
+      ' to interview you about the program.')
+  can_we_contact_you.group = ugettext("2. Contact Info (Private)")

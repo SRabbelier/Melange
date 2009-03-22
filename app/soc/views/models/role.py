@@ -139,7 +139,7 @@ class View(base.View):
        'longitude': forms.fields.FloatField(widget=forms.HiddenInput,
                                             required=False),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
-       'clean_phone': cleaning.clean_numeric_only('phone'),
+       'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_res_street': cleaning.clean_ascii_only('res_street'),
        'clean_res_city': cleaning.clean_ascii_only('res_city'),
        'clean_res_state': cleaning.clean_ascii_only('res_state'),

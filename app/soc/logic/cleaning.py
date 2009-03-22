@@ -297,7 +297,7 @@ def clean_ascii_only(field_name):
   return wrapper
 
 
-def clean_numeric_only(field_name):
+def clean_phone_number(field_name):
   """Clean method for cleaning a field that may only contain numerical values.
   """
 
@@ -307,6 +307,10 @@ def clean_numeric_only(field_name):
     """
 
     value = self.cleaned_data.get(field_name)
+
+    # allow for a '+' prefix which means '00'
+    if value[0] == '+':
+      value = '00' + value[1:]
 
     if not value.isdigit():
       raise forms.ValidationError("Only numerical characters are allowed")

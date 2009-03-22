@@ -91,7 +91,7 @@ class View(presence.View):
     new_params['list_heading'] = 'soc/group/list/heading.html'
 
     new_params['create_extra_dynaproperties'] = {
-       'clean_phone': cleaning.clean_numeric_only('phone'),
+       'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_contact_street': cleaning.clean_ascii_only('contact_street'),
        'clean_contact_city': cleaning.clean_ascii_only('contact_city'),
        'clean_contact_state': cleaning.clean_ascii_only('contact_state'),

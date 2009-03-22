@@ -103,8 +103,12 @@ class View(base.View):
     Overrides public_template to point at 'home_template'.
     """
 
+    key_name = self._logic.getKeyNameFromFields(kwargs)
+    redirect = '/%s/show/%s' % (self._params['url_name'], key_name)
+
     new_params = {}
     new_params['public_template'] = self._params['home_template']
+    new_params['public_redirect'] = redirect
 
     params = dicts.merge(params, new_params)
 

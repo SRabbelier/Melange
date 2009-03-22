@@ -98,7 +98,7 @@ class View(base.View):
         'clean_content': cleaning.clean_html_content('content'),
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_scope_path': cleaning.clean_scope_path('scope_path'),
-        'clean': cleaning.validate_document_acl(self),
+        'clean': cleaning.validate_document_acl(self, True),
         }
     new_params['extra_dynaexclude'] = ['author', 'created', 'home_for',
                                        'modified_by', 'modified']
@@ -109,6 +109,7 @@ class View(base.View):
             widget=widgets.ReadOnlyInput(), required=False),
         'last_modified_by': forms.fields.CharField(
             widget=widgets.ReadOnlyInput(), required=False),
+        'clean': cleaning.validate_document_acl(self),
         }
 
     params = dicts.merge(params, new_params)

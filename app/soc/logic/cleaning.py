@@ -612,7 +612,7 @@ def validate_new_student_project(org_field, mentor_field, student_field):
 
   return wrapper
 
-def validate_document_acl(view):
+def validate_document_acl(view, creating=False):
   """Validates that the document ACL settings are correct.
   """
 
@@ -632,36 +632,48 @@ def validate_document_acl(view):
         raise forms.ValidationError(
             "Read access should be less strict than write access.")
 
-    validate_access(self, view, 'read_access')
-    validate_access(self, view, 'write_access')
+    params = view.getParams()
+    rights = params['rights']
+
+    user = user_logic.getForCurrentAccount()
+
+    rights.setCurrentUser(user.account, user)
+
+    prefix = self.cleaned_data['prefix']
+    scope_path = self.cleaned_data['scope_path']
+
+    validate_access(self, view, rights, prefix, scope_path, 'read_access')
+    validate_access(self, view, rights, prefix, scope_path, 'write_access')
+
+    if creating and not has_access(rights, 'restricted', scope_path, prefix):
+      raise forms.ValidationError(
+          "You do not have the required access to create this document.")
 
     return cleaned_data
 
   return wrapper
 
-def validate_access(self, view, field):
-  """Validates that the user has access to the ACL for the specified fields.
+
+def has_access(rights, access_level, scope_path, prefix):
+  """Checks whether the current user has the required access.
   """
 
-  access_level = self.cleaned_data[field]
-  prefix = self.cleaned_data['prefix']
-  scope_path = self.cleaned_data['scope_path']
-
-  params = view.getParams()
-  rights = params['rights']
-
-  user = user_logic.getForCurrentAccount()
-
-  rights.setCurrentUser(user.account, user)
   checker = rights_logic.Checker(prefix)
-
   roles = checker.getMembership(access_level)
 
   django_args = {
       'scope_path': scope_path,
-      'prefix': prefix
+      'prefix': prefix,
       }
 
-  if not rights.hasMembership(roles, django_args):
+  return rights.hasMembership(roles, django_args)
+
+def validate_access(self, view, rights, prefix, scope_path, field):
+  """Validates that the user has access to the ACL for the specified fields.
+  """
+
+  access_level = self.cleaned_data[field]
+
+  if not has_access(rights, access_level, scope_path, prefix):
     self._errors[field] = ErrorList([DEF_NO_RIGHTS_FOR_ACL_MSG])
     del self.cleaned_data[field]

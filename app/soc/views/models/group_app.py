@@ -133,15 +133,6 @@ class View(base.View):
     super(View, self)._editPost(request, entity, fields)
 
 
-  def _public(self, request, entity, context):
-    """See base._public().
-    """
-
-    context['entity_type_url'] = self._params['url_name']
-
-    super(View, self)._public(request, entity, context)
-
-
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,

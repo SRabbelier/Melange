@@ -123,9 +123,13 @@ class View(base.View):
     except db.Error:
       home_doc = None
 
-    if home_doc:
-      home_doc.content = helper.templates.unescape(home_doc.content)
-      context['home_document'] = home_doc
+    if not home_doc:
+      return False
+
+    home_doc.content = helper.templates.unescape(home_doc.content)
+    context['home_document'] = home_doc
+
+    return True
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

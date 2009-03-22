@@ -122,7 +122,10 @@ class View(object):
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
 
-    self._public(request, entity, context)
+    if not self._public(request, entity, context):
+      redirect = params['public_redirect']
+      if redirect:
+        return http.HttpResponseRedirect(redirect)
 
     context['entity'] = entity
     context['entity_type'] = params['name']
@@ -798,12 +801,15 @@ class View(object):
   def _public(self, request, entity, context):
     """Performs any required processing to get an entity's public page.
 
+    Should return True iff the public page should be displayed.
+
     Args:
       request: the django request object
       entity: the entity to make public
       context: the context object
     """
-    pass
+
+    return True
 
   def _editGet(self, request, entity, form):
     """Performs any required processing on the form to get its edit page.

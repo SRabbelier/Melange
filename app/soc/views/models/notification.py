@@ -199,6 +199,8 @@ class View(base.View):
     context['entity_type_url'] = self._params['url_name']
     context['entity_suffix'] = self._logic.getKeySuffix(entity)
 
+    return True
+
 
 view = View()
 

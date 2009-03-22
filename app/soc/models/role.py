@@ -307,6 +307,9 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('T-shirt Size'),
       choices=('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'))
   tshirt_size.group = ugettext("4. Private Info")
+  tshirt_size.example_text = ugettext('See also '
+      '<a href="http://en.wikipedia.org/wiki/US_standard_clothing_size">'
+      'this article</a>.')
 
   #: Optional field indicating choice of t-shirt fit; kept private.
   tshirt_style = db.StringProperty(

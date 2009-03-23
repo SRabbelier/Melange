@@ -274,7 +274,7 @@ class View(group.View):
         assigned_proposals), None)
 
     new_params = list_params.copy() # new proposals
-    new_params['list_description'] = 'List of new %s send to %s ' % (
+    new_params['list_description'] = 'List of new %s sent to %s ' % (
         new_params['name_plural'], org_entity.name)
     new_params['list_action'] = (redirects.getReviewRedirect, new_params)
 

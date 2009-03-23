@@ -689,6 +689,10 @@ class View(presence.View):
           {'url_name':'student_proposal'}),
          "List my Student Proposals", 'any_access')]
 
+    items += [(redirects.getEditRedirect(student_entity, 
+                                         {'url_name': 'student'}),
+              "Edit my Student Profile", 'any_access')]
+
     return items
 
   def _getOrganizationEntries(self, program_entity, org_admin_entity,

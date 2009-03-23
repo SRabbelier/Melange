@@ -46,7 +46,7 @@ class Organization(soc.models.group.Group):
       ' and other non-member participants, when they apply to contribute'
       ' to the organization.')
 
-  ideas = db.LinkProperty(required=False, verbose_name=ugettext('Idea list'))
+  ideas = db.LinkProperty(required=False, verbose_name=ugettext('Ideas list'))
   ideas.help_text = ugettext(
       'The URL to the ideas list of your organization.')
   ideas.example_text = ugettext('For instance a link to a Melange public '

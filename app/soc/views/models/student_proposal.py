@@ -64,7 +64,7 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkCanStudentPropose', 'scope_path'),
+    rights['edit'] = [('checkCanStudentPropose', ['scope_path', False]),
         ('checkRoleAndStatusForStudentProposal',
             [['proposer'], ['active'], ['new', 'pending']])]
     rights['delete'] = ['checkIsDeveloper']
@@ -76,12 +76,12 @@ class View(base.View):
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
-        ('checkCanStudentPropose', 'scope_path')]
+        ('checkCanStudentPropose', ['scope_path', False])]
     rights['list_self'] = [
         ('checkIsStudent', ['scope_path', ['active', 'inactive']])]
     rights['apply'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
-        ('checkCanStudentPropose', 'scope_path')]
+        ('checkCanStudentPropose', ['scope_path', True])]
     rights['review'] = [('checkRoleAndStatusForStudentProposal',
             [['org_admin', 'mentor', 'host'], 
             ['active'], ['new', 'pending']])]

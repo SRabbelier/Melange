@@ -124,6 +124,10 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 DEF_SIGN_UP_AS_STUDENT_MSG = ugettext(
     'You need to sign up as a Student first.')
 
+DEF_MAX_PROPOSALS_REACHED = ugettext(
+    'You have reached the maximum number of Proposals allowed '
+    'for this program.')
+
 DEF_NO_LIST_ACCESS_MSG = ugettext('You do not have the required rights to '
     'list documents for this scope and prefix.')
 
@@ -1286,13 +1290,15 @@ class Checker(object):
         message_fmt=DEF_NEED_ROLE_MSG)
 
   @allowDeveloper
-  def checkCanStudentPropose(self, django_args, key_location):
+  def checkCanStudentPropose(self, django_args, key_location, check_limit):
     """Checks if the program for this student accepts proposals.
 
     Args:
       django_args: a dictionary with django's arguments
       key_location: the key for django_args in which the key_name
                     from the student is stored
+      check_limit: iff true checks if the student reached the apps_tasks_limit
+                   for the given program.
     """
 
     self.checkIsUser(django_args)
@@ -1313,6 +1319,15 @@ class Checker(object):
     if not timeline_helper.isActivePeriod(program_entity.timeline,
                                           'student_signup'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+
+    if check_limit:
+      # count all studentproposals by the student
+      fields = {'scope': student_entity}
+      proposal_query = student_proposal_logic.getQueryForFields(fields)
+
+      if proposal_query.count() >= program_entity.apps_tasks_limit:
+        # too many proposals access denied
+        raise out_of_band.AccessViolation(message_fmt=DEF_MAX_PROPOSALS_REACHED)
 
     return
 

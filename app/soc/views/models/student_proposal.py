@@ -355,7 +355,7 @@ class View(base.View):
 
         if not reviewer:
           # no org_admin found, maybe it's a mentor?
-          reviewer = mentor_logic.logic.getForFields(filter, unique=True)
+          reviewer = mentor_logic.logic.getForFields(fields, unique=True)
 
       # create the review (reviewer might be None if a Host or Developer is posting)
       self._createReviewFor(entity, reviewer, comment, is_public=True)

@@ -5,11 +5,11 @@
 {% endifequal %}
 onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td><div class="rank">{{ list.info.rank }}</a></div></td>
-  <td align="right"><div class="name"><a class="noul"
-         href="{{ list.redirect }}">{{ list.item.scope.link_id }}</a>
+  <td align="right"><div class="title"><a class="noul"
+         href="{{ list.redirect }}">{{ list.item.title }}</a>
      </div>
   </td>
-  <td><div class="title">{{ list.item.title }}</a></div></td>
+  <td><div class="name">{{ list.item.scope.name }}</a></div></td>
   <td><div class="status">{{ list.item.status }}</a></div></td>
   <td><div class="score">{{ list.item.score }}</a></div></td>
   <td><div class="date">{{ list.item.last_modified_on|date:"jS F Y H:i" }}</a></div></td>

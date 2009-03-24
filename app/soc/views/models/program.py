@@ -380,6 +380,8 @@ class View(presence.View):
 
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['uses_duplicates'] = True
+    context['uses_json'] = True
     context['page_name'] = page_name
 
     # get all orgs for this program who are active and have slots assigned
@@ -397,6 +399,7 @@ class View(presence.View):
 
     # TODO(ljvderijk) cache the result of the duplicate calculation
     context['duplicate_cache_content'] = simplejson.dumps({})
+    context['offset_length'] = 10
 
     template = 'soc/program/show_duplicates.html'
 
@@ -460,7 +463,6 @@ class View(presence.View):
                 'status': 'accepted'}
 
       query = student_proposal_logic.logic.getQueryForFields(fields)
-      test = query.count()
 
       slots_left_to_assign = max(0, org.slots - query.count())
 

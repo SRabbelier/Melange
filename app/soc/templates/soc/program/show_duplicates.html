@@ -19,6 +19,43 @@ limitations under the License.
 {% endblock %}
 
 {% block body %}
-{{ info }} <br/>
-{{ duplicate_cache_content }}
+<script language="javascript" type="text/javascript">
+  // variables from python context to get eventual cache
+  // number of orgs, offset and url for querying the apps
+  var infos = {{ info|safe }};
+  var cache = {{ duplicate_cache_content|safe }};
+  var offset_length = {{ offset_length }};
+  var number_of_orgs = infos.nr_of_orgs;
+  var url_to_query = infos.program_key;
+  // this global variable will contain the html to output
+  var html_string = '';
+  $(document).ready(function(){
+    // Initialize the progress bar
+    $("#duplicates_progress_bar").progressBar({showText: false});
+    // if there's data in the cache
+    if (cache.data!=undefined) {
+      // then the button will show "recalculate" instead of "calculate"
+      $("#id_button_duplicate_slots").val("Recalculate");
+      // and then we will show the html based on the cache
+      for (var student_key in cache.data.students) {
+        duplicateSlots.showDuplicatesHtml(cache.data.orgs,cache.data.students[student_key],student_key,cache.data.students[student_key].proposals);
+      }
+      // if there's no data in the cache, tell the user
+      if (html_string=="") {
+        $("#div_duplicate_slots").html("<strong>No duplicate slot assignments found</strong>");
+      }
+    }
+    // else if there's no data in the cache
+    else {
+      // then the button will show "calculate"
+      $("#id_button_duplicate_slots").val("Calculate");
+    }
+  });
+</script>
+<input type="button" id="id_button_duplicate_slots" onclick="javascript:duplicateSlots.showDuplicatesInit();" class="button" />
+<span class="progressBar" style="display:none;" id="duplicates_progress_bar"></span>
+<span id="description_progressbar"></span><span id="description_done"></span>
+
+<br /><br />
+<div id="div_duplicate_slots"></div>
 {% endblock %}

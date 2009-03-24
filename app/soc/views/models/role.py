@@ -156,6 +156,14 @@ class View(base.View):
        }
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
+    
+    new_params['list_key_order'] = [
+        'link_id', 'scope_path', 'given_name', 'surname', 'name_on_documents',
+        'email', 'home_page','blog','res_street', 'res_city', 
+        'res_state', 'res_country', 'res_postalcode', 'phone', 
+        'ship_street', 'ship_city', 'ship_state', 'ship_country',
+        'ship_postalcode', 'birth_date', 'tshirt_size',
+        'tshirt_style', 'status']
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

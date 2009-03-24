@@ -25,6 +25,7 @@ __authors__ = [
 
 
 import csv
+import datetime
 import StringIO
 
 from google.appengine.ext import db
@@ -755,14 +756,18 @@ class View(object):
       # encode the data to UTF-8 to ensure compatibiliy
       for row_dict in data:
         for key in row_dict.keys():
-          row_dict[key] = row_dict[key].encode("utf-8")
+          value = row_dict[key]
+          row_dict[key] = value.encode("utf-8") if isinstance(value, basestring) else str(value)
         writer.writerow(row_dict)
     else:
       writer = csv.writer(f, dialect='excel')
 
       # encode the data to UTF-8 to ensure compatibiliy
       for row in data:
-        writer.writerow(row.encode("utf-8"))
+        if row:
+          writer.writerow(row.encode("utf-8"))
+        else:
+          writer.writerow(row)
 
     data = f.getvalue()
 

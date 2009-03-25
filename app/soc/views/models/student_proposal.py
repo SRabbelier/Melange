@@ -660,23 +660,26 @@ class View(base.View):
       # might be None (if Host or Developer is commenting)
       reviewer = mentor
 
+    # store the properties to update the proposal with
+    properties = {}
+
     if reviewer and (not is_public) and (given_score is not 0):
       # if it is not a public comment and it's made by a member of the
       # organization we update the score of the proposal
       new_score = given_score + entity.score
-
       properties = {'score': new_score}
 
+    if comment or (given_score is not 0):
       # if the proposal is new we change it status to pending
       if entity.status == 'new':
         properties['status'] = 'pending'
 
-      # update the proposal with the new score
-      self._logic.updateEntityProperties(entity, properties)
-
-    # create the review entity
-    if comment or (given_score is not 0):
+      # create the review entity
       self._createReviewFor(entity, reviewer, comment, given_score, is_public)
+
+    if properties.values():
+      # there is something to update
+      self._logic.updateEntityProperties(entity, properties)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

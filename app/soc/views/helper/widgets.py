@@ -73,9 +73,9 @@ class FullTinyMCE(forms.widgets.Textarea):
     class ExampleForm(helper.forms.BaseForm):
       content = forms.fields.CharField(widget=helper.widgets.TinyMCE())
   
-  You can include tiny_mce_src.js in your template using:
+  You can include tiny_mce.js in your template using:
     {% block scripts %}
-  	  <script type="text/javascript" src="/tiny_mce/tiny_mce_src.js"></script>
+  	  <script type="text/javascript" src="/tiny_mce/tiny_mce.js"></script>
     {% endblock %}
   """ 
 

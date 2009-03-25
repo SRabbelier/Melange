@@ -1,4 +1,3 @@
-//http://www.digital-web.com/articles/scope_in_javascript/
 var duplicateSlots = new function() {
   // this variable will contain all the org details, and filled
   // incrementally

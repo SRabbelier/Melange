@@ -126,6 +126,7 @@ class View(base.View):
             required=True),
         'organization': forms.CharField(label='Organization Link ID',
             required=True),
+        'clean_content': cleaning.clean_html_content('content'),
         'clean_organization': cleaning.clean_link_id('organization'),
         'clean_additional_info': cleaning.clean_url('additional_info'),
         'clean': cleaning.validate_student_proposal('organization',
@@ -174,6 +175,7 @@ class View(base.View):
          ]
 
     dynaproperties = params_helper.getDynaFields(dynafields)
+    dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
 
     public_review_form = dynaform.newDynaForm(dynamodel=None, 
         dynabase=helper.forms.BaseForm, dynainclude=None, 
@@ -217,6 +219,7 @@ class View(base.View):
          ]
 
     dynaproperties = params_helper.getDynaFields(dynafields)
+    dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
 
     mentor_review_form = dynaform.newDynaForm(dynamodel=None, 
         dynabase=helper.forms.BaseForm, dynainclude=None, 
@@ -246,6 +249,7 @@ class View(base.View):
       ]
 
     dynaproperties = params_helper.getDynaFields(dynafields)
+    dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
 
     admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, 
         dynaproperties=dynaproperties)

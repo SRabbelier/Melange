@@ -584,7 +584,8 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = page_name
+    context['page_name'] = '%s "%s" from %s' %(page_name, entity.title,
+                                               entity.scope.name())
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']

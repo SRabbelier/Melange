@@ -61,6 +61,9 @@ limitations under the License.
 
 <hr />
 <form method="POST">
+  <tr>
+  <td><b>Score and Review</b></td>
+  </tr>
   <table>
     {% block form_table %}
       {% as_table form %}
@@ -74,6 +77,11 @@ limitations under the License.
    <td> 
     <input style="font-weight: bold" type="submit" value="Submit"/></span>
    </td>
+  </tr>
+  <tr>
+  <td><b>Other Options:</b></td>
+  </tr>
+  <tr>
    {% if add_me_as_mentor %}
    <td>
    <input style="font-weight: bold" type="button" value="I am willing to mentor this student"
@@ -93,6 +101,7 @@ limitations under the License.
        onclick="location.href='?ineligible=1'"/>
      </td>
    {% endif %}
+   </tr>
  </table>
 </form>
 

@@ -351,7 +351,4 @@ class Role(soc.models.linkable.Linkable):
   def name(self):
     """Property as 'name' for use in common templates.
     """
-    if self.name_on_documents:
-      return self.name_on_documents
-    else:
-      return '%s %s' % (self.given_name, self.surname)
+    return '%s %s' %(self.given_name, self.surname)

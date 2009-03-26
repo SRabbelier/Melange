@@ -94,7 +94,6 @@ class View(base.View):
                                              required=True),
         'prefix': forms.fields.CharField(widget=widgets.ReadOnlyInput(),
                                         required=True),
-
         'clean_content': cleaning.clean_html_content('content'),
         'clean_link_id': cleaning.clean_link_id('link_id'),
         'clean_scope_path': cleaning.clean_scope_path('scope_path'),

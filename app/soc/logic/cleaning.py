@@ -352,6 +352,7 @@ def clean_html_content(field_name):
     sanitizer = feedparser._HTMLSanitizer('utf-8')
     sanitizer.feed(content)
     content = sanitizer.output()
+    content = content.decode('utf-8')
     content = content.strip().replace('\r\n', '\n')
 
     return content

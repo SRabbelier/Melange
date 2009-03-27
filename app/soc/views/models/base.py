@@ -146,7 +146,7 @@ class View(object):
 
     Params usage:
       rights: The rights dictionary is used to check if the user has
-        the required rights to view the public page for this entity.
+        the required rights to view the admin page for this entity.
         See checkAccess for more details on how the rights dictionary
         is used to check access rights.
       name: The name value is used to set the entity_type in the
@@ -872,7 +872,7 @@ class View(object):
       template: if specified, this template is
 
     Params usage:
-      name: The name_plural value is used to set the entity_type
+      name: The name value is used to set the entity_type
        value in the context so that the template can refer to it.
       name_plural: same as name, but used to set entity_type_plural
       name_short: same as name, but used to set entity_type_short

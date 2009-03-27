@@ -61,7 +61,7 @@ class View(role.View):
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasActiveRoleForScope', org_admin_logic.logic),
-        ('checkIsMyEntity', org_admin_logic.logic)]
+        ('checkIsMyEntity', [org_admin_logic.logic, 'user', True])]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          org_admin_logic.logic)]

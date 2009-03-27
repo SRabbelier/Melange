@@ -57,7 +57,7 @@ class View(role.View):
     rights = access.Checker(params)
     rights['create'] = [('checkHasActiveRoleForScope', host_logic.logic)]
     rights['edit'] = [('checkHasActiveRoleForScope', host_logic.logic),
-        ('checkIsMyEntity', host_logic.logic)]
+        ('checkIsMyEntity', [host_logic.logic, 'user', True])]
     rights['invite'] = [('checkHasActiveRoleForScope', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
     rights['accept_invite'] = [('checkCanCreateFromRequest','host')]

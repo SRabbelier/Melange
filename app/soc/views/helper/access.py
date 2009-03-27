@@ -1370,7 +1370,7 @@ class Checker(object):
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to fetch the entity
       field_name: the name of the field the entity uses to store it's owner
-      user: whether the entity stores the user's key name, or a reference
+      user: true iff the entity stores the user's reference, false iff keyname
     """
 
     self.checkIsUser(django_args)

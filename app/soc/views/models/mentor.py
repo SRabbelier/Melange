@@ -57,7 +57,7 @@ class View(role.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasActiveRoleForScope', 
                        soc.logic.models.mentor.logic),
-        ('checkIsMyEntity', soc.logic.models.mentor.logic)]
+        ('checkIsMyEntity', [soc.logic.models.mentor.logic, 'user', True])]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          soc.logic.models.org_admin.logic)]

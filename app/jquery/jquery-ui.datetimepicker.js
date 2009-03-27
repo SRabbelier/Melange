@@ -53,7 +53,7 @@ function DateTimepicker() {
 		dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'], // Column headings for days starting at Sunday
 		dayStatus: 'Set DD as first week day', // Status text for the day of the week selection
 		dateStatus: 'Select DD, M d', // Status text for the date selection
-		dateFormat: 'mm/dd/yy', // See format options on parseDate
+		dateFormats: ['yy-mm-dd', 'mm/dd/yy'], // All date formats accepted by the input fields
 		timeFormat: 'hh:ii',
 		firstDay: 0, // The first day of the week, Sun = 0, Mon = 1, ...
 		initStatus: 'Select a date', // Initial Status text on opening
@@ -103,7 +103,8 @@ function DateTimepicker() {
 		numberOfMonths: 1, // Number of months to show at a time
 		stepMonths: 1, // Number of months to step back/forward
 		rangeSelect: false, // Allows for selecting a date range on one date picker
-		rangeSeparator: ' - ' // Text between two dates in a range
+		rangeSeparator: ' - ', // Text between two dates in a range
+		dateFormat: 'yy-mm-dd' // A default date format. See format options on parseDate
 	};
 	$.extend(this._defaults, this.regional['']);
 	this._datetimepickerDiv = $('<div id="datetimepicker_div"></div>');
@@ -303,7 +304,11 @@ $.extend(DateTimepicker.prototype, {
 	/* Filter entered characters - based on date format. */
 	_doKeyPress: function(e) {
 		var inst = $.datetimepicker._getInst(this._calId);
-		var chars = $.datetimepicker._possibleChars(inst._get('dateFormat')+' '+inst._get('timeFormat'));
+		var formats = ' '+ inst._get('timeFormat');
+		var dateFormats = inst._get('dateFormats');
+		for (var i = 0; i < dateFormats.length; i++)
+			formats += dateFormats[i];
+		var chars = $.datetimepicker._possibleChars(formats);
 		var chr = String.fromCharCode(e.charCode == undefined ? e.keyCode : e.charCode);
 		return e.ctrlKey || (chr < ' ' || !chars || chars.indexOf(chr) > -1);
 	},
@@ -824,12 +829,12 @@ $.extend(DateTimepicker.prototype, {
 		};
 		// Extract a number from the string value
 		var getNumber = function(match) {
-			lookAhead(match);
-			var size = (match == 'y' ? 4 : 2);
+			matches = lookAhead(match);
+			var size = ((match == 'y' && matches) ? 4 : 2);
 			var num = 0;
 			while (size > 0 && iValue < value.length &&
 					value.charAt(iValue) >= '0' && value.charAt(iValue) <= '9') {
-				num = num * 10 + (value.charAt(iValue++) - 0);
+				num = num * 10 + (value.charAt(iValue++) - '0');
 				size--;
 			}
 			if (size == (match == 'y' ? 4 : 2))
@@ -855,7 +860,7 @@ $.extend(DateTimepicker.prototype, {
 		};
 		// Confirm that a literal character matches the string value
 		var checkLiteral = function() {
-			if (value.charAt(iValue) != format.charAt(iFormat))
+			if (iValue < value.length && (value.charAt(iValue) != format.charAt(iFormat)))
 				throw 'Unexpected literal at position ' + iValue;
 			iValue++;
 		};
@@ -1062,24 +1067,31 @@ $.extend(DateTimepickerInstance.prototype, {
 	/* Parse existing date and initialise date picker. */
 	_setDateFromField: function(input) {
 		this._input = $(input);
-		var dateFormat = this._get('dateFormat')+' '+this._get('timeFormat');
 		var dates = this._input ? this._input.val().split(this._get('rangeSeparator')) : null;
 		this._endDay = this._endMonth = this._endYear = null;
 		var date = defaultDate = this._getDefaultDate();
 		if (dates.length > 0) {
 			var settings = this._getFormatConfig();
 			if (dates.length > 1) {
+				var dateFormat = this._get('dateFormat') +' '+this._get('timeFormat');
 				date = $.datetimepicker.parseDate(dateFormat, dates[1], settings) || defaultDate;
 				this._endDay = date.getDate();
 				this._endMonth = date.getMonth();
 				this._endYear = date.getFullYear();
 			}
-			try {
+			date = null;
+			var dateFormats = this._get('dateFormats');
+			for (var i = 0; i < dateFormats.length; i++) {
+				var dateFormat = dateFormats[i] +' '+this._get('timeFormat');
+				try {
 				date = $.datetimepicker.parseDate(dateFormat, dates[0], settings) || defaultDate;
-			} catch (e) {
-				$.datetimepicker.log(e);
-				date = defaultDate;
+				} catch (e) {}
+				if (date != null) {
+					$.datetimepicker._defaults['dateFormat'] = dateFormats[i];
+					break;
+				}
 			}
+			if (date == null) date = defaultDate;
 		}
 		this._selectedDay = date.getDate();
 		this._drawMonth = this._selectedMonth = date.getMonth();

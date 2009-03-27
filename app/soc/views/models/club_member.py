@@ -26,6 +26,7 @@ from django import forms
 
 from soc.logic import dicts
 from soc.logic.models import club as club_logic
+from soc.logic.models import club_member as club_member_logic
 from soc.logic.models import club_admin as club_admin_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -52,8 +53,8 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope', club_admin_logic.logic),
-        ('checkIsMyEntity', club_admin_logic.logic)]
+    rights['edit'] = [('checkHasActiveRoleForScope', club_member_logic.logic),
+        ('checkIsMyEntity', club_member_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope', club_admin_logic.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest','club_member')]

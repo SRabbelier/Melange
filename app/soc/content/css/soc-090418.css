@@ -188,7 +188,11 @@ td.formfieldvalue {
 }
 
 td.formfieldvalue input {
-  width: 200px;
+  width: 100%;
+}
+
+td.formfieldvalue input[type=checkbox] {
+  width: auto;
 }
 
 td.formfieldvalue input:focus {

@@ -9,7 +9,7 @@ $(function() {
              titleSelector: "parent().parent().attr('xtitle')",
              killTitle: false,
              fill: 'rgba(135, 206, 250, .9)',
-             positions: ['bottom', 'top', 'right'],
+             positions: ['bottom', 'top', 'right']
           })
       .bind('focus', function() {
                 $(this).trigger('helperon');

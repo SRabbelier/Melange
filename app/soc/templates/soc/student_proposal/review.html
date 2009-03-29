@@ -98,7 +98,7 @@ limitations under the License.
    {% if is_org_admin %}
      <td>
        <input style="font-weight: bold" type="button" value="Mark as Ineligible"
-       onclick="location.href='?ineligible=1'"/>
+       onclick="if (confirm('Are you sure? This can not be undone!')) { location.href='?ineligible=1'; }"/>
      </td>
    {% endif %}
    </tr>

@@ -288,6 +288,24 @@ def seed(request, *args, **kwargs):
     ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,
         student_proposal.DEF_SCORE, 100)
 
+    if i < 2:
+      role_properties.update({
+          'key_name': 'google/gsoc2009/org_%d/test' % i,
+          'link_id': 'test',
+          'scope_path': 'google/gsoc2009/org_%d' % i,
+          'scope': entity,
+          'program': gsoc2009,
+          })
+ 
+      # Admin for the first org 
+      if i == 0:
+        org_1_admin = OrgAdmin(**role_properties)
+        org_1_admin.put()
+
+      # Only a mentor for the second org
+      if i == 1:
+        org_1_mentor = Mentor(**role_properties)
+        org_1_mentor.put()
 
   role_properties.update({
       'key_name': 'google/ghop2009/melange/test',

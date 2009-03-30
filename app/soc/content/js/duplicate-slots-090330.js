@@ -12,6 +12,7 @@ var duplicateSlots = new function() {
   this.showDuplicatesInit = function() {
 
     // Remember this object for Javascript scoping
+    html_string = '';
     var this_object = this;
     var NUMBER_OF_ORGS = number_of_orgs;
     var OFFSET_LENGTH = offset_length;
@@ -59,6 +60,8 @@ var duplicateSlots = new function() {
 
   function showDuplicates(url_to_query,OFFSET_LENGTH,NUMBER_OF_ORGS) {
     var current_offset = 0;
+    orgs_details = {};
+    assigned_proposals = new Array();
 
     // Here Ajax call is handled
     setTimeout(function() {
@@ -163,7 +166,8 @@ var duplicateSlots = new function() {
 
   // public function to output actual HTML out of the data (cached or not)
   this.showDuplicatesHtml = function(orgs_details,student,student_key,proposals) {
-    if (html_string==='') {
+    if (html_string == '') {
+      $("#div_duplicate_slots").html('');
       html_string='<ul>';
     }
     html_string+= '<li>Student: <strong><a href="/student/show/'+student_key+'">'+student.name+'</a></strong> (<a href="mailto:'+student.contact+'">'+student.contact+'</a>)';

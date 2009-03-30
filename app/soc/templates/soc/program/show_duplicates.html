@@ -37,6 +37,7 @@ limitations under the License.
       // then the button will show "recalculate" instead of "calculate"
       $("#id_button_duplicate_slots").val("Recalculate");
       // and then we will show the html based on the cache
+      html_string = '';
       for (var student_key in cache.data.students) {
         duplicateSlots.showDuplicatesHtml(cache.data.orgs,cache.data.students[student_key],student_key,cache.data.students[student_key].proposals);
       }

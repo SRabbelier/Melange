@@ -106,7 +106,7 @@ class View(group.View):
     new_params['group_applicant_url'] = True
     new_params['sans_link_id_public_list'] = True
 
-    new_params['extra_dynaexclude'] = ['slots']
+    new_params['extra_dynaexclude'] = ['slots', 'nr_applications', 'nr_mentors']
 
     patterns = []
 

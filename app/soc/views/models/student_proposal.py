@@ -126,6 +126,7 @@ class View(base.View):
             required=True),
         'organization': forms.CharField(label='Organization Link ID',
             required=True),
+        'clean_abstract': cleaning.clean_content_length('abstract'),
         'clean_content': cleaning.clean_html_content('content'),
         'clean_organization': cleaning.clean_link_id('organization'),
         'clean_additional_info': cleaning.clean_url('additional_info'),

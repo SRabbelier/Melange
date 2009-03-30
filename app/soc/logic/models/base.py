@@ -369,7 +369,7 @@ class Logic(object):
     properties = self._model.properties()
 
     for name, prop in properties.iteritems():
-      # if the property is not updatable or is not updated, skip it
+      # if the property is not updateable or is not updated, skip it
       if name in self._skip_properties or (name not in entity_properties):
         continue
 

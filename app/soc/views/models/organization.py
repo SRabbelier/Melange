@@ -285,26 +285,28 @@ class View(group.View):
     new_list = lists.getListContent(
         request, new_params, filter, idx=1, need_content=True)
 
-    ineligible_params = list_params.copy() # new proposals
-    ineligible_params['list_description'] = 'List of ineligible %s sent to %s ' % (
-    ineligible_params['name_plural'], org_entity.name)
-    ineligible_params['list_action'] = (redirects.getReviewRedirect, ineligible_params)
+    ip_params = list_params.copy() # ineligible proposals
+
+    description = ugettext('List of ineligible %s sent to %s ') % (
+        ip_params['name_plural'], org_entity.name)
+
+    ip_params['list_description'] = description
+    ip_params['list_action'] = (redirects.getReviewRedirect, ip_params)
 
     filter = {'org': org_entity,
               'status': 'invalid'}
 
-    contents = []
-    ineligible_list = lists.getListContent(
-        request, ineligible_params, filter, idx=1, need_content=False)
+    ip_list = lists.getListContent(
+        request, ip_params, filter, idx=1, need_content=True)
 
     # fill contents with all the needed lists
     if new_list != None:
       contents.append(new_list)
-    
+
     contents.append(prop_list)
-    
-    if ineligible_list != None:
-      contents.append(ineligible_list)
+
+    if ip_list != None:
+      contents.append(ip_list)
 
     # call the _list method from base to display the list
     return self._list(request, list_params, contents, page_name, context)

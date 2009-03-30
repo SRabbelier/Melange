@@ -1414,6 +1414,7 @@ class Checker(object):
     try:
       # check if it is my role the user's own role
       self.checkHasActiveRoleForScope(django_args, role_logic)
+      return
     except out_of_band.Error:
       pass
 

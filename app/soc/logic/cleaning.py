@@ -52,6 +52,12 @@ DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
 DEF_NO_SUCH_DOCUMENT_MSG = ugettext(
     "There is no such document with that link ID under this entity.")
 
+DEF_MUST_BE_ABOVE_LIMIT_FMT = ugettext(
+    "Must be at least %d characters, it has %d characters.")
+
+DEF_MUST_BE_UNDER_LIMIT_FMT = ugettext(
+    "Must be under %d characters, it has %d characters.")
+
 
 def check_field_is_empty(field_name):
   """Returns decorator that bypasses cleaning for empty fields.
@@ -292,6 +298,36 @@ def clean_ascii_only(field_name):
     except UnicodeEncodeError:
       # can not encode as ASCII
       raise forms.ValidationError("Only ASCII characters are allowed")
+
+    return value
+  return wrapper
+
+
+def clean_content_length(field_name, min_length=0, max_length=500):
+  """Clean method for cleaning a field which must contain at least min and
+     not more then max length characters.
+
+  Args:
+    field_name: the name of the field needed cleaning
+    min_length: the minimum amount of allowed characters
+    max_length: the maximum amount of allowed characters
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    """Decorator wrapper method.
+    """
+
+    value = self.cleaned_data[field_name]
+    value_length = len(value)
+
+    if value_length < min_length:
+      raise forms.ValidationError(DEF_MUST_BE_ABOVE_LIMIT_FMT %(
+          min_length, value_length))
+
+    if value_length > max_length:
+      raise forms.ValidationError(DEF_MUST_BE_UNDER_LIMIT_FMT %(
+          max_length, value_length))
 
     return value
   return wrapper

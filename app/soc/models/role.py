@@ -300,6 +300,8 @@ class Role(soc.models.linkable.Linkable):
   birth_date.help_text = ugettext(
       'required for determining program eligibility')
   birth_date.group = ugettext("4. Private Info")
+  birth_date.example_text = ugettext(
+      'e.g. 1999-12-31 or 12/31/1999')
 
   #: Optional field indicating choice of t-shirt, from XXS to XXXL;
   #: kept private.

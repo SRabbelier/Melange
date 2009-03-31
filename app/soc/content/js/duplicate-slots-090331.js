@@ -68,10 +68,10 @@ var duplicateSlots = new function() {
       $.ajax({
         cache:false,
         mode: "sync",
-        type: "POST",
+        type: "GET",
         timeout: 1000000,
         dataType: "json",
-        url: "/program/assigned_proposals/"+url_to_query+"?limit="+OFFSET_LENGTH+"&offset="+current_offset+"&_="+(new Date().getTime()),
+        url: "/program/assigned_proposals/"+url_to_query+"?limit="+OFFSET_LENGTH+"&offset="+current_offset,
         success: function (data, textStatus) {
           if (data) {
             // Load JSON data

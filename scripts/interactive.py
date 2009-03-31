@@ -18,7 +18,7 @@
 
 Usage is simple:
 
-App Engine interactive console for srabbelier-melange
+App Engine interactive console
 >>> from soc.models.user import User
 >>> gen = lambda: User.all()
 >>> it = deepFetch(gen)
@@ -136,4 +136,3 @@ if __name__ == '__main__':
     sys.exit(1)
 
   main(sys.argv[1:])
-

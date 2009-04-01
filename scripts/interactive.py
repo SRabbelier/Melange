@@ -80,12 +80,19 @@ def deepFetch(queryGen,key=None,batchSize = 100):
       key = results[-1].key()
 
 
-def remote(args):
+def remote(args, context=None):
   """Starts a shell with the datastore as remote_api_stub.
+
+  Args:
+    args: arguments from the user
+    context: locals that should be added to the shell
   """
 
   from google.appengine.ext import db
   from google.appengine.ext.remote_api import remote_api_stub
+
+  if not context:
+    context = {}
 
   app_id = args[0]
 
@@ -96,14 +103,12 @@ def remote(args):
 
   remote_api_stub.ConfigureRemoteDatastore(app_id, '/remote_api', auth_func, host)
 
-  context = {
-      'deepFetch': deepFetch,
-  }
+  context['deepFetch'] = deepFetch
 
   code.interact('App Engine interactive console for %s' % (app_id,), None, context)
 
 
-def main(args):
+def setup():
   """Sets up the sys.path and environment for development.
   """
 
@@ -127,6 +132,11 @@ def main(args):
 
   import main as app_main
 
+def main(args):
+  """Convenience wrapper that calls setup and remote.
+  """
+
+  setup()
   remote(args)
 
 

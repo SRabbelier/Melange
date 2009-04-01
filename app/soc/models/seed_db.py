@@ -24,6 +24,7 @@ __authors__ = [
 
 import datetime
 import itertools
+import logging
 import random
 
 from google.appengine.api import users
@@ -78,6 +79,38 @@ def ensureUser():
   return account, current_user
 
 
+def determine_index_of_seeded_entity(entity):
+  """Determines the index of a seeded_entity.
+
+  Because we seed entities in a predictable manner, we can look at an entity
+    and determine which one it is.  This works iff entities are seeded with
+    link_id's of the form: foo_%04d (where 4 is at least the number of digits
+    of the index of the highest-seeded entity).
+  """
+
+
+def seed_and_put_example_user(i):
+  """Creates and Persists an example user identified by i.
+
+  Args:
+    i, int: the index of this example user.
+
+  Returns:
+    None
+
+  Side Effects:
+    Persists a user to the datastore.
+  """
+  user_properties = {
+      'key_name': 'user_%04d' % i,
+      'link_id': 'user_%04d' % i,
+      'account': users.User(email='user_%04d@example.com' % i),
+      'name': 'User %04d' % i,
+      }
+  entity = User(**user_properties)
+  entity.put()
+
+
 def seed(request, *args, **kwargs):
   """Seeds the datastore with some default values.
   """
@@ -95,15 +128,7 @@ def seed(request, *args, **kwargs):
 
 
   for i in range(15):
-    user_properties = {
-        'key_name': 'user_%d' % i,
-        'link_id': 'user_%d' % i,
-        'account': users.User(email='user_%d@example.com' % i),
-        'name': 'User %d' % i,
-        }
-    entity = User(**user_properties)
-    entity.put()
-
+    seed_and_put_example_user(i)
 
   group_properties = {
        'key_name': 'google',
@@ -296,8 +321,8 @@ def seed(request, *args, **kwargs):
           'scope': entity,
           'program': gsoc2009,
           })
- 
-      # Admin for the first org 
+
+      # Admin for the first org
       if i == 0:
         org_1_admin = OrgAdmin(**role_properties)
         org_1_admin.put()
@@ -363,10 +388,9 @@ def seed(request, *args, **kwargs):
   return http.HttpResponse('Done')
 
 
-def seed_user(request, i):
+def seed_user(unused_request, i):
   """Returns the properties for a new user entity.
   """
-
   properties = {
       'key_name': 'user_%(num)d' % i,
       'link_id': 'user_%(num)d' % i,
@@ -522,6 +546,72 @@ def seed_student_proposal(request, i):
 
   return all_properties
 
+
+SEEDABLE_MODEL_TYPES = {
+    'user' : (User, seed_and_put_example_user),
+    }
+
+
+def new_seed_many(request, *args, **kwargs):
+  """Seeds many instances of the specified type.
+
+  Takes as URL parameters:
+  seed_type: the type of entity to seed; should be a key in SEEDABLE_MODEL_TYPES
+  goal: the total number of entities desired
+
+  This differs from seed_many. Instead of having to specify many parameters
+    that are the state of an in-flight process, simply say how many you want
+    to have (at least) at the end.  This will make progress towards that goal.
+    In my test run, even adding 1001 users completed in far less than the
+    limit for one request, so pagination was unnecessary.
+  """
+  # First, figure out which model we're interested in.
+  if ('seed_type' not in request.GET or
+      request.GET['seed_type'] not in SEEDABLE_MODEL_TYPES):
+    return http.HttpResponse(
+        ('Missing or invalid required argument "seed_type" (which model'
+        ' type to populate). '
+        'Valid values are: %s') % SEEDABLE_MODEL_TYPES.keys())
+
+  (model_class, seed_func) = SEEDABLE_MODEL_TYPES[request.GET['seed_type']]
+
+  if 'goal' not in request.GET:
+    return http.HttpResponse(
+        'Missing required argument "goal" (how many entities of '
+        'this type you want to have in the datastore).'
+        )
+  goal = int(request.GET['goal'])
+
+  # Get the highest instance of this model so that we know
+  # where to start seeding new ones.
+  query = db.Query(model_class)
+  query.order('-link_id')
+  # TODO(dbentley): filter for ones < user_9999
+  highest_instance = query.get()
+  if not highest_instance:
+    start_index = 0
+  else:
+    # We know that seeded entities have link_id's of the form foo_%04d
+    # so, we look for what's after the _ and turn it into an int.
+    link_id = highest_instance.link_id
+    if '_' in link_id:
+      start_index = int(link_id.split('_')[1]) + 1
+    else:
+      # couldn't find seeded_entities; guessing there are none
+      start_index = 0
+
+
+  # Insert from start_index to goal
+  logging.info("To insert: %d to %d" % (start_index, goal))
+  seeded_entities = 0
+  for i in xrange(start_index, goal):
+    logging.info("Inserting: %d of %d" % (i+1, goal))
+    seed_func(i)
+    seeded_entities += 1
+
+  return http.HttpResponse('Seeded %d entities.' % seeded_entities)
+
+
 def seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
 
@@ -596,6 +686,9 @@ def clear(*args, **kwargs):
   class ranker(db.Model):
     pass
 
+  # TODO(dbentley): If there are more than 1000 instances of any model,
+  # this method will not clear all instances.  Instead, it should continually
+  # call .all(), delete all those, and loop until .all() is empty.
   entities = itertools.chain(*[
       Notification.all(),
       Mentor.all(),

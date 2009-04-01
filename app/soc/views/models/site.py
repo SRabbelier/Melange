@@ -99,11 +99,11 @@ class View(presence_with_tos.View):
     patterns = []
 
     page_name = "Home Page"
-    patterns += [(r'^$', 'soc.views.models.%(module_name)s.main_public', 
+    patterns += [(r'^$', 'soc.views.models.%(module_name)s.main_public',
                   page_name)]
 
     page_name = "Maintenance"
-    patterns += [(r'^maintenance$', 
+    patterns += [(r'^maintenance$',
                   'soc.views.models.%(module_name)s.maintenance', page_name)]
 
     page_name = "Edit Site"
@@ -116,6 +116,8 @@ class View(presence_with_tos.View):
                    ('^clear_db$', 'soc.models.seed_db.clear', "Clear DB"),
                    ('^reseed_db$', 'soc.models.seed_db.reseed', "Reseed DB"),
                    ('^seed_many$', 'soc.models.seed_db.seed_many', "Seed Many"),
+                   ('^new_seed_many$', 'soc.models.seed_db.new_seed_many',
+                    "New Seed Many"),
                    ]
 
     new_params['extra_django_patterns'] = patterns

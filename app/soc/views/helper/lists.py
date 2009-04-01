@@ -50,13 +50,13 @@ DEF_DEVELOPER_CHOICES = [
 
 def getPreferredListPagination(user=None):
   """Returns User's preferred list pagination limit.
-  
+
   Args:
     user: User entity containing the list pagination preference;
       default is None, to use the current logged-in User
   """
   # TODO: eventually this limit should be a User profile preference
-  #   (stored in the site-wide User Model) preference 
+  #   (stored in the site-wide User Model) preference
   return DEF_DEFAULT_PAGINATION
 
 
@@ -115,6 +115,11 @@ def getListContent(request, params, filter=None, order=None,
                    idx=0, need_content=False):
   """Returns a dict with fields used for rendering lists.
 
+  TODO(dbentley): we need better terminology. List in this context can have
+    one of two meanings.
+    Meaning 1:  the underlying list, which may be very large.
+    Meaning 2:  the returned list, which is at most 'limit' items.
+
   Args:
     request: the Django HTTP request object
     params: a dict with params for the View this list belongs to
@@ -124,7 +129,7 @@ def getListContent(request, params, filter=None, order=None,
     need_content: iff True will return None if there is no data
 
   Returns:
-    A a dictionary with the following values set:
+    A dictionary with the following values set:
 
     {
       'data': list data to be displayed
@@ -133,11 +138,11 @@ def getListContent(request, params, filter=None, order=None,
       'row': url to list row template
       'heading': url to list heading template
       'limit': max amount of items per page,
-      'newest': url to first page of the list 
-      'prev': url to previous page 
+      'newest': url to first page of the list
+      'prev': url to previous page
       'next': url to next page
       'first': offset of the first item in the list
-      'last': offest of the lst item in the list
+      'last': offest of the last item in the list
     }
   """
 
@@ -163,33 +168,33 @@ def getListContent(request, params, filter=None, order=None,
 
   newest = next = prev = export_link =''
 
-  get_args = request.GET
-  offset_and_limits = {}
-
-  for key, value in get_args.iteritems():
-    if key.startswith('offset_') or key.startswith('limit_'):
-      offset_and_limits[key] = value
+  base_params = dict(i for i in request.GET.iteritems() if
+                     i[0].startswith('offset_') or i[0].startswith('limit_'))
 
   if params.get('list_key_order'):
-    offset_and_limits['export'] = idx
-    export_link = generateLinkFromGetArgs(request, offset_and_limits)
-    del offset_and_limits['export']
+    export_link_params = dict(base_params)
+    export_link_params['export'] = idx
+    export_link = generateLinkFromGetArgs(request, export_link_params)
 
   if more:
-    offset_and_limits[offset_key] = offset+limit
-    offset_and_limits[limit_key] = limit
-    next = generateLinkFromGetArgs(request, offset_and_limits)
+    # TODO(dbentley): here we need to implement a new field "last_key"
+    next_params = dict(base_params)
+    next_params[offset_key] = offset+limit
+    next_params[limit_key] = limit
+    next = generateLinkFromGetArgs(request, next_params)
 
   if offset > 0:
-    offset_and_limits[offset_key] = max(0, offset-limit)
-    offset_and_limits[limit_key] = limit
-    prev = generateLinkFromGetArgs(request, offset_and_limits)
+    # TODO(dbentley): here we need to implement previous in the good way.
+    prev_params = dict(base_params)
+    prev_params[offset_key] = max(0, offset-limit)
+    prev_params[limit_key] = limit
+    prev = generateLinkFromGetArgs(request, prev_params)
 
   if offset > limit:
-    del offset_and_limits[offset_key]
-    offset_and_limits[limit_key] = limit
-
-    newest = generateLinkFromGetArgs(request, offset_and_limits)
+    newest_params = dict(base_params)
+    del newest_params[offset_key]
+    newest_params[limit_key] = limit
+    newest = generateLinkFromGetArgs(request, newest_params)
 
   content = {
       'data': data,
@@ -198,10 +203,10 @@ def getListContent(request, params, filter=None, order=None,
       'last': len(data) > 1 and offset+len(data) or None,
       'logic': logic,
       'limit': limit,
-      'newest': newest, 
+      'newest': newest,
       'next': next,
       'pagination_form': pagination_form,
-      'prev': prev, 
+      'prev': prev,
       }
 
   updates = dicts.rename(params, params['list_params'])
@@ -214,7 +219,7 @@ def makePaginationForm(
   request, limit, arg_name, choices=DEF_PAGINATION_CHOICES,
   field_name_fmt=soc.views.helper.forms.DEF_SELECT_QUERY_ARG_FIELD_NAME_FMT):
   """Returns a customized pagination limit selection form.
-  
+
   Args:
     request: the standard Django HTTP request object
     limit: the initial value of the selection control
@@ -224,7 +229,7 @@ def makePaginationForm(
     field_name_fmt: see soc.views.helper.forms.makeSelectQueryArgForm()
   """
   choices = makeNewPaginationChoices(limit=limit, choices=choices)
-  
+
   return soc.views.helper.forms.makeSelectQueryArgForm(
       request, arg_name, limit, choices)
 

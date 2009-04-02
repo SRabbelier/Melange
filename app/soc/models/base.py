@@ -58,14 +58,14 @@ class ModelWithFieldAttributes(db.Model):
     """
 
     result = {}
-    props = self.properties()
 
     if not field_names:
+      props = self.properties()
       field_names = [k for k, v in props.iteritems() if isinstance(v, self.DICT_TYPES)]
 
-    for key, value in props.iteritems():
+    for key in field_names:
       # Skip everything that is not valid
-      if key not in field_names:
+      if not hasattr(self, key):
         continue
 
       result[key] = getattr(self, key)

@@ -29,6 +29,42 @@ import sys
 import interactive
 
 
+def dateFetch(queryGen, last=None, batchSize=100):
+  """Iterator that yields an entity in batches.
+
+  Args:
+    queryGen: should return a Query object
+    last: used to .filter() for last_modified_on
+    batchSize: how many entities to retrieve in one datastore call
+
+  Retrieved from http://tinyurl.com/d887ll (AppEngine cookbook).
+  """
+
+  from google.appengine.ext import db
+
+   # AppEngine will not fetch more than 1000 results
+  batchSize = min(batchSize,1000)
+
+  query = None
+  done = False
+  count = 0
+
+  while not done:
+    print count
+    query = queryGen()
+    query.order('last_modified_on')
+    if last:
+      query.filter("last_modified_on > ", last)
+    results = query.fetch(batchSize)
+    for result in results:
+      count += 1
+      yield result
+    if batchSize > len(results):
+      done = True
+    else:
+      last = results[-1].last_modified_on
+
+
 def addKey(target, fieldname):
   """Adds the key of the specified field.
   """

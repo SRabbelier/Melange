@@ -376,7 +376,20 @@ class View(presence.View):
 
     from django.utils import simplejson
 
+    from soc.logic.models.proposal_duplicates import logic as duplicates_logic
+
     program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.POST and request.POST.get('result'):
+      # store result in the datastore
+      fields = {'link_id': program_entity.link_id,
+                'scope': program_entity,
+                'scope_path': program_entity.key().name(),
+                'json_representation' : request.POST['result']
+                }
+      key_name = duplicates_logic.getKeyNameFromFields(fields)
+      duplicates_logic.updateOrCreateFromKeyName(fields, key_name)
+      return http.HttpResponse('Done')
 
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
@@ -396,10 +409,19 @@ class View(presence.View):
         'program_key': program_entity.key().name()}
     json = simplejson.dumps(to_json)
     context['info'] = json
-
-    # TODO(ljvderijk) cache the result of the duplicate calculation
-    context['duplicate_cache_content'] = simplejson.dumps({})
     context['offset_length'] = 10
+
+    fields = {'link_id': program_entity.link_id,
+              'scope': program_entity}
+    duplicates = duplicates_logic.getForFields(fields, unique=True)
+
+    if duplicates:
+      # we have stored information
+      context['duplicate_cache_content'] = duplicates.json_representation
+      context['date_of_calculation'] = duplicates.calculated_on
+    else:
+      # no information stored
+      context['duplicate_cache_content'] = simplejson.dumps({})
 
     template = 'soc/program/show_duplicates.html'
 

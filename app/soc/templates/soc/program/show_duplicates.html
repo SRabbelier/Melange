@@ -55,7 +55,13 @@ limitations under the License.
 </script>
 <input type="button" id="id_button_duplicate_slots" onclick="javascript:duplicateSlots.showDuplicatesInit();" class="button" />
 <span class="progressBar" style="display:none;" id="duplicates_progress_bar"></span>
-<span id="description_progressbar"></span><span id="description_done"></span>
+<span id="description_progressbar">
+  {% if date_of_calculation %}
+    Duplicates as calculated on: {{ date_of_calculation|date:"jS F Y H:i" }}
+  {% endif %}
+</span>
+
+<span id="description_done"></span>
 
 <br /><br />
 <div id="div_duplicate_slots"></div>

@@ -88,23 +88,24 @@ def getEntities(model):
   return wrapped
 
 
-def getProps():
+def getProps(last=None):
   """Returns all proposals as a list of dictionaries.
   """
 
   key_order = [
       'link_id', 'scope_path', 'title', 'abstract', 'content',
-      'additional_info', 'mentor', 'possible_mentors', 'score',
-      'status', 'org']
+      'additional_info', '_mentor', 'possible_mentors', 'score',
+      'status', '_org', 'created_on', 'last_modified_on']
 
   from soc.models.student_proposal import StudentProposal
 
   gen = lambda: StudentProposal.all()
-  it = interactive.deepFetch(gen)
 
-  proposals = [i.toDict(key_order) for i in it]
+  it = dateFetch(gen, last)
 
-  return proposals
+  proposals = [(i.key().name(), i.toDict(key_order)) for i in it]
+
+  return dict(proposals)
 
 
 def orgStats(target):
@@ -113,8 +114,7 @@ def orgStats(target):
 
   from soc.logic import dicts
 
-  target = [addKey(i, 'org') for i in target]
-  grouped = dicts.groupby(target, 'org_key')
+  grouped = dicts.groupby(target.values(), '_org')
   popularity = [(k, len(v)) for k,v in grouped.iteritems()]
 
   return grouped, dict(popularity)

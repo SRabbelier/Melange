@@ -173,7 +173,7 @@ def loadPickle(name):
 
 
 def dumpPickle(target, name):
-  """Dumps a pickle"
+  """Dumps a pickle.
   """
 
   f = open("%s.dat" % name, 'w')

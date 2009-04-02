@@ -35,7 +35,6 @@ import code
 import getpass
 import os
 import sys
-import sys
 
 
 def auth_func():
@@ -56,6 +55,8 @@ def deepFetch(queryGen,key=None,batchSize = 100):
   Retrieved from http://tinyurl.com/d887ll (AppEngine cookbook).
   """
 
+  from google.appengine.ext import db
+
    # AppEngine will not fetch more than 1000 results
   batchSize = min(batchSize,1000)
 
@@ -67,6 +68,7 @@ def deepFetch(queryGen,key=None,batchSize = 100):
     key = db.Key(key)
 
   while not done:
+    print count
     query = queryGen()
     if key:
       query.filter("__key__ > ",key)

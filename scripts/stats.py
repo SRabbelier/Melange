@@ -50,6 +50,58 @@ def getOrgs():
   return dict(orgs)
 
 
+def getUsers():
+  """Returns all Users as dictionary.
+  """
+
+  from soc.models.user import User
+
+  gen = lambda: User.all()
+  it = interactive.deepFetch(gen)
+
+  users = [(i.key().name(), i) for i in it]
+  return dict(users)
+
+
+def getStudents():
+  """Returns all Students as dictionary.
+  """
+
+  from soc.models.student import Student
+
+  gen = lambda: Student.all()
+  it = interactive.deepFetch(gen)
+
+  students = [(i.key().name(), i) for i in it]
+  return dict(students)
+
+
+def getMentors():
+  """Returns all Mentors as dictionary.
+  """
+
+  from soc.models.mentor import Mentor
+
+  gen = lambda: Mentor.all()
+  it = interactive.deepFetch(gen)
+
+  mentors = [(i.key().name(), i) for i in it]
+  return dict(mentors)
+
+
+def getOrgAdmins():
+  """Returns all Organization Administrators as dictionary.
+  """
+
+  from soc.models.org_admin import OrgAdmin
+
+  gen = lambda: OrgAdmin.all()
+  it = interactive.deepFetch(gen)
+
+  orgAdmins = [(i.key().name(), i) for i in it]
+  return dict(orgAdmins)
+
+
 def getProps():
   """Returns all proposals as a list of dictionaries.
   """
@@ -69,7 +121,21 @@ def getProps():
   return proposals
 
 
-def orgstats(target):
+def getStudentProposals():
+  """Returns all Student Proposals as dictionary.
+  """
+
+  from soc.models.student_proposal import StudentProposal
+
+  gen = lambda: StudentProposal.all()
+  it = interactive.deepFetch(gen)
+
+  studentProposals = [(i.key().name(), i) for i in it]
+  
+  return dict(studentProposals)
+
+
+def orgStats(target):
   """Retrieves org stats.
   """
 
@@ -80,6 +146,19 @@ def orgstats(target):
   popularity = [(k, len(v)) for k,v in grouped.iteritems()]
 
   return grouped, dict(popularity)
+
+
+def countStudentsWithProposals():
+  """Retrieves number of Students who have submitted at least one Student Proposal.
+  """
+  
+  proposals = getStudentProposals()
+  students = {}
+  
+  for proposal_key in proposals.keys():
+    students[proposals[proposal_key].scope_path] = True
+  
+  return len(students)
 
 
 def printPopularity(popularity):
@@ -138,11 +217,17 @@ def main(args):
   context = {
       'load': loadPickle,
       'dump': dumpPickle,
-      'orgstats': orgstats,
+      'orgStats': orgStats,
       'printPopularity': printPopularity,
       'savePopularity': savePopularity,
       'getOrgs': getOrgs,
       'getProps': getProps,
+      'getStudents': getStudents,
+      'getMentors': getMentors,
+      'getOrgAdmins': getOrgAdmins,
+      'getUsers': getUsers,
+      'getStudentProposals': getStudentProposals,
+      'countStudentsWithProposals': countStudentsWithProposals
   }
 
   interactive.remote(args, context)

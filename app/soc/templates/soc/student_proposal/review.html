@@ -61,14 +61,42 @@ limitations under the License.
 
 <hr />
 <form method="POST">
-  <tr>
-  <td><b>Score and Review</b></td>
-  </tr>
-  <table>
-    {% block form_table %}
-      {% as_table form %}
-    {% endblock %}
+<b>Score and Review</b>
+
+<div class="box" style="border: 1px solid blue;">
+  <table id="commentcommon">
+    <!-- By default this is not displayed, so that all options work on non-javascript browsers -->
+    <tr style="display: none;">
+      <td class="formfieldlabel">
+        Comment Type:
+      </td>
+      <td class="formfieldvalue" colspan=3>
+        <select id="commenttypeselector" onchange="commentType();">
+          <option value="Public">Public Comment</option>
+          <option value="Private">Private Comment</option>
+         {% if is_org_admin %}
+          <option value="Admin">Admin Comment</option>
+         {% endif %} 
+        </select>
+      </td>
+    </tr>
+    <tbody id="commentpublic">
+      {% block comment_public_form_table %}
+        {% as_table comment_public %}
+      {% endblock %}
+    </tbody>
+    <tbody id="commentprivate">
+      {% block comment_private_form_table %}
+        {% as_table comment_private %}
+      {% endblock %}
+    </tbody>
+    <tbody id="commentadmin">
+      {% block comment_admin_form_table %}
+        {% as_table comment_admin %}
+      {% endblock %}
+    </tbody>
   </table>
+</div>
  <table>
   <tr>
    <td colspan="4">&nbsp;</td>
@@ -116,5 +144,56 @@ limitations under the License.
   {% as_student_proposal_review review student %}
 {% endfor %}
 <hr />
+
+{% comment %}
+  TODO(pawel.solyga): Put this javascript into separate file
+{% endcomment %}
+<script type="text/javascript"/>
+function commentType() {
+  var commentTypeSelector = document.getElementById("commenttypeselector");
+  var type = commentTypeSelector[commentTypeSelector.options.selectedIndex].value;
+
+  var commentPublic = document.getElementById("commentpublic");
+  var commentPrivate = document.getElementById("commentprivate");
+  var commentAdmin = document.getElementById("commentadmin");
+
+  var publicCheckbox = document.getElementById("id_public");
+
+  switch (type) {
+    case "Public":
+      commentPublic.style.display = "";
+      commentPrivate.style.display = "none";
+      commentAdmin.style.display = "none";
+      publicCheckbox.value = true;
+      break;
+    case "Private":
+      commentPublic.style.display = "";
+      commentPrivate.style.display = "";
+      commentAdmin.style.display = "none";
+      publicCheckbox.value = false;
+      break;
+    case "Admin":
+      commentPublic.style.display = "";
+      commentPrivate.style.display = "";
+      commentAdmin.style.display = "";
+      publicCheckbox.value = false;
+      break;
+    default:
+      alert("Unknown value");
+      alert(type);
+      break;
+  }
+}
+
+// Set the comment type selector to be displayed
+var commentTypeSelector = document.getElementById("commenttypeselector");
+commentTypeSelector.parentNode.parentNode.style.display = "";
+commentTypeSelector.options.selectedIndex = 0;
+var publicCheckbox = document.getElementById("id_public");
+publicCheckbox.parentNode.parentNode.style.display = "none";
+
+// Set the comment view to default to what ever is selected
+commentType();
+</script>
 
 {% endblock %}

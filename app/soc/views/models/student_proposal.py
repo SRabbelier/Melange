@@ -763,6 +763,37 @@ class View(base.View):
 
     context['form'] = form(initial)
 
+    # create the special form for mentors
+    comment_public = ['public', 'comment']
+    comment_private = ['score']
+    comment_admin = ['rank', 'mentor']
+    class FilterForm(object):
+      def __init__(self, form, fields):
+        self.__form = form
+        self.__fields = fields
+
+      @property
+      def fields(self):
+        return dict([(k,i) for k, i in self.__form.fields.iteritems() if k in self.__fields])
+
+      def __iter__(self):
+        for x in self.__form:
+          if x.name not in self.__fields:
+            continue
+          yield x
+
+      _marker = []
+      def __getattr__(self, key, default=_marker):
+        if default is self._marker:
+          return getattr(self.__form, key)
+        else:
+          return getattr(self.__form, key, default)
+
+    context['form'] = form(initial)
+    context['comment_public'] = FilterForm(context['form'], comment_public)
+    context['comment_private'] = FilterForm(context['form'], comment_private)
+    context['comment_admin'] = FilterForm(context['form'], comment_admin)
+
     # get all the extra information that should be in the context
     review_context = self._getDefaultReviewContext(entity, org_admin, mentor)
     context = dicts.merge(context, review_context)

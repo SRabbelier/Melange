@@ -73,69 +73,19 @@ def addKey(target, fieldname):
   result['%s_key' % fieldname] = target[fieldname].key().name()
   return result
 
-def getOrgs():
-  """Returns all orgs as dictionary.
+
+def getEntities(model):
+  """Returns all users as dictionary.
   """
 
-  from soc.models.organization import Organization
+  def wrapped():
+    gen = lambda: model.all()
+    it = interactive.deepFetch(gen)
 
-  gen = lambda: Organization.all()
-  it = interactive.deepFetch(gen)
+    entities = [(i.key().name(), i) for i in it]
+    return dict(entities)
 
-  orgs = [(i.key().name(), i) for i in it]
-  return dict(orgs)
-
-
-def getUsers():
-  """Returns all Users as dictionary.
-  """
-
-  from soc.models.user import User
-
-  gen = lambda: User.all()
-  it = interactive.deepFetch(gen)
-
-  users = [(i.key().name(), i) for i in it]
-  return dict(users)
-
-
-def getStudents():
-  """Returns all Students as dictionary.
-  """
-
-  from soc.models.student import Student
-
-  gen = lambda: Student.all()
-  it = interactive.deepFetch(gen)
-
-  students = [(i.key().name(), i) for i in it]
-  return dict(students)
-
-
-def getMentors():
-  """Returns all Mentors as dictionary.
-  """
-
-  from soc.models.mentor import Mentor
-
-  gen = lambda: Mentor.all()
-  it = interactive.deepFetch(gen)
-
-  mentors = [(i.key().name(), i) for i in it]
-  return dict(mentors)
-
-
-def getOrgAdmins():
-  """Returns all Organization Administrators as dictionary.
-  """
-
-  from soc.models.org_admin import OrgAdmin
-
-  gen = lambda: OrgAdmin.all()
-  it = interactive.deepFetch(gen)
-
-  orgAdmins = [(i.key().name(), i) for i in it]
-  return dict(orgAdmins)
+  return wrapped
 
 
 def getProps():
@@ -157,20 +107,6 @@ def getProps():
   return proposals
 
 
-def getStudentProposals():
-  """Returns all Student Proposals as dictionary.
-  """
-
-  from soc.models.student_proposal import StudentProposal
-
-  gen = lambda: StudentProposal.all()
-  it = interactive.deepFetch(gen)
-
-  studentProposals = [(i.key().name(), i) for i in it]
-  
-  return dict(studentProposals)
-
-
 def orgStats(target):
   """Retrieves org stats.
   """
@@ -187,13 +123,13 @@ def orgStats(target):
 def countStudentsWithProposals():
   """Retrieves number of Students who have submitted at least one Student Proposal.
   """
-  
+
   proposals = getStudentProposals()
   students = {}
-  
+
   for proposal_key in proposals.keys():
     students[proposals[proposal_key].scope_path] = True
-  
+
   return len(students)
 
 
@@ -250,20 +186,25 @@ def main(args):
 
   interactive.setup()
 
+  from soc.models.organization import Organization
+  from soc.models.user import User
+  from soc.models.student import Student
+  from soc.models.mentor import Mentor
+  from soc.models.org_admin import OrgAdmin
+
   context = {
       'load': loadPickle,
       'dump': dumpPickle,
       'orgStats': orgStats,
       'printPopularity': printPopularity,
       'savePopularity': savePopularity,
-      'getOrgs': getOrgs,
+      'getOrgs': getEntities(Organization),
+      'getUsers': getEntities(User),
+      'getStudents': getEntities(Student),
+      'getMentors': getEntities(Mentor),
+      'getOrgAdmins': getEntities(OrgAdmins),
       'getProps': getProps,
-      'getStudents': getStudents,
-      'getMentors': getMentors,
-      'getOrgAdmins': getOrgAdmins,
-      'getUsers': getUsers,
-      'getStudentProposals': getStudentProposals,
-      'countStudentsWithProposals': countStudentsWithProposals
+      'countStudentsWithProposals': countStudentsWithProposals,
   }
 
   interactive.remote(args, context)

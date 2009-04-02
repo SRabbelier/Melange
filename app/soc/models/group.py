@@ -53,7 +53,7 @@ class Group(soc.models.presence.Presence):
   #: creation limits, used to prevent spamming, etc.).
   founder = db.ReferenceProperty(reference_class=soc.models.user.User,
                                  required=True, collection_name="groups",
-                                 verbose_name=ugettext('Founded by'))
+                                 verbose_name=ugettext('Registered by'))
 
   #: Required field storing a home page URL of the group.
   home_page = db.LinkProperty(required=True,

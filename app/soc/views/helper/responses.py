@@ -25,7 +25,6 @@ __authors__ = [
 
 
 from google.appengine.api import users
-from google.appengine.ext import db
 
 from django import http
 from django.template import loader
@@ -38,9 +37,6 @@ from soc.views import helper
 from soc.views.helper import redirects
 from soc.views.helper import templates
 from soc.views.sitemap import sidebar
-
-import soc.logic
-import soc.views.helper.requests
 
 
 def respond(request, template, context=None, response_args=None,

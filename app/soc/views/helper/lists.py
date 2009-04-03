@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-import itertools
-
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
 
@@ -166,7 +164,7 @@ def getListContent(request, params, filter=None, order=None,
   if more:
     del data[limit:]
 
-  newest = next = prev = export_link =''
+  newest = next = prev = export_link = ''
 
   base_params = dict(i for i in request.GET.iteritems() if
                      i[0].startswith('offset_') or i[0].startswith('limit_'))

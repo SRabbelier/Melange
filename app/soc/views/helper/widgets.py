@@ -23,8 +23,6 @@ __authors__ = [
   ]
 
 
-import copy
-
 from django import forms
 from django.forms import util
 from django.forms import widgets
@@ -118,7 +116,7 @@ tinyMCE.init(%(settings_json)s)
       *args, **kwargs:  passed through to parent __init__() constructor
     """
 
-    super(forms.widgets.Textarea, self).__init__(*args, **kwargs)
+    super(FullTinyMCE, self).__init__(*args, **kwargs)
     self.mce_settings = self.DEF_MCE_SETTINGS
   
   def render(self, name, value, attrs=None):
@@ -189,10 +187,10 @@ class AgreementField(widgets.Widget):
     super(AgreementField, self).__init__(*args, **kwargs)
 
   def render(self, name, value, attrs=None):
+    """HTML renderer for Agreement field.
     """
-    """
-
-    url = '<a href="%s" target="_blank">Full Text</a>' % self.url if self.url else ""
+    url_text = '<a href="%s" target="_blank">Full Text</a>'
+    url = url_text % self.url if self.url else ""
     value = self.text.replace('\n', '<BR />')
     result = self.HTML_CODE % {'url': url, 'text': value}
     return result

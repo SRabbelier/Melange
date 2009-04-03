@@ -41,7 +41,7 @@ class DynaFormMetaclass(djangoforms.ModelFormMetaclass):
   and the values are used as the property value.
   """
 
-  def __new__(cls, class_name, bases, attrs):
+  def __new__(mcs, class_name, bases, attrs):
     """See djangoforms.ModelFormMetaclass on how the __new__ method
     is used, for an explanation on how this class modifies the default
     behavior, see the DynaFormMetaclass's docstring.
@@ -61,7 +61,7 @@ class DynaFormMetaclass(djangoforms.ModelFormMetaclass):
         attrs[key] = value
 
     # Leave the rest to djangoforms.ModelFormMetaclass.
-    return super(DynaFormMetaclass, cls).__new__(cls, class_name, bases, attrs)
+    return super(DynaFormMetaclass, mcs).__new__(mcs, class_name, bases, attrs)
 
 
 def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None, 
@@ -164,7 +164,7 @@ class DynaFieldMetaclass(type):
   and the values are used as the property value.
   """
 
-  def __new__(cls, name, bases, attrs):
+  def __new__(mcs, name, bases, attrs):
     """See djangoforms.ModelFormMetaclass on how the __new__ method
     is used, for an explanation on how this class modifies the default
     behavior, see the DynaFormMetaclass's docstring.
@@ -177,7 +177,7 @@ class DynaFieldMetaclass(type):
       attrs[key] = value
 
     # Leave the rest to type
-    return super(DynaFieldMetaclass, cls).__new__(cls, name, bases, attrs)
+    return super(DynaFieldMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
 
 def newDynaField(field, base, passthrough):
@@ -202,7 +202,7 @@ def newDynaField(field, base, passthrough):
     if key in properties:
       del properties[key]
 
-  class DynaField(base):
+  class DynaField(object):
     """The dynamically created Field class.
     """
 

@@ -28,7 +28,6 @@ from google.appengine.ext.db import djangoforms
 
 from django import forms
 from django.utils import safestring
-from django.utils.safestring import mark_safe
 
 
 class BaseForm(djangoforms.ModelForm):
@@ -60,7 +59,7 @@ class BaseForm(djangoforms.ModelForm):
       *args, **kwargs:  passed through to parent __init__() constructor
     """
 
-    super(djangoforms.ModelForm, self).__init__(*args, **kwargs)
+    super(BaseForm, self).__init__(*args, **kwargs)
 
     renames = {
         'verbose_name': 'label',

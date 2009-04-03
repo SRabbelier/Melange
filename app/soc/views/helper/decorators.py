@@ -37,6 +37,9 @@ from soc.logic import dicts
 
 
 class Error(Exception):
+  """Base class for all exceptions raised by this module.
+  """
+  
   pass
 
 
@@ -52,6 +55,8 @@ def view(func):
 
   @wraps(func)
   def view_wrapper(request, *args, **kwds):
+    """View decorator wrapper method.
+    """
     site = site_logic.getSingleton()
 
     # don't redirect admins, or if we're at /maintenance already
@@ -87,6 +92,8 @@ def merge_params(func):
 
   @wraps(func)
   def wrapper(self, *args, **kwargs):
+    """Decorator wrapper method.
+    """
     params = kwargs.get('params', {})
     kwargs['params'] = dicts.merge(params, self._params)
     return func(self, *args, **kwargs)
@@ -108,6 +115,8 @@ def check_access(func):
 
   @wraps(func)
   def wrapper(self, request, access_type, *args, **kwargs):
+    """Decorator wrapper method.
+    """
     params = kwargs.get('params', {})
 
     # Try to extract rights

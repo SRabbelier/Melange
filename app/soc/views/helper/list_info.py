@@ -31,6 +31,8 @@ def getStudentProposalInfo(ranking, assigned_proposals):
   """
 
   def wrapper(item, _):
+    """Decorator wrapper method.
+    """
     info = {'rank': ranking[item]}
 
     if item in assigned_proposals:

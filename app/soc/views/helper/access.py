@@ -165,6 +165,8 @@ def allowSidebar(fun):
 
   @wraps(fun)
   def wrapper(self, django_args, *args, **kwargs):
+    """Decorator wrapper method.
+    """
     if django_args.get('SIDEBAR_CALLING'):
       return
     return fun(self, django_args, *args, **kwargs)
@@ -179,6 +181,8 @@ def denySidebar(fun):
 
   @wraps(fun)
   def wrapper(self, django_args, *args, **kwargs):
+    """Decorator wrapper method.
+    """
     if django_args.get('SIDEBAR_CALLING'):
       raise out_of_band.Error("Sidebar Calling")
     return fun(self, django_args, *args, **kwargs)
@@ -197,6 +201,8 @@ def allowIfCheckPasses(checker_name):
 
     @wraps(fun)
     def wrapper(self, django_args=None, *args, **kwargs):
+      """Decorator wrapper method.
+      """
       try:
         # if the check passes we allow access regardless
         return self.doCheck(checker_name, django_args, [])
@@ -207,8 +213,8 @@ def allowIfCheckPasses(checker_name):
 
   return decorator
 
-
-allowDeveloper = allowIfCheckPasses('checkIsDeveloper')
+# pylint: disable-msg=C0103
+allowDeveloper = allowIfCheckPasses('checkIsDeveloper') 
 
 
 class Checker(object):
@@ -439,7 +445,7 @@ class Checker(object):
     checks raised is reraised.
     """
 
-    first = None
+    first = Exception()
 
     for checker_name, args in checks:
       try:
@@ -723,7 +729,11 @@ class Checker(object):
     self._checkIsActive(django_args, logic, fields)
 
   def checkHasActiveRoleForKeyFieldsAsScope(self, django_args, logic):
-    """
+    """Checks that the user has the specified active role.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to look up the entity
     """
 
     key_fields = "%(scope_path)s/%(link_id)s" % django_args
@@ -1125,7 +1135,8 @@ class Checker(object):
     if not django_args.get('scope_path'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
 
-    program_entity = program_logic.getFromKeyNameOr404(django_args['scope_path'])
+    program_entity = program_logic.getFromKeyNameOr404(
+        django_args['scope_path'])
     user_entity = user_logic.getForCurrentAccount()
 
     filter = {'user': user_entity,
@@ -1140,7 +1151,7 @@ class Checker(object):
           message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
     # fill the role_list with all the mentor and org admin roles for this user
-    role_list = []
+    # role_list = []
 
     filter = {'user': user_entity,
               'program': program_entity,
@@ -1392,13 +1403,14 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsAllowedToManageRole(self, django_args, role_logic, manage_role_logic):
+  def checkIsAllowedToManageRole(self, django_args, logic_for_role, 
+      manage_role_logic):
     """Returns an alternate HTTP response if the user is not allowed to manage
        the role given in args.
 
      Args:
        django_args: a dictionary with django's arguments
-       role_logic: determines the logic for the role in args.
+       logic_for_role: determines the logic for the role in args.
        manage_role_logic: determines the logic for the role which is allowed
            to manage this role.
 
@@ -1413,12 +1425,13 @@ class Checker(object):
 
     try:
       # check if it is my role the user's own role
-      self.checkHasActiveRoleForScope(django_args, role_logic)
+      self.checkHasActiveRoleForScope(django_args, logic_for_role)
       return
     except out_of_band.Error:
       pass
 
-    # apparently it's not the user's role so check if managing this role is allowed
+    # apparently it's not the user's role so check 
+    # if managing this role is allowed
     fields = {
         'link_id': django_args['link_id'],
         'scope_path': django_args['scope_path'],

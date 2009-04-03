@@ -33,8 +33,6 @@ from django.utils.html import escape
 
 from soc.logic import accounts
 from soc.logic import dicts
-from soc.logic.models import user as user_logic
-from soc.views.helper import redirects
 from soc.views.helper import widgets
 
 

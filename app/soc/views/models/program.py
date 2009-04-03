@@ -714,6 +714,8 @@ class View(presence.View):
       items += [('/student_proposal/list_orgs/%s' % (
           student_entity.key().name()),
           "Submit your Student Proposal", 'any_access')]
+
+    if timeline_helper.isAfterEvent(timeline_entity, 'student_signup_start'):
       items += [(redirects.getListSelfRedirect(student_entity,
           {'url_name':'student_proposal'}),
          "List my Student Proposals", 'any_access')]

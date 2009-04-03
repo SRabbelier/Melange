@@ -23,6 +23,7 @@ __authors__ = [
 
 
 import cPickle
+import datetime
 import operator
 import sys
 
@@ -104,20 +105,29 @@ def getProps(last=None):
   it = dateFetch(gen, last)
 
   proposals = [(i.key().name(), i.toDict(key_order)) for i in it]
+  if proposals:
+    last = i.last_modified_on # last modified entity
+  else:
+    last = datetime.datetime.now()
 
-  return dict(proposals)
+  return dict(proposals), last
 
 
-def orgStats(target):
+def orgStats(target, orgs):
   """Retrieves org stats.
   """
 
   from soc.logic import dicts
 
-  grouped = dicts.groupby(target.values(), '_org')
-  popularity = [(k, len(v)) for k,v in grouped.iteritems()]
+  orgs = [(v.key(), v) for k, v in orgs.iteritems()]
+  orgs = dict(orgs)
 
-  return grouped, dict(popularity)
+  grouped = dicts.groupby(target.values(), '_org')
+
+  grouped = [(orgs[k], v) for k, v in grouped.iteritems()]
+  popularity = [(k.link_id, len(v)) for k, v in grouped]
+
+  return dict(grouped), dict(popularity)
 
 
 def countStudentsWithProposals():

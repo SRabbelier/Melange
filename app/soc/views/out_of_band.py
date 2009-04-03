@@ -52,7 +52,7 @@ class Error(Exception):
     self.message_fmt = message_fmt
     self.context = context
     self.response_args = response_args
-    super(Error, self).__init__(message_fmt, context, response_args)
+    super(Error, self).__init__()
 
 
 class LoginRequest(Error):

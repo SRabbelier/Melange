@@ -23,7 +23,6 @@ __authors__ = [
 
 
 from soc.logic.models import presence
-from soc.logic.models import presence as presence_logic
 
 import soc.models.presence_with_tos
 
@@ -33,7 +32,7 @@ class Logic(presence.Logic):
   """
 
   def __init__(self, model=soc.models.presence_with_tos.PresenceWithToS,
-               base_model=None, scope_logic=presence_logic):
+               base_model=None, scope_logic=presence):
     """Defines the name, key_name and model for this entity.
     """
 

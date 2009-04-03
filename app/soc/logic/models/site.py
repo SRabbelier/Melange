@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.cache import sidebar
 from soc.logic.models import presence_with_tos
 
 import soc.models.presence_with_tos

@@ -63,8 +63,10 @@ class Logic(role.Logic):
 
     """
 
-    from soc.logic.models.student_project import logic as student_project_logic
-    from soc.logic.models.student_proposal import logic as student_proposal_logic
+    from soc.logic.models.student_project import logic as \
+        student_project_logic
+    from soc.logic.models.student_proposal import logic as \
+        student_proposal_logic
 
     fields = {'mentor': entity}
 
@@ -88,7 +90,8 @@ class Logic(role.Logic):
       Proposals possible mentor lists.
     """
 
-    from soc.logic.models.student_proposal import logic as student_proposal_logic
+    from soc.logic.models.student_proposal import logic \
+        as student_proposal_logic
 
     value = entity_properties[name]
 

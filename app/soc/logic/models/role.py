@@ -103,14 +103,14 @@ class Logic(base.Logic):
     """
 
     if self.disallow_last_resign:
-     # check if this is the last active role for it's scope
-     fields = {'scope': entity.scope,
+      # check if this is the last active role for it's scope
+      fields = {'scope': entity.scope,
           'status': 'active'}
-     roles = self.getForFields(fields, limit=2)
+      roles = self.getForFields(fields, limit=2)
 
-     # if this it the last one return error message
-     if len(roles) <= 1:
-       return DEF_LAST_RESIGN_ERROR_FMT
+      # if this it the last one return error message
+      if len(roles) <= 1:
+        return DEF_LAST_RESIGN_ERROR_FMT
 
     # resignation is possible
     return None

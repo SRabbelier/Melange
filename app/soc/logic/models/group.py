@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from soc.cache import sidebar
 from soc.logic.models import base
 
 import soc.models.group

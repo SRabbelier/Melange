@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Main Melange module with profiling support.
+"""
+
 __authors__ = [
   # alphabetical order by last name, please
   '"Augie Fackler" <durin42@gmail.com>',
@@ -52,6 +55,8 @@ import django.db
 
 # Log errors.
 def log_exception(*args, **kwds):
+  """Function used for logging exceptions.
+  """
   logging.exception('Exception in request:')
 
 # Log all exceptions detected by Django.

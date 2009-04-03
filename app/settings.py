@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module containing Melange Django settings.
+"""
+
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',

@@ -202,7 +202,7 @@ def main(args):
       'getUsers': getEntities(User),
       'getStudents': getEntities(Student),
       'getMentors': getEntities(Mentor),
-      'getOrgAdmins': getEntities(OrgAdmins),
+      'getOrgAdmins': getEntities(OrgAdmin),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
   }

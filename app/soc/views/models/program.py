@@ -389,7 +389,9 @@ class View(presence.View):
                 }
       key_name = duplicates_logic.getKeyNameFromFields(fields)
       duplicates_logic.updateOrCreateFromKeyName(fields, key_name)
-      return http.HttpResponse('Done')
+
+      response = simplejson.dumps({'status': 'done'})
+      return http.HttpResponse(response)
 
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])

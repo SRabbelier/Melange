@@ -22,10 +22,7 @@ __authors__ = [
   ]
 
 
-import operator
-
 from soc.views import out_of_band
-from soc.views.helper import access
 
 import soc.cache.sidebar
 
@@ -40,7 +37,6 @@ def addMenu(callback):
 
   The callback should return a list of menu's when called.
   """
-
   global SIDEBAR
   SIDEBAR.append(callback)
 
@@ -137,7 +133,7 @@ def getSidebarMenu(id, user, items, params):
 
   submenus = []
 
-  args = SIDEBAR_ACCESS_ARGS
+  # args = SIDEBAR_ACCESS_ARGS
   kwargs = SIDEBAR_ACCESS_KWARGS
 
   # reset and pre-fill the Checker's cache

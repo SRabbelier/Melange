@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module containing Melange URL patterns definition.
+"""
+
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',

@@ -38,6 +38,8 @@ def getCacher(get, put):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
+      """Decorator wrapper method.
+      """
       result, key = get(*args, **kwargs)
       if result:
         return result

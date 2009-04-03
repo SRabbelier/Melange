@@ -34,9 +34,9 @@ def key(model, filter, order):
 
   new_filter = {}
 
-  for key, value in filter.iteritems():
+  for filter_key, value in filter.iteritems():
     new_value = value.key().name() if isinstance(value, db.Model) else value
-    new_filter[key] = new_value
+    new_filter[filter_key] = new_value
 
   return 'query_for_%(kind)s_%(filter)s_%(order)s' % {
       'kind': repr(model.kind()),

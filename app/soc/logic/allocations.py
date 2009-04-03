@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-import itertools
 import math
 
 
@@ -64,11 +63,14 @@ class Allocator(object):
     self.adjusted_slots = {}
     self.adjusted_orgs = []
     self.locked_orgs = []
+    self.unlocked_orgs = []
     self.unlocked_applications = []
     self.slots = slots
     self.max_slots_per_org = max_slots_per_org
     self.min_slots_per_org = min_slots_per_org
     self.orgs = set(orgs)
+    self.popularity = None
+    self.total_popularity = None
     self.initial_popularity = popularity
     self.mentors = mentors
     self.iterative = iterative
@@ -95,7 +97,7 @@ class Allocator(object):
       return self.preprocessingAllocation()
 
   def buildSets(self):
-    """Allocates slots with the specified constraints
+    """Allocates slots with the specified constraints.
     """
 
     popularity = self.initial_popularity.copy()
@@ -223,7 +225,7 @@ class Allocator(object):
     # adjust the popularity so that the invariants are always met
     for org in unlocked_orgs:
       popularity = self.popularity[org]
-      mentors = self.mentors[org]
+      # mentors = self.mentors[org]
 
       slots = (float(popularity)/float(total_popularity))*available_slots
       slots = self.rangeSlots(slots, org)
@@ -246,7 +248,8 @@ class Allocator(object):
     slots_left = available_slots - sum(allocations.values())
 
     # add leftover slots, sorted by slack, decending
-    for org, slack in sorted(slack.iteritems(), key=lambda (k,v): v, reverse=True):
+    for org, slack in sorted(slack.iteritems(), 
+        key=lambda (k, v): v, reverse=True):
       if slots_left < 1:
         break
 

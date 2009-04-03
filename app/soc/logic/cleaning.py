@@ -604,7 +604,8 @@ def validate_new_student_project(org_field, mentor_field, student_field):
   """
 
   def wrapper(self):
-
+    """Decorator wrapper method.
+    """
     from soc.logic.models.mentor import logic as mentor_logic
     from soc.logic.models.organization import logic as org_logic
     from soc.logic.models.student import logic as student_logic

@@ -168,10 +168,10 @@ def split(target):
     tmpresult = []
 
     # Iterate over all we gathered so far
-    for filter in result:
+    for current_filter in result:
       for value in values:
         # Create a new dict from the current filter
-        newdict = dict(filter)
+        newdict = dict(current_filter)
 
         # And create a new dict that also has the current key/value pair
         newdict[key] = value

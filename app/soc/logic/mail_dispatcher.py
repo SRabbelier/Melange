@@ -117,7 +117,7 @@ def sendMail(context):
   try:
     # send the message
     message.send()
-  except Exception, exception:
+  except mail.Error, exception:
     import logging
     logging.info(context)
     logging.exception(exception)

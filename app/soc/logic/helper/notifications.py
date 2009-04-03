@@ -146,7 +146,7 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
 
   # determine the subject
   review_type = 'public' if review.is_public else 'private'
-  subject =  DEF_NEW_REVIEW_SUBJECT_FMT %(review_type, reviewed_name)
+  subject =  DEF_NEW_REVIEW_SUBJECT_FMT % (review_type, reviewed_name)
 
   template = DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE
 
@@ -169,7 +169,7 @@ def sendNotification(to_user, from_user, message_properties, subject, template):
     sender_name = from_user.name
   else:
     site_entity = model_logic.site.logic.getSingleton()
-    sender_name = 'The %s Team' %(site_entity.site_name)
+    sender_name = 'The %s Team' % (site_entity.site_name)
 
   new_message_properties = {
       'sender_name': sender_name,
@@ -185,7 +185,7 @@ def sendNotification(to_user, from_user, message_properties, subject, template):
       'subject': subject,
       'message': message,
       'scope': to_user,
-      'link_id': 't%i' %(int(time.time()*100)),
+      'link_id': 't%i' % (int(time.time()*100)),
       'scope_path': to_user.link_id
   }
 

@@ -133,7 +133,8 @@ class View(group_app.View):
             initial=False, required=True),
 
         'clean_description': cleaning.clean_html_content('description'),
-        'clean_contrib_template': cleaning.clean_html_content('contrib_template'),
+        'clean_contrib_template': cleaning.clean_html_content(
+            'contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             model_logic.organization, org_app_logic)}
@@ -151,7 +152,8 @@ class View(group_app.View):
 
     new_params['review_template'] = 'soc/org_app/review.html'
     # TODO use a proper template that works for each program
-    new_params['accepted_mail_template'] = 'soc/org_app/mail/accepted_gsoc2009.html'
+    new_params['accepted_mail_template'] = \
+        'soc/org_app/mail/accepted_gsoc2009.html'
     new_params['rejected_mail_template'] = 'soc/org_app/mail/rejected.html'
 
     params = dicts.merge(params, new_params)
@@ -234,7 +236,7 @@ class View(group_app.View):
         # use the accepted template and subject
         template = params['accepted_mail_template']
         context['subject'] = 'Congratulations!'
-        context['HTTP_host'] = 'http://%s' %(os.environ['HTTP_HOST'])
+        context['HTTP_host'] = 'http://%s' % (os.environ['HTTP_HOST'])
       elif status == 'rejected':
         # use the rejected template and subject
         template = params['rejected_mail_template']

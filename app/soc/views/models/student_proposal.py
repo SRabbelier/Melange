@@ -234,7 +234,8 @@ class View(base.View):
          'label': 'Set to rank',
          'help_text':
              'Set this proposal to the given rank (ignores the given score)',
-         'example_text': 'A rank will only be assigned if the review is private!',
+         'example_text': 'A rank will only be assigned if the '
+            'review is private!',
          'min_value': 1,
          'required': False,
          'passthrough': ['min_value', 'required', 'help_text'],
@@ -271,7 +272,7 @@ class View(base.View):
     """
 
     if not entity:
-      fields['link_id'] = 't%i' %(int(time.time()*100))
+      fields['link_id'] = 't%i' % (int(time.time()*100))
     else:
       fields['link_id'] = entity.link_id
 
@@ -362,7 +363,8 @@ class View(base.View):
           # no org_admin found, maybe it's a mentor?
           reviewer = mentor_logic.logic.getForFields(fields, unique=True)
 
-      # create the review (reviewer might be None if a Host or Developer is posting)
+      # create the review (reviewer might be None 
+      # if a Host or Developer is posting)
       self._createReviewFor(entity, reviewer, comment, is_public=True)
 
     # redirect to the same page
@@ -532,7 +534,7 @@ class View(base.View):
 
     student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
 
-    filter = {'scope' : student_entity.scope,
+    filter = {'scope': student_entity.scope,
               'status': 'active'}
 
     list_params = org_view.view.getParams().copy()
@@ -585,8 +587,8 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = '%s "%s" from %s' %(page_name, entity.title,
-                                               entity.scope.name())
+    context['page_name'] = '%s "%s" from %s' % (page_name, entity.title,
+                                                entity.scope.name())
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
@@ -650,7 +652,8 @@ class View(base.View):
       rank = fields['rank']
       if rank:
         ranker = self._logic.getRankerFor(entity)
-        # if a very high rank is filled in use the highest one that returns a score
+        # if a very high rank is filled in use the highest 
+        # one that returns a score
         rank = min(ranker.TotalRankedScores(), rank)
         # ranker uses zero-based ranking
         score_and_rank = ranker.FindScore(rank-1)
@@ -768,19 +771,23 @@ class View(base.View):
     comment_private = ['score']
     comment_admin = ['rank', 'mentor']
     class FilterForm(object):
+      """Helper class used for form filtering.
+      """
       def __init__(self, form, fields):
         self.__form = form
         self.__fields = fields
 
       @property
       def fields(self):
-        return dict([(k,i) for k, i in self.__form.fields.iteritems() if k in self.__fields])
+        """Property that returns all fields as dictionary."""
+        fields = self.__form.fields.iteritems()
+        return dict([(k, i) for k, i in fields if k in self.__fields])
 
       def __iter__(self):
-        for x in self.__form:
-          if x.name not in self.__fields:
+        for field in self.__form:
+          if field.name not in self.__fields:
             continue
-          yield x
+          yield field
 
       _marker = []
       def __getattr__(self, key, default=_marker):
@@ -933,8 +940,10 @@ class View(base.View):
     properties = {'mentor': mentor_entity}
     self._logic.updateEntityProperties(entity, properties)
 
-  def _createReviewFor(self, entity, reviewer, comment, score=0, is_public=True):
-    """Creates a review for the given proposal and sends out a message to all followers.
+  def _createReviewFor(self, entity, reviewer, comment, 
+                       score=0, is_public=True):
+    """Creates a review for the given proposal and sends 
+       out a message to all followers.
 
     Args:
       entity: Student Proposal entity for which the review should be created
@@ -944,14 +953,12 @@ class View(base.View):
       is_public: Determines if the review is a public review
     """
 
-    import time
-
     from soc.logic.helper import notifications as notifications_helper
     from soc.logic.models.review import logic as review_logic
     from soc.logic.models.review_follower import logic as review_follower_logic
 
     # create the fields for the review entity
-    fields = {'link_id': 't%i' %(int(time.time()*100)),
+    fields = {'link_id': 't%i' % (int(time.time()*100)),
         'scope': entity,
         'scope_path': entity.key().name(),
         'author': user_logic.logic.getForCurrentAccount(),

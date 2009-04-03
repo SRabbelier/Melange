@@ -25,7 +25,6 @@ __authors__ = [
 
 
 import csv
-import datetime
 import StringIO
 
 from google.appengine.ext import db
@@ -745,22 +744,25 @@ class View(object):
     params = params.copy()
     params['export_extension'] = '.csv'
     params['export_content_type'] = 'text/csv'
-    fieldnames = params['csv_fieldnames']
+    # fieldnames = params['csv_fieldnames']
 
-    f = StringIO.StringIO()
+    file_handler = StringIO.StringIO()
 
     if key_order:
-      writer = csv.DictWriter(f, key_order, dialect='excel')
+      writer = csv.DictWriter(file_handler, key_order, dialect='excel')
       writer.writerow(dicts.identity(key_order))
 
       # encode the data to UTF-8 to ensure compatibiliy
       for row_dict in data:
         for key in row_dict.keys():
           value = row_dict[key]
-          row_dict[key] = value.encode("utf-8") if isinstance(value, basestring) else str(value)
+          if isinstance(value, basestring):
+            row_dict[key] = value.encode("utf-8")
+          else:
+            row_dict[key] = str(value)
         writer.writerow(row_dict)
     else:
-      writer = csv.writer(f, dialect='excel')
+      writer = csv.writer(file_handler, dialect='excel')
 
       # encode the data to UTF-8 to ensure compatibiliy
       for row in data:
@@ -769,7 +771,7 @@ class View(object):
         else:
           writer.writerow(row)
 
-    data = f.getvalue()
+    data = file_handler.getvalue()
 
     return self.download(request, data, filename, params)
 
@@ -834,7 +836,8 @@ class View(object):
         field = getter(entity)
         form.fields[field_name].initial = field.link_id if field else None
       except db.Error:
-        pass
+        # TODO(Pawel.Solyga): use logging to log exception
+        return
 
     for field, value in request.GET.iteritems():
       if field in form.fields:

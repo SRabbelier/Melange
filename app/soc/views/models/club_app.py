@@ -34,8 +34,6 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.models import group_app
 
-import soc.logic.dicts
-
 
 class View(group_app.View):
   """View methods for the Club Application model.

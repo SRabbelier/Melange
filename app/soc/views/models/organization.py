@@ -36,7 +36,6 @@ from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
-from soc.logic.models import program as program_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -47,7 +46,6 @@ from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import group
-from soc.views.models import program as program_view
 
 import soc.models.organization
 import soc.logic.models.organization
@@ -63,7 +61,9 @@ class View(group.View):
     Params:
       original_params: a dict with params for this View
     """
-
+    
+    from soc.views.models import program as program_view
+    
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
@@ -138,7 +138,8 @@ class View(group.View):
             widget=helper.widgets.FullTinyMCE(
                 attrs={'rows': 25, 'cols': 100})),
         'clean_description': cleaning.clean_html_content('description'),
-        'clean_contrib_template': cleaning.clean_html_content('contrib_template'),
+        'clean_contrib_template': cleaning.clean_html_content(
+            'contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
             soc.logic.models.organization, org_app_logic)
@@ -257,10 +258,11 @@ class View(group.View):
 
     assigned_proposals = []
 
-    # only when the program allows allocations to be seen we should color the list
+    # only when the program allows allocations 
+    # to be seen we should color the list
     if org_entity.scope.allocations_visible:
       # get the limit and offset for the list
-      limit, offset = lists.getLimitAndOffset(request, 'offset_0', 'limit_0')
+      _, offset = lists.getLimitAndOffset(request, 'offset_0', 'limit_0')
 
       # determine the amount of proposals to color
       to_color = max(0, org_entity.slots - offset)

@@ -24,15 +24,12 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django import forms
 
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
-from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects

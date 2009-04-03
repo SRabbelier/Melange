@@ -115,8 +115,8 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  def list(self, request, access_type, page_name=None,
-           params=None, filter=None, **kwargs):
+  def list(self, request, access_type,
+           page_name=None, params=None, filter=None, order=None, **kwargs):
     """See base.View.list.
     """
 

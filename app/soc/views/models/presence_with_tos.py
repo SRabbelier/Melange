@@ -24,12 +24,10 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django import forms
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import document as document_logic
 from soc.views.models import presence
 from soc.views.helper import widgets
 

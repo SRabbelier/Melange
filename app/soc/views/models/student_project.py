@@ -33,7 +33,6 @@ from soc.logic.models import student as student_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import organization as org_view
@@ -55,7 +54,9 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsDeveloper'] # TODO who should be able to edit this?
+    # TODO who should be able to edit this?
+    rights['edit'] = ['checkIsDeveloper']
+    
     rights['delete'] = ['checkIsDeveloper']
     rights['show'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
@@ -119,7 +120,7 @@ class View(base.View):
     """
 
     if not entity:
-      fields['link_id'] = 't%i' %(int(time.time()*100))
+      fields['link_id'] = 't%i' % (int(time.time()*100))
     else:
       fields['link_id'] = entity.link_id
 

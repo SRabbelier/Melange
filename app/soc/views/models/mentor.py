@@ -225,7 +225,7 @@ invite = decorators.view(view.invite)
 list = decorators.view(view.list)
 manage = decorators.view(view.manage)
 process_request = decorators.view(view.processRequest)
-request = decorators.view(view.request)
+role_request = decorators.view(view.request)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 

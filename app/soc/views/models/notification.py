@@ -29,10 +29,8 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import validate
 from soc.models import notification as notification_model
 from soc.views import helper
-from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
@@ -109,7 +107,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None):
+           page_name=None, params=None, filter=None, order=None, **kwargs):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
@@ -163,7 +161,7 @@ class View(base.View):
     # get the current user
     current_user = user_logic.getForCurrentAccount()
 
-    fields['link_id'] = 't%i' %(int(time.time()*100))
+    fields['link_id'] = 't%i' % (int(time.time()*100))
     fields['scope'] = fields['to_user']
     fields['from_user'] = current_user
     fields['scope_path'] = fields['to_user'].link_id

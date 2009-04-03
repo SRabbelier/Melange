@@ -27,7 +27,6 @@ import os
 
 from django import forms
 from django import http
-from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
@@ -42,7 +41,6 @@ from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import student_proposal as student_proposal_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
-from soc.logic.models.document import logic as document_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -265,9 +263,11 @@ class View(presence.View):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View, not used
     """
+    
+    from django.utils import simplejson
 
     program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
-    slots = program.slots
+    program_slots = program.slots
 
     filter = {
           'scope': program,
@@ -308,7 +308,7 @@ class View(presence.View):
     iterative = False
 
     allocator = allocations.Allocator(orgs.keys(), applications, mentors,
-                                      slots, max_slots_per_org,
+                                      program_slots, max_slots_per_org,
                                       min_slots_per_org, iterative)
 
     result = allocator.allocate(locked_slots, adjusted_slots)
@@ -369,7 +369,8 @@ class View(presence.View):
   @decorators.check_access
   def showDuplicates(self, request, access_type, page_name=None,
                      params=None, **kwargs):
-    """View in which a host can see which students have been assigned multiple slots.
+    """View in which a host can see which students have been assigned 
+       multiple slots.
 
     For params see base.view.Public().
     """
@@ -462,7 +463,8 @@ class View(presence.View):
               'slots >': 0,
               'status': 'active'}
 
-    org_entities = org_logic.logic.getForFields(fields, limit=limit, offset=offset)
+    org_entities = org_logic.logic.getForFields(fields, 
+        limit=limit, offset=offset)
 
     orgs_data = {}
     proposals_data = []
@@ -644,7 +646,8 @@ class View(presence.View):
           (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
-    if user and timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
+    if user and timeline_helper.isAfterEvent(timeline_entity, 
+        'org_signup_start'):
       filter = {
           'applicant': user,
           'scope': program_entity,

@@ -22,32 +22,18 @@ __authors__ = [
     '"Matthew Wilkes" <matthew@matthewwilkes.co.uk>',
   ]
 
-import time
 
-from google.appengine.api import users
-from google.appengine.ext.db import Key
+import time
 
 from django import forms
 
-from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import validate
 from soc.logic.models.user import logic as user_logic
 from soc.logic.models.comment import logic as comment_logic
-from soc.logic.models.document import logic as document_logic
-from soc.logic.models.linkable import logic as link_logic
-from soc.models import linkable
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
-from soc.views.helper import params as params_helper
 from soc.views.models import base
-
-import soc.models.comment
-import soc.logic.models.comment
-import soc.logic.dicts
-import soc.views.helper
-import soc.views.helper.widgets
 
 
 class View(base.View):
@@ -65,9 +51,10 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['create'] = [('checkSeeded', ['checkIsDocumentReadable','scope_path'])]
-    rights['edit'] = [('checkIsMyEntity', [comment_logic,'author', True])]
-    rights['delete'] = [('checkIsMyEntity', [comment_logic,'author', True])]
+    rights['create'] = [('checkSeeded', ['checkIsDocumentReadable', 
+        'scope_path'])]
+    rights['edit'] = [('checkIsMyEntity', [comment_logic, 'author', True])]
+    rights['delete'] = [('checkIsMyEntity', [comment_logic, 'author', True])]
 
     new_params = {}
     new_params['logic'] = comment_logic
@@ -95,8 +82,8 @@ class View(base.View):
 
     new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
-        'created_by': forms.fields.CharField(widget=helper.widgets.ReadOnlyInput(),
-                                             required=False),
+        'created_by': forms.fields.CharField(
+            widget=helper.widgets.ReadOnlyInput(), required=False),
         }
 
     params = dicts.merge(params, new_params)
@@ -121,7 +108,7 @@ class View(base.View):
     context['comment_on_name'] = self._params['comment_on_name']
     context['work_link'] = redirect
 
-  def _editPost(self, request, entity, fields, params=None):
+  def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
 
@@ -130,7 +117,7 @@ class View(base.View):
 
     if not entity:
       fields['author'] = user
-      fields['link_id'] = 't%i' %(int(time.time()*100))
+      fields['link_id'] = 't%i' % (int(time.time()*100))
     else:
       fields['author'] = entity.author
       fields['link_id'] = entity.link_id

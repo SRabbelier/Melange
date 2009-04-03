@@ -179,7 +179,7 @@ class View(role.View):
     """See base.View._editContext().
     """
 
-    entity = context['entity']
+    # entity = context['entity']
     form = context['form']
 
     if 'scope_path' in form.initial:

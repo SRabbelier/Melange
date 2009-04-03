@@ -136,7 +136,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter={}, **kwargs):
+           page_name=None, params=None, filter=None, order=None, **kwargs):
     """Lists all notifications in separate tables, depending on their status.
 
     for parameters see base.list()
@@ -203,7 +203,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def listSelf(self, request, access_type,
-             page_name=None, params=None, **kwargs):
+               page_name=None, params=None, **kwargs):
     """List all applications from the current logged-in user.
 
     For params see base.View.public().

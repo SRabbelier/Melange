@@ -24,18 +24,15 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django import forms
 from django.utils.translation import ugettext
 
 from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
-from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -143,7 +140,8 @@ class View(base.View):
       if entity.home:
         form.fields['home_link_id'].initial = entity.home.link_id
     except db.Error:
-      pass
+      # TODO(Pawel.Solyga): use logging to log exception
+      return
 
     super(View, self)._editGet(request, entity, form)
 

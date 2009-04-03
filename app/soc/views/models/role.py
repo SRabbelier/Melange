@@ -31,7 +31,6 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
-from soc.logic.helper import notifications as notifications_helper
 from soc.logic.helper import request as request_helper
 from soc.views.helper import decorators
 from soc.views.helper import redirects
@@ -107,7 +106,7 @@ class View(base.View):
           'soc.views.models.%(module_name)s.process_request',
           'Process request for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
-          'soc.views.models.%(module_name)s.request',
+          'soc.views.models.%(module_name)s.role_request',
           'Create a Request to become %(name)s')]
     elif params.get('allow_invites'):
       # add patterns concerning only invites
@@ -265,8 +264,7 @@ class View(base.View):
     key_name = request_logic.logic.getKeyNameFromFields(request_fields)
 
     # create the request entity
-    entity = request_logic.logic.updateOrCreateFromKeyName(request_fields,
-                                                           key_name)
+    request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
 
     group_view = params.get('group_view')
     if not group_view:

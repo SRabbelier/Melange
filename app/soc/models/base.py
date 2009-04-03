@@ -60,8 +60,8 @@ class ModelWithFieldAttributes(db.Model):
     result = {}
 
     if not field_names:
-      props = self.properties()
-      field_names = [k for k, v in props.iteritems() if isinstance(v, self.DICT_TYPES)]
+      props = self.properties().iteritems()
+      field_names = [k for k, v in props if isinstance(v, self.DICT_TYPES)]
 
     for key in field_names:
       # Skip everything that is not valid

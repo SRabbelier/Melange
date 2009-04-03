@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-import datetime
 import itertools
 import logging
 import random
@@ -54,6 +53,9 @@ from soc.models.user import User
 
 
 class Error(Exception):
+  """Base class for all exceptions raised by this module.
+  """
+  
   pass
 
 
@@ -124,7 +126,7 @@ def seed(request, *args, **kwargs):
   site.put()
 
 
-  account, current_user = ensureUser()
+  _, current_user = ensureUser()
 
 
   for i in range(15):
@@ -405,7 +407,7 @@ def seed_org_app(request, i):
   """Returns the properties for a new org proposal,
   """
 
-  account, current_user = ensureUser()
+  _, current_user = ensureUser()
   status = request.GET.get('status', 'pre-accepted')
   gsoc2009 = Program.get_by_key_name('google/gsoc2009')
 
@@ -444,7 +446,7 @@ def seed_org(request, i):
   """Returns the properties for a new org entity.
   """
 
-  account, current_user = ensureUser()
+  _, current_user = ensureUser()
   gsoc2009 = Program.get_by_key_name('google/gsoc2009')
 
   if not gsoc2009:
@@ -478,7 +480,7 @@ def seed_mentor(request, i):
   """Returns the properties of a new student proposal.
   """
 
-  account, current_user = ensureUser()
+  _, current_user = ensureUser()
   org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
 
   if not org:
@@ -511,7 +513,7 @@ def seed_student_proposal(request, i):
   """Returns the properties of a new student proposal.
   """
 
-  account, current_user = ensureUser()
+  _, current_user = ensureUser()
   org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
   mentor = Mentor.get_by_key_name('google/gsoc2009/org_%d/mentor' % i)
 
@@ -684,6 +686,9 @@ def clear(*args, **kwargs):
   # there no explicit ranker model anywhere, so make one for
   # our own convenience to delete all rankers
   class ranker(db.Model):
+    """ranker model used with ranklist module.
+    """
+    
     pass
 
   # TODO(dbentley): If there are more than 1000 instances of any model,

@@ -24,7 +24,6 @@ from google.appengine.ext import db
 
 import soc.models.work
 import soc.models.user
-from soc.models import base
 import soc.models.linkable
 
 

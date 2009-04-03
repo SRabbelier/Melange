@@ -353,7 +353,7 @@ class Role(soc.models.linkable.Linkable):
   def name(self):
     """Property as 'name' for use in common templates.
     """
-    return '%s %s' %(self.given_name, self.surname)
+    return '%s %s' % (self.given_name, self.surname)
 
   def document_name(self):
     """Property as 'document_name' used on for example award certificates.

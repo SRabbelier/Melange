@@ -17,6 +17,7 @@
 # To disable some of the checks use options listed below:
 # disable unused imports: --disable-msg=W0611
 # disable TODO: --disable-msg=W0511
+# disable cyclic imports: --disable-msg=R0401
 # disable report: --reports=no
 # disable similarity check: --disable-checker=similarities
 #
@@ -27,7 +28,7 @@ SILENT_ARGS=""
 ARGS=( "$@" )
 
 if [ "$1" == "--silent" ]; then
-  SILENT_ARGS="--disable-msg=W0611 --disable-msg=W0511 --reports=no --disable-checker=similarities"
+  SILENT_ARGS="--disable-msg=W0511,R0401 --reports=no --disable-checker=similarities"
   ARGS[0]=""
 fi
 

@@ -39,6 +39,7 @@ from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import forms
 from soc.views.helper import redirects
+from soc.views.helper import requests
 from soc.views.helper import responses
 from soc.views import sitemap
 
@@ -456,7 +457,7 @@ class View(object):
 
     # remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
-    is_self_referrer = helper.requests.isReferrerSelf(
+    is_self_referrer = requests.isReferrerSelf(
         request, suffix=suffix, url_name=params['url_name'])
 
     if request.GET.get(params['submit_msg_param_name']):
@@ -465,7 +466,7 @@ class View(object):
 
     if entity:
       # note: no message will be displayed if parameter is not present
-      context['notice'] = helper.requests.getSingleIndexedParamValue(
+      context['notice'] = requests.getSingleIndexedParamValue(
           request, params['submit_msg_param_name'],
           values=params['save_message'])
 

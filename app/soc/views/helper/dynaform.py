@@ -202,7 +202,7 @@ def newDynaField(field, base, passthrough):
     if key in properties:
       del properties[key]
 
-  class DynaField(object):
+  class DynaField(base):
     """The dynamically created Field class.
     """
 

@@ -174,6 +174,37 @@ def savePopularity(popularities):
   print "done"
 
 
+def addFollower(follower, proposals, add_public=True, add_private=True):
+  """Adds a user as follower to the specified proposals.
+
+  Args:
+    follower: the User to add as follower
+    proposals: a list with the StudnetProposals that should be subscribed to
+    add_public: whether the user is subscribed to public updates
+    add_private: whether the user should be subscribed to private updates
+  """
+
+  from soc.models.review_follower import ReviewFollower
+
+  result = []
+
+  for i in proposals:
+     properties = {
+       'user': follower,
+       'link_id': follower.link_id,
+       'scope': i,
+       'scope_path': i.key().name(),
+       'key_name': '%s/%s' % (i.key().name(), follower.link_id),
+       'subscribed_public': add_public,
+       'subscribed_private': add_private,
+     }
+
+     entity = ReviewFollower(**properties)
+     result.append(entity)
+
+  return result
+
+
 def loadPickle(name):
   """Loads a pickle.
   """
@@ -215,6 +246,7 @@ def main(args):
       'getOrgAdmins': getEntities(OrgAdmin),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
+      'addFollower': addFollower,
       'Organization': Organization,
       'User': User,
       'Student': Student,

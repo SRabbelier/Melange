@@ -148,7 +148,7 @@ limitations under the License.
 {% comment %}
   TODO(pawel.solyga): Put this javascript into separate file
 {% endcomment %}
-<script type="text/javascript"/>
+<script type="text/javascript">
 function commentType() {
   var commentTypeSelector = document.getElementById("commenttypeselector");
   var type = commentTypeSelector[commentTypeSelector.options.selectedIndex].value;
@@ -166,7 +166,7 @@ function commentType() {
       commentPublic.style.display = "";
       commentPrivate.style.display = "none";
       commentAdmin.style.display = "none";
-      publicCheckbox.value = true;
+      publicCheckbox.checked = true;
       cssString += "public";
       cssRemoveString += "private";
       break;
@@ -174,7 +174,7 @@ function commentType() {
       commentPublic.style.display = "";
       commentPrivate.style.display = "";
       commentAdmin.style.display = "none";
-      publicCheckbox.value = false;
+      publicCheckbox.checked = false;
       cssString += "private";
       cssRemoveString += "public";
       break;
@@ -182,7 +182,7 @@ function commentType() {
       commentPublic.style.display = "";
       commentPrivate.style.display = "";
       commentAdmin.style.display = "";
-      publicCheckbox.value = false;
+      publicCheckbox.checked = false;
       cssString += "private";
       cssRemoveString += "public";
       break;

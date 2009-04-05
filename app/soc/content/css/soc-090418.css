@@ -499,8 +499,14 @@ span.edited {
   background: #d0f5a9;
 }
 
-.studentproposalreview .other {
+.studentproposalcomment-public,
+.studentproposalreview-public .other {
   background: #f5f6ce;
+}
+
+.studentproposalcomment-private,
+.studentproposalreview-private .other {
+  background: #D2EDF6;
 }
 
 /*

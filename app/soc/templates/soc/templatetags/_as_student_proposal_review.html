@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-<div class="studentproposalreview">
+<div class="studentproposalreview studentproposalreview-{% if is_public %}public{% else %}private{% endif %}">
   <div class="title">
     On {{ created|date:"jS F Y H:i" }}
     {% if is_public %}

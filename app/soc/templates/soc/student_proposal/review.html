@@ -63,7 +63,7 @@ limitations under the License.
 <form method="POST">
 <b>Score and Review</b>
 
-<div class="box" style="border: 1px solid blue;">
+<div class="box">
   <table id="commentcommon">
     <!-- By default this is not displayed, so that all options work on non-javascript browsers -->
     <tr style="display: none;">
@@ -158,6 +158,8 @@ function commentType() {
   var commentAdmin = document.getElementById("commentadmin");
 
   var publicCheckbox = document.getElementById("id_public");
+  var cssString = "studentproposalcomment-";
+  var cssRemoveString = "studentproposalcomment-";
 
   switch (type) {
     case "Public":
@@ -165,24 +167,31 @@ function commentType() {
       commentPrivate.style.display = "none";
       commentAdmin.style.display = "none";
       publicCheckbox.value = true;
+      cssString += "public";
+      cssRemoveString += "private";
       break;
     case "Private":
       commentPublic.style.display = "";
       commentPrivate.style.display = "";
       commentAdmin.style.display = "none";
       publicCheckbox.value = false;
+      cssString += "private";
+      cssRemoveString += "public";
       break;
     case "Admin":
       commentPublic.style.display = "";
       commentPrivate.style.display = "";
       commentAdmin.style.display = "";
       publicCheckbox.value = false;
+      cssString += "private";
+      cssRemoveString += "public";
       break;
     default:
       alert("Unknown value");
       alert(type);
       break;
   }
+  $($('#commenttypeselector').parents('.box').get(0)).removeClass(cssRemoveString).addClass(cssString);
 }
 
 // Set the comment type selector to be displayed

@@ -215,6 +215,11 @@ def main(args):
       'getOrgAdmins': getEntities(OrgAdmin),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
+      'Organization': Organization,
+      'User': User,
+      'Student': Student,
+      'Mentor': Mentor,
+      'OrgAdmin': OrgAdmin,
   }
 
   interactive.remote(args, context)

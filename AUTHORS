@@ -3,6 +3,7 @@
 # included, it must be RFC 2821 compliant (properly quoted, escaped, etc.).
 # Lines beginning with # can be stripped from the file, as can blank lines.
 
+"Dmitri Gaskin" <dmitrig01@gmail.com>
 "Madhusudan.C.S" <madhusudancs@gmail.com>
 "Haoyu Bai" <baihaoyu@gmail.com>
 "Augie Fackler" <durin42@gmail.com>

@@ -507,7 +507,8 @@ class View(base.View):
 
       proposal_logic = params['logic']
       student_proposal_entity = proposal_logic.getForFields(filter, unique=True)
-
+      reviewer = student_proposal_entity.scope
+      
       # update the entity mark it as invalid
       proposal_logic.updateEntityProperties(student_proposal_entity,
           {'status': 'invalid'})
@@ -515,7 +516,9 @@ class View(base.View):
       # redirect to the program's homepage
       redirect_url = redirects.getHomeRedirect(student_proposal_entity.program,
           {'url_name': 'program'})
-
+      
+      comment = "Student withdrew proposal."
+      self._createReviewFor(student_proposal_entity, reviewer, comment)
       return http.HttpResponseRedirect(redirect_url)
 
     return super(View, self).edit(request=request, access_type=access_type,

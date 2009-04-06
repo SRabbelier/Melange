@@ -569,7 +569,8 @@ class View(base.View):
               'status': ['new', 'pending', 'accepted', 'rejected']}
 
     list_params = params.copy()
-    list_params['list_description'] = 'List of my %(name_plural)s.' % list_params
+    list_params['list_description'] = \
+        'List of my %(name_plural)s.' % list_params
     list_params['list_action'] = (redirects.getPublicRedirect, list_params)
 
     valid_list = lists.getListContent(

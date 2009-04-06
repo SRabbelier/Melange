@@ -445,7 +445,7 @@ class Checker(object):
     checks raised is reraised.
     """
 
-    first = Exception()
+    first = None
 
     for checker_name, args in checks:
       try:

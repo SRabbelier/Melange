@@ -87,8 +87,8 @@ class View(presence.View):
         host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
-    rights['assign_slots'] = ['checkIsDeveloper']
-    rights['slots'] = ['checkIsDeveloper']
+    rights['assign_slots'] = ['checkIsHostForProgram']
+    rights['slots'] = ['checkIsHostForProgram']
     rights['show_duplicates'] = ['checkIsHostForProgram']
     rights['assigned_proposals'] = ['checkIsHostForProgram']
     rights['accepted_orgs'] = [('checkisAfterEvent',

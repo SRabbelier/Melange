@@ -245,7 +245,7 @@ class View(group.View):
 
     # retrieve the ranker
     fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-                'scope': org_entity}
+              'scope': org_entity}
 
     ranker_root = ranker_root_logic.getForFields(fields, unique=True)
     ranker = ranker_root_logic.getRootFromEntity(ranker_root)

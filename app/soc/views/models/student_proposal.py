@@ -27,6 +27,7 @@ import time
 
 from django import forms
 from django import http
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -40,6 +41,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import responses
@@ -66,13 +68,13 @@ class View(base.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkCanStudentPropose', ['scope_path', False]),
         ('checkRoleAndStatusForStudentProposal',
-            [['proposer'], ['active'], ['new', 'pending']])]
+            [['proposer'], ['active'], ['new', 'pending', 'invalid']])]
     rights['delete'] = ['checkIsDeveloper']
     rights['show'] = [
         ('checkRoleAndStatusForStudentProposal',
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], 
-            ['new', 'pending', 'accepted', 'rejected']])]
+            ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
@@ -553,24 +555,49 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def listSelf(self, request, access_type,
-             page_name=None, params=None, **kwargs):
+               page_name=None, params=None, **kwargs):
     """Lists all proposals from the current logged-in user 
        for the given student.
 
     For params see base.View.public().
     """
 
+    context = {}
     student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
 
     filter = {'scope' : student_entity,
               'status': ['new', 'pending', 'accepted', 'rejected']}
 
     list_params = params.copy()
-    list_params['list_description'] = 'List of my %(name_plural)s' % list_params
+    list_params['list_description'] = 'List of my %(name_plural)s.' % list_params
     list_params['list_action'] = (redirects.getPublicRedirect, list_params)
 
-    return self.list(request, access_type=access_type, page_name=page_name,
-                     params=list_params, filter=filter, **kwargs)
+    valid_list = lists.getListContent(
+        request, list_params, filter, idx=0)
+
+    ip_params = list_params.copy() # ineligible proposals
+
+    description = ugettext('List of my ineligible/withdrawn %s.') % (
+        ip_params['name_plural'])
+
+    ip_params['list_description'] = description
+    ip_params['list_action'] = (redirects.getPublicRedirect, ip_params)
+
+    filter = {'scope' : student_entity,
+              'status': 'invalid'}
+
+    ip_list = lists.getListContent(
+        request, ip_params, filter, idx=1, need_content=True)
+
+    contents = []
+    # fill contents with all the needed lists
+    contents.append(valid_list)
+
+    if ip_list != None:
+      contents.append(ip_list)
+
+    # call the _list method from base to display the list
+    return self._list(request, list_params, contents, page_name, context)
 
   @decorators.merge_params
   @decorators.check_access

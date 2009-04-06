@@ -16,7 +16,9 @@ limitations under the License.
 {% if is_admin %}
   {{ block.super }}
 {% endif %}
+{% ifnotequal entity.status "invalid" %}
 <td>
   <input type="submit" class="button" name="action" value="Withdraw"/>
 </td>
+{% endifnotequal %}
 {% endblock %}

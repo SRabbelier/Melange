@@ -546,8 +546,9 @@ class View(object):
     except ValueError:
       export = None
 
-    if export is not None and export < len(contents):
-      content = contents[export]
+    content = [i for i in contents if i['idx'] == export]
+    if len(content) == 1:
+      content = content[0]
       key_order = content.get('key_order')
 
       if key_order:

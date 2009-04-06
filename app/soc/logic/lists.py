@@ -39,6 +39,7 @@ class Lists(object):
       'next',
       'first',
       'last',
+      'idx',
       ]
 
   def __init__(self, contents):

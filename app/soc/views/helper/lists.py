@@ -195,6 +195,7 @@ def getListContent(request, params, filter=None, order=None,
     newest = generateLinkFromGetArgs(request, newest_params)
 
   content = {
+      'idx': idx,
       'data': data,
       'export': export_link,
       'first': offset+1,

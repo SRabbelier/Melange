@@ -213,11 +213,11 @@ class View(base.View):
          },
         {'name': 'public',
          'base': forms.BooleanField,
-         'label': 'Public review',
+         'label': 'Review visible to Student',
          'initial': False,
          'required': False,
          'help_text': 'By ticking this box the score will not be assigned, '
-             'and the review will be public.',
+             'and the review will be visible to the student.',
          },
          ]
 

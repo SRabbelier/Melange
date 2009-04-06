@@ -292,15 +292,9 @@ class View(presence.View):
     mentors = {}
 
     for org in organizations:
-      filter = {
-          'org': org,
-          'status': ['new', 'pending']
-          }
       orgs[org.link_id] = org
-      query = student_proposal_logic.logic.getQueryForFields(filter=filter)
-      proposals = student_proposal_logic.logic.getAll(query)
-      applications[org.link_id] = len(proposals)
-      mentors[org.link_id] = len([i for i in proposals if i.mentor != None])
+      applications[org.link_id] = org.nr_applications
+      mentors[org.link_id] = org.nr_mentors
 
     # TODO: Use configuration variables here
     max_slots_per_org = 40

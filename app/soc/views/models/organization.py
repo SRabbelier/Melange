@@ -217,6 +217,10 @@ class View(group.View):
 
     list_params = student_proposal_view.view.getParams().copy()
     list_params['list_template'] = 'soc/student_proposal/list_for_org.html'
+    list_params['list_key_order'] = [
+         'title', 'abstract', 'content', 'additional_info', 'mentor',
+         'possible_mentors', 'score', 'status', 'created_on',
+         'last_modified_on']
 
     ranked_params = list_params.copy()# ranked proposals
     ranked_params['list_row'] = ('soc/%(module_name)s/list/'

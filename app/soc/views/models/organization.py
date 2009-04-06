@@ -61,9 +61,9 @@ class View(group.View):
     Params:
       original_params: a dict with params for this View
     """
-    
+
     from soc.views.models import program as program_view
-    
+
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
@@ -275,6 +275,28 @@ class View(group.View):
     prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking,
         assigned_proposals), None)
 
+    # check if the current user is a mentor
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    fields = {'user': user_entity,
+        'scope': org_entity,}
+    mentor_entity = mentor_logic.logic.getForFields(fields, unique=True)
+
+    if mentor_entity:
+      mp_params = list_params.copy() # proposals mentored by current user
+
+      description = ugettext('List of %s sent to %s you are mentoring') % (
+          mp_params['name_plural'], org_entity.name)
+      mp_params['list_description'] = description
+      mp_params['list_action'] = (redirects.getReviewRedirect, mp_params)
+
+      filter = {'org': org_entity,
+                'mentor': mentor_entity,
+                'status': 'pending'}
+
+      mp_list = lists.getListContent(
+          request, mp_params, filter, idx=1, need_content=True)
+
     new_params = list_params.copy() # new proposals
     new_params['list_description'] = 'List of new %s sent to %s ' % (
         new_params['name_plural'], org_entity.name)
@@ -285,7 +307,7 @@ class View(group.View):
 
     contents = []
     new_list = lists.getListContent(
-        request, new_params, filter, idx=1, need_content=True)
+        request, new_params, filter, idx=2, need_content=True)
 
     ip_params = list_params.copy() # ineligible proposals
 
@@ -299,13 +321,16 @@ class View(group.View):
               'status': 'invalid'}
 
     ip_list = lists.getListContent(
-        request, ip_params, filter, idx=1, need_content=True)
+        request, ip_params, filter, idx=3, need_content=True)
 
     # fill contents with all the needed lists
     if new_list != None:
       contents.append(new_list)
 
     contents.append(prop_list)
+
+    if mentor_entity and mp_list != None:
+      contents.append(mp_list)
 
     if ip_list != None:
       contents.append(ip_list)

@@ -711,15 +711,35 @@ class View(base.View):
     if mentor and choice:
       self._adjustPossibleMentors(entity, mentor, choice)
 
-    is_ineligible = get_dict.get('ineligible')
-    if org_admin and is_ineligible:
-      # mark the proposal invalid and return to the list
-      properties = {'status': 'invalid'}
-      self._logic.updateEntityProperties(entity, properties)
+    ineligible = get_dict.get('ineligible')
+    
+    if org_admin:
+      reviewer = org_admin
+    elif mentor:
+      reviewer = mentor
+    
+    if (org_admin or mentor) and ineligible != None:
+      ineligible = int(ineligible)
+      if ineligible == 1:
+        # mark the proposal invalid and return to the list
+        properties = {'status': 'invalid'}
+        self._logic.updateEntityProperties(entity, properties)
 
-      redirect = redirects.getListProposalsRedirect(entity.org,
-                                                    {'url_name': 'org'})
-      return http.HttpResponseRedirect(redirect)
+        redirect = redirects.getListProposalsRedirect(entity.org,
+                                                      {'url_name': 'org'})
+        comment = "Marked Student Proposal as Ineligible."
+        self._createReviewFor(entity, reviewer, comment, is_public=False)
+        return http.HttpResponseRedirect(redirect)
+      elif ineligible == 0:
+        # mark the proposal as new and return to the list
+        properties = {'status': 'new'}
+        self._logic.updateEntityProperties(entity, properties)
+
+        redirect = redirects.getListProposalsRedirect(entity.org,
+                                                      {'url_name': 'org'})
+        comment = "Marked Student Proposal as Eligible."
+        self._createReviewFor(entity, reviewer, comment, is_public=False)
+        return http.HttpResponseRedirect(redirect)
 
     # check if we should change the subscription state for the current user
     public_subscription = None
@@ -862,6 +882,7 @@ class View(base.View):
 
     # which button should we show to the mentor?
     if mentor:
+      context['is_mentor'] = True
       if mentor.key() in possible_mentors:
         # show "No longer willing to mentor"
         context['remove_me_as_mentor'] = True

@@ -123,11 +123,18 @@ limitations under the License.
      </td>
      {% endif %}
    {% endif %}
-   {% if is_org_admin %}
+   {% if is_org_admin or is_mentor %}
+     {% ifequal entity.status "invalid" %}
+     <td>
+       <input style="font-weight: bold" type="button" value="Mark as Eligible"
+       onclick="if (confirm('Are you sure you want to mark this proposal as eligible?')) { location.href='?ineligible=0'; }"/>
+     </td>
+     {% else %}
      <td>
        <input style="font-weight: bold" type="button" value="Mark as Ineligible"
-       onclick="if (confirm('Are you sure? This can not be undone!')) { location.href='?ineligible=1'; }"/>
+       onclick="if (confirm('Are you sure you want to mark this proposal as ineligible?')) { location.href='?ineligible=1'; }"/>
      </td>
+     {% endifequal %}
    {% endif %}
    </tr>
  </table>

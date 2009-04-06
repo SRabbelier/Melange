@@ -51,8 +51,8 @@ limitations under the License.
   {% readonly_field_as_table_row "Student" student_name %}
   {% readonly_field_as_table_row "Mentor" mentor_name %}
   {% readonly_field_as_table_row "Possible Mentors" possible_mentors %}
-  {% readonly_field_as_twoline_table_row entity.fields.abstract.label entity.abstract %}
-  {% readonly_safe_field_as_twoline_table_row entity.fields.content.label entity.content %}
+  {% readonly_field_as_table_row entity.fields.abstract.label entity.abstract %}
+  {% readonly_safe_field_as_table_row entity.fields.content.label entity.content %}
   {% readonly_url_field_as_table_row entity.fields.additional_info.label entity.additional_info %}
   {% readonly_field_as_table_row "Created on" entity.created_on %}
   {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}

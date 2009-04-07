@@ -458,6 +458,7 @@ class Checker(object):
         first = first if first else exception
 
     # none passed, re-raise the first exception
+    # pylint: disable-msg=W0706
     raise first
 
   def allow(self, django_args):

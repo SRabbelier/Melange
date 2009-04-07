@@ -14,6 +14,23 @@ limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
 
+{% block scripts %}
+{{ block.super }}
+{% if entity.feed_url %}
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="/soc/content/js/blog-081117.js"></script>
+  <script type="text/javascript" >
+  google.load("feeds", "1");
+
+  function initialize() {
+    var blog = new BlogPreview(document.getElementById("blog"));
+    blog.show("{{ entity.feed_url }}", 3);
+  }
+  google.setOnLoadCallback(initialize);
+  </script>
+{% endif %}
+{% endblock %}
+
 {% block header_title %}
 {{ page_name }} {{ entity.title }} for {{ entity.scope.name }}
 {% endblock %}
@@ -28,5 +45,7 @@ limitations under the License.
   {% readonly_url_field_as_table_row entity.fields.additional_info.label entity.additional_info %}
  </table>
 </p>
-{% block manage %} {% endblock %}
+{% if entity.feed_url %}
+  <div id="blog"></div>
+{% endif %}
 {% endblock %}

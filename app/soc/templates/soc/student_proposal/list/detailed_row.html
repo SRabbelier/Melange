@@ -12,7 +12,11 @@ onclick="document.location.href='{{ list.redirect }}'" name="name">
   <td><div class="name">{{ list.item.scope.name }}</a></div></td>
   <td><div class="name">
     {% if not list.item.mentor %}
-      None
+      {% if list.item.possible_mentors %}
+        {{ list.item.possible_mentors|length }} Pending
+      {% else %}
+        None
+      {% endif %}
     {% else %}
       {{ list.item.mentor.name }}
     {% endif %}

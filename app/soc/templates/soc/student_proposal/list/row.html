@@ -5,13 +5,6 @@ onclick="document.location.href='{{ list.redirect }}'" name="name">
      </div>
   </td>
   <td><div class="name">{{ list.item.scope.name }}</a></div></td>
-  <td><div class="name">
-    {% if not list.item.mentor %}
-      None
-    {% else %}
-      {{ list.item.mentor.name }}
-    {% endif %}
-  </a></div></td>
   <td><div class="status">{{ list.item.org.name }}</a></div></td>
   <td><div class="date">{{ list.item.last_modified_on|date:"jS F Y H:i" }}</a></div></td>
 </tr>

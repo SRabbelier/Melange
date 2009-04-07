@@ -33,6 +33,7 @@ from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models.student_project import logic as project_logic
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -41,7 +42,6 @@ from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import responses
-from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import organization as org_view
 
@@ -202,14 +202,14 @@ class View(base.View):
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
-      return helper.responses.errorResponse(
+      return responses.errorResponse(
           error, request, template=params['error_public'])
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = "%s '%s' from %s" %(page_name, entity.title,
-                                               entity.student.name())
+    context['page_name'] = "%s '%s' from %s" % (page_name, entity.title,
+                                                entity.student.name())
 
     # use another template and make the cancel button goes to the public view
     params['edit_template'] = 'soc/student_project/manage.html'
@@ -275,7 +275,7 @@ class View(base.View):
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    key_name, fields = forms_helper.collectCleanedFields(form)
+    _, fields = forms_helper.collectCleanedFields(form)
 
     # get the mentor from the form
     fields = {'link_id': fields['mentor_id'],
@@ -306,7 +306,7 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = '%s %s' %(page_name, org_entity.name)
+    context['page_name'] = '%s %s' % (page_name, org_entity.name)
 
     list_params = params.copy()
 
@@ -334,7 +334,8 @@ class View(base.View):
     fields['status'] = ['passed']
     completed_params = list_params.copy()
     completed_params['list_description'] = ('List of %(name_plural)s that have '
-        'successfully completed the program, these cannot be managed.' % list_params)
+        'successfully completed the program, '
+        'these cannot be managed.' % list_params)
     completed_params['list_action'] = (redirects.getPublicRedirect, list_params)
 
     completed_list = lists.getListContent(
@@ -367,7 +368,7 @@ class View(base.View):
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
-      return helper.responses.errorResponse(
+      return responses.errorResponse(
           error, request, template=params['error_public'])
 
     # get the context for this webpage
@@ -408,7 +409,7 @@ class View(base.View):
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    key_name, fields = forms_helper.collectCleanedFields(form)
+    _, fields = forms_helper.collectCleanedFields(form)
 
     project_logic.updateEntityProperties(entity, fields)
 

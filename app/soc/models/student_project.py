@@ -41,13 +41,18 @@ class StudentProject(soc.models.linkable.Linkable):
       verbose_name=ugettext('Title'))
   title.help_text = ugettext('Title of the project')
 
-  #: required, text field describing the project
+  #: Required, text field describing the project
   abstract = db.TextProperty(required=True)
   abstract.help_text = ugettext(
       'Short abstract, summary, or snippet;'
       ' 500 characters or less, plain text displayed publicly')
 
-  #: optional, URL which can give more information about this project
+  #: Optional, text field containing all kinds of information about this project
+  public_info = db.TextProperty(required=False, default ='')
+  public_info.help_text = ugettext(
+      'Additional information about this project to be shown publicly')
+
+  #: Optional, URL which can give more information about this project
   additional_info = db.URLProperty(required=False)
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about this project.')
@@ -57,7 +62,7 @@ class StudentProject(soc.models.linkable.Linkable):
       verbose_name=ugettext('Project Feed URL'))
   feed_url.help_text = ugettext(
       'The URL should be a valid ATOM or RSS feed. '
-      'Feed entries are shown on the home page.')
+      'Feed entries are shown on the public page.')
 
   #: A property containing which mentor has been assigned to this project.
   #: A project must have a mentor at all times
@@ -65,7 +70,7 @@ class StudentProject(soc.models.linkable.Linkable):
                                 required=True,
                                 collection_name='student_projects')
 
-  #: the status of this project
+  #: The status of this project
   #: accepted: This project has been accepted into the program
   #: mid_term_passed: This project has passed the midterm evaluation
   #: mid_term_failed: This project has failed the midterm evaluation
@@ -75,12 +80,12 @@ class StudentProject(soc.models.linkable.Linkable):
       choices=['accepted', 'mid_term_passed', 'mid_term_failed', 
               'final_failed', 'passed'])
 
-  #: student which this project is from
+  #: Student which this project is from
   student = db.ReferenceProperty(
       reference_class=soc.models.student.Student,
       required=True, collection_name='student_projects')
 
-  #: program in which this project has been created
+  #: Program in which this project has been created
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
                                  required=True, 
                                  collection_name='student_projects')

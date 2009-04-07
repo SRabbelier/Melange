@@ -54,6 +54,10 @@ class View(group.View):
   """View methods for the Organization model.
   """
 
+  DEF_ACCEPTED_PROJECTS_MSG_FMT = ugettext("These projects have"
+      " been accepted into %s. You can learn more about"
+      " each project by visiting the links below.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -101,6 +105,7 @@ class View(group.View):
     new_params['public_template'] = 'soc/organization/public.html'
     new_params['list_row'] = 'soc/organization/list/row.html'
     new_params['list_heading'] = 'soc/organization/list/heading.html'
+    new_params['home_template'] = 'soc/organization/home.html'
 
     new_params['application_logic'] = org_app_logic
     new_params['group_applicant_url'] = True
@@ -379,6 +384,38 @@ class View(group.View):
     contents = [content]
 
     return self._list(request, params, contents, page_name)
+
+  def _public(self, request, entity, context):
+    """See base.View._public().
+    """
+
+    from soc.views.models import student_project as student_project_view
+
+    ap_params = student_project_view.view.getParams().copy() # accepted projects
+
+    # define the list redirect action to show the notification
+    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+    ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT %(
+                                        entity.name)
+    ap_params['list_heading'] = 'soc/student_project/list/heading.html'
+    ap_params['list_row'] = 'soc/student_project/list/row.html'
+
+    # only show projects that have not failed
+    filter = {'scope': entity,
+              'status': ['accepted', 'mid_term_passed', 'passed']}
+
+    ap_list = lists.getListContent(request, ap_params, filter, idx=0,
+                                   need_content=True)
+
+    contents = []
+
+    if ap_list:
+      contents.append(ap_list)
+
+    # construct the list and put it into the context
+    context['list'] = soc.logic.lists.Lists(contents)
+
+    return super(View, self)._public(request=request, entity=entity, context=context)
 
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific Organization menu entries.

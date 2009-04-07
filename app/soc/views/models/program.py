@@ -213,7 +213,7 @@ class View(presence.View):
 
     # define the list redirect action to show the notification
     del aa_params['list_key_order']
-    aa_params['list_action'] = (redirects.getPublicRedirect, aa_params)
+    aa_params['list_action'] = (redirects.getHomeRedirect, aa_params)
     aa_params['list_description'] = description
 
     aa_list = lists.getListContent(request, aa_params, filter, idx=0,

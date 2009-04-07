@@ -52,6 +52,13 @@ class StudentProject(soc.models.linkable.Linkable):
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about this project.')
 
+  #: Optional field storing a feed URL; displayed publicly.
+  feed_url = db.LinkProperty(
+      verbose_name=ugettext('Project Feed URL'))
+  feed_url.help_text = ugettext(
+      'The URL should be a valid ATOM or RSS feed. '
+      'Feed entries are shown on the home page.')
+
   #: A property containing which mentor has been assigned to this project.
   #: A project must have a mentor at all times
   mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,

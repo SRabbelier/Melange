@@ -235,6 +235,16 @@ def getManageRedirect(entity, params):
   return result
 
 
+def getManageOverviewRedirect(entity, params):
+  """Returns the redirect for the manage overview view of the given entity.
+  """
+
+  result = '/%s/manage_overview/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
 def getSelectRedirect(params):
   """Returns the pick redirect for the specified entity.
   """

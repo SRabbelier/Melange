@@ -42,6 +42,7 @@ limitations under the License.
   {% readonly_field_as_table_row "Mentor Name" entity.mentor.name %}
   {% readonly_field_as_table_row entity.fields.title.label entity.title %}
   {% readonly_field_as_twoline_table_row entity.fields.abstract.label entity.abstract %}
+  {% readonly_safe_field_as_twoline_table_row entity.fields.public_info.label entity.public_info %}
   {% readonly_url_field_as_table_row entity.fields.additional_info.label entity.additional_info %}
  </table>
 </p>

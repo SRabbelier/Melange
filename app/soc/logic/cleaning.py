@@ -589,7 +589,7 @@ def validate_student_proposal(org_field, scope_field,
     return cleaned_data
   return wrapper
 
-def validate_new_student_project(org_field, mentor_field, student_field):
+def validate_student_project(org_field, mentor_field, student_field):
   """Validates the form of a student proposal.
 
   Args:
@@ -599,7 +599,7 @@ def validate_new_student_project(org_field, mentor_field, student_field):
 
   Raises ValidationError if:
     -A valid Organization does not exist for the given keyname
-    -The mentor link_id does not match the mentors for the active organization
+    -The mentor link_id does not match a mentor for the active organization
     -The student link_id does not match a student in the org's Program
   """
 

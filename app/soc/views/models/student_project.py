@@ -42,6 +42,7 @@ from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import responses
+from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import organization as org_view
 
@@ -95,11 +96,14 @@ class View(base.View):
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
             required=True),
+        'public_info': forms.fields.CharField(required=True,
+            widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'student_id': forms.CharField(label='Student Link ID',
             required=True),
         'mentor_id': forms.CharField(label='Mentor Link ID',
             required=True),
         'clean_abstract': cleaning.clean_content_length('abstract'),
+        'clean_public_info': cleaning.clean_html_content('public_info'),
         'clean_student': cleaning.clean_link_id('student'),
         'clean_mentor': cleaning.clean_link_id('mentor'),
         'clean_additional_info': cleaning.clean_url('additional_info'),
@@ -137,7 +141,10 @@ class View(base.View):
 
     # create the form that students will use to edit their projects
     dynaproperties = {
+        'public_info': forms.fields.CharField(required=True,
+            widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'clean_abstract': cleaning.clean_content_length('abstract'),
+        'clean_public_info': cleaning.clean_html_content('public_info'),
         'clean_additional_info': cleaning.clean_url('additional_info'),
         'clean_feed_url': cleaning.clean_feed_url,
         }

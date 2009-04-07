@@ -51,6 +51,7 @@ from soc.logic.models.role import logic as role_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.student import logic as student_logic
+from soc.logic.models.student_project import logic as student_project_logic
 from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
@@ -1369,6 +1370,51 @@ class Checker(object):
     if student_entity.user.key() != self.user.key():
       # this is not the page for the current user
       self.deny(django_args)
+
+    return
+
+  @allowDeveloper
+  def checkIsMyStudentProject(self, django_args):
+    """Checks whether the project belongs to the current user.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the project does not belong to the current user
+    """
+
+    self.checkIsUser()
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+
+    if project_entity.student.user.key() != self.user.key():
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    return
+
+  @allowDeveloper
+  def checkStudentProjectHasStatus(self, django_args, allowed_status):
+    """Checks whether the Project has one of the given statusses.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      allowed_status: list with the allowed statusses for the entity
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the project is not in the requested status
+    """
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+
+    if not project_entity.status in allowed_status:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
     return
 

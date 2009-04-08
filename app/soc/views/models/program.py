@@ -188,6 +188,35 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
+  def _getAcceptedOrgsList(self, description, params, filter, use_cache):
+    """Returns a list with all accepted orgs.
+
+    Args:
+      description: the description of the list
+      params: the params to use
+      filter: the filter to use
+      use_cache: whether or not to use the cache
+    """
+
+    logic = params['logic']
+
+    order = ['name']
+
+    if not use_cache:
+      fun = self._getData
+    else:
+      # only cache if all profiles are created
+      fun =  soc.cache.logic.cache(self._getData)
+    entities = fun(logic.getModel(), filter, order, logic)
+
+    result = dicts.rename(params, params['list_params'])
+    result['action'] = (redirects.getHomeRedirect, params)
+    result['description'] = description
+    result['pagination'] = 'soc/list/no_pagination.html'
+    result['data'] = entities
+
+    return result
+
   @decorators.merge_params
   @decorators.check_access
   def acceptedOrgs(self, request, access_type,
@@ -222,28 +251,14 @@ class View(presence.View):
     if aa_list:
       contents.append(aa_list)
 
+    use_cache = not aa_list # only cache if there are no aa's left
     description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
 
     filter['status'] = ['new', 'active']
 
     from soc.views.models.organization import view as org_view
     ao_params = org_view.getParams().copy() # active orgs
-    ao_logic = ao_params['logic']
-
-    order = ['name']
-
-    if aa_list:
-      fun = self._getData
-    else:
-      # only cache if all profiles are created
-      fun =  soc.cache.logic.cache(self._getData)
-    entities = fun(ao_logic.getModel(), filter, order, ao_logic)
-
-    ao_list = dicts.rename(ao_params, ao_params['list_params'])
-    ao_list['action'] = (redirects.getPublicRedirect, ao_params)
-    ao_list['description'] = description
-    ao_list['pagination'] = 'soc/list/no_pagination.html'
-    ao_list['data'] = entities
+    ao_list = self._getAcceptedOrgsList(description, ao_params, filter, use_cache)
 
     contents.append(ao_list)
 

@@ -243,7 +243,10 @@ class View(base.View):
          'passthrough': ['min_value', 'required', 'help_text'],
       },
       {'name': 'mentor',
-       'base': forms.CharField,
+       'base': widgets.ReferenceField,
+       'passthrough': ['reference_url', 'required', 'label', 'filter'],
+       'reference_url': 'mentor',
+       'filter': ['__org__'],
        'label': 'Assign Mentor (Link ID)',
        'required': False,
        'help_text': 'Fill in the Link ID of the Mentor '

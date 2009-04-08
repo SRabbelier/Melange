@@ -62,6 +62,11 @@ class Organization(soc.models.group.Group):
   slots_desired.help_text = ugettext(
       'The amount of slots desired by this organization.')
 
+  slots_calculated = db.IntegerProperty(required=False, default=0,
+      verbose_name=ugettext('Slots calculated'))
+  slots_calculated.help_text = ugettext(
+      'The amount of slots calculated for this organization.')
+
   nr_applications = db.IntegerProperty(required=False, default=0,
       verbose_name=ugettext('Amount of applications received'))
   nr_applications.help_text = ugettext(

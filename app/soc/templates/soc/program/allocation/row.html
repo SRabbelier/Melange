@@ -15,10 +15,5 @@
      size="3" value="0" onchange="javascript:assignSlots(this)"/>
     </div>
   </td>
-  <td>
-      <div class="slots" id="id_adjustment_count_{{ list.item.link_id }}">
-      <input type="text" id="id_spin_adjustment_count_{{ list.item.link_id }}"
-      size="3" value="0" onchange="javascript:assignAdjustment(this)"/>
-      </div>
-  </td>
+  <td><div class="raw">{{ list.item.slots_calculated }}</div></td>
 </tr>

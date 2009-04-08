@@ -72,6 +72,8 @@ class View(presence.View):
       " profiles. You can learn more about each organization by"
       " visiting the links below.")
 
+  DEF_SLOTS_ALLOCATION_MSG = ugettext("Use this view to assign slots.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -352,12 +354,15 @@ class View(presence.View):
 
     program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
+    description = self.DEF_SLOTS_ALLOCATION_MSG
+
     filter = {
         'scope': program,
         'status': 'active',
         }
 
-    content = lists.getListContent(request, org_params, filter=filter)
+    content = self._getAcceptedOrgsList(description, org_params, filter, False)
+
     contents = [content]
 
     return_url =  "http://%(host)s%(index)s" % {

@@ -46,7 +46,7 @@ class Allocator(object):
   # the convenience of any mathematicians that happen to read this
   # piece of code ;).
 
-  def __init__(self, orgs, popularity, mentors, slots,
+  def __init__(self, orgs, popularity, max, slots,
                max_slots_per_org, min_slots_per_org, iterative):
     """Initializes the allocator.
 
@@ -72,10 +72,10 @@ class Allocator(object):
     self.popularity = None
     self.total_popularity = None
     self.initial_popularity = popularity
-    self.mentors = mentors
+    self.max = max
     self.iterative = iterative
 
-  def allocate(self, locked_slots, adjusted_slots):
+  def allocate(self, locked_slots):
     """Allocates the slots and returns the result.
 
     Args:
@@ -84,11 +84,10 @@ class Allocator(object):
     """
 
     self.locked_slots = locked_slots
-    self.adjusted_slots = adjusted_slots
 
     self.buildSets()
 
-    if not sum(self.popularity.values()) or not sum(self.mentors.values()):
+    if not sum(self.popularity.values()) or not sum(self.max.values()):
       return self.popularity
 
     if self.iterative:
@@ -104,37 +103,22 @@ class Allocator(object):
 
     # set s
     locked_slots = self.locked_slots
-    adjusted_slots = self.adjusted_slots
 
     # set a and b
     locked_orgs = set(locked_slots.keys())
-    adjusted_orgs = set(adjusted_slots.keys())
 
     # set a' and b'
     unlocked_orgs = self.orgs.difference(locked_orgs)
 
-    # set a*b and a'*b'
-    locked_and_adjusted_orgs = locked_orgs.intersection(adjusted_orgs)
-
     # a+o and b+o should be o
     locked_orgs_or_orgs = self.orgs.union(locked_orgs)
-    adjusted_orgs_or_orgs = self.orgs.union(adjusted_orgs)
 
     total_popularity = sum(popularity.values())
-
-    # an item can be only a or b, so a*b should be empty
-    if locked_and_adjusted_orgs:
-      raise Error("Cannot have an org locked and adjusted")
 
     # a+o should be o, testing length is enough though
     if len(locked_orgs_or_orgs) != len(self.orgs):
       raise Error("Unknown org as locked slot")
 
-    # same for b+o
-    if len(adjusted_orgs_or_orgs) != len(self.orgs):
-      raise Error("Unknown org as adjusted slot")
-
-    self.adjusted_orgs = adjusted_orgs
     self.unlocked_orgs = unlocked_orgs
     self.locked_orgs = locked_orgs
     self.popularity = popularity
@@ -147,7 +131,7 @@ class Allocator(object):
     slots = int(math.floor(float(slots)))
     slots = min(slots, self.max_slots_per_org)
     slots = max(slots, self.min_slots_per_org)
-    slots = min(slots, self.mentors[org])
+    slots = min(slots, self.max[org])
 
     return slots
 

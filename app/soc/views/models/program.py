@@ -302,27 +302,26 @@ class View(presence.View):
       from_json = simplejson.loads(result)
 
       locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
-      adjusted_slots = dicts.groupDictBy(from_json, 'adjustment')
 
     orgs = {}
     applications = {}
-    mentors = {}
+    max = {}
 
     for org in organizations:
       orgs[org.link_id] = org
       applications[org.link_id] = org.nr_applications
-      mentors[org.link_id] = org.nr_mentors
+      max[org.link_id] = min(org.nr_mentors, org.slots_desired)
 
     # TODO: Use configuration variables here
-    max_slots_per_org = 40
+    max_slots_per_org = 50
     min_slots_per_org = 2
     iterative = False
 
-    allocator = allocations.Allocator(orgs.keys(), applications, mentors,
+    allocator = allocations.Allocator(orgs.keys(), applications, max,
                                       program_slots, max_slots_per_org,
                                       min_slots_per_org, iterative)
 
-    result = allocator.allocate(locked_slots, adjusted_slots)
+    result = allocator.allocate(locked_slots)
 
     data = []
 

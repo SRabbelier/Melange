@@ -91,59 +91,30 @@ class AllocationsTest(unittest.TestCase):
 
     locked_slots = {}
     adjusted_slots = {}
-    self.allocater.allocate(locked_slots, adjusted_slots)
+    self.allocater.allocate(locked_slots)
 
   def testLockedSlotsAllocation(self):
     """Test that an allocation with an org locked does not crash.
     """
 
     locked_slots = {'melange': 3}
-    adjusted_slots = {}
-    self.allocater.allocate(locked_slots, adjusted_slots)
+    self.allocater.allocate(locked_slots)
 
-  def testAdjustedSlotsAllocation(self):
-    """Test that an allocation with an org adjusted does not crash.
-    """
-
-    locked_slots = {}
-    adjusted_slots = {'google': -1}
-    self.allocater.allocate(locked_slots, adjusted_slots)
-
-  def testInvalidSlotsAllocation(self):
-    """Test that an allocation with an org locked and adjusted errors out.
-    """
-
-    locked_slots = {'git': 1}
-    adjusted_slots = {'git': 1}
-    self.failUnlessRaises(allocations.Error, self.allocater.allocate,
-                          locked_slots, adjusted_slots)
-
-  def testNonExistantOrgAllocation1(self):
+  def testNonExistantOrgAllocation(self):
     """Test that locking a non-existing org errors out.
     """
 
     locked_slots = {'gnome': 1}
-    adjusted_slots = {}
     self.failUnlessRaises(allocations.Error, self.allocater.allocate,
-                          locked_slots, adjusted_slots)
-
-  def testNonExistantOrgAllocation2(self):
-    """Test that adjusting a non-existing org errors out.
-    """
-
-    locked_slots = {}
-    adjusted_slots = {'gnome': 1}
-    self.failUnlessRaises(allocations.Error, self.allocater.allocate,
-                          locked_slots, adjusted_slots)
+                          locked_slots)
 
   def testInitialAllocationBelowMaxSlots(self):
     """Test that the initial allocation is below the max slot count.
     """
 
     locked_slots = {}
-    adjusted_slots = {}
 
-    result = self.allocater.allocate(locked_slots, adjusted_slots)
+    result = self.allocater.allocate(locked_slots)
     self.failIf(sum(result.values()) > self.slots)
 
   def testLockedAllocationCorrect(self):
@@ -151,9 +122,8 @@ class AllocationsTest(unittest.TestCase):
     """
 
     locked_slots = {'git': 6}
-    adjusted_slots = {}
 
-    result = self.allocater.allocate(locked_slots, adjusted_slots)
+    result = self.allocater.allocate(locked_slots)
 
     expected = 6
     actual = result['git']
@@ -165,26 +135,10 @@ class AllocationsTest(unittest.TestCase):
     """
 
     locked_slots = {'git': 20}
-    adjusted_slots = {}
 
-    result = self.allocater.allocate(locked_slots, adjusted_slots)
+    result = self.allocater.allocate(locked_slots)
 
     expected = 6
     actual = result['git']
 
     self.failUnlessEqual(expected, actual)
-
-  def testAdjustedAllocationCorrect(self):
-    """Test that locking an allocation assigns the org the allocation.
-    """
-
-    locked_slots = {}
-    adjusted_slots = {'gcc': 10}
-
-    with_adjusting = self.allocater.allocate(locked_slots, adjusted_slots)
-    without_adjusting = self.allocater.allocate(locked_slots, {})
-
-    expected = without_adjusting['gcc'] + 10
-    actual = with_adjusting['gcc']
-
-    self.failIf(actual < expected, "%d < %d" % (actual, expected))

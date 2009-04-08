@@ -298,9 +298,9 @@ class View(presence.View):
 
     if request.method == 'POST' and 'result' in request.POST:
       result = request.POST['result']
+      submit = request.GET.get('submit')
 
       from_json = simplejson.loads(result)
-
       locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
 
     orgs = {}
@@ -311,6 +311,16 @@ class View(presence.View):
       orgs[org.link_id] = org
       applications[org.link_id] = org.nr_applications
       max[org.link_id] = min(org.nr_mentors, org.slots_desired)
+
+      if submit:
+        org_post = from_json[org.link_id]
+        org_slots = org_post['slots']
+        try:
+          org_slots = int(org_slots)
+        except ValueError:
+          continue
+        org.slots = org_slots
+        org.put()
 
     # TODO: Use configuration variables here
     max_slots_per_org = 50

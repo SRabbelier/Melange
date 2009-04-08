@@ -77,6 +77,8 @@ class View(role.View):
     new_params['group_logic'] = org_logic.logic
     new_params['group_view'] = org_view.view
     new_params['rights'] = rights
+    new_params['pickable'] = True
+    new_params['cache_pick_order'] = ['link_id', 'name']
 
     new_params['scope_view'] = org_view
 
@@ -228,4 +230,5 @@ process_request = decorators.view(view.processRequest)
 role_request = decorators.view(view.request)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
+pick = decorators.view(view.pick)
 

@@ -706,7 +706,8 @@ class View(object):
     order = []
     entities = fun(logic.getModel(), filter, order, logic)
 
-    data = [i.toDict() for i in entities]
+    key_order = params.get('cache_pick_order')
+    data = [i.toDict(key_order) for i in entities]
 
     return self.json(request, data)
 

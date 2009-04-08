@@ -331,6 +331,10 @@ def as_table_row_helper(context, item):
       if '__scoped__' in filter:
         args['scope_path'] = entity.key().name()
 
+      # TODO: replace this hack needed to get org-scoped mentor autocompletion on student proposals
+      if '__org__' in filter:
+        args['scope_path'] = entity.org.key().name()
+
       params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
 
     select_url = redirects.getSelectRedirect(params)

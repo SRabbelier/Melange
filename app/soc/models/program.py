@@ -85,6 +85,18 @@ class Program(soc.models.presence.Presence):
       'of Code</i>, but <b>1</b> is the tasks limit that the student can work '
       'on at the same time during <i>GHOP</i></tt>')
 
+  #: Optional field storing minimum slots per organization
+  min_slots = db.IntegerProperty(required=False, default=2,
+      verbose_name=ugettext('Min slots per org'))
+  min_slots.help_text = ugettext(
+      'The amount of slots each org should get at the very least')
+
+  #: Optional field storing maximum slots per organization
+  max_slots = db.IntegerProperty(required=False, default=50,
+      verbose_name=ugettext('Max slots per org'))
+  max_slots.help_text = ugettext(
+      'The amount of slots each organization should get at most')
+
   #: Required field storing slots limit of the program.
   slots = db.IntegerProperty(required=True,
       verbose_name=ugettext('Slots'))
@@ -94,6 +106,10 @@ class Program(soc.models.presence.Presence):
       'of Code</i>, which indicates how many students can be accepted '
       'to the program.<br>For <i>GHOP</i> this indicates how '
       'many tasks can be completed.</tt>')
+
+  #: Optional field storing the allocation of slots for this program
+  slots_allocation = db.TextProperty(required=False,
+      verbose_name=ugettext('the allocation of slots'))
 
   #: Required field storing the type of workflow this program has
   workflow = db.StringProperty(required=True,

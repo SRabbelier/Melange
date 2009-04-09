@@ -66,7 +66,7 @@ class AllocationsTest(unittest.TestCase):
     self.max_slots_per_org = 40
     self.min_slots_per_org = 2
     self.allocated = 0
-    self.iterative = False
+    self.algorithm = 1
 
     apps = {
         'asf': (20, 20),
@@ -83,7 +83,7 @@ class AllocationsTest(unittest.TestCase):
 
     self.allocater = allocations.Allocator(
         self.orgs, self.popularity, self.mentors, self.slots,
-        self.max_slots_per_org, self.min_slots_per_org, self.iterative)
+        self.max_slots_per_org, self.min_slots_per_org, self.algorithm)
 
   def testInitialAllocation(self):
     """Test that an allocation with no arguments does not crash.

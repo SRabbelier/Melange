@@ -47,16 +47,17 @@ class Allocator(object):
   # piece of code ;).
 
   def __init__(self, orgs, popularity, max, slots,
-               max_slots_per_org, min_slots_per_org, iterative):
+               max_slots_per_org, min_slots_per_org, algorithm):
     """Initializes the allocator.
 
     Args:
       orgs: a list of all the orgs that need to be allocated
       popularity: the amount of applications per org
-      mentors: the amount of assigned mentors per org
+      max: the amount of assigned mentors per org
       slots: the total amount of available slots
       max_slots_per_org: how many slots an org should get at most
       min_slots_per_org: how many slots an org should at least get
+      algorithm: the algorithm to use
     """
 
     self.locked_slots = {}
@@ -73,14 +74,13 @@ class Allocator(object):
     self.total_popularity = None
     self.initial_popularity = popularity
     self.max = max
-    self.iterative = iterative
+    self.algorithm = algorithm
 
   def allocate(self, locked_slots):
     """Allocates the slots and returns the result.
 
     Args:
       locked_slots: a dict with orgs and the number of slots they get
-      adjusted_slots: a dict with orgs and the number of extra slots they get
     """
 
     self.locked_slots = locked_slots
@@ -90,10 +90,10 @@ class Allocator(object):
     if not sum(self.popularity.values()) or not sum(self.max.values()):
       return dict([(i, 0) for i in self.orgs])
 
-    if self.iterative:
-      return self.iterativeAllocation()
-    else:
+    if self.algorithm == 1:
       return self.preprocessingAllocation()
+
+    return self.iterativeAllocation()
 
   def buildSets(self):
     """Allocates slots with the specified constraints.

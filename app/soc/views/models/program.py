@@ -303,6 +303,10 @@ class View(presence.View):
       from_json = simplejson.loads(result)
       locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
 
+      if submit:
+        program.slots_allocation = result
+        program.put()
+
     orgs = {}
     applications = {}
     max = {}
@@ -312,29 +316,19 @@ class View(presence.View):
       applications[org.link_id] = org.nr_applications
       max[org.link_id] = min(org.nr_mentors, org.slots_desired)
 
-      if submit:
-        org_post = from_json[org.link_id]
-        org_slots = org_post['slots']
-        try:
-          org_slots = int(org_slots)
-        except ValueError:
-          continue
-        org.slots = org_slots
-        org.put()
-
-    # TODO: Use configuration variables here
-    max_slots_per_org = 50
-    min_slots_per_org = 2
-    iterative = False
+    max_slots_per_org = program.max_slots
+    min_slots_per_org = program.min_slots
+    algorithm = 1
 
     allocator = allocations.Allocator(orgs.keys(), applications, max,
                                       program_slots, max_slots_per_org,
-                                      min_slots_per_org, iterative)
+                                      min_slots_per_org, algorithm)
 
     result = allocator.allocate(locked_slots)
 
     data = []
 
+    # TODO: remove adjustment here and in the JS
     for link_id, count in result.iteritems():
       org = orgs[link_id]
       data.append({

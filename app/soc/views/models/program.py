@@ -318,7 +318,7 @@ class View(presence.View):
 
     max_slots_per_org = program.max_slots
     min_slots_per_org = program.min_slots
-    algorithm = 1
+    algorithm = 2
 
     allocator = allocations.Allocator(orgs.keys(), applications, max,
                                       program_slots, max_slots_per_org,

@@ -93,6 +93,9 @@ class Allocator(object):
     if self.algorithm == 1:
       return self.preprocessingAllocation()
 
+    if self.algorithm == 2:
+      return self.reliableAlgorithm()
+
     return self.iterativeAllocation()
 
   def buildSets(self):
@@ -242,5 +245,73 @@ class Allocator(object):
 
       slots_left += slots - current
       allocations[org] = slots
+
+    return allocations
+
+  def reliableAlgorithm(self):
+    """An algorithm that reliable calculates the slots assignments.
+    """
+
+    adjusted_orgs = self.adjusted_orgs
+    adjusted_slots = self.adjusted_slots
+    locked_orgs = self.locked_orgs
+    locked_slots = self.locked_slots
+    unlocked_orgs = self.unlocked_orgs
+    total_popularity = self.total_popularity
+
+    available_slots = self.slots
+    allocations = {}
+    slack = {}
+
+    # take out the easy ones
+    for org in locked_orgs:
+      popularity = self.popularity[org]
+      slots = locked_slots[org]
+      slots = float(slots)
+      slots = self.rangeSlots(slots, org)
+
+      total_popularity -= popularity
+      available_slots -= slots
+      allocations[org] = slots
+      del self.popularity[org]
+
+    total_popularity = sum(self.popularity.values())
+
+    pop_per_slot = float(available_slots)/float(total_popularity)
+
+    slack = 0
+    wanted = {}
+
+    # filter out all those that deserve more than their maximum
+    for org in unlocked_orgs:
+      popularity = self.popularity[org]
+      raw_slots = float(popularity)*pop_per_slot
+      slots = int(math.floor(raw_slots))
+      slots = self.rangeSlots(slots, org)
+      max = self.max[org]
+
+      if max > slots:
+        wanted[org] = max - slots
+
+      allocations[org] = slots
+
+    available_slots = self.slots - sum(allocations.values())
+
+    # distribute the slack
+    while available_slots > 0 and (sum(wanted.values()) > 0):
+      for org, amount in wanted.iteritems():
+        available_slots = self.slots - sum(allocations.values())
+        if available_slots <= 0:
+          break
+
+        if wanted[org] <= 0:
+          continue
+
+        current = allocations[org]
+        slots = self.rangeSlots(current + 1, org)
+        extra = current - slots
+
+        wanted[org] += extra
+        allocations[org] = slots
 
     return allocations

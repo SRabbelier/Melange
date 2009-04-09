@@ -88,7 +88,7 @@ class Allocator(object):
     self.buildSets()
 
     if not sum(self.popularity.values()) or not sum(self.max.values()):
-      return self.popularity
+      return dict([(i, 0) for i in self.orgs])
 
     if self.iterative:
       return self.iterativeAllocation()

@@ -229,7 +229,6 @@ class View(base.View):
         dynaexclude=None, dynaproperties=dynaproperties)
     params['mentor_review_form'] = mentor_review_form
 
-    # TODO see if autocomplete can be used for mentor field
     dynafields = [
       {'name': 'rank',
          'base': forms.IntegerField,

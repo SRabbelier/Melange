@@ -32,6 +32,7 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import accounts
+from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
@@ -426,6 +427,7 @@ class View(group.View):
     submenus = []
 
     group_entity = role_description['group']
+    program_entity = group_entity.scope
     roles = role_description['roles']
 
     if roles.get('org_admin') or roles.get('mentor'):
@@ -436,6 +438,15 @@ class View(group.View):
 
 
     if roles.get('org_admin'):
+
+      # add a link to manage student projects after they have been announced
+      if timeline_helper.isAfterEvent(program_entity.timeline,
+                                     'accepted_students_announced_deadline'):
+        submenu = (redirects.getManageOverviewRedirect(group_entity,
+            {'url_name': 'student_project'}),
+            "Manage Student Projects", 'any_access')
+        submenus.append(submenu)
+
       # add a link to the management page
       submenu = (redirects.getListRolesRedirect(group_entity, params),
           "Manage Admins and Mentors", 'any_access')

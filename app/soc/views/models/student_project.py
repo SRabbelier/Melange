@@ -133,7 +133,6 @@ class View(base.View):
     new_params['edit_template'] = 'soc/student_project/edit.html'
 
     # TODO(ljvderijk) list all projects for one student
-    # TODO(ljvderijk) add manage item to org menu for admins
 
     params = dicts.merge(params, new_params)
 

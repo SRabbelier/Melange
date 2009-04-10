@@ -142,3 +142,18 @@ class AllocationsTest(unittest.TestCase):
     actual = result['git']
 
     self.failUnlessEqual(expected, actual)
+
+  def testAllOrgsLocked(self):
+    """Test that when all orgs are locked the correct result is given.
+    """
+
+    locked_slots = {
+        'asf': 20,
+        'gcc': 15,
+        'git': 6,
+        'google': 3,
+        'melange': 3,
+        }
+
+    result = self.allocater.allocate(locked_slots)
+    self.failUnlessEqual(locked_slots, result)

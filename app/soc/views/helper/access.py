@@ -1399,7 +1399,7 @@ class Checker(object):
 
   @allowDeveloper
   def checkStudentProjectHasStatus(self, django_args, allowed_status):
-    """Checks whether the Project has one of the given statusses.
+    """Checks whether the Project has one of the given statuses.
 
     Args:
       django_args: a dictionary with django's arguments

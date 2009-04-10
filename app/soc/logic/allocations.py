@@ -277,6 +277,10 @@ class Allocator(object):
 
     total_popularity = sum(self.popularity.values())
 
+    # all orgs have been locked, nothing to do
+    if total_popularity <= 0:
+      return allocations
+
     pop_per_slot = float(available_slots)/float(total_popularity)
 
     slack = 0

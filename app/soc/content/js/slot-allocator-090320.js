@@ -57,6 +57,11 @@ function submit() {
   $.postJSON(url, current_slots, updateFromJSON);
 }
 
+function load() {
+  url = RETURN_URL+"?load=1&_="+(new Date().getTime())
+  $.postJSON(url, current_slots, updateFromJSON);
+}
+
 function updateOverlay() {
   updateCurrentSlots();
   var remaining_slots = MAX_AVAILABLE_SLOTS - current_allocated_slots;

@@ -299,8 +299,14 @@ class View(presence.View):
     if request.method == 'POST' and 'result' in request.POST:
       result = request.POST['result']
       submit = request.GET.get('submit')
+      load = request.GET.get('load')
+      stored = program.slots_allocation
+
+      if load and stored:
+        result = stored
 
       from_json = simplejson.loads(result)
+
       locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
 
       if submit:

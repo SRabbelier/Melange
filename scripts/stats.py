@@ -153,7 +153,7 @@ def printPopularity(popularity):
     print "%s: %d" % item
 
 
-def savePopularity(popularities):
+def saveValues(values, saver):
   """Saves the specified popularities.
   """
 
@@ -162,12 +162,12 @@ def savePopularity(popularities):
 
   from soc.models.organization import Organization
 
-  def txn(key_name, popularity):
-    org = Organization.get_by_key_name(key_name)
-    org.nr_applications = popularity
+  def txn(key, value):
+    org = Organization.get_by_key_name(key)
+    saver(org, value)
     org.put()
 
-  for key, value in sorted(popularities.iteritems()):
+  for key, value in sorted(values.iteritems()):
     print key
     db.run_in_transaction_custom_retries(10, txn, key, value)
 
@@ -233,12 +233,19 @@ def main(args):
   from soc.models.mentor import Mentor
   from soc.models.org_admin import OrgAdmin
 
+  def slot_saver(org, value):
+    org.slots = value
+  def pop_saver(org, value):
+    org.nr_applications = value
+  def raw_saver(org, value):
+    org.slots_calculated = value
+
   context = {
       'load': loadPickle,
       'dump': dumpPickle,
       'orgStats': orgStats,
       'printPopularity': printPopularity,
-      'savePopularity': savePopularity,
+      'saveValues': saveValues,
       'getOrgs': getEntities(Organization),
       'getUsers': getEntities(User),
       'getStudents': getEntities(Student),
@@ -252,6 +259,9 @@ def main(args):
       'Student': Student,
       'Mentor': Mentor,
       'OrgAdmin': OrgAdmin,
+      'slot_saver': slot_saver,
+      'pop_saver': pop_saver,
+      'raw_saver': raw_saver,
   }
 
   interactive.remote(args, context)

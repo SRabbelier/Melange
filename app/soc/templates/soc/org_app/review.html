@@ -33,7 +33,7 @@ limitations under the License.
 {% endblock %}
 
 {% block buttons %}
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-accepted'" value="Pre-Accept"/>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.name }}?status=pre-rejected'" value="Pre-Reject"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.id_or_name }}?status=pre-accepted'" value="Pre-Accept"/>
+    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/review/{{ entity.key.id_or_name }}?status=pre-rejected'" value="Pre-Reject"/>
     {{ block.super }}
 {% endblock buttons %}

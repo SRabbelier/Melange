@@ -17,7 +17,7 @@ limitations under the License.
 {% block header_title %}
 {{ page_name }} for {{ entity.name }}
 {% if entity.home %}
-<a href="/{{ entity_type_url }}/home/{{ entity.key.name }}">(Home Page)</a>
+<a href="/{{ entity_type_url }}/home/{{ entity.key.id_or_name }}">(Home Page)</a>
 {% endif %}
 {% endblock %}
 

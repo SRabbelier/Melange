@@ -17,7 +17,7 @@ limitations under the License.
 {% block header_title %}
 {{ page_name }}
  {% if entity %}
-   <a href="/{{ entity_type_url|lower }}/show/{{ entity.key.name }}"
+   <a href="/{{ entity_type_url|lower }}/show/{{ entity.key.id_or_name }}"
 >{% if entity.name %}{{ entity.name }} {% endif %}(public view)</a>
  {% endif %}
 {% endblock %}

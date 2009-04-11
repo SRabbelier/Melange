@@ -108,14 +108,15 @@ class Linkable(base.ModelWithFieldAttributes):
   "leaf" entities (such as the Document in the example above) could
   be allowed. 
   """
-  #: Required field storing "ID" used in URL links. Lower ASCII characters,
+  #: Required field storing "ID" used in URL links. ASCII characters,
   #: digits and underscores only.  Valid link IDs successfully match
   #: the LINK_ID_REGEX.
   link_id = db.StringProperty(required=True,
       verbose_name=ugettext('Link ID'))
   link_id.help_text = ugettext(
       'Link ID is used as part of various URL links throughout the site.'
-      ' Lowercase ASCII characters, digits, and underscores only.'
+      ' <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> '
+      ' characters, digits, and underscores only.'
       ' The regexp used to validate is "%s".') % LINK_ID_PATTERN_CORE
 
   #: Optional Self Reference property to another Linkable entity which defines

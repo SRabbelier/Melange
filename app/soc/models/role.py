@@ -82,21 +82,23 @@ class Role(soc.models.linkable.Linkable):
 
   #: Required field storing the parts of the Role's name
   #: corresponding to the field names; displayed publicly.
-  #: given_name can only be lower ASCII, not UTF-8 text, because it is
+  #: given_name can only be ASCII, not UTF-8 text, because it is
   #: used, for example, as part of the shipping (mailing) address.
   given_name = db.StringProperty(required=True,
       verbose_name=ugettext('First (given) name'))
-  given_name.help_text = ugettext('lower ASCII characters only')
+  given_name.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   given_name.group = ugettext("1. Public Info")
 
   #: Required field storing the parts of the Role's name
   #: corresponding to the field names; displayed publicly.
-  #: Surname can only be lower ASCII, not UTF-8 text, because it is
+  #: Surname can only be ASCII, not UTF-8 text, because it is
   #: used, for example, as part of the shipping (mailing) address.
   surname = db.StringProperty(
       required=True,
       verbose_name=ugettext('Last (family) name'))
-  surname.help_text = ugettext('lower ASCII characters only')
+  surname.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   surname.group = ugettext("1. Public Info")
 
   #: Optional field used as a display name, such as for awards
@@ -179,30 +181,32 @@ class Role(soc.models.linkable.Linkable):
   #====================================================================
 
   #: Required field containing residence street address; kept private.
-  #: Residence street address can only be lower ASCII, not UTF-8 text, because
+  #: Residence street address can only be ASCII, not UTF-8 text, because
   #: it may be used as a shipping address.
   res_street = db.StringProperty(required=True,
       verbose_name=ugettext('Street address'))
   res_street.help_text = ugettext(
-      'street number and name, lower ASCII characters only')
+      'street number and name, '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   res_street.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address city; kept private.
-  #: Residence city can only be lower ASCII, not UTF-8 text, because it
+  #: Residence city can only be ASCII, not UTF-8 text, because it
   #: may be used as a shipping address.
   res_city = db.StringProperty(required=True,
       verbose_name=ugettext('City'))
-  res_city.help_text = ugettext('lower ASCII characters only')
+  res_city.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   res_city.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing residence address state or province; kept
-  #: private.  Residence state/province can only be lower ASCII, not UTF-8
+  #: private.  Residence state/province can only be ASCII, not UTF-8
   #: text, because it may be used as a shipping address.
   res_state = db.StringProperty(
       verbose_name=ugettext('State/Province'))
   res_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      'lower ASCII characters only')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   res_state.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address country or territory; kept
@@ -214,10 +218,11 @@ class Role(soc.models.linkable.Linkable):
 
   #: Required field containing residence address postal code (ZIP code in
   #: the United States); kept private.  Residence postal code can only be
-  #: lower ASCII, not UTF-8 text, because it may be used as a shipping address.
+  #: ASCII, not UTF-8 text, because it may be used as a shipping address.
   res_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext('ZIP/Postal Code'))
-  res_postalcode.help_text = ugettext('lower ASCII characters only')
+  res_postalcode.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   res_postalcode.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing a phone number that will be used to
@@ -241,32 +246,35 @@ class Role(soc.models.linkable.Linkable):
   #: Optional field containing a separate shipping street address; kept
   #: private.  If shipping address is not present in its entirety, the
   #: residence address will be used instead.  Shipping street address can only
-  #: be lower ASCII, not UTF-8 text, because, if supplied, it is used as a
+  #: be ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_street = db.StringProperty(
       verbose_name=ugettext('Shipping Street address'))
   ship_street.help_text = ugettext(
-      'street number and name, lower ASCII characters only, '
+      'street number and name, '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
       'fill in only if not same as above')
   ship_street.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address city; kept private.
-  #: Shipping city can only be lower ASCII, not UTF-8 text, because, if
+  #: Shipping city can only be ASCII, not UTF-8 text, because, if
   #: supplied, it is used as a shipping address.
   ship_city = db.StringProperty(
       verbose_name=ugettext('Shipping City'))
-  ship_city.help_text = ugettext('lower ASCII characters only'
-                                 'fill in only if not same as above')
+  ship_city.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
+      'fill in only if not same as above')
   ship_city.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address state or province; kept
-  #: private.  Shipping state/province can only be lower ASCII, not UTF-8
+  #: private.  Shipping state/province can only be ASCII, not UTF-8
   #: text, because, if supplied, it is used as a shipping address.
   ship_state = db.StringProperty(
       verbose_name=ugettext('Shipping State/Province'))
   ship_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      'lower ASCII characters only, fill in only if not same as above')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'fill in only if not same as above')
   ship_state.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address country or territory; kept
@@ -279,12 +287,13 @@ class Role(soc.models.linkable.Linkable):
 
   #: Optional field containing shipping address postal code (ZIP code in
   #: the United States); kept private.  Shipping postal code can only be
-  #: lower ASCII, not UTF-8 text, because, if supplied, it is used as a
+  #: ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_postalcode = db.StringProperty(
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
-  ship_postalcode.help_text = ugettext('lower ASCII characters only'
-                                       'fill in only if not same as above')
+  ship_postalcode.help_text = ugettext(
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
+      'fill in only if not same as above')
   ship_postalcode.group = ugettext("3. Shipping Info (Private and Optional)")
   
 

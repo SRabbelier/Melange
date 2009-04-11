@@ -161,7 +161,7 @@ class View(role.View):
   def listProjects(self, request, access_type,
                    page_name=None, params=None, **kwargs):
     """View that lists all of the current user's Student Projects for the
-       Program given as Scope.
+    Program given as Scope.
     """
 
     from soc.views.models import student_project as project_view

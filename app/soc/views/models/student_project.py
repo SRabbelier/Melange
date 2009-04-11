@@ -69,13 +69,13 @@ class View(base.View):
     rights['list'] = ['checkIsDeveloper']
     rights['manage'] = [('checkHasActiveRoleForScope',
                          org_admin_logic),
-        ('checkStudentProjectHasStatus', ['accepted', 'mid_term_passed'])]
+        ('checkStudentProjectHasStatus', [['accepted', 'mid_term_passed']])]
     rights['manage_overview'] = [('checkHasActiveRoleForScope',
                          org_admin_logic)]
     # TODO lack of better name here!
     rights['st_edit'] = ['checkIsMyStudentProject',
-        ('checkStudentProjectHasStatus', 
-            ['accepted', 'mid_term_passed', 'passed'])
+        ('checkStudentProjectHasStatus',
+            [['accepted', 'mid_term_passed', 'passed']])
         ]
 
     new_params = {}

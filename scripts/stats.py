@@ -233,11 +233,11 @@ def main(args):
   from soc.models.mentor import Mentor
   from soc.models.org_admin import OrgAdmin
 
-  def slot_saver(org, value):
+  def slotSaver(org, value):
     org.slots = value
-  def pop_saver(org, value):
+  def popSaver(org, value):
     org.nr_applications = value
-  def raw_saver(org, value):
+  def rawSaver(org, value):
     org.slots_calculated = value
 
   context = {
@@ -259,9 +259,9 @@ def main(args):
       'Student': Student,
       'Mentor': Mentor,
       'OrgAdmin': OrgAdmin,
-      'slot_saver': slot_saver,
-      'pop_saver': pop_saver,
-      'raw_saver': raw_saver,
+      'slotSaver': slotSaver,
+      'popSaver': popSaver,
+      'rawSaver': rawSaver,
   }
 
   interactive.remote(args, context)
@@ -272,4 +272,3 @@ if __name__ == '__main__':
     sys.exit(1)
 
   main(sys.argv[1:])
-

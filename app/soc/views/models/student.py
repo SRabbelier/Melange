@@ -30,6 +30,7 @@ from soc.logic import dicts
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -66,6 +67,8 @@ class View(role.View):
         ]
     rights['manage'] = [
         ('checkIsAllowedToManageRole', [soc.logic.models.host.logic])]
+    rights['list_projects'] = [
+        ('checkHasActiveRoleForScope', student_logic.logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student.logic
@@ -84,7 +87,11 @@ class View(role.View):
     # add apply pattern
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         'soc.views.models.%(module_name)s.apply',
-        'Become a %(name)s'),]
+        'Become a %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>list_projects)/%(scope)s$',
+        'soc.views.models.%(module_name)s.list_projects',
+        'List of my Student Projects'),]
+
     new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school']
@@ -149,6 +156,38 @@ class View(role.View):
     return self.create(request, access_type='unspecified', page_name=page_name,
         params=params, link_id=user_entity.link_id, **kwargs)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def listProjects(self, request, access_type,
+           page_name=None, params=None, **kwargs):
+    """View that lists all of the current user's Student Projects for the
+        Program given as Scope.
+    """
+
+    from soc.views.models import student_project as project_view
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    fields = {'link_id': user_entity.link_id,
+        'scope_path': kwargs['scope_path']}
+
+    try:
+      student_entity = student_logic.logic.getFromKeyFieldsOr404(fields)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # set the fields we need for the Student Project list
+    fields = {'student': student_entity}
+
+    list_params = project_view.view.getParams().copy()
+    list_params['list_description'] = ugettext(
+        'List of my Student Projects for %s') %(student_entity.scope.name)
+    list_params['list_action'] = (redirects.getStudentEditRedirect, list_params)
+
+    return project_view.view.list(request, access_type, page_name=page_name,
+                                  params=list_params, filter=fields)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
@@ -212,6 +251,7 @@ create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
+list_projects = decorators.view(view.listProjects)
 manage = decorators.view(view.manage)
 public = decorators.view(view.public)
 export = decorators.view(view.export)

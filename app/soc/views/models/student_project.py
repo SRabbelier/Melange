@@ -132,8 +132,6 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/student_project/edit.html'
 
-    # TODO(ljvderijk) list all projects for one student
-
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

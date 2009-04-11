@@ -144,7 +144,7 @@ class View(base.View):
 
     form.fields['created_by'].initial = entity.author.name
     form.fields['last_modified_by'].initial = entity.modified_by.name
-    form.fields['doc_key_name'].initial = entity.key().name()
+    form.fields['doc_key_name'].initial = entity.key().id_or_name()
 
     super(View, self)._editGet(request, entity, form)
 
@@ -160,7 +160,7 @@ class View(base.View):
 
     filter = {
         'prefix' : params['url_name'],
-        'scope_path': entity.key().name(),
+        'scope_path': entity.key().id_or_name(),
         'is_featured': True,
         }
 

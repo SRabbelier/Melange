@@ -417,7 +417,7 @@ class View(presence.View):
       roles = role_logic.getForFields(fields)
 
       for role in roles:
-        group_key_name = role.scope.key().name()
+        group_key_name = role.scope.key().id_or_name()
         existing_role_descriptions = role_descriptions.get(group_key_name)
 
         if existing_role_descriptions:

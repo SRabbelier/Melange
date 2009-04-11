@@ -397,7 +397,7 @@ class View(base.View):
       # create the fields that should be in the ReviewFollower entity
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
-                'scope_path': entity.key().name(),
+                'scope_path': entity.key().id_or_name(),
                 'user': user_entity
                }
       # get the keyname for the ReviewFollower entity
@@ -548,7 +548,7 @@ class View(base.View):
     list_params['list_description'] = ('List of %(name_plural)s you can send '
         'your proposal to.') % list_params
     list_params['list_action'] = (redirects.getStudentProposalRedirect,
-        {'student_key': student_entity.key().name(),
+        {'student_key': student_entity.key().id_or_name(),
             'url_name': params['url_name']})
 
     return self.list(request, access_type=access_type, page_name=page_name,
@@ -795,7 +795,7 @@ class View(base.View):
       # create the fields that should be in the ReviewFollower entity
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
-                'scope_path': entity.key().name(),
+                'scope_path': entity.key().id_or_name(),
                 'user': user_entity
                }
       # get the keyname for the ReviewFollower entity
@@ -895,8 +895,8 @@ class View(base.View):
       mentor_names = []
 
       for mentor_key in possible_mentors:
-        possible_mentor = mentor_logic.logic.getFromKeyName(mentor_key.name())
-        mentor_names.append(possible_mentor.name())
+        possible_mentor = mentor_logic.logic.getFromKeyName(mentor_key.id_or_name())
+        mentor_names.append(possible_mentor.id_or_name())
 
       context['possible_mentors'] = ', '.join(mentor_names)
 
@@ -1015,7 +1015,7 @@ class View(base.View):
     # create the fields for the review entity
     fields = {'link_id': 't%i' % (int(time.time()*100)),
         'scope': entity,
-        'scope_path': entity.key().name(),
+        'scope_path': entity.key().id_or_name(),
         'author': user_logic.logic.getForCurrentAccount(),
         'content': comment,
         'is_public': is_public,

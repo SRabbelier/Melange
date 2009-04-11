@@ -490,7 +490,7 @@ def seed_mentor(request, i):
       'key_name': 'google/gsoc2009/org_%d/mentor' % i,
       'link_id': 'mentor',
       'scope': org,
-      'scope_path': org.key().name(),
+      'scope_path': org.key().id_or_name(),
       'user': current_user,
       'given_name': 'Mentor',
       'surname': 'Man',
@@ -526,8 +526,8 @@ def seed_student_proposal(request, i):
   all_properties = []
 
   for i in range(random.randint(5, 20)):
-    link_id = 'proposal_%s_%d' % (org.key().name(), i)
-    scope_path = current_user.key().name()
+    link_id = 'proposal_%s_%d' % (org.key().id_or_name(), i)
+    scope_path = current_user.key().id_or_name()
 
     properties = {
         'link_id': link_id,

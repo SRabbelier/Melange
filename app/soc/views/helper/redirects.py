@@ -31,7 +31,7 @@ def getApplyRedirect(entity, params):
   """
 
   result ='/%s/apply/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -40,7 +40,7 @@ def getInviteRedirect(entity, params):
   """
 
   result ='/%s/invite/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -50,7 +50,7 @@ def getCreateRedirect(entity, params):
   """
 
   result ='/%s/create/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -60,7 +60,7 @@ def getEditRedirect(entity, params):
   """
 
   return '/%s/edit/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getPublicRedirect(entity, params):
@@ -68,7 +68,7 @@ def getPublicRedirect(entity, params):
   """
 
   return '/%s/show/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getAdminRedirect(entity, params):
@@ -76,7 +76,7 @@ def getAdminRedirect(entity, params):
   """
 
   return '/%s/admin/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getListRedirect(entity, params):
@@ -84,7 +84,7 @@ def getListRedirect(entity, params):
   """
 
   return '/%s/list/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getPublicListRedirect(entity, params):
@@ -92,7 +92,7 @@ def getPublicListRedirect(entity, params):
   """
 
   return '/%s/list_public/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getExportRedirect(entity, params):
@@ -100,7 +100,7 @@ def getExportRedirect(entity, params):
   """
 
   return '/%s/export/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getHomeRedirect(entity, params):
@@ -108,14 +108,14 @@ def getHomeRedirect(entity, params):
   """
 
   return '/%s/home/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 def getReviewRedirect(entity, params):
   """Returns the redirect to review the specified entity.
   """
   
   return '/%s/review/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 def getReviewOverviewRedirect(entity, params):
   """Returns the redirect to the review_overview using the 
@@ -123,14 +123,14 @@ def getReviewOverviewRedirect(entity, params):
   """
 
   return '/%s/review_overview/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 def getCreateRequestRedirect(entity, params):
   """Returns the create request redirect for the specified entity.
   """
 
   result ='/request/create/%s/%s/%s' % (
-      params['group_scope'], params['url_name'], entity.key().name())
+      params['group_scope'], params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -140,7 +140,7 @@ def getRequestRedirectForRole(entity, role_name):
   """
 
   result ='/%s/request/%s' % (
-      role_name, entity.key().name())
+      role_name, entity.key().id_or_name())
 
   return result
 
@@ -150,7 +150,7 @@ def getInviteRedirectForRole(entity, role_name):
   """
 
   result ='/%s/invite/%s' % (
-      role_name, entity.key().name())
+      role_name, entity.key().id_or_name())
 
   return result
 
@@ -161,7 +161,7 @@ def getListProposalsRedirect(entity, params):
   """
 
   result = '/%s/list_proposals/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -171,7 +171,7 @@ def getAcceptedOrgsRedirect(entity, params):
   """
 
   result = '/%s/accepted_orgs/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -192,7 +192,7 @@ def getListRequestsRedirect(entity, params):
   """
 
   result = '/%s/list_requests/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -202,7 +202,7 @@ def getListSelfRedirect(entity, params):
   """
 
   result = '/%s/list_self/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -213,7 +213,7 @@ def getListRolesRedirect(entity, params):
   """
 
   result = '/%s/list_roles/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -240,7 +240,7 @@ def getManageRedirect(entity, params):
   """
 
   result = '/%s/manage/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -250,7 +250,7 @@ def getManageOverviewRedirect(entity, params):
   """
 
   result = '/%s/manage_overview/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -286,7 +286,7 @@ def getApplicantRedirect(entity, params):
   """
 
   return '/%s/applicant/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getStudentEditRedirect(entity, params):
@@ -320,7 +320,7 @@ def getSlotsRedirect(entity, params):
   """
 
   return'/%s/slots/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getAssignSlotsRedirect(entity, params):
@@ -328,21 +328,21 @@ def getAssignSlotsRedirect(entity, params):
   """
 
   return'/%s/assign_slots/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getCreateDocumentRedirect(entity, prefix):
   """Returns the redirect for new documents.
   """
 
-  return '/document/create/%s/%s' % (prefix, entity.key().name())
+  return '/document/create/%s/%s' % (prefix, entity.key().id_or_name())
 
 
 def getListDocumentsRedirect(entity, prefix):
   """Returns the redirect for listing documents.
   """
 
-  return '/document/list/%s/%s' % (prefix, entity.key().name())
+  return '/document/list/%s/%s' % (prefix, entity.key().id_or_name())
 
 
 def getToSRedirect(presence):

@@ -61,7 +61,7 @@ class Logic(base.Logic):
 
     fields = {'link_id': name,
         'scope': scope,
-        'scope_path': scope.key().name(),
+        'scope_path': scope.key().id_or_name(),
         'root': ranker.rootkey}
 
     key_name = self.getKeyNameFromFields(fields)

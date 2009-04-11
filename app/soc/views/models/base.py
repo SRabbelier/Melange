@@ -433,7 +433,7 @@ class View(object):
       edit_form: The edit_form is used as form if there is an existing
         entity. The existing entity is passed as instance to it on
         construction. If key_name is part of it's fields it will be
-        set to the entity's key().name() value. It is also passed as
+        set to the entity's key().id_or_name() value. It is also passed as
         argument to the _editGet method. See the docstring for
         _editGet on how it uses it.
       create_form: The create_form is used as form if there was no
@@ -474,7 +474,7 @@ class View(object):
       form = params['edit_form'](instance=entity)
 
       if 'key_name' in form.fields:
-        form.fields['key_name'].initial = entity.key().name()
+        form.fields['key_name'].initial = entity.key().id_or_name()
 
       self._editGet(request, entity, form)
     else:
@@ -613,7 +613,7 @@ class View(object):
 
     if not logic.isDeletable(entity):
       page_params = params['cannot_delete_params']
-      params['suffix'] = entity.key().name()
+      params['suffix'] = entity.key().id_or_name()
       request.path = params['edit_redirect'] % params
 
       # redirect to the edit page

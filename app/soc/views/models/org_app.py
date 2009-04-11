@@ -305,7 +305,7 @@ class View(group_app.View):
         'application_type' : params['name_plural'],
         'applications': org_apps,
         'link' : '/%s/review/%s/(link_id)?status=%s' %(
-            params['url_name'] ,program_entity.key().name(), to_status),
+            params['url_name'] ,program_entity.key().id_or_name(), to_status),
         }
 
     json = simplejson.dumps(to_json)

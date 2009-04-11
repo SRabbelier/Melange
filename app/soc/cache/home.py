@@ -35,7 +35,7 @@ def key(entity):
   """Returns the memcache key for the user's sidebar.
   """
 
-  return 'homepage_for_%s_%s' % (entity.kind(), entity.key().name())
+  return 'homepage_for_%s_%s' % (entity.kind(), entity.key().id_or_name())
 
 
 def get(self, *args, **kwargs):

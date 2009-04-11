@@ -816,7 +816,7 @@ class Checker(object):
     for _ in range(depth):
       entity = entity.scope
 
-    django_args['scope_path'] = entity.key().name()
+    django_args['scope_path'] = entity.key().id_or_name()
 
     self.checkHasActiveRoleForScope(django_args, logic)
 
@@ -1435,7 +1435,7 @@ class Checker(object):
 
     fields = {
         'link_id': django_args['link_id'],
-        field_name: self.user if user else self.user.key().name()
+        field_name: self.user if user else self.user.key().id_or_name()
         }
 
     if 'scope_path' in django_args:

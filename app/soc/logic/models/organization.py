@@ -73,7 +73,7 @@ class Logic(group.Logic):
       # only if there is an application send out the invites
       properties = {
           'scope': entity,
-          'scope_path': entity.key().name(),
+          'scope_path': entity.key().id_or_name(),
           'role': 'org_admin',
           'role_verbose': 'Organization Admin',
           'status': 'group_accepted',

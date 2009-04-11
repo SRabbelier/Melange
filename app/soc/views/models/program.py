@@ -408,7 +408,7 @@ class View(presence.View):
       # store result in the datastore
       fields = {'link_id': program_entity.link_id,
                 'scope': program_entity,
-                'scope_path': program_entity.key().name(),
+                'scope_path': program_entity.key().id_or_name(),
                 'json_representation' : request.POST['result']
                 }
       key_name = duplicates_logic.getKeyNameFromFields(fields)
@@ -432,7 +432,7 @@ class View(presence.View):
 
     to_json = {
         'nr_of_orgs': query.count(),
-        'program_key': program_entity.key().name()}
+        'program_key': program_entity.key().id_or_name()}
     json = simplejson.dumps(to_json)
     context['info'] = json
     context['offset_length'] = 10
@@ -520,7 +520,7 @@ class View(presence.View):
         continue
 
       # store information about the org
-      orgs_data[org.key().name()] = org_data
+      orgs_data[org.key().id_or_name()] = org_data
 
       fields = {'org': org,
                 'mentor !=': None,
@@ -536,12 +536,12 @@ class View(presence.View):
         student_entity = proposal.scope
 
         proposals_data.append(
-            {'key_name': proposal.key().name(),
+            {'key_name': proposal.key().id_or_name(),
             'proposal_title': proposal.title,
-            'student_key': student_entity.key().name(),
+            'student_key': student_entity.key().id_or_name(),
             'student_name': student_entity.name(),
             'student_contact': student_entity.email,
-            'org_key': org.key().name()
+            'org_key': org.key().id_or_name()
             })
 
     # return all the data in JSON format
@@ -710,7 +710,7 @@ class View(presence.View):
     if user and not (student_entity or mentor_entity or org_admin_entity):
       if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
         # this user does not have a role yet for this program
-        items += [('/student/apply/%s' % (program_entity.key().name()),
+        items += [('/student/apply/%s' % (program_entity.key().id_or_name()),
             "Register as a Student", 'any_access')]
 
     deadline = 'accepted_organization_announced_deadline'
@@ -722,7 +722,7 @@ class View(presence.View):
 
       if not student_entity:
         # add apply to become a mentor link
-        items += [('/org/apply_mentor/%s' % (program_entity.key().name()),
+        items += [('/org/apply_mentor/%s' % (program_entity.key().id_or_name()),
          "Apply to become a Mentor", 'any_access')]
 
     return items
@@ -738,7 +738,7 @@ class View(presence.View):
 
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
       items += [('/student_proposal/list_orgs/%s' % (
-          student_entity.key().name()),
+          student_entity.key().id_or_name()),
           "Submit your Student Proposal", 'any_access')]
 
     if timeline_helper.isAfterEvent(timeline_entity, 'student_signup_start'):

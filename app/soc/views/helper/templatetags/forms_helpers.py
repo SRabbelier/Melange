@@ -329,11 +329,11 @@ def as_table_row_helper(context, item):
         args[filter_field] = getattr(entity, filter_field)
 
       if '__scoped__' in filter:
-        args['scope_path'] = entity.key().name()
+        args['scope_path'] = entity.key().id_or_name()
 
       # TODO: replace this hack needed to get org-scoped mentor autocompletion on student proposals
       if '__org__' in filter:
-        args['scope_path'] = entity.org.key().name()
+        args['scope_path'] = entity.org.key().id_or_name()
 
       params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
 

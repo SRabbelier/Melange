@@ -69,7 +69,7 @@ class Logic(base.Logic):
     """
 
     ranker = self.getRankerFor(entity)
-    ranker.SetScore(entity.key().name(), [entity.score])
+    ranker.SetScore(entity.key().id_or_name(), [entity.score])
 
     super(Logic, self)._onCreate(entity)
 
@@ -91,7 +91,7 @@ class Logic(base.Logic):
 
       # update the ranker
       ranker = self.getRankerFor(entity)
-      ranker.SetScore(entity.key().name(), [value])
+      ranker.SetScore(entity.key().id_or_name(), [value])
 
     if name == 'status':
 
@@ -101,7 +101,7 @@ class Logic(base.Logic):
         ranker = self.getRankerFor(entity)
 
         # entries in the ranker can be removed by setting the score to None
-        ranker.SetScore(entity.key().name(), None)
+        ranker.SetScore(entity.key().id_or_name(), None)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 
@@ -116,7 +116,7 @@ class Logic(base.Logic):
 
     # entries in the ranker can be removed by setting the score to None
     ranker = self.getRankerFor(entity)
-    ranker.SetScore(entity.key().name(), None)
+    ranker.SetScore(entity.key().id_or_name(), None)
 
     # get all the ReviewFollwers that have this entity as it's scope
     fields = {'scope': entity}

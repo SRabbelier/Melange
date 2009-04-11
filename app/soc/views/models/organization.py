@@ -438,7 +438,6 @@ class View(group.View):
 
 
     if roles.get('org_admin'):
-
       # add a link to manage student projects after they have been announced
       if timeline_helper.isAfterEvent(program_entity.timeline,
                                      'accepted_students_announced_deadline'):

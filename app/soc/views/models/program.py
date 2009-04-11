@@ -626,10 +626,13 @@ class View(presence.View):
             "Review Organization Applications", 'any_access')]
         # add link to edit Program Profile
         items += [(redirects.getEditRedirect(entity, params),
-            'Edit Program Profile','any_access')]
+            'Edit Program Profile', 'any_access')]
         # add link to Assign Slots
         items += [(redirects.getAssignSlotsRedirect(entity, params),
-            'Assign Slots','any_access')]
+            'Assign Slots', 'any_access')]
+        # add link to Show Duplicate project assignments
+        items += [(redirects.getShowDuplicatesRedirect(entity, params),
+            'Show Duplicate Project Assignments', 'any_access')]
         # add link to edit Program Timeline
         items += [(redirects.getEditRedirect(entity, {'url_name': 'timeline'}),
             "Edit Program Timeline", 'any_access')]
@@ -741,11 +744,18 @@ class View(presence.View):
     if timeline_helper.isAfterEvent(timeline_entity, 'student_signup_start'):
       items += [(redirects.getListSelfRedirect(student_entity,
           {'url_name':'student_proposal'}),
-         "List my Student Proposals", 'any_access')]
+          "List my Student Proposals", 'any_access')]
 
     items += [(redirects.getEditRedirect(student_entity, 
-                                         {'url_name': 'student'}),
-              "Edit my Student Profile", 'any_access')]
+        {'url_name': 'student'}),
+        "Edit my Student Profile", 'any_access')]
+
+    if timeline_helper.isAfterEvent(timeline_entity,
+                                   'accepted_students_announced_deadline'):
+      # add a link to show all projects
+      items += [(redirects.getListProjectsRedirect(program_entity,
+          {'url_name':'student'}),
+          "List my Student Projects", 'any_access')]
 
     return items
 

@@ -693,7 +693,8 @@ class View(base.View):
         # get the score at the requested rank
         score_at_rank = score_and_rank[0][0]
         # calculate the score that should be given to end up at the given rank
-        given_score = score_at_rank - entity.score
+        # give +1 to make sure that in the case of a tie they end up top
+        given_score = score_at_rank - entity.score + 1
     else:
       # might be None (if Host or Developer is commenting)
       reviewer = mentor

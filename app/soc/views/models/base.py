@@ -376,7 +376,7 @@ class View(object):
         edit_form, only it is used when there is no existing entity.
       edit_redirect: The edit_redirect value is used as the first part
         of the url if the form was valid. The last part of the url is
-        created using the getKeySuffix method of the _logic object.
+        created using the .key().id_or_name() method of the entity.
       edit_params: The edit_params dictionary is used as argument to
         redirectToChangedSuffix, it will be appended to the url in the
         standard ?key=value format.
@@ -411,7 +411,7 @@ class View(object):
       return http.HttpResponseRedirect('/')
 
     page_params = params['edit_params']
-    params['suffix'] = logic.getKeySuffix(entity)
+    params['suffix'] = entity.key().id_or_name()
 
     request.path = params['edit_redirect'] % params
 
@@ -453,7 +453,7 @@ class View(object):
     """
 
     logic = params['logic']
-    suffix = logic.getKeySuffix(entity)
+    suffix = entity.key().id_or_name()
 
     # remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.
@@ -891,7 +891,7 @@ class View(object):
     """
 
     logic = params['logic']
-    suffix = logic.getKeySuffix(entity)
+    suffix = entity.key().id_or_name()
 
     context['form'] = form
     context['entity'] = entity

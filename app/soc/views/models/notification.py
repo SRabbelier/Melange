@@ -195,7 +195,7 @@ class View(base.View):
         self._logic.updateEntityProperties(entity, {'unread' : False} )
 
     context['entity_type_url'] = self._params['url_name']
-    context['entity_suffix'] = self._logic.getKeySuffix(entity)
+    context['entity_suffix'] = entity.key().id_or_name()
 
     return True
 

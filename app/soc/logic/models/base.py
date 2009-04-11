@@ -176,21 +176,6 @@ class Logic(object):
 
     return ['scope_path', 'link_id']
 
-  def getKeySuffix(self, entity):
-    """Returns a suffix for the specified entity or None if no entity specified.
-
-    Args:
-      entity: the entity for which to get the suffix
-    """
-
-    if not entity:
-      return None
-
-    key_values = self.getKeyValuesFromEntity(entity)
-    suffix = '/'.join(key_values)
-
-    return suffix
-
   def getKeyFieldsFromFields(self, dictionary):
     """Does any required massaging and filtering of dictionary.
 

@@ -176,6 +176,16 @@ def getAcceptedOrgsRedirect(entity, params):
   return result
 
 
+def getListProjectsRedirect(entity, params):
+  """Returns the redirect for the List Projects page for the given entity.
+  """
+
+  result = '/%s/list_projects/%s' % (
+      params['url_name'], entity.key().name())
+
+  return result
+
+
 def getListRequestsRedirect(entity, params):
   """Returns the redirect for the List Requests paged for the given
   Group entity and Group View params.
@@ -279,6 +289,14 @@ def getApplicantRedirect(entity, params):
       params['url_name'], entity.key().name())
 
 
+def getStudentEditRedirect(entity, params):
+  """Returns the redirect for Students to edit their Projects.
+  """
+
+  return '/%s/st_edit/%s' % (
+      params['url_name'], entity.key().name())
+
+
 def getStudentProposalRedirect(entity, params):
   """Returns the student proposal redirect for the given org and student.
   """
@@ -287,6 +305,14 @@ def getStudentProposalRedirect(entity, params):
       params['url_name'], params['student_key'], entity.link_id)
 
   return result
+
+
+def getShowDuplicatesRedirect(entity, params):
+  """Returns the show duplicates redirect for the specified entity.
+  """
+
+  return'/%s/show_duplicates/%s' % (
+      params['url_name'], entity.key().name())
 
 
 def getSlotsRedirect(entity, params):

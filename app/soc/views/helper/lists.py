@@ -22,6 +22,7 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+import logging
 
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
@@ -58,19 +59,32 @@ def getPreferredListPagination(user=None):
   return DEF_DEFAULT_PAGINATION
 
 
-def getLimitAndOffset(request, offset_key, limit_key):
-  """Retrieves, converts and validates offset and limit values
+OFFSET_KEY = 'offset_%d'
+LIMIT_KEY = 'limit_%d'
+
+
+def makeOffsetKey(limit_idx):
+  return OFFSET_KEY % limit_idx
+
+
+def makeLimitKey(limit_idx):
+  return LIMIT_KEY % limit_idx
+
+
+def getListParameters(request, list_index):
+  """Retrieves, converts and validates values for one list
 
   Args:
-    offset: offset in list which defines first item to return
-    limit: max amount of items per page
+    list_index, int: which list to get the values for.
+      (there may be multiple lists on one page, which are multiplexed
+       by an integer.)
 
   Returns:
-    updated offset and limit values
+    a dictionary of str -> str.  field name -> field value.
   """
 
-  offset = request.GET.get(offset_key)
-  limit = request.GET.get(limit_key)
+  offset = request.GET.get(makeOffsetKey(list_index))
+  limit = request.GET.get(makeLimitKey(list_index))
 
   if offset is None:
     offset = ''
@@ -96,7 +110,7 @@ def getLimitAndOffset(request, offset_key, limit_key):
   else:
     limit = min(DEF_MAX_PAGINATION, limit)
 
-  return limit, offset
+  return dict(limit=limit, offset=offset)
 
 
 def generateLinkFromGetArgs(request, offset_and_limits):
@@ -109,11 +123,24 @@ def generateLinkFromGetArgs(request, offset_and_limits):
   return request.path + link_suffix
 
 
+def generateLinkForRequest(request, base_params, updated_params):
+  """Create a link to the same page as request but with different params
+
+  Params:
+    request: the request for the page
+    base_params: the base parameters
+    updated_params: the parameters to update
+  """
+  params = base_params.copy()
+  params.update(updated_params)
+  return generateLinkFromGetArgs(request, params)
+
+
 def getListContent(request, params, filter=None, order=None,
                    idx=0, need_content=False):
   """Returns a dict with fields used for rendering lists.
 
-  TODO(dbentley): we need better terminology. List in this context can have
+  TODO(dbentley): we need better terminology. List, in this context, can have
     one of two meanings.
     Meaning 1:  the underlying list, which may be very large.
     Meaning 2:  the returned list, which is at most 'limit' items.
@@ -140,17 +167,19 @@ def getListContent(request, params, filter=None, order=None,
       'prev': url to previous page
       'next': url to next page
       'first': offset of the first item in the list
-      'last': offest of the last item in the list
+      'last': offset of the last item in the list
     }
   """
-
+  # TODO(dbentley): this appears to be unnecessary indirection,
+  # as we only use this logic for getForFields, which is never overridden
   logic = params['logic']
 
-  offset_key = 'offset_%d' % idx
-  limit_key = 'limit_%d' % idx
+  limit_key, offset_key = makeLimitKey(idx), makeOffsetKey(idx)
 
-  limit, offset = getLimitAndOffset(request, offset_key, limit_key)
-  pagination_form = makePaginationForm(request, limit, limit_key)
+  list_params = getListParameters(request, idx)
+  limit, offset = list_params['limit'], list_params['offset']
+  pagination_form = makePaginationForm(request, list_params['limit'],
+                                       limit_key)
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
@@ -170,29 +199,29 @@ def getListContent(request, params, filter=None, order=None,
                      i[0].startswith('offset_') or i[0].startswith('limit_'))
 
   if params.get('list_key_order'):
-    export_link_params = dict(base_params)
-    export_link_params['export'] = idx
-    export_link = generateLinkFromGetArgs(request, export_link_params)
+    export_link = generateLinkForRequest(request, base_params, {'export' : idx})
 
   if more:
     # TODO(dbentley): here we need to implement a new field "last_key"
-    next_params = dict(base_params)
-    next_params[offset_key] = offset+limit
-    next_params[limit_key] = limit
-    next = generateLinkFromGetArgs(request, next_params)
+    next = generateLinkForRequest(request, base_params, {offset_key : offset+limit,
+                                                         limit_key : limit})
 
   if offset > 0:
     # TODO(dbentley): here we need to implement previous in the good way.
-    prev_params = dict(base_params)
-    prev_params[offset_key] = max(0, offset-limit)
-    prev_params[limit_key] = limit
-    prev = generateLinkFromGetArgs(request, prev_params)
+    prev = generateLinkForRequest(request, base_params,
+                                  { offset_key : max(0, offset-limit),
+                                    limit_key : limit })
 
   if offset > limit:
-    newest_params = dict(base_params)
-    del newest_params[offset_key]
-    newest_params[limit_key] = limit
-    newest = generateLinkFromGetArgs(request, newest_params)
+    # Having a link to the first doesn't make sense on the first page (we're on
+    # it).  It also doesn't make sense on the second page (because the first
+    # page is the previous page).
+
+    # NOTE(dbentley): I personally disagree that it's simpler to do that way,
+    # because sometimes you want to go to the first page without having to
+    # consider what page you're on now.
+    newest = generateLinkForGetArgs(request, base_params, {offset_key : 0,
+                                                           limit_key : limit})
 
   content = {
       'idx': idx,

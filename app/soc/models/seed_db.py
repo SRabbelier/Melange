@@ -55,7 +55,7 @@ from soc.models.user import User
 class Error(Exception):
   """Base class for all exceptions raised by this module.
   """
-  
+
   pass
 
 
@@ -81,18 +81,8 @@ def ensureUser():
   return account, current_user
 
 
-def determine_index_of_seeded_entity(entity):
-  """Determines the index of a seeded_entity.
-
-  Because we seed entities in a predictable manner, we can look at an entity
-    and determine which one it is.  This works iff entities are seeded with
-    link_id's of the form: foo_%04d (where 4 is at least the number of digits
-    of the index of the highest-seeded entity).
-  """
-
-
 def seed_and_put_example_user(i):
-  """Creates and Persists an example user identified by i.
+  """Creates and persists an example user identified by i.
 
   Args:
     i, int: the index of this example user.
@@ -558,8 +548,9 @@ def new_seed_many(request, *args, **kwargs):
   """Seeds many instances of the specified type.
 
   Takes as URL parameters:
-  seed_type: the type of entity to seed; should be a key in SEEDABLE_MODEL_TYPES
-  goal: the total number of entities desired
+    seed_type: the type of entity to seed; should be a key in
+               SEEDABLE_MODEL_TYPES
+    goal: the total number of entities desired
 
   This differs from seed_many. Instead of having to specify many parameters
     that are the state of an in-flight process, simply say how many you want
@@ -607,7 +598,8 @@ def new_seed_many(request, *args, **kwargs):
   logging.info("To insert: %d to %d" % (start_index, goal))
   seeded_entities = 0
   for i in xrange(start_index, goal):
-    logging.info("Inserting: %d of %d" % (i+1, goal))
+    if i % 20 == 0:
+      logging.info("Inserting: %d of %d" % (i+1, goal))
     seed_func(i)
     seeded_entities += 1
 
@@ -688,7 +680,6 @@ def clear(*args, **kwargs):
   class ranker(db.Model):
     """ranker model used with ranklist module.
     """
-    
     pass
 
   # TODO(dbentley): If there are more than 1000 instances of any model,

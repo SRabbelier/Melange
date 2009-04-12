@@ -1114,10 +1114,13 @@ class Checker(object):
     self.checkIsUser(django_args)
 
     application = app_logic.getFromKeyFieldsOr404(django_args)
+    applicant = application.applicant.key()
+    backup_admin = application.backup_admin.key()
+    user = self.user.key()
 
     # check if the application is accepted and the applicant is the current user
-    if (application.applicant.key() == self.user.key()) and (
-        application.status == 'accepted'):
+    if application.status == 'accepted' and (applicant == user or
+                                             backup_admin == user):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)

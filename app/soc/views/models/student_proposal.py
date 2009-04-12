@@ -900,19 +900,46 @@ class View(base.View):
 
       context['possible_mentors'] = ', '.join(mentor_names)
 
-    # TODO(ljvderijk) listing of total given scores per mentor
-    # a dict with key as role.user ?
-
     # order the reviews by ascending creation date
     order = ['created']
 
     # get the public reviews
-    context['public_reviews'] = review_logic.getReviewsForEntity(entity,
+    public_reviews = review_logic.getReviewsForEntity(entity,
         is_public=True, order=order)
 
     # get the private reviews
-    context['private_reviews'] = review_logic.getReviewsForEntity(entity,
+    private_reviews = review_logic.getReviewsForEntity(entity,
         is_public=False, order=order)
+
+    # store the reviews in the context
+    context['public_reviews'] = public_reviews
+    context['private_reviews'] = private_reviews
+
+    review_summary = {}
+
+    for review in private_reviews:
+
+      reviewer = review.reviewer
+      if not reviewer:
+        continue
+
+      reviewer_key = reviewer.key()
+      reviewer_summary = review_summary.get(reviewer_key)
+
+      if reviewer_summary:
+        # we already have something on file for this reviewer
+        old_total_score = reviewer_summary['total_score']
+        reviewer_summary['total_score'] = old_total_score + review.score
+
+        old_total_comments = reviewer_summary['total_comments']
+        reviewer_summary['total_comments'] = old_total_comments + 1
+      else:
+        review_summary[reviewer_key] = {
+            'name': reviewer.name(),
+            'total_comments': 1,
+            'total_score': review.score}
+
+    context['review_summary'] = review_summary
 
     # which button should we show to the mentor?
     if mentor:

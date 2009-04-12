@@ -60,6 +60,12 @@ limitations under the License.
 </p>
 
 <hr />
+<b>Summary of Reviews</b>:
+{% for key, value in review_summary.items %}
+    <li>{{ value.name }} ({{ value.total_comments }} posts, {{ value.total_score }} points)</li>
+{% endfor %}
+
+<hr />
 <form method="POST">
 <b>Score and Review</b>
 

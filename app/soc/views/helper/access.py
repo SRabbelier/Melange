@@ -1115,7 +1115,8 @@ class Checker(object):
 
     application = app_logic.getFromKeyFieldsOr404(django_args)
     applicant = application.applicant.key()
-    backup_admin = application.backup_admin.key()
+    backup_admin = application.backup_admin
+    backup_admin = backup_admin.key() if backup_admin else None
     user = self.user.key()
 
     # check if the application is accepted and the applicant is the current user

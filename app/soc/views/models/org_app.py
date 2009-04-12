@@ -243,6 +243,9 @@ class View(group_app.View):
         context['subject'] = 'Thank you for your application'
 
       for to in [admin_entity, backup_entity]:
+        if not to:
+          continue
+
         email = accounts.denormalizeAccount(to.account).email()
         context['to'] = email
         context['to_name'] = to.name

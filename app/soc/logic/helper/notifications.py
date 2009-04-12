@@ -125,6 +125,9 @@ def sendNewGroupNotification(entity, params):
   template = DEF_NEW_GROUP_TEMPLATE
 
   for to in [entity.applicant, entity.backup_admin]:
+    if not to:
+      continue
+
     sendNotification(to, None, message_properties, subject, template)
 
 

@@ -174,6 +174,7 @@ class View(base.View):
          'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
          'label': 'Comment',
          'required': False,
+         'example_text': 'Caution, you will not be able to edit your comment!',
          },
          ]
 
@@ -210,6 +211,7 @@ class View(base.View):
          'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
          'label': 'Comment',
          'required': False,
+         'example_text': 'Caution, you will not be able to edit your review!',
          },
         {'name': 'public',
          'base': forms.BooleanField,
@@ -915,10 +917,11 @@ class View(base.View):
     context['public_reviews'] = public_reviews
     context['private_reviews'] = private_reviews
 
+    # create a summary of all the private reviews
     review_summary = {}
 
     for review in private_reviews:
-
+      # make sure there is a reviewer
       reviewer = review.reviewer
       if not reviewer:
         continue

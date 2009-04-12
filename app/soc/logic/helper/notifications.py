@@ -104,8 +104,6 @@ def sendNewGroupNotification(entity, params):
     entity : An accepted group application
   """
 
-  to_user = entity.applicant
-
   url = "http://%(host)s%(redirect)s" % {
       'redirect': redirects.getApplicantRedirect(entity,
       {'url_name': params['group_url_name']}),
@@ -126,7 +124,8 @@ def sendNewGroupNotification(entity, params):
 
   template = DEF_NEW_GROUP_TEMPLATE
 
-  sendNotification(to_user, None, message_properties, subject, template)
+  for to in [entity.applicant, entity.backup_admin]:
+    sendNotification(to, None, message_properties, subject, template)
 
 
 def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):

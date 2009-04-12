@@ -222,15 +222,15 @@ class View(group_app.View):
         (sender_name, sender) = default_sender
 
       # construct the contents of the email
-      user_entity = app_entity.applicant
-      to = accounts.denormalizeAccount(user_entity.account).email()
+      admin_entity = app_entity.applicant
+      backup_entity = app_entity.backup_admin
 
-      context = {'sender': sender,
-              'to': to,
-              'sender_name': sender_name,
-              'to_name': user_entity.name,
-              'program_name': app_entity.scope.name,
-              'org_app_name': app_entity.name}
+      context = {
+          'sender': sender,
+          'sender_name': sender_name,
+          'program_name': app_entity.scope.name,
+          'org_app_name': app_entity.name
+          }
 
       if status == 'accepted':
         # use the accepted template and subject
@@ -242,8 +242,13 @@ class View(group_app.View):
         template = params['rejected_mail_template']
         context['subject'] = 'Thank you for your application'
 
-      # send out the constructed email
-      mail_dispatcher.sendMailFromTemplate(template, context)
+      for to in [admin_entity, backup_entity]:
+        email = accounts.denormalizeAccount(to.account).email()
+        context['to'] = email
+        context['to_name'] = to.name
+
+        # send out the constructed email
+        mail_dispatcher.sendMailFromTemplate(template, context)
 
   @decorators.merge_params
   @decorators.check_access

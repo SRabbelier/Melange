@@ -240,7 +240,10 @@ class Role(soc.models.linkable.Linkable):
   publish_location = db.BooleanProperty(required=False, default=False,
       verbose_name=ugettext('Publish my location'))
   publish_location.help_text = ugettext(
-      'Indicates whether the user agreed to publish location.')
+      'By checking this box, you are agreeing to allow the Program Owner'
+      ' to display your location (City, State/Province, Country level only)'
+      ' on any map. For instance on the map linking Students to Mentors or'
+      ' by showing your location on your public profile page in the system.')
   publish_location.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing a separate shipping street address; kept

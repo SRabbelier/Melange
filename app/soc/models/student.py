@@ -40,6 +40,15 @@ class Student(soc.models.role.Role):
   school_name = db.StringProperty(required=True, 
       verbose_name=ugettext('School Name'))
   school_name.group = ugettext("5. Education")
+  school_name.help_text = ugettext(
+      'Please enter the full name of your school, college or university in'
+      ' this field. Please use the complete formal name of your school, e.g.'
+      ' UC Berekeley instead of Cal or UCB. It would be most wonderful if you'
+      ' could provide your school\'s name in English, as all the program '
+      'administrators speak English as their first language and it will make'
+      ' it much easier for us to assemble program statistics, etc., later if'
+      ' we can easily read the name of your school.')
+
   school_country = db.StringProperty(required=True,
       verbose_name=ugettext('School Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)

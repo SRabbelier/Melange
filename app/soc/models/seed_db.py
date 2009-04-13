@@ -384,10 +384,10 @@ def seed_user(unused_request, i):
   """Returns the properties for a new user entity.
   """
   properties = {
-      'key_name': 'user_%(num)d' % i,
-      'link_id': 'user_%(num)d' % i,
-      'account': users.User(email='user_%(num)d@example.com' % i),
-      'name': 'User %(num)d' % i,
+      'key_name': 'user_%d' % i,
+      'link_id': 'user_%d' % i,
+      'account': users.User(email='user_%d@example.com' % i),
+      'name': 'User %d' % i,
       }
 
   return properties

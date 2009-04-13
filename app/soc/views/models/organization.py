@@ -171,7 +171,7 @@ class View(group.View):
         dynaform = self._params['create_form'],
         dynaproperties = updated_fields)
 
-    params['applicant_create_form'] = applicant_create_form
+    self._params['applicant_create_form'] = applicant_create_form
 
   @decorators.merge_params
   @decorators.check_access
@@ -367,14 +367,12 @@ class View(group.View):
     except out_of_band.Error:
       is_host = False
 
-    new_params = {}
+    params = params.copy()
 
     if is_host:
-      new_params['list_action'] = (redirects.getAdminRedirect, params)
+      params['list_action'] = (redirects.getAdminRedirect, params)
     else:
-      new_params['list_action'] = (redirects.getPublicRedirect, params)
-    # safe to merge them the wrong way around because of @merge_params
-    params = dicts.merge(new_params, params)
+      params['list_action'] = (redirects.getPublicRedirect, params)
 
     new_filter = {}
 

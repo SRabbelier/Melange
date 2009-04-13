@@ -165,7 +165,7 @@ class View(base.View):
         dynaform=self._params['create_form'],
         dynaproperties=dynaproperties)
 
-    params['student_create_form'] = student_create_form
+    self._params['student_create_form'] = student_create_form
 
     # create the special form for public review
     dynafields = [
@@ -184,7 +184,7 @@ class View(base.View):
     public_review_form = dynaform.newDynaForm(dynamodel=None, 
         dynabase=helper.forms.BaseForm, dynainclude=None, 
         dynaexclude=None, dynaproperties=dynaproperties)
-    params['public_review_form'] = public_review_form
+    self._params['public_review_form'] = public_review_form
 
     # create the special form for mentors
     dynafields = [
@@ -229,7 +229,7 @@ class View(base.View):
     mentor_review_form = dynaform.newDynaForm(dynamodel=None, 
         dynabase=helper.forms.BaseForm, dynainclude=None, 
         dynaexclude=None, dynaproperties=dynaproperties)
-    params['mentor_review_form'] = mentor_review_form
+    self._params['mentor_review_form'] = mentor_review_form
 
     dynafields = [
       {'name': 'rank',
@@ -262,7 +262,7 @@ class View(base.View):
     admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, 
         dynaproperties=dynaproperties)
 
-    params['admin_review_form'] = admin_review_form
+    self._params['admin_review_form'] = admin_review_form
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

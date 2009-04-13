@@ -124,7 +124,7 @@ class View(group.View):
         dynaform = self._params['create_form'],
         dynaproperties = updated_fields)
 
-    params['applicant_create_form'] = applicant_create_form
+    self._params['applicant_create_form'] = applicant_create_form
 
   @decorators.merge_params
   @decorators.check_access

@@ -147,13 +147,13 @@ class View(base.View):
         }
 
     student_edit_form = dynaform.newDynaForm(
-        dynabase = params['dynabase'],
-        dynamodel = params['logic'].getModel(),
-        dynaexclude = params['create_dynaexclude'],
+        dynabase = self._params['dynabase'],
+        dynamodel = self._params['logic'].getModel(),
+        dynaexclude = self._params['create_dynaexclude'],
         dynaproperties = dynaproperties,
     )
 
-    params['student_edit_form'] = student_edit_form
+    self._params['student_edit_form'] = student_edit_form
 
 
   def _editGet(self, request, entity, form):

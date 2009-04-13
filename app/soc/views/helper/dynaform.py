@@ -137,10 +137,7 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
 
     # The most interesting parameter, the 'extra fields' dictionary
     dynaconf = getattr(meta, 'dynaconf', {})
-    if not dynaproperties:
-      dynaproperties = dynaconf
-    else:
-      dicts.merge(dynaproperties, dynaconf)
+    dynaproperties = dicts.merge(dynaproperties, dynaconf)
 
   # Create a new DynaForm, using the properties we extracted
   return newDynaForm(

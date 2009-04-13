@@ -161,9 +161,10 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
     # add manage template
-    params['manage_template'] = 'soc/%(module_name)s/manage.html' % params
+    template = 'soc/%(module_name)s/manage.html' % self._params
+    self._params['manage_template'] = template
 
-    if params.get('show_in_roles_overview'):
+    if self._params.get('show_in_roles_overview'):
       # add to roles overview
       addRole(self)
 

@@ -53,11 +53,10 @@ def merge(target, updates, sub_merge=False, recursive=False):
     recursive: Determines whether merge_subdicts is recursive
 
   Returns:
-    the target dict, with any missing values from updates merged in, in-place.
+    a new dict, with any missing values from updates merged into target
   """
 
-  if not target:
-    target = {}
+  target = target.copy() if target else {}
 
   for key, value in updates.iteritems():
     if key not in target:

@@ -88,7 +88,7 @@ class View(role.View):
     super(View, self).__init__(params=params)
 
     # register the role with the group_view
-    params['group_view'].registerRole(params['module_name'], self)
+    self._params['group_view'].registerRole(self._params['module_name'], self)
 
     # create and store the special form for invited users
     updated_fields = {
@@ -99,7 +99,7 @@ class View(role.View):
         dynaform = self._params['create_form'],
         dynaproperties = updated_fields)
 
-    params['invited_create_form'] = invited_create_form
+    self._params['invited_create_form'] = invited_create_form
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

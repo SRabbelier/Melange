@@ -110,7 +110,7 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
     # create and store the special forms for invite and requests
-    params['invite_form'] = params['create_form']
+    self._params['invite_form'] = self._params['create_form']
 
     updated_fields = {
         'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
@@ -122,7 +122,7 @@ class View(base.View):
         dynaform = self._params['create_form'],
         dynaproperties = updated_fields)
 
-    params['request_form'] = request_form
+    self._params['request_form'] = request_form
 
 
   @decorators.merge_params

@@ -181,7 +181,7 @@ def getListProjectsRedirect(entity, params):
   """
 
   result = '/%s/list_projects/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -294,7 +294,7 @@ def getStudentEditRedirect(entity, params):
   """
 
   return '/%s/st_edit/%s' % (
-      params['url_name'], entity.key().name())
+      params['url_name'], entity.key().id_or_name())
 
 
 def getStudentProposalRedirect(entity, params):

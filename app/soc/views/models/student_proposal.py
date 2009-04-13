@@ -898,7 +898,7 @@ class View(base.View):
 
       for mentor_key in possible_mentors:
         possible_mentor = mentor_logic.logic.getFromKeyName(mentor_key.id_or_name())
-        mentor_names.append(possible_mentor.id_or_name())
+        mentor_names.append(possible_mentor.name())
 
       context['possible_mentors'] = ', '.join(mentor_names)
 

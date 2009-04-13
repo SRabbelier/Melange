@@ -57,15 +57,16 @@ def view(func):
   def view_wrapper(request, *args, **kwds):
     """View decorator wrapper method.
     """
-    site = site_logic.getSingleton()
-
-    # don't redirect admins, or if we're at /maintenance already
-    no_redirect = user_logic.isDeveloper() or request.path == '/maintenance'
-
-    if (not no_redirect) and timeline.isActivePeriod(site, 'maintenance'):
-      return http.HttpResponseRedirect('/maintenance')
 
     try:
+      site = site_logic.getSingleton()
+
+      # don't redirect admins, or if we're at /maintenance already
+      no_redirect = user_logic.isDeveloper() or request.path == '/maintenance'
+
+      if (not no_redirect) and timeline.isActivePeriod(site, 'maintenance'):
+        return http.HttpResponseRedirect('/maintenance')
+
       return func(request, *args, **kwds)
     except DeadlineExceededError, exception:
       logging.exception(exception)

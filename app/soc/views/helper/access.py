@@ -1475,8 +1475,9 @@ class Checker(object):
     """
 
     try:
-      # check if it is my role the user's own role
+      # check if it is the user's own role
       self.checkHasActiveRoleForScope(django_args, logic_for_role)
+      self.checkIsMyEntity(django_args, logic_for_role, 'user', True)
       return
     except out_of_band.Error:
       pass
@@ -1488,7 +1489,8 @@ class Checker(object):
         'scope_path': django_args['scope_path'],
         }
 
-    role_entity = role_logic.getFromKeyFieldsOr404(fields)
+    role_entity = logic_for_role.getFromKeyFieldsOr404(fields)
+
     if role_entity.status != 'active':
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ROLE_MSG)
 

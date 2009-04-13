@@ -523,16 +523,36 @@ class View(presence.View):
       orgs_data[org.key().id_or_name()] = org_data
 
       fields = {'org': org,
-                'mentor !=': None,
                 'status': 'pending'}
       order = ['-score']
 
       # get the the number of proposals that would be assigned a slot
-      student_proposal_entities = student_proposal_logic.logic.getForFields(
-          fields, limit=slots_left_to_assign, order=order)
+      query = student_proposal_logic.logic.getQueryForFields(
+          fields, order=order)
+
+      proposals = query.fetch(slots_left_to_assign)
+      proposals = [i for i in proposals if i.mentor]
+
+      offset = slots_left_to_assign
+      stepsize = program_entity.max_slots
+
+      # retrieve as many additional proposals as needed in case the top
+      # N do not have a mentor assigned
+      while len(proposals) < slots_left_to_assign:
+        new_proposals = query.fetch(stepsize, offset=offset)
+        # we ran out of proposals
+        if not new_proposals:
+          break
+
+        new_proposals = [i for i in new_proposals if i.mentor]
+        proposals += new_proposals
+        offset += stepsize
+
+      # cut off any superfluas proposals
+      del proposals[slots_left_to_assign:]
 
       # store each proposal in the dictionary
-      for proposal in student_proposal_entities:
+      for proposal in proposals:
         student_entity = proposal.scope
 
         proposals_data.append(

@@ -70,6 +70,9 @@ class StudentProject(soc.models.linkable.Linkable):
                                 required=True,
                                 collection_name='student_projects')
 
+  #: A property containing a list of additional Mentors for this project
+  additional_mentors = db.ListProperty(item_type=db.Key, default=[])
+
   #: The status of this project
   #: accepted: This project has been accepted into the program
   #: mid_term_passed: This project has passed the midterm evaluation

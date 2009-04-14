@@ -26,6 +26,5 @@ import soc.models.group
 
 class Sponsor(soc.models.group.Group):
   """Sponsor details."""
-  
-  pass
 
+  pass

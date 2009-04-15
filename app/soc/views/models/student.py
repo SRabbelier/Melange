@@ -34,6 +34,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import responses
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import program as program_view
@@ -174,7 +175,7 @@ class View(role.View):
     try:
       student_entity = student_logic.logic.getFromKeyFieldsOr404(fields)
     except out_of_band.Error, error:
-      return helper.responses.errorResponse(
+      return responses.errorResponse(
           error, request, template=params['error_public'])
 
     # set the fields we need for the Student Project list

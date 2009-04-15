@@ -134,25 +134,22 @@ class View(presence_with_tos.View):
 
     entity = self._logic.getSingleton()
 
-    submenus = []
+    submenus = document_view.view.getMenusForScope(entity, self._params)
 
-    if entity:
-      submenus += document_view.view.getMenusForScope(entity, self._params)
+    try:
+      rights = self._params['rights']
+      rights.setCurrentUser(id, user)
+      rights.checkIsHost()
+      is_host = True
+    except out_of_band.Error:
+      is_host = False
 
-      try:
-        rights = self._params['rights']
-        rights.setCurrentUser(id, user)
-        rights.checkIsHost()
-        is_host = True
-      except out_of_band.Error:
-        is_host = False
+    if is_host:
+      submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
+          "Create a New Document", 'any_access')]
 
-      if is_host:
-        submenus += [(redirects.getCreateDocumentRedirect(entity, 'site'),
-            "Create a New Document", 'any_access')]
-
-        submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
-            "List Documents", 'any_access')]
+      submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
+          "List Documents", 'any_access')]
 
     new_params = {}
     new_params['sidebar_additional'] = submenus

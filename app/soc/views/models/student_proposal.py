@@ -897,7 +897,8 @@ class View(base.View):
       mentor_names = []
 
       for mentor_key in possible_mentors:
-        possible_mentor = mentor_logic.logic.getFromKeyName(mentor_key.id_or_name())
+        possible_mentor = mentor_logic.logic.getFromKeyName(
+            mentor_key.id_or_name())
         mentor_names.append(possible_mentor.name())
 
       context['possible_mentors'] = ', '.join(mentor_names)
@@ -920,9 +921,9 @@ class View(base.View):
     # create a summary of all the private reviews
     review_summary = {}
 
-    for review in private_reviews:
+    for private_review in private_reviews:
       # make sure there is a reviewer
-      reviewer = review.reviewer
+      reviewer = private_review.reviewer
       if not reviewer:
         continue
 
@@ -932,7 +933,7 @@ class View(base.View):
       if reviewer_summary:
         # we already have something on file for this reviewer
         old_total_score = reviewer_summary['total_score']
-        reviewer_summary['total_score'] = old_total_score + review.score
+        reviewer_summary['total_score'] = old_total_score + private_review.score
 
         old_total_comments = reviewer_summary['total_comments']
         reviewer_summary['total_comments'] = old_total_comments + 1
@@ -940,7 +941,7 @@ class View(base.View):
         review_summary[reviewer_key] = {
             'name': reviewer.name(),
             'total_comments': 1,
-            'total_score': review.score}
+            'total_score': private_review.score}
 
     context['review_summary'] = review_summary
 

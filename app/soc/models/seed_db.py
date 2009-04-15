@@ -81,26 +81,99 @@ def ensureUser():
   return account, current_user
 
 
-def seed_and_put_example_user(i):
-  """Creates and persists an example user identified by i.
-
-  Args:
-    i, int: the index of this example user.
-
-  Returns:
-    None
-
-  Side Effects:
-    Persists a user to the datastore.
+class Seeder(object):
+  """A Seeder can seed Melange types.
   """
-  user_properties = {
-      'key_name': 'user_%04d' % i,
-      'link_id': 'user_%04d' % i,
-      'account': users.User(email='user_%04d@example.com' % i),
-      'name': 'User %04d' % i,
-      }
-  entity = User(**user_properties)
-  entity.put()
+  def type(self):
+    """Returns the type to be seeded."""
+    raise NotImplementedError
+
+  def seed(self, i, entities=None, **kwargs):
+    """Seed the ith instance of this type.
+
+    Args:
+      i, int: which to seed
+      entities, list of type()'s: if None, persist at the end of this call.
+        if non-None, append the created entity to entities instead of
+        persisting.
+      kwargs: the dictionary returned by commonSeedArgs
+    """
+    raise NotImplementedError
+
+  def commonSeedArgs(self, request):
+    """Find common information for seeding that's common across entities
+    seeded in one request.
+
+    Returns:
+      dictionary of str->value; passed to each call of seed() for this
+      request
+    """
+    raise NotImplementedError
+
+
+class UserSeeder(Seeder):
+  def type(self):
+    return User
+
+  def seed(self, i, entities=None):
+    user_properties = {
+        'key_name': 'user_%04d' % i,
+        'link_id': 'user_%04d' % i,
+        'account': users.User(email='user_%04d@example.com' % i),
+        'name': 'User %04d' % i,
+        }
+    entity = User(**user_properties)
+    if entities is None:
+      entity.put()
+    else:
+      entities.append(entity)
+
+  def commonSeedArgs(self, request):
+    return {}
+
+
+class OrganizationSeeder(Seeder):
+  def type(self):
+    return Organization
+
+  def seed(self, i, entities=None, current_user=None, gsoc2009=None):
+    properties = {
+        'key_name': 'google/gsoc2009/%04d' % i,
+        'link_id': 'org_%04d' % i,
+        'name': 'Organization %04d' % i,
+        'short_name': 'Org %04d' % i,
+        'founder': current_user,
+        'scope_path': 'google/gsoc2009',
+        'scope': gsoc2009,
+        'status': 'active',
+        'email': 'org_%04d@example.com' % i,
+        'home_page': 'http://code.google.com/p/soc',
+        'description': 'Melange, share the love!',
+        'license_name': 'Apache License',
+        'contact_street': 'Some Street',
+        'contact_city': 'Some City',
+        'contact_country': 'United States',
+        'contact_postalcode': '12345',
+        'phone': '1-555-BANANA',
+        'ideas': 'http://code.google.com/p/soc/issues',
+        }
+
+    org = Organization(**properties)
+    if entities is None:
+      org.put()
+    else:
+      entities.append(org)
+
+  def commonSeedArgs(self, request):
+    _, current_user = ensureUser()
+    gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+
+    if not gsoc2009:
+      raise Error('Run seed_db first')
+
+    return dict(current_user=current_user,
+                gsoc2009=gsoc2009)
+
 
 
 def seed(request, *args, **kwargs):
@@ -119,8 +192,9 @@ def seed(request, *args, **kwargs):
   _, current_user = ensureUser()
 
 
+  s = UserSeeder()
   for i in range(15):
-    seed_and_put_example_user(i)
+    s.seed(i)
 
   group_properties = {
        'key_name': 'google',
@@ -432,7 +506,7 @@ def seed_org_app(request, i):
   return properties
 
 
-def seed_org(request, i):
+def seed_org(unused_request, i):
   """Returns the properties for a new org entity.
   """
 
@@ -540,7 +614,8 @@ def seed_student_proposal(request, i):
 
 
 SEEDABLE_MODEL_TYPES = {
-    'user' : (User, seed_and_put_example_user),
+    'user' : UserSeeder(),
+    'organization' : OrganizationSeeder(),
     }
 
 
@@ -566,7 +641,7 @@ def new_seed_many(request, *args, **kwargs):
         ' type to populate). '
         'Valid values are: %s') % SEEDABLE_MODEL_TYPES.keys())
 
-  (model_class, seed_func) = SEEDABLE_MODEL_TYPES[request.GET['seed_type']]
+  seeder = SEEDABLE_MODEL_TYPES[request.GET['seed_type']]
 
   if 'goal' not in request.GET:
     return http.HttpResponse(
@@ -577,7 +652,7 @@ def new_seed_many(request, *args, **kwargs):
 
   # Get the highest instance of this model so that we know
   # where to start seeding new ones.
-  query = db.Query(model_class)
+  query = db.Query(seeder.type())
   query.order('-link_id')
   # TODO(dbentley): filter for ones < user_9999
   highest_instance = query.get()
@@ -593,17 +668,24 @@ def new_seed_many(request, *args, **kwargs):
       # couldn't find seeded_entities; guessing there are none
       start_index = 0
 
+  common_args = seeder.commonSeedArgs(request)
 
   # Insert from start_index to goal
   logging.info("To insert: %d to %d" % (start_index, goal))
-  seeded_entities = 0
+  seeded_entities = []
+  total = 0
   for i in xrange(start_index, goal):
     if i % 20 == 0:
       logging.info("Inserting: %d of %d" % (i+1, goal))
-    seed_func(i)
-    seeded_entities += 1
+    if len(seeded_entities) % 100 == 0:
+      db.put(seeded_entities)
+      total += len(seeded_entities)
+      seeded_entities = []
+    seeder.seed(i, entities=seeded_entities, **common_args)
 
-  return http.HttpResponse('Seeded %d entities.' % seeded_entities)
+  db.put(seeded_entities)
+  total += len(seeded_entities)
+  return http.HttpResponse('Seeded %d entities.' % total)
 
 
 def seed_many(request, *args, **kwargs):

@@ -252,8 +252,8 @@ class Allocator(object):
     """An algorithm that reliable calculates the slots assignments.
     """
 
-    adjusted_orgs = self.adjusted_orgs
-    adjusted_slots = self.adjusted_slots
+    # adjusted_orgs = self.adjusted_orgs
+    # adjusted_slots = self.adjusted_slots
     locked_orgs = self.locked_orgs
     locked_slots = self.locked_slots
     unlocked_orgs = self.unlocked_orgs
@@ -261,7 +261,7 @@ class Allocator(object):
 
     available_slots = self.slots
     allocations = {}
-    slack = {}
+    # slack = {}
 
     # take out the easy ones
     for org in locked_orgs:
@@ -283,7 +283,7 @@ class Allocator(object):
 
     pop_per_slot = float(available_slots)/float(total_popularity)
 
-    slack = 0
+    # slack = 0
     wanted = {}
 
     # filter out all those that deserve more than their maximum
@@ -303,7 +303,7 @@ class Allocator(object):
 
     # distribute the slack
     while available_slots > 0 and (sum(wanted.values()) > 0):
-      for org, amount in wanted.iteritems():
+      for org, _ in wanted.iteritems():
         available_slots = self.slots - sum(allocations.values())
         if available_slots <= 0:
           break

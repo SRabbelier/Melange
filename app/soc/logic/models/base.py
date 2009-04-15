@@ -163,7 +163,7 @@ class Logic(object):
       fields: the dict from which to extract the key values
     """
 
-    if not all( (i in fields for i in ['scope_path', 'link_id']) ):
+    if ('scope_path' not in fields) or ('link_id' not in fields):
       raise InvalidArgumentError
 
     return [fields['scope_path'], fields['link_id']]

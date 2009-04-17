@@ -46,6 +46,7 @@ from soc.models.org_app import OrgApplication
 from soc.models.program import Program
 from soc.models.ranker_root import RankerRoot
 from soc.models.site import Site
+from soc.models.student import Student
 from soc.models.student_proposal import StudentProposal
 from soc.models.sponsor import Sponsor
 from soc.models.timeline import Timeline
@@ -175,7 +176,6 @@ class OrganizationSeeder(Seeder):
                 gsoc2009=gsoc2009)
 
 
-
 def seed(request, *args, **kwargs):
   """Seeds the datastore with some default values.
   """
@@ -192,9 +192,9 @@ def seed(request, *args, **kwargs):
   _, current_user = ensureUser()
 
 
-  s = UserSeeder()
+  seeder = UserSeeder()
   for i in range(15):
-    s.seed(i)
+    seeder.seed(i)
 
   group_properties = {
        'key_name': 'google',
@@ -517,7 +517,7 @@ def seed_org(unused_request, i):
     raise Error('Run seed_db first')
 
   properties = {
-      'key_name': 'google/gsoc2009/%d' % i,
+      'key_name': 'google/gsoc2009/org_%d' % i,
       'link_id': 'org_%d' % i,
       'name': 'Organization %d' % i,
       'short_name': 'Org %d' % i,
@@ -545,7 +545,7 @@ def seed_mentor(request, i):
   """
 
   _, current_user = ensureUser()
-  org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
+  org = Organization.get_by_key_name('google/gsoc2009/org_%d' % i)
 
   if not org:
     raise Error('Run seed_many for at least %d orgs first.' % i)
@@ -573,14 +573,67 @@ def seed_mentor(request, i):
 
   return properties
 
+
+def seed_student(request, i):
+  """Returns the properties for a new student entity.
+  """
+  
+  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+  user = User.get_by_key_name('user_%d' % i)
+  
+  if not gsoc2009:
+    raise Error('Run seed_db first')
+    
+  if not user:
+    raise Error('Run seed_many for at least %d users first.' % i)
+    
+  properties = {
+      'key_name':'google/gsoc2009/student_%d' % i,
+      'link_id': 'student_%d' % i,
+      'scope_path': 'google/gsoc2009',
+      'scope': gsoc2009,
+      'user' : user,
+      'given_name': 'Student %d' % i,
+      'surname': 'Last Name',
+      'name_on_documents': 'Test Example',
+      'email': 'test@example.com',
+      'res_street': 'Some Street',
+      'res_city': 'Some City',
+      'res_state': 'Some State',
+      'res_country': 'United States',
+      'res_postalcode': '12345',
+      'phone': '1-555-BANANA',
+      'birth_date': db.DateProperty.now(),
+      'agreed_to_tos': True,
+      'school_name': 'School %d' % i,
+      'school_country': 'United States',
+      'major': 'Computer Science',
+      'degree': 'Undergraduate',
+      'expected_graduation': 2012,
+      'program_knowledge': 'Knowledge %d' % i,
+      'school': None,
+      'can_we_contact_you': True,
+  }
+
+  return properties
+
+
 def seed_student_proposal(request, i):
   """Returns the properties of a new student proposal.
   """
 
-  _, current_user = ensureUser()
-  org = Organization.get_by_key_name('google/gsoc2009/%d' % i)
+  ensureUser()
+  org = Organization.get_by_key_name('google/gsoc2009/org_%d' % i)
   mentor = Mentor.get_by_key_name('google/gsoc2009/org_%d/mentor' % i)
+  user = User.get_by_key_name('user_%d' % i)
+  student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+    
+  if not user:
+    raise Error('Run seed_many for at least %d users first.' % i)
 
+  if not student:
+    raise Error('Run seed_many for at least %d students first.' % i)
+  
   if not org:
     raise Error('Run seed_many for at least %d orgs first.' % i)
 
@@ -590,15 +643,15 @@ def seed_student_proposal(request, i):
   all_properties = []
 
   for i in range(random.randint(5, 20)):
-    link_id = 'proposal_%s_%d' % (org.key().id_or_name(), i)
-    scope_path = current_user.key().id_or_name()
+    link_id = 'proposal_%s_%d' % (org.link_id, i)
+    scope_path = 'google/gsoc2009/' + user.link_id
 
     properties = {
         'link_id': link_id,
         'scope_path': scope_path,
-        'scope': current_user,
+        'scope': student,
         'key_name': '%s/%s' % (scope_path, link_id),
-        'title':'The Awesome Proposal',
+        'title': 'The Awesome Proposal %s %d' % (user.link_id, i),
         'abstract': 'This is an Awesome Proposal, look at its awesomeness!',
         'content': 'Sorry, too Awesome for you to read!',
         'additional_info': 'http://www.zipit.com',
@@ -713,6 +766,7 @@ def seed_many(request, *args, **kwargs):
     'org': (seed_org, Organization),
     'org_app': (seed_org_app, OrgApplication),
     'mentor': (seed_mentor, Mentor),
+    'student': (seed_student, Student),
     'student_proposal': (seed_student_proposal, StudentProposal),
     }
 
@@ -770,6 +824,7 @@ def clear(*args, **kwargs):
   entities = itertools.chain(*[
       Notification.all(),
       Mentor.all(),
+      Student.all(),
       OrgAdmin.all(),
       ranker.all(),
       RankerRoot.all(),

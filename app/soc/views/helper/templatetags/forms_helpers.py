@@ -331,7 +331,8 @@ def as_table_row_helper(context, item):
       if '__scoped__' in filter:
         args['scope_path'] = entity.key().id_or_name()
 
-      # TODO: replace this hack needed to get org-scoped mentor autocompletion on student proposals
+      # TODO: replace this hack needed to get org-scoped mentor 
+      #       autocompletion on student proposals
       if '__org__' in filter:
         args['scope_path'] = entity.org.key().id_or_name()
 

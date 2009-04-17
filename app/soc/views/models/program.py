@@ -508,49 +508,15 @@ class View(presence.View):
         org_data['admin_name'] = org_admin.name()
         org_data['admin_email'] = org_admin.email
 
-      # check if there are already slots taken by this org
-      fields = {'org': org,
-                'status': 'accepted'}
+      proposals = student_proposal_logic.logic.getProposalsToBeAcceptedForOrg(
+          org, stepsize=program_entity.max_slots)
 
-      query = student_proposal_logic.logic.getQueryForFields(fields)
-
-      slots_left_to_assign = max(0, org.slots - query.count())
-
-      if slots_left_to_assign == 0:
-        # no slots left so next org
+      if not proposals:
+        # nothing to accept, next organization
         continue
 
       # store information about the org
       orgs_data[org.key().id_or_name()] = org_data
-
-      fields = {'org': org,
-                'status': 'pending'}
-      order = ['-score']
-
-      # get the the number of proposals that would be assigned a slot
-      query = student_proposal_logic.logic.getQueryForFields(
-          fields, order=order)
-
-      proposals = query.fetch(slots_left_to_assign)
-      proposals = [i for i in proposals if i.mentor]
-
-      offset = slots_left_to_assign
-      stepsize = program_entity.max_slots
-
-      # retrieve as many additional proposals as needed in case the top
-      # N do not have a mentor assigned
-      while len(proposals) < slots_left_to_assign:
-        new_proposals = query.fetch(stepsize, offset=offset)
-        # we ran out of proposals
-        if not new_proposals:
-          break
-
-        new_proposals = [i for i in new_proposals if i.mentor]
-        proposals += new_proposals
-        offset += stepsize
-
-      # cut off any superfluas proposals
-      del proposals[slots_left_to_assign:]
 
       # store each proposal in the dictionary
       for proposal in proposals:

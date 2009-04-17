@@ -64,6 +64,60 @@ class Logic(base.Logic):
 
     return ranker
 
+  def getProposalsToBeAcceptedForOrg(self, org_entity, stepsize=25):
+    """Returns all StudentProposals which will be accepted into the program
+    for the given organization.
+
+    params:
+      org_entity: the Organization for which the proposals should be checked
+      stepsize: optional parameter to specify the ammount of Student Proposals
+                that should be retrieved per roundtrip to the datastore
+
+    returns:
+      List with all StudentProposal which will be accepted into the program
+    """
+
+    # check if there are already slots taken by this org
+    fields = {'org': org_entity,
+              'status': 'accepted'}
+
+    query = self.getQueryForFields(fields)
+
+    slots_left_to_assign = max(0, org_entity.slots - query.count())
+
+    if slots_left_to_assign == 0:
+      # no slots left so return nothing
+      return []
+
+    fields = {'org': org_entity,
+              'status': 'pending'}
+    order = ['-score']
+
+    # get the the number of proposals that would be assigned a slot
+    query = self.getQueryForFields(
+        fields, order=order)
+
+    proposals = query.fetch(slots_left_to_assign)
+    proposals = [i for i in proposals if i.mentor]
+
+    offset = slots_left_to_assign
+
+    # retrieve as many additional proposals as needed in case the top
+    # N do not have a mentor assigned
+    while len(proposals) < slots_left_to_assign:
+      new_proposals = query.fetch(stepsize, offset=offset)
+
+      if not new_proposals:
+        # we ran out of proposals`
+        break
+
+      new_proposals = [i for i in new_proposals if i.mentor]
+      proposals += new_proposals
+      offset += stepsize
+
+    # cut off any superfluous proposals
+    return proposals[:slots_left_to_assign]
+
   def _onCreate(self, entity):
     """Adds this proposal to the organization ranker entity.
     """

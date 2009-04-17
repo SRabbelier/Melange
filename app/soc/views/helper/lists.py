@@ -22,7 +22,6 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-import logging
 
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
@@ -156,7 +155,7 @@ class LinkCreator(object):
         params[makeOffsetLinkidKey(self.idx)]=offset_linkid
     if reverse_direction:
       params[makeReverseDirectionKey(self.idx)]=True
-    link_suffix = '&'.join('%s=%s' % (k,v) for k,v in params.iteritems())
+    link_suffix = '&'.join('%s=%s' % (k, v) for k, v in params.iteritems())
     return '%s?%s' % (self.path, link_suffix)
 
 
@@ -198,7 +197,10 @@ def getListContent(request, params, filter=None, order=None,
   # as we only use this logic for getForFields, which is never overridden
   logic = params['logic']
 
-  limit_key, offset_key, offset_linkid_key, reverse_direction_key = makeLimitKey(idx), makeOffsetKey(idx), makeOffsetLinkidKey(idx), makeReverseDirectionKey(idx)
+  limit_key = makeLimitKey(idx)
+  # offset_key = makeOffsetKey(idx)
+  # offset_linkid_key = makeOffsetLinkidKey(idx) 
+  # reverse_direction_key = makeReverseDirectionKey(idx)
 
   list_params = getListParameters(request, idx)
   limit, offset = list_params['limit'], list_params['offset']

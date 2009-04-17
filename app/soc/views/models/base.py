@@ -452,7 +452,7 @@ class View(object):
       params: required, a dict with params for this View
     """
 
-    logic = params['logic']
+    # logic = params['logic']
     suffix = entity.key().id_or_name() if entity else None
 
     # remove the params from the request, this is relevant only if
@@ -890,7 +890,7 @@ class View(object):
         there is no existing entity.
     """
 
-    logic = params['logic']
+    # logic = params['logic']
     suffix = entity.key().id_or_name() if entity else None
 
     context['form'] = form

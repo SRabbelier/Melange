@@ -64,13 +64,13 @@ class Logic(base.Logic):
 
     return ranker
 
-  def getProposalsToBeAcceptedForOrg(self, org_entity, stepsize=25):
+  def getProposalsToBeAcceptedForOrg(self, org_entity, step_size=25):
     """Returns all StudentProposals which will be accepted into the program
     for the given organization.
 
     params:
       org_entity: the Organization for which the proposals should be checked
-      stepsize: optional parameter to specify the ammount of Student Proposals
+      step_size: optional parameter to specify the amount of Student Proposals
                 that should be retrieved per roundtrip to the datastore
 
     returns:
@@ -105,7 +105,7 @@ class Logic(base.Logic):
     # retrieve as many additional proposals as needed in case the top
     # N do not have a mentor assigned
     while len(proposals) < slots_left_to_assign:
-      new_proposals = query.fetch(stepsize, offset=offset)
+      new_proposals = query.fetch(step_size, offset=offset)
 
       if not new_proposals:
         # we ran out of proposals`
@@ -113,7 +113,7 @@ class Logic(base.Logic):
 
       new_proposals = [i for i in new_proposals if i.mentor]
       proposals += new_proposals
-      offset += stepsize
+      offset += step_size
 
     # cut off any superfluous proposals
     return proposals[:slots_left_to_assign]

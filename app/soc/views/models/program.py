@@ -260,7 +260,8 @@ class View(presence.View):
 
     from soc.views.models.organization import view as org_view
     ao_params = org_view.getParams().copy() # active orgs
-    ao_list = self._getAcceptedOrgsList(description, ao_params, filter, use_cache)
+    ao_list = self._getAcceptedOrgsList(description, ao_params, 
+        filter, use_cache)
 
     contents.append(ao_list)
 

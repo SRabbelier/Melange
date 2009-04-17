@@ -99,6 +99,8 @@ class View(base.View):
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
     new_params['no_create_with_key_fields'] = True
+    new_params['list_key_order'] = ['title', 'abstract', 'content',
+        'additional_info', 'created_on', 'last_modified_on']
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',

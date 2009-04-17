@@ -395,8 +395,8 @@ class View(group.View):
 
     # define the list redirect action to show the notification
     ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
-    ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT %(
-                                        entity.name)
+    ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
+        entity.name)
     ap_params['list_heading'] = 'soc/student_project/list/heading.html'
     ap_params['list_row'] = 'soc/student_project/list/row.html'
 
@@ -415,7 +415,8 @@ class View(group.View):
     # construct the list and put it into the context
     context['list'] = soc.logic.lists.Lists(contents)
 
-    return super(View, self)._public(request=request, entity=entity, context=context)
+    return super(View, self)._public(request=request, 
+        entity=entity, context=context)
 
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific Organization menu entries.

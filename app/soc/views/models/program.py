@@ -509,7 +509,7 @@ class View(presence.View):
         org_data['admin_email'] = org_admin.email
 
       proposals = student_proposal_logic.logic.getProposalsToBeAcceptedForOrg(
-          org, stepsize=program_entity.max_slots)
+          org, step_size=program_entity.max_slots)
 
       if not proposals:
         # nothing to accept, next organization

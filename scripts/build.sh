@@ -10,7 +10,7 @@
 
 DEFAULT_APP_BUILD=../build
 DEFAULT_APP_FOLDER="../app"
-DEFAULT_APP_FILES="app.yaml index.yaml __init__.py main.py settings.py urls.py"
+DEFAULT_APP_FILES="app.yaml cron.yaml index.yaml __init__.py main.py settings.py urls.py"
 DEFAULT_APP_DIRS="soc ghop gsoc feedparser python25src reflistprop jquery ranklist json"
 DEFAULT_ZIP_FILES="tiny_mce.zip"
 

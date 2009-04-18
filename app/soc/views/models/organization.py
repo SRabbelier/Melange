@@ -272,12 +272,7 @@ class View(group.View):
     # only when the program allows allocations 
     # to be seen we should color the list
     if org_entity.scope.allocations_visible:
-      # get the limit and offset for the list
-      _, offset = lists.getLimitAndOffset(request, 'offset_0', 'limit_0')
-
-      # determine the amount of proposals to color
-      to_color = max(0, org_entity.slots - offset)
-      assigned_proposals = proposals[0:to_color]
+      assigned_proposals = getProposalsToBeAcceptedForOrg(org_entity)
 
       # show the amount of slots assigned on the webpage
       context['slots_visible'] = True

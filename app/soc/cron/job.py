@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -140,7 +141,7 @@ class Handler(object):
 
       task = self.tasks[job.task_name]
 
-      # excecute the actual job
+      # execute the actual job
       task(job)
 
       db.run_in_transaction(self.finishJob, job_key)

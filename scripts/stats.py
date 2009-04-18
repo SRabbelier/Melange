@@ -26,6 +26,7 @@ import cPickle
 import datetime
 import operator
 import sys
+import time
 
 import interactive
 
@@ -203,6 +204,53 @@ def addFollower(follower, proposals, add_public=True, add_private=True):
      result.append(entity)
 
   return result
+
+
+def convertProposals(org):
+  """Convert all proposals for the specified organization.
+
+  Args:
+    org: the organization for which all proposals will be converted
+  """
+
+  from soc.logic.models.student_proposal import logic as proposal_logic
+  from soc.logic.models.student_project import logic as project_logic
+
+  proposals = proposal_logic.getProposalsToBeAcceptedForOrg(org)
+
+  for proposal in proposals:
+    fields = {
+        'link_id': 't%i' % (int(time.time()*100)),
+        'scope_path': proposal.org.key().id_or_name(),
+        'scope': proposal.organization,
+        'program': proposal.program,
+        'student': proposal.scope,
+        'title': proposal.title,
+        'abstract': proposal.abstract,
+        'mentor': proposal.mentor,
+        }
+
+    project = project_logic.updateOrCreateFromFields(fields)
+
+    fields = {
+        'status':'accepted',
+        }
+    proposal_logic.updateEntityProperties(proposal, fields)
+
+  fields = {
+      'status': ['new', 'pending', 'invalid'],
+      'org': org,
+      }
+
+  query = proposal_logic.getQueryForFields(filter)
+  proposals = interactive.deepFetch(query)
+
+  fields = {
+      'status': 'rejected',
+      }
+
+  for proposal in proposals:
+    proposal_logic.updateEntityProperties(proposal, fields)
 
 
 def loadPickle(name):

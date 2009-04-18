@@ -76,10 +76,12 @@ class View(base.View):
     groups = priority_group_logic.getAll(query)
     handler = soc.cron.job.handler
 
-    groups_completed = 0
+    groups_touched = 0
     jobs_completed = 0
 
     for group in groups:
+      groups_touched += 1
+
       filter = {
           'priority_group': group,
           'status': 'waiting',
@@ -97,10 +99,8 @@ class View(base.View):
 
         jobs_completed += 1
 
-      groups_completed += 1
-
-    response = 'Completed %d jobs and %d groups completed.' % (
-        jobs_completed, groups_completed)
+    response = 'Completed %d jobs in %d priority groups.' % (
+        jobs_completed, groups_touched)
 
     return http.HttpResponse(response)
 

@@ -437,7 +437,7 @@ class View(object):
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    fields = forms.collectCleanedFields(form)
+    _, fields = forms.collectCleanedFields(form)
 
     self._editPost(request, entity, fields)
 

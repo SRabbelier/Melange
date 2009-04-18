@@ -138,7 +138,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def editProfile(self, request, access_type,
-           page_name=None, params=None, seed=None, **kwargs):
+           page_name=None, params=None, **kwargs):
     """Displays User profile edit page for the current user.
 
     Args:
@@ -153,9 +153,9 @@ class View(base.View):
     link_id = user_entity.link_id
 
     return self.edit(request, access_type, page_name=page_name, 
-        params=params, seed=seed, link_id=link_id, **kwargs)
+        params=params, link_id=link_id, **kwargs)
 
-  def editGet(self, request, entity, context, seed, params=None):
+  def editGet(self, request, entity, context, params=None):
     """Overwrite so we can add the contents of the ToS.
     For params see base.View.editGet().
     """
@@ -165,8 +165,7 @@ class View(base.View):
     if site_tos:
       context['tos_contents'] = site_tos.content
 
-    return super(View, self).editGet(request, entity, context, 
-        seed, params=params)
+    return super(View, self).editGet(request, entity, context, params=params)
 
   def _editGet(self, request, entity, form):
     """Sets the content of the agreed_to_tos_on field and replaces.

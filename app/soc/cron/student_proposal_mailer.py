@@ -34,9 +34,6 @@ from soc.logic.models.student_proposal import logic as proposal_logic
 # amount of students to create jobs for before updating
 DEF_STUDENT_STEP_SIZE = 10
 
-# property text_data for a sendStudentProposalMail Job
-DEF_STUDENT_PROPOSAL_MAIL_TEXT_DATA_FMT = '%s/proposal_mail'
-
 
 def setupStudentProposalMailing(job_entity):
   """Job that setup jobs that will mail students if they have been accepted in
@@ -81,15 +78,12 @@ def setupStudentProposalMailing(job_entity):
   while students:
     # for each student create a mailing job
     for student in students:
-      text_data = DEF_STUDENT_PROPOSAL_MAIL_TEXT_DATA_FMT % (
-          student.key().name())
 
-      job_query_fields['text_data'] = text_data
+      job_query_fields['key_data'] = student.key()
       mail_job = job_logic.getForFields(job_query_fields, unique=True)
 
       if not mail_job:
         # this student did not receive mail yet
-        job_fields['text_data'] = text_data
         job_fields['key_data'] = [student.key()]
         job_logic.updateOrCreateFromFields(job_fields)
 

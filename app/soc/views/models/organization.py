@@ -209,7 +209,7 @@ class View(group.View):
     """
 
     from soc.logic.models.ranker_root import logic as ranker_root_logic
-    from soc.logic.models import student_proposal as sp_logic
+    from soc.logic.models.student_proposal import logic as sp_logic
     from soc.models import student_proposal
     from soc.views.helper import list_info as list_info_helper
     from soc.views.models import student_proposal as student_proposal_view

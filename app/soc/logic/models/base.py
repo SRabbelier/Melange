@@ -443,11 +443,12 @@ class Logic(object):
 
     return entity
 
-  def updateOrCreateFromFields(self, properties):
+  def updateOrCreateFromFields(self, properties, silent=False):
     """Creates a new entity with the supplied properties.
 
     Args:
       properties: dict with entity properties and their values
+      silent: if True, do not run the _onCreate hook
     """
 
     for property_name in properties:
@@ -460,7 +461,9 @@ class Logic(object):
       key_name = self.getKeyNameFromFields(properties)
       entity = self._model.get_or_insert(key_name, **properties)
 
-    self._onCreate(entity)
+    if not silent:
+      self._onCreate(entity)
+
     return entity
 
   def isDeletable(self, entity):

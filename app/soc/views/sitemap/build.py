@@ -28,6 +28,7 @@ from django.conf.urls import defaults
 #from soc.views.models import club_app
 #from soc.views.models import club_admin
 #from soc.views.models import club_member
+from soc.views.models import cron
 from soc.views.models import document
 from soc.views.models import host
 from soc.views.models import job
@@ -83,6 +84,7 @@ sidebar.addMenu(org_app.view.getSidebarMenus)
 #sitemap.addPages(club_admin.view.getDjangoURLPatterns())
 #sitemap.addPages(club_app.view.getDjangoURLPatterns())
 #sitemap.addPages(club_member.view.getDjangoURLPatterns())
+sitemap.addPages(cron.view.getDjangoURLPatterns())
 sitemap.addPages(document.view.getDjangoURLPatterns())
 sitemap.addPages(host.view.getDjangoURLPatterns())
 sitemap.addPages(job.view.getDjangoURLPatterns())

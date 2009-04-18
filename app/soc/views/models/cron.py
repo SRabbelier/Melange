@@ -22,17 +22,12 @@ __authors__ = [
   ]
 
 
-from django import forms
 from django import http
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models.priority_group import logic as priority_group_logic
 from soc.logic.models.job import logic as job_logic
 from soc.views.helper import access
-from soc.views.helper import decorators
-from soc.views.helper import dynaform
-from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.cron.job

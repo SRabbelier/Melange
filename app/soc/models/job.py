@@ -23,10 +23,9 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from django.utils.translation import ugettext
-
 from soc.models import base
-from soc.models import priority_group
+
+import soc.models.priority_group
 
 
 class Job(base.ModelWithFieldAttributes):
@@ -35,8 +34,8 @@ class Job(base.ModelWithFieldAttributes):
 
   #: reference to the priority group this job belongs to
   priority_group = db.ReferenceProperty(
-      reference_class=priority_group.PriorityGroup, required=True,
-      collection_name='jobs')
+      reference_class=soc.models.priority_group.PriorityGroup,
+      required=True, collection_name='jobs')
 
   #: the name of the task as defined in soc.cron.job
   task_name = db.StringProperty(required=True)

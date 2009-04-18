@@ -278,7 +278,7 @@ class View(group.View):
       # show the amount of slots assigned on the webpage
       context['slots_visible'] = True
 
-    ranking_keys = dict([(k.key(),v) for k,v in ranking.iteritems()])
+    ranking_keys = dict([(k.key(), v) for k, v in ranking.iteritems()])
     proposal_keys = [i.key() for i in assigned_proposals]
 
     # update the prop_list with the ranking and coloring information

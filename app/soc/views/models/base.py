@@ -291,7 +291,6 @@ class View(object):
                          params=params, page_name=page_name, **kwargs)
 
     params = new_params
-    logic = params['logic']
 
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])

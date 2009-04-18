@@ -54,8 +54,6 @@ class View(base.View):
     new_params['name'] = "Cron"
 
     new_params['django_patterns_defaults'] = [
-        (r'^%(url_name)s/(?P<access_type>add)$',
-          'soc.views.models.%(module_name)s.add', 'Add %(name_short)s'),
         (r'^%(url_name)s/(?P<access_type>poke)$',
           'soc.views.models.%(module_name)s.poke', 'Poke %(name_short)s'),
         ]

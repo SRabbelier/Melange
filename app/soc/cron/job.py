@@ -28,8 +28,8 @@ import logging
 from google.appengine.ext import db
 from google.appengine.runtime import DeadlineExceededError
 
+from soc.cron import student_proposal_mailer
 from soc.models.job import Job
-
 
 class Error(Exception):
   """Base class for all exceptions raised by this module.
@@ -57,7 +57,10 @@ class Handler(object):
     """
 
     self.tasks = {}
-    self.tasks['sendAcceptanceEmail'] = logging.info
+    self.tasks['setupStudentProposalMailing'] = \
+        student_proposal_mailer.setupStudentProposalMailing
+    self.tasks['sendStudentProposalMail'] = \
+        student_proposal_mailer.sendStudentProposalMail
 
   def claimJob(self, job_key):
     """A transaction to claim a job.

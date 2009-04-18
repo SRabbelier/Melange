@@ -30,6 +30,18 @@ from google.appengine.runtime import DeadlineExceededError
 from soc.models.job import Job
 
 
+class Error(Exception):
+  """Base class for all exceptions raised by this module.
+  """
+  pass
+
+
+class FatalJobError(Error):
+  """Class for all errors that lead to immediate job abortion.
+  """
+  pass
+
+
 class Handler(object):
   """A handler that dispatches a cron job.
 
@@ -136,6 +148,10 @@ class Handler(object):
     except DeadlineExceededError, exception:
       db.run_in_transaction(self.freeJob, job_key)
       return False
+    except FatalJobError, exception:
+      logging.exception(exception)
+      db.run_in_transaction(self.abortJob, job_key)
+      return True
     except Exception, exception:
       logging.exception(exception)
       db.run_in_transaction(self.failJob, job_key)

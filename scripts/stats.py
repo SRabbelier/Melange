@@ -222,7 +222,7 @@ def convertProposals(org):
     fields = {
         'link_id': 't%i' % (int(time.time()*100)),
         'scope_path': proposal.org.key().id_or_name(),
-        'scope': proposal.organization,
+        'scope': proposal.org,
         'program': proposal.program,
         'student': proposal.scope,
         'title': proposal.title,
@@ -230,27 +230,30 @@ def convertProposals(org):
         'mentor': proposal.mentor,
         }
 
-    project = project_logic.updateOrCreateFromFields(fields)
+    project = project_logic.updateOrCreateFromFields(fields, silent=True)
 
     fields = {
         'status':'accepted',
         }
-    proposal_logic.updateEntityProperties(proposal, fields)
+
+    proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
   fields = {
-      'status': ['new', 'pending', 'invalid'],
+      'status': ['new', 'pending'],
       'org': org,
       }
 
-  query = proposal_logic.getQueryForFields(filter)
-  proposals = interactive.deepFetch(query)
+  querygen = lambda: proposal_logic.getQueryForFields(fields)
+  proposals = [i for i in interactive.deepFetch(querygen)]
+
+  print "rejecting %d proposals" % len(proposals)
 
   fields = {
       'status': 'rejected',
       }
 
   for proposal in proposals:
-    proposal_logic.updateEntityProperties(proposal, fields)
+    proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
 
 def loadPickle(name):
@@ -301,6 +304,7 @@ def main(args):
       'getOrgAdmins': getEntities(OrgAdmin),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
+      'convertProposals': convertProposals,
       'addFollower': addFollower,
       'Organization': Organization,
       'User': User,

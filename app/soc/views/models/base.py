@@ -283,6 +283,7 @@ class View(object):
 
     new_params = dicts.merge(params, self._params)
 
+    # redirect to scope selection view
     if ('scope_view' in new_params) and ('scope_path' not in kwargs):
       view = new_params['scope_view'].view
       redirect = new_params['scope_redirect']
@@ -292,14 +293,57 @@ class View(object):
     params = new_params
     logic = params['logic']
 
-    # Create page is an edit page with no key fields
-    empty_kwargs = {}
-    fields = logic.getKeyFieldNames()
-    for field in fields:
-      empty_kwargs[field] = None
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
 
-    return self.edit(request, access_type, page_name=page_name,
-                     params=params, seed=kwargs, **empty_kwargs)
+    if request.method == 'POST':
+      return self.createPost(request, context, params)
+    else:
+      return self.createGet(request, context, params, kwargs)
+
+  def createGet(self, request, context, params, seed):
+    """See editGet.
+
+    Handles generating the patch to create new entities.
+    """
+
+    self._editSeed(request, seed)
+
+    if seed:
+      # pass the seed through the  context to _constructResponse
+      # it will be popped before dispatching to Django
+      context['seed'] = seed
+      form = params['create_form'](initial=seed)
+    else:
+      form = params['create_form']()
+
+    return self._constructResponse(request, None, context, form, params)
+
+  def createPost(self, request, context, params):
+    """See editPost.
+
+    Handles the creation of new entities.
+    """
+
+    form = params['create_form'](request.POST)
+
+    if not form.is_valid():
+      return self._constructResponse(request, None, context, form, params)
+
+    _, fields = forms.collectCleanedFields(form)
+    self._editPost(request, None, fields)
+
+    logic = params['logic']
+    entity = logic.updateOrCreateFromFields(fields)
+
+    page_params = params['edit_params']
+    params['suffix'] = entity.key().id_or_name()
+
+    request.path = params['edit_redirect'] % params
+
+    return helper.responses.redirectToChangedSuffix(
+        request, None, params=page_params)
 
   @decorators.merge_params
   @decorators.check_access
@@ -338,25 +382,23 @@ class View(object):
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
-    entity = None
 
     try:
-      if all(kwargs.values()):
-        entity = logic.getFromKeyFieldsOr404(kwargs)
+      entity = logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
-      if not seed:
-        error.message_fmt = (
-          error.message_fmt + self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
-            'entity_type_lower' : params['name'].lower(),
-            'entity_type' : params['name'],
-            'create' : params['missing_redirect']})
-        return helper.responses.errorResponse(
-            error, request, template=params['error_public'], context=context)
+      msg = self.DEF_CREATE_NEW_ENTITY_MSG_FMT % {
+          'entity_type_lower' : params['name'].lower(),
+          'entity_type' : params['name'],
+          'create' : params['missing_redirect']
+          }
+      error.message_fmt = error.message_fmt + msg
+      return helper.responses.errorResponse(
+          error, request, context=context)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
     else:
-      return self.editGet(request, entity, context, seed, params=params)
+      return self.editGet(request, entity, context, params=params)
 
   @decorators.merge_params
   def editPost(self, request, entity, context, params=None):
@@ -390,38 +432,27 @@ class View(object):
 
     logic = params['logic']
 
-    if entity:
-      form = params['edit_form'](request.POST)
-    else:
-      form = params['create_form'](request.POST)
+    form = params['edit_form'](request.POST)
 
     if not form.is_valid():
       return self._constructResponse(request, entity, context, form, params)
 
-    key_name, fields = forms.collectCleanedFields(form)
+    fields = forms.collectCleanedFields(form)
 
     self._editPost(request, entity, fields)
 
-    if not key_name:
-      key_name = logic.getKeyNameFromFields(fields)
-
-    entity = logic.updateOrCreateFromKeyName(fields, key_name)
-
-    if not entity:
-      return http.HttpResponseRedirect('/')
+    entity = logic.updateEntityProperties(entity, fields)
 
     page_params = params['edit_params']
     params['suffix'] = entity.key().id_or_name()
 
     request.path = params['edit_redirect'] % params
 
-    # redirect to (possibly new) location of the entity
-    # (causes 'Profile saved' message to be displayed)
     return helper.responses.redirectToChangedSuffix(
         request, None, params=page_params)
 
   @decorators.merge_params
-  def editGet(self, request, entity, context, seed, params=None):
+  def editGet(self, request, entity, context, params=None):
     """Processes GET requests for the specified entity.
 
     Params usage:
@@ -464,31 +495,15 @@ class View(object):
       if (not entity) or (not is_self_referrer):
         return http.HttpResponseRedirect(request.path)
 
-    if entity:
-      # note: no message will be displayed if parameter is not present
-      context['notice'] = requests.getSingleIndexedParamValue(
-          request, params['submit_msg_param_name'],
-          values=params['save_message'])
+    # note: no message will be displayed if parameter is not present
+    context['notice'] = requests.getSingleIndexedParamValue(
+        request, params['submit_msg_param_name'],
+        values=params['save_message'])
 
-      # populate form with the existing entity
-      form = params['edit_form'](instance=entity)
+    # populate form with the existing entity
+    form = params['edit_form'](instance=entity)
 
-      if 'key_name' in form.fields:
-        form.fields['key_name'].initial = entity.key().id_or_name()
-
-      self._editGet(request, entity, form)
-    else:
-      seed = seed if seed else {}
-      dicts.merge(seed, request.GET)
-      self._editSeed(request, seed)
-
-      if seed:
-        # pass the seed through the  context to _constructResponse
-        # it will be popped before dispatching to Django
-        context['seed'] = seed
-        form = params['create_form'](initial=seed)
-      else:
-        form = params['create_form']()
+    self._editGet(request, entity, form)
 
     return self._constructResponse(request, entity, context, form, params)
 

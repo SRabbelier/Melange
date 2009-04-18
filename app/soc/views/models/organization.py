@@ -390,29 +390,33 @@ class View(group.View):
 
     from soc.views.models import student_project as student_project_view
 
-    ap_params = student_project_view.view.getParams().copy() # accepted projects
+    program_entity = entity.scope
 
-    # define the list redirect action to show the notification
-    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
-    ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
-        entity.name)
-    ap_params['list_heading'] = 'soc/student_project/list/heading.html'
-    ap_params['list_row'] = 'soc/student_project/list/row.html'
+    if timeline_helper.isAfterEvent(program_entity.timeline,
+                                    'accepted_students_announced_deadline'):
+      ap_params = student_project_view.view.getParams().copy() # accepted projects
 
-    # only show projects that have not failed
-    filter = {'scope': entity,
-              'status': ['accepted', 'mid_term_passed', 'passed']}
+      # define the list redirect action to show the notification
+      ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
+          entity.name)
+      ap_params['list_heading'] = 'soc/student_project/list/heading.html'
+      ap_params['list_row'] = 'soc/student_project/list/row.html'
 
-    ap_list = lists.getListContent(request, ap_params, filter, idx=0,
-                                   need_content=True)
+      # only show projects that have not failed
+      filter = {'scope': entity,
+                'status': ['accepted', 'mid_term_passed', 'passed']}
 
-    contents = []
+      ap_list = lists.getListContent(request, ap_params, filter, idx=0,
+                                     need_content=True)
 
-    if ap_list:
-      contents.append(ap_list)
+      contents = []
 
-    # construct the list and put it into the context
-    context['list'] = soc.logic.lists.Lists(contents)
+      if ap_list:
+        contents.append(ap_list)
+
+      # construct the list and put it into the context
+      context['list'] = soc.logic.lists.Lists(contents)
 
     return super(View, self)._public(request=request, 
         entity=entity, context=context)

@@ -65,13 +65,14 @@ class Logic(object):
   """
 
   def __init__(self, model, base_model=None, scope_logic=None,
-               name=None, skip_properties=None):
+               name=None, skip_properties=None, id_based=False):
     """Defines the name, key_name and model for this entity.
     """
 
     self._model = model
     self._base_model = base_model
     self._scope_logic = scope_logic
+    self._id_based = id_based
 
     if name:
       self._name = name
@@ -202,10 +203,28 @@ class Logic(object):
       key_name: key name of entity
     """
 
+    if self._id_based:
+      raise Error("getFromKeyName called on an id based logic")
+
     if not key_name:
       raise InvalidArgumentError
 
     return self._model.get_by_key_name(key_name)
+
+  def getFromID(self, id):
+    """Returns entity for id or None if not found.
+
+    Args:
+      id: id of entity
+    """
+
+    if not self._id_based:
+      raise Error("getFromID called on a not id based logic")
+
+    if not id:
+      raise InvalidArgumentError
+
+    return self._model.get_by_id(id)
 
   def getFromKeyNameOr404(self, key_name):
     """Like getFromKeyName but expects to find an entity.
@@ -221,6 +240,23 @@ class Logic(object):
 
     msg = ugettext('There is no "%(name)s" named %(key_name)s.') % {
         'name': self._name, 'key_name': key_name}
+
+    raise out_of_band.Error(msg, status=404)
+
+  def getFromIDOr404(self, id):
+    """Like getFromID but expects to find an entity.
+
+    Raises:
+      out_of_band.Error if no entity is found
+    """
+
+    entity = self.getFromID(id)
+
+    if entity:
+      return entity
+
+    msg = ugettext('There is no "%(name)s" with id %(id)s.') % {
+        'name': self._name, 'id': id}
 
     raise out_of_band.Error(msg, status=404)
 
@@ -405,6 +441,26 @@ class Logic(object):
       # the entity has been updated call _onUpdate
       self._onUpdate(entity)
 
+    return entity
+
+  def updateOrCreateFromFields(self, properties):
+    """Creates a new entity with the supplied properties.
+
+    Args:
+      properties: dict with entity properties and their values
+    """
+
+    for property_name in properties:
+      self._createField(properties, property_name)
+
+    if self._id_based:
+      entity = self._model(**properties)
+      entity.put()
+    else:
+      key_name = self.getKeyNameFromFields(properties)
+      entity = self._model.get_or_insert(key_name, **properties)
+
+    self._onCreate(entity)
     return entity
 
   def isDeletable(self, entity):

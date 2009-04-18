@@ -51,7 +51,7 @@ class Job(base.ModelWithFieldAttributes):
   #: the date this job was last modified on
   last_modified_on = db.DateTimeProperty(auto_now_add=True)
 
-  #: the amount of times this job raised an Exception (other than an
+  #: the amount of times this job raised an Exception (other than a
   #: DeadlineExceededException).
   errors = db.IntegerProperty(default=0)
 

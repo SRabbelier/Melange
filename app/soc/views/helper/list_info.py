@@ -24,7 +24,7 @@ __authors__ = [
 
 def getStudentProposalInfo(ranking, proposals_keys):
   """Returns a function that returns information about the rank and assignment.
-  
+
   Args:
     ranking: dict with a mapping from Student Proposal key to rank
     proposals_keys: list of proposal keys assigned a slot

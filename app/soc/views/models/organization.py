@@ -209,6 +209,7 @@ class View(group.View):
     """
 
     from soc.logic.models.ranker_root import logic as ranker_root_logic
+    from soc.logic.models import student_proposal as sp_logic
     from soc.models import student_proposal
     from soc.views.helper import list_info as list_info_helper
     from soc.views.models import student_proposal as student_proposal_view
@@ -272,14 +273,17 @@ class View(group.View):
     # only when the program allows allocations 
     # to be seen we should color the list
     if org_entity.scope.allocations_visible:
-      assigned_proposals = getProposalsToBeAcceptedForOrg(org_entity)
+      assigned_proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
 
       # show the amount of slots assigned on the webpage
       context['slots_visible'] = True
 
+    ranking_keys = dict([(k.key(),v) for k,v in ranking.iteritems()])
+    proposal_keys = [i.key() for i in assigned_proposals]
+
     # update the prop_list with the ranking and coloring information
-    prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking,
-        assigned_proposals), None)
+    prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking_keys,
+        proposal_keys), None)
 
     # check if the current user is a mentor
     user_entity = user_logic.logic.getForCurrentAccount()

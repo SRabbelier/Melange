@@ -150,6 +150,8 @@ class View(presence_with_tos.View):
 
       submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
           "List Documents", 'any_access')]
+    submenus += [('/priority_group/list', "List Priority Groups", 'edit')]
+    submenus += [('/job/list', "List Jobs", 'edit')]
 
     new_params = {}
     new_params['sidebar_additional'] = submenus

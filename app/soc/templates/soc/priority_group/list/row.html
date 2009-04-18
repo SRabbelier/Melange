@@ -1,0 +1,13 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'"
+onclick="document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right">
+   <div class="link_id">
+    <a class="noul"
+     href="{{ list.redirect }}">{{ list.item.link_id }}</a>
+   </div>
+  </td>
+  <td><div class="name">{{ list.item.name }}</div></td>
+  <td><div class="priority">
+    {% if not list.item.priority %}disabled{% else %}{{ list.item.priority }}{% endif %}
+  </div></td>
+</tr>

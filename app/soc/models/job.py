@@ -46,7 +46,7 @@ class Job(base.ModelWithFieldAttributes):
   #: Finished means that this job has been completed.
   #: Aborted means that this job has been aborted due to a fatal error.
   status = db.StringProperty(default='waiting',
-      choices=['waiting','started','finished', 'aborted'])
+      choices=['waiting', 'started', 'finished', 'aborted'])
 
   #: the date this job was last modified on
   last_modified_on = db.DateTimeProperty(auto_now_add=True)

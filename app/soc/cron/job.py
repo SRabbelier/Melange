@@ -110,6 +110,8 @@ class Handler(object):
 
   def handle(self, job_key):
     """Handle one job.
+
+    Returns: whether another job should be started after this one
     """
 
     try:

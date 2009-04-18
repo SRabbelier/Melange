@@ -64,21 +64,13 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-  def add(self, request, access_type, page_name):
-    group = priority_group_logic.getGroup(priority_group_logic.EMAIL)
-
-    fields = {
-        'priority_group': group,
-        'task_name': 'sendAcceptanceEmail',
-        'text_data': "O HI THAR",
-        }
-
-    job_logic.updateOrCreateFromFields(fields)
-
-    return http.HttpResponse("Done")
-
   def poke(self, request, access_type, page_name):
-    """
+    """View called by the cron system that handles jobs.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
     """
 
     order = ['-priority']
@@ -117,5 +109,4 @@ class View(base.View):
 
 view = View()
 
-add = view.add
 poke = view.poke

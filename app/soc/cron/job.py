@@ -185,5 +185,13 @@ class Handler(object):
       db.run_in_transaction(self.failJob, job_key)
       return self.ERRORED
 
+  def iterate(self, jobs, retry_jobs):
+    """Trivial iterator that iterates over jobs then retry_jobs
+    """
+
+    for job in jobs:
+      yield job
+    while retry_jobs:
+      yield retry_jobs[0]
 
 handler = Handler()

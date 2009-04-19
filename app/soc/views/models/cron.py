@@ -92,14 +92,22 @@ class View(base.View):
       queryGen = lambda: job_logic.getQueryForFields(filter=filter)
       jobs = job_logic.entityIterator(queryGen, batchSize=10)
 
-      for job in jobs:
-        if random.randint(0, 5) > 0:
-          continue
-        job_key = job.key().id()
-        good = handler.handle(job_key)
+      good = True
+      retry_jobs = []
 
-        if not good:
+      for job in handler.iterate(jobs, retry_jobs):
+        if random.randint(0, 3) > 0:
+          retry_jobs.append(job)
+          continue
+
+        job_key = job.key().id()
+        status = handler.handle(job_key)
+
+        if status is handler.OUT_OF_TIME:
           break
+
+        if status is handler.ERRORED:
+          retry_jobs.append(job)
 
         jobs_completed += 1
 

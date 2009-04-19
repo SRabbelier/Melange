@@ -121,7 +121,6 @@ def sendStudentProposalMail(job_entity):
     job_entity: a Job entity with key_data set to [student_key]
   """
 
-  from soc.cron.job import Error
   from soc.cron.job import FatalJobError
 
 
@@ -142,8 +141,9 @@ def sendStudentProposalMail(job_entity):
 
     if not default_sender:
       # no default sender abort
-      raise Error('No valid sender address could be found, try setting '
-                  'a no-reply address on the site settings page')
+      raise FatalJobError('No valid sender address could be found, try '
+                          'setting a no-reply address on the site settings '
+                          'page')
     else:
       (sender_name, sender) = default_sender
 

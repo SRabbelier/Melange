@@ -321,6 +321,34 @@ class View(group.View):
     new_list = lists.getListContent(
         request, new_params, filter, idx=2, need_content=True)
 
+    ap_params = list_params.copy() # accepted proposals
+
+    description = ugettext('List of accepted %s sent to %s ') % (
+        ap_params['name_plural'], org_entity.name)
+
+    ap_params['list_description'] = description
+    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+
+    filter = {'org': org_entity,
+              'status': 'accepted'}
+
+    ap_list = lists.getListContent(
+        request, ap_params, filter, idx=3, need_content=True)
+
+    rp_params = list_params.copy() # rejected proposals
+
+    description = ugettext('List of rejected %s sent to %s ') % (
+        rp_params['name_plural'], org_entity.name)
+
+    rp_params['list_description'] = description
+    rp_params['list_action'] = (redirects.getPublicRedirect, rp_params)
+
+    filter = {'org': org_entity,
+              'status': 'rejected'}
+
+    rp_list = lists.getListContent(
+        request, rp_params, filter, idx=4, need_content=True)
+
     ip_params = list_params.copy() # ineligible proposals
 
     description = ugettext('List of ineligible %s sent to %s ') % (
@@ -333,7 +361,7 @@ class View(group.View):
               'status': 'invalid'}
 
     ip_list = lists.getListContent(
-        request, ip_params, filter, idx=3, need_content=True)
+        request, ip_params, filter, idx=5, need_content=True)
 
     # fill contents with all the needed lists
     if new_list != None:
@@ -343,6 +371,12 @@ class View(group.View):
 
     if mentor_entity and mp_list != None:
       contents.append(mp_list)
+
+    if ap_list != None:
+      contents.append(ap_list)
+
+    if rp_list != None:
+      contents.append(rp_list)
 
     if ip_list != None:
       contents.append(ip_list)

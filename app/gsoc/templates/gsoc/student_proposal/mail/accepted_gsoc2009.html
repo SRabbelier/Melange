@@ -1,0 +1,46 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block greeting %}
+Dear {{ to_name }},
+{% endblock %}
+
+
+{% block content %}
+<p>
+Congratulations! Your proposal "{{ proposal_title }}" as submitted to "{{ org_name }}" 
+has been accepted for {{ program_name }}. Over the next few days, we will add 
+you to the private Google Summer of Code Student Discussion List. Over the next few 
+weeks, we will send instructions to this list regarding turn in proof of enrollment, 
+tax forms, etc.
+</p>
+
+<p>
+Now that you've been accepted, please take the opportunity to speak with your mentors 
+about plans for the Community Bonding Period: what documentation should you be 
+reading, what version control system will you need to set up, etc., before start of 
+coding begins on May 23rd.
+</p>
+
+<p>
+Welcome to {{ program_name }}! We look forward to having you with us.
+</p>
+{% endblock %}
+
+
+{% block signature %}
+  With best regards,<br />
+  The Google Summer of Code Program Administration Team
+{% endblock %}

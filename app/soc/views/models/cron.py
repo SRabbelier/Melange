@@ -87,8 +87,8 @@ class View(base.View):
           'status': 'waiting',
           }
 
-      query = job_logic.getQueryForFields(filter=filter)
-      jobs = job_logic.getAll(query)
+      queryGen = lambda: job_logic.getQueryForFields(filter=filter)
+      jobs = job_logic.entityIterator(queryGen, batchSize=10)
 
       for job in jobs:
         job_key = job.key().id()

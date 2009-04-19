@@ -272,6 +272,28 @@ def startSpam():
   job_logic.updateOrCreateFromFields(job_fields)
 
 
+def deleteEntities(model, step_size=25):
+  """Deletes all entities of the specified type
+  """
+
+  print "Deleting..."
+  count = 0
+
+  while True:
+    entities = model.all().fetch(step_size)
+
+    if not entities:
+      break
+
+    for entity in entities:
+      entity.delete()
+
+    count += step_size
+
+    print "deleted %d entities" % count
+
+  print "Done"
+
 def loadPickle(name):
   """Loads a pickle.
   """
@@ -299,6 +321,9 @@ def main(args):
   from soc.models.student import Student
   from soc.models.mentor import Mentor
   from soc.models.org_admin import OrgAdmin
+  from soc.models.job import Job
+  from soc.models.student_proposal import StudentProposal
+  from soc.models.student_project import StudentProject
 
   def slotSaver(org, value):
     org.slots = value
@@ -313,6 +338,8 @@ def main(args):
       'orgStats': orgStats,
       'printPopularity': printPopularity,
       'saveValues': saveValues,
+      'getEntities': getEntities,
+      'deleteEntities': deleteEntities,
       'getOrgs': getEntities(Organization),
       'getUsers': getEntities(User),
       'getStudents': getEntities(Student),
@@ -323,10 +350,13 @@ def main(args):
       'convertProposals': convertProposals,
       'addFollower': addFollower,
       'Organization': Organization,
+      'Job': Job,
       'User': User,
       'Student': Student,
       'Mentor': Mentor,
       'OrgAdmin': OrgAdmin,
+      'StudentProject': StudentProject,
+      'StudentProposal': StudentProposal,
       'slotSaver': slotSaver,
       'popSaver': popSaver,
       'rawSaver': rawSaver,

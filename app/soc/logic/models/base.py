@@ -508,6 +508,36 @@ class Logic(object):
 
     return result
 
+  def entityIterator(self, queryGen, batchSize = 100):
+    """Iterator that yields an entity in batches.
+
+    Args:
+      queryGen: should return a Query object
+      batchSize: how many entities to retrieve in one datastore call
+
+    Retrieved from http://tinyurl.com/d887ll (AppEngine cookbook).
+    """
+
+     # AppEngine will not fetch more than 1000 results
+    batchSize = min(batchSize,1000)
+
+    done = False
+    count = 0
+    key = None
+
+    while not done:
+      query = queryGen()
+      if key:
+        query.filter("__key__ > ",key)
+      results = query.fetch(batchSize)
+      for result in results:
+        count += 1
+        yield result
+      if batchSize > len(results):
+        done = True
+      else:
+        key = results[-1].key()
+
   def _createField(self, entity_properties, name):
     """Hook called when a field is created.
 

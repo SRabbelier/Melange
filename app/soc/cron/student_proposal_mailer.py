@@ -22,8 +22,7 @@ __authors__ = [
   ]
 
 
-import logging
-
+from soc.logic import mail_dispatcher
 from soc.logic.models.job import logic as job_logic
 from soc.logic.models.priority_group import logic as priority_logic
 from soc.logic.models.program import logic as program_logic
@@ -33,6 +32,14 @@ from soc.logic.models.student_proposal import logic as proposal_logic
 
 # amount of students to create jobs for before updating
 DEF_STUDENT_STEP_SIZE = 10
+
+# template for the accepted proposal mail
+DEF_ACCEPTED_MAIL_TEMPLATE = \
+    'gsoc/student_proposal/mail/accepted_gsoc2009.html'
+
+# template for the rejected proposal mail
+DEF_REJECTED_MAIL_TEMPLATE = \
+    'gsoc/student_proposal/mail/rejected_gsoc2009.html'
 
 
 def setupStudentProposalMailing(job_entity):
@@ -114,6 +121,7 @@ def sendStudentProposalMail(job_entity):
     job_entity: a Job entity with key_data set to [student_key]
   """
 
+  from soc.cron.job import Error
   from soc.cron.job import FatalJobError
 
 
@@ -129,15 +137,47 @@ def sendStudentProposalMail(job_entity):
   proposal = proposal_logic.getForFields(fields, unique=True)
 
   if proposal:
+    # a proposal has been found we must sent out an email
+    default_sender = mail_dispatcher.getDefaultMailSender()
+
+    if not default_sender:
+      # no default sender abort
+      raise Error('No valid sender address could be found, try setting '
+                  'a no-reply address on the site settings page')
+    else:
+      (sender_name, sender) = default_sender
+
+    # construct the contents of the email
+    student_entity = proposal.scope
+    program_entity = proposal.program
+
+    context = {
+        'to': student_entity.email,
+        'to_name': student_entity.given_name,
+        'sender': sender,
+        'sender_name': sender_name,
+        'program_name': program_entity.name,
+    }
+
     # check if the student has an accepted proposal
     fields['status'] = 'accepted'
     accepted_proposal = proposal_logic.getForFields(fields, unique=True)
 
-    # TODO(ljvderijk) replace with real mail sending
     if accepted_proposal:
-      logging.info('Sending acceptance mail to %s' % (student_entity.name()))
+      org_entity = accepted_proposal.org
+      # use the accepted template and subject
+      template = DEF_ACCEPTED_MAIL_TEMPLATE
+      context['subject'] = 'Congratulations!'
+      context['proposal_title'] = accepted_proposal.title
+      context['org_name'] = accepted_proposal.org.name
     else:
-      logging.info('Sending rejectance mail to %s' % (student_entity.name()))
+      # use the rejected template and subject
+      template = DEF_REJECTED_MAIL_TEMPLATE
+      context['subject'] = 'Thank you for applying to %s' % (
+          program_entity.name)
+
+    # send out the constructed email
+    mail_dispatcher.sendMailFromTemplate(template, context)
 
   # we are done here
   return

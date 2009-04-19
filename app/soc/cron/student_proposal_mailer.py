@@ -113,6 +113,7 @@ def setupStudentProposalMailing(job_entity):
   # we are finished
   return
 
+
 def sendStudentProposalMail(job_entity):
   """Job that will send out an email to a student that sent in a proposal
   that either got accepted or rejected.
@@ -181,4 +182,3 @@ def sendStudentProposalMail(job_entity):
 
   # we are done here
   return
-

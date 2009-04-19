@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import random
+
 from django import http
 
 from soc.logic import dicts
@@ -91,6 +93,8 @@ class View(base.View):
       jobs = job_logic.entityIterator(queryGen, batchSize=10)
 
       for job in jobs:
+        if random.randint(0, 5) > 0:
+          continue
         job_key = job.key().id()
         good = handler.handle(job_key)
 

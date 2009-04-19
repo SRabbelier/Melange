@@ -148,11 +148,11 @@ def getDefaultMailSender():
   # use the email address of the current logged in user
   account = accounts.getCurrentAccount(normalize=False)
 
-  # we need to retrieve account seperately, as user_logic normalizes it
+  # we need to retrieve account separately, as user_logic normalizes it
   # and the GAE admin API is case sensitive
   user_entity = user_logic.logic.getForAccount(account)
 
-  if not account:
+  if not (account and user_entity):
     logging.warning('Non-Authenticated user triggered getDefaultMailSender')
     return None
 

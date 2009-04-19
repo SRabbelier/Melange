@@ -256,6 +256,22 @@ def convertProposals(org):
     proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
 
+def startSpam():
+  from soc.logic.models.job import logic as job_logic
+  from soc.logic.models.priority_group import logic as priority_logic
+  from soc.logic.models.program import logic as program_logic
+
+  program_entity = program_logic.getFromKeyName('google/gsoc2009')
+
+  priority_group = priority_logic.getGroup(priority_logic.EMAIL)
+  job_fields = {
+      'priority_group': priority_group,
+      'task_name': 'setupStudentProposalMailing',
+      'key_data': [program_entity.key()]}
+
+  job_logic.updateOrCreateFromFields(job_fields)
+
+
 def loadPickle(name):
   """Loads a pickle.
   """
@@ -314,6 +330,7 @@ def main(args):
       'slotSaver': slotSaver,
       'popSaver': popSaver,
       'rawSaver': rawSaver,
+      'startSpam': startSpam,
   }
 
   interactive.remote(args, context)

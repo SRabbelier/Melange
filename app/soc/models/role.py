@@ -374,3 +374,8 @@ class Role(soc.models.linkable.Linkable):
       return self.name_on_documents
     else:
       return self.name()
+
+  def ccTld(self):
+    """Property as 'ccTld' for use in Maps.
+    """
+    return countries.COUNTRIES_TO_CCTLD[self.res_country]

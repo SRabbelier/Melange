@@ -56,6 +56,12 @@ class Handler(object):
     """Constructs a new Handler with all known jobs set.
     """
 
+    self.OUT_OF_TIME = 0
+    self.ALREADY_CLAIMED = 1
+    self.SUCCESS = 2
+    self.ABORTED = 3
+    self.ERRORED = 4
+
     self.tasks = {}
     self.tasks['setupStudentProposalMailing'] = \
         student_proposal_mailer.setupStudentProposalMailing
@@ -153,12 +159,12 @@ class Handler(object):
 
       if not job:
         # someone already claimed the job
-        return True
+        return self.ALREADY_CLAIMED
 
       if job.task_name not in self.tasks:
         logging.error("Unknown job %s" % job.task_name)
         db.run_in_transaction(self.abortJob, job_key)
-        return True
+        return self.ABORTED
 
       task = self.tasks[job.task_name]
 
@@ -166,18 +172,18 @@ class Handler(object):
       task(job)
 
       db.run_in_transaction(self.finishJob, job_key)
-      return True
+      return self.SUCCESS
     except DeadlineExceededError, exception:
       db.run_in_transaction(self.timeoutJob, job_key)
-      return False
+      return self.OUT_OF_TIME
     except FatalJobError, exception:
       logging.exception(exception)
       db.run_in_transaction(self.abortJob, job_key)
-      return True
+      return self.ABORTED
     except Exception, exception:
       logging.exception(exception)
       db.run_in_transaction(self.failJob, job_key)
-      return True
+      return self.ERRORED
 
 
 handler = Handler()

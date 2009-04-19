@@ -124,12 +124,12 @@ def sendMail(context):
 
 def getDefaultMailSender():
   """Returns the sender that currently can be used to send emails.
-  
+
   Returns:
     - A tuple containing (sender_name, sender_address)
     Consisting of:
     - If available the site name and noreply address from the site singleton
-    - Or the public name and email address of the current logged in User
+    - Or the (public) name and email address of the current logged in User
     - None if there is no address to return
   """
 
@@ -148,12 +148,15 @@ def getDefaultMailSender():
   # use the email address of the current logged in user
   account = accounts.getCurrentAccount(normalize=False)
 
+  if not account:
+    logging.warning('Non-Authenticated user triggered getDefaultMailSender '
+                    'please set a no-reply address in Site settings')
+    return None
+
   # we need to retrieve account separately, as user_logic normalizes it
   # and the GAE admin API is case sensitive
   user_entity = user_logic.logic.getForAccount(account)
 
-  if not (account and user_entity):
-    logging.warning('Non-Authenticated user triggered getDefaultMailSender')
-    return None
+  name = user_entity.name if user_entity else account.nickname()
 
-  return (user_entity.name, account.email())
+  return (name, account.email())

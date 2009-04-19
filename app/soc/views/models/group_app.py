@@ -173,7 +173,8 @@ class View(base.View):
     list_params = params.copy()
     index = 0
 
-    filter = {}
+    if not filter:
+      filter = {}
 
     for status, action in selection:
       # only select the requests that have been pre-accpeted

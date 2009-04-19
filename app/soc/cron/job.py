@@ -95,7 +95,7 @@ class Handler(object):
     return job.put()
 
   def timeoutJob(self, job_key):
-    """A transaction to tiemout a job.
+    """A transaction to timeout a job.
     """
 
     job = Job.get_by_id(job_key)

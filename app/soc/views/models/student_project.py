@@ -62,6 +62,7 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
+    rights['any_access'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = ['checkIsDeveloper']
     rights['delete'] = ['checkIsDeveloper']

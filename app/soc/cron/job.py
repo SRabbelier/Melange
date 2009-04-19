@@ -70,6 +70,8 @@ class Handler(object):
 
   def claimJob(self, job_key):
     """A transaction to claim a job.
+
+    The transaction is rolled back if the status is not 'waiting'.
     """
 
     job = Job.get_by_id(job_key)
@@ -84,21 +86,11 @@ class Handler(object):
     else:
       return None
 
-  def freeJob(self, job_key):
-    """A transaction to free a job.
+  def timeoutJob(self, job):
+    """Timeout a job.
+
+    If a job has timed out more than 50 times, the job is aborted.
     """
-
-    job = Job.get_by_id(job_key)
-
-    job.status = 'waiting'
-
-    return job.put()
-
-  def timeoutJob(self, job_key):
-    """A transaction to timeout a job.
-    """
-
-    job = Job.get_by_id(job_key)
 
     job.timeouts += 1
 
@@ -107,16 +99,16 @@ class Handler(object):
     else:
       job.status = 'waiting'
 
+    job.put()
+
     job_id = job.key().id()
     logging.debug("job %d now timeout %d time(s)" % (job_id, job.timeouts))
 
-    return job.put()
+  def failJob(self, job):
+    """Fail a job.
 
-  def failJob(self, job_key):
-    """A transaction to fail a job.
+    If the job has failed more than 5 times, the job is aborted.
     """
-
-    job = Job.get_by_id(job_key)
 
     job.errors += 1
 
@@ -125,34 +117,37 @@ class Handler(object):
     else:
       job.status = 'waiting'
 
+    job.put()
+
     job_id = job.key().id()
     logging.warning("job %d now failed %d time(s)" % (job_id, job.errors))
 
-    return job.put()
-
-  def finishJob(self, job_key):
-    """A transaction to finish a job.
+  def finishJob(self, job):
+    """Finish a job.
     """
 
-    job = Job.get_by_id(job_key)
     job.status = 'finished'
+    job.put()
 
-    return job.put()
-
-  def abortJob(self, job_key):
-    """A transaction to abort a job.
+  def abortJob(self, job):
+    """Abort a job.
     """
 
-    job = Job.get_by_id(job_key)
     job.status = 'aborted'
-
-    return job.put()
+    job.put()
 
   def handle(self, job_key):
     """Handle one job.
 
-    Returns: whether another job should be started after this one
+    Returns: one of the following status codes:
+      self.OUT_OF_TIME: returned when a DeadlineExceededError is raised
+      self.ALREADY_CLAIMED: if job.status is not 'waiting'
+      self.SUCCESS: if the job.status has been set to 'succes'
+      self.ABORTED: if the job.status has been set to 'aborted'
+      self.ERRORED: if the job encountered an error
     """
+
+    job = None
 
     try:
       job = db.run_in_transaction(self.claimJob, job_key)
@@ -171,18 +166,21 @@ class Handler(object):
       # execute the actual job
       task(job)
 
-      db.run_in_transaction(self.finishJob, job_key)
+      self.finishJob(job)
       return self.SUCCESS
     except DeadlineExceededError, exception:
-      db.run_in_transaction(self.timeoutJob, job_key)
+      if job:
+        self.timeoutJob(job)
       return self.OUT_OF_TIME
     except FatalJobError, exception:
       logging.exception(exception)
-      db.run_in_transaction(self.abortJob, job_key)
+      if job:
+        self.abortJob(job)
       return self.ABORTED
     except Exception, exception:
       logging.exception(exception)
-      db.run_in_transaction(self.failJob, job_key)
+      if job:
+        self.failJob(job)
       return self.ERRORED
 
   def iterate(self, jobs, retry_jobs):

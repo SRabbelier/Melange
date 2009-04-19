@@ -88,6 +88,24 @@ class Handler(object):
 
     return job.put()
 
+  def timeoutJob(self, job_key):
+    """A transaction to tiemout a job.
+    """
+
+    job = Job.get_by_id(job_key)
+
+    job.timeouts += 1
+
+    if job.timeouts > 50:
+      job.status = 'aborted'
+    else:
+      job.status = 'waiting'
+
+    job_id = job.key().id()
+    logging.debug("job %d now timeout %d time(s)" % (job_id, job.timeouts))
+
+    return job.put()
+
   def failJob(self, job_key):
     """A transaction to fail a job.
     """
@@ -150,7 +168,7 @@ class Handler(object):
       db.run_in_transaction(self.finishJob, job_key)
       return True
     except DeadlineExceededError, exception:
-      db.run_in_transaction(self.freeJob, job_key)
+      db.run_in_transaction(self.timeoutJob, job_key)
       return False
     except FatalJobError, exception:
       logging.exception(exception)

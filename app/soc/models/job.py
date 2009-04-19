@@ -52,8 +52,11 @@ class Job(base.ModelWithFieldAttributes):
   last_modified_on = db.DateTimeProperty(auto_now_add=True)
 
   #: the amount of times this job raised an Exception (other than a
-  #: DeadlineExceededException).
+  #: DeadlineExceededError).
   errors = db.IntegerProperty(default=0)
+
+  #: the amount of times this job raised an DeadlineExceededError.
+  timeouts = db.IntegerProperty(default=0)
 
   #: the data that the worker will use to process this job
   text_data = db.TextProperty(required=False, default="")

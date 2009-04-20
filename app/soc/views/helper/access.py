@@ -983,7 +983,7 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkisAfterEvent(self, django_args, event_name, key_name_arg):
+  def checkIsAfterEvent(self, django_args, event_name, key_name_arg):
     """Checks if the given event has taken place for the given program.
 
     Args:

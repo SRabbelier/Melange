@@ -93,7 +93,7 @@ class View(presence.View):
     rights['slots'] = ['checkIsHostForProgram']
     rights['show_duplicates'] = ['checkIsHostForProgram']
     rights['assigned_proposals'] = ['checkIsHostForProgram']
-    rights['accepted_orgs'] = [('checkisAfterEvent',
+    rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['accepted_organization_announced_deadline', '__all__'])]
 
     new_params = {}

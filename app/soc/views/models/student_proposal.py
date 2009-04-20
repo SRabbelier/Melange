@@ -637,7 +637,8 @@ class View(base.View):
 
     program_entity = entity.program
 
-    if timeline_helper.isAfterEvent(program_entity.timeline, 'accepted_students_announced_deadline'):
+    if timeline_helper.isAfterEvent(program_entity.timeline,
+                                    'accepted_students_announced_deadline'):
       return self.reviewAfterDeadline(request, context, params, entity,
                                       **kwargs)
 

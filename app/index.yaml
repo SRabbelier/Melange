@@ -36,6 +36,13 @@ indexes:
   - name: status
   - name: mentor
 
+# used to determine which proposals will be accepted
+- kind: StudentProposal
+  properties:
+  - name: org
+  - name: status
+  - name: __key__
+
 # used for the bulk mailing of students
 - kind: Student
   properties:

@@ -259,6 +259,9 @@ def convertProposals(org):
 
 
 def startSpam():
+  """Creates the job that is responsible for sending mails
+  """
+
   from soc.logic.models.job import logic as job_logic
   from soc.logic.models.priority_group import logic as priority_logic
   from soc.logic.models.program import logic as program_logic
@@ -272,6 +275,48 @@ def startSpam():
       'key_data': [program_entity.key()]}
 
   job_logic.updateOrCreateFromFields(job_fields)
+
+
+def reviveJobs(amount):
+  """Sets jobs that are stuck in 'aborted' to waiting.
+
+  Args:
+    amount: the amount of jobs to revive
+  """
+
+  from soc.models.job import Job
+
+  query = Job.all().filter('status', 'aborted')
+  jobs = query.fetch(amount)
+
+  if not jobs:
+    print "no dead jobs"
+
+  for job in jobs:
+     job.status = 'waiting'
+     job.put()
+     print "restarted %d" % job.key().id()
+
+
+def deidleJobs(amount):
+  """Sets jobs that are stuck in 'started' to waiting.
+
+  Args:
+    amount: the amount of jobs to deidle
+  """
+
+  from soc.models.job import Job
+
+  query = Job.all().filter('status', 'started')
+  jobs = query.fetch(amount)
+
+  if not jobs:
+    print "no idle jobs"
+
+  for job in jobs:
+     job.status = 'waiting'
+     job.put()
+     print "restarted %d" % job.key().id()
 
 
 def deleteEntities(model, step_size=25):
@@ -363,6 +408,8 @@ def main(args):
       'popSaver': popSaver,
       'rawSaver': rawSaver,
       'startSpam': startSpam,
+      'reviveJobs': reviveJobs,
+      'deidleJobs': deidleJobs,
   }
 
   interactive.remote(args, context)

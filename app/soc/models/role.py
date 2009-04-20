@@ -120,14 +120,6 @@ class Role(soc.models.linkable.Linkable):
   #  (public) contact information
   #====================================================================
 
-  #: Required field used as the 'public' contact mechanism for the
-  #: Role (as opposed to the user.account email address which is
-  #: kept secret).
-  email = db.EmailProperty(
-      required=True,
-      verbose_name=ugettext('Email Address'))
-  email.group = ugettext("1. Public Info")
-
   #: Optional field storing Instant Messaging network; displayed publicly.
   im_network = db.StringProperty(
       verbose_name=ugettext('IM Network'))
@@ -179,6 +171,13 @@ class Role(soc.models.linkable.Linkable):
   #====================================================================
   # (private) contact information
   #====================================================================
+
+  #: Required field used as the contact mechanism for the program
+  #: Role (for example the address the system sends emails to).
+  email = db.EmailProperty(
+      required=True,
+      verbose_name=ugettext('Email Address'))
+  email.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence street address; kept private.
   #: Residence street address can only be ASCII, not UTF-8 text, because

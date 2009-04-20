@@ -49,7 +49,7 @@ class Job(base.ModelWithFieldAttributes):
       choices=['waiting', 'started', 'finished', 'aborted'])
 
   #: the date this job was last modified on
-  last_modified_on = db.DateTimeProperty(auto_now_add=True)
+  last_modified_on = db.DateTimeProperty(auto_now=True)
 
   #: the amount of times this job raised an Exception (other than a
   #: DeadlineExceededError).

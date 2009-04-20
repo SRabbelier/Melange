@@ -86,7 +86,8 @@ class View(base.View):
         ('checkCanStudentPropose', ['scope_path', True])]
     rights['review'] = [('checkRoleAndStatusForStudentProposal',
             [['org_admin', 'mentor', 'host'], 
-            ['active'], ['new', 'pending', 'invalid']])]
+            ['active'],
+            ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_proposal.logic
@@ -146,6 +147,7 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
+    new_params['review_after_deadline_template'] = 'soc/student_proposal/review_after_deadline.html'
 
     params = dicts.merge(params, new_params)
 
@@ -615,6 +617,9 @@ class View(base.View):
        For Args see base.View.public().
     """
 
+    from soc.logic.helper import timeline as timeline_helper
+
+
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
@@ -629,6 +634,12 @@ class View(base.View):
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
+
+    program_entity = entity.program
+
+    if timeline_helper.isAfterEvent(program_entity.timeline, 'accepted_students_announced_deadline'):
+      return self.reviewAfterDeadline(request, context, params, entity,
+                                      **kwargs)
 
     # get the roles important for reviewing an application
     filter = {'user': user_logic.logic.getForCurrentAccount(),
@@ -750,13 +761,14 @@ class View(base.View):
       self._adjustPossibleMentors(entity, mentor, choice)
 
     ineligible = get_dict.get('ineligible')
-    
+
     if org_admin:
       reviewer = org_admin
     elif mentor:
       reviewer = mentor
-    
-    if (org_admin or mentor) and ineligible != None:
+
+    if (org_admin or mentor) and (ineligible != None) and (
+        entity.status not in ['accepted', 'rejected']):
       ineligible = int(ineligible)
       if ineligible == 1:
         # mark the proposal invalid and return to the list
@@ -864,6 +876,19 @@ class View(base.View):
     context = dicts.merge(context, review_context)
 
     template = params['review_template']
+
+    return responses.respond(request, template, context=context)
+
+  def reviewAfterDeadline(self,request, context, params, entity,**kwargs):
+    """View that shows the review view after the accepted students announced deadline.
+
+    For Args see base.View.public().
+    """
+
+    review_context = self._getDefaultReviewContext(entity, None, None)
+    context = dicts.merge(context, review_context)
+
+    template = params['review_after_deadline_template']
 
     return responses.respond(request, template, context=context)
 

@@ -1,0 +1,58 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load comments_helpers %}
+{% load forms_helpers %}
+
+{% block header_title %}
+{{ page_name }} (Score: {{ entity.score }})
+{% endblock %}
+
+{% block body %}
+<p>
+ <table>
+  {% readonly_field_as_table_row entity.fields.title.label entity.title %}
+  {% readonly_field_as_table_row "Student" student_name %}
+  {% readonly_field_as_table_row "Mentor" mentor_name %}
+  {% readonly_field_as_table_row "Possible Mentors" possible_mentors %}
+  {% readonly_field_as_table_row entity.fields.abstract.label entity.abstract %}
+  {% readonly_safe_field_as_table_row entity.fields.content.label entity.content %}
+  {% readonly_url_field_as_table_row entity.fields.additional_info.label entity.additional_info %}
+  {% readonly_field_as_table_row "Created on" entity.created_on %}
+  {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
+ </table>
+</p>
+
+<hr />
+<b>Summary of Reviews</b>:
+{% for key, value in review_summary.items %}
+    <li>{{ value.name }} ({{ value.total_comments }} posts, {{ value.total_score }} points)</li>
+{% endfor %}
+
+<hr />
+
+
+<hr />
+<b>Public Reviews</b>
+{% for review in public_reviews %}
+  {% as_student_proposal_review review student %}
+{% endfor %}
+<hr />
+<b>Private Reviews</b>
+{% for review in private_reviews %}
+  {% as_student_proposal_review review student %}
+{% endfor %}
+<hr />
+
+{% endblock %}

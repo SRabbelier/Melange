@@ -327,7 +327,7 @@ class View(group.View):
         ap_params['name_plural'], org_entity.name)
 
     ap_params['list_description'] = description
-    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+    ap_params['list_action'] = (redirects.getReviewRedirect, ap_params)
 
     filter = {'org': org_entity,
               'status': 'accepted'}
@@ -341,7 +341,7 @@ class View(group.View):
         rp_params['name_plural'], org_entity.name)
 
     rp_params['list_description'] = description
-    rp_params['list_action'] = (redirects.getPublicRedirect, rp_params)
+    rp_params['list_action'] = (redirects.getReviewRedirect, rp_params)
 
     filter = {'org': org_entity,
               'status': 'rejected'}

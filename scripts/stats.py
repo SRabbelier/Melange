@@ -218,6 +218,8 @@ def convertProposals(org):
 
   proposals = proposal_logic.getProposalsToBeAcceptedForOrg(org)
 
+  print "accepting %d proposals, with %d slots" % (len(proposals), org.slots)
+
   for proposal in proposals:
     fields = {
         'link_id': 't%i' % (int(time.time()*100)),
@@ -244,7 +246,7 @@ def convertProposals(org):
       }
 
   querygen = lambda: proposal_logic.getQueryForFields(fields)
-  proposals = [i for i in interactive.deepFetch(querygen)]
+  proposals = [i for i in interactive.deepFetch(querygen, batchSize=10)]
 
   print "rejecting %d proposals" % len(proposals)
 

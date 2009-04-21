@@ -334,6 +334,31 @@ table#queues td {
   width: 320px;
 }
 
+#org_home_extras {
+  position: relative;
+  margin:2em 0em 2em;
+  min-height:500px;
+}
+
+#extras_left {
+  position: absolute;
+  width: 55%;
+  left: 0px;
+} 
+
+#extras_right {
+  position: absolute;
+  width: 43%;
+  right: 0px;
+  float: right;
+} 
+
+/* Organization home gmap */
+#org_home_map {
+  height: 500px;
+  width: 500px;
+}
+
 /* SIDEBAR MENU */
 #side {
   width: 200px;

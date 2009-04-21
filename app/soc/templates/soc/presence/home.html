@@ -55,6 +55,7 @@ limitations under the License.
 This is the default home page, it can be edited via <a href="/{{ entity_type_url|lower }}/edit/{{ entity.key.id_or_name }}">Edit {{ entity_type }} Settings</a>.<br />
 {% endblock %}
  {% endif %}
+ {% block home_extras %}<!--To be used in inherited templates-->{% endblock %}
  {% if entity.feed_url %}
     <div id="blog"></div>
  {% endif %}

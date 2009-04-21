@@ -13,11 +13,44 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% block body %}
-  {{ block.super }}
+{% block scripts %}
+{{ block.super }}
+{% if gmaps_api_key %}
+	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ gmaps_api_key }}" type="text/javascript"></script>
+	<script type="text/javascript" src="/soc/content/js/map-090420.js"></script>
+{% endif %}
+{% endblock %}
+
+{% block body_tag %}
+  {% if gmaps_api_key %}
+    <body onLoad="org_home_gmap.map_load({{ org_map_data }})" onunload="GUnload()">
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+
+{% block instructions %}
+{{ block.super }}
+{% if not gmaps_api_key %}
+<br /><span class="error">Google Maps API key not present.
+Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps field.
+</span>
+{% endif %}
+{% endblock %}
+
+{% block home_extras %}
+<div id="org_home_extras">
+ <div id="extras_left">
   {% for list_number in list.lists %}
   <p>
     {% include list.nextList %}
   </p>
   {% endfor %}
+ </div>
+ <div id="extras_right"> 
+  {% if gmaps_api_key %}
+    <div id="org_home_map"></div>
+  {% endif %}
+ </div>
+</div>
 {% endblock %}

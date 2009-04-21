@@ -32,7 +32,6 @@ class AccessTest(unittest.TestCase):
     self.rights = access.Checker(None)
 
   def testAllow(self):
-    assert False
     try:
       self.rights.allow(self.test_context)
     except out_of_band.Error:

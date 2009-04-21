@@ -259,7 +259,7 @@ def convertProposals(org):
 
 
 def startSpam():
-  """Creates the job that is responsible for sending mails
+  """Creates the job that is responsible for sending mails.
   """
 
   from soc.logic.models.job import logic as job_logic

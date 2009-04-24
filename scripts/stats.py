@@ -392,6 +392,7 @@ def main(args):
       'getStudents': getEntities(Student),
       'getMentors': getEntities(Mentor),
       'getOrgAdmins': getEntities(OrgAdmin),
+      'getStudentProjects': getEntities(StudentProject),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
       'convertProposals': convertProposals,

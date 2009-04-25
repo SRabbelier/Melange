@@ -40,6 +40,9 @@ limitations under the License.
  <table>
   {% readonly_field_as_table_row "Student Name" entity.student.name %}
   {% readonly_field_as_table_row "Mentor Name" entity.mentor.name %}
+  {% if additional_mentors %}
+    {% readonly_field_as_table_row "Co-Mentors" additional_mentors %}
+  {% endif %}
   {% readonly_field_as_table_row entity.fields.title.label entity.title %}
   {% readonly_field_as_table_row entity.fields.abstract.label entity.abstract %}
   {% readonly_safe_field_as_table_row entity.fields.public_info.label entity.public_info %}

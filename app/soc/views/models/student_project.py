@@ -200,6 +200,26 @@ class View(base.View):
               'status': 'active'}
     fields['mentor'] = mentor_logic.logic.getForFields(filter, unique=True)
 
+  def _public(self, request, entity, context):
+    """Adds the names of all additional mentors to the context.
+
+    For params see base.View._public()
+    """
+
+    additional_mentors = entity.additional_mentors
+
+    if not additional_mentors:
+      context['additional_mentors'] = []
+    else:
+      mentor_names = []
+
+      for mentor_key in additional_mentors:
+        additional_mentor = mentor_logic.logic.getFromKeyName(
+            mentor_key.id_or_name())
+        mentor_names.append(additional_mentor.name())
+
+      context['additional_mentors'] = ', '.join(mentor_names)
+
   @decorators.merge_params
   @decorators.check_access
   def manage(self, request, access_type,

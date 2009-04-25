@@ -22,9 +22,11 @@ __authors__ = [
   ]
 
 
+import logging
 import time
 
 from django import forms
+from django import http
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -133,6 +135,7 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['edit_template'] = 'soc/student_project/edit.html'
+    new_params['manage_template'] = 'soc/student_project/manage.html'
 
     params = dicts.merge(params, new_params)
 
@@ -212,16 +215,33 @@ class View(base.View):
       return responses.errorResponse(
           error, request, template=params['error_public'])
 
+    get_dict = request.GET
+
+    if 'remove' in get_dict:
+      # get the mentor to remove
+      fields = {'link_id': get_dict['remove'],
+                'scope': entity.scope}
+      mentor = mentor_logic.logic.getForFields(fields, unique=True)
+
+      additional_mentors = entity.additional_mentors
+      if additional_mentors and mentor.key() in additional_mentors:
+        # remove the mentor from the additional mentors list
+        additional_mentors.remove(mentor.key())
+        fields= {'additional_mentors': additional_mentors}
+        project_logic.updateEntityProperties(entity, fields)
+
+      # redirect to the same page without GET arguments
+      redirect = request.path
+      return http.HttpResponseRedirect(redirect)
+
+    template = params['manage_template']
+
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = "%s '%s' from %s" % (page_name, entity.title,
                                                 entity.student.name())
-
-    # use another template and make the cancel button goes to the public view
-    params['edit_template'] = 'soc/student_project/manage.html'
-    params['edit_cancel_redirect'] = redirects.getManageOverviewRedirect(
-        entity.scope, params)
+    context['entity'] = entity
 
     # get all mentors for this organization
     fields = {'scope': entity.scope,
@@ -235,7 +255,7 @@ class View(base.View):
     dynafields = [
         {'name': 'mentor_id',
          'base': forms.ChoiceField,
-         'label': 'Mentor',
+         'label': 'Primary Mentor',
          'required': True,
          'passthrough': ['required', 'choices', 'label'],
          'choices': choices,
@@ -250,37 +270,112 @@ class View(base.View):
 
     params['mentor_edit_form'] = mentor_edit_form
 
-    if request.POST:
-      return self.managePost(request, context, params, entity, **kwargs)
-    else: #request.GET
-      return self.manageGet(request, context, params, entity, **kwargs)
+    additional_mentors = entity.additional_mentors
 
-  def manageGet(self, request, context, params, entity, **kwargs):
+    # we want to show the names of the additional mentors in the context
+    # therefore they need to be resolved to entities first
+    additional_mentors_context = []
+
+    for mentor_key in additional_mentors:
+      mentor_entity = mentor_logic.logic.getFromKeyName(
+          mentor_key.id_or_name())
+      additional_mentors_context.append(mentor_entity)
+
+    context['additional_mentors'] = additional_mentors_context
+
+    # all mentors who are not already an additional mentor or
+    # the primary mentor are allowed to become an additional mentor
+    possible_additional_mentors = [m for m in mentors if 
+        (m.key() not in additional_mentors) and (m.key() != entity.mentor.key())]
+
+    # create the information to be shown on the additional mentor form
+    additional_mentor_choices = [
+        (mentor.link_id,'%s (%s)' %(mentor.name(), mentor.link_id))
+        for mentor in possible_additional_mentors]
+
+    dynafields = [
+        {'name': 'mentor_id',
+         'base': forms.ChoiceField,
+         'label': 'Additional Mentors',
+         'required': True,
+         'passthrough': ['required', 'choices', 'label'],
+         'choices': additional_mentor_choices,
+        },]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    additional_mentor_form = dynaform.newDynaForm(
+        dynabase = params['dynabase'],
+        dynaproperties = dynaproperties,
+    )
+
+    params['additional_mentor_form'] = additional_mentor_form
+
+    if request.POST:
+      return self.managePost(request, template, context, params, entity,
+                             **kwargs)
+    else: #request.GET
+      return self.manageGet(request, template, context, params, entity,
+                            **kwargs)
+
+  def manageGet(self, request, template, context, params, entity, **kwargs):
     """Handles the GET request for the project's manage page.
 
     Args:
+        template: the template used for this view
         entity: the student project entity
         rest: see base.View.public()
     """
 
     # populate form with the current mentor
     initial = {'mentor_id': entity.mentor.link_id}
-    form = params['mentor_edit_form'](initial=initial)
+    context['mentor_edit_form'] = params['mentor_edit_form'](initial=initial)
 
-    return self._constructResponse(request, entity, context, form, params)
+    context['additional_mentor_form'] = params['additional_mentor_form']()
 
-  def managePost(self, request, context, params, entity, **kwargs):
+    return responses.respond(request, template, context)
+
+  def managePost(self, request, template, context, params, entity, **kwargs):
     """Handles the POST request for the project's manage page.
 
     Args:
+        template: the template used for this view
         entity: the student project entity
         rest: see base.View.public()
     """
 
-    form = params['mentor_edit_form'](request.POST)
+    post_dict = request.POST
+
+    if 'set_mentor' in post_dict:
+      form = params['mentor_edit_form'](post_dict)
+      return self._manageSetMentor(request, template, context, params, entity,
+                                   form)
+    elif 'add_additional_mentor' in post_dict:
+      form = params['additional_mentor_form'](post_dict)
+      return self._manageAddAdditionalMentor(request, template, context,
+                                             params, entity, form)
+    else:
+      # unexpected error return the normal page
+      logging.warning('Unexpected POST data found')
+      return self.manageGet(request, template, context, params, entity)
+
+  def _manageSetMentor(self, request, template, context, params, entity, form):
+    """Handles the POST request for changing a Projects's mentor.
+
+    Args:
+        template: the template used for this view
+        entity: the student project entity
+        form: instance of the form used to set the mentor
+        rest: see base.View.public()
+    """
 
     if not form.is_valid():
-      return self._constructResponse(request, entity, context, form, params)
+      context['mentor_edit_form'] = form
+
+      # add an a fresh additional mentors form
+      context['additional_mentor_form'] = params['additional_mentor_form']()
+
+      return responses.respond(request, template, context)
 
     _, fields = forms_helper.collectCleanedFields(form)
 
@@ -292,9 +387,61 @@ class View(base.View):
 
     # update the project with the assigned mentor
     fields = {'mentor': mentor}
+
+    additional_mentors = entity.additional_mentors
+
+    if additional_mentors and mentor.key() in additional_mentors:
+      # remove the mentor that is now becoming the primary mentor
+      additional_mentors.remove(mentor.key())
+      fields['additional_mentors'] = additional_mentors
+
+    # update the project with the new mentor and possible 
+    # new set of additional mentors
     project_logic.updateEntityProperties(entity, fields)
 
-    return self.manageGet(request, context, params, entity)
+    # redirect to the same page
+    redirect = request.path
+    return http.HttpResponseRedirect(redirect)
+
+  def _manageAddAdditionalMentor(self, request, template, context, params, entity, form):
+    """Handles the POST request for changing a Projects's additional mentors.
+
+    Args:
+        template: the template used for this view
+        entity: the student project entity
+        form: instance of the form used to add an additional mentor
+        rest: see base.View.public()
+    """
+
+    if not form.is_valid():
+      context['additional_mentor_form'] = form
+
+      # add a fresh edit mentor form
+      initial = {'mentor_id': entity.mentor.link_id}
+      context['mentor_edit_form'] = params['mentor_edit_form'](initial=initial)
+
+      return responses.respond(request, template, context)
+
+    _, fields = forms_helper.collectCleanedFields(form)
+
+    # get the mentor from the form
+    fields = {'link_id': fields['mentor_id'],
+              'scope': entity.scope,
+              'status': 'active'}
+    mentor = mentor_logic.logic.getForFields(fields, unique=True)
+
+    # add this mentor to the additional mentors
+    if not entity.additional_mentors:
+      additional_mentors = [mentor.key()]
+    else:
+      additional_mentors = additional_mentors.append(mentor.key())
+
+    fields = {'additional_mentors': additional_mentors}
+    project_logic.updateEntityProperties(entity, fields)
+
+    # redirect to the same page
+    redirect = request.path
+    return http.HttpResponseRedirect(redirect)
 
   @decorators.merge_params
   @decorators.check_access

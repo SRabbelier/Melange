@@ -56,7 +56,7 @@ def main():
   apiproxy_stub_map.apiproxy.RegisterStub('user',
                                           user_service_stub.UserServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('datastore',
-    datastore_file_stub.DatastoreFileStub('your_app_id', None, None))
+    datastore_file_stub.DatastoreFileStub('test-app-run', None, None))
   apiproxy_stub_map.apiproxy.RegisterStub('memcache',
     memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())

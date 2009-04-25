@@ -296,7 +296,7 @@ class View(base.View):
     dynafields = [
         {'name': 'mentor_id',
          'base': forms.ChoiceField,
-         'label': 'Additional Mentors',
+         'label': 'Co-Mentor',
          'required': True,
          'passthrough': ['required', 'choices', 'label'],
          'choices': additional_mentor_choices,

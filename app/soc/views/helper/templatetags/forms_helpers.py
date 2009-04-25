@@ -270,6 +270,7 @@ def as_table_helper(context, form):
       'errors': errors,
       'groups': fields if fields else '',
       'hidden_fields': hidden_fields or '',
+      'form': form,
       })
 
   return context

@@ -247,7 +247,7 @@ class View(base.View):
       if additional_mentors and mentor.key() in additional_mentors:
         # remove the mentor from the additional mentors list
         additional_mentors.remove(mentor.key())
-        fields= {'additional_mentors': additional_mentors}
+        fields = {'additional_mentors': additional_mentors}
         project_logic.updateEntityProperties(entity, fields)
 
       # redirect to the same page without GET arguments
@@ -306,7 +306,8 @@ class View(base.View):
     # all mentors who are not already an additional mentor or
     # the primary mentor are allowed to become an additional mentor
     possible_additional_mentors = [m for m in mentors if 
-        (m.key() not in additional_mentors) and (m.key() != entity.mentor.key())]
+        (m.key() not in additional_mentors) 
+        and (m.key() != entity.mentor.key())]
 
     # create the information to be shown on the additional mentor form
     additional_mentor_choices = [
@@ -423,7 +424,8 @@ class View(base.View):
     redirect = request.path
     return http.HttpResponseRedirect(redirect)
 
-  def _manageAddAdditionalMentor(self, request, template, context, params, entity, form):
+  def _manageAddAdditionalMentor(self, request, template, 
+                                 context, params, entity, form):
     """Handles the POST request for changing a Projects's additional mentors.
 
     Args:

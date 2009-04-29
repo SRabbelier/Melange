@@ -536,7 +536,8 @@ class View(group.View):
 
     if timeline_helper.isAfterEvent(program_entity.timeline,
                                     'accepted_students_announced_deadline'):
-      ap_params = student_project_view.view.getParams().copy() # accepted projects
+      # accepted projects
+      ap_params = student_project_view.view.getParams().copy() 
 
       # define the list redirect action to show the notification
       ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)

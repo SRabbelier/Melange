@@ -485,18 +485,13 @@ class View(base.View):
       org_entity = org_logic.logic.getForFields(filter, unique=True)
 
       if org_entity:
-        # organization found use special form
+        # organization found use special form and also seed this form
         params['create_form'] = params['student_create_form']
+        kwargs['organization'] = org_entity.link_id
         kwargs['content'] = org_entity.contrib_template
 
-    # Create page is an edit page with no key fields
-    empty_kwargs = {}
-    fields = self._logic.getKeyFieldNames()
-    for field in fields:
-      empty_kwargs[field] = None
-
-    return super(View, self).edit(request, access_type, page_name=page_name,
-                     params=params, seed=kwargs, **empty_kwargs)
+    return super(View, self).create(request, access_type, page_name=page_name,
+                     params=params, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access
@@ -518,7 +513,7 @@ class View(base.View):
       proposal_logic = params['logic']
       student_proposal_entity = proposal_logic.getForFields(filter, unique=True)
       reviewer = student_proposal_entity.scope
-      
+
       # update the entity mark it as invalid
       proposal_logic.updateEntityProperties(student_proposal_entity,
           {'status': 'invalid'})
@@ -526,7 +521,7 @@ class View(base.View):
       # redirect to the program's homepage
       redirect_url = redirects.getHomeRedirect(student_proposal_entity.program,
           {'url_name': 'program'})
-      
+
       comment = "Student withdrew proposal."
       self._createReviewFor(student_proposal_entity, reviewer, comment)
       return http.HttpResponseRedirect(redirect_url)

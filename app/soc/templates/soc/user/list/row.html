@@ -1,6 +1,6 @@
-<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='{{ list.redirect }}'" name="name">
-  <td align="right"><div class="account"><a class="noul"
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right"><div class="account"><a class="noul" onclick="do_redirect=false"
          href="{{ list.redirect }}">{{ list.item.account }}</a>
      </div>
   </td>

@@ -1,9 +1,19 @@
-<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" 
-onclick="document.location.href='{{ list.redirect }}'" name="name">
-  <td align="right"><div class="name"><a class="noul"
-         href="{{ list.redirect }}">{{ list.item.name }}</a>
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right">
+     <div class="name">
+	<a class="noul" onclick="do_redirect=false" href="{{ list.redirect }}">
+	  {{ list.item.name }}
+	</a>
      </div>
   </td>
   <td><div class="link_id">{{ list.item.link_id }}</a></div></td>
-  <td><div class="idea_url">{{ list.item.ideas|urlizetrunc:35 }}</div></td>
+  <td onclick="if (redirect_to_ideas) document.location.href='{{ list.item.ideas }}'; do_redirect=false"
+      onmouseover="redirect_to_ideas=true">
+    <div class="idea_url">
+      <a onclick="redirect_to_ideas=false" href="{{ list.item.ideas }}">
+        {{ list.item.ideas|urlizetrunc:35|removetags:"a" }}
+      </a>
+    </div>
+  </td>
 </tr>

@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -74,6 +75,10 @@ class View(presence.View):
 
   DEF_SLOTS_ALLOCATION_MSG = ugettext("Use this view to assign slots.")
 
+  DEF_ACCEPTED_PROJECTS_MSG_FMT = ugettext("These projects have been"
+      " accepted into %(name)s. You can learn more about each project"
+      " by visiting the links below.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -95,6 +100,8 @@ class View(presence.View):
     rights['assigned_proposals'] = ['checkIsHostForProgram']
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['accepted_organization_announced_deadline', '__all__'])]
+    rights['list_projects'] = [('checkIsAfterEvent',
+        ['accepted_students_announced_deadline', '__all__'])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic
@@ -127,6 +134,9 @@ class View(presence.View):
         (r'^%(url_name)s/(?P<access_type>accepted_orgs)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.accepted_orgs',
           "List all accepted organizations"),
+        (r'^%(url_name)s/(?P<access_type>list_projects)/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.list_projects',
+          "List all student projects"),
         ]
 
     new_params['extra_django_patterns'] = patterns
@@ -267,6 +277,46 @@ class View(presence.View):
 
     params = params.copy()
     params['list_msg'] = program_entity.accepted_orgs_msg
+
+    return self._list(request, params, contents, page_name)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptedProjects(self, request, access_type,
+		       page_name=None, params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+    contents = []
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    filter = {
+	'status': 'accepted',
+	'program': program_entity }
+
+    fmt = {'name': program_entity.name}
+    description = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % fmt
+
+    from soc.views.models import student_project as sp_view
+
+    ap_params = sp_view.view.getParams().copy() # accepted projects
+
+    fun =  soc.cache.logic.cache(self._getData)
+    ap_logic = ap_params['logic']
+    entities = fun(logic.getModel(), filter, order=None, logic=ap_logic)
+    
+    ap_list = dicts.rename(ap_params, ap_params['list_params'])
+    ap_list['action'] = (redirects.getPublicRedirect, ap_params)
+    ap_list['description'] = description
+    ap_list['pagination'] = 'soc/list/no_pagination.html'
+    ap_list['heading'] = 'soc/student_project/list/heading_all.html'
+    ap_list['row'] = 'soc/student_project/list/row_all.html'
+    ap_list['data'] = entities
+
+    contents.append(ap_list)
+
+    params = params.copy()
 
     return self._list(request, params, contents, page_name)
 
@@ -712,6 +762,13 @@ class View(presence.View):
         items += [('/org/apply_mentor/%s' % (program_entity.key().id_or_name()),
          "Apply to become a Mentor", 'any_access')]
 
+    deadline = 'accepted_students_announced_deadline'
+
+    if timeline_helper.isAfterEvent(timeline_entity, deadline):
+      items += [(redirects.getListProjectsRedirect(program_entity,
+          {'url_name':'program'}),
+          "List all student projects", 'any_access')]
+
     return items
 
   def _getStudentEntries(self, program_entity, student_entity, 
@@ -762,6 +819,7 @@ class View(presence.View):
 view = View()
 
 accepted_orgs = decorators.view(view.acceptedOrgs)
+list_projects = decorators.view(view.acceptedProjects)
 admin = decorators.view(view.admin)
 assign_slots = decorators.view(view.assignSlots)
 assigned_proposals = decorators.view(view.assignedProposals)

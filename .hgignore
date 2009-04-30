@@ -4,5 +4,7 @@ syntax: glob
 *.pyc
 *.zip
 *~
+.project
+.pydevproject
 app.yaml
 build

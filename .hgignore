@@ -3,5 +3,6 @@ syntax: glob
 
 *.pyc
 *.zip
+*~
 app.yaml
 build

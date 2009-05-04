@@ -54,7 +54,6 @@ DEF_JS_USES_LIST = [
     'jq_ajaqQueue',
     'jq_autocomplete',
     'jq_bgiframe',
-    'jq_bt',
     'jq_purr',
     'jq_spin',
     'jq_datetimepicker',
@@ -240,8 +239,8 @@ def constructParams(params):
   new_params['js_uses_all'] = DEF_JS_USES_LIST
   new_params['js_uses_list'] = ['jq', 'menu']
   new_params['js_uses_show'] = ['jq', 'menu']
-  new_params['js_uses_edit'] = ['jq', 'menu', 'tinymce', 'jq_bt',
-                                'jq_purr','jq_spin','jq_autocomplete']
+  new_params['js_uses_edit'] = ['jq', 'menu', 'tinymce', 'jq_purr',
+                                'jq_spin', 'jq_autocomplete']
 
   new_params['error_public'] = 'soc/%(module_name)s/error.html' % params
   new_params['error_export'] = new_params['error_public']

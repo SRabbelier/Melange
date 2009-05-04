@@ -27,7 +27,7 @@ limitations under the License.
 
 {% block label_row %}{% endblock %}
 
-<tr title="{{ help_text }}">
+<tr>
   {% block label_column %}
   <td class="{{ field_class_type }}">
     {{ label }}
@@ -50,6 +50,22 @@ limitations under the License.
         }
       );
     </script>
+  {% endif %}
+  {% if help_text %}
+  <script type="text/javascript">
+  $(document).ready( function() {
+    var tooltip = "<div class='tooltip'><div class='tooltip-body'><img src='/soc/content/images/purrInfo.png' alt='' /><h3>Info</h3><p>{{ help_text }}</p></div><div class='tooltip-bottom'></div></div>";
+    var tooltip_object=null;
+    $("#{{ field_id }}").focus(function() {
+      tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+    });
+    $("#{{ field_id }}").blur(function() {
+      if (tooltip_object!==null) {
+        tooltip_object.remove();
+      }
+    });
+  });
+  </script>
   {% endif %}
     {{ field|safe }}
   </td>

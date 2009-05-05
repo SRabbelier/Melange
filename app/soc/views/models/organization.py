@@ -422,14 +422,14 @@ class View(group.View):
 
   def _getMapData(self, student_project_params, filter=None):
     """Constructs the JSON object required to generate a 
-      google map on organization home page.
+      Google map on organization home page.
 
     Args:
-      student_project_logic: logic for student_project to obtain entities
+      student_project_params: params for student project view
       filter: a dict for the properties that the entities should have
 
     Returns: 
-      A json object containing map data with the following structure.
+      A JSON object containing map data with the following structure.
       [
         {
           'type': 'mentor',
@@ -449,14 +449,15 @@ class View(group.View):
         }
       ]
     """
-    student_project_logic = student_project_params['logic']
+
+    from soc.logic.models.student_project import logic as student_project_logic
 
     map_data = []
     mentors = {}
     student_only = []
 
     # get all the student_project entities for this organization
-    student_project_entities = student_project_logic.getForFields(filter)
+    student_project_entities = student_project_logic.getForFields(filter=filter)
 
     # construct a dictionary of mentors. For each mentor construct a
     # list of 3-tuple containing student, project title and url. This is

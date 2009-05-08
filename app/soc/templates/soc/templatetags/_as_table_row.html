@@ -57,11 +57,14 @@ limitations under the License.
     var tooltip = "<div class='tooltip'><div class='tooltip-body'><img src='/soc/content/images/purrInfo.png' alt='' /><h3>Info</h3><p>{{ help_text }}</p></div><div class='tooltip-bottom'></div></div>";
     var tooltip_object=null;
     $("#{{ field_id }}").focus(function() {
-      tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+      if (tooltip_object==null) {
+        tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+      }
     });
     $("#{{ field_id }}").blur(function() {
       if (tooltip_object!==null) {
         tooltip_object.remove();
+        tooltip_object=null;
       }
     });
   });

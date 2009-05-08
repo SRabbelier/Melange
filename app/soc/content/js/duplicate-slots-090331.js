@@ -11,13 +11,19 @@ var duplicateSlots = new function() {
 
   this.showDuplicatesInit = function() {
 
-    // Remember this object for Javascript scoping
     html_string = '';
+    // Remember this object for Javascript scoping
     var this_object = this;
     var NUMBER_OF_ORGS = number_of_orgs;
     var OFFSET_LENGTH = offset_length;
     // Variables to handle progress bar updating
     var ITERATIONS = (number_of_orgs % offset_length)==0 ? Math.floor(number_of_orgs/offset_length) : Math.floor(number_of_orgs/offset_length)+1;
+
+    if (ITERATIONS==0) {
+      $("#div_duplicate_slots").html("<strong>No org slots to process</strong>");
+      return;
+    }
+
     var successful_calls = 0;
 
     $("#id_button_duplicate_slots").fadeOut("slow",

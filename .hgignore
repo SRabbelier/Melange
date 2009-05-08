@@ -8,3 +8,6 @@ syntax: glob
 .pydevproject
 app.yaml
 build
+tests/coverageResults
+*,cover
+tests/.coverage

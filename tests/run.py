@@ -62,7 +62,10 @@ def main():
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
   import django.test.utils
   django.test.utils.setup_test_environment()
-  nose.main(plugins=[AppEngineDatastoreClearPlugin(), ])
+  
+  from nose.plugins import cover
+  plugin = cover.Coverage()
+  nose.main(plugins=[AppEngineDatastoreClearPlugin(), plugin])
 
 
 if __name__ == '__main__':

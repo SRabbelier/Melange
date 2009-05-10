@@ -12,3 +12,4 @@ tests/coverageResults
 *,cover
 tests/.coverage
 *.git
+.gitignore

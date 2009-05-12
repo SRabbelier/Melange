@@ -1,0 +1,315 @@
+vcs-load-dirs (1.1.6) unstable; urgency=low
+
+  * Added Vcs-* and Homepage control lines.
+
+ -- John Goerzen <jgoerzen@complete.org>  Sat, 01 Mar 2008 20:49:13 -0600
+
+vcs-load-dirs (1.1.5) unstable; urgency=low
+
+  * Better git rm handling.  Patch from agx@sigxcpu.org.
+    Closes: #417307.
+  * Convert changelog to UTF-8.  Closes: #453970.  (And the merged
+    bugs from the other binary debs generated from this package.)
+
+ -- John Goerzen <jgoerzen@complete.org>  Sun, 10 Feb 2008 07:52:54 -0600
+
+vcs-load-dirs (1.1.4) unstable; urgency=low
+
+  * Better documented -f
+  * Put Mercurial log where it won't get accidentally checked in
+  * Unify logfile generation across VCSs
+
+ -- John Goerzen <jgoerzen@complete.org>  Sat,  3 Mar 2007 08:12:28 -0600
+
+vcs-load-dirs (1.1.3) unstable; urgency=low
+
+  * -f now suppresses the interactive interface; it isn't necessary
+    in that mode.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 28 Feb 2007 06:07:56 -0600
+
+vcs-load-dirs (1.1.2) unstable; urgency=low
+
+  * Can now import directly from tar.gz, tar.bz2, and zip archives.
+    Closes: #235240.
+  * Guido's patch for git summary was already applied.  Closes: #403505.
+  * Fixed bug with Mercurial renames.
+  * New option -f to request no changes other than commits to the VCS.
+  * Documented -n and -f in the manpages.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 28 Feb 2007 05:32:53 -0600
+
+vcs-load-dirs (1.1.1) unstable; urgency=low
+
+  * Fixed Mercurial log summary recording.
+  * Noted program's new homepage.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 27 Feb 2007 03:04:54 -0600
+
+vcs-load-dirs (1.1.0) unstable; urgency=low
+
+  * New version.
+  * Source renamed to vcs-load-dirs.
+
+ -- John Goerzen <jgoerzen@complete.org>  Mon, 26 Feb 2007 05:06:12 -0600
+
+tla-load-dirs (1.0.35) unstable; urgency=low
+
+  * Merge and ACK NMU 1.0.33.1.  Closes: #395128.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 22 Nov 2006 05:07:41 -0600
+
+tla-load-dirs (1.0.34) unstable; urgency=high
+
+  * Fix darcs support, which one of the earlier git patches broke.
+
+ -- John Goerzen <jgoerzen@complete.org>  Fri, 17 Nov 2006 06:16:14 -0600
+
+tla-load-dirs (1.0.33.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Make sure git-load-dirs actually gets installed (Closes: #395128)
+
+ -- Guido Guenther <agx@sigxcpu.org>  Thu,  9 Nov 2006 09:48:02 +0100
+
+tla-load-dirs (1.0.33) unstable; urgency=low
+
+  * Added support for git, thanks to a patch from Guido Guenther.
+    Closes: #387139.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 18 Oct 2006 04:00:47 -0500
+
+tla-load-dirs (1.0.32) unstable; urgency=low
+
+  * Now build baz-load-dirs again, since bazaar is no longer broken.
+    Closes: #390458.
+
+ -- John Goerzen <jgoerzen@complete.org>  Mon,  9 Oct 2006 07:02:03 -0500
+
+tla-load-dirs (1.0.31) unstable; urgency=high
+
+  * Update deps on load-dirs-common.  Closes: #385644.
+  * Update for new Python policy.  Closes: #380975.
+  * No longer build baz-load-dirs for Debian.  bazaar is not migrating
+    into testing, and is preventing this package from entering.
+  * Update standards-version to 3.7.2.
+
+ -- John Goerzen <jgoerzen@complete.org>  Mon,  4 Sep 2006 09:06:41 -0500
+
+tla-load-dirs (1.0.30) unstable; urgency=low
+
+  * Apply patch from Gregory Colpart to fix a typo in svk support.
+    Closes: #382291.
+
+ -- John Goerzen <jgoerzen@complete.org>  Thu, 10 Aug 2006 16:13:13 -0500
+
+tla-load-dirs (1.0.29) unstable; urgency=low
+
+  * Ack NMU.  Closes: #360730.
+  * Do import instead of commit when the current tree-version has no logs.
+    Patch from Lionel Elie Mamane.  Closes: #350234.
+
+ -- John Goerzen <jgoerzen@complete.org>  Sat, 17 Jun 2006 11:21:19 -0500
+
+tla-load-dirs (1.0.28-0.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Add commas in dependency fields (Closes: #360730).
+
+ -- Luk Claes <luk@debian.org>  Mon, 17 Apr 2006 11:12:32 +0200
+
+tla-load-dirs (1.0.28) unstable; urgency=low
+
+  * Applied patch from Teemu Ikonen to support baz.  Closes: #322622.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue,  6 Sep 2005 06:03:24 -0500
+
+tla-load-dirs (1.0.27) unstable; urgency=low
+
+  * Fixed docs for darcs_load_dirs and also fixed manpages to reflect
+    that upstream archive is now kept in darcs instead of tla.
+
+ -- John Goerzen <jgoerzen@complete.org>  Thu,  1 Sep 2005 06:18:46 -0500
+
+tla-load-dirs (1.0.26) unstable; urgency=low
+
+  * Applied patch from Marc Dequènes to support new tla 1.3 command syntax.
+    Closes: #319505.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 24 Aug 2005 06:26:53 -0500
+
+tla-load-dirs (1.0.25) unstable; urgency=low
+
+  * Fixed bug where moving files into a new directory could fail on darcs.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 17 Aug 2005 05:26:27 -0500
+
+tla-load-dirs (1.0.24) unstable; urgency=low
+
+  * Now use darcs record -l instead of darcs add for adds.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 21 Jun 2005 06:47:27 -0500
+
+tla-load-dirs (1.0.23) unstable; urgency=low
+
+  * Missed a change to tla_wc.py that resulted because of the changes in
+    1.0.22.  Thanks James Vega for the helpful bug report.  Closes: #311582.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  1 Jun 2005 21:20:09 -0500
+
+tla-load-dirs (1.0.22) unstable; urgency=low
+
+  * Add --case-ok to darcs command line and sort filenames before adding.
+    Closes: #311041.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 31 May 2005 06:00:45 -0500
+
+tla-load-dirs (1.0.21) unstable; urgency=low
+
+  * No longer run "darcs check".
+
+ -- John Goerzen <jgoerzen@complete.org>  Sat, 14 May 2005 12:09:53 -0500
+
+tla-load-dirs (1.0.20) unstable; urgency=low
+
+  * Fixed rename problem caused by the fix in 1.0.19.
+
+ -- John Goerzen <jgoerzen@complete.org>  Mon, 25 Apr 2005 06:09:22 -0500
+
+tla-load-dirs (1.0.19) unstable; urgency=low
+
+  * [darcs] Fixed moving a file to a directory whose parent didn't yet exist.
+    Thanks to Matt Krai for helpful debugging information.  Closes: #293088.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 20 Apr 2005 22:04:15 -0500
+
+tla-load-dirs (1.0.18) unstable; urgency=low
+
+  * Fixed typos in control.  Closes: #300420.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 19 Apr 2005 23:56:29 -0500
+
+tla-load-dirs (1.0.17) unstable; urgency=low
+
+  * [darcs] No longer attempt to darcs remove files; darcs will detect
+    the deletion automatically.
+
+ -- John Goerzen <jgoerzen@complete.org>  Mon, 18 Apr 2005 20:16:14 -0500
+
+tla-load-dirs (1.0.16) unstable; urgency=low
+
+  * Added patch from Alfred M. Szmidt to support symlinks.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue,  1 Mar 2005 14:57:02 -0600
+
+tla-load-dirs (1.0.15) unstable; urgency=low
+
+  * Made load-dirs-common conflict with tla-load-dirs (<< 1.0.14).
+    Some files in earlier tla-load-dirs packages are now in
+    load-dirs-common.  Closes: #278102.
+
+ -- John Goerzen <jgoerzen@complete.org>  Sun, 24 Oct 2004 17:02:04 -0500
+
+tla-load-dirs (1.0.14) unstable; urgency=low
+
+  * Added darcs_load_dirs.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 13 Oct 2004 21:01:04 -0500
+
+tla-load-dirs (1.0.13) unstable; urgency=low
+
+  * Added python to build-deps.  Closes: #259136.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 13 Jul 2004 10:17:04 -0500
+
+tla-load-dirs (1.0.12) unstable; urgency=low
+
+  * Experimental: Let the tagging method be tagline.
+
+ -- John Goerzen <jgoerzen@complete.org>  Thu, 26 Feb 2004 22:00:07 -0600
+
+tla-load-dirs (1.0.11) unstable; urgency=low
+
+  * Added "upstream" changelog (from tla), note it in debian/rules,
+    and build-dep on a version of debhelper that can support it.
+  * Fixed tla version detection to work with the new "candidate" versions
+    in Debian sid.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue, 16 Dec 2003 16:16:46 -0600
+
+tla-load-dirs (1.0.10) unstable; urgency=low
+
+  * Added a manpage and description of the program's operation.
+    Closes: #214097.
+  * control s/Build-Depends/Build-Depends-Indep/
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 22 Oct 2003 16:55:19 -0500
+
+tla-load-dirs (1.0.9) unstable; urgency=low
+
+  * Fixed a typo in tla_wc.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 22 Oct 2003 13:52:37 -0500
+
+tla-load-dirs (1.0.8) unstable; urgency=low
+
+  * Now compatible with both 1.0 and the latest 1.1 snapshot.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed, 22 Oct 2003 13:27:54 -0500
+
+tla-load-dirs (1.0.7) unstable; urgency=low
+
+  * Various bugfixes.
+  * Added -s option to set the summary line.
+
+ -- John Goerzen <jgoerzen@complete.org>  Fri,  5 Sep 2003 09:43:03 -0500
+
+tla-load-dirs (1.0.6) unstable; urgency=low
+
+  * Made the verbose stuff actually do something more verbose.
+
+ -- John Goerzen <jgoerzen@complete.org>  Thu,  4 Sep 2003 09:36:06 -0500
+
+tla-load-dirs (1.0.5) unstable; urgency=low
+
+  * Slight logic error when adding multiple nested directories.
+    Now do the adds after the copyfrom().
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  3 Sep 2003 22:04:25 -0500
+
+tla-load-dirs (1.0.4) unstable; urgency=low
+
+  * Added better error checking of input.
+  * Added command to redraw screen.
+  * Many bugfixes.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  3 Sep 2003 15:09:18 -0500
+
+tla-load-dirs (1.0.3) unstable; urgency=low
+
+  * Now properly rm -rf's a directory that is removed.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  3 Sep 2003 14:32:39 -0500
+
+tla-load-dirs (1.0.2) unstable; urgency=low
+
+  * Fixed a small syntax error in tla_wc.py.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  3 Sep 2003 14:04:21 -0500
+
+tla-load-dirs (1.0.1) unstable; urgency=low
+
+  * New arg: --no-commit.
+  * Now strips off the path from the logged import directory.
+  * More aggressive clean target.
+  * Creates any directories necessary to move files into.
+  * Cleaned up output.
+
+ -- John Goerzen <jgoerzen@complete.org>  Wed,  3 Sep 2003 11:43:12 -0500
+
+tla-load-dirs (1.0.0) unstable; urgency=low
+
+  * Initial Release.  Closes: #208463.
+
+ -- John Goerzen <jgoerzen@complete.org>  Tue,  2 Sep 2003 20:10:45 -0500
+

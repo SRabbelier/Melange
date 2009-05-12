@@ -1,0 +1,314 @@
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+  <!ENTITY vld "<application>vcs_load_dirs</application>">
+]>
+<!--      "file:///usr/share/sgml/docbook/dtd/xml/4.2/docbookx.dtd"> -->
+
+<reference>
+  <title>vcs_load_dirs Manual</title>
+
+  <refentry>
+    <refentryinfo>
+      <address><email>jgoerzen@complete.org</email></address>
+      <author><firstname>John</firstname><surname>Goerzen</surname></author>
+    </refentryinfo>
+
+    <refmeta>
+      <refentrytitle>vcs_load_dirs</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo>John Goerzen</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>vcs_load_dirs</refname>
+      <refpurpose>Import upstream archives into tla, hg, darcs, or git and handle renames</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <cmdsynopsis>
+        <command>vcs_load_dirs</command>
+        <group>
+          <arg>-w<replaceable>WC</replaceable></arg>
+          <arg>--wc=<replaceable>WC</replaceable></arg>
+        </group>
+        <group>
+          <arg>-l<replaceable>FILE</replaceable></arg>
+          <arg>--log=<replaceable>FILE</replaceable></arg>
+        </group>
+        <group>
+          <arg>-L<replaceable>TEXT</replaceable></arg>
+          <arg>--log-message=<replaceable>TEXT</replaceable></arg>
+        </group>
+        <group>
+          <arg>-s<replaceable>MSG</replaceable></arg>
+          <arg>--summary=<replaceable>MSG</replaceable></arg>
+        </group>
+        <group>
+          <arg>-v</arg>
+          <arg>--verbose</arg>
+        </group>
+        <group>
+          <arg>-n</arg>
+          <arg>--no-commit</arg>
+        </group>
+        <group>
+          <arg>-f</arg>
+          <arg>--fs-changes-only</arg>
+        </group>
+        <arg choice="plain">vendor_source_dir</arg>
+      </cmdsynopsis>
+
+      <cmdsynopsis>
+	<command>vcs_load_dirs</command>
+        <arg choice="plain">--version</arg>
+      </cmdsynopsis>
+
+      <cmdsynopsis>
+        <command>vcs_load_dirs</command>
+        <group>
+          <arg choice="plain">--help</arg>
+          <arg choice="plain">-h</arg>
+        </group>
+      </cmdsynopsis>
+
+    </refsynopsisdiv>
+
+    <refsect1>
+      <title>Description</title>
+      <para>
+        &vld; is a tool to help you import archives from people that
+        do not use Arch, Mercurial, Darcs, or Git into an Arch,
+        Mercurial, Darcs, or Git
+        archive.  Along the way, it takes
+        care of all the typical hassles: it will create tags in the
+        repository for new files; delete tags for removed files;
+        and move tags for files that have themselves been moved.
+        &vld; can handle both first imports of a package and
+        successive imports.
+      </para>
+      <para>
+        For those familiar with Subversion, you will know that it has
+        a tool called <application>svn_load_dirs</application>.  &vld;
+        is modeled after that program, but contains various
+        improvements for ease of use.
+      </para>
+    </refsect1>
+
+    <refsect1>
+      <title>Usage</title>
+      <para>
+        In the simplest case, you will simply run &vld; from your
+        working directory, passing it the name of the directory
+        containing the new upstream sources.  &vld will run, usually
+        making and commiting changes without any need of greater
+        assistance from you.
+      </para>
+      <refsect2>
+        <title>Renamed Files</title>
+        <para>
+          &vld; can automatically detect added files and deleted files
+          if they occur in isolation.  However, it cannot
+          automatically tell the difference between a delete and an
+          add, and a rename.  (There is not enough information in
+          simple upstream imports to capture the intent.)  
+          Therefore, &vld; will prompt you to solve the problem.
+          You can opt to ignore it -- &vld; will just issue deletes
+          and adds as appropriate -- but then your history will be
+          harder to track if there were indeed renames along the way.
+        </para>
+        <para>
+          You will be presented with a four-column listing.  Those
+          columns, in order from left to right, represent:
+        </para>
+        <orderedlist>
+          <listitem><para>File number for deleted file</para>
+          </listitem>
+          <listitem><para>File name of deleted file</para>
+          </listitem>
+          <listitem><para>File number of added file</para>
+          </listitem>
+          <listitem><para>File name of added file</para>
+          </listitem>
+        </orderedlist>
+        <para>
+          You have three options at this point: you can press q to
+          indicate that there are no more renames; you can press r to
+          request the list be re-drawn, or you can supply one or more
+          renames.
+        </para>
+        <para>
+          A rename uses the left column as the old name and the right
+          column as the new name.  To save you typing, you just enter
+          the appropriate file numbers separated by spaces.  So, if
+          the file at position 5 on the left moved to position 1b on
+          the right, just enter "5 1b".  After doing that, the list
+          will be automatically re-drawn, and you can either make
+          further selections or exit.
+        </para>
+        <para>
+          If you want to rename several files at once, enter your
+          rename commands separated by commas.  For instance, "5 1b, 6
+          1c".
+        </para>
+      </refsect2>
+    </refsect1>
+
+    <refsect1>
+      <title>Options</title>
+      
+      <variablelist>
+        <varlistentry><term>-h</term>
+          <term>--help</term>
+          <listitem><para>Displays a brief summary of the available
+              options and exits.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-l<replaceable>FILE</replaceable></term>
+          <term>--log=<replaceable>FILE</replaceable></term>
+          <listitem><para>
+              Add the contents of <replaceable>FILE</replaceable> to
+              the end of the log message automatically generated by
+              &vld; for a commit/record.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-L<replaceable>TEXT</replaceable></term>
+          <term>--log-message=<replaceable>TEXT</replaceable></term>
+          <listitem><para>
+              Add the <replaceable>TEXT</replaceable> specified on the
+              command line to the log message.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-s<replaceable>MSG</replaceable></term>
+          <term>--summary=<replaceable>MSG</replaceable></term>
+          <listitem>
+            <para>
+              Sets the log summary line to the
+              <replaceable>MSG</replaceable> supplied on the command
+              line.  This operation requires Darcs, Mercurial, or 
+              tla 1.1 or above; tla 1.0
+              does not provide the features necessary to implement it.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-n</term>
+          <term>--no-commit</term>
+          <listitem><para>
+              Do not commit changes to the target VCS.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-f</term>
+          <term>--fs-changes-only</term>
+          <listitem><para>
+              Move files in the filesystem, but do not inform VCS of
+              changes.  You will almost certainly want to use this
+              with -n.  This also suppresses the interactive interface.
+            </para>
+          </listitem>
+        </varlistentry>
+              
+        <varlistentry><term>-v</term>
+          <term>--verbose</term>
+          <listitem><para>Causes &vld; to display additional status
+              information.  You will see the darcs/tla/git/hg commands that are
+              being run behind the scenes, and some executed commands
+              may receive arguments asking them to be more verbose as
+              well.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>--version</term>
+          <listitem><para>Causes &vld; to print its version number and
+              exit.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry><term>-w<replaceable>WC</replaceable></term>
+          <term>--wc=<replaceable>WC</replaceable></term>
+          <listitem>
+            <para>
+              Explicitly set the working copy directory to
+              <replaceable>WC</replaceable>.  If not specified,
+              defaults to the current working directory.
+            </para>
+          </listitem>
+        </varlistentry>        
+      </variablelist>
+    </refsect1>
+    <refsect1>
+      <title>Copyright</title>
+      <para>&vld;, and this manual, are Copyright &copy; 2003-2007 John Goerzen.</para>
+
+      <para>
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+      </para>
+
+      <para>
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+      </para>
+
+      <para>
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA</para>
+
+    </refsect1>
+
+    <refsect1>
+      <title>Author</title>
+      <para>&vld;, its libraries, documentation, and all included files, except where
+	noted, was written by John Goerzen <email>jgoerzen@complete.org</email> and
+	copyright is held as stated in the COPYRIGHT section.
+      </para>
+
+      <para>
+        The homepage for &vld; is
+        <ulink
+        url="http://software.complete.org/vcs-load-dirs"></ulink>
+      </para>
+      <para>
+        This package may be downloaded from
+        <ulink
+          url="http://packages.debian.org/vcs-load-dirs"></ulink>.
+        darcs users may also obtain the latest version with:
+        <screen>
+$ darcs get --partial http://darcs.complete.org/vcs-load-dirs
+        </screen>
+      </para>
+    </refsect1>
+
+    <refsect1>
+      <title>See Also</title>
+      <para>
+        <application>tla</application>(1),
+        <application>darcs</application>(1),
+        <application>hg</application>(1),
+        <application>git</application>(1),
+        <application>tla-buildpackage</application>(1),
+        <application>darcs-buildpackage</application>(1),
+        <application>hg-buildpackage</application>(1).
+      </para>
+    </refsect1>
+  </refentry>
+</reference>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-set-face: T
+End:
+-->

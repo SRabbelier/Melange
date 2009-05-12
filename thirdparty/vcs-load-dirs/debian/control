@@ -1,0 +1,99 @@
+Source: vcs-load-dirs
+Section: devel
+Priority: optional
+Maintainer: John Goerzen <jgoerzen@complete.org>
+XS-Python-Version: current
+Build-Depends-Indep: debhelper (>= 5.0.37.2), gtk-doc-tools, sgml2x, docbook-utils, jade, python (>= 2.3), python-dev, python-central (>= 0.5)
+Standards-Version: 3.7.2
+Homepage: http://software.complete.org/vcs-load-dirs
+Vcs-Git: git://git.complete.org/vcs-load-dirs
+Vcs-Browser: http://git.complete.org/vcs-load-dirs
+
+Package: tla-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), tla, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: Import upstream archives into tla/arch
+ Tom Lord's arch/tla system is capable of importing upstream directories
+ into a tla archive for some archives.  For situations where the upstream
+ renames or moves files and directories on a regular basis, version
+ information can be lost.
+ .
+ tla-load-dirs works with tla to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs.
+
+Package: darcs-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), darcs, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: Import upstream archives into darcs
+ Darcs works fine for importing new archives.  However, for situations
+ where the upstream renames or moves files and directories on a regular
+ basis, version information can be lost.
+ .
+ darcs-load-dirs works with darcs to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs or my tla_load_dirs package for Arch.
+
+Package: hg-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), mercurial, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: Import upstream archives into darcs
+ Mercurial works fine for importing new archives.  However, for situations
+ where the upstream renames or moves files and directories on a regular
+ basis, version information can be lost.
+ .
+ hg-load-dirs works with darcs to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs or my tla_load_dirs package for Arch.
+
+Package: baz-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), bazaar, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: Import upstream archives into baz
+ Bazaar (baz) works fine for importing new archives.  However, for situations
+ where the upstream renames or moves files and directories on a regular
+ basis, version information can be lost.
+ .
+ baz-load-dirs works with baz to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs or my tla_load_dirs package for tla.
+
+Package: svk-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), svk, ${shlibs:Depends} ${misc:Depends} ${python:Depends}
+Description: Import upstream archives into svk
+ Svk works fine for importing new archives.  However, for situations
+ where the upstream renames or moves files and directories on a regular
+ basis, version information can be lost.
+ .
+ svk-load-dirs works with svk to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs or my tla_load_dirs package for tla.
+
+Package: git-load-dirs
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: load-dirs-common (= ${Source-Version}), git-core, ${shlibs:Depends} ${misc:Depends} ${python:Depends}
+Description: Import upstream archives into git
+ Git works fine for importing new archives.  However, for situations
+ where the upstream renames or moves files and directories on a regular
+ basis, version information can be lost.
+ .
+ git-load-dirs works with git to import these things and preserve
+ changes.  It works on a principle similar to Subversion's
+ svn_load_dirs or my tla_load_dirs package for tla.
+
+Package: load-dirs-common
+Architecture: all
+XB-Python-Version: ${python:Versions}
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Conflicts: tla-load-dirs (<< 1.0.14)
+Description: Common files for tla-load-dirs and darcs-load-dirs
+ These two packages share much common code.  This package provides
+ that common code so you don't have to install it twice on your system.
+

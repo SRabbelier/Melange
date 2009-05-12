@@ -13,3 +13,4 @@ tests/coverageResults
 tests/.coverage
 *.git
 .gitignore
+.DS_Store

@@ -21,21 +21,17 @@ import os
 import sys
 
 if not hasattr(sys, 'version_info'):
-  sys.stderr.write('Error: Very old versions of Python are not supported. Please '
-                   'use version 2.5.\n')
+  sys.stderr.write('Very old versions of Python are not supported. Please '
+                   'use version 2.5 or greater.\n')
   sys.exit(1)
 version_tuple = tuple(sys.version_info[:2])
 if version_tuple < (2, 4):
   sys.stderr.write('Error: Python %d.%d is not supported. Please use '
-                   'version 2.5.\n' % version_tuple)
+                   'version 2.5 or greater.\n' % version_tuple)
   sys.exit(1)
 if version_tuple == (2, 4):
   sys.stderr.write('Warning: Python 2.4 is not supported; this program may '
-                   'break. Please use version 2.5.\n')
-if version_tuple > (2, 5):
-  sys.stderr.write('Error: Python %d.%d and is not supported; '
-		   'Please use version 2.5, not greater.\n' % version_tuple)
-  sys.exit(1)
+                   'break. Please use version 2.5 or greater.\n')
 
 DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 SCRIPT_DIR = os.path.join(DIR_PATH, 'google', 'appengine', 'tools')

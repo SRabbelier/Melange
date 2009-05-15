@@ -191,6 +191,7 @@ def sendNotification(to_user, from_user, message_properties, subject, template):
       'scope_path': to_user.link_id
   }
 
+  import soc.logic.models.notification
   key_name = model_logic.notification.logic.getKeyNameFromFields(fields)
 
   # create and put a new notification in the datastore
@@ -203,6 +204,8 @@ def sendNewNotificationMessage(notification_entity):
     Args:
       notification_entity: Notification about which the message should be sent
   """
+
+  import soc.views.models.notification
 
   # create the url to show this notification
   notification_url = "http://%(host)s%(index)s" % {

@@ -26,6 +26,7 @@ from zope.testbrowser import browser
 
 import os.path
 
+
 class MelangeFunctionalTestCase(FunctionalTestCase):
   """A base class for all functional tests in Melange.
 
@@ -53,6 +54,7 @@ class TestBranding(MelangeFunctionalTestCase):
     tb.open("http://127.0.0.1:8080/site/show/site")
 
     self.assertTrue("Powered by Melange" in tb.contents)
+
 
 class TestLogin(MelangeFunctionalTestCase):
   """Tests that check the login system is functioning correctly.
@@ -96,4 +98,3 @@ class TestLogin(MelangeFunctionalTestCase):
     # call to action no longer on front page
     self.assertFalse('Please create <a href="/user/create_profile">'
         'User Profile</a> in order to view this page' in tb.contents)
-

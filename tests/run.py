@@ -9,6 +9,7 @@ extra_paths = [HERE,
                os.path.join(appengine_location, 'lib', 'django'),
                os.path.join(appengine_location, 'lib', 'webob'),
                os.path.join(appengine_location, 'lib', 'yaml', 'lib'),
+               os.path.join(appengine_location, 'lib', 'antlr3'),
                appengine_location,
                os.path.join(HERE, 'app'),
                os.path.join(HERE, 'thirdparty', 'coverage'),
@@ -32,7 +33,9 @@ class AppEngineDatastoreClearPlugin(plugins.Plugin):
   def afterTest(self, test):
     from google.appengine.api import apiproxy_stub_map
     datastore = apiproxy_stub_map.apiproxy.GetStub('datastore')
-    datastore.Clear()
+    # clear datastore iff one is available
+    if datastore is not None:
+      datastore.Clear()
 
 
 def main():

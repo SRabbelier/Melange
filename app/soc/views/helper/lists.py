@@ -22,6 +22,7 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
+import logging
 
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
@@ -60,8 +61,6 @@ def getPreferredListPagination(user=None):
 
 OFFSET_KEY = 'offset_%d'
 LIMIT_KEY = 'limit_%d'
-OFFSET_LINKID_KEY = 'offset_linkid_%d'
-REVERSE_DIRECTION_KEY = 'reverse_sort_direction_%d'
 
 
 def makeOffsetKey(limit_idx):
@@ -70,14 +69,6 @@ def makeOffsetKey(limit_idx):
 
 def makeLimitKey(limit_idx):
   return LIMIT_KEY % limit_idx
-
-
-def makeOffsetLinkidKey(limit_idx):
-  return OFFSET_LINKID_KEY % limit_idx
-
-
-def makeReverseDirectionKey(limit_idx):
-  return REVERSE_DIRECTION_KEY % limit_idx
 
 
 def getListParameters(request, list_index):
@@ -119,44 +110,30 @@ def getListParameters(request, list_index):
   else:
     limit = min(DEF_MAX_PAGINATION, limit)
 
-  result = dict(limit=limit, offset=offset)
-  offset_linkid = request.GET.get(makeOffsetLinkidKey(list_index),
-                                  '')
-  # TODO(dbentley): URL unescape
-  result['offset_linkid'] = offset_linkid
-
-  reverse_direction = makeReverseDirectionKey(list_index) in request.GET
-  result['reverse_direction'] = reverse_direction
-
-  return result
+  return dict(limit=limit, offset=offset)
 
 
-class LinkCreator(object):
-  """A way to create links for a page.
+def generateLinkFromGetArgs(request, offset_and_limits):
+  """Constructs the get args for the url.
   """
-  def __init__(self, request, list_idx, limit):
-    self.path = request.path
-    self.base_params = dict(
-        i for i in request.GET.iteritems() if
-        i[0].startswith('offset_') or i[0].startswith('limit_'))
-    self.idx = list_idx
-    self.base_params[makeLimitKey(self.idx)] = limit
 
-  def create(self, offset_linkid=None, export=False, reverse_direction=False):
-    params = self.base_params.copy()
-    if offset_linkid is not None:
-      # TODO(dbentley): URL encode
-      if offset_linkid == '':
-        try:
-          del params[makeOffsetLinkidKey(self.idx)]
-        except KeyError:
-          pass
-      else:
-        params[makeOffsetLinkidKey(self.idx)]=offset_linkid
-    if reverse_direction:
-      params[makeReverseDirectionKey(self.idx)]=True
-    link_suffix = '&'.join('%s=%s' % (k, v) for k, v in params.iteritems())
-    return '%s?%s' % (self.path, link_suffix)
+  args = ["%s=%s" % (k, v) for k, v in offset_and_limits.iteritems()]
+  link_suffix = '?' + '&'.join(args)
+
+  return request.path + link_suffix
+
+
+def generateLinkForRequest(request, base_params, updated_params):
+  """Create a link to the same page as request but with different params
+
+  Params:
+    request: the request for the page
+    base_params: the base parameters
+    updated_params: the parameters to update
+  """
+  params = base_params.copy()
+  params.update(updated_params)
+  return generateLinkFromGetArgs(request, params)
 
 
 def getListContent(request, params, filter=None, order=None,
@@ -197,35 +174,12 @@ def getListContent(request, params, filter=None, order=None,
   # as we only use this logic for getForFields, which is never overridden
   logic = params['logic']
 
-  limit_key = makeLimitKey(idx)
-  # offset_key = makeOffsetKey(idx)
-  # offset_linkid_key = makeOffsetLinkidKey(idx) 
-  # reverse_direction_key = makeReverseDirectionKey(idx)
+  limit_key, offset_key = makeLimitKey(idx), makeOffsetKey(idx)
 
   list_params = getListParameters(request, idx)
   limit, offset = list_params['limit'], list_params['offset']
-  offset_linkid = list_params['offset_linkid']
-  reverse_direction = list_params['reverse_direction']
   pagination_form = makePaginationForm(request, list_params['limit'],
                                        limit_key)
-
-  if offset_linkid:
-    if filter is None:
-      filter = {}
-
-    if reverse_direction:
-      filter['link_id <'] = offset_linkid
-    else:
-      filter['link_id >'] = offset_linkid
-
-    if order is None:
-      order = []
-    if reverse_direction:
-      order.append('-link_id')
-    else:
-      order.append('link_id')
-
-
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
@@ -235,61 +189,46 @@ def getListContent(request, params, filter=None, order=None,
     return None
 
   more = len(data) > limit
-  if reverse_direction:
-    data.reverse()
 
   if more:
-    if reverse_direction:
-      data = data[1:]
-    else:
-      data = data[:limit]
+    del data[limit:]
 
-  should_have_next_link = True
-  if not reverse_direction and not more:
-    should_have_next_link = False
-
-  # Calculating should_have_previous_link is tricky. It's possible we could
-  # be creating a previous link to a page that would have 0 entities.
-  # That would be suboptimal; what's a better way?
-  should_have_previous_link = False
-  if offset_linkid:
-    should_have_previous_link = True
-  if reverse_direction and not more:
-    should_have_previous_link = False
-
-  if data:
-    first_displayed_item = data[0]
-    last_displayed_item = data[-1]
-  else:
-    class Dummy(object):
-      pass
-    first_displayed_item = last_displayed_item = Dummy()
-    first_displayed_item.link_id = None
   newest = next = prev = export_link = ''
 
-  link_creator = LinkCreator(request, idx, limit)
+  base_params = dict(i for i in request.GET.iteritems() if
+                     i[0].startswith('offset_') or i[0].startswith('limit_'))
 
   if params.get('list_key_order'):
-    export_link = link_creator.create(export=True)
+    export_link = generateLinkForRequest(request, base_params, {'export' : idx})
 
-  if should_have_next_link:
-    next = link_creator.create(offset_linkid=last_displayed_item.link_id)
+  if more:
+    # TODO(dbentley): here we need to implement a new field "last_key"
+    next = generateLinkForRequest(request, base_params, {offset_key : offset+limit,
+                                                         limit_key : limit})
 
-  if should_have_previous_link:
-    prev = link_creator.create(offset_linkid=first_displayed_item.link_id,
-                               reverse_direction=True)
+  if offset > 0:
+    # TODO(dbentley): here we need to implement previous in the good way.
+    prev = generateLinkForRequest(request, base_params,
+                                  { offset_key : max(0, offset-limit),
+                                    limit_key : limit })
 
-  newest = link_creator.create(offset_linkid='')
+  if offset > limit:
+    # Having a link to the first doesn't make sense on the first page (we're on
+    # it).  It also doesn't make sense on the second page (because the first
+    # page is the previous page).
 
-  # TODO(dbentley): add a "last" link (which is now possible because we can
-  # query with a reverse linkid sorting
+    # NOTE(dbentley): I personally disagree that it's simpler to do that way,
+    # because sometimes you want to go to the first page without having to
+    # consider what page you're on now.
+    newest = generateLinkForGetArgs(request, base_params, {offset_key : 0,
+                                                           limit_key : limit})
 
   content = {
       'idx': idx,
       'data': data,
       'export': export_link,
-      'first': first_displayed_item.link_id,
-      'last': last_displayed_item.link_id,
+      'first': offset+1,
+      'last': len(data) > 1 and offset+len(data) or None,
       'logic': logic,
       'limit': limit,
       'newest': newest,

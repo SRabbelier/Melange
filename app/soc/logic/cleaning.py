@@ -24,7 +24,7 @@ __authors__ = [
     ]
 
 
-import feedparser
+from htmlsanitizer import HtmlSanitizer
 
 from google.appengine.api import users
 
@@ -379,16 +379,21 @@ def clean_html_content(field_name):
   def wrapped(self):
     """Decorator wrapper method.
     """
+    from HTMLParser import HTMLParseError
 
     content = self.cleaned_data.get(field_name)
 
     if user_logic.isDeveloper():
       return content
-
-    sanitizer = feedparser._HTMLSanitizer('utf-8')
-    sanitizer.feed(content)
-    content = sanitizer.output()
-    content = content.decode('utf-8')
+    
+    try:
+      cleaner = HtmlSanitizer.Cleaner()
+      cleaner.string = content
+      cleaner.clean()
+    except HTMLParseError, msg:
+      raise forms.ValidationError(msg)
+    
+    content = cleaner.string
     content = content.strip().replace('\r\n', '\n')
 
     return content

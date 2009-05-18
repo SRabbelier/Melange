@@ -36,7 +36,6 @@ PROJ_DIR=$(dirname "$0")/../..
 PROJ_DIR=$(cd "$PROJ_DIR"; pwd)
 APP_DIR="${PROJ_DIR}/app"
 
-# Note: We will add ghop and gsoc modules once there something in there
 CHECK_MODULES="soc reflistprop settings.py urls.py main.py"
 
 PYLINTRC=$(dirname "$0")/pylintrc
@@ -60,3 +59,4 @@ do
 done
 
 pylint $SILENT_ARGS $ARGS $CHECK_MODULES_PATHS
+exit $?

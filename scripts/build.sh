@@ -20,6 +20,17 @@ APP_FILES=${APP_FILES:-"${DEFAULT_APP_FILES}"}
 APP_DIRS=${APP_DIRS:-"${DEFAULT_APP_DIRS}"}
 ZIP_FILES=${ZIP_FILES:-"${DEFAULT_ZIP_FILES}"}
 
+
+if [ "$1" != "--skip-pylint" ]; then
+  cd pylint
+  bash do_pylint.sh --silent
+  if [ "$?" != "1" ] ; then
+      echo ' Build failed. Build script encountered pylint errors.'
+      exit 1
+  fi
+  cd ..
+fi
+
 if [ -e $APP_FOLDER ] ; then
     cd $APP_FOLDER
 else

@@ -357,6 +357,87 @@ def dumpPickle(target, name):
   cPickle.dump(target, f)
 
 
+def acceptedStudentsCSVExport(csv_filename, program_key_name):
+  """Exports all accepted Students for particular program into CSV file.
+  """
+  # TODO(Pawel.Solyga): Add additional Program parameter to this method 
+  # so we export students from different programs
+  # TODO(Pawel.SOlyga): Make it universal so it works with both GHOP 
+  # and GSoC programs
+  
+  from soc.models.student_project import StudentProject
+  from soc.models.student import Student
+  from soc.models.organization import Organization
+  
+  getStudentProjects = getEntities(StudentProject)
+  student_projects = getStudentProjects()
+  student_projects_amount = len(student_projects)
+  print "Fetched %d Student Projects." % student_projects_amount
+  print "Fetching Student entities from Student Projects."
+  accepted_students = {}
+  student_organization = {}
+  counter = 0
+  for sp_key in student_projects.keys():
+    key = student_projects[sp_key].student.key().name()
+    accepted_students[key] = student_projects[sp_key].student
+    org_name = student_projects[sp_key].scope.name
+    student_organization[key] = org_name
+    counter += 1
+    print str(counter) + '/' + str(student_projects_amount) + ' ' + key + ' (' + org_name + ')'
+  print "All Student entities fetched."
+  
+  students_key_order = ['link_id', 'given_name', 'surname', 
+      'name_on_documents', 'email', 'res_street', 'res_city', 'res_state',
+      'res_country', 'res_postalcode', 'phone', 'ship_street', 'ship_city',
+      'ship_state', 'ship_country', 'ship_postalcode', 'birth_date', 
+      'tshirt_size', 'tshirt_style', 'name', 'school_name', 'school_country',
+      'major', 'degree']
+
+  print "Preparing Students data for export."
+  students_data = [accepted_students[i].toDict(students_key_order) for i in accepted_students.keys()]
+  
+  print "Adding organization name to Students data."
+  for student in students_data:
+    student['organization'] = student_organization[program_key_name + '/' + student['link_id']]
+  
+  students_key_order.append('organization')
+  
+  saveDataToCSV(csv_filename, students_data, students_key_order)
+  print "Accepted Students exported to %s file." % csv_filename
+  
+  
+def saveDataToCSV(csv_filename, data, key_order):
+  """Saves data in order into CSV file.
+  
+  This is a helper function used with acceptedStudentsCSVExport().
+  """
+  
+  import csv
+  import StringIO
+  
+  from soc.logic import dicts
+  
+  file_handler = StringIO.StringIO()
+  
+  writer = csv.DictWriter(file_handler, key_order, dialect='excel')
+  writer.writerow(dicts.identity(key_order))
+  
+  # encode the data to UTF-8 to ensure compatibiliy
+  for row_dict in data:
+    for key in row_dict.keys():
+      value = row_dict[key]
+      if isinstance(value, basestring):
+        row_dict[key] = value.encode("utf-8")
+      else:
+        row_dict[key] = str(value)
+    writer.writerow(row_dict)
+  
+  csv_data = file_handler.getvalue()
+  csv_file = open(csv_filename, 'w')
+  csv_file.write(csv_data)
+  csv_file.close()
+
+
 def main(args):
   """Main routine.
   """
@@ -411,6 +492,7 @@ def main(args):
       'startSpam': startSpam,
       'reviveJobs': reviveJobs,
       'deidleJobs': deidleJobs,
+      'acceptedStudentsCSVExport': acceptedStudentsCSVExport,
   }
 
   interactive.remote(args, context)

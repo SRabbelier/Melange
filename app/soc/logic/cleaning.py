@@ -21,6 +21,7 @@ __authors__ = [
     '"Todd Larsen" <tlarsen@google.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Pawel Solyga" <pawel.solyga@gmail.com>',
     ]
 
 
@@ -383,6 +384,10 @@ def clean_html_content(field_name):
 
     content = self.cleaned_data.get(field_name)
 
+    # clean_html_content is called when writing data into GAE rather than 
+    # when reading data from GAE. This short-circuiting of the sanitizer 
+    # only affects html authored by developers. The isDeveloper test for 
+    # example allows developers to add javascript.
     if user_logic.isDeveloper():
       return content
     

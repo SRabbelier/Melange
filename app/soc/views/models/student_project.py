@@ -552,7 +552,7 @@ class View(base.View):
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
     # cancel should go to the public view
-    params['edit_cancel_redirect'] = redirects.getPublicRedirect(entity, params)
+    params['cancel_redirect'] = redirects.getPublicRedirect(entity, params)
 
     if request.POST:
       return self.stEditPost(request, context, params, entity, **kwargs)

@@ -23,7 +23,17 @@ limitations under the License.
   <td>
     Please select the appropriate action:</br>
     <input type="button" onclick="location.href='/{{ url_name }}/manage/{{ entity.scope_path }}/{{ entity.link_id }}?resign=true'" value="Resign"/>
-    <input type="button" onclick="location.href='{{ cancel_redirect }}'" value="Cancel"/>
+    {% if cancel_redirect %}
+    <input type="button" 
+      {% if entity %}
+      onclick="location.href='{{ cancel_redirect }}'" 
+      {% else %}
+      onClick="javascript: history.go(-1)">
+      {% endif %}
+    value="Cancel"/>
+    {% else %}
+    <input type="button" value="Back to Previous Page" onClick="javascript:history.go(-1)">
+    {% endif %}
   </td>
 </tr>
 {% endblock %}

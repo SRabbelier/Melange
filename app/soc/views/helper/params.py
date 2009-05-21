@@ -128,7 +128,7 @@ def constructParams(params):
   new_params['missing_redirect'] = '/%(url_name)s/create' % params
   new_params['delete_redirect'] = '/%(url_name)s/list' % params
   new_params['invite_redirect'] = '/request/list'
-  new_params['edit_cancel_redirect'] = '/%(url_name)s/list' % params
+  # new_params['cancel_redirect'] = '/%(url_name)s/list' % params
   new_params['public_redirect'] = None
 
   new_params['sidebar'] = None

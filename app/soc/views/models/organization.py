@@ -554,6 +554,8 @@ class View(group.View):
       ap_list = lists.getListContent(request, ap_params, filter, idx=0,
                                      need_content=True)
 
+      ap_list['data'].sort(key=lambda sp: sp.student.name().lower())
+      
       contents = []
 
       if ap_list:

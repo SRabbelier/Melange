@@ -554,7 +554,7 @@ class View(group.View):
       ap_list = lists.getListContent(request, ap_params, filter, idx=0,
                                      need_content=True)
 
-      # This is a temporary fix for sorting Student Projects 
+      # this is a temporary fix for sorting Student Projects 
       # by Student name until we have a view that default 
       # sorts it self by name (right now we can't do such query)
       ap_list['data'].sort(key=lambda sp: sp.student.name().lower())

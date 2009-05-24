@@ -41,7 +41,8 @@ from soc.views.helper import forms
 from soc.views.helper import redirects
 from soc.views.helper import requests
 from soc.views.helper import responses
-from soc.views import sitemap
+from soc.views.sitemap import sidebar
+from soc.views.sitemap import sitemap
 
 import soc.cache.logic
 import soc.logic
@@ -952,7 +953,7 @@ class View(object):
       of _getSidebarItems on how it uses it.
     """
 
-    return sitemap.sidebar.getSidebarMenus(id, user, params=params)
+    return sidebar.getSidebarMenus(id, user, params=params)
 
   @decorators.merge_params
   def getDjangoURLPatterns(self, params=None):
@@ -967,5 +968,5 @@ class View(object):
       params: a dict with params for this View
     """
 
-    return sitemap.sitemap.getDjangoURLPatterns(params)
+    return sitemap.getDjangoURLPatterns(params)
 

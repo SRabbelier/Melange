@@ -126,6 +126,12 @@ def real_main():
   # Create a Django application for WSGI.
   application = django.core.handlers.wsgi.WSGIHandler()
 
+  from soc.modules import callback
+  from soc.modules import core
+
+  callback.registerCore(core.Core())
+  callback.getCore().registerModuleCallbacks()
+
   # Run the WSGI CGI handler with that application.
   util.run_wsgi_app(application)
 

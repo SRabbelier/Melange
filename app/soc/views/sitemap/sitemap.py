@@ -22,17 +22,6 @@ __authors__ = [
   ]
 
 
-SITEMAP = []
-
-
-def addPages(pages):
-  """Adds the specified pages to the sitemap.
-  """
-
-  global SITEMAP
-  SITEMAP += pages
-
-
 def getDjangoURLPatterns(params):
   """Retrieves a list of sidebar entries for this View.
 

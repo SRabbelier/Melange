@@ -100,6 +100,7 @@ TEMPLATE_DIRS = (
     os.path.join(ROOT_PATH, 'ghop', 'templates'),
     os.path.join(ROOT_PATH, 'gsoc', 'templates'),
     os.path.join(ROOT_PATH, 'soc', 'templates'),
+    os.path.join(ROOT_PATH, 'shell', 'templates'),
 )
 
 INSTALLED_APPS = (

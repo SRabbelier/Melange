@@ -46,6 +46,14 @@ handlers:
 - url: /json
   static_dir: json
 
+- url: /admin/shell.*
+  script: shell/shell.py
+  login: admin
+
+- url: /static
+  static_dir: shell/static
+  expiration: 1d
+
 - url: /.*
   script: main.py
 

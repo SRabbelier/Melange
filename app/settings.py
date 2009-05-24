@@ -110,3 +110,6 @@ INSTALLED_APPS = (
 #    'django.contrib.sessions',
 #    'django.contrib.sites',
 )
+
+MODULE_FMT = 'soc.modules.%s'
+MODULES = []

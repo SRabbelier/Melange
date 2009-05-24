@@ -24,37 +24,10 @@ __authors__ = [
 
 from soc.views import out_of_band
 
-import soc.cache.sidebar
 
-
-SIDEBAR = []
 SIDEBAR_ACCESS_ARGS = ['SIDEBAR_CALLING']
 SIDEBAR_ACCESS_KWARGS = {'SIDEBAR_CALLING': True}
 
-
-def addMenu(callback):
-  """Adds a callback to the menu builder.
-
-  The callback should return a list of menu's when called.
-  """
-  global SIDEBAR
-  SIDEBAR.append(callback)
-
-
-@soc.cache.sidebar.cache
-def getSidebar(id, user):
-  """Constructs a sidebar for the current user.
-  """
-
-  sidebar = []
-
-  for callback in SIDEBAR:
-    menus = callback(id, user)
-
-    for menu in (menus if menus else []):
-      sidebar.append(menu)
-
-  return sorted(sidebar, key=lambda x: x.get('group'))
 
 
 def getSidebarItems(params):

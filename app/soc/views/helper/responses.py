@@ -33,6 +33,7 @@ from soc.logic import accounts
 from soc.logic import system
 from soc.logic.models import site
 from soc.logic.models.user import logic as user_logic
+from soc.modules import callback
 from soc.views import helper
 from soc.views.helper import redirects
 from soc.views.helper import templates
@@ -125,7 +126,7 @@ def getUniversalContext(request):
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
 
-  context['sidebar_menu_items'] = sidebar.getSidebar(account, user)
+  context['sidebar_menu_items'] = callback.getCore().getSidebar(account, user)
 
   context['gae_version'] = system.getAppVersion()
   context['soc_release'] = system.getMelangeVersion()

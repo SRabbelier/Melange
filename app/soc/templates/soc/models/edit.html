@@ -34,7 +34,7 @@ Please use this form to edit the {{ entity_type }}.
   <div class="error">{{ error_message|safe }}</div>
 {% endif %}
 
-<form method="POST">
+<form id="EditForm" method="POST">
   <table>
     {% block form_table %}
       {% as_table form %}

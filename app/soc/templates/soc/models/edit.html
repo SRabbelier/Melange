@@ -92,4 +92,10 @@ Please use this form to edit the {{ entity_type }}.
  </table>
 </form>
 </p>
+
+{% if supplemental %}
+{{ supplemental|safe }}
+{% endif %}
+
+
 {% endblock %}

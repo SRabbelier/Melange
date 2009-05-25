@@ -25,6 +25,8 @@ __authors__ = [
   ]
 
 
+import logging
+
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext
@@ -324,7 +326,13 @@ class Logic(object):
 
     query = self.getQueryForFields(filter=filter, order=order)
 
-    result = query.fetch(limit, offset)
+    try:
+      result = query.fetch(limit, offset)
+    except db.NeedIndexError, exception:
+      result = []
+      logging.exception("%s, model: %s filter: %s, order: %s" % 
+                        (exception, self._model, filter, order))
+      # TODO: send email
 
     if unique:
       return result[0] if result else None

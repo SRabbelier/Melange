@@ -60,7 +60,7 @@ def getPreferredListPagination(user=None):
 
 OFFSET_KEY = 'offset_%d'
 LIMIT_KEY = 'limit_%d'
-OFFSET_LINKID_KEY = 'offset_linkid_%d'
+OFFSET_KEYNAME_KEY = 'offset_keyname_%d'
 REVERSE_DIRECTION_KEY = 'reverse_sort_direction_%d'
 
 
@@ -72,8 +72,8 @@ def makeLimitKey(limit_idx):
   return LIMIT_KEY % limit_idx
 
 
-def makeOffsetLinkidKey(limit_idx):
-  return OFFSET_LINKID_KEY % limit_idx
+def makeOffsetKeynameKey(limit_idx):
+  return OFFSET_KEYNAME_KEY % limit_idx
 
 
 def makeReverseDirectionKey(limit_idx):
@@ -120,10 +120,10 @@ def getListParameters(request, list_index):
     limit = min(DEF_MAX_PAGINATION, limit)
 
   result = dict(limit=limit, offset=offset)
-  offset_linkid = request.GET.get(makeOffsetLinkidKey(list_index),
-                                  '')
+  offset_keyname_key = makeOffsetLinkidKey(list_index)
+  offset_keyname = request.GET.get(offset_keyname_key, '')
   # TODO(dbentley): URL unescape
-  result['offset_linkid'] = offset_linkid
+  result['offset_keyname'] = offset_keyname
 
   reverse_direction = makeReverseDirectionKey(list_index) in request.GET
   result['reverse_direction'] = reverse_direction
@@ -142,7 +142,7 @@ class LinkCreator(object):
     self.idx = list_idx
     self.base_params[makeLimitKey(self.idx)] = limit
 
-  def create(self, offset_linkid=None, export=False, reverse_direction=False):
+  def create(self, offset_keyname=None, export=False, reverse_direction=False):
     params = self.base_params.copy()
     if offset_linkid is not None:
       # TODO(dbentley): URL encode
@@ -193,39 +193,38 @@ def getListContent(request, params, filter=None, order=None,
       'last': offset of the last item in the list
     }
   """
-  # TODO(dbentley): this appears to be unnecessary indirection,
-  # as we only use this logic for getForFields, which is never overridden
+
   logic = params['logic']
 
   limit_key = makeLimitKey(idx)
-  # offset_key = makeOffsetKey(idx)
-  # offset_linkid_key = makeOffsetLinkidKey(idx) 
-  # reverse_direction_key = makeReverseDirectionKey(idx)
+  offset_key = makeOffsetKey(idx)
+  offset_keyname_key = makeOffsetKeynameKey(idx)
+  reverse_direction_key = makeReverseDirectionKey(idx)
 
   list_params = getListParameters(request, idx)
-  limit, offset = list_params['limit'], list_params['offset']
-  offset_linkid = list_params['offset_linkid']
-  reverse_direction = list_params['reverse_direction']
-  pagination_form = makePaginationForm(request, list_params['limit'],
-                                       limit_key)
 
-  if offset_linkid:
+  limit = list_params['limit']
+  offset = list_params['offset']
+  offset_keyname = list_params['offset_keyname']
+  reverse_direction = list_params['reverse_direction']
+
+  pagination_form = makePaginationForm(request, limit, limit_key)
+
+  if offset_keyname:
     if filter is None:
       filter = {}
 
     if reverse_direction:
-      filter['link_id <'] = offset_linkid
+      filter['__key__ <'] = offset_keyname
     else:
-      filter['link_id >'] = offset_linkid
+      filter['__key__ >'] = offset_keyname
 
     if order is None:
       order = []
     if reverse_direction:
-      order.append('-link_id')
+      order.append('-__key__')
     else:
-      order.append('link_id')
-
-
+      order.append('__key__')
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
@@ -252,19 +251,18 @@ def getListContent(request, params, filter=None, order=None,
   # be creating a previous link to a page that would have 0 entities.
   # That would be suboptimal; what's a better way?
   should_have_previous_link = False
-  if offset_linkid:
+  if offset_keyname:
     should_have_previous_link = True
   if reverse_direction and not more:
     should_have_previous_link = False
 
   if data:
-    first_displayed_item = data[0]
-    last_displayed_item = data[-1]
+    first_key_name = data[0].key().name_or_id()
+    last_key_name = data[-1].key().name_or_id()
   else:
-    class Dummy(object):
-      pass
-    first_displayed_item = last_displayed_item = Dummy()
-    first_displayed_item.link_id = None
+    first_key_name = None
+    last_key_name = None
+
   newest = next = prev = export_link = ''
 
   link_creator = LinkCreator(request, idx, limit)
@@ -273,23 +271,23 @@ def getListContent(request, params, filter=None, order=None,
     export_link = link_creator.create(export=True)
 
   if should_have_next_link:
-    next = link_creator.create(offset_linkid=last_displayed_item.link_id)
+    next = link_creator.create(offset_keyname=last_key_name)
 
   if should_have_previous_link:
-    prev = link_creator.create(offset_linkid=first_displayed_item.link_id,
+    prev = link_creator.create(offset_keyname=first_key_name,
                                reverse_direction=True)
 
-  newest = link_creator.create(offset_linkid='')
+  newest = link_creator.create(offset_keyname='')
 
   # TODO(dbentley): add a "last" link (which is now possible because we can
-  # query with a reverse linkid sorting
+  # query with a reverse keyname sorting
 
   content = {
       'idx': idx,
       'data': data,
       'export': export_link,
-      'first': first_displayed_item.link_id,
-      'last': last_displayed_item.link_id,
+      'first': first_key_name,
+      'last': last_key_name,
       'logic': logic,
       'limit': limit,
       'newest': newest,

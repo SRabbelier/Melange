@@ -73,7 +73,7 @@ class User(soc.models.linkable.Linkable):
       'A valid Google Account.')
   
   #: Google Account unique user id
-  user_id = db.StringProperty(required=True)
+  user_id = db.StringProperty(required=False)
 
   #: A list (possibly empty) of former Google Accounts associated with
   #: this User.

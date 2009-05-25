@@ -75,6 +75,20 @@ class Logic(base.Logic):
 
     return self.getForAccount(account)
 
+  def getForCurrentUserId(self):
+    """Retrieves the user entity for the currently logged in user id.
+
+    If there is no user logged in, or they have no valid associated User
+    entity, None is returned.
+    """
+
+    user_id = accounts.getCurrentUserId()
+
+    if not user_id:
+      return None
+
+    return self.getForUserId(user_id)
+
   def getForAccount(self, account):
     """Retrieves the user entity for the specified account.
 
@@ -89,6 +103,23 @@ class Logic(base.Logic):
 
     fields = {
         'account': account,
+        'status':'valid',
+        }
+
+    return self.getForFields(filter=fields, unique=True)
+
+  def getForUserId(self, user_id):
+    """Retrieves the user entity for the specified user id.
+
+    If there is no user logged in, or they have no valid associated User
+    entity, None is returned.
+    """
+
+    if not user_id:
+      raise base.InvalidArgumentError
+
+    fields = {
+        'user_id': user_id,
         'status':'valid',
         }
 

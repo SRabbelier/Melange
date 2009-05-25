@@ -277,6 +277,21 @@ def startSpam():
   job_logic.updateOrCreateFromFields(job_fields)
 
 
+def startUniqueUserIdConversion():
+  """Creates the job that is responsible for adding unique user ids.
+  """
+
+  from soc.logic.models.job import logic as job_logic
+  from soc.logic.models.priority_group import logic as priority_logic
+
+  priority_group = priority_logic.getGroup(priority_logic.CONVERT)
+  job_fields = {
+      'priority_group': priority_group,
+      'task_name': 'setupUniqueUserIdAdder'}
+
+  job_logic.updateOrCreateFromFields(job_fields)
+
+
 def reviveJobs(amount):
   """Sets jobs that are stuck in 'aborted' to waiting.
 
@@ -493,6 +508,7 @@ def main(args):
       'reviveJobs': reviveJobs,
       'deidleJobs': deidleJobs,
       'acceptedStudentsCSVExport': acceptedStudentsCSVExport,
+      'startUniqueUserIdConversion': startUniqueUserIdConversion,
   }
 
   interactive.remote(args, context)

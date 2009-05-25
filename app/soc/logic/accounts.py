@@ -35,6 +35,13 @@ def getCurrentAccount(normalize=True):
   return normalizeAccount(account) if (account and normalize) else account
 
 
+def getCurrentUserId():
+  """Returns a unique id of the current user.
+  """
+
+  return users.get_current_user().user_id()
+
+
 def normalizeAccount(account):
   """Returns a normalized version of the specified account.
   """
@@ -45,6 +52,7 @@ def normalizeAccount(account):
     return account
 
   return users.User(email=normalized)
+
 
 def denormalizeAccount(account):
   """Returns a denormalized version of the specified account.
@@ -57,6 +65,7 @@ def denormalizeAccount(account):
   denormalized = ''.join([account.email(), '@', domain])
 
   return users.User(email=denormalized)
+
 
 def isDeveloper(account=None):
   """Returns True if a Google Account is a Developer with special privileges.

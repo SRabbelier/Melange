@@ -139,7 +139,7 @@ class OrganizationSeeder(Seeder):
 
   def seed(self, i, entities=None, current_user=None, gsoc2009=None):
     properties = {
-        'key_name': 'google/gsoc2009/%04d' % i,
+        'key_name': 'google/gsoc2009/org_%04d' % i,
         'link_id': 'org_%04d' % i,
         'name': 'Organization %04d' % i,
         'short_name': 'Org %04d' % i,
@@ -197,8 +197,8 @@ class OrgApplicationSeeder(Seeder):
   def seed(self, i, entities=None, current_user=None, gsoc2009=None,
            status=None):
     properties = {
-        'key_name': 'google/gsoc2009/org_app_%04d' % i,
-        'link_id': 'org_app_%04d' % i,
+        'key_name': 'google/gsoc2009/org_%04d' % i,
+        'link_id': 'org_%04d' % i,
         'name': 'Org App %04d' % i,
         'scope_path': 'google/gsoc2009',
         'scope': gsoc2009,
@@ -374,8 +374,8 @@ def seed(request, *args, **kwargs):
     }
 
   for i in range(10):
-    org_app_properties['key_name'] = 'google/gsoc2009/org_app_%04d' % i
-    org_app_properties['link_id'] = 'org_app_%04d' % i
+    org_app_properties['key_name'] = 'google/gsoc2009/org_%04d' % i
+    org_app_properties['link_id'] = 'org_%04d' % i
     org_app_properties['name'] = 'Org App %04d' % i
     entity = OrgApplication(**org_app_properties)
     entity.put()
@@ -531,8 +531,8 @@ def seed_org_app(request, i):
     raise Error('Run seed_db first')
 
   properties = {
-      'key_name': 'google/gsoc2009/org_app_%d' % i,
-      'link_id': 'org_app_%d' % i,
+      'key_name': 'google/gsoc2009/org_%d' % i,
+      'link_id': 'org_%d' % i,
       'name': 'Org App %d' % i,
       'scope_path': 'google/gsoc2009',
       'scope': gsoc2009,

@@ -41,7 +41,7 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
   """
 
   #: Task to which this work was submitted
-  task = db.ReferenceProperty(reference_class=ghop.models.task.Task,
+  task = db.ReferenceProperty(reference_class=ghop.models.task.GHOPTask,
                               required=True,
                               collection_name='work_submissions')
 

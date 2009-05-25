@@ -28,14 +28,14 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.linkable
-import soc.models.organization
-import soc.models.program
 import soc.models.role
 import soc.models.student
 import soc.models.user
 
+import ghop.models.program
 
-class Task(soc.models.linkable.Linkable):
+
+class GHOPTask(soc.models.linkable.Linkable):
   """Model for a task used in GHOP workflow.
 
   The scope property of Linkable will be set to the Organization to which
@@ -53,7 +53,7 @@ class Task(soc.models.linkable.Linkable):
                                 verbose_name=ugettext('Description'))
   description.help_text = ugettext('Complete description of the task')
 
-  #: field indicating the difficulty level of the task. This is not
+  #: Field indicating the difficulty level of the Task. This is not
   #: mandatory so the it can be assigned at any later stage. 
   #: The options are configured by a Program Admin.
   difficulty = db.StringProperty(required=False,
@@ -92,7 +92,7 @@ class Task(soc.models.linkable.Linkable):
                                  collection_name='assigned_tasks')
 
   #: Program in which this Task has been created
-  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
+  program = db.ReferenceProperty(reference_class=ghop.models.program.GHOPProgram,
                                  required=True,
                                  collection_name='tasks')
 
@@ -124,7 +124,7 @@ class Task(soc.models.linkable.Linkable):
                'needs_review'],
       default='unapproved')
 
-  #: A field which indicates if the task was ever in the Reopened state.
+  #: A field which indicates if the Task was ever in the Reopened state.
   #: True indicates that its state was Reopened once, false indicated that it
   #: has never been in the Reopened state.
   was_reopened = db.BooleanProperty(default=False,

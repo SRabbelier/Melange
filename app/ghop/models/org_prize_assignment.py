@@ -48,7 +48,6 @@ class GHOPOrgPrizeAssignment(soc.models.base.ModelWithFieldAttributes):
   #: organization under the specified program
   winners = db.ListProperty(item_type=db.Key, default=[])
 
-  #: unordered list of runner-ups(reference to Student entities) for the given
+  #: Unordered list of runner-ups(reference to Student entities) for the given
   #: organization under the specified program
   runner_ups = db.ListProperty(item_type=db.Key, default=[])
-

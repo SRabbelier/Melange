@@ -27,7 +27,6 @@ from google.appengine.api import users
 from soc.logic.models.job import logic as job_logic
 from soc.logic.models.priority_group import logic as priority_logic
 from soc.logic.models.user import logic as user_logic
-from soc.models.user import User
 
 
 # amount of users to create jobs for before updating
@@ -47,6 +46,7 @@ def emailToAccountAndUserId(address):
   user = users.User(address)
   key = TempUserWithUniqueId(user=user).put()
   obj = TempUserWithUniqueId.get(key)
+  # pylint: disable-msg=E1103
   return (obj, obj.user.user_id())
 
 
@@ -58,10 +58,9 @@ def setupUniqueUserIdAdder(job_entity):
                 [last_completed_user]
   """
 
-  from soc.cron.job import FatalJobError
-
+  key_data = job_entity.key_data
   user_fields = {'user_id': None}
-
+  
   if len(key_data) == 1:
     # start where we left off
     user_fields['__key__ >'] = key_data[0]
@@ -93,17 +92,17 @@ def setupUniqueUserIdAdder(job_entity):
     last_user_key = m_users[-1].key()
 
     if len(key_data) == 1:
-      key_data[0] = last_student_key
+      key_data[0] = last_user_key
     else:
-      key_data.append(last_student_key)
+      key_data.append(last_user_key)
 
     updated_job_fields = {'key_data': key_data}
     job_logic.updateEntityProperties(job_entity, updated_job_fields)
 
     # rinse and repeat
     user_fields['__key__ >'] = last_user_key
-    m_users = student_logic.getForFields(user_fields,
-                                         limit=DEF_USER_STEP_SIZE)
+    m_users = user_logic.getForFields(user_fields,
+                                      limit=DEF_USER_STEP_SIZE)
 
   # we are finished
   return

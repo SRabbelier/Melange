@@ -22,7 +22,6 @@ __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-import logging
 
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic

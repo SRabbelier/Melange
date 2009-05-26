@@ -21,8 +21,6 @@ __authors__ = [
   ]
 
 
-from soc.modules import callback
-
 from soc.views.models import club
 from soc.views.models import club_app
 from soc.views.models import club_admin

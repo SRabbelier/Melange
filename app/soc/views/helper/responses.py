@@ -37,7 +37,6 @@ from soc.modules import callback
 from soc.views import helper
 from soc.views.helper import redirects
 from soc.views.helper import templates
-from soc.views.sitemap import sidebar
 
 
 def respond(request, template, context=None, response_args=None,

@@ -62,11 +62,26 @@ class MissingService(Error):
     super(MissingService, self).__init__(msg)
 
 
+class MissingCapability(Error):
+  """Error raised when a required capability is missing.
+  """
+
+  MISSING_CAPABILITY_FMT = "Required capability '%s' " + \
+      "is not registered, known: %s"
+
+  def __init__(self, capability, capabilities):
+    """Instantiates a new exception with a customized message.
+    """
+
+    msg = self.MISSING_CAPABILITY_FMT % (capability, capabilities)
+    super(MissingCapability, self).__init__(msg)
+
+
 class NonUniqueService(Error):
   """Error raised when a required service is missing.
   """
 
-  NON_UNIQUE_SERVICE_FMT = "Unique service '%s' called a second time, known: %s."
+  NON_UNIQUE_SERVICE_FMT = "Unique service '%s' called a 2nd time, known: %s."
 
   def __init__(self, service, services):
     """Instantiates a new exception with a customized message.
@@ -83,11 +98,12 @@ class Core(object):
   def __init__(self):
     """Creates a new instance of the Core.
     """
-
+    
+    # pylint: disable-msg=C0103
     self.API_VERSION = 1
 
     self.registered_callbacks = []
-    self.capability = []
+    self.capabilities = []
     self.services = []
 
     self.sitemap = []
@@ -98,22 +114,22 @@ class Core(object):
   ##
 
   def getService(self, callback, service):
-   """Retrieves the specified service from the callback if supported.
+    """Retrieves the specified service from the callback if supported.
 
-   Args:
+    Args:
      callback: the callback to retrieve the capability from
      service: the service to retrieve
-   """
+    """
 
-   if not hasattr(callback, service):
-     return False
+    if not hasattr(callback, service):
+      return False
 
-   func = getattr(callback, service)
+    func = getattr(callback, service)
 
-   if not callable(func):
-     return False
+    if not callable(func):
+      return False
 
-   return func
+    return func
 
   ##
   ## Core code
@@ -176,8 +192,8 @@ class Core(object):
 
     for callback_class in [i.getCallback() for i in modules]:
       if callback_class.API_VERSION != self.API_VERSION:
-        raise callback.APIVersionMismatch(self.API_VERSION,
-                                          callback_class.API_VERSION)
+        raise APIVersionMismatch(self.API_VERSION,
+                                 callback_class.API_VERSION)
 
 
       callback = callback_class(self)
@@ -202,7 +218,7 @@ class Core(object):
     if capability in self.capabilities:
       return True
 
-    raise MissingCapability(capability, self.capability)
+    raise MissingCapability(capability, self.capabilities)
 
   def requireService(self, service):
     """Requires that the specified service has been called.

@@ -75,7 +75,7 @@ class View(base.View):
         ('checkStudentProjectHasStatus', [['accepted', 'mid_term_passed']])]
     rights['manage_overview'] = [('checkHasActiveRoleForScope',
                          org_admin_logic)]
-    # TODO lack of better name here!
+    # TODO: lack of better name here!
     rights['st_edit'] = ['checkIsMyStudentProject',
         ('checkStudentProjectHasStatus',
             [['accepted', 'mid_term_passed', 'passed']])
@@ -244,6 +244,7 @@ class View(base.View):
       mentor = mentor_logic.logic.getForFields(fields, unique=True)
 
       additional_mentors = entity.additional_mentors
+      # pylint: disable-msg=E1103
       if additional_mentors and mentor.key() in additional_mentors:
         # remove the mentor from the additional mentors list
         additional_mentors.remove(mentor.key())
@@ -411,6 +412,7 @@ class View(base.View):
 
     additional_mentors = entity.additional_mentors
 
+    # pylint: disable-msg=E1103
     if additional_mentors and mentor.key() in additional_mentors:
       # remove the mentor that is now becoming the primary mentor
       additional_mentors.remove(mentor.key())
@@ -453,6 +455,7 @@ class View(base.View):
     mentor = mentor_logic.logic.getForFields(fields, unique=True)
 
     # add this mentor to the additional mentors
+    # pylint: disable-msg=E1103
     if not entity.additional_mentors:
       additional_mentors = [mentor.key()]
     else:

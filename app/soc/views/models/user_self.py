@@ -150,6 +150,7 @@ class View(base.View):
 
     # set the link_id to the current user's link_id
     user_entity = user_logic.getForCurrentAccount()
+    # pylint: disable-msg=E1103
     link_id = user_entity.link_id
 
     return self.edit(request, access_type, page_name=page_name, 
@@ -235,6 +236,7 @@ class View(base.View):
     user = user_logic.getForCurrentAccount()
 
     # only select the roles for the current user
+    # pylint: disable-msg=E1103
     filter = {
         'link_id': user.link_id,
         'status': ['active', 'inactive']

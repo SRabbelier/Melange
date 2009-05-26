@@ -191,6 +191,7 @@ def sendNotification(to_user, from_user, message_properties, subject, template):
       'scope_path': to_user.link_id
   }
 
+  # pylint: disable-msg=W0612
   import soc.logic.models.notification
   key_name = model_logic.notification.logic.getKeyNameFromFields(fields)
 
@@ -204,7 +205,7 @@ def sendNewNotificationMessage(notification_entity):
     Args:
       notification_entity: Notification about which the message should be sent
   """
-
+  # pylint: disable-msg=W0612
   import soc.views.models.notification
 
   # create the url to show this notification

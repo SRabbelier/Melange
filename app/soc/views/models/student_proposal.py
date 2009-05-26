@@ -147,7 +147,8 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
-    new_params['review_after_deadline_template'] = 'soc/student_proposal/review_after_deadline.html'
+    new_params['review_after_deadline_template'] = \
+        'soc/student_proposal/review_after_deadline.html'
 
     params = dicts.merge(params, new_params)
 
@@ -355,7 +356,7 @@ class View(base.View):
     if comment:
       # create a new public review containing the comment
       user_entity = user_logic.logic.getForCurrentAccount()
-
+      # pylint: disable-msg=E1103
       if user_entity.key() == entity.scope.user.key():
         # student is posting
         reviewer = entity.scope
@@ -401,6 +402,7 @@ class View(base.View):
       user_entity = user_logic.logic.getForCurrentAccount()
 
       # create the fields that should be in the ReviewFollower entity
+      # pylint: disable-msg=E1103
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
                 'scope_path': entity.key().id_or_name(),
@@ -446,6 +448,7 @@ class View(base.View):
     user_entity = user_logic.logic.getForCurrentAccount()
 
     # check if the current user is the student
+    # pylint: disable-msg=E1103
     if user_entity.key() == student_entity.user.key():
       # show the proposal edit link
       context['edit_link'] = redirects.getEditRedirect(entity, params)
@@ -487,6 +490,7 @@ class View(base.View):
       if org_entity:
         # organization found use special form and also seed this form
         params['create_form'] = params['student_create_form']
+        # pylint: disable-msg=E1103
         kwargs['organization'] = org_entity.link_id
         kwargs['content'] = org_entity.contrib_template
 
@@ -805,6 +809,7 @@ class View(base.View):
       user_entity = user_logic.logic.getForCurrentAccount()
 
       # create the fields that should be in the ReviewFollower entity
+      # pylint: disable-msg=E1103
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
                 'scope_path': entity.key().id_or_name(),
@@ -875,8 +880,9 @@ class View(base.View):
 
     return responses.respond(request, template, context=context)
 
-  def reviewAfterDeadline(self,request, context, params, entity,**kwargs):
-    """View that shows the review view after the accepted students announced deadline.
+  def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
+    """View that shows the review view after the accepted students 
+       announced deadline.
 
     For Args see base.View.public().
     """
@@ -989,6 +995,7 @@ class View(base.View):
     follower_entity = review_follower_logic.getForFields(fields, unique=True)
 
     if follower_entity:
+      # pylint: disable-msg=E1103
       context['is_subscribed_public'] =  follower_entity.subscribed_public
       context['is_subscribed_private'] = follower_entity.subscribed_private
 

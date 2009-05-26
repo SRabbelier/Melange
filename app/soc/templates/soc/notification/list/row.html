@@ -11,5 +11,5 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
      </div>
   </td>
   <td><div class="subject">{{ list.item.subject }}</div></td>
-  <td><div class="created_on">{{ list.item.created_on }} </div> </td>
+  <td><div class="created_on">{{ list.item.created_on|date:"jS F Y H:i" }} </div> </td>
 </tr>

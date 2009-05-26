@@ -20,15 +20,15 @@
 __authors__ = [
   # alphabetical order by last name, please
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
 import logging
-import os
-import sys
 
 from google.appengine.ext.webapp import util
 
+# pylint: disable-msg=W0611
 import gae_django
 
 

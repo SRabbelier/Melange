@@ -57,7 +57,7 @@ class Handler(object):
   def __init__(self):
     """Constructs a new Handler with all known jobs set.
     """
-
+    # pylint: disable-msg=C0103
     self.OUT_OF_TIME = 0
     self.ALREADY_CLAIMED = 1
     self.SUCCESS = 2
@@ -87,6 +87,7 @@ class Handler(object):
 
     job.status = 'started'
 
+    # pylint: disable-msg=E1103
     if job.put():
       return job
     else:

@@ -67,6 +67,7 @@ class Allocator(object):
     self.unlocked_orgs = []
     self.unlocked_applications = []
     self.slots = slots
+    self.mentors = {}
     self.max_slots_per_org = max_slots_per_org
     self.min_slots_per_org = min_slots_per_org
     self.orgs = set(orgs)

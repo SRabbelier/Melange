@@ -115,7 +115,8 @@ class Seeder(object):
 class UserSeeder(Seeder):
   def type(self):
     return User
-
+  
+  # pylint: disable-msg=W0221
   def seed(self, i, entities=None):
     user_properties = {
         'key_name': 'user_%04d' % i,
@@ -136,7 +137,8 @@ class UserSeeder(Seeder):
 class OrganizationSeeder(Seeder):
   def type(self):
     return Organization
-
+  
+  # pylint: disable-msg=W0221
   def seed(self, i, entities=None, current_user=None, gsoc2009=None):
     properties = {
         'key_name': 'google/gsoc2009/org_%04d' % i,
@@ -193,7 +195,7 @@ class OrgApplicationSeeder(Seeder):
                 gsoc2009=gsoc2009,
                 status=status)
 
-
+  # pylint: disable-msg=W0221
   def seed(self, i, entities=None, current_user=None, gsoc2009=None,
            status=None):
     properties = {

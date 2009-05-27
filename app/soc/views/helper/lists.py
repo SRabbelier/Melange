@@ -198,18 +198,19 @@ def getListContent(request, params, filter=None, order=None,
                      i[0].startswith('offset_') or i[0].startswith('limit_'))
 
   if params.get('list_key_order'):
-    export_link = generateLinkForRequest(request, base_params, {'export' : idx})
+    export_link = generateLinkForRequest(request, base_params, {'export': idx})
 
   if more:
     # TODO(dbentley): here we need to implement a new field "last_key"
-    next = generateLinkForRequest(request, base_params, {offset_key : offset+limit,
-                                                         limit_key : limit})
+    next = generateLinkForRequest(request, base_params, 
+                                  {offset_key: offset + limit,
+                                   limit_key: limit})
 
   if offset > 0:
     # TODO(dbentley): here we need to implement previous in the good way.
     prev = generateLinkForRequest(request, base_params,
-                                  { offset_key : max(0, offset-limit),
-                                    limit_key : limit })
+                                  {offset_key: max(0, offset-limit),
+                                   limit_key: limit})
 
   if offset > limit:
     # Having a link to the first doesn't make sense on the first page (we're on
@@ -219,8 +220,8 @@ def getListContent(request, params, filter=None, order=None,
     # NOTE(dbentley): I personally disagree that it's simpler to do that way,
     # because sometimes you want to go to the first page without having to
     # consider what page you're on now.
-    newest = generateLinkForGetArgs(request, base_params, {offset_key : 0,
-                                                           limit_key : limit})
+    newest = generateLinkForRequest(request, base_params, {offset_key: 0,
+                                                           limit_key: limit})
 
   content = {
       'idx': idx,

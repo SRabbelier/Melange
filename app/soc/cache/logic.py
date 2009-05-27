@@ -53,6 +53,7 @@ def get(model, filter, order, *args, **kwargs):
   """
 
   memcache_key = key(model, filter, order)
+  # pylint: disable-msg=E1101
   return memcache.get(memcache_key), memcache_key
 
 
@@ -65,6 +66,7 @@ def put(data, memcache_key, *args, **kwargs):
 
   # Store data for fifteen minutes to force a refresh every so often
   retention = 15*60
+  # pylint: disable-msg=E1101
   memcache.add(memcache_key, data, retention)
 
 
@@ -73,6 +75,7 @@ def flush(model, filter):
   """
 
   memcache_key = key(model, filter)
+  # pylint: disable-msg=E1101
   memcache.delete(memcache_key)
 
 

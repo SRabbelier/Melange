@@ -55,4 +55,5 @@ def flush(id):
   """
 
   key_prefix = '%s.' % id
+  # pylint: disable-msg=E1101
   memcache.delete_multi(RIGHTS, key_prefix=key_prefix)

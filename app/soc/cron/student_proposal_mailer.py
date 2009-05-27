@@ -149,6 +149,7 @@ def sendStudentProposalMail(job_entity):
       (sender_name, sender) = default_sender
 
     # construct the contents of the email
+    # pylint: disable-msg=E1103
     student_entity = proposal.scope
     program_entity = proposal.program
 
@@ -165,7 +166,6 @@ def sendStudentProposalMail(job_entity):
     accepted_proposal = proposal_logic.getForFields(fields, unique=True)
 
     if accepted_proposal:
-      org_entity = accepted_proposal.org
       # use the accepted template and subject
       template = DEF_ACCEPTED_MAIL_TEMPLATE
       context['subject'] = 'Congratulations!'

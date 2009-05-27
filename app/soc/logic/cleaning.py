@@ -191,7 +191,7 @@ def clean_user_is_current(field_name, as_user=True):
     link_id = clean_link_id(field_name)(self)
 
     user_entity = user_logic.getForCurrentAccount()
-
+    # pylint: disable-msg=E1103
     if not user_entity or user_entity.link_id != link_id:
       # this user is not the current user
       raise forms.ValidationError("This user is not you.")
@@ -234,7 +234,7 @@ def clean_users_not_same(field_name):
     user_entity = clean_user_field(self)
 
     current_user_entity = user_logic.getForCurrentAccount()
-
+    # pylint: disable-msg=E1103
     if user_entity.key() == current_user_entity.key():
       # users are equal
       raise forms.ValidationError("You cannot enter yourself here.")
@@ -534,6 +534,7 @@ def validate_new_group(link_id_field, scope_path_field,
 
       # if the proposal has not been accepted or it's not the applicant
       # creating the new group then show link ID in use message
+      # pylint: disable-msg=E1103
       if group_app_entity and (group_app_entity.status != 'accepted' or (
           group_app_entity.applicant.key() != user_entity.key())):
         # add the error message to the link id field
@@ -688,7 +689,8 @@ def validate_document_acl(view, creating=False):
     rights = params['rights']
 
     user = user_logic.getForCurrentAccount()
-
+    
+    # pylint: disable-msg=E1103
     rights.setCurrentUser(user.account, user)
 
     prefix = self.cleaned_data['prefix']

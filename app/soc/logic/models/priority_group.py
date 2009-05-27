@@ -36,6 +36,7 @@ class Logic(base.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
+    # pylint: disable-msg=C0103
     self.EMAIL = 'emails'
     self.CONVERT = 'convert'
 

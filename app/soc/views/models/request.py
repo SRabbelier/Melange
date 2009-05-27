@@ -198,6 +198,7 @@ class View(base.View):
     # construct the Unhandled Invites list
 
     # only select the Invites for this user that haven't been handled yet
+    # pylint: disable-msg=E1103
     filter = {'link_id': user_entity.link_id,
               'status': 'group_accepted'}
 

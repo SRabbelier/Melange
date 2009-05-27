@@ -494,6 +494,7 @@ class View(presence.View):
 
     if duplicates:
       # we have stored information
+      # pylint: disable-msg=E1103
       context['duplicate_cache_content'] = duplicates.json_representation
       context['date_of_calculation'] = duplicates.calculated_on
     else:
@@ -555,6 +556,7 @@ class View(presence.View):
       org_admin = org_admin_logic.logic.getForFields(fields, unique=True)
 
       if org_admin:
+        # pylint: disable-msg=E1103
         org_data['admin_name'] = org_admin.name()
         org_data['admin_email'] = org_admin.email
 

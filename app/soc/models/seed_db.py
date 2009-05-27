@@ -500,7 +500,7 @@ def seed(request, *args, **kwargs):
 
   site.home = home_document
   site.put()
-
+  # pylint: disable-msg=E1101
   memcache.flush_all()
 
   return http.HttpResponse('Done')
@@ -601,7 +601,8 @@ def seed_mentor(request, i):
 
   if not org:
     raise Error('Run seed_many for at least %d orgs first.' % i)
-
+  
+  # pylint: disable-msg=E1103
   properties = {
       'key_name': 'google/gsoc2009/org_%d/mentor' % i,
       'link_id': 'mentor',
@@ -693,7 +694,8 @@ def seed_student_proposal(request, i):
     raise Error('Run seed_many for at least %d mentors first.' % i)
 
   all_properties = []
-
+  
+  # pylint: disable-msg=E1103
   for i in range(random.randint(5, 20)):
     link_id = 'proposal_%s_%d' % (org.link_id, i)
     scope_path = 'google/gsoc2009/' + user.link_id
@@ -898,7 +900,7 @@ def clear(*args, **kwargs):
       entity.delete()
   except db.Timeout:
     return http.HttpResponseRedirect('#')
-
+  # pylint: disable-msg=E1101
   memcache.flush_all()
 
   return http.HttpResponse('Done')

@@ -496,6 +496,7 @@ class View(base.View):
 
     # set right fields for the request form
     user_entity = user_logic.logic.getForCurrentAccount()
+    # pylint: disable-msg=E1103
     fields = {'link_id' : user_entity.link_id,
               'role' : params['module_name'],
               'group_id' : kwargs['scope_path']}
@@ -537,6 +538,7 @@ class View(base.View):
 
     # defensively set the fields we need for this request and set status to new
     user_entity = user_logic.logic.getForCurrentAccount()
+    # pylint: disable-msg=E1103
     request_fields = {'link_id' : user_entity.link_id,
         'scope' : group,
         'scope_path' : request_scope_path,
@@ -588,6 +590,7 @@ class View(base.View):
         'role': params['module_name']}
     request_entity = request_logic.logic.getForFields(fields, unique=True)
 
+    # pylint: disable-msg=E1103
     user_entity = user_logic.logic.getFromKeyNameOr404(request_entity.link_id)
 
     get_dict = request.GET

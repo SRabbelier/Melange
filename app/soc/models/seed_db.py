@@ -113,6 +113,8 @@ class Seeder(object):
 
 
 class UserSeeder(Seeder):
+  """A Seeder for Melange User model.
+  """
   def type(self):
     return User
   
@@ -135,6 +137,8 @@ class UserSeeder(Seeder):
 
 
 class OrganizationSeeder(Seeder):
+  """A Seeder for Melange Organization model.
+  """
   def type(self):
     return Organization
   
@@ -179,6 +183,8 @@ class OrganizationSeeder(Seeder):
 
 
 class OrgApplicationSeeder(Seeder):
+  """A Seeder for Melange OrgApplication model.
+  """
   def type(self):
     return OrgApplication
 

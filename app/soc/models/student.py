@@ -64,8 +64,7 @@ class Student(soc.models.role.Role):
   degree.group = ugettext("5. Education")
   expected_graduation = db.IntegerProperty(required=True,
       verbose_name=ugettext('Expected Graduation Year'))
-  expected_graduation.help_text = ugettext("Year in integer format only!")
-  expected_graduation.example_text = ugettext('Year only, for example "2012"')
+  expected_graduation.help_text = ugettext("Pick your expected graduation year")
   expected_graduation.group = ugettext("5. Education")
 
   #: Property to gain insight into where students heard about this program

@@ -16,9 +16,9 @@ class Tag(db.Model):
     tagged_count = db.IntegerProperty(default=0)
     "The number of entities in tagged."
 
-    @staticmethod
-    def __key_name(tag_name):
-        return "tag_%s" % tag_name
+    @classmethod
+    def __key_name(cls, tag_name):
+        return cls.__name__ + '_' + tag_name
     
     def remove_tagged(self, key):
         def remove_tagged_txn():
@@ -27,7 +27,7 @@ class Tag(db.Model):
                 self.tagged_count -= 1
                 self.put()
         db.run_in_transaction(remove_tagged_txn)
-        Tag.expire_cached_tags()
+        self.__class__.expire_cached_tags()
 
     def add_tagged(self, key):
         def add_tagged_txn():
@@ -36,7 +36,7 @@ class Tag(db.Model):
                 self.tagged_count += 1
                 self.put()
         db.run_in_transaction(add_tagged_txn)
-        Tag.expire_cached_tags()
+        self.__class__.expire_cached_tags()
     
     def clear_tagged(self):
         def clear_tagged_txn():
@@ -44,27 +44,27 @@ class Tag(db.Model):
             self.tagged_count = 0
             self.put()
         db.run_in_transaction(clear_tagged_txn)
-        Tag.expire_cached_tags()
+        self.__class__.expire_cached_tags()
         
     @classmethod
     def get_by_name(cls, tag_name):
-        return Tag.get_by_key_name(Tag.__key_name(tag_name))
+        return cls.get_by_key_name(cls.__key_name(tag_name))
     
     @classmethod
     def get_tags_for_key(cls, key):
         "Set the tags for the datastore object represented by key."
-        tags = db.Query(Tag).filter('tagged =', key).fetch(1000)
+        tags = db.Query(cls).filter('tagged =', key).fetch(1000)
         return tags
     
     @classmethod
     def get_or_create(cls, tag_name):
         "Get the Tag object that has the tag value given by tag_value."
-        tag_key_name = Tag.__key_name(tag_name)
-        existing_tag = Tag.get_by_key_name(tag_key_name)
+        tag_key_name = cls.__key_name(tag_name)
+        existing_tag = cls.get_by_key_name(tag_key_name)
         if existing_tag is None:
             # The tag does not yet exist, so create it.
             def create_tag_txn():
-                new_tag = Tag(key_name=tag_key_name, tag = tag_name)
+                new_tag = cls(key_name=tag_key_name, tag=tag_name)
                 new_tag.put()
                 return new_tag
             existing_tag = db.run_in_transaction(create_tag_txn)
@@ -75,7 +75,7 @@ class Tag(db.Model):
         """Return a list of Tags sorted by the number of objects to which they have been applied,
         most frequently-used first.  If limit is given, return only that many tags; otherwise,
         return all."""
-        tag_list = db.Query(Tag).filter('tagged_count >', 0).order("-tagged_count").fetch(limit)
+        tag_list = db.Query(cls).filter('tagged_count >', 0).order("-tagged_count").fetch(limit)
             
         return tag_list
 
@@ -87,7 +87,7 @@ class Tag(db.Model):
 
         from google.appengine.api import memcache
 
-        cache_name = 'tags_by_name'
+        cache_name = cls.__name__ + '_tags_by_name'
         if ascending:
             cache_name += '_asc'
         else:
@@ -99,7 +99,7 @@ class Tag(db.Model):
             if not ascending:
                 order_by = "-tag"
             
-            tags = db.Query(Tag).order(order_by).fetch(limit)
+            tags = db.Query(cls).order(order_by).fetch(limit)
             memcache.add(cache_name, tags, 3600)
         else:
             if len(tags) > limit:
@@ -113,10 +113,10 @@ class Tag(db.Model):
     def popular_tags(cls, limit=5):
         from google.appengine.api import memcache
         
-        tags = memcache.get('popular_tags')
+        tags = memcache.get(cls.__name__ + '_popular_tags')
         if tags is None:
-            tags = Tag.get_tags_by_frequency(limit)
-            memcache.add('popular_tags', tags, 3600)
+            tags = cls.get_tags_by_frequency(limit)
+            memcache.add(cls.__name__ + '_popular_tags', tags, 3600)
         
         return tags
 
@@ -124,12 +124,12 @@ class Tag(db.Model):
     def expire_cached_tags(cls):
         from google.appengine.api import memcache
         
-        memcache.delete('popular_tags')
-        memcache.delete('tags_by_name_asc')
-        memcache.delete('tags_by_name_desc')
+        memcache.delete(cls.__name__ + '_popular_tags')
+        memcache.delete(cls.__name__ + '_tags_by_name_asc')
+        memcache.delete(cls.__name__ + '_tags_by_name_desc')
 
 class Taggable:
-    """A mixin class that is used for making Google AppEnigne Model classes taggable.
+    """A mixin class that is used for making Google AppEngine Model classes taggable.
         Usage:
             class Post(db.Model, taggable.Taggable):
                 body = db.TextProperty(required = True)
@@ -142,8 +142,9 @@ class Taggable:
                     taggable.Taggable.__init__(self)
     """
     
-    def __init__(self):
+    def __init__(self, tag_model = Tag):
         self.__tags = None
+        self.__tag_model = tag_model
         self.tag_separator = ","
         """The string that is used to separate individual tags in a string
         representation of a list of tags.  Used by tags_string() to join the tags
@@ -153,7 +154,7 @@ class Taggable:
     def __get_tags(self):
         "Get a List of Tag objects for all Tags that apply to this object."
         if self.__tags is None or len(self.__tags) == 0:
-            self.__tags = Tag.get_tags_for_key(self.key())
+            self.__tags = self.__tag_model.get_tags_for_key(self.key())
         return self.__tags
 
     def __set_tags(self, tags):
@@ -182,7 +183,7 @@ class Taggable:
                     # A tag that was not previously assigned to this entity
                     # is present in the list that is being assigned, so we
                     # associate this entity with the tag.
-                    tag = Tag.get_or_create(each_tag)
+                    tag = self.__tag_model.get_or_create(each_tag)
                     tag.add_tagged(self.key())
                     self.__tags.append(tag)
         else:

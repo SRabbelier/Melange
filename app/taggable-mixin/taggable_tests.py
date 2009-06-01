@@ -17,7 +17,7 @@
 import sys
 import os.path
 
-APPENGINE_PATH = '../../../../google/google_appengine'
+APPENGINE_PATH = '../../thirdparty/google_appengine'
 
 # Add app-engine related libraries to your path
 paths = [

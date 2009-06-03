@@ -152,71 +152,77 @@ def constructParams(params):
   new_params['extra_django_patterns'] = []
   new_params['django_patterns_defaults'] = []
 
+  # Defines the module package that the view is in. If it is not
+  # already defined in the respective view, it defaults to 
+  # soc.views.models
+  if not params.get('module_package'):
+    new_params['module_package'] = 'soc.views.models'
+
   if not params.get('no_edit'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.edit', 'Edit %(name_short)s')]
+          '%(module_package)s.%(module_name)s.edit', 'Edit %(name_short)s')]
 
   if not params.get('no_delete'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>delete)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.delete', 'Delete %(name_short)s')]
+          '%(module_package)s.%(module_name)s.delete', 'Delete %(name_short)s')]
 
   if not params.get('no_show'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>show)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.public', 'Show %(name_short)s')]
+          '%(module_package)s.%(module_name)s.public', 'Show %(name_short)s')]
 
   if not params.get('no_admin'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>admin)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.admin', 
+          '%(module_package)s.%(module_name)s.admin', 
           'Show %(name_short)s (admin)')]
 
   if not params.get('no_create_raw'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>create)$',
-          'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+          '%(module_package)s.%(module_name)s.create', 'Create %(name_short)s')]
 
   if not params.get('no_create_with_scope'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>create)/%(scope)s$',
-        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+        '%(module_package)s.%(module_name)s.create', 'Create %(name_short)s')]
 
   if not params.get('no_create_with_key_fields'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>create)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+        '%(module_package)s.%(module_name)s.create', 'Create %(name_short)s')]
 
   if not params.get('no_list_raw'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list)$',
-          'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
+          '%(module_package)s.%(module_name)s.list', 'List %(name_plural)s')]
 
   if params.get('pickable'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>pick)$',
-          'soc.views.models.%(module_name)s.pick', 'Pick %(name_short)s')]
+          '%(module_package)s.%(module_name)s.pick', 'Pick %(name_short)s')]
 
   if params.get('export_content_type'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>export)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.export', 'Export %(name_short)s')]
+          '%(module_package)s.%(module_name)s.export', 'Export %(name_short)s')]
 
   if params.get('sans_link_id_create'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>create)/%(sans_link_id)s$',
-         'soc.views.models.%(module_name)s.create', 'Create %(name_short)s')]
+         '%(module_package)s.%(module_name)s.create', 'Create %(name_short)s')]
 
   if params.get('sans_link_id_list'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list)/%(sans_link_id)s$',
-         'soc.views.models.%(module_name)s.list', 'List %(name_plural)s')]
+         '%(module_package)s.%(module_name)s.list', 'List %(name_plural)s')]
 
   if params.get('sans_link_id_public_list'):
     new_params['django_patterns_defaults'] += [
         (r'^%(url_name)s/(?P<access_type>list_public)/%(sans_link_id)s$',
-         'soc.views.models.%(module_name)s.list_public', 
+         '%(module_package)s.%(module_name)s.list_public', 
          'List %(name_plural)s')]
 
   new_params['public_template'] = 'soc/%(module_name)s/public.html' % params

@@ -33,6 +33,7 @@ from soc.logic.models import document as document_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import base
 
@@ -130,7 +131,28 @@ class View(base.View):
     home_doc.content = helper.templates.unescape(home_doc.content)
     context['home_document'] = home_doc
 
-    return True
+    # check if the current user is allowed edit the home document
+    rights = self._params['rights']
+
+    allowed_to_edit = False
+
+    try:
+      # use the IsDocumentWritable check because we have no django args
+      rights.checkIsDocumentWritable({'key_name': home_doc.key().name(),
+                                      'prefix': home_doc.prefix,
+                                      'scope_path': home_doc.scope_path,
+                                      'link_id': home_doc.link_id},
+                                      'key_name')
+      allowed_to_edit = True
+    except:
+      pass
+
+    if allowed_to_edit:
+      # put the link to edit to home document in context
+      context['home_document_edit_redirect'] = redirects.getEditRedirect(
+          home_doc, {'url_name': 'document'})
+
+    return super(View, self)._public(request, entity, context)
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

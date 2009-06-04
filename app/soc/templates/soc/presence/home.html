@@ -40,7 +40,10 @@ limitations under the License.
 
 {% block header_title %}
 {% if home_document %}
-{{ home_document.title }}
+{{ home_document.title }} 
+	{% if home_document_edit_redirect %}
+		<a href={{ home_document_edit_redirect }}> (Click here to Edit Home Page)</a>
+	{% endif %}
 {% else %}
 {{ page_name }}
 {% endif %}

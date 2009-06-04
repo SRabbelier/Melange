@@ -135,13 +135,17 @@ class View(base.View):
     allowed_to_edit = False
     try:
       # use the IsDocumentWritable check because we have no django args
-      rights.checkIsDocumentWritable({'key_name': entity.key().name()},
+      rights.checkIsDocumentWritable({'key_name': entity.key().name(),
+                                      'prefix': entity.prefix,
+                                      'scope_path': entity.scope_path,
+                                      'link_id': entity.link_id},
                                      'key_name')
       allowed_to_edit = True
     except:
       pass
 
     if allowed_to_edit:
+      # add the document edit redirect to the context
       context['edit_redirect'] = redirects.getEditRedirect(
           entity, {'url_name': 'document'})
 

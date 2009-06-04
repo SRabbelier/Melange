@@ -142,7 +142,7 @@ class View(base.View):
                                       'prefix': home_doc.prefix,
                                       'scope_path': home_doc.scope_path,
                                       'link_id': home_doc.link_id},
-                                      'key_name')
+                                     'key_name')
       allowed_to_edit = True
     except:
       pass

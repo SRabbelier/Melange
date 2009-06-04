@@ -31,6 +31,7 @@ from django.template import loader
 
 from soc.logic import accounts
 from soc.logic import system
+from soc.logic.helper import timeline
 from soc.logic.models import site
 from soc.logic.models.user import logic as user_logic
 from soc.modules import callback
@@ -137,6 +138,7 @@ def getUniversalContext(request):
   context['site_name'] = settings.site_name
   context['site_notice'] = settings.site_notice
   context['tos_link'] = redirects.getToSRedirect(settings)
+  context['in_maintenance'] = timeline.isActivePeriod(site, 'maintenance')
  
   return context
 

@@ -79,42 +79,35 @@ def view(func):
   """Decorator that insists that exceptions are handled by view.
   """
 
-  from soc.logic.helper import timeline
-  from soc.logic.models.site import logic as site_logic
-  from soc.logic.models.user import logic as user_logic
   from soc.views import out_of_band
-  from soc.views.helper import responses
 
   @wraps(func)
   def view_wrapper(request, *args, **kwds):
     """View decorator wrapper method.
     """
 
+    context = responses.getUniversalContext(request)
+
     try:
-      site = site_logic.getSingleton()
-
-      # don't redirect admins
-      redirect = not user_logic.isDeveloper()
-
-      if redirect and timeline.isActivePeriod(site, 'maintenance'):
+      if not context['is_admin'] and context['in_maintenance']:
         return maintenance(request)
 
       return func(request, *args, **kwds)
-    except DeadlineExceededError, exception:
-      logging.exception(exception)
-      return http.HttpResponseRedirect('/soc/content/deadline_exceeded.html')
     except CapabilityDisabledError, exception:
       logging.exception(exception)
       # assume the site is in maintenance if we get CDE
-      return http.HttpResponseRedirect('/maintenance')
+      return maintenance(request)
+    except DeadlineExceededError, exception:
+      template = 'soc/deadline_exceeded.html'
     except MemoryError, exception:
-      logging.exception(exception)
-      return http.HttpResponseRedirect('/soc/content/memory_error.html')
+      template = 'soc/memory_error.html'
     except AssertionError, exception:
-      logging.exception(exception)
-      return http.HttpResponseRedirect('/soc/content/assertion_error.html')
+      template = 'soc/assertion_error.html'
     except out_of_band.Error, error:
       return responses.errorResponse(error, request)
+
+    logging.exception(exception)
+    return responses.respond(request, template, context=context)
 
   return view_wrapper
 

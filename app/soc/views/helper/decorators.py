@@ -30,10 +30,17 @@ from functools import wraps
 from google.appengine.runtime import DeadlineExceededError
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
-
 from django import http
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.views.helper import responses
+
+
+DEF_DOWN_FOR_MAINTENANCE_MSG = ugettext("Down for maintenance")
+DEF_IN_UNEXPECTED_MAINTENANCE_MSG = ugettext(
+      "Down for unexpected maintenance.")
+
 
 
 class Error(Exception):
@@ -41,6 +48,31 @@ class Error(Exception):
   """
   
   pass
+
+
+def maintenance(request):
+  """Returns a 'down for maintenance' view.
+  """
+
+  context = responses.getUniversalContext(request)
+  context['page_name'] = ugettext('Maintenance')
+
+  notice = context.pop('site_notice')
+
+  if not notice:
+    context['body_content'] = DEF_IN_UNEXPECTED_MAINTENANCE_MSG
+  else:
+    context['body_content'] = notice
+
+  context['header_title'] = DEF_DOWN_FOR_MAINTENANCE_MSG
+  context['sidebar_menu_items'] = [
+      {'heading': DEF_DOWN_FOR_MAINTENANCE_MSG,
+       'group': ''},
+      ]
+
+  template = 'soc/base.html'
+
+  return responses.respond(request, template, context=context)
 
 
 def view(func):
@@ -61,11 +93,11 @@ def view(func):
     try:
       site = site_logic.getSingleton()
 
-      # don't redirect admins, or if we're at /maintenance already
-      no_redirect = user_logic.isDeveloper() or request.path == '/maintenance'
+      # don't redirect admins
+      redirect = not user_logic.isDeveloper()
 
-      if (not no_redirect) and timeline.isActivePeriod(site, 'maintenance'):
-        return http.HttpResponseRedirect('/maintenance')
+      if redirect and timeline.isActivePeriod(site, 'maintenance'):
+        return maintenance(request)
 
       return func(request, *args, **kwds)
     except DeadlineExceededError, exception:

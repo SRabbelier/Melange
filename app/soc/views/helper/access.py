@@ -1512,7 +1512,7 @@ class Checker(object):
   @allowSidebar
   @allowDeveloper
   def checkIsDocumentReadable(self, django_args, key_name_field=None):
-    """Checks whether a document is readable.
+    """Checks whether a document is readable by the current user.
 
     Args:
       django_args: a dictionary with django's arguments
@@ -1531,7 +1531,7 @@ class Checker(object):
   @denySidebar
   @allowDeveloper
   def checkIsDocumentWritable(self, django_args, key_name_field=None):
-    """Checks whether a document is writable.
+    """Checks whether a document is writable by the current user.
 
     Args:
       django_args: a dictionary with django's arguments

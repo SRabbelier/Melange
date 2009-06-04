@@ -21,7 +21,9 @@
       <a onclick="redirect_to_ideas=false" href="{{ list.item.ideas }}">
       {% endif %}
         {{ list.item.ideas|urlizetrunc:35|removetags:"a" }}
+      {% if list.item.ideas %}
       </a>
+      {% endif %}
     </div>
   </td>
 </tr>

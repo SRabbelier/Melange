@@ -272,13 +272,14 @@ def sendWelcomeMessage(user_entity):
   messageProperties = {
       'to_name': user_entity.name,
       'sender_name': sender_name,
-      'site_name': site_name,
       'to': to,
       'sender': sender,
       'subject': DEF_WELCOME_MSG_FMT % {
           'site_name': site_name,
           'name': user_entity.name
-          }
+          },
+      'site_name': site_name,
+      'site_location': 'http://%s' % os.environ['HTTP_HOST'],
       }
 
   # send out the message using the default welcome template

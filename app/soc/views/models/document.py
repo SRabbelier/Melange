@@ -123,6 +123,30 @@ class View(base.View):
     return super(View, self).list(request, access_type, page_name=page_name,
                                   params=params, filter=kwargs)
 
+  def _public(self, request, entity, context):
+    """Performs any processing needed for the Document's public page.
+
+    For args see base.View._public().
+    """
+
+    # check if the current user is allowed to visit the edit page
+    rights = self._params['rights']
+
+    allowed_to_edit = False
+    try:
+      # use the IsDocumentWritable check because we have no django args
+      rights.checkIsDocumentWritable({'key_name': entity.key().name()},
+                                     'key_name')
+      allowed_to_edit = True
+    except:
+      pass
+
+    if allowed_to_edit:
+      context['edit_redirect'] = redirects.getEditRedirect(
+          entity, {'url_name': 'document'})
+
+    return super(View, self)._public(request, entity, context)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """

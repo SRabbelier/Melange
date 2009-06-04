@@ -14,14 +14,17 @@ limitations under the License.
 {% endcomment %}
 
 {% block page_title %}
-{{ entity.title }}
+	{{ entity.title }}
 {% endblock %}
 
 {% block header_title %}
-{{ entity.title }}
+	{{ entity.title }}
+	{% if edit_redirect %}
+		<a href={{ edit_redirect }}> (Edit this {{entity_type}})</a>
+	{% endif %}
 {% endblock %}
 
 {% block body %}
-<div id="created">Last modified on {{ entity.modified }} by {{ entity.modified_by.name }}</div>
-<div id="content">{{ entity.content|safe }}</div>
+	<div id="created">Last modified on {{ entity.modified }} by {{ entity.modified_by.name }}</div>
+	<div id="content">{{ entity.content|safe }}</div>
 {% endblock %}

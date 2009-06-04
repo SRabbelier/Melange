@@ -388,19 +388,17 @@ table#queues td {
 }
 
 #org_home_extras {
-  position: relative;
   margin:2em 0em 2em;
   min-height:500px;
 }
 
 #extras_left {
-  position: absolute;
   width: 55%;
   left: 0px;
+  float: left;
 } 
 
 #extras_right {
-  position: absolute;
   width: 43%;
   right: 0px;
   float: right;

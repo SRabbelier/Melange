@@ -180,14 +180,13 @@ org_home_gmap = new function(){
   // HTML div tag where map needs to be inserted
   var map_div = "org_home_map";
   
+  // Geo Data to be displayed on Google Maps
+  var geo_data = null;
+  var geo_data_keys = [];
+  
   // Geocoder object for obtaining locations from city/country
   var geocoder = new GClientGeocoder();
-  
-  // Lat/lng pairs stored for drawing polylines.
-  var student_lat = 0;
-  var student_lng = 0;
-  var mentor_lat = 0;
-  var mentor_lng = 0;
+  var numGeocoded = 0;
 
   // Setup required icons
   var base_icon = new GIcon();
@@ -202,92 +201,91 @@ org_home_gmap = new function(){
   var mentor_icon = new GIcon(base_icon);
   mentor_icon.image = "/soc/content/images/mentor-marker.png";
 
-  // Mark mentor marker if he has published the location and call 
-  // drawStudentMarker function.
-  function drawMarkers(map_elem) {
-    function iterateStudents(students, mentor_name, mentor_published) {
-      for (student in students) {
-        drawStudentMarker(students[student], mentor_name, mentor_published);
-      }
+  Object.prototype.keys = function ()
+  {
+    var keys = [];
+    for(i in this) if (this.hasOwnProperty(i))
+    {
+      keys.push(i);
     }
-    if (map_elem.type == 'mentor') {
-      geocoder.setBaseCountryCode(map_elem.ccTLD);
-      geocoder.getLatLng(
-        map_elem.city,
-        function(point) {
-          if (point) {
-            var marker = new GMarker(point, mentor_icon);
-            mentor_lat = marker.getPoint().lat();
-            mentor_lng = marker.getPoint().lng();
-            var html = "<strong>" + map_elem.name + "</strong><br> Mentor";
-            GEvent.addListener(marker, "click", function() {
-                 marker.openInfoWindowHtml(html);
-            });
-            map.addOverlay(marker);
-          } else {
-            mentor_lat = null;
-            mentor_lng = null;
-          }
-          iterateStudents(map_elem.students, map_elem.name, true);
-        }
-      );
-    } else if (map_elem.type == 'none') {
-      drawStudentMarker(map_elem.student, map_elem.name, false);
-    }
+    return keys;
   }
-
+  
+  
   // Mark student and enable a popup box upon click
-  function drawStudentMarker(student, mname, mentor_published) {
-    geocoder.setBaseCountryCode(student.ccTLD);
-    geocoder.getLatLng(
-      student.city,
-      function(point) {
-        if (point) {
-          var marker = new GMarker(point, student_icon);
-          var html = "<strong>" + student.name + "</strong><br>";
-          html += "<a href='"+ student.url + "'>" + student.summary + "</a><br>";
-          html += "Mentor: " + mname;
-          GEvent.addListener(marker, "click", function() {
-            marker.openInfoWindowHtml(html);
-          });
-          student_lat = marker.getPoint().lat();
-          student_lng = marker.getPoint().lng();
-          map.addOverlay(marker);
+  function drawMarker(person) {
+    geocoder.setBaseCountryCode(person.ccTLD);
+    geocoder.getLocations(
+      person.city,
+      function(response) {
+        var delay = 0;
+        if (response.Status.code == 620) {
+          // Too fast, try again, with a small pause
+          delay = 100;
         } else {
-          student_lat = null;
-          student_lng = null;
+          if (response.Status.code == 200) {
+            // Success; do something with the address.
+            var html = "";
+            var marker = null;
+            
+            place = response.Placemark[0];
+            point = new GLatLng(place.Point.coordinates[1],
+                                place.Point.coordinates[0]);
+            if (person.type == 'mentor') {
+              marker = new GMarker(point, mentor_icon);
+              html = "<strong>" + person.name + "</strong><br> Mentor";
+            } else if (person.type == 'student') {
+              marker = new GMarker(point, student_icon);
+              html = "<strong>" + person.name + "</strong><br>";
+              html += "<a href='"+ person.url + "'>" + person.summary + "</a><br>";
+              html += "Mentor: " + person.mentor;
+            }
+
+            GEvent.addListener(marker, "click", function() {
+              marker.openInfoWindowHtml(html);
+            });
+
+            map.addOverlay(marker);
+          }
+          
+          // Move onto the next address; this skips bad addresses, too.
+          numGeocoded += 1;
         }
-        if (mentor_published) {
-          drawPolyLine();
-        }
+        
+        window.setTimeout(geocodeAll, delay);
       }
     );
   }
 
-  // Draw a polyline between the student and his mentor
-  drawPolyLine = function() {
-    var polyline = new GPolyline([
-      new GLatLng(mentor_lat, mentor_lng),
-      new GLatLng(student_lat, student_lng)
-      ], "#ff0000", 3);
+  // Draw a polyline between two points
+  drawPolyLine = function(from, to) {
+    var polyline = new GPolyline([from, to], "#ff0000", 3);
     map.addOverlay(polyline);
   }
-    
+
+  function geocodeAll() {
+    if (numGeocoded < geo_data_keys.length) {
+      drawMarker(geo_data[geo_data_keys[numGeocoded]])
+    }
+  }
+
   // Map load function
   this.map_load = function(map_data) {
     // Check if browser is gmap compatible.
     if (GBrowserIsCompatible()) {
+      geo_data = map_data;
+      
       // Create the map and add small controls
       map = new GMap2(document.getElementById(map_div));
       map.addControl(new GLargeMapControl());
-        map.addControl(new GMapTypeControl());
+      map.addControl(new GMapTypeControl());
       
       // Set map center and initial zoom level
       map.setCenter(new GLatLng(0, 0), 1);
+      geocoder.setCache(null);
+      geo_data_keys = geo_data.keys()
+      window.setTimeout(geocodeAll, 50);
       
-      for (elem in map_data) {
-        drawMarkers(map_data[elem])
-      }
     }
   }
 };

@@ -37,8 +37,13 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
 </span>
 {% endif %}
 {% endblock %}
-
 {% block home_extras %}
+{% for list_number in list.lists %}
+<p>
+  {% include list.nextList %}
+</p>
+{% endfor %}
+{% comment %}
 <div id="org_home_extras">
  <div id="extras_left">
   {% for list_number in list.lists %}
@@ -53,4 +58,5 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
   {% endif %}
  </div>
 </div>
+{% endcomment %}
 {% endblock %}

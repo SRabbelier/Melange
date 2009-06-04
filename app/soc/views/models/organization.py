@@ -421,40 +421,20 @@ class View(group.View):
     return self._list(request, params, contents, page_name)
 
   def _getMapData(self, student_project_params, filter=None):
-    """Constructs the JSON object required to generate a 
-      Google map on organization home page.
+    """Constructs the JSON object required to generate 
+       Google Maps on organization home page.
 
     Args:
       student_project_params: params for student project view
       filter: a dict for the properties that the entities should have
 
     Returns: 
-      A JSON object containing map data with the following structure.
-      [
-        {
-          'type': 'mentor',
-          'name': MentorName,
-          'city': CityName,
-          'ccTLD': ccTLD,
-          'students': [{'name': Name, 'city': CityName, 'ccTLD': ccTLD,
-                      'summary': Summary, 'url': URL}, 
-                   {'name': Name, 'city': CityName, 'ccTLD': ccTLD,
-                      'summary': Summary, 'url': URL}, ]
-        },
-        {
-          'type': 'none',
-          'name': MentorName,
-          'student': {'name': Name, 'city': CityName, 'ccTLD': ccTLD, 
-                      'summary': Summary, 'url': URL}
-        }
-      ]
+      A JSON object containing map data.
     """
 
     from soc.logic.models.student_project import logic as student_project_logic
 
-    map_data = []
-    mentors = {}
-    student_only = []
+    people = {}
 
     # get all the student_project entities for this organization
     student_project_entities = student_project_logic.getForFields(filter=filter)
@@ -465,67 +445,31 @@ class View(group.View):
     # have allowed to publish their locations.
     for entity in student_project_entities:
 
-      if entity.mentor.publish_location and entity.mentor not in mentors:
+      if entity.mentor.publish_location and (entity.mentor.key().name() not in people.keys()):
         # if mentor has allowed to publish his location add it to the 
         # mentors dictionary
-        mentors[entity.mentor] = []
+        people[entity.mentor.key().name()] = {
+            'type': 'mentor',
+            'name': entity.mentor.name(),
+            'city': entity.mentor.res_city,
+            'ccTLD': entity.mentor.ccTld(),
+            'students': []
+            }
 
       if entity.student.publish_location:
-        # if student has allowed to publish his location, add it to the
-        # corresponding mentor list, otherwise add it to the 'none' list
-        if entity.mentor in mentors:
-          mentors[entity.mentor].append(
-              (entity.student, entity.title,
-              redirects.getPublicRedirect(entity, student_project_params)))
-        else:
-          student_only.append(
-              (entity.student, entity.title,
-               redirects.getPublicRedirect(entity, student_project_params),
-               entity.mentor))
-
-    # from the index built in the form of mentors dictionary we now build
-    # the map_data for all the mentors who have allowed to publish their
-    # location
-    for mentor in mentors:
-      mentor_map = {
-          'type': 'mentor',
-          'name': mentor.name(),
-          'city': mentor.res_city,
-          'ccTLD': mentor.ccTld(),
-          'students': []
+        if entity.mentor.publish_location:
+          people[entity.mentor.key().name()]['students'].append(entity.student.key().name())
+        people[entity.student.key().name()] = {
+          'type': 'student',
+          'name': entity.student.name(),
+          'city': entity.student.res_city,
+          'ccTLD': entity.student.ccTld(),
+          'summary': entity.title,
+          'url': redirects.getPublicRedirect(entity, student_project_params),
+          'mentor': entity.mentor.name()
           }
 
-      for student, summary, url in mentors[mentor]:
-        student_map = {
-           'name': student.name(),
-           'city': student.res_city,
-           'ccTLD': student.ccTld(),
-           'summary': summary,
-           'url': url
-           }
-
-        mentor_map['students'].append(student_map)
-
-      map_data.append(mentor_map)
-
-    # construct the 'type': 'none' dictionary for those students, whose
-    # mentors haven't allowed to publish location
-    for student, summary, url, mentor in student_only:
-      nomentor_map = {
-          'type': 'none',
-          'name': mentor.name(), 
-          'student': {
-              'name': student.name(),
-              'city': student.res_city,
-              'ccTLD': student.ccTld(),
-              'summary': summary,
-              'url': url
-              }
-          }
-
-      map_data.append(nomentor_map)
-
-    return simplejson.dumps(map_data)
+    return simplejson.dumps(people)
 
   def _public(self, request, entity, context):
     """See base.View._public().

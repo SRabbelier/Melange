@@ -90,7 +90,7 @@ class View(base.View):
           }
 
       queryGen = lambda: job_logic.getQueryForFields(filter=filter)
-      jobs = job_logic.entityIterator(queryGen, batchSize=10)
+      jobs = job_logic.entityIterator(queryGen, batch_size=10)
 
       retry_jobs = []
 

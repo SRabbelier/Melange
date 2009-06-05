@@ -37,9 +37,6 @@ handlers:
 - url: /gsoc/content
   static_dir: gsoc/content
 
-- url: /ghop/content
-  static_dir: ghop/content
-
 - url: /jquery
   static_dir: jquery
 

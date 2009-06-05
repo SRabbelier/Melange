@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the GHOP PrizePerOrg Model.
+"""This module contains the GHOP OrgPrizeAssignment Model.
 """
 
 __authors__ = [

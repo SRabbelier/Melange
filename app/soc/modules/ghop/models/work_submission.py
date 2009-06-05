@@ -30,8 +30,8 @@ from django.utils.translation import ugettext
 import soc.models.linkable
 import soc.models.user
 
-import ghop.models.program
-import ghop.models.task
+from soc.modules.ghop.models import program as ghop_program_model
+from soc.modules.ghop.models import task as task_model
 
 
 class GHOPWorkSubmission(soc.models.linkable.Linkable):
@@ -41,7 +41,7 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
   """
 
   #: Task to which this work was submitted
-  task = db.ReferenceProperty(reference_class=ghop.models.task.GHOPTask,
+  task = db.ReferenceProperty(reference_class=task_model.GHOPTask,
                               required=True,
                               collection_name='work_submissions')
 
@@ -51,9 +51,9 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
                               collection_name='work_submissions')
 
   #: Program to which this work belongs to
-  program = db.ReferenceProperty(reference_class=ghop.models.program.GHOPProgram,
-                                 required=True,
-                                 collection_name='work_submissions')
+  program = db.ReferenceProperty(
+      reference_class=ghop_program_model.GHOPProgram,
+      required=True, collection_name='work_submissions')
 
   #: Property allowing you to store information about your work
   information = db.TextProperty(

@@ -32,7 +32,7 @@ import soc.models.role
 import soc.models.student
 import soc.models.user
 
-import ghop.models.program
+from soc.modules.ghop.models import program as ghop_program_model
 
 
 class GHOPTask(soc.models.linkable.Linkable):
@@ -92,9 +92,9 @@ class GHOPTask(soc.models.linkable.Linkable):
                                  collection_name='assigned_tasks')
 
   #: Program in which this Task has been created
-  program = db.ReferenceProperty(reference_class=ghop.models.program.GHOPProgram,
-                                 required=True,
-                                 collection_name='tasks')
+  program = db.ReferenceProperty(
+      reference_class=ghop_program_model.GHOPProgram,
+      required=True, collection_name='tasks')
 
   #: Required property which holds the state, the Task is currently in.
   #: This is a hidden field not shown on forms. Handled by logic internally.

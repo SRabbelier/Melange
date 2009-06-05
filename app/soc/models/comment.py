@@ -22,7 +22,6 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.work
 import soc.models.user
 import soc.models.linkable
 

@@ -11,19 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 """This is the main modules module.
 """
- 
+
 __authors__ = [
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+  '"Madhusudan C.S." <madhusudancs@gmail.com>',
   ]
- 
- 
- 
+
+
+
 from soc.modules.ghop import callback
- 
+
 def getCallback():
   return callback.Callback
-

@@ -14,7 +14,3 @@
 
 """This is the GHOP Views module.
 """
-
-__authors__ = [
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
-  ]

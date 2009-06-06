@@ -190,7 +190,7 @@ class Core(object):
     modules = ['soc_core'] + settings.MODULES
     modules = [__import__(fmt % i, fromlist=['']) for i in modules]
 
-    for callback_class in [i.getCallback() for i in modules]:
+    for callback_class in [i.Callback for i in modules]:
       if callback_class.API_VERSION != self.API_VERSION:
         raise APIVersionMismatch(self.API_VERSION,
                                  callback_class.API_VERSION)

@@ -15,15 +15,3 @@
 
 """This is the main modules module.
 """
-
-__authors__ = [
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
-  ]
-
-
-
-from soc.modules.soc_core import callback
-
-def getCallback():
-  return callback.Callback

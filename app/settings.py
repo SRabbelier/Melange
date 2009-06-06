@@ -110,5 +110,5 @@ INSTALLED_APPS = (
 #    'django.contrib.sites',
 )
 
-MODULE_FMT = 'soc.modules.%s'
+MODULE_FMT = 'soc.modules.%s.callback'
 MODULES = ['ghop']

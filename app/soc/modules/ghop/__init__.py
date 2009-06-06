@@ -12,16 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This is the main modules module.
+"""This is the main ghop module.
 """
-
-__authors__ = [
-  '"Madhusudan C.S." <madhusudancs@gmail.com>',
-  ]
-
-
-
-from soc.modules.ghop import callback
-
-def getCallback():
-  return callback.Callback

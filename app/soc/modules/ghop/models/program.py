@@ -37,6 +37,7 @@ class GHOPProgram(soc.models.program.Program):
   #: participate
   student_min_age = db.IntegerProperty(
       required=True, verbose_name=ugettext('Student minimum age'))
+  student_min_age.group = ugettext('Contest Rules')
   student_min_age.help_text = ugettext(
       'Minimum age of the student to sign-up in years.')
 
@@ -46,6 +47,7 @@ class GHOPProgram(soc.models.program.Program):
   #: is running on.
   student_min_age_as_of = db.DateTimeProperty(
       required=True, verbose_name=ugettext('Minimum age as of'))
+  student_min_age_as_of.group = ugettext('Contest Rules')
   student_min_age_as_of.help_text = ugettext(
       'Date as of which the student minimum age requirement holds.')
 
@@ -54,6 +56,7 @@ class GHOPProgram(soc.models.program.Program):
   nr_simultaneous_tasks = db.IntegerProperty(
       required=True, default=1, 
       verbose_name=ugettext('Simultaneous tasks'))
+  nr_simultaneous_tasks.group = ugettext('Contest Rules')
   nr_simultaneous_tasks.help_text = ugettext(
       'Number of tasks students can work on simultaneously in the program.')
 
@@ -61,6 +64,7 @@ class GHOPProgram(soc.models.program.Program):
   nr_winners = db.IntegerProperty(
       required=True, default=0,
       verbose_name=ugettext('Winners per organization'))
+  nr_winners.group = ugettext('Prize Information')
   nr_winners.help_text = ugettext(
       'Number of winners an organization can announce.')
 
@@ -68,6 +72,7 @@ class GHOPProgram(soc.models.program.Program):
   nr_runnerups = db.IntegerProperty(
       required=True, default=0,
       verbose_name=ugettext('Runner-ups per organization'))
+  nr_runnerups.group = ugettext('Prize Information')
   nr_runnerups.help_text = ugettext(
       'Number of runner-ups an organization can announce.')
 
@@ -75,6 +80,7 @@ class GHOPProgram(soc.models.program.Program):
   task_difficulties = db.StringListProperty(
       required=True, default=[''],
       verbose_name=ugettext('Difficulty levels'))
+  task_difficulties.group = ugettext('Task Settings')
   task_difficulties.help_text = ugettext(
       'List all the difficulty levels that can be assigned to a task.')
 
@@ -82,5 +88,6 @@ class GHOPProgram(soc.models.program.Program):
   task_types = db.StringListProperty(
       required=True, default=['Any'],
       verbose_name=ugettext('Task Types'))
+  task_types.group = ugettext('Task Settings')
   task_types.help_text = ugettext(
       'List all the types a task can be in.')

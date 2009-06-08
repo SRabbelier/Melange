@@ -283,7 +283,7 @@ class View(presence.View):
   @decorators.merge_params
   @decorators.check_access
   def acceptedProjects(self, request, access_type,
-		       page_name=None, params=None, filter=None, **kwargs):
+                       page_name=None, params=None, filter=None, **kwargs):
     """See base.View.list.
     """
     contents = []
@@ -292,8 +292,8 @@ class View(presence.View):
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
     filter = {
-	'status': 'accepted',
-	'program': program_entity }
+        'status': 'accepted',
+        'program': program_entity}
 
     fmt = {'name': program_entity.name}
     description = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % fmt
@@ -301,24 +301,13 @@ class View(presence.View):
     from soc.views.models import student_project as sp_view
 
     ap_params = sp_view.view.getParams().copy() # accepted projects
+    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+    ap_params['list_description'] = description
+    ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
+    ap_params['list_row'] = 'soc/student_project/list/row_all.html'
 
-    fun =  soc.cache.logic.cache(self._getData)
-    ap_logic = ap_params['logic']
-    entities = fun(logic.getModel(), filter, order=None, logic=ap_logic)
-    
-    ap_list = dicts.rename(ap_params, ap_params['list_params'])
-    ap_list['action'] = (redirects.getPublicRedirect, ap_params)
-    ap_list['description'] = description
-    ap_list['pagination'] = 'soc/list/no_pagination.html'
-    ap_list['heading'] = 'soc/student_project/list/heading_all.html'
-    ap_list['row'] = 'soc/student_project/list/row_all.html'
-    ap_list['data'] = entities
-
-    contents.append(ap_list)
-
-    params = params.copy()
-
-    return self._list(request, params, contents, page_name)
+    return self.list(request, access_type, page_name=page_name,
+                     params=ap_params, filter=filter)
 
   @decorators.merge_params
   @decorators.check_access

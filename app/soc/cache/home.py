@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module contains sidebar memcaching functions.
+"""Module contains homepage memcaching functions.
 """
 
 __authors__ = [
@@ -32,14 +32,14 @@ import soc.cache.base
 
 
 def key(entity):
-  """Returns the memcache key for the user's sidebar.
+  """Returns the memcache key for an entities homepage.
   """
 
   return 'homepage_for_%s_%s' % (entity.kind(), entity.key().id_or_name())
 
 
 def get(self, *args, **kwargs):
-  """Retrieves the sidebar for the specified user from the memcache.
+  """Retrieves the homepage for the specified entity from the memcache.
   """
 
   # only cache the page for non-logged-in users
@@ -60,10 +60,10 @@ def get(self, *args, **kwargs):
   return memcache.get(memcache_key), memcache_key
 
 def put(result, memcache_key, *args, **kwargs):
-  """Sets the sidebar for the specified user in the memcache.
+  """Sets the homepage for the specified entity in the memcache.
 
   Args:
-    sidebar: the sidebar to be cached
+    result: the homepage to be cached
   """
 
   # no sense in storing anything if we won't query it later on
@@ -71,7 +71,7 @@ def put(result, memcache_key, *args, **kwargs):
   if accounts.getCurrentAccount(normalize=False):
     return
 
-  # Store sidebar for just ten minutes to force a refresh every so often
+  # Store homepage for just ten minutes to force a refresh every so often
   retention = 10*60
 
   logging.info("Setting %s" % memcache_key)
@@ -80,7 +80,7 @@ def put(result, memcache_key, *args, **kwargs):
 
 
 def flush(entity):
-  """Removes the sidebar for the current user from the memcache.
+  """Removes the homepage for the current entity from the memcache.
 
   Also calls soc.cache.rights.flush for the specified user.
 

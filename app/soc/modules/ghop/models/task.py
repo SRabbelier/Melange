@@ -32,7 +32,7 @@ import soc.models.role
 import soc.models.student
 import soc.models.user
 
-from soc.modules.ghop.models import program as ghop_program_model
+import soc.modules.ghop.models.program
 
 
 class GHOPTask(soc.models.linkable.Linkable):
@@ -93,7 +93,7 @@ class GHOPTask(soc.models.linkable.Linkable):
 
   #: Program in which this Task has been created
   program = db.ReferenceProperty(
-      reference_class=ghop_program_model.GHOPProgram,
+      reference_class=soc.modules.ghop.models.program.GHOPProgram,
       required=True, collection_name='tasks')
 
   #: Required property which holds the state, the Task is currently in.

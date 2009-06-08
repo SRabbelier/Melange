@@ -27,14 +27,14 @@ from soc.logic.models import linkable as linkable_logic
 
 import soc.models.comment
 
-from soc.modules.ghop.models import comment as ghop_comment_model
+import soc.modules.ghop.models.comment
 
 
 class Logic(comment.Logic):
   """Logic methods for the GHOPComment model.
   """
 
-  def __init__(self, model=ghop_comment_model.GHOPComment,
+  def __init__(self, model=soc.modules.ghop.models.comment.GHOPComment,
                base_model=soc.models.comment.Comment,
                scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.

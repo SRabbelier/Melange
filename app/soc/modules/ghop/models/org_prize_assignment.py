@@ -26,8 +26,8 @@ from google.appengine.ext import db
 
 import soc.models.base
 
-from soc.modules.ghop.models import organization as ghop_organization_model
-from soc.modules.ghop.models import program as ghop_program_model
+import soc.modules.ghop.models.organization
+import soc.modules.ghop.models.program
 
 
 class GHOPOrgPrizeAssignment(soc.models.base.ModelWithFieldAttributes):
@@ -36,12 +36,12 @@ class GHOPOrgPrizeAssignment(soc.models.base.ModelWithFieldAttributes):
 
   #: Program to which these winners belong to
   program = db.ReferenceProperty(
-      reference_class=ghop_program_model.GHOPProgram,
+      reference_class=soc.modules.ghop.models.program.GHOPProgram,
       required=True, collection_name='program_prizes')
 
   #: Organization to which these winners belong to
   org = db.ReferenceProperty(
-      reference_class=ghop_organization_model.GHOPOrganization,
+      reference_class=soc.modules.ghop.models.organization.GHOPOrganization,
       required=True, collection_name='organization_prizes')
 
   #: Ordered list of winners(reference to Student entities) for the given

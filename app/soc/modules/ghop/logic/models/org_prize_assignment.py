@@ -24,15 +24,17 @@ __authors__ = [
 
 from soc.logic.models import base
 
-from soc.modules.ghop.models import org_prize_assignment_model
+import soc.modules.ghop.models.org_prize_assignment
 
 
 class Logic(base.Logic):
   """Logic methods for the GHOPOrgPrizeAssigment model.
   """
 
-  def __init__(self, model=org_prize_assignment_model.GHOPOrgPrizeAssignment,
-               base_model=None, scope_logic=None):
+  def __init__(
+      self, model=\
+      soc.modules.ghop.models.org_prize_assignment.GHOPOrgPrizeAssignment,
+      base_model=None, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 

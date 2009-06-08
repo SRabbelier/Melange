@@ -25,18 +25,19 @@ from soc.logic.models import linkable
 
 import soc.models.linkable
 
-from soc.modules.ghop.logic.models import organization as ghop_org_logic
-from soc.modules.ghop.models import work_submission as \
-    ghop_work_submission_model
+import soc.modules.ghop.logic.models.organization
+import soc.modules.ghop.models.work_submission
 
 
 class Logic(linkable.Logic):
   """Logic methods for the GHOPWorkSubmission model.
   """
 
-  def __init__(self, model=ghop_work_submission_model.GHOPWorkSubmission,
-               base_model=soc.models.linkable.Linkable, 
-               scope_logic=ghop_org_logic):
+  def __init__(
+      self,
+      model=soc.modules.ghop.models.work_submission.GHOPWorkSubmission,
+      base_model=soc.models.linkable.Linkable, 
+      scope_logic=soc.modules.ghop.logic.models.organization):
     """Defines the name, key_name and model for this entity.
     """
 

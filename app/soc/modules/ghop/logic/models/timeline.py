@@ -27,14 +27,14 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.timeline
 
-from soc.modules.ghop.models import timeline as ghop_timeline_model
+import soc.modules.ghop.models.timeline
 
 
 class Logic(timeline.Logic):
   """Logic methods for the GHOPTimeline model.
   """
 
-  def __init__(self, model=ghop_timeline_model.GHOPTimeline,
+  def __init__(self, model=soc.modules.ghop.models.timeline.GHOPTimeline,
                base_model=soc.models.timeline.Timeline,
                scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.

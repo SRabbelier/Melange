@@ -26,17 +26,17 @@ from soc.logic.models import mentor
 
 import soc.models.mentor
 
-from soc.modules.ghop.logic.models import organization as ghop_org_logic
-from soc.modules.ghop.models import mentor as ghop_mentor_model
+import soc.modules.ghop.logic.models.organization
+import soc.modules.ghop.models.mentor
 
 
 class Logic(mentor.Logic):
   """Logic methods for the GHOPMentor model.
   """
 
-  def __init__(self, model=ghop_mentor_model.GHOPMentor,
+  def __init__(self, model=soc.modules.ghop.models.mentor.GHOPMentor,
                base_model=soc.models.mentor.Mentor,
-               scope_logic=ghop_org_logic):
+               scope_logic=soc.modules.ghop.logic.models.organization):
     """Defines the name, key_name and model for this entity.
     """
 

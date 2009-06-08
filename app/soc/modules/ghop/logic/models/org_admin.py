@@ -26,17 +26,17 @@ from soc.logic.models import org_admin
 
 import soc.models.org_admin
 
-from soc.modules.ghop.logic.models import organization as ghop_org_logic
-from soc.modules.ghop.models import org_admin as ghop_org_admin_model
+import soc.modules.ghop.logic.models.organization
+import soc.modules.ghop.models.org_admin
 
 
 class Logic(org_admin.Logic):
   """Logic methods for the GHOPOrgAdmin model.
   """
 
-  def __init__(self, model=ghop_org_admin_model.GHOPOrgAdmin,
+  def __init__(self, model=soc.modules.ghop.models.org_admin.GHOPOrgAdmin,
                base_model=soc.models.org_admin.OrgAdmin,
-               scope_logic=ghop_org_logic):
+               scope_logic=soc.modules.ghop.logic.models.organization):
     """Defines the name, key_name and model for this entity.
     """
 

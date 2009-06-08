@@ -27,14 +27,14 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
-from soc.modules.ghop.models import program as ghop_program_model
+import soc.modules.ghop.models.program
 
 
 class Logic(program.Logic):
   """Logic methods for the GHOPProgram model.
   """
 
-  def __init__(self, model=ghop_program_model.GHOPProgram,
+  def __init__(self, model=soc.modules.ghop.models.program.GHOPProgram,
                base_model=soc.models.program.Program,
                scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.

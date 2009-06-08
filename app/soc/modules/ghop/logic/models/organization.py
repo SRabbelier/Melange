@@ -26,17 +26,18 @@ from soc.logic.models import organization
 
 import soc.models.organization
 
-from soc.modules.ghop.logic.models import program as ghop_program_logic
-from soc.modules.ghop.models import organization as ghop_organization_model
+import soc.modules.ghop.logic.models.program
+import soc.modules.ghop.models.organization
 
 
 class Logic(organization.Logic):
   """Logic methods for the GHOPOrganization model.
   """
 
-  def __init__(self, model=ghop_organization_model.GHOPOrganization,
-               base_model=soc.models.organization.Organization, 
-               scope_logic=ghop_program_logic):
+  def __init__(
+      self, model=soc.modules.ghop.models.organization.GHOPOrganization,
+      base_model=soc.models.organization.Organization, 
+      scope_logic=soc.modules.ghop.logic.models.program):
     """Defines the name, key_name and model for this entity.
     """
 

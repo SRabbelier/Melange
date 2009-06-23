@@ -56,17 +56,34 @@ limitations under the License.
   $(document).ready( function() {
     var tooltip = "<div class='tooltip'><div class='tooltip-body'><img src='/soc/content/images/purrInfo.png' alt='' /><h3>Info</h3><p>{{ help_text }}</p></div><div class='tooltip-bottom'></div></div>";
     var tooltip_object=null;
-    $("#{{ field_id }}").focus(function() {
-      if (tooltip_object==null) {
-        tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
-      }
-    });
-    $("#{{ field_id }}").blur(function() {
-      if (tooltip_object!==null) {
-        tooltip_object.remove();
-        tooltip_object=null;
-      }
-    });
+    var documented = $("#{{ field_id }}");
+    var not_fieldset = documented.attr('tagName') !== 'FIELDSET';
+    if (not_fieldset) {
+      documented.focus(function() {
+        if (tooltip_object==null) {
+          tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+        }
+      });
+      documented.blur(function() {
+        if (tooltip_object!==null) {
+          tooltip_object.remove();
+          tooltip_object=null;
+        }
+      });
+    }
+    else {
+      documented.find("input").hover(function() {
+        if (tooltip_object==null) {
+          tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+        }
+      },
+      function() {
+        if (tooltip_object!==null) {
+          tooltip_object.remove();
+          tooltip_object=null;
+        }
+      });
+    }
   });
   </script>
   {% endif %}

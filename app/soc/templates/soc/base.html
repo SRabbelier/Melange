@@ -99,8 +99,8 @@ limitations under the License.
   {% if uses_duplicates %}
   <script type="text/javascript" src="/soc/content/js/duplicate-slots-090505.js"></script>
   {% endif %}
- </head>
 {% endblock %}
+</head>
 
 {% block body_tag %}
  <body>
@@ -109,7 +109,7 @@ limitations under the License.
   <div id="login">
 	{% block login_links %}
 	{% if account %}
-	<b>{{ account.email }} ({{ account.nickname }})</b> | 
+	<b>{{ account.email }} ({{ account.nickname }})</b> |
 	{% endif %}
 	{% if is_admin %}
 	Developer |
@@ -120,10 +120,10 @@ limitations under the License.
 	{% if is_local %}
 	<form id="flush_form" action="/_ah/admin/memcache" method="post" style="display: inline;">
       <input type="submit" class="button" name="action:flush" value="Flush Cache"/>
-    </form> | 
-	<a class="novisit" target="_blank" href="/_ah/admin">Admin</a> | 
+    </form> |
+	<a class="novisit" target="_blank" href="/_ah/admin">Admin</a> |
 	{% endif %}
-	<a class="novisit" href="http://code.google.com/p/soc/issues/list">Report bugs</a> | 
+	<a class="novisit" href="http://code.google.com/p/soc/issues/list">Report bugs</a> |
 	{% if account %}
 	<a class="novisit" href="{{sign_out}}">Sign out</a>
 	{% else %}
@@ -196,7 +196,7 @@ TODO(tlarsen): replace this with breadcrumbs
 
   <div id="side" dir="ltr">
    <div id="menu">
-{% block sidebar_menu %}	
+{% block sidebar_menu %}
     <ul>
      <li>
 <a class="selected" href="/">

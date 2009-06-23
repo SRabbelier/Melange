@@ -1,7 +1,7 @@
 /*
- * jQuery UI @VERSION
+ * jQuery UI 1.6
  *
- * Copyright (c) 2009 AUTHORS.txt (http://ui.jquery.com/about)
+ * Copyright (c) 2008 AUTHORS.txt (http://ui.jquery.com/about)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
@@ -14,7 +14,8 @@ var _remove = $.fn.remove,
 
 //Helper functions and ui object
 $.ui = {
-	version: "@VERSION",
+
+	version: "1.6",
 
 	// $.ui.plugin is deprecated.  Use the proxy pattern instead.
 	plugin: {
@@ -38,15 +39,21 @@ $.ui = {
 	},
 
 	contains: function(a, b) {
-		return document.compareDocumentPosition
-			? a.compareDocumentPosition(b) & 16
-			: a !== b && a.contains(b);
+		var safari2 = $.browser.safari && $.browser.version < 522;
+	    if (a.contains && !safari2) {
+	        return a.contains(b);
+	    }
+	    if (a.compareDocumentPosition)
+	        return !!(a.compareDocumentPosition(b) & 16);
+	    while (b = b.parentNode)
+	          if (b == a) return true;
+	    return false;
 	},
 
 	cssCache: {},
 	css: function(name) {
 		if ($.ui.cssCache[name]) { return $.ui.cssCache[name]; }
-		var tmp = $('<div class="ui-gen"></div>').addClass(name).css({position:'absolute', top:'-5000px', left:'-5000px', display:'block'}).appendTo('body');
+		var tmp = $('<div class="ui-gen">').addClass(name).css({position:'absolute', top:'-5000px', left:'-5000px', display:'block'}).appendTo('body');
 
 		//if (!$.browser.safari)
 			//tmp.appendTo('body');
@@ -118,6 +125,7 @@ $.ui = {
 		TAB: 9,
 		UP: 38
 	}
+
 };
 
 // WAI-ARIA normalization
@@ -153,6 +161,7 @@ if (isFF2) {
 
 //jQuery plugins
 $.fn.extend({
+
 	remove: function() {
 		// Safari has a native remove event which actually removes DOM elements,
 		// so we have to use triggerHandler instead of trigger (#3037).
@@ -177,6 +186,7 @@ $.fn.extend({
 	},
 
 	scrollParent: function() {
+
 		var scrollParent;
 		if(($.browser.msie && (/(static|relative)/).test(this.css('position'))) || (/absolute/).test(this.css('position'))) {
 			scrollParent = this.parents().filter(function() {
@@ -189,41 +199,48 @@ $.fn.extend({
 		}
 
 		return (/fixed/).test(this.css('position')) || !scrollParent.length ? $(document) : scrollParent;
+
+
 	}
+
 });
 
 
 //Additional selectors
 $.extend($.expr[':'], {
-	data: function(elem, i, match) {
-		return !!$.data(elem, match[3]);
+
+	data: function(a, i, m) {
+		return $.data(a, m[3]);
 	},
 
 	// TODO: add support for object, area
-	tabbable: function(elem) {
-		var nodeName = elem.nodeName.toLowerCase();
+	tabbable: function(a, i, m) {
+
+		var nodeName = a.nodeName.toLowerCase();
 		function isVisible(element) {
 			return !($(element).is(':hidden') || $(element).parents(':hidden').length);
 		}
 
 		return (
 			// in tab order
-			elem.tabIndex >= 0 &&
+			a.tabIndex >= 0 &&
 
 			( // filter node types that participate in the tab order
 
 				// anchor tag
-				('a' == nodeName && elem.href) ||
+				('a' == nodeName && a.href) ||
 
 				// enabled form element
 				(/input|select|textarea|button/.test(nodeName) &&
-					'hidden' != elem.type && !elem.disabled)
+					'hidden' != a.type && !a.disabled)
 			) &&
 
 			// visible on page
-			isVisible(elem)
+			isVisible(a)
 		);
+
 	}
+
 });
 
 
@@ -282,7 +299,6 @@ $.widget = function(name, prototype) {
 	$[namespace][name] = function(element, options) {
 		var self = this;
 
-		this.namespace = namespace;
 		this.widgetName = name;
 		this.widgetEventPrefix = $[namespace][name].eventPrefix || name;
 		this.widgetBaseClass = namespace + '-' + name;
@@ -295,14 +311,10 @@ $.widget = function(name, prototype) {
 
 		this.element = $(element)
 			.bind('setData.' + name, function(event, key, value) {
-				if (event.target == element) {
-					return self._setData(key, value);
-				}
+				return self._setData(key, value);
 			})
 			.bind('getData.' + name, function(event, key) {
-				if (event.target == element) {
-					return self._getData(key);
-				}
+				return self._getData(key);
 			})
 			.bind('remove', function() {
 				return self.destroy();
@@ -322,9 +334,7 @@ $.widget = function(name, prototype) {
 $.widget.prototype = {
 	_init: function() {},
 	destroy: function() {
-		this.element.removeData(this.widgetName)
-			.removeClass(this.widgetBaseClass + '-disabled' + ' ' + this.namespace + '-state-disabled')
-			.removeAttr('aria-disabled');
+		this.element.removeData(this.widgetName);
 	},
 
 	option: function(key, value) {
@@ -350,11 +360,8 @@ $.widget.prototype = {
 		this.options[key] = value;
 
 		if (key == 'disabled') {
-			this.element
-				[value ? 'addClass' : 'removeClass'](
-					this.widgetBaseClass + '-disabled' + ' ' +
-					this.namespace + '-state-disabled')
-				.attr("aria-disabled", value);
+			this.element[value ? 'addClass' : 'removeClass'](
+				this.widgetBaseClass + '-disabled');
 		}
 	},
 
@@ -366,17 +373,10 @@ $.widget.prototype = {
 	},
 
 	_trigger: function(type, event, data) {
-		var callback = this.options[type],
-			eventName = (type == this.widgetEventPrefix
-				? type : this.widgetEventPrefix + type);
-
-		event = event ? $.event.fix(event) : $.Event();
-		event.type = eventName;
-
-		this.element.trigger(event, data);
-
-		return !(callback && callback.call(this.element[0], event, data) === false
-			|| event.isDefaultPrevented());
+		var eventName = (type == this.widgetEventPrefix
+			? type : this.widgetEventPrefix + type);
+		event = event || $.event.fix({ type: eventName, target: this.element[0] });
+		return this.element.triggerHandler(eventName, [event, data], this.options[type]);
 	}
 };
 
@@ -463,8 +463,7 @@ $.ui.mouse = {
 		// preventDefault() is used to prevent the selection of text here -
 		// however, in Safari, this causes select boxes not to be selectable
 		// anymore, so this fix is needed
-		($.browser.safari || event.preventDefault());
-		
+		if(!$.browser.safari) event.preventDefault();
 		return true;
 	},
 

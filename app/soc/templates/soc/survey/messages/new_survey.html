@@ -1,0 +1,21 @@
+{% extends "soc/notification/messages/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% block content %}
+There is a new Survey available for your program.<br />
+Please visit <a href="{{ survey_url }}">{{ survey_title}}</a>
+to take the survey.<br />
+
+Keep in mind that taking a survey might be mandatory!
+{% endblock %}

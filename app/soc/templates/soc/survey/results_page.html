@@ -1,0 +1,109 @@
+{% extends "soc/models/edit.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% load forms_helpers %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="/soc/content/js/default-text.js"></script>
+<script type="text/javascript" src="/jquery/jquery-ui.draggable.js"></script>
+<script type="text/javascript" src="/jquery/jquery-ui.sortable.js"></script>
+<script type="text/javascript" src="/jquery/jquery-ui.dialog.js"></script>
+<script type="text/javascript" src="/jquery/jquery-growfield.js"></script>
+<script type="text/javascript" src="/jquery/jquery-editable-1.3.3.js"></script>
+<script type="text/javascript" src="/soc/content/js/edit_survey.js"></script>
+
+{% endblock %}
+
+{% block body %}
+
+{% if not new_survey %}
+  {% if results %}
+  <table> <tr>
+  {% for user_role in results %}
+  <td>
+  <div class="list">
+  <table style="width:100%">
+
+  <th>Taken By</th>
+
+  <th>Survey</th>
+
+  <th>Last Modified</th>
+
+  <th>Answer</th>
+
+  {% if grades %}
+    <th>Grade</th>
+  {% endif %}
+</tr>
+  {% for record in user_role %}
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'"
+onclick="return false; document.location.href='{{ record.redirect }}'" name="name">
+
+
+  <td>
+    <div class="author">
+      {{ record.user.name }} ({{ record.user.link_id }})
+    </div>
+  </td>
+
+  <td>
+    <div class="title">
+      {{ record.survey.title }}
+    </div>
+  </td>
+
+
+  <td>
+    <div class="modified">
+      {{ record.modified|date:"Y-m-d H:i" }}
+    </div>
+  </td>
+
+  <td>
+    <a class="fetch_answers" id="results_for_{{ record.user.link_id }}">View</a>
+  </td>
+
+  {% if grades %}
+  <td>
+    <div class="grade">
+      <select id="id_survey__{{ record.user.link_id }}__selection__grade"
+        name="id_survey__{{ record.user.link_id }}__selection__grade">
+
+  <option value='' {% ifequal record.grade '' %} selected="selected" {% endifequal %} >
+    None</option>
+  <option value='pass' {% ifequal record.grade 'Pass' %} selected="selected" {% endifequal %} >
+  Pass</option>
+  <option value='fail' {% ifequal record.grade 'Fail' %} selected="selected" {% endifequal %} >
+  Fail</option>
+
+  </select>
+</div>
+</td>
+{% endif %}
+</tr>
+
+  {% endfor %}
+  </table>
+  </div>
+  </td>
+  {% endfor %}
+</tr>
+</table>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

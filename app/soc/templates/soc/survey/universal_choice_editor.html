@@ -1,0 +1,43 @@
+<fieldset>
+
+{# Question type drop-down #}
+  <label for="type_for_{{ name }}">Question Type</label>
+  <select id="type_for_{{ name }}" name="type_for_{{ name }}">
+    <option value="selection" {{ is_selection|safe }}>selection</option>
+    <option value="pick_multi" {{ is_pick_multi }}>pick_multi</option>
+    <option value="pick_quant" {{ is_pick_quant }}>pick_quant</option>
+  </select>
+
+{# Render widget drop-down #}
+  <label for="render_for_{{ name }}">Render as</label>
+  <select id="render_for_{{ name }}" name="render_for_{{ name }}">
+    <option value="select" {{ is_select|safe }}>select</option>
+    <option value="checkboxes" {{ is_checkboxes|safe }}>checkboxes</option>
+    <option value="radio_buttons" {{ is_radio_buttons }}>radio_buttons</option>
+  </select>
+
+{# Each choice field has a hidden input where its options' order is stored. #}
+  <input type="hidden" id="order_for_{{ name }}" name="order_for_{{ name }}"
+   value=""/>
+
+{# Open the ordered list. #}
+  <ol id="{{ name }}" class="sortable">
+{# Template for each option #}
+  {% for i, option_value in  choices.items %}
+    <li id="id-li-{{ name }}_{{ i }}" class="ui-state-default sortable_li">
+      <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+      <span id="id_{{ name }}_{{ i }}" class="editable_option" name="id_{{ name }}_{{ i }}__field">
+        {{ option_value }}
+      </span>
+      <input type="hidden" id="id_{{ name }}_{{ i }}__field"
+       name="id_{{ name }}_{{ i }}__field" value="{{ option_value }}"/>
+    </li>
+  {% endfor %}
+
+{# Close the ordered list and add the 'add option' button. #}
+  </ol>
+  <button name="create-option-button" id="create-option-button__{{ name }}"
+   class="ui-button ui-state-default ui-corner-all" value="{{ name }}"
+   onClick="return false;">Create new option</button>
+
+</fieldset>

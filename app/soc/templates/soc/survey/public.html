@@ -1,0 +1,88 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script type="text/javascript" src="/soc/content/js/take_survey.js"></script>
+<script type="text/javascript" src="/soc/content/js/default-text.js"></script>
+<script type="text/javascript" src="/jquery/jquery-growfield.js"></script>
+{% endblock %}
+
+{% block page_title %}
+{{ entity.title }}
+{% endblock %}
+
+{% block header_title %}
+{{ entity.title }}
+{% endblock %}
+
+{% block body %}
+<div id="created">Last modified on {{ entity.modified }} by {{ entity.modified_by.name }}</div>
+
+{% if survey_form %}
+
+  {% load forms_helpers %}
+
+  {% if not read_only %}
+    <form method="post">
+  {% endif %}
+
+  {% if read_only %}
+    <form method="get" onsubmit="javascript:return false">
+  {% endif %}
+
+  {{ help_text }}
+
+<div style="width:100%; float:left;">
+  <div class="{{ status }}" id="survey_widget">
+
+    <table>
+
+  {# Project Selected for this Survey #}
+  {% if project %}
+ <div id="project_link" style="font-size:.8em; margin:3px; display:none;">
+ view project:
+ <a target="_blank" href="/student_project/show/{{ project.key.name }}" >
+ {{ project.title }}
+ </a>
+ </div>
+  {% endif %}
+
+      {% block form_table %}
+        {% as_twoline_table survey_form %}
+      {% endblock %}
+
+    </table>
+  </div> {# end survey_widget #}
+  </div>
+
+<br/><br/>
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          {% if not read_only %}
+            <input type="submit" value="Submit" style="font-weight: bold;"/>
+          {% endif %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+    </form>
+{% endif %}
+
+{% endblock %}

@@ -17,7 +17,7 @@ limitations under the License.
 /*
  * STANDARD HTML TAGS
  */
-
+@import '/soc/content/css/ui.all.css';
 body {
   background-color: white;
   color: black;
@@ -204,9 +204,9 @@ td.formfieldvalue textarea {
   width: 100%;
 }
 
-td.formfieldvalue select {
+/*td.formfieldvalue select {
   width: 100%;
-}
+}*/
 
 td.formfielderrorlabel, td.warning, span.formfielderrorlabel {
   font-weight: bold;
@@ -267,7 +267,7 @@ table#queues td {
 }
 
 .tooltip-body h3 {
-  margin: 0; 
+  margin: 0;
   font-size: 1.1em;
 }
 
@@ -396,13 +396,13 @@ table#queues td {
   width: 55%;
   left: 0px;
   float: left;
-} 
+}
 
 #extras_right {
   width: 43%;
   right: 0px;
   float: right;
-} 
+}
 
 /* Organization home gmap */
 #org_home_map {
@@ -641,4 +641,211 @@ span.edited {
   background:transparent none repeat scroll 0 0;
   border:0 none;
   color:black;
+}
+
+/* Surveys */
+
+
+div #survey_widget {
+  margin: 20px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  background-color: #FFFEEB;
+  border: 5px solid #F7CA75;
+  padding: 15px;
+  /*max-width: 700px;*/
+  float: left;
+}
+
+
+div #survey_widget.survey_admin {
+/* TODO(ajaksu) remove if unnecessary */
+}
+
+div #survey_widget tr {
+  float: left;
+  clear: both;
+}
+
+div #survey_widget th,
+div #survey_widget td {
+  padding-top: 15px;
+}
+
+/* fields */
+
+div #survey_widget textarea {
+  padding: 10px;
+  width: 300px;
+}
+
+div #survey_widget input.text_question {
+  width: 320px;
+}
+
+div #survey_widget td.formfieldlabel {
+  font-size: medium;
+}
+
+#survey_widget.view input[disabled="disabled"],
+#survey_widget.view textarea[disabled="disabled"],
+#survey_widget.view select[disabled="disabled"],
+#survey_widget.view option {
+  color: black;
+}
+
+#survey_widget.quant_radio input,
+#survey_widget.quant_radio label {
+  clear: left;
+  display: block;
+  float: left;
+  margin: 4px;
+}
+
+/* options */
+
+div #survey_options button {
+  display: block;
+  margin: 10px 0 0;
+}
+
+div #survey_options {
+  margin: 20px 0 0 0;
+}
+
+div #survey_widget a.delete {
+  margin: 0 7px;
+}
+
+div #survey_widget th label {
+  display: block;
+  max-width: 180px;
+}
+
+div #survey_widget tr.role-specific label {
+  color: #666666;
+}
+
+
+span.formfieldlabel {
+  font-weight: bold;
+  font-size: small;
+}
+
+.sortable_li {
+  border: solid 1px !important;
+  padding: 5px !important;
+}
+
+.sortable_li,
+div #survey_widget fieldset {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+div #survey_widget fieldset,
+div #survey_widget th,
+div #survey_widget td,
+div #survey_widget select {
+  max-width:700px;
+}
+
+#dialog {
+  font-size: 62.5%;
+}
+
+#dialog input {
+  margin: 5px;
+}
+
+#dialog label, #dialog input {
+  display: block;
+}
+
+#dialog p {
+  text-align: center;
+  padding-left: 0;
+}
+
+#dialog input.text {
+  margin-bottom: 12px;
+  width: 95%;
+  padding: .4em;
+}
+
+#dialog fieldset {
+  padding: 0;
+  border: 0;
+  margin-top: 25px;
+}
+
+#dialog h1 {
+  font-size: 1.2em;
+  margin: .6em 0;
+}
+
+.ui-button {
+  outline: 0;
+  margin: 0;
+  padding: .4em 1em .5em;
+  text-decoration: none;
+  cursor:pointer;
+  position: relative;
+  text-align: center;
+}
+
+.ui-dialog .ui-state-highlight,
+.ui-dialog .ui-state-error {
+  padding: .3em;
+}
+
+.pick_multi input {
+  display: inline;
+}
+
+/* NEWS FEED FEEDS */
+.news_feed {
+  border: 10px solid #e5ecf9;
+  border-top: 1px solid #3366cc;
+  float:left;
+}
+
+.news_feed .inner{
+  padding:0 20px;
+}
+
+.news_feed h2 {
+  margin-top: 0.1em;
+  background-color: #e5ecf9;
+}
+
+.news_feed h2 a {
+  text-decoration: none;
+  color: black;
+}
+
+.news_feed h2 a:visited {
+  text-decoration: none;
+  color: black;
+}
+
+.news_feed .entry {
+  margin:1em 0.3em;
+}
+
+.news_feed .title {
+   font-size: medium;
+}
+
+.news_feed .time {
+  color: gray;
+  margin-bottom: 0.5em;
+}
+
+.news_feed .snippet {
+  background-color: white;
+}
+
+a#feed_icon img{
+  margin:-1px 0;
 }

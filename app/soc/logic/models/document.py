@@ -68,7 +68,10 @@ class Logic(work.Logic):
     return not entity.home_for
 
   def _updateField(self, entity, entity_properties, name):
-    """Special logic for role. If state changes to active we flush the sidebar.
+    """Special logic for Document.
+
+    - Flush the sidebar when a document is featured.
+    - Remove the document from the homepage cache when the home_for is updated
     """
 
     value = entity_properties[name]

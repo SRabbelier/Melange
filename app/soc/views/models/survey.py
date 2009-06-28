@@ -29,18 +29,21 @@ import re
 import StringIO
 import string
 
+from google.appengine.ext import db
+
 from django import forms
 from django import http
 from django.utils import simplejson
-
-from google.appengine.ext import db
 
 from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import logic as survey_logic
+from soc.logic.models.survey import project_logic
+from soc.logic.models.survey import grading_logic
 from soc.logic.models.survey_record import logic as results_logic
+from soc.logic.models.survey_record import updateSurveyRecord
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
 from soc.models.survey_record import SurveyRecord
@@ -108,6 +111,7 @@ class View(base.View):
     rights['grade'] = ['checkIsSurveyGradable']
 
     new_params = {}
+    # TODO(ajaksu) pass logic in a way views can use them
     new_params['logic'] = survey_logic
     new_params['rights'] = rights
 
@@ -268,8 +272,8 @@ class View(base.View):
       else:
         # save/update the submitted survey
         context['notice'] = "Survey Submission Saved"
-        survey_record = survey_logic.updateSurveyRecord(user, survey,
-        survey_record, request.POST)
+        survey_record = updateSurveyRecord(user, survey, survey_record,
+                                           request.POST)
     survey_content = survey.survey_content
 
     if not survey_record and read_only:
@@ -391,6 +395,19 @@ class View(base.View):
                                                filter={})
 
     super(View, self)._editContext(request, context)
+
+  def createPost(self, request, context, params):
+
+    # TODO(ajaksu) create new View class for other surveys
+    survey_type = request.POST.get('survey_type')
+    if not survey_type:
+      self._logic = params['logic'] = survey_logic
+    elif survey_type == 'project':
+      self._logic =  params['logic'] = project_logic
+    elif survey_type == 'grading':
+      self._logic = params['logic'] = grading_logic
+
+    return super(View, self).createPost(request, context, params)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -908,13 +925,13 @@ def to_csv(survey):
   properties = leading + survey.survey_content.orderedProperties()
 
   try:
-    first = survey.survey_records.run().next()
+    first = survey.getRecords().run().next()
   except StopIteration:
     # bail out early if survey_records.run() is empty
     return header, survey.link_id
 
   # generate results list
-  recs = survey.survey_records.run()
+  recs = survey.getRecords().run()
   recs = _get_records(recs, properties)
 
   # write results to CSV

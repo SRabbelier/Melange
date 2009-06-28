@@ -16,8 +16,9 @@
 
 """SurveyRecord represents a single Survey result.
 
-SurveyRecordGroup represents a cluster (mentor/student) of SurveyRecords
-for an evaluation period.
+ProjectSurveyRecord allows linking two result sets by StudentProject.
+
+GradingProjectSurveyRecord stores the grade in an evaluation survey.
 """
 
 __authors__ = [
@@ -32,36 +33,23 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models.survey import Survey
+from soc.models.survey import GradingProjectSurvey
+from soc.models.survey import ProjectSurvey
 import soc.models.student_project
 import soc.models.user
 
 
-class SurveyRecord(db.Expando):
+class BaseSurveyRecord(db.Expando):
   """Record produced each time Survey is taken.
 
   Like SurveyContent, this model includes dynamic properties
   corresponding to the fields of the survey.
-
-  This also contains a Binary grade value that can be added/edited
-  by the administrator of the Survey.
   """
-
-  #: The survey for which this entity is a record.
-  survey = db.ReferenceProperty(Survey, collection_name="survey_records")
 
   #: Reference to the User entity which took this survey.
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True, collection_name="surveys_taken",
                               verbose_name=ugettext('Created by'))
-
-  #: Reference to the Project that this record belongs to.
-  # TODO should be moved to its own subclass
-  project = db.ReferenceProperty(soc.models.student_project.StudentProject,
-                                 collection_name="survey_records")
-
-  #: Grade given to the project that this survey is about.
-  # TODO should be moved to its own subclass
-  grade = db.BooleanProperty(required=False)
 
   #: Date when this record was created.
   created = db.DateTimeProperty(auto_now_add=True)
@@ -75,8 +63,59 @@ class SurveyRecord(db.Expando):
     Right now it gets all dynamic values, but it could also be confined to
     the SurveyContent entity linked to the survey entity.
     """
-    survey_order = self.survey.survey_content.getSurveyOrder()
+    survey_order = self.getSurvey().survey_content.getSurveyOrder()
     values = []
     for position, property in survey_order.items():
         values.insert(position, getattr(self, property, None))
     return values
+
+
+# TODO(ajaksu) think of a better way to handle the survey reference
+class SurveyRecord(BaseSurveyRecord):
+
+  #: The survey for which this entity is a record.
+  survey = db.ReferenceProperty(Survey, collection_name="survey_records")
+
+  def getSurvey(self):
+    """Returns the Survey belonging to this record.
+    """
+    return self.survey
+
+class ProjectSurveyRecord(SurveyRecord):
+  """Record linked to a Project, enabling to store which Projects had their
+  Survey done.
+  """
+
+  #: The survey for which this entity is a record.
+  project_survey = db.ReferenceProperty(ProjectSurvey,
+                                collection_name="project_survey_records")
+
+  #: Reference to the Project that this record belongs to.
+  project = db.ReferenceProperty(soc.models.student_project.StudentProject,
+                                 collection_name="survey_records")
+
+  def getSurvey(self):
+    """Returns the ProjectSurvey that belongs to this record.
+    """
+    return self.project_survey
+
+
+class GradingProjectSurveyRecord(ProjectSurveyRecord):
+  """Grading record for evaluation surveys.
+
+  Represents the grading part of a evaluation survey group (usually a pair)
+  where the grading (e.g. Mentor's) survey is linked to a non-grading (e.g
+  Student's) one by a project.
+  """
+
+  #: The survey for which this entity is a record.
+  grading_survey = db.ReferenceProperty(GradingProjectSurvey,
+                                collection_name="grading_survey_records")
+
+  #: Required grade given to the project that this survey is about.
+  grade = db.BooleanProperty(required=True)
+
+  def getSurvey(self):
+    """Returns the GradingProjectSurvey that belongs to this record.
+    """
+    return self.grading_survey

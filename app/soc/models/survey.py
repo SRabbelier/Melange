@@ -32,6 +32,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.work
+from soc.models.program import Program
 
 
 class SurveyContent(db.Expando):
@@ -95,14 +96,13 @@ class Survey(soc.models.work.Work):
   # these are GSoC specific, so eventually we can subclass this
   SURVEY_TAKING_ACCESS = ['student', 
                           'mentor',
-                          'student evaluation',
-                          'mentor evaluation',
                           'org_admin',
                           'user',
                           'public']
   GRADE_OPTIONS = {'midterm':['mid_term_passed', 'mid_term_failed'],
                    'final':['final_passed', 'final_failed'],
                    'N/A':[] }
+
   prefix = db.StringProperty(default='program', required=True,
       choices=['site', 'club', 'sponsor', 'program', 'org', 'user'],
       verbose_name=ugettext('Prefix'))
@@ -156,3 +156,42 @@ class Survey(soc.models.work.Work):
   #: Referenceproperty that specifies the content of this survey.
   survey_content = db.ReferenceProperty(SurveyContent,
                                      collection_name="survey_parent")
+
+  #: Survey kind, a helper for handling the different classes on creation.
+  survey_kind = db.StringProperty(default='', required=False,
+                                  choices=('', 'project', 'grading'))
+
+  def getRecords(self):
+    """Returns all SurveyRecords belonging to this survey.
+    """
+    return self.survey_records
+
+
+class ProjectSurvey(Survey):
+  """Survey for Students that have a StudentProject.
+  """
+
+  def __init__(self, *args, **kwargs):
+    super(ProjectSurvey, self).__init__(*args, **kwargs)
+    self.prefix = 'program'
+    self.taking_access = 'student'
+    self.scope = Program.get_by_key_name(self.scope_path)
+
+  def getRecords(self):
+    """Returns all ProjectSurveyRecords belonging to this survey.
+    """
+    return self.project_survey_records
+
+
+class GradingProjectSurvey(ProjectSurvey):
+  """Survey for Mentors that have a StudentProject.
+  """
+
+  def __init__(self, *args, **kwargs):
+    super(GradingProjectSurvey, self).__init__(*args, **kwargs)
+    self.taking_access = 'mentor'
+
+  def getRecords(self):
+    """Returns all GradingProjectSurveyRecords belonging to this survey.
+    """
+    return self.grading_survey_records

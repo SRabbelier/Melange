@@ -26,12 +26,15 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc.models.survey_record import SurveyRecord
+from soc.models.survey_record import GradingProjectSurveyRecord
+from soc.models.survey_record import ProjectSurveyRecord
 import soc.models.user
 
 
 class SurveyRecordGroup(db.Expando):
-  """Because Mentors and Students take different surveys,
+  """Explicitly group SurveyRecords with a common project.
+
+  Because Mentors and Students take different surveys,
   we cannot simply link survey records by a common project and survey.
 
   Instead, we establish a SurveyRecordGroup.
@@ -44,12 +47,15 @@ class SurveyRecordGroup(db.Expando):
   against unpredictable behavior. 
   """
 
+  # TODO Create SurveyGroup model that contains the two Surveys as to make
+  # it possible to setup which surveys should be grouped.
+
   #: Mentor SurveyRecord for this evaluation.
-  mentor_record = db.ReferenceProperty(SurveyRecord, required=False,
+  mentor_record = db.ReferenceProperty(GradingProjectSurveyRecord, required=False,
                               collection_name='mentor_record_groups')
 
   #: Student SurveyRecord for this evaluation.
-  student_record = db.ReferenceProperty(SurveyRecord, required=False,
+  student_record = db.ReferenceProperty(ProjectSurveyRecord, required=False,
                               collection_name='student_record_groups')
 
   #: Project for this evaluation.

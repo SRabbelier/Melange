@@ -35,6 +35,8 @@ from soc.logic.models import work
 from soc.models.program import Program
 from soc.models import student_project
 from soc.models.survey import Survey
+from soc.models.survey import ProjectSurvey
+from soc.models.survey import GradingProjectSurvey
 from soc.models.survey import SurveyContent
 from soc.models.survey_record import SurveyRecord
 from soc.models.survey_record_group import SurveyRecordGroup
@@ -199,8 +201,6 @@ class Logic(work.Logic):
         user.key().name(), str(students)) )
         return False
 
-      this_student = students[0]
-
   def getStudentforProject(self, user, project):
     """Get student projects for a given User.
 
@@ -256,7 +256,7 @@ class Logic(work.Logic):
       % (survey.key().name(), survey.taking_access))
       return False
 
-    program = survey.scope
+    program = survey.scope or Program.get_by_key_name(survey.scope_path)
 
     for project in program.student_projects.fetch(1000):
       this_record_group = SurveyRecordGroup.all().filter(
@@ -289,7 +289,7 @@ class Logic(work.Logic):
          project.key().name(), this_record_group.final_status ) )
          continue
 
-      # assign the new status to the project and s
+      # assign the new status to the project and surveyrecordgroup
       project.status = new_project_status
       this_record_group.final_status = new_project_status
 
@@ -313,12 +313,14 @@ class Logic(work.Logic):
       survey = survey entity
       user = survey taking user
     """
-    this_program = survey.scope
+
+    this_program = survey.scope or Program.get_by_key_name(survey.scope_path)
+
 
     if 'mentor' in survey.taking_access:
       these_projects = self.getMentorProjects(user, this_program)
 
-    if 'student' in survey.taking_access:
+    elif 'student' in survey.taking_access:
       these_projects = self.getStudentProjects(user, this_program)
 
     logging.info(these_projects)
@@ -403,4 +405,8 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
+
 logic = Logic()
+# TODO separate project and grading logic into own class to overwrite methods
+project_logic = Logic(model=ProjectSurvey)
+grading_logic = Logic(model=GradingProjectSurvey)

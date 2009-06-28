@@ -26,6 +26,7 @@ __authors__ = [
 
 from itertools import chain
 import datetime
+import logging
 
 from google.appengine.ext.db import djangoforms
 
@@ -95,7 +96,7 @@ class SurveyForm(djangoforms.ModelForm):
       return
 
     self.survey_fields = {}
-    schema = eval(self.survey_content.schema)
+    schema = SurveyContentSchema(self.survey_content.schema)
     has_record = (not self.editing) and self.survey_record
     extra_attrs = {}
 
@@ -105,7 +106,7 @@ class SurveyForm(djangoforms.ModelForm):
       read_only = self.read_only
 
       if not read_only:
-        deadline = self.survey_content.survey_parent.get().deadline
+        deadline = self.survey_content.survey_parent.get().survey_end
         read_only =  deadline and (datetime.datetime.now() > deadline)
       else:
         extra_attrs['disabled'] = 'disabled'

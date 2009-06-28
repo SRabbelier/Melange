@@ -306,7 +306,7 @@ class View(base.View):
     return True
 
   def getStatus(self, request, context, user, survey):
-    """Determine if we're past deadline or before opening, check user rights.
+    """Determine if the survey is available for taking, check user rights.
     """
 
     read_only = (context.get("read_only", False) or
@@ -315,8 +315,8 @@ class View(base.View):
                  )
     now = datetime.datetime.now()
 
-    # check deadline, see check for opening below
-    if survey.deadline and now > survey.deadline:
+    # check survey end date, see check for start below
+    if survey.survey_end and now > survey.survey_end:
       # are we already passed the deadline?
       context["notice"] = "The Deadline For This Survey Has Passed"
       read_only = True
@@ -330,11 +330,11 @@ class View(base.View):
 
 
     not_ready = False
-    # check if we're past the opening date
-    if survey.opening and now < survey.opening:
+    # check if we're past the start date
+    if survey.survey_start and now < survey.survey_start:
       not_ready = True
 
-      # only users that can edit a survey should see it before opening
+      # only users that can edit a survey should see it before it can be taken
       if not can_write:
         context["notice"] = "There is no such survey available."
         return False
@@ -349,11 +349,11 @@ class View(base.View):
     """
 
     if not read_only:
-      if not survey.deadline:
+      if not survey.survey_end:
         deadline_text = ""
       else:
         deadline_text = " by " + str(
-      survey.deadline.strftime("%A, %d. %B %Y %I:%M%p"))
+      survey.survey_end.strftime("%A, %d. %B %Y %I:%M%p"))
 
       if survey_record:
         help_text = "Edit and re-submit this survey" + deadline_text + "."
@@ -637,14 +637,14 @@ class View(base.View):
     context.update(local)
 
     params['edit_form'] = HelperForm(params['edit_form'])
-    if entity.deadline and datetime.datetime.now() > entity.deadline:
-      # are we already passed the deadline?
+    if entity.survey_end and datetime.datetime.now() > entity.survey_end:
+      # are we already passed the survey end date?
       context["passed_deadline"] = True
 
     return super(View, self).editGet(request, entity, context, params=params)
 
   def getMenusForScope(self, entity, params):
-    """List featured surveys iff after the opening date and before deadline.
+    """List featured surveys iff after they are availble to be taken.
     """
 
     # only list surveys for registered users
@@ -689,11 +689,11 @@ class View(base.View):
       elif not survey_rights[entity.read_access]:
         continue
 
-      # omit if either before opening or after deadline
-      if entity.opening and entity.opening > now:
+      # omit if either before start or after end
+      if entity.survey_start and entity.survey_start > now:
         continue
 
-      if entity.deadline and entity.deadline < now:
+      if entity.survey_end and entity.survey_end < now:
         continue
 
       #TODO only if a document is readable it might be added

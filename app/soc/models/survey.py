@@ -142,14 +142,14 @@ class Survey(soc.models.work.Work):
       ' in the sidebar menu.')
 
   #: Date at which the survey becomes available for taking.
-  opening = db.DateTimeProperty(required=False)
-  opening.help_text = ugettext(
+  survey_start = db.DateTimeProperty(required=False)
+  survey_start.help_text = ugettext(
       'Indicates a date before which this survey'
       ' cannot be taken or displayed.')
 
   #: Deadline for taking survey.
-  deadline = db.DateTimeProperty(required=False)
-  deadline.help_text = ugettext(
+  survey_end = db.DateTimeProperty(required=False)
+  survey_end.help_text = ugettext(
       'Indicates a date after which this survey'
       ' cannot be taken.')
 

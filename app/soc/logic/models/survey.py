@@ -30,7 +30,6 @@ from google.appengine.ext import db
 
 from soc.cache import sidebar
 from soc.logic.models import linkable as linkable_logic
-from soc.logic.models.news_feed import logic as newsfeed_logic
 from soc.logic.models.user import logic as user_logic
 from soc.logic.models import work
 from soc.models.program import Program

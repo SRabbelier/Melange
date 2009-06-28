@@ -110,15 +110,17 @@ def getHomeRedirect(entity, params):
   return '/%s/home/%s' % (
       params['url_name'], entity.key().id_or_name())
 
+
 def getReviewRedirect(entity, params):
   """Returns the redirect to review the specified entity.
   """
-  
+
   return '/%s/review/%s' % (
       params['url_name'], entity.key().id_or_name())
 
+
 def getReviewOverviewRedirect(entity, params):
-  """Returns the redirect to the review_overview using the 
+  """Returns the redirect to the review_overview using the
      keyname of the specified entity.
   """
 
@@ -343,6 +345,27 @@ def getListDocumentsRedirect(entity, prefix):
   """
 
   return '/document/list/%s/%s' % (prefix, entity.key().id_or_name())
+
+
+def getCreateSurveyRedirect(entity, prefix):
+  """Returns the redirect for new documents.
+  """
+
+  return '/survey/create/%s/%s' % (prefix, entity.key().id_or_name())
+
+
+def getListSurveysRedirect(entity, prefix):
+  """Returns the redirect for listing documents.
+  """
+
+  return '/survey/list/%s/%s' % (prefix, entity.key().id_or_name())
+
+
+def getListSurveyResultsRedirect(entity, prefix):
+  """Returns the redirect for listing documents.
+  """
+
+  return '/survey/list_results/%s/%s' % (prefix, entity.key().id_or_name())
 
 
 def getToSRedirect(presence):

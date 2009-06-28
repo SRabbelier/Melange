@@ -404,19 +404,3 @@ class Logic(work.Logic):
     return entity.scope
 
 logic = Logic()
-
-
-class ResultsLogic(work.Logic):
-  """Logic methods for listing results for Surveys.
-  """
-
-  def __init__(self, model=SurveyRecord,
-               base_model=None, scope_logic=None):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(ResultsLogic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
-
-
-results_logic = ResultsLogic()

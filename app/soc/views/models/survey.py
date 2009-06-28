@@ -40,7 +40,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import logic as survey_logic
-from soc.logic.models.survey import results_logic
+from soc.logic.models.survey_record import logic as results_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
 from soc.models.survey_record import SurveyRecord

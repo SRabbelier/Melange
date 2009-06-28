@@ -40,7 +40,7 @@ from django.utils.safestring import mark_safe
 from soc.logic import dicts
 from soc.logic.lists import Lists
 from soc.logic.models.survey import logic as survey_logic
-from soc.logic.models.survey import results_logic
+from soc.logic.models.survey_record import logic as results_logic
 from soc.models.survey import SurveyContent
 
 

@@ -24,6 +24,8 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.logic.models.survey import grading_logic as grading_survey_logic
+from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.models import project_survey
 
 

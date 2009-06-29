@@ -24,6 +24,8 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.logic.models.survey import project_logic as project_survey_logic
+from soc.views.helper import access
+from soc.views.helper import decorators
 from soc.views.models import survey
 
 

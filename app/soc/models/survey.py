@@ -32,7 +32,6 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.work
-from soc.models.program import Program
 
 
 class SurveyContent(db.Expando):

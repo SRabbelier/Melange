@@ -102,13 +102,12 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = ['checkIsSurveyReadable']
+    rights['show'] = [('checkIsSurveyReadable', survey_logic)]
     rights['create'] = ['checkIsUser']
-    rights['edit'] = ['checkIsSurveyWritable']
-    rights['delete'] = ['checkIsSurveyWritable']
+    rights['edit'] = [('checkIsSurveyWritable', survey_logic)]
+    rights['delete'] = [('checkIsSurveyWritable', survey_logic)]
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
-    rights['grade'] = ['checkIsSurveyGradable']
 
     new_params = {}
     # TODO(ajaksu) pass logic in a way views can use them
@@ -720,6 +719,7 @@ class View(base.View):
       submenus.append(submenu)
     return submenus
 
+  # TODO the following two methods should move to GradingProjectSurvey
   def activate(self, request, **kwargs):
     """This is a hack to support the 'Enable grades' button.
     """

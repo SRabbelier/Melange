@@ -331,7 +331,6 @@ class View(base.View):
     rights = self._params['rights']
     can_write = access.Checker.hasMembership(rights, roles, params)
 
-
     not_ready = False
     # check if we're past the start date
     if survey.survey_start and now < survey.survey_start:
@@ -394,19 +393,6 @@ class View(base.View):
                                                filter={})
 
     super(View, self)._editContext(request, context)
-
-  def createPost(self, request, context, params):
-
-    # TODO(ajaksu) create new View class for other surveys
-    survey_type = request.POST.get('survey_type')
-    if not survey_type:
-      self._logic = params['logic'] = survey_logic
-    elif survey_type == 'project':
-      self._logic =  params['logic'] = project_logic
-    elif survey_type == 'grading':
-      self._logic = params['logic'] = grading_logic
-
-    return super(View, self).createPost(request, context, params)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

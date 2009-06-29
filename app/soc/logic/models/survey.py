@@ -35,8 +35,8 @@ from soc.logic.models import work
 from soc.models.program import Program
 from soc.models import student_project
 from soc.models.survey import Survey
-from soc.models.survey import ProjectSurvey
-from soc.models.survey import GradingProjectSurvey
+from soc.models.grading_project_survey import GradingProjectSurvey
+from soc.models.project_survey import ProjectSurvey
 from soc.models.survey import SurveyContent
 from soc.models.survey_record import SurveyRecord
 from soc.models.survey_record_group import SurveyRecordGroup

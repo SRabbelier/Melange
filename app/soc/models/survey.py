@@ -165,33 +165,3 @@ class Survey(soc.models.work.Work):
     """Returns all SurveyRecords belonging to this survey.
     """
     return self.survey_records
-
-
-class ProjectSurvey(Survey):
-  """Survey for Students that have a StudentProject.
-  """
-
-  def __init__(self, *args, **kwargs):
-    super(ProjectSurvey, self).__init__(*args, **kwargs)
-    self.prefix = 'program'
-    self.taking_access = 'student'
-    self.scope = Program.get_by_key_name(self.scope_path)
-
-  def getRecords(self):
-    """Returns all ProjectSurveyRecords belonging to this survey.
-    """
-    return self.project_survey_records
-
-
-class GradingProjectSurvey(ProjectSurvey):
-  """Survey for Mentors that have a StudentProject.
-  """
-
-  def __init__(self, *args, **kwargs):
-    super(GradingProjectSurvey, self).__init__(*args, **kwargs)
-    self.taking_access = 'mentor'
-
-  def getRecords(self):
-    """Returns all GradingProjectSurveyRecords belonging to this survey.
-    """
-    return self.grading_survey_records

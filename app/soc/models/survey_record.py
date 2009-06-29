@@ -33,8 +33,8 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models.survey import Survey
-from soc.models.survey import GradingProjectSurvey
-from soc.models.survey import ProjectSurvey
+from soc.models.grading_project_survey import GradingProjectSurvey
+from soc.models.project_survey import ProjectSurvey
 import soc.models.student_project
 import soc.models.user
 

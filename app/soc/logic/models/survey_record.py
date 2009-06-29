@@ -87,7 +87,7 @@ class ProjectLogic(Logic):
   """
 
   def __init__(self, model=ProjectSurveyRecord,
-               base_model=None, scope_logic=None):
+               base_model=SurveyRecord, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 
@@ -100,7 +100,7 @@ class GradingProjectLogic(ProjectLogic):
   """
 
   def __init__(self, model=GradingProjectSurveyRecord,
-               base_model=None, scope_logic=None):
+               base_model=ProjectSurveyRecord, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 

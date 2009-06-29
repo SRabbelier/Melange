@@ -410,7 +410,7 @@ class ProjectLogic(Logic):
   """
 
   def __init__(self, model=ProjectSurvey,
-               base_model=None, scope_logic=None):
+               base_model=Survey, scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.
     """
 
@@ -423,7 +423,7 @@ class GradingProjectLogic(ProjectLogic):
   """
 
   def __init__(self, model=GradingProjectSurvey,
-               base_model=None, scope_logic=None):
+               base_model=ProjectSurvey, scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.
     """
 

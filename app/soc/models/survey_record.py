@@ -15,10 +15,6 @@
 # limitations under the License.
 
 """SurveyRecord represents a single Survey result.
-
-ProjectSurveyRecord allows linking two result sets by StudentProject.
-
-GradingProjectSurveyRecord stores the grade in an evaluation survey.
 """
 
 __authors__ = [
@@ -33,9 +29,6 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models.survey import Survey
-from soc.models.grading_project_survey import GradingProjectSurvey
-from soc.models.project_survey import ProjectSurvey
-import soc.models.student_project
 import soc.models.user
 
 
@@ -80,42 +73,3 @@ class SurveyRecord(BaseSurveyRecord):
     """Returns the Survey belonging to this record.
     """
     return self.survey
-
-class ProjectSurveyRecord(SurveyRecord):
-  """Record linked to a Project, enabling to store which Projects had their
-  Survey done.
-  """
-
-  #: The survey for which this entity is a record.
-  project_survey = db.ReferenceProperty(ProjectSurvey,
-                                collection_name="project_survey_records")
-
-  #: Reference to the Project that this record belongs to.
-  project = db.ReferenceProperty(soc.models.student_project.StudentProject,
-                                 collection_name="survey_records")
-
-  def getSurvey(self):
-    """Returns the ProjectSurvey that belongs to this record.
-    """
-    return self.project_survey
-
-
-class GradingProjectSurveyRecord(ProjectSurveyRecord):
-  """Grading record for evaluation surveys.
-
-  Represents the grading part of a evaluation survey group (usually a pair)
-  where the grading (e.g. Mentor's) survey is linked to a non-grading (e.g
-  Student's) one by a project.
-  """
-
-  #: The survey for which this entity is a record.
-  grading_survey = db.ReferenceProperty(GradingProjectSurvey,
-                                collection_name="grading_survey_records")
-
-  #: Required grade given to the project that this survey is about.
-  grade = db.BooleanProperty(required=True)
-
-  def getSurvey(self):
-    """Returns the GradingProjectSurvey that belongs to this record.
-    """
-    return self.grading_survey

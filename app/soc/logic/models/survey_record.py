@@ -26,8 +26,8 @@ from google.appengine.ext import db
 
 from soc.logic.models import work
 from soc.models.survey_record import SurveyRecord
-from soc.models.survey_record import ProjectSurveyRecord
-from soc.models.survey_record import GradingProjectSurveyRecord
+from soc.models.grading_project_survey_record import GradingProjectSurveyRecord
+from soc.models.project_survey_record import ProjectSurveyRecord
 
 
 class Logic(work.Logic):

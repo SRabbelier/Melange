@@ -26,8 +26,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-from soc.models.survey_record import GradingProjectSurveyRecord
-from soc.models.survey_record import ProjectSurveyRecord
+from soc.models.grading_project_survey_record import GradingProjectSurveyRecord
+from soc.models.project_survey_record import ProjectSurveyRecord
 import soc.models.user
 
 

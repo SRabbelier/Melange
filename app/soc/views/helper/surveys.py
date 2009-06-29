@@ -66,23 +66,21 @@ class SurveyForm(djangoforms.ModelForm):
     """
 
     self.kwargs = kwargs
-    self.survey_content = self.kwargs.get('survey_content', None)
-    self.this_user = self.kwargs.get('this_user', None)
-    self.project = self.kwargs.get('project', None)
-    self.survey_record = self.kwargs.get('survey_record', None)
+    self.survey_content = self.kwargs.pop('survey_content', None)
+    self.this_user = self.kwargs.pop('this_user', None)
+    self.project = self.kwargs.pop('project', None)
+    self.survey_record = self.kwargs.pop('survey_record', None)
 
-    del self.kwargs['survey_content']
-    del self.kwargs['this_user']
-    del self.kwargs['project']
-    del self.kwargs['survey_record']
+    self.read_only = self.kwargs.pop('read_only', None)
+    self.editing = self.kwargs.pop('editing', None)
 
-    self.read_only = self.kwargs.get('read_only', None)
-    if 'read_only' in self.kwargs:
-      del self.kwargs['read_only']
-
-    self.editing = self.kwargs.get('editing', None)
-    if 'editing' in self.kwargs:
-      del self.kwargs['editing']
+    self.fields_map = dict(
+        long_answer=self.addLongField,
+        short_answer=self.addShortField,
+        selection=self.addSingleField,
+        pick_multi=self.addMultiField,
+        pick_quant=self.addQuantField,
+        )
 
     super(SurveyForm, self).__init__(*args, **self.kwargs)
 
@@ -125,31 +123,13 @@ class SurveyForm(djangoforms.ModelForm):
         # use prompts set by survey creator
         value = getattr(self.survey_content, field)
 
-      if field not in schema:
-        logging.error('field %s not found in schema %s' %
-        (field, str(schema) ) )
-        continue 
-      elif 'question' in schema[field]:
-        label = schema[field].get('question', None) or field
-      else:
-        label = field
+      label = schema.getLabel(field)
+      if label is None:
+        continue
 
       # dispatch to field-specific methods
-      if schema[field]["type"] == "long_answer":
-        self.addLongField(field, value, extra_attrs, label=label,
-                          comment=comment)
-      elif schema[field]["type"] == "short_answer":
-        self.addShortField(field, value, extra_attrs, label=label,
-                           comment=comment)
-      elif schema[field]["type"] == "selection":
-        self.addSingleField(field, value, extra_attrs, schema, label=label,
-                            comment=comment)
-      elif schema[field]["type"] == "pick_multi":
-        self.addMultiField(field, value, extra_attrs, schema, label=label,
-                           comment=comment)
-      elif schema[field]["type"] == "pick_quant":
-        self.addQuantField(field, value, extra_attrs, schema, label=label,
-                           comment=comment)
+      addField = self.fields_map[schema.getType(field)]
+      addField(field, value, extra_attrs, schema, label=label, comment=comment)
 
     return self.insertFields()
 
@@ -169,7 +149,7 @@ class SurveyForm(djangoforms.ModelForm):
                            self.survey_fields[property])
     return self.fields
 
-  def addLongField(self, field, value, attrs, req=False, label='', tip='',
+  def addLongField(self, field, value, attrs, schema, req=False, label='', tip='',
                    comment=''):
     """Add a long answer fields to this form.
 
@@ -177,10 +157,11 @@ class SurveyForm(djangoforms.ModelForm):
       field: the current field
       value: the initial value for this field
       attrs: additional attributes for field
+      schema: schema for survey
       req: required bool
       label: label for field
       tip: tooltip text for field
-      comment: initial comment value for field 
+      comment: initial comment value for field
     """
 
     widget = widgets.Textarea(attrs=attrs)
@@ -190,15 +171,11 @@ class SurveyForm(djangoforms.ModelForm):
 
     question = CharField(help_text=tip, required=req, label=label,
                          widget=widget, initial=value)
+
     self.survey_fields[field] = question
+    self.addCommentField(field, comment, attrs, tip)
 
-    if not self.editing:
-      widget = widgets.Textarea(attrs=attrs)
-      comment = CharField(help_text=tip, required=False, label='Comments',
-                          widget=widget, initial=comment)
-      self.survey_fields['comment_for_' + field] = comment
-
-  def addShortField(self, field, value, attrs, req=False, label='', tip='',
+  def addShortField(self, field, value, attrs, schema, req=False, label='', tip='',
                     comment=''):
     """Add a short answer fields to this form.
 
@@ -206,10 +183,11 @@ class SurveyForm(djangoforms.ModelForm):
       field: the current field
       value: the initial value for this field
       attrs: additional attributes for field
+      schema: schema for survey
       req: required bool
       label: label for field
       tip: tooltip text for field
-      comment: initial comment value for field 
+      comment: initial comment value for field
     """
 
     attrs['class'] = "text_question"
@@ -220,13 +198,9 @@ class SurveyForm(djangoforms.ModelForm):
 
     question = CharField(help_text=tip, required=req, label=label,
                          widget=widget, max_length=140, initial=value)
-    self.survey_fields[field] = question
 
-    if not self.editing:
-      widget = widgets.Textarea(attrs=attrs)
-      comment = CharField(help_text=tip, required=False, label='Comments',
-                          widget=widget, initial=comment)
-      self.survey_fields['comment_for_' + field] = comment
+    self.survey_fields[field] = question
+    self.addCommentField(field, comment, attrs, tip)
 
   def addSingleField(self, field, value, attrs, schema, req=False, label='',
                      tip='', comment=''):
@@ -243,12 +217,7 @@ class SurveyForm(djangoforms.ModelForm):
       comment: initial comment value for field
     """
 
-    if self.editing:
-      kind = schema[field]["type"]
-      render = schema[field]["render"]
-      widget = UniversalChoiceEditor(kind, render)
-    else:
-      widget = WIDGETS[schema[field]['render']](attrs=attrs)
+    widget = schema.getWidget(field, self.editing, attrs)
 
     these_choices = []
     # add all properties, but select chosen one
@@ -266,13 +235,9 @@ class SurveyForm(djangoforms.ModelForm):
 
     question = PickOneField(help_text=tip, required=req, label=label,
                             choices=tuple(these_choices), widget=widget)
-    self.survey_fields[field] = question
 
-    if not self.editing:
-      widget = widgets.Textarea(attrs=attrs)
-      comment = CharField(help_text=tip, required=False, label='Comments',
-                          widget=widget, initial=comment)
-      self.survey_fields['comment_for_' + field] = comment
+    self.survey_fields[field] = question
+    self.addCommentField(field, comment, attrs, tip)
 
   def addMultiField(self, field, value, attrs, schema, req=False, label='',
                     tip='', comment=''):
@@ -287,14 +252,10 @@ class SurveyForm(djangoforms.ModelForm):
       label: label for field
       tip: tooltip text for field
       comment: initial comment value for field
+
     """
 
-    if self.editing:
-      kind = schema[field]["type"]
-      render = schema[field]["render"]
-      widget = UniversalChoiceEditor(kind, render)
-    else:
-      widget = WIDGETS[schema[field]['render']](attrs=attrs)
+    widget = schema.getWidget(field, self.editing, attrs)
 
     # TODO(ajaksu) need to allow checking checkboxes by default
     if self.survey_record and isinstance(value, basestring):
@@ -310,12 +271,9 @@ class SurveyForm(djangoforms.ModelForm):
     question = PickManyField(help_text=tip, required=req, label=label,
                              choices=tuple(these_choices), widget=widget,
                              initial=value)
+
     self.survey_fields[field] = question
-    if not self.editing:
-      widget = widgets.Textarea(attrs=attrs)
-      comment = CharField(help_text=tip, required=False, label='Comments',
-                          widget=widget, initial=comment)
-      self.survey_fields['comment_for_' + field] = comment
+    self.addCommentField(field, comment, attrs, tip)
 
   def addQuantField(self, field, value, attrs, schema, req=False, label='',
                     tip='', comment=''):
@@ -330,14 +288,10 @@ class SurveyForm(djangoforms.ModelForm):
       label: label for field
       tip: tooltip text for field
       comment: initial comment value for field
+
     """
 
-    if self.editing:
-      kind = schema[field]["type"]
-      render = schema[field]["render"]
-      widget = UniversalChoiceEditor(kind, render)
-    else:
-      widget = WIDGETS[schema[field]['render']](attrs=attrs)
+    widget = schema.getWidget(field, self.editing, attrs)
 
     if self.survey_record:
       value = value
@@ -352,16 +306,58 @@ class SurveyForm(djangoforms.ModelForm):
                              choices=tuple(these_choices), widget=widget,
                              initial=value)
     self.survey_fields[field] = question
+    self.addCommentField(field, comment, attrs, tip)
+
+  def addCommentField(self, field, comment, attrs, tip):
     if not self.editing:
       widget = widgets.Textarea(attrs=attrs)
       comment = CharField(help_text=tip, required=False, label='Comments',
                           widget=widget, initial=comment)
       self.survey_fields['comment_for_' + field] = comment
 
-
   class Meta(object):
     model = SurveyContent
     exclude = ['schema']
+
+
+class SurveyContentSchema(object):
+  """Abstract question metadata handling.
+  """
+
+  def __init__(self, schema):
+    self.schema = eval(schema)
+
+  def getType(self, field):
+    return self.schema[field]["type"]
+
+  def getRender(self, field):
+    return self.schema[field]["render"]
+
+  def getWidget(self, field, editing, attrs):
+    """Get survey editing or taking widget for choice questions.
+    """
+
+    if editing:
+      kind = self.getType(field)
+      render = self.getRender(field)
+      widget = UniversalChoiceEditor(kind, render)
+    else:
+      widget = WIDGETS[self.schema[field]['render']](attrs=attrs)
+    return widget
+
+  def getLabel(self, field):
+    """Fetch the free text 'question' or use field name as label.
+    """
+
+    if field not in self.schema:
+      logging.error('field %s not found in schema %s' %
+                    (field, str(self.schema)))
+      return
+    elif 'question' in self.schema[field]:
+      label = self.schema[field].get('question') or field
+    else:
+      label = field
+    return label
 
 
 class UniversalChoiceEditor(widgets.Widget):
@@ -600,9 +596,9 @@ class SurveyResults(widgets.Widget):
 def getRoleSpecificFields(survey, user, this_project, survey_form,
                           survey_record):
   """For evaluations, mentors get required Project and Grade fields, and
-  students get a required Project field. 
+  students get a required Project field.
 
-  Because we need to get a list of the user's projects, we call the 
+  Because we need to get a list of the user's projects, we call the
   logic getProjects method, which doubles as an access check.
   (No projects means that the survey cannot be taken.)
 
@@ -615,11 +611,10 @@ def getRoleSpecificFields(survey, user, this_project, survey_form,
       or None
   """
 
-  from django import forms
-
   field_count = len(eval(survey.survey_content.schema).items())
   these_projects = survey_logic.getProjects(survey, user)
-  if not these_projects: return False # no projects found
+  if not these_projects:
+    return False # no projects found
 
   project_pairs = []
   #insert a select field with options for each project

@@ -405,8 +405,32 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
+class ProjectLogic(Logic):
+  """Logic class for ProjectSurvey.
+  """
+
+  def __init__(self, model=ProjectSurvey,
+               base_model=None, scope_logic=None):
+    """Defines the name, key_name and model for this entity.
+    """
+
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
+
+
+class GradingProjectLogic(ProjectLogic):
+  """Logic class for GradingProjectSurvey
+  """
+
+  def __init__(self, model=GradingProjectSurvey,
+               base_model=None, scope_logic=None):
+    """Defines the name, key_name and model for this entity.
+    """
+
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
+
 
 logic = Logic()
-# TODO separate project and grading logic into own class to overwrite methods
-project_logic = Logic(model=ProjectSurvey)
-grading_logic = Logic(model=GradingProjectSurvey)
+project_logic = ProjectLogic()
+grading_logic = GradingProjectLogic()

@@ -82,10 +82,35 @@ class Logic(work.Logic):
     return survey_record
 
 
+class ProjectLogic(Logic):
+  """Logic class for ProjectSurveyRecord.
+  """
+
+  def __init__(self, model=ProjectSurveyRecord,
+               base_model=None, scope_logic=None):
+    """Defines the name, key_name and model for this entity.
+    """
+
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
+
+
+class GradingProjectLogic(ProjectLogic):
+  """Logic class for GradingProjectSurveyRecord
+  """
+
+  def __init__(self, model=GradingProjectSurveyRecord,
+               base_model=None, scope_logic=None):
+    """Defines the name, key_name and model for this entity.
+    """
+
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
+
+
 logic = Logic()
-# TODO separate project and grading logic into own class to overwrite methods
-project_logic = Logic(model=ProjectSurveyRecord)
-grading_logic = Logic(model=GradingProjectSurveyRecord)
+project_logic = ProjectLogic()
+grading_logic = GradingProjectLogic()
 
 
 def updateSurveyRecord(user, survey, survey_record, fields):

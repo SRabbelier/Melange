@@ -156,10 +156,6 @@ class Survey(soc.models.work.Work):
   survey_content = db.ReferenceProperty(SurveyContent,
                                      collection_name="survey_parent")
 
-  #: Survey kind, a helper for handling the different classes on creation.
-  survey_kind = db.StringProperty(default='', required=False,
-                                  choices=('', 'project', 'grading'))
-
   def getRecords(self):
     """Returns all SurveyRecords belonging to this survey.
     """

@@ -22,28 +22,23 @@ __authors__ = [
   '"James Levy" <jamesalexanderlevy@gmail.com>',
   ]
 
-
 import csv
 import datetime
 import re
 import StringIO
 import string
-
-from google.appengine.ext import db
-
 from django import forms
 from django import http
 from django.utils import simplejson
 
+from google.appengine.ext import db
+
 from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import logic as survey_logic
-from soc.logic.models.survey import project_logic
-from soc.logic.models.survey import grading_logic
-from soc.logic.models.survey_record import logic as results_logic
-from soc.logic.models.survey_record import updateSurveyRecord
+from soc.logic.models.survey import results_logic
+from soc.logic.models.survey import GRADES
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
 from soc.models.survey_record import SurveyRecord
@@ -102,15 +97,15 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = [('checkIsSurveyReadable', survey_logic)]
+    rights['show'] = ['checkIsSurveyReadable']
     rights['create'] = ['checkIsUser']
-    rights['edit'] = [('checkIsSurveyWritable', survey_logic)]
-    rights['delete'] = [('checkIsSurveyWritable', survey_logic)]
+    rights['edit'] = ['checkIsSurveyWritable']
+    rights['delete'] = ['checkIsSurveyWritable']
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
+    rights['grade'] = ['checkIsSurveyGradable']
 
     new_params = {}
-    # TODO(ajaksu) pass logic in a way views can use them
     new_params['logic'] = survey_logic
     new_params['rights'] = rights
 
@@ -127,6 +122,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>results)/%(scope)s$',
          'soc.views.models.%(module_name)s.results',
          'View survey results for %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>show)/user/(?P<link_id>)\w+$',
+         'soc.views.models.%(module_name)s.results',
+         'View survey results for user'),
         ]
 
     new_params['export_content_type'] = 'text/text'
@@ -198,10 +196,12 @@ class View(base.View):
   def _public(self, request, entity, context):
     """Survey taking and result display handler.
 
+
     Args:
       request: the django request object
       entity: the entity to make public
       context: the context object
+
 
     -- Taking Survey Pages Are Not 'Public' --
 
@@ -221,7 +221,7 @@ class View(base.View):
 
     --- Deadlines ---
 
-    A deadline can also be used as a conditional for updating values,
+    A survey_end can also be used as a conditional for updating values,
     we have a special read_only UI and a check on the POST handler for this.
     Passing read_only=True here allows one to fetch the read_only view.
     """
@@ -271,12 +271,12 @@ class View(base.View):
       else:
         # save/update the submitted survey
         context['notice'] = "Survey Submission Saved"
-        survey_record = updateSurveyRecord(user, survey, survey_record,
-                                           request.POST)
+        survey_record = survey_logic.updateSurveyRecord(user, survey,
+        survey_record, request.POST)
     survey_content = survey.survey_content
 
     if not survey_record and read_only:
-      # no recorded answers, we're either past deadline or want to see answers
+      # no recorded answers, we're either past survey_end or want to see answers
       is_same_user = user.key() == user_logic.getForCurrentAccount().key()
 
       if not can_write or not is_same_user:
@@ -309,7 +309,7 @@ class View(base.View):
     return True
 
   def getStatus(self, request, context, user, survey):
-    """Determine if the survey is available for taking, check user rights.
+    """Determine if we're past survey_end or before survey_start, check user rights.
     """
 
     read_only = (context.get("read_only", False) or
@@ -318,9 +318,9 @@ class View(base.View):
                  )
     now = datetime.datetime.now()
 
-    # check survey end date, see check for start below
+    # check survey_end, see check for survey_start below
     if survey.survey_end and now > survey.survey_end:
-      # are we already passed the deadline?
+      # are we already passed the survey_end?
       context["notice"] = "The Deadline For This Survey Has Passed"
       read_only = True
 
@@ -331,12 +331,13 @@ class View(base.View):
     rights = self._params['rights']
     can_write = access.Checker.hasMembership(rights, roles, params)
 
+
     not_ready = False
-    # check if we're past the start date
+    # check if we're past the survey_start date
     if survey.survey_start and now < survey.survey_start:
       not_ready = True
 
-      # only users that can edit a survey should see it before it can be taken
+      # only users that can edit a survey should see it before survey_start
       if not can_write:
         context["notice"] = "There is no such survey available."
         return False
@@ -352,16 +353,16 @@ class View(base.View):
 
     if not read_only:
       if not survey.survey_end:
-        deadline_text = ""
+        survey_end_text = ""
       else:
-        deadline_text = " by " + str(
+        survey_end_text = " by " + str(
       survey.survey_end.strftime("%A, %d. %B %Y %I:%M%p"))
 
       if survey_record:
-        help_text = "Edit and re-submit this survey" + deadline_text + "."
+        help_text = "Edit and re-submit this survey" + survey_end_text + "."
         status = "edit"
       else:
-        help_text = "Please complete this survey" + deadline_text + "."
+        help_text = "Please complete this survey" + survey_end_text + "."
         status = "create"
 
     else:
@@ -640,13 +641,13 @@ class View(base.View):
 
     params['edit_form'] = HelperForm(params['edit_form'])
     if entity.survey_end and datetime.datetime.now() > entity.survey_end:
-      # are we already passed the survey end date?
-      context["passed_deadline"] = True
+      # are we already passed the survey_end?
+      context["passed_survey_end"] = True
 
     return super(View, self).editGet(request, entity, context, params=params)
 
   def getMenusForScope(self, entity, params):
-    """List featured surveys iff after they are availble to be taken.
+    """List featured surveys if after the survey_start date and before survey_end.
     """
 
     # only list surveys for registered users
@@ -686,26 +687,28 @@ class View(base.View):
         survey_rights[entity.read_access] = can_read
 
         if not can_read:
-          continue
+          pass#continue
 
       elif not survey_rights[entity.read_access]:
-        continue
+        pass#continue
 
-      # omit if either before start or after end
+      # omit if either before survey_start or after survey_end
       if entity.survey_start and entity.survey_start > now:
-        continue
+        pass#continue
 
       if entity.survey_end and entity.survey_end < now:
-        continue
+        pass#continue
 
+      taken_status = ""
+      taken_status = "(new)"
       #TODO only if a document is readable it might be added
       submenu = (redirects.getPublicRedirect(entity, self._params),
-                 entity.short_name, 'show')
+      'Survey ' +  taken_status + ': ' + entity.short_name,
+      'show')
 
       submenus.append(submenu)
     return submenus
 
-  # TODO the following two methods should move to GradingProjectSurvey
   def activate(self, request, **kwargs):
     """This is a hack to support the 'Enable grades' button.
     """
@@ -729,47 +732,55 @@ class View(base.View):
     """View for SurveyRecord and SurveyRecordGroup.
     """
 
-    entity, context = self.getContextEntity(request, page_name, params, kwargs)
-
-    if context is None:
-      # user cannot see this page, return error response
-      return entity
-
-    can_write = False
-    rights = self._params['rights']
-    try:
-      rights.checkIsSurveyWritable({'key_name': entity.key().name(),
-                                    'prefix': entity.prefix,
-                                    'scope_path': entity.scope_path,
-                                    'link_id': entity.link_id,},
-                                   'key_name')
-      can_write = True
-    except out_of_band.AccessViolation:
-      pass
-
     user = user_logic.getForCurrentAccount()
 
-    filter = self._params.get('filter') or {}
-
-    # if user can edit the survey, show everyone's results
-    if can_write:
-      filter['survey'] = entity
+    # TODO(ajaksu) use the named parameter link_id from the re
+    if request.path == '/survey/show/user/' + user.link_id:
+      records = tuple(user.surveys_taken.run())
+      context = responses.getUniversalContext(request)
+      context['content'] = records[0].survey.survey_content
+      responses.useJavaScript(context, params['js_uses_all'])
+      context['page_name'] = u'Your survey records.'
     else:
-      filter.update({'user': user, 'survey': entity})
+      entity, context = self.getContextEntity(request, page_name,
+                                              params, kwargs)
 
-    limit = self._params.get('limit') or 1000
-    offset = self._params.get('offset') or 0
-    order = self._params.get('order') or []
-    idx = self._params.get('idx') or 0
+      if context is None:
+        # user cannot see this page, return error response
+        return entity
+      context['content'] = entity.survey_content
+      can_write = False
+      rights = self._params['rights']
+      try:
+        rights.checkIsSurveyWritable({'key_name': entity.key().name(),
+                                      'prefix': entity.prefix,
+                                      'scope_path': entity.scope_path,
+                                      'link_id': entity.link_id,},
+                                     'key_name')
+        can_write = True
+      except out_of_band.AccessViolation:
+        pass
 
-    records = results_logic.getForFields(filter=filter, limit=limit,
-                                      offset=offset, order=order)
+      filter = self._params.get('filter') or {}
+
+      # if user can edit the survey, show everyone's results
+      if can_write:
+        filter['survey'] = entity
+      else:
+        filter.update({'user': user, 'survey': entity})
+
+      limit = self._params.get('limit') or 1000
+      offset = self._params.get('offset') or 0
+      order = self._params.get('order') or []
+      idx = self._params.get('idx') or 0
+
+      records = results_logic.getForFields(filter=filter, limit=limit,
+                                        offset=offset, order=order)
 
     updates = dicts.rename(params, params['list_params'])
     context.update(updates)
 
     context['results'] = records, records
-    context['content'] = entity.survey_content
 
     template = 'soc/survey/results_page.html'
     return responses.respond(request, template, context=context)
@@ -911,13 +922,13 @@ def to_csv(survey):
   properties = leading + survey.survey_content.orderedProperties()
 
   try:
-    first = survey.getRecords().run().next()
+    first = survey.survey_records.run().next()
   except StopIteration:
     # bail out early if survey_records.run() is empty
     return header, survey.link_id
 
   # generate results list
-  recs = survey.getRecords().run()
+  recs = survey.survey_records.run()
   recs = _get_records(recs, properties)
 
   # write results to CSV

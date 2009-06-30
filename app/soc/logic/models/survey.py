@@ -430,7 +430,58 @@ class GradingProjectLogic(ProjectLogic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+class ResultsLogic(work.Logic):
+  """Logic methods for the Survey model
+  """
+
+  def __init__(self, model=SurveyRecord,
+               base_model=Work, scope_logic=linkable_logic):
+    """Defines the name, key_name and model for this entity.
+    """
+
+    super(ResultsLogic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
+
+  def getKeyValuesFromEntity(self, entity):
+    """See base.Logic.getKeyNameValues.
+    """
+
+    return [entity.prefix, entity.scope_path, entity.link_id]
+
+  def getKeyValuesFromFields(self, fields):
+    """See base.Logic.getKeyValuesFromFields.
+    """
+
+    return [fields['prefix'], fields['scope_path'], fields['link_id']]
+
+  def getKeyFieldNames(self):
+    """See base.Logic.getKeyFieldNames.
+    """
+
+    return ['prefix', 'scope_path', 'link_id']
+
+  def isDeletable(self, entity):
+    """See base.Logic.isDeletable.
+    """
+
+    return not entity.home_for
+
+  def _updateField(self, entity, entity_properties, name):
+    """Special logic for role. If state changes to active we flush the sidebar.
+    """
+
+    value = entity_properties[name]
+
+    if (name == 'is_featured') and (entity.is_featured != value):
+      sidebar.flush()
+
+    home_for = entity.home_for
+    if (name != 'home_for') and home_for:
+      home.flush(home_for)
+    return True
+
 
 logic = Logic()
 project_logic = ProjectLogic()
 grading_logic = GradingProjectLogic()
+results_logic = ResultsLogic()

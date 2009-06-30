@@ -20,6 +20,7 @@
 __authors__ = [
   '"Daniel Diniz" <ajaksu@gmail.com>',
   '"James Levy" <jamesalexanderlevy@gmail.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 import csv
@@ -183,6 +184,7 @@ class View(base.View):
         }
 
     params = dicts.merge(params, new_params)
+
     super(View, self).__init__(params=params)
 
   def list(self, request, access_type, page_name=None, params=None,
@@ -288,6 +290,7 @@ class View(base.View):
     survey_form = surveys.SurveyForm(survey_content=survey_content,
                                      this_user=user,
                                      project=project,
+                                     survey_logic=self._params['logic'],
                                      survey_record=survey_record,
                                      read_only=read_only,
                                      editing=False)
@@ -626,7 +629,9 @@ class View(base.View):
 
 
     survey_form = surveys.SurveyForm(survey_content=survey_content,
-                                     this_user=user, project=project, survey_record=survey_record,
+                                     this_user=user, project=project,
+                                     survey_logic=params['logic'],
+                                     survey_record=survey_record,
                                      editing=True, read_only=False)
     survey_form.getFields()
 

@@ -40,8 +40,6 @@ from django.utils.safestring import mark_safe
 
 from soc.logic import dicts
 from soc.logic.lists import Lists
-from soc.logic.models.survey import logic as survey_logic
-from soc.logic.models.survey_record import logic as results_logic
 from soc.models.survey import SurveyContent
 
 
@@ -69,6 +67,7 @@ class SurveyForm(djangoforms.ModelForm):
     self.survey_content = self.kwargs.pop('survey_content', None)
     self.this_user = self.kwargs.pop('this_user', None)
     self.project = self.kwargs.pop('project', None)
+    self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
 
     self.read_only = self.kwargs.pop('read_only', None)
@@ -104,7 +103,9 @@ class SurveyForm(djangoforms.ModelForm):
       read_only = self.read_only
 
       if not read_only:
-        deadline = self.survey_content.survey_parent.get().survey_end
+        survey_content = self.survey_content
+        survey_entity = self.survey_logic.getSurveyForContent(survey_content)
+        deadline = survey_entity.survey_end
         read_only =  deadline and (datetime.datetime.now() > deadline)
       else:
         extra_attrs['disabled'] = 'disabled'
@@ -548,9 +549,10 @@ class SurveyResults(widgets.Widget):
       context: context dict for template
     """
 
-    logic = results_logic
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
     filter = {'survey': survey}
-    data = logic.getForFields(filter=filter, limit=limit, offset=offset,
+    data = record_logic.getForFields(filter=filter, limit=limit, offset=offset,
                               order=order)
 
     params['name'] = "Survey Results"

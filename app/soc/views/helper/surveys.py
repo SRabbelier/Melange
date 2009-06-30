@@ -176,8 +176,8 @@ class SurveyForm(djangoforms.ModelForm):
     self.survey_fields[field] = question
     self.addCommentField(field, comment, attrs, tip)
 
-  def addShortField(self, field, value, attrs, schema, req=False, label='', tip='',
-                    comment=''):
+  def addShortField(self, field, value, attrs, schema, req=False, label='',
+                    tip='', comment=''):
     """Add a short answer fields to this form.
 
     params:

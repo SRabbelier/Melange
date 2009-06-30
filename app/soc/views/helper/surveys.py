@@ -559,7 +559,7 @@ class SurveyResults(widgets.Widget):
     content = {
       'idx': idx,
       'data': data,
-      'logic': logic,
+      'logic': record_logic,
       'limit': limit,
      }
     updates = dicts.rename(params, params['list_params'])

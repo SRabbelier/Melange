@@ -183,7 +183,7 @@ class View(base.View):
         'clean': cleaning.validate_document_acl(self),
         }
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

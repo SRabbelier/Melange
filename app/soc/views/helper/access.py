@@ -1656,3 +1656,51 @@ class Checker(object):
 
     fields = program_logic.getKeyFieldsFromFields(django_args)
     self.checkIsHostForProgram(fields)
+
+  def checkHasSurveyAccess(self, django_args):
+    """Checks if the survey specified in django_args can be taken.
+
+    Uses survey.taking_access to map that string onto a check. Also checks for
+    deadline start and end.
+
+    If the prefix is 'program', the scope of the survey is the program and
+    the taking_acccess attribute means:
+      mentor: user is mentor for the program
+      org_admin: user is org_admin for the program
+      student: user is student for the program
+      user: valid user on the website
+      public: anyone can participate in the survey
+    """
+
+    if django_args['prefix'] != 'program':
+      # TODO : update when generic surveys are allowe
+      return self.deny(django_args)
+
+    survey = survey_logic.getFromKeyFieldsOr404(django_args)
+
+    if not timeline_helper.isActivePeriod(survey, 'survey'):
+      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+
+    role = survey.taking_access
+
+    if role == 'public':
+      # TODO : are we sure we want public surveys?
+      return self.allow(django_args)
+
+    if role == 'user':
+      return self.checkIsUser(django_args)
+
+    django_args = django_args.copy()
+
+    if role == 'mentor' or role == 'org_admin':
+      django_args['program'] = survey.scope
+      # program is the 'program' attribute for mentors and org_admins
+      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+
+    if role == 'student':
+      django_args['scope'] = survey.scope
+      # program is the 'scope' attribute for students
+      return self.checkHasActiveRoleForScope(django_args, student_logic)
+
+    # unknown role
+    self.deny(django_args)

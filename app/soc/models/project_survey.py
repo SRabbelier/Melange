@@ -34,7 +34,6 @@ class ProjectSurvey(Survey):
     super(ProjectSurvey, self).__init__(*args, **kwargs)
     self.prefix = 'program'
     self.taking_access = 'student'
-    self.scope = Program.get_by_key_name(self.scope_path)
 
   def getRecords(self):
     """Returns all ProjectSurveyRecords belonging to this survey.

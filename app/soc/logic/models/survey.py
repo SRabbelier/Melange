@@ -30,6 +30,7 @@ from google.appengine.ext import db
 
 from soc.cache import sidebar
 from soc.logic.models import linkable as linkable_logic
+from soc.logic.models import survey_record as survey_record_logic
 from soc.logic.models.user import logic as user_logic
 from soc.logic.models import work
 from soc.models.program import Program
@@ -54,9 +55,15 @@ class Logic(work.Logic):
   """
 
   def __init__(self, model=Survey, base_model=Work,
-               scope_logic=linkable_logic):
+               scope_logic=linkable_logic,
+               record_logic=survey_record_logic.logic):
     """Defines the name, key_name and model for this entity.
+
+    params:
+      record_logic: SurveyRecordLogic (or subclass) instance for this Survey
     """
+
+    self.record_logic = record_logic
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
@@ -186,6 +193,15 @@ class Logic(work.Logic):
 
     return self.getForFields(fields, unique=True)
 
+<<<<<<< local
+=======
+  def getRecordLogic(self):
+    """Returns SurveyRecordLogic that belongs to this SurveyLogic.
+    """
+
+    return self.record_logic
+
+>>>>>>> other
   def getUserRole(self, user, survey, project):
     """Gets the role of a user for a project, used for SurveyRecordGroup.
 
@@ -424,12 +440,14 @@ class ProjectLogic(Logic):
   """
 
   def __init__(self, model=ProjectSurvey,
-               base_model=Survey, scope_logic=linkable_logic):
+               base_model=Survey, scope_logic=linkable_logic,
+               record_logic=survey_record_logic.project_logic):
     """Defines the name, key_name and model for this entity.
     """
 
     super(ProjectLogic, self).__init__(model=model, base_model=base_model,
-                                       scope_logic=scope_logic)
+                                       scope_logic=scope_logic,
+                                       record_logic=record_logic)
 
 
 class GradingProjectLogic(ProjectLogic):
@@ -437,12 +455,14 @@ class GradingProjectLogic(ProjectLogic):
   """
 
   def __init__(self, model=GradingProjectSurvey,
-               base_model=ProjectSurvey, scope_logic=linkable_logic):
+               base_model=ProjectSurvey, scope_logic=linkable_logic,
+               record_logic=survey_record_logic.grading_logic):
     """Defines the name, key_name and model for this entity.
     """
 
     super(GradingProjectLogic, self).__init__(model=model,
                                               base_model=base_model,
+<<<<<<< local
                                               scope_logic=scope_logic)
 
 class ResultsLogic(work.Logic):
@@ -456,6 +476,10 @@ class ResultsLogic(work.Logic):
 
     super(ResultsLogic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+=======
+                                              scope_logic=scope_logic,
+                                              record_logic=record_logic)
+>>>>>>> other
 
   def getKeyValuesFromEntity(self, entity):
     """See base.Logic.getKeyNameValues.

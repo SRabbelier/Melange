@@ -172,6 +172,20 @@ class Logic(work.Logic):
 
     return survey_record_group
 
+  def getSurveyForContent(self, survey_content):
+    """Returns the Survey belonging to the given SurveyContent.
+
+    params:
+      survey_content: the SurveyContent to retrieve the Survey for.
+
+    returns:
+      Survey or subclass if possible else None.
+    """
+
+    fields = {'survey_content': survey_content}
+
+    return self.getForFields(fields, unique=True)
+
   def getUserRole(self, user, survey, project):
     """Gets the role of a user for a project, used for SurveyRecordGroup.
 

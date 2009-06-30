@@ -38,7 +38,6 @@ from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models.survey import logic as survey_logic
-from soc.logic.models.survey import results_logic
 from soc.logic.models.survey import GRADES
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
@@ -736,6 +735,8 @@ class View(base.View):
                   params=None, **kwargs):
     """View for SurveyRecord and SurveyRecordGroup.
     """
+
+    results_logic = params['logic'].getRecordLogic()
 
     user = user_logic.getForCurrentAccount()
 

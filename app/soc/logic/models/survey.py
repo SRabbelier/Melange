@@ -193,15 +193,12 @@ class Logic(work.Logic):
 
     return self.getForFields(fields, unique=True)
 
-<<<<<<< local
-=======
   def getRecordLogic(self):
     """Returns SurveyRecordLogic that belongs to this SurveyLogic.
     """
 
     return self.record_logic
 
->>>>>>> other
   def getUserRole(self, user, survey, project):
     """Gets the role of a user for a project, used for SurveyRecordGroup.
 

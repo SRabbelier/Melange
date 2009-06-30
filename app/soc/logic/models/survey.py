@@ -414,8 +414,8 @@ class ProjectLogic(Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+    super(ProjectLogic, self).__init__(model=model, base_model=base_model,
+                                       scope_logic=scope_logic)
 
 
 class GradingProjectLogic(ProjectLogic):
@@ -427,8 +427,9 @@ class GradingProjectLogic(ProjectLogic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+    super(GradingProjectLogic, self).__init__(model=model,
+                                              base_model=base_model,
+                                              scope_logic=scope_logic)
 
 class ResultsLogic(work.Logic):
   """Logic methods for the Survey model

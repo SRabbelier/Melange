@@ -99,7 +99,7 @@ class View(base.View):
     rights['any_access'] = ['allow']
     rights['show'] = [('checkIsSurveyReadable', survey_logic)]
     rights['create'] = ['checkIsUser']
-    rights['edit'] = [('checkIsSurveyWritable', suvery_logic)]
+    rights['edit'] = [('checkIsSurveyWritable', survey_logic)]
     rights['delete'] = [('checkIsSurveyWritable', survey_logic)]
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']

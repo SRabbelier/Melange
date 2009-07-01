@@ -28,17 +28,17 @@ import datetime
 import re
 import StringIO
 import string
+
+from google.appengine.ext import db
+
 from django import forms
 from django import http
 from django.utils import simplejson
 
-from google.appengine.ext import db
-
-from soc.cache import home
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.survey import GRADES
+from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
 from soc.models.survey_record import SurveyRecord
@@ -103,6 +103,7 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
+    rights['take'] = ['checkIsDeveloper'] # TODO(ljvderijk) test proper check
 
     new_params = {}
     new_params['logic'] = survey_logic
@@ -112,6 +113,9 @@ class View(base.View):
     new_params['pickable'] = True
 
     new_params['extra_django_patterns'] = [
+         (r'^%(url_name)s/(?P<access_type>take)/%(key_fields)s$',
+         'soc.views.models.%(module_name)s.take',
+         'Take %(module_name)s'),
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
          'soc.views.models.%(module_name)s.json',
          'Export %(name)s as JSON'),
@@ -133,6 +137,7 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/survey/edit.html'
     new_params['create_template'] = 'soc/survey/edit.html'
+    new_params['take_template'] = 'soc/survey/take.html'
 
     # TODO which one of these are leftovers from Document?
     new_params['no_create_raw'] = True
@@ -487,6 +492,62 @@ class View(base.View):
 
     return super(View, self).editGet(request, entity, context, params=params)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def take(self, request, access_type, page_name=None,
+           params=None, **kwargs):
+    """View for taking a Survey.
+
+    For Args see base.View().public().
+    """
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    template = params['take_template']
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
+    context['entity'] = entity
+
+    if request.POST:
+      return self.takePost(request, template, context, params, entity,
+                           **kwargs)
+    else: #request.GET
+      return self.takeGet(request, template, context, params, entity,
+                          **kwargs)
+
+  def takeGet(self, request, template, context, params, entity, **kwargs):
+    """Handles the GET request for the Survey's take page.
+
+    Args:
+        template: the template used for this view
+        entity: the student project entity
+        rest: see base.View.public()
+    """
+
+    # TODO(ljvderijk) implement takeGet
+
+    return http.HttpResponse("Work in Progress")
+
+  def takePost(self, request, template, context, params, entity, **kwargs):
+    """Handles the POST request for the Survey's take page.
+
+    Args:
+        template: the template used for this view
+        entity: the student project entity
+        rest: see base.View.public()
+    """
+
+    # TODO(ljvderijk) implement takePost
+
+    return httpHttpResponse("Work in Progress")
+
   def activate(self, request, **kwargs):
     """This is a hack to support the 'Enable grades' button.
     """
@@ -787,10 +848,11 @@ view = View()
 admin = decorators.view(view.admin)
 create = decorators.view(view.create)
 edit = decorators.view(view.edit)
+export = decorators.view(view.export)
 delete = decorators.view(view.delete)
+json = decorators.view(view.exportSerialized)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
-export = decorators.view(view.export)
 pick = decorators.view(view.pick)
 results = decorators.view(view.viewResults)
-json = decorators.view(view.exportSerialized)
+take = decorators.view(view.take)

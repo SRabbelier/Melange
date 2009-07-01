@@ -112,9 +112,6 @@ class View(base.View):
     new_params['pickable'] = True
 
     new_params['extra_django_patterns'] = [
-        (r'^%(url_name)s/(?P<access_type>activate)/%(scope)s$',
-         'soc.views.models.%(module_name)s.activate',
-         'Activate grades for %(name)s'),
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
          'soc.views.models.%(module_name)s.json',
          'Export %(name)s as JSON'),
@@ -955,6 +952,5 @@ list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
-activate = decorators.view(view.activate)
 results = decorators.view(view.viewResults)
 json = decorators.view(view.exportSerialized)

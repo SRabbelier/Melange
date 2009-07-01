@@ -97,10 +97,10 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = [('checkIsSurveyReadable', survey_logic)]
+    rights['show'] = [('checkIsSurveyWritable', survey_logic)]
     rights['create'] = ['checkIsUser']
     rights['edit'] = [('checkIsSurveyWritable', survey_logic)]
-    rights['delete'] = [('checkIsSurveyWritable', survey_logic)]
+    rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
 
@@ -191,185 +191,26 @@ class View(base.View):
                                   params=params, filter=kwargs)
 
   def _public(self, request, entity, context):
-    """Survey taking and result display handler.
-
+    """Add a preview version of the Survey to the page's context.
 
     Args:
       request: the django request object
       entity: the entity to make public
       context: the context object
-
-
-    -- Taking Survey Pages Are Not 'Public' --
-
-    For surveys, the "public" page is actually the access-protected
-    survey-taking page.
-
-    -- SurveyProjectGroups --
-
-    Each survey can be taken once per user per project.
-
-    This means that MidtermGSOC2009 can be taken once for a student
-    for a project, and once for a mentor for each project they are
-    mentoring.
-
-    The project selected while taking a survey determines how this_user
-    SurveyRecord will be linked to other SurveyRecords.
-
-    --- Deadlines ---
-
-    A survey_end can also be used as a conditional for updating values,
-    we have a special read_only UI and a check on the POST handler for this.
-    Passing read_only=True here allows one to fetch the read_only view.
     """
 
-    # check ACL
-    rights = self._params['rights']
-    rights.checkIsSurveyReadable({'key_name': entity.key().name(),
-                                  'prefix': entity.prefix,
-                                  'scope_path': entity.scope_path,
-                                  'link_id': entity.link_id,},
-                                 'key_name')
+    # construct the form to be shown on the page
+    # TODO(ljvderijk) Generate SurveyForm without passing along the logic
+    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
+                                     survey_logic=self._params['logic'])
 
-    survey = entity
-    user = user_logic.getForCurrentAccount()
-
-    status = self.getStatus(request, context, user, survey)
-    read_only, can_write, not_ready = status
-
-    # If user can edit this survey and is requesting someone else's results,
-    # in a read-only request, we fetch them.
-    if can_write and read_only and 'user_results' in request.GET:
-      user = user_logic.getFromKeyNameOr404(request.GET['user_results'])
-
-    if not_ready and not can_write:
-      context['notice'] = "No survey available."
-      return False
-    elif not_ready:
-      return False
-    else:
-      # check for existing survey_record
-      record_query = SurveyRecord.all(
-      ).filter("user =", user
-      ).filter("survey =", survey)
-      # get project from GET arg
-      if request._get.get('project'):
-        import soc.models.student_project
-        project = soc.models.student_project.StudentProject.get(
-        request._get.get('project'))
-        record_query = record_query.filter("project =", project)
-      else:
-        project = None
-      survey_record = record_query.get()
-
-      if len(request.POST) < 1 or read_only or not_ready:
-         # not submitting completed survey OR we're ignoring late submission
-        pass
-      else:
-        # save/update the submitted survey
-        context['notice'] = "Survey Submission Saved"
-        survey_record = survey_logic.updateSurveyRecord(user, survey,
-        survey_record, request.POST)
-    survey_content = survey.survey_content
-
-    if not survey_record and read_only:
-      # no recorded answers, we're either past survey_end or want to see answers
-      is_same_user = user.key() == user_logic.getForCurrentAccount().key()
-
-      if not can_write or not is_same_user:
-        # If user who can edit looks at her own taking page, show the default
-        # form as readonly. Otherwise, below, show nothing.
-        context["notice"] = "There are no records for this survey and user."
-        return False
-
-    survey_form = surveys.SurveyForm(survey_content=survey_content,
-                                     this_user=user,
-                                     project=project,
-                                     survey_logic=self._params['logic'],
-                                     survey_record=survey_record,
-                                     read_only=read_only,
-                                     editing=False)
+    # TOOD(ljvderijk) pose question about the getFields method name and working
     survey_form.getFields()
-    if 'evaluation' in survey.taking_access:
-      survey_form = surveys.getRoleSpecificFields(survey, user,
-                                  project, survey_form, survey_record)
 
-    # set help and status text
-    self.setHelpStatus(context, read_only,
-    survey_record, survey_form, survey)
+    context['survey_form'] = survey_form
 
-    if not context['survey_form']:
-      access_tpl = "Access Error: This Survey Is Limited To %s"
-      context["notice"] = access_tpl % string.capwords(survey.taking_access)
-
-    context['read_only'] = read_only
-    context['project'] = project
+    # return True to signal that the page may be displayed
     return True
-
-  def getStatus(self, request, context, user, survey):
-    """Determine if we're past survey_end or before survey_start, check user rights.
-    """
-
-    read_only = (context.get("read_only", False) or
-                 request.GET.get("read_only", False) or
-                 request.POST.get("read_only", False)
-                 )
-    now = datetime.datetime.now()
-
-    # check survey_end, see check for survey_start below
-    if survey.survey_end and now > survey.survey_end:
-      # are we already passed the survey_end?
-      context["notice"] = "The Deadline For This Survey Has Passed"
-      read_only = True
-
-    # check if user can edit this survey
-    params = dict(prefix=survey.prefix, scope_path=survey.scope_path)
-    checker = access.rights_logic.Checker(survey.prefix)
-    roles = checker.getMembership(survey.write_access)
-    rights = self._params['rights']
-    can_write = access.Checker.hasMembership(rights, roles, params)
-
-
-    not_ready = False
-    # check if we're past the survey_start date
-    if survey.survey_start and now < survey.survey_start:
-      not_ready = True
-
-      # only users that can edit a survey should see it before survey_start
-      if not can_write:
-        context["notice"] = "There is no such survey available."
-        return False
-      else:
-        context["notice"] = "This survey is not open for taking yet."
-
-    return read_only, can_write, not_ready
-
-  def setHelpStatus(self, context, read_only, survey_record, survey_form,
-                    survey):
-    """Set help_text and status for template use.
-    """
-
-    if not read_only:
-      if not survey.survey_end:
-        survey_end_text = ""
-      else:
-        survey_end_text = " by " + str(
-      survey.survey_end.strftime("%A, %d. %B %Y %I:%M%p"))
-
-      if survey_record:
-        help_text = "Edit and re-submit this survey" + survey_end_text + "."
-        status = "edit"
-      else:
-        help_text = "Please complete this survey" + survey_end_text + "."
-        status = "create"
-
-    else:
-      help_text = "Read-only view."
-      status = "view"
-
-    survey_data = dict(survey_form=survey_form, status=status,
-                                     help_text=help_text)
-    context.update(survey_data)
 
   def _editContext(self, request, context):
     """Performs any required processing on the context for edit pages.

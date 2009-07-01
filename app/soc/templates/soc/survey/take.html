@@ -20,10 +20,6 @@ limitations under the License.
 <script type="text/javascript" src="/jquery/jquery-growfield.js"></script>
 {% endblock %}
 
-{% block page_title %}
-{{ entity.title }}
-{% endblock %}
-
 {% block header_title %}
 {{ entity.title }}
 {% endblock %}
@@ -35,53 +31,32 @@ limitations under the License.
 
   {% load forms_helpers %}
 
-  {% if not read_only %}
-    <form method="post">
-  {% endif %}
-
-  {% if read_only %}
-    <form method="get" onsubmit="javascript:return false">
-  {% endif %}
-
   {{ help_text }}
 
-<div style="width:100%; float:left;">
-  <div class="{{ status }}" id="survey_widget">
-
-    <table>
-
-  {# Project Selected for this Survey #}
-  {% if project %}
- <div id="project_link" style="font-size:.8em; margin:3px; display:none;">
- view project:
- <a target="_blank" href="/student_project/show/{{ project.key.name }}" >
- {{ project.title }}
- </a>
- </div>
-  {% endif %}
-
-      {% block form_table %}
-        {% as_twoline_table survey_form %}
-      {% endblock %}
-
-    </table>
-  </div> {# end survey_widget #}
-  </div>
+  <form method="post">
+    <div style="width:100%; float:left;">
+      <div class="{{ status }}" id="survey_widget">
+        <table>
+          {% block form_table %}
+            {% as_twoline_table survey_form %}
+          {% endblock %}
+        </table>
+      </div> {# end survey_widget #}
+    </div>
 
 <br/><br/>
-  <table>
-    <tbody>
-      <tr>
-        <td>
-          {% if not read_only %}
-            <input type="submit" value="Submit" style="font-weight: bold;"/>
-          {% endif %}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-    </form>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            {% if not read_only %}
+              <input type="submit" value="Submit" style="font-weight: bold;"/>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
 {% endif %}
 
 {% endblock %}

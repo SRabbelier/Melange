@@ -501,6 +501,9 @@ class View(base.View):
     For Args see base.View().public().
     """
 
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
@@ -515,38 +518,82 @@ class View(base.View):
     context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
 
+    user_entity = user_logic.getForCurrentAccount()
+
+    # try to get an existing SurveyRecord for the current user
+    # TODO(ljvderijk) deal with the SurveyProperty name in subclasses
+    filter = {'survey': entity,
+              'user': user_entity}
+    survey_record = record_logic.getForFields(filter, unique=True)
+
     if request.POST:
       return self.takePost(request, template, context, params, entity,
-                           **kwargs)
+                           survey_record, **kwargs)
     else: #request.GET
       return self.takeGet(request, template, context, params, entity,
-                          **kwargs)
+                          survey_record, **kwargs)
 
-  def takeGet(self, request, template, context, params, entity, **kwargs):
+  def takeGet(self, request, template, context, params, entity, record,
+              **kwargs):
     """Handles the GET request for the Survey's take page.
 
     Args:
         template: the template used for this view
-        entity: the student project entity
+        entity: the Survey entity
         rest: see base.View.public()
     """
 
-    # TODO(ljvderijk) implement takeGet
+    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
+                                     survey_record=record,
+                                     survey_logic=self._params['logic'])
 
-    return http.HttpResponse("Work in Progress")
+    survey_form.getFields()
 
-  def takePost(self, request, template, context, params, entity, **kwargs):
+    # fill context with the survey and additional information
+    context['survey_form'] = survey_form
+    self.setHelpAndStatus(context, entity, record)
+
+    return responses.respond(request, template, context)
+
+  def takePost(self, request, template, context, params, entity, record,
+               **kwargs):
     """Handles the POST request for the Survey's take page.
 
     Args:
         template: the template used for this view
-        entity: the student project entity
+        entity: the Survey entity
         rest: see base.View.public()
     """
 
     # TODO(ljvderijk) implement takePost
 
-    return httpHttpResponse("Work in Progress")
+    return http.HttpResponse("Work in Progress")
+
+  def setHelpAndStatus(self, context, survey, survey_record):
+    """Get help_text and status for template use.
+
+    Args:
+        context: the context for the view to update
+        survey: a Survey entity
+        survey_record: a SurveyRecordEntity 
+    """
+
+    if not survey.survey_end:
+      survey_end_text = ""
+    else:
+      survey_end_text = " by " + str(
+          survey.survey_end.strftime("%A, %d. %B %Y %I:%M%p"))
+
+    if survey_record:
+      help_text = "Edit and re-submit this survey" + survey_end_text + "."
+      status = "edit"
+    else:
+      help_text = "Please complete this survey" + survey_end_text + "."
+      status = "create"
+
+    # update the context with the help_text and status
+    context_update = dict(status=status, help_text=help_text)
+    context.update(context_update)
 
   def activate(self, request, **kwargs):
     """This is a hack to support the 'Enable grades' button.

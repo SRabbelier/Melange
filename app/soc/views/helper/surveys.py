@@ -150,8 +150,8 @@ class SurveyForm(djangoforms.ModelForm):
                            self.survey_fields[property])
     return self.fields
 
-  def addLongField(self, field, value, attrs, schema, req=False, label='', tip='',
-                   comment=''):
+  def addLongField(self, field, value, attrs, schema, req=False, label='',
+                   tip='', comment=''):
     """Add a long answer fields to this form.
 
     params:

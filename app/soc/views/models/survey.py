@@ -97,13 +97,12 @@ class View(base.View):
 
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = ['checkIsSurveyReadable']
+    rights['show'] = [('checkIsSurveyReadable', survey_logic)]
     rights['create'] = ['checkIsUser']
-    rights['edit'] = ['checkIsSurveyWritable']
-    rights['delete'] = ['checkIsSurveyWritable']
+    rights['edit'] = [('checkIsSurveyWritable', suvery_logic)]
+    rights['delete'] = [('checkIsSurveyWritable', survey_logic)]
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
-    rights['grade'] = ['checkIsSurveyGradable']
 
     new_params = {}
     new_params['logic'] = survey_logic

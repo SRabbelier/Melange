@@ -487,76 +487,12 @@ class View(base.View):
 
     return super(View, self).editGet(request, entity, context, params=params)
 
-  def getMenusForScope(self, entity, params):
-    """List featured surveys if after the survey_start date and before survey_end.
-    """
-
-    # only list surveys for registered users
-    user = user_logic.getForCurrentAccount()
-    if not user:
-      return []
-
-    filter = {
-        'prefix' : params['url_name'],
-        'scope_path': entity.key().id_or_name(),
-        'is_featured': True,
-        }
-
-    entities = self._logic.getForFields(filter)
-    submenus = []
-    now = datetime.datetime.now()
-
-    # cache ACL
-    survey_rights = {}
-
-    # add a link to all featured documents
-    for entity in entities:
-
-      # only list those surveys the user can read
-      if entity.read_access not in survey_rights:
-
-        params = dict(prefix=entity.prefix, scope_path=entity.scope_path,
-                      link_id=entity.link_id, user=user)
-
-        # TODO(ajaksu) use access.Checker.checkIsSurveyReadable
-        checker = access.rights_logic.Checker(entity.prefix)
-        roles = checker.getMembership(entity.read_access)
-        rights = self._params['rights']
-        can_read = access.Checker.hasMembership(rights, roles, params)
-
-        # cache ACL for a given entity.read_access
-        survey_rights[entity.read_access] = can_read
-
-        if not can_read:
-          pass#continue
-
-      elif not survey_rights[entity.read_access]:
-        pass#continue
-
-      # omit if either before survey_start or after survey_end
-      if entity.survey_start and entity.survey_start > now:
-        pass#continue
-
-      if entity.survey_end and entity.survey_end < now:
-        pass#continue
-
-      taken_status = ""
-      taken_status = "(new)"
-      #TODO only if a document is readable it might be added
-      submenu = (redirects.getPublicRedirect(entity, self._params),
-      'Survey ' +  taken_status + ': ' + entity.short_name,
-      'show')
-
-      submenus.append(submenu)
-    return submenus
-
   def activate(self, request, **kwargs):
     """This is a hack to support the 'Enable grades' button.
     """
     self.activateGrades(request)
     redirect_path = request.path.replace('/activate/', '/edit/') + '?activate=1'
     return http.HttpResponseRedirect(redirect_path)
-
 
   def activateGrades(self, request, **kwargs):
     """Updates SurveyRecord's grades for a given Survey.
@@ -692,6 +628,69 @@ class View(base.View):
       return error, None
 
     return entity, context
+
+  def getMenusForScope(self, entity, params):
+    """List featured surveys if after the survey_start date and before survey_end.
+    """
+
+    # only list surveys for registered users
+    user = user_logic.getForCurrentAccount()
+    if not user:
+      return []
+
+    filter = {
+        'prefix' : params['url_name'],
+        'scope_path': entity.key().id_or_name(),
+        'is_featured': True,
+        }
+
+    entities = self._logic.getForFields(filter)
+    submenus = []
+    now = datetime.datetime.now()
+
+    # cache ACL
+    survey_rights = {}
+
+    # add a link to all featured documents
+    for entity in entities:
+
+      # only list those surveys the user can read
+      if entity.read_access not in survey_rights:
+
+        params = dict(prefix=entity.prefix, scope_path=entity.scope_path,
+                      link_id=entity.link_id, user=user)
+
+        # TODO(ajaksu) use access.Checker.checkIsSurveyReadable
+        checker = access.rights_logic.Checker(entity.prefix)
+        roles = checker.getMembership(entity.read_access)
+        rights = self._params['rights']
+        can_read = access.Checker.hasMembership(rights, roles, params)
+
+        # cache ACL for a given entity.read_access
+        survey_rights[entity.read_access] = can_read
+
+        if not can_read:
+          pass#continue
+
+      elif not survey_rights[entity.read_access]:
+        pass#continue
+
+      # omit if either before survey_start or after survey_end
+      if entity.survey_start and entity.survey_start > now:
+        pass#continue
+
+      if entity.survey_end and entity.survey_end < now:
+        pass#continue
+
+      taken_status = ""
+      taken_status = "(new)"
+      #TODO only if a document is readable it might be added
+      submenu = (redirects.getPublicRedirect(entity, self._params),
+      'Survey ' +  taken_status + ': ' + entity.short_name,
+      'show')
+
+      submenus.append(submenu)
+    return submenus
 
 class HelperForm(object):
   """Thin wrapper for adding values to params['edit_form'].fields.

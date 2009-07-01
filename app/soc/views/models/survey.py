@@ -60,7 +60,7 @@ PROPERTY_TYPES = tuple(CHOICE_TYPES) + tuple(TEXT_TYPES)
 _short_answer = ("Short Answer",
                 "Less than 40 characters. Rendered as a text input. "
                 "It's possible to add a free form question (Content) "
-                "and a in-input propmt/example text.")
+                "and a in-input prompt/example text.")
 _choice = ("Selection",
            "Can be set as a single choice (selection) or multiple choice "
            "(pick_multi) question. Rendered as a select (single choice) "
@@ -69,7 +69,7 @@ _choice = ("Selection",
            "as wanted. Each option can be edited (double-click), deleted "
            "(click on (-) button) or reordered (drag and drop).")
 _long_answer = ("Long Answer",
-                "Unlimited length, auto-growing field. endered as a textarea. "
+                "Unlimited length, auto-growing field. Rendered as a textarea. "
                  "It's possible to add a free form question (Content) and "
                  "an in-input prompt/example text.")
 QUESTION_TYPES = dict(short_answer=_short_answer, long_answer=_long_answer,

@@ -126,7 +126,7 @@ class View(base.View):
 
     new_params['export_content_type'] = 'text/text'
     new_params['export_extension'] = '.csv'
-    new_params['export_function'] = surveys.to_csv
+    new_params['export_function'] = surveys.to_csv(self)
     new_params['delete_redirect'] = '/'
     new_params['list_key_order'] = [
         'link_id', 'scope_path', 'name', 'short_name', 'title',

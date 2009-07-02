@@ -769,29 +769,43 @@ def _get_records(recs, props):
   return records
 
 
-def to_csv(survey):
+def to_csv(survey_view):
   """CSV exporter.
+
+  Args:
+      survey_view: instance of the SurveyView
   """
 
-  # get header and properties
-  header = _get_csv_header(survey)
-  leading = ['user', 'created', 'modified']
-  properties = leading + survey.survey_content.orderedProperties()
+  def wrapper(survey):
+    """Wrapper function.
+    """
+    survey_logic = survey_view.getParams()['logic']
+    record_logic = survey_logic.getRecordLogic()
 
-  try:
-    first = survey.getRecords().run().next()
-  except StopIteration:
-    # bail out early if survey_records.run() is empty
-    return header, survey.link_id
+    # get header and properties
+    header = _get_csv_header(survey)
+    leading = ['user', 'created', 'modified']
+    properties = leading + survey.survey_content.orderedProperties()
 
-  # generate results list
-  recs = survey.getRecords().run()
-  recs = _get_records(recs, properties)
+    # retrieve the query of the data to export
+    fields = {'survey': survey}
+    record_query = record_logic.getQueryForFields(fields)
 
-  # write results to CSV
-  output = StringIO.StringIO()
-  writer = csv.writer(output)
-  writer.writerow(properties)
-  writer.writerows(recs)
-
-  return header + output.getvalue(), survey.link_id
+    try:
+      first = record_query.run().next()
+    except StopIteration:
+      # bail out early if survey_records.run() is empty
+      return header, survey.link_id
+  
+    # generate results list
+    recs = record_query.run()
+    recs = _get_records(recs, properties)
+  
+    # write results to CSV
+    output = StringIO.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(properties)
+    writer.writerows(recs)
+  
+    return header + output.getvalue(), survey.link_id
+  return wrapper

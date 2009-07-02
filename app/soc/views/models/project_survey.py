@@ -56,7 +56,7 @@ class View(survey.View):
 
     new_params['name'] = "Project Survey"
 
-    new_params['extra_dynaexclude'] = ['prefix', 'taking_access']
+    new_params['extra_dynaexclude'] = ['taking_access']
 
     params = dicts.merge(params, new_params)
 
@@ -73,6 +73,5 @@ list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
-activate = decorators.view(view.activate)
 results = decorators.view(view.viewResults)
 json = decorators.view(view.exportSerialized)

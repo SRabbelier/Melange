@@ -25,8 +25,10 @@ __authors__ = [
 
 
 from itertools import chain
+import csv
 import datetime
 import logging
+import StringIO
 
 from google.appengine.ext.db import djangoforms
 
@@ -666,3 +668,96 @@ def getRoleSpecificFields(survey, user, this_project, survey_form,
     survey_form.fields.insert(field_count + 1, 'grade', gradeField)
 
   return survey_form
+
+
+class HelperForm(object):
+  """Thin wrapper for adding values to params['edit_form'].fields.
+  """
+
+  def __init__(self, form=None):
+    """Store the edit_form.
+    """
+
+    self.form = form
+
+  def __call__(self, instance=None):
+    """Transparently instantiate and add initial values to the edit_form.
+    """
+
+    form = self.form(instance=instance)
+    form.fields['created_by'].initial = instance.author.name
+    form.fields['last_modified_by'].initial = instance.modified_by.name
+    form.fields['doc_key_name'].initial = instance.key().id_or_name()
+    return form
+
+
+def _get_csv_header(sur):
+  """CSV header helper, needs support for comment lines in CSV.
+
+  Args:
+      sur: Survey entity
+  """
+
+  tpl = '# %s: %s\n'
+
+  # add static properties
+  fields = ['# Melange Survey export for \n#  %s\n#\n' % sur.title]
+  fields += [tpl % (k,v) for k,v in sur.toDict().items()]
+  fields += [tpl % (f, str(getattr(sur, f))) for f in PLAIN.split()]
+  fields += [tpl % (f, str(getattr(sur, f).link_id)) for f in FIELDS.split()]
+  fields.sort()
+
+  # add dynamic properties
+  fields += ['#\n#---\n#\n']
+  dynamic = sur.survey_content.dynamic_properties()
+  dynamic = [(prop, getattr(sur.survey_content, prop)) for prop in dynamic]
+  fields += [tpl % (k,v) for k,v in sorted(dynamic)]
+
+  # add schema
+  fields += ['#\n#---\n#\n']
+  schema =  sur.survey_content.schema
+  indent = '},\n#' + ' ' * 9
+  fields += [tpl % ('Schema', schema.replace('},', indent)) + '#\n']
+
+  return ''.join(fields).replace('\n', '\r\n')
+
+
+def _get_records(recs, props):
+  """Fetch properties from SurveyRecords for CSV export.
+  """
+
+  records = []
+  props = props[1:]
+  for rec in recs:
+    values = tuple(getattr(rec, prop, None) for prop in props)
+    leading = (rec.user.link_id,)
+    records.append(leading + values)
+  return records
+
+
+def to_csv(survey):
+  """CSV exporter.
+  """
+
+  # get header and properties
+  header = _get_csv_header(survey)
+  leading = ['user', 'created', 'modified']
+  properties = leading + survey.survey_content.orderedProperties()
+
+  try:
+    first = survey.getRecords().run().next()
+  except StopIteration:
+    # bail out early if survey_records.run() is empty
+    return header, survey.link_id
+
+  # generate results list
+  recs = survey.getRecords().run()
+  recs = _get_records(recs, properties)
+
+  # write results to CSV
+  output = StringIO.StringIO()
+  writer = csv.writer(output)
+  writer.writerow(properties)
+  writer.writerows(recs)
+
+  return header + output.getvalue(), survey.link_id

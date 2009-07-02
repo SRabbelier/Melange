@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.logic import dicts
+from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import grading_logic as grading_survey_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -60,6 +61,23 @@ class View(project_survey.View):
 
     super(View, self).__init__(params=params)
 
+  # TODO: work on grade activation
+  def activate(self, request, **kwargs):
+    """This is a hack to support the 'Enable grades' button.
+    """
+    self.activateGrades(request)
+    redirect_path = request.path.replace('/activate/', '/edit/') + '?activate=1'
+    return http.HttpResponseRedirect(redirect_path)
+
+
+  def activateGrades(self, request, **kwargs):
+    """Updates SurveyRecord's grades for a given Survey.
+    """
+    survey_key_name = survey_logic.getKeyNameFromPath(request.path)
+    survey = Survey.get_by_key_name(survey_key_name)
+    survey_logic.activateGrades(survey)
+    return
+
 
 view = View()
 
@@ -71,6 +89,5 @@ list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
-activate = decorators.view(view.activate)
 results = decorators.view(view.viewResults)
 json = decorators.view(view.exportSerialized)

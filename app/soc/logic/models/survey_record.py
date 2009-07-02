@@ -111,25 +111,3 @@ class GradingProjectLogic(ProjectLogic):
 logic = Logic()
 project_logic = ProjectLogic()
 grading_logic = GradingProjectLogic()
-
-
-def updateSurveyRecord(user, survey, survey_record, fields):
-  """Create a new survey record, or get an existing one.
-
-  params:
-    user = user taking survey
-    survey = survey entity
-    survey_record = existing record, if one exists
-    fields = submitted responses to survey fields
-  """
-
-  # TODO(ajaksu) We should use class information here, but being careful about
-  # compatibility with existent records should the class change.
-  if hasattr(survey_record, 'grade'):
-    record_logic = grading_logic
-  elif hasattr(survey_record, 'project'):
-    record_logic = grading_logic
-  else:
-    record_logic = logic
-
-  return record_logic.updateSurveyRecord(user, survey, survey_record, fields)

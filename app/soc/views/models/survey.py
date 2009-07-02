@@ -23,10 +23,8 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
-import csv
 import datetime
 import re
-import StringIO
 import string
 
 from google.appengine.ext import db
@@ -37,7 +35,6 @@ from django.utils import simplejson
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.survey import Survey
@@ -129,7 +126,7 @@ class View(base.View):
 
     new_params['export_content_type'] = 'text/text'
     new_params['export_extension'] = '.csv'
-    new_params['export_function'] = to_csv
+    new_params['export_function'] = surveys.to_csv
     new_params['delete_redirect'] = '/'
     new_params['list_key_order'] = [
         'link_id', 'scope_path', 'name', 'short_name', 'title',
@@ -137,6 +134,7 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/survey/edit.html'
     new_params['create_template'] = 'soc/survey/edit.html'
+    new_params['public_template'] = 'soc/survey/public.html'
     new_params['take_template'] = 'soc/survey/take.html'
 
     # TODO which one of these are leftovers from Document?
@@ -253,7 +251,8 @@ class View(base.View):
     if not entity:
       # new Survey
       if 'serialized' in request.POST:
-        fields, schema, survey_fields = self.importSerialized(request, fields, user)
+        fields, schema, survey_fields = self.importSerialized(request, fields,
+                                                              user)
       fields['author'] = user
     else:
       fields['author'] = entity.author
@@ -440,34 +439,12 @@ class View(base.View):
     Builds the SurveyForm that represents the Survey question contents.
     """
 
-    # TODO(ajaksu) Move CHOOSE_A_PROJECT_FIELD and CHOOSE_A_GRADE_FIELD
-    # to template.
-
-    CHOOSE_A_PROJECT_FIELD = """<tr class="role-specific">
-    <th><label>Choose Project:</label></th>
-    <td>
-      <select disabled="TRUE" id="id_survey__NA__selection__project"
-        name="survey__1__selection__see">
-          <option>Survey Taker's Projects For This Program</option></select>
-     </td></tr>
-     """
-
-    CHOOSE_A_GRADE_FIELD = """<tr class="role-specific">
-    <th><label>Assign Grade:</label></th>
-    <td>
-      <select disabled=TRUE id="id_survey__NA__selection__grade"
-       name="survey__1__selection__see">
-        <option>Pass/Fail</option>
-      </select></td></tr>
-    """
-
     self._entity = entity
     survey_content = entity.survey_content
     user = user_logic.getForCurrentAccount()
     # no project or survey_record needed for survey prototype
     project = None
     survey_record = None
-
 
     survey_form = surveys.SurveyForm(survey_content=survey_content,
                                      this_user=user, project=project,
@@ -476,16 +453,11 @@ class View(base.View):
                                      editing=True, read_only=False)
     survey_form.getFields()
 
-
-    # activate grades flag -- TODO: Can't configure notice on edit page
-    if request._get.get('activate'):
-      context['notice'] = "Evaluation Grades Have Been Activated"
-
     local = dict(survey_form=survey_form, question_types=QUESTION_TYPES,
                 survey_h=entity.survey_content)
     context.update(local)
 
-    params['edit_form'] = HelperForm(params['edit_form'])
+    params['edit_form'] = surveys.HelperForm(params['edit_form'])
     if entity.survey_end and datetime.datetime.now() > entity.survey_end:
       # are we already passed the survey_end?
       context["passed_survey_end"] = True
@@ -736,158 +708,6 @@ class View(base.View):
       return error, None
 
     return entity, context
-
-  def getMenusForScope(self, entity, params):
-    """List featured surveys if after the survey_start date and before survey_end.
-    """
-
-    # only list surveys for registered users
-    user = user_logic.getForCurrentAccount()
-    if not user:
-      return []
-
-    filter = {
-        'prefix' : params['url_name'],
-        'scope_path': entity.key().id_or_name(),
-        'is_featured': True,
-        }
-
-    entities = self._logic.getForFields(filter)
-    submenus = []
-    now = datetime.datetime.now()
-
-    # cache ACL
-    survey_rights = {}
-
-    # add a link to all featured documents
-    for entity in entities:
-
-      # only list those surveys the user can read
-      if entity.read_access not in survey_rights:
-
-        params = dict(prefix=entity.prefix, scope_path=entity.scope_path,
-                      link_id=entity.link_id, user=user)
-
-        # TODO(ajaksu) use access.Checker.checkIsSurveyReadable
-        checker = access.rights_logic.Checker(entity.prefix)
-        roles = checker.getMembership(entity.read_access)
-        rights = self._params['rights']
-        can_read = access.Checker.hasMembership(rights, roles, params)
-
-        # cache ACL for a given entity.read_access
-        survey_rights[entity.read_access] = can_read
-
-        if not can_read:
-          pass#continue
-
-      elif not survey_rights[entity.read_access]:
-        pass#continue
-
-      # omit if either before survey_start or after survey_end
-      if entity.survey_start and entity.survey_start > now:
-        pass#continue
-
-      if entity.survey_end and entity.survey_end < now:
-        pass#continue
-
-      taken_status = ""
-      taken_status = "(new)"
-      #TODO only if a document is readable it might be added
-      submenu = (redirects.getPublicRedirect(entity, self._params),
-      'Survey ' +  taken_status + ': ' + entity.short_name,
-      'show')
-
-      submenus.append(submenu)
-    return submenus
-
-class HelperForm(object):
-  """Thin wrapper for adding values to params['edit_form'].fields.
-  """
-
-  def __init__(self, form=None):
-    """Store the edit_form.
-    """
-
-    self.form = form
-
-  def __call__(self, instance=None):
-    """Transparently instantiate and add initial values to the edit_form.
-    """
-
-    form = self.form(instance=instance)
-    form.fields['created_by'].initial = instance.author.name
-    form.fields['last_modified_by'].initial = instance.modified_by.name
-    form.fields['doc_key_name'].initial = instance.key().id_or_name()
-    return form
-
-
-def _get_csv_header(sur):
-  """CSV header helper, needs support for comment lines in CSV.
-  """
-
-  tpl = '# %s: %s\n'
-
-  # add static properties
-  fields = ['# Melange Survey export for \n#  %s\n#\n' % sur.title]
-  fields += [tpl % (k,v) for k,v in sur.toDict().items()]
-  fields += [tpl % (f, str(getattr(sur, f))) for f in PLAIN.split()]
-  fields += [tpl % (f, str(getattr(sur, f).link_id)) for f in FIELDS.split()]
-  fields.sort()
-
-  # add dynamic properties
-  fields += ['#\n#---\n#\n']
-  dynamic = sur.survey_content.dynamic_properties()
-  dynamic = [(prop, getattr(sur.survey_content, prop)) for prop in dynamic]
-  fields += [tpl % (k,v) for k,v in sorted(dynamic)]
-
-  # add schema
-  fields += ['#\n#---\n#\n']
-  schema =  sur.survey_content.schema
-  indent = '},\n#' + ' ' * 9
-  fields += [tpl % ('Schema', schema.replace('},', indent)) + '#\n']
-
-  return ''.join(fields).replace('\n', '\r\n')
-
-
-def _get_records(recs, props):
-  """Fetch properties from SurveyRecords for CSV export.
-  """
-
-  records = []
-  props = props[1:]
-  for rec in recs:
-    values = tuple(getattr(rec, prop, None) for prop in props)
-    leading = (rec.user.link_id,)
-    records.append(leading + values)
-  return records
-
-
-def to_csv(survey):
-  """CSV exporter.
-  """
-
-  # get header and properties
-  header = _get_csv_header(survey)
-  leading = ['user', 'created', 'modified']
-  properties = leading + survey.survey_content.orderedProperties()
-
-  try:
-    first = survey.survey_records.run().next()
-  except StopIteration:
-    # bail out early if survey_records.run() is empty
-    return header, survey.link_id
-
-  # generate results list
-  recs = survey.survey_records.run()
-  recs = _get_records(recs, properties)
-
-  # write results to CSV
-  output = StringIO.StringIO()
-  writer = csv.writer(output)
-  writer.writerow(properties)
-  writer.writerows(recs)
-
-  return header + output.getvalue(), survey.link_id
 
 
 view = View()

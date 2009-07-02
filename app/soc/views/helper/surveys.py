@@ -597,6 +597,40 @@ class SurveyResults(widgets.Widget):
     return markup
 
 
+def getSurveyResponseFromPost(survey, post_dict):
+  """Returns the data for a SurveyRecord that answer the questions
+     posed in the given Survey's schema.
+
+  Args:
+      survey: a Survey entity
+      post_dict: dictionary with data from the POST request
+  """
+
+  # TODO(ljvderijk) deal with the comment fields
+
+  # get the schema for this survey
+  schema = eval(survey.survey_content.schema)
+
+  # fill a dictionary with the data to be stored in the SurveyRecord
+  response_dict = {}
+
+  for name, value in post_dict.items():
+    # make sure name is a string
+    name = name.encode()
+    if name not in schema:
+      # property not in survey schema ignore
+      continue
+    else:
+      pick_multi = schema[name]['type'] == 'pick_multi'
+
+      if pick_multi and hasattr(post_dict, 'getlist'): # it's a multidict
+        response_dict[name] = ','.join(post_dict.getlist(name))
+      else:
+        response_dict[name] = value
+
+  return response_dict
+
+
 def getRoleSpecificFields(survey, user, this_project, survey_form,
                           survey_record):
   """For evaluations, mentors get required Project and Grade fields, and

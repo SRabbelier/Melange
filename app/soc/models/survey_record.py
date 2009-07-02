@@ -39,10 +39,9 @@ class BaseSurveyRecord(db.Expando):
   corresponding to the fields of the survey.
   """
 
-  #: Reference to the User entity which took this survey.
-  user = db.ReferenceProperty(reference_class=soc.models.user.User,
-                              required=True, collection_name="surveys_taken",
-                              verbose_name=ugettext('Created by'))
+  #: The survey for which this entity is a record.
+  survey = db.ReferenceProperty(Survey,
+                                collection_name="survey_records")
 
   #: Date when this record was created.
   created = db.DateTimeProperty(auto_now_add=True)
@@ -56,20 +55,16 @@ class BaseSurveyRecord(db.Expando):
     Right now it gets all dynamic values, but it could also be confined to
     the SurveyContent entity linked to the survey entity.
     """
-    survey_order = self.getSurvey().survey_content.getSurveyOrder()
+    survey_order = self.survey.survey_content.getSurveyOrder()
     values = []
     for position, property in survey_order.items():
         values.insert(position, getattr(self, property, None))
     return values
 
 
-# TODO(ajaksu) think of a better way to handle the survey reference
 class SurveyRecord(BaseSurveyRecord):
 
-  #: The survey for which this entity is a record.
-  survey = db.ReferenceProperty(Survey, collection_name="survey_records")
-
-  def getSurvey(self):
-    """Returns the Survey belonging to this record.
-    """
-    return self.survey
+  #: Reference to the User entity which took this survey.
+  user = db.ReferenceProperty(reference_class=soc.models.user.User,
+                              required=True, collection_name="surveys_taken",
+                              verbose_name=ugettext('Taken by'))

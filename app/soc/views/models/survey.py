@@ -493,7 +493,6 @@ class View(base.View):
     user_entity = user_logic.getForCurrentAccount()
 
     # try to get an existing SurveyRecord for the current user
-    # TODO(ljvderijk) deal with the SurveyProperty name in subclasses
     filter = {'survey': entity,
               'user': user_entity}
 

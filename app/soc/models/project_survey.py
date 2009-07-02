@@ -34,8 +34,3 @@ class ProjectSurvey(Survey):
     super(ProjectSurvey, self).__init__(*args, **kwargs)
     self.prefix = 'program'
     self.taking_access = 'student'
-
-  def getRecords(self):
-    """Returns all ProjectSurveyRecords belonging to this survey.
-    """
-    return self.project_survey_records

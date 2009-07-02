@@ -30,22 +30,12 @@ from soc.models.project_survey import ProjectSurvey
 import soc.models.student_project
 
 
-#TODO decide if this should inherit from BaseSurveyRecord
 class ProjectSurveyRecord(SurveyRecord):
   """Record linked to a Project, enabling to store which Projects had their
   Survey done.
   """
 
-  #: The survey for which this entity is a record.
-  project_survey = db.ReferenceProperty(ProjectSurvey,
-                                collection_name="project_survey_records")
-
   #: Reference to the Project that this record belongs to.
   project = db.ReferenceProperty(soc.models.student_project.StudentProject,
                                  required=True,
                                  collection_name="survey_records")
-
-  def getSurvey(self):
-    """Returns the ProjectSurvey that belongs to this record.
-    """
-    return self.project_survey

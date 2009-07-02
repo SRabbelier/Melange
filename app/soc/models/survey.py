@@ -155,8 +155,3 @@ class Survey(soc.models.work.Work):
   #: Referenceproperty that specifies the content of this survey.
   survey_content = db.ReferenceProperty(SurveyContent,
                                      collection_name="survey_parent")
-
-  def getRecords(self):
-    """Returns all SurveyRecords belonging to this survey.
-    """
-    return self.survey_records

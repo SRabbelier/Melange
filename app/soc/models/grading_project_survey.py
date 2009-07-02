@@ -33,8 +33,3 @@ class GradingProjectSurvey(ProjectSurvey):
   def __init__(self, *args, **kwargs):
     super(GradingProjectSurvey, self).__init__(*args, **kwargs)
     self.taking_access = 'mentor'
-
-  def getRecords(self):
-    """Returns all GradingProjectSurveyRecords belonging to this survey.
-    """
-    return self.grading_survey_records

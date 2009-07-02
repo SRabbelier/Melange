@@ -347,25 +347,18 @@ def getListDocumentsRedirect(entity, prefix):
   return '/document/list/%s/%s' % (prefix, entity.key().id_or_name())
 
 
-def getCreateSurveyRedirect(entity, prefix):
-  """Returns the redirect for new documents.
+def getCreateSurveyRedirect(entity, prefix, url_name):
+  """Returns the redirect for new surveys.
   """
 
-  return '/survey/create/%s/%s' % (prefix, entity.key().id_or_name())
+  return '/%s/create/%s/%s' % (url_name, prefix, entity.key().id_or_name())
 
 
-def getListSurveysRedirect(entity, prefix):
-  """Returns the redirect for listing documents.
+def getListSurveysRedirect(entity, prefix, url_name):
+  """Returns the redirect for listing surveys.
   """
 
-  return '/survey/list/%s/%s' % (prefix, entity.key().id_or_name())
-
-
-def getListSurveyResultsRedirect(entity, prefix):
-  """Returns the redirect for listing documents.
-  """
-
-  return '/survey/list_results/%s/%s' % (prefix, entity.key().id_or_name())
+  return '/%s/list/%s/%s' % (url_name, prefix, entity.key().id_or_name())
 
 
 def getTakeProjectSurveyRedirect(entity, info):

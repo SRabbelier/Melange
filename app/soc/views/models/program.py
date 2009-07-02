@@ -672,11 +672,29 @@ class View(presence.View):
         items += [(redirects.getListDocumentsRedirect(entity, 'program'),
             "List Documents", 'any_access')]
         # add link to create a new Program Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'program'),
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+                                                     'survey'),
             "Create a New Survey", 'any_access')]
         # add link to list all Program Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'program'),
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+                                                    'survey'),
             "List Surveys", 'any_access')]
+        # add link to create a new Project Survey
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+                                                     'project_survey'),
+            "Create a New Project Survey", 'any_access')]
+        # add link to list all Project Surveys
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+                                                    'project_survey'),
+            "List Project Surveys", 'any_access')]
+        # add link to create a new Grading Survey
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+                                                     'grade_survey'),
+            "Create a New Grading Survey", 'any_access')]
+        # add link to list all Grading Surveys
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+                                                    'grade_survey'),
+            "List Grading Surveys", 'any_access')]
 
       except out_of_band.Error:
         pass

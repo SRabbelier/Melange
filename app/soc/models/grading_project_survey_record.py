@@ -40,4 +40,5 @@ class GradingProjectSurveyRecord(ProjectSurveyRecord):
   """
 
   #: Required grade given to the project that this survey is about.
+  #: Symbolizes pass(=True) or fail(=False)
   grade = db.BooleanProperty(required=True)

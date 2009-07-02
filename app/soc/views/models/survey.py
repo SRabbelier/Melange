@@ -496,6 +496,7 @@ class View(base.View):
     # TODO(ljvderijk) deal with the SurveyProperty name in subclasses
     filter = {'survey': entity,
               'user': user_entity}
+
     survey_record = record_logic.getForFields(filter, unique=True)
 
     if request.POST:
@@ -537,9 +538,23 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    # TODO(ljvderijk) implement takePost
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
 
-    return http.HttpResponse("Work in Progress")
+    # TODO: check the validity of the form data
+    properties = surveys.getSurveyResponseFromPost(entity, request.POST)
+
+    # add the required SurveyRecord properties
+    properties['user'] = user_logic.getForCurrentAccount()
+    properties['survey'] = entity
+
+    # update the record entity if any and clear all dynamic properties
+    record_logic.updateOrCreateFromFields(record, properties, clear_dynamic=True)
+
+    # TODO: add notice to page that the response has been saved successfully
+    # redirect to the same page for now
+    redirect = request.path
+    return http.HttpResponseRedirect(redirect)
 
   def setHelpAndStatus(self, context, survey, survey_record):
     """Get help_text and status for template use.

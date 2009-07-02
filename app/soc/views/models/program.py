@@ -637,7 +637,6 @@ class View(presence.View):
       if entity.status == 'visible':
         # show the documents for this program, even for not logged in users
         items += document_view.view.getMenusForScope(entity, params)
-        items += survey_view.view.getMenusForScope(entity, params)
         items += self._getTimeDependentEntries(entity, params, id, user)
 
       try:

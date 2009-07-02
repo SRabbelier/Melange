@@ -513,6 +513,7 @@ class View(base.View):
     Args:
         template: the template used for this view
         entity: the Survey entity
+        record: a SurveyRecord entity
         rest: see base.View.public()
     """
 
@@ -526,7 +527,24 @@ class View(base.View):
     context['survey_form'] = survey_form
     self.setHelpAndStatus(context, entity, record)
 
+    # call the hook method
+    self._takeGet(request, template, context, params, entity, record, **kwargs)
+
     return responses.respond(request, template, context)
+
+  def _takeGet(self, request, template, context, params, entity, record,
+              **kwargs):
+    """Hook for the GET request for the Survey's take page.
+
+    This method is called just before the GET page is shown.
+
+    Args:
+        template: the template used for this view
+        entity: the Survey entity
+        record: a SurveyRecord entity
+        rest: see base.View.public()
+    """
+    pass
 
   def takePost(self, request, template, context, params, entity, record,
                **kwargs):
@@ -535,6 +553,7 @@ class View(base.View):
     Args:
         template: the template used for this view
         entity: the Survey entity
+        record: a SurveyRecord entity
         rest: see base.View.public()
     """
 
@@ -548,6 +567,9 @@ class View(base.View):
     properties['user'] = user_logic.getForCurrentAccount()
     properties['survey'] = entity
 
+    # call the hook method before updating the SurveyRecord
+    self._takePost(request, params, entity, record, properties)
+
     # update the record entity if any and clear all dynamic properties
     record_logic.updateOrCreateFromFields(record, properties, clear_dynamic=True)
 
@@ -555,6 +577,20 @@ class View(base.View):
     # redirect to the same page for now
     redirect = request.path
     return http.HttpResponseRedirect(redirect)
+
+  def _takePost(self, request, params, entity, record, properties):
+    """Hook for the POST request for the Survey's take page.
+
+    This method is called just before the SurveyRecord is stored.
+
+    Args:
+        request: Django Request object
+        params: the params for the current view
+        entity: a Survey entity
+        record: a SurveyRecord entity
+        properties: properties to be stored in the SurveyRecord entity
+    """
+    pass
 
   def setHelpAndStatus(self, context, survey, survey_record):
     """Get help_text and status for template use.

@@ -1,0 +1,15 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'"
+ onclick="document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right">
+   <div class="title">
+    <a class="noul"
+     href="{{ list.redirect }}">{{ list.item.scope_path}}/{{ list.item.link_id }}</a>
+   </div>
+  </td>
+  <td><div class="title">{{ list.item.title }}</div></td>
+  <td><div class="link_id">{{ list.item.link_id }}</div></td>
+  <td><div class="featured">{{ list.item.is_featured }}</div></td>
+  <td><div class="author">{{ list.item.author.link_id }}</div></td>
+  <td><div class="created">{{ list.item.created }}</div></td>
+  <td><div class="modified">{{ list.item.modified }}</div></td>
+</tr>

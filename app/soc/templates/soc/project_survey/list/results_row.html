@@ -1,0 +1,51 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'"
+onclick="return false; document.location.href='{{ list.redirect }}'" name="name">
+
+  {% for value in list.item.getValues %}
+    <td>
+      <div class="{{ value }}">
+        {{ value }}
+      </div>
+    </td>
+  {% endfor %}
+
+  <td>
+    <div class="author">
+      {{ list.item.user.link_id }}
+    </div>
+  </td>
+
+  <td>
+    <div class="created">
+      {{ list.item.created|date:"Y-m-d H:i" }}
+    </div>
+  </td>
+
+  <td>
+    <div class="modified">
+      {{ list.item.modified|date:"Y-m-d H:i" }}
+    </div>
+  </td>
+
+  <td>
+    <a class="fetch_answers" id="results_for_{{ list.item.user.link_id }}">View</a>
+  </td>
+
+  {% if grades %}
+  <td>
+    <div class="grade">
+      <select id="id_survey__{{ list.item.user.link_id }}__selection__grade"
+       name="id_survey__{{ list.item.user.link_id }}__selection__grade">
+
+        <option value='' {% ifequal list.item.grade '' %} selected="selected" {% endifequal %} >
+         None</option>
+        <option value='pass' {% ifequal list.item.grade 'Pass' %} selected="selected" {% endifequal %} >
+        Pass</option>
+        <option value='fail' {% ifequal list.item.grade 'Fail' %} selected="selected" {% endifequal %} >
+        Fail</option>
+
+      </select>
+    </div>
+  </td>
+  {% endif %}
+</tr>

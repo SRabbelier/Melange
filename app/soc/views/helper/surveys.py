@@ -599,7 +599,7 @@ class SurveyResults(widgets.Widget):
 
 def getSurveyResponseFromPost(survey, post_dict):
   """Returns the data for a SurveyRecord that answer the questions
-     posed in the given Survey's schema.
+  posed in the given Survey's schema.
 
   Args:
       survey: a Survey entity

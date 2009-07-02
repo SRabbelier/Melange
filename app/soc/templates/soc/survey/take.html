@@ -33,7 +33,11 @@ limitations under the License.
 
   {{ help_text }}
 
-  <form method="post">
+  {% if form_action %}
+    <form method="post" action="{{ form_action }}">
+  {% else %}
+    <form method="post">
+  {% endif %}
     <div style="width:100%; float:left;">
       <div class="{{ status }}" id="survey_widget">
         <table>

@@ -368,6 +368,22 @@ def getListSurveyResultsRedirect(entity, prefix):
   return '/survey/list_results/%s/%s' % (prefix, entity.key().id_or_name())
 
 
+def getTakeProjectSurveyRedirect(entity, info):
+  """Returns the redirect for taking a Survey for the given Student Project.
+
+  Args:
+      entity: a StudentProject entity
+      info: a dictionary contain a survey and params entry
+  """
+
+  survey_entity = info['survey']
+  params = info['params']
+
+  return '/%s/take/%s?project=%s' %(params['url_name'],
+                                    survey_entity.key().id_or_name(),
+                                    entity.key().id_or_name())
+
+
 def getToSRedirect(presence):
   """Returns link to 'show' the ToS Document if it exists, None otherwise.
 

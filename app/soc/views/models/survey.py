@@ -112,7 +112,7 @@ class View(base.View):
     new_params['extra_django_patterns'] = [
          (r'^%(url_name)s/(?P<access_type>take)/%(key_fields)s$',
          'soc.views.models.%(module_name)s.take',
-         'Take %(module_name)s'),
+         'Take %(name)s'),
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
          'soc.views.models.%(module_name)s.json',
          'Export %(name)s as JSON'),

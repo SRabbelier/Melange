@@ -24,8 +24,11 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.logic.models.survey import project_logic as project_survey_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import lists
+from soc.views.helper import redirects
 from soc.views.models import survey
 
 
@@ -44,11 +47,11 @@ class View(survey.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = [('checkIsSurveyReadable', project_survey_logic)]
-    rights['create'] = ['checkIsUser']
+    rights['create'] = ['checkIsDeveloper'] # TODO(ljvderijk) proper access check
     rights['edit'] = [('checkIsSurveyWritable', project_survey_logic)]
     rights['delete'] = [('checkIsSurveyWritable', project_survey_logic)]
     rights['list'] = ['checkDocumentList']
-    rights['pick'] = ['checkDocumentPick']
+    rights['take'] = ['checkIsDeveloper'] # TODO(ljvderijk) add Project check
 
     new_params = {}
     new_params['logic'] = project_survey_logic
@@ -62,16 +65,108 @@ class View(survey.View):
 
     super(View, self).__init__(params=params)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def take(self, request, access_type, page_name=None,
+           params=None, **kwargs):
+    """View for taking a Survey.
+
+    For Args see base.View().public().
+    """
+
+    from soc.logic.models.student import logic as student_logic
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    get_dict = request.GET
+
+    if not 'project' in get_dict:
+      user_entity = user_logic.getForCurrentAccount()
+
+      fields = {'user': user_entity,
+                'scope': survey_logic.getScope(entity),
+                'status': 'active'}
+
+      student_entity = student_logic.getForFields(fields, unique=True)
+
+      # TODO(ljvderijk) transform StudentProject to handle multiple surveys
+      fields = {'student': student_entity,
+                'status': 'accepted'}
+
+      # show project selection screen
+      return self._selectProjects(request, page_name, params, entity, fields)
+
+    return super(View, self).take(request, 'any_access', page_name=page_name,
+                                  params=params, **kwargs)
+
+  def _takeGet(self, request, template, context, params, entity, record,
+              **kwargs):
+    """Hooking into the view for the take's page GET request.
+
+    For params see survey.View._takeGet().
+    """
+
+    # the form action should contain the requested project
+    context['form_action'] = "?project=%s" %(request.GET['project'])
+
+  def _takePost(self, request, params, entity, record, properties):
+    """Hook into the view for the take's page POST request.
+
+    This is used to ensure the right StudentProject gets stored
+
+    For params see survey.View._takePost().
+    """
+
+    from soc.logic.models.student_project import logic as student_project_logic
+
+    # retrieve the project using the key name in the GET param
+    get_dict = request.GET
+    project_entity = student_project_logic.getFromKeyName(get_dict['project'])
+
+    # update the properties that will be stored with the referenced project
+    properties.update(project=project_entity)
+
+  def _selectProjects(self, request, page_name, params, survey, fields):
+    """Shows a view upon which a User can select a Student Project to fill in
+    the ProjectSurvey for.
+
+    Args:
+      survey: a Survey entity
+      fields: the filter to use on the Project List.
+      rest: see base.View.public()
+    """
+
+    from soc.views.models.student_project import view as student_project_view
+
+    student_project_params = student_project_view.getParams().copy()
+
+    redirect_dict = {'survey': survey,
+                     'params': params}
+
+    student_project_params['list_action'] = (
+        redirects.getTakeProjectSurveyRedirect, redirect_dict)
+    student_project_params['list_description'] = (
+        "Select a %s for which to fill in the %s named %s" %(
+            student_project_params['name'], params['name'], survey.title))
+
+    content = lists.getListContent(request, student_project_params, fields)
+    contents = [content]
+
+    return self._list(request, student_project_params, contents, page_name)
+
 
 view = View()
 
-admin = decorators.view(view.admin)
 create = decorators.view(view.create)
 edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
-export = decorators.view(view.export)
-pick = decorators.view(view.pick)
-results = decorators.view(view.viewResults)
-json = decorators.view(view.exportSerialized)
+take = decorators.view(view.take)

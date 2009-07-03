@@ -106,6 +106,32 @@ class View(survey.View):
     return super(View, self).take(request, 'any_access', page_name=page_name,
                                   params=params, **kwargs)
 
+  def _getSurveyRecordFor(self, survey, request, params):
+    """Returns the SurveyRecord for the given Survey and request.
+
+    This method also take the StudentProject specified as GET param into
+    account when querying for the SurveyRecord.
+
+    For params see base.View._getSurveyRecordFor().
+    """
+
+    from soc.logic.models.student_project import logic as student_project_logic
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    # get the StudentProject specified in the GET params
+    project_key_name = request.GET['project']
+    project_entity = student_project_logic.getFromKeyName(project_key_name)
+
+    filter = {'survey': survey,
+              'user': user_entity,
+              'project': project_entity}
+
+    return record_logic.getForFields(filter, unique=True)
+
   def _takeGet(self, request, template, context, params, entity, record,
               **kwargs):
     """Hooking into the view for the take's page GET request.

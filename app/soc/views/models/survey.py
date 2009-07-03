@@ -474,10 +474,9 @@ class View(base.View):
     """
 
     survey_logic = params['logic']
-    record_logic = survey_logic.getRecordLogic()
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])
@@ -490,13 +489,8 @@ class View(base.View):
     context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
 
-    user_entity = user_logic.getForCurrentAccount()
-
     # try to get an existing SurveyRecord for the current user
-    filter = {'survey': entity,
-              'user': user_entity}
-
-    survey_record = record_logic.getForFields(filter, unique=True)
+    survey_record = self._getSurveyRecordFor(entity, request, params)
 
     if request.POST:
       return self.takePost(request, template, context, params, entity,
@@ -504,6 +498,29 @@ class View(base.View):
     else: #request.GET
       return self.takeGet(request, template, context, params, entity,
                           survey_record, **kwargs)
+
+  def _getSurveyRecordFor(self, survey, request, params):
+    """Returns the SurveyRecord for the given Survey and request.
+
+    Args:
+        survey: a Survey entity
+        request: a Django HTTPRequest object
+        params: params for the requesting view
+
+    Returns:
+        An existing SurveyRecord iff any exists for the given Survey, request
+        and any other conditions that must apply.
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    filter = {'survey': survey,
+              'user': user_entity}
+
+    return record_logic.getForFields(filter, unique=True)
 
   def takeGet(self, request, template, context, params, entity, record,
               **kwargs):

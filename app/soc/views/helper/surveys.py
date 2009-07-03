@@ -139,6 +139,9 @@ class SurveyForm(djangoforms.ModelForm):
       else:
         extra_attrs['disabled'] = 'disabled'
 
+    # flag whether we can use getlist to retrieve multiple values
+    is_post = hasattr(post_dict, 'getlist')
+
     # add unordered fields to self.survey_fields
     for field in self.survey_content.dynamic_properties():
 
@@ -150,7 +153,10 @@ class SurveyForm(djangoforms.ModelForm):
 
       if has_record and field in post_dict:
         # entered value that is not yet saved
-        value = post_dict[field]
+        if schema.getType(field) == 'pick_multi' and is_post:
+          value = post_dict.getlist(field)
+        else:
+          value = post_dict[field]
         if COMMENT_PREFIX + field in post_dict:
           comment = post_dict[COMMENT_PREFIX + field]
       elif has_record and hasattr(self.survey_record, field):

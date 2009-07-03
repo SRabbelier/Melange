@@ -553,16 +553,14 @@ class View(base.View):
     # fetch field contents and pass request data, if any
     survey_form.getFields(post_dict=form_data)
 
-    # validate request data
-    if form_data and not survey_form.is_valid():
-      survey_form.full_clean()
-      context['survey_form'] = survey_form
-      return self._constructResponse(request, entity=None, context=context,
-          form=survey_form, params=params, template=template)
-
     # fill context with the survey and additional information
     context['survey_form'] = survey_form
     self.setHelpAndStatus(context, entity, record)
+
+    # validate request data
+    if form_data and not survey_form.is_valid():
+      return self._constructResponse(request, entity=entity, context=context,
+          form=survey_form, params=params, template=template)
 
     # call the hook method
     self._takeGet(request, template, context, params, entity, record, **kwargs)

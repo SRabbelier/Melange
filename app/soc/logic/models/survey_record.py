@@ -83,8 +83,9 @@ class GradingProjectLogic(ProjectLogic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(GradingProjectLogic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+    super(GradingProjectLogic, self).__init__(model=model,
+                                              base_model=base_model,
+                                              scope_logic=scope_logic)
 
 
 logic = Logic()

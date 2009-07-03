@@ -346,6 +346,7 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
+
 class ProjectLogic(Logic):
   """Logic class for ProjectSurvey.
   """
@@ -373,7 +374,8 @@ class GradingProjectLogic(ProjectLogic):
 
     super(GradingProjectLogic, self).__init__(model=model,
                                               base_model=base_model,
-                                              scope_logic=scope_logic)
+                                              scope_logic=scope_logic,
+                                              record_logic=record_logic)
 
 
 logic = Logic()

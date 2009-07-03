@@ -67,7 +67,8 @@ class View(project_survey.View):
     """This is a hack to support the 'Enable grades' button.
     """
     self.activateGrades(request)
-    redirect_path = request.path.replace('/activate/', '/edit/') + '?activate=1'
+    redirect_path = request.path.replace('/activate/', '/edit/') + (
+        '?activate=1')
     return http.HttpResponseRedirect(redirect_path)
 
 
@@ -78,7 +79,6 @@ class View(project_survey.View):
     survey = Survey.get_by_key_name(survey_key_name)
     survey_logic.activateGrades(survey)
     return
-
 
   def _takeGet(self, request, template, context, params, entity, record,
               **kwargs):
@@ -100,17 +100,17 @@ class View(project_survey.View):
     return super(View, self)._takeGet(request, template, context,
                                       params, entity, record, **kwargs)
 
-
   def addGradeField(self, survey, survey_record):
-    """ adds a Grade Field to Survey.
-    Used for mentor evaluations. 
+    """Adds a Grade Field to Survey.
+
+    Used for mentor evaluations.
 
     params:
       survey: the survey being taken
       survey_record: an existing survey record for a user-project-survey combo,
         or None
+    """
 
-    """ 
     # Add a grade field determining if student passes or fails.
     # Activate grades handler should determine whether new status
     # is midterm_passed, final_passed, etc.

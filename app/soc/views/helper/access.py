@@ -1512,7 +1512,8 @@ class Checker(object):
 
   @allowSidebar
   @allowDeveloper
-  def checkIsSurveyReadable(self, django_args, survey_logic, key_name_field=None):
+  def checkIsSurveyReadable(self, django_args, survey_logic,
+                            key_name_field=None):
     """Checks whether a survey is readable.
 
     Args:
@@ -1531,7 +1532,8 @@ class Checker(object):
 
   @denySidebar
   @allowDeveloper
-  def checkIsSurveyWritable(self, django_args, survey_logic, key_name_field=None):
+  def checkIsSurveyWritable(self, django_args, survey_logic,
+                            key_name_field=None):
     """Checks whether a survey is writable.
 
     Args:

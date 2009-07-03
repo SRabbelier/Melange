@@ -51,12 +51,14 @@ class SurveyRecordGroup(db.Expando):
   # it possible to setup which surveys should be grouped.
 
   #: Mentor SurveyRecord for this evaluation.
-  mentor_record = db.ReferenceProperty(GradingProjectSurveyRecord, required=False,
-                              collection_name='mentor_record_groups')
+  mentor_record = db.ReferenceProperty(GradingProjectSurveyRecord,
+                                       required=False,
+                                       collection_name='mentor_record_groups')
 
   #: Student SurveyRecord for this evaluation.
-  student_record = db.ReferenceProperty(ProjectSurveyRecord, required=False,
-                              collection_name='student_record_groups')
+  student_record = db.ReferenceProperty(
+      ProjectSurveyRecord, required=False,
+      collection_name='student_record_groups')
 
   #: Project for this evaluation.
   project = db.ReferenceProperty(soc.models.student_project.StudentProject,

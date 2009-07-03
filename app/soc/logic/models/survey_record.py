@@ -41,12 +41,12 @@ class Logic(expando_base.Logic):
                                 scope_logic=scope_logic, id_based=True)
 
   def updateOrCreateFromFields(self, entity, properties, clear_dynamic=False):
-    """ Create a new SurveyRecord, or update an existing one.
+    """Create a new SurveyRecord, or update an existing one.
 
     params:
-      entity = existing SurveyRecord, if one exists
-      properties = the properties to be set
-      clear_dynamic = iff True removes all dynamic properties before updating
+      entity: existing SurveyRecord, if one exists
+      properties: the properties to be set
+      clear_dynamic: iff True removes all dynamic properties before updating
     """
 
     if entity:

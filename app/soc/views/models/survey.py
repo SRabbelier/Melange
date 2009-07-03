@@ -535,14 +535,13 @@ class View(base.View):
     return record_logic.getForFields(filter, unique=True)
 
   def takeGet(self, request, template, context, params, entity, record,
-              form_data=None, **kwargs):
+              **kwargs):
     """Handles the GET request for the Survey's take page.
 
     Args:
         template: the template used for this view
         entity: the Survey entity
         record: a SurveyRecord entity
-        form_data: dict with form data that will be used for validation
         rest: see base.View.public()
     """
 
@@ -550,17 +549,12 @@ class View(base.View):
                                      survey_record=record,
                                      survey_logic=self._params['logic'])
 
-    # fetch field contents and pass request data, if any
-    survey_form.getFields(post_dict=form_data)
+    # fetch field contents
+    survey_form.getFields()
 
     # fill context with the survey and additional information
     context['survey_form'] = survey_form
     self.setHelpAndStatus(context, entity, record)
-
-    # validate request data
-    if form_data and not survey_form.is_valid():
-      return self._constructResponse(request, entity=entity, context=context,
-          form=survey_form, params=params, template=template)
 
     # call the hook method
     self._takeGet(request, template, context, params, entity, record, **kwargs)
@@ -603,9 +597,13 @@ class View(base.View):
     survey_form.getFields(post_dict=request.POST)
 
     if not survey_form.is_valid():
-      # redirect to takeGet so we can handle errors
-      return self.takeGet(request, template, context, params, entity, record,
-                          form_data=request.POST)
+      # fill context with the survey and additional information
+      context['survey_form'] = survey_form
+      self.setHelpAndStatus(context, entity, record)
+      # show the form errors
+      return self._constructResponse(request, entity=entity, context=context,
+                                     form=survey_form, params=params,
+                                     template=template)
 
     # retrieve the data from the form
     _, properties = forms_helper.collectCleanedFields(survey_form)

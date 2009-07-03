@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"James Levy" <jamesalexanderlevy@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -49,7 +50,7 @@ class View(project_survey.View):
     rights['edit'] = [('checkIsSurveyWritable', grading_survey_logic)]
     rights['delete'] = [('checkIsSurveyWritable', grading_survey_logic)]
     rights['list'] = ['checkDocumentList']
-    rights['pick'] = ['checkDocumentPick']
+    rights['take'] = ['checkIsDeveloper'] # TODO(ljvderijk) add Project check
 
     new_params = {}
     new_params['logic'] = grading_survey_logic
@@ -79,15 +80,64 @@ class View(project_survey.View):
     return
 
 
+  def _takeGet(self, request, template, context, params, entity, record,
+              **kwargs):
+    """Hook for the GET request for the Survey's take page.
+
+    This method is called just before the GET page is shown.
+
+    Args:
+        template: the template used for this view
+        entity: the Survey entity
+        record: a SurveyRecord entity
+        rest: see base.View.public()
+    """
+
+    gradeField = self.addGradeField(entity, record)
+    field_count = len(eval(entity.survey_content.schema).items())
+    context['survey_form'].fields.insert(field_count + 1, 'grade', gradeField)
+
+    return super(View, self)._takeGet(request, template, context,
+                                      params, entity, record, **kwargs)
+
+
+  def addGradeField(self, survey, survey_record):
+    """ adds a Grade Field to Survey.
+    Used for mentor evaluations. 
+
+    params:
+      survey: the survey being taken
+      survey_record: an existing survey record for a user-project-survey combo,
+        or None
+
+    """ 
+    # Add a grade field determining if student passes or fails.
+    # Activate grades handler should determine whether new status
+    # is midterm_passed, final_passed, etc.
+    grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
+    grade_vals = { 'pass': True, 'fail': False }
+    from django import forms
+    gradeField = forms.fields.ChoiceField(choices=grade_choices,
+                                           required=True,
+                                           widget=forms.Select())
+
+    gradeField.choices.insert(0, (None, "Choose a Grade")  )
+    if survey_record:
+      for g in grade_choices:
+        if grade_vals[g[0]] == survey_record.grade:
+          gradeField.choices.insert(0, (g[0],g[1] + " (Saved)")   )
+          gradeField.choices.remove(g)
+          break;
+      gradeField.show_hidden_initial = True
+
+    return gradeField
+
+
 view = View()
 
-admin = decorators.view(view.admin)
 create = decorators.view(view.create)
 edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
-export = decorators.view(view.export)
-pick = decorators.view(view.pick)
-results = decorators.view(view.viewResults)
-json = decorators.view(view.exportSerialized)
+take = decorators.view(view.take)

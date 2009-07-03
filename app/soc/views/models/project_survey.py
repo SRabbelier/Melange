@@ -77,10 +77,9 @@ class View(survey.View):
     from soc.logic.models.student import logic as student_logic
 
     survey_logic = params['logic']
-    record_logic = survey_logic.getRecordLogic()
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])

@@ -46,6 +46,26 @@ from soc.models.survey import COMMENT_PREFIX
 from soc.models.survey import SurveyContent
 
 
+# TODO(ajaksu) add this to template
+REQUIRED_COMMENT_TPL = """
+  <label for="required_for_{{ name }}">Required</label>
+  <select id="required_for_{{ name }}" name="required_for_{{ name }}">
+    <option value="True" {% if is_required %} selected='selected' {% endif %}
+     >True</option>
+    <option value="False" {% if not is_required %} selected='selected'
+     {% endif %}>False</option>
+  </select><br/>
+
+  <label for="comment_for_{{ name }}">Allow Comments</label>
+  <select id="comment_for_{{ name }}" name="comment_for_{{ name }}">
+    <option value="True" {% if has_comment %} selected='selected' {% endif %}
+     >True</option>
+    <option value="False" {% if not has_comment %} selected='selected'
+     {% endif %}>False</option>
+  </select><br/>
+"""
+
+
 class SurveyForm(djangoforms.ModelForm):
   """Main SurveyContent form.
 
@@ -161,12 +181,17 @@ class SurveyForm(djangoforms.ModelForm):
 
       # find correct field type
       addField = self.fields_map[schema.getType(field)]
-      addField(field, value, extra_attrs, schema, label=label, comment=comment)
 
-      # handle comments
-      comment_name = COMMENT_PREFIX + field
-      if comment_name in post_dict or hasattr(self.survey_record, comment_name):
-        self.data[comment_name] = comment
+      # check if question is required, it's never required when editing
+      required = not self.editing and schema.getRequired(field)
+      kwargs = dict(label=label, req=required)
+
+      # add new field
+      addField(field, value, extra_attrs, schema, **kwargs)
+
+      # handle comments if question allows them
+      if schema.getHasComment(field):
+        self.data[COMMENT_PREFIX + field] = comment
         self.addCommentField(field, comment, extra_attrs, tip='Add a comment.')
 
     return self.insertFields()
@@ -189,7 +214,7 @@ class SurveyForm(djangoforms.ModelForm):
                              self.survey_fields[property])
     return self.fields
 
-  def addLongField(self, field, value, attrs, schema, req=False, label='',
+  def addLongField(self, field, value, attrs, schema, req=True, label='',
                    tip='', comment=''):
     """Add a long answer fields to this form.
 
@@ -204,7 +229,11 @@ class SurveyForm(djangoforms.ModelForm):
       comment: initial comment value for field
     """
 
-    widget = widgets.Textarea(attrs=attrs)
+    # use a widget that allows setting required and comments
+    has_comment = schema.getHasComment(field)
+    is_required = schema.getRequired(field)
+    widget = LongTextarea(is_required, has_comment, attrs=attrs,
+                          editing=self.editing)
 
     if not tip:
       tip = 'Please provide a long answer to this question.'
@@ -230,7 +259,12 @@ class SurveyForm(djangoforms.ModelForm):
     """
 
     attrs['class'] = "text_question"
-    widget = widgets.TextInput(attrs=attrs)
+
+    # use a widget that allows setting required and comments
+    has_comment = schema.getHasComment(field)
+    is_required = schema.getRequired(field)
+    widget = ShortTextInput(is_required, has_comment, attrs=attrs,
+                          editing=self.editing)
 
     if not tip:
       tip = 'Please provide a short answer to this question.'
@@ -298,8 +332,6 @@ class SurveyForm(djangoforms.ModelForm):
     if self.survey_record and isinstance(value, basestring):
       # pass value as 'initial' so MultipleChoiceField renders checked boxes
       value = value.split(',')
-    else:
-      value = None
 
     these_choices = [(v,v) for v in getattr(self.survey_content, field)]
     if not tip:
@@ -365,6 +397,18 @@ class SurveyContentSchema(object):
   def getType(self, field):
     return self.schema[field]["type"]
 
+  def getRequired(self, field):
+    """Check whether survey question is required.
+    """
+
+    return self.schema[field]["required"]
+
+  def getHasComment(self, field):
+    """Check whether survey question allows adding a comment.
+    """
+
+    return self.schema[field]["has_comment"]
+
   def getRender(self, field):
     return self.schema[field]["render"]
 
@@ -375,7 +419,9 @@ class SurveyContentSchema(object):
     if editing:
       kind = self.getType(field)
       render = self.getRender(field)
-      widget = UniversalChoiceEditor(kind, render)
+      is_required = self.getRequired(field)
+      has_comment = self.getHasComment(field)
+      widget = UniversalChoiceEditor(kind, render, is_required, has_comment)
     else:
       widget = WIDGETS[self.schema[field]['render']](attrs=attrs)
     return widget
@@ -401,7 +447,15 @@ class UniversalChoiceEditor(widgets.Widget):
   Allows adding and removing options, re-ordering and editing option text.
   """
 
-  def __init__(self, kind, render, attrs=None, choices=()):
+  def __init__(self, kind, render, is_required, has_comment, attrs=None,
+               choices=()):
+    """
+    params:
+      kind: question kind (one of selection, pick_multi or pick_quant)
+      render: question widget (single_select, multi_checkbox or quant_radio)
+      is_required: bool, controls selection in the required_for field
+      has_comments: bool, controls selection in the has_comments field
+    """
 
     self.attrs = attrs or {}
 
@@ -411,9 +465,14 @@ class UniversalChoiceEditor(widgets.Widget):
     self.choices = list(choices)
     self.kind = kind
     self.render_as = render
+    self.is_required = is_required
+    self.has_comment = has_comment
+
 
   def render(self, name, value, attrs=None, choices=()):
-    """ renders UCE widget
+    """Render UCE widget.
+
+    Option reordering, editing, addition and deletion are added here.
     """
 
     if value is None:
@@ -432,6 +491,12 @@ class UniversalChoiceEditor(widgets.Widget):
         is_checkboxes=selected * (self.render_as == 'multi_checkbox'),
         is_radio_buttons=selected * (self.render_as == 'quant_radio'),
         )
+
+    # set required and has_comment selects
+    context.update(dict(
+        is_required = self.is_required,
+        has_comment = self.has_comment,
+        ))
 
     str_value = forms.util.smart_unicode(value) # normalize to string.
     chained_choices = enumerate(chain(self.choices, choices))
@@ -470,6 +535,86 @@ class PickQuantField(forms.MultipleChoiceField):
 
   def __init__(self, *args, **kwargs):
     super(PickQuantField, self).__init__(*args, **kwargs)
+
+
+class LongTextarea(widgets.Textarea):
+  """Set whether long question is required or allows comments.
+  """
+
+  def __init__(self, is_required, has_comment, attrs=None, editing=False):
+    """Initialize widget and store editing mode.
+
+    params:
+      is_required: bool, controls selection in the 'required' extra field
+      has_comments: bool, controls selection in the 'has_comment' extra field
+      editing: bool, controls rendering as plain textarea or with extra fields
+    """
+
+    self.editing = editing
+    self.is_required = is_required
+    self.has_comment = has_comment
+
+    super(LongTextarea, self).__init__(attrs)
+
+  def render(self, name, value, attrs=None):
+    """Render plain textarea or widget with extra fields.
+
+    Extra fields are 'required' and 'has_comment'.
+    """
+
+    # plain text area
+    output = super(LongTextarea, self).render(name, value, attrs)
+
+    if self.editing:
+      # add 'required' and 'has_comment' fields
+      context = dict(name=name, is_required=self.is_required,
+                     has_comment=self.has_comment)
+      template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
+      rendered = template.render(context=loader.Context(dict_=context))
+      output =  rendered + output
+
+      output = '<fieldset>' + output + '</fieldset>'
+    return output
+
+
+class ShortTextInput(widgets.TextInput):
+  """Set whether short answer question is required or allows comments.
+  """
+
+  def __init__(self, is_required, has_comment, attrs=None, editing=False):
+    """Initialize widget and store editing mode.
+
+    params:
+      is_required: bool, controls selection in the 'required' extra field
+      has_comments: bool, controls selection in the 'has_comment' extra field
+      editing: bool, controls rendering as plain text input or with extra fields
+    """
+
+    self.editing = editing
+    self.is_required = is_required
+    self.has_comment = has_comment
+
+    super(ShortTextInput, self).__init__(attrs)
+
+  def render(self, name, value, attrs=None):
+    """Render plain text input or widget with extra fields.
+
+    Extra fields are 'required' and 'has_comment'.
+    """
+
+    # plain text area
+    output = super(ShortTextInput, self).render(name, value, attrs)
+
+    if self.editing:
+      # add 'required' and 'has_comment' fields
+      context = dict(name=name, is_required=self.is_required,
+                     has_comment=self.has_comment)
+      template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
+      rendered = template.render(context=loader.Context(dict_=context))
+      output =  rendered + output
+
+      output = '<fieldset>' + output + '</fieldset>'
+    return output
 
 
 class PickOneSelect(forms.Select):
@@ -664,8 +809,8 @@ def getSurveyResponseFromPost(survey, post_dict):
     response_dict[name] = value
 
     # handle comments
-    comment_name = COMMENT_PREFIX + name
-    if comment_name in post_dict:
+    if schema.getHasComment(name):
+      comment_name = COMMENT_PREFIX + name
       comment = post_dict.get(comment_name)
       if comment:
         response_dict[comment_name] = comment

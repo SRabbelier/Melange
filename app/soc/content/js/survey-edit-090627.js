@@ -565,11 +565,43 @@
             // create the HTML for the field
             switch (button_id) {
             case "short_answer":
-              new_field = "<input type='text'/ class='short_answer'>";
+              new_field = ["<fieldset>\n",
+                          '<label for="required_for_',
+                           field_name, '">Required</label>',
+                           '<select id="required_for_', field_name,
+                           '" name="required_for_', field_name,
+                           '"><option value="True" selected="selected">True',
+                           '</option>', '<option value="False">False</option>',
+                           '</select><br/>', '<label for="comment_for_',
+                           field_name, '">Allow Comments</label>',
+                           '<select id="comment_for_', field_name,
+                           '" name="comment_for_', field_name, '">',
+                           '<option value="True" selected="selected">',
+                           'True</option>', '<option value="False">',
+                           'False</option>', '</select><br/>',
+                          "<input type='text' ",
+                           "class='short_answer'>", "</fieldset>"
+                          ].join("");
               break;
             case "long_answer":
-              new_field = ["<textarea cols='40' rows='", MIN_ROWS,
-                           "' class='long_answer'/>"].join("");
+              field_count = survey_table.find('tr').length;
+              new_field_count = field_count + 1 + '__';
+              new_field = ['<fieldset>\n', '<label for="required_for_',
+                           field_name, '">Required</label>',
+                           '<select id="required_for_', field_name,
+                           '" name="required_for_', field_name,
+                           '"><option value="True" selected="selected">True',
+                           '</option>', '<option value="False">False</option>',
+                           '</select><br/>', '<label for="comment_for_',
+                           field_name, '">Allow Comments</label>',
+                           '<select id="comment_for_', field_name,
+                           '" name="comment_for_', field_name, '">',
+                           '<option value="True" selected="selected">',
+                           'True</option>', '<option value="False">',
+                           'False</option>', '</select><br/>',
+                           "<textarea cols='40' rows='", MIN_ROWS,
+                           "' class='long_answer'/>", '</fieldset>'
+                          ].join("");
               break;
             case "selection":
               new_field = ["<select><option></option>", default_option,
@@ -601,7 +633,18 @@
               if (button_id === 'choice')  {
                 var name = (field_name);
                 new_field = $([
-                  '<fieldset>\n <label for="render_for_', name,
+                  '<fieldset>\n', '<label for="required_for_', name,
+                  '">Required</label>',
+                  '<select id="required_for_', name, '" name="required_for_',
+                  name, '"><option value="True" selected="selected">True',
+                  '</option>', '<option value="False">False</option>',
+                  '</select><br/>', '<label for="comment_for_', name,
+                  '">Allow Comments</label>', '<select id="comment_for_', name,
+                  '" name="comment_for_', name, '">',
+                  '<option value="True" selected="selected">True</option>',
+                  '<option value="False">False</option>',
+                  '</select><br/>',
+                  '<label for="render_for_', name,
                   '">Render as</label>', '\n  <select id="render_for_', name,
                   '" name="render_for_', name, '">', '\n    <option',
                   'selected="selected" value="select">select</option>',
@@ -672,7 +715,7 @@
               else {
                 new_field = $(new_field);
                 // maybe the name should be serialized in a more common format
-                $(new_field).attr({
+                $(new_field).find('.long_answer, .short_answer').attr({
                   'id': 'id_' + formatted_name,
                   'name': formatted_name
                 });

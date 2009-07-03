@@ -55,6 +55,9 @@ CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))
 TEXT_TYPES = set(('long_answer', 'short_answer'))
 PROPERTY_TYPES = tuple(CHOICE_TYPES) + tuple(TEXT_TYPES)
 
+# used in View.getSchemaOptions to map POST values
+BOOL = {'True': True, 'False': False}
+
 _short_answer = ("Short Answer",
                 "Less than 40 characters. Rendered as a text input. "
                 "It's possible to add a free form question (Content) "
@@ -423,6 +426,14 @@ class View(base.View):
       question_for = 'NEW_' + key
       if question_for in POST:
         schema[key]["question"] = POST[question_for]
+
+      # set wheter the question is required
+      required_for = 'required_for_' + key
+      schema[key]['required'] = BOOL[POST[required_for]]
+
+      # set wheter the question allows comments
+      comment_for = 'comment_for_' + key
+      schema[key]['has_comment'] = BOOL[POST[comment_for]]
 
   def createGet(self, request, context, params, seed):
     """Pass the question types for the survey creation template.

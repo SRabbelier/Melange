@@ -1,5 +1,23 @@
 <fieldset>
 
+{# Drop-down setting whether question is required #}
+  <label for="required_for_{{ name }}">Required</label>
+  <select id="required_for_{{ name }}" name="required_for_{{ name }}">
+    <option value="True" {% if is_required %} selected='selected' {% endif %}
+    >True</option>
+    <option value="False" {% if not is_required %} selected='selected' {% endif %}
+    >False</option>
+  </select><br/>
+
+{# Drop-down setting whether question allows comments #}
+  <label for="comment_for_{{ name }}">Allow Comments</label>
+  <select id="comment_for_{{ name }}" name="comment_for_{{ name }}">
+    <option value="True" {% if has_comment %} selected='selected' {% endif %}
+    >True</option>
+    <option value="False" {% if not has_comment %} selected='selected' {% endif %}
+    >False</option>
+  </select><br/>
+
 {# Question type drop-down #}
   <label for="type_for_{{ name }}">Question Type</label>
   <select id="type_for_{{ name }}" name="type_for_{{ name }}">

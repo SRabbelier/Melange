@@ -82,6 +82,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
   def __init__(self, *args, **kwargs):
     """Store special kwargs as attributes.
 
+    params:
       survey_content: a SuveryContent entity.
       survey_logic: instance of SurveyLogic.
       survey_record: a SurveyRecord entity.
@@ -319,7 +320,6 @@ class SurveyTakeForm(djangoforms.ModelForm):
       label: label for field
       tip: tooltip text for field
       comment: initial comment value for field
-
     """
 
     widget = PickManyCheckbox(attrs)
@@ -352,7 +352,6 @@ class SurveyTakeForm(djangoforms.ModelForm):
       label: label for field
       tip: tooltip text for field
       comment: initial comment value for field
-
     """
 
     widget = PickQuantRadio(attrs)
@@ -372,9 +371,17 @@ class SurveyTakeForm(djangoforms.ModelForm):
     self.survey_fields[field] = question
 
   def addCommentField(self, field, comment, attrs, tip):
+    """Add comment field to a question.
+
+    params:
+      field: the name of the field to add the comment field to
+      comment: the initial value of this field.
+      attrs: the attrs for the widget
+      tip: tooltip text for this field
+    """
     widget = widgets.Textarea(attrs=attrs)
     comment_field = CharField(help_text=tip, required=False, label='Comments',
-                        widget=widget, initial=comment)
+                              widget=widget, initial=comment)
     self.survey_fields[COMMENT_PREFIX + field] = comment_field
 
 
@@ -397,6 +404,7 @@ class SurveyEditForm(djangoforms.ModelForm):
   def __init__(self, *args, **kwargs):
     """Store special kwargs as attributes.
 
+    params:
       survey_content: a SurveyContent entity.
       survey_logic: an instance of SurveyLogic.
     """
@@ -439,7 +447,6 @@ class SurveyEditForm(djangoforms.ModelForm):
       kwargs = schema.getEditFieldArgs(field, value, tip, label)
 
       kwargs['widget'] = schema.getEditWidget(field, extra_attrs)
-
 
       # add new field
       self.survey_fields[field] = schema.getEditField(field)(**kwargs)
@@ -612,7 +619,6 @@ class UniversalChoiceEditor(widgets.Widget):
     self.is_required = is_required
     self.has_comment = has_comment
 
-
   def render(self, name, value, attrs=None, choices=()):
     """Render UCE widget.
 
@@ -691,7 +697,6 @@ class LongTextarea(widgets.Textarea):
     params:
       is_required: bool, controls selection in the 'required' extra field
       has_comments: bool, controls selection in the 'has_comment' extra field
-      editing: bool, controls rendering as plain textarea or with extra fields
     """
 
     self.is_required = is_required
@@ -729,7 +734,6 @@ class ShortTextInput(widgets.TextInput):
     params:
       is_required: bool, controls selection in the 'required' extra field
       has_comments: bool, controls selection in the 'has_comment' extra field
-      editing: bool, controls rendering as plain text input or with extra fields
     """
 
     self.is_required = is_required

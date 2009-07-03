@@ -62,7 +62,7 @@ class View(survey.View):
 
     new_params['extra_dynaexclude'] = ['taking_access']
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

@@ -497,12 +497,20 @@ class View(base.View):
     # try to get an existing SurveyRecord for the current user
     survey_record = self._getSurveyRecordFor(entity, request, params)
 
+    # create an instance of SurveyTakeForm to use
+    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
+                                         survey_logic=self._params['logic'])
+
+    # fill context with the survey_form and additional information
+    context['survey_form'] = survey_form
+    self.setHelpAndStatus(context, entity, survey_record)
+
     if request.POST:
-      return self.takePost(request, template, context, params, entity,
-                           survey_record, **kwargs)
+      return self.takePost(request, template, context, params, survey_form,
+                           entity, survey_record, **kwargs)
     else: #request.GET
-      return self.takeGet(request, template, context, params, entity,
-                          survey_record, **kwargs)
+      return self.takeGet(request, template, context, params, survey_form,
+                          entity, survey_record, **kwargs)
 
   def _getSurveyRecordFor(self, survey, request, params):
     """Returns the SurveyRecord for the given Survey and request.
@@ -527,27 +535,25 @@ class View(base.View):
 
     return record_logic.getForFields(filter, unique=True)
 
-  def takeGet(self, request, template, context, params, entity, record,
-              **kwargs):
+  def takeGet(self, request, template, context, params, survey_form, entity,
+              record, **kwargs):
     """Handles the GET request for the Survey's take page.
 
     Args:
         template: the template used for this view
+        survey_form: instance of SurveyTakeForm
         entity: the Survey entity
-        record: a SurveyRecord entity
+        record: a SurveyRecord entity iff any exists
         rest: see base.View.public()
     """
 
-    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
-                                         survey_record=record,
-                                         survey_logic=self._params['logic'])
+    # set the possible survey record as initial value
+    # TODO: SurveyTakeForm should just work with post_data if available
+    # and otherwise use the record supplied.
+    survey_form.survey_record = record
 
     # fetch field contents
     survey_form.getFields()
-
-    # fill context with the survey and additional information
-    context['survey_form'] = survey_form
-    self.setHelpAndStatus(context, entity, record)
 
     # call the hook method
     self._takeGet(request, template, context, params, entity, record, **kwargs)
@@ -555,7 +561,7 @@ class View(base.View):
     return responses.respond(request, template, context)
 
   def _takeGet(self, request, template, context, params, entity, record,
-              **kwargs):
+               **kwargs):
     """Hook for the GET request for the Survey's take page.
 
     This method is called just before the GET page is shown.
@@ -568,12 +574,13 @@ class View(base.View):
     """
     pass
 
-  def takePost(self, request, template, context, params, entity, record,
-               **kwargs):
+  def takePost(self, request, template, context, params, survey_form, entity,
+               record, **kwargs):
     """Handles the POST request for the Survey's take page.
 
     Args:
         template: the template used for this view
+        survey_form: instance of SurveyTakeForm
         entity: the Survey entity
         record: a SurveyRecord entity
         rest: see base.View.public()
@@ -582,17 +589,10 @@ class View(base.View):
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    # create a form to validate
-    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
-                                         survey_record=None,
-                                         survey_logic=self._params['logic'])
     # fill form with request data
     survey_form.getFields(post_dict=request.POST)
 
     if not survey_form.is_valid():
-      # fill context with the survey and additional information
-      context['survey_form'] = survey_form
-      self.setHelpAndStatus(context, entity, record)
       # show the form errors
       return self._constructResponse(request, entity=entity, context=context,
                                      form=survey_form, params=params,

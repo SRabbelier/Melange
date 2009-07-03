@@ -132,7 +132,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
       survey_content = self.survey_content
       survey_entity = self.survey_logic.getSurveyForContent(survey_content)
       deadline = survey_entity.survey_end
-      read_only =  deadline and (datetime.datetime.now() > deadline)
+      read_only = deadline and (datetime.datetime.now() > deadline)
     else:
       extra_attrs['disabled'] = 'disabled'
 

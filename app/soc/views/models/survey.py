@@ -43,6 +43,7 @@ from soc.models.user import User
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import forms as forms_helper
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import surveys
@@ -523,13 +524,14 @@ class View(base.View):
     return record_logic.getForFields(filter, unique=True)
 
   def takeGet(self, request, template, context, params, entity, record,
-              **kwargs):
+              form_data=None, **kwargs):
     """Handles the GET request for the Survey's take page.
 
     Args:
         template: the template used for this view
         entity: the Survey entity
         record: a SurveyRecord entity
+        form_data: dict with form data that will be used for validation
         rest: see base.View.public()
     """
 
@@ -537,7 +539,15 @@ class View(base.View):
                                      survey_record=record,
                                      survey_logic=self._params['logic'])
 
-    survey_form.getFields()
+    # fetch field contents and pass request data, if any
+    survey_form.getFields(post_dict=form_data)
+
+    # validate request data
+    if form_data and not survey_form.is_valid():
+      survey_form.full_clean()
+      context['survey_form'] = survey_form
+      return self._constructResponse(request, entity=None, context=context,
+          form=survey_form, params=params, template=template)
 
     # fill context with the survey and additional information
     context['survey_form'] = survey_form
@@ -576,8 +586,20 @@ class View(base.View):
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    # TODO: check the validity of the form data
-    properties = surveys.getSurveyResponseFromPost(entity, request.POST)
+    # create a form to validate
+    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
+                                     survey_record=None,
+                                     survey_logic=self._params['logic'])
+    # fill form with request data
+    survey_form.getFields(post_dict=request.POST)
+
+    if not survey_form.is_valid():
+      # redirect to takeGet so we can handle errors
+      return self.takeGet(request, template, context, params, entity, record,
+                          form_data=properties)
+
+    # retrieve the data from the form
+    _, properties = forms_helper.collectCleanedFields(survey_form)
 
     # add the required SurveyRecord properties
     properties['user'] = user_logic.getForCurrentAccount()
@@ -614,7 +636,7 @@ class View(base.View):
     Args:
         context: the context for the view to update
         survey: a Survey entity
-        survey_record: a SurveyRecordEntity 
+        survey_record: a SurveyRecordEntity
     """
 
     if not survey.survey_end:

@@ -42,6 +42,7 @@ from django.utils.safestring import mark_safe
 
 from soc.logic import dicts
 from soc.logic.lists import Lists
+from soc.models.survey import COMMENT_PREFIX
 from soc.models.survey import SurveyContent
 
 
@@ -83,20 +84,26 @@ class SurveyForm(djangoforms.ModelForm):
         pick_quant=self.addQuantField,
         )
 
+    self.kwargs['data'] = {}
     super(SurveyForm, self).__init__(*args, **self.kwargs)
 
-  def getFields(self):
+  def getFields(self, post_dict=None):
     """Build the SurveyContent (questions) form fields.
 
+    params:
+      post_dict: dict with POST data that will be used for validation
+
     Populates self.survey_fields, which will be ordered in self.insert_fields.
+    Also populates self.data, which will be used in form validation.
     """
 
     if not self.survey_content:
       return
 
+    post_dict = post_dict or {}
     self.survey_fields = {}
     schema = SurveyContentSchema(self.survey_content.schema)
-    has_record = (not self.editing) and self.survey_record
+    has_record = (not self.editing) and (self.survey_record or post_dict)
     extra_attrs = {}
 
     # figure out whether we want a read-only view
@@ -117,22 +124,50 @@ class SurveyForm(djangoforms.ModelForm):
 
       # a comment made by the user
       comment = ''
-      if has_record and hasattr(self.survey_record, field):
+
+      # flag to know where the value came from
+      from_content = False
+
+      if has_record and field in post_dict:
+        # entered value that is not yet saved
+        value = post_dict[field]
+        if COMMENT_PREFIX + field in post_dict:
+          comment = post_dict[COMMENT_PREFIX + field]
+      elif has_record and hasattr(self.survey_record, field):
         # previously entered value
         value = getattr(self.survey_record, field)
-        if hasattr(self.survey_record, 'comment_for_' + field):
-          comment = getattr(self.survey_record, 'comment_for_' + field)
+        if hasattr(self.survey_record, COMMENT_PREFIX + field):
+          comment = getattr(self.survey_record, COMMENT_PREFIX + field)
       else:
         # use prompts set by survey creator
         value = getattr(self.survey_content, field)
+        from_content = True
 
       label = schema.getLabel(field)
       if label is None:
         continue
 
-      # dispatch to field-specific methods
+      # fix validation for pick_multi fields
+      is_multi = schema.getType(field) == 'pick_multi'
+      if not from_content and schema.getType(field) == 'pick_multi':
+        if isinstance(value, basestring):
+          value = value.split(',')
+      elif from_content and is_multi:
+        value = []
+
+      # record field value for validation
+      if not from_content:
+        self.data[field] = value
+
+      # find correct field type
       addField = self.fields_map[schema.getType(field)]
       addField(field, value, extra_attrs, schema, label=label, comment=comment)
+
+      # handle comments
+      comment_name = COMMENT_PREFIX + field
+      if comment_name in post_dict or hasattr(self.survey_record, comment_name):
+        self.data[comment_name] = comment
+        self.addCommentField(field, comment, extra_attrs, tip='Add a comment.')
 
     return self.insertFields()
 
@@ -147,9 +182,11 @@ class SurveyForm(djangoforms.ModelForm):
       position = position * 2
       self.fields.insert(position, property, self.survey_fields[property])
       if not self.editing:
-        property = 'comment_for_' + property
-        self.fields.insert(position - 1, property,
-                           self.survey_fields[property])
+        # add comment if field has one and this isn't an edit view
+        property = COMMENT_PREFIX + property
+        if property in self.survey_fields:
+          self.fields.insert(position - 1, property,
+                             self.survey_fields[property])
     return self.fields
 
   def addLongField(self, field, value, attrs, schema, req=False, label='',
@@ -176,7 +213,6 @@ class SurveyForm(djangoforms.ModelForm):
                          widget=widget, initial=value)
 
     self.survey_fields[field] = question
-    self.addCommentField(field, comment, attrs, tip)
 
   def addShortField(self, field, value, attrs, schema, req=False, label='',
                     tip='', comment=''):
@@ -203,7 +239,6 @@ class SurveyForm(djangoforms.ModelForm):
                          widget=widget, max_length=140, initial=value)
 
     self.survey_fields[field] = question
-    self.addCommentField(field, comment, attrs, tip)
 
   def addSingleField(self, field, value, attrs, schema, req=False, label='',
                      tip='', comment=''):
@@ -240,7 +275,6 @@ class SurveyForm(djangoforms.ModelForm):
                             choices=tuple(these_choices), widget=widget)
 
     self.survey_fields[field] = question
-    self.addCommentField(field, comment, attrs, tip)
 
   def addMultiField(self, field, value, attrs, schema, req=False, label='',
                     tip='', comment=''):
@@ -276,7 +310,6 @@ class SurveyForm(djangoforms.ModelForm):
                              initial=value)
 
     self.survey_fields[field] = question
-    self.addCommentField(field, comment, attrs, tip)
 
   def addQuantField(self, field, value, attrs, schema, req=False, label='',
                     tip='', comment=''):
@@ -309,14 +342,13 @@ class SurveyForm(djangoforms.ModelForm):
                              choices=tuple(these_choices), widget=widget,
                              initial=value)
     self.survey_fields[field] = question
-    self.addCommentField(field, comment, attrs, tip)
 
   def addCommentField(self, field, comment, attrs, tip):
     if not self.editing:
       widget = widgets.Textarea(attrs=attrs)
-      comment = CharField(help_text=tip, required=False, label='Comments',
+      comment_field = CharField(help_text=tip, required=False, label='Comments',
                           widget=widget, initial=comment)
-      self.survey_fields['comment_for_' + field] = comment
+      self.survey_fields[COMMENT_PREFIX + field] = comment_field
 
   class Meta(object):
     model = SurveyContent
@@ -606,10 +638,11 @@ def getSurveyResponseFromPost(survey, post_dict):
       post_dict: dictionary with data from the POST request
   """
 
-  # TODO(ljvderijk) deal with the comment fields
+  # TODO(ljvderijk) deal with the comment fields neatly
 
   # get the schema for this survey
-  schema = eval(survey.survey_content.schema)
+  schema = SurveyContentSchema(survey.survey_content.schema)
+  schema_dict = schema.schema
 
   # fill a dictionary with the data to be stored in the SurveyRecord
   response_dict = {}
@@ -617,16 +650,25 @@ def getSurveyResponseFromPost(survey, post_dict):
   for name, value in post_dict.items():
     # make sure name is a string
     name = name.encode()
-    if name not in schema:
+
+    if name not in schema_dict:
       # property not in survey schema ignore
       continue
     else:
-      pick_multi = schema[name]['type'] == 'pick_multi'
+      pick_multi = schema.getType(name) == 'pick_multi'
 
       if pick_multi and hasattr(post_dict, 'getlist'): # it's a multidict
-        response_dict[name] = ','.join(post_dict.getlist(name))
-      else:
-        response_dict[name] = value
+        # validation asks for a list of values
+        value = post_dict.getlist(name)
+
+    response_dict[name] = value
+
+    # handle comments
+    comment_name = COMMENT_PREFIX + name
+    if comment_name in post_dict:
+      comment = post_dict.get(comment_name)
+      if comment:
+        response_dict[comment_name] = comment
 
   return response_dict
 
@@ -796,16 +838,16 @@ def to_csv(survey_view):
     except StopIteration:
       # bail out early if survey_records.run() is empty
       return header, survey.link_id
-  
+
     # generate results list
     recs = record_query.run()
     recs = _get_records(recs, properties)
-  
+
     # write results to CSV
     output = StringIO.StringIO()
     writer = csv.writer(output)
     writer.writerow(properties)
     writer.writerows(recs)
-  
+
     return header + output.getvalue(), survey.link_id
   return wrapper

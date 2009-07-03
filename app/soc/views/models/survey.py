@@ -607,7 +607,7 @@ class View(base.View):
     if not survey_form.is_valid():
       # redirect to takeGet so we can handle errors
       return self.takeGet(request, template, context, params, entity, record,
-                          form_data=properties)
+                          form_data=request.POST)
 
     # retrieve the data from the form
     _, properties = forms_helper.collectCleanedFields(survey_form)

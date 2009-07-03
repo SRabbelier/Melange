@@ -689,11 +689,11 @@ class View(presence.View):
             "List Project Surveys", 'any_access')]
         # add link to create a new Grading Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-                                                     'grade_survey'),
+                                                     'grading_project_survey'),
             "Create a New Grading Survey", 'any_access')]
         # add link to list all Grading Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-                                                    'grade_survey'),
+                                                    'grading_project_survey'),
             "List Grading Surveys", 'any_access')]
 
       except out_of_band.Error:

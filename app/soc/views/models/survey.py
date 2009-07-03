@@ -497,9 +497,8 @@ class View(base.View):
     # try to get an existing SurveyRecord for the current user
     survey_record = self._getSurveyRecordFor(entity, request, params)
 
-    # create an instance of SurveyTakeForm to use
-    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
-                                         survey_logic=self._params['logic'])
+    # get an instance of SurveyTakeForm to use
+    survey_form = self._getSurveyTakeForm(entity, survey_record, params)
 
     # fill context with the survey_form and additional information
     context['survey_form'] = survey_form
@@ -534,6 +533,21 @@ class View(base.View):
               'user': user_entity}
 
     return record_logic.getForFields(filter, unique=True)
+
+  def _getSurveyTakeForm(self, survey, record, params):
+    """Returns the specific SurveyTakeForm needed for the take view.
+
+    Args:
+        survey: a Survey entity
+        record: a SurveyRecord instance if any exist
+        params: the params dict for the requesting View
+
+    Returns:
+        An instance of SurveyTakeForm that can be used to take a Survey.
+    """
+
+    return surveys.SurveyTakeForm(survey_content=survey.survey_content,
+                                  survey_logic=params['logic'])
 
   def takeGet(self, request, template, context, params, survey_form, entity,
               record, **kwargs):

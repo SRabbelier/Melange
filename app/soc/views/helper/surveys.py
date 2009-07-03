@@ -46,6 +46,8 @@ from soc.models.survey import COMMENT_PREFIX
 from soc.models.survey import SurveyContent
 
 
+CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))
+
 # TODO(ajaksu) add this to template
 REQUIRED_COMMENT_TPL = """
   <label for="required_for_{{ name }}">Required</label>
@@ -66,12 +68,10 @@ REQUIRED_COMMENT_TPL = """
 """
 
 
-class SurveyForm(djangoforms.ModelForm):
-  """Main SurveyContent form.
+class SurveyTakeForm(djangoforms.ModelForm):
+  """SurveyContent form for recording survey answers.
 
-  This class is used to produce survey forms for several circumstances:
-    - Admin creating survey from scratch
-    - Admin updating existing survey
+  This class is used to produce survey forms for survey taking:
     - User taking survey
     - User updating already taken survey
 
@@ -82,19 +82,18 @@ class SurveyForm(djangoforms.ModelForm):
   def __init__(self, *args, **kwargs):
     """Store special kwargs as attributes.
 
+      survey_content: a SuveryContent entity.
+      survey_logic: instance of SurveyLogic.
+      survey_record: a SurveyRecord entity.
       read_only: controls whether the survey taking UI allows data entry.
-      editing: controls whether to show the edit or show form.
     """
 
     self.kwargs = kwargs
+
     self.survey_content = self.kwargs.pop('survey_content', None)
-    self.this_user = self.kwargs.pop('this_user', None)
-    self.project = self.kwargs.pop('project', None)
     self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
-
     self.read_only = self.kwargs.pop('read_only', None)
-    self.editing = self.kwargs.pop('editing', None)
 
     self.fields_map = dict(
         long_answer=self.addLongField,
@@ -105,7 +104,7 @@ class SurveyForm(djangoforms.ModelForm):
         )
 
     self.kwargs['data'] = {}
-    super(SurveyForm, self).__init__(*args, **self.kwargs)
+    super(SurveyTakeForm, self).__init__(*args, **self.kwargs)
 
   def getFields(self, post_dict=None):
     """Build the SurveyContent (questions) form fields.
@@ -123,21 +122,19 @@ class SurveyForm(djangoforms.ModelForm):
     post_dict = post_dict or {}
     self.survey_fields = {}
     schema = SurveyContentSchema(self.survey_content.schema)
-    has_record = (not self.editing) and (self.survey_record or post_dict)
+    has_record = self.survey_record or post_dict
     extra_attrs = {}
 
     # figure out whether we want a read-only view
-    if not self.editing:
-      # only survey taking can be read-only
-      read_only = self.read_only
+    read_only = self.read_only
 
-      if not read_only:
-        survey_content = self.survey_content
-        survey_entity = self.survey_logic.getSurveyForContent(survey_content)
-        deadline = survey_entity.survey_end
-        read_only =  deadline and (datetime.datetime.now() > deadline)
-      else:
-        extra_attrs['disabled'] = 'disabled'
+    if not read_only:
+      survey_content = self.survey_content
+      survey_entity = self.survey_logic.getSurveyForContent(survey_content)
+      deadline = survey_entity.survey_end
+      read_only =  deadline and (datetime.datetime.now() > deadline)
+    else:
+      extra_attrs['disabled'] = 'disabled'
 
     # flag whether we can use getlist to retrieve multiple values
     is_post = hasattr(post_dict, 'getlist')
@@ -182,14 +179,14 @@ class SurveyForm(djangoforms.ModelForm):
         value = []
 
       # record field value for validation
-      if not from_content:
-        self.data[field] = value
+      #if not from_content:
+      self.data[field] = value
 
       # find correct field type
       addField = self.fields_map[schema.getType(field)]
 
       # check if question is required, it's never required when editing
-      required = not self.editing and schema.getRequired(field)
+      required = schema.getRequired(field)
       kwargs = dict(label=label, req=required)
 
       # add new field
@@ -212,12 +209,12 @@ class SurveyForm(djangoforms.ModelForm):
     for position, property in survey_order.items():
       position = position * 2
       self.fields.insert(position, property, self.survey_fields[property])
-      if not self.editing:
-        # add comment if field has one and this isn't an edit view
-        property = COMMENT_PREFIX + property
-        if property in self.survey_fields:
-          self.fields.insert(position - 1, property,
-                             self.survey_fields[property])
+
+      # add comment if field has one and this isn't an edit view
+      property = COMMENT_PREFIX + property
+      if property in self.survey_fields:
+        self.fields.insert(position - 1, property,
+                           self.survey_fields[property])
     return self.fields
 
   def addLongField(self, field, value, attrs, schema, req=True, label='',
@@ -235,11 +232,7 @@ class SurveyForm(djangoforms.ModelForm):
       comment: initial comment value for field
     """
 
-    # use a widget that allows setting required and comments
-    has_comment = schema.getHasComment(field)
-    is_required = schema.getRequired(field)
-    widget = LongTextarea(is_required, has_comment, attrs=attrs,
-                          editing=self.editing)
+    widget = widgets.Textarea(attrs=attrs)
 
     if not tip:
       tip = 'Please provide a long answer to this question.'
@@ -266,11 +259,7 @@ class SurveyForm(djangoforms.ModelForm):
 
     attrs['class'] = "text_question"
 
-    # use a widget that allows setting required and comments
-    has_comment = schema.getHasComment(field)
-    is_required = schema.getRequired(field)
-    widget = ShortTextInput(is_required, has_comment, attrs=attrs,
-                          editing=self.editing)
+    widget = widgets.TextInput(attrs=attrs)
 
     if not tip:
       tip = 'Please provide a short answer to this question.'
@@ -295,10 +284,11 @@ class SurveyForm(djangoforms.ModelForm):
       comment: initial comment value for field
     """
 
-    widget = schema.getWidget(field, self.editing, attrs)
+    widget = PickOneSelect(attrs)
 
     these_choices = []
     # add all properties, but select chosen one
+    # TODO(ajaksu): this breaks ordering and blocks merging choice methods
     options = getattr(self.survey_content, field)
     has_record = not self.editing and self.survey_record
     if has_record and hasattr(self.survey_record, field):
@@ -332,7 +322,7 @@ class SurveyForm(djangoforms.ModelForm):
 
     """
 
-    widget = schema.getWidget(field, self.editing, attrs)
+    widget = PickManyCheckbox(attrs)
 
     # TODO(ajaksu) need to allow checking checkboxes by default
     if self.survey_record and isinstance(value, basestring):
@@ -365,7 +355,7 @@ class SurveyForm(djangoforms.ModelForm):
 
     """
 
-    widget = schema.getWidget(field, self.editing, attrs)
+    widget = PickQuantRadio(attrs)
 
     if self.survey_record:
       value = value
@@ -382,11 +372,92 @@ class SurveyForm(djangoforms.ModelForm):
     self.survey_fields[field] = question
 
   def addCommentField(self, field, comment, attrs, tip):
-    if not self.editing:
-      widget = widgets.Textarea(attrs=attrs)
-      comment_field = CharField(help_text=tip, required=False, label='Comments',
-                          widget=widget, initial=comment)
-      self.survey_fields[COMMENT_PREFIX + field] = comment_field
+    widget = widgets.Textarea(attrs=attrs)
+    comment_field = CharField(help_text=tip, required=False, label='Comments',
+                        widget=widget, initial=comment)
+    self.survey_fields[COMMENT_PREFIX + field] = comment_field
+
+
+  class Meta(object):
+    model = SurveyContent
+    exclude = ['schema']
+
+
+class SurveyEditForm(djangoforms.ModelForm):
+  """SurveyContent form for editing a survey.
+
+  This class is used to produce survey forms for several circumstances:
+    - Admin creating survey from scratch
+    - Admin updating existing survey
+
+  Using dynamic properties of the survey model (if passed as an arg) the
+  survey form is dynamically formed.
+  """
+
+  def __init__(self, *args, **kwargs):
+    """Store special kwargs as attributes.
+
+      survey_content: a SurveyContent entity.
+      survey_logic: an instance of SurveyLogic.
+    """
+
+    self.kwargs = kwargs
+    self.survey_content = self.kwargs.pop('survey_content', None)
+    self.survey_logic = self.kwargs.pop('survey_logic', None)
+
+    super(SurveyEditForm, self).__init__(*args, **self.kwargs)
+
+  def getFields(self):
+    """Build the SurveyContent (questions) form fields.
+
+    params:
+      post_dict: dict with POST data that will be used for validation
+
+    Populates self.survey_fields, which will be ordered in self.insert_fields.
+    Also populates self.data, which will be used in form validation.
+    """
+
+    if not self.survey_content:
+      return
+
+    self.survey_fields = {}
+    schema = SurveyContentSchema(self.survey_content.schema)
+    extra_attrs = {}
+
+    # add unordered fields to self.survey_fields
+    for field in self.survey_content.dynamic_properties():
+
+      # use prompts set by survey creator
+      value = getattr(self.survey_content, field)
+      from_content = True
+
+      label = schema.getLabel(field)
+      if label is None:
+        continue
+
+      tip = 'Please provide an answer to this question.'
+      kwargs = schema.getEditFieldArgs(field, value, tip, label)
+
+      kwargs['widget'] = schema.getEditWidget(field, extra_attrs)
+
+
+      # add new field
+      self.survey_fields[field] = schema.getEditField(field)(**kwargs)
+
+    # TODO(ajaksu): find a new way to keep fields in order
+    return self.insertFields()
+
+  def insertFields(self):
+    """Add ordered fields to self.fields.
+    """
+
+    survey_order = self.survey_content.getSurveyOrder()
+
+    # insert dynamic survey fields
+    for position, property in survey_order.items():
+      self.fields.insert(position, property, self.survey_fields[property])
+
+    return self.fields
 
   class Meta(object):
     model = SurveyContent
@@ -398,39 +469,106 @@ class SurveyContentSchema(object):
   """
 
   def __init__(self, schema):
+    """Set the dictionary that this class encapsulates.
+
+    Args:
+      schema: schema as stored in SurveyConent entity
+    """
+
     self.schema = eval(schema)
 
   def getType(self, field):
+    """Fetch question type for field e.g. short_answer, pick_multi, etc.
+
+    Args:
+      field: name of the field to get the type from
+    """
+
     return self.schema[field]["type"]
 
   def getRequired(self, field):
     """Check whether survey question is required.
+
+    Args:
+      field: name of the field to check the required property for
     """
 
     return self.schema[field]["required"]
 
   def getHasComment(self, field):
     """Check whether survey question allows adding a comment.
+
+    Args:
+      field: name of the field to get the hasComment property for
     """
 
     return self.schema[field]["has_comment"]
 
   def getRender(self, field):
-    return self.schema[field]["render"]
+    """Get rendering options for choice questions.
 
-  def getWidget(self, field, editing, attrs):
-    """Get survey editing or taking widget for choice questions.
+    Args:
+      field: name of the field to get the rendering option for
     """
 
-    if editing:
-      kind = self.getType(field)
-      render = self.getRender(field)
-      is_required = self.getRequired(field)
-      has_comment = self.getHasComment(field)
-      widget = UniversalChoiceEditor(kind, render, is_required, has_comment)
+    return self.schema[field]["render"]
+
+  def getEditField(self, field):
+    """For a given question kind, get the correct edit view field.
+    """
+
+    kind = self.getType(field)
+    if kind in CHOICE_TYPES:
+      Field = PickOneField
     else:
-      widget = WIDGETS[self.schema[field]['render']](attrs=attrs)
-    return widget
+      Field = CharField
+
+    return Field
+
+  def getEditFieldArgs(self, field, value, tip, label):
+    """Build edit view field arguments.
+
+    params:
+      field: field name
+      value: field value (text for text questions, list for choice questions)
+      tipe: help text, to be used in a tooltip
+      label: the field's question (or identifier if question is missing)
+    """
+
+    kind = self.getType(field)
+
+    kwargs = dict(help_text=tip, required=False, label=label)
+
+    if kind in CHOICE_TYPES:
+      kwargs['choices'] = tuple([(val, val) for val in value])
+    else:
+      kwargs['initial'] = value
+
+    return kwargs
+
+  def getEditWidget(self, field, attrs):
+    """Get survey editing widget for questions.
+    """
+
+    kind = self.getType(field)
+    is_required = self.getRequired(field)
+    has_comment = self.getHasComment(field)
+
+    if kind in CHOICE_TYPES:
+      widget = UniversalChoiceEditor
+      render = self.getRender(field)
+      args = kind, render, is_required, has_comment
+    else:
+      args = is_required, has_comment
+      if kind == 'long_answer':
+        attrs['class'] = "text_question"
+        widget = LongTextarea
+      elif kind == 'short_answer':
+        widget = ShortTextInput
+
+    kwargs = dict(attrs=attrs)
+
+    return widget(*args, **kwargs)
 
   def getLabel(self, field):
     """Fetch the free text 'question' or use field name as label.
@@ -547,7 +685,7 @@ class LongTextarea(widgets.Textarea):
   """Set whether long question is required or allows comments.
   """
 
-  def __init__(self, is_required, has_comment, attrs=None, editing=False):
+  def __init__(self, is_required, has_comment, attrs=None):
     """Initialize widget and store editing mode.
 
     params:
@@ -556,7 +694,6 @@ class LongTextarea(widgets.Textarea):
       editing: bool, controls rendering as plain textarea or with extra fields
     """
 
-    self.editing = editing
     self.is_required = is_required
     self.has_comment = has_comment
 
@@ -571,15 +708,14 @@ class LongTextarea(widgets.Textarea):
     # plain text area
     output = super(LongTextarea, self).render(name, value, attrs)
 
-    if self.editing:
-      # add 'required' and 'has_comment' fields
-      context = dict(name=name, is_required=self.is_required,
-                     has_comment=self.has_comment)
-      template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
-      rendered = template.render(context=loader.Context(dict_=context))
-      output =  rendered + output
+    # add 'required' and 'has_comment' fields
+    context = dict(name=name, is_required=self.is_required,
+                   has_comment=self.has_comment)
+    template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
+    rendered = template.render(context=loader.Context(dict_=context))
+    output =  rendered + output
 
-      output = '<fieldset>' + output + '</fieldset>'
+    output = '<fieldset>' + output + '</fieldset>'
     return output
 
 
@@ -587,7 +723,7 @@ class ShortTextInput(widgets.TextInput):
   """Set whether short answer question is required or allows comments.
   """
 
-  def __init__(self, is_required, has_comment, attrs=None, editing=False):
+  def __init__(self, is_required, has_comment, attrs=None):
     """Initialize widget and store editing mode.
 
     params:
@@ -596,7 +732,6 @@ class ShortTextInput(widgets.TextInput):
       editing: bool, controls rendering as plain text input or with extra fields
     """
 
-    self.editing = editing
     self.is_required = is_required
     self.has_comment = has_comment
 
@@ -611,15 +746,14 @@ class ShortTextInput(widgets.TextInput):
     # plain text area
     output = super(ShortTextInput, self).render(name, value, attrs)
 
-    if self.editing:
-      # add 'required' and 'has_comment' fields
-      context = dict(name=name, is_required=self.is_required,
-                     has_comment=self.has_comment)
-      template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
-      rendered = template.render(context=loader.Context(dict_=context))
-      output =  rendered + output
+    # add 'required' and 'has_comment' fields
+    context = dict(name=name, is_required=self.is_required,
+                   has_comment=self.has_comment)
+    template = loader.get_template_from_string(REQUIRED_COMMENT_TPL)
+    rendered = template.render(context=loader.Context(dict_=context))
+    output =  rendered + output
 
-      output = '<fieldset>' + output + '</fieldset>'
+    output = '<fieldset>' + output + '</fieldset>'
     return output
 
 
@@ -778,79 +912,6 @@ class SurveyResults(widgets.Widget):
     markup = loader.render_to_string('soc/survey/results.html',
                                      dictionary=context).strip('\n')
     return markup
-
-
-def getRoleSpecificFields(survey, user, this_project, survey_form,
-                          survey_record):
-  """For evaluations, mentors get required Project and Grade fields, and
-  students get a required Project field.
-
-  Because we need to get a list of the user's projects, we call the
-  logic getProjects method, which doubles as an access check.
-  (No projects means that the survey cannot be taken.)
-
-  params:
-    survey: the survey being taken
-    user: the survey-taking user
-    this_project: either an already-selected project, or None
-    survey_form: the surveyForm widget for this survey
-    survey_record: an existing survey record for a user-project-survey combo,
-      or None
-  """
-
-  field_count = len(eval(survey.survey_content.schema).items())
-  these_projects = survey_logic.getProjects(survey, user)
-  if not these_projects:
-    return False # no projects found
-
-  project_pairs = []
-  #insert a select field with options for each project
-  for project in these_projects:
-    project_pairs.append((project.key(), project.title))
-  if project_pairs:
-    project_tuples = tuple(project_pairs)
-    # add select field containing list of projects
-    projectField =  forms.fields.ChoiceField(
-                              choices=project_tuples,
-                              required=True,
-                              widget=forms.Select())
-    projectField.choices.insert(0, (None, "Choose a Project")  )
-    # if editing an existing survey
-    if not this_project and survey_record:
-      this_project = survey_record.project
-    if this_project:
-      for tup in project_tuples:
-        if tup[1] == this_project.title:
-          if survey_record: project_name = tup[1] + " (Saved)"
-          else: project_name = tup[1]
-          projectField.choices.remove(tup)
-          projectField.choices.insert(0, (tup[0], project_name)  )
-          break
-    survey_form.fields.insert(0, 'project', projectField )
-
-  if survey.taking_access == "mentor evaluation":
-    # If this is a mentor, add a field
-    # determining if student passes or fails.
-    # Activate grades handler should determine whether new status
-    # is midterm_passed, final_passed, etc.
-    grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
-    grade_vals = { 'pass': True, 'fail': False }
-    gradeField = forms.fields.ChoiceField(choices=grade_choices,
-                                           required=True,
-                                           widget=forms.Select())
-
-    gradeField.choices.insert(0, (None, "Choose a Grade")  )
-    if survey_record:
-      for g in grade_choices:
-        if grade_vals[g[0]] == survey_record.grade:
-          gradeField.choices.insert(0, (g[0],g[1] + " (Saved)")   )
-          gradeField.choices.remove(g)
-          break;
-      gradeField.show_hidden_initial = True
-
-    survey_form.fields.insert(field_count + 1, 'grade', gradeField)
-
-  return survey_form
 
 
 class HelperForm(object):

@@ -208,8 +208,8 @@ class View(base.View):
 
     # construct the form to be shown on the page
     # TODO(ljvderijk) Generate SurveyForm without passing along the logic
-    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
-                                     survey_logic=self._params['logic'])
+    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
+                                         survey_logic=self._params['logic'])
 
     # TOOD(ljvderijk) pose question about the getFields method name and working
     survey_form.getFields()
@@ -453,16 +453,9 @@ class View(base.View):
 
     self._entity = entity
     survey_content = entity.survey_content
-    user = user_logic.getForCurrentAccount()
-    # no project or survey_record needed for survey prototype
-    project = None
-    survey_record = None
 
-    survey_form = surveys.SurveyForm(survey_content=survey_content,
-                                     this_user=user, project=project,
-                                     survey_logic=params['logic'],
-                                     survey_record=survey_record,
-                                     editing=True, read_only=False)
+    survey_form = surveys.SurveyEditForm(survey_content=survey_content,
+                                         survey_logic=params['logic'])
     survey_form.getFields()
 
     local = dict(survey_form=survey_form, question_types=QUESTION_TYPES,
@@ -545,9 +538,9 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
-                                     survey_record=record,
-                                     survey_logic=self._params['logic'])
+    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
+                                         survey_record=record,
+                                         survey_logic=self._params['logic'])
 
     # fetch field contents
     survey_form.getFields()
@@ -590,9 +583,9 @@ class View(base.View):
     record_logic = survey_logic.getRecordLogic()
 
     # create a form to validate
-    survey_form = surveys.SurveyForm(survey_content=entity.survey_content,
-                                     survey_record=None,
-                                     survey_logic=self._params['logic'])
+    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
+                                         survey_record=None,
+                                         survey_logic=self._params['logic'])
     # fill form with request data
     survey_form.getFields(post_dict=request.POST)
 

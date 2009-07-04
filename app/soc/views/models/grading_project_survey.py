@@ -18,9 +18,11 @@
 """
 
 __authors__ = [
+  '"Daniel Diniz" <ajaksu@gmail.com>',
   '"James Levy" <jamesalexanderlevy@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
+
 
 from django import forms
 

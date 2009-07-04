@@ -148,6 +148,9 @@ DEF_LOGOUT_MSG_FMT = ugettext(
 DEF_GROUP_NOT_FOUND_MSG = ugettext(
     'The requested Group can not be found.')
 
+DEF_NO_ACTIVE_STUDENT_PROJECT_MSG = ugettext(
+    'There is no active student project that would allow you to take this survey.')
+
 DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
     ' one or more of the following reasons:'
@@ -1690,15 +1693,45 @@ class Checker(object):
 
     django_args = django_args.copy()
 
-    if role == 'mentor' or role == 'org_admin':
+    if role == 'mentor':
       django_args['program'] = survey.scope
       # program is the 'program' attribute for mentors and org_admins
-      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+      entity = self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+
+      fields = {
+          'mentor': entity,
+          'program': survey.scope,
+          'status': ['accepted', 'mid_term_passed'],
+          }
+
+      project = student_project_logic.getForFields(fields, unique=True)
+
+      if project:
+        return
+
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
+
+    if role == 'org_admin':
+      # program is the 'program' attribute for mentors and org_admins
+      return self._checkHasActiveRoleFor(django_args, org_admin_logic, 'program')
 
     if role == 'student':
       django_args['scope'] = survey.scope
       # program is the 'scope' attribute for students
-      return self.checkHasActiveRoleForScope(django_args, student_logic)
+      entity = self.checkHasActiveRoleForScope(django_args, student_logic)
+
+      fields = {
+          'scope': entity,
+          'status': ['accepted', 'mid_term_passed'],
+          }
+
+      # student is scope for student projects
+      project = student_project_logic.getForFields(fields, unique=True)
+
+      if project:
+        return
+
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
 
     # unknown role
     self.deny(django_args)

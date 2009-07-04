@@ -147,8 +147,8 @@ DEF_LOGOUT_MSG_FMT = ugettext(
 DEF_GROUP_NOT_FOUND_MSG = ugettext(
     'The requested Group can not be found.')
 
-DEF_NO_ACTIVE_STUDENT_PROJECT_MSG = ugettext(
-    'There is no active student project that would allow you to take this survey.')
+DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
+    'You are not allowed to take this Survey for the specified Student Project')
 
 DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
@@ -159,6 +159,22 @@ DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     ' used to create another one</li>'
     ' <li>the account is a former account that cannot be used again</li>'
     '</ul>')
+
+
+class Error(Exception):
+  """Base class for all exceptions raised by this module.
+  """
+
+  pass
+
+
+class InvalidArgumentError(Error):
+  """Raised when an invalid argument is passed to a method.
+
+  For example, if an argument is None, but must always be non-False.
+  """
+
+  pass
 
 
 def allowSidebar(fun):
@@ -1635,10 +1651,40 @@ class Checker(object):
         where the key for the project can be located.
     """
 
-    # TODO(ljvderijk) implement this check
-    #raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
+    if not role_name in ['mentor', 'student']:
+      raise InvalidArgumentError('role_name is not mentor or student')
 
-    self.allow(django_args)
+    # get the project keyname from the GET dictionary
+    get_dict= django_args['GET']
+    key_name = get_dict.get(project_key_location)
+
+    if not key_name:
+      # no key name present so no need to deny access
+      return
+
+    # retrieve the Student Project for the key
+    entity = student_project_logic.getFromKeyNameOr404(key_name)
+
+    # TODO(ljvderijk) change this to cope with multiple surveys for one project
+    # check if a survey can be conducted about this project
+    if entity.status != 'accepted':
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
+
+    # get the correct role depending on the role_name
+    role_entity = getattr(entity, role_name)
+    user_entity = user_logic.getForCurrentAccount()
+
+    # check if the role matches the current user
+    if (not user_entity) or (role_entity.user.key() != user_entity.key()):
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
+
+    # check if the role is active
+    if role_entity.status != 'active':
+      raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
+
+    return
 
   @allowSidebar
   @allowDeveloper

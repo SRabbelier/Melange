@@ -22,12 +22,14 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+from django import forms
 
 from soc.logic import dicts
 from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import grading_logic as grading_survey_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import surveys
 from soc.views.models import project_survey
 
 
@@ -71,7 +73,6 @@ class View(project_survey.View):
         '?activate=1')
     return http.HttpResponseRedirect(redirect_path)
 
-
   def activateGrades(self, request, **kwargs):
     """Updates SurveyRecord's grades for a given Survey.
     """
@@ -80,57 +81,102 @@ class View(project_survey.View):
     survey_logic.activateGrades(survey)
     return
 
-  def _takeGet(self, request, template, context, params, entity, record,
-              **kwargs):
-    """Hook for the GET request for the Survey's take page.
-
-    This method is called just before the GET page is shown.
+  def _getSurveyTakeForm(self, survey, record, params):
+    """Returns the specific SurveyTakeForm needed for the take view.
 
     Args:
-        template: the template used for this view
-        entity: the Survey entity
-        record: a SurveyRecord entity
-        rest: see base.View.public()
+        survey: a Survey entity
+        record: a SurveyRecord instance if any exist
+        params: the params dict for the requesting View
+
+    Returns:
+        An instance of GradseSurveyTakeForm.
     """
 
-    gradeField = self.addGradeField(entity, record)
-    field_count = len(eval(entity.survey_content.schema).items())
-    context['survey_form'].fields.insert(field_count + 1, 'grade', gradeField)
+    grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
+    survey_form = GradeSurveyTakeForm(survey_content=survey.survey_content,
+                                      survey_logic=params['logic'],
+                                      grade_choices=grade_choices)
 
-    return super(View, self)._takeGet(request, template, context,
-                                      params, entity, record, **kwargs)
+    return survey_form
 
-  def addGradeField(self, survey, survey_record):
-    """Adds a Grade Field to Survey.
 
-    Used for mentor evaluations.
+class GradeSurveyTakeForm(surveys.SurveyTakeForm):
+  """Extends SurveyTakeForm by adding a grade field.
+
+  The grade field logic is dependent on the kwarg 'grade_choices' (behavior
+  should be the same as the base class's if this argument is missing).
+  """
+
+  def __init__(self, *args, **kwargs):
+    """Store grade choices and initialize the form.
 
     params:
-      survey: the survey being taken
-      survey_record: an existing survey record for a user-project-survey combo,
-        or None
+      grade_choices: pair of tuples representing the grading choices
     """
 
-    # Add a grade field determining if student passes or fails.
-    # Activate grades handler should determine whether new status
-    # is midterm_passed, final_passed, etc.
-    grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
-    grade_vals = { 'pass': True, 'fail': False }
-    from django import forms
-    gradeField = forms.fields.ChoiceField(choices=grade_choices,
-                                           required=True,
-                                           widget=forms.Select())
+    self.grade_choices = kwargs.pop('grade_choices', None)
 
-    gradeField.choices.insert(0, (None, "Choose a Grade")  )
-    if survey_record:
-      for g in grade_choices:
-        if grade_vals[g[0]] == survey_record.grade:
-          gradeField.choices.insert(0, (g[0],g[1] + " (Saved)")   )
-          gradeField.choices.remove(g)
-          break;
-      gradeField.show_hidden_initial = True
+    if self.grade_choices:
+      # add grade field to self.data, respecting the data kwarg if present
+      data = kwargs.pop('data', {})
+      data['grade'] = None
+      kwargs['data'] = data
 
-    return gradeField
+    super(GradeSurveyTakeForm, self).__init__(*args, **kwargs)
+
+  def clean_grade(self):
+    """Validate the grade field.
+    """
+
+    grade = self.cleaned_data['grade']
+
+    # map to bool
+    grade_vals = {'pass': True, 'fail': False, '': ''}
+
+    return grade_vals.get(grade, None)
+
+  def getFields(self, post_dict=None):
+    """Add the extra grade field's value from POST or survey_record.
+
+    Args:
+        post_dict: dict with POST data if exists
+    """
+
+    # fetch value from post_dict if it's there
+    post_dict = post_dict or {}
+    grade = post_dict.get('grade', None)
+
+    # otherwise, try to fetch from survey_record
+    if not grade and hasattr(self.survey_record, 'grade'):
+      grade = self.survey_record.grade
+
+    # remap bool to string values as the ChoiceField validates on 'choices'.
+    vals_grade = {True: 'pass', False: 'fail'}
+
+    if self.grade_choices:
+      self.data['grade'] = vals_grade.get(grade, None) or grade
+
+    super(GradeSurveyTakeForm, self).getFields(post_dict)
+
+  def insertFields(self):
+    """Add ordered fields to self.fields, add grade field with grade choices.
+    """
+
+    # add common survey fields
+    super(GradeSurveyTakeForm, self).insertFields()
+
+    if self.grade_choices:
+      # add empty option to choices
+      grade_choices = (('', "Choose a Grade"),) + tuple(self.grade_choices)
+
+      gradeField = forms.fields.ChoiceField(choices=grade_choices,
+                                            required=True,
+                                            widget=forms.Select())
+      # add the grade field at the form's bottom
+      self.fields.insert(len(self.fields) + 1, 'grade', gradeField)
+
+    return self.fields
 
 
 view = View()

@@ -87,6 +87,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
       survey_logic: instance of SurveyLogic.
       survey_record: a SurveyRecord entity.
       read_only: controls whether the survey taking UI allows data entry.
+      data: dictionary mapping fields to data for validation.
     """
 
     self.kwargs = kwargs
@@ -95,6 +96,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
     self.read_only = self.kwargs.pop('read_only', None)
+    data = self.kwargs.pop('data', {})
 
     self.fields_map = dict(
         long_answer=self.addLongField,
@@ -104,7 +106,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
         pick_quant=self.addQuantField,
         )
 
-    self.kwargs['data'] = {}
+    self.kwargs['data'] = data
     super(SurveyTakeForm, self).__init__(*args, **self.kwargs)
 
   def getFields(self, post_dict=None):

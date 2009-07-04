@@ -56,7 +56,7 @@ class View(project_survey.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     # TODO(ljvderijk) add Project check
-    rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
+    rights['take'] = [('checkIsSurveyTakeable', grading_survey_logic)]
 
     new_params = {}
     new_params['logic'] = grading_survey_logic

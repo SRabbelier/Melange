@@ -148,7 +148,8 @@ DEF_GROUP_NOT_FOUND_MSG = ugettext(
     'The requested Group can not be found.')
 
 DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
-    'You are not allowed to take this Survey for the specified Student Project')
+    'You are not allowed to take this Survey for the specified Student'
+    ' Project.')
 
 DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'

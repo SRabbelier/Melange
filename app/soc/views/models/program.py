@@ -673,27 +673,27 @@ class View(presence.View):
             "List Documents", 'any_access')]
         # add link to create a new Program Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-                                                     'survey'),
+            'survey'),
             "Create a New Survey", 'any_access')]
         # add link to list all Program Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-                                                    'survey'),
+            'survey'),
             "List Surveys", 'any_access')]
         # add link to create a new Project Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-                                                     'project_survey'),
+            'project_survey'),
             "Create a New Project Survey", 'any_access')]
         # add link to list all Project Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-                                                    'project_survey'),
+            'project_survey'),
             "List Project Surveys", 'any_access')]
         # add link to create a new Grading Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-                                                     'grading_project_survey'),
+            'grading_project_survey'),
             "Create a New Grading Survey", 'any_access')]
         # add link to list all Grading Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-                                                    'grading_project_survey'),
+            'grading_project_survey'),
             "List Grading Surveys", 'any_access')]
 
       except out_of_band.Error:

@@ -372,9 +372,9 @@ def getTakeProjectSurveyRedirect(entity, info):
   survey_entity = info['survey']
   params = info['params']
 
-  return '/%s/take/%s?project=%s' %(params['url_name'],
-                                    survey_entity.key().id_or_name(),
-                                    entity.key().id_or_name())
+  return '/%s/take/%s?project=%s' % (params['url_name'],
+                                     survey_entity.key().id_or_name(),
+                                     entity.key().id_or_name())
 
 
 def getToSRedirect(presence):

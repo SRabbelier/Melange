@@ -498,7 +498,8 @@ class View(base.View):
     survey_record = self._getSurveyRecordFor(entity, request, params)
 
     # get an instance of SurveyTakeForm to use
-    survey_form = self._getSurveyTakeForm(entity, survey_record, params)
+    survey_form = self._getSurveyTakeForm(entity, survey_record, params,
+                                          request.POST)
 
     # fill context with the survey_form and additional information
     context['survey_form'] = survey_form
@@ -534,20 +535,24 @@ class View(base.View):
 
     return record_logic.getForFields(filter, unique=True)
 
-  def _getSurveyTakeForm(self, survey, record, params):
+  def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
     """Returns the specific SurveyTakeForm needed for the take view.
 
     Args:
         survey: a Survey entity
         record: a SurveyRecord instance if any exist
         params: the params dict for the requesting View
+        post_dict: POST data to be passed to form initialization
 
     Returns:
         An instance of SurveyTakeForm that can be used to take a Survey.
     """
 
     return surveys.SurveyTakeForm(survey_content=survey.survey_content,
-                                  survey_logic=params['logic'])
+                                  survey_record=record,
+                                  survey_logic=params['logic'],
+                                  data=post_dict)
+
 
   def takeGet(self, request, template, context, params, survey_form, entity,
               record, **kwargs):
@@ -560,14 +565,6 @@ class View(base.View):
         record: a SurveyRecord entity iff any exists
         rest: see base.View.public()
     """
-
-    # set the possible survey record as initial value
-    # TODO: SurveyTakeForm should just work with post_data if available
-    # and otherwise use the record supplied.
-    survey_form.survey_record = record
-
-    # fetch field contents
-    survey_form.getFields()
 
     # call the hook method
     self._takeGet(request, template, context, params, entity, record, **kwargs)
@@ -602,9 +599,6 @@ class View(base.View):
 
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
-
-    # fill form with request data
-    survey_form.getFields(post_dict=request.POST)
 
     if not survey_form.is_valid():
       # show the form errors

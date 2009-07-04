@@ -86,7 +86,7 @@ class View(project_survey.View):
     survey_logic.activateGrades(survey)
     return
 
-  def _getSurveyTakeForm(self, survey, record, params):
+  def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
     """Returns the specific SurveyTakeForm needed for the take view.
 
     Args:
@@ -100,8 +100,10 @@ class View(project_survey.View):
 
     grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
     survey_form = GradeSurveyTakeForm(survey_content=survey.survey_content,
+                                      survey_record=record,
                                       survey_logic=params['logic'],
-                                      grade_choices=grade_choices)
+                                      grade_choices=grade_choices,
+                                      data=post_dict)
 
     return survey_form
 
@@ -155,9 +157,10 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
 
     if self.grade_choices:
       # add grade field to self.data, respecting the data kwarg if present
-      data = kwargs.pop('data', {})
-      data['grade'] = None
-      kwargs['data'] = data
+      if kwargs.get('data') and kwargs['data'].get('grade'):
+        data = {}
+        data['grade'] = kwargs['data']['grade']
+        self.data = data
 
     super(GradeSurveyTakeForm, self).__init__(*args, **kwargs)
 
@@ -166,7 +169,6 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     """
 
     grade = self.cleaned_data['grade']
-
     # map to bool
     grade_vals = {'pass': True, 'fail': False, '': ''}
 
@@ -193,14 +195,14 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     if self.grade_choices:
       self.data['grade'] = vals_grade.get(grade, None) or grade
 
-    super(GradeSurveyTakeForm, self).getFields(post_dict)
+    return super(GradeSurveyTakeForm, self).getFields(post_dict)
 
   def insertFields(self):
     """Add ordered fields to self.fields, add grade field with grade choices.
     """
 
     # add common survey fields
-    super(GradeSurveyTakeForm, self).insertFields()
+    fields = super(GradeSurveyTakeForm, self).insertFields()
 
     if self.grade_choices:
       # add empty option to choices
@@ -208,11 +210,12 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
 
       gradeField = forms.fields.ChoiceField(choices=grade_choices,
                                             required=True,
-                                            widget=forms.Select())
+                                            widget=forms.Select(),
+                                            initial=self.data.get('grade'))
       # add the grade field at the form's bottom
-      self.fields.insert(len(self.fields) + 1, 'grade', gradeField)
+      fields.insert(len(fields) + 1, 'grade', gradeField)
 
-    return self.fields
+    return fields
 
 
 view = View()

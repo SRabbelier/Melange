@@ -37,6 +37,7 @@ from django import forms
 from django.forms import widgets
 from django.forms.fields import CharField
 from django.template import loader
+from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -97,7 +98,6 @@ class SurveyTakeForm(djangoforms.ModelForm):
     self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
     self.read_only = self.kwargs.pop('read_only', None)
-    data = self.kwargs.pop('data', {})
 
     self.fields_map = dict(
         long_answer=self.addLongField,
@@ -107,19 +107,37 @@ class SurveyTakeForm(djangoforms.ModelForm):
         pick_quant=self.addQuantField,
         )
 
-    # set cleaner methods for fields
-    self.kwargs['data'] = self.setCleaners()
+    # get the POST data dict if present
+    data = self.kwargs.pop('data', None)
+
+    # set cleaner methods for fields, only needed if we have POST data
+    if data:
+      # prepare to render a bound, validating form
+      clean_data = self.setCleaners(data)
+    else:
+      clean_data = self.setCleaners()
+
+    # update with fields from subclasses
+    if hasattr(self, 'data') and self.data:
+        clean_data.update(self.data)
+        delattr(self, 'data')
+
+    # pass data, so form is bound
+    if data:
+      self.kwargs['data'] = clean_data
 
     super(SurveyTakeForm, self).__init__(*args, **self.kwargs)
 
-  def setCleaners(self):
+    self.fields = self.getFields(clean_data)
+
+  def setCleaners(self, post_dict=None):
     """Set cleaner methods for dynamic fields.
 
-    Used for storing textual input as Text instead of StringProperty. Passing
-    a dict of field names/values (from survey_content/survey_record) as the
-    kwarg 'data', it's possible to set clean_[field_id] methods for validation.
-    This method populates the data dict and uses setattr to add field cleaner
-    methods.
+    Used for storing textual input as Text instead of StringProperty. If
+    passed a dict of field names/values (as the kwarg 'data' to __init__),
+    it's possible to set clean_[field_id] methods for validation.
+
+    This method populates the 'data' dict used for generating form fields.
     """
 
     # prefix for method names
@@ -127,6 +145,9 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
     # data is passed to super's __init__ as the 'data' kwarg
     data = {}
+
+    # flag whether we can use getlist to retrieve multiple values
+    is_post = hasattr(post_dict, 'getlist')
 
     schema = {}
     if self.survey_content:
@@ -149,11 +170,25 @@ class SurveyTakeForm(djangoforms.ModelForm):
                 )
 
         # put comment in self.data
-        data[comment] = getattr(self.survey_record, comment, None)
+        if post_dict:
+          comment_val = post_dict.get(comment) or None
+        else:
+          comment_val = getattr(self.survey_record, comment, None)
+        data[comment] = comment_val
 
-      # put user's (record) or default (content) value for field in self.data
-      data[key] = (getattr(self.survey_record, key, None) or
-                   getattr(self.survey_content, key))
+      # put POST or record value for field in self.data
+      is_multi = val['type'] == 'pick_multi'
+      if post_dict:
+        if is_multi and is_post:
+          key_val = post_dict.getlist(key)
+        else:
+          key_val = post_dict.get(key)
+      else:
+        key_val = getattr(self.survey_record, key, None)
+        if is_multi and isinstance(key_val, basestring):
+          key_val = key_val.split(',')
+
+      data[key] = key_val
 
     return data
 
@@ -163,8 +198,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     params:
       post_dict: dict with POST data that will be used for validation
 
-    Populates self.survey_fields, which will be ordered in self.insert_fields.
-    Also populates self.data, which will be used in form validation.
+    Populates self.survey_fields, which will be ordered in self.insertFields.
     """
 
     if not self.survey_content:
@@ -173,7 +207,6 @@ class SurveyTakeForm(djangoforms.ModelForm):
     post_dict = post_dict or {}
     self.survey_fields = {}
     schema = SurveyContentSchema(self.survey_content.schema)
-    has_record = self.survey_record or post_dict
     extra_attrs = {}
 
     # figure out whether we want a read-only view
@@ -187,51 +220,19 @@ class SurveyTakeForm(djangoforms.ModelForm):
     else:
       extra_attrs['disabled'] = 'disabled'
 
-    # flag whether we can use getlist to retrieve multiple values
-    is_post = hasattr(post_dict, 'getlist')
-
     # add unordered fields to self.survey_fields
     for field in self.survey_content.dynamic_properties():
 
-      # a comment made by the user
-      comment = ''
+      value = post_dict.get(field)
 
-      # flag to know where the value came from
-      from_content = False
-
-      if has_record and field in post_dict:
-        # entered value that is not yet saved
-        if schema.getType(field) == 'pick_multi' and is_post:
-          value = post_dict.getlist(field)
-        else:
-          value = post_dict[field]
-        if COMMENT_PREFIX + field in post_dict:
-          comment = post_dict[COMMENT_PREFIX + field]
-      elif has_record and hasattr(self.survey_record, field):
-        # previously entered value
-        value = getattr(self.survey_record, field)
-        if hasattr(self.survey_record, COMMENT_PREFIX + field):
-          comment = getattr(self.survey_record, COMMENT_PREFIX + field)
-      else:
-        # use prompts set by survey creator
-        value = getattr(self.survey_content, field)
-        from_content = True
+      # skip comments, as they should go below their corresponding questions
+      if field.startswith(COMMENT_PREFIX):
+        continue
 
       label = schema.getLabel(field)
       if label is None:
+        # we log this error in getLabel
         continue
-
-      # fix validation for pick_multi fields
-      is_multi = schema.getType(field) == 'pick_multi'
-      if not from_content and schema.getType(field) == 'pick_multi':
-        if isinstance(value, basestring):
-          value = value.split(',')
-      elif from_content and is_multi:
-        value = []
-
-      # record field value for validation
-      if not from_content:
-        self.data[field] = value
 
       # find correct field type
       addField = self.fields_map[schema.getType(field)]
@@ -245,7 +246,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
       # handle comments if question allows them
       if schema.getHasComment(field):
-        self.data[COMMENT_PREFIX + field] = comment
+        comment = post_dict.get(COMMENT_PREFIX + field)
         self.addCommentField(field, comment, extra_attrs, tip='Add a comment.')
 
     return self.insertFields()
@@ -253,20 +254,20 @@ class SurveyTakeForm(djangoforms.ModelForm):
   def insertFields(self):
     """Add ordered fields to self.fields.
     """
-
+    fields = SortedDict()
     survey_order = self.survey_content.getSurveyOrder()
 
     # first, insert dynamic survey fields
     for position, property in survey_order.items():
       position = position * 2
-      self.fields.insert(position, property, self.survey_fields[property])
+      fields.insert(position, property, self.survey_fields[property])
 
       # add comment if field has one and this isn't an edit view
       property = COMMENT_PREFIX + property
       if property in self.survey_fields:
-        self.fields.insert(position - 1, property,
+        fields.insert(position - 1, property,
                            self.survey_fields[property])
-    return self.fields
+    return fields
 
   def addLongField(self, field, value, attrs, schema, req=True, label='',
                    tip='', comment=''):

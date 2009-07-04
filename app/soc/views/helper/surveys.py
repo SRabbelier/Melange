@@ -56,7 +56,7 @@ REQUIRED_COMMENT_TPL = """
      >True</option>
     <option value="False" {% if not is_required %} selected='selected'
      {% endif %}>False</option>
-  </select><br/>
+  </select>
 
   <label for="comment_for_{{ name }}">Allow Comments</label>
   <select id="comment_for_{{ name }}" name="comment_for_{{ name }}">
@@ -64,7 +64,7 @@ REQUIRED_COMMENT_TPL = """
      >True</option>
     <option value="False" {% if not has_comment %} selected='selected'
      {% endif %}>False</option>
-  </select><br/>
+  </select>
 """
 
 
@@ -379,9 +379,10 @@ class SurveyTakeForm(djangoforms.ModelForm):
       attrs: the attrs for the widget
       tip: tooltip text for this field
     """
+    attrs['class'] = 'comment'
     widget = widgets.Textarea(attrs=attrs)
-    comment_field = CharField(help_text=tip, required=False, label='Comments',
-                              widget=widget, initial=comment)
+    comment_field = CharField(help_text=tip, required=False, 
+        label='Add a Comment (optional)', widget=widget, initial=comment)
     self.survey_fields[COMMENT_PREFIX + field] = comment_field
 
 

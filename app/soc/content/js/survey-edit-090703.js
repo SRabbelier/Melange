@@ -192,7 +192,8 @@
                 });
                 edit_form.append(deleted_input);
               }
-              this_field.remove();
+              this_field.next('tr').remove().end()
+                        .remove();
             }
           }
         );
@@ -572,13 +573,13 @@
                            '" name="required_for_', field_name,
                            '"><option value="True" selected="selected">True',
                            '</option>', '<option value="False">False</option>',
-                           '</select><br/>', '<label for="comment_for_',
+                           '</select>', '<label for="comment_for_',
                            field_name, '">Allow Comments</label>',
                            '<select id="comment_for_', field_name,
                            '" name="comment_for_', field_name, '">',
                            '<option value="True" selected="selected">',
                            'True</option>', '<option value="False">',
-                           'False</option>', '</select><br/>',
+                           'False</option>', '</select>',
                           "<input type='text' ",
                            "class='short_answer'>", "</fieldset>"
                           ].join("");
@@ -592,13 +593,13 @@
                            '" name="required_for_', field_name,
                            '"><option value="True" selected="selected">True',
                            '</option>', '<option value="False">False</option>',
-                           '</select><br/>', '<label for="comment_for_',
+                           '</select>', '<label for="comment_for_',
                            field_name, '">Allow Comments</label>',
                            '<select id="comment_for_', field_name,
                            '" name="comment_for_', field_name, '">',
                            '<option value="True" selected="selected">',
                            'True</option>', '<option value="False">',
-                           'False</option>', '</select><br/>',
+                           'False</option>', '</select>',
                            "<textarea cols='40' rows='", MIN_ROWS,
                            "' class='long_answer'/>", '</fieldset>'
                           ].join("");
@@ -638,12 +639,12 @@
                   '<select id="required_for_', name, '" name="required_for_',
                   name, '"><option value="True" selected="selected">True',
                   '</option>', '<option value="False">False</option>',
-                  '</select><br/>', '<label for="comment_for_', name,
+                  '</select>', '<label for="comment_for_', name,
                   '">Allow Comments</label>', '<select id="comment_for_', name,
                   '" name="comment_for_', name, '">',
                   '<option value="True" selected="selected">True</option>',
                   '<option value="False">False</option>',
-                  '</select><br/>',
+                  '</select>',
                   '<label for="render_for_', name,
                   '">Render as</label>', '\n  <select id="render_for_', name,
                   '" name="render_for_', name, '">', '\n    <option',
@@ -726,7 +727,7 @@
                   'for',
                   'id_' + formatted_name
                 )
-                .append(question_content + ":").end()
+                .append(question_content).end()
                 .find(
                   'td'
                 )

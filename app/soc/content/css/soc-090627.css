@@ -714,7 +714,8 @@ div #survey_options {
 }
 
 div #survey_widget a.delete {
-  margin: 0 7px;
+  float:left;
+  margin:-1px 7px;
 }
 
 div #survey_widget th label {
@@ -749,6 +750,28 @@ div #survey_widget td,
 div #survey_widget select {
   max-width:700px;
 }
+
+div #survey_widget td {
+  display: block;
+}
+
+div #survey_widget label {
+  font-size: 18px;
+}
+
+div #survey_widget fieldset select {
+  display:block;
+}
+
+div #survey_widget fieldset textarea,
+div #survey_widget fieldset input {
+  margin: 10px;
+}
+
+div #survey_widget td > fieldset > label {
+  font-size: 11px;
+}
+
 
 #dialog {
   font-size: 62.5%;

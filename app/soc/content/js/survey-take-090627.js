@@ -19,9 +19,9 @@
 * @author <a href="mailto:jamesalexanderlevy@gmail.com">James Levy</a>
 */
 
-(function ($) {
+(function ($) { 
   $(function () {
-
+  
     /*
     * == Setup Survey on Page Load ==
     *
@@ -148,5 +148,18 @@
         );
       }
     );
+  
+   /*
+   * == Customize Comment Appearance ==
+   */
+   
+   var comments = widget.find('td > .comment');
+   comments.each(function(){
+     $(this).parents('tr:first')
+           .css({'margin-top': '-10px', 'margin-bottom': '10px'})
+           .prev().css({'margin-top': '-10px'})
+           .find('label').css({'font-size': '11px'});
+   });
+    
   });
 }(jQuery));

@@ -30,6 +30,7 @@ import datetime
 import logging
 import StringIO
 
+from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
 from django import forms
@@ -106,8 +107,55 @@ class SurveyTakeForm(djangoforms.ModelForm):
         pick_quant=self.addQuantField,
         )
 
-    self.kwargs['data'] = data
+    # set cleaner methods for fields
+    self.kwargs['data'] = self.setCleaners()
+
     super(SurveyTakeForm, self).__init__(*args, **self.kwargs)
+
+  def setCleaners(self):
+    """Set cleaner methods for dynamic fields.
+
+    Used for storing textual input as Text instead of StringProperty. Passing
+    a dict of field names/values (from survey_content/survey_record) as the
+    kwarg 'data', it's possible to set clean_[field_id] methods for validation.
+    This method populates the data dict and uses setattr to add field cleaner
+    methods.
+    """
+
+    # prefix for method names
+    clean = 'clean_'
+
+    # data is passed to super's __init__ as the 'data' kwarg
+    data = {}
+
+    schema = {}
+    if self.survey_content:
+      schema = eval(self.survey_content.schema)
+
+    for key, val in schema.items():
+      if val['type'] == 'long_answer':
+
+        # store > 500 chars per long answer
+        setattr(self, clean + key,
+                lambda key=key: db.Text(self.cleaned_data.get(key))
+                )
+
+      if val['has_comment']:
+        comment = COMMENT_PREFIX + key
+
+        #store > 500 chars per comment field
+        setattr(self, clean + comment,
+                lambda comment=comment: db.Text(self.cleaned_data.get(comment))
+                )
+
+        # put comment in self.data
+        data[comment] = getattr(self.survey_record, comment, None)
+
+      # put user's (record) or default (content) value for field in self.data
+      data[key] = (getattr(self.survey_record, key, None) or
+                   getattr(self.survey_content, key))
+
+    return data
 
   def getFields(self, post_dict=None):
     """Build the SurveyContent (questions) form fields.
@@ -182,8 +230,8 @@ class SurveyTakeForm(djangoforms.ModelForm):
         value = []
 
       # record field value for validation
-      #if not from_content:
-      self.data[field] = value
+      if not from_content:
+        self.data[field] = value
 
       # find correct field type
       addField = self.fields_map[schema.getType(field)]
@@ -382,7 +430,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     """
     attrs['class'] = 'comment'
     widget = widgets.Textarea(attrs=attrs)
-    comment_field = CharField(help_text=tip, required=False, 
+    comment_field = CharField(help_text=tip, required=False,
         label='Add a Comment (optional)', widget=widget, initial=comment)
     self.survey_fields[COMMENT_PREFIX + field] = comment_field
 

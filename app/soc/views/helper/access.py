@@ -674,7 +674,7 @@ class Checker(object):
     entity = logic.getForFields(fields, unique=True)
 
     if entity:
-      return
+      return entity
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
@@ -690,7 +690,7 @@ class Checker(object):
     """
 
     fields = ['scope_path', 'link_id']
-    self._checkIsActive(django_args, logic, fields)
+    return self._checkIsActive(django_args, logic, fields)
 
   def checkGroupIsActiveForLinkId(self, django_args, logic):
     """Checks that the specified group is active.
@@ -703,7 +703,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    self._checkIsActive(django_args, logic, ['link_id'])
+    return self._checkIsActive(django_args, logic, ['link_id'])
 
   def checkHasActiveRole(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -715,7 +715,7 @@ class Checker(object):
 
     django_args = django_args.copy()
     django_args['user'] = self.user
-    self._checkIsActive(django_args, logic, ['user'])
+    return self._checkIsActive(django_args, logic, ['user'])
 
   def _checkHasActiveRoleFor(self, django_args, logic, field_name):
     """Checks that the user has the specified active role.
@@ -731,7 +731,7 @@ class Checker(object):
     fields = [field_name, 'user']
     django_args = django_args.copy()
     django_args['user'] = self.user
-    self._checkIsActive(django_args, logic, fields)
+    return self._checkIsActive(django_args, logic, fields)
 
   def checkHasActiveRoleForKeyFieldsAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -743,7 +743,7 @@ class Checker(object):
 
     key_fields = "%(scope_path)s/%(link_id)s" % django_args
     new_args = {'scope_path': key_fields}
-    self._checkHasActiveRoleFor(new_args, logic, 'scope_path')
+    return self._checkHasActiveRoleFor(new_args, logic, 'scope_path')
 
   def checkHasActiveRoleForScope(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -756,7 +756,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
+    return self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
 
   def checkHasActiveRoleForLinkId(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -769,7 +769,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    self._checkHasActiveRoleFor(django_args, logic, 'link_id')
+    return self._checkHasActiveRoleFor(django_args, logic, 'link_id')
 
   def checkHasActiveRoleForLinkIdAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -784,7 +784,7 @@ class Checker(object):
 
     django_args = django_args.copy()
     django_args['scope_path'] = django_args['link_id']
-    self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
+    return self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.

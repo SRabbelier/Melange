@@ -346,6 +346,13 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
+  def _onCreate(self, entity):
+    """Set the scope of the survey.
+    """
+
+    self.getScope(entity)
+    super(Logic, self)._onCreate(entity)
+
 
 class ProjectLogic(Logic):
   """Logic class for ProjectSurvey.

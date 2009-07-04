@@ -151,6 +151,9 @@ class View(survey.View):
   def _constructFilterForProjectSelection(self, survey, params):
     """Returns the filter needed for the Project selection view.
 
+    Returns a filter for all the valid projects for which the current user
+    is a student. Of course only in the survey's scope.
+
     Args:
       survey: a Survey entity
       params: the params dict for the requesting view

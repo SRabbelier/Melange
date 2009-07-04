@@ -29,6 +29,7 @@ from django import forms
 from soc.logic import dicts
 from soc.logic.models.survey import GRADES
 from soc.logic.models.survey import grading_logic as grading_survey_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import surveys
@@ -102,6 +103,37 @@ class View(project_survey.View):
 
     return survey_form
 
+  def _constructFilterForProjectSelection(self, survey, params):
+    """Returns the filter needed for the Project selection view.
+
+    Constructs a filter that returns all valid projects for which the current
+    user is the mentor. Only for the projects in the program given by the
+    survey's scope of course.
+
+    For args see project_survey.View._constructFilterForProjectSelection().
+    """
+
+    from soc.logic.models.mentor import logic as mentor_logic
+
+    survey_logic = params['logic']
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    # get the mentor entities for the current user and program
+    fields = {'user': user_entity,
+              'program': survey_logic.getScope(survey),
+              'status': 'active'}
+
+    mentor_entities = mentor_logic.getForFields(fields)
+
+    # TODO: Ensure that this doesn't break when someone is a mentor for
+    # a lot of organizations.
+
+    # TODO(ljvderijk) transform StudentProject to handle multiple surveys
+    fields = {'mentor': mentor_entities,
+              'status': 'accepted'}
+
+    return fields
 
 class GradeSurveyTakeForm(surveys.SurveyTakeForm):
   """Extends SurveyTakeForm by adding a grade field.

@@ -104,7 +104,7 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
-    rights['take'] = ['checkIsDeveloper'] # TODO(ljvderijk) test proper check
+    rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}
     new_params['logic'] = survey_logic

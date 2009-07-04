@@ -41,7 +41,6 @@ from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.club_member import logic as club_member_logic
 from soc.logic.models.document import logic as document_logic
-from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
@@ -1553,6 +1552,93 @@ class Checker(object):
     self.checkMembership('write', survey.prefix,
                          survey.write_access, django_args)
 
+  @denySidebar
+  @allowDeveloper
+  def checkIsSurveyTakeable(self, django_args, survey_logic):
+    """Checks if the survey specified in django_args can be taken.
+
+    Uses survey.taking_access to map that string onto a check. Also checks for
+    survey start and end.
+
+    If the prefix is 'program', the scope of the survey is the program and
+    the taking_acccess attribute means:
+      mentor: user is mentor for the program
+      org_admin: user is org_admin for the program
+      student: user is student for the program
+      user: valid user on the website
+
+    Args:
+      survey_logic: SurveyLogic instance (or subclass)
+    """
+
+    if django_args['prefix'] != 'program':
+      # TODO: update when generic surveys are allowed
+      return self.deny(django_args)
+
+    # get the survey from django_args
+    survey = survey_logic.getFromKeyFieldsOr404(django_args)
+
+    # check if the survey can be taken now
+    if not timeline_helper.isActivePeriod(survey, 'survey'):
+      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+
+    # retrieve the role that is allowed to take this survey
+    role = survey.taking_access
+
+    if role == 'user':
+      # check if the current user is registered
+      return self.checkIsUser(django_args)
+
+    django_args = django_args.copy()
+
+    # get the survey scope
+    survey_scope = survey_logic.getScope(survey)
+
+    if role == 'mentor':
+      # check if the current user is a mentor for the program in survey.scope
+      django_args['program'] = survey_scope
+      # program is the 'program' attribute for mentors and org_admins
+      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+
+    if role == 'org_admin':
+      # check if the current user is a mentor for the program in survey.scope
+      django_args['program'] = survey_scope
+      # program is the 'program' attribute for mentors and org_admins
+      return self._checkHasActiveRoleFor(django_args, org_admin_logic, 'program')
+
+    if role == 'student':
+      # check if the current user is a student for the program in survey.scope
+      django_args['scope'] = survey_scope
+      # program is the 'scope' attribute for students
+      return self.checkHasActiveRoleForScope(django_args, student_logic)
+
+    # unknown role
+    self.deny(django_args)
+
+  @denySidebar
+  @allowDeveloper
+  def checkIsAllowedToTakeProjectSurveyAs(self, django_args, survey_logic,
+                                          role_name, project_key_location):
+    """Checks whether a ProjectSurvey can be taken by the current User.
+
+    role_name argument determines wether the current user should be the
+    student or mentor specified by the project in GET dict.
+
+    However if the project entry is not present in the dictionary this access
+    check passes.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      survey_logic: instance of ProjectSurveyLogic (or subclass)
+      role_name: String containing either "student" or "mentor"
+      project_key_location: String containing the key entry in the GET dict
+        where the key for the project can be located.
+    """
+
+    # TODO(ljvderijk) implement this check
+    #raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
+
+    self.allow(django_args)
 
   @allowSidebar
   @allowDeveloper
@@ -1647,7 +1733,7 @@ class Checker(object):
 
   def checkCanEditTimeline(self, django_args):
     """Checks whether this program's timeline may be edited.
-    
+
     Args:
       django_args: a dictionary with django's arguments
     """
@@ -1661,77 +1747,3 @@ class Checker(object):
 
     fields = program_logic.getKeyFieldsFromFields(django_args)
     self.checkIsHostForProgram(fields)
-
-  def checkHasSurveyAccess(self, django_args):
-    """Checks if the survey specified in django_args can be taken.
-
-    Uses survey.taking_access to map that string onto a check. Also checks for
-    deadline start and end.
-
-    If the prefix is 'program', the scope of the survey is the program and
-    the taking_acccess attribute means:
-      mentor: user is mentor for the program
-      org_admin: user is org_admin for the program
-      student: user is student for the program
-      user: valid user on the website
-      public: anyone can participate in the survey
-    """
-
-    if django_args['prefix'] != 'program':
-      # TODO: update when generic surveys are allowe
-      return self.deny(django_args)
-
-    survey = survey_logic.getFromKeyFieldsOr404(django_args)
-
-    if not timeline_helper.isActivePeriod(survey, 'survey'):
-      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
-
-    role = survey.taking_access
-
-    if role == 'user':
-      return self.checkIsUser(django_args)
-
-    django_args = django_args.copy()
-
-    if role == 'mentor':
-      django_args['program'] = survey.scope
-      # program is the 'program' attribute for mentors and org_admins
-      entity = self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
-
-      fields = {
-          'mentor': entity,
-          'program': survey.scope,
-          'status': ['accepted', 'mid_term_passed'],
-          }
-
-      project = student_project_logic.getForFields(fields, unique=True)
-
-      if project:
-        return
-
-      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
-
-    if role == 'org_admin':
-      # program is the 'program' attribute for mentors and org_admins
-      return self._checkHasActiveRoleFor(django_args, org_admin_logic, 'program')
-
-    if role == 'student':
-      django_args['scope'] = survey.scope
-      # program is the 'scope' attribute for students
-      entity = self.checkHasActiveRoleForScope(django_args, student_logic)
-
-      fields = {
-          'scope': entity,
-          'status': ['accepted', 'mid_term_passed'],
-          }
-
-      # student is scope for student projects
-      project = student_project_logic.getForFields(fields, unique=True)
-
-      if project:
-        return
-
-      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_STUDENT_PROJECT_MSG)
-
-    # unknown role
-    self.deny(django_args)

@@ -50,9 +50,10 @@ class View(survey.View):
     rights['show'] = [('checkIsSurveyReadable', project_survey_logic)]
     rights['create'] = ['checkIsDeveloper'] # TODO(ljvderijk) proper access check
     rights['edit'] = [('checkIsSurveyWritable', project_survey_logic)]
-    rights['delete'] = [('checkIsSurveyWritable', project_survey_logic)]
+    rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
-    rights['take'] = ['checkIsDeveloper'] # TODO(ljvderijk) add Project check
+    # TODO(ljvderijk) add Project check
+    rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}
     new_params['logic'] = project_survey_logic

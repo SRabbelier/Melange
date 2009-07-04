@@ -99,8 +99,8 @@ class Survey(soc.models.work.Work):
   SURVEY_TAKING_ACCESS = ['student',
                           'mentor',
                           'org_admin',
-                          'user',
-                          'public']
+                          'user']
+  
   GRADE_OPTIONS = {'midterm':['mid_term_passed', 'mid_term_failed'],
                    'final':['final_passed', 'final_failed'],
                    'N/A':[] }

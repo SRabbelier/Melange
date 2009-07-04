@@ -681,10 +681,9 @@ class PickManyField(forms.MultipleChoiceField):
     super(PickManyField, self).__init__(*args, **kwargs)
 
 
-class PickQuantField(forms.MultipleChoiceField):
-  """Stub for customizing the multiple choice field.
+class PickQuantField(forms.ChoiceField):
+  """Stub for customizing the choice field.
   """
-  #TODO(james): Ensure that more than one quant cannot be selected
 
   def __init__(self, *args, **kwargs):
     super(PickQuantField, self).__init__(*args, **kwargs)

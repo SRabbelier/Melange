@@ -489,7 +489,8 @@
             '<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>',
             '<span id="', id_, '" class="editable_option" name="', id_,
             '__field">', name, '</span>', '<input type="hidden" id="', id_,
-            '__field" name="', id_, '__field" value="', name, '" >', '</li>'
+            '__field" name="', id_, '__field" value="',
+            name.replace(/\"/g,'&quot;'), '" >', '</li>'
           ].join(""));
 
           ol.append(
@@ -702,7 +703,7 @@
                       '<span id="' + id_ + '" class="editable_option" name="',
                       id_, '__field">', oname, '</span>', '<input ',
                       'type="hidden" id="', id_, '__field" name="', id_,
-                      '__field" value="', oname, '" >', '</li>'
+                      '__field" value="', oname.replace(/\"/g,'&quot;'), '" >', '</li>'
                     ].join(""));
                     ol.append(option_html.prepend(
                       del_li.join(option_html.attr('id'))));

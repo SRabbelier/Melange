@@ -293,8 +293,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     # add all properties, but select chosen one
     # TODO(ajaksu): this breaks ordering and blocks merging choice methods
     options = getattr(self.survey_content, field)
-    has_record = not self.editing and self.survey_record
-    if has_record and hasattr(self.survey_record, field):
+    if self.survey_record and hasattr(self.survey_record, field):
       these_choices.append((value, value))
       if value in options:
         options.remove(value)

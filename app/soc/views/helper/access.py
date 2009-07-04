@@ -1675,7 +1675,7 @@ class Checker(object):
     """
 
     if django_args['prefix'] != 'program':
-      # TODO : update when generic surveys are allowe
+      # TODO: update when generic surveys are allowe
       return self.deny(django_args)
 
     survey = survey_logic.getFromKeyFieldsOr404(django_args)
@@ -1684,10 +1684,6 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
     role = survey.taking_access
-
-    if role == 'public':
-      # TODO : are we sure we want public surveys?
-      return self.allow(django_args)
 
     if role == 'user':
       return self.checkIsUser(django_args)

@@ -75,8 +75,6 @@ class View(survey.View):
     For Args see base.View().public().
     """
 
-    from soc.logic.models.student import logic as student_logic
-
     survey_logic = params['logic']
 
     try:
@@ -88,19 +86,10 @@ class View(survey.View):
     get_dict = request.GET
 
     if not 'project' in get_dict:
-      user_entity = user_logic.getForCurrentAccount()
+      # get the fields needed to filter projects on
+      fields = self._constructFilterForProjectSelection(entity, params)
 
-      fields = {'user': user_entity,
-                'scope': survey_logic.getScope(entity),
-                'status': 'active'}
-
-      student_entity = student_logic.getForFields(fields, unique=True)
-
-      # TODO(ljvderijk) transform StudentProject to handle multiple surveys
-      fields = {'student': student_entity,
-                'status': 'accepted'}
-
-      # show project selection screen
+      # show project selection screen using the given filter
       return self._selectProjects(request, page_name, params, entity, fields)
 
     return super(View, self).take(request, 'any_access', page_name=page_name,
@@ -112,7 +101,7 @@ class View(survey.View):
     This method also take the StudentProject specified as GET param into
     account when querying for the SurveyRecord.
 
-    For params see base.View._getSurveyRecordFor().
+    For params see survey.View._getSurveyRecordFor().
     """
 
     from soc.logic.models.student_project import logic as student_project_logic
@@ -159,13 +148,43 @@ class View(survey.View):
     # update the properties that will be stored with the referenced project
     properties.update(project=project_entity)
 
+  def _constructFilterForProjectSelection(self, survey, params):
+    """Returns the filter needed for the Project selection view.
+
+    Args:
+      survey: a Survey entity
+      params: the params dict for the requesting view
+
+    Returns:
+      Dictionary that can be used as a input for a query.
+    """
+
+    from soc.logic.models.student import logic as student_logic
+
+    survey_logic = params['logic']
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    # get the student entity for the current user and program
+    fields = {'user': user_entity,
+              'scope': survey_logic.getScope(survey),
+              'status': 'active'}
+
+    student_entity = student_logic.getForFields(fields, unique=True)
+
+    # TODO(ljvderijk) transform StudentProject to handle multiple surveys
+    fields = {'student': student_entity,
+              'status': 'accepted'}
+
+    return fields
+
   def _selectProjects(self, request, page_name, params, survey, fields):
     """Shows a view upon which a User can select a Student Project to fill in
     the ProjectSurvey for.
 
     Args:
       survey: a Survey entity
-      fields: the filter to use on the Project List.
+      fields: the filter to use on the Project List
       rest: see base.View.public()
     """
 

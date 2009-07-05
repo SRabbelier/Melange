@@ -112,14 +112,11 @@ class View(survey.View):
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    user_entity = user_logic.getForCurrentAccount()
-
     # get the StudentProject specified in the GET params
     project_key_name = request.GET['project']
     project_entity = student_project_logic.getFromKeyName(project_key_name)
 
     filter = {'survey': survey,
-              'user': user_entity,
               'project': project_entity}
 
     return record_logic.getForFields(filter, unique=True)

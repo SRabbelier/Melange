@@ -852,15 +852,19 @@ class View(base.View):
         # check if the current user is allowed to visit the take Survey page
         allowed_to_take = False
 
-        rights.checkIsSurveyTakeable(
-            {'key_name': survey_entity.key().name(),
-             'prefix': survey_entity.prefix,
-             'scope_path': survey_entity.scope_path,
-             'link_id': survey_entity.link_id,
-             'user': user},
-            survey_logic,
-            check_time=False)
-        allowed_to_take = True
+        try:
+          rights.checkIsSurveyTakeable(
+              {'key_name': survey_entity.key().name(),
+               'prefix': survey_entity.prefix,
+               'scope_path': survey_entity.scope_path,
+               'link_id': survey_entity.link_id,
+               'user': user},
+              survey_logic,
+              check_time=False)
+          allowed_to_take = True
+        except:
+          pass
+
         # cache ACL for a given entity.taking_access
         survey_rights[survey_entity.taking_access] = allowed_to_take
 

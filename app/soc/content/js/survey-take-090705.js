@@ -88,7 +88,7 @@
       }
     );
 
-  // remember initially chosen project choice
+    // remember initially chosen project choice
     $('select#id_project').blur(
       function () {
         $(this).data('selected', $(this).find('option:first'));

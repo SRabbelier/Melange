@@ -156,7 +156,7 @@
    var comments = widget.find('td > .comment');
    comments.each(function(){
      $(this).parents('tr:first')
-           .css({'margin-top': '-10px', 'margin-bottom': '10px'})
+           .css({'margin-top': '-10px', 'margin-bottom': '30px'})
            .prev().css({'margin-top': '-10px'})
            .find('label').css({'font-size': '11px'});
    });

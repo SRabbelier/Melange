@@ -1571,7 +1571,7 @@ class Checker(object):
 
   @denySidebar
   @allowDeveloper
-  def checkIsSurveyTakeable(self, django_args, survey_logic):
+  def checkIsSurveyTakeable(self, django_args, survey_logic, check_time=True):
     """Checks if the survey specified in django_args can be taken.
 
     Uses survey.taking_access to map that string onto a check. Also checks for
@@ -1586,6 +1586,8 @@ class Checker(object):
 
     Args:
       survey_logic: SurveyLogic instance (or subclass)
+      check_time: iff True checks if the current date is between the survey
+        start and end date.
     """
 
     if django_args['prefix'] != 'program':
@@ -1596,7 +1598,7 @@ class Checker(object):
     survey = survey_logic.getFromKeyFieldsOr404(django_args)
 
     # check if the survey can be taken now
-    if not timeline_helper.isActivePeriod(survey, 'survey'):
+    if check_time and not timeline_helper.isActivePeriod(survey, 'survey'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
     # retrieve the role that is allowed to take this survey

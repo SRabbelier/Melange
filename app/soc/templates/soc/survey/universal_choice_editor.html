@@ -1,5 +1,8 @@
 <fieldset>
 
+<table>
+ <tr>
+  <td>
 {# Drop-down setting whether question is required #}
   <label for="required_for_{{ name }}">Required</label>
   <select id="required_for_{{ name }}" name="required_for_{{ name }}">
@@ -7,8 +10,9 @@
     >True</option>
     <option value="False" {% if not is_required %} selected='selected' {% endif %}
     >False</option>
-  </select><br/>
-
+  </select>
+  </td>
+  <td>
 {# Drop-down setting whether question allows comments #}
   <label for="comment_for_{{ name }}">Allow Comments</label>
   <select id="comment_for_{{ name }}" name="comment_for_{{ name }}">
@@ -16,8 +20,11 @@
     >True</option>
     <option value="False" {% if not has_comment %} selected='selected' {% endif %}
     >False</option>
-  </select><br/>
-
+  </select>
+  </td>
+ </tr>
+ <tr>
+  <td>
 {# Question type drop-down #}
   <label for="type_for_{{ name }}">Question Type</label>
   <select id="type_for_{{ name }}" name="type_for_{{ name }}">
@@ -25,7 +32,8 @@
     <option value="pick_multi" {{ is_pick_multi }}>pick_multi</option>
     <option value="pick_quant" {{ is_pick_quant }}>pick_quant</option>
   </select>
-
+  </td>
+  <td>
 {# Render widget drop-down #}
   <label for="render_for_{{ name }}">Render as</label>
   <select id="render_for_{{ name }}" name="render_for_{{ name }}">
@@ -33,10 +41,23 @@
     <option value="checkboxes" {{ is_checkboxes|safe }}>checkboxes</option>
     <option value="radio_buttons" {{ is_radio_buttons }}>radio_buttons</option>
   </select>
+  </td>
+ </tr>
+ <tr>
+  <td  colspan='2'>
+    <textarea id="tip_for_{{ name }}" name="tip_for_{{ name }}"
+     cols='20' rows='1' class="tooltip_entry">{{ tooltip_content }}</textarea>
+  </td>
+ </tr>
+</table>
+
 
 {# Each choice field has a hidden input where its options' order is stored. #}
   <input type="hidden" id="order_for_{{ name }}" name="order_for_{{ name }}"
    value=""/>
+{# The index for choice questions is also kept in a hidden input. #}
+  <input type="hidden" id="index_for_{{ name }}"
+   name="index_for_{{ name }}" value=""/>
 
 {# Open the ordered list. #}
   <ol id="{{ name }}" class="sortable">

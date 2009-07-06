@@ -654,7 +654,6 @@ div #survey_widget {
   border: 5px solid #F7CA75;
   padding: 15px;
   /*max-width: 700px;*/
-  float: left;
 }
 
 
@@ -662,9 +661,8 @@ div #survey_widget.survey_admin {
 /* TODO(ajaksu) remove if unnecessary */
 }
 
-div #survey_widget tr {
-  float: left;
-  clear: both;
+div #survey_widget table {
+  width:100%
 }
 
 div #survey_widget th,
@@ -674,9 +672,14 @@ div #survey_widget td {
 
 /* fields */
 
-div #survey_widget textarea {
+div #survey_widget textarea.long_answer {
   padding: 10px;
-  width: 300px;
+  width: 500px;
+}
+
+div #survey_widget textarea.tooltip_entry {
+  padding: 10px;
+  width: 80%;
 }
 
 div #survey_widget input.text_question {
@@ -748,19 +751,15 @@ div #survey_widget fieldset,
 div #survey_widget th,
 div #survey_widget td,
 div #survey_widget select {
-  max-width:700px;
 }
 
 div #survey_widget td {
-  display: block;
 }
 
 div #survey_widget label {
-  font-size: 18px;
 }
 
 div #survey_widget fieldset select {
-  display:block;
 }
 
 div #survey_widget fieldset textarea,

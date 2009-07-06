@@ -76,6 +76,18 @@
         }
       );
 
+      // add index information to choice fields
+      widget.find('[name=create-option-button]').each(
+        function () {
+          $(
+            '#index_for_' + $(this).attr('value')
+          )
+          .val(
+            $(this).getPosition()
+          );
+        }
+      );
+
       widget.find('.long_answer').each(
         function () {
           $(this).attr('name', SURVEY_PREFIX + $(this).getPosition() +
@@ -159,7 +171,7 @@
           }
         );
 
-        widget.find('.long_answer').each(
+        widget.find('.long_answer, .tooltip_entry').each(
           function () {
             if ($(this).val().length < 1 ||
             $(this).val() === DEFAULT_LONG_ANSWER_TEXT) {
@@ -350,7 +362,7 @@
         );
 
         // don't save default value
-        widget.find('.long_answer').each(
+        widget.find('.long_answer, .tooltip_entry').each(
           function () {
             if ($(this).val() === DEFAULT_LONG_ANSWER_TEXT) {
               $(this).val('');
@@ -397,9 +409,9 @@
 
     // get position of survey field
     getPosition: function () {
-      var this_row = $(this).parents('tr:first');
-      var this_table = this_row.parents('table:first');
-      var position = this_table.find('tr').index(this_row) + '__';
+      var this_fieldset = $(this).parents('fieldset:first');
+      var this_table = this_fieldset.parents('table:first');
+      var position = this_table.find('fieldset').index(this_fieldset) + '__';
       return position;
     }
   });
@@ -555,7 +567,7 @@
 
             var new_field = false;
             var type = button_id + "__";
-            var field_count = survey_table.find('tr').length;
+            var field_count = survey_table.find('fieldset').length;
             var new_field_count = field_count + 1 + '__';
 
             var MIN_ROWS = 10;
@@ -586,7 +598,7 @@
                           ].join("");
               break;
             case "long_answer":
-              field_count = survey_table.find('tr').length;
+              field_count = survey_table.find('fieldset').length;
               new_field_count = field_count + 1 + '__';
               new_field = ['<fieldset>\n', '<label for="required_for_',
                            field_name, '">Required</label>',
@@ -628,7 +640,7 @@
                 '"/>'
               ].join("");
 
-              field_count = survey_table.find('tr').length;
+              field_count = survey_table.find('fieldset').length;
               new_field_count = field_count + 1 + '__';
               var formatted_name = (SURVEY_PREFIX + new_field_count + type +
                                     field_name);

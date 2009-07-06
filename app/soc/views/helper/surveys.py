@@ -186,7 +186,11 @@ class SurveyTakeForm(djangoforms.ModelForm):
       else:
         key_val = getattr(self.survey_record, key, None)
         if is_multi and isinstance(key_val, basestring):
+          # TODO(ajaksu): find out if we still need this safety net
           key_val = key_val.split(',')
+        elif not is_multi and isinstance(key_val, list):
+          # old pick_multi record for a question that is now single choice
+          key_val = key_val[0] if key_val else ''
 
       data[key] = key_val
 
@@ -207,7 +211,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     post_dict = post_dict or {}
     self.survey_fields = {}
     schema = SurveyContentSchema(self.survey_content.schema)
-    extra_attrs = {}
+    attrs = {}
 
     # figure out whether we want a read-only view
     read_only = self.read_only
@@ -217,8 +221,9 @@ class SurveyTakeForm(djangoforms.ModelForm):
       survey_entity = self.survey_logic.getSurveyForContent(survey_content)
       deadline = survey_entity.survey_end
       read_only = deadline and (datetime.datetime.now() > deadline)
-    else:
-      extra_attrs['disabled'] = 'disabled'
+
+    if read_only:
+      attrs['disabled'] = 'disabled'
 
     # add unordered fields to self.survey_fields
     for field in self.survey_content.dynamic_properties():
@@ -239,7 +244,12 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
       # check if question is required, it's never required when editing
       required = schema.getRequired(field)
-      kwargs = dict(label=label, req=required)
+
+      tip = schema.getTip(field)
+      kwargs = dict(label=label, req=required, tip=tip)
+
+      # copy attrs
+      extra_attrs = attrs.copy()
 
       # add new field
       addField(field, value, extra_attrs, schema, **kwargs)
@@ -258,15 +268,13 @@ class SurveyTakeForm(djangoforms.ModelForm):
     survey_order = self.survey_content.getSurveyOrder()
 
     # first, insert dynamic survey fields
-    for position, property in survey_order.items():
-      position = position * 2
-      fields.insert(position, property, self.survey_fields[property])
+    for position, property in sorted(survey_order.items()):
+      fields.insert(len(fields) + 1, property, self.survey_fields[property])
 
       # add comment if field has one and this isn't an edit view
       property = COMMENT_PREFIX + property
       if property in self.survey_fields:
-        fields.insert(position - 1, property,
-                           self.survey_fields[property])
+        fields.insert(len(fields) + 1, property, self.survey_fields[property])
     return fields
 
   def addLongField(self, field, value, attrs, schema, req=True, label='',
@@ -429,7 +437,9 @@ class SurveyTakeForm(djangoforms.ModelForm):
       attrs: the attrs for the widget
       tip: tooltip text for this field
     """
+
     attrs['class'] = 'comment'
+    attrs['rows'] = '1'
     widget = widgets.Textarea(attrs=attrs)
     comment_field = CharField(help_text=tip, required=False,
         label='Add a Comment (optional)', widget=widget, initial=comment)
@@ -494,10 +504,10 @@ class SurveyEditForm(djangoforms.ModelForm):
       if label is None:
         continue
 
-      tip = 'Please provide an answer to this question.'
+      tip = schema.getTip(field)
       kwargs = schema.getEditFieldArgs(field, value, tip, label)
 
-      kwargs['widget'] = schema.getEditWidget(field, extra_attrs)
+      kwargs['widget'] = schema.getEditWidget(field, extra_attrs, tip)
 
       # add new field
       self.survey_fields[field] = schema.getEditField(field)(**kwargs)
@@ -539,10 +549,20 @@ class SurveyContentSchema(object):
     """Fetch question type for field e.g. short_answer, pick_multi, etc.
 
     Args:
-      field: name of the field to get the type from
+      field: name of the field to get the type for
     """
 
     return self.schema[field]["type"]
+
+  def getTip(self, field):
+    """Fetch question help text, used for tooltips.
+
+    Args:
+      field: name of the field to get the tooltip for
+    """
+
+    return self.schema[field].get('tip', '')
+
 
   def getRequired(self, field):
     """Check whether survey question is required.
@@ -600,11 +620,11 @@ class SurveyContentSchema(object):
     if kind in CHOICE_TYPES:
       kwargs['choices'] = tuple([(val, val) for val in value])
     else:
-      kwargs['initial'] = value
+      kwargs['initial'] = tip
 
     return kwargs
 
-  def getEditWidget(self, field, attrs):
+  def getEditWidget(self, field, attrs, tip):
     """Get survey editing widget for questions.
     """
 
@@ -615,14 +635,15 @@ class SurveyContentSchema(object):
     if kind in CHOICE_TYPES:
       widget = UniversalChoiceEditor
       render = self.getRender(field)
-      args = kind, render, is_required, has_comment
+      args = kind, render, is_required, has_comment, tip
     else:
       args = is_required, has_comment
       if kind == 'long_answer':
-        attrs['class'] = "text_question"
         widget = LongTextarea
       elif kind == 'short_answer':
         widget = ShortTextInput
+      attrs = attrs.copy()
+      attrs['class'] = kind
 
     kwargs = dict(attrs=attrs)
 
@@ -636,10 +657,9 @@ class SurveyContentSchema(object):
       logging.error('field %s not found in schema %s' %
                     (field, str(self.schema)))
       return
-    elif 'question' in self.schema[field]:
-      label = self.schema[field].get('question') or field
     else:
-      label = field
+      label = self.schema[field].get('question') or field
+
     return label
 
 
@@ -649,8 +669,8 @@ class UniversalChoiceEditor(widgets.Widget):
   Allows adding and removing options, re-ordering and editing option text.
   """
 
-  def __init__(self, kind, render, is_required, has_comment, attrs=None,
-               choices=()):
+  def __init__(self, kind, render, is_required, has_comment, tip,
+               attrs=None, choices=()):
     """
     params:
       kind: question kind (one of selection, pick_multi or pick_quant)
@@ -669,6 +689,7 @@ class UniversalChoiceEditor(widgets.Widget):
     self.render_as = render
     self.is_required = is_required
     self.has_comment = has_comment
+    self.tooltip_content = tip or ''
 
   def render(self, name, value, attrs=None, choices=()):
     """Render UCE widget.
@@ -707,6 +728,9 @@ class UniversalChoiceEditor(widgets.Widget):
       option_value = escape(forms.util.smart_unicode(option_value))
       choices[i] = option_value
     context['choices'] = choices
+
+    tooltip_content = escape(forms.util.smart_unicode(self.tooltip_content))
+    context['tooltip_content'] = tooltip_content
 
     template = 'soc/survey/universal_choice_editor.html'
     return loader.render_to_string(template, context)

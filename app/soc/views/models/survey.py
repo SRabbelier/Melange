@@ -348,7 +348,6 @@ class View(base.View):
           if 'NEW_' + name in POST:
             # new Choice question, set generic type and get its index
             schema[name] = {'type': 'choice'}
-            schema[name]['index'] = int(POST['index_for_' + name])
 
         if name in schema and schema[name]['type'] in CHOICE_TYPES:
           # build an index:content dictionary
@@ -358,7 +357,7 @@ class View(base.View):
           else:
             survey_fields[name] = {int(number): value}
 
-      elif key.startswith('survey__'): # new Text question
+      elif key.startswith('survey__'): # Text question
         # this is super ugly but unless data is serialized the regex is needed
         prefix = re.compile('survey__([0-9]{1,3})__')
         prefix_match = re.match(prefix, key)
@@ -373,10 +372,15 @@ class View(base.View):
           # should only match one
           if ptype + "__" in field_name:
             field_name = field_name.replace(ptype + "__", "")
-            schema[field_name] = {}
+            if field_name not in schema:
+              schema[field_name]= {}
             schema[field_name]["index"] = index
             schema[field_name]["type"] = ptype
 
+        # store text question tooltip from the input/textarea value
+        schema[field_name]["tip"] = value
+
+        # add the question as a dynamic property to survey_content
         survey_fields[field_name] = value
 
   def getSchemaOptions(self, schema, survey_fields, POST):
@@ -396,6 +400,10 @@ class View(base.View):
         if render_for in POST:
           schema[key]['render'] = RENDER[POST[render_for]]
           schema[key]['type'] = RENDER_TYPES[POST[render_for]]
+
+        # set the choice question's tooltip
+        tip_for = 'tip_for_' + key
+        schema[key]['tip'] = POST.get(tip_for)
 
         # handle reordering fields
         ordered = False
@@ -422,7 +430,7 @@ class View(base.View):
 
       # set 'question' entry (free text label for question) in schema
       question_for = 'NEW_' + key
-      if question_for in POST:
+      if question_for in POST and POST[question_for]:
         schema[key]["question"] = POST[question_for]
 
       # set wheter the question is required
@@ -432,6 +440,11 @@ class View(base.View):
       # set wheter the question allows comments
       comment_for = 'comment_for_' + key
       schema[key]['has_comment'] = BOOL[POST[comment_for]]
+
+      # set the question index from JS-calculated value
+      index_for = 'index_for_' + key
+      if index_for in POST:
+        schema[key]['index'] = int(POST[index_for].replace('__', ''))
 
   def createGet(self, request, context, params, seed):
     """Pass the question types for the survey creation template.

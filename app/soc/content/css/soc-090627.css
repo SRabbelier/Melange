@@ -768,6 +768,10 @@ div #survey_widget fieldset input {
   margin: 10px;
 }
 
+div #survey_widget textarea.comment{
+margin-bottom: 30px;
+}
+
 div #survey_widget td > fieldset > label {
   font-size: 11px;
 }

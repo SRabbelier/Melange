@@ -19,9 +19,9 @@
 * @author <a href="mailto:jamesalexanderlevy@gmail.com">James Levy</a>
 */
 
-(function ($) { 
+(function ($) {
   $(function () {
-  
+
     /*
     * == Setup Survey on Page Load ==
     *
@@ -42,16 +42,9 @@
       * == Set Custom Field Rules ==
       *
       */
-      widget.find('input').each(
-        function () {
-          $(this).preserveDefaultText($(this).val());
-        }
-      );
-
       widget.find('textarea').each(
         function () {
-          $(this).preserveDefaultText($(this).val()).attr('overflow', 'auto')
-          .growfield();
+          $(this).attr('overflow', 'auto').growfield();
         }
       );
     }
@@ -148,11 +141,11 @@
         );
       }
     );
-  
+
    /*
    * == Customize Comment Appearance ==
    */
-   
+
    var comments = widget.find('td > .comment');
    comments.each(function(){
      $(this).parents('tr:first')
@@ -160,6 +153,6 @@
            .prev().css({'margin-top': '-10px'})
            .find('label').css({'font-size': '11px'});
    });
-    
+
   });
 }(jQuery));

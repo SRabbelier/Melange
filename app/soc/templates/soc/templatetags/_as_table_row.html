@@ -54,7 +54,7 @@ limitations under the License.
   {% if help_text %}
   <script type="text/javascript">
   $(document).ready( function() {
-    var tooltip = "<div class='tooltip'><div class='tooltip-body'><img src='/soc/content/images/purrInfo.png' alt='' /><h3>Info</h3><p>{{ help_text }}</p></div><div class='tooltip-bottom'></div></div>";
+    var tooltip = "<div class='tooltip'><div class='tooltip-body'><img src='/soc/content/images/purrInfo.png' alt='' /><h3>Info</h3><p>{% autoescape off %}{{ help_text|linebreaksbr|escapejs }}{% endautoescape %}</p></div><div class='tooltip-bottom'></div></div>";
     var tooltip_object=null;
     var documented = $("#{{ field_id }}");
     var not_fieldset = documented.attr('tagName') !== 'FIELDSET';

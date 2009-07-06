@@ -67,13 +67,13 @@ class Work(soc.models.linkable.Linkable):
   #: The content is only to be displayed to Persons in Roles eligible to
   #: view them (which may be anyone, for example, with the site front page).
   content = db.TextProperty(verbose_name=ugettext('Content'))
-  
+
   #: date when the work was created
   created = db.DateTimeProperty(auto_now_add=True)
-  
+
   #: date when the work was last modified
   modified = db.DateTimeProperty(auto_now=True)
-  
+
   # indicating wich user last modified the work. Used in displaying Work
   modified_by = db.ReferenceProperty(reference_class=soc.models.user.User,
                                      required=True,

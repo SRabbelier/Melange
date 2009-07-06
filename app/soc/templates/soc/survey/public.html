@@ -37,6 +37,10 @@ limitations under the License.
   <form method="get" onsubmit="javascript:return false">
     This page gives a preview of how users will see the Survey.
 
+    <div=description>
+      {{ entity.content|safe }}
+    </div>
+
     <div style="width:100%; float:left;">
       <div class="{{ status }}" id="survey_widget">
         <table>

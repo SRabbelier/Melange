@@ -33,6 +33,12 @@ limitations under the License.
 
   {{ help_text }}
 
+  {% if entity.content %}
+    <div=survey_description>
+      {{ entity.content|safe }}
+    </div>
+  {% endif %}
+
   {% if form_action %}
     <form method="post" action="{{ form_action }}">
   {% else %}

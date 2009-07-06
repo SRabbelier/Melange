@@ -154,10 +154,9 @@ class View(base.View):
          },
         ]
 
-    # survey_html: save form content if POST fails, so fields remain in UI
     new_params['create_extra_dynaproperties'] = {
-        #'survey_content': forms.fields.CharField(widget=surveys.EditSurvey(),
-                                                 #required=False),
+        'content': forms.fields.CharField(required=False, label='Description',
+            widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'survey_html': forms.fields.CharField(widget=forms.HiddenInput,
                                               required=False),
         'scope_path': forms.fields.CharField(widget=forms.HiddenInput,
@@ -170,7 +169,7 @@ class View(base.View):
         'clean': cleaning.validate_document_acl(self, True),
         }
 
-    new_params['extra_dynaexclude'] = ['author', 'created', 'content',
+    new_params['extra_dynaexclude'] = ['author', 'created',
                                        'home_for', 'modified_by', 'modified',
                                        'take_survey', 'survey_content']
 

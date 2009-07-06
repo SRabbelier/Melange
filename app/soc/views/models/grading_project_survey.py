@@ -155,14 +155,21 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
 
     self.grade_choices = kwargs.pop('grade_choices', None)
 
-    if self.grade_choices:
-      # add grade field to self.data, respecting the data kwarg if present
-      if kwargs.get('data') and kwargs['data'].get('grade'):
-        data = {}
-        data['grade'] = kwargs['data']['grade']
-        self.data = data
-
     super(GradeSurveyTakeForm, self).__init__(*args, **kwargs)
+
+  def setCleaners(self, post_dict=None):
+    """Ensures that the grade field is added to the clean data.
+
+    For args see surveys.SurveyTakeForm.setCleaners().
+    """
+
+    clean_data = super(GradeSurveyTakeForm, self).setCleaners(
+        post_dict=post_dict)
+
+    if post_dict:
+      clean_data['grade'] = post_dict.get('grade', None)
+
+    return clean_data
 
   def clean_grade(self):
     """Validate the grade field.
@@ -186,7 +193,7 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     grade = post_dict.get('grade', None)
 
     # otherwise, try to fetch from survey_record
-    if not grade and hasattr(self.survey_record, 'grade'):
+    if grade == None and hasattr(self.survey_record, 'grade'):
       grade = self.survey_record.grade
 
     # remap bool to string values as the ChoiceField validates on 'choices'.

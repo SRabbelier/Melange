@@ -138,6 +138,9 @@ class SurveyTakeForm(djangoforms.ModelForm):
     it's possible to set clean_[field_id] methods for validation.
 
     This method populates the 'data' dict used for generating form fields.
+
+    Args:
+      post_dict: dictionary used to populate the fields
     """
 
     # prefix for method names

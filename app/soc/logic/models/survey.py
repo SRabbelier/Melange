@@ -37,10 +37,10 @@ from soc.models.program import Program
 from soc.models import student_project
 from soc.models.survey import Survey
 from soc.models.grading_project_survey import GradingProjectSurvey
+from soc.models.grading_record import GradingRecord
 from soc.models.project_survey import ProjectSurvey
 from soc.models.survey import SurveyContent
 from soc.models.survey_record import SurveyRecord
-from soc.models.survey_record_group import SurveyRecordGroup
 from soc.models.work import Work
 
 #TODO(James): Ensure this facilitates variable # of surveys 
@@ -200,7 +200,7 @@ class Logic(work.Logic):
     program = survey.scope or Program.get_by_key_name(survey.scope_path)
 
     for project in program.student_projects.fetch(1000):
-      this_record_group = SurveyRecordGroup.all().filter(
+      this_record_group = GradingRecord.all().filter(
       "project = ", project).filter(
       "initial_status = ", project.status).get()
 

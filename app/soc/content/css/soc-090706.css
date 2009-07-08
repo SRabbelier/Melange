@@ -662,7 +662,7 @@ div #survey_widget.survey_admin {
 }
 
 div #survey_widget table {
-  width:100%
+  width:95%
 }
 
 div #survey_widget th,
@@ -674,7 +674,6 @@ div #survey_widget td {
 
 div #survey_widget textarea.long_answer {
   padding: 10px;
-  width: 500px;
 }
 
 div #survey_widget textarea.tooltip_entry {
@@ -682,8 +681,8 @@ div #survey_widget textarea.tooltip_entry {
   width: 80%;
 }
 
-div #survey_widget input.text_question {
-  width: 320px;
+div #survey_widget textarea {
+  width: 90% !important;
 }
 
 div #survey_widget td.formfieldlabel {
@@ -699,9 +698,6 @@ div #survey_widget td.formfieldlabel {
 
 #survey_widget.quant_radio input,
 #survey_widget.quant_radio label {
-  clear: left;
-  display: block;
-  float: left;
   margin: 4px;
 }
 
@@ -722,7 +718,7 @@ div #survey_widget a.delete {
 }
 
 div #survey_widget th label {
-  display: block;
+  /*display: block;*/
   max-width: 180px;
 }
 
@@ -747,10 +743,8 @@ div #survey_widget fieldset {
   -webkit-border-radius: 5px;
 }
 
-div #survey_widget fieldset,
-div #survey_widget th,
-div #survey_widget td,
 div #survey_widget select {
+  display: inline;
 }
 
 div #survey_widget td {
@@ -768,13 +762,17 @@ div #survey_widget fieldset input {
 }
 
 div #survey_widget textarea.comment{
-margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 div #survey_widget td > fieldset > label {
   font-size: 11px;
 }
 
+.ui-dialog-content {
+  padding: 0px !important;
+  margin: 5px !important;
+}
 
 #dialog {
   font-size: 62.5%;
@@ -825,8 +823,10 @@ div #survey_widget td > fieldset > label {
   padding: .3em;
 }
 
-.pick_multi input {
+.pick_multi input,
+.quant_radio input {
   display: inline;
+  width: auto !important;
 }
 
 /* NEWS FEED FEEDS */

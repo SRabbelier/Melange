@@ -53,7 +53,7 @@
     */
 
     var SURVEY_PREFIX = 'survey__';
-    var del_el = ["<a class='delete'><img '",
+    var del_el = ["<a class='delete'><img ",
                   "src='/soc/content/images/minus.gif'/></a>"].join("");
     var del_li = ["<a class='delete_item' id='del_",
                   "' ><img src='/soc/content/images/minus.gif'/></a> "];
@@ -62,7 +62,7 @@
 
     function renderHTML() {
       // render existing survey forms
-      widget.find('td > label').prepend(del_el).end();
+      widget.find('td.twolineformfieldlabel > label').prepend(del_el).end();
 
       $('ol').find('li').each(
         function () {
@@ -487,6 +487,7 @@
       bgiframe: true,
       autoOpen: false,
       height: 300,
+      width: 300,
       modal: true,
       buttons: {
         'Add option': function () {
@@ -533,7 +534,7 @@
   $(function () {
     //  Dialog for adding new question to survey
     var SURVEY_PREFIX = 'survey__';
-    var del_el = ["<a class='delete'><img '",
+    var del_el = ["<a class='delete'><img ",
               "src='/soc/content/images/minus.gif'/></a>"].join("");
     var del_li = ["<a class='delete_item' id='del_",
                   "' ><img src='/soc/content/images/minus.gif'/></a> "];
@@ -546,6 +547,7 @@
       bgiframe: true,
       autoOpen: false,
       height: 400,
+      width: 300,
       modal: true,
       buttons: {
         'Add question': function () {

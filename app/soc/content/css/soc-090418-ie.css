@@ -30,3 +30,11 @@ td.formfieldvalue select {
   width: 200px;
 }
 
+#survey_widget select,
+#survey_widget input {
+  width: auto !important;
+}
+
+#survey_widget textarea {
+  width: 95%;
+}

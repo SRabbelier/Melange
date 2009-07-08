@@ -28,10 +28,6 @@
     */
 
     var widget = $('div#survey_widget');
-    widget.parents('td.formfieldvalue:first').css({
-      'float': 'left',
-      'width': 200
-    });
 
     // TODO(ajaksu) survey below is unused, remove if no known use is predicted
     var survey = widget.find('tbody:first');

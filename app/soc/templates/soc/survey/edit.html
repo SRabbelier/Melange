@@ -51,7 +51,7 @@ Please use this form to edit the {{ entity_type }}.
 
   <span class="formfieldlabel">Survey content:</span>
 
-<div style="width:100%; float:left;">
+<div style="width:100%;">
   <div class="survey_admin" id="survey_widget">
     <table>
       {% block survey_content %}
@@ -160,9 +160,9 @@ Please use this form to edit the {{ entity_type }}.
 
 <div id="new_item_dialog" title="Name new option">
   <form>
-    <fieldset style="width: 50px;">
+    <fieldset style="margin: 5px;">
 
-      <label for="new_item_name">Name</label>
+      <label for="new_item_name">Name</label><br>
       <input type="text" name="new_item_name" id="new_item_name"
        class="text ui-widget-content ui-corner-all" value="" />
 
@@ -172,21 +172,21 @@ Please use this form to edit the {{ entity_type }}.
 
 <div id="new_question_dialog" title="Name new question">
   <form>
-    <fieldset style="width: 50px;">
+    <fieldset style="margin: 5px;">
 
-      <label for="new_question_name">ID (link_id-like)</label>
+      <label for="new_question_name">ID (link_id-like)</label><br>
       <input type="text" name="new_question_name" id="new_question_name"
-       class="text ui-widget-content ui-corner-all" value="" />
+       class="text ui-widget-content ui-corner-all" value="" /><br>
 
-      <label for="new_question_content">Title</label>
+      <label for="new_question_content">Title</label><br>
       <input type="text" name="new_question_content" id="new_question_content"
-       class="text ui-widget-content ui-corner-all" value="" />
+       class="text ui-widget-content ui-corner-all" value="" /><br>
 
       <div id='question_options_div'>
-        <label for="new_question_options">Options</label>
+        <label for="new_question_options">Options</label><br>
         <textarea name="new_question_options"
          id="new_question_options" class="text ui-widget-content ui-corner-all"
-         rows="7" cols="20"></textarea>
+         rows="7" cols="20"></textarea><br>
       </div>
 
      </fieldset>

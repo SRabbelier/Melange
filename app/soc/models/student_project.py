@@ -82,7 +82,8 @@ class StudentProject(soc.models.linkable.Linkable):
   #: withdrawn: This project has been withdrawn from the program by a Program
   #:            Administrator or higher.
   #: invalid: This project has been marked as invalid because it was deleted
-  status = db.StringProperty(required=True, default='accepted',
+  status = db.StringProperty(
+      required=True, default='accepted',
       choices=['accepted', 'failed', 'completed', 'withdrawn', 'invalid'])
 
   #: List of all processed GradingRecords which state a pass for this project.

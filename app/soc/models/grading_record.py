@@ -70,9 +70,8 @@ class GradingRecord(base.ModelWithFieldAttributes):
       collection_name='student_grading_records')
 
   #: Project for this evaluation.
-  project = db.ReferenceProperty(StudentProject,
-                                collection_name='grading_records',
-                                required=True)
+  project = db.ReferenceProperty(
+      StudentProject, required=True, collection_name='grading_records')
 
   #: Grade decision set for this grading record.
   #: pass: Iff the mentor_record states that the student has passed. 
@@ -85,7 +84,7 @@ class GradingRecord(base.ModelWithFieldAttributes):
   #:       set the decision will be fail.
   #: undecided: If no mentor_record has been set.
   grade_decision = db.StringProperty(required=True, default='undecided',
-      choices=['pass', 'fail', 'undecided'])
+                                     choices=['pass', 'fail', 'undecided'])
 
   #: Boolean that states if the grade_decision property has been locked
   #: This is to prevent an automatic update from a GradingSurveyGroup to

@@ -72,13 +72,13 @@ class View(base.View):
     rights['list'] = ['checkIsDeveloper']
     rights['manage'] = [('checkHasActiveRoleForScope',
                          org_admin_logic),
-        ('checkStudentProjectHasStatus', [['accepted', 'mid_term_passed']])]
+        ('checkStudentProjectHasStatus', [['accepted']])]
     rights['manage_overview'] = [('checkHasActiveRoleForScope',
                          org_admin_logic)]
     # TODO: lack of better name here!
     rights['st_edit'] = ['checkIsMyStudentProject',
         ('checkStudentProjectHasStatus',
-            [['accepted', 'mid_term_passed', 'passed']])
+            [['accepted', 'completed']])
         ]
 
     new_params = {}
@@ -95,7 +95,7 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['program', 'status', 'link_id',
                                        'mentor', 'additional_mentors',
-                                       'student']
+                                       'student', 'passed_evaluations']
 
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,
@@ -490,7 +490,7 @@ class View(base.View):
     list_params = params.copy()
 
     #list all active projects
-    fields['status'] = ['accepted', 'mid_term_passed']
+    fields['status'] = 'accepted'
     active_params = list_params.copy()
     active_params['list_description'] = \
         'List of all active %(name_plural)s' % list_params
@@ -500,7 +500,7 @@ class View(base.View):
         request, active_params, fields, idx=0)
 
     # list all failed projects
-    fields['status'] = ['mid_term_failed', 'final_failed']
+    fields['status'] = 'failed'
     failed_params = list_params.copy()
     failed_params['list_description'] = ('List of all failed %(name_plural)s, '
         'these cannot be managed.') % list_params
@@ -510,7 +510,7 @@ class View(base.View):
         request, failed_params, fields, idx=1, need_content=True)
 
     #list all completed projects
-    fields['status'] = ['passed']
+    fields['status'] = 'completed'
     completed_params = list_params.copy()
     completed_params['list_description'] = ('List of %(name_plural)s that have '
         'successfully completed the program, '

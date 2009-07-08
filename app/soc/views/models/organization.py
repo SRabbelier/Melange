@@ -493,7 +493,7 @@ class View(group.View):
 
       # only show projects that have not failed
       filter = {'scope': entity,
-                'status': ['accepted', 'mid_term_passed', 'passed']}
+                'status': ['accepted', 'completed']}
 
       ap_list = lists.getListContent(request, ap_params, filter, idx=0,
                                      need_content=True)

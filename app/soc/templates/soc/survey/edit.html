@@ -78,7 +78,7 @@ Please use this form to edit the {{ entity_type }}.
     var tooltip_object=null;
     $('#{{ type_id }}').hover(function() {
       if (tooltip_object==null) {
-        tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+        tooltip_object = $(tooltip).purr({usingTransparentPNG: true,removeTimer: 10000});
       }
     },
     function() {

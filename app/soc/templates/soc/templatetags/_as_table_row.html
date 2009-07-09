@@ -61,7 +61,7 @@ limitations under the License.
     if (not_fieldset) {
       documented.focus(function() {
         if (tooltip_object==null) {
-          tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+          tooltip_object = $(tooltip).purr({usingTransparentPNG: true,removeTimer: 10000});
         }
       });
       documented.blur(function() {
@@ -74,7 +74,7 @@ limitations under the License.
     else {
       documented.find("input").hover(function() {
         if (tooltip_object==null) {
-          tooltip_object = $(tooltip).purr({usingTransparentPNG: true});
+          tooltip_object = $(tooltip).purr({usingTransparentPNG: true,removeTimer: 10000});
         }
       },
       function() {

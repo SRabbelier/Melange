@@ -27,6 +27,7 @@ from soc.logic.models import program as program_logic
 
 import soc.models.grading_survey_group
 
+
 class Logic(base.Logic):
   """Logic methods for the GradingSurveyGroup model.
   """

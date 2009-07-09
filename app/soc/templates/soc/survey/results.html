@@ -1,6 +1,3 @@
-{% if grades %}
-  <form id='GradesForm' method='post' action="{{ grade_action }}" >
-{% endif %}
 {% if list_msg %}
   {{ list_msg|safe }}
 {% endif %}
@@ -14,8 +11,3 @@
   {% include list.nextList %}
   </p>
 {% endfor %}
-
-{% if grades %}
-    <input type='submit' value='Update Grades'/>
-  </form>
-{% endif %}

@@ -53,10 +53,10 @@ class View(survey.View):
     rights['edit'] = [('checkIsSurveyWritable', project_survey_logic)]
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
+    rights['results'] = [('checkIsSurveyWritable', project_survey_logic)]
     rights['take'] = [('checkIsSurveyTakeable', project_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [project_survey_logic, 'student', 'project'])]
-
 
     new_params = {}
     new_params['logic'] = project_survey_logic
@@ -218,4 +218,5 @@ edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
+results = decorators.view(view.viewResults)
 take = decorators.view(view.take)

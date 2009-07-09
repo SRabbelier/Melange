@@ -55,6 +55,7 @@ class View(project_survey.View):
     rights['edit'] = [('checkIsSurveyWritable', grading_survey_logic)]
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
+    rights['results'] = [('checkIsSurveyWritable', grading_survey_logic)]
     rights['take'] = [('checkIsSurveyTakeable', grading_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [grading_survey_logic, 'mentor', 'project'])]
@@ -232,4 +233,5 @@ edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
+results = decorators.view(view.viewResults)
 take = decorators.view(view.take)

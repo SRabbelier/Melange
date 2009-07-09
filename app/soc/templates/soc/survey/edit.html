@@ -194,11 +194,4 @@ Please use this form to edit the {{ entity_type }}.
 </div>
 
 </p>
-
-  {% if not new_survey %}
-    {% if survey_records %}
-      {{ survey_records|safe }}
-    {% endif %}
-  {% endif %}
-
 {% endblock %}

@@ -45,6 +45,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import forms as forms_helper
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import surveys
@@ -102,6 +103,7 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
+    rights['results'] = [('checkIsSurveyWritable', survey_logic)]
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}
@@ -118,7 +120,7 @@ class View(base.View):
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
          'soc.views.models.%(module_name)s.json',
          'Export %(name)s as JSON'),
-        (r'^%(url_name)s/(?P<access_type>results)/%(scope)s$',
+        (r'^%(url_name)s/(?P<access_type>results)/%(key_fields)s$',
          'soc.views.models.%(module_name)s.results',
          'View survey results for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>show)/user/(?P<link_id>)\w+$',
@@ -215,28 +217,6 @@ class View(base.View):
 
     # return True to signal that the page may be displayed
     return True
-
-  def _editContext(self, request, context):
-    """Performs any required processing on the context for edit pages.
-
-    Args:
-      request: the django request object
-      context: the context dictionary that will be used
-
-      Adds list of SurveyRecord results as supplement to view.
-
-      See surveys.SurveyResults for details.
-    """
-
-    if not getattr(self, '_entity', None):
-      return
-
-    results = surveys.SurveyResults()
-
-    context['survey_records'] = results.render(self._entity, self._params,
-                                               filter={})
-
-    super(View, self)._editContext(request, context)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -696,63 +676,52 @@ class View(base.View):
   @decorators.check_access
   def viewResults(self, request, access_type, page_name=None,
                   params=None, **kwargs):
-    """View for SurveyRecord and SurveyRecordGroup.
+    """View for SurveyRecords.
+
+    For params see base.View.public().
     """
 
-    results_logic = params['logic'].getRecordLogic()
+    survey_logic = params['logic']
+
+    try:
+      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
+    context['entity'] = entity
+
+    results_logic = survey_logic.getRecordLogic()
 
     user = user_logic.getForCurrentAccount()
 
-    # TODO(ajaksu) use the named parameter link_id from the re
-    if request.path == '/survey/show/user/' + user.link_id:
-      records = tuple(user.surveys_taken.run())
-      context = responses.getUniversalContext(request)
-      context['content'] = records[0].survey.survey_content
-      responses.useJavaScript(context, params['js_uses_all'])
-      context['page_name'] = u'Your survey records.'
-    else:
-      entity, context = self.getContextEntity(request, page_name,
-                                              params, kwargs)
+    context['properties'] = entity.survey_content.orderedProperties()
 
-      if context is None:
-        # user cannot see this page, return error response
-        return entity
-      context['content'] = entity.survey_content
-      can_write = False
-      rights = self._params['rights']
-      try:
-        rights.checkIsSurveyWritable({'key_name': entity.key().name(),
-                                      'prefix': entity.prefix,
-                                      'scope_path': entity.scope_path,
-                                      'link_id': entity.link_id,},
-                                     'key_name')
-        can_write = True
-      except out_of_band.AccessViolation:
-        pass
+    filter = self._params.get('filter') or {}
 
-      filter = self._params.get('filter') or {}
+    filter['survey'] = entity
 
-      # if user can edit the survey, show everyone's results
-      if can_write:
-        filter['survey'] = entity
-      else:
-        filter.update({'user': user, 'survey': entity})
+    list_params = params.copy()
+    list_params['list_description'] = \
+      'List of  %(name_plural)s.' % list_params
 
-      limit = self._params.get('limit') or 1000
-      offset = self._params.get('offset') or 0
-      order = self._params.get('order') or []
-      idx = self._params.get('idx') or 0
+    list_params['logic'] = results_logic
 
-      records = results_logic.getForFields(filter=filter, limit=limit,
-                                        offset=offset, order=order)
+    valid_list = lists.getListContent(request, list_params, filter, idx=0)
 
-    updates = dicts.rename(params, params['list_params'])
-    context.update(updates)
+    valid_list['row'] = 'soc/survey/list/results_row.html'
+    valid_list['heading'] = 'soc/survey/list/results_heading.html'
+    valid_list['description'] = 'Survey Results:'
 
-    context['results'] = records, records
+    contents = []
+    # fill contents with all the needed lists
+    contents.append(valid_list)
 
-    template = 'soc/survey/results_page.html'
-    return responses.respond(request, template, context=context)
+    return self._list(request, list_params, contents, page_name, context)
 
   @decorators.merge_params
   @decorators.check_access

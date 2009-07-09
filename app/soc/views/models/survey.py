@@ -110,8 +110,8 @@ class View(base.View):
     new_params['logic'] = survey_logic
     new_params['rights'] = rights
 
-    new_params['name'] = "Survey"
-    new_params['pickable'] = True
+    new_params['name'] = 'Survey'
+    new_params['sidebar_grouping'] = "Surveys"
 
     new_params['extra_django_patterns'] = [
          (r'^%(url_name)s/(?P<access_type>take)/%(key_fields)s$',

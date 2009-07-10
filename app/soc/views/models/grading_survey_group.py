@@ -112,6 +112,7 @@ class View(base.View):
     new_params['logic'] = survey_group_logic
     new_params['rights'] = rights
     new_params['name'] = "Grading Survey Group"
+    new_params['sidebar_grouping'] = "Surveys"
 
     new_params['no_admin'] = True
     new_params['no_create_raw'] = True

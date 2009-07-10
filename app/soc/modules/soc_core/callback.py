@@ -28,6 +28,7 @@ from soc.views.models import club_member
 from soc.views.models import cron
 from soc.views.models import document
 from soc.views.models import grading_project_survey as grading_survey
+from soc.views.models import grading_survey_group
 from soc.views.models import host
 from soc.views.models import job
 from soc.views.models import mentor
@@ -80,6 +81,7 @@ class Callback(object):
     self.core.registerSitemapEntry(cron.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(document.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(grading_survey.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(grading_survey_group.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(host.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(job.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
@@ -134,3 +136,4 @@ class Callback(object):
     self.core.registerSidebarEntry(survey.view.getSidebarMenus)
     self.core.registerSidebarEntry(project_survey.view.getSidebarMenus)
     self.core.registerSidebarEntry(grading_survey.view.getSidebarMenus)
+    self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)

@@ -32,7 +32,7 @@ class Logic(base.Logic):
   """Logic methods for the GradingSurveyGroup model.
   """
 
-  def __init__(self, model=soc.models.grading_survey_group,
+  def __init__(self, model=soc.models.grading_survey_group.GradingSurveyGroup,
                base_model=None, scope_logic=program_logic):
     """Defines the name, key_name and model for this entity.
     """

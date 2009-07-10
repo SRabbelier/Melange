@@ -31,7 +31,7 @@ class Logic(base.Logic):
   """Logic methods for the GradingRecord model.
   """
 
-  def __init__(self, model=soc.models.grading_record,
+  def __init__(self, model=soc.models.grading_record.GradingRecord,
                base_model=None, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """

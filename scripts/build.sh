@@ -10,7 +10,7 @@
 
 DEFAULT_APP_BUILD=../build
 DEFAULT_APP_FOLDER="../app"
-DEFAULT_APP_FILES="app.yaml cron.yaml index.yaml main.py settings.py shell.py urls.py gae_django.py"
+DEFAULT_APP_FILES="app.yaml cron.yaml index.yaml queue.yaml main.py settings.py shell.py urls.py gae_django.py"
 DEFAULT_APP_DIRS="soc ghop gsoc feedparser python25src reflistprop jquery \
     ranklist shell json htmlsanitizer taggable-mixin gviz"
 DEFAULT_ZIP_FILES="tiny_mce.zip"

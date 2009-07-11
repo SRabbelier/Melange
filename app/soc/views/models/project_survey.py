@@ -68,7 +68,7 @@ class View(survey.View):
     new_params['extra_dynaexclude'] = ['taking_access']
 
     new_params['extra_django_patterns'] = [
-         (r'^%(url_name)s/(?P<access_type>send_reminder)/start/%(key_fields)s$',
+         (r'^%(url_name)s/(?P<access_type>send_reminder)/%(key_fields)s$',
           'soc.views.models.%(module_name)s.send_reminder',
          'Send Reminder for %(name)s')]
 

@@ -36,7 +36,7 @@ class Mentor(soc.models.role.Role):
 
   #: A required property that defines the program that this mentor works for
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
-                              required=True, collection_name='mentors')
+                                 required=True, collection_name='mentors')
 
   can_we_contact_you = db.BooleanProperty(verbose_name=ugettext(
       'Can we contact you?'))

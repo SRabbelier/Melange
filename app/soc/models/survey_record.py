@@ -40,7 +40,8 @@ class BaseSurveyRecord(db.Expando):
   """
 
   #: The survey for which this entity is a record.
-  survey = db.ReferenceProperty(Survey, collection_name="survey_records")
+  survey = db.ReferenceProperty(
+      reference_class=Survey, collection_name="survey_records")
 
   #: Date when this record was created.
   created = db.DateTimeProperty(auto_now_add=True)

@@ -33,5 +33,4 @@ class RankerRoot(soc.models.linkable.Linkable):
   """
 
   #: A required reference property to the root of the RankList tree
-  root = db.ReferenceProperty(required=True,
-      collection_name='roots')
+  root = db.ReferenceProperty(required=True, collection_name='roots')

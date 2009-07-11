@@ -56,12 +56,12 @@ class GradingSurveyGroup(linkable.Linkable):
 
   #: GradingProjectSurvey which belongs to this group.
   grading_survey = db.ReferenceProperty(
-      GradingProjectSurvey, required=True,
+      reference_class=GradingProjectSurvey, required=True,
       collection_name='grading_survey_groups')
 
   #: non-required ProjectSurvey that belongs to this group.
   student_survey = db.ReferenceProperty(
-      ProjectSurvey, required=False,
+      reference_class=ProjectSurvey, required=False,
       collection_name='project_survey_groups')
 
   #: DateTime when the last GradingRecord update was started for this group.

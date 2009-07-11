@@ -36,6 +36,6 @@ class ProjectSurveyRecord(SurveyRecord):
   """
 
   #: Reference to the Project that this record belongs to.
-  project = db.ReferenceProperty(soc.models.student_project.StudentProject,
-                                 required=True,
-                                 collection_name="survey_records")
+  project = db.ReferenceProperty(
+      reference_class=soc.models.student_project.StudentProject,
+      required=True, collection_name="survey_records")

@@ -37,7 +37,7 @@ class OrgAdmin(soc.models.role.Role):
 
   #: A required property that defines the program that this org admin works for
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
-                              required=True, collection_name='org_admins')
+                                 required=True, collection_name='org_admins')
 
   can_we_contact_you = db.BooleanProperty(verbose_name=ugettext(
       'Can we contact you?'))

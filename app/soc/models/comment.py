@@ -42,7 +42,7 @@ class Comment(soc.models.linkable.Linkable):
   #: A required many:1 relationship with a comment entity indicating
   #: the user who provided that comment.
   author = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                  required=True, collection_name="commented")
+                                required=True, collection_name="commented")
 
   #: The rich textual content of this comment
   content = db.TextProperty(verbose_name=_('Content'))

@@ -156,5 +156,5 @@ class Survey(soc.models.work.Work):
       ' cannot be taken.')
 
   #: Referenceproperty that specifies the content of this survey.
-  survey_content = db.ReferenceProperty(SurveyContent,
-                                     collection_name="survey_parent")
+  survey_content = db.ReferenceProperty(reference_class=SurveyContent,
+                                        collection_name="survey_parent")

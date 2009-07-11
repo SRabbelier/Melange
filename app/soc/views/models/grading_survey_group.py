@@ -27,6 +27,8 @@ import time
 
 from google.appengine.ext.db import djangoforms
 
+from django import forms
+
 from soc.logic import dicts
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.survey import grading_logic
@@ -40,53 +42,6 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import base
-
-
-class GroupForm(djangoforms.ModelForm):
-  """Form for creating a GradingSurveyGroup.
-  """
-
-  grading_survey = djangoforms.ModelChoiceField(GradingProjectSurvey)
-
-  student_survey = djangoforms.ModelChoiceField(ProjectSurvey, required=False)
-
-  def __init__(self, *args, **kwargs):
-    """Process field names for readable display and initialize form.
-    """
-
-    # use survey titles in drop-downs
-    self.choiceTitles('grading_survey', grading_logic)
-    self.choiceTitles('student_survey', project_logic)
-
-    super(GroupForm, self).__init__(*args, **kwargs)
-
-  def choiceTitles(self, field, logic):
-    """Fetch entity titles for choice field entries.
-    """
-
-    # TODO(ajaksu): subclass ModelChoiceField so we don't need this method
-    choice_list = []
-
-    model = logic.getModel()
-
-    for value, text in tuple(self.base_fields[field].choices):
-      if value:
-        entity = model.get(value)
-        text = entity.title
-      choice_list.append((value,text))
-
-    choices = tuple(choice_list)
-
-    self.base_fields[field].choices = choices
-
-  class Meta:
-    """Inner Meta class for fetching fields from model.
-    """
-    model = GradingSurveyGroup
-
-    # exclude the necessary fields from the form
-    exclude = ['link_id', 'scope', 'scope_path', 'last_update_started',
-               'last_update_complete']
 
 
 class View(base.View):
@@ -118,8 +73,20 @@ class View(base.View):
     new_params['no_create_raw'] = True
     new_params['no_create_with_key_fields'] = True
 
-    new_params['create_form'] = GroupForm
-    new_params['edit_form'] = GroupForm
+    new_params['create_extra_dynaproperties'] = {
+       'grading_survey': djangoforms.ModelChoiceField(
+            GradingProjectSurvey, required=True),
+       'student_survey': djangoforms.ModelChoiceField(ProjectSurvey,
+                                                      required=False),
+       }
+
+    new_params['extra_dynaexclude'] = ['link_id', 'scope', 'scope_path',
+                                       'last_update_started',
+                                       'last_update_complete']
+
+    new_params['edit_extra_dynaproperties'] = {
+        'link_id': forms.CharField(widget=forms.HiddenInput),
+        }
 
     params = dicts.merge(params, new_params)
 
@@ -134,7 +101,7 @@ class View(base.View):
     For params see base.View.create().
     """
 
-    self.setQueries(kwargs['scope_path'], params)
+    self.setQueries(kwargs['scope_path'], params['create_form'])
 
     return super(View, self).create(request, access_type, page_name=page_name,
                                     params=params, **kwargs)
@@ -148,10 +115,23 @@ class View(base.View):
     For params see base.View.edit().
     """
 
-    self.setQueries(kwargs['scope_path'], params)
+    self.setQueries(kwargs['scope_path'], params['edit_form'])
 
     return super(View, self).edit(request, access_type, page_name=page_name,
                                   params=params, seed=seed, **kwargs)
+
+  def _editGet(self, request, entity, form):
+    """Performs any required processing on the form to get its edit page.
+
+    Args:
+      request: the django request object
+      entity: the entity to get
+      form: the django form that will be used for the page
+    """
+
+    form.fields['link_id'].initial = entity.link_id
+
+    return super(View,self)._editGet(request, entity,form)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
@@ -167,28 +147,58 @@ class View(base.View):
       fields['link_id'] = entity.link_id
 
     # fill in the scope via call to super
-    super(View, self)._editPost(request, entity, fields)
+    return super(View, self)._editPost(request, entity, fields)
 
-  def setQueries(self, program, params):
+  def setQueries(self, program_keyname, group_form):
     """Add program filtering queries to the GroupForm.
+
+    Args:
+      program_keyname: keyname of the program to filter on
+      group_form: DynaForm instance to set the queries for
     """
 
     # fetch the program
-    program = program_logic.getFromKeyNameOr404(program)
+    program = program_logic.getFromKeyNameOr404(program_keyname)
 
     # filter grading surveys by program and use title for display
-    grading_query = grading_logic.getQueryForFields(filter={'scope':program})
+    grading_query = grading_logic.getQueryForFields(
+        filter={'scope_path':program_keyname})
 
     # filter project surveys by program and use title for display
-    student_query = project_logic.getQueryForFields(filter={'scope':program})
+    student_query = project_logic.getQueryForFields(
+        filter={'scope_path':program_keyname})
 
-    if params.get('edit_form'):
-      params['edit_form'].base_fields['student_survey'].query = student_query
-      params['edit_form'].base_fields['grading_survey'].query = grading_query
+    group_form.base_fields['grading_survey'].query = grading_query
+    group_form.base_fields['student_survey'].query = student_query
 
-    if params.get('create_form'):
-      params['create_form'].base_fields['student_survey'].query = student_query
-      params['create_form'].base_fields['grading_survey'].query = grading_query
+    # use survey titles in drop-downs
+    self.choiceTitles(group_form, 'grading_survey', grading_logic)
+    self.choiceTitles(group_form, 'student_survey', project_logic)
+
+
+  def choiceTitles(self, group_form, field, logic):
+    """Fetch entity titles for choice field entries.
+
+    Args:
+      group_form: The form to set the choice field entries for
+      field: the field_name to set the choice entries for
+      logic: the logic for the model to set the choice entries for
+    """
+
+    # TODO(ajaksu): subclass ModelChoiceField so we don't need this method
+    choice_list = []
+
+    model = logic.getModel()
+
+    for value, text in tuple(group_form.base_fields[field].choices):
+      if value:
+        entity = model.get(value)
+        text = '%s (%s)' % (entity.title, entity.link_id)
+      choice_list.append((value,text))
+
+    choices = tuple(choice_list)
+
+    group_form.base_fields[field].choices = choices
 
 
 view = View()

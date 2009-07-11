@@ -23,6 +23,7 @@ __authors__ = [
 
 
 import logging
+import os
 
 from google.appengine.api.labs import taskqueue
 
@@ -204,15 +205,20 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
     site_entity = site_logic.getSingleton()
 
     if survey_type == 'project':
-      survey_url = redirects.getTakeSurveyRedirect(
+      survey_redirect = redirects.getTakeSurveyRedirect(
           survey,{'url_name': 'project_survey'})
       to_role = student_entity
       mail_template = 'soc/project_survey/mail/reminder_gsoc.html'
     elif survey_type == 'grading':
-      survey_url = redirects.getTakeSurveyRedirect(
+      survey_redirect = redirects.getTakeSurveyRedirect(
           survey,{'url_name': 'grading_project_survey'})
       to_role = student_project.mentor
       mail_template = 'soc/grading_project_survey/mail/reminder_gsoc.html'
+
+    survey_url = "http://%(host)s%(redirect)s" % {
+      'redirect': survey_redirect,
+      'host': os.environ['HTTP_HOST'],
+      }
 
     # set the context for the mail template
     mail_context = {

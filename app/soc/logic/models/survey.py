@@ -370,7 +370,7 @@ class ProjectLogic(Logic):
 
 
 class GradingProjectLogic(ProjectLogic):
-  """Logic class for GradingProjectSurvey
+  """Logic class for GradingProjectSurvey.
   """
 
   def __init__(self, model=GradingProjectSurvey,

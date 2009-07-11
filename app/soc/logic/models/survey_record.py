@@ -71,11 +71,11 @@ class ProjectLogic(Logic):
     """
 
     super(ProjectLogic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                       scope_logic=scope_logic)
 
 
 class GradingProjectLogic(ProjectLogic):
-  """Logic class for GradingProjectSurveyRecord
+  """Logic class for GradingProjectSurveyRecord.
   """
 
   def __init__(self, model=GradingProjectSurveyRecord,

@@ -147,7 +147,7 @@ class View(survey.View):
     project_entity = student_project_logic.getFromKeyName(get_dict['project'])
 
     # update the properties that will be stored with the referenced project
-    properties.update(project=project_entity)
+    properties.update(project=project_entity, org=project_entity.scope)
 
   def _constructFilterForProjectSelection(self, survey, params):
     """Returns the filter needed for the Project selection view.

@@ -25,6 +25,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.models.organization import Organization
 from soc.models.survey_record import SurveyRecord
 from soc.models.project_survey import ProjectSurvey
 import soc.models.student_project
@@ -39,3 +40,10 @@ class ProjectSurveyRecord(SurveyRecord):
   project = db.ReferenceProperty(
       reference_class=soc.models.student_project.StudentProject,
       required=True, collection_name="survey_records")
+  
+  #: A many:1 relationship associating ProjectSurveyRecords 
+  #: with specific Organization. The back-reference in the 
+  #: Organization model is a Query named 'survey_records'.
+  org = db.ReferenceProperty(
+      reference_class=Organization, 
+      required=False, collection_name='survey_records')

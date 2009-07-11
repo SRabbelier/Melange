@@ -84,7 +84,7 @@ def getEntities(model):
     gen = lambda: model.all()
     it = interactive.deepFetch(gen)
 
-    entities = [(i.key().name(), i) for i in it]
+    entities = [(i.key().id_or_name(), i) for i in it]
     return dict(entities)
 
   return wrapped
@@ -356,6 +356,7 @@ def deleteEntities(model, step_size=25):
 
   print "Done"
 
+
 def loadPickle(name):
   """Loads a pickle.
   """
@@ -372,12 +373,46 @@ def dumpPickle(target, name):
   cPickle.dump(target, f)
 
 
+def addOrganizationToSurveyRecords(survey_record_model):
+  """Set Organization in SurveyRecords entities of a given model.
+  """
+  
+  print "Fetching %s." % survey_record_model.__name__
+  getSurveyRecord = getEntities(survey_record_model)
+  survey_records = getSurveyRecord()
+  survey_records_amount = len(survey_records)
+  print "Fetched %d %s." % (survey_records_amount, survey_record_model.__name__)
+  
+  counter = 0
+  
+  for key in survey_records.keys():
+    survey_records[key].org = survey_records[key].project.scope
+    survey_records[key].put()
+    
+    counter += 1
+    print str(counter) + '/' + str(survey_records_amount) + ' ' + str(key)
+    
+  print "Organization added to all %s." % survey_record_model.__name__
+
+
+def setOrganizationInSurveyRecords():
+  """Sets Organization property in ProjectSurveyRecords 
+  and GradingProjectSurveyRecords entities.
+  """
+  from soc.models.project_survey_record import ProjectSurveyRecord
+  from soc.models.grading_project_survey_record \
+      import GradingProjectSurveyRecord
+  
+  addOrganizationToSurveyRecords(ProjectSurveyRecord)
+  addOrganizationToSurveyRecords(GradingProjectSurveyRecord)
+
+
 def acceptedStudentsCSVExport(csv_filename, program_key_name):
   """Exports all accepted Students for particular program into CSV file.
   """
   # TODO(Pawel.Solyga): Add additional Program parameter to this method 
   # so we export students from different programs
-  # TODO(Pawel.SOlyga): Make it universal so it works with both GHOP 
+  # TODO(Pawel.Solyga): Make it universal so it works with both GHOP 
   # and GSoC programs
   
   from soc.models.student_project import StudentProject
@@ -491,6 +526,7 @@ def main(args):
       'getStudentProjects': getEntities(StudentProject),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
+      'setOrganizationInSurveyRecords': setOrganizationInSurveyRecords,
       'convertProposals': convertProposals,
       'addFollower': addFollower,
       'Organization': Organization,

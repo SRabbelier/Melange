@@ -47,6 +47,10 @@ handlers:
   script: shell/shell.py
   login: admin
 
+- url: /tasks/*
+  script: main.py
+  login: admin
+
 - url: /static
   static_dir: shell/static
   expiration: 1d

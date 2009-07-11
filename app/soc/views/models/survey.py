@@ -647,7 +647,7 @@ class View(base.View):
           survey.survey_end.strftime("%A, %d. %B %Y %I:%M%p"))
 
     if survey_record:
-      help_text = "Edit and re-submit this survey" + survey_end_text + "."
+      help_text = "You may edit and re-submit this survey" + survey_end_text + "."
       status = "edit"
     else:
       help_text = "Please complete this survey" + survey_end_text + "."

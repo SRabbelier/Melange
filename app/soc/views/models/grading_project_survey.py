@@ -66,6 +66,9 @@ class View(project_survey.View):
 
     new_params['name'] = "Grading Project Survey"
 
+    # used for sending reminders
+    new_params['survey_type'] = 'grading'
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -234,4 +237,5 @@ delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 results = decorators.view(view.viewResults)
+send_reminder = decorators.view(view.sendReminder)
 take = decorators.view(view.take)

@@ -57,6 +57,7 @@ class View(survey.View):
     rights['take'] = [('checkIsSurveyTakeable', project_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [project_survey_logic, 'student', 'project'])]
+    rights['send_reminder'] = ['checkIsDeveloper'] #TODO: proper access check
 
     new_params = {}
     new_params['logic'] = project_survey_logic
@@ -65,6 +66,15 @@ class View(survey.View):
     new_params['name'] = "Project Survey"
 
     new_params['extra_dynaexclude'] = ['taking_access']
+
+    new_params['extra_django_patterns'] = [
+         (r'^%(url_name)s/(?P<access_type>send_reminder)/start/%(key_fields)s$',
+          'soc.views.models.%(module_name)s.send_reminder',
+         'Send Reminder for %(name)s')]
+
+    # used for sending reminders
+    new_params['survey_type'] = 'project'
+    new_params['reminder_template'] = 'soc/project_survey/reminder.html'
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -211,6 +221,48 @@ class View(survey.View):
     return self._list(request, student_project_params, contents, page_name)
 
 
+  @decorators.merge_params
+  @decorators.check_access
+  def sendReminder(self, request, access_type, page_name=None,
+                   params=None, **kwargs):
+    """Starts the task to send out reminders for the Survey given in kwargs.
+
+    For args see base.View.public().
+    """
+
+    from google.appengine.api.labs import taskqueue
+
+    from django import http
+
+    survey_logic = params['logic']
+
+    try:
+      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    context['page_name'] = page_name
+
+    if request.POST and request.POST.get('start'):
+      # button has been pressed start the task
+      task_params = {
+          'program_key': survey_logic.getScope(entity).key().id_or_name(),
+          'survey_key': entity.key().id_or_name(),
+          'survey_type': params['survey_type']}
+      task_url = '/tasks/surveys/projects/send_reminder/spawn'
+
+      new_task = taskqueue.Task(params=task_params, url=task_url)
+      new_task.add()
+
+      context['message'] = "Task successfully started!"
+
+    template = params['reminder_template']
+    return responses.respond(request, template, context)
+
+
 view = View()
 
 create = decorators.view(view.create)
@@ -219,4 +271,5 @@ delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 results = decorators.view(view.viewResults)
+send_reminder = decorators.view(view.sendReminder)
 take = decorators.view(view.take)

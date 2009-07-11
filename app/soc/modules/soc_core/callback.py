@@ -21,6 +21,7 @@ __authors__ = [
   ]
 
 
+from soc.tasks import surveys as survey_tasks
 from soc.views.models import club
 from soc.views.models import club_app
 from soc.views.models import club_admin
@@ -102,6 +103,9 @@ class Callback(object):
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(user_self.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(user.view.getDjangoURLPatterns())
+
+    # register task URL's
+    self.core.registerSitemapEntry(survey_tasks.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

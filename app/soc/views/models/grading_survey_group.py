@@ -38,9 +38,12 @@ from soc.logic.models.grading_survey_group import logic as survey_group_logic
 from soc.models.grading_survey_group import GradingSurveyGroup
 from soc.models.grading_project_survey import GradingProjectSurvey
 from soc.models.project_survey import ProjectSurvey
+from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.models import base
 from soc.views.models import program as program_view
 
@@ -63,6 +66,7 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['show'] = ['checkIsHostForProgramInScope']
     rights['list'] = ['checkIsDeveloper']
+    rights['records'] = ['checkIsHostForProgramInScope']
 
     new_params = {}
     new_params['logic'] = survey_group_logic
@@ -90,6 +94,18 @@ class View(base.View):
     new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput),
         }
+
+    patterns = [
+        (r'^%(url_name)s/(?P<access_type>records)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.grading_records',
+        'Overview of GradingRecords'),
+    ]
+
+    new_params['extra_django_patterns'] = patterns
+
+    new_params['records_template'] = 'soc/grading_survey_group/records.html'
+    new_params['records_heading_template'] = 'soc/grading_record/list/heading.html'
+    new_params['records_row_template'] = 'soc/grading_record/list/row.html'
 
     params = dicts.merge(params, new_params)
 
@@ -204,11 +220,86 @@ class View(base.View):
 
     group_form.base_fields[field].choices = choices
 
+  @decorators.merge_params
+  @decorators.check_access
+  def gradingRecords(self, request, access_type, page_name=None, params=None,
+                     **kwargs):
+    """View which shows all collected records for a given GradingSurveyGroup.
+
+    For args see base.View.public().
+    """
+
+    from soc.logic import lists as lists_logic
+    from soc.logic.models.grading_record import logic as record_logic
+
+    survey_group_logic = params['logic']
+
+    try:
+      entity = survey_group_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    template = params['records_template']
+
+    list_params = params.copy()
+    list_params['logic'] = record_logic
+    list_params['list_heading'] = params['records_heading_template']
+    list_params['list_row'] = params['records_row_template']
+    # TODO(ljvderijk) proper redirect to edit a record
+    list_params['list_action'] = None
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = "%s for %s named '%s'" %(
+        page_name, params['name'], entity.name)
+    context['entity'] = entity
+
+    fields = {'grading_survey_group': entity}
+
+    # list all records with grading_decision set to pass
+    fields['grade_decision'] = 'pass'
+
+    # get the list content for passing records
+    pr_params = list_params.copy()
+    pr_params['list_description'] =  \
+        'List of all Records which have their grading outcome set to pass.'
+    pr_list = lists.getListContent(
+        request, pr_params, fields, idx=0)
+
+    # list all records with grading_decision set to fail
+    fields['grade_decision'] = 'fail'
+
+    # get the list content for all failing records
+    fr_params = list_params.copy()
+    fr_params['list_description'] =  \
+        'List of all Records which have their grading outcome set to fail.'
+    fr_list = lists.getListContent(
+        request, fr_params, fields, idx=1)
+
+    # list all records with grading decision set to undecided
+    fields['grade_decision'] = 'undecided'
+
+    # get the list content for all undecided records
+    ur_params = list_params.copy()
+    ur_params['list_description'] =  \
+        'List of all Records which have their grading outcome set to undecided.'
+    ur_list = lists.getListContent(
+        request, ur_params, fields, idx=2)
+
+    # specify the contents and create a Lists object for use in the context
+    contents = [pr_list, fr_list, ur_list]
+    context['list'] = lists_logic.Lists(contents)
+
+    return responses.respond(request, template, context)
+
 
 view = View()
 
 create = decorators.view(view.create)
-edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)
+grading_records = decorators.view(view.gradingRecords)
 list = decorators.view(view.list)
 public = decorators.view(view.public)

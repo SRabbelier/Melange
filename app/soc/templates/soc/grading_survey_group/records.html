@@ -20,9 +20,24 @@ limitations under the License.
   All records collected for this Grading Survey Group are shown on this page.
 </p>
 
+{{ message }}
+
+<form method="post">
+  <table>
+    <tr>
+      <td>
+        <input type="submit" name="update_records" value="Start Updating Records" style="font-weight: bold;">
+      </td>
+      <td>
+        <input type="submit" name="update_projects" value="Update Projects with collected Grades" style="font-weight: bold;">
+      </td>
+    </tr>
+  </table>
+</form>
+
 <p>
-  Collection Task last started: {{ entity.last_update_started|date:"jS F Y H:i"|default:"Never Started" }} <br />
-  Collection Task last completed: {{ entity.last_update_completed|date:"jS F Y H:i"|default:"Never Completed" }} <br />
+  Last Record Update started: {{ entity.last_update_started|date:"jS F Y H:i"|default:"Never Started" }} <br />
+  Last Record Update completed: {{ entity.last_update_complete|date:"jS F Y H:i"|default:"Never Completed" }} <br />
 </p>
 
 {% for list_number in list.lists %}

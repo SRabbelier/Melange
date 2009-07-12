@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+import datetime
 import time
 
 from google.appengine.ext.db import djangoforms
@@ -229,6 +230,8 @@ class View(base.View):
     For args see base.View.public().
     """
 
+    from google.appengine.api.labs import taskqueue
+
     from soc.logic import lists as lists_logic
     from soc.logic.models.grading_record import logic as record_logic
 
@@ -239,6 +242,32 @@ class View(base.View):
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])
+
+    # get the POST request dictionary and check if we should take action
+    post_dict = request.POST
+
+    if post_dict.get('update_records'):
+      # start the task to update all GradingRecords for the given group
+      task_params = {
+          'group_key': entity.key().id_or_name()}
+      task_url = '/tasks/grading_survey_group/update_records'
+
+      new_task = taskqueue.Task(params=task_params, url=task_url)
+      new_task.add()
+
+      # update the GradingSurveyGroup with the new timestamp
+      fields = {'last_update_started': datetime.datetime.now()}
+      survey_group_logic.updateEntityProperties(entity, fields)
+
+    if post_dict.get('update_projects'):
+      # start the task to update all StudentProjects for the given group
+      task_params = {
+          'group_key': entity.key().id_or_name()}
+      task_url = '/tasks/grading_survey_group/update_projects'
+
+      new_task = taskqueue.Task(params=task_params, url=task_url)
+      new_task.add()
+
 
     template = params['records_template']
 

@@ -42,6 +42,7 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.models import base
+from soc.views.models import program as program_view
 
 
 class View(base.View):
@@ -57,10 +58,10 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = ['checkIsDeveloper']
+    rights['create'] = ['checkIsHostForProgramInScope']
+    rights['edit'] = ['checkIsHostForProgramInScope']
     rights['delete'] = ['checkIsDeveloper']
-    rights['show'] = ['checkIsDeveloper']
+    rights['show'] = ['checkIsHostForProgramInScope']
     rights['list'] = ['checkIsDeveloper']
 
     new_params = {}
@@ -69,8 +70,10 @@ class View(base.View):
     new_params['name'] = "Grading Survey Group"
     new_params['sidebar_grouping'] = "Surveys"
 
+    new_params['scope_view'] = program_view
+    new_params['scope_redirect'] = redirects.getCreateRedirect
+
     new_params['no_admin'] = True
-    new_params['no_create_raw'] = True
     new_params['no_create_with_key_fields'] = True
 
     new_params['create_extra_dynaproperties'] = {
@@ -101,7 +104,8 @@ class View(base.View):
     For params see base.View.create().
     """
 
-    self.setQueries(kwargs['scope_path'], params['create_form'])
+    if kwargs.get('scope_path'):
+      self.setQueries(kwargs['scope_path'], params['create_form'])
 
     return super(View, self).create(request, access_type, page_name=page_name,
                                     params=params, **kwargs)

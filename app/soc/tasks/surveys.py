@@ -29,6 +29,8 @@ from google.appengine.api.labs import taskqueue
 
 from django import http
 
+from soc.tasks.helper import error_handler
+
 
 def getDjangoURLPatterns():
   """Returns the URL patterns for the tasks in this module.
@@ -75,7 +77,7 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
 
   if not (program_key and survey_key and survey_type):
     # invalid task data, log and return OK
-    return logErrorAndReturnOK(
+    return error_handler.logErrorAndReturnOK(
         'Invalid sendRemindersForProjectSurvey data: %s' % post_dict)
 
   # get the program for the given keyname
@@ -83,7 +85,8 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
 
   if not program_entity:
     # invalid program specified, log and return OK
-    return logErrorAndReturnOK('Invalid program specified: %s' % program_key)
+    return error_handler.logErrorAndReturnOK(
+        'Invalid program specified: %s' % program_key)
 
   # check and retrieve the project_key that has been done last
   if 'project_key' in post_dict:
@@ -101,8 +104,8 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
 
     if not project_start:
       # invalid starting project key specified, log and return OK
-      return logErrorAndReturnOK('Invalid Student Project Key specified: %s' %(
-          project_start_key))
+      return error_handler.logErrorAndReturnOK(
+          'Invalid Student Project Key specified: %s' %(project_start_key))
 
     fields['__key__ >'] = project_start.key()
 
@@ -169,7 +172,7 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
 
   if not (project_key and survey_key and survey_type):
     # invalid task data, log and return OK
-    return logErrorAndReturnOK(
+    return error_handler.logErrorAndReturnOK(
         'Invalid sendSurveyReminderForProject data: %s' % post_dict)
 
   # set logic depending on survey type specified in POST
@@ -183,13 +186,15 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
 
   if not student_project:
     # no existing project found, log and return OK
-    return logErrorAndReturnOK('Invalid project specified %s:' % project_key)
+    return error_handler.logErrorAndReturnOK(
+        'Invalid project specified %s:' % project_key)
 
   survey = survey_logic.getFromKeyName(survey_key)
 
   if not survey:
     # no existing survey found, log and return OK
-    return logErrorAndReturnOK('Invalid survey specified %s:' % survey_key)
+    return error_handler.logErrorAndReturnOK(
+        'Invalid survey specified %s:' % survey_key)
 
   # try to retrieve an existing record
   record_logic = survey_logic.getRecordLogic()
@@ -257,14 +262,4 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
     mail_dispatcher.sendMailFromTemplate(mail_template, mail_context)
 
   # return OK
-  return http.HttpResponse()
-
-
-def logErrorAndReturnOK(error_msg='Error found in Survey Task'):
-  """Logs the given error message and returns a HTTP OK response.
-
-  Args:
-    error_msg: Error message to log
-  """
-  logging.error(error_msg)
   return http.HttpResponse()

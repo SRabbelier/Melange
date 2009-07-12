@@ -4,10 +4,26 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
          href="{{ list.redirect }}">{{ list.item.project.title }}</a>
      </div>
   </td>
-  <td><div class="date">{{ list.item.project.student.name }}</a></div></td>
-  <td><div class="date">{{ list.item.project.scope.name }}</a></div></td>
-  <td><div class="date">{{ list.item.project.mentor.name }}</a></div></td>
-  <td><div class="date">{{ list.item.grade_decision }}</a></div></td>
-  <td><div class="date">{{ list.item.locked }}</a></div></td>
+  <td><div class="name">{{ list.item.project.student.name }}</a></div></td>
+  <td><div class="name">{{ list.item.project.scope.name }}</a></div></td>
+  <td><div class="name">{{ list.item.project.mentor.name }}</a></div></td>
+  <td><div class="name">{{ list.item.grade_decision }}</a></div></td>
+  <td><div class="name">
+      {% if list.item.mentor_record %}
+        Yes
+      {% else %}
+        No
+      {% endif %}
+    </a></div>
+  </td>
+  <td><div class="name">
+      {% if list.item.student_record %}
+        Yes
+      {% else %}
+        No
+      {% endif %}
+    </a></div>
+  </td>
+  <td><div class="name">{{ list.item.locked }}</a></div></td>
   <td><div class="date">{{ list.item.modified|date:"jS F Y H:i" }}</a></div></td>
 </tr>

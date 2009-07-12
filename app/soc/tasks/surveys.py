@@ -53,7 +53,7 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
     survey_key: specifies the key name for the ProjectSurvey to send reminders
                 for
     survey_type: either project or grading depending on the type of Survey
-    project_key: optional to specifiy which project was the last for which a
+    project_key: optional to specify which project was the last for which a
                  task was spawn
 
   Args:
@@ -94,7 +94,7 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
   else:
     project_start_key = None
 
-  # get all valid surveys from starting key
+  # get all valid StudentProjects from starting key
   fields = {'program': program_entity,
             'status': 'accepted'}
 

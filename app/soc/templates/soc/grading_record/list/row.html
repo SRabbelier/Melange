@@ -1,0 +1,13 @@
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right"><div class="name"><a class="noul" onclick="do_redirect=false"
+         href="{{ list.redirect }}">{{ list.item.project.title }}</a>
+     </div>
+  </td>
+  <td><div class="date">{{ list.item.project.student.name }}</a></div></td>
+  <td><div class="date">{{ list.item.project.organization.name }}</a></div></td>
+  <td><div class="date">{{ list.item.project.mentor.name }}</a></div></td>
+  <td><div class="date">{{ list.item.grade_decision }}</a></div></td>
+  <td><div class="date">{{ list.item.locked }}</a></div></td>
+  <td><div class="date">{{ list.item.modified|date:"jS F Y H:i" }}</a></div></td>
+</tr>

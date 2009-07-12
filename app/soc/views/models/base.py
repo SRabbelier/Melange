@@ -282,16 +282,14 @@ class View(object):
       kwargs: not used for create()
     """
 
-    new_params = dicts.merge(params, self._params)
+    params = dicts.merge(params, self._params)
 
     # redirect to scope selection view
-    if ('scope_view' in new_params) and ('scope_path' not in kwargs):
-      view = new_params['scope_view'].view
-      redirect = new_params['scope_redirect']
+    if ('scope_view' in params) and ('scope_path' not in kwargs):
+      view = params['scope_view'].view
+      redirect = params['scope_redirect']
       return self.select(request, view, redirect,
                          params=params, page_name=page_name, **kwargs)
-
-    params = new_params
 
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
@@ -662,14 +660,12 @@ class View(object):
       params: a dict with params for this View
       filter: a filter that all displayed entities should satisfy
     """
+    view_params = view.getParams().copy()
+    view_params['list_action'] = (redirect, params)
+    view_params['list_description'] = self.DEF_CREATE_INSTRUCTION_MSG_FMT % (
+        view_params['name'], self._params['name'])
 
-    params = dicts.merge(params, view.getParams())
-    params = dicts.merge(params, self._params)
-    params['list_action'] = (redirect, self._params)
-    params['list_description'] = self.DEF_CREATE_INSTRUCTION_MSG_FMT % (
-        params['name'], self._params['name'])
-
-    content = helper.lists.getListContent(request, params, filter=filter)
+    content = helper.lists.getListContent(request, view_params, filter=filter)
     contents = [content]
 
     return self._list(request, params, contents, page_name)

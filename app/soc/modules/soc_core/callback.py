@@ -21,6 +21,7 @@ __authors__ = [
   ]
 
 
+from soc.tasks import grading_survey_group as grading_group_tasks
 from soc.tasks import surveys as survey_tasks
 from soc.views.models import club
 from soc.views.models import club_app
@@ -105,6 +106,7 @@ class Callback(object):
     self.core.registerSitemapEntry(user.view.getDjangoURLPatterns())
 
     # register task URL's
+    self.core.registerSitemapEntry(grading_group_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(survey_tasks.getDjangoURLPatterns())
 
   def registerWithSidebar(self):

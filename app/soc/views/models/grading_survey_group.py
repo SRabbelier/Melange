@@ -243,6 +243,13 @@ class View(base.View):
       return responses.errorResponse(
           error, request, template=params['error_public'])
 
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = "%s for %s named '%s'" %(
+        page_name, params['name'], entity.name)
+    context['entity'] = entity
+
     # get the POST request dictionary and check if we should take action
     post_dict = request.POST
 
@@ -259,6 +266,8 @@ class View(base.View):
       fields = {'last_update_started': datetime.datetime.now()}
       survey_group_logic.updateEntityProperties(entity, fields)
 
+      context['message'] = 'Updating GradingRecords successfully started'
+
     if post_dict.get('update_projects'):
       # start the task to update all StudentProjects for the given group
       task_params = {
@@ -268,6 +277,7 @@ class View(base.View):
       new_task = taskqueue.Task(params=task_params, url=task_url)
       new_task.add()
 
+      context['message'] = 'Updating StudentProjects successfully started'
 
     template = params['records_template']
 
@@ -277,13 +287,6 @@ class View(base.View):
     list_params['list_row'] = params['records_row_template']
     # TODO(ljvderijk) proper redirect to edit a record
     list_params['list_action'] = None
-
-    # get the context for this webpage
-    context = responses.getUniversalContext(request)
-    responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = "%s for %s named '%s'" %(
-        page_name, params['name'], entity.name)
-    context['entity'] = entity
 
     fields = {'grading_survey_group': entity}
 

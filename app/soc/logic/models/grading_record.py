@@ -81,7 +81,6 @@ class Logic(base.Logic):
     # batch put and return the entities
     return db.put(records_to_store)
 
-
   def getFieldsForGradingRecord(self, project, survey_group,
                                 record_entity=None):
     """Returns the fields for a GradingRecord.
@@ -112,7 +111,8 @@ class Logic(base.Logic):
     if student_survey:
       # retrieve ProjectSurveyRecord
       survey_record_fields['survey'] = student_survey
-      project_survey_record = project_logic.getForFields(survey_record_fields, unique=True)
+      project_survey_record = project_logic.getForFields(survey_record_fields,
+                                                         unique=True)
     else:
       project_survey_record = None
 

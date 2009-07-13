@@ -456,11 +456,11 @@ class View(base.View):
     mentor = mentor_logic.logic.getForFields(fields, unique=True)
 
     # add this mentor to the additional mentors
-    # pylint: disable-msg=E1103
     if not entity.additional_mentors:
       additional_mentors = [mentor.key()]
     else:
-      additional_mentors = additional_mentors.append(mentor.key())
+      additional_mentors = entity.additional_mentors
+      additional_mentors.append(mentor.key())
 
     fields = {'additional_mentors': additional_mentors}
     project_logic.updateEntityProperties(entity, fields)

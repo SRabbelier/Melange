@@ -134,7 +134,8 @@ class Logic(base.Logic):
       else:
         # no ProjectSurveyRecord on file while there is a survey to be taken
         grade_decision = 'fail'
-        fields['grade_decision'] = grade_decision
+
+      fields['grade_decision'] = grade_decision
 
     # return the fields that should be set for a GradingRecord
     return fields

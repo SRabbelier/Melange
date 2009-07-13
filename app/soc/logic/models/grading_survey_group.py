@@ -24,6 +24,7 @@ __authors__ = [
 
 from soc.logic.models import base
 from soc.logic.models import program as program_logic
+from soc.logic.models.grading_record import logic as record_logic
 
 import soc.models.grading_survey_group
 
@@ -33,12 +34,20 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.grading_survey_group.GradingSurveyGroup,
-               base_model=None, scope_logic=program_logic):
+               base_model=None, scope_logic=program_logic,
+               record_logic=record_logic):
     """Defines the name, key_name and model for this entity.
     """
 
+    self.record_logic = record_logic
+
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def getRecordLogic(self):
+    """Returns Record logic belonging to the GradingSurveyGroup
+    """
+    return self.record_logic
 
 
 logic = Logic()

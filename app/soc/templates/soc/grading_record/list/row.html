@@ -7,12 +7,16 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
   <td><div class="name">{{ list.item.project.student.name }}</a></div></td>
   <td><div class="name">{{ list.item.project.scope.name }}</a></div></td>
   <td><div class="name">{{ list.item.project.mentor.name }}</a></div></td>
-  <td><div class="name">{{ list.item.grade_decision }}</a></div></td>
+  <td><div class="name">{{ list.item.grade_decision|capfirst }}</a></div></td>
   <td><div class="name">
       {% if list.item.mentor_record %}
-        Yes
+        {% if list.item.mentor_record.grade %}
+          Pass
+        {% else %}
+          Fail
+        {% endif %}
       {% else %}
-        No
+        Not Available
       {% endif %}
     </a></div>
   </td>
@@ -20,10 +24,9 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
       {% if list.item.student_record %}
         Yes
       {% else %}
-        No
+        Not Available
       {% endif %}
     </a></div>
   </td>
   <td><div class="name">{{ list.item.locked }}</a></div></td>
-  <td><div class="date">{{ list.item.modified|date:"jS F Y H:i" }}</a></div></td>
 </tr>

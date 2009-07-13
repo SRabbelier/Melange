@@ -57,7 +57,7 @@ class StudentProject(soc.models.linkable.Linkable):
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about this project.')
 
-  #: Optional field storing a feed URL; displayed publicly.
+  #: Optional field storing a feed URL; displayed publicly
   feed_url = db.LinkProperty(
       verbose_name=ugettext('Project Feed URL'))
   feed_url.help_text = ugettext(
@@ -65,7 +65,7 @@ class StudentProject(soc.models.linkable.Linkable):
       'Feed entries are shown on the public page.')
 
   #: A property containing which mentor has been assigned to this project.
-  #: A project must have a mentor at all times
+  #: A project must have a mentor at all times.
   mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
                                 required=True,
                                 collection_name='student_projects')
@@ -91,6 +91,11 @@ class StudentProject(soc.models.linkable.Linkable):
   #: passed. And is also used to ensure that a GradingRecord has been
   #: processed.
   passed_evaluations = db.ListProperty(item_type=db.Key, default=[])
+
+  #: List of all processed GradingRecords which state a fail for this project.
+  #: This is a ListProperty to ensure that the system keeps functioning when
+  #: manual changes in GradingRecords occur.
+  failed_evaluations = db.ListProperty(item_type=db.Key, default=[])
 
   #: Student which this project is from
   student = db.ReferenceProperty(

@@ -91,7 +91,7 @@ class GradingRecord(base.ModelWithFieldAttributes):
   #: Boolean that states if the grade_decision property has been locked
   #: This is to prevent an automatic update from a GradingSurveyGroup to
   #: overwrite the decision made by for example a Program Administrator.
-  locked = db.BooleanProperty(required=True, default=False,
+  locked = db.BooleanProperty(required=False, default=False,
                               verbose_name=ugettext('Grade Decision locked'))
 
   #: Property containing the date that this GradingRecord was created.

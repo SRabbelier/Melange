@@ -130,6 +130,7 @@ def updateOrCreateRecordsForSurveyGroup(request, *args, **kwargs):
   # task completed, return OK
   return http.HttpResponse('OK')
 
+
 def updateProjectsForSurveyGroup(request, *args, **kwargs):
   """Updates each StudentProject for which a GradingRecord is found.
 

@@ -83,7 +83,8 @@ class Callback(object):
     self.core.registerSitemapEntry(cron.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(document.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(grading_survey.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(grading_survey_group.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(
+        grading_survey_group.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(host.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(job.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())

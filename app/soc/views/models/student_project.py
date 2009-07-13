@@ -95,7 +95,8 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['program', 'status', 'link_id',
                                        'mentor', 'additional_mentors',
-                                       'student', 'passed_evaluations']
+                                       'student', 'passed_evaluations',
+                                       'failed_evaluations']
 
     new_params['create_extra_dynaproperties'] = {
         'scope_path': forms.CharField(widget=forms.HiddenInput,

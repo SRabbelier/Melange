@@ -392,6 +392,16 @@ def getTakeProjectSurveyRedirect(entity, info):
                                      entity.key().id_or_name())
 
 
+def getEditGradingRecordRedirect(entity, params):
+  """Returns the redirect for editing a given GradingRecord.
+  """
+
+  return '/%s/edit_record/%s?id=%s' % (
+      params['url_name'],
+      entity.grading_survey_group.key().id_or_name(),
+      entity.key().id_or_name())
+
+
 def getToSRedirect(presence):
   """Returns link to 'show' the ToS Document if it exists, None otherwise.
 

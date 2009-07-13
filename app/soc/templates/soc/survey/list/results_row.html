@@ -1,5 +1,5 @@
-<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'"
-onclick="return false; document.location.href='{{ list.redirect }}'" name="name">
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'"
+onclick="return false; if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
 
   {% for value in list.item.getValues %}
     <td>
@@ -28,7 +28,7 @@ onclick="return false; document.location.href='{{ list.redirect }}'" name="name"
   </td>
 
   <td>
-    <a class="fetch_answers" id="results_for_{{ list.item.user.link_id }}">View</a>
+    <a class="fetch_answers" id="results_for_{{ list.item.user.link_id }}" onclick="do_redirect=false">View</a>
   </td>
 
   {% if grades %}

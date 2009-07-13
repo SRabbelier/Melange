@@ -90,7 +90,7 @@ def updateOrCreateRecordsForSurveyGroup(request, *args, **kwargs):
 
   # get all valid StudentProjects from starting key
   fields = {'program': survey_group_entity.scope,
-            'status': ['accepted', 'failed', 'completed', 'withdrawn']}
+            'status': ['accepted', 'failed', 'completed']}
 
   if project_start_key:
     # retrieve the last project that was done

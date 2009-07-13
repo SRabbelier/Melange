@@ -29,6 +29,7 @@ import time
 from google.appengine.ext.db import djangoforms
 
 from django import forms
+from django import http
 
 from soc.logic import dicts
 from soc.logic.models.program import logic as program_logic
@@ -42,11 +43,15 @@ from soc.models.project_survey import ProjectSurvey
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import dynaform
+from soc.views.helper import forms as forms_helper
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import base
 from soc.views.models import program as program_view
+
+import soc.views.helper.forms
 
 
 class View(base.View):
@@ -68,6 +73,7 @@ class View(base.View):
     rights['show'] = ['checkIsHostForProgramInScope']
     rights['list'] = ['checkIsDeveloper']
     rights['records'] = ['checkIsHostForProgramInScope']
+    rights['edit_record'] = ['checkIsHostForProgramInScope']
 
     new_params = {}
     new_params['logic'] = survey_group_logic
@@ -98,15 +104,31 @@ class View(base.View):
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>records)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.grading_records',
+        'soc.views.models.%(module_name)s.view_records',
         'Overview of GradingRecords'),
+        (r'^%(url_name)s/(?P<access_type>edit_record)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.edit_record',
+        'Edit a GradingRecord'),
     ]
 
     new_params['extra_django_patterns'] = patterns
 
-    new_params['records_template'] = 'soc/grading_survey_group/records.html'
+    new_params['view_records_template'] = 'soc/grading_survey_group/records.html'
     new_params['records_heading_template'] = 'soc/grading_record/list/heading.html'
     new_params['records_row_template'] = 'soc/grading_record/list/row.html'
+    new_params['record_edit_template'] = 'soc/grading_record/edit.html'
+
+    # create the form that will be used to edit a GradingRecord
+    record_logic = survey_group_logic.getRecordLogic()
+
+    record_edit_form = dynaform.newDynaForm(
+        dynabase=soc.views.helper.forms.BaseForm,
+        dynamodel=record_logic.getModel(),
+        dynaexclude=['grading_survey_group', 'mentor_record',
+                     'student_record', 'project'],
+    )
+
+    new_params['record_edit_form'] = record_edit_form
 
     params = dicts.merge(params, new_params)
 
@@ -223,8 +245,8 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def gradingRecords(self, request, access_type, page_name=None, params=None,
-                     **kwargs):
+  def viewRecords(self, request, access_type, page_name=None, params=None,
+                  **kwargs):
     """View which shows all collected records for a given GradingSurveyGroup.
 
     For args see base.View.public().
@@ -233,9 +255,9 @@ class View(base.View):
     from google.appengine.api.labs import taskqueue
 
     from soc.logic import lists as lists_logic
-    from soc.logic.models.grading_record import logic as record_logic
 
     survey_group_logic = params['logic']
+    record_logic = survey_group_logic.getRecordLogic()
 
     try:
       entity = survey_group_logic.getFromKeyFieldsOr404(kwargs)
@@ -249,6 +271,7 @@ class View(base.View):
     context['page_name'] = "%s for %s named '%s'" %(
         page_name, params['name'], entity.name)
     context['entity'] = entity
+    template = params['view_records_template']
 
     # get the POST request dictionary and check if we should take action
     post_dict = request.POST
@@ -279,14 +302,12 @@ class View(base.View):
 
       context['message'] = 'Updating StudentProjects successfully started'
 
-    template = params['records_template']
-
     list_params = params.copy()
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
     list_params['list_row'] = params['records_row_template']
-    # TODO(ljvderijk) proper redirect to edit a record
-    list_params['list_action'] = None
+    list_params['list_action'] = (redirects.getEditGradingRecordRedirect,
+                                  list_params)
 
     fields = {'grading_survey_group': entity}
 
@@ -295,7 +316,7 @@ class View(base.View):
 
     # get the list content for passing records
     pr_params = list_params.copy()
-    pr_params['list_description'] =  \
+    pr_params['list_description'] = \
         'List of all Records which have their grading outcome set to pass.'
     pr_list = lists.getListContent(
         request, pr_params, fields, idx=0)
@@ -305,7 +326,7 @@ class View(base.View):
 
     # get the list content for all failing records
     fr_params = list_params.copy()
-    fr_params['list_description'] =  \
+    fr_params['list_description'] = \
         'List of all Records which have their grading outcome set to fail.'
     fr_list = lists.getListContent(
         request, fr_params, fields, idx=1)
@@ -315,7 +336,7 @@ class View(base.View):
 
     # get the list content for all undecided records
     ur_params = list_params.copy()
-    ur_params['list_description'] =  \
+    ur_params['list_description'] = \
         'List of all Records which have their grading outcome set to undecided.'
     ur_list = lists.getListContent(
         request, ur_params, fields, idx=2)
@@ -326,12 +347,132 @@ class View(base.View):
 
     return responses.respond(request, template, context)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def editRecord(self, request, access_type, page_name=None, params=None,
+                 **kwargs):
+    """View in which a GradingRecord can be edited.
+
+    For args see base.View.public().
+    """
+
+    survey_group_logic = params['logic']
+    record_logic = survey_group_logic.getRecordLogic()
+
+    get_dict = request.GET
+
+    record_id = get_dict.get('id')
+
+    if not (record_id and record_id.isdigit()):
+      # no valid record_id specified showing the list of GradingRecords
+      return self._showEditRecordList(request, params, page_name, **kwargs)
+
+    # retrieve the wanted GradingRecord
+    try:
+      record_entity = record_logic.getFromIDOr404(int(record_id))
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+    context['entity'] = record_entity
+    template = params['record_edit_template']
+
+    if request.POST:
+      return self._editRecordPost(request, params, context, template,
+                                 record_entity)
+    else: # request.GET
+      return self._editRecordGet(request, params, context, template,
+                                  record_entity)
+
+  def _editRecordGet(self, request, params, context, template, record_entity):
+    """Handles the GET request for editing a GradingRecord.
+    Args:
+      request: a Django Request object
+      params: the params for this view
+      context: the context for the webpage
+      template: the location of the template used for this view
+      record_entity: a GradingRecord entity
+    """
+
+    form = params['record_edit_form'](instance=record_entity)
+    context['form'] = form
+
+    return responses.respond(request, template, context)
+
+  def _editRecordPost(self, request, params, context, template, record_entity):
+    """Handles the POST request for editing a GradingRecord.
+
+    Args:
+      request: a Django Request object
+      params: the params for this view
+      context: the context for the webpage
+      template: the location of the template used for this view
+      record_entity: a GradingRecord entity
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    form = params['record_edit_form'](request.POST)
+
+    if not form.is_valid():
+      return self._constructResponse(request, record_entity, context, form,
+                                     params)
+
+    _, fields = forms_helper.collectCleanedFields(form)
+
+    record_entity = record_logic.updateEntityProperties(record_entity, fields)
+
+    # Redirect to the same page
+    redirect = request.META['HTTP_REFERER']
+    return http.HttpResponseRedirect(redirect)
+
+  def _showEditRecordList(self, request, params, page_name, **kwargs):
+    """Returns a list containing GradingRecords that can be edited.
+
+    For args see base.View.public().
+    """
+
+    survey_group_logic = params['logic']
+    record_logic = survey_group_logic.getRecordLogic()
+
+    try:
+      survey_group = survey_group_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    list_params = params.copy()
+    list_params['logic'] = record_logic
+    list_params['list_heading'] = params['records_heading_template']
+    list_params['list_row'] = params['records_row_template']
+    list_params['list_action'] = (redirects.getEditGradingRecordRedirect,
+                                  list_params)
+
+    fields = {'grading_survey_group': survey_group}
+
+    # get the list content for all records
+    list_params['list_description'] = \
+        'List of all GradingRecords. Pick one to edit it.'
+    list_content = lists.getListContent(
+        request, list_params, fields, idx=0)
+
+    contents = [list_content]
+
+    # return the view which renders the set content
+    return self._list(request, list_params, contents, page_name)
+
 
 view = View()
 
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
-grading_records = decorators.view(view.gradingRecords)
+edit_record = decorators.view(view.editRecord)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
+view_records = decorators.view(view.viewRecords)

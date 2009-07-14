@@ -1,0 +1,41 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block content %}
+<p>
+We have processed the evaluation for your project named {{ project.title }} with {{ organization.name }}.
+</p>
+
+<p>
+{% ifequal grading_record.grade_decision "pass" %}
+  Congratulations, from our data it seems that you have successfully passed the {{ survey_group.name }}.
+{% endifequal %}
+
+{% ifequal grading_record.grade_decision "fail" %}
+  From our data it seems that you have not passed the {{ survey_group.name }}.
+  This is either due to your mentor failing you or due to a missing evaluation from you, the student.
+{% endifequal %}
+
+{% ifequal grading_record.grade_decision "undecided" %}
+  From our data it seems that it is not possible to evaluate your project at this time for the {{ survey_group.name }}.
+  Please contact the program administrator as soon as possible.
+{% endifequal %}
+</p>
+{% endblock %}
+
+{% block signature %}
+Greetings, <br />
+The {{ site_name }} Team
+{% endblock %}

@@ -136,9 +136,71 @@ def updateProjectsForSurveyGroup(request, *args, **kwargs):
 
   Expects the following to be present in the POST dict:
     group_key: Specifies the GradingSurveyGroup key name.
+    record_key: Optional, specifies the key of the last processed
+                GradingRecord.
 
   Args:
     request: Django Request object
   """
-  # TODO(ljvderijk) implement this method
+
+  from soc.logic.models.grading_record import logic as grading_record_logic
+  from soc.logic.models.grading_survey_group import logic as survey_group_logic
+  from soc.logic.models.student_project import logic as student_project_logic
+
+  post_dict = request.POST
+
+  group_key = post_dict.get('group_key')
+
+  if not group_key:
+    # invalid task data, log and return OK
+    return error_handler.logErrorAndReturnOK(
+        'Invalid updateRecordForSurveyGroup data: %s' % post_dict)
+
+  # get the GradingSurveyGroup for the given keyname
+  survey_group_entity = survey_group_logic.getFromKeyName(group_key)
+
+  if not survey_group_entity:
+    # invalid GradingSurveyGroup specified, log and return OK
+    return error_handler.logErrorAndReturnOK(
+        'Invalid GradingSurveyGroup specified: %s' % group_key)
+
+  # check and retrieve the record_key that has been done last
+  if 'record_key' in post_dict and post_dict['record_key'].isdigit():
+    record_start_key = int(post_dict['record_key'])
+  else:
+    record_start_key = None
+
+  # get all valid StudentProjects from starting key
+  fields = {'grading_survey_group': survey_group_entity}
+
+  if record_start_key:
+    # retrieve the last record that was done
+    record_start = grading_record_logic.getFromID(record_start_key)
+
+    if not record_start:
+      # invalid starting record key specified, log and return OK
+      return error_handler.logErrorAndReturnOK(
+          'Invalid GradingRecord Key specified: %s' %(record_start_key))
+
+    fields['__key__ >'] = record_start.key()
+
+  # get the first batch_size number of GradingRecords
+  record_entities = grading_record_logic.getForFields(fields,
+                                                      limit=DEF_BATCH_SIZE)
+
+  student_project_logic.updateProjectsForGradingRecords(record_entities)
+
+  if len(record_entities) == DEF_BATCH_SIZE:
+    # spawn new task starting from the last
+    new_record_start = record_entities[DEF_BATCH_SIZE-1].key().id_or_name()
+
+    # pass along these params as POST to the new task
+    task_params = {'group_key': group_key,
+                   'record_key': new_record_start}
+    task_url = '/tasks/grading_survey_group/update_projects'
+
+    new_task = taskqueue.Task(params=task_params, url=task_url)
+    new_task.add()
+
+  # task completed, return OK
   return http.HttpResponse('OK')

@@ -316,7 +316,6 @@ class View(base.View):
       context['message'] = ('Updating StudentProjects successfully started. '
                            'And sending out e-mail with the results.')
 
-
     list_params = params.copy()
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
@@ -388,6 +387,14 @@ class View(base.View):
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])
+
+    survey_group_key_name = survey_group_logic.getKeyNameFromFields(kwargs)
+    record_survey_group_key_name = (
+        record_entity.grading_survey_group.key().id_or_name())
+
+    if survey_group_key_name != record_survey_group_key_name:
+      # this record does not belong to the given GradingSurveyGroup show list
+      return self._showEditRecordList(request, params, page_name, **kwargs)
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)

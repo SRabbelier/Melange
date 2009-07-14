@@ -425,13 +425,16 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
   print "Fetched %d Student Projects." % student_projects_amount
   print "Fetching Student entities from Student Projects."
   accepted_students = {}
-  student_organization = {}
+  student_extra_data = {}
   counter = 0
+  
   for sp_key in student_projects.keys():
     key = student_projects[sp_key].student.key().name()
     accepted_students[key] = student_projects[sp_key].student
     org_name = student_projects[sp_key].scope.name
-    student_organization[key] = org_name
+    student_extra_data[key] = {}
+    student_extra_data[key]['organization'] = org_name
+    student_extra_data[key]['project_status'] = student_projects[sp_key].status
     counter += 1
     print str(counter) + '/' + str(student_projects_amount) + ' ' + key + ' (' + org_name + ')'
   print "All Student entities fetched."
@@ -446,11 +449,14 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
   print "Preparing Students data for export."
   students_data = [accepted_students[i].toDict(students_key_order) for i in accepted_students.keys()]
   
-  print "Adding organization name to Students data."
+  print "Adding organization name and project status to Students data."
   for student in students_data:
-    student['organization'] = student_organization[program_key_name + '/' + student['link_id']]
+    extra_data = student_extra_data[program_key_name + '/' + student['link_id']]
+    student['organization'] = extra_data['organization']
+    student['project_status'] = extra_data['project_status']
   
   students_key_order.append('organization')
+  students_key_order.append('project_status')
   
   saveDataToCSV(csv_filename, students_data, students_key_order)
   print "Accepted Students exported to %s file." % csv_filename

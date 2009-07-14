@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.logic.models import base
 from soc.logic.models import organization as org_logic
 
@@ -41,6 +43,67 @@ class Logic(base.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def updateProjectsForGradingRecords(self, record_entities):
+    """Updates StudentProjects using a list of GradingRecord entities.
+
+    Args:
+      record_entities: List of GradingRecord entities to process.
+    """
+
+    projects_to_update = []
+
+    for record_entity in record_entities:
+
+      project_entity = record_entity.project
+
+      if project_entity.status in ['withdrawn', 'invalid']:
+        # skip this project
+        continue
+
+      # get the key from the GradingRecord entity since that gets stored
+      record_key = record_entity.key()
+
+      passed_evals = project_entity.passed_evaluations
+      failed_evals = project_entity.failed_evaluations
+
+      # try to remove this GradingRecord from the existing list of evals
+      if record_key in passed_evals:
+        passed_evals.remove(record_key)
+
+      if record_key in failed_evals:
+        failed_evals.remove(record_key)
+
+      # get the grade_decision from the GradingRecord
+      grade_decision = record_entity.grade_decision
+
+      # update GradingRecord lists with respect to the grading_decision
+      if grade_decision == 'pass':
+        passed_evals.append(record_key)
+      elif grade_decision == 'fail':
+        failed_evals.append(record_key)
+
+      if project_entity.status != 'completed':
+        # Only when the project has not been completed should the status be
+        # updated to reflect the new setting of the evaluations.
+
+        if len(failed_evals) == 0:
+          # no failed evaluations present
+          new_status = 'accepted'
+        else:
+          new_status = 'failed'
+      else:
+          new_status = project_entity.status
+
+      # update the necessary fields and store it before updating
+      project_entity.passed_evaluations = passed_evals
+      project_entity.failed_evaluations = failed_evals
+      project_entity.status = new_status
+
+      projects_to_update.append(project_entity)
+
+    # batch put the StudentProjects that need to be updated
+    db.put(projects_to_update)
 
 
 logic = Logic()

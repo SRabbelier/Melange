@@ -45,7 +45,10 @@ def getDjangoURLPatterns():
       'soc.tasks.grading_survey_group.updateOrCreateRecordsForSurveyGroup'),
               (
       r'tasks/grading_survey_group/update_projects$',
-      'soc.tasks.grading_survey_group.updateProjectsForSurveyGroup')]
+      'soc.tasks.grading_survey_group.updateProjectsForSurveyGroup'),
+              (
+      r'tasks/grading_survey_group/mail_result$',
+      'soc.tasks.grading_survey_group.sendMailAboutGradingRecordResult')]
 
   return patterns
 
@@ -138,6 +141,8 @@ def updateProjectsForSurveyGroup(request, *args, **kwargs):
     group_key: Specifies the GradingSurveyGroup key name.
     record_key: Optional, specifies the key of the last processed
                 GradingRecord.
+    send_mail: Optional, if this string evaluates to True mail will be send
+               for each GradingRecord that's processed.
 
   Args:
     request: Django Request object
@@ -190,13 +195,27 @@ def updateProjectsForSurveyGroup(request, *args, **kwargs):
 
   student_project_logic.updateProjectsForGradingRecords(record_entities)
 
+  # check if we need to send an email for each GradingRecord
+  send_mail = post_dict.get('send_mail', '')
+
+  if send_mail:
+    # enqueue a task to send mail for each GradingRecord
+    for record_entity in record_entities:
+      # pass along these params as POST to the new task
+      task_params = {'record_key': record_entity.key().id_or_name()}
+      task_url = '/tasks/grading_survey_group/mail_result'
+
+      mail_task = taskqueue.Task(params=task_params, url=task_url)
+      mail_task.add('mail')
+
   if len(record_entities) == DEF_BATCH_SIZE:
     # spawn new task starting from the last
     new_record_start = record_entities[DEF_BATCH_SIZE-1].key().id_or_name()
 
     # pass along these params as POST to the new task
     task_params = {'group_key': group_key,
-                   'record_key': new_record_start}
+                   'record_key': new_record_start,
+                   'send_mail': send_mail}
     task_url = '/tasks/grading_survey_group/update_projects'
 
     new_task = taskqueue.Task(params=task_params, url=task_url)
@@ -204,3 +223,86 @@ def updateProjectsForSurveyGroup(request, *args, **kwargs):
 
   # task completed, return OK
   return http.HttpResponse('OK')
+
+
+def sendMailAboutGradingRecordResult(request, *args, **kwargs):
+  """Sends out a mail about the result of one GradingRecord.
+
+  Expects the following to be present in the POST dict:
+    record_key: Specifies the key for the record to process.
+
+  Args:
+    request: Django Request object
+  """
+
+  from soc.logic import mail_dispatcher
+  from soc.logic.models.grading_record import logic as grading_record_logic
+  from soc.logic.models.org_admin import logic as org_admin_logic
+  from soc.logic.models.site import logic as site_logic
+
+  post_dict = request.POST
+
+  # check and retrieve the record_key that has been done last
+  if 'record_key' in post_dict and post_dict['record_key'].isdigit():
+    record_key = int(post_dict['record_key'])
+  else:
+    record_key = None
+
+  if not record_key:
+    # no GradingRecord key specified, log and return OK
+    error_handler.logErrorAndReturnOK(
+        'No valid record_key specified in POST data: %s' % request.POST)
+
+  record_entity = grading_record_logic.getFromID(record_key)
+
+  if not record_entity:
+    # no valid GradingRecord key specified, log and return OK
+    error_handler.logErrorAndReturnOK(
+        'No valid GradingRecord key specified: %s' % record_key)
+
+  survey_group_entity = record_entity.grading_survey_group
+  project_entity = record_entity.project
+  student_entity = project_entity.student
+  mentor_entity = project_entity.mentor
+  org_entity = project_entity.scope
+  site_entity = site_logic.getSingleton()
+
+  mail_context = {
+    'survey_group': survey_group_entity,
+    'grading_record': record_entity,
+    'project': project_entity,
+    'organization': org_entity,
+    'site_name': site_entity.site_name,
+    'to_name': student_entity.name()
+  }
+
+  # set the sender
+  (sender, sender_address) = mail_dispatcher.getDefaultMailSender()
+  mail_context['sender'] = sender_address
+
+  # set the receiver and subject
+  mail_context['to'] = student_entity.email
+  mail_context['cc'] = [mentor_entity.email]
+  mail_context['subject'] = '%s results processed for %s' %(
+      survey_group_entity.name, project_entity.title)
+
+  # find all org admins for the project's organization
+  fields = {'scope': org_entity,
+            'status': 'active'}
+  org_admin_entities = org_admin_logic.getForFields(fields)
+
+  # collect email addresses for all found org admins
+  org_admin_addresses = []
+
+  for org_admin_entity in org_admin_entities:
+    org_admin_addresses.append(org_admin_entity.email)
+
+  if org_admin_addresses:
+    mail_context['cc'].extend(org_admin_addresses)
+
+  # send out the email using a template
+  mail_template = 'soc/grading_record/mail/result.html'
+  mail_dispatcher.sendMailFromTemplate(mail_template, mail_context)
+
+  # return OK
+  return http.HttpResponse()

@@ -17,3 +17,4 @@ queue:
 # queue used for tasks that send out mail
 - name: mail
   rate: 1/s
+  bucket_size: 1

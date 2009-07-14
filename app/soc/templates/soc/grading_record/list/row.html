@@ -4,9 +4,15 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
          href="{{ list.redirect }}">{{ list.item.project.title }}</a>
      </div>
   </td>
-  <td><div class="name">{{ list.item.project.student.name }}</a></div></td>
+  <td><div class="name">
+      {{ list.item.project.student.name }}
+      ({{ list.item.project.student.link_id }})
+  </a></div></td>
   <td><div class="name">{{ list.item.project.scope.name }}</a></div></td>
-  <td><div class="name">{{ list.item.project.mentor.name }}</a></div></td>
+  <td><div class="name">
+      {{ list.item.project.mentor.name }}
+      ({{ list.item.project.mentor.link_id }})
+   </a></div></td>
   <td><div class="name">{{ list.item.grade_decision|capfirst }}</a></div></td>
   <td><div class="name">
       {% if list.item.mentor_record %}

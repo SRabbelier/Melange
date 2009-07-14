@@ -436,10 +436,15 @@ class View(base.View):
       record_entity: a GradingRecord entity
     """
 
+    from google.appengine.api.labs import taskqueue
+    from soc.logic.models.student_project import logic as student_project_logic
+
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    form = params['record_edit_form'](request.POST)
+    post_dict = request.POST
+
+    form = params['record_edit_form'](post_dict)
 
     if not form.is_valid():
       return self._constructResponse(request, record_entity, context, form,
@@ -448,6 +453,20 @@ class View(base.View):
     _, fields = forms_helper.collectCleanedFields(form)
 
     record_entity = record_logic.updateEntityProperties(record_entity, fields)
+
+    if 'save_update' in post_dict:
+      # also update the accompanying StudentProject
+      student_project_logic.updateProjectsForGradingRecords([record_entity])
+    elif 'save_update_mail' in post_dict:
+      # update the StudentProject and send an email about the result
+      student_project_logic.updateProjectsForGradingRecords([record_entity])
+
+      # pass along these params as POST to the new task
+      task_params = {'record_key': record_entity.key().id_or_name()}
+      task_url = '/tasks/grading_survey_group/mail_result'
+
+      mail_task = taskqueue.Task(params=task_params, url=task_url)
+      mail_task.add('mail')
 
     # Redirect to the same page
     redirect = request.META['HTTP_REFERER']

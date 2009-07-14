@@ -289,7 +289,7 @@ class View(base.View):
       fields = {'last_update_started': datetime.datetime.now()}
       survey_group_logic.updateEntityProperties(entity, fields)
 
-      context['message'] = 'Updating GradingRecords successfully started'
+      context['message'] = 'Updating GradingRecords successfully started.'
 
     if post_dict.get('update_projects'):
       # start the task to update all StudentProjects for the given group
@@ -300,7 +300,22 @@ class View(base.View):
       new_task = taskqueue.Task(params=task_params, url=task_url)
       new_task.add()
 
-      context['message'] = 'Updating StudentProjects successfully started'
+      context['message'] = 'Updating StudentProjects successfully started.'
+
+    if post_dict.get('update_projects_and_mail'):
+      # Start the task to update all StudentProjects for the given group and
+      # send out emails.
+      task_params = {
+          'group_key': entity.key().id_or_name(),
+          'send_mail': 'true'}
+      task_url = '/tasks/grading_survey_group/update_projects'
+
+      new_task = taskqueue.Task(params=task_params, url=task_url)
+      new_task.add()
+
+      context['message'] = ('Updating StudentProjects successfully started. '
+                           'And sending out e-mail with the results.')
+
 
     list_params = params.copy()
     list_params['logic'] = record_logic

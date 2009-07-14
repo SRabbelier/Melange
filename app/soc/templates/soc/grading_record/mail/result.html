@@ -21,16 +21,20 @@ We have processed the evaluation for your project named {{ project.title }} with
 <p>
 {% ifequal grading_record.grade_decision "pass" %}
   Congratulations, from our data it seems that you have successfully passed the {{ survey_group.name }}.
+  Please contact your mentor to discuss the results of your evaluation and to plan your goals and development plan for the rest of the program
 {% endifequal %}
 
 {% ifequal grading_record.grade_decision "fail" %}
   From our data it seems that you have not passed the {{ survey_group.name }}.
   This is either due to your mentor failing you or due to a missing evaluation from you, the student.
+  Please contact your mentor to discuss the results of your evaluation.
+  If the issue is that you have not yet submitted the required evaluation, please contact the program administrator as soon as possible so we can work on getting this situation rectified.
 {% endifequal %}
 
 {% ifequal grading_record.grade_decision "undecided" %}
   From our data it seems that it is not possible to evaluate your project at this time for the {{ survey_group.name }}.
-  Please contact the program administrator as soon as possible.
+  This is likely because the evaluation requested was not submitted on time.
+  Please contact the program administrator as soon as possible so we can work on getting this situation rectified.
 {% endifequal %}
 </p>
 {% endblock %}

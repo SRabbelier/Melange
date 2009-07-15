@@ -76,13 +76,10 @@ class View(project_survey.View):
   def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
     """Returns the specific SurveyTakeForm needed for the take view.
 
-    Args:
-        survey: a Survey entity
-        record: a SurveyRecord instance if any exist
-        params: the params dict for the requesting View
+    For args see survey.View._getSurveyTakeForm().
 
     Returns:
-        An instance of GradseSurveyTakeForm.
+        An instance of GradeSurveyTakeForm.
     """
 
     grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))

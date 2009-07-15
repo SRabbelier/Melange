@@ -90,7 +90,7 @@ class Logic(base.Logic):
     Args:
       project: Project entity
       survey_group: a GradingSurveyGroup entity
-      record_entity an optional GradingRecord entity
+      record_entity: an optional GradingRecord entity
 
     Returns:
       Dict containing the fields that should be set on a GradingRecord for this

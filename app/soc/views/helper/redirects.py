@@ -362,7 +362,7 @@ def getListSurveysRedirect(entity, prefix, url_name):
 
 
 def getTakeSurveyRedirect(entity, info):
-  """Returns the redirect for taking a Survey .
+  """Returns the redirect for taking a Survey.
 
   Args:
       entity: a Survey entity
@@ -373,7 +373,7 @@ def getTakeSurveyRedirect(entity, info):
   params = info
 
   return '/%s/take/%s' % (params['url_name'],
-                                     survey_entity.key().id_or_name())
+                          survey_entity.key().id_or_name())
 
 
 def getTakeProjectSurveyRedirect(entity, info):

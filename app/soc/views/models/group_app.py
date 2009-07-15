@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django import http
 from django.utils.translation import ugettext
 
@@ -93,6 +94,7 @@ class View(base.View):
          ]
 
     new_params['create_extra_dynaproperties'] = {
+        'email': forms.fields.EmailField(required=True),
         'clean_backup_admin_link_id': 
             cleaning.clean_users_not_same('backup_admin_link_id'),
         }

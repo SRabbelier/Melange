@@ -137,6 +137,7 @@ class View(base.View):
                                           required=False),
        'longitude': forms.fields.FloatField(widget=forms.HiddenInput,
                                             required=False),
+       'email': forms.fields.EmailField(required=True),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
        'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_res_street': cleaning.clean_ascii_only('res_street'),

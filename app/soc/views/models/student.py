@@ -163,7 +163,7 @@ class View(role.View):
 
     user_entity = user_logic.logic.getForCurrentAccount()
     params['create_form'] = params['user_create_form']
-    
+
     # pylint: disable-msg=E1103
     return self.create(request, access_type='unspecified', page_name=page_name,
         params=params, link_id=user_entity.link_id, **kwargs)

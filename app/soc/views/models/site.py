@@ -76,7 +76,7 @@ class View(presence_with_tos.View):
 
     new_params['create_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
-        'clean_noreply_email': cleaning.clean_empty_field('noreply_email'),
+        'noreply_email': forms.EmailField(required=False),
         }
     new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),

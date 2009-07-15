@@ -951,38 +951,40 @@ class HelperForm(object):
     return form
 
 
-def _get_csv_header(sur):
+def getCSVHeader(survey_entity):
   """CSV header helper, needs support for comment lines in CSV.
 
   Args:
-      sur: Survey entity
+      survey_entity: Survey entity
   """
 
   tpl = '# %s: %s\n'
 
   # add static properties
-  fields = ['# Melange Survey export for \n#  %s\n#\n' % sur.title]
-  fields += [tpl % (k,v) for k,v in sur.toDict().items()]
-  fields += [tpl % (f, str(getattr(sur, f))) for f in PLAIN.split()]
-  fields += [tpl % (f, str(getattr(sur, f).link_id)) for f in FIELDS.split()]
+  fields = ['# Melange Survey export for \n#  %s\n#\n' % survey_entity.title]
+  fields += [tpl % (k,v) for k,v in survey_entity.toDict().items()]
+  fields += [tpl % (f, str(getattr(survey_entity, f))) for f in PLAIN.split()]
+  fields += [tpl % (f, str(getattr(survey_entity, f).link_id))
+             for f in FIELDS.split()]
   fields.sort()
 
   # add dynamic properties
   fields += ['#\n#---\n#\n']
-  dynamic = sur.survey_content.dynamic_properties()
-  dynamic = [(prop, getattr(sur.survey_content, prop)) for prop in dynamic]
+  dynamic = survey_entity.survey_content.dynamic_properties()
+  dynamic = [(prop, getattr(survey_entity.survey_content, prop))
+             for prop in dynamic]
   fields += [tpl % (k,v) for k,v in sorted(dynamic)]
 
   # add schema
   fields += ['#\n#---\n#\n']
-  schema =  sur.survey_content.schema
+  schema =  survey_entity.survey_content.schema
   indent = '},\n#' + ' ' * 9
   fields += [tpl % ('Schema', schema.replace('},', indent)) + '#\n']
 
   return ''.join(fields).replace('\n', '\r\n')
 
 
-def _get_records(recs, props):
+def getRecords(recs, props):
   """Fetch properties from SurveyRecords for CSV export.
   """
 
@@ -1009,7 +1011,7 @@ def toCSV(survey_view):
     record_logic = survey_logic.getRecordLogic()
 
     # get header and properties
-    header = _get_csv_header(survey)
+    header = getCSVHeader(survey)
     leading = ['user', 'created', 'modified']
     properties = leading + survey.survey_content.orderedProperties()
 
@@ -1025,7 +1027,7 @@ def toCSV(survey_view):
 
     # generate results list
     recs = record_query.run()
-    recs = _get_records(recs, properties)
+    recs = getRecords(recs, properties)
 
     # write results to CSV
     output = StringIO.StringIO()

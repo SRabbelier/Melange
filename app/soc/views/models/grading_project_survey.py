@@ -73,23 +73,6 @@ class View(project_survey.View):
 
     super(View, self).__init__(params=params)
 
-  # TODO: work on grade activation
-  def activate(self, request, **kwargs):
-    """This is a hack to support the 'Enable grades' button.
-    """
-    self.activateGrades(request)
-    redirect_path = request.path.replace('/activate/', '/edit/') + (
-        '?activate=1')
-    return http.HttpResponseRedirect(redirect_path)
-
-  def activateGrades(self, request, **kwargs):
-    """Updates SurveyRecord's grades for a given Survey.
-    """
-    survey_key_name = survey_logic.getKeyNameFromPath(request.path)
-    survey = Survey.get_by_key_name(survey_key_name)
-    survey_logic.activateGrades(survey)
-    return
-
   def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
     """Returns the specific SurveyTakeForm needed for the take view.
 

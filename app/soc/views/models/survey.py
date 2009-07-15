@@ -213,7 +213,7 @@ class View(base.View):
     survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
                                          survey_logic=self._params['logic'])
 
-    # TOOD(ljvderijk) pose question about the getFields method name and working
+    # TODO(ljvderijk) pose question about the getFields method name and working
     survey_form.getFields()
 
     context['survey_form'] = survey_form

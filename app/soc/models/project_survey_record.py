@@ -40,7 +40,7 @@ class ProjectSurveyRecord(SurveyRecord):
   project = db.ReferenceProperty(
       reference_class=soc.models.student_project.StudentProject,
       required=True, collection_name="survey_records")
-  
+
   #: A many:1 relationship associating ProjectSurveyRecords 
   #: with specific Organization. The back-reference in the 
   #: Organization model is a Query named 'survey_records'.

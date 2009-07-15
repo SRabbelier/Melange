@@ -995,7 +995,7 @@ def _get_records(recs, props):
   return records
 
 
-def to_csv(survey_view):
+def toCSV(survey_view):
   """CSV exporter.
 
   Args:

@@ -25,23 +25,15 @@ import unittest
 from google.appengine.api import users
 from google.appengine.api import memcache
 
-from soc.views.sitemap import sidebar
+from soc.modules import callback
 
 
 class SidebarTest(unittest.TestCase):
   def setUp(self):
     pass
 
-  def testSidebarCallbacksAreAdded(self):
-    """Test that the sidebar callbacks are added when importing 'build'.
-    """
-
-    self.assertEqual([], sidebar.SIDEBAR)
-    from soc.views.sitemap import build
-    self.assertNotEqual([], sidebar.SIDEBAR)
-
   def testSidebarBuilds(self):
     """Test that the sidebar builds and does not return None.
     """
 
-    self.assertNotEqual(None, sidebar.getSidebar('id', None))
+    self.assertNotEqual(None, callback.getCore().getSidebar('id', None))

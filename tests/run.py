@@ -87,6 +87,13 @@ def main():
   import django.test.utils
   django.test.utils.setup_test_environment()
 
+  # register a core for the test modules to use
+  from soc.modules import callback
+  from soc.modules import core
+
+  callback.registerCore(core.Core())
+  callback.getCore().registerModuleCallbacks()
+
   from nose.plugins import cover
   plugin = cover.Coverage()
   nose.main(plugins=[AppEngineDatastoreClearPlugin(), plugin])

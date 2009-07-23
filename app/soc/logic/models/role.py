@@ -33,24 +33,48 @@ DEF_LAST_RESIGN_ERROR_FMT = "This user can't be " \
     "resigned, please make sure it's not the last %(name)s."
 
 
+ROLE_LOGICS = {}
+
+
+def registerRoleLogic(role_logic):
+  """Adds the specified Role Logic to the known ones.
+
+  Args:
+    role_logic: Instance of or subclass from Role Logic
+  """
+
+  global ROLE_LOGICS
+  name = role_logic.role_name
+  ROLE_LOGICS[name] = role_logic
+
+
 class Logic(base.Logic):
   """Logic methods for the Role model.
   """
 
   def __init__(self, model=soc.models.role.Role,
-               base_model=None, scope_logic=None, disallow_last_resign=False):
+               base_model=None, scope_logic=None, role_name=None,
+               disallow_last_resign=False):
     """Defines the name, key_name and model for this entity.
+
+    Args:
+      role_name: The name of this role used for instance for Requests
+      dissallow_last_resign: Iff True and a given role entity is the last of
+        its kind in its scope then this role can not be resigned.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+    self.role_name = role_name
+    registerRoleLogic(self)
 
     self.disallow_last_resign = disallow_last_resign
 
 
   def getGroupEntityFromScopePath(self, group_logic, scope_path):
     """Returns a group entity by using the given scope_path.
-    
+
     Args:
       group_logic: logic for the group which should be retrieved
       scope_path : the scope path of the entity

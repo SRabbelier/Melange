@@ -36,12 +36,12 @@ class Logic(role.Logic):
 
   def __init__(self, model=soc.models.club_admin.ClubAdmin,
                base_model=soc.models.role.Role, scope_logic=club_logic,
-               disallow_last_resign=True):
+               role_name='club_admin', disallow_last_resign=True):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, base_model=base_model,
-                                scope_logic=scope_logic,
+    super(Logic, self).__init__(role_name=role_name, model=model,
+                                base_model=base_model, scope_logic=scope_logic,
                                 disallow_last_resign=disallow_last_resign)
 
   def _onCreate(self, entity):

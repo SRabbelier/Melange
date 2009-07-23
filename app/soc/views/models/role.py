@@ -53,7 +53,8 @@ def addRole(view):
 
   global ROLE_VIEWS
   params = view.getParams()
-  name = params['url_name']
+  role_logic = params['logic']
+  name = role_logic.role_name
   ROLE_VIEWS[name] = view
 
 

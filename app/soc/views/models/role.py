@@ -209,7 +209,7 @@ class View(base.View):
     """
 
     # set the role to the right name
-    fields = {'role': '%(module_name)s' % (params)}
+    fields = {'role': params['logic'].role_name}
 
     # get the request view parameters and initialize the create form
     request_params = request_view.view.getParams()
@@ -253,7 +253,7 @@ class View(base.View):
     request_fields = {'link_id': form_fields['link_id'].link_id,
         'scope': group,
         'scope_path': request_scope_path,
-        'role': params['module_name'],
+        'role': params['logic'].role_name,
         'role_verbose': params['name'],
         'status': 'group_accepted'}
 
@@ -292,7 +292,6 @@ class View(base.View):
       request_scope_path = group_entity.link_id
 
     return request_scope_path
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -380,7 +379,7 @@ class View(base.View):
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     # mark the request as completed
-    request_helper.completeRequestForRole(entity, params['module_name'])
+    request_helper.completeRequestForRole(entity, params['logic'].role_name)
 
     # redirect to the roles overview page
     return http.HttpResponseRedirect('/user/roles')
@@ -396,7 +395,6 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
     pass
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -500,7 +498,7 @@ class View(base.View):
     user_entity = user_logic.logic.getForCurrentAccount()
     # pylint: disable-msg=E1103
     fields = {'link_id' : user_entity.link_id,
-              'role' : params['module_name'],
+              'role' : params['logic'].role_name,
               'group_id' : kwargs['scope_path']}
 
     # get the request view parameters and initialize the create form
@@ -544,7 +542,7 @@ class View(base.View):
     request_fields = {'link_id' : user_entity.link_id,
         'scope' : group,
         'scope_path' : request_scope_path,
-        'role' : params['module_name'],
+        'role' : params['logic'].role_name,
         'role_verbose' : params['name'],
         'status' : 'new'}
 
@@ -565,7 +563,6 @@ class View(base.View):
 
     # redirect to requests overview
     return http.HttpResponseRedirect('/user/requests')
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -589,7 +586,7 @@ class View(base.View):
     # get the request entity using the information from kwargs
     fields = {'link_id': kwargs['link_id'],
         'scope_path': kwargs['scope_path'],
-        'role': params['module_name']}
+        'role': params['logic'].role_name}
     request_entity = request_logic.logic.getForFields(fields, unique=True)
 
     # pylint: disable-msg=E1103
@@ -620,7 +617,7 @@ class View(base.View):
     context['entity'] = request_entity
     context['user_in_request'] = user_entity
     context['request_status'] = request_entity.status 
-    context['module_name'] = params['module_name']
+    context['role_name'] = params['logic'].role_name
 
     #display the request processing page using the appropriate template
     template = request_view.view.getParams()['request_processing_template']

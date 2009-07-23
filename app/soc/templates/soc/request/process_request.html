@@ -31,9 +31,9 @@ limitations under the License.
 <table>
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=group_accepted'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=group_accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
   </td>
 </tr>
 </table>
@@ -49,7 +49,7 @@ limitations under the License.
 <table>
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Withdraw"/>
+    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Withdraw"/>
     <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
   </td>
 </tr>

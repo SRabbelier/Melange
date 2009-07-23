@@ -270,7 +270,7 @@ def getSelectRedirect(params):
 def getInviteAcceptedRedirect(entity, _):
   """Returns the redirect for accepting an invite.
   """
-
+  # TODO: redesign this redirect to use ROLE_VIEWS from the Role View
   return '/%s/accept_invite/%s/%s' % (
       entity.role, entity.scope_path, entity.link_id)
 

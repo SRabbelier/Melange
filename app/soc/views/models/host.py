@@ -97,7 +97,7 @@ class View(role.View):
     super(View, self).__init__(params=params)
 
     # register the role with the group_view
-    self._params['group_view'].registerRole(self._params['module_name'], self)
+    self._params['group_view'].registerRole(self._logic.role_name, self)
 
     # create and store the special form for invited users
     updated_fields = {

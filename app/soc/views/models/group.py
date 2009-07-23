@@ -42,6 +42,7 @@ from soc.views.sitemap import sidebar
 
 import soc.views.helper
 
+
 class View(presence.View):
   """View methods for the Group model.
   """
@@ -105,7 +106,6 @@ class View(presence.View):
           'shipping_postalcode'),
        }
 
-
     new_params['role_views'] = {}
 
     params = dicts.merge(params, new_params, sub_merge=True)
@@ -130,7 +130,6 @@ class View(presence.View):
       fields['founder'] = user
 
     super(View, self)._editPost(request, entity, fields)
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -242,7 +241,6 @@ class View(presence.View):
         fields['scope_path'])
     fields['scope'] = scope
 
-
   @decorators.merge_params
   @decorators.check_access
   def listRequests(self, request, access_type,
@@ -266,7 +264,7 @@ class View(presence.View):
     group_entity = group_logic.getFromKeyFields(kwargs)
 
     role_names = params['role_views'].keys()
-    
+
     # list all incoming requests
     filter = {
         'scope': group_entity,
@@ -281,7 +279,7 @@ class View(presence.View):
     inc_req_params['list_action'] = (redirects.getProcessRequestRedirect, None)
     inc_req_params['list_description'] = ugettext(
         "An overview of the %(name)s's incoming requests." % params)
-    
+
     inc_req_content = list_helper.getListContent(
         request, inc_req_params, filter, idx=0)
 
@@ -317,14 +315,13 @@ class View(presence.View):
     ignored_params['list_action'] = (redirects.getProcessRequestRedirect, None)
     ignored_params['list_description'] = ugettext(
         "An overview of the %(name)s's ignored requests." % params)
-    
+
     ignored_content = list_helper.getListContent(
         request, ignored_params, filter, idx=2)
 
     contents = [inc_req_content, out_inv_content, ignored_content]
 
     return self._list(request, params, contents, page_name)
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -367,7 +364,7 @@ class View(presence.View):
       list_params['list_description'] = ugettext(
           "An overview of the %s for this %s." % (
           list_params['name_plural'], params['name']))
-    
+
       new_list_content = list_helper.getListContent(
           request, list_params, filter, idx=index)
 
@@ -380,7 +377,7 @@ class View(presence.View):
 
   def registerRole(self, role_name, role_view):
     """Adds a role to the role_views param.
-    
+
     Args:
       role_name: The name of the role that needs to be added
       role_view: The view that needs to be added to role_views.

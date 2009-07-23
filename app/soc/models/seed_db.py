@@ -19,12 +19,14 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    'JamesLevy" <jamesalexanderlevy@gmail.com>',
   ]
 
 
 import itertools
 import logging
 import random
+import datetime
 
 from google.appengine.api import users
 from google.appengine.api import memcache
@@ -32,7 +34,11 @@ from google.appengine.ext import db
 
 from django import http
 
+from soc.logic.models.document import logic as document_logic
 from soc.logic.models.ranker_root import logic as ranker_root_logic
+from soc.logic.models.survey import logic as survey_logic
+from soc.logic.models.user import logic as user_logic
+
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.models import student_proposal
@@ -47,11 +53,13 @@ from soc.models.program import Program
 from soc.models.ranker_root import RankerRoot
 from soc.models.site import Site
 from soc.models.student import Student
+from soc.models.student_project import StudentProject
 from soc.models.student_proposal import StudentProposal
+from soc.models.survey import Survey, SurveyContent
+from soc.models.survey_record import SurveyRecord
 from soc.models.sponsor import Sponsor
 from soc.models.timeline import Timeline
 from soc.models.user import User
-
 
 class Error(Exception):
   """Base class for all exceptions raised by this module.
@@ -129,6 +137,7 @@ class UserSeeder(Seeder):
     entity = User(**user_properties)
     if entities is None:
       entity.put()
+      user_logic._onCreate(entity)
     else:
       entities.append(entity)
 
@@ -234,6 +243,8 @@ class OrgApplicationSeeder(Seeder):
       org_application.put()
     else:
       entities.append(org_application)
+
+
 
 
 def seed(request, *args, **kwargs):
@@ -424,6 +435,7 @@ def seed(request, *args, **kwargs):
     'scope': gsoc2009,
     })
 
+  orgs = []
   for i in range(15):
     group_properties.update({
         'key_name': 'google/gsoc2009/org_%d' % i,
@@ -434,6 +446,7 @@ def seed(request, *args, **kwargs):
         })
 
     entity = Organization(**group_properties)
+    orgs.append(entity)
     entity.put()
     # create a new ranker
     ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,
@@ -455,6 +468,8 @@ def seed(request, *args, **kwargs):
 
       # Only a mentor for the second org
       if i == 1:
+        org_1_admin = OrgAdmin(**role_properties)
+        org_1_admin.put()
         org_1_mentor = Mentor(**role_properties)
         org_1_mentor.put()
 
@@ -472,7 +487,83 @@ def seed(request, *args, **kwargs):
   melange_mentor = Mentor(**role_properties)
   melange_mentor.put()
 
+  student_id = 'test'
+  student_properties = {
+      'key_name': gsoc2009.key().name() + "/" + student_id,
+      'link_id': student_id, 
+      'scope_path': gsoc2009.key().name(),
+      'scope': gsoc2009,
+      'program': gsoc2009,
+      'user': current_user,
+      'given_name': 'test',
+      'surname': 'test',
+      'birth_date': db.DateProperty.now(),
+      'email': 'test@email.com',
+      'im_handle': 'test_im_handle',
+      'major': 'test major',
+      'name_on_documents': 'test',
+      'res_country': 'United States',
+      'res_city': 'city',
+      'res_street': 'test street',
+      'res_postalcode': '12345',
+      'publish_location': True,
+      'blog': 'http://www.blog.com/',
+      'home_page': 'http://www.homepage.com/',
+      'photo_url': 'http://www.photosite.com/thumbnail.png',
+      'ship_state': None,
+      'expected_graduation': 2009,
+      'school_country': 'United States',
+      'school_name': 'Test School', 
+      'tshirt_size': 'XS',
+      'tshirt_style': 'male',
+      'degree': 'Undergraduate',
+      'phone': '1650253000',
+      'can_we_contact_you': True, 
+      'program_knowledge': 'I heard about this program through a friend.'
+      }
 
+  melange_student = Student(**student_properties)
+  melange_student.put()
+
+  student_id = 'test2'
+  student_properties.update({
+      'key_name': gsoc2009.key().name() + "/" + student_id,
+      'link_id': student_id,
+      'user': current_user 
+      })
+
+  melange_student2 = Student(**student_properties)
+  melange_student2.put()
+                                       
+  project_id = 'test_project'
+  project_properties = {
+      'key_name':  gsoc2009.key().name() + "/org_1/" + project_id,
+      'link_id': project_id, 
+      'scope_path': gsoc2009.key().name() + "/org_1",
+      'scope': orgs[1].key(),
+
+      'title': 'test project',
+      'abstract': 'test abstract',
+      'status': 'accepted',
+      'student': melange_student,
+      'mentor': org_1_mentor,
+      'program':  gsoc2009
+       }
+
+  melange_project = StudentProject(**project_properties)
+  melange_project.put()
+
+  project_id = 'test_project2'
+  project_properties.update({
+      'key_name':  gsoc2009.key().name() + "/org_1/" + project_id,
+      'link_id': project_id,
+      'student': melange_student2,
+      'title': 'test project2'
+      })
+      
+  melange_project2 = StudentProject(**project_properties)
+  melange_project2.put()
+    
   document_properties = {
       'key_name': 'site/site/home',
       'link_id': 'home',
@@ -488,6 +579,7 @@ def seed(request, *args, **kwargs):
 
   home_document = Document(**document_properties)
   home_document.put()
+  document_logic._onCreate(home_document) 
 
 
   document_properties = {
@@ -505,6 +597,7 @@ def seed(request, *args, **kwargs):
 
   notes_document = Document(**document_properties)
   notes_document.put()
+  document_logic._onCreate(home_document) 
 
   site.home = home_document
   site.put()
@@ -598,6 +691,91 @@ def seed_org(unused_request, i):
       }
 
   return properties
+
+DEADLINE = datetime.datetime.now() + datetime.timedelta(10)
+
+def seed_survey(request, i):
+  """Returns the properties for a new survey.
+  """
+
+  _, current_user = ensureUser()
+  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+
+  if not gsoc2009:
+    raise Error('Run seed_db first')
+  link_id = 'survey_%d' % i
+  fields = {'SelectionQ': [u'SelectionQ Option 2 for %s' % link_id,
+                           u'SelectionQ Option 1 for %s'  % link_id
+                           ],
+            'PickMultipleQ': ['PickMultipleQ Checkbox 1 for %s' % link_id,
+                              'PickMultipleQ Checkbox 2 for %s' % link_id,
+                              ],
+            'LongQ': 'LongQ Custom Prompt for %s' % link_id,
+            'ShortQ': 'ShortQ Custom Prompt for %s' % link_id,
+            }
+  schema = {u'PickMultipleQ': {'index': 5, 'type': 'pick_multi',
+                               'render': 'multi_checkbox'},
+            u'LongQ': {'index': 2, 'type': 'long_answer'},
+            u'ShortQ': {'index': 3, 'type': 'short_answer'},
+            u'SelectionQ': {'index': 4, 'type': 'selection',
+                            'render': 'single_select'}
+            }
+  properties = {
+      'key_name': 'program/google/gsoc2009/%s' % link_id,
+      'link_id': link_id,
+      'scope_path': 'google/gsoc2009',
+      'scope': None,
+      'prefix': 'program',
+      'author': current_user,
+      'title': 'My Survey %d' % i,
+      'short_name': 'Survey %d' % i,
+      'modified_by': current_user,
+      'is_featured': True,
+      'fields': fields,
+      'schema': schema,
+      'deadline': DEADLINE,
+      'taking_access': 'everyone',
+      }
+  return properties
+
+
+def seed_survey_answer(request, i):
+  """Returns the properties of a student's survey answers.
+  """
+
+  ensureUser()
+  survey = Survey.get_by_key_name('program/google/gsoc2009/survey_%d' % i)
+  user = User.get_by_key_name('user_%d' % i)
+  #student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+
+  if not user:
+    raise Error('Run seed_many for at least %d users first.' % i)
+
+  if not survey:
+    raise Error('Run seed_many for at least %d surveys first.' % i)
+
+  all_properties = []
+  scope_path = 'google/gsoc2009/'
+  checkbox = 'PickMultipleQ Checkbox 2 for survey_%d' % i
+  # pylint: disable-msg=E1103
+  for i in range(5):
+    #student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+    user = User.get_by_key_name('user_%d' % i)
+
+    properties = {
+        'scope_path': scope_path,
+        'user': user,
+        'project': None,
+        '_survey': survey,
+        '_fields': {'ShortQ':'Test', 'SelectionQ': u'SelectionQ Option 2',
+                   'LongQ': 'Long answer... \n' * 10,
+                   'PickMultipleQ': checkbox,
+                   }
+        }
+
+    all_properties.append(properties)
+
+  return all_properties
 
 
 def seed_mentor(request, i):
@@ -831,6 +1009,8 @@ def seed_many(request, *args, **kwargs):
     'mentor': (seed_mentor, Mentor),
     'student': (seed_student, Student),
     'student_proposal': (seed_student_proposal, StudentProposal),
+    'survey': (seed_survey, Survey),
+    'survey_answer': (seed_survey_answer, SurveyRecord),
     }
 
   goal = int(get_args['goal'])
@@ -852,7 +1032,23 @@ def seed_many(request, *args, **kwargs):
 
     for properties in props if isinstance(props, list) else [props]:
       entity = model(**properties)
+      if seed_type == 'survey':
+        survey_content = survey_logic.createSurvey(properties['fields'],
+                                                    properties['schema'],
+                                                    this_survey=None
+                                                    )
+        entity.this_survey = survey_content
+      elif seed_type == 'survey_answer':
+        record = SurveyRecord.gql("WHERE user = :1 AND this_survey = :2",
+                                  properties['user'], properties['_survey']
+                                  ).get()
+        entity = survey_logic.updateSurveyRecord(properties['user'],
+                                                   properties['_survey'],
+                                                   record,
+                                                   properties['_fields']
+                                                   )
       entity.put()
+      if seed_type == 'survey': survey_logic._onCreate(entity) 
 
   if end < goal:
     info = {
@@ -888,6 +1084,9 @@ def clear(*args, **kwargs):
       Notification.all(),
       Mentor.all(),
       Student.all(),
+      Survey.all(),
+      SurveyContent.all(),
+      SurveyRecord.all(),
       OrgAdmin.all(),
       ranker.all(),
       RankerRoot.all(),

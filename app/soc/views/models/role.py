@@ -558,9 +558,6 @@ class View(base.View):
     # create the request entity
     request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
 
-    # TODO(ljvderijk): send out a message to alert the users 
-    # able to process this request
-
     # redirect to requests overview
     return http.HttpResponseRedirect('/user/requests')
 

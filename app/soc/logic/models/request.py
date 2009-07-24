@@ -68,8 +68,7 @@ class Logic(base.Logic):
       notifications.sendInviteNotification(entity)
     elif entity.status == 'new':
       # this is a request
-      # TODO(Lennard) Create a new request message
-      pass
+      notifications.sendNewRequestNotification(entity)
 
     super(Logic, self)._onCreate(entity)
 
@@ -87,8 +86,7 @@ class Logic(base.Logic):
         notifications.sendInviteNotification(entity)
       elif value == 'new':
         # this is a request
-        # TODO(Lennard) Create a new request message
-        pass
+        notifications.sendNewRequestNotification(entity)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 

@@ -139,4 +139,15 @@ class Logic(base.Logic):
     # resignation is possible
     return None
 
+  def getRoleLogicsToNotifyUponeNewRequest(self):
+    """Returns a list with subclasses of Role Logic which should be notified
+    when a new request to obtain this Role arrives.
+
+    Returns:
+      A list with all Role Logics to notify
+    """
+
+    return []
+
+
 logic = Logic()

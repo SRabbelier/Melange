@@ -43,5 +43,13 @@ class Logic(role.Logic):
                                 base_model=base_model, scope_logic=scope_logic,
                                 disallow_last_resign=disallow_last_resign)
 
+  def getRoleLogicsToNotifyUponeNewRequest(self):
+    """Returns a list with ClubAdmin logic which can be used to notify all
+    appropriate Club Admins.
+    """
+
+    from soc.logic.models.club_admin import logic as club_admin_logic
+
+    return [club_admin_logic]
 
 logic = Logic()

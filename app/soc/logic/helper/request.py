@@ -22,9 +22,6 @@ __authors__ = [
   ]
 
 
-import soc.logic.models as model_logic
-
-
 def completeRequestForRole(role_entity, role_name):
   """Marks the request that leads to the given role_entity as completed.
   
@@ -36,8 +33,7 @@ def completeRequestForRole(role_entity, role_name):
    
   """
 
-  # get the request logic so we can query the datastore
-  request_logic = model_logic.request.logic
+  from soc.logic.models.request import logic as request_logic
 
   # create the query properties for the specific role
   properties = {'scope_path' : role_entity.scope_path,
@@ -49,5 +45,5 @@ def completeRequestForRole(role_entity, role_name):
 
   # mark the request completed, if there is any
   if request_entity:
-    request_logic.updateEntityProperties(request_entity,
-        {'status': 'completed'})
+    request_logic.updateEntityProperties(
+        request_entity, {'status': 'completed'})

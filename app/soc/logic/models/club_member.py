@@ -44,7 +44,7 @@ class Logic(role.Logic):
                                 role_name=role_name,
                                 disallow_last_resign=disallow_last_resign)
 
-  def getRoleLogicsToNotifyUponeNewRequest(self):
+  def getRoleLogicsToNotifyUponNewRequest(self):
     """Returns a list with ClubAdmin logic which can be used to notify all
     appropriate Club Admins.
     """

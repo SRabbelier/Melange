@@ -117,7 +117,7 @@ class Logic(role.Logic):
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 
-  def getRoleLogicsToNotifyUponeNewRequest(self):
+  def getRoleLogicsToNotifyUponNewRequest(self):
     """Returns a list with OrgAdmin logic which can be used to notify all
     appropriate Organization Admins.
     """

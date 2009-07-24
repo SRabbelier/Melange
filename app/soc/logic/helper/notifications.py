@@ -43,6 +43,9 @@ DEF_NEW_NOTIFICATION_MSG = ugettext(
 DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
 
+DEF_NEW_REQUEST_MSG_FMT = ugettext(
+    "New Request Received from %(requester)s to become a %(role_verbose)s for %(group)s")
+
 DEF_NEW_GROUP_MSG_FMT = ugettext(
     "Your %(application_type)s for %(group_name)s has been accepted.")
 
@@ -53,6 +56,9 @@ DEF_WELCOME_MSG_FMT = ugettext("Welcome to %(site_name)s, %(name)s,")
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
     'invitation.html'
+
+DEF_NEW_REQUEST_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
+    'new_request.html'
 
 DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
     'new_review.html'
@@ -94,6 +100,57 @@ def sendInviteNotification(entity):
   from_user = user_logic.getForCurrentAccount()
 
   sendNotification(to_user, from_user, message_properties, subject, template)
+
+
+def sendNewRequestNotification(request_entity):
+  """Sends out a notification to the persons who can process this Request.
+
+  Args:
+    request_entity: an instance of Request model
+  """
+
+  from soc.logic.helper import notifications
+  from soc.logic.models.role import ROLE_LOGICS
+  from soc.logic.models.user import logic as user_logic
+
+  # get the users who should get the notification
+  to_users = []
+
+  # retrieve the Role Logics which we should query on
+  role_logic = ROLE_LOGICS[request_entity.role]
+  role_logics_to_notify = role_logic.getRoleLogicsToNotifyUponNewRequest()
+
+  # the scope of the roles is the same as the scope of the Request entity
+  fields = {'scope': request_entity.scope,
+            'status': 'active'}
+
+  for role_logic in role_logics_to_notify:
+    roles = role_logic.getForFields(fields)
+
+    for role_entity in roles:
+      # TODO: this might lead to double notifications
+      to_users.append(role_entity.user)
+
+  # get the user the request is from
+  properties = {'link_id': request_entity.link_id }
+  user_entity = user_logic.getForFields(properties, unique=True)
+
+  message_properties = {
+      'requester_name': user_entity.name,
+      'entity': request_entity,
+      'request_url': redirects.getProcessRequestRedirect(request_entity, None)}
+
+  subject = DEF_NEW_REQUEST_MSG_FMT % {
+      'requester': user_entity.name,
+      'role_verbose' : request_entity.role_verbose,
+      'group' : request_entity.scope.name
+      }
+
+  template = DEF_NEW_REQUEST_NOTIFICATION_TEMPLATE
+
+  for to_user in to_users:
+    notifications.sendNotification(to_user, None, message_properties,
+                                   subject, template)
 
 
 def sendNewGroupNotification(entity, params):

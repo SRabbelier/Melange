@@ -295,6 +295,8 @@ class SurveyTakeForm(djangoforms.ModelForm):
       comment: initial comment value for field
     """
 
+    #fix growfield wrapping
+    attrs['wrap'] = 'hard'
     widget = widgets.Textarea(attrs=attrs)
 
     if not tip:

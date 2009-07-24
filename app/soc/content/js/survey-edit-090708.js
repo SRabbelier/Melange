@@ -615,7 +615,7 @@
                            '<option value="True" selected="selected">',
                            'True</option>', '<option value="False">',
                            'False</option>', '</select>',
-                           "<textarea cols='40' rows='", MIN_ROWS,
+                           "<textarea wrap='hard' cols='40' rows='", MIN_ROWS,
                            "' class='long_answer'/>", '</fieldset>'
                           ].join("");
               break;

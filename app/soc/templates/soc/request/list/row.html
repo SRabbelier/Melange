@@ -7,7 +7,7 @@ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="na
      </div>
   </td>
   <td><div class="user_link_id">{% as_user list.item.link_id %}</div></td>
-  <td><div class="for">{{ list.item.scope_path }}</div></td>
+  <td><div class="for">{{ list.item.scope.name }}</div></td>
   <td><div class="status">{{ list.item.status }}</div></td>
   <td><div class="created">{{ list.item.created_on|date:"jS F Y H:i" }}</div></td>
 </tr>

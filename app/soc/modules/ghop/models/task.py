@@ -27,6 +27,10 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from taggable.taggable import Tag
+from taggable.taggable import Taggable
+from taggable.taggable import tag_property
+
 import soc.models.linkable
 import soc.models.role
 import soc.models.student
@@ -34,8 +38,51 @@ import soc.models.user
 
 import soc.modules.ghop.models.program
 
+class TaskTag(Tag):
+  """Model for storing all Task tags.
+  """
+  
+  #: Each task_type tag is scoped under the program. 
+  scope = db.ReferenceProperty(reference_class=soc.models.linkable.Linkable,
+                               required=True,
+                               collection_name='task_type_tags')
+  
+  @classmethod
+  def __key_name(cls, scope_path, tag_name):
+    return scope_path + '/' + tag_name
 
-class GHOPTask(soc.models.linkable.Linkable):
+  @classmethod
+  def get_by_name(cls, tag_name):
+    tags = db.Query(cls).filter('tag =', tag_name).fetch(1000)
+    return tags
+
+  @classmethod
+  def get_or_create(cls, program, tag_name):
+    "Get the Tag object that has the tag value given by tag_value."
+    tag_key_name = cls.__key_name(program.key().name(), tag_name)
+    existing_tag = cls.get_by_key_name(tag_key_name)
+    if existing_tag is None:
+      # The tag does not yet exist, so create it.
+      def create_tag_txn():
+        new_tag = cls(key_name=tag_key_name, tag=tag_name, scope=program)
+        new_tag.put()
+        return new_tag
+      existing_tag = db.run_in_transaction(create_tag_txn)
+    return existing_tag
+
+class TaskTypeTag(TaskTag):
+  "Model for storing of task type tags."
+
+  pass
+
+
+class TaskDifficultyTag(TaskTag):
+  "Model for storing of task difficulty level tags."
+
+  pass
+
+
+class GHOPTask(Taggable, soc.models.linkable.Linkable):
   """Model for a task used in GHOP workflow.
 
   The scope property of Linkable will be set to the Organization to which
@@ -56,15 +103,11 @@ class GHOPTask(soc.models.linkable.Linkable):
   #: Field indicating the difficulty level of the Task. This is not
   #: mandatory so the it can be assigned at any later stage. 
   #: The options are configured by a Program Admin.
-  difficulty = db.StringProperty(required=False,
-                                 verbose_name=ugettext('Difficulty'))
-  difficulty.help_text = ugettext('Difficulty Level of the task')
+  difficulty = tag_property('difficulty')
 
   #: Required field which contains the type of the task. These types are
   #: configured by a Program Admin.
-  type = db.StringListProperty(required=True, 
-                               verbose_name=ugettext('Task Type'))
-  type.help_text = ugettext('Type of the task')
+  task_type = tag_property('task_type')
 
   #: A field which contains time allowed for completing the task (in hours)
   #: from the moment that this task has been assigned to a Student
@@ -148,7 +191,8 @@ class GHOPTask(soc.models.linkable.Linkable):
 
   #: Required field containing the Mentor/Org Admin who last edited this
   #: task. It changes only when Mentor/Org Admin changes title, description,
-  #: difficulty, type, time_to_complete.
+  #: difficulty, task_type, time_to_complete. If site developer has modified
+  #: the task, it is empty.
   modified_by = db.ReferenceProperty(reference_class=soc.models.role.Role,
                                    required=True,
                                    collection_name='edited_tasks',
@@ -179,3 +223,20 @@ class GHOPTask(soc.models.linkable.Linkable):
   #: timestamp given by the key.
   #: Reference properties will be stored by calling str() on their Key.
   history = db.TextProperty(required=True, default='')
+
+  def __init__(self, parent=None, key_name=None, 
+               app=None, **entity_values):
+    """Constructor for GHOPTask Model.
+    
+    Args:
+        See Google App Engine APIs.
+    """
+
+    # explicitly call the AppEngine datastore Model constructor
+    db.Model.__init__(self, parent, key_name, app, **entity_values)
+
+    # call the Taggable constructor to initialize the tags specified as
+    # keyword arguments
+    Taggable.__init__(self, task_type=TaskTypeTag, 
+                      difficulty=TaskDifficultyTag)
+

@@ -39,8 +39,9 @@ class Logic(role.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(role_name=role_name, model=model,
-                                base_model=base_model, scope_logic=scope_logic,
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic,
+                                role_name=role_name,
                                 disallow_last_resign=disallow_last_resign)
 
 

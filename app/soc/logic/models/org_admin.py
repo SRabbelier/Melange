@@ -35,12 +35,13 @@ class Logic(role.Logic):
 
   def __init__(self, model=soc.models.org_admin.OrgAdmin,
                base_model=soc.models.role.Role, scope_logic=org_logic,
-               disallow_last_resign=True):
+               role_name='org_admin', disallow_last_resign=True):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic,
+                                role_name=role_name,
                                 disallow_last_resign=disallow_last_resign)
 
   def _onCreate(self, entity):

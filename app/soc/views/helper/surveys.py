@@ -40,7 +40,6 @@ from django.template import loader
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
-from django.utils.safestring import mark_safe
 
 from soc.logic import dicts
 from soc.logic.lists import Lists
@@ -912,7 +911,9 @@ class PickQuantRadioRenderer(widgets.RadioFieldRenderer):
     """Outputs set of radio fields in a div.
     """
 
-    return mark_safe(u'<div class="quant_radio">\n%s\n</div>'
+    from django.utils.html import linebreaks
+
+    return linebreaks(u'<div class="quant_radio">%s</div>'
                      % u'\n'.join([u'%s' % force_unicode(w) for w in self]))
 
 

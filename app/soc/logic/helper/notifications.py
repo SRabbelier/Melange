@@ -44,7 +44,8 @@ DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
 
 DEF_NEW_REQUEST_MSG_FMT = ugettext(
-    "New Request Received from %(requester)s to become a %(role_verbose)s for %(group)s")
+    "New Request Received from %(requester)s to become a %(role_verbose)s "
+    "for %(group)s")
 
 DEF_NEW_GROUP_MSG_FMT = ugettext(
     "Your %(application_type)s for %(group_name)s has been accepted.")

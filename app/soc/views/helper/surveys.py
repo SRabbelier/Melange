@@ -914,7 +914,7 @@ class PickQuantRadioRenderer(widgets.RadioFieldRenderer):
     from django.utils.html import linebreaks
 
     return linebreaks(u'<div class="quant_radio">%s</div>'
-                     % u'\n'.join([u'%s' % force_unicode(w) for w in self]))
+                      % u'\n'.join([u'%s' % force_unicode(w) for w in self]))
 
 
 class PickQuantRadio(forms.RadioSelect):

@@ -1,0 +1,20 @@
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right"><div class="name"><a class="noul" onclick="do_redirect=false"
+         href="{{ list.redirect }}">{{ list.item.student.name }}</a>
+     </div>
+  </td>
+  <td><div class="title">{{ list.item.title }}</a></div></td>
+  <td><div class="name">{{ list.item.mentor.name }}</a></div></td>
+  <td><div class="count">
+    {{ list.info.grading_project_surveys_completed }}
+    /
+    {{ list.info.grading_project_surveys_total }}
+  </a></div></td>
+  <td><div class="count">
+    {{ list.info.project_surveys_completed }}
+    /
+    {{ list.info.project_surveys_total }}
+    </a></div></td>
+  <td><div class="status">{{ list.item.status }}</a></div></td>
+</tr>

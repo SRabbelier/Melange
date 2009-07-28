@@ -137,6 +137,10 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/student_project/edit.html'
     new_params['manage_template'] = 'soc/student_project/manage.html'
+    new_params['manage_overview_heading'] = \
+        'soc/student_project/list/heading_manage.html'
+    new_params['manage_overview_row'] = \
+        'soc/student_project/list/row_manage.html'
 
     params = dicts.merge(params, new_params)
 
@@ -479,6 +483,8 @@ class View(base.View):
     For params see base.View().public()
     """
 
+    from soc.views.helper import list_info
+
     # make sure the organization exists
     org_entity = org_logic.getFromKeyNameOr404(kwargs['scope_path'])
     fields = {'scope': org_entity}
@@ -489,6 +495,10 @@ class View(base.View):
     context['page_name'] = '%s %s' % (page_name, org_entity.name)
 
     list_params = params.copy()
+    list_params['list_heading'] = params['manage_overview_heading']
+    list_params['list_row'] = params['manage_overview_row']
+    list_params['list_info'] = (
+        list_info.getStudentProjectSurveyInfo(org_entity.scope), None)
 
     #list all active projects
     fields['status'] = 'accepted'

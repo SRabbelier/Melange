@@ -346,6 +346,18 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
+  def hasAtLeastOneRecord(self, survey_entity):
+    """Returns True iff the given Survey has at least one SurveyRecord.
+
+    Args:
+      survey_entity: a Survey instance
+    """
+
+    fields = {'survey': survey_entity}
+
+    record_logic = self.getRecordLogic()
+    return record_logic.getQueryForFields(fields).count(1) > 0
+
   def _onCreate(self, entity):
     """Set the scope of the survey.
     """

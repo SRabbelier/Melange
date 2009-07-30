@@ -22,7 +22,12 @@ __authors__ = [
   ]
 
 
+from django.utils.translation import ugettext
+
 from soc.views.helper import redirects
+
+
+DEF_NO_RECORD_AVAILABLE_MESSAGE = ugettext('No Record Available')
 
 
 def getStudentProposalInfo(ranking, proposals_keys):
@@ -146,8 +151,8 @@ def getProjectSurveyInfoForProject(project_entity, survey_params):
       info['taken_by'] = record_entity.user.name
       info['taken_on'] = record_entity.modified
     else:
-      info['taken_by'] = 'No Record Available'
-      info['taken_on'] = 'No Record Available'
+      info['taken_by'] = DEF_NO_RECORD_AVAILABLE_MESSAGE
+      info['taken_on'] = DEF_NO_RECORD_AVAILABLE_MESSAGE
 
     take_redirect_info = {'survey': survey_entity,
                           'params': survey_params}

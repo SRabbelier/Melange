@@ -420,12 +420,11 @@ class View(group.View):
 
     return self._list(request, params, contents, page_name)
 
-  def _getMapData(self, student_project_params, filter=None):
+  def _getMapData(self, filter=None):
     """Constructs the JSON object required to generate 
        Google Maps on organization home page.
 
     Args:
-      student_project_params: params for student project view
       filter: a dict for the properties that the entities should have
 
     Returns: 
@@ -433,43 +432,76 @@ class View(group.View):
     """
 
     from soc.logic.models.student_project import logic as student_project_logic
+    from soc.views.models import student_project as student_project_view
+
+    sp_params = student_project_view.view.getParams().copy()
 
     people = {}
+    projects = {}
 
-    # get all the student_project entities for this organization
-    student_project_entities = student_project_logic.getForFields(filter=filter)
+    # get all the student_project entities for the given filter
+    student_project_entities = student_project_logic.getForFields(
+        filter=filter)
 
-    # construct a dictionary of mentors. For each mentor construct a
-    # list of 3-tuple containing student, project title and url. This is
-    # mainly done to track and pair all students and mentors who
-    # have allowed to publish their locations.
+    # Construct a dictionary of mentors and students. For each mentor construct
+    # a list of 3-tuples containing student name, project title and url.
+    # And for each student a list of 3 tuples containing mentor name, project
+    # title and url. Only students and mentors who have agreed to publish their
+    # locations will be in the dictionary.
     for entity in student_project_entities:
 
-      if entity.mentor.publish_location and (entity.mentor.key().name() not in people.keys()):
-        # if mentor has allowed to publish his location add it to the 
-        # mentors dictionary
-        people[entity.mentor.key().name()] = {
-            'type': 'mentor',
-            'name': entity.mentor.name(),
-            'city': entity.mentor.res_city,
-            'ccTLD': entity.mentor.ccTld(),
-            'students': []
-            }
+      project_key_name = entity.key().id_or_name()
+      project_redirect = redirects.getPublicRedirect(entity, sp_params)
 
-      if entity.student.publish_location:
-        if entity.mentor.publish_location:
-          people[entity.mentor.key().name()]['students'].append(entity.student.key().name())
-        people[entity.student.key().name()] = {
-          'type': 'student',
-          'name': entity.student.name(),
-          'city': entity.student.res_city,
-          'ccTLD': entity.student.ccTld(),
-          'summary': entity.title,
-          'url': redirects.getPublicRedirect(entity, student_project_params),
-          'mentor': entity.mentor.name()
-          }
+      student_entity = entity.student
+      student_key_name = student_entity.key().id_or_name()
 
-    return simplejson.dumps(people)
+      mentor_entity = entity.mentor
+      mentor_key_name = mentor_entity.key().id_or_name()
+
+      # store the project data in the projects dictionary
+      projects[project_key_name] = {'title': entity.title,
+                                    'redirect': project_redirect,
+                                    'student_key': student_key_name,
+                                    'student_name': student_entity.name(),
+                                    'mentor_key': mentor_key_name,
+                                    'mentor_name': mentor_entity.name()}
+
+      if mentor_entity.publish_location:
+        if mentor_key_name not in people:
+          # we have not stored the information of this mentor yet
+          people[mentor_key_name] = {
+              'type': 'mentor',
+              'name': mentor_entity.name(),
+              'lat': mentor_entity.latitude,
+              'long': mentor_entity.longitude,
+              'projects': []
+              }
+
+        # add this project to the mentor's list
+        people[mentor_key_name]['projects'].append(project_key_name)
+
+      if student_entity.publish_location:
+        if student_key_name not in people:
+          # new student, store the name and location
+          people[student_key_name] = {
+              'type': 'student',
+              'name': student_entity.name(),
+              'lat': student_entity.latitude,
+              'long': student_entity.longitude,
+              'projects': [],
+              }
+
+        # append the current project to the known student's list of projects
+        people[student_key_name]['projects'].append(project_key_name)
+
+    # combine the people and projects data into one JSON object
+    data = {}
+    # TODO: to enable map data uncomment the piece of code below
+    #data = {'people': people,
+    #        'projects': projects}
+
+    return simplejson.dumps(data)
 
   def _public(self, request, entity, context):
     """See base.View._public().
@@ -482,11 +514,11 @@ class View(group.View):
     if timeline_helper.isAfterEvent(program_entity.timeline,
                                     'accepted_students_announced_deadline'):
       # accepted projects
-      ap_params = student_project_view.view.getParams().copy() 
+      ap_params = student_project_view.view.getParams().copy()
 
       # define the list redirect action to show the notification
       ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
-      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
+      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT %(
           entity.name)
       ap_params['list_heading'] = 'soc/student_project/list/heading.html'
       ap_params['list_row'] = 'soc/student_project/list/row.html'
@@ -512,7 +544,7 @@ class View(group.View):
       context['list'] = soc.logic.lists.Lists(contents)
 
       # obtain data to construct the organization map as json object
-      context['org_map_data'] = self._getMapData(ap_params, filter)
+      context['org_map_data'] = self._getMapData(filter)
 
     return super(View, self)._public(request=request, entity=entity,
                                      context=context)

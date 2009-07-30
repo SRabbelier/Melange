@@ -381,7 +381,7 @@ class View(base.View):
     gps_params['list_info'] = (
         list_info.getProjectSurveyInfoForProject(entity, gps_params), None)
 
-    #list all surveys for this Project's Program
+    # list all surveys for this Project's Program
     fields['scope_path'] = entity.program.key().id_or_name()
     gps_params['list_description'] = \
         'List of all Mentor Evaluations for this Project'
@@ -402,7 +402,7 @@ class View(base.View):
         'List of all Student Evaluations for this Project'
     ps_params['list_action'] = None
 
-    #list all surveys for this Project's Program
+    # list all surveys for this Project's Program
     fields['scope_path'] = entity.program.key().id_or_name()
     ps_list = lists.getListContent(
         request, ps_params, fields, idx=1)
@@ -597,7 +597,7 @@ class View(base.View):
     failed_list = list_info.setStudentProjectSurveyInfo(failed_list,
                                                         org_entity.scope)
 
-    #list all completed projects
+    # list all completed projects
     fields['status'] = 'completed'
     completed_params = list_params.copy()
     completed_params['list_description'] = ('List of %(name_plural)s that have '

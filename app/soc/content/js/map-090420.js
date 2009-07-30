@@ -180,14 +180,6 @@ org_home_gmap = new function(){
   // HTML div tag where map needs to be inserted
   var map_div = "org_home_map";
   
-  // Geo Data to be displayed on Google Maps
-  var geo_data = null;
-  var geo_data_keys = [];
-  
-  // Geocoder object for obtaining locations from city/country
-  var geocoder = new GClientGeocoder();
-  var numGeocoded = 0;
-
   // Setup required icons
   var base_icon = new GIcon();
   base_icon.shadow = "http://www.google.com/mapfiles/shadow50.png";
@@ -201,91 +193,120 @@ org_home_gmap = new function(){
   var mentor_icon = new GIcon(base_icon);
   mentor_icon.image = "/soc/content/images/mentor-marker.png";
 
-  Object.prototype.keys = function ()
-  {
-    var keys = [];
-    for(i in this) if (this.hasOwnProperty(i))
-    {
-      keys.push(i);
-    }
-    return keys;
-  }
-  
-  
-  // Mark student and enable a popup box upon click
-  function drawMarker(person) {
-    geocoder.setBaseCountryCode(person.ccTLD);
-    geocoder.getLocations(
-      person.city,
-      function(response) {
-        var delay = 0;
-        if (response.Status.code == 620) {
-          // Too fast, try again, with a small pause
-          delay = 100;
-        } else {
-          if (response.Status.code == 200) {
-            // Success; do something with the address.
-            var html = "";
-            var marker = null;
-            
-            place = response.Placemark[0];
-            point = new GLatLng(place.Point.coordinates[1],
-                                place.Point.coordinates[0]);
-            if (person.type == 'mentor') {
-              marker = new GMarker(point, mentor_icon);
-              html = "<strong>" + person.name + "</strong><br> Mentor";
-            } else if (person.type == 'student') {
-              marker = new GMarker(point, student_icon);
-              html = "<strong>" + person.name + "</strong><br>";
-              html += "<a href='"+ person.url + "'>" + person.summary + "</a><br>";
-              html += "Mentor: " + person.mentor;
-            }
-
-            GEvent.addListener(marker, "click", function() {
-              marker.openInfoWindowHtml(html);
-            });
-
-            map.addOverlay(marker);
-          }
-          
-          // Move onto the next address; this skips bad addresses, too.
-          numGeocoded += 1;
-        }
-        
-        window.setTimeout(geocodeAll, delay);
-      }
-    );
-  }
-
-  // Draw a polyline between two points
-  drawPolyLine = function(from, to) {
-    var polyline = new GPolyline([from, to], "#ff0000", 3);
-    map.addOverlay(polyline);
-  }
-
-  function geocodeAll() {
-    if (numGeocoded < geo_data_keys.length) {
-      drawMarker(geo_data[geo_data_keys[numGeocoded]])
-    }
-  }
-
   // Map load function
   this.map_load = function(map_data) {
-    // Check if browser is gmap compatible.
+
     if (GBrowserIsCompatible()) {
-      geo_data = map_data;
-      
       // Create the map and add small controls
       map = new GMap2(document.getElementById(map_div));
       map.addControl(new GLargeMapControl());
       map.addControl(new GMapTypeControl());
-      
+
       // Set map center and initial zoom level
       map.setCenter(new GLatLng(0, 0), 1);
-      geocoder.setCache(null);
-      geo_data_keys = geo_data.keys()
-      window.setTimeout(geocodeAll, 50);
-      
+
+      var mentors = {};
+      var students = {};
+      var projects = {};
+      var polylines = [];
+
+      jQuery.each(map_data.people, function(key, person) {
+        if (person.type === "student") {
+          students[key] = {
+            "name": person.name,
+            "lat": person.lat,
+            "long": person.long,
+            "projects": person.projects
+          }
+        }
+        if (person.type === "mentor") {
+          mentors[key] = {
+            "name": person.name,
+            "lat": person.lat,
+            "long": person.long,
+            "projects": person.projects
+          };
+        }
+      });
+
+      // Iterate over projects to draw polylines
+      jQuery.each(map_data.projects, function (key, project) {
+        var current_student = students[project.student_key];
+        var current_mentor = mentors[project.mentor_key];
+        if (current_student !== undefined && 
+            current_mentor !== undefined &&
+            current_student.lat !== null &&
+            current_student.long !== null &&
+            current_mentor.lat !== null &&
+            current_mentor.long !== null) {
+              polylines.push([[current_student.lat,current_student.long],[current_mentor.lat,current_mentor.long]]);
+        }
+      });
+
+      // Iterate over students
+      jQuery.each(students, function(key, person) {
+        var html = "";
+        var marker = null;
+
+        if (person.lat!==null && person.long!==null) {
+          point = new GLatLng(person.lat,
+                              person.long);
+
+          marker = new GMarker(point, student_icon);
+          html = "<strong>" + person.name + "</strong><br />";
+          html += "<span style='font-style:italic;'>Student</span><br />";
+          html += "<div style='height:100px;width:300px;overflow:auto;font-size:70%'>";
+          // iterate through projects
+          jQuery.each(person.projects, function () {
+            var current_project = map_data.projects[this];
+            html += "<a href='"+ current_project.redirect + "'>" + current_project.title + "</a><br />";
+            html += "Mentor: " + current_project.mentor_name + "<br />";
+          });
+          html+= "</div>";
+          GEvent.addListener(marker, "click", function() {
+            marker.openInfoWindowHtml(html);
+          });
+
+          map.addOverlay(marker);
+        }
+      });
+
+      // Iterate over mentors
+      jQuery.each(mentors, function(key, person) {
+        var html = "";
+        var marker = null;
+
+        if (person.lat!==null && person.long!==null) {
+          point = new GLatLng(person.lat,
+                              person.long);
+
+          marker = new GMarker(point, mentor_icon);
+          html = "<strong>" + person.name + "</strong><br />";
+          html += "<span style='font-style:italic;'>Student</span><br />";
+          html += "<div style='height:100px;width:300px;overflow:auto;font-size:70%'>";
+          // iterate through projects
+          jQuery.each(person.projects, function () {
+            var current_project = map_data.projects[this];
+            html += "<a href='"+ current_project.redirect + "'>" + current_project.title + "</a><br />";
+            html += "Student: " + current_project.student_name + "<br />";
+          });
+          html+= "</div>";
+
+          GEvent.addListener(marker, "click", function() {
+            marker.openInfoWindowHtml(html);
+          });
+
+          map.addOverlay(marker);
+        }
+      });
+
+      // Draw all polylines
+      jQuery.each(polylines, function() {
+        var from = new GLatLng(this[0][0],this[0][1]);
+        var to = new GLatLng(this[1][0],this[1][1]);
+        var polyline = new GPolyline([from, to], "#ff0000", 3);
+        map.addOverlay(polyline);
+      });
     }
   }
 };

@@ -15,16 +15,14 @@ limitations under the License.
 {% load forms_helpers %}
 
 {% block body %}
-<p>
-<p>
 {% block instructions %}
-Please use this form to change the Mentor for the Student Project.
+Use this page to manage the Student Project. You can (re)assign Mentors here and check the status of the evaluations.
 {% endblock %}
 
-{% if error_message %}
-  <div class="error">{{ error_message|safe }}</div>
-{% endif %}
-
+<p>
+<b>Primary Mentor</b><br />
+In this section you can assign a new Primary Mentor.
+Note that if you select a co-Mentor from this list that Mentor will be removed from the co-Mentors.
 <form method="POST">
   <table>
     {% as_table mentor_edit_form %}
@@ -43,10 +41,12 @@ Please use this form to change the Mentor for the Student Project.
   </tr>
  </table>
 </form>
-<p/>
+</p>
 
-<b> Co-Mentors </b><br/>
-
+<p>
+<b>Co-Mentors</b><br/>
+In this section you can add/remove co-mentors for this project.
+Co-mentors usually play a vital role in the success of a project, however they are not responsible for taking evaluations.
 <table>
   {% for mentor in additional_mentors %}
     <tr>
@@ -77,4 +77,19 @@ Please use this form to change the Mentor for the Student Project.
   </tr>
  </table>
 </form>
+</p>
+
+<p>
+<b>Evaluations</b><br />
+This section contains the Mentor and Student Evaluations.
+From here you can view the Mentor and Student Evaluations and if possible (re)take the evaluations given by your Mentor.
+
+{% with evaluation_list as list %}
+  {% for list_number in list.lists %}
+    <p>
+      {% include list.nextList %}
+    </p>
+  {% endfor %}
+{% endwith %}
+</p>
 {% endblock %}

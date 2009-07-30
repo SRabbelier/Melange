@@ -338,12 +338,85 @@ class View(base.View):
 
     params['additional_mentor_form'] = additional_mentor_form
 
+    context['evaluation_list'] = self._getEvaluationLists(request, params,
+                                                          entity)
+
     if request.POST:
       return self.managePost(request, template, context, params, entity,
                              **kwargs)
     else: #request.GET
       return self.manageGet(request, template, context, params, entity,
                             **kwargs)
+
+  def _getEvaluationLists(self, request, params, entity):
+    """Returns List Object containing the list to be shown on the Student 
+    Project's manage page.
+
+    This list contains all Surveys that have at least one record and will also 
+    contain information about the presence (or absence) of a accompanying 
+    record for the given Student Project.
+
+    Args:
+      request: Django HTTP Request Object
+      params: the params dict for this View
+      entity: a StudentProject entity for which the Surveys(Records) should be
+              retrieved
+
+    Returns:
+      A List Object as specified by this method.
+    """
+
+    from soc.views.helper import list_info
+    from soc.views.models.grading_project_survey import view as \
+        grading_survey_view
+    from soc.views.models.project_survey import view as project_survey_view
+
+    fields = {'scope_path': entity.program.key().id_or_name()}
+
+    # get the GradingProjectSurvey list
+    gps_params = grading_survey_view.getParams().copy()
+    gps_params['list_key_order'] = None
+    gps_params['list_heading'] = gps_params['manage_student_project_heading']
+    gps_params['list_row'] = gps_params['manage_student_project_row']
+    gps_params['list_info'] = (
+        list_info.getProjectSurveyInfoForProject(entity, gps_params), None)
+
+    #list all surveys for this Project's Program
+    fields['scope_path'] = entity.program.key().id_or_name()
+    gps_params['list_description'] = \
+        'List of all Mentor Evaluations for this Project'
+    gps_params['list_action'] = None
+
+    gps_list = lists.getListContent(
+        request, gps_params, fields, idx=0)
+
+    # get the ProjectSurvey list
+    ps_params = project_survey_view.getParams().copy()
+    ps_params['list_key_order'] = None
+    ps_params['list_heading'] = ps_params['manage_student_project_heading']
+    ps_params['list_row'] = ps_params['manage_student_project_row']
+    ps_params['list_info'] = (
+        list_info.getProjectSurveyInfoForProject(entity, ps_params), None)
+
+    ps_params['list_description'] = \
+        'List of all Student Evaluations for this Project'
+    ps_params['list_action'] = None
+
+    #list all surveys for this Project's Program
+    fields['scope_path'] = entity.program.key().id_or_name()
+    ps_list = lists.getListContent(
+        request, ps_params, fields, idx=1)
+
+    # store both lists in the content
+    content = [gps_list, ps_list]
+
+    for list in content:
+      # remove all the surveys that have no records attached
+      list['data'] = [i for i in list['data'] if
+                      list['logic'].hasAtLeastOneRecord(i)]
+
+    # return the List Object with the filtered list content
+    return soc.logic.lists.Lists(content)
 
   def manageGet(self, request, template, context, params, entity, **kwargs):
     """Handles the GET request for the project's manage page.

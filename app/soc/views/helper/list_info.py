@@ -22,6 +22,9 @@ __authors__ = [
   ]
 
 
+from soc.views.helper import redirects
+
+
 def getStudentProposalInfo(ranking, proposals_keys):
   """Returns a function that returns information about the rank and assignment.
 
@@ -92,6 +95,49 @@ def getStudentProjectSurveyInfo(program_entity):
             'project_surveys_completed': project_record_count,
             'grading_project_surveys_total': grading_survey_count,
             'grading_project_surveys_completed': grading_record_count}
+
+    return info
+  return wrapper
+
+
+def getProjectSurveyInfoForProject(project_entity, survey_params):
+  """Returns a function that returns info for listing Surveys and if possible
+  their accompanying record.
+
+  Args:
+    project_entity: a StudentProject entity
+    survey_params: params for the view of the type of Survey that is listed
+  """
+
+  survey_logic = survey_params['logic']
+  record_logic = survey_logic.getRecordLogic()
+
+  def wrapper(survey_entity, _):
+    """Wrapper method.
+
+    Args:
+      survey_entity: a ProjectSurvey (or subclass) entity
+    """
+
+    # try to retrieve the SurveyRecord for the given Survey and Project
+    fields = {'survey': survey_entity,
+              'project': project_entity}
+    record_entity = record_logic.getForFields(fields, unique=True)
+
+    info = {'record': record_entity}
+
+    if record_entity:
+      # SurveyRecord has been found store the import data in info
+      info['taken_by'] = record_entity.user.name
+      info['taken_on'] = record_entity.modified
+    else:
+      info['taken_by'] = 'No Record Available'
+      info['taken_on'] = 'No Record Available'
+
+    take_redirect_info = {'survey': survey_entity,
+                          'params': survey_params}
+    info['take_url'] = redirects.getTakeProjectSurveyRedirect(
+        project_entity, take_redirect_info)
 
     return info
   return wrapper

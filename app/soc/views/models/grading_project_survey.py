@@ -69,6 +69,11 @@ class View(project_survey.View):
     # used for sending reminders
     new_params['survey_type'] = 'grading'
 
+    new_params['manage_student_project_heading'] = \
+        'soc/grading_project_survey/list/heading_manage_student_project.html'
+    new_params['manage_student_project_row'] = \
+        'soc/grading_project_survey/list/row_manage_student_project.html'
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

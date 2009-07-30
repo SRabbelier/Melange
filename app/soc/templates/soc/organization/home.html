@@ -43,20 +43,16 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
   {% include list.nextList %}
 </p>
 {% endfor %}
-{% comment %}
 <div id="org_home_extras">
- <div id="extras_left">
   {% for list_number in list.lists %}
   <p>
     {% include list.nextList %}
   </p>
   {% endfor %}
- </div>
- <div id="extras_right"> 
-  {% if gmaps_api_key %}
-    <div id="org_home_map"></div>
-  {% endif %}
- </div>
-</div>
+{% comment %}
+ {% if gmaps_api_key %}
+   <div id="org_home_map"></div>
+ {% endif %}
 {% endcomment %}
+</div>
 {% endblock %}

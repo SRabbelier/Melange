@@ -346,7 +346,7 @@ class Logic(work.Logic):
     # return the scope
     return entity.scope
 
-  def hasAtLeastOneRecord(self, survey_entity):
+  def hasRecord(self, survey_entity):
     """Returns True iff the given Survey has at least one SurveyRecord.
 
     Args:

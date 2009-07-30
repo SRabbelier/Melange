@@ -413,7 +413,7 @@ class View(base.View):
     for list in content:
       # remove all the surveys that have no records attached
       list['data'] = [i for i in list['data'] if
-                      list['logic'].hasAtLeastOneRecord(i)]
+                      list['logic'].hasRecord(i)]
 
     # return the List Object with the filtered list content
     return soc.logic.lists.Lists(content)

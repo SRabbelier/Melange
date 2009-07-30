@@ -67,7 +67,7 @@ def getStudentProjectSurveyInfo(program_entity):
   project_survey_count = len(project_surveys)
 
   for project_survey in project_surveys:
-    if not project_survey_logic.hasAtLeastOneRecord(project_survey):
+    if not project_survey_logic.hasRecord(project_survey):
       project_survey_count = project_survey_count - 1
 
   # count the number of have been active GradingProjectSurveys
@@ -75,7 +75,7 @@ def getStudentProjectSurveyInfo(program_entity):
   grading_survey_count = len(grading_surveys)
 
   for grading_survey in grading_surveys:
-    if not grading_survey_logic.hasAtLeastOneRecord(grading_survey):
+    if not grading_survey_logic.hasRecord(grading_survey):
       grading_survey_count = grading_survey_count - 1
 
   def wrapper(item, _):

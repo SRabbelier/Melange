@@ -570,8 +570,6 @@ class View(base.View):
     list_params = params.copy()
     list_params['list_heading'] = params['manage_overview_heading']
     list_params['list_row'] = params['manage_overview_row']
-    list_params['list_info'] = (
-        list_info.getStudentProjectSurveyInfo(org_entity.scope), None)
 
     #list all active projects
     fields['status'] = 'accepted'
@@ -582,6 +580,9 @@ class View(base.View):
 
     active_list = lists.getListContent(
         request, active_params, fields, idx=0)
+    # set the needed info
+    active_list = list_info.setStudentProjectSurveyInfo(active_list,
+                                                        org_entity.scope)
 
     # list all failed projects
     fields['status'] = 'failed'
@@ -592,6 +593,9 @@ class View(base.View):
 
     failed_list = lists.getListContent(
         request, failed_params, fields, idx=1, need_content=True)
+    # set the needed info
+    failed_list = list_info.setStudentProjectSurveyInfo(failed_list,
+                                                        org_entity.scope)
 
     #list all completed projects
     fields['status'] = 'completed'
@@ -603,6 +607,9 @@ class View(base.View):
 
     completed_list = lists.getListContent(
         request, completed_params, fields, idx=2, need_content=True)
+    # set the needed info
+    completed_list = list_info.setStudentProjectSurveyInfo(completed_list,
+                                                           org_entity.scope)
 
     # always show the list with active projects
     content = [active_list]

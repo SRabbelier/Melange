@@ -47,18 +47,28 @@ def getStudentProposalInfo(ranking, proposals_keys):
   return wrapper
 
 
-def getStudentProjectSurveyInfo(program_entity):
-  """Returns a function that returns information used in a Student Project
-  table to show how many evaluations have been available and how
+def setStudentProjectSurveyInfo(list_content, program_entity):
+  """Sets the list info to a method that returns information used in a Student
+  Project table to show how many evaluations have been available and how
   many have been taken.
 
   Args:
-    program_entity: the program to check the total amount of
+    list_content: list content for which to set the info
+    program_entity: the Program to check the total amount of
                     (Grading)ProjctSurveys for
+
+  Returns:
+    The original list_content with info set
   """
 
   from soc.logic.models.survey import grading_logic as grading_survey_logic
   from soc.logic.models.survey import project_logic as project_survey_logic
+  from soc.logic.models.survey_record import grading_logic
+  from soc.logic.models.survey_record import project_logic
+
+  if not list_content:
+    # this can happen because of the need_content parameter for getListContent
+    return list_content
 
   fields = {'scope_path': program_entity.key().id_or_name()}
 
@@ -78,13 +88,11 @@ def getStudentProjectSurveyInfo(program_entity):
     if not grading_survey_logic.hasRecord(grading_survey):
       grading_survey_count = grading_survey_count - 1
 
-  def wrapper(item, _):
-    """Wrapper method.
-    """
+  # Pre-store the needed info since Django calls the wrapper method for every
+  # info call.
+  info_storage = {}
 
-    from soc.logic.models.survey_record import grading_logic
-    from soc.logic.models.survey_record import project_logic
-
+  for item in list_content['data']:
     fields = {'project': item}
 
     # count the amount of records we have on store for this project
@@ -96,8 +104,15 @@ def getStudentProjectSurveyInfo(program_entity):
             'grading_project_surveys_total': grading_survey_count,
             'grading_project_surveys_completed': grading_record_count}
 
-    return info
-  return wrapper
+    info_storage[item.key()] = info
+
+  def wrapper(item, _):
+    """Wrapper method.
+    """
+    return info_storage[item.key()]
+
+  list_content['info'] = (wrapper, None)
+  return list_content
 
 
 def getProjectSurveyInfoForProject(project_entity, survey_params):

@@ -239,10 +239,11 @@ class Role(soc.models.linkable.Linkable):
   publish_location = db.BooleanProperty(required=False, default=False,
       verbose_name=ugettext('Publish my location'))
   publish_location.help_text = ugettext(
-      'By checking this box, you are agreeing to allow the Program Owner'
-      ' to display your location (City, State/Province, Country level only)'
-      ' on any map. For instance on the map linking Students to Mentors or'
+      'By checking this box, you are agreeing to allow your location to be'
+      ' displayed, as given by the Marker below, on any map.'
+      ' For instance on the map linking Students to Mentors or'
       ' by showing your location on your public profile page in the system.')
+  publish_location.example_text = ugettext('You can set your location below')
   publish_location.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing a separate shipping street address; kept
@@ -297,7 +298,6 @@ class Role(soc.models.linkable.Linkable):
       '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
       'fill in only if not same as above')
   ship_postalcode.group = ugettext("3. Shipping Info (Private and Optional)")
-  
 
   #====================================================================
   # (private) personal information

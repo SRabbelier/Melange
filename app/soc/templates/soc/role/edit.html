@@ -42,15 +42,15 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
 {% block form_table %}
 {{ block.super }}
     {% if gmaps_api_key %}
-    <tr title="your location">
+    <tr title="My Location">
       <td class="formfieldlabel">
-        <label for="id_location">Location:</label>
+        <label for="id_location">Public Location:</label>
       </td>
       <td>
         <div id="role_profile_map"></div>
       </td>
       <td></td>
-      <td></td>
+      <td>Drag the marker to the location you want to be displayed</td>
       <td></td>
     </tr>
     {% endif %}

@@ -282,7 +282,7 @@ org_home_gmap = new function(){
 
           marker = new GMarker(point, mentor_icon);
           html = "<strong>" + person.name + "</strong><br />";
-          html += "<span style='font-style:italic;'>Student</span><br />";
+          html += "<span style='font-style:italic;'>Mentor</span><br />";
           html += "<div style='height:100px;width:300px;overflow:auto;font-size:70%'>";
           // iterate through projects
           jQuery.each(person.projects, function () {

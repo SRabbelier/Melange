@@ -38,6 +38,7 @@ import soc.models.user
 
 import soc.modules.ghop.models.program
 
+
 class TaskTag(Tag):
   """Model for storing all Task tags.
   """
@@ -49,20 +50,25 @@ class TaskTag(Tag):
   
   @classmethod
   def __key_name(cls, scope_path, tag_name):
+    """Create the key_name from program key_name as scope_path and tag_name.
+    """
     return scope_path + '/' + tag_name
 
   @classmethod
   def get_by_name(cls, tag_name):
+    """Get the list of tag objects that has the given tag_name.
+    """
     tags = db.Query(cls).filter('tag =', tag_name).fetch(1000)
     return tags
 
   @classmethod
   def get_or_create(cls, program, tag_name):
-    "Get the Tag object that has the tag value given by tag_value."
+    """Get the Tag object that has the tag value given by tag_value.
+    """
     tag_key_name = cls.__key_name(program.key().name(), tag_name)
     existing_tag = cls.get_by_key_name(tag_key_name)
     if existing_tag is None:
-      # The tag does not yet exist, so create it.
+      # the tag does not yet exist, so create it.
       def create_tag_txn():
         new_tag = cls(key_name=tag_key_name, tag=tag_name, scope=program)
         new_tag.put()
@@ -70,14 +76,17 @@ class TaskTag(Tag):
       existing_tag = db.run_in_transaction(create_tag_txn)
     return existing_tag
 
+
 class TaskTypeTag(TaskTag):
-  "Model for storing of task type tags."
+  """Model for storing of task type tags.
+  """
 
   pass
 
 
 class TaskDifficultyTag(TaskTag):
-  "Model for storing of task difficulty level tags."
+  """Model for storing of task difficulty level tags.
+  """
 
   pass
 

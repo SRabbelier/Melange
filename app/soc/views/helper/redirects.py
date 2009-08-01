@@ -219,6 +219,35 @@ def getListRolesRedirect(entity, params):
 
   return result
 
+def getAcceptProjectRedirect(entity, params):
+  """Returns the redirect for withdraw_project access type.
+  """
+
+  result = '/%s/accept_project/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
+
+def getWithdrawProjectRedirect(entity, params):
+  """Returns the redirect for withdraw_project access type.
+  """
+
+  result = '/%s/withdraw_project/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
+
+def getWithdrawRedirect(entity, params):
+  """Returns the redirect for withdraw_project access type.
+  """
+
+  result = '/%s/withdraw/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
 
 def getUserRolesRedirect(_, __):
   """Returns the redirect to the users Roles page.

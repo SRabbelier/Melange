@@ -220,7 +220,7 @@ def getListRolesRedirect(entity, params):
   return result
 
 def getAcceptProjectRedirect(entity, params):
-  """Returns the redirect for withdraw_project access type.
+  """Returns the redirect for accept_project access type.
   """
 
   result = '/%s/accept_project/%s' % (
@@ -230,7 +230,7 @@ def getAcceptProjectRedirect(entity, params):
 
 
 def getWithdrawProjectRedirect(entity, params):
-  """Returns the redirect for withdraw_project access type.
+  """Returns the redirect for withdraw access type.
   """
 
   result = '/%s/withdraw_project/%s' % (

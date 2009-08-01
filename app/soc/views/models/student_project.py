@@ -27,6 +27,7 @@ import time
 
 from django import forms
 from django import http
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -34,6 +35,7 @@ from soc.logic.models import mentor as mentor_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models import student as student_logic
+from soc.logic.models.program import logic as program_logic
 from soc.logic.models.student_project import logic as project_logic
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -80,6 +82,9 @@ class View(base.View):
         ('checkStudentProjectHasStatus',
             [['accepted', 'completed']])
         ]
+    rights['withdraw'] = ['checkIsHostForProgram']
+    rights['withdraw_project'] = ['checkIsHost'] # TODO proper check
+    rights['accept_project'] = ['checkIsHost'] # TODO proper check
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_project.logic
@@ -131,6 +136,15 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>st_edit)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.st_edit',
         'Edit my %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>withdraw)/(?P<scope_path>%(ulnp)s)/%(lnp)s$',
+        'soc.views.models.%(module_name)s.withdraw',
+        'Withdraw %(name_plural)s'),
+        (r'^%(url_name)s/(?P<access_type>withdraw_project)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.withdraw_project',
+        'Withdraw a %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>accept_project)/%(key_fields)s$',
+        'soc.views.models.%(module_name)s.accept_project',
+        'Accept a %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -224,6 +238,94 @@ class View(base.View):
         mentor_names.append(additional_mentor.name())
 
       context['additional_mentors'] = ', '.join(mentor_names)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def withdraw(self, request, access_type,
+                      page_name=None, params=None, **kwargs):
+    """View that allows Program Admins to withdraw Students.
+
+    For params see base.View().public()
+    """
+
+    program = program_logic.getFromKeyFieldsOr404(kwargs)
+
+    fields = {
+        'program': program,
+        'status': ['accepted', 'completed'],
+        }
+
+    ap_params = params.copy() # accepted projects
+
+    ap_params['list_action'] = (redirects.getWithdrawProjectRedirect, ap_params)
+    ap_params['list_description'] = ugettext(
+        "An overview of accepted and completed Projects.")
+
+    ap_list = lists.getListContent(
+        request, ap_params, fields, idx=0)
+
+    fields['status'] = ['withdrawn', 'invalid', 'failed']
+
+    wp_params = params.copy() # withdrawn projects
+
+    wp_params['list_action'] = (redirects.getAcceptProjectRedirect, wp_params)
+    wp_params['list_description'] = ugettext(
+        "An overview of withdrawn, invalid, and failed Projects.")
+
+    wp_list = lists.getListContent(
+        request, wp_params, fields, idx=1)
+
+    # fill contents with all the needed lists
+    contents = [ap_list, wp_list]
+
+    # call the _list method from base to display the list
+    return self._list(request, params, contents, page_name)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def withdrawProject(self, request, access_type,
+                      page_name=None, params=None, **kwargs):
+    """View that allows Program Admins to withdraw Students.
+
+    For params see base.View().public()
+
+    """
+
+    logic = params['logic']
+    entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    fields = {
+        'status': 'withdrawn',
+        }
+
+    logic.updateEntityProperties(entity, fields)
+
+    url = redirects.getWithdrawRedirect(entity.program, params)
+
+    return http.HttpResponseRedirect(url)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptProject(self, request, access_type,
+                      page_name=None, params=None, **kwargs):
+    """View that allows Program Admins to withdraw Students.
+
+    For params see base.View().public()
+
+    """
+
+    logic = params['logic']
+    entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    fields = {
+        'status': 'accepted',
+        }
+
+    logic.updateEntityProperties(entity, fields)
+
+    url = redirects.getWithdrawRedirect(entity.program, params)
+
+    return http.HttpResponseRedirect(url)
 
   @decorators.merge_params
   @decorators.check_access
@@ -688,6 +790,7 @@ class View(base.View):
 
 view = View()
 
+accept_project = decorators.view(view.acceptProject)
 admin = decorators.view(view.admin)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
@@ -699,3 +802,5 @@ public = decorators.view(view.public)
 st_edit = decorators.view(view.stEdit)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
+withdraw = decorators.view(view.withdraw)
+withdraw_project = decorators.view(view.withdrawProject)

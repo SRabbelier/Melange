@@ -395,7 +395,8 @@ table#queues td {
 /* Organization home gmap */
 #org_home_map {
   height: 500px;
-  width: 100%;
+  width: 550px;
+  margin: 0 auto;
 }
 
 /* SIDEBAR MENU */

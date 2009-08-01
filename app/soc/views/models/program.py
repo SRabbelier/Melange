@@ -707,6 +707,10 @@ class View(presence.View):
         items += [(redirects.getListSurveysRedirect(entity, 'program',
             'grading_project_survey'),
             "List Grading Surveys", 'any_access')]
+        # add link to withdraw Student Projects
+        items += [(redirects.getWithdrawRedirect(
+            entity, {'url_name': 'student_project'}),
+            "Withdraw Student Projects", 'any_access')]
 
       except out_of_band.Error:
         pass

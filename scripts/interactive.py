@@ -27,8 +27,8 @@ App Engine interactive console
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
-
 
 
 import code
@@ -44,12 +44,13 @@ def auth_func():
   return raw_input('Username:'), getpass.getpass('Password:')
 
 
-def deepFetch(queryGen,key=None,batchSize = 100):
+def deepFetch(queryGen, key=None, filters=None, batchSize = 100):
   """Iterator that yields an entity in batches.
 
   Args:
     queryGen: should return a Query object
     key: used to .filter() for __key__
+    filters: dict with additional filters
     batchSize: how many entities to retrieve in one datastore call
 
   Retrieved from http://tinyurl.com/d887ll (AppEngine cookbook).
@@ -58,7 +59,7 @@ def deepFetch(queryGen,key=None,batchSize = 100):
   from google.appengine.ext import db
 
    # AppEngine will not fetch more than 1000 results
-  batchSize = min(batchSize,1000)
+  batchSize = min(batchSize, 1000)
 
   query = None
   done = False
@@ -70,8 +71,14 @@ def deepFetch(queryGen,key=None,batchSize = 100):
   while not done:
     print count
     query = queryGen()
+
+    if filters:
+      for key, value in filters.items():
+        query.filter(key, value)
+
     if key:
-      query.filter("__key__ > ",key)
+      query.filter("__key__ > ", key)
+
     results = query.fetch(batchSize)
     for result in results:
       count += 1

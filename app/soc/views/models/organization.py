@@ -496,10 +496,8 @@ class View(group.View):
         people[student_key_name]['projects'].append(project_key_name)
 
     # combine the people and projects data into one JSON object
-    data = {}
-    # TODO: to enable map data uncomment the piece of code below
-    #data = {'people': people,
-    #        'projects': projects}
+    data = {'people': people,
+            'projects': projects}
 
     return simplejson.dumps(data)
 

@@ -198,11 +198,12 @@ class Logic(object):
 
     return key_fields
 
-  def getFromKeyName(self, key_name):
-    """"Returns entity for key_name or None if not found.
+  def getFromKeyName(self, key_name, parent=None):
+    """Returns entity for key_name or None if not found.
 
     Args:
       key_name: key name of entity
+      parent: parent of the entity
     """
 
     if self._id_based:
@@ -211,13 +212,14 @@ class Logic(object):
     if not key_name:
       raise InvalidArgumentError
 
-    return self._model.get_by_key_name(key_name)
+    return self._model.get_by_key_name(key_name, parent=parent)
 
-  def getFromID(self, id):
+  def getFromID(self, id, parent=None):
     """Returns entity for id or None if not found.
 
     Args:
       id: id of entity
+      parent: parent of the entity
     """
 
     if not self._id_based:
@@ -226,7 +228,7 @@ class Logic(object):
     if not id:
       raise InvalidArgumentError
 
-    return self._model.get_by_id(id)
+    return self._model.get_by_id(id, parent=parent)
 
   def getFromKeyNameOr404(self, key_name):
     """Like getFromKeyName but expects to find an entity.

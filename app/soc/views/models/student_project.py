@@ -83,8 +83,14 @@ class View(base.View):
             [['accepted', 'completed']])
         ]
     rights['withdraw'] = ['checkIsHostForProgram']
-    rights['withdraw_project'] = ['checkIsHost'] # TODO proper check
-    rights['accept_project'] = ['checkIsHost'] # TODO proper check
+    rights['withdraw_project'] = ['checkIsHostForStudentProject',
+        ('checkStudentProjectHasStatus',
+            [['accepted', 'completed']])
+        ]
+    rights['accept_project'] = ['checkIsHostForStudentProject',
+        ('checkStudentProjectHasStatus',
+            [['withdrawn']])
+        ]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student_project.logic
@@ -243,7 +249,7 @@ class View(base.View):
   @decorators.check_access
   def withdraw(self, request, access_type,
                       page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to accept or withdraw Students.
+    """View that allows Program Admins to accept or withdraw Student Projects.
 
     For params see base.View().public()
     """
@@ -264,13 +270,13 @@ class View(base.View):
     ap_list = lists.getListContent(
         request, ap_params, fields, idx=0)
 
-    fields['status'] = ['withdrawn', 'invalid', 'failed']
+    fields['status'] = ['withdrawn']
 
     wp_params = params.copy() # withdrawn projects
 
     wp_params['list_action'] = (redirects.getAcceptProjectRedirect, wp_params)
     wp_params['list_description'] = ugettext(
-        "An overview of withdrawn, invalid, and failed Projects.")
+        "An overview of withdrawn Projects.")
 
     wp_list = lists.getListContent(
         request, wp_params, fields, idx=1)
@@ -285,7 +291,7 @@ class View(base.View):
   @decorators.check_access
   def withdrawProject(self, request, access_type,
                       page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to withdraw Students.
+    """View that allows Program Admins to withdraw Student Projects.
 
     For params see base.View().public()
 
@@ -308,7 +314,7 @@ class View(base.View):
   @decorators.check_access
   def acceptProject(self, request, access_type,
                       page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to accept Students.
+    """View that allows Program Admins to accept Student Projects.
 
     For params see base.View().public()
 

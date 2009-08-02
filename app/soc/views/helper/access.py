@@ -1429,6 +1429,29 @@ class Checker(object):
     return
 
   @allowDeveloper
+  def checkIsHostForStudentProject(self, django_args):
+    """Checks whether the user is Host for the specified project.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the user is not a host for hte specified project
+    """
+
+    self.checkIsUser()
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+    program_entity = project_entity.program
+
+    new_args = {'scope_path': program_entity.scope_path }
+    self.checkHasActiveRoleForScope(new_args, host_logic)
+
+    return
+
+  @allowDeveloper
   def checkStudentProjectHasStatus(self, django_args, allowed_status):
     """Checks whether the Project has one of the given statuses.
 

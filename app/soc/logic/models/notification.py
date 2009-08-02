@@ -36,11 +36,12 @@ class Logic(base.Logic):
   """Logic methods for the Notification model.
   """
 
-  def __init__(self):
+  def __init__(self, model=soc.models.notification.Notification,
+               base_model=None, scope_logic=user_logic):
     """Defines the name, key_name and model for this entity.
     """
-    super(Logic, self).__init__(model=soc.models.notification.Notification,
-         base_model=None, scope_logic=user_logic)
+    super(Logic, self).__init__(model=model, base_model=base_model,
+                                scope_logic=scope_logic)
 
   def _onCreate(self, entity):
     """Sends out a message if there is only one unread notification.

@@ -33,24 +33,6 @@ class GHOPProgram(soc.models.program.Program):
   """GHOP Program model extends the basic Program model.
   """
 
-  #: Property that contains the minimum age of a student allowed to
-  #: participate
-  student_min_age = db.IntegerProperty(
-      required=True, verbose_name=ugettext('Student minimum age'))
-  student_min_age.group = ugettext('Contest Rules')
-  student_min_age.help_text = ugettext(
-      'Minimum age of the student to sign-up in years.')
-
-  #: Property that contains the date as of which above student
-  #: minimum age requirement holds. This is a DateTimeProperty because
-  #: programs might run in a different timezone then the Appengine Server
-  #: is running on.
-  student_min_age_as_of = db.DateTimeProperty(
-      required=True, verbose_name=ugettext('Minimum age as of'))
-  student_min_age_as_of.group = ugettext('Contest Rules')
-  student_min_age_as_of.help_text = ugettext(
-      'Date as of which the student minimum age requirement holds.')
-
   #: Required property containing the number of Tasks Students can work
   #: on simultaneously. For GHOP it is 1
   nr_simultaneous_tasks = db.IntegerProperty(

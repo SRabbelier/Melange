@@ -144,7 +144,9 @@ class View(role.View):
     updated_fields = {
         'link_id': forms.CharField(widget=forms.HiddenInput,
             required=True),
-        'clean_link_id': cleaning.clean_user_is_current('link_id')
+        'clean_link_id': cleaning.clean_user_is_current('link_id'),
+        'clean': cleaning.validate_student_age(
+            'birth_date', 'scope_path', self._logic.getScopeLogic().logic),
         }
 
     user_create_form = dynaform.extendDynaForm(

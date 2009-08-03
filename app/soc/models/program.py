@@ -111,6 +111,25 @@ class Program(soc.models.presence.Presence):
   slots_allocation = db.TextProperty(required=False,
       verbose_name=ugettext('the allocation of slots'))
 
+  #: Property that contains the minimum age of a student allowed to
+  #: participate
+  student_min_age = db.IntegerProperty(
+      required=False, verbose_name=ugettext('Student minimum age'))
+  student_min_age.group = ugettext('Contest Rules')
+  student_min_age.help_text = ugettext(
+      'Minimum age of the student to sign-up in years.')
+
+  #: Property that contains the date as of which above student
+  #: minimum age requirement holds. This is a DateTimeProperty because
+  #: programs might run in a different timezone then the Appengine Server
+  #: is running on.
+  student_min_age_as_of = db.DateProperty(
+      required=False, verbose_name=ugettext('Minimum age as of'))
+  student_min_age_as_of.group = ugettext('Contest Rules')
+  student_min_age_as_of.help_text = ugettext(
+      'Date as of which the student minimum age requirement '
+      'should be reached.')
+
   #: Required field storing the type of workflow this program has
   workflow = db.StringProperty(required=True,
       choices=['gsoc', 'ghop'],

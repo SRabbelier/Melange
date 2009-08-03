@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Todd Larsen" <tlarsen@google.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -52,6 +53,10 @@ DEF_ORGANZIATION_NOT_ACTIVE_MSG = ugettext(
 
 DEF_NO_SUCH_DOCUMENT_MSG = ugettext(
     "There is no such document with that link ID under this entity.")
+
+DEF_MUST_BE_ABOVE_AGE_LIMIT_FMT = ugettext(
+    "To sign up as a student for this program, you "
+    "must be at least %d years of age, as of %s.")
 
 DEF_MUST_BE_ABOVE_LIMIT_FMT = ugettext(
     "Must be at least %d characters, it has %d characters.")
@@ -556,6 +561,7 @@ def validate_new_group(link_id_field, scope_path_field,
     return cleaned_data
   return wrapper
 
+
 def validate_student_proposal(org_field, scope_field,
                               student_logic, org_logic):
   """Validates the form of a student proposal.
@@ -599,6 +605,7 @@ def validate_student_proposal(org_field, scope_field,
 
     return cleaned_data
   return wrapper
+
 
 def validate_student_project(org_field, mentor_field, student_field):
   """Validates the form of a student proposal.
@@ -665,6 +672,58 @@ def validate_student_project(org_field, mentor_field, student_field):
 
   return wrapper
 
+
+def validate_student_age(birth_date_field, scope_field,
+                         program_logic):
+  """Checks if the student has eligibility to sign up, given 
+  by his birth_date given in field_name.
+
+  Args:
+    birth_date_field: Field containing birth_date of student 
+    scope_field: Field containing scope_path of the student entity
+    program_logic: Logic instance of the program
+
+  Raises ValidationError if:
+    -The student's age is less than the minimum age required by the program
+  """
+
+  def wrapper(self):
+    """Wrapper method.
+    """
+
+    cleaned_data = self.cleaned_data
+
+    birth_date = cleaned_data.get(birth_date_field)
+    program_key_name = cleaned_data.get(scope_field)
+
+    if not birth_date or not program_key_name:
+      # nothing to check, field validator will find these errors
+      return cleaned_data
+
+    # get the current program entity or bail out 404
+    entity = program_logic.getFromKeyName(program_key_name)
+
+    if not entity:
+      raise forms.ValidationError(
+          ugettext("No valid program found"))
+
+    if entity.student_min_age and entity.student_min_age_as_of:
+      # only check if both the min_age and min_age_as_of are defined
+      min_year = entity.student_min_age_as_of.year - entity.student_min_age
+      min_date = entity.student_min_age_as_of.replace(year=min_year)
+
+      if birth_date > min_date:
+        # this Student is not old enough
+        self._errors[birth_date_field] = ErrorList(
+            [DEF_MUST_BE_ABOVE_AGE_LIMIT_FMT %(
+            entity.student_min_age,
+            entity.student_min_age_as_of.strftime('%A, %B %d, %Y'))])
+        del cleaned_data[birth_date_field]
+
+    return cleaned_data
+  return wrapper
+
+
 def validate_document_acl(view, creating=False):
   """Validates that the document ACL settings are correct.
   """
@@ -721,6 +780,7 @@ def has_access(rights, access_level, scope_path, prefix):
       }
 
   return rights.hasMembership(roles, django_args)
+
 
 def validate_access(self, view, rights, prefix, scope_path, field):
   """Validates that the user has access to the ACL for the specified fields.

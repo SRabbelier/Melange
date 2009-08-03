@@ -833,6 +833,10 @@ class View(presence.View):
           {'url_name':'student'}),
           "List my Student Projects", 'any_access')]
 
+    items += [(redirects.getManageRedirect(student_entity,
+        {'url_name':'student'}),
+        "Resign as a Student", 'any_access')]
+
     return items
 
   def _getOrganizationEntries(self, program_entity, org_admin_entity,

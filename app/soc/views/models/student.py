@@ -68,8 +68,8 @@ class View(role.View):
         ('checkIsActivePeriod', ['student_signup', 'scope_path']),
         'checkIsNotParticipatingInProgramInScope',
         ]
-    rights['manage'] = [
-        ('checkIsAllowedToManageRole', [soc.logic.models.host.logic])]
+    rights['manage'] = [('checkHasActiveRoleForScope', student_logic.logic),
+        ('checkIsMyEntity', [student_logic.logic, 'user', True])]
     rights['list_projects'] = [
         ('checkHasActiveRoleForScope', student_logic.logic),
         ('checkIsAfterEvent', ['accepted_students_announced_deadline',

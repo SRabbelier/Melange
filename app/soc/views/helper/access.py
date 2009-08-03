@@ -476,7 +476,7 @@ class Checker(object):
         # one check passed, all is well
         return
       except out_of_band.Error, exception:
-        # store the first esception
+        # store the first exception
         first = first if first else exception
 
     # none passed, re-raise the first exception

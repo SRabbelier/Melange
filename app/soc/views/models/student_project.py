@@ -266,7 +266,7 @@ class View(base.View):
     ap_params['list_action'] = (redirects.getWithdrawProjectRedirect,
                                 ap_params)
     ap_params['list_description'] = ugettext(
-        "An overview of accepted and completed Projects."
+        "An overview of accepted and completed Projects. "
         "Click on a project to withdraw it.")
 
     ap_list = lists.getListContent(
@@ -278,7 +278,7 @@ class View(base.View):
 
     wp_params['list_action'] = (redirects.getAcceptProjectRedirect, wp_params)
     wp_params['list_description'] = ugettext(
-        "An overview of withdrawn Projects."
+        "An overview of withdrawn Projects. "
         "Click on a project to undo the withdrawal.")
 
     wp_list = lists.getListContent(

@@ -53,7 +53,8 @@ class View(survey.View):
     rights['edit'] = [('checkIsSurveyWritable', project_survey_logic)]
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
-    rights['results'] = [('checkIsSurveyWritable', project_survey_logic)]
+    rights['record'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
     rights['take'] = [('checkIsSurveyTakeable', project_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [project_survey_logic, 'student', 'project'])]
@@ -224,7 +225,6 @@ class View(survey.View):
 
     return self._list(request, student_project_params, contents, page_name)
 
-
   @decorators.merge_params
   @decorators.check_access
   def sendReminder(self, request, access_type, page_name=None,
@@ -274,6 +274,7 @@ edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
+record = decorators.view(view.viewRecord)
 results = decorators.view(view.viewResults)
 send_reminder = decorators.view(view.sendReminder)
 take = decorators.view(view.take)

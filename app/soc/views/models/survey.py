@@ -106,7 +106,8 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
-    rights['results'] = [('checkIsSurveyWritable', survey_logic)]
+    rights['record'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}
@@ -123,6 +124,9 @@ class View(base.View):
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
          'soc.views.models.%(module_name)s.json',
          'Export %(name)s as JSON'),
+        (r'^%(url_name)s/(?P<access_type>record)/%(key_fields)s$',
+         'soc.views.models.%(module_name)s.record',
+         'View survey record for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>results)/%(key_fields)s$',
          'soc.views.models.%(module_name)s.results',
          'View survey results for %(name)s'),
@@ -142,9 +146,9 @@ class View(base.View):
     new_params['edit_template'] = 'soc/survey/edit.html'
     new_params['create_template'] = 'soc/survey/edit.html'
     new_params['public_template'] = 'soc/survey/public.html'
+    new_params['record_template'] = 'soc/survey/view_record.html'
     new_params['take_template'] = 'soc/survey/take.html'
 
-    # TODO: which one of these are leftovers from Document?
     new_params['no_create_raw'] = True
     new_params['no_create_with_scope'] = True
     new_params['no_create_with_key_fields'] = True
@@ -213,7 +217,6 @@ class View(base.View):
     survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
                                          survey_logic=self._params['logic'])
 
-    # TODO(ljvderijk) pose question about the getFields method name and working
     survey_form.getFields()
 
     context['survey_form'] = survey_form
@@ -671,10 +674,14 @@ class View(base.View):
     For params see base.View.public().
     """
 
-    survey_logic = params['logic']
+    # TODO(ljvderijk) finish this method
+    return http.HttpResponse("Work In Progress")
+
+    # TODO If read access then show all records, else show only mine +
+    # hook for subclasses. On both possibilities.
 
     try:
-      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+      entity = params['logic'].getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])
@@ -685,33 +692,78 @@ class View(base.View):
     context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
 
-    results_logic = survey_logic.getRecordLogic()
+    results_logic = params['logic'].getRecordLogic()
 
-    user = user_logic.getForCurrentAccount()
+    # only show truncated preview of first answer
+    context['first_question'] = entity.survey_content.orderedProperties()[0]
 
-    context['properties'] = entity.survey_content.orderedProperties()
+    context['record_redirect'] = redirects.getSurveyRecordRedirect(
+        entity, params)
 
-    filter = self._params.get('filter') or {}
-
-    filter['survey'] = entity
+    filter = {'survey': entity}
 
     list_params = params.copy()
     list_params['list_description'] = \
-      'List of  %(name_plural)s.' % list_params
-
+      'List of %(name_plural)s.' % list_params
     list_params['logic'] = results_logic
+    list_params['list_heading'] = 'soc/survey/list/results_heading.html'
+    list_params['list_row'] = 'soc/survey/list/results_row.html'
 
-    valid_list = lists.getListContent(request, list_params, filter, idx=0)
+    record_list = lists.getListContent(request, list_params, filter, idx=0)
 
-    valid_list['row'] = 'soc/survey/list/results_row.html'
-    valid_list['heading'] = 'soc/survey/list/results_heading.html'
-    valid_list['description'] = 'Survey Results:'
-
-    contents = []
-    # fill contents with all the needed lists
-    contents.append(valid_list)
+    contents = [record_list]
 
     return self._list(request, list_params, contents, page_name, context)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def viewRecord(self, request, access_type, page_name=None,
+                 params=None, **kwargs):
+    """View that allows the user to see the contents of a single SurveyRecord.
+
+    For params see base.View.public()
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    try:
+      survey_entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    get_dict = request.GET
+    record_id = get_dict.get('id')
+
+    if record_id and record_id.isdigit():
+      record_id = int(record_id)
+      record_entity = record_logic.getFromIDOr404(record_id)
+    else:
+      raise out_of_band.Error('No valid Record ID given')
+
+    if record_entity.survey.key() != survey_entity.key():
+      # record does not match the retrieved survey
+      raise out_of_band.Error('Record ID does not match the given survey')
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = "%s titled '%s'" %(page_name, survey_entity.title)
+    context['entity'] = survey_entity
+    context['record'] = record_entity
+
+    # store the read only survey form in the context
+    survey_form = surveys.SurveyTakeForm(
+       survey_content=survey_entity.survey_content,
+       survey_record=record_entity,
+       survey_logic=self._params['logic'],
+       read_only=True)
+    survey_form.getFields()
+    context['survey_form'] = survey_form
+
+    template = params['record_template']
+    return responses.respond(request, template, context)
 
   @decorators.merge_params
   @decorators.check_access
@@ -879,5 +931,6 @@ json = decorators.view(view.exportSerialized)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 pick = decorators.view(view.pick)
+record = decorators.view(view.viewRecord)
 results = decorators.view(view.viewResults)
 take = decorators.view(view.take)

@@ -120,11 +120,15 @@ def setStudentProjectSurveyInfo(list_content, program_entity):
   return list_content
 
 
-def getProjectSurveyInfoForProject(project_entity, survey_params):
-  """Returns a function that returns info for listing Surveys and if possible
-  their accompanying record.
+def setProjectSurveyInfoForProject(list_content, project_entity,
+                                   survey_params):
+  """Sets the list info to a function for the given list.
+  
+  This function contains the information used for showing ProjectSurvey
+  records on the StudentProject manage page.
 
   Args:
+    list_content: list content for which to set the info
     project_entity: a StudentProject entity
     survey_params: params for the view of the type of Survey that is listed
   """
@@ -132,13 +136,11 @@ def getProjectSurveyInfoForProject(project_entity, survey_params):
   survey_logic = survey_params['logic']
   record_logic = survey_logic.getRecordLogic()
 
-  def wrapper(survey_entity, _):
-    """Wrapper method.
+  # store the needed info since Django calls the wrapper method for every
+  # info call.
+  info_storage = {}
 
-    Args:
-      survey_entity: a ProjectSurvey (or subclass) entity
-    """
-
+  for survey_entity in list_content['data']:
     # try to retrieve the SurveyRecord for the given Survey and Project
     fields = {'survey': survey_entity,
               'project': project_entity}
@@ -161,5 +163,12 @@ def getProjectSurveyInfoForProject(project_entity, survey_params):
     info['take_url'] = redirects.getTakeProjectSurveyRedirect(
         project_entity, take_redirect_info)
 
-    return info
-  return wrapper
+    info_storage[survey_entity.key()] = info
+
+  def wrapper(item, _):
+    """Wrapper method.
+    """
+    return info_storage[item.key()]
+
+  list_content['info'] = (wrapper, None)
+  return list_content

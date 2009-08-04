@@ -489,8 +489,6 @@ class View(base.View):
     gps_params['list_key_order'] = None
     gps_params['list_heading'] = gps_params['manage_student_project_heading']
     gps_params['list_row'] = gps_params['manage_student_project_row']
-    gps_params['list_info'] = (
-        list_info.getProjectSurveyInfoForProject(entity, gps_params), None)
 
     # list all surveys for this Project's Program
     fields['scope_path'] = entity.program.key().id_or_name()
@@ -500,14 +498,13 @@ class View(base.View):
 
     gps_list = lists.getListContent(
         request, gps_params, fields, idx=0)
+    list_info.setProjectSurveyInfoForProject(gps_list, entity, gps_params)
 
     # get the ProjectSurvey list
     ps_params = project_survey_view.getParams().copy()
     ps_params['list_key_order'] = None
     ps_params['list_heading'] = ps_params['manage_student_project_heading']
     ps_params['list_row'] = ps_params['manage_student_project_row']
-    ps_params['list_info'] = (
-        list_info.getProjectSurveyInfoForProject(entity, ps_params), None)
 
     ps_params['list_description'] = \
         'List of all Student Evaluations for this Project'
@@ -517,6 +514,7 @@ class View(base.View):
     fields['scope_path'] = entity.program.key().id_or_name()
     ps_list = lists.getListContent(
         request, ps_params, fields, idx=1)
+    list_info.setProjectSurveyInfoForProject(ps_list, entity, ps_params)
 
     # store both lists in the content
     content = [gps_list, ps_list]

@@ -1,5 +1,5 @@
 <tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'"
-onclick="return false; if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+ onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
 
   <td>
     <div class="author">

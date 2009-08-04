@@ -421,6 +421,22 @@ def getTakeProjectSurveyRedirect(entity, info):
                                      entity.key().id_or_name())
 
 
+def getViewSurveyRecordRedirect(entity, params):
+  """Returns the redirect for view a Survey Record
+  for the given Survey Record.
+
+  Args:
+      entity: a Survey Record entity
+      params: params for a Survey view
+      
+  """
+
+  return '/%s/record/%s?id=%s' % (
+      params['url_name'],
+      entity.survey.key().id_or_name(),
+      entity.key().id_or_name())
+
+
 def getEditGradingRecordRedirect(entity, params):
   """Returns the redirect for editing a given GradingRecord.
   """
@@ -449,3 +465,10 @@ def getToSRedirect(presence):
     return None
 
   return getPublicRedirect(tos_doc, {'url_name': 'document'})
+
+
+def getSubscribeRedirect(entity, params):
+  """Redirects to subscription XML doc for an entity
+  """
+  return'/%s/subscribe/%s' % (
+      params['url_name'], entity.key().name())

@@ -221,6 +221,9 @@ class View(base.View):
 
     context['survey_form'] = survey_form
 
+    context['page_name'] = "%s titled '%s'" %(
+        context['page_name'], entity.title)
+
     # return True to signal that the page may be displayed
     return True
 
@@ -930,7 +933,6 @@ delete = decorators.view(view.delete)
 json = decorators.view(view.exportSerialized)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
-pick = decorators.view(view.pick)
 record = decorators.view(view.viewRecord)
 results = decorators.view(view.viewResults)
 take = decorators.view(view.take)

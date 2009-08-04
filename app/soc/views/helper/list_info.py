@@ -150,6 +150,8 @@ def getProjectSurveyInfoForProject(project_entity, survey_params):
       # SurveyRecord has been found store the import data in info
       info['taken_by'] = record_entity.user.name
       info['taken_on'] = record_entity.modified
+      info['record_url'] = redirects.getViewSurveyRecordRedirect(record_entity,
+                                                                 survey_params)
     else:
       info['taken_by'] = DEF_NO_RECORD_AVAILABLE_MESSAGE
       info['taken_on'] = DEF_NO_RECORD_AVAILABLE_MESSAGE

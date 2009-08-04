@@ -1,11 +1,10 @@
-<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'"
- onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" name="name">
   <td><div class="title">{{ list.item.title }}</div></td>
   <td><div class="taken_by">{{ list.info.taken_by }}</div></td>
   <td><div class="taken_on">{{ list.info.taken_on }}</div></td>
   <td><div class="view_record">
   {% if list.info.record %}
-    Record Available (TBD: Record Showing)
+    <a href="{{ list.info.record_url }}">View Record</a>
   {% else %}
     No Record Available
   {% endif %} 

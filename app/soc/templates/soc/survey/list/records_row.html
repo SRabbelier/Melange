@@ -1,0 +1,21 @@
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'"
+onclick="return false; if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+
+  <td>
+    <div class="author">
+      {{ list.item.user.name }}
+    </div>
+  </td>
+
+  <td>
+    <div class="modified">
+      {{ list.item.modified|date:"Y-m-d H:i" }}
+    </div>
+  </td>
+
+  <td style="max-width: 150px;">
+    <div class="first_answer">
+      {{ list.item.getValues.0|truncatewords:20 }}
+    </div>
+  </td>
+</tr>

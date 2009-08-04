@@ -672,19 +672,19 @@ class View(base.View):
   @decorators.check_access
   def viewResults(self, request, access_type, page_name=None,
                   params=None, **kwargs):
-    """View for SurveyRecords.
+    """View that will list the survey records.
 
     For params see base.View.public().
     """
 
-    # TODO(ljvderijk) finish this method
-    return http.HttpResponse("Work In Progress")
-
     # TODO If read access then show all records, else show only mine +
     # hook for subclasses. On both possibilities.
 
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
     try:
-      entity = params['logic'].getFromKeyFieldsOr404(kwargs)
+      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return responses.errorResponse(
           error, request, template=params['error_public'])
@@ -695,22 +695,19 @@ class View(base.View):
     context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
 
-    results_logic = params['logic'].getRecordLogic()
-
     # only show truncated preview of first answer
     context['first_question'] = entity.survey_content.orderedProperties()[0]
-
-    context['record_redirect'] = redirects.getSurveyRecordRedirect(
-        entity, params)
 
     filter = {'survey': entity}
 
     list_params = params.copy()
+    list_params['logic'] = record_logic
+    list_params['list_heading'] = 'soc/survey/list/records_heading.html'
+    list_params['list_row'] = 'soc/survey/list/records_row.html'
     list_params['list_description'] = \
       'List of %(name_plural)s.' % list_params
-    list_params['logic'] = results_logic
-    list_params['list_heading'] = 'soc/survey/list/results_heading.html'
-    list_params['list_row'] = 'soc/survey/list/results_row.html'
+    list_params['list_action'] = (redirects.getViewSurveyRecordRedirect,
+                                  list_params)
 
     record_list = lists.getListContent(request, list_params, filter, idx=0)
 

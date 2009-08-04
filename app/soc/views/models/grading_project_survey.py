@@ -123,7 +123,6 @@ class View(project_survey.View):
     # TODO: Ensure that this doesn't break when someone is a mentor for
     # a lot of organizations.
 
-    # TODO(ljvderijk) transform StudentProject to handle multiple surveys
     fields = {'mentor': mentor_entities,
               'status': 'accepted'}
 

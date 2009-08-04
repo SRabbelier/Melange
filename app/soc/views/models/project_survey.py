@@ -191,7 +191,6 @@ class View(survey.View):
 
     student_entity = student_logic.getForFields(fields, unique=True)
 
-    # TODO(ljvderijk) transform StudentProject to handle multiple surveys
     fields = {'student': student_entity,
               'status': 'accepted'}
 

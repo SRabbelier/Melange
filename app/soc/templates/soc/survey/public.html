@@ -12,16 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
 {% block scripts %}
 {{ block.super }}
 <script type="text/javascript" src="/soc/content/js/survey-default-text-090627.js"></script>
 <script type="text/javascript" src="/soc/content/js/survey-take-090708.js"></script>
 <script type="text/javascript" src="/jquery/jquery-growfield.js"></script>
-{% endblock %}
-
-{% block page_title %}
-{{ entity.title }}
 {% endblock %}
 
 {% block header_title %}
@@ -33,9 +30,10 @@ limitations under the License.
 
 {% if survey_form %}
 
-  {% load forms_helpers %}
   <form method="get" onsubmit="javascript:return false">
+  {% block page_description %}
     This page gives a preview of how users will see the Survey.
+  {% endblock %}
 
     {% if entity.content %}
       <div id="survey_description">

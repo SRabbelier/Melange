@@ -1,0 +1,6 @@
+{% extends "soc/survey/public.html" %}
+
+{% block page_description %}
+  Below is a read-only view of the survey record for the Survey called "{{ entity.title }}".
+  As taken by {{ record.user.name }} on {{ record.modified|date:"jS F Y H:i" }}.
+{% endblock %}

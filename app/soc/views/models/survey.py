@@ -672,13 +672,12 @@ class View(base.View):
   @decorators.check_access
   def viewResults(self, request, access_type, page_name=None,
                   params=None, **kwargs):
-    """View that will list the survey records.
+    """View that lists all SurveyRecords which are of interest to the user.
 
     For params see base.View.public().
     """
 
-    # TODO If read access then show all records, else show only mine +
-    # hook for subclasses. On both possibilities.
+    # TODO: this view could also contain statistics for the Survey
 
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
@@ -695,25 +694,67 @@ class View(base.View):
     context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
 
-    # only show truncated preview of first answer
+    # add the first question to the context show a preview can be shown
     context['first_question'] = entity.survey_content.orderedProperties()[0]
 
-    filter = {'survey': entity}
+    # get the rights checker
+    user_entity = user_logic.getForCurrentAccount()
+    rights = self._params['rights']
+    rights.setCurrentUser(user_entity.account, user_entity)
+
+    # check if the current user is allowed to visit the read the survey
+    allowed_to_read = False
+
+    try:
+      rights.checkIsSurveyReadable(
+          {'key_name': survey_entity.key().name(),
+           'prefix': survey_entity.prefix,
+           'scope_path': survey_entity.scope_path,
+           'link_id': survey_entity.link_id,
+           'user': user_entity},
+          survey_logic)
+      allowed_to_read = True
+    except:
+      pass
+
+    # only show records for the retrieved survey
+    fields = {'survey': entity}
+
+    if not allowed_to_read:
+      # this user is not allowed to view all the Records so only show their own
+      fields['user'] = user_entity
+
+    # call the hook for adjusting the SurveyRecord filter
+    fields = self._getResultsViewRecordFields(fields, entity, allowed_to_read)
 
     list_params = params.copy()
     list_params['logic'] = record_logic
     list_params['list_heading'] = 'soc/survey/list/records_heading.html'
     list_params['list_row'] = 'soc/survey/list/records_row.html'
     list_params['list_description'] = \
-      'List of %(name_plural)s.' % list_params
+        "List of Records for the %s titled '%s'." %(list_params['name'],
+                                                    entity.title)
     list_params['list_action'] = (redirects.getViewSurveyRecordRedirect,
                                   list_params)
 
-    record_list = lists.getListContent(request, list_params, filter, idx=0)
+    record_list = lists.getListContent(request, list_params, fields, idx=0)
 
     contents = [record_list]
 
     return self._list(request, list_params, contents, page_name, context)
+
+  def _getResultsViewRecordFields(self, fields, survey, allowed_to_read):
+    """Hook for adjusting the Results View filter for SurveyRecords.
+
+    Args:
+      fields: filter dictionary to adjust
+      survey: Survey instance for which the Records need to be shown
+      allowed_to_read: specifies if the current User has read access
+
+    Returns:
+      Returns the dictionary containing the fields to filter on
+    """
+    return fields
 
   @decorators.merge_params
   @decorators.check_access

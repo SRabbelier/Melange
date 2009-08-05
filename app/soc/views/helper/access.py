@@ -1669,8 +1669,11 @@ class Checker(object):
                                           role_name, project_key_location):
     """Checks whether a ProjectSurvey can be taken by the current User.
 
-    role_name argument determines wether the current user should be the
-    student or mentor specified by the project in GET dict.
+    role_name argument determines wether the current user is taking the survey
+    as a student or mentor specified by the project in GET dict.
+
+    If the survey is taken as a mentor, org admins for the Organization in
+    which the project resides will also have access.
 
     However if the project entry is not present in the dictionary this access
     check passes.
@@ -1686,6 +1689,10 @@ class Checker(object):
     if not role_name in ['mentor', 'student']:
       raise InvalidArgumentError('role_name is not mentor or student')
 
+    # check if the current user is signed up
+    self.checkIsUser(django_args)
+    user_entity = self.user
+
     # get the project keyname from the GET dictionary
     get_dict= django_args['GET']
     key_name = get_dict.get(project_key_location)
@@ -1695,25 +1702,36 @@ class Checker(object):
       return
 
     # retrieve the Student Project for the key
-    entity = student_project_logic.getFromKeyNameOr404(key_name)
+    project_entity = student_project_logic.getFromKeyNameOr404(key_name)
 
-    # TODO(ljvderijk) change this to cope with multiple surveys for one project
     # check if a survey can be conducted about this project
-    if entity.status != 'accepted':
+    if project_entity.status != 'accepted':
       raise out_of_band.AccessViolation(
           message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
 
     # get the correct role depending on the role_name
-    role_entity = getattr(entity, role_name)
-    user_entity = user_logic.getForCurrentAccount()
+    if role_name == 'student':
+      role_entity = project_entity.student
+    elif role_name == 'mentor':
+      role_entity = project_entity.mentor
 
     # check if the role matches the current user
-    if (not user_entity) or (role_entity.user.key() != user_entity.key()):
-      raise out_of_band.AccessViolation(
-          message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
-
-    # check if the role is active
-    if role_entity.status != 'active':
+    if role_entity.user.key() != user_entity.key():
+      if role_name == 'student':
+        raise out_of_band.AccessViolation(
+            message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
+      elif role_name == 'mentor':
+        # check if the current user is an Org Admin for this Student Project
+        fields = {'user': user_entity,
+                  'scope': project_entity.scope,
+                  'status': 'active'}
+        admin_entity = org_admin_logic.getForFields(fields, unique=True)
+        if not admin_entity:
+          # this user is no Org Admin or Mentor for this project
+          raise out_of_band.AccessViolation(
+              message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
+    elif role_entity.status != 'active':
+      # this role is not active
       raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
 
     return

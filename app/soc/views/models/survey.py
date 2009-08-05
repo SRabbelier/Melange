@@ -106,7 +106,10 @@ class View(base.View):
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
     rights['pick'] = ['checkDocumentPick']
-    rights['record'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['record'] = [('checkHasAny', [
+        [('checkIsSurveyReadable', [survey_logic]),
+         ('checkIsMySurveyRecord', [survey_logic, 'id'])]
+        ])]
     rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 

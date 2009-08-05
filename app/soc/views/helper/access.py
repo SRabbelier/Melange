@@ -1579,6 +1579,43 @@ class Checker(object):
 
   @denySidebar
   @allowDeveloper
+  def checkIsMySurveyRecord(self, django_args, survey_logic, id_field):
+    """Checks if the SurveyRecord given in the GET arguments as id_field is
+    from the current user.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      survey_logic: Survey Logic which contains the needed Record logic
+      id_field: name of the field in the GET dictionary that contains the Record ID.
+
+    Raises:
+      AccesViolation if:
+        - There is no valid numeric record ID present in the GET dict
+        - There is no SurveyRecord with the found ID
+        - The SurveyRecord has not been taken by the current user
+    """
+
+    self.checkIsUser(django_args)
+    user_entity = self.user
+
+    get_dict = django_args['GET']
+    record_id = get_dict.get(id_field)
+
+    if not record_id or not record_id.isdigit():
+      raise out_of_band.AccessViolation(
+          message_fmt='No valid numeric record ID given')
+    else:
+      record_id = int(record_id)
+
+    record_logic = survey_logic.getRecordLogic()
+    record_entity = record_logic.getFromIDOr404(record_id)
+
+    if record_entity.user.key() != user_entity.key():
+      raise out_of_band.AccessViolation(
+          message_fmt='This is not your SurveyRecord')
+
+  @denySidebar
+  @allowDeveloper
   def checkIsSurveyWritable(self, django_args, survey_logic,
                             key_name_field=None):
     """Checks whether a survey is writable.

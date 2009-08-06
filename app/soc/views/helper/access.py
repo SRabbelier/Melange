@@ -151,6 +151,12 @@ DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
     'You are not allowed to take this Survey for the specified Student'
     ' Project.')
 
+DEF_NO_VALID_RECORD_ID = ugettext('No valid numeric record ID given.')
+
+DEF_NOT_YOUR_RECORD = ugettext(
+    'This is not your Survey Record. If you feel you should have access to '
+    'this page please notify the administrators.')
+
 DEF_USER_ACCOUNT_INVALID_MSG_FMT = ugettext(
     'The <b><i>%(email)s</i></b> account cannot be used with this site, for'
     ' one or more of the following reasons:'
@@ -1603,7 +1609,7 @@ class Checker(object):
 
     if not record_id or not record_id.isdigit():
       raise out_of_band.AccessViolation(
-          message_fmt='No valid numeric record ID given')
+          message_fmt=DEF_NO_VALID_RECORD_ID)
     else:
       record_id = int(record_id)
 
@@ -1612,7 +1618,7 @@ class Checker(object):
 
     if record_entity.user.key() != user_entity.key():
       raise out_of_band.AccessViolation(
-          message_fmt='This is not your SurveyRecord')
+          message_fmt=DEF_NOT_YOUR_RECORD)
 
   @denySidebar
   @allowDeveloper
@@ -1731,7 +1737,7 @@ class Checker(object):
     user_entity = self.user
 
     # get the project keyname from the GET dictionary
-    get_dict= django_args['GET']
+    get_dict = django_args['GET']
     key_name = get_dict.get(project_key_location)
 
     if not key_name:
@@ -1753,7 +1759,8 @@ class Checker(object):
       role_entity = project_entity.mentor
 
     # check if the role matches the current user
-    if role_entity.user.key() != user_entity.key():
+    if role_entity.user.key() != user_entity.key() and (
+        role_entity.status == 'active'):
       if role_name == 'student':
         raise out_of_band.AccessViolation(
             message_fmt=DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG)
@@ -1772,6 +1779,77 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
 
     return
+
+  @denySidebar
+  @allowDeveloper
+  def checkIsAllowedToViewProjectSurveyRecordAs(
+      self, django_args, survey_logic, role_name, record_key_location):
+    """Checks wether the current user is allowed to view the record given in
+    the GET data by the record_key_location.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      survey_logic: Survey Logic instance that belongs to the SurveyRecord
+        type in question
+      role_name: string containing either "student" or "mentor". Determines
+        which of the roles the within the project the current user should have
+        to view the evaluation results.
+      record_key_location: string containing the name of the GET param which
+        contains the id for the SurveyRecord to retrieve
+
+    Raises:
+      AccessViolation if:
+        - No valid numeric Record ID is given in the POST data.
+        - No Record could be retrieved for the given Record ID.
+        - The current user has not taken the survey, is not the Student/Mentor
+          (depending on the role_name) and is not an Org Admin for the project
+          to which the SurveyRecord belongs.
+    """
+
+    if not role_name in ['mentor', 'student']:
+      raise InvalidArgumentError('role_name is not mentor or student')
+
+    self.checkIsUser(django_args)
+    user_entity = self.user
+
+    get_dict = django_args['GET']
+    record_id = get_dict.get(record_key_location)
+
+    if not record_id or not record_id.isdigit():
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NO_VALID_RECORD_ID)
+    else:
+      record_id = int(record_id)
+
+    record_logic = survey_logic.getRecordLogic()
+    record_entity = record_logic.getFromIDOr404(record_id)
+
+    if record_entity.user.key() == user_entity.key():
+      # this record belongs to the current user
+      return
+
+    if role_name == 'student':
+      role_entity = record_entity.project.student
+    elif role_name == 'mentor':
+      role_entity = record_entity.project.mentor
+
+    if role_entity.user.key() == user_entity.key() and (
+        role_entity.status == 'active'):
+      # this user has the role required
+      return
+
+    fields = {'user': user_entity,
+              'scope': record_entity.org,
+              'status': 'active'}
+    admin_entity = org_admin_logic.getForFields(fields, unique=True)
+
+    if admin_entity:
+      # this user is org admin for the retrieved record's project
+      return
+
+    # The current user is no Org Admin, has not taken the Survey and is not
+    # the one responsible for taking this survey.
+    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_RECORD)
 
   @allowSidebar
   @allowDeveloper

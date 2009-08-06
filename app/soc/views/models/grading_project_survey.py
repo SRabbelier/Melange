@@ -55,7 +55,11 @@ class View(project_survey.View):
     rights['edit'] = [('checkIsSurveyWritable', grading_survey_logic)]
     rights['delete'] = ['checkIsDeveloper'] # TODO: fix deletion of Surveys
     rights['list'] = ['checkDocumentList']
-    rights['record'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['record'] = [('checkHasAny', [
+        [('checkIsAllowedToViewProjectSurveyRecordAs',
+          [grading_survey_logic, 'mentor', 'id']),
+        ('checkIsSurveyReadable', [grading_survey_logic]),
+        ]])]
     rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
     rights['take'] = [('checkIsSurveyTakeable', grading_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',

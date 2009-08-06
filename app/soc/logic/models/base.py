@@ -378,7 +378,8 @@ class Logic(object):
 
     return query
 
-  def updateEntityProperties(self, entity, entity_properties, silent=False):
+  def updateEntityProperties(self, entity, entity_properties, silent=False,
+                             store=True):
     """Update existing entity using supplied properties.
 
     Args:
@@ -386,6 +387,7 @@ class Logic(object):
       entity_properties: keyword arguments that correspond to entity
         properties and their values
       silent: iff True does not call _onUpdate method
+      store: iff True updated entity is actually stored in the data model
 
     Returns:
       The original entity with any supplied properties changed.
@@ -408,7 +410,8 @@ class Logic(object):
         value = entity_properties[name]
         prop.__set__(entity, value)
 
-    entity.put()
+    if store:
+      entity.put()
 
     # call the _onUpdate method
     if not silent:

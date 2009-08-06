@@ -39,7 +39,8 @@ class Logic(base.Logic):
                                 skip_properties=skip_properties,
                                 id_based=id_based)
 
-  def updateEntityProperties(self, entity, entity_properties, silent=False):
+  def updateEntityProperties(self, entity, entity_properties, silent=False,
+                             store=True):
     """Update existing entity using supplied properties.
 
     Overwrites base because of Expando properties.
@@ -49,7 +50,8 @@ class Logic(base.Logic):
       entity_properties: keyword arguments that correspond to entity
         properties and their values
       silent: iff True does not call _onUpdate method
-
+      store: iff True updated entity is actually stored in the data model 
+      
     Returns:
       The original entity with any supplied properties changed.
     """
@@ -68,7 +70,8 @@ class Logic(base.Logic):
       if self._updateField(entity, entity_properties, name):
         setattr(entity, name, value)
 
-    entity.put()
+    if store:
+      entity.put()
 
     # call the _onUpdate method
     if not silent:

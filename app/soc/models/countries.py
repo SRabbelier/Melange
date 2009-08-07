@@ -266,7 +266,7 @@ COUNTRY_INFO = {
     }
 
 # List of all countries and territories
-COUNTRIES_AND_TERRITORIES = COUNTRY_INFO.keys() 
+COUNTRIES_AND_TERRITORIES = sorted(COUNTRY_INFO.keys())
 
 # Mapping of countries to their CCTLD
 COUNTRIES_TO_CCTLD = dict((k, c) for k, (c, _) in COUNTRY_INFO.items()) 

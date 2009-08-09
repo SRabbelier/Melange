@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load forms_helpers %}
 
 {% block scripts %}
 {{ block.super }}
@@ -27,46 +28,50 @@ limitations under the License.
 {% block body %}
 <div id="created">Last modified on {{ entity.modified }} by {{ entity.modified_by.name }}</div>
 
-{% if survey_form %}
+<div id="help_text">
+  {% block help_text %}
+    {{ help_text }}
+  {% endblock help_text %}
+</div>
 
-  {% load forms_helpers %}
-
-  {{ help_text }}
-
-  {% if entity.content %}
-    <div id="survey_description">
-      {{ entity.content|safe }}
-    </div>
-  {% endif %}
-
-  {% if form_action %}
-    <form method="post" action="{{ form_action }}">
-  {% else %}
-    <form method="post">
-  {% endif %}
-    <div style="width:100%;">
-      <div class="{{ status }}" id="survey_widget">
-        <table>
-          {% block form_table %}
-            {% as_twoline_table survey_form %}
-          {% endblock %}
-        </table>
-      </div> {# end survey_widget #}
-    </div>
-
-<br><br>
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <input type="submit" value="Submit" style="font-weight: bold;">
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </form>
+{% block survey_description %}
+{% if entity.content %}
+  <div id="survey_description">
+    {{ entity.content|safe }}
+  </div>
 {% endif %}
+{% endblock survey_description %}
 
-{% endblock %}
+{% block survey_form %}
+{% if form_action %}
+  <form method="post" action="{{ form_action }}">
+{% else %}
+  <form method="post">
+{% endif %}
+  <div style="width:100%;">
+    <div class="{{ status }}" id="survey_widget">
+      <table>
+        {% block form_table %}
+          {% as_twoline_table survey_form %}
+        {% endblock %}
+      </table>
+    </div> {# end survey_widget #}
+  </div>
+
+  <br /><br />
+
+  <div>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <input type="submit" value="Submit" style="font-weight: bold;">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</form>
+{% endblock survey_form %}
+
+{% endblock body %}

@@ -77,9 +77,12 @@ class View(survey.View):
           'soc.views.models.%(module_name)s.send_reminder',
          'Send Reminder for %(name)s')]
 
+    new_params['take_template'] = 'soc/project_survey/take.html'
+
     # used for sending reminders
     new_params['survey_type'] = 'project'
     new_params['reminder_template'] = 'soc/project_survey/reminder.html'
+
     new_params['manage_student_project_heading'] = \
         'soc/project_survey/list/heading_manage_student_project.html'
     new_params['manage_student_project_row'] = \
@@ -167,6 +170,31 @@ class View(survey.View):
 
     # update the properties that will be stored with the referenced project
     properties.update(project=project_entity, org=project_entity.scope)
+
+  def _setSurveyTakeContext(self, request, params, context, survey,
+                            survey_record):
+    """Sets the context for the ProjectSurvey take page.
+
+    This includes setting the help_text, status and project_entity.
+
+    Args:
+        request: HTTP request object
+        params: the params for the current View
+        context: the context for the view to update
+        survey: a Survey entity
+        survey_record: a SurveyRecordEntity
+    """
+
+    from soc.logic.models.student_project import logic as student_project_logic
+
+    # call super first to set the other context items
+    super(View, self)._setSurveyTakeContext(request, params, context, survey,
+                                            survey_record)
+
+    # retrieve the project using the key name in the GET param
+    get_dict = request.GET
+    context['project_entity'] = student_project_logic.getFromKeyName(
+        get_dict['project'])
 
   def _constructFilterForProjectSelection(self, survey, params):
     """Returns the filter needed for the Project selection view.

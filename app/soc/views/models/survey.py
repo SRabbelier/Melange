@@ -506,7 +506,7 @@ class View(base.View):
 
     # fill context with the survey_form and additional information
     context['survey_form'] = survey_form
-    self.setHelpAndStatus(context, entity, survey_record)
+    self._setSurveyTakeContext(request, params, context, entity, survey_record)
 
     if request.POST:
       return self.takePost(request, template, context, params, survey_form,
@@ -642,14 +642,16 @@ class View(base.View):
     """
     pass
 
-
-  def setHelpAndStatus(self, context, survey, survey_record):
-    """Get help_text and status for template use.
+  def _setSurveyTakeContext(self, request, params, context, survey,
+                            survey_record):
+    """Sets the help_text and status for take template use.
 
     Args:
+        request: HTTP request object
+        params: the params for the current View
         context: the context for the view to update
         survey: a Survey entity
-        survey_record: a SurveyRecordEntity
+        survey_record: a SurveyRecordEntity iff exists
     """
 
     if not survey.survey_end:

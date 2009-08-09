@@ -420,6 +420,18 @@ class View(base.View):
       record_entity: a GradingRecord entity
     """
 
+    survey_group_logic = params['logic']
+    record_logic = survey_group_logic.getRecordLogic()
+
+    get_dict = request.GET
+
+    if get_dict.get('update'):
+      # try to update this record
+      properties = record_logic.getFieldsForGradingRecord(
+          record_entity.project, record_entity.grading_survey_group,
+          record_entity)
+      record_logic.updateEntityProperties(record_entity, properties)
+
     form = params['record_edit_form'](instance=record_entity)
     context['form'] = form
 

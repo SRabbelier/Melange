@@ -49,13 +49,16 @@ limitations under the License.
   </tr>
   <tr>
    <td> 
-    <input style="font-weight: bold" type="submit" name="save" value="Save Changes"/></span>
+    <input style="font-weight: bold" type="submit" name="save" value="Save Changes"/>
    </td>
    <td> 
-    <input style="font-weight: bold" type="submit" name="save_update" value="Save Changes and Update Project"/></span>
+    <input style="font-weight: bold" type="submit" name="save_update" value="Save Changes and Update Project"/>
    </td>
    <td> 
-    <input style="font-weight: bold" type="submit" name="save_update_mail" value="Save Changes, Update Project and Send Mail"/></span>
+    <input style="font-weight: bold" type="submit" name="save_update_mail" value="Save Changes, Update Project and Send Mail"/>
+   </td>
+   <td>
+     <input type="button" value="Auto-Update this Record" onClick="parent.location='?id={{entity.key.id_or_name}}&update=1'">
    </td>
    <td>
      <input type="button" value="Back to Previous Page" onClick="javascript:history.go(-1)">

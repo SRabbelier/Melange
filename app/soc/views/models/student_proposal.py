@@ -311,19 +311,19 @@ class View(base.View):
     For params see base.view.Public().
     """
 
-    context = helper.responses.getUniversalContext(request)
-    helper.responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = page_name
-
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
 
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
+    context['page_name'] = 'Proposal titled "%s" from %s' % (
+        entity.title, entity.scope.name())
 
     if request.method == 'POST':
       return self.publicPost(request, context, params, entity, **kwargs)

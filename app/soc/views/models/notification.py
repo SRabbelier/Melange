@@ -188,7 +188,7 @@ class View(base.View):
     if entity.unread:
       # get the current user
       user = user_logic.getForCurrentAccount()
-      
+
       # if the message is meant for the user that is reading it
       # pylint: disable-msg=E1103
       if entity.scope.key() == user.key():
@@ -197,6 +197,7 @@ class View(base.View):
 
     context['entity_type_url'] = self._params['url_name']
     context['entity_suffix'] = entity.key().id_or_name() if entity else None
+    context['page_name'] = 'Notification - %s' %(entity.subject)
 
     return True
 

@@ -151,6 +151,19 @@ class View(base.View):
 
     return super(View, self)._public(request, entity, context)
 
+  def _edit(self, request, entity, context, params):
+    """Hook for edit View.
+
+    Adds the title of the document to the edit View.
+
+    For args see base.View._edit().
+    """
+
+    context['page_name'] = "%s titled '%s'" %(context['page_name'],
+                                              entity.title)
+
+    return super(View, self)._edit(request, entity, context, params)
+
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """

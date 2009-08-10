@@ -124,6 +124,16 @@ class View(base.View):
 
     self._params['request_form'] = request_form
 
+  def _edit(self, request, entity, context, params):
+    """Hook for edit View.
+
+    Changes the page name to contain request information.
+
+    For args see base.View._edit().
+    """
+    context['page_name'] = '%s to become a %s for %s' %(context['page_name'],
+                                                        entity.role_verbose,
+                                                        entity.scope.name)
 
   @decorators.merge_params
   @decorators.check_access
@@ -153,8 +163,8 @@ class View(base.View):
     request_entity = request_logic.getForFields(fields, unique=True)
 
     # set the page name using the request_entity
-    context['page_name'] = '%s %s' % (page_name, 
-        request_entity.role_verbose)
+    context['page_name'] = '%s %s for %s' % (page_name, 
+        request_entity.role_verbose, request_entity.scope.name)
 
     get_dict = request.GET
 

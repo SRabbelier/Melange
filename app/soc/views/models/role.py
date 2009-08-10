@@ -105,7 +105,7 @@ class View(base.View):
           'Accept invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
           'soc.views.models.%(module_name)s.process_request',
-          'Process request for %(name)s'),
+          'Process request'),
           (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
           'soc.views.models.%(module_name)s.role_request',
           'Create a Request to become %(name)s')]
@@ -575,10 +575,6 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-    # get the context for this webpage
-    context = responses.getUniversalContext(request)
-    responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = page_name
 
     # get the request entity using the information from kwargs
     fields = {'link_id': kwargs['link_id'],
@@ -586,8 +582,15 @@ class View(base.View):
         'role': params['logic'].role_name}
     request_entity = request_logic.logic.getForFields(fields, unique=True)
 
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+
     # pylint: disable-msg=E1103
     user_entity = user_logic.logic.getFromKeyNameOr404(request_entity.link_id)
+
+    context['page_name'] = '%s from %s to become a %s' %(
+        page_name, user_entity.name, request_entity.role_verbose)
 
     get_dict = request.GET
 

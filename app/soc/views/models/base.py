@@ -393,6 +393,8 @@ class View(object):
       return helper.responses.errorResponse(
           error, request, context=context)
 
+    self._edit(request, entity, context, params)
+
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
     else:
@@ -831,6 +833,17 @@ class View(object):
     """
 
     return True
+
+  def _edit(self, request, entity, context, params):
+    """Hook for the edit View.
+  
+    Args:
+      request: the Django request object
+      entity: entity being edited
+      context: context for the View
+      params: params for the View
+    """
+    pass
 
   def _editGet(self, request, entity, form):
     """Performs any required processing on the form to get its edit page.

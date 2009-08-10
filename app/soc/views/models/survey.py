@@ -194,6 +194,8 @@ class View(base.View):
         'clean': cleaning.validate_document_acl(self),
         }
 
+    new_params['survey_take_form'] = surveys.SurveyTakeForm
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -217,8 +219,8 @@ class View(base.View):
 
     # construct the form to be shown on the page
     # TODO(ljvderijk) Generate SurveyForm without passing along the logic
-    survey_form = surveys.SurveyTakeForm(survey_content=entity.survey_content,
-                                         survey_logic=self._params['logic'])
+    survey_form = self._params['survey_take_form'](
+        survey_content=entity.survey_content, survey_logic=self._params['logic'])
 
     survey_form.getFields()
 
@@ -501,8 +503,11 @@ class View(base.View):
     survey_record = self._getSurveyRecordFor(entity, request, params)
 
     # get an instance of SurveyTakeForm to use
-    survey_form = self._getSurveyTakeForm(entity, survey_record, params,
-                                          request.POST)
+    survey_form = params['survey_take_form'](
+        survey_content=survey.survey_content,
+        survey_record=record,
+        survey_logic=params['logic'],
+        data=post_dict)
 
     # fill context with the survey_form and additional information
     context['survey_form'] = survey_form
@@ -537,25 +542,6 @@ class View(base.View):
               'user': user_entity}
 
     return record_logic.getForFields(filter, unique=True)
-
-  def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
-    """Returns the specific SurveyTakeForm needed for the take view.
-
-    Args:
-        survey: a Survey entity
-        record: a SurveyRecord instance if any exist
-        params: the params dict for the requesting View
-        post_dict: POST data to be passed to form initialization
-
-    Returns:
-        An instance of SurveyTakeForm that can be used to take a Survey.
-    """
-
-    return surveys.SurveyTakeForm(survey_content=survey.survey_content,
-                                  survey_record=record,
-                                  survey_logic=params['logic'],
-                                  data=post_dict)
-
 
   def takeGet(self, request, template, context, params, survey_form, entity,
               record, **kwargs):
@@ -800,7 +786,7 @@ class View(base.View):
     context['record'] = record_entity
 
     # store the read only survey form in the context
-    survey_form = surveys.SurveyTakeForm(
+    survey_form = params['survey_take_form'](
        survey_content=survey_entity.survey_content,
        survey_record=record_entity,
        survey_logic=self._params['logic'],

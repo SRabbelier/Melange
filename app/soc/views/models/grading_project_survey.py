@@ -71,6 +71,8 @@ class View(project_survey.View):
 
     new_params['name'] = "Grading Project Survey"
 
+    new_params['survey_take_form'] = GradeSurveyTakeForm
+
     # used for sending reminders
     new_params['survey_type'] = 'grading'
 
@@ -82,22 +84,6 @@ class View(project_survey.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
-
-  def _getSurveyTakeForm(self, survey, record, params, post_dict=None):
-    """Returns the specific SurveyTakeForm needed for the take view.
-
-    For args see survey.View._getSurveyTakeForm().
-
-    Returns:
-        An instance of GradeSurveyTakeForm.
-    """
-
-    survey_form = GradeSurveyTakeForm(survey_content=survey.survey_content,
-                                      survey_record=record,
-                                      survey_logic=params['logic'],
-                                      data=post_dict)
-
-    return survey_form
 
   def _constructFilterForProjectSelection(self, survey, params):
     """Returns the filter needed for the Project selection view.

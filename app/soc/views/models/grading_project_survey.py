@@ -92,11 +92,9 @@ class View(project_survey.View):
         An instance of GradeSurveyTakeForm.
     """
 
-    grade_choices = (('pass', 'Pass'), ('fail', 'Fail'))
     survey_form = GradeSurveyTakeForm(survey_content=survey.survey_content,
                                       survey_record=record,
                                       survey_logic=params['logic'],
-                                      grade_choices=grade_choices,
                                       data=post_dict)
 
     return survey_form
@@ -132,6 +130,7 @@ class View(project_survey.View):
 
     return fields
 
+
 class GradeSurveyTakeForm(surveys.SurveyTakeForm):
   """Extends SurveyTakeForm by adding a grade field.
 
@@ -139,16 +138,7 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
   should be the same as the base class's if this argument is missing).
   """
 
-  def __init__(self, *args, **kwargs):
-    """Store grade choices and initialize the form.
-
-    params:
-      grade_choices: pair of tuples representing the grading choices
-    """
-
-    self.grade_choices = kwargs.pop('grade_choices', None)
-
-    super(GradeSurveyTakeForm, self).__init__(*args, **kwargs)
+  DEF_GRADE_CHOICES = (('pass', 'Pass'), ('fail', 'Fail'))
 
   def setCleaners(self, post_dict=None):
     """Ensures that the grade field is added to the clean data.
@@ -192,8 +182,7 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     # remap bool to string values as the ChoiceField validates on 'choices'.
     vals_grade = {True: 'pass', False: 'fail'}
 
-    if self.grade_choices:
-      self.data['grade'] = vals_grade.get(grade, None) or grade
+    self.data['grade'] = vals_grade.get(grade, None) or grade
 
     return super(GradeSurveyTakeForm, self).getFields(post_dict)
 
@@ -204,16 +193,15 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     # add common survey fields
     fields = super(GradeSurveyTakeForm, self).insertFields()
 
-    if self.grade_choices:
-      # add empty option to choices
-      grade_choices = (('', "Choose a Grade"),) + tuple(self.grade_choices)
+    # add empty option to choices
+    grade_choices = (('', "Choose a Grade"),) + tuple(self.DEF_GRADE_CHOICES)
 
-      gradeField = forms.fields.ChoiceField(choices=grade_choices,
-                                            required=True,
-                                            widget=forms.Select(),
-                                            initial=self.data.get('grade'))
-      # add the grade field at the form's bottom
-      fields.insert(len(fields) + 1, 'grade', gradeField)
+    gradeField = forms.fields.ChoiceField(choices=grade_choices,
+                                          required=True,
+                                          widget=forms.Select(),
+                                          initial=self.data.get('grade'))
+    # add the grade field at the form's bottom
+    fields.insert(len(fields) + 1, 'grade', gradeField)
 
     return fields
 

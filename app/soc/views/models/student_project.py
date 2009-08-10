@@ -710,9 +710,9 @@ class View(base.View):
     # list all failed projects
     fields['status'] = 'failed'
     failed_params = list_params.copy()
-    failed_params['list_description'] = ('List of all failed %(name_plural)s, '
-        'these cannot be managed.') % list_params
-    failed_params['list_action'] = (redirects.getPublicRedirect, list_params)
+    failed_params['list_description'] = ('List of all %(name_plural)s who ' 
+                                         'failed the program.') % list_params
+    failed_params['list_action'] = (redirects.getManageRedirect, list_params)
 
     failed_list = lists.getListContent(
         request, failed_params, fields, idx=1, need_content=True)
@@ -723,15 +723,29 @@ class View(base.View):
     # list all completed projects
     fields['status'] = 'completed'
     completed_params = list_params.copy()
-    completed_params['list_description'] = ('List of %(name_plural)s that have '
-        'successfully completed the program, '
-        'these cannot be managed.' % list_params)
-    completed_params['list_action'] = (redirects.getPublicRedirect, list_params)
+    completed_params['list_description'] = (
+        'List of %(name_plural)s that have successfully completed the '
+        'program.' % list_params)
+    completed_params['list_action'] = (redirects.getManageRedirect, list_params)
 
     completed_list = lists.getListContent(
         request, completed_params, fields, idx=2, need_content=True)
     # set the needed info
     completed_list = list_info.setStudentProjectSurveyInfo(completed_list,
+                                                           org_entity.scope)
+
+    # list all withdrawn projects
+    fields['status'] = 'withdrawn'
+    withdrawn_params = list_params.copy()
+    withdrawn_params['list_description'] = (
+        'List of %(name_plural)s that have withdrawn from the program.' %(
+            list_params))
+    withdrawn_params['list_action'] = (redirects.getManageRedirect, list_params)
+
+    withdrawn_list = lists.getListContent(
+        request, withdrawn_params, fields, idx=3, need_content=True)
+    # set the needed info
+    withdrawn_list = list_info.setStudentProjectSurveyInfo(withdrawn_list,
                                                            org_entity.scope)
 
     # always show the list with active projects
@@ -744,6 +758,10 @@ class View(base.View):
     if completed_list != None:
       # do not show empty completed list
       content.append(completed_list)
+
+    if withdrawn_list != None:
+      # do not show empty withdrawn list
+      content.append(withdrawn_list)
 
     # call the _list method from base to display the list
     return self._list(request, list_params, content,

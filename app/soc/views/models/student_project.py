@@ -74,7 +74,8 @@ class View(base.View):
     rights['list'] = ['checkIsDeveloper']
     rights['manage'] = [('checkHasActiveRoleForScope',
                          org_admin_logic),
-        ('checkStudentProjectHasStatus', [['accepted']])]
+        ('checkStudentProjectHasStatus', [['accepted', 'failed', 'completed',
+                                           'withdrawn']])]
     rights['manage_overview'] = [('checkHasActiveRoleForScope',
                          org_admin_logic)]
     # TODO: lack of better name here!
@@ -184,7 +185,6 @@ class View(base.View):
     )
 
     self._params['student_edit_form'] = student_edit_form
-
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -351,26 +351,6 @@ class View(base.View):
       return responses.errorResponse(
           error, request, template=params['error_public'])
 
-    get_dict = request.GET
-
-    if 'remove' in get_dict:
-      # get the mentor to remove
-      fields = {'link_id': get_dict['remove'],
-                'scope': entity.scope}
-      mentor = mentor_logic.logic.getForFields(fields, unique=True)
-
-      additional_mentors = entity.additional_mentors
-      # pylint: disable-msg=E1103
-      if additional_mentors and mentor.key() in additional_mentors:
-        # remove the mentor from the additional mentors list
-        additional_mentors.remove(mentor.key())
-        fields = {'additional_mentors': additional_mentors}
-        project_logic.updateEntityProperties(entity, fields)
-
-      # redirect to the same page without GET arguments
-      redirect = request.path
-      return http.HttpResponseRedirect(redirect)
-
     template = params['manage_template']
 
     # get the context for this webpage
@@ -379,6 +359,30 @@ class View(base.View):
     context['page_name'] = "%s '%s' from %s" % (page_name, entity.title,
                                                 entity.student.name())
     context['entity'] = entity
+
+
+    if entity.status == 'accepted':
+      # only accepted project can have their mentors managed
+      self._enableMentorManagement(entity, params, context)
+
+    context['evaluation_list'] = self._getEvaluationLists(request, params,
+                                                          entity)
+
+    if request.POST:
+      return self.managePost(request, template, context, params, entity,
+                             **kwargs)
+    else: #request.GET
+      return self.manageGet(request, template, context, params, entity,
+                            **kwargs)
+
+  def _enableMentorManagement(self, entity, params, context):
+    """Sets the data required to manage mentors for a StudentProject.
+
+    Args:
+      entity: StudentProject entity to manage
+      params: params dict for the manage view
+      context: context for the manage view
+    """
 
     # get all mentors for this organization
     fields = {'scope': entity.scope,
@@ -448,16 +452,6 @@ class View(base.View):
     )
 
     params['additional_mentor_form'] = additional_mentor_form
-
-    context['evaluation_list'] = self._getEvaluationLists(request, params,
-                                                          entity)
-
-    if request.POST:
-      return self.managePost(request, template, context, params, entity,
-                             **kwargs)
-    else: #request.GET
-      return self.manageGet(request, template, context, params, entity,
-                            **kwargs)
 
   def _getEvaluationLists(self, request, params, entity):
     """Returns List Object containing the list to be shown on the Student 
@@ -536,11 +530,31 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    # populate form with the current mentor
-    initial = {'mentor_id': entity.mentor.link_id}
-    context['mentor_edit_form'] = params['mentor_edit_form'](initial=initial)
+    get_dict = request.GET
 
-    context['additional_mentor_form'] = params['additional_mentor_form']()
+    if 'remove' in get_dict and entity.status == 'accepted':
+      # get the mentor to remove
+      fields = {'link_id': get_dict['remove'],
+                'scope': entity.scope}
+      mentor = mentor_logic.logic.getForFields(fields, unique=True)
+
+      additional_mentors = entity.additional_mentors
+      # pylint: disable-  msg=E1103
+      if additional_mentors and mentor.key() in additional_mentors:
+        # remove the mentor from the additional mentors list
+        additional_mentors.remove(mentor.key())
+        fields = {'additional_mentors': additional_mentors}
+        project_logic.updateEntityProperties(entity, fields)
+
+      # redirect to the same page without GET arguments
+      redirect = request.path
+      return http.HttpResponseRedirect(redirect)
+
+    if entity.status == 'accepted':
+      # populate forms with the current mentors set
+      initial = {'mentor_id': entity.mentor.link_id}
+      context['mentor_edit_form'] = params['mentor_edit_form'](initial=initial)
+      context['additional_mentor_form'] = params['additional_mentor_form']()
 
     return responses.respond(request, template, context)
 
@@ -555,11 +569,11 @@ class View(base.View):
 
     post_dict = request.POST
 
-    if 'set_mentor' in post_dict:
+    if 'set_mentor' in post_dict and entity.status == 'accepted':
       form = params['mentor_edit_form'](post_dict)
       return self._manageSetMentor(request, template, context, params, entity,
                                    form)
-    elif 'add_additional_mentor' in post_dict:
+    elif 'add_additional_mentor' in post_dict and entity.status == 'accepted':
       form = params['additional_mentor_form'](post_dict)
       return self._manageAddAdditionalMentor(request, template, context,
                                              params, entity, form)

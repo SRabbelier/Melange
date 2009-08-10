@@ -28,65 +28,67 @@ Use this page to manage the Student Project. You can (re)assign Mentors here and
 </table>
 </p>
 
-<p>
-<b>Primary Mentor</b><br />
-In this section you can assign a new Primary Mentor.
-Note that if you select a co-Mentor from this list that Mentor will be removed from the co-Mentors.
-<form method="POST">
-  <table>
-    {% as_table mentor_edit_form %}
-  </table>
-  <table>
-  <tr>
-   <td colspan="4">&nbsp;</td>
-  </tr>
-  <tr>
-    <td> 
-      <input style="font-weight: bold" type="submit" value="Submit" name="set_mentor"/></span>
-    </td>
-    <td>
-      <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
-    </td>
-  </tr>
- </table>
-</form>
-</p>
-
-<p>
-<b>Co-Mentors</b><br/>
-In this section you can add/remove co-mentors for this project.
-Co-mentors usually play a vital role in the success of a project, however they are not responsible for taking evaluations.
-<table>
-  {% for mentor in additional_mentors %}
+{% ifequal entity.status "accepted" %}
+  <p>
+  <b>Primary Mentor</b><br />
+  In this section you can assign a new Primary Mentor.
+  Note that if you select a co-Mentor from this list that Mentor will be removed from the co-Mentors.
+  <form method="POST">
+    <table>
+      {% as_table mentor_edit_form %}
+    </table>
+    <table>
     <tr>
-      <td>
-        {{ mentor.name }}
+     <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td> 
+        <input style="font-weight: bold" type="submit" value="Submit" name="set_mentor"/></span>
       </td>
       <td>
-        <input type="button" onclick="location.href='?remove={{ mentor.link_id }}'" value="Remove"/>
+        <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
       </td>
-  {% endfor %}
-</table>
-
-<form method="POST">
+    </tr>
+   </table>
+  </form>
+  </p>
+  
+  <p>
+  <b>Co-Mentors</b><br/>
+  In this section you can add/remove co-mentors for this project.
+  Co-mentors usually play a vital role in the success of a project, however they are not responsible for taking evaluations.
   <table>
-    {% as_table additional_mentor_form %}
+    {% for mentor in additional_mentors %}
+      <tr>
+        <td>
+          {{ mentor.name }}
+        </td>
+        <td>
+          <input type="button" onclick="location.href='?remove={{ mentor.link_id }}'" value="Remove"/>
+        </td>
+    {% endfor %}
   </table>
-  <table>
-  <tr>
-   <td colspan="4">&nbsp;</td>
-  </tr>
-  <tr>
-    <td> 
-      <input style="font-weight: bold" type="submit" value="Add" name="add_additional_mentor"/></span>
-    </td>
-    <td>
-      <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
-    </td>
-  </tr>
- </table>
-</form>
-</p>
+  
+  <form method="POST">
+    <table>
+      {% as_table additional_mentor_form %}
+    </table>
+    <table>
+    <tr>
+     <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td> 
+        <input style="font-weight: bold" type="submit" value="Add" name="add_additional_mentor"/></span>
+      </td>
+      <td>
+        <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
+      </td>
+    </tr>
+   </table>
+  </form>
+  </p>
+{% endifequal %}
 
 <p>
 <b>Evaluations</b><br />

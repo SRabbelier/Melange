@@ -60,7 +60,7 @@ class View(project_survey.View):
           [grading_survey_logic, 'mentor', 'id']),
         ('checkIsSurveyReadable', [grading_survey_logic]),
         ]])]
-    rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['results'] = ['checkIsUser']
     rights['take'] = [('checkIsSurveyTakeable', grading_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [grading_survey_logic, 'mentor', 'project'])]
@@ -113,6 +113,62 @@ class View(project_survey.View):
 
     fields = {'mentor': mentor_entities,
               'status': 'accepted'}
+
+    return fields
+
+  def _getResultsViewRecordFields(self, survey, allowed_to_read):
+    """Get the Results View filter for ProjectSurveyRecords.
+
+    For args see survey.View()._getResultsViewRecordFields()
+
+    Returns:
+      Returns the dictionary containing the fields to filter on
+    """
+
+    from soc.logic.models.mentor import logic as mentor_logic
+    from soc.logic.models.org_admin import logic as org_admin_logic
+
+    if allowed_to_read:
+      return super(View, self)._getResultsViewRecordFields(survey,
+                                                           allowed_to_read)
+
+    fields = {'survey': survey}
+
+    user_entity = user_logic.getForCurrentAccount()
+    program_entity = survey.scope
+
+    role_fields = {'user': user_entity,
+                   'program': program_entity,
+                   'status': ['active', 'inactive']}
+
+    org_admins = org_admin_logic.getForFields(role_fields)
+    mentors = mentor_logic.getForFields(role_fields)
+
+    organizations = {}
+
+    if org_admins:
+      for org_admin in org_admins:
+        # for each org admin store the organization
+        org_scope = org_admin.scope
+        org_key_name = org_scope.key().id_or_name()
+        organizations[org_key_name] = org_scope
+
+    if mentors:
+      for mentor in mentors:
+        # for each mentor store the organization
+        # This will allow the user to view the GradingProjectSurvey Records
+        # listing for projects which he might have no further access to.
+        org_scope = mentor.scope
+        org_key_name = org_scope.key().id_or_name()
+        organizations[org_key_name] = org_scope
+
+    if organizations:
+      # filter on all the found organizations
+      fields['org'] = organizations.values()
+    else:
+      # This user is no org admin or mentor and should only see
+      # his/her own records.
+      fields['user'] = user_entity
 
     return fields
 

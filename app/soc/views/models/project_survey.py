@@ -58,7 +58,7 @@ class View(survey.View):
           [project_survey_logic, 'student', 'id']),
         ('checkIsSurveyReadable', [project_survey_logic]),
         ]])]
-    rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['results'] = ['checkIsUser']
     rights['take'] = [('checkIsSurveyTakeable', project_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [project_survey_logic, 'student', 'project'])]
@@ -255,6 +255,55 @@ class View(survey.View):
     contents = [content]
 
     return self._list(request, student_project_params, contents, page_name)
+
+  def _getResultsViewRecordFields(self, survey, allowed_to_read):
+    """Get the Results View filter for ProjectSurveyRecords.
+
+    For args see survey.View()._getResultsViewRecordFields()
+
+    Returns:
+      Returns the dictionary containing the fields to filter on
+    """
+
+    from soc.logic.models.org_admin import logic as org_admin_logic
+    from soc.logic.models.student import logic as student_logic
+
+    if allowed_to_read:
+      return super(View, self)._getResultsViewRecordFields(survey,
+                                                           allowed_to_read)
+
+    fields = {'survey': survey}
+
+    program_entity = survey.scope
+    user_entity = user_logic.getForCurrentAccount()
+
+    student_fields = {'scope': program_entity,
+                      'user': user_entity,
+                      'status': ['active', 'inactive']}
+    student_entity = student_logic.getForFields(student_fields, unique=True)
+
+    if student_entity:
+      # just get all records for the current user
+      fields['user'] = user_entity
+      return fields
+
+    org_admin_fields = {'user': user_entity,
+                        'program': program_entity,
+                        'status': ['active', 'inactive']}
+
+    org_admins = org_admin_logic.getForFields(org_admin_fields)
+
+    if org_admins:
+      # filter on all the organizations this user is org admin for
+      organizations = []
+
+      for org_admin in org_admins:
+        organizations.append(org_admin.scope)
+
+      # TODO: this might blow up if the user is org admin for too many orgs
+      fields['org'] = organizations
+
+    return fields
 
   @decorators.merge_params
   @decorators.check_access

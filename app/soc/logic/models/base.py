@@ -429,12 +429,13 @@ class Logic(object):
 
     return entity
 
-  def updateOrCreateFromKeyName(self, properties, key_name):
+  def updateOrCreateFromKeyName(self, properties, key_name, silent=False):
     """Update existing entity, or create new one with supplied properties.
 
     Args:
       properties: dict with entity properties and their values
       key_name: the key_name of the entity that uniquely identifies it
+      silent: if True, do not run the _onCreate hook
 
     Returns:
       the entity corresponding to the key_name, with any supplied
@@ -452,22 +453,20 @@ class Logic(object):
 
       # entity did not exist, so create one in a transaction
       entity = self._model.get_or_insert(key_name, **properties)
+
+      if not silent:
+        # a new entity has been created call _onCreate
+        self._onCreate(entity)
     else:
       # If someone else already created the entity (due to a race), we
       # should not update the propties (as they 'won' the race).
-      entity = self.updateEntityProperties(entity, properties, silent=True)
-
-    if create_entity:
-      # a new entity has been created call _onCreate
-      self._onCreate(entity)
-    else:
-      # the entity has been updated call _onUpdate
-      self._onUpdate(entity)
+      entity = self.updateEntityProperties(entity, properties, silent=silent)
 
     return entity
 
   def updateOrCreateFromFields(self, properties, silent=False):
-    """Creates a new entity with the supplied properties.
+    """Update existing entity or creates a new entity with the supplied 
+    properties containing the key fields.
 
     Args:
       properties: dict with entity properties and their values
@@ -480,12 +479,14 @@ class Logic(object):
     if self._id_based:
       entity = self._model(**properties)
       entity.put()
+
+      if not silent:
+        # call the _onCreate hook
+        self._onCreate(entity)
     else:
       key_name = self.getKeyNameFromFields(properties)
-      entity = self._model.get_or_insert(key_name, **properties)
-
-    if not silent:
-      self._onCreate(entity)
+      entity = self.updateOrCreateFromKeyName(properties, key_name,
+                                              silent=silent)
 
     return entity
 

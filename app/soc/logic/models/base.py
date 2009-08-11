@@ -335,8 +335,8 @@ class Logic(object):
       result = query.fetch(limit, offset)
     except db.NeedIndexError, exception:
       result = []
-      logging.exception("%s, model: %s filter: %s, ancestor: %s, order: %s" % 
-                        (exception, self._model, filter, ancestor, order))
+      logging.exception("%s, model: %s filter: %s, ancestors: %s, order: %s" % 
+                        (exception, self._model, filter, ancestors, order))
       # TODO: send email
 
     if unique:

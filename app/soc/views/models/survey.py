@@ -698,10 +698,10 @@ class View(base.View):
 
     try:
       rights.checkIsSurveyReadable(
-          {'key_name': survey_entity.key().name(),
-           'prefix': survey_entity.prefix,
-           'scope_path': survey_entity.scope_path,
-           'link_id': survey_entity.link_id,
+          {'key_name': entity.key().name(),
+           'prefix': entity.prefix,
+           'scope_path': entity.scope_path,
+           'link_id': entity.link_id,
            'user': user_entity},
           survey_logic)
       allowed_to_read = True

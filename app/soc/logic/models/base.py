@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Madhusudan C.S." <madhusudancs@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -311,8 +312,8 @@ class Logic(object):
 
     raise out_of_band.Error(msg, status=404)
 
-  def getForFields(self, filter=None, unique=False,
-                   limit=1000, offset=0, order=None):
+  def getForFields(self, filter=None, unique=False, limit=1000, offset=0,
+                   ancestors=None, order=None):
     """Returns all entities that have the specified properties.
 
     Args:
@@ -320,20 +321,22 @@ class Logic(object):
       unique: if set, only the first item from the resultset will be returned
       limit: the amount of entities to fetch at most
       offset: the position to start at
+      ancestors: list of ancestors properties to set for this query
       order: a list with the sort order
     """
 
     if unique:
       limit = 1
 
-    query = self.getQueryForFields(filter=filter, order=order)
+    query = self.getQueryForFields(filter=filter, 
+                                   ancestors=ancestors, order=order)
 
     try:
       result = query.fetch(limit, offset)
     except db.NeedIndexError, exception:
       result = []
-      logging.exception("%s, model: %s filter: %s, order: %s" % 
-                        (exception, self._model, filter, order))
+      logging.exception("%s, model: %s filter: %s, ancestor: %s, order: %s" % 
+                        (exception, self._model, filter, ancestor, order))
       # TODO: send email
 
     if unique:
@@ -341,11 +344,12 @@ class Logic(object):
 
     return result
 
-  def getQueryForFields(self, filter=None, order=None):
+  def getQueryForFields(self, filter=None, ancestors=None, order=None):
     """Returns a query with the specified properties.
 
     Args:
       filter: a dict for the properties that the entities should have
+      ancestors: list with ancestor properties to set for this query
       order: a list with the sort order
 
     Returns:
@@ -354,6 +358,9 @@ class Logic(object):
 
     if not filter:
       filter = {}
+
+    if not ancestors:
+      ancestors = []
 
     if not order:
       order = []
@@ -372,6 +379,9 @@ class Logic(object):
         query.filter(op, value)
       else:
         query.filter(key, value)
+
+    for ancestor in ancestors:
+      query.ancestor(ancestor)
 
     for key in order:
       query.order(key)

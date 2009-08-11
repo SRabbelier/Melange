@@ -303,6 +303,10 @@ class View(survey.View):
       # TODO: this might blow up if the user is org admin for too many orgs
       fields['org'] = organizations
 
+    if not student_entity and not org_admins:
+      # return only the surveys for the current user
+      fields['user'] = user_entity
+
     return fields
 
   @decorators.merge_params

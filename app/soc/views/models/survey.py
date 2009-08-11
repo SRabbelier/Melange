@@ -708,15 +708,8 @@ class View(base.View):
     except:
       pass
 
-    # only show records for the retrieved survey
-    fields = {'survey': entity}
-
-    if not allowed_to_read:
-      # this user is not allowed to view all the Records so only show their own
-      fields['user'] = user_entity
-
-    # call the hook for adjusting the SurveyRecord filter
-    fields = self._getResultsViewRecordFields(fields, entity, allowed_to_read)
+    # get the filter for the SurveyRecords
+    fields = self._getResultsViewRecordFields(entity, allowed_to_read)
 
     list_params = params.copy()
     list_params['logic'] = record_logic
@@ -734,17 +727,24 @@ class View(base.View):
 
     return self._list(request, list_params, contents, page_name, context)
 
-  def _getResultsViewRecordFields(self, fields, survey, allowed_to_read):
-    """Hook for adjusting the Results View filter for SurveyRecords.
+  def _getResultsViewRecordFields(self, survey, allowed_to_read):
+    """Retrieves the Results View filter for SurveyRecords.
 
     Args:
-      fields: filter dictionary to adjust
       survey: Survey instance for which the Records need to be shown
       allowed_to_read: specifies if the current User has read access
 
     Returns:
       Returns the dictionary containing the fields to filter on
     """
+
+    # only show records for the retrieved survey
+    fields = {'survey': survey}
+
+    if not allowed_to_read:
+      # this user is not allowed to view all the Records so only show their own
+      fields['user'] = user_logic.getForCurrentAccount()
+
     return fields
 
   @decorators.merge_params

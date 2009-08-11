@@ -110,7 +110,7 @@ class View(base.View):
         [('checkIsSurveyReadable', [survey_logic]),
          ('checkIsMySurveyRecord', [survey_logic, 'id'])]
         ])]
-    rights['results'] = ['checkIsDeveloper'] # TODO: proper access check
+    rights['results'] = ['checkIsUser']
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}

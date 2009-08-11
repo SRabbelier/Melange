@@ -140,6 +140,8 @@ class View(base.View):
                                             required=False),
        'email': forms.fields.EmailField(required=True),
        'clean_link_id': cleaning.clean_existing_user('link_id'),
+       'clean_given_name': cleaning.clean_ascii_only('given_name'),
+       'clean_surname': cleaning.clean_ascii_only('surname'),
        'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_res_street': cleaning.clean_ascii_only('res_street'),
        'clean_res_city': cleaning.clean_ascii_only('res_city'),

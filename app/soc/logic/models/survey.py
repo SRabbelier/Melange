@@ -43,12 +43,6 @@ from soc.models.survey import SurveyContent
 from soc.models.survey_record import SurveyRecord
 from soc.models.work import Work
 
-#TODO(James): Ensure this facilitates variable # of surveys 
-GRADES = {'pass': True, 'fail': False}
-PROJECT_STATUSES = {
-'accepted': {True: 'mid_term_passed', False: 'mid_term_failed'},
-'mid_term_passed': {True: 'passed', False: 'final_failed'}
-}
 
 class Logic(work.Logic):
   """Logic methods for the Survey model.
@@ -113,164 +107,6 @@ class Logic(work.Logic):
 
     return self.record_logic
 
-  def getUserRole(self, user, survey, project):
-    """Gets the role of a user for a project, used for SurveyRecordGroup.
-
-    params:
-      user: user taking survey
-      survey: survey entity
-      project: student project for this user
-    """
-
-    if survey.taking_access == 'mentor evaluation':
-      mentors = self.getMentorforProject(user, project)
-
-      if len(mentors) < 1 or len(mentors) > 1:
-        logging.warning('Unable to determine mentor for \
-        user %s. Results returned: %s ' % (
-        user.key().name(), str(mentors)) )
-        return False
-
-      this_mentor = mentors[0]
-
-    if survey.taking_access == 'student evaluation':
-      students = self.getStudentforProject(user, project)
-
-      if len(students) < 1 or len(students) > 1:
-        logging.warning('Unable to determine student for \
-        user %s. Results returned: %s ' % (
-        user.key().name(), str(students)) )
-        return False
-
-  def getStudentforProject(self, user, project):
-    """Get student projects for a given User.
-
-    params:
-      user = survey taking user
-      project = survey taker's student project
-    """
-    from soc.logic.models.student import logic as student_logic
-    import soc.models.student
-
-    # TODO this should be done per Student or Program
-    # TODO filter for accepted, midterm_passed, etc?
-    user_students = student_logic.getForFields({'user': user}) 
-    if not user_students: return []
-    return set([project.student for project in sum(
-    (list(s.student_projects.run())
-    for s in user_students), []) if project.key() == project.key()])
-
-  def getMentorforProject(self, user, project):
-    """Get Student Projects that are being mentored by the given User.
-
-    params:
-      user = survey taking user
-      project = survey taker's student project
-    """
-
-    from soc.logic.models.mentor import logic as mentor_logic
-    import soc.models.mentor
-
-    # TODO filter for accepted, midterm_passed, etc?
-    # TODO this should be done a program basis not user
-
-    user_mentors = mentor_logic.getForFields({'user': user}) 
-
-    if not user_mentors:
-      return []
-
-    return set([project.mentor for project in sum(
-            (list(mentor.student_projects.run())
-             for mentor in user_mentors), [])
-        if project.key() == project.key()])
-
-  def activateGrades(self, survey):
-    """Activates the grades on a Grading Survey.
-
-    TODO(James) Fix this Docstring
-
-    params:
-      survey = survey entity
-    """
-    if survey.taking_access != "mentor evaluation":
-      logging.error("Cannot grade survey %s with taking access %s"
-      % (survey.key().name(), survey.taking_access))
-      return False
-
-    program = survey.scope or Program.get_by_key_name(survey.scope_path)
-
-    for project in program.student_projects.fetch(1000):
-      this_record_group = GradingRecord.all().filter(
-      "project = ", project).filter(
-      "initial_status = ", project.status).get()
-
-      if not this_record_group:
-         logging.warning('neither mentor nor student has \
-         taken the survey for project %s' % project.key().name() )
-         continue
-
-      if not this_record_group.mentor_record:
-        # student has taken survey, but not mentor
-        logging.warning('not continuing without mentor record...')
-        continue
-
-      status_options = PROJECT_STATUSES.get(project.status)
-
-      if not status_options:
-        logging.warning('unable to find status options for project \
-        status %s' % project.status)
-        continue
-
-      new_project_grade = this_record_group.mentor_record.grade
-      new_project_status = status_options.get(new_project_grade)
-
-      if getattr(this_record_group, 'final_status'):
-         logging.warning('project %s record group should not \
-         yet have a final status %s' % (
-         project.key().name(), this_record_group.final_status ) )
-         continue
-
-      # assign the new status to the project and surveyrecordgroup
-      project.status = new_project_status
-      this_record_group.final_status = new_project_status
-
-  def getKeyNameFromPath(self, path):
-    """Gets survey key name from a request path.
-
-    params:
-      path = path of the current request
-    """
-
-    # TODO determine if kwargs in the request contains this information
-    return '/'.join(path.split('/')[-4:]).split('?')[0]
-
-  def getProjects(self, survey, user):
-    """Get projects linking user to a program.
-
-    Serves as access handler (since no projects == no access).
-    And retrieves projects to choose from (if mentors have >1 projects).
-
-    params:
-      survey = survey entity
-      user = survey taking user
-    """
-
-    this_program = survey.scope or Program.get_by_key_name(survey.scope_path)
-
-
-    if 'mentor' in survey.taking_access:
-      these_projects = self.getMentorProjects(user, this_program)
-
-    elif 'student' in survey.taking_access:
-      these_projects = self.getStudentProjects(user, this_program)
-
-    logging.info(these_projects)
-
-    if len(these_projects) == 0:
-      return False
-
-    return these_projects
-
   def getDebugUser(self, survey, this_program):
     """Debugging method impersonates other roles.
 
@@ -327,10 +163,11 @@ class Logic(work.Logic):
     import soc.models.site
 
     # use prefix to generate dict key
-    scope_types = {"program": soc.models.program.Program,
-    "org": soc.models.organization.Organization,
-    "user": soc.models.user.User,
-    "site": soc.models.site.Site}
+    scope_types = {
+        "program": soc.models.program.Program,
+        "org": soc.models.organization.Organization,
+        "user": soc.models.user.User,
+        "site": soc.models.site.Site}
 
     # determine the type of the scope
     scope_type = scope_types.get(entity.prefix)

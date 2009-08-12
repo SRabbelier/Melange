@@ -501,11 +501,12 @@ class View(base.View):
 
     # try to get an existing SurveyRecord for the current user
     survey_record = self._getSurveyRecordFor(entity, request, params)
+    post_dict = request.POST
 
     # get an instance of SurveyTakeForm to use
     survey_form = params['survey_take_form'](
-        survey_content=survey.survey_content,
-        survey_record=record,
+        survey_content=entity.survey_content,
+        survey_record=survey_record,
         survey_logic=params['logic'],
         data=post_dict)
 

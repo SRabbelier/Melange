@@ -31,13 +31,15 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.models.expando_base import ExpandoBase
+
 import soc.models.work
 
 
 COMMENT_PREFIX = 'comment_for_'
 
 
-class SurveyContent(db.Expando):
+class SurveyContent(ExpandoBase):
   """Fields (questions) and schema representation of a Survey.
 
   Each survey content entity consists of properties where names and default

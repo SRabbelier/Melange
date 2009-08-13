@@ -407,8 +407,14 @@ def setOrganizationInSurveyRecords():
   addOrganizationToSurveyRecords(GradingProjectSurveyRecord)
 
 
-def acceptedStudentsCSVExport(csv_filename, program_key_name):
-  """Exports all accepted Students for particular program into CSV file.
+def exportStudentsWithProjects(csv_filename, scope_path_start=''):
+  """Exports all Students who have a project assigned.
+
+  Args:
+    csv_filename: the name of the file where to save the CSV export
+    scope_path_start: The string with which the scope_path of the project
+      should start with. Can be used to select which sponsor, program or org
+      the projects should belong to.
   """
   # TODO(Pawel.Solyga): Add additional Program parameter to this method 
   # so we export students from different programs
@@ -419,51 +425,74 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
   from soc.models.student import Student
   from soc.models.organization import Organization
 
+  # get all projects
   getStudentProjects = getEntities(StudentProject)
   student_projects = getStudentProjects()
+
   student_projects_amount = len(student_projects)
   print "Fetched %d Student Projects." % student_projects_amount
+
   print "Fetching Student entities from Student Projects."
   accepted_students = {}
   student_extra_data = {}
   counter = 0
 
-  for sp_key in student_projects.keys():
-    key = student_projects[sp_key].student.key().name()
-    accepted_students[key] = student_projects[sp_key].student
-    org_name = student_projects[sp_key].scope.name
-    student_extra_data[key] = {}
-    student_extra_data[key]['organization'] = org_name
-    student_extra_data[key]['project_status'] = student_projects[sp_key].status
+  for student_project in student_projects.values():
     counter += 1
 
-    print str(counter) + '/' + str(student_projects_amount) + ' ' + key + ' (' + org_name + ')'
+    if student_project.status == 'invalid' or not \
+        student_project.scope_path.startswith(scope_path_start):
+      # no need to export this project
+      continue
+
+    student_entity = student_project.student
+
+    student_key = student_entity.key().id_or_name()
+    accepted_students[student_key] = student_entity
+
+    org_name = student_project.scope.name
+
+    extra_data = {}
+    extra_data['organization'] = org_name
+    extra_data['project_status'] = student_project.status
+    student_extra_data[student_key] = extra_data
+
+    print '%s/%s %s (%s)' %(counter, student_projects_amount,
+                            student_key, org_name)
+
   print "All Student entities fetched."
 
   students_key_order = ['link_id', 'given_name', 'surname', 
-      'name_on_documents', 'email', 'res_street', 'res_city', 'res_state',
-      'res_country', 'res_postalcode', 'phone', 'ship_street', 'ship_city',
-      'ship_state', 'ship_country', 'ship_postalcode', 'birth_date', 
-      'tshirt_size', 'tshirt_style', 'name', 'school_name', 'school_country',
-      'major', 'degree']
+      'document_name', 'email', 'res_street', 'res_city', 'res_state',
+      'res_country', 'res_postalcode', 'phone', 'shipping_street',
+      'shipping_city', 'shipping_state', 'shipping_country',
+      'shipping_postalcode', 'birth_date', 'tshirt_size', 'tshirt_style',
+      'school_name', 'school_country', 'major', 'degree']
 
   print "Preparing Students data for export."
-  students_data = [accepted_students[i].toDict(students_key_order) for i in accepted_students.keys()]
+  students_data = []
 
-  print "Adding organization name and project status to Students data."
-  for student in students_data:
-    extra_data = student_extra_data[program_key_name + '/' + student['link_id']]
-    student['organization'] = extra_data['organization']
-    student['project_status'] = extra_data['project_status']
+  for student_key, student_entity in accepted_students.iteritems():
+    # transform the Student into a set of dict entries
+    prepared_data = student_entity.toDict(students_key_order)
 
+    # add the additional fields
+    extra_data = student_extra_data[student_key]
+    prepared_data['organization'] = extra_data['organization']
+    prepared_data['project_status'] = extra_data['project_status']
+
+    # append the prepared data to the collected data
+    students_data.append(prepared_data)
+
+  # append the extra fields to the key_order
   students_key_order.append('organization')
   students_key_order.append('project_status')
 
   saveDataToCSV(csv_filename, students_data, students_key_order)
-  print "Accepted Students exported to %s file." % csv_filename
+  print "Students with Projects exported to %s file." % csv_filename
 
 
-def exportUniqueOrgAdminsAndMentors(csv_filename, scope_path_start):
+def exportUniqueOrgAdminsAndMentors(csv_filename, scope_path_start=''):
   """Exports Org Admins and Mentors to a CSV file, one per User.
 
   Args:
@@ -505,10 +534,12 @@ def exportUniqueOrgAdminsAndMentors(csv_filename, scope_path_start):
       'shipping_postalcode', 'birth_date', 'tshirt_size', 'tshirt_style']
 
   print 'Preparing the data for export'
-  data = [user.toDict(field_names=export_fields) for user in unique_users.values()]
+  data = [user.toDict(field_names=export_fields) for user in \
+          unique_users.values()]
 
   print 'Exporting the data to CSV'
   saveDataToCSV(csv_filename, data, export_fields)
+  print "Exported Org admins and Mentors (1 per User) to %s file." % csv_filename
 
 
 def saveDataToCSV(csv_filename, data, key_order):
@@ -604,7 +635,7 @@ def main(args):
       'startSpam': startSpam,
       'reviveJobs': reviveJobs,
       'deidleJobs': deidleJobs,
-      'acceptedStudentsCSVExport': acceptedStudentsCSVExport,
+      'exportStudentsWithProjects': exportStudentsWithProjects,
       'exportUniqueOrgAdminsAndMentors': exportUniqueOrgAdminsAndMentors,
       'startUniqueUserIdConversion': startUniqueUserIdConversion,
   }

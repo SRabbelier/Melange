@@ -22,6 +22,7 @@ Melange Datastore Models.
 
 __authors__ = [
   '"Todd Larsen" <tlarsen@google.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
 
@@ -68,12 +69,12 @@ class ModelWithFieldAttributes(db.Model):
       if not hasattr(self, key):
         continue
 
-      result[key] = getattr(self, key)
+      value = getattr(self, key)
 
-    if hasattr(self, 'name'):
-      name_prop = getattr(self, 'name')
-      if callable(name_prop):
-        result['name'] = name_prop()
+      if callable(value):
+        value = value()
+
+      result[key] = value
 
     return result
 

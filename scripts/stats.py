@@ -77,7 +77,7 @@ def addKey(target, fieldname):
 
 
 def getEntities(model):
-  """Returns all users as dictionary.
+  """Returns all entities as dictionary keyed on their id_or_name property.
   """
 
   def wrapped():
@@ -414,11 +414,11 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
   # so we export students from different programs
   # TODO(Pawel.Solyga): Make it universal so it works with both GHOP 
   # and GSoC programs
-  
+
   from soc.models.student_project import StudentProject
   from soc.models.student import Student
   from soc.models.organization import Organization
-  
+
   getStudentProjects = getEntities(StudentProject)
   student_projects = getStudentProjects()
   student_projects_amount = len(student_projects)
@@ -427,7 +427,7 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
   accepted_students = {}
   student_extra_data = {}
   counter = 0
-  
+
   for sp_key in student_projects.keys():
     key = student_projects[sp_key].student.key().name()
     accepted_students[key] = student_projects[sp_key].student
@@ -436,9 +436,10 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
     student_extra_data[key]['organization'] = org_name
     student_extra_data[key]['project_status'] = student_projects[sp_key].status
     counter += 1
+
     print str(counter) + '/' + str(student_projects_amount) + ' ' + key + ' (' + org_name + ')'
   print "All Student entities fetched."
-  
+
   students_key_order = ['link_id', 'given_name', 'surname', 
       'name_on_documents', 'email', 'res_street', 'res_city', 'res_state',
       'res_country', 'res_postalcode', 'phone', 'ship_street', 'ship_city',
@@ -448,36 +449,90 @@ def acceptedStudentsCSVExport(csv_filename, program_key_name):
 
   print "Preparing Students data for export."
   students_data = [accepted_students[i].toDict(students_key_order) for i in accepted_students.keys()]
-  
+
   print "Adding organization name and project status to Students data."
   for student in students_data:
     extra_data = student_extra_data[program_key_name + '/' + student['link_id']]
     student['organization'] = extra_data['organization']
     student['project_status'] = extra_data['project_status']
-  
+
   students_key_order.append('organization')
   students_key_order.append('project_status')
-  
+
   saveDataToCSV(csv_filename, students_data, students_key_order)
   print "Accepted Students exported to %s file." % csv_filename
-  
-  
+
+
+def exportUniqueOrgAdminsAndMentors(csv_filename, scope_path_start):
+  """Exports Org Admins and Mentors to a CSV file, one per User.
+
+  Args:
+    csv_filename: the name of the csv file to save
+    scope_path_start: the start of the scope path of the roles to get could be
+      google/gsoc2009 if you want to export all GSoC 2009 Org Admins and
+      Mentors.
+  """
+
+  from soc.models.mentor import Mentor
+  from soc.models.org_admin import OrgAdmin
+
+  print 'Retrieving all Mentors'
+  mentors = getEntities(Mentor)()
+  all_mentors = mentors.values()
+
+  print 'Retrieving all Org Admins'
+  org_admins = getEntities(OrgAdmin)()
+  all_org_admins = org_admins.values()
+
+  print 'Combining the list of Mentors and Org Admins'
+  unique_users = {}
+  all_users = []
+  all_users.extend(all_mentors)
+  all_users.extend(all_org_admins)
+
+  for user in all_users:
+    if not user.scope_path.startswith(scope_path_start) or \
+        user.status == 'invalid':
+      # not the correct program or valid user
+      continue
+
+    unique_users[user.link_id] = user
+
+  export_fields = ['link_id', 'given_name', 'surname', 
+      'document_name', 'email', 'res_street', 'res_city', 'res_state',
+      'res_country', 'res_postalcode', 'phone', 'shipping_street',
+      'shipping_city', 'shipping_state', 'shipping_country',
+      'shipping_postalcode', 'birth_date', 'tshirt_size', 'tshirt_style']
+
+  print 'Preparing the data for export'
+  data = [user.toDict(field_names=export_fields) for user in unique_users.values()]
+
+  print 'Exporting the data to CSV'
+  saveDataToCSV(csv_filename, data, export_fields)
+
+
 def saveDataToCSV(csv_filename, data, key_order):
   """Saves data in order into CSV file.
+
+  This is a helper function used for exporting CSV data.
   
-  This is a helper function used with acceptedStudentsCSVExport().
+  Args:
+    csv_filename: The name of the file where to save the CSV data
+    data: the data dict to write to CSV
+    key_order: the order in which to export the data in data dict
   """
-  
+
   import csv
   import StringIO
-  
+
   from soc.logic import dicts
-  
+
   file_handler = StringIO.StringIO()
-  
-  writer = csv.DictWriter(file_handler, key_order, dialect='excel')
+
+  # ignore the extra data
+  writer = csv.DictWriter(file_handler, key_order, extrasaction='ignore', dialect='excel')
   writer.writerow(dicts.identity(key_order))
-  
+
   # encode the data to UTF-8 to ensure compatibiliy
   for row_dict in data:
     for key in row_dict.keys():
@@ -487,7 +542,7 @@ def saveDataToCSV(csv_filename, data, key_order):
       else:
         row_dict[key] = str(value)
     writer.writerow(row_dict)
-  
+
   csv_data = file_handler.getvalue()
   csv_file = open(csv_filename, 'w')
   csv_file.write(csv_data)
@@ -550,6 +605,7 @@ def main(args):
       'reviveJobs': reviveJobs,
       'deidleJobs': deidleJobs,
       'acceptedStudentsCSVExport': acceptedStudentsCSVExport,
+      'exportUniqueOrgAdminsAndMentors': exportUniqueOrgAdminsAndMentors,
       'startUniqueUserIdConversion': startUniqueUserIdConversion,
   }
 

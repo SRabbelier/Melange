@@ -73,7 +73,7 @@ class View(role.View):
     rights['list_projects'] = [
         ('checkHasActiveRoleForScope', student_logic.logic),
         ('checkIsAfterEvent', ['accepted_students_announced_deadline',
-                               'scope_path'])]
+                               'scope_path', program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.student.logic

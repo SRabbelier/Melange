@@ -99,9 +99,11 @@ class View(presence.View):
     rights['show_duplicates'] = ['checkIsHostForProgram']
     rights['assigned_proposals'] = ['checkIsHostForProgram']
     rights['accepted_orgs'] = [('checkIsAfterEvent',
-        ['accepted_organization_announced_deadline', '__all__'])]
+        ['accepted_organization_announced_deadline',
+         '__all__', program_logic.logic])]
     rights['list_projects'] = [('checkIsAfterEvent',
-        ['accepted_students_announced_deadline', '__all__'])]
+        ['accepted_students_announced_deadline', 
+         '__all__', program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.program.logic

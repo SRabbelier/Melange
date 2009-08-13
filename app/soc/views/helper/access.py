@@ -1016,7 +1016,8 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsAfterEvent(self, django_args, event_name, key_name_arg):
+  def checkIsAfterEvent(self, django_args, event_name, 
+                        key_name_arg, program_logic):
     """Checks if the given event has taken place for the given program.
 
     Args:
@@ -1025,6 +1026,7 @@ class Checker(object):
       key_name_arg: the entry in django_args that specifies the given program
         keyname. If none is given the key_name is constructed from django_args
         itself.
+      program_logic: Program Logic instance
 
     Raises:
       AccessViolationResponse:

@@ -374,6 +374,43 @@ class Role(soc.models.linkable.Linkable):
     else:
       return self.name()
 
+  def shipping_street(self):
+    """Property shipping_street that returns shipping street if
+    shipping address is set else the residential street.
+    """
+    return self.ship_street if self.hasShippingAddress() else self.res_street
+
+  def shipping_city(self):
+    """Property shipping_city that returns shipping city if
+    shipping address is set else the residential city.
+    """
+    return self.ship_city if self.hasShippingAddress() else self.res_city
+
+  def shipping_state(self):
+    """Property shipping_state that returns shipping state if
+    shipping address is set else the residential state.
+    """
+    return self.ship_state if self.hasShippingAddress() else self.res_state
+
+  def shipping_country(self):
+    """Property shipping_country that returns shipping country if
+    shipping address is set else the residential country.
+    """
+    return self.ship_country if self.hasShippingAddress() else self.res_country
+
+  def shipping_postalcode(self):
+    """Property shipping_postalcode that returns the shipping postal code if
+    shipping address set else the residential postal code.
+    """
+    return self.ship_postalcode if self.hasShippingAddress() else \
+        self.res_postalcode
+
+  def hasShippingAddress(self):
+    """Checks if the required fields for the shipping address are set.
+    """
+    return self.ship_city and self.ship_country and self.ship_postalcode and \
+        self.ship_street
+
   def ccTld(self):
     """Property as 'ccTld' for use in Maps.
     """

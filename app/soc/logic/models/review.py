@@ -54,7 +54,7 @@ class Logic(base.Logic):
     fields = {'scope': entity,
               'is_public': is_public}
 
-    query = self.getQueryForFields(fields, order)
+    query = self.getQueryForFields(fields, order=order)
 
     return self.getAll(query)
 

@@ -841,7 +841,7 @@ class View(object):
 
   def _edit(self, request, entity, context, params):
     """Hook for the edit View.
-  
+
     Args:
       request: the Django request object
       entity: entity being edited

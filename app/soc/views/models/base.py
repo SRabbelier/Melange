@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
@@ -724,15 +725,19 @@ class View(object):
 
     return self.json(request, data)
 
-  def json(self, request, data):
+  def json(self, request, data, to_json=True):
     """Returns data as a json object.
+
+    Args:
+      request: the standard Django HTTP request object
+      data: the data to be sent as a json object
+      to_json: determines if the data should be converted to a json object
     """
 
-    to_json = {
-        'data': data,
-        }
-
-    json = simplejson.dumps(to_json)
+    if to_json:
+      json = simplejson.dumps({'data': data})
+    else:
+      json = data
 
     context = {'json': json}
     template = 'soc/json.html'

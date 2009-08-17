@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -34,6 +35,7 @@ def getApplyRedirect(entity, params):
       params['url_name'], entity.key().id_or_name())
 
   return result
+
 
 def getInviteRedirect(entity, params):
   """Returns the invitation redirect for the specified entity.
@@ -127,6 +129,7 @@ def getReviewOverviewRedirect(entity, params):
   return '/%s/review_overview/%s' % (
       params['url_name'], entity.key().id_or_name())
 
+
 def getCreateRequestRedirect(entity, params):
   """Returns the create request redirect for the specified entity.
   """
@@ -218,6 +221,7 @@ def getListRolesRedirect(entity, params):
       params['url_name'], entity.key().id_or_name())
 
   return result
+
 
 def getAcceptProjectRedirect(entity, params):
   """Returns the redirect for accept_project access type.
@@ -428,7 +432,7 @@ def getViewSurveyRecordRedirect(entity, params):
   Args:
       entity: a Survey Record entity
       params: params for a Survey view
-      
+
   """
 
   return '/%s/record/%s?id=%s' % (
@@ -468,7 +472,17 @@ def getToSRedirect(presence):
 
 
 def getSubscribeRedirect(entity, params):
-  """Redirects to subscription XML doc for an entity
+  """Redirects to subscription XML doc for an entity.
   """
   return'/%s/subscribe/%s' % (
       params['url_name'], entity.key().name())
+
+
+def getManageStatisticsRedirect(entity, params):
+  """Returns redirect for managing statistic view.
+  """
+
+  result = '/%s/manage_stats/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result

@@ -90,7 +90,7 @@ class View(presence.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
-    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope', 
+    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',
         host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
@@ -102,7 +102,7 @@ class View(presence.View):
         ['accepted_organization_announced_deadline',
          '__all__', program_logic.logic])]
     rights['list_projects'] = [('checkIsAfterEvent',
-        ['accepted_students_announced_deadline', 
+        ['accepted_students_announced_deadline',
          '__all__', program_logic.logic])]
 
     new_params = {}
@@ -272,7 +272,7 @@ class View(presence.View):
 
     from soc.views.models.organization import view as org_view
     ao_params = org_view.getParams().copy() # active orgs
-    ao_list = self._getAcceptedOrgsList(description, ao_params, 
+    ao_list = self._getAcceptedOrgsList(description, ao_params,
         filter, use_cache)
 
     contents.append(ao_list)
@@ -322,7 +322,7 @@ class View(presence.View):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View, not used
     """
-    
+
     from django.utils import simplejson
 
     program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
@@ -434,7 +434,7 @@ class View(presence.View):
   @decorators.check_access
   def showDuplicates(self, request, access_type, page_name=None,
                      params=None, **kwargs):
-    """View in which a host can see which students have been assigned 
+    """View in which a host can see which students have been assigned
        multiple slots.
 
     For params see base.view.Public().
@@ -529,7 +529,7 @@ class View(presence.View):
               'slots >': 0,
               'status': 'active'}
 
-    org_entities = org_logic.logic.getForFields(fields, 
+    org_entities = org_logic.logic.getForFields(fields,
         limit=limit, offset=offset)
 
     orgs_data = {}
@@ -743,7 +743,7 @@ class View(presence.View):
           (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
           "Apply to become an Organization", 'any_access')]
 
-    if user and timeline_helper.isAfterEvent(timeline_entity, 
+    if user and timeline_helper.isAfterEvent(timeline_entity,
         'org_signup_start'):
       filter = {
           'applicant': user,
@@ -805,7 +805,7 @@ class View(presence.View):
 
     return items
 
-  def _getStudentEntries(self, program_entity, student_entity, 
+  def _getStudentEntries(self, program_entity, student_entity,
                          params, id, user):
     """Returns a list with menu items for students in a specific program.
     """
@@ -824,7 +824,7 @@ class View(presence.View):
           {'url_name':'student_proposal'}),
           "List my Student Proposals", 'any_access')]
 
-    items += [(redirects.getEditRedirect(student_entity, 
+    items += [(redirects.getEditRedirect(student_entity,
         {'url_name': 'student'}),
         "Edit my Student Profile", 'any_access')]
 

@@ -22,6 +22,7 @@ __authors__ = [
 
 
 from soc.modules.ghop.views.models import program
+from soc.modules.ghop.views.models import timeline
 
 
 class Callback(object):
@@ -43,6 +44,7 @@ class Callback(object):
     self.core.requireUniqueService('registerWithSitemap')
 
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

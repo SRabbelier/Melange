@@ -46,5 +46,18 @@ class Logic(presence_with_tos.Logic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+  def createTimelineForType(self, fields):
+    """Creates and stores a timeline model for the given type of program.
+    """
+
+    properties = self.timeline_logic.getKeyFieldsFromFields(fields)
+    key_name = self.timeline_logic.getKeyNameFromFields(properties)
+
+    properties['scope'] = fields['scope']
+
+    timeline = self.timeline_logic.updateOrCreateFromKeyName(properties,
+                                                             key_name)
+    return timeline
+
 
 logic = Logic()

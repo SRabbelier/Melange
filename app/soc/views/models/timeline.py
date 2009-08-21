@@ -58,7 +58,7 @@ class View(base.View):
     new_params['name'] = "Timeline"
 
     patterns = [(r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
-                  'soc.views.models.%(module_name)s.edit', 
+                  '%(module_package)s.%(module_name)s.edit', 
                   "Edit %(name_short)s")]
 
     new_params['create_extra_dynaproperties'] = {
@@ -72,16 +72,15 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-    for name, logic_value in program_logic.logic.TIMELINE_LOGIC.iteritems():
-      create_form = params_helper.getCreateForm(self._params, 
-          logic_value.getModel())
-      edit_form = dynaform.extendDynaForm(
-        dynaform = create_form,
-        dynainclude = self._params['edit_dynainclude'],
-        dynaexclude = self._params['edit_dynaexclude'],
-        )
+    create_form = params_helper.getCreateForm(self._params, 
+        program_logic.logic.timeline_logic.getModel())
+    edit_form = dynaform.extendDynaForm(
+      dynaform = create_form,
+      dynainclude = self._params['edit_dynainclude'],
+      dynaexclude = self._params['edit_dynaexclude'],
+      )
 
-      self._params['edit_form_%s' % name] = edit_form
+    self._params['edit_form'] = edit_form
 
   def edit(self, request, access_type,
            page_name=None, params=None, seed=None, **kwargs):
@@ -97,9 +96,7 @@ class View(base.View):
 
     program = program_logic.logic.getFromKeyFields(key_fields)
     if program:
-      workflow = program.workflow
-      params['edit_form'] = params["edit_form_%s" % workflow]
-      params['logic'] = program_logic.logic.TIMELINE_LOGIC[workflow]
+      params['logic'] = program_logic.logic.timeline_logic
 
     return super(View, self).edit(request, access_type, page_name=page_name,
                                   params=params, seed=seed, **kwargs)

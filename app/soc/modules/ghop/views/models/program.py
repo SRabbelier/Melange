@@ -34,6 +34,7 @@ from soc.views.sitemap import sidebar
 
 import soc.cache.logic
 
+from soc.modules.ghop.logic.models import program as ghop_program_logic
 import soc.modules.ghop.logic.models.program
 
 

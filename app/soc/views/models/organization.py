@@ -121,10 +121,10 @@ class View(group.View):
 
     patterns += [
         (r'^%(url_name)s/(?P<access_type>apply_mentor)/%(scope)s$',
-        'soc.views.models.%(module_name)s.apply_mentor',
+        '%(module_package)s.%(module_name)s.apply_mentor',
         "List of all %(name_plural)s you can apply to"),
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.list_proposals',
+        '%(module_package)s.%(module_name)s.list_proposals',
         "List of all Student Proposals for this %(name)s"),
         ]
 

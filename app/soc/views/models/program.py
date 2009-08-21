@@ -122,22 +122,22 @@ class View(presence.View):
     patterns = []
     patterns += [
         (r'^%(url_name)s/(?P<access_type>assign_slots)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.assign_slots',
+          '%(module_package)s.%(module_name)s.assign_slots',
           'Assign slots'),
         (r'^%(url_name)s/(?P<access_type>slots)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.slots',
+          '%(module_package)s.%(module_name)s.slots',
           'Assign slots (JSON)'),
         (r'^%(url_name)s/(?P<access_type>show_duplicates)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.show_duplicates',
+          '%(module_package)s.%(module_name)s.show_duplicates',
           'Show duplicate slot assignments'),
         (r'^%(url_name)s/(?P<access_type>assigned_proposals)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.assigned_proposals',
+          '%(module_package)s.%(module_name)s.assigned_proposals',
           "Assigned proposals for multiple organizations"),
         (r'^%(url_name)s/(?P<access_type>accepted_orgs)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.accepted_orgs',
+          '%(module_package)s.%(module_name)s.accepted_orgs',
           "List all accepted organizations"),
         (r'^%(url_name)s/(?P<access_type>list_projects)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.list_projects',
+          '%(module_package)s.%(module_name)s.list_projects',
           "List all student projects"),
         ]
 

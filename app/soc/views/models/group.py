@@ -70,17 +70,17 @@ class View(presence.View):
 
     patterns += [
         (r'^%(url_name)s/(?P<access_type>list_requests)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.list_requests',
+        '%(module_package)s.%(module_name)s.list_requests',
         'List of requests for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_roles)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.list_roles',
+        '%(module_package)s.%(module_name)s.list_roles',
         'List of roles for %(name)s')]
 
     if params.get('group_applicant_url'):
       # add the applicant pattern
       patterns += [
           (r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.applicant', 
+          '%(module_package)s.%(module_name)s.applicant', 
           "%(name)s Creation via Accepted Application"),]
 
     new_params['extra_django_patterns'] = patterns

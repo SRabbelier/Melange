@@ -98,32 +98,32 @@ class View(base.View):
     if params.get('allow_requests_and_invites'):
       # add patterns concerning requests and invites
       patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
-          'soc.views.models.%(module_name)s.invite',
+          '%(module_package)s.%(module_name)s.invite',
           'Create invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
-          'soc.views.models.%(module_name)s.accept_invite',
+          '%(module_package)s.%(module_name)s.accept_invite',
           'Accept invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
-          'soc.views.models.%(module_name)s.process_request',
+          '%(module_package)s.%(module_name)s.process_request',
           'Process request'),
           (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
-          'soc.views.models.%(module_name)s.role_request',
+          '%(module_package)s.%(module_name)s.role_request',
           'Create a Request to become %(name)s')]
     elif params.get('allow_invites'):
       # add patterns concerning only invites
       patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
-          'soc.views.models.%(module_name)s.invite',
+          '%(module_package)s.%(module_name)s.invite',
           'Create invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
-          'soc.views.models.%(module_name)s.accept_invite',
+          '%(module_package)s.%(module_name)s.accept_invite',
           'Accept invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
-          'soc.views.models.%(module_name)s.process_request',
+          '%(module_package)s.%(module_name)s.process_request',
           'Process request for %(name)s')]
 
     # add manage pattern
     patterns += [(r'^%(url_name)s/(?P<access_type>manage)/%(scope)s/%(lnp)s$',
-        'soc.views.models.%(module_name)s.manage',
+        '%(module_package)s.%(module_name)s.manage',
         'Manage a %(name)s'),]
 
     new_params['extra_django_patterns'] = patterns

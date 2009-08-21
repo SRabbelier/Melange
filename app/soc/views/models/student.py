@@ -92,10 +92,10 @@ class View(role.View):
 
     # add apply pattern
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
-        'soc.views.models.%(module_name)s.apply',
+        '%(module_package)s.%(module_name)s.apply',
         'Become a %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_projects)/%(scope)s$',
-        'soc.views.models.%(module_name)s.list_projects',
+        '%(module_package)s.%(module_name)s.list_projects',
         'List of my Student Projects'),]
 
     new_params['extra_django_patterns'] = patterns

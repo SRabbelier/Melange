@@ -83,7 +83,7 @@ class View(base.View):
 
     page_name = "Home"
     patterns += [(r'^%(url_name)s/(?P<access_type>home)/%(key_fields)s$',
-                  'soc.views.models.%(module_name)s.home',
+                  '%(module_package)s.%(module_name)s.home',
                   page_name)]
 
     new_params['extra_django_patterns'] = patterns

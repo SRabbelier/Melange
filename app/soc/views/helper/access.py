@@ -982,7 +982,8 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsActivePeriod(self, django_args, period_name, key_name_arg):
+  def checkIsActivePeriod(self, django_args, period_name, 
+                          key_name_arg, program_logic):
     """Checks if the given period is active for the given program.
 
     Args:
@@ -991,6 +992,7 @@ class Checker(object):
       key_name_arg: the entry in django_args that specifies the given program
         keyname. If none is given the key_name is constructed from django_args
         itself.
+      program_logic: Program Logic instance
 
     Raises:
       AccessViolationResponse:
@@ -1050,17 +1052,18 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
-  def checkCanCreateOrgApp(self, django_args, period_name):
+  def checkCanCreateOrgApp(self, django_args, period_name, program_logic):
     """Checks to see if the program in the scope_path is accepting org apps
     
     Args:
       django_args: a dictionary with django's arguments
       period_name: the name of the period which is checked
+      program_logic: Program Logic instance
     """
 
     if 'seed' in django_args:
       return self.checkIsActivePeriod(django_args['seed'],
-          period_name, 'scope_path')
+          period_name, 'scope_path', program_logic)
     else:
       return
 
@@ -1161,12 +1164,13 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
 
-  def checkIsNotParticipatingInProgramInScope(self, django_args):
+  def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic):
     """Checks if the current user has no roles for the given 
        program in django_args.
 
     Args:
       django_args: a dictionary with django's arguments
+      program_logic: Program Logic instance
 
      Raises:
        AccessViolationResponse: if the current user has a student, mentor or
@@ -1213,12 +1217,13 @@ class Checker(object):
     # no roles found, access granted
     return
 
-  def checkIsNotStudentForProgramInScope(self, django_args):
+  def checkIsNotStudentForProgramInScope(self, django_args, program_logic):
     """Checks if the current user is not a student for the given
        program in django_args.
 
     Args:
       django_args: a dictionary with django's arguments
+      program_logic: Program Logic instance
 
      Raises:
        AccessViolationResponse: if the current user has a student

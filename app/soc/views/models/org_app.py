@@ -60,10 +60,12 @@ class View(group_app.View):
     rights['create'] = ['checkIsDeveloper']
     rights['delete'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic]),
-                       ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
+                       ('checkIsActivePeriod',
+                        ['org_signup', 'scope_path', program_logic.logic])]
     rights['edit'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic]),
-                       ('checkIsActivePeriod', ['org_signup', 'scope_path'])]
+                       ('checkIsActivePeriod', 
+                        ['org_signup', 'scope_path', program_logic.logic])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_self'] = ['checkIsUser']
     rights['show'] = ['allow']
@@ -73,7 +75,8 @@ class View(group_app.View):
     rights['bulk_accept'] = ['checkIsHostForProgramInScope']
     rights['bulk_reject'] = ['checkIsHostForProgramInScope']
     rights['apply'] = ['checkIsUser',
-                             ('checkCanCreateOrgApp', ['org_signup']),
+                             ('checkCanCreateOrgApp', 
+                              ['org_signup', program_logic.logic]),
                        'checkIsNotStudentForProgramInScope']
 
     new_params = {}

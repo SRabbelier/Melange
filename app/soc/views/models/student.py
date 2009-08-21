@@ -65,8 +65,9 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['apply'] = [
         'checkIsUser',
-        ('checkIsActivePeriod', ['student_signup', 'scope_path']),
-        'checkIsNotParticipatingInProgramInScope',
+        ('checkIsActivePeriod', 
+         ['student_signup', 'scope_path', program_logic.logic]),
+        ('checkIsNotParticipatingInProgramInScope', [program_logic.logic]),
         ]
     rights['manage'] = [('checkHasActiveRoleForScope', student_logic.logic),
         ('checkIsMyEntity', [student_logic.logic, 'user', True])]

@@ -791,3 +791,29 @@ def validate_access(self, view, rights, prefix, scope_path, field):
   if not has_access(rights, access_level, scope_path, prefix):
     self._errors[field] = ErrorList([DEF_NO_RIGHTS_FOR_ACL_MSG])
     del self.cleaned_data[field]
+
+def str2set(string_field):
+  """Clean method for cleaning comma separated string in the edit form.
+
+  Obtains the comma separated string from the form and stores it as
+  returns it as a list of strings.
+  """
+
+  def wrapper(self):
+    """Decorator wrapper method.
+    """
+    cleaned_data = self.cleaned_data
+
+    string_data = cleaned_data.get(string_field)
+
+    list_data = []
+    for string in string_data.split(','):
+      string_strip = string.strip()
+      if string_strip and string_strip not in list_data:
+        list_data.append(string_strip)
+
+    cleaned_data[string_field] = list_data
+
+    return cleaned_data[string_field]
+
+  return wrapper

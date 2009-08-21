@@ -27,6 +27,7 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
+import soc.modules.ghop.logic.models.timeline
 import soc.modules.ghop.models.program
 
 
@@ -39,6 +40,8 @@ class Logic(program.Logic):
                scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
+
+    self.timeline_logic = soc.modules.ghop.logic.models.timeline.logic
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)

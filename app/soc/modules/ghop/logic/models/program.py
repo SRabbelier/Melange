@@ -27,7 +27,6 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
-import soc.modules.ghop.logic.models.timeline
 import soc.modules.ghop.models.program
 
 
@@ -43,21 +42,6 @@ class Logic(program.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
-
-    self.timeline_logic = soc.modules.ghop.logic.models.timeline.logic
-
-  def createTimelineForType(self, fields):
-    """Creates and stores a timeline model for the given type of program.
-    """
-
-    properties = self.timeline_logic.getKeyFieldsFromFields(fields)
-    key_name = self.timeline_logic.getKeyNameFromFields(properties)
-
-    properties['scope'] = fields['scope']
-
-    timeline = self.timeline_logic.updateOrCreateFromKeyName(properties,
-                                                             key_name)
-    return timeline
 
 
 logic = Logic()

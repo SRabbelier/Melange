@@ -77,7 +77,7 @@ class Program(soc.models.presence.Presence):
       '<small><i>(rich text formatting is supported)</i></small>')
 
   #: Required field storing application/tasks limit of the program.
-  apps_tasks_limit = db.IntegerProperty(required=True, default=20,
+  apps_tasks_limit = db.IntegerProperty(required=True,
       verbose_name=ugettext('Application/Tasks Limit'))
   apps_tasks_limit.example_text = ugettext(
       '<small><i>e.g.</i></small> '
@@ -98,7 +98,7 @@ class Program(soc.models.presence.Presence):
       'The amount of slots each organization should get at most')
 
   #: Required field storing slots limit of the program.
-  slots = db.IntegerProperty(required=True, default=0,
+  slots = db.IntegerProperty(required=True,
       verbose_name=ugettext('Slots'))
   slots.example_text = ugettext(
       '<small><i>e.g.</i></small> '

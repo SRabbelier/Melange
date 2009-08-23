@@ -21,11 +21,6 @@ __authors__ = [
   ]
 
 
-from soc.modules.ghop.views.models import organization
-from soc.modules.ghop.views.models import program
-from soc.modules.ghop.views.models import timeline
-
-
 class Callback(object):
   """Callback object that handles interaction between the core.
   """
@@ -44,17 +39,9 @@ class Callback(object):
 
     self.core.requireUniqueService('registerWithSitemap')
 
-    self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
-
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.
     """
 
     # require that we had the chance to register the urls we need with the sitemap
     self.core.requireUniqueService('registerWithSidebar')
-
-    self.core.registerSidebarEntry(organization.view.getExtraMenus)
-    self.core.registerSidebarEntry(organization.view.getSidebarMenus)
-    self.core.registerSidebarEntry(program.view.getSidebarMenus)

@@ -27,37 +27,24 @@ from soc.logic.models import presence_with_tos
 from soc.logic.models import sponsor as sponsor_logic
 
 import gsoc.logic.models.timeline
+import soc.logic.models.timeline
 import soc.models.program
-
-import soc.modules.ghop.logic.models.timeline
 
 
 class Logic(presence_with_tos.Logic):
   """Logic methods for the Program model.
   """
 
+  TIMELINE_LOGIC = {'gsoc' : gsoc.logic.models.timeline.logic,
+                    'ghop' : soc.logic.models.timeline.logic}
+
   def __init__(self, model=soc.models.program.Program, 
                base_model=None, scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    self.timeline_logic = gsoc.logic.models.timeline.logic
-
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
-
-  def createTimelineForType(self, fields):
-    """Creates and stores a timeline model for the given type of program.
-    """
-
-    properties = self.timeline_logic.getKeyFieldsFromFields(fields)
-    key_name = self.timeline_logic.getKeyNameFromFields(properties)
-
-    properties['scope'] = fields['scope']
-
-    timeline = self.timeline_logic.updateOrCreateFromKeyName(properties,
-                                                             key_name)
-    return timeline
 
 
 logic = Logic()

@@ -38,26 +38,18 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
   """Model for work submissions for a task by students.
 
   Scope will be set to the Organization to which this work has been submitted.
+  scope_path will be set to the task key name under which this work was
+  submitted.
   """
-
-  #: Task to which this work was submitted
-  task = db.ReferenceProperty(reference_class=task_model.GHOPTask,
-                              required=True,
-                              collection_name='work_submissions')
 
   #: User who submitted this work
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True,
                               collection_name='work_submissions')
 
-  #: Program to which this work belongs to
-  program = db.ReferenceProperty(
-      reference_class=ghop_program_model.GHOPProgram,
-      required=True, collection_name='work_submissions')
-
   #: Property allowing you to store information about your work
   information = db.TextProperty(
-      required=True, verbose_name=ugettext('Info'))
+      required=False, verbose_name=ugettext('Info'))
   information.help_text = ugettext(
       'Information about the work you submit for this task')
 

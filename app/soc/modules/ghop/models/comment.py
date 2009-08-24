@@ -26,15 +26,61 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.comment
+import soc.models.base
+
+import soc.modules.ghop.models.task
 
 
-class GHOPComment(soc.models.comment.Comment):
+class GHOPComment(soc.models.base.ModelWithFieldAttributes):
   """GHOP Comment model for tasks, extends the basic Comment model.
   """
+
+  #: The rich textual content of this comment
+  content = db.TextProperty(required=False, verbose_name=ugettext('Content'))
 
   #: Property containing the human readable string that should be
   #: shown for the comment when something in the task changes, 
   #: code.google.com issue tracker style
-  change_in_task = db.StringProperty(required=True,
-      verbose_name=ugettext('Changes in the task'))
+  changes = db.StringListProperty(required=True, default=[],
+                                  verbose_name=ugettext('Changes in the task'))
+
+  #: Property storing the status of the comment.
+  #: valid: comment is visible to all
+  #: invalid: comment is deleted, which is marked as invalid
+  status = db.StringProperty(default='valid',
+                             choices=['valid','invalid'],
+                             verbose_name=ugettext('Status of this Comment'))
+
+  #: Reference property to the task entity under which the comment
+  #: is scoped 
+  scope = db.ReferenceProperty(
+      reference_class=soc.modules.ghop.models.task.GHOPTask,
+      required=True, collection_name='comment_scopes',
+      verbose_name=ugettext('Comment Scope'))
+  scope.help_text = ugettext(
+      'Reference to the task entity under which this comment was posted.')
+
+  #: Hidden (not displayed to users or editable in forms) cache of the string
+  #: representation of the transitive closure of scopes, for use in URLs.
+  scope_path = db.StringProperty(required=False,
+                                 verbose_name=ugettext('Scope path'))
+  scope_path.help_text = ugettext(
+      'Cache of the string form of the entity scope.')
+
+  #: A required many:1 relationship with a comment entity indicating
+  #: the user who provided that comment.
+  created_by = db.ReferenceProperty(reference_class=soc.models.user.User,
+                                    required=True,
+                                    collection_name="commented_by")
+
+  #: Date when the comment was added
+  created_on = db.DateTimeProperty(auto_now_add=True)
+
+  # indicating wich user last modified the work. Used in displaying Work
+  modified_by = db.ReferenceProperty(reference_class=soc.models.user.User,
+                                     required=False,
+                                     collection_name="comment_modified_by",
+                                     verbose_name=ugettext('Modified by'))
+
+  #: date when the work was last modified
+  modified_on = db.DateTimeProperty(auto_now=True)

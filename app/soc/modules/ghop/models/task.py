@@ -151,36 +151,31 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: Required property which holds the state, the Task is currently in.
   #: This is a hidden field not shown on forms. Handled by logic internally.
   #: The state can be one of the following:
-  #: unapproved: If Task is created by a Mentor, this is the automatically
+  #: Unapproved: If Task is created by a Mentor, this is the automatically
   #:   assigned state.
-  #: unpublished: This Task is not published yet.
-  #: open: This Task is open and ready to be claimed.
-  #: reopened: This Task has been claimed but never finished and has been
+  #: Unpublished: This Task is not published yet.
+  #: Open: This Task is open and ready to be claimed.
+  #: Reopened: This Task has been claimed but never finished and has been
   #:   reopened.
-  #: claim_requested: A Student has requested to claim this task.
-  #: claimed: This Task has been claimed and someone is working on it.
-  #: action_needed: Work on this Task must be submitted for review within 
+  #: ClaimRequested: A Student has requested to claim this task.
+  #: Claimed: This Task has been claimed and someone is working on it.
+  #: ActionNeeded: Work on this Task must be submitted for review within 
   #:   24 hours.
-  #: closed: Work on this Task has been completed to the org's content.
-  #: awaiting_registration: Student has completed work on this task, but
+  #: Closed: Work on this Task has been completed to the org's content.
+  #: AwaitingRegistration: Student has completed work on this task, but
   #:   needs to complete Student registration before this task is closed.
-  #: needs_work: This work on this Tasks needs a bit more brushing up. This
+  #: NeedsWork: This work on this Tasks needs a bit more brushing up. This
   #:   state is followed by a Mentor review.
-  #: needs_review: Student has submitted work for this task and it should
+  #: NeedsReview: Student has submitted work for this task and it should
   #:   be reviewed by a Mentor.
+  #: Invalid: The Task is deleted either by an Org Admin/Mentor
   status = db.StringProperty(
       required=True, verbose_name=ugettext('Status'),
-      choices=['unapproved', 'unpublished', 'open', 'reopened', 
-               'claim_requested', 'claimed', 'action_needed', 
-               'closed', 'awaiting_registration', 'needs_work',
-               'needs_review'],
-      default='unapproved')
-
-  #: A field which indicates if the Task was ever in the Reopened state.
-  #: True indicates that its state was Reopened once, false indicated that it
-  #: has never been in the Reopened state.
-  was_reopened = db.BooleanProperty(default=False,
-                                    verbose_name=ugettext('Has been reopened'))
+      choices=['Unapproved', 'Unpublished', 'Open', 'Reopened', 
+               'ClaimRequested', 'Claimed', 'ActionNeeded', 
+               'Closed', 'AwaitingRegistration', 'NeedsWork',
+               'NeedsReview', 'Invalid'],
+      default='Unapproved')
 
   #: This field is set to the next deadline that will have consequences for
   #: this Task. For instance this will store a DateTime property which will
@@ -188,9 +183,10 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   deadline = db.DateTimeProperty(required=False,
                                  verbose_name=ugettext('Deadline'))
 
-  #: Required field containing the Mentor/Org Admin who created this task
+  #: Required field containing the Mentor/Org Admin who created this task.
+  #: If site developer has created the task, it is empty.
   created_by = db.ReferenceProperty(reference_class=soc.models.role.Role,
-                                    required=True,
+                                    required=False,
                                     collection_name='created_tasks',
                                     verbose_name=ugettext('Created by'))
 
@@ -203,7 +199,7 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: difficulty, task_type, time_to_complete. If site developer has modified
   #: the task, it is empty.
   modified_by = db.ReferenceProperty(reference_class=soc.models.role.Role,
-                                   required=True,
+                                   required=False,
                                    collection_name='edited_tasks',
                                    verbose_name=ugettext('Modified by'))
 
@@ -231,7 +227,7 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: model. The subsequent items hold the properties that changed at the
   #: timestamp given by the key.
   #: Reference properties will be stored by calling str() on their Key.
-  history = db.TextProperty(required=True, default='')
+  history = db.TextProperty(required=False, default='')
 
   def __init__(self, parent=None, key_name=None, 
                app=None, **entity_values):

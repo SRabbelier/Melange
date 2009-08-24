@@ -32,4 +32,4 @@ class GradingProjectSurvey(ProjectSurvey):
 
   def __init__(self, *args, **kwargs):
     super(GradingProjectSurvey, self).__init__(*args, **kwargs)
-    self.taking_access = 'mentor'
+    self.taking_access = 'org'

@@ -67,6 +67,13 @@ class Logic(base.Logic):
                                                      survey_group,
                                                      record_entity)
 
+      if not record_entity and project_entity.status in ['failed', 'invalid'] \
+          and not record_fields['mentor_record'] \
+          and not record_fields['student_record']:
+        # Don't create a new GradingRecord for an already failed project which
+        # has no records attached. Because it does not matter.
+        continue
+
       if record_entity:
         # update existing GradingRecord
         for key,value in record_fields.iteritems():

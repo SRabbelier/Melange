@@ -1698,11 +1698,26 @@ class Checker(object):
       return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
 
     if role == 'org_admin':
-      # check if the current user is a mentor for the program in survey.scope
+      # check if the current user is an org admin for the program
       django_args['program'] = survey_scope
       # program is the 'program' attribute for mentors and org_admins
       return self._checkHasActiveRoleFor(django_args, org_admin_logic,
                                          'program')
+
+    if role == 'org':
+      # check if the current user is an org admin or mentor for the program
+      django_args['program'] = survey_scope
+
+      try:
+        # program is the 'program' attribute for mentors and org_admins
+        return self._checkHasActiveRoleFor(django_args, org_admin_logic,
+                                          'program')
+      except:
+        # the current user is no org admin
+        pass
+
+      # try to check if the current user is a mentor instead
+      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
 
     if role == 'student':
       # check if the current user is a student for the program in survey.scope

@@ -98,11 +98,8 @@ class Survey(soc.models.work.Work):
   SURVEY_ACCESS = ['admin', 'restricted', 'member', 'user']
 
   # these are GSoC specific, so eventually we can subclass this
-  SURVEY_TAKING_ACCESS = ['student',
-                          'mentor',
-                          'org_admin',
-                          'user']
-  
+  SURVEY_TAKING_ACCESS = ['student', 'mentor', 'org_admin', 'org', 'user']
+
   GRADE_OPTIONS = {'midterm':['mid_term_passed', 'mid_term_failed'],
                    'final':['final_passed', 'final_failed'],
                    'N/A':[] }

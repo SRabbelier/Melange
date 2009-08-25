@@ -20,6 +20,7 @@
 __authors__ = [
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -57,7 +58,7 @@ class PlainTextWidget(forms.widgets.Widget):
     """Render ReadOnlyInput widget as HTML.
     """
 
-    return str(value) if value else ""
+    return html.linebreaks(str(value)) if value else ""
 
 
 class FullTinyMCE(forms.widgets.Textarea):

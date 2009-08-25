@@ -195,11 +195,11 @@
     var this_object = this;
     var NUMBER_OF_ORGS = number_of_orgs;
     var OFFSET_LENGTH = offset_length;
-    /*jslint undef:true */
     // Variables to handle progress bar updating
     var ITERATIONS = (number_of_orgs % offset_length) === 0 ?
       Math.floor(number_of_orgs / offset_length) :
       Math.floor(number_of_orgs / offset_length) + 1;
+    /*jslint undef:true */
 
     if (ITERATIONS === 0) {
       jQuery("#div_duplicate_slots")

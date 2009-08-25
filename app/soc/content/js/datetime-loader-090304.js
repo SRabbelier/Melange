@@ -1,5 +1,6 @@
-$(function()
-{
-$('.datetime-pick').datetimepicker();
-});
+jQuery(
+  function () {
+    jQuery('.datetime-pick').datetimepicker();
+  }
+);
 

@@ -17,17 +17,19 @@ function BlogPreview(container) {
   this.container_ = container;
 }
 
-BlogPreview.prototype.show = function(url, entries_num, title, title_link) {
+BlogPreview.prototype.show = function (url, entries_num, title, title_link) {
   var feed = new google.feeds.Feed(url);
   var preview = this;
-  feed.setNumEntries(entries_num)
-  feed.load(function(result) {
+  feed.setNumEntries(entries_num);
+  feed.load(function (result) {
     preview.render_(result, title, title_link);
   });
-}
+};
 
-BlogPreview.prototype.render_ = function(result, title, title_link) {
-  if (!result.feed || !result.feed.entries) return;
+BlogPreview.prototype.render_ = function (result, title, title_link) {
+  if (!result.feed || !result.feed.entries) {
+    return;
+  }
   while (this.container_.firstChild) {
     this.container_.removeChild(this.container_.firstChild);
   }
@@ -52,20 +54,20 @@ BlogPreview.prototype.render_ = function(result, title, title_link) {
     }
     this.createDiv_(div, "snippet", entry.contentSnippet);
   }
-}
+};
 
-BlogPreview.prototype.createDiv_ = function(parent, className, opt_text) {
+BlogPreview.prototype.createDiv_ = function (parent, className, opt_text) {
   return this.createElement_("div", parent, className, opt_text);
-}
+};
 
-BlogPreview.prototype.createLink_ = function(parent, href, text) {
+BlogPreview.prototype.createLink_ = function (parent, href, text) {
   var link = this.createElement_("a", parent, "", text);
   link.href = href;
   return link;
-}
+};
 
-BlogPreview.prototype.createElement_ = function(tagName, parent, className,
-                                                opt_text) {
+BlogPreview.prototype.createElement_ = function (tagName, parent, className,
+                                                 opt_text) {
   var div = document.createElement(tagName);
   div.className = className;
   parent.appendChild(div);
@@ -73,5 +75,5 @@ BlogPreview.prototype.createElement_ = function(tagName, parent, className,
     div.appendChild(document.createTextNode(opt_text));
   }
   return div;
-}
+};
 

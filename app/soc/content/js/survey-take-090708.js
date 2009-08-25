@@ -54,9 +54,11 @@
       .find('.pick_multi').each(
         function () {
           $(this).find('input').each(
+            /*jslint white: false */
             function () {
               // if $(this).attr('checked', 'true');});
             }
+            /*jslint white: true */
           );
         }
       );
@@ -142,12 +144,12 @@
    * == Customize Comment Appearance ==
    */
 
-   var comments = widget.find('td > .comment');
-   comments.each(function(){
-     $(this).parents('tr:first')
+    var comments = widget.find('td > .comment');
+    comments.each(function () {
+      $(this).parents('tr:first')
            .prev().css({'margin-top': '-10px'})
            .find('label').css({'font-size': '11px'});
-   });
+    });
 
   });
 }(jQuery));

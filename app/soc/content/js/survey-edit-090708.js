@@ -454,8 +454,10 @@
 
 (function ($) {
   $(function () {
-  var del_li = ["<a class='delete_item' id='del_",
-                "' ><img src='/soc/content/images/minus.gif'/></a> "];
+    var del_li = [
+      "<a class='delete_item' id='del_",
+      "' ><img src='/soc/content/images/minus.gif'/></a> "
+    ];
 
     // Confirmation dialog for deleting list/choice-field item from survey
     $("#delete_item_dialog").dialog({
@@ -503,7 +505,7 @@
             '<span id="', id_, '" class="editable_option" name="', id_,
             '__field">', name, '</span>', '<input type="hidden" id="', id_,
             '__field" name="', id_, '__field" value="',
-            name.replace(/\"/g,'&quot;'), '" >', '</li>'
+            name.replace(/\"/g, '&quot;'), '" >', '</li>'
           ].join(""));
 
           ol.append(
@@ -717,7 +719,7 @@
                       '<span id="' + id_ + '" class="editable_option" name="',
                       id_, '__field">', oname, '</span>', '<input ',
                       'type="hidden" id="', id_, '__field" name="', id_,
-                      '__field" value="', oname.replace(/\"/g,'&quot;'), '" >', '</li>'
+                      '__field" value="', oname.replace(/\"/g, '&quot;'), '" >', '</li>'
                     ].join(""));
                     ol.append(option_html.prepend(
                       del_li.join(option_html.attr('id'))));

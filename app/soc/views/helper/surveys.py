@@ -45,6 +45,7 @@ from soc.logic import dicts
 from soc.logic.lists import Lists
 from soc.models.survey import COMMENT_PREFIX
 from soc.models.survey import SurveyContent
+from soc.views.helper import widgets as custom_widgets
 
 
 CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))
@@ -96,6 +97,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     self.survey_content = self.kwargs.pop('survey_content', None)
     self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
+    # TODO: This should be removed since readonly is covered by the RecordForm
     self.read_only = self.kwargs.pop('read_only', None)
 
     self.fields_map = dict(
@@ -453,6 +455,51 @@ class SurveyTakeForm(djangoforms.ModelForm):
   class Meta(object):
     model = SurveyContent
     exclude = ['schema']
+
+
+class SurveyRecordForm(SurveyTakeForm):
+  """SurveyContent form for showing record of survey answers.
+  """
+
+  def addLongField(self, field, value, attrs, schema, **kwargs):
+    """Add plain text long answer fields to this form.
+
+    params:
+      field: the current field
+      value: the initial value for this field
+      attrs: additional attributes for field
+      schema: schema for survey
+    """
+
+    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value)
+    self.survey_fields[field] = question
+
+  def addShortField(self, field, value, attrs, schema, **kwargs):
+    """Add plain text short answer fields to this form.
+
+    params:
+      field: the current field
+      value: the initial value for this field
+      attrs: additional attributes for field
+      schema: schema for survey
+    """
+
+    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value)
+    self.survey_fields[field] = question
+
+  def addCommentField(self, field, comment, attrs, tip):
+    """Add plain text comment field to a question.
+
+    params:
+      field: the name of the field to add the comment field to
+      comment: the initial value of this field.
+      attrs: the attrs for the widget
+      tip: tooltip text for this field
+    """
+
+    widget = custom_widgets.PlainTextWidget
+    comment_field = CharField(label='Comment', widget=widget, initial=comment)
+    self.survey_fields[COMMENT_PREFIX + field] = comment_field
 
 
 class SurveyEditForm(djangoforms.ModelForm):

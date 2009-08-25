@@ -33,6 +33,10 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import surveys
 from soc.views.models import project_survey
+from soc.views.helper import widgets as custom_widgets
+
+
+DEF_GRADE_CHOICES = (('pass', 'Pass'), ('fail', 'Fail'))
 
 
 class View(project_survey.View):
@@ -71,6 +75,7 @@ class View(project_survey.View):
     new_params['name'] = "Grading Project Survey"
 
     new_params['survey_take_form'] = GradeSurveyTakeForm
+    new_params['survey_record_form'] = GradeSurveyRecordForm
 
     # used for sending reminders
     new_params['survey_type'] = 'grading'
@@ -179,8 +184,6 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
   should be the same as the base class's if this argument is missing).
   """
 
-  DEF_GRADE_CHOICES = (('pass', 'Pass'), ('fail', 'Fail'))
-
   def setCleaners(self, post_dict=None):
     """Ensures that the grade field is added to the clean data.
 
@@ -235,12 +238,50 @@ class GradeSurveyTakeForm(surveys.SurveyTakeForm):
     fields = super(GradeSurveyTakeForm, self).insertFields()
 
     # add empty option to choices
-    grade_choices = (('', "Choose a Grade"),) + tuple(self.DEF_GRADE_CHOICES)
+    grade_choices = (('', "Choose a Grade"),) + tuple(DEF_GRADE_CHOICES)
 
     gradeField = forms.fields.ChoiceField(choices=grade_choices,
                                           required=True,
                                           widget=forms.Select(),
                                           initial=self.data.get('grade'))
+    # add the grade field at the form's bottom
+    fields.insert(len(fields) + 1, 'grade', gradeField)
+
+    return fields
+
+
+
+class GradeSurveyRecordForm(surveys.SurveyRecordForm):
+  """RecordForm for the GradeSurveyTakeForm.
+  """
+
+  def getFields(self, *args):
+    """Add the extra grade field's value from survey_record.
+    """
+
+    # try to fetch from survey_record
+    if hasattr(self.survey_record, 'grade'):
+      grade = self.survey_record.grade
+
+    # remap bool to string values as the ChoiceField validates on 'choices'.
+    vals_grade = {True: 'pass', False: 'fail'}
+
+    self.data['grade'] = vals_grade.get(grade, None) or grade
+
+    return super(GradeSurveyRecordForm, self).getFields(*args)
+
+  def insertFields(self):
+    """Add ordered fields to self.fields, add grade field with grade choices.
+    """
+
+    # add common survey fields
+    fields = super(GradeSurveyRecordForm, self).insertFields()
+
+    # add empty option to choices
+    grade_choices = (('', "Choose a Grade"),) + tuple(DEF_GRADE_CHOICES)
+
+    gradeField = forms.fields.CharField(widget=custom_widgets.PlainTextWidget,
+                                        initial=self.data.get('grade'))
     # add the grade field at the form's bottom
     fields.insert(len(fields) + 1, 'grade', gradeField)
 

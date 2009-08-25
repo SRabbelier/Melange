@@ -195,6 +195,7 @@ class View(base.View):
         }
 
     new_params['survey_take_form'] = surveys.SurveyTakeForm
+    new_params['survey_record_form'] = surveys.SurveyRecordForm
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -787,7 +788,7 @@ class View(base.View):
     context['record'] = record_entity
 
     # store the read only survey form in the context
-    survey_form = params['survey_take_form'](
+    survey_form = params['survey_record_form'](
        survey_content=survey_entity.survey_content,
        survey_record=record_entity,
        survey_logic=self._params['logic'],

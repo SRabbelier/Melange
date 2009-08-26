@@ -36,12 +36,14 @@ class Logic(org_admin.Logic):
 
   def __init__(self, model=soc.modules.ghop.models.org_admin.GHOPOrgAdmin,
                base_model=soc.models.org_admin.OrgAdmin,
-               scope_logic=soc.modules.ghop.logic.models.organization):
+               scope_logic=soc.modules.ghop.logic.models.organization,
+               role_name='ghop_org_admin', disallow_last_resign=True):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                scope_logic=scope_logic, role_name=role_name,
+                                disallow_last_resign=disallow_last_resign)
 
 
 logic = Logic()

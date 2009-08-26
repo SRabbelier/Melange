@@ -22,26 +22,25 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import comment
-from soc.logic.models import linkable as linkable_logic
+from soc.logic.models import base
 
 import soc.models.comment
 
 import soc.modules.ghop.models.comment
 
 
-class Logic(comment.Logic):
+class Logic(base.Logic):
   """Logic methods for the GHOPComment model.
   """
 
   def __init__(self, model=soc.modules.ghop.models.comment.GHOPComment,
                base_model=soc.models.comment.Comment,
-               scope_logic=linkable_logic):
+               id_based=True):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                id_based=id_based)
 
 
 logic = Logic()

@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -33,7 +34,7 @@ from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
 from soc.views.models import base
 
-import soc.logic.models.timeline
+import gsoc.logic.models.timeline
 
 
 class View(base.View):
@@ -53,7 +54,8 @@ class View(base.View):
 
     new_params = {}
     new_params['rights'] = rights
-    new_params['logic'] = soc.logic.models.timeline.logic
+    # TODO: Change to basic timeline when GSoC has been moved to module system
+    new_params['logic'] = gsoc.logic.models.timeline.logic
     new_params['edit_template'] = 'soc/timeline/edit.html'
     new_params['name'] = "Timeline"
 
@@ -72,53 +74,16 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
-    for name, logic_value in program_logic.logic.TIMELINE_LOGIC.iteritems():
-      create_form = params_helper.getCreateForm(self._params, 
-          logic_value.getModel())
-      edit_form = dynaform.extendDynaForm(
-        dynaform = create_form,
-        dynainclude = self._params['edit_dynainclude'],
-        dynaexclude = self._params['edit_dynaexclude'],
-        )
 
-      self._params['edit_form_%s' % name] = edit_form
-
-  def edit(self, request, access_type,
-           page_name=None, params=None, seed=None, **kwargs):
-    """See base.View.edit.
-    """
-
-    params = dicts.merge(params, self._params)
-
-    # TODO(pawel.solyga): If program doesn't exist for timeline display
-    # customized error message without pointing to 'Create Timeline'
-
-    key_fields = program_logic.logic.getKeyFieldsFromFields(kwargs)
-
-    program = program_logic.logic.getFromKeyFields(key_fields)
-    if program:
-      workflow = program.workflow
-      params['edit_form'] = params["edit_form_%s" % workflow]
-      params['logic'] = program_logic.logic.TIMELINE_LOGIC[workflow]
-
-    return super(View, self).edit(request, access_type, page_name=page_name,
-                                  params=params, seed=seed, **kwargs)
-  
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """
-    
+
     # a timeline can only be edited, so set the scope path using entity
     fields['scope_path'] = entity.scope_path
 
 
 view = View()
 
-admin = decorators.view(view.admin)
-create = decorators.view(view.create)
-delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
-list = decorators.view(view.list)
 public = decorators.view(view.public)
-export = decorators.view(view.export)
-

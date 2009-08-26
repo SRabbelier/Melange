@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -26,7 +27,6 @@ __authors__ = [
 from soc.logic.models import presence_with_tos
 from soc.logic.models import sponsor as sponsor_logic
 
-import soc.logic.models.timeline
 import soc.models.program
 
 from gsoc.logic.models.timeline import logic as gsoc_timeline_logic
@@ -35,10 +35,6 @@ from gsoc.logic.models.timeline import logic as gsoc_timeline_logic
 class Logic(presence_with_tos.Logic):
   """Logic methods for the Program model.
   """
-
-  TIMELINE_LOGIC = {'gsoc' : gsoc.logic.models.timeline.logic,
-                    'ghop' : soc.logic.models.timeline.logic}
-
 
   def __init__(self, model=soc.models.program.Program, 
                base_model=None, scope_logic=sponsor_logic,
@@ -50,6 +46,19 @@ class Logic(presence_with_tos.Logic):
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
+
+  def createTimelineForType(self, fields):
+    """Creates and stores a timeline model for the given type of program.
+    """
+
+    properties = self.timeline_logic.getKeyFieldsFromFields(fields)
+    key_name = self.timeline_logic.getKeyNameFromFields(properties)
+
+    properties['scope'] = fields['scope']
+
+    timeline = self.timeline_logic.updateOrCreateFromKeyName(properties,
+                                                             key_name)
+    return timeline
 
 
 logic = Logic()

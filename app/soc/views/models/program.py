@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -586,28 +587,12 @@ class View(presence.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-    if not entity:
+    if entity:
       # there is no existing entity so create a new timeline
-      fields['timeline'] = self._createTimelineForType(fields)
+      fields['timeline'] = self._params['logic'].createTimelineForType(fields)
     else:
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
-
-  def _createTimelineForType(self, fields):
-    """Creates and stores a timeline model for the given type of program.
-    """
-
-    workflow = fields['workflow']
-
-    timeline_logic = program_logic.logic.TIMELINE_LOGIC[workflow]
-
-    properties = timeline_logic.getKeyFieldsFromFields(fields)
-    key_name = timeline_logic.getKeyNameFromFields(properties)
-
-    properties['scope'] = fields['scope']
-
-    timeline = timeline_logic.updateOrCreateFromKeyName(properties, key_name)
-    return timeline
 
   @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):

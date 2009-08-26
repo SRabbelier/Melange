@@ -18,7 +18,8 @@
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -26,6 +27,8 @@ from soc.logic.models import program
 from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
+
+from soc.modules.ghop.logic.models.timeline import logic as ghop_timeline_logic
 
 import soc.modules.ghop.models.program
 
@@ -36,12 +39,13 @@ class Logic(program.Logic):
 
   def __init__(self, model=soc.modules.ghop.models.program.GHOPProgram,
                base_model=soc.models.program.Program,
-               scope_logic=sponsor_logic):
+               scope_logic=sponsor_logic, timeline_logic=ghop_timeline_logic):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                scope_logic=scope_logic,
+                                timeline_logic=timeline_logic)
 
 
 logic = Logic()

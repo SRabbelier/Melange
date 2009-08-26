@@ -18,17 +18,18 @@
 """
 
 __authors__ = [
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from soc.logic.models import presence_with_tos
 from soc.logic.models import sponsor as sponsor_logic
 
-import gsoc.logic.models.timeline
 import soc.logic.models.timeline
 import soc.models.program
+
+from gsoc.logic.models.timeline import logic as gsoc_timeline_logic
 
 
 class Logic(presence_with_tos.Logic):
@@ -38,10 +39,14 @@ class Logic(presence_with_tos.Logic):
   TIMELINE_LOGIC = {'gsoc' : gsoc.logic.models.timeline.logic,
                     'ghop' : soc.logic.models.timeline.logic}
 
+
   def __init__(self, model=soc.models.program.Program, 
-               base_model=None, scope_logic=sponsor_logic):
+               base_model=None, scope_logic=sponsor_logic,
+               timeline_logic=gsoc_timeline_logic):
     """Defines the name, key_name and model for this entity.
     """
+
+    self.timeline_logic = timeline_logic
 
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)

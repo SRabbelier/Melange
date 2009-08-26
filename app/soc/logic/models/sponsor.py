@@ -41,13 +41,13 @@ class Logic(group.Logic):
 
   def isDeletable(self, entity):
     """Returns whether the specified Sponsor entity can be deleted.
-    
+
     Args:
       entity: an existing Sponsor entity in datastore
     """
 
     # TODO(pawel.solyga): Check if Sponsor can be deleted (no Hosts, Programs)
-    return True
+    return False
 
 
 logic = Logic()

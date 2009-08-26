@@ -335,7 +335,6 @@ def seed(request, *args, **kwargs):
       'description': 'This is the program for GSoC 2009.',
       'apps_tasks_limit': 42,
       'slots': 42,
-      'workflow': 'gsoc',
       'timeline': gsoc2009_timeline,
       'status': 'visible',
       }
@@ -343,7 +342,7 @@ def seed(request, *args, **kwargs):
   gsoc2009 = Program(**program_properties)
   gsoc2009.put()
 
-
+  # TODO: Use real GHOPProgram here
   timeline_properties = {
         'key_name': 'google/ghop2009',
         'link_id': 'ghop2009',
@@ -362,7 +361,6 @@ def seed(request, *args, **kwargs):
       'short_name': 'GHOP 2009',
       'group_label': 'GHOP',
       'description': 'This is the program for GHOP 2009.',
-      'workflow': 'ghop',
       'timeline': ghop2009_timeline,
       })
 

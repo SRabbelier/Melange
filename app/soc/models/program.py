@@ -130,14 +130,6 @@ class Program(soc.models.presence.Presence):
       'Date as of which the student minimum age requirement '
       'should be reached.')
 
-  #: Required field storing the type of workflow this program has
-  workflow = db.StringProperty(required=True,
-      choices=['gsoc', 'ghop'],
-      verbose_name= ugettext('Workflow type'))
-  workflow.example_text = ugettext(
-      '<tt><b>Project-based</b> for GSoC workflow type,<br>' 
-      '<b>Task-based</b> for GHOP workflow type.</tt>')
-
   #: Required 1:1 relationship indicating the Program the Timeline
   #: belongs to.
   timeline = db.ReferenceProperty(reference_class=soc.models.timeline.Timeline,

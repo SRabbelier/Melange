@@ -158,8 +158,6 @@ class View(presence.View):
         'accepted_orgs_msg': forms.fields.CharField(
             widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
-        'workflow': forms.ChoiceField(choices=[('gsoc','Project-based'),
-            ('ghop','Task-based')], required=True),
         }
 
     reference_fields = [
@@ -181,8 +179,6 @@ class View(presence.View):
           filter_fields={'prefix': new_params['document_prefix']},
           required=False, label=label, help_text=help_text)
 
-    result['workflow'] = forms.CharField(widget=widgets.ReadOnlyInput(),
-                                         required=True)
     result['clean'] = cleaning.clean_refs(new_params,
                                           [i for i,_,_ in reference_fields])
 
@@ -587,7 +583,7 @@ class View(presence.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-    if entity:
+    if not entity:
       # there is no existing entity so create a new timeline
       fields['timeline'] = self._params['logic'].createTimelineForType(fields)
     else:

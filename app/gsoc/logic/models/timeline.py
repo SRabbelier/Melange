@@ -19,9 +19,11 @@
 
 __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com.',
   ]
 
 
+from soc.logic.models import sponsor as sponsor_logic
 from soc.logic.models import timeline as timeline_logic
 
 import gsoc.models.timeline
@@ -34,7 +36,7 @@ class Logic(timeline_logic.Logic):
 
   def __init__(self, model=gsoc.models.timeline.Timeline,
                base_model=soc.models.timeline.Timeline,
-               scope_logic=None):
+               scope_logic=sponsor_logic):
     """Defines the name, key_name and model for this entity.
     """
 

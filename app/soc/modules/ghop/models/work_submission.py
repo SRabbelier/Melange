@@ -47,6 +47,11 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
                               required=True,
                               collection_name='work_submissions')
 
+  #: Program to which this work belongs to
+  program = db.ReferenceProperty(
+      reference_class=ghop_program_model.GHOPProgram,
+      required=True, collection_name='work_submissions')
+
   #: Property allowing you to store information about your work
   information = db.TextProperty(
       required=False, verbose_name=ugettext('Info'))

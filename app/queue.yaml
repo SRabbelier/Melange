@@ -18,3 +18,8 @@ queue:
 - name: mail
   rate: 1/s
   bucket_size: 1
+
+# queue used by the GHOP module to do GHOP task related work
+- name: ghop-update
+  rate: 5/s
+  bucket_size: 5

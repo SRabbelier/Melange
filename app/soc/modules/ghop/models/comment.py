@@ -51,22 +51,6 @@ class GHOPComment(soc.models.base.ModelWithFieldAttributes):
                              choices=['valid','invalid'],
                              verbose_name=ugettext('Status of this Comment'))
 
-  #: Reference property to the task entity under which the comment
-  #: is scoped 
-  scope = db.ReferenceProperty(
-      reference_class=soc.modules.ghop.models.task.GHOPTask,
-      required=True, collection_name='comment_scopes',
-      verbose_name=ugettext('Comment Scope'))
-  scope.help_text = ugettext(
-      'Reference to the task entity under which this comment was posted.')
-
-  #: Hidden (not displayed to users or editable in forms) cache of the string
-  #: representation of the transitive closure of scopes, for use in URLs.
-  scope_path = db.StringProperty(required=False,
-                                 verbose_name=ugettext('Scope path'))
-  scope_path.help_text = ugettext(
-      'Cache of the string form of the entity scope.')
-
   #: A required many:1 relationship with a comment entity indicating
   #: the user who provided that comment.
   created_by = db.ReferenceProperty(reference_class=soc.models.user.User,

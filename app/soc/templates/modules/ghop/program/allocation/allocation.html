@@ -1,0 +1,23 @@
+{% extends "soc/models/list.html" %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script type="text/javascript">
+  var RETURN_URL = "{{ return_url }}";
+  $(document).ready(function(){
+    $('[id^=id_spin_slot_count_]').spin({min:0});
+  });
+</script>
+{% endblock %}
+
+{% block body %}
+<form method="POST">
+<input style="font-weight: bold" type="submit" value="Submit"/></span>
+{% if error_message %}
+<div class="error">{{ error_message|safe }}</div>
+{% endif %}
+{{ block.super }}
+</form>
+{% endblock %}
+

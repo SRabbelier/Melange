@@ -1,0 +1,11 @@
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" name="name">
+  <td><div class="name">{{ list.item.name }}</div></td>
+  <td>
+    <div class="slots" id="id_slot_count_{{ list.item.link_id }}">
+    <input type="text" id="id_spin_slot_count_{{ list.item.link_id }}"
+     name="{{ list.item.link_id }}" size="10" 
+     value="{{ list.item.task_quota_limit }}"/>
+    </div>
+  </td>
+</tr>
+

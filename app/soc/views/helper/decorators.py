@@ -34,6 +34,7 @@ from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.modules import callback
 from soc.views.helper import responses
 
 
@@ -86,28 +87,39 @@ def view(func):
     """View decorator wrapper method.
     """
 
-    context = responses.getUniversalContext(request)
+    core = callback.getCore()
+    core.startNewRequest(request)
 
-    try:
-      if not context['is_admin'] and context['in_maintenance']:
+    def view_wrapper_helper():
+      """View wrapper helper that does all the work.
+      """
+
+      context = responses.getUniversalContext(request)
+
+      try:
+        if not context['is_admin'] and context['in_maintenance']:
+          return maintenance(request)
+
+        return func(request, *args, **kwds)
+      except CapabilityDisabledError, exception:
+        logging.exception(exception)
+        # assume the site is in maintenance if we get CDE
         return maintenance(request)
+      except DeadlineExceededError, exception:
+        template = 'soc/deadline_exceeded.html'
+      except MemoryError, exception:
+        template = 'soc/memory_error.html'
+      except AssertionError, exception:
+        template = 'soc/assertion_error.html'
+      except out_of_band.Error, error:
+        return responses.errorResponse(error, request)
 
-      return func(request, *args, **kwds)
-    except CapabilityDisabledError, exception:
       logging.exception(exception)
-      # assume the site is in maintenance if we get CDE
-      return maintenance(request)
-    except DeadlineExceededError, exception:
-      template = 'soc/deadline_exceeded.html'
-    except MemoryError, exception:
-      template = 'soc/memory_error.html'
-    except AssertionError, exception:
-      template = 'soc/assertion_error.html'
-    except out_of_band.Error, error:
-      return responses.errorResponse(error, request)
+      return responses.respond(request, template, context=context)
 
-    logging.exception(exception)
-    return responses.respond(request, template, context=context)
+    result = view_wrapper_helper()
+    core.endRequest(request)
+    return result
 
   return view_wrapper
 

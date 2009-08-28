@@ -106,11 +106,17 @@ def getUniversalContext(request):
     }
   """
 
+  core = callback.getCore()
+
+  context = core.getRequestValue('context', {})
+
+  if context:
+    return context
+
   account = accounts.getCurrentAccount()
   user = None
   is_admin = False
 
-  context = {}
   context['request'] = request
 
   if account:
@@ -126,7 +132,7 @@ def getUniversalContext(request):
   context['sign_in'] = users.create_login_url(request.path)
   context['sign_out'] = users.create_logout_url(request.path)
 
-  context['sidebar_menu_items'] = callback.getCore().getSidebar(account, user)
+  context['sidebar_menu_items'] = core.getSidebar(account, user)
 
   context['gae_version'] = system.getAppVersion()
   context['soc_release'] = system.getMelangeVersion()
@@ -140,6 +146,8 @@ def getUniversalContext(request):
   context['tos_link'] = redirects.getToSRedirect(settings)
   context['in_maintenance'] = timeline.isActivePeriod(site, 'maintenance')
  
+  core.setRequestValue('context', context)
+
   return context
 
 def useJavaScript(context, uses):

@@ -1,0 +1,35 @@
+{% load ghop_filters %}
+
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" 
+    onmouseout="this.className='off'" name="name"
+    onclick="if (do_redirect) document.location.href='{{ list.redirect }}'">
+  <td align="right">
+    <div class="name">
+      <a class="noul" onclick="do_redirect=false" href="{{ list.redirect }}">
+        {{ list.item.name }}
+      </a>
+    </div>
+  </td>
+  <td>
+   <div class="task_quota_limit">{{ list.item.task_quota_limit }}</a></div>
+  </td>
+  <td><div class="open_tasks">{{ list.item|open_tasks }}</a></div></td>
+  <td><div class="claimed_tasks">{{ list.item|claimed_tasks }}</a></div></td>
+  <td><div class="closed_tasks">{{ list.item|closed_tasks }}</a></div></td>
+  {% if list.item.ideas %}
+  <td onclick="if (redirect_to_home) document.location.href='{{ list.item.home_page }}'; 
+      do_redirect=false" onmouseover="redirect_to_home=true">
+  {% else %}
+  <td class="no_hand" onclick="do_redirect=false">
+  {% endif %}
+    <div class="home_url">
+      {% if list.item.home_page %}
+      <a onclick="redirect_to_home=false" href="{{ list.item.home_page }}">
+      {% endif %}
+        {{ list.item.home_page|urlizetrunc:35|removetags:"a" }}
+      {% if list.item.home_page %}
+      </a>
+      {% endif %}
+    </div>
+  </td>
+</tr>

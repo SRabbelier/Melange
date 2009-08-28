@@ -31,8 +31,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import memcache
-
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -55,6 +53,7 @@ from soc.logic.models.student_project import logic as student_project_logic
 from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
+from soc.modules import callback
 from soc.views.helper import redirects
 from soc.views import out_of_band
 
@@ -280,6 +279,7 @@ class Checker(object):
     self.rights = base.rights if base else {}
     self.id = None
     self.user = None
+    self.core = callback.getCore()
 
   def normalizeChecker(self, checker):
     """Normalizes the checker to a pre-defined format.
@@ -314,25 +314,21 @@ class Checker(object):
     """Returns the key for the specified checker for the current user.
     """
 
-    return "%s.%s" % (self.id, checker_name)
+    return "checker.%s.%s" % (self.id, checker_name)
 
   def put(self, checker_name, value):
     """Puts the result for the specified checker in the cache.
     """
 
-    retention = 30
-
-    memcache_key = self.key(checker_name)
-    # pylint: disable-msg=E1101
-    memcache.add(memcache_key, value, retention)
+    cache_key = self.key(checker_name)
+    self.core.setRequestValue(cache_key, value)
 
   def get(self, checker_name):
     """Retrieves the result for the specified checker from cache.
     """
 
-    memcache_key = self.key(checker_name)
-    # pylint: disable-msg=E1101
-    return memcache.get(memcache_key)
+    cache_key = self.key(checker_name)
+    return self.core.getRequestValue(cache_key)
 
   def doCheck(self, checker_name, django_args, args):
     """Runs the specified checker with the specified arguments.

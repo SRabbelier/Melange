@@ -1,0 +1,59 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.spc{{ comment_id }}').hide();
+  $('.ghoptaskcomment #c{{ comment_id }}').hover(
+    function() {
+      $('.spc{{ comment_id }}').show();
+    },
+    function() {
+      $('.spc{{ comment_id }}').hide();
+    });
+});
+</script>
+
+<div class="ghoptaskcomment">
+ <div class="title" id="c{{ comment_id }}">
+  On {{ comment.created_on|date:"jS F Y H:i" }},
+  by
+  {% if comment.created_by %} 
+    {{ comment.created_by.name }}:
+  {% else %}
+    {{ site_name }} Automatic Updater:
+  {% endif %}
+  <span class="spc{{ comment_id }}">
+   <a title="Permalink to this Comment" href="#c{{ comment_id }}">¶</a>
+  </span>
+ </div>
+ <div class="box-inner">
+  <p>
+   {% if comment.content %}
+     {{ comment.content|safe }}</p>
+   {% else %}
+   (No Comment was entered for this change.)
+   {% endif %}
+ </div>
+ {% if comment.changes %}
+  <div class="changes">
+   <div class="box-inner">
+    <b>Changes:</b>
+    {{ comment.changes|join:"; " }} 
+   </div>
+  </div>
+ {% endif %}
+</div>
+<hr />
+

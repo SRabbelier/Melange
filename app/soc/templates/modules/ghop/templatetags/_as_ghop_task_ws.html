@@ -1,0 +1,54 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.spws{{ ws_id }}').hide();
+  $('.ghoptaskcomment #ws{{ ws_id }}').hover(
+    function() {
+      $('.spws{{ ws_id }}').show();
+    },
+    function() {
+      $('.spws{{ ws_id }}').hide();
+    });
+});
+</script>
+
+<div class="ghoptaskcomment">
+ <div class="title" id="ws{{ ws_id }}">
+  On {{ ws.submitted_on|date:"jS F Y H:i" }},
+  by {{ ws.user.name }}:
+  <span class="spws{{ ws_id }}">
+   <a title="Permalink to this Work Submission" href="#ws{{ ws_id }}">¶</a>
+  </span>
+ </div>
+ <div class="box-inner">
+  <p>
+   {% if ws.information %}
+     {{ ws.information|safe }}</p>
+   {% else %}
+   (No additional information was entered with this work submission.)
+   {% endif %}
+ </div>
+ {% if ws.url_to_work %}
+  <div class="changes">
+   <div class="box-inner">
+    <b>Link to Work Submitted:</b>
+    <a href='{{ ws.url_to_work|safe }}'>{{ ws.url_to_work|safe }}</a> 
+   </div>
+  </div>
+ {% endif %}
+</div>
+<hr />
+

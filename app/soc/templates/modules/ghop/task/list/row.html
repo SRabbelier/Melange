@@ -1,0 +1,31 @@
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  {% block first %}
+  <!-- to be used in the inherited block -->
+  {% endblock %}
+  <td align="right"><div class="title"><a class="noul" onclick="do_redirect=false"
+         href="{{ list.redirect }}">{{ list.item.title }}</a>
+     </div>
+  </td>
+  <td><div class="difficulty">{{ list.item.difficulty.0.tag }}</a></div></td>
+  <td><div class="task_type">
+  {% for task_type in list.item.task_type %}
+    {{ task_type.tag }}{% if not forloop.last %}, {% endif %}
+  {% endfor %}
+  </a></div></td>
+  <td><div class="timetocomplete">{{ list.item.time_to_complete }} hrs</a></div></td>
+  <td><div class="status">{{ list.item.status }}</a></div></td>
+  <td><div class="mentors">
+  {% if list.info.mentors %}
+    {% for mentor in list.info.mentors|slice:":2" %}
+      {{ mentor.name }}{% if not forloop.last %}, {% endif %}    
+    {% endfor %}
+    {% if list.info.extramentors %}
+      + {{ list.info.extramentors }} 
+    {% endif %}
+  {% else %}
+    Not Assigned
+  {% endif %}
+  </a></div></td>
+</tr>
+

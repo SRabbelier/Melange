@@ -1,0 +1,202 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+{% load ghop_comments_helpers %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script type="text/javascript">
+  $(document).ready(function(){
+	  if (!$('#id_work_submission').val()) {
+		  $('[for^=id_work_submission]').hide();
+		  $('#id_work_submission').hide();
+		}
+    $('#id_action').change(function() {
+      if ($(this).val() == 'needs_review') {
+        $('[for^=id_work_submission]').show("normal");
+        $('#id_work_submission').show("normal");
+        $('td.formfielderror').show("normal");
+      }
+      else if ($(this).val() != 'needs_work'){
+        $('[for^=id_work_submission]').hide("normal");
+        $('#id_work_submission').hide("normal");
+        $('td.formfielderror').hide("normal");
+      }
+    });
+
+    if (!$('#id_extended_deadline').val()) {
+	    $('[for^=id_extended_deadline]').hide();
+	    $('#id_extended_deadline').hide();
+    }
+    $('#id_action').change(function() {
+      if ($(this).val() == 'needs_work') {
+        $('[for^=id_extended_deadline]').show("normal");
+        $('#id_extended_deadline').show("normal");
+        $('td.formfielderror').show("normal");
+      }
+      else if ($(this).val() != 'needs_review'){
+        $('[for^=id_extended_deadline]').hide("normal");
+        $('#id_extended_deadline').hide("normal");
+        $('td.formfielderror').hide("normal");
+      }
+    });
+
+    nosubscribe = '/soc/content/images/star-white.png'
+    subscribe = '/soc/content/images/star-gold.png';
+
+    $.get('/ghop/task_subscription/subscribe', 
+            { key_name: '{{ entity_key_name }}',
+              no_toggle: true },
+            function(data){
+             if (data == 'remove') { 
+                $("img#subscribe").attr('src', subscribe);
+                $("img#subscribe").attr('title', 'Unsubscribe from this task');
+              } else {
+                $("img#subscribe").attr('src', nosubscribe);
+                $("img#subscribe").attr('title', 'Subscribe to this task');
+              }
+            }
+    );
+
+    $("img#subscribe").click(
+      function () {
+        if ($("img#subscribe").attr('src') == subscribe) {
+          $("img#subscribe").attr('src', nosubscribe);
+          $("img#subscribe").attr('title', 'Subscribe to this task');
+        } else if ($("img#subscribe").attr('src') == nosubscribe) {
+          $("img#subscribe").attr('src', subscribe);
+          $("img#subscribe").attr('title', 
+                                  'Unsubscribe from this task');
+        }
+        $.get('/ghop/task_subscription/subscribe', 
+             { key_name: '{{ entity_key_name }}' },
+              function(data){
+                if (data == 'add') { 
+                  $("img#subscribe").attr('src', subscribe);
+                  $("img#subscribe").attr('title', 
+                                          'Unsubscribe from this task');
+                } else if (data == 'remove') {
+                 $("img#subscribe").attr('src', nosubscribe);
+                 $("img#subscribe").attr('title', 'Subscribe to this task');
+                }
+              });
+     }
+    );
+  });
+</script>
+{% endblock %}
+
+{% block header_title %}
+{% if account %}
+<img id="subscribe" src="/soc/content/images/star-white.png" />
+{% endif %}
+Title: {{ entity.title }}
+
+{% if edit_link %}
+(<a href='{{ edit_link }}'>Edit this task</a>)
+{% else %}{% if suggest_link %}
+(<a href='{{ suggest_link }}'>Edit this task</a>)
+{% endif %}{% endif %}
+
+{% endblock %}
+
+{% block body %}
+
+{% block task-show %}
+{% if header_msg %} 
+<p>
+ <div id="pageheader">
+  <table width="100%" cellpadding="0" cellspacing="0">
+   <tr>
+    <td style="font-weight: bold; text-align:center"> 
+     {{ header_msg }}
+    </td>
+   </tr>
+  </table>
+ </div>
+</p>
+{% endif %}
+
+<div id="created">
+ {% readonly_date_field_as_table_row "Last Modified on" entity.modified_on %}
+ by {{ entity.modified_by.name }}
+</div>
+
+<p>
+ <table>
+  {% readonly_safe_field_as_table_row entity.fields.description.label entity.description %}
+  {% readonly_field_as_table_row "Difficulty" difficulty_str %}
+  {% readonly_field_as_table_row "Task Type Tags" task_type_str %}
+  {% readonly_field_as_table_row entity.fields.time_to_complete.label time_to_complete %}
+  {% readonly_field_as_table_row "Mentor(s)" mentors_str %}
+  {% readonly_date_field_as_table_row entity.fields.deadline.label entity.deadline %}
+ </table>
+</p>
+<hr />
+{% endblock task-show %}
+
+{% if comment_disabled %}
+  <h4>Comments are disabled</h4>
+{% else %}
+{% block comment-form %}
+<p>
+{% if signin_comment_msg %}
+  <h4>{{ signin_comment_msg|safe }}</h4>
+{% else %}
+<form method="POST">
+ <table>
+   {% block form_table %}
+     {% as_table comment_form %}
+   {% endblock %}
+ </table>
+ <table>
+  <tr><td colspan="4">&nbsp;</td></tr>
+  <tr>
+   <td>
+    <input style="font-weight: bold; float: right" type="submit"
+    name="submit" value="Save Changes"/></span>
+   </td>
+  </tr>
+ </table>
+</form>
+{% endif %}
+</p>
+<br /><br />
+<hr />
+{% endblock comment-form %}
+{% endif %}
+
+{% block list-work-submissions %}
+{% if work_submissions %}
+<h3> Work Submission:</h3>
+{% for work_submission in work_submissions %}
+  {% as_ghop_task_ws work_submission %}
+{% endfor %}
+<br /><br />
+<hr />
+{% endif %}
+{% endblock list-work-submissions %}
+{% block list-comments %}
+{% if comments %}
+<h3> Comments and Actions:</h3>
+{% for comment in comments %}
+  {% as_ghop_task_comment comment %}
+{% endfor %}
+{% endif %}
+{% endblock list-comments %}
+
+{% endblock %}
+

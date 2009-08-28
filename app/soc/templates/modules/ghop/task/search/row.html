@@ -1,0 +1,17 @@
+<tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
+onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
+  <td align="right">
+   <div class="title"><a class="noul" onclick="do_redirect=false"
+       href="{{ list.redirect }}">{{ list.item.title }}</a>
+   </div>
+  </td>
+  <td><div class="organization">{{ list.item.scope.name }}</a></div></td>
+  <td><div class="difficulty">{{ list.item.difficulty.0.tag }}</a></div></td>
+  <td>
+   <div class="timetocomplete">{{ list.item.time_to_complete }} hrs</a></div>
+  </td>
+  <td><div class="status">{{ list.item.status }}</a></div></td>
+  <td><div class="task_type">{{ list.item.task_type|join:", " }}
+  </a></div></td>
+</tr>
+

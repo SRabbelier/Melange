@@ -1,0 +1,11 @@
+{% extends "modules/ghop/task/list/row.html" %}
+
+{% block first %}
+<td>
+  <div class="approve" id="id_approve_{{ list.item.link_id }}">
+  <input type="checkbox" id="id_approve_{{ list.item.key.name }}"
+   name="{{ list.item.key.name }}"/>
+  </div>
+</td>
+{% endblock %}
+

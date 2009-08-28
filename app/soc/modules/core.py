@@ -21,6 +21,8 @@ __authors__ = [
   ]
 
 
+import logging
+
 from django.conf.urls import defaults
 
 import settings
@@ -108,6 +110,7 @@ class Core(object):
 
     self.sitemap = []
     self.sidebar = []
+    self.per_request_cache = {}
 
   ##
   ## internal
@@ -134,6 +137,36 @@ class Core(object):
   ##
   ## Core code
   ##
+
+  def startNewRequest(self, request):
+    """Prepares core to handle a new request.
+    """
+
+    self.per_request_value = {}
+    self.setRequestValue('request', request)
+
+  def endRequest(self, request):
+    """Performs cleanup after current request.
+    """
+
+    old_request = self.getRequestValue('request')
+    self.per_request_value = {}
+
+    if id(old_request) != id(request):
+      logging.error("ending request: \n'%s'\n != \n'%s'\n" % (
+          old_request, request))
+
+  def getRequestValue(self, key, default=None):
+    """Gets a per-request value.
+    """
+
+    return self.per_request_value.get(key, default)
+
+  def setRequestValue(self, key, value):
+    """Sets a per-request value.
+    """
+
+    self.per_request_value[key] = value
 
   def getPatterns(self):
     """Returns the Django patterns for this site.

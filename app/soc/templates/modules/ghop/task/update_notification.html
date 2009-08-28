@@ -1,0 +1,52 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% block content %}
+
+{% if comment_entity.changes %}
+  &nbsp;&nbsp;&nbsp;&nbsp;Updates: <br />
+  {% for change in comment_entity.changes %}
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ change }}<br />
+  {% endfor %}
+<br />
+{% endif %}
+
+Comment on {{ task_entity.title }}<br />
+<a href={{ redirect_url }}>{{ redirect_url }}</a><br />
+On {{ comment_entity.created_on|date:"jS F Y H:i" }}, by 
+
+{% if comment_entity.created_by %} 
+  {{ comment_entity.created_by.name }}:
+{% else %}
+  {{ site_name }} Automatic Updater:
+{% endif %}
+
+<br />
+
+{% if comment_entity.content %}
+{{ comment_entity.content|wordwrap:80|safe }}
+{% else %}
+(No Comment was entered for this change.)
+{% endif %}
+
+<br />
+<br />
+--<br />
+You are receiving this message because you have subscribed to updates on this
+<br/>
+
+GHOP Task. You may unsubscribe from this GHOP Task by visiting the 
+<a href={{ task_url }}>GHOP Task <br />page.</a><br />
+
+{% endblock %}

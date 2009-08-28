@@ -39,10 +39,10 @@ import soc.modules.ghop.models.task
 
 
 STATE_TRANSITIONS = {
-    'Claimed': transitFromClaimed,
-    'NeedsReview': transitFromNeedsReview,
-    'ActionNeeded': transitFromActionNeeded,
-    'NeedsWork': transitFromNeedsWork,
+    'Claimed': 'transitFromClaimed',
+    'NeedsReview': 'transitFromNeedsReview',
+    'ActionNeeded': 'transitFromActionNeeded',
+    'NeedsWork': 'transitFromNeedsWork',
     }
 
 
@@ -292,7 +292,7 @@ class Logic(base.Logic):
     if entity.deadline and datetime.datetime.now() > entity.deadline:
       # calls a specific method to make a transition depending on the
       # task's current state
-      transit_func = STATE_TRANSITIONS[entity.status]
+      transit_func = getattr(self, STATE_TRANSITIONS[entity.status])
       update_dict = transit_func(entity)
 
       comment_properties = {

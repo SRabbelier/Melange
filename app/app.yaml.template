@@ -55,6 +55,9 @@ handlers:
   static_dir: shell/static
   expiration: 1d
 
+- url: /profiler/.*
+  script: app_profiler/app_profiler.py
+
 - url: /.*
   script: main.py
 

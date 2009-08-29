@@ -356,6 +356,13 @@ class Logic(object):
       - Query object instantiated with the given properties
     """
 
+    from google.appengine.api import memcache
+    queries = memcache.get('__melange__queries')
+    if not queries:
+        queries = []
+    queries.append((self._model.__name__, filter, order))
+    memcache.set('__melange_queries', queries)
+
     if not filter:
       filter = {}
 

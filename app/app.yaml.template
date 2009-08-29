@@ -61,7 +61,7 @@ handlers:
   expiration: 1d
 
 - url: /profiler/.*
-  script: app_profiler/app_profiler.py
+  script: profiler.py
   login: admin
 
 - url: /.*

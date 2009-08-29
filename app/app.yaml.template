@@ -57,6 +57,7 @@ handlers:
 
 - url: /profiler/.*
   script: app_profiler/app_profiler.py
+  login: admin
 
 - url: /.*
   script: main.py

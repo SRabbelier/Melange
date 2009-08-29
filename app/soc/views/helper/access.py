@@ -279,7 +279,6 @@ class Checker(object):
     self.rights = base.rights if base else {}
     self.id = None
     self.user = None
-    self.core = callback.getCore()
 
   def normalizeChecker(self, checker):
     """Normalizes the checker to a pre-defined format.
@@ -321,14 +320,14 @@ class Checker(object):
     """
 
     cache_key = self.key(checker_name)
-    self.core.setRequestValue(cache_key, value)
+    callback.getCore().setRequestValue(cache_key, value)
 
   def get(self, checker_name):
     """Retrieves the result for the specified checker from cache.
     """
 
     cache_key = self.key(checker_name)
-    return self.core.getRequestValue(cache_key)
+    return callback.getCore().getRequestValue(cache_key)
 
   def doCheck(self, checker_name, django_args, args):
     """Runs the specified checker with the specified arguments.

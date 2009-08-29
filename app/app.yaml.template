@@ -27,21 +27,26 @@ handlers:
 - url: /(robots.txt|favicon.ico)
   static_files: soc/content/\1
   upload: soc/content/(robots.txt|favicon.ico)  
+  expiration: 1d
 
 - url: /tiny_mce/.*
   script: $PYTHON_LIB/google/appengine/ext/zipserve
 
 - url: /soc/content
   static_dir: soc/content
+  expiration: 1d
 
 - url: /gsoc/content
   static_dir: gsoc/content
+  expiration: 1d
 
 - url: /jquery
   static_dir: jquery
+  expiration: 1d
 
 - url: /json
   static_dir: json
+  expiration: 1d
 
 - url: /admin/shell.*
   script: shell/shell.py

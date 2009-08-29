@@ -176,9 +176,11 @@ class start_profiler(webapp.RequestHandler):
     def get(self):
         gp = get_global_profiler()
         gp.start_profiling()
-        self.response.headers['Content-Type'] = "text/plain"
-        self.response.out.write("Started profiling (key: %s).\n" % gp.profile_key)
-        self.response.out.write("Retrieve saved results at <a href='/profiler/show?key=%(key)s'>/profiler/show?key=%(key)s).\n" % {'key':gp.profile_key})
+        self.response.out.write("<html><body>")
+        self.response.out.write("Started profiling (key: %s). <br />" % gp.profile_key)
+        self.response.out.write("Retrieve saved results at "
+            "<a href='/profiler/show?key=%(key)s'>/profiler/show?key=%(key)s</a>. <br />" % {'key':gp.profile_key})
+        self.response.out.write("</body></html>")
 
 class stop_profiler(webapp.RequestHandler):
     def get(self):

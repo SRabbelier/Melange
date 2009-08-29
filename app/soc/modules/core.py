@@ -111,6 +111,7 @@ class Core(object):
     self.sitemap = []
     self.sidebar = []
     self.per_request_cache = {}
+    self.in_request = False
 
   ##
   ## internal
@@ -142,6 +143,7 @@ class Core(object):
     """Prepares core to handle a new request.
     """
 
+    self.in_request = True
     self.per_request_value = {}
     self.setRequestValue('request', request)
 
@@ -151,6 +153,7 @@ class Core(object):
 
     old_request = self.getRequestValue('request')
     self.per_request_value = {}
+    self.in_request = False
 
     if id(old_request) != id(request):
       logging.error("ending request: \n'%s'\n != \n'%s'\n" % (
@@ -160,12 +163,14 @@ class Core(object):
     """Gets a per-request value.
     """
 
+    assert self.in_request
     return self.per_request_value.get(key, default)
 
   def setRequestValue(self, key, value):
     """Sets a per-request value.
     """
 
+    assert self.in_request
     self.per_request_value[key] = value
 
   def getPatterns(self):

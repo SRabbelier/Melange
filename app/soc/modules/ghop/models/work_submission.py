@@ -27,14 +27,15 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.linkable
+import soc.models.base
 import soc.models.user
 
+from soc.modules.ghop.models import organization as ghop_org_model
 from soc.modules.ghop.models import program as ghop_program_model
 from soc.modules.ghop.models import task as task_model
 
 
-class GHOPWorkSubmission(soc.models.linkable.Linkable):
+class GHOPWorkSubmission(soc.models.base.ModelWithFieldAttributes):
   """Model for work submissions for a task by students.
 
   Scope will be set to the Organization to which this work has been submitted.
@@ -46,6 +47,11 @@ class GHOPWorkSubmission(soc.models.linkable.Linkable):
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=True,
                               collection_name='work_submissions')
+
+  #: Organization to which this work belongs to
+  org = db.ReferenceProperty(
+      reference_class=ghop_org_model.GHOPOrganization,
+      required=True, collection_name='work_submissions')
 
   #: Program to which this work belongs to
   program = db.ReferenceProperty(

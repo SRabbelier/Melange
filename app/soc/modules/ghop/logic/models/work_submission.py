@@ -21,28 +21,23 @@ __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>'
   ]
 
-from soc.logic.models import linkable
+from soc.logic.models import base
 
-import soc.models.linkable
-
-import soc.modules.ghop.logic.models.organization
 import soc.modules.ghop.models.work_submission
 
 
-class Logic(linkable.Logic):
+class Logic(base.Logic):
   """Logic methods for the GHOPWorkSubmission model.
   """
 
   def __init__(
       self,
       model=soc.modules.ghop.models.work_submission.GHOPWorkSubmission,
-      base_model=soc.models.linkable.Linkable, 
-      scope_logic=soc.modules.ghop.logic.models.organization):
+      id_based=True):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+    super(Logic, self).__init__(model, id_based=id_based)
 
 
 logic = Logic()

@@ -137,6 +137,9 @@ class GHOPChecker(access.Checker):
                                 role_status, task_status):
     """Checks if the current user has access to the given task.
 
+    This method checks if the current user is in one of the allowed_roles
+    and has specified role_status, If yes, allows him to access the Task page.
+
     Args:
       django_args: a dictionary with django's arguments
       allowed_roles: list with names for the roles allowed to pass access check
@@ -197,6 +200,12 @@ class GHOPChecker(access.Checker):
 
   def checkStatusForTask(self, django_args):
     """Checks if the current user has access to the given task.
+
+    This method checks if the current user is either an GHOP Org Admin or a
+    Mentor and is active, if yes it allows them to view the task page at any
+    task state. If the user is none of the above, it checks the status of the
+    task, and if it is in one of the valid published states it allows access
+    to view the task page.
 
     Args:
       django_args: a dictionary with django's arguments

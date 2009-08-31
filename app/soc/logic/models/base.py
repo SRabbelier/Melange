@@ -357,7 +357,7 @@ class Logic(object):
     """
 
     from google.appengine.api import memcache
-    queries = memcache.get('__melange__queries')
+    queries = memcache.get('__melange_queries')
     if not queries:
         queries = []
     queries.append((self._model.__name__, filter, order))

@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Chen Lunpeng" <forever.clp@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -136,7 +137,7 @@ def generateLinkForRequest(request, base_params, updated_params):
 
 
 def getListContent(request, params, filter=None, order=None,
-                   idx=0, need_content=False):
+                   idx=0, need_content=False, prefetch=None):
   """Returns a dict with fields used for rendering lists.
 
   TODO(dbentley): we need better terminology. List, in this context, can have
@@ -151,6 +152,7 @@ def getListContent(request, params, filter=None, order=None,
     order: the order which should be used for the list (in getForFields format)
     idx: the index of this list
     need_content: iff True will return None if there is no data
+    prefetch: the fields of the data that should be pre-fetched
 
   Returns:
     A dictionary with the following values set:
@@ -182,7 +184,7 @@ def getListContent(request, params, filter=None, order=None,
 
   # Fetch one more to see if there should be a 'next' link
   data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
-                            order=order)
+                            order=order, prefetch=prefetch)
 
   if need_content and not data:
     return None

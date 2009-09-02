@@ -305,8 +305,10 @@ class View(presence.View):
     ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
     ap_params['list_row'] = 'soc/student_project/list/row_all.html'
 
+    prefetch = ['mentor', 'student', 'scope']
+
     return self.list(request, access_type, page_name=page_name,
-                     params=ap_params, filter=filter)
+                     params=ap_params, filter=filter, prefetch=prefetch)
 
   @decorators.merge_params
   @decorators.check_access

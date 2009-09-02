@@ -690,6 +690,8 @@ class View(base.View):
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = '%s %s' % (page_name, org_entity.name)
 
+    prefetch = ['student', 'mentor']
+
     list_params = params.copy()
     list_params['list_heading'] = params['manage_overview_heading']
     list_params['list_row'] = params['manage_overview_row']
@@ -701,8 +703,8 @@ class View(base.View):
         'List of all active %(name_plural)s' % list_params
     active_params['list_action'] = (redirects.getManageRedirect, list_params)
 
-    active_list = lists.getListContent(
-        request, active_params, fields, idx=0)
+    active_list = lists.getListContent(request, active_params, fields, idx=0,
+                                       prefetch=prefetch)
     # set the needed info
     active_list = list_info.setStudentProjectSurveyInfo(active_list,
                                                         org_entity.scope)
@@ -714,8 +716,8 @@ class View(base.View):
                                          'failed the program.') % list_params
     failed_params['list_action'] = (redirects.getManageRedirect, list_params)
 
-    failed_list = lists.getListContent(
-        request, failed_params, fields, idx=1, need_content=True)
+    failed_list = lists.getListContent(request, failed_params, fields, idx=1,
+                                       need_content=True, prefetch=prefetch)
     # set the needed info
     failed_list = list_info.setStudentProjectSurveyInfo(failed_list,
                                                         org_entity.scope)
@@ -728,8 +730,9 @@ class View(base.View):
         'program.' % list_params)
     completed_params['list_action'] = (redirects.getManageRedirect, list_params)
 
-    completed_list = lists.getListContent(
-        request, completed_params, fields, idx=2, need_content=True)
+    completed_list = lists.getListContent(request, completed_params, fields,
+                                          idx=2, need_content=True,
+                                          prefetch=prefetch)
     # set the needed info
     completed_list = list_info.setStudentProjectSurveyInfo(completed_list,
                                                            org_entity.scope)
@@ -742,8 +745,9 @@ class View(base.View):
             list_params))
     withdrawn_params['list_action'] = (redirects.getManageRedirect, list_params)
 
-    withdrawn_list = lists.getListContent(
-        request, withdrawn_params, fields, idx=3, need_content=True)
+    withdrawn_list = lists.getListContent(request, withdrawn_params, fields,
+                                          idx=3, need_content=True,
+                                          prefetch=prefetch)
     # set the needed info
     withdrawn_list = list_info.setStudentProjectSurveyInfo(withdrawn_list,
                                                            org_entity.scope)

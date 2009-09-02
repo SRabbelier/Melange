@@ -5,10 +5,14 @@ from google.appengine.ext import webapp
 from google.appengine.api import memcache
 import google.appengine.ext.webapp.util
 
-import os.path
+from email.MIMEMultipart import MIMEMultipart
+from email.Message import Message
+
+import httplib
 import logging
-import re
+import os.path
 import random
+import re
 import string
 import zlib
 
@@ -107,6 +111,11 @@ def get_global_profiler():
 
     return global_profiler
     
+def new_global_profiler():
+    global global_profiler
+    global_profiler = GAEProfiler()
+    return global_profiler
+
 def cache_key_for_profile(profile_key):
     "generate a memcache key"
     return "ProfileData.%s" % profile_key
@@ -123,12 +132,30 @@ def get_stats_from_global_or_request(request_obj):
     "get pstats for a key, or the global pstats"
     key = request_obj.get('key', '')
     if key:
-        return load_pstats_from_memcache(key)
+        gp = GAEProfiler()
+        gp.profile_obj = load_pstats_from_memcache(key)
+        gp.profile_key = key
+        return gp
     else:
         gp = get_global_profiler()
         if not gp.has_profiler():
             return None
-        return gp.get_pstats()
+        return gp
+
+def mime_upload_data_as_file(field_name, filename, body):
+    part = Message()
+    part['Content-Disposition'] = 'form-data; name="%s"; filename="%s"' % (field_name, filename)
+    part['Content-Transfer-Encoding'] = 'binary'
+    part['Content-Type'] = 'application/octet-stream'
+    part['Content-Length'] = str(len(body))
+    part.set_payload(body)
+    return part
+
+def mime_form_value(name, value):
+    part = Message()
+    part['Content-Disposition'] = 'form-data; name="%s"' % name
+    part.set_payload(value)
+    return part
 
 class show_profile(webapp.RequestHandler):
     def get(self):
@@ -137,11 +164,11 @@ class show_profile(webapp.RequestHandler):
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
             return
 
-        ps.set_output(self.response.out)
+        ps.profile_obj.set_output(self.response.out)
         sort = self.request.get('sort', 'time')
-        ps.sort_stats(sort)
+        ps.profile_obj.sort_stats(sort)
         self.response.out.write("<body><html><pre>\n")
-        ps.print_stats(30)
+        ps.profile_obj.print_stats(30)
         self.response.out.write("</pre></html></body>")
 
 class download_profile_data(webapp.RequestHandler):
@@ -151,12 +178,44 @@ class download_profile_data(webapp.RequestHandler):
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
             return            
 
-        output = ps.dump_stats_pickle()
+        output = ps.profile_obj.dump_stats_pickle()
 
         self.response.headers['Content-Type'] = 'application/octet-stream'
 
         self.response.out.write(output)
 
+class send_profile_data(webapp.RequestHandler):
+    def get(self):
+        ps = get_stats_from_global_or_request(self.request)
+        if not ps:
+            self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
+            return            
+
+        dest = self.request.get('dest', '')
+        if not dest:
+            self.response.out.write("<body><html>No destination</html></body>")
+
+        upload_form = MIMEMultipart('form-data')
+
+        upload_filename =  'profile.%s.pstats' % ps.profile_key
+        upload_field_name = 'profile_file'
+
+        upload_form.attach(mime_upload_data_as_file('profile_file', upload_field_name, zlib.compress(ps.profile_obj.dump_stats_pickle())))
+        upload_form.attach(mime_form_value('key_only', '1'))
+
+        http_conn = httplib.HTTPConnection(dest)
+        http_conn.connect()
+        http_conn.request('POST', '/upload_profile', upload_form.as_string(), 
+                          {'Content-Type': 'multipart/form-data; boundary=%s' % upload_form.get_boundary()})
+
+        http_resp = http_conn.getresponse()
+        remote_data = http_resp.read()
+        if http_resp.status == 200:
+            remote_url = "http://%s/view_profile?key=%s" % (dest, remote_data)
+            self.response.out.write("<html><body>Success! <a href='%s'>%s</a></body></html>" % (remote_url, remote_url))
+        else:
+            self.response.out.write("Failure!\n%s: %s\n%s" % (http_resp.status, http_resp.reason, remote_data))
+            
 class show_profiler_status(webapp.RequestHandler):
     def get(self):
         gp = get_global_profiler()
@@ -174,13 +233,11 @@ class show_profiler_status(webapp.RequestHandler):
 
 class start_profiler(webapp.RequestHandler):
     def get(self):
-        gp = get_global_profiler()
+        gp = new_global_profiler()
         gp.start_profiling()
-        self.response.out.write("<html><body>")
-        self.response.out.write("Started profiling (key: %s). <br />" % gp.profile_key)
-        self.response.out.write("Retrieve saved results at "
-            "<a href='/profiler/show?key=%(key)s'>/profiler/show?key=%(key)s</a>. <br />" % {'key':gp.profile_key})
-        self.response.out.write("</body></html>")
+        self.response.headers['Content-Type'] = "text/plain"
+        self.response.out.write("Started profiling (key: %s).\n" % gp.profile_key)
+        self.response.out.write("Retrieve saved results at <a href='/profiler/show?key=%(key)s'>/profiler/show?key=%(key)s).\n" % {'key':gp.profile_key})
 
 class stop_profiler(webapp.RequestHandler):
     def get(self):
@@ -231,6 +288,7 @@ application = webapp.WSGIApplication(
      ('/profiler/show', show_profile),
      ('/profiler/download', download_profile_data),
      ('/profiler/status', show_profiler_status),
+     ('/profiler/send', send_profile_data),
      ],
     debug=True)
 

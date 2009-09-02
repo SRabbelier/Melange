@@ -1,6 +1,7 @@
 import pstats
 import cPickle
 import zlib
+import re
 
 class PickleStats(object):
     def __init__(self, stats):
@@ -48,6 +49,7 @@ class Stats(pstats.Stats):
     def __init__(self, *args, **kwargs):
         pstats.Stats.__init__(self, *args)
         self.replace_dirs = {}
+        self.replace_regexes = {}
 
     def set_output(self, stream):
         "redirect output of print_stats to the file object <stream>"
@@ -56,6 +58,10 @@ class Stats(pstats.Stats):
     def hide_directory(self, dirname, replacement=''):
         "replace occurences of <dirname> in filenames with <replacement>"
         self.replace_dirs[dirname] = replacement
+        
+    def hide_regex(self, pattern, replacement=''):
+        "call re.sub(pattern, replacement) on each filename"
+        self.replace_regexes[pattern] = replacement
 
     def func_strip_path(self, func_name):
         "take a filename, line, name tuple and mangle appropiately"
@@ -64,11 +70,15 @@ class Stats(pstats.Stats):
         for dirname in self.replace_dirs:
             filename = filename.replace(dirname, self.replace_dirs[dirname])
 
+        for pattern in self.replace_regexes:
+            filename = re.sub(pattern, self.replace_regexes[pattern], filename)
+
         return filename, line, name
 
     def strip_dirs(self):
         "strip irrelevant/redundant directories from filenames in profile data"
         func_std_string = pstats.func_std_string
+        add_func_stats = pstats.add_func_stats
 
         oldstats = self.stats
         self.stats = newstats = {}

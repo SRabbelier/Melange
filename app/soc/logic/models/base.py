@@ -312,8 +312,37 @@ class Logic(object):
 
     raise out_of_band.Error(msg, status=404)
 
+  def prefetchField(self, field, data):
+    """Prefetches all fields in data from the datastore in one fetch.
+
+    Args:
+      field: the field that should be fetched
+      data: the data for which the prefetch should be done
+    """
+
+    prop = getattr(self._model, field, None)
+
+    if not prop:
+      logging.exception("Model %s does not have attribute %s" %
+                        (self._model, field))
+      return
+
+    if not isinstance(prop, db.ReferenceProperty):
+      logging.exception("Property %s of %s is not a ReferenceProperty but a %s" %
+                        (field, self._model.kind(), prop.__class__.__name__))
+      return
+
+    keys = [prop.get_value_for_datastore(i) for i in data]
+
+    prefetched_entities = db.get(keys)
+    prefetched_dict = dict((i.key(), i) for i in prefetched_entities)
+
+    for i in data:
+      value = prefetched_dict[prop.get_value_for_datastore(i)]
+      setattr(i, field, value)
+
   def getForFields(self, filter=None, unique=False, limit=1000, offset=0,
-                   ancestors=None, order=None):
+                   ancestors=None, order=None, prefetch=None):
     """Returns all entities that have the specified properties.
 
     Args:
@@ -323,10 +352,15 @@ class Logic(object):
       offset: the position to start at
       ancestors: list of ancestors properties to set for this query
       order: a list with the sort order
+      prefetch: the fields of the data that should be pre-fetched,
+          has no effect if unique is True
     """
 
     if unique:
       limit = 1
+
+    if not prefetch:
+      prefetch = []
 
     query = self.getQueryForFields(filter=filter, 
                                    ancestors=ancestors, order=order)
@@ -341,6 +375,9 @@ class Logic(object):
 
     if unique:
       return result[0] if result else None
+
+    for field in prefetch:
+      self.prefetchField(field, result)
 
     return result
 

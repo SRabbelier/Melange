@@ -47,7 +47,9 @@ class TaskTag(Tag):
   scope = db.ReferenceProperty(reference_class=soc.models.linkable.Linkable,
                                required=True,
                                collection_name='task_type_tags')
-  
+
+  order = db.IntegerProperty(required=True, default=0)
+
   @classmethod
   def __key_name(cls, scope_path, tag_name):
     """Create the key_name from program key_name as scope_path and tag_name.
@@ -62,15 +64,98 @@ class TaskTag(Tag):
     return tags
 
   @classmethod
-  def get_or_create(cls, program, tag_name):
+  def get_by_scope(cls, scope):
+    """Get the list of tag objects that has the given scope.
+    """
+    tags = db.Query(cls).filter('scope =', scope).order('order').fetch(1000)
+    return tags
+
+  @classmethod
+  def get_highest_order(cls, scope):
+    """Get a tag with highest order.
+    """
+    tags = db.Query(cls).filter('scope =', scope).order('-order').fetch(1)
+    if tags:
+      return tags[0].order
+    else:
+      return -1
+
+  @classmethod
+  def get_by_scope_and_name(cls, scope, tag_name):
+    """Get a tag by scope and name.
+
+    There can be only one such tag.
+    """
+
+    tags = db.Query(cls).filter(
+        'scope =', scope).filter('tag =', tag_name).fetch(1)
+    if tags:
+      return tags[0]
+    else:
+      return None
+
+  @classmethod
+  def update_order(cls, scope, tag_name, order):
+    """Updates the order of the tag.
+    """
+
+    tag = cls.get_by_scope_and_name(scope, tag_name)
+    if tag:
+      tag.order = order
+      tag.put()
+
+    return tag
+
+  @classmethod
+  def copy_tag(cls, scope, tag_name, new_tag_name):
+    """Copy a tag with a given scope and tag_name to another tag with
+    new tag_name.
+    """
+    tag = cls.get_by_scope_and_name(scope, tag_name)
+
+    if tag:
+      tag_key_name = cls.__key_name(scope.key().name(), new_tag_name)
+      existing_tag = cls.get_by_key_name(tag_key_name)
+
+      if existing_tag is None:
+        new_tag = cls(key_name=tag_key_name, tag=new_tag_name, scope=scope, 
+                      added=tag.added, tagged=tag.tagged,
+                      tagged_count=tag.tagged_count)
+        new_tag.put()
+        tag.delete()
+
+        return new_tag
+
+      return existing_tag
+
+    return None
+
+  @classmethod
+  def delete_tag(cls, scope, tag_name):
+    """Copy a tag with a given scope and tag_name to another tag with
+    new tag_name.
+    """
+    tag = cls.get_by_scope_and_name(scope, tag_name)
+
+    if tag:
+      tag.delete()
+      return True
+
+    return False
+
+  @classmethod
+  def get_or_create(cls, scope, tag_name, order=0):
     """Get the Tag object that has the tag value given by tag_value.
     """
-    tag_key_name = cls.__key_name(program.key().name(), tag_name)
+    tag_key_name = cls.__key_name(scope.key().name(), tag_name)
     existing_tag = cls.get_by_key_name(tag_key_name)
     if existing_tag is None:
       # the tag does not yet exist, so create it.
+      if not order:
+        order = cls.get_highest_order(scope=scope) + 1
       def create_tag_txn():
-        new_tag = cls(key_name=tag_key_name, tag=tag_name, scope=program)
+        new_tag = cls(key_name=tag_key_name, tag=tag_name,
+                      scope=scope, order=order)
         new_tag.put()
         return new_tag
       existing_tag = db.run_in_transaction(create_tag_txn)
@@ -86,6 +171,13 @@ class TaskTypeTag(TaskTag):
 
 class TaskDifficultyTag(TaskTag):
   """Model for storing of task difficulty level tags.
+  """
+
+  pass
+
+
+class TaskArbitraryTag(TaskTag):
+  """Model for storing of arbitrary tags.
   """
 
   pass
@@ -117,6 +209,10 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: Required field which contains the type of the task. These types are
   #: configured by a Program Admin.
   task_type = tag_property('task_type')
+
+  #: Field which contains the arbitrary tags for the task. These tags can
+  #: be assigned by Org Admins and mentors.
+  arbit_tag = tag_property('arbit_tag')
 
   #: A field which contains time allowed for completing the task (in hours)
   #: from the moment that this task has been assigned to a Student
@@ -243,5 +339,5 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
     # call the Taggable constructor to initialize the tags specified as
     # keyword arguments
     Taggable.__init__(self, task_type=TaskTypeTag, 
-                      difficulty=TaskDifficultyTag)
-
+                      difficulty=TaskDifficultyTag,
+                      arbit_tag=TaskArbitraryTag)

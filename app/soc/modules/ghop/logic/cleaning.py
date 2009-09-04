@@ -25,6 +25,7 @@ __authors__ = [
 from django import forms
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 
 def cleanTaskComment(comment_field, action_field, ws_field):
   """Cleans the comment form and checks to see if there is either
@@ -55,4 +56,41 @@ def cleanTaskComment(comment_field, action_field, ws_field):
 
     return cleaned_data
 
+  return wrapper
+
+
+def clean_mentors_list(field_name):
+  """Clean method to check and validate list of mentor's link_ids.
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    """Decorator wrapped method.
+    """
+
+    from soc.modules.ghop.logic.models.mentor import logic as ghop_mentor_logic
+
+    mentors_list_str = cleaning.str2set(field_name)
+
+    filter = {
+        'scope_path': self.cleaned_data.get('scope_path'),
+        'status': ['active']
+        }
+
+    mentors_list = []
+    for link_id in mentors_list_str:
+
+      if not validate.isLinkIdFormatValid(link_id):
+        raise forms.ValidationError(
+            "%s is not a valid link ID." % link_id)
+
+      filter['link_id'] = link_id
+
+      if not ghop_mentor_logic.getFromKeyFields(filter):
+        raise forms.ValidationError(
+            'link_id "%s" is not a valid Mentor.' % link_id)
+
+      mentors_list.append(link_id)
+
+    return mentors_list
   return wrapper

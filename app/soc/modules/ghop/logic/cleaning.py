@@ -74,7 +74,7 @@ def clean_mentors_list(field_name):
 
     filter = {
         'scope_path': self.cleaned_data.get('scope_path'),
-        'status': ['active']
+        'status': 'active'
         }
 
     mentors_list = []

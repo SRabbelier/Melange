@@ -132,7 +132,7 @@ COUNTRY_INFO = {
     "Ireland": ('.ie', 'Europe'),
     "Israel": ('.il', 'Asia'),
     "Italy": ('.it', 'Europe'),
-    "Ivory Coast": ('.ci', 'Africa'),
+    "Ivory Coast (Cote D'Ivoire)": ('.ci', 'Africa'),
     "Jamaica": ('.jm', 'North America'),
     "Japan": ('.jp', 'Asia'),
     "Jordan": ('.jo', 'Asia'),

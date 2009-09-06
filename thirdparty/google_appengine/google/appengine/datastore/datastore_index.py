@@ -192,6 +192,74 @@ EXISTS_OPERATORS = set((datastore_pb.Query_Filter.EXISTS,
                         ))
 
 
+def Normalize(filters, orders):
+  """ Normalizes filter and order query components.
+
+  The resulting components have the same effect as the given components if used
+  in a query.
+
+  Returns:
+    (filter, orders) the reduced set of filters and orders
+  """
+
+  for f in filters:
+    if f.op() == datastore_pb.Query_Filter.IN and f.property_size() == 1:
+      f.set_op(datastore_pb.Query_Filter.EQUAL);
+
+  eq_properties = set([f.property(0).name() for f in filters if f.op() == datastore_pb.Query_Filter.EQUAL]);
+
+  remove_set = eq_properties.copy()
+  new_orders = []
+  for o in orders:
+    if o.property() not in remove_set:
+      remove_set.add(o.property())
+      new_orders.append(o)
+  orders = new_orders
+
+
+  if datastore_types._KEY_SPECIAL_PROPERTY in eq_properties:
+    orders = []
+
+  new_orders = []
+  for o in orders:
+    if o.property() == datastore_types._KEY_SPECIAL_PROPERTY:
+      new_orders.append(o)
+      break
+    new_orders.append(o)
+  orders = new_orders
+
+  return (filters, orders)
+
+
+def RemoveNativelySupportedComponents(filters, orders):
+  """ Removes query components that are natively supported by the datastore.
+
+  The resulting filters and orders should not be used in an actual query.
+
+  Returns
+    (filters, orders) the reduced set of filters and orders
+  """
+  (filters, orders) = Normalize(filters, orders)
+
+  has_key_desc_order = False
+  if orders and orders[-1].property() == datastore_types._KEY_SPECIAL_PROPERTY:
+    if orders[-1].direction() == ASCENDING:
+      orders = orders[:-1]
+    else:
+      has_key_desc_order = True
+
+  if not has_key_desc_order:
+    for f in filters:
+      if (f.op() in INEQUALITY_OPERATORS and
+          f.property(0).name() != datastore_types._KEY_SPECIAL_PROPERTY):
+        break
+    else:
+      filters = [f for f in filters
+          if f.property(0).name() != datastore_types._KEY_SPECIAL_PROPERTY]
+
+  return (filters, orders)
+
+
 def CompositeIndexForQuery(query):
   """Return the composite index needed for a query.
 
@@ -213,12 +281,18 @@ def CompositeIndexForQuery(query):
     can be at most one of these.
 
   - After that come all the (property, direction) pairs for the Order
-    entries, in the order given in the query.  Exceptions: (a) if
-    there is a Filter entry with an inequality operator that matches
-    the first Order entry, the first order pair is omitted (or,
-    equivalently, in this case the inequality pair is omitted); (b) if
-    an Order entry corresponds to an equality filter, it is ignored
-    (since there will only ever be one value returned).
+    entries, in the order given in the query.  Exceptions:
+      (a) if there is a Filter entry with an inequality operator that matches
+          the first Order entry, the first order pair is omitted (or,
+          equivalently, in this case the inequality pair is omitted).
+      (b) if an Order entry corresponds to an equality filter, it is ignored
+          (since there will only ever be one value returned).
+      (c) if there is an equality filter on __key__ all orders are dropped
+          (since there will be at most one result returned).
+      (d) if there is an order on __key__ all further orders are dropped (since
+          keys are unique).
+      (e) orders on __key__ ASCENDING are dropped (since this is supported
+          natively by the datastore).
 
   - Finally, if there are Filter entries whose operator is EXISTS, and
     whose property names are not already listed, they are added, with
@@ -271,8 +345,10 @@ def CompositeIndexForQuery(query):
     nprops = len(filter.property_list())
     assert nprops == 1, 'Filter has %s properties, expected 1' % nprops
 
-  if ancestor and not kind and not filters and not orders:
+  if not kind:
     required = False
+
+  (filters, orders) = RemoveNativelySupportedComponents(filters, orders)
 
   eq_filters = [f for f in filters if f.op() in EQUALITY_OPERATORS]
   ineq_filters = [f for f in filters if f.op() in INEQUALITY_OPERATORS]
@@ -280,7 +356,7 @@ def CompositeIndexForQuery(query):
   assert (len(eq_filters) + len(ineq_filters) +
           len(exists_filters)) == len(filters), 'Not all filters used'
 
-  if (kind and eq_filters and not ineq_filters and not exists_filters and
+  if (kind and not ineq_filters and not exists_filters and
       not orders):
     names = set(f.property(0).name() for f in eq_filters)
     if not names.intersection(datastore_types._SPECIAL_PROPERTIES):
@@ -291,16 +367,6 @@ def CompositeIndexForQuery(query):
     ineq_property = ineq_filters[0].property(0).name()
     for filter in ineq_filters:
       assert filter.property(0).name() == ineq_property
-
-  new_orders = []
-  for order in orders:
-    name = order.property()
-    for filter in eq_filters:
-      if filter.property(0).name() == name:
-        break
-    else:
-      new_orders.append(order)
-  orders = new_orders
 
   props = []
 

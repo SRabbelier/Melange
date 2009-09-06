@@ -55,7 +55,6 @@ _API_CALL_DEADLINE = 5.0
 _UNTRUSTED_REQUEST_HEADERS = frozenset([
   'content-length',
   'host',
-  'referer',
   'vary',
   'via',
   'x-forwarded-for',
@@ -168,7 +167,6 @@ class URLFetchServiceStub(apiproxy_stub.APIProxyStub):
       adjusted_headers = {
           'User-Agent':
           'AppEngine-Google; (+http://code.google.com/appengine)',
-          'Referer': 'http://localhost/',
           'Host': host,
           'Accept-Encoding': 'gzip',
       }
@@ -212,7 +210,10 @@ class URLFetchServiceStub(apiproxy_stub.APIProxyStub):
           socket.setdefaulttimeout(deadline)
           connection.request(method, full_path, payload, adjusted_headers)
           http_response = connection.getresponse()
-          http_response_data = http_response.read()
+          if method == 'HEAD':
+            http_response_data = ''
+          else:
+            http_response_data = http_response.read()
         finally:
           socket.setdefaulttimeout(orig_timeout)
           connection.close()
@@ -239,7 +240,7 @@ class URLFetchServiceStub(apiproxy_stub.APIProxyStub):
               header_value == 'gzip'):
             continue
           if header_key.lower() == 'content-length':
-            header_value = len(response.content())
+            header_value = str(len(response.content()))
           header_proto = response.add_header()
           header_proto.set_key(header_key)
           header_proto.set_value(header_value)

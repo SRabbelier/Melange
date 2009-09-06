@@ -22,6 +22,7 @@ import dummy_thread as thread
 __pychecker__ = """maxreturns=0 maxbranches=0 no-callinit
                    unusednames=printElemNumber,debug_strs no-special"""
 
+from google.appengine.datastore.datastore_v3_pb import *
 class TaskQueueServiceError(ProtocolBuffer.ProtocolMessage):
 
   OK           =    0
@@ -37,6 +38,7 @@ class TaskQueueServiceError(ProtocolBuffer.ProtocolMessage):
   TASK_ALREADY_EXISTS =   10
   TOMBSTONED_TASK =   11
   INVALID_ETA  =   12
+  INVALID_REQUEST =   13
 
   _ErrorCode_NAMES = {
     0: "OK",
@@ -52,6 +54,7 @@ class TaskQueueServiceError(ProtocolBuffer.ProtocolMessage):
     10: "TASK_ALREADY_EXISTS",
     11: "TOMBSTONED_TASK",
     12: "INVALID_ETA",
+    13: "INVALID_REQUEST",
   }
 
   def ErrorCode_Name(cls, x): return cls._ErrorCode_NAMES.get(x, "")
@@ -96,13 +99,17 @@ class TaskQueueServiceError(ProtocolBuffer.ProtocolMessage):
     return res
 
 
-  _TEXT = (
-   "ErrorCode",
-  )
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-  )
+
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+  }, 0)
+
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+  }, 0, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -234,9 +241,12 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
   url_ = ""
   has_body_ = 0
   body_ = ""
+  has_transaction_ = 0
+  transaction_ = None
 
   def __init__(self, contents=None):
     self.header_ = []
+    self.lazy_init_lock_ = thread.allocate_lock()
     if contents is not None: self.MergeFromString(contents)
 
   def queue_name(self): return self.queue_name_
@@ -333,6 +343,24 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
 
   def has_body(self): return self.has_body_
 
+  def transaction(self):
+    if self.transaction_ is None:
+      self.lazy_init_lock_.acquire()
+      try:
+        if self.transaction_ is None: self.transaction_ = Transaction()
+      finally:
+        self.lazy_init_lock_.release()
+    return self.transaction_
+
+  def mutable_transaction(self): self.has_transaction_ = 1; return self.transaction()
+
+  def clear_transaction(self):
+    if self.has_transaction_:
+      self.has_transaction_ = 0;
+      if self.transaction_ is not None: self.transaction_.Clear()
+
+  def has_transaction(self): return self.has_transaction_
+
 
   def MergeFrom(self, x):
     assert x is not self
@@ -343,6 +371,7 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
     if (x.has_url()): self.set_url(x.url())
     for i in xrange(x.header_size()): self.add_header().CopyFrom(x.header(i))
     if (x.has_body()): self.set_body(x.body())
+    if (x.has_transaction()): self.mutable_transaction().MergeFrom(x.transaction())
 
   def Equals(self, x):
     if x is self: return 1
@@ -361,6 +390,8 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
       if e1 != e2: return 0
     if self.has_body_ != x.has_body_: return 0
     if self.has_body_ and self.body_ != x.body_: return 0
+    if self.has_transaction_ != x.has_transaction_: return 0
+    if self.has_transaction_ and self.transaction_ != x.transaction_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -383,6 +414,7 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
         debug_strs.append('Required field: url not set.')
     for p in self.header_:
       if not p.IsInitialized(debug_strs): initialized=0
+    if (self.has_transaction_ and not self.transaction_.IsInitialized(debug_strs)): initialized = 0
     return initialized
 
   def ByteSize(self):
@@ -395,6 +427,7 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
     n += 2 * len(self.header_)
     for i in xrange(len(self.header_)): n += self.header_[i].ByteSize()
     if (self.has_body_): n += 1 + self.lengthString(len(self.body_))
+    if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSize())
     return n + 4
 
   def Clear(self):
@@ -405,6 +438,7 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
     self.clear_url()
     self.clear_header()
     self.clear_body()
+    self.clear_transaction()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
@@ -425,6 +459,10 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_body_):
       out.putVarInt32(74)
       out.putPrefixedString(self.body_)
+    if (self.has_transaction_):
+      out.putVarInt32(82)
+      out.putVarInt32(self.transaction_.ByteSize())
+      self.transaction_.OutputUnchecked(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -450,6 +488,12 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
       if tt == 74:
         self.set_body(d.getPrefixedString())
         continue
+      if tt == 82:
+        length = d.getVarInt32()
+        tmp = ProtocolBuffer.Decoder(d.buffer(), d.pos(), d.pos() + length)
+        d.skip(length)
+        self.mutable_transaction().TryMerge(tmp)
+        continue
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
       d.skipData(tt)
 
@@ -470,7 +514,15 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
       res+=prefix+"}\n"
       cnt+=1
     if self.has_body_: res+=prefix+("body: %s\n" % self.DebugFormatString(self.body_))
+    if self.has_transaction_:
+      res+=prefix+"transaction <\n"
+      res+=self.transaction_.__str__(prefix + "  ", printElemNumber)
+      res+=prefix+">\n"
     return res
+
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
 
   kqueue_name = 1
   ktask_name = 2
@@ -481,41 +533,35 @@ class TaskQueueAddRequest(ProtocolBuffer.ProtocolMessage):
   kHeaderkey = 7
   kHeadervalue = 8
   kbody = 9
+  ktransaction = 10
 
-  _TEXT = (
-   "ErrorCode",
-   "queue_name",
-   "task_name",
-   "eta_usec",
-   "url",
-   "method",
-   "Header",
-   "key",
-   "value",
-   "body",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "queue_name",
+    2: "task_name",
+    3: "eta_usec",
+    4: "url",
+    5: "method",
+    6: "Header",
+    7: "key",
+    8: "value",
+    9: "body",
+    10: "transaction",
+  }, 10)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-   ProtocolBuffer.Encoder.STARTGROUP,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.STRING,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STRING,
+    2: ProtocolBuffer.Encoder.STRING,
+    3: ProtocolBuffer.Encoder.NUMERIC,
+    4: ProtocolBuffer.Encoder.STRING,
+    5: ProtocolBuffer.Encoder.NUMERIC,
+    6: ProtocolBuffer.Encoder.STARTGROUP,
+    7: ProtocolBuffer.Encoder.STRING,
+    8: ProtocolBuffer.Encoder.STRING,
+    9: ProtocolBuffer.Encoder.STRING,
+    10: ProtocolBuffer.Encoder.STRING,
+  }, 10, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -582,18 +628,21 @@ class TaskQueueAddResponse(ProtocolBuffer.ProtocolMessage):
     if self.has_chosen_task_name_: res+=prefix+("chosen_task_name: %s\n" % self.DebugFormatString(self.chosen_task_name_))
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kchosen_task_name = 1
 
-  _TEXT = (
-   "ErrorCode",
-   "chosen_task_name",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "chosen_task_name",
+  }, 1)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STRING,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STRING,
+  }, 1, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -779,34 +828,33 @@ class TaskQueueUpdateQueueRequest(ProtocolBuffer.ProtocolMessage):
     if self.has_user_specified_rate_: res+=prefix+("user_specified_rate: %s\n" % self.DebugFormatString(self.user_specified_rate_))
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kapp_id = 1
   kqueue_name = 2
   kbucket_refill_per_second = 3
   kbucket_capacity = 4
   kuser_specified_rate = 5
 
-  _TEXT = (
-   "ErrorCode",
-   "app_id",
-   "queue_name",
-   "bucket_refill_per_second",
-   "bucket_capacity",
-   "user_specified_rate",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "app_id",
+    2: "queue_name",
+    3: "bucket_refill_per_second",
+    4: "bucket_capacity",
+    5: "user_specified_rate",
+  }, 5)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.DOUBLE,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-   ProtocolBuffer.Encoder.STRING,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STRING,
+    2: ProtocolBuffer.Encoder.STRING,
+    3: ProtocolBuffer.Encoder.DOUBLE,
+    4: ProtocolBuffer.Encoder.NUMERIC,
+    5: ProtocolBuffer.Encoder.STRING,
+  }, 5, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -850,13 +898,17 @@ class TaskQueueUpdateQueueResponse(ProtocolBuffer.ProtocolMessage):
     return res
 
 
-  _TEXT = (
-   "ErrorCode",
-  )
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-  )
+
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+  }, 0)
+
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+  }, 0, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -956,22 +1008,24 @@ class TaskQueueFetchQueuesRequest(ProtocolBuffer.ProtocolMessage):
     if self.has_max_rows_: res+=prefix+("max_rows: %s\n" % self.DebugFormatInt32(self.max_rows_))
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kapp_id = 1
   kmax_rows = 2
 
-  _TEXT = (
-   "ErrorCode",
-   "app_id",
-   "max_rows",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "app_id",
+    2: "max_rows",
+  }, 2)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STRING,
+    2: ProtocolBuffer.Encoder.NUMERIC,
+  }, 2, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -1204,34 +1258,33 @@ class TaskQueueFetchQueuesResponse(ProtocolBuffer.ProtocolMessage):
       cnt+=1
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kQueueGroup = 1
   kQueuequeue_name = 2
   kQueuebucket_refill_per_second = 3
   kQueuebucket_capacity = 4
   kQueueuser_specified_rate = 5
 
-  _TEXT = (
-   "ErrorCode",
-   "Queue",
-   "queue_name",
-   "bucket_refill_per_second",
-   "bucket_capacity",
-   "user_specified_rate",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "Queue",
+    2: "queue_name",
+    3: "bucket_refill_per_second",
+    4: "bucket_capacity",
+    5: "user_specified_rate",
+  }, 5)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STARTGROUP,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.DOUBLE,
-
-   ProtocolBuffer.Encoder.DOUBLE,
-
-   ProtocolBuffer.Encoder.STRING,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STARTGROUP,
+    2: ProtocolBuffer.Encoder.STRING,
+    3: ProtocolBuffer.Encoder.DOUBLE,
+    4: ProtocolBuffer.Encoder.DOUBLE,
+    5: ProtocolBuffer.Encoder.STRING,
+  }, 5, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -1366,26 +1419,27 @@ class TaskQueueFetchQueueStatsRequest(ProtocolBuffer.ProtocolMessage):
     if self.has_max_num_tasks_: res+=prefix+("max_num_tasks: %s\n" % self.DebugFormatInt32(self.max_num_tasks_))
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kapp_id = 1
   kqueue_name = 2
   kmax_num_tasks = 3
 
-  _TEXT = (
-   "ErrorCode",
-   "app_id",
-   "queue_name",
-   "max_num_tasks",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "app_id",
+    2: "queue_name",
+    3: "max_num_tasks",
+  }, 3)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.STRING,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STRING,
+    2: ProtocolBuffer.Encoder.STRING,
+    3: ProtocolBuffer.Encoder.NUMERIC,
+  }, 3, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -1563,26 +1617,27 @@ class TaskQueueFetchQueueStatsResponse(ProtocolBuffer.ProtocolMessage):
       cnt+=1
     return res
 
+
+  def _BuildTagLookupTable(sparse, maxtag, default=None):
+    return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
+
   kQueueStatsGroup = 1
   kQueueStatsnum_tasks = 2
   kQueueStatsoldest_eta_usec = 3
 
-  _TEXT = (
-   "ErrorCode",
-   "QueueStats",
-   "num_tasks",
-   "oldest_eta_usec",
-  )
+  _TEXT = _BuildTagLookupTable({
+    0: "ErrorCode",
+    1: "QueueStats",
+    2: "num_tasks",
+    3: "oldest_eta_usec",
+  }, 3)
 
-  _TYPES = (
-   ProtocolBuffer.Encoder.NUMERIC,
-   ProtocolBuffer.Encoder.STARTGROUP,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-   ProtocolBuffer.Encoder.NUMERIC,
-
-  )
+  _TYPES = _BuildTagLookupTable({
+    0: ProtocolBuffer.Encoder.NUMERIC,
+    1: ProtocolBuffer.Encoder.STARTGROUP,
+    2: ProtocolBuffer.Encoder.NUMERIC,
+    3: ProtocolBuffer.Encoder.NUMERIC,
+  }, 3, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""

@@ -36,11 +36,13 @@ import logging
 import mimetypes
 import optparse
 import os
+import random
 import re
 import sha
 import sys
 import tempfile
 import time
+import urllib
 import urllib2
 
 import google
@@ -68,6 +70,11 @@ UPDATE_CHECK_TIMEOUT = 3
 NAG_FILE = '.appcfg_nag'
 
 MAX_LOG_LEVEL = 4
+
+MAX_BATCH_SIZE = 1000000
+MAX_BATCH_COUNT = 100
+MAX_BATCH_FILE_SIZE = 200000
+BATCH_OVERHEAD = 500
 
 verbosity = 1
 
@@ -220,6 +227,25 @@ def RetryWithBackoff(initial_delay, backoff_factor, max_tries, callable_func):
   return max_tries > 0
 
 
+def _VersionList(release):
+  """Parse a version string into a list of ints.
+
+  Args:
+    release: The 'release' version, e.g. '1.2.4'.
+        (Due to YAML parsing this may also be an int or float.)
+
+  Returns:
+    A list of ints corresponding to the parts of the version string
+    between periods.  Example:
+      '1.2.4' -> [1, 2, 4]
+      '1.2.3.4' -> [1, 2, 3, 4]
+
+  Raises:
+    ValueError if not all the parts are valid integers.
+  """
+  return [int(part) for part in str(release).split('.')]
+
+
 class UpdateCheck(object):
   """Determines if the local SDK is the latest version.
 
@@ -332,9 +358,25 @@ class UpdateCheck(object):
       return
 
     latest = yaml.safe_load(response)
-    if latest['release'] == version['release']:
+    if version['release'] == latest['release']:
       logging.info('The SDK is up to date.')
       return
+
+    try:
+      this_release = _VersionList(version['release'])
+    except ValueError:
+      logging.warn('Could not parse this release version (%r)',
+                   version['release'])
+    else:
+      try:
+        advertised_release = _VersionList(latest['release'])
+      except ValueError:
+        logging.warn('Could not parse advertised release version (%r)',
+                     latest['release'])
+      else:
+        if this_release > advertised_release:
+          logging.info('This SDK release is newer than the advertised release.')
+          return
 
     api_versions = latest['api_versions']
     if self.config.api_version not in api_versions:
@@ -964,6 +1006,149 @@ def FindSentinel(filename, blocksize=2**16):
     fp.close()
 
 
+class UploadBatcher(object):
+  """Helper to batch file uploads."""
+
+  def __init__(self, what, app_id, version, server):
+    """Constructor.
+
+    Args:
+      what: Either 'file' or 'blob' indicating what kind of objects
+        this batcher uploads.  Used in messages and URLs.
+      app_id: The application ID.
+      version: The application version string.
+      server: The RPC server.
+    """
+    assert what in ('file', 'blob'), repr(what)
+    self.what = what
+    self.app_id = app_id
+    self.version = version
+    self.server = server
+    self.single_url = '/api/appversion/add' + what
+    self.batch_url = self.single_url + 's'
+    self.batching = True
+    self.batch = []
+    self.batch_size = 0
+
+  def SendBatch(self):
+    """Send the current batch on its way.
+
+    If successful, resets self.batch and self.batch_size.
+
+    Raises:
+      HTTPError with code=404 if the server doesn't support batching.
+    """
+    boundary = 'boundary'
+    parts = []
+    for path, payload, mime_type in self.batch:
+      while boundary in payload:
+        boundary += '%04x' % random.randint(0, 0xffff)
+        assert len(boundary) < 80, 'Unexpected error, please try again.'
+      part = '\n'.join(['',
+                        'X-Appcfg-File: %s' % urllib.quote(path),
+                        'X-Appcfg-Hash: %s' % _Hash(payload),
+                        'Content-Type: %s' % mime_type,
+                        'Content-Length: %d' % len(payload),
+                        'Content-Transfer-Encoding: 8bit',
+                        '',
+                        payload,
+                        ])
+      parts.append(part)
+    parts.insert(0,
+                 'MIME-Version: 1.0\n'
+                 'Content-Type: multipart/mixed; boundary="%s"\n'
+                 '\n'
+                 'This is a message with multiple parts in MIME format.' %
+                 boundary)
+    parts.append('--\n')
+    delimiter = '\n--%s' % boundary
+    payload = delimiter.join(parts)
+    logging.info('Uploading batch of %d %ss to %s with boundary="%s".',
+                 len(self.batch), self.what, self.batch_url, boundary)
+    self.server.Send(self.batch_url,
+                     payload=payload,
+                     content_type='message/rfc822',
+                     app_id=self.app_id,
+                     version=self.version)
+    self.batch = []
+    self.batch_size = 0
+
+  def SendSingleFile(self, path, payload, mime_type):
+    """Send a single file on its way."""
+    logging.info('Uploading %s %s (%s bytes, type=%s) to %s.',
+                 self.what, path, len(payload), mime_type, self.single_url)
+    self.server.Send(self.single_url,
+                     payload=payload,
+                     content_type=mime_type,
+                     path=path,
+                     app_id=self.app_id,
+                     version=self.version)
+
+  def Flush(self):
+    """Flush the current batch.
+
+    This first attempts to send the batch as a single request; if that
+    fails because the server doesn't support batching, the files are
+    sent one by one, and self.batching is reset to False.
+
+    At the end, self.batch and self.batch_size are reset.
+    """
+    if not self.batch:
+      return
+    try:
+      self.SendBatch()
+    except urllib2.HTTPError, err:
+      if err.code != 404:
+        raise
+
+      logging.info('Old server detected; turning off %s batching.', self.what)
+      self.batching = False
+
+      for path, payload, mime_type in self.batch:
+        self.SendSingleFile(path, payload, mime_type)
+
+      self.batch = []
+      self.batch_size = 0
+
+  def AddToBatch(self, path, payload, mime_type):
+    """Batch a file, possibly flushing first, or perhaps upload it directly.
+
+    Args:
+      path: The name of the file.
+      payload: The contents of the file.
+      mime_type: The MIME Content-type of the file, or None.
+
+    If mime_type is None, application/octet-stream is substituted.
+    """
+    if not mime_type:
+      mime_type = 'application/octet-stream'
+    size = len(payload)
+    if size <= MAX_BATCH_FILE_SIZE:
+      if (len(self.batch) >= MAX_BATCH_COUNT or
+          self.batch_size + size > MAX_BATCH_SIZE):
+        self.Flush()
+      if self.batching:
+        logging.info('Adding %s %s (%s bytes, type=%s) to batch.',
+                     self.what, path, size, mime_type)
+        self.batch.append((path, payload, mime_type))
+        self.batch_size += size + BATCH_OVERHEAD
+        return
+    self.SendSingleFile(path, payload, mime_type)
+
+
+def _Hash(content):
+  """Compute the hash of the content.
+
+  Args:
+    content: The data to hash as a string.
+
+  Returns:
+    The string representation of the hash.
+  """
+  h = sha.new(content).hexdigest()
+  return '%s_%s_%s_%s_%s' % (h[0:8], h[8:16], h[16:24], h[24:32], h[32:40])
+
+
 class AppVersionUpload(object):
   """Provides facilities to upload a new appversion to the hosting service.
 
@@ -995,18 +1180,11 @@ class AppVersionUpload(object):
     self.files = {}
     self.in_transaction = False
     self.deployed = False
-
-  def _Hash(self, content):
-    """Compute the hash of the content.
-
-    Args:
-      content: The data to hash as a string.
-
-    Returns:
-      The string representation of the hash.
-    """
-    h = sha.new(content).hexdigest()
-    return '%s_%s_%s_%s_%s' % (h[0:8], h[8:16], h[16:24], h[24:32], h[32:40])
+    self.batching = True
+    self.file_batcher = UploadBatcher('file', self.app_id, self.version,
+                                      self.server)
+    self.blob_batcher = UploadBatcher('blob', self.app_id, self.version,
+                                      self.server)
 
   def AddFile(self, path, file_handle):
     """Adds the provided file to the list to be pushed to the server.
@@ -1024,7 +1202,7 @@ class AppVersionUpload(object):
       return
 
     pos = file_handle.tell()
-    content_hash = self._Hash(file_handle.read())
+    content_hash = _Hash(file_handle.read())
     file_handle.seek(pos, 0)
 
     self.files[path] = content_hash
@@ -1084,7 +1262,7 @@ class AppVersionUpload(object):
     CloneFiles('/api/appversion/cloneblobs', blobs_to_clone, 'static')
     CloneFiles('/api/appversion/clonefiles', files_to_clone, 'application')
 
-    logging.info('Files to upload: ' + str(files_to_upload))
+    logging.debug('Files to upload: %s', files_to_upload)
 
     self.files = files_to_upload
     return sorted(files_to_upload.iterkeys())
@@ -1109,14 +1287,11 @@ class AppVersionUpload(object):
 
     del self.files[path]
     mime_type = GetMimeTypeIfStaticFile(self.config, path)
-    if mime_type is not None:
-      self.server.Send('/api/appversion/addblob', app_id=self.app_id,
-                       version=self.version, path=path, content_type=mime_type,
-                       payload=file_handle.read())
+    payload = file_handle.read()
+    if mime_type is None:
+      self.file_batcher.AddToBatch(path, payload, mime_type)
     else:
-      self.server.Send('/api/appversion/addfile', app_id=self.app_id,
-                       version=self.version, path=path,
-                       payload=file_handle.read())
+      self.blob_batcher.AddToBatch(path, payload, mime_type)
 
   def Commit(self):
     """Commits the transaction, making the new app version available.
@@ -1249,10 +1424,9 @@ class AppVersionUpload(object):
     try:
       missing_files = self.Begin()
       if missing_files:
-        StatusUpdate('Uploading %d files.' % len(missing_files))
+        StatusUpdate('Uploading %d files and blobs.' % len(missing_files))
         num_files = 0
         for missing_file in missing_files:
-          logging.info('Uploading file \'%s\'' % missing_file)
           file_handle = openfunc(missing_file)
           try:
             self.UploadFile(missing_file, file_handle)
@@ -1260,12 +1434,20 @@ class AppVersionUpload(object):
             file_handle.close()
           num_files += 1
           if num_files % 500 == 0:
-            StatusUpdate('Uploaded %d files.' % num_files)
+            StatusUpdate('Processed %d out of %s.' %
+                         (num_files, len(missing_files)))
+        self.file_batcher.Flush()
+        self.blob_batcher.Flush()
+        StatusUpdate('Uploaded %d files and blobs' % num_files)
 
       self.Commit()
 
     except KeyboardInterrupt:
       logging.info('User interrupted. Aborting.')
+      self.Rollback()
+      raise
+    except urllib2.HTTPError, err:
+      logging.info('HTTP Error (%s)', err)
       self.Rollback()
       raise
     except:
@@ -1856,6 +2038,12 @@ class AppCfgApp(object):
 
     if self.options.num_days is None:
       self.options.num_days = int(not self.options.append)
+
+    try:
+      end_date = self._ParseEndDate(self.options.end_date)
+    except ValueError:
+      self.parser.error('End date must be in the format YYYY-MM-DD.')
+
     basepath = self.args[0]
     appyaml = self._ParseAppYaml(basepath)
     rpc_server = self._GetRpcServer()
@@ -1863,10 +2051,26 @@ class AppCfgApp(object):
                                    self.options.num_days,
                                    self.options.append,
                                    self.options.severity,
-                                   time.time(),
+                                   end_date,
                                    self.options.vhost,
                                    self.options.include_vhost)
     logs_requester.DownloadLogs()
+
+  def _ParseEndDate(self, date, time_func=time.time):
+    """Translates a user-readable end date to a POSIX timestamp.
+
+    Args:
+      date: A utc date string as YYYY-MM-DD.
+      time_func: time.time() function for testing.
+
+    Returns:
+      A POSIX timestamp representing the last moment of that day.
+      If no date is given, returns a timestamp representing now.
+    """
+    if not date:
+      return time_func()
+    struct_time = time.strptime('%s' % date, '%Y-%m-%d')
+    return calendar.timegm(struct_time) + 86400
 
   def _RequestLogsOptions(self, parser):
     """Adds request_logs-specific options to 'parser'.
@@ -1896,6 +2100,10 @@ class AppCfgApp(object):
     parser.add_option('--include_vhost', dest='include_vhost',
                       action='store_true', default=False,
                       help='Include virtual host in log messages.')
+    parser.add_option('--end_date', dest='end_date',
+                      action='store', default='',
+                      help='End date (as YYYY-MM-DD) of period for log data. '
+                      'Defaults to today.')
 
   def CronInfo(self, now=None, output=sys.stdout):
     """Displays information about cron definitions.
@@ -2032,7 +2240,12 @@ class AppCfgApp(object):
                      'email',
                      'debug',
                      'exporter_opts',
+                     'mapper_opts',
                      'result_db_filename',
+                     'mapper_opts',
+                     'dry_run',
+                     'dump',
+                     'restore',
                      )])
 
   def PerformDownload(self, run_fn=None):
@@ -2050,6 +2263,9 @@ class AppCfgApp(object):
     args = self._MakeLoaderArgs()
     args['download'] = True
     args['has_header'] = False
+    args['map'] = False
+    args['dump'] = False
+    args['restore'] = False
 
     run_fn(args)
 
@@ -2067,6 +2283,9 @@ class AppCfgApp(object):
 
     args = self._MakeLoaderArgs()
     args['download'] = False
+    args['map'] = False
+    args['dump'] = False
+    args['restore'] = False
 
     run_fn(args)
 
@@ -2114,6 +2333,9 @@ class AppCfgApp(object):
                       help='File to write bulkloader logs.  If not supplied '
                       'then a new log file will be created, named: '
                       'bulkloader-log-TIMESTAMP.')
+    parser.add_option('--dry_run', action='store_true',
+                      dest='dry_run', default=False,
+                      help='Do not execute any remote_api calls')
 
   def _PerformUploadOptions(self, parser):
     """Adds 'upload_data' specific options to the 'parser' passed in.

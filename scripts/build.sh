@@ -89,7 +89,14 @@ popd > /dev/null
 # Create symbolic links.
 for x in $APP_FILES $APP_DIRS $ZIP_FILES
 do
-    ln -s $APP_FOLDER/$x $APP_BUILD/$x
+    if [[ $x != "soc" && $x != "jquery" && $x != "json" ]] ; then
+      ln -s $APP_FOLDER/$x $APP_BUILD/$x
+    else
+      cp -R $APP_FOLDER/$x $APP_BUILD/$x
+    fi
 done
+
+# Run shrinksafe
+bash ../scripts/shrinksafe.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json
 
 echo "Build results in $APP_BUILD."

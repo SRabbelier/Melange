@@ -26,12 +26,6 @@ import os
 import settings
 
 
-def getHostname():
-  """Returns the hostname
-  """
-
-  return os.environ.get('HTTP_HOST')
-
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.
   """

@@ -97,8 +97,6 @@ def remote(args, context=None):
     context: locals that should be added to the shell
   """
 
-  from google.appengine.api import apiproxy_stub_map
-  from google.appengine.api.memcache import memcache_stub
   from google.appengine.ext import db
   from google.appengine.ext.remote_api import remote_api_stub
 
@@ -113,8 +111,6 @@ def remote(args, context=None):
     host = '%s.appspot.com' % app_id
 
   remote_api_stub.ConfigureRemoteDatastore(app_id, '/remote_api', auth_func, host)
-  apiproxy_stub_map.apiproxy.RegisterStub('memcache',
-      memcache_stub.MemcacheServiceStub())
 
   context['deepFetch'] = deepFetch
 

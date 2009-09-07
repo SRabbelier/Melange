@@ -23,13 +23,13 @@ __authors__ = [
 
 
 import logging
+import os
 
 from google.appengine.api.labs import taskqueue
 
 from django import http
 
 from soc.tasks.helper import error_handler
-from soc.logic import system
 
 
 def getDjangoURLPatterns():
@@ -222,7 +222,7 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
 
     survey_url = "http://%(host)s%(redirect)s" % {
       'redirect': survey_redirect,
-      'host': system.getHostname(),
+      'host': os.environ['HTTP_HOST'],
       }
 
     # set the context for the mail template

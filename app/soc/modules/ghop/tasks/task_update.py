@@ -23,6 +23,7 @@ __authors__ = [
 
 
 import logging
+import os
 
 from google.appengine.api.labs import taskqueue
 from google.appengine.ext import db
@@ -30,7 +31,6 @@ from google.appengine.ext import db
 from django import http
 from django.utils.translation import ugettext
 
-from soc.logic import system
 from soc.tasks.helper import error_handler
 from soc.views.helper import redirects
 
@@ -180,7 +180,7 @@ def createNotificationMail(request, *args, **kwargs):
       subscriber_start_index:subscriber_start_index+batch_size])
 
   task_url = "http://%(host)s%(task)s" % {
-                 'host': system.getHostname(),
+                 'host': os.environ['HTTP_HOST'],
                  'task': redirects.getPublicRedirect(
                      task_entity, {'url_name': 'ghop/task'}),
                  }

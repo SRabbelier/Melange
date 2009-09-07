@@ -25,8 +25,6 @@ __authors__ = [
   ]
 
 
-import os
-
 from django import forms
 from django import http
 from django.utils.translation import ugettext
@@ -34,6 +32,7 @@ from django.utils.translation import ugettext
 from soc.logic import allocations
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic import system
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import mentor as mentor_logic
@@ -416,7 +415,7 @@ class View(presence.View):
     contents = [content]
 
     return_url =  "http://%(host)s%(index)s" % {
-      'host' : os.environ['HTTP_HOST'],
+      'host' : system.getHostname(),
       'index': redirects.getSlotsRedirect(program, params)
       }
 

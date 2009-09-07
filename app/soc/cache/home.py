@@ -27,6 +27,7 @@ import logging
 from google.appengine.api import memcache
 
 from soc.logic import accounts
+from soc.logic import system
 
 import soc.cache.base
 
@@ -35,7 +36,12 @@ def key(entity):
   """Returns the memcache key for an entities homepage.
   """
 
-  return 'homepage_for_%s_%s' % (entity.kind(), entity.key().id_or_name())
+  host = system.getHostname()
+  version = system.getAppVersion()
+  kind = entity.kind()
+  key = entity.key().id_or_name()
+
+  return 'homepage_for_%s_%s_%s_%s' % (host, version, kind, key)
 
 
 def get(self, *args, **kwargs):

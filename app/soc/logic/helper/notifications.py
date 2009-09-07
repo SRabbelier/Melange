@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-import os
 import time
 
 from django.template import loader
@@ -34,6 +33,7 @@ from django.utils.translation import ugettext
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic import mail_dispatcher
+from soc.logic import system
 from soc.views.helper import redirects
 
 
@@ -81,7 +81,7 @@ def sendInviteNotification(entity):
   to_user = user_logic.getForFields(properties, unique=True)
 
   invitation_url = "http://%(host)s%(index)s" % {
-      'host' : os.environ['HTTP_HOST'],
+      'host' : system.getHostname(),
       'index': redirects.getInviteProcessRedirect(entity, None),
       }
 
@@ -164,7 +164,7 @@ def sendNewGroupNotification(entity, params):
   url = "http://%(host)s%(redirect)s" % {
       'redirect': redirects.getApplicantRedirect(entity,
       {'url_name': params['group_url_name']}),
-      'host': os.environ['HTTP_HOST'],
+      'host': system.getHostname(),
       }
 
   message_properties = {
@@ -269,7 +269,7 @@ def sendNewNotificationMessage(notification_entity):
 
   # create the url to show this notification
   notification_url = "http://%(host)s%(index)s" % {
-      'host' : os.environ['HTTP_HOST'],
+      'host' : system.getHostname(),
       'index': redirects.getPublicRedirect(notification_entity,
           notification_view.getParams())}
 
@@ -340,7 +340,7 @@ def sendWelcomeMessage(user_entity):
           'name': user_entity.name
           },
       'site_name': site_name,
-      'site_location': 'http://%s' % os.environ['HTTP_HOST'],
+      'site_location': 'http://%s' % system.getHostname(),
       }
 
   # send out the message using the default welcome template

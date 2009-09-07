@@ -28,8 +28,8 @@ from google.appengine.api.labs import taskqueue
 
 from django import http
 
-from soc.tasks.helper import error_handler
 from soc.logic import system
+from soc.tasks.helper import error_handler
 
 
 def getDjangoURLPatterns():

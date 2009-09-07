@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-import os
-
 from django import forms
 from django.utils import simplejson
 
@@ -32,6 +30,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import mail_dispatcher
 from soc.logic import models as model_logic
+from soc.logic import system
 from soc.logic.models import program as program_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.views import helper
@@ -239,7 +238,7 @@ class View(group_app.View):
         # use the accepted template and subject
         template = params['accepted_mail_template']
         context['subject'] = 'Congratulations!'
-        context['HTTP_host'] = 'http://%s' % (os.environ['HTTP_HOST'])
+        context['HTTP_host'] = 'http://%s' % (system.getHostname())
       elif status == 'rejected':
         # use the rejected template and subject
         template = params['rejected_mail_template']

@@ -59,7 +59,7 @@ def cleanTaskComment(comment_field, action_field, ws_field):
   return wrapper
 
 
-def clean_mentors_list(field_name):
+def cleanMentorsList(field_name):
   """Clean method to check and validate list of mentor's link_ids.
   """
 

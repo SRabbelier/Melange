@@ -1,0 +1,18 @@
+#info {
+	display: block;
+	padding: 10px; margin-bottom: 20px;
+	border: 1px solid #333;
+	background-color: #efefef;
+}
+
+#dynamic-add {
+	list-style: none;
+}
+
+#dynamic-add li.handle {
+	display: block;
+	padding: 20px 10px; margin-bottom: 3px;
+	background-color: #efefef;
+	cursor: move;
+}
+

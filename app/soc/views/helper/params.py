@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -95,7 +96,11 @@ def constructParams(params):
 
   logic = params['logic']
 
-  rights = access.Checker(params)
+  if params.get('rights'):
+    rights = params['rights']
+  else:
+    rights = access.Checker(params)
+
   rights['unspecified'] = []
   rights['any_access'] = ['checkIsLoggedIn']
   rights['show'] = ['checkIsUser']

@@ -24,6 +24,8 @@ __authors__ = [
 
 
 from soc.logic import dicts
+from soc.views.helper import decorators
+from soc.views.models import timeline
 
 from soc.modules.ghop.logic.models import program as ghop_program_logic
 from soc.modules.ghop.logic.models import timeline as ghop_timeline_logic

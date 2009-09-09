@@ -301,7 +301,7 @@ class View(base.View):
 
     dynaproperties = params_helper.getDynaFields(dynafields)
     dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
-    dynaproperties['clean'] = ghop_cleaning.clean_comment(
+    dynaproperties['clean'] = ghop_cleaning.cleanTaskComment(
         'comment', 'action', 'work_submission')
 
     comment_form = dynaform.newDynaForm(dynamodel=None, 

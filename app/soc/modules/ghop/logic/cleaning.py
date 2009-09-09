@@ -26,6 +26,8 @@ from django import forms
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
+from soc.logic import validate
+
 
 def cleanTaskComment(comment_field, action_field, ws_field):
   """Cleans the comment form and checks to see if there is either
@@ -63,7 +65,7 @@ def cleanMentorsList(field_name):
   """Clean method to check and validate list of mentor's link_ids.
   """
 
-  @check_field_is_empty(field_name)
+  @cleaning.check_field_is_empty(field_name)
   def wrapper(self):
     """Decorator wrapped method.
     """

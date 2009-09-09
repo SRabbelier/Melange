@@ -36,9 +36,6 @@ class Callback(object):
 
   API_VERSION = 1
 
-  # TODO: set this to True if you want to enable the GHOP module
-  ENABLE_MODULE = False
-
   def __init__(self, core):
     """Initializes a new Callback object for the specified core.
     """
@@ -50,9 +47,6 @@ class Callback(object):
     """
 
     self.core.requireUniqueService('registerWithSitemap')
-
-    if not self.ENABLE_MODULE:
-      return
 
     # register the GHOP Views
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
@@ -72,9 +66,6 @@ class Callback(object):
 
     # require that we had the chance to register the urls we need with the sitemap
     self.core.requireUniqueService('registerWithSidebar')
-
-    if not self.ENABLE_MODULE:
-      return
 
     # register the GHOP menu entries
     self.core.registerSidebarEntry(mentor.view.getSidebarMenus)

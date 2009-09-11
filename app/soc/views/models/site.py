@@ -90,6 +90,7 @@ class View(presence_with_tos.View):
             filter_fields={'prefix': new_params['document_prefix']},
             label=ugettext('Terms of Service Document link ID'),
             help_text=soc.models.work.Work.link_id.help_text),
+        'clean_noreply_email': cleaning.clean_empty_field('noreply_email'),
         }
 
     patterns = []

@@ -396,13 +396,6 @@ class Logic(object):
     from google.appengine.api import memcache
     from soc.logic import system
 
-    if system.isDebug():
-      queries = memcache.get('__melange_queries')
-      if not queries:
-        queries = []
-      queries.append((self._model.__name__, filter, order))
-      memcache.set('__melange_queries', queries)
-
     if not filter:
       filter = {}
 

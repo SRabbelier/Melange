@@ -144,7 +144,7 @@ def getUniversalContext(request):
   context['site_name'] = settings.site_name
   context['site_notice'] = settings.site_notice
   context['tos_link'] = redirects.getToSRedirect(settings)
-  context['in_maintenance'] = timeline.isActivePeriod(site, 'maintenance')
+  context['in_maintenance'] = timeline.isActivePeriod(settings, 'maintenance')
  
   core.setRequestValue('context', context)
 

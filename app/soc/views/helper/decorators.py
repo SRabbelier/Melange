@@ -27,21 +27,11 @@ import logging
 
 from functools import wraps
 
-from google.appengine.runtime import DeadlineExceededError
-from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
-
 from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
-from soc.modules import callback
 from soc.views.helper import responses
-
-
-DEF_DOWN_FOR_MAINTENANCE_MSG = ugettext("Down for maintenance")
-DEF_IN_UNEXPECTED_MAINTENANCE_MSG = ugettext(
-      "Down for unexpected maintenance.")
-
 
 
 class Error(Exception):
@@ -51,75 +41,16 @@ class Error(Exception):
   pass
 
 
-def maintenance(request):
-  """Returns a 'down for maintenance' view.
-  """
-
-  context = responses.getUniversalContext(request)
-  context['page_name'] = ugettext('Maintenance')
-
-  notice = context.pop('site_notice')
-
-  if not notice:
-    context['body_content'] = DEF_IN_UNEXPECTED_MAINTENANCE_MSG
-  else:
-    context['body_content'] = notice
-
-  context['header_title'] = DEF_DOWN_FOR_MAINTENANCE_MSG
-  context['sidebar_menu_items'] = [
-      {'heading': DEF_DOWN_FOR_MAINTENANCE_MSG,
-       'group': ''},
-      ]
-
-  template = 'soc/base.html'
-
-  return responses.respond(request, template, context=context)
-
-
 def view(func):
   """Decorator that insists that exceptions are handled by view.
   """
-
-  from soc.views import out_of_band
 
   @wraps(func)
   def view_wrapper(request, *args, **kwds):
     """View decorator wrapper method.
     """
 
-    core = callback.getCore()
-    core.startNewRequest(request)
-
-    def view_wrapper_helper():
-      """View wrapper helper that does all the work.
-      """
-
-      context = responses.getUniversalContext(request)
-
-      try:
-        if not context['is_admin'] and context['in_maintenance']:
-          return maintenance(request)
-
-        return func(request, *args, **kwds)
-      except CapabilityDisabledError, exception:
-        logging.exception(exception)
-        # assume the site is in maintenance if we get CDE
-        return maintenance(request)
-      except DeadlineExceededError, exception:
-        template = 'soc/deadline_exceeded.html'
-      except MemoryError, exception:
-        template = 'soc/memory_error.html'
-      except AssertionError, exception:
-        template = 'soc/assertion_error.html'
-      except out_of_band.Error, error:
-        return responses.errorResponse(error, request)
-
-      logging.exception(exception)
-      return responses.respond(request, template, context=context)
-
-    result = view_wrapper_helper()
-    core.endRequest(request)
-    return result
+    return func(request, *args, **kwds)
 
   return view_wrapper
 

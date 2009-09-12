@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Middleware to handle exceptions.
+"""Middleware to handle maintenance mode.
 """
 
 __authors__ = [

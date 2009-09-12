@@ -13,7 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block body %}
-Started conversion job {{ option }}. <br />
-Job starter was {% if not success %}not {% endif %} successfull. <br />
+
+The updates are sorted per version.
+
+{% for option in options %}
+<p>
+If you are updating from version <b>{{ option.from_version }}</b> or earlier.
+Please click <a href="/tasks/update/{{option.name}}">here</a> to run the following update:<br />
+{{option.description}}
+</p>
+{% endfor %}
 
 {% endblock %}

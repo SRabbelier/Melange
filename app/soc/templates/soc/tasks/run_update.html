@@ -13,9 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block body %}
-{% for option in options %}
-Start <a target="_blank" href="/tasks/convert/{{ option }}">
-convert {{ option }}</a> job. <br/>
-{% endfor %}
+<p>
+Trying to start the update Task with the following description:<br /> 
+{{ option.description }}. <br />
+</p>
+
+The Task was {% if not success %}not {% endif %} successfully started. <br />
+Click <a href="/tasks/update/start">here</a> to go back to the list of possible update tasks.
 
 {% endblock %}

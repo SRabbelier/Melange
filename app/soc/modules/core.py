@@ -150,12 +150,17 @@ class Core(object):
     self.per_request_value = {}
     self.setRequestValue('request', request)
 
-  def endRequest(self, request):
+  def endRequest(self, request, optional):
     """Performs cleanup after current request.
 
     Args:
       request: a Django HttpRequest object
+      optional: whether to noop when not in a request
     """
+
+    # already cleaned up, as expected
+    if optional and not self.in_request:
+      return
 
     old_request = self.getRequestValue('request')
     self.per_request_value = {}

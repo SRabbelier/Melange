@@ -39,7 +39,7 @@ class ValueStoreMiddleware(object):
     core = callback.getCore()
     core.startNewRequest(request)
 
-  def end(self, request):
+  def end(self, request, optional):
     """Empties the value store.
 
     Args:
@@ -47,7 +47,7 @@ class ValueStoreMiddleware(object):
     """
 
     core = callback.getCore()
-    core.endRequest(request)
+    core.endRequest(request, optional)
 
   def process_request(self, request):
     """Called when a request is made.
@@ -64,7 +64,7 @@ class ValueStoreMiddleware(object):
     the method signature.
     """
 
-    self.end(request)
+    self.end(request, True)
     return response
 
   def process_exception(self, request, exception):
@@ -74,4 +74,4 @@ class ValueStoreMiddleware(object):
     the method signature.
     """
 
-    self.end(request)
+    self.end(request, False)

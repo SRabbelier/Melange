@@ -64,12 +64,24 @@ class MaintenanceMiddleware(object):
     return responses.respond(request, template, context=context)
 
   def process_request(self, request):
+    """Called when a request is made.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
+
     context = responses.getUniversalContext(request)
 
     if not context['is_admin'] and context['in_maintenance']:
       return self.maintenance(request)
 
   def process_exception(self, request, exception):
+    """Called when an uncaught exception is raised.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
+
     if isinstance(exception, CapabilityDisabledError):
       # assume the site is in maintenance if we get CDE
       return maintenance(request)

@@ -38,6 +38,12 @@ class ExceptionHandlerMiddleware(object):
   """
 
   def process_exception(self, request, exception):
+    """Called when an uncaught exception is raised.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
+
     template = None
     context = responses.getUniversalContext(request)
 

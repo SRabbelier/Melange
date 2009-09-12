@@ -50,11 +50,28 @@ class ValueStoreMiddleware(object):
     core.endRequest(request)
 
   def process_request(self, request):
+    """Called when a request is made.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
     self.start(request)
 
   def process_response(self, request, response):
+    """Called when a response is returned.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
+
     self.end(request)
     return response
 
   def process_exception(self, request, exception):
+    """Called when an uncaught exception is raised.
+
+    See the Django middleware documentation for an explanation of
+    the method signature.
+    """
+
     self.end(request)

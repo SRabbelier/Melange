@@ -141,6 +141,9 @@ class Core(object):
 
   def startNewRequest(self, request):
     """Prepares core to handle a new request.
+
+    Args:
+      request: a Django HttpRequest object
     """
 
     self.in_request = True
@@ -149,6 +152,9 @@ class Core(object):
 
   def endRequest(self, request):
     """Performs cleanup after current request.
+
+    Args:
+      request: a Django HttpRequest object
     """
 
     old_request = self.getRequestValue('request')
@@ -161,6 +167,10 @@ class Core(object):
 
   def getRequestValue(self, key, default=None):
     """Gets a per-request value.
+
+    Args:
+      key: the key of the to be retrieved value
+      default: the default value (returned if no value is set)
     """
 
     assert self.in_request
@@ -168,6 +178,10 @@ class Core(object):
 
   def setRequestValue(self, key, value):
     """Sets a per-request value.
+
+    Args:
+      key: the key of the to be set value
+      value: the value that should be set
     """
 
     assert self.in_request

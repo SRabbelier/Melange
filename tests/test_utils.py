@@ -19,12 +19,42 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
+
+
+from soc.modules import callback
 
 
 class MockRequest(object):
   """Shared dummy request object to mock common aspects of a request.
+
+  Before using the object, start should be called, when done (and
+  before calling start on a new request), end should be called.
   """
+
   def __init__(self, path=None):
-    self.REQUEST = self.GET = self.POST = {}
+    """Creates a new empty request object.
+
+    self.REQUEST, self.GET and self.POST are set to an empty
+    dictionary, and path to the value specified.
+    """
+
+    self.REQUEST = {}
+    self.GET = {}
+    self.POST = {}
     self.path = path
+
+  def start(self):
+    """Readies the core for a new request.
+    """
+
+    core = callback.getCore()
+    core.startNewRequest(self)
+
+  def end(self):
+    """Finishes up the current request.
+    """
+
+    core = callback.getCore()
+    core.endRequest(self, False)

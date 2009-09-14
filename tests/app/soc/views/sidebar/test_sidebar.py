@@ -36,4 +36,6 @@ class SidebarTest(unittest.TestCase):
     """Test that the sidebar builds and does not return None.
     """
 
+    callback.getCore().startNewRequest(None)
     self.assertNotEqual(None, callback.getCore().getSidebar('id', None))
+    callback.getCore().endRequest(None, False)

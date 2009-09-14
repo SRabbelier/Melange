@@ -95,8 +95,10 @@ class BaseTest(unittest.TestCase):
     """
 
     request = MockRequest("/test/public")
+    request.start()
     access_type = "show"
     page_name = "Show Test"
     django_args = {'link_id': 'foo', 'scope_path': 'bar'}
     actual = self.view.public(request, access_type, page_name=page_name, **django_args)
+    request.end()
     self.assertTrue('error' in actual)

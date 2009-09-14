@@ -1511,6 +1511,29 @@ class Checker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
   @allowDeveloper
+  def checkIsMyActiveRole(self, django_args, role_logic):
+    """Checks whether the current user has the active role given by django_args.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      logic: the logic that should be used to fetch the role
+    """
+
+    self.checkIsUser(django_args)
+
+    entity = role_logic.getFromKeyFieldsOr404(django_args)
+
+    if entity.user.key() != self.user.key() or (
+        entity.link_id != self.user.link_id):
+      raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    if entity.status != 'active':
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ROLE_MSG)
+
+    # this role belongs to the current user and is active
+    return
+
+  @allowDeveloper
   @denySidebar
   def checkIsAllowedToManageRole(self, django_args, logic_for_role, 
       manage_role_logic):

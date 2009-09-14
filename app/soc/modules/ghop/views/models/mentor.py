@@ -52,9 +52,7 @@ class View(mentor.View):
 
     rights = ghop_access.GHOPChecker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope', 
-                       ghop_mentor_logic.logic),
-        ('checkIsMyEntity', [ghop_mentor_logic.logic, 'user', True])]
+    rights['edit'] = [('checkIsMyActiveRole', ghop_mentor_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          ghop_org_admin_logic.logic)]

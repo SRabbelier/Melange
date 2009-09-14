@@ -50,8 +50,7 @@ class View(org_admin.View):
     rights = ghop_access.GHOPChecker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [
-        ('checkHasActiveRoleForScope', ghop_org_admin_logic.logic),
-        ('checkIsMyEntity', [ghop_org_admin_logic.logic, 'user', True])]
+        ('checkIsMyActiveRole', ghop_org_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          ghop_org_admin_logic.logic)]

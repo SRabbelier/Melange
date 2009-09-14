@@ -60,8 +60,7 @@ class View(role.View):
 
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForScope', student_logic.logic),
-        ('checkIsMyEntity', [student_logic.logic, 'user', True])]
+    rights['edit'] = [('checkIsMyActiveRole', student_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['apply'] = [
         'checkIsUser',
@@ -69,8 +68,7 @@ class View(role.View):
          ['student_signup', 'scope_path', program_logic.logic]),
         ('checkIsNotParticipatingInProgramInScope', [program_logic.logic]),
         ]
-    rights['manage'] = [('checkHasActiveRoleForScope', student_logic.logic),
-        ('checkIsMyEntity', [student_logic.logic, 'user', True])]
+    rights['manage'] = [('checkIsMyActiveRole', student_logic.logic)]
     rights['list_projects'] = [
         ('checkHasActiveRoleForScope', student_logic.logic),
         ('checkIsAfterEvent', ['accepted_students_announced_deadline',

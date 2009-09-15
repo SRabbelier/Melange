@@ -20,7 +20,8 @@ See soc.views.helper.access module.
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -34,12 +35,16 @@ from soc.views.helper import access
 
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
+from soc.modules.ghop.logic.models import program as ghop_program_logic
 from soc.modules.ghop.logic.models import task as ghop_task_logic
 
 
 DEF_CANT_EDIT_MSG = ugettext(
     'This task cannot be edited since it has been claimed at least '
     'once before.')
+
+DEF_CANT_REGISTER = ugettext(
+    'You have not completed your first task to register as a student. ')
 
 DEF_MAX_TASKS_REACHED_MSG = ugettext(
     'You have reached the maximum number of Tasks allowed '
@@ -242,3 +247,33 @@ class GHOPChecker(access.Checker):
       # this proposal can not be task at the moment
       raise out_of_band.AccessViolation(
           message_fmt=DEF_NO_PUB_TASK_MSG)
+
+  def checkCanApply(self, django_args):
+    """Checks if the user has the completed at least one task to register as
+    a student.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse:
+         - If student has not completed even a single task
+    """
+
+    self.checkIsUser(django_args)
+
+    program_entity = ghop_program_logic.logic.getFromKeyNameOr404(
+        django_args['scope_path'])
+
+    filter = {
+        'user': self.user,
+        'program': program_entity,
+        'status': 'AwaitingRegistration',
+        }
+
+    if ghop_task_logic.logic.getForFields(filter, unique=True):
+      return
+
+    # no completed tasks found, access denied
+    raise out_of_band.AccessViolation(
+        message_fmt=DEF_CANT_REGISTER)

@@ -1159,13 +1159,18 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
 
-  def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic):
+  def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic,
+                                              student_logic, org_admin_logic,
+                                              mentor_logic):
     """Checks if the current user has no roles for the given 
        program in django_args.
 
     Args:
       django_args: a dictionary with django's arguments
       program_logic: Program Logic instance
+      student_logic: Student Logic instance
+      org_admin_logic: Org Admin Logic instance
+      mentor_logic: Mentor Logic instance
 
      Raises:
        AccessViolationResponse: if the current user has a student, mentor or

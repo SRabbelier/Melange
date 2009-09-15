@@ -29,6 +29,8 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models import mentor as mentor_logic
+from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
@@ -66,7 +68,8 @@ class View(role.View):
         'checkIsUser',
         ('checkIsActivePeriod', 
          ['student_signup', 'scope_path', program_logic.logic]),
-        ('checkIsNotParticipatingInProgramInScope', [program_logic.logic]),
+        ('checkIsNotParticipatingInProgramInScope', [program_logic.logic,
+        student_logic.logic, org_admin_logic.logic, mentor_logic.logic]),
         ]
     rights['manage'] = [('checkIsMyActiveRole', student_logic.logic)]
     rights['list_projects'] = [

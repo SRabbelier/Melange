@@ -17,6 +17,7 @@
 """This module contains the Student Model."""
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -54,14 +55,32 @@ class Student(soc.models.role.Role):
       choices=countries.COUNTRIES_AND_TERRITORIES)
   school_country.group = ugettext("5. Education")
 
-  major = db.StringProperty(required=True,
+  #: School type can be only High school for GHOP and can be University
+  #: for GSoC.
+  school_type = db.StringProperty(required=False,
+                                  verbose_name=ugettext('School Type'),
+                                  choices=['University', 'High School'])
+  school_type.group = ugettext("5. Education")
+
+  major = db.StringProperty(required=False,
       verbose_name=ugettext('Major Subject'))
   major.group = ugettext("5. Education")
-  # TODO add more degrees because this should be used in GHOP as well
-  degree = db.StringProperty(required=True,
+
+  degree = db.StringProperty(required=False,
       verbose_name=ugettext('Degree'),
       choices=['Undergraduate', 'Master', 'PhD'])
   degree.group = ugettext("5. Education")
+
+  #: Property containing the Grade of the student if the school type
+  #: is High School.
+  grade = db.IntegerProperty(required=False,
+                            verbose_name=ugettext('Grade'))
+  grade.group = ugettext("5. Education")
+  grade.help_text = ugettext(
+      'Please enter your grade in the school, e.g. 8 if you are in 8th' 
+      'grade. In some parts of the world it is called as, e.g. 8th'
+      'Standard')
+
   expected_graduation = db.IntegerProperty(required=True,
       verbose_name=ugettext('Expected Graduation Year'))
   expected_graduation.help_text = ugettext("Pick your expected graduation year")

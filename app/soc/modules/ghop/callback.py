@@ -25,6 +25,7 @@ from soc.modules.ghop.views.models import mentor
 from soc.modules.ghop.views.models import organization
 from soc.modules.ghop.views.models import org_admin
 from soc.modules.ghop.views.models import program
+from soc.modules.ghop.views.models import student
 from soc.modules.ghop.views.models import task
 from soc.modules.ghop.views.models import task_subscription
 from soc.modules.ghop.views.models import timeline
@@ -53,6 +54,7 @@ class Callback(object):
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task_subscription.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
@@ -73,6 +75,7 @@ class Callback(object):
     self.core.registerSidebarEntry(organization.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)
     self.core.registerSidebarEntry(program.view.getSidebarMenus)
+    self.core.registerSidebarEntry(student.view.getSidebarMenus)
     self.core.registerSidebarEntry(task.view.getSidebarMenus)
     self.core.registerSidebarEntry(task_subscription.view.getSidebarMenus)
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)

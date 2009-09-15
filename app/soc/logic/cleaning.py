@@ -707,7 +707,7 @@ def validate_student(birth_date_field, school_type_field, major_field,
       # nothing to check, field validator will find these errors
       return cleaned_data
 
-    # get the current program entity or bail out 404
+    # get the current program entity
     entity = program_logic.getFromKeyName(program_key_name)
 
     if not entity:
@@ -717,6 +717,10 @@ def validate_student(birth_date_field, school_type_field, major_field,
     school_type = cleaned_data.get(school_type_field)
     major = cleaned_data.get(major_field)
     degree = cleaned_data.get(degree_field)
+
+    # TODO: when school_type is required this can be removed
+    if not school_type:
+      raise forms.ValidationError("School type cannot be left blank.")
 
     # if school_type is University, check for major
     if school_type == 'University' and not major:

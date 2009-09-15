@@ -112,11 +112,16 @@ class View(role.View):
     # more than one year
     allowed_years = range(current_year-1, current_year+20)
 
+    view_logic = params['logic'] if params else new_params['logic']
+
     new_params['create_extra_dynaproperties'] = {
         'expected_graduation': forms.TypedChoiceField(
             choices=[(x,x) for x in allowed_years],
             coerce=lambda val: int(val)
             ),
+        'clean': cleaning.validate_student(
+            'birth_date', 'school_type', 'major', 'degree', 'grade', 
+            'scope_path', view_logic.getScopeLogic().logic),
         }
 
     new_params['create_dynafields'] = [
@@ -151,9 +156,6 @@ class View(role.View):
         'link_id': forms.CharField(widget=forms.HiddenInput,
             required=True),
         'clean_link_id': cleaning.clean_user_is_current('link_id'),
-        'clean': cleaning.validate_student(
-            'birth_date', 'school_type', 'major', 'degree', 'grade', 
-            'scope_path', self._logic.getScopeLogic().logic),
         }
 
     user_create_form = dynaform.extendDynaForm(

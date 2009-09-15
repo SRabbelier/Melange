@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Version update Tasks starters.
+"""Version update Tasks runner.
 """
 
 __authors__ = [
@@ -27,6 +27,7 @@ from django import http
 from django.template import loader
 from django.utils.translation import ugettext
 
+from soc.tasks.helper import error_handler
 from soc.views.helper import responses
 
 
@@ -36,7 +37,10 @@ def getDjangoURLPatterns():
 
   patterns = [
       (r'tasks/update/start$', 'soc.tasks.updates.start_update.startTasks'),
-      (r'tasks/update/([a-z]+)$', 'soc.tasks.updates.start_update.runner')]
+      (r'tasks/update/start/([a-z]+)$',
+       'soc.tasks.updates.start_update.start_task'),
+      (r'tasks/update/run/([a-z]+)$',
+       'soc.tasks.updates.start_update.run_task')]
 
   return patterns
 
@@ -49,7 +53,7 @@ def startTasks(request):
 
   context = responses.getUniversalContext(request)
 
-  options = runner.getOptions()
+  options = task_runner.getOptions()
 
   sorted_keys = []
   for key, option in options.iteritems():
@@ -77,17 +81,24 @@ def startTasks(request):
 
 
 class TaskRunner(object):
-  """Runs one of the supported task starters.
+  """Runs one of the supported tasks.
   """
+
+  ORG_CONVERSION = {
+      'from_version': 'V-2',
+      'in_version_order': 1,
+      'description': ugettext('This converts the Organization models to contain X,Y,Z.'),
+      'starter': lambda x:False,
+      'runner': lambda x,**kwargs:http.HttpResponse('TEST OK'),
+      }
+
 
   def __init__(self):
     """Initializes the TaskRunner.
     """
 
     self.options = {
-        'program': self.programConversion(),
-        'student': self.studentConversion(),
-        'organization': self.orgConversion(),
+        'organization': self.ORG_CONVERSION,
     }
 
   def getOptions(self):
@@ -96,8 +107,8 @@ class TaskRunner(object):
 
     return self.options
 
-  def __call__(self, request, option):
-    """Starts the specified task.
+  def startTask(self, request, option):
+    """Starts the specified Task for the given option.
     """
 
     context = responses.getUniversalContext(request)
@@ -110,58 +121,23 @@ class TaskRunner(object):
     else:
       template = 'soc/tasks/run_update.html'
       context['option'] = option
-      context['success'] = option['updater'](request)
+      context['success'] = option['starter'](request)
 
     content = loader.render_to_string(template, dictionary=context)
     return http.HttpResponse(content)
 
-  def programConversion(self):
-    """
-    """
-
-    description = ugettext('This converts the Program models to contain X,Y,Z. '
-                           'Note that this conversion will only work after Q')
-
-    # TODO(ljvderijk): implement this
-    updater = lambda x:False
-
-    conversion_information = {'from_version': 'V-1',
-                              'in_version_order': 2,
-                              'description': description,
-                              'updater': updater}
-
-    return conversion_information
-
-  def studentConversion(self):
-    """
+  def runTask(self, request, option, **kwargs):
+    """Runs the specified Task for the given option.
     """
 
-    description = ugettext('This converts the Student models to contain X,Y,Z.')
+    option = self.options.get(option)
 
-    # TODO(ljvderijk): implement this
-    updater = lambda x:False
+    if not option:
+      error_handler('Uknown Updater option "%s".' % option)
+    else:
+      return option['runner'](request, **kwargs)
 
-    conversion_information = {'from_version': 'V-1',
-                              'in_version_order': 1,
-                              'description': description,
-                              'updater': updater}
 
-    return conversion_information
-
-  def orgConversion(self):
-    """
-    """
-
-    description = ugettext('This converts the Organization models to contain X,Y,Z.')
-
-    # TODO(ljvderijk): implement this
-    updater = lambda x:False
-
-    conversion_information = {'from_version': 'V-2',
-                              'in_version_order': 1,
-                              'description': description,
-                              'updater': updater}
-
-    return conversion_information
-
-runner = TaskRunner()
+task_runner = TaskRunner()
+start_task = task_runner.startTask
+run_task = task_runner.runTask

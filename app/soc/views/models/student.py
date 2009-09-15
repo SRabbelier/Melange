@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S." <madhusudancs@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
@@ -91,6 +92,9 @@ class View(role.View):
     new_params['module_name'] = "student"
     new_params['sidebar_grouping'] = 'Students'
 
+    new_params['create_template'] = 'soc/student/edit.html'
+    new_params['edit_template'] = 'soc/student/edit.html'
+
     # add apply pattern
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         '%(module_package)s.%(module_name)s.apply',
@@ -112,8 +116,8 @@ class View(role.View):
         'expected_graduation': forms.TypedChoiceField(
             choices=[(x,x) for x in allowed_years],
             coerce=lambda val: int(val)
-            )
-        } 
+            ),
+        }
 
     new_params['create_dynafields'] = [
         {'name': 'scope_path',
@@ -147,8 +151,9 @@ class View(role.View):
         'link_id': forms.CharField(widget=forms.HiddenInput,
             required=True),
         'clean_link_id': cleaning.clean_user_is_current('link_id'),
-        'clean': cleaning.validate_student_age(
-            'birth_date', 'scope_path', self._logic.getScopeLogic().logic),
+        'clean': cleaning.validate_student(
+            'birth_date', 'school_type', 'major', 'degree', 'grade', 
+            'scope_path', self._logic.getScopeLogic().logic),
         }
 
     user_create_form = dynaform.extendDynaForm(

@@ -673,13 +673,20 @@ def validate_student_project(org_field, mentor_field, student_field):
   return wrapper
 
 
-def validate_student_age(birth_date_field, scope_field,
-                         program_logic):
-  """Checks if the student has eligibility to sign up, given 
+def validate_student(birth_date_field, school_type_field, major_field,
+                     degree_field, grade_field, scope_field, program_logic):
+  """Checks if the student is eligible to sign up, determined 
   by his birth_date given in field_name.
 
+  Also checks if the school information has been correctly filled in.
+
   Args:
-    birth_date_field: Field containing birth_date of student 
+    birth_date_field: Field containing birth_date of student
+    school_type_field: The field containing the type of student
+    major_field: The field containing the major of a University student
+    degree_field: The field containing the type of degree for a University
+                  student
+    grade_field: The field containing the grade of a High School student
     scope_field: Field containing scope_path of the student entity
     program_logic: Logic instance of the program
 
@@ -706,6 +713,25 @@ def validate_student_age(birth_date_field, scope_field,
     if not entity:
       raise forms.ValidationError(
           ugettext("No valid program found"))
+
+    school_type = cleaned_data.get(school_type_field)
+    major = cleaned_data.get(major_field)
+    degree = cleaned_data.get(degree_field)
+
+    # if school_type is University, check for major
+    if school_type == 'University' and not major:
+      raise forms.ValidationError("Major cannot be left blank.")
+
+    # if school_type is University, check for degree
+    if school_type == 'University' and not degree: 
+      raise forms.ValidationError("Degree must be selected from "
+                                  "the given options.")
+
+    grade = cleaned_data.get(grade_field)
+
+    # if school_type is High School check for grade
+    if school_type == 'High School' and not grade: 
+      raise forms.ValidationError("Grade cannot be left blank.")
 
     if entity.student_min_age and entity.student_min_age_as_of:
       # only check if both the min_age and min_age_as_of are defined
@@ -748,7 +774,7 @@ def validate_document_acl(view, creating=False):
     rights = params['rights']
 
     user = user_logic.getForCurrentAccount()
-    
+
     # pylint: disable-msg=E1103
     rights.setCurrentUser(user.account, user)
 

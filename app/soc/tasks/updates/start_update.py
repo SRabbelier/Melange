@@ -34,8 +34,9 @@ def getDjangoURLPatterns():
   """Returns the URL patterns for the views in this module.
   """
 
-  patterns = [(r'tasks/update/start$', 'soc.tasks.start_update.startTasks'),
-              (r'tasks/update/([a-z]+)$', 'soc.tasks.start_update.runner')]
+  patterns = [
+      (r'tasks/update/start$', 'soc.tasks.updates.start_update.startTasks'),
+      (r'tasks/update/([a-z]+)$', 'soc.tasks.updates.start_update.runner')]
 
   return patterns
 

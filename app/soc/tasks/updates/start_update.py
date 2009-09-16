@@ -28,6 +28,7 @@ from django.template import loader
 from django.utils.translation import ugettext
 
 from soc.tasks.helper import error_handler
+from soc.tasks.updates import student_school_type
 from soc.views.helper import responses
 
 
@@ -37,9 +38,9 @@ def getDjangoURLPatterns():
 
   patterns = [
       (r'tasks/update/start$', 'soc.tasks.updates.start_update.startTasks'),
-      (r'tasks/update/start/([a-z]+)$',
+      (r'tasks/update/start/([0-9_a-z]+)$',
        'soc.tasks.updates.start_update.start_task'),
-      (r'tasks/update/run/([a-z]+)$',
+      (r'tasks/update/run/([0-9_a-z]+)$',
        'soc.tasks.updates.start_update.run_task')]
 
   return patterns
@@ -84,12 +85,15 @@ class TaskRunner(object):
   """Runs one of the supported tasks.
   """
 
-  ORG_CONVERSION = {
-      'from_version': 'V-2',
+  STUDENT_SCHOOL_TYPE = {
+      'from_version': '0-5-20090914',
       'in_version_order': 1,
-      'description': ugettext('This converts the Organization models to contain X,Y,Z.'),
-      'starter': lambda x:False,
-      'runner': lambda x,**kwargs:http.HttpResponse('TEST OK'),
+      'description': ugettext(
+          'Updates due to changes in the Student model. Sets all school_type '
+          'entries to University since that was the first type of Student that '
+          'was supported.'),
+      'starter': student_school_type.startSchoolTypeUpdate,
+      'runner': student_school_type.runSchoolTypeUpdate,
       }
 
 
@@ -98,7 +102,7 @@ class TaskRunner(object):
     """
 
     self.options = {
-        'organization': self.ORG_CONVERSION,
+        'student_school_type': self.STUDENT_SCHOOL_TYPE,
     }
 
   def getOptions(self):
@@ -107,33 +111,41 @@ class TaskRunner(object):
 
     return self.options
 
-  def startTask(self, request, option):
+  def startTask(self, request, option_name):
     """Starts the specified Task for the given option.
     """
 
     context = responses.getUniversalContext(request)
     context['page_name'] = 'Start Update Task'
 
-    option = self.options.get(option)
+    option = self.options.get(option_name)
     if not option:
       template = 'soc/error.html'
-      context['message'] = 'Uknown option "%s".' % option
+      context['message'] = 'Uknown option "%s".' % option_name
     else:
       template = 'soc/tasks/run_update.html'
       context['option'] = option
-      context['success'] = option['starter'](request)
+      context['success'] = option['starter'](request, self._getRunUpdateURL(option_name))
 
     content = loader.render_to_string(template, dictionary=context)
     return http.HttpResponse(content)
 
-  def runTask(self, request, option, **kwargs):
+  def _getRunUpdateURL(self, option):
+    """Returns the URL to run a specific update.
+
+    Args:
+      option: the update option for which the URL should returned
+    """
+    return '/tasks/update/run/%s' % option
+
+  def runTask(self, request, option_name, **kwargs):
     """Runs the specified Task for the given option.
     """
 
-    option = self.options.get(option)
+    option = self.options.get(option_name)
 
     if not option:
-      error_handler('Uknown Updater option "%s".' % option)
+      error_handler('Uknown Updater option "%s".' % option_name)
     else:
       return option['runner'](request, **kwargs)
 

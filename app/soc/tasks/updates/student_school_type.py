@@ -104,7 +104,8 @@ def runSchoolTypeUpdate(request, *args, **kwargs):
     # pass along these params as POST to the new task
     task_params = {'start_key': new_start}
 
-    new_task = taskqueue.Task(params=task_params, url=request['PATH_INFO'])
+    new_task = taskqueue.Task(params=task_params,
+                              url=request.META['PATH_INFO'])
     new_task.add()
 
   # task completed, return OK

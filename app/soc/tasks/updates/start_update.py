@@ -125,7 +125,8 @@ class TaskRunner(object):
     else:
       template = 'soc/tasks/run_update.html'
       context['option'] = option
-      context['success'] = option['starter'](request, self._getRunUpdateURL(option_name))
+      context['success'] = option['starter'](request,
+                                             self._getRunUpdateURL(option_name))
 
     content = loader.render_to_string(template, dictionary=context)
     return http.HttpResponse(content)

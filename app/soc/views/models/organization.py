@@ -159,6 +159,8 @@ class View(group.View):
         'clean': cleaning.clean_refs(new_params, ['home_link_id'])
         }
 
+    new_params['mentor_role_name'] = 'mentor'
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -192,7 +194,8 @@ class View(group.View):
     """
 
     list_params = params.copy()
-    list_params['list_action'] = (redirects.getRequestRedirectForRole, 'mentor')
+    list_params['list_action'] = (redirects.getRequestRedirectForRole,
+                                  params['mentor_role_name'])
     list_params['list_description'] = ugettext('Choose an Organization which '
         'you want to become a Mentor for.')
 

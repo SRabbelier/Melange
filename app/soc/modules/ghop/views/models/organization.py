@@ -107,6 +107,8 @@ class View(organization.View):
                                        'slots_desired', 'ideas',
                                        'task_quota_limit']
 
+    new_params['mentor_role_name'] = 'ghop_mentor'
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -286,6 +288,7 @@ class View(organization.View):
 view = View()
 
 admin = decorators.view(view.admin)
+apply_mentor = decorators.view(view.applyMentor)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)

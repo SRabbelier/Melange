@@ -50,7 +50,7 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['edit'] = ['checkCanEditTimeline']
+    rights['edit'] = [('checkCanEditTimeline', [program_logic.logic])]
 
     new_params = {}
     new_params['rights'] = rights
@@ -60,7 +60,7 @@ class View(base.View):
     new_params['name'] = "Timeline"
 
     patterns = [(r'^%(url_name)s/(?P<access_type>edit)/%(key_fields)s$',
-                  'soc.views.models.%(module_name)s.edit', 
+                  '%(module_package)s.%(module_name)s.edit',
                   "Edit %(name_short)s")]
 
     new_params['create_extra_dynaproperties'] = {

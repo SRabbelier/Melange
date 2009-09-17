@@ -1989,19 +1989,18 @@ class Checker(object):
     get_args.setlist('read_access', roles)
     get_args._mutable = mutable
 
-  def checkCanEditTimeline(self, django_args):
+  def checkCanEditTimeline(self, django_args, program_logic):
     """Checks whether this program's timeline may be edited.
 
     Args:
       django_args: a dictionary with django's arguments
+      program_logic: Program Logic instance
     """
-    
-    time_line_keyname = timeline_logic.getKeyFieldsFromFields(django_args)
-    timeline_entity = timeline_logic.getFromKeyName(time_line_keyname)
 
-    if not timeline_entity:
-      # timeline does not exists so deny
-      self.deny(django_args)
+    time_line_keyname = program_logic.timeline_logic.getKeyNameFromFields(
+        django_args)
+    timeline_entity = program_logic.timeline_logic.getFromKeyNameOr404(
+        time_line_keyname)
 
     fields = program_logic.getKeyFieldsFromFields(django_args)
     self.checkIsHostForProgram(fields)

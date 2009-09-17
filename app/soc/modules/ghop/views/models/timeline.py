@@ -28,7 +28,6 @@ from soc.views.helper import decorators
 from soc.views.models import timeline
 
 from soc.modules.ghop.logic.models import program as ghop_program_logic
-from soc.modules.ghop.logic.models import timeline as ghop_timeline_logic
 from soc.modules.ghop.views.helper import access as ghop_access
 
 import soc.modules.ghop.logic.models.timeline
@@ -47,8 +46,7 @@ class View(timeline.View):
     """
 
     rights = ghop_access.GHOPChecker(params)
-    rights['edit'] = [('checkCanEditTimeline',
-                       [ghop_program_logic.logic, ghop_timeline_logic.logic])]
+    rights['edit'] = [('checkCanEditTimeline', [ghop_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.timeline.logic

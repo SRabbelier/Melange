@@ -72,7 +72,7 @@ def cleanMentorsList(field_name):
 
     from soc.modules.ghop.logic.models.mentor import logic as ghop_mentor_logic
 
-    mentors_list_str = cleaning.str2set(field_name)
+    mentors_list_str = cleaning.str2set(field_name)(self)
 
     filter = {
         'scope_path': self.cleaned_data.get('scope_path'),

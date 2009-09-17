@@ -143,18 +143,20 @@ class View(program.View):
     super(View, self).__init__(params=params)
 
     dynafields = [
-        {'name': 'task_difficulties',
+        {'name': 'overview_task_difficulties',
          'base': forms.CharField,
          'label': 'Task Difficulty Levels',
+         'group': 'Task Settings',
          'widget': widgets.ReadOnlyInput(),
          'required': False,
          'help_text': ugettext('Lists all the difficulty levels that '
                                'can be assigned to a task. Edit them '
                                'from the Program menu on sidebar.'),
          },
-         {'name': 'task_types',
+         {'name': 'overview_task_types',
          'base': forms.CharField,
          'label': 'Task Type Tags',
+         'group': 'Task Settings',
          'widget': widgets.ReadOnlyInput(),
          'required': False,
          'help_text': ugettext('Lists all the types a task can be in. '

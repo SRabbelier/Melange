@@ -185,7 +185,7 @@ class View(program.View):
 
       td_str += str(tds[-1])
 
-      form.fields['task_difficulties'].initial = td_str
+      form.fields['overview_task_difficulties'].initial = td_str
 
     tts = ghop_task_model.TaskTypeTag.get_by_scope(entity)
     if tts:
@@ -195,7 +195,7 @@ class View(program.View):
 
       tt_str += str(tts[-1])
 
-      form.fields['task_types'].initial = tt_str
+      form.fields['overview_task_types'].initial = tt_str
 
     return super(View, self)._editGet(request, entity, form)
 

@@ -74,8 +74,10 @@ class Callback(object):
     self.core.registerSidebarEntry(organization.view.getExtraMenus)
     self.core.registerSidebarEntry(organization.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)
+    self.core.registerSidebarEntry(program.view.getExtraMenus)
     self.core.registerSidebarEntry(program.view.getSidebarMenus)
     self.core.registerSidebarEntry(student.view.getSidebarMenus)
     self.core.registerSidebarEntry(task.view.getSidebarMenus)
     self.core.registerSidebarEntry(task_subscription.view.getSidebarMenus)
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)
+

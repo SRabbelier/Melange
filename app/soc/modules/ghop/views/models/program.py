@@ -112,10 +112,8 @@ class View(program.View):
     new_params['url_name'] = 'ghop/program'
 
     # TODO: this list can be reduced after GSoC has been moved
-    new_params['extra_dynaexclude'] = ['apps_tasks_limit',
-                                       'min_slots', 'max_slots',
-                                       'slots', 'slot_allocation',
-                                       'allocations_visible',
+    new_params['extra_dynaexclude'] = ['min_slots', 'max_slots',
+                                       'slot_allocation', 'allocations_visible',
                                        'task_difficulties', 'task_types',
                                        ]
 

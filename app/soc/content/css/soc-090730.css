@@ -130,11 +130,60 @@ table {
   border-collapse: collapse;
 }
 
+table.right {
+  margin-left:auto;
+}
+
 th, td {
   /*padding: 0;*/
   padding:2px 5px;
   vertical-align: top;
   text-align: left;
+}
+
+/*
+ * GHOP TASK PAGE
+ */
+#body #pageheader {
+  margin: 0.5em 0 0em 0;
+  border: 3px solid #c3d9ff;
+  background: #c3d9ff;
+}
+
+#body #pageheader td {
+  background: #c3d9ff;
+}
+
+.ghoptaskcomment {
+  margin: 1em .7em 0 .7em;
+}
+
+.ghoptaskcomment .title {
+  background: #f5f6ce;
+  font-size: small;
+}
+
+.changes {
+  margin: 1em 0 0 .7em;
+  background: #ebf3ff;
+  width: 80%;
+  font-size: small;
+}
+
+.box-inner {
+  margin: 0;
+  padding: 0 13px 0 13px;
+}
+
+img#subscribe {
+  cursor: pointer;
+  width: 22px;
+  position: relative;
+  top: 2px;
+}
+
+.ghoptaskcomment .title a {
+  color: #C60F0F;
 }
 
 /* FORM FIELDS */

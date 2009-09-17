@@ -14,7 +14,7 @@ shrinksafe () {
   for dir in $(find $SOURCE_DIR -type d); do
     for i in $(find $dir/*.js -type f); do
       echo "SHRINKSAFE: Processing $i"
-      CURRENT_SOURCE_FILE_SIZE=$(stat -c%s "$i")
+      CURRENT_SOURCE_FILE_SIZE=$(ls -l "$i" | awk '{print $5}')
       let SOURCE_FILE_SIZES=$SOURCE_FILE_SIZES+$CURRENT_SOURCE_FILE_SIZE
       mv $i $i.old.js
       java -jar $SHRINKSAFE $i.old.js > $i
@@ -23,7 +23,7 @@ shrinksafe () {
         cp $i.old.js $i
       fi
       rm $i.old.js
-      CURRENT_DEST_FILE_SIZE=$(stat -c%s "$i")
+      CURRENT_DEST_FILE_SIZE=$(ls -l "$i" | awk '{print $5}')
       let DEST_FILE_SIZES=$DEST_FILE_SIZES+$CURRENT_DEST_FILE_SIZE
     done
   done

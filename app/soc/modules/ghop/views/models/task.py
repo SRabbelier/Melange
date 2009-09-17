@@ -18,7 +18,8 @@
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -731,8 +732,7 @@ class View(base.View):
         'status': ['Unapproved', 'Unpublished'],
         }
 
-    up_list = lists.getListContent(request, up_params, filter,
-                                   order=order, idx=0, 
+    up_list = lists.getListContent(request, up_params, filter, idx=0,
                                    need_content=True)
 
     if up_list:
@@ -763,8 +763,7 @@ class View(base.View):
             'NeedsWork', 'NeedsReview'],
         }
 
-    ap_list = lists.getListContent(request, ap_params, filter,
-                                   order=order, idx=1, 
+    ap_list = lists.getListContent(request, ap_params, filter, idx=1,
                                    need_content=True)
 
     if ap_list:

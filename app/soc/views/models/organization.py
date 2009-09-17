@@ -20,6 +20,7 @@
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Augie Fackler" <durin42@gmail.com>',
+    '"Mario Ferraro" <fadinlight@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -474,7 +475,7 @@ class View(group.View):
               'type': 'mentor',
               'name': mentor_entity.name(),
               'lat': mentor_entity.latitude,
-              'long': mentor_entity.longitude,
+              'lon': mentor_entity.longitude,
               'projects': []
               }
 
@@ -488,7 +489,7 @@ class View(group.View):
               'type': 'student',
               'name': student_entity.name(),
               'lat': student_entity.latitude,
-              'long': student_entity.longitude,
+              'lon': student_entity.longitude,
               'projects': [],
               }
 

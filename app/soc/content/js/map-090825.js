@@ -235,7 +235,7 @@
           students[key] = {
             "name": person.name,
             "lat": person.lat,
-            "long": person.long,
+            "lon": person.lon,
             "projects": person.projects
           };
         }
@@ -243,7 +243,7 @@
           mentors[key] = {
             "name": person.name,
             "lat": person.lat,
-            "long": person.long,
+            "lon": person.lon,
             "projects": person.projects
           };
         }
@@ -256,13 +256,13 @@
         if (current_student !== undefined && 
             current_mentor !== undefined &&
             current_student.lat !== null &&
-            current_student.long !== null &&
+            current_student.lon !== null &&
             current_mentor.lat !== null &&
-            current_mentor.long !== null) {
+            current_mentor.lon !== null) {
               /*jslint white: false */
               polylines.push([
-                [current_student.lat, current_student.long],
-                [current_mentor.lat, current_mentor.long]
+                [current_student.lat, current_student.lon],
+                [current_mentor.lat, current_mentor.lon]
               ]);
               /*jslint white: true */
         }
@@ -273,8 +273,8 @@
         var html = "";
         var marker = null;
 
-        if (person.lat !== null && person.long !== null) {
-          var point = new window.GLatLng(person.lat, person.long);
+        if (person.lat !== null && person.lon !== null) {
+          var point = new window.GLatLng(person.lat, person.lon);
 
           marker = new window.GMarker(point, student_icon);
           html = [
@@ -306,8 +306,8 @@
         var html = "";
         var marker = null;
 
-        if (person.lat !== null && person.long !== null) {
-          var point = new window.GLatLng(person.lat, person.long);
+        if (person.lat !== null && person.lon !== null) {
+          var point = new window.GLatLng(person.lat, person.lon);
 
           marker = new window.GMarker(point, mentor_icon);
           html = [

@@ -76,7 +76,7 @@ class View(group_app.View):
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', 
                               ['org_signup', program_logic.logic]),
-                       'checkIsNotStudentForProgramInScope']
+                       ('checkIsNotStudentForProgramInScope', [program_logic.logic])]
 
     new_params = {}
 

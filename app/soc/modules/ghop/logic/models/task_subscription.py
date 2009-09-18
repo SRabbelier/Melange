@@ -43,5 +43,25 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 id_based=id_based)
 
+  def getOrCreateTaskSubscriptionForTask(self, task_entity):
+    """Gets or creates a TaskSubscription entity for the given GHOPTask.
+
+    Args:
+      task_entity: GHOPTask entity
+
+    Returns:
+      Existing TaskSubscription entity iff any exists, otherwise a new
+      TaskSubscription entity.
+    """
+
+    fields = {'task': task_entity}
+
+    task_subscription = self.getForFields(fields, unique=True)
+
+    if not task_subscription:
+      task_subscription = self.updateOrCreateFromFields(fields)
+
+    return task_subscription
+
 
 logic = Logic()

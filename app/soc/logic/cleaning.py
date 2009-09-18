@@ -34,12 +34,12 @@ from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext
 
-from soc.logic import rights as rights_logic
 from soc.logic import validate
 from soc.logic.models import document as document_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models import document as document_model
+from soc.modules import callback
 
 
 DEF_LINK_ID_IN_USE_MSG = ugettext(
@@ -801,7 +801,7 @@ def has_access(rights, access_level, scope_path, prefix):
   """Checks whether the current user has the required access.
   """
 
-  checker = rights_logic.Checker(prefix)
+  checker = callback.getCore().getRightsChecker(prefix)
   roles = checker.getMembership(access_level)
 
   django_args = {

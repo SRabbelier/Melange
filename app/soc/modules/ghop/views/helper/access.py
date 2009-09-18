@@ -121,7 +121,7 @@ class GHOPChecker(access.Checker):
 
       if task_query.count() >= org_entity.task_quota_limit:
         # too many tasks access denied
-        raise out_of_band.AccessViolation(message_fmt=DEF_MAX_TASKS_REACHED)
+        raise out_of_band.AccessViolation(message_fmt=DEF_MAX_TASKS_REACHED_MSG)
 
     if 'link_id' in django_args:
       task_filter = {

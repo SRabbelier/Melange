@@ -91,6 +91,9 @@ class View(program.View):
     rights['edit'] = [('checkIsHostForProgram',
                        [ghop_program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']
+    rights['accepted_orgs'] = [('checkIsAfterEvent',
+        ['student_signup_start',
+         '__all__', ghop_program_logic.logic])]
     rights['task_difficulty'] = [('checkIsHostForProgram',
                                   [ghop_program_logic.logic])]
     rights['task_type'] = [('checkIsHostForProgram',
@@ -417,7 +420,7 @@ class View(program.View):
             "Register as a Student", 'any_access')]
 
     if timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
-      url = ghop_redirects.getParticipatingOrgsRedirect(
+      url = redirects.getAcceptedOrgsRedirect(
           ghop_program_entity, params)
       # add a link to list all the organizations
       items += [(url, "List participating Organizations", 'any_access')]
@@ -587,10 +590,50 @@ class View(program.View):
 
       return http.HttpResponse(tag_value)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptedOrgs(self, request, access_type,
+                   page_name=None, params=None, filter=None, **kwargs):
+    """List all the accepted orgs for the given program.
+    """
+
+    from soc.modules.ghop.views.models.organization import view as \
+        ghop_org_view
+
+    contents = []
+    logic = params['logic']
+
+    ghop_program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    ao_params = ghop_org_view.getParams().copy()
+    ao_params['list_action'] = (redirects.getHomeRedirect,
+                                ao_params)
+    ao_params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % {
+        'name': ghop_program_entity.name
+        }
+
+    filter = {
+        'scope': ghop_program_entity,
+        'status': ['new', 'active'],
+        }
+
+    order = ['name']
+
+    ao_list = lists.getListContent(request, ao_params, filter=filter,
+                                   order=order, idx=0)
+
+    contents.append(ao_list)
+
+    params = params.copy()
+    params['list_msg'] = ghop_program_entity.accepted_orgs_msg
+
+    return self._list(request, params, contents, page_name)
+
 
 view = View()
 
 admin = decorators.view(view.admin)
+accepted_orgs = decorators.view(view.acceptedOrgs)
 assign_task_quotas = decorators.view(view.assignTaskQuotas)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)

@@ -66,12 +66,3 @@ def getTaskTypeEditRedirect(entity, params):
 
   return'/%s/task_type/%s' % (
       params['url_name'], entity.key().id_or_name())
-
-
-def getParticipatingOrgsRedirect(entity, params):
-  """Returns the participating organizations list redirect for the
-  specified program entity.
-  """
-
-  return '/%s/participating_orgs/%s' % (
-      params['url_name'], entity.key().id_or_name())

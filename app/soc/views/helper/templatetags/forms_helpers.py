@@ -133,6 +133,28 @@ def readonly_field_as_twoline_table_row(label, value):
   return {'field_label': label,
           'field_value': value}
 
+@register.inclusion_tag('soc/templatetags/_readonly_field_as_table_row.html')
+def readonly_date_field_as_table_row(label, value):
+  """Prints a field value formatted as the given format string.
+
+  """
+
+  import datetime
+  if isinstance(value, datetime.datetime):
+    if value.day % 10 == 1 and value.day != 11:
+      ord_suf = 'st'
+    elif value.day % 10 == 2 and value.day != 12:
+      ord_suf = 'nd'
+    elif value.day % 10 == 3 and value.day != 13:
+      ord_suf = 'rd'
+    else:
+      ord_suf = 'th'
+
+    fmt = "%d" + ord_suf + " %B %Y, %H:%M"
+    value = value.strftime(fmt)
+
+  return {'field_label': label,
+          'field_value': value}
 
 @register.inclusion_tag(
     'soc/templatetags/_readonly_url_field_as_table_row.html')

@@ -95,23 +95,17 @@ class View(base.View):
 
     user_account = user_logic.logic.getForCurrentAccount()
 
-    fields = {
-        'task': task_entity,
-        }
-
-    entity = ghop_task_subscription_logic.logic.getForFields(
-        fields, unique=True)
+    entity = params['logic'].getOrCreateTaskSubscriptionForTask(task_entity)
 
     subscribers = db.get(entity.subscribers)
 
     # TODO: this should not loop over all subscribers but use GET argument
     remove = False
 
-    if entity:
-      for subscriber in subscribers:
-        if subscriber.key() == user_account.key():
-          remove = True
-          break 
+    for subscriber in subscribers:
+      if subscriber.key() == user_account.key():
+        remove = True
+        break
 
     if remove:
       subscribers.remove(subscriber)

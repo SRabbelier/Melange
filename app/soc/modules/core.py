@@ -135,40 +135,29 @@ class Core(object):
 
     return func
 
+  def callService(self, service, unique, *args, **kwargs):
+    """Calls the specified service on all callbacks.
+    """
+
+    if unique and (service in self.services):
+      return
+
+    results = []
+
+    for callback in self.registered_callbacks:
+      func = self.getService(callback, service)
+      if not func:
+        continue
+
+      result = func(*args, **kwargs)
+      results.append(result)
+
+    self.services.append(service)
+    return results
+
   ##
   ## Core code
   ##
-
-  def startNewRequest(self, request):
-    """Prepares core to handle a new request.
-
-    Args:
-      request: a Django HttpRequest object
-    """
-
-    self.in_request = True
-    self.per_request_value = {}
-    self.setRequestValue('request', request)
-
-  def endRequest(self, request, optional):
-    """Performs cleanup after current request.
-
-    Args:
-      request: a Django HttpRequest object
-      optional: whether to noop when not in a request
-    """
-
-    # already cleaned up, as expected
-    if optional and not self.in_request:
-      return
-
-    old_request = self.getRequestValue('request')
-    self.per_request_value = {}
-    self.in_request = False
-
-    if id(old_request) != id(request):
-      logging.error("ending request: \n'%s'\n != \n'%s'\n" % (
-          old_request, request))
 
   def getRequestValue(self, key, default=None):
     """Gets a per-request value.
@@ -216,25 +205,42 @@ class Core(object):
 
     return sorted(sidebar, key=lambda x: x.get('group'))
 
-  def callService(self, service, unique, *args, **kwargs):
-    """Calls the specified service on all callbacks.
+  ###
+  ### Core control code
+  ###
+  ### Called by other setup code to get the Core in a desired state.
+  ###
+
+  def startNewRequest(self, request):
+    """Prepares core to handle a new request.
+
+    Args:
+      request: a Django HttpRequest object
     """
 
-    if unique and (service in self.services):
+    self.in_request = True
+    self.per_request_value = {}
+    self.setRequestValue('request', request)
+
+  def endRequest(self, request, optional):
+    """Performs cleanup after current request.
+
+    Args:
+      request: a Django HttpRequest object
+      optional: whether to noop when not in a request
+    """
+
+    # already cleaned up, as expected
+    if optional and not self.in_request:
       return
 
-    results = []
+    old_request = self.getRequestValue('request')
+    self.per_request_value = {}
+    self.in_request = False
 
-    for callback in self.registered_callbacks:
-      func = self.getService(callback, service)
-      if not func:
-        continue
-
-      result = func(*args, **kwargs)
-      results.append(result)
-
-    self.services.append(service)
-    return results
+    if id(old_request) != id(request):
+      logging.error("ending request: \n'%s'\n != \n'%s'\n" % (
+          old_request, request))
 
   def registerModuleCallbacks(self):
     """Retrieves all callbacks for the modules of this site.

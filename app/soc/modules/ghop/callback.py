@@ -81,3 +81,25 @@ class Callback(object):
     self.core.registerSidebarEntry(task_subscription.view.getSidebarMenus)
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)
 
+  def registerRights(self):
+    """Called by the server when the documetn rights should be registerd.
+    """
+
+    ghop_program_membership  = {
+        'admin': ['host'],
+        'restricted': ['host', 'ghop_org_admin'],
+        'member': ['host', 'ghop_org_admin', 'ghop_org_mentor',
+                   'ghop_org_student'],
+        'list': ['host', 'ghop_org_admin', 'ghop_org_mentor'],
+        }
+
+    ghop_organization_membership = {
+        'admin': ['host', 'ghop_org_admin'],
+        'restricted': ['host', 'ghop_org_admin', 'ghop_org_mentor'],
+        'member': ['host', 'ghop_org_admin', 'ghop_org_mentor',
+                   'ghop_org_student'],
+        'list': ['host', 'ghop_org_admin', 'ghop_org_mentor'],
+        }
+
+    self.core.registerRight('ghop_program', ghop_program_membership)
+    self.core.registerRight('ghop_org', ghop_organization_membership)

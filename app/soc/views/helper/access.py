@@ -24,6 +24,7 @@ do not meet the required criteria.
 """
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -55,6 +56,13 @@ from soc.logic.models.user import logic as user_logic
 from soc.modules import callback
 from soc.views.helper import redirects
 from soc.views import out_of_band
+
+from soc.modules.ghop.logic.models.mentor import logic as ghop_mentor_logic
+from soc.modules.ghop.logic.models.organization import logic as ghop_org_logic
+from soc.modules.ghop.logic.models.org_admin import logic as \
+    ghop_org_admin_logic
+from soc.modules.ghop.logic.models.program import logic as ghop_program_logic
+from soc.modules.ghop.logic.models.student import logic as ghop_student_logic
 
 
 DEF_NO_USER_LOGIN_MSG = ugettext(
@@ -257,6 +265,9 @@ class Checker(object):
     'org_admin': ('checkHasDocumentAccess', [org_admin_logic, 'org']),
     'org_mentor': ('checkHasDocumentAccess', [mentor_logic, 'org']),
     'org_student': ('checkHasDocumentAccess', [student_logic, 'org']),
+    'ghop_org_admin': ('checkHasDocumentAccess', [ghop_org_admin_logic, 'org']),
+    'ghop_org_mentor': ('checkHasDocumentAccess', [ghop_mentor_logic, 'org']),
+    'ghop_org_student': ('checkHasDocumentAccess', [ghop_student_logic, 'org']),
     'user': 'checkIsUser',
     'user_self': ('checkIsUserSelf', 'scope_path'),
     }
@@ -267,7 +278,11 @@ class Checker(object):
       'site': None,
       'sponsor': (sponsor_logic, {'sponsor': 0}),
       'program': (program_logic, {'sponsor': 1, 'program': 0}),
+      'ghop_program': (
+          ghop_program_logic, {'sponsor': 1, 'ghop_program': 0}),
       'org': (org_logic, {'sponsor': 2, 'program': 1, 'org': 0}),
+      'ghop_org': (
+          ghop_org_logic, {'sponsor': 2, 'ghop_program': 1, 'ghop_org': 0}),
       }
 
   def __init__(self, params):

@@ -109,6 +109,10 @@ class View(organization.View):
 
     new_params['mentor_role_name'] = 'ghop_mentor'
 
+    new_params['edit_extra_dynaproperties'] = {
+        'clean': cleaning.clean_refs(new_params, ['home_link_id'])
+        }
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

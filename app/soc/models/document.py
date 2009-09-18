@@ -17,6 +17,7 @@
 """This module contains the Document Model."""
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
 ]
@@ -50,7 +51,8 @@ class Document(soc.models.work.Work):
 
   #: field storing the prefix of this document
   prefix = db.StringProperty(default='user', required=True,
-      choices=['site', 'club', 'sponsor', 'program', 'org', 'user'],
+      choices=['site', 'club', 'sponsor', 'program',
+               'ghop_program', 'org', 'ghop_org', 'user'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the document,'

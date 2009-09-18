@@ -191,8 +191,8 @@ class Callback(object):
         }
 
     self.core.registerRight('site', site_membership)
-    self.core.registerRight('club': club_membership)
-    self.core.registerRight('sponsor': sponsor_membership)
-    self.core.registerRight('program': program_membership)
-    self.core.registerRight('org': organization_membership)
-    self.core.registerRight('user': user_membership)
+    self.core.registerRight('club', club_membership)
+    self.core.registerRight('sponsor', sponsor_membership)
+    self.core.registerRight('program', program_membership)
+    self.core.registerRight('org', organization_membership)
+    self.core.registerRight('user', user_membership)

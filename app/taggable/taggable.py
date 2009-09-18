@@ -148,7 +148,6 @@ def tag_property(tag_name):
     specified entity.
     """
 
-    
     if self._tags[tag_name] is None or len(self._tags[tag_name]) == 0:
       self._tags[tag_name] = self._tag_model[
           tag_name].get_tags_for_key(self.key())
@@ -222,11 +221,17 @@ class Taggable(object):
 
     self.tag_separator = ", "
 
-  def tags_string(self, tag_name):
-    "Create a formatted string version of this entity's tags"
-    to_str = ""
-    for each_tag in tag_name:
-      to_str += each_tag.tag
-      if each_tag != tag_name[-1]:
-        to_str += self.tag_separator
-    return to_str
+  def tags_string(self, tag_name, ret_list=False):
+    """Create a formatted string version of this entity's tags.
+    
+    Args:
+      tag_name: the name of the tag which must be formatted
+      ret_list: if False sends a string, otherwise sends a Python list
+    """
+
+    tag_list = [each_tag.tag for each_tag in tag_name]
+
+    if ret_list:
+      return tag_list
+    else:
+      return self.tag_separator.join(tag_list)

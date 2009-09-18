@@ -93,6 +93,20 @@ class NonUniqueService(Error):
     super(NonUniqueService, self).__init__(msg)
 
 
+class AlreadyRegisteredRight(Error):
+  """Error raised when a right is registrated a second time
+  """
+
+  ALREADY_REGISTERED_RIGHT_FMT = "Tried to register right '%s' a second time."
+
+  def __init__(self, right):
+    """Instantiates a new exception with a customized message.
+    """
+
+    msg = self.ALREADY_REGISTERED_RIGHT_FMT % right
+    super(AlreadyRegisteredRight, self).__init__(msg)
+
+
 class Core(object):
   """The core handler that controls the Melange API.
   """
@@ -326,5 +340,8 @@ class Core(object):
   def registerRight(self, key, value):
     """Registers the specified right.
     """
+
+    if key in self.rights:
+      raise AlreadyRegisteredRight(key)
 
     self.rights[key] = value

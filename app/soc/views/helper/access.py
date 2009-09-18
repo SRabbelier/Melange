@@ -34,7 +34,6 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
-from soc.logic import rights as rights_logic
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.club_admin import logic as club_admin_logic
 from soc.logic.models.club_member import logic as club_member_logic
@@ -448,7 +447,7 @@ class Checker(object):
       django_args: the django args to pass on to the checkers
     """
 
-    checker = rights_logic.Checker(prefix)
+    checker = callback.getCore().getRightsChecker(prefix)
     roles = checker.getMembership(status)
 
     message_fmt = DEF_NEED_MEMBERSHIP_MSG_FMT % {
@@ -1946,7 +1945,7 @@ class Checker(object):
     filter = django_args['filter']
     prefix = filter['prefix']
 
-    checker = rights_logic.Checker(prefix)
+    checker = callback.getCore().getRightsChecker(prefix)
     roles = checker.getMembership('list')
 
     if not self.hasMembership(roles, filter):
@@ -1975,7 +1974,7 @@ class Checker(object):
     django_args['prefix'] = prefix
     django_args['scope_path'] = get_args['scope_path']
 
-    checker = rights_logic.Checker(prefix)
+    checker = callback.getCore().getRightsChecker(prefix)
     memberships = checker.getMemberships()
 
     roles = []

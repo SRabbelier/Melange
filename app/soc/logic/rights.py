@@ -29,63 +29,12 @@ class Checker(object):
   """Checker class that maps from prefix and status to membership.
   """
 
-  SITE_MEMBERSHIP = {
-      'admin': [],
-      'restricted': ['host'],
-      'member': ['user'],
-      'list': ['host'],
-      }
-
-  CLUB_MEMBERSHIP = {
-      'admin': ['host', 'club_admin'],
-      'restricted': ['host', 'club_admin'],
-      'member': ['host', 'club_admin', 'club_member'],
-      'list': ['host', 'club_admin', 'club_member'],
-      }
-
-  SPONSOR_MEMBERSHIP = {
-      'admin': ['host'],
-      'restricted': ['host'],
-      'member': ['host'],
-      'list': ['host'],
-      }
-
-  PROGRAM_MEMBERSHIP = {
-      'admin': ['host'],
-      'restricted': ['host', 'org_admin'],
-      'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
-      'list': ['host', 'org_admin', 'org_mentor'],
-      }
-
-  ORGANIZATION_MEMBERSHIP = {
-      'admin': ['host', 'org_admin'],
-      'restricted': ['host', 'org_admin', 'org_mentor'],
-      'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
-      'list': ['host', 'org_admin', 'org_mentor'],
-      }
-
-  USER_MEMBERSHIP = {
-      'admin': ['user_self'],
-      'restricted': ['user_self'], # ,'friends'
-      'member': ['user'],
-      'list': ['user_self'],
-      }
-
-  RIGHTS = {
-      'site': SITE_MEMBERSHIP,
-      'club': CLUB_MEMBERSHIP,
-      'sponsor': SPONSOR_MEMBERSHIP,
-      'program': PROGRAM_MEMBERSHIP,
-      'org': ORGANIZATION_MEMBERSHIP,
-      'user': USER_MEMBERSHIP,
-      }
-
-  def __init__(self, prefix):
+  def __init__(self, rights, prefix):
     """Constructs a Checker for the specified prefix.
     """
 
+    self.rights = rights[prefix]
     self.prefix = prefix
-    self.rights = self.RIGHTS[prefix]
 
   def getMembership(self, status):
     """Retrieves the membership list for the specified status.

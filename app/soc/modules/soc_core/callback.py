@@ -143,3 +143,58 @@ class Callback(object):
     self.core.registerSidebarEntry(mentor.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_app.view.getSidebarMenus)
     self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)
+
+  def registerRights(self):
+    """Called by the server when the documetn rights should be registerd.
+    """
+
+    site_membership = {
+        'admin': [],
+        'restricted': ['host'],
+        'member': ['user'],
+        'list': ['host'],
+        }
+
+    club_membership = {
+        'admin': ['host', 'club_admin'],
+        'restricted': ['host', 'club_admin'],
+        'member': ['host', 'club_admin', 'club_member'],
+        'list': ['host', 'club_admin', 'club_member'],
+        }
+
+    sponsor_membership = {
+        'admin': ['host'],
+        'restricted': ['host'],
+        'member': ['host'],
+        'list': ['host'],
+        }
+
+    program_membership = {
+        'admin': ['host'],
+        'restricted': ['host', 'org_admin'],
+        'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
+        'list': ['host', 'org_admin', 'org_mentor'],
+        }
+
+    organization_membership = {
+        'admin': ['host', 'org_admin'],
+        'restricted': ['host', 'org_admin', 'org_mentor'],
+        'member': ['host', 'org_admin', 'org_mentor', 'org_student'],
+        'list': ['host', 'org_admin', 'org_mentor'],
+        }
+
+    user_membership = {
+        'admin': ['user_self'],
+        'restricted': ['user_self'], # ,'friends'
+        'member': ['user'],
+        'list': ['user_self'],
+        }
+
+    self.core.registerRight('site', site_membership)
+    self.core.registerRight('club': club_membership)
+    self.core.registerRight('sponsor': sponsor_membership)
+    self.core.registerRight('program': program_membership)
+    self.core.registerRight('ghop_program': ghop_program_membership)
+    self.core.registerRight('org': organization_membership)
+    self.core.registerRight('ghop_org': ghop_organization_membership)
+    self.core.registerRight('user': user_membership)

@@ -71,6 +71,13 @@ indexes:
   - name: grading_survey_group
   - name: __key__
 
+# used to order the accepted GHOPorganizations on there name
+- kind: GHOPOrganization
+  properties:
+  - name: scope
+  - name: status
+  - name: name
+
 # used to order GHOPComments under a GHOPTask with that GHOPTask being
 # its ancestor entity in the entity group.
 - kind: GHOPComment

@@ -194,7 +194,5 @@ class Callback(object):
     self.core.registerRight('club': club_membership)
     self.core.registerRight('sponsor': sponsor_membership)
     self.core.registerRight('program': program_membership)
-    self.core.registerRight('ghop_program': ghop_program_membership)
     self.core.registerRight('org': organization_membership)
-    self.core.registerRight('ghop_org': ghop_organization_membership)
     self.core.registerRight('user': user_membership)

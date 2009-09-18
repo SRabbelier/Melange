@@ -112,6 +112,7 @@ class Core(object):
     self.sidebar = []
     self.per_request_cache = {}
     self.in_request = False
+    self.rights = {}
 
   ##
   ## internal
@@ -204,6 +205,15 @@ class Core(object):
         sidebar.append(menu)
 
     return sorted(sidebar, key=lambda x: x.get('group'))
+
+  def getRightsChecker(self, prefix):
+    """Returns a rights checker for this site.
+    """
+
+    from soc.logic import rights as rights_logic
+
+    self.callService('registerRights', True)
+    return rights_logic.Checker(self.rights, prefix)
 
   ###
   ### Core control code
@@ -312,3 +322,9 @@ class Core(object):
     """
 
     self.sidebar.append(entry)
+
+  def registerRight(self, key, value):
+    """Registers the specified right.
+    """
+
+    self.rights[key] = value

@@ -221,7 +221,7 @@ class Core(object):
     return sorted(sidebar, key=lambda x: x.get('group'))
 
   def getRightsChecker(self, prefix):
-    """Returns a rights checker for this site.
+    """Returns a rights checker for the specified prefix.
     """
 
     from soc.logic import rights as rights_logic

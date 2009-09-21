@@ -40,9 +40,9 @@ class GHOPTimeline(soc.models.timeline.Timeline):
       'No tasks can be claimed after this date.'
       'Work on claimed tasks can continue.')
 
-  stop_all_work = db.DateTimeProperty(
+  stop_all_work_deadline = db.DateTimeProperty(
       verbose_name=ugettext('Work Submission Deadline date'))
-  stop_all_work.help_text = ugettext(
+  stop_all_work_deadline.help_text = ugettext(
       'All work must stop by this date.')
 
   winner_selection_start = db.DateTimeProperty(

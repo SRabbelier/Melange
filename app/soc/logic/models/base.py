@@ -87,6 +87,21 @@ class Logic(object):
     else:
       self._skip_properties = []
 
+  def skipField(self, name):
+    """Returns whether a field with the specified name should be saved.
+    """
+
+    if name in self._skip_properties:
+      return True
+
+    if self._id_based:
+      return False
+
+    if name in self.getKeyFieldNames():
+      return True
+
+    return False
+
   def getModel(self):
     """Returns the model this logic class uses.
     """
@@ -453,7 +468,7 @@ class Logic(object):
 
     for name, prop in properties.iteritems():
       # if the property is not updateable or is not updated, skip it
-      if name in self._skip_properties or (name not in entity_properties):
+      if self.skipField(name) or (name not in entity_properties):
         continue
 
       if self._updateField(entity, entity_properties, name):

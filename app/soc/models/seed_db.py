@@ -19,7 +19,7 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-    'JamesLevy" <jamesalexanderlevy@gmail.com>',
+    '"James Levy" <jamesalexanderlevy@gmail.com>',
   ]
 
 
@@ -992,7 +992,6 @@ def seed_many(request, *args, **kwargs):
       user, org, org_app, mentor, student_proposal
 
     Redirects if end < goal, incrementing both start and end with step.
-
   """
 
   get_args = request.GET
@@ -1032,21 +1031,18 @@ def seed_many(request, *args, **kwargs):
       entity = model(**properties)
       if seed_type == 'survey':
         survey_content = survey_logic.createSurvey(properties['fields'],
-                                                    properties['schema'],
-                                                    this_survey=None
-                                                    )
+                                                   properties['schema'],
+                                                   this_survey=None)
         entity.this_survey = survey_content
       elif seed_type == 'survey_answer':
         record = SurveyRecord.gql("WHERE user = :1 AND this_survey = :2",
-                                  properties['user'], properties['_survey']
-                                  ).get()
+            properties['user'], properties['_survey']).get()
         entity = survey_logic.updateSurveyRecord(properties['user'],
-                                                   properties['_survey'],
-                                                   record,
-                                                   properties['_fields']
-                                                   )
+                                                 properties['_survey'],
+                                                 record,
+                                                 properties['_fields'])
       entity.put()
-      if seed_type == 'survey': survey_logic._onCreate(entity) 
+      if seed_type == 'survey': survey_logic._onCreate(entity)
 
   if end < goal:
     info = {

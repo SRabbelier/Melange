@@ -432,7 +432,6 @@ def getViewSurveyRecordRedirect(entity, params):
   Args:
       entity: a Survey Record entity
       params: params for a Survey view
-
   """
 
   return '/%s/record/%s?id=%s' % (

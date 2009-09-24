@@ -29,7 +29,7 @@ from google.appengine.ext import db
 
 from django.http import HttpResponse
 
-from soc.views.helper import responses
+from soc.tasks.helper import error_handler
 
 
 # batch size to use when going through Student entities.

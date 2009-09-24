@@ -248,7 +248,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def withdraw(self, request, access_type,
-                      page_name=None, params=None, **kwargs):
+               page_name=None, params=None, **kwargs):
     """View that allows Program Admins to accept or withdraw Student Projects.
 
     For params see base.View().public()
@@ -316,7 +316,7 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def acceptProject(self, request, access_type,
-                      page_name=None, params=None, **kwargs):
+                    page_name=None, params=None, **kwargs):
     """View that allows Program Admins to accept Student Projects.
 
     For params see base.View().public()

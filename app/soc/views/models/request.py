@@ -131,9 +131,9 @@ class View(base.View):
 
     For args see base.View._edit().
     """
-    context['page_name'] = '%s to become a %s for %s' %(context['page_name'],
-                                                        entity.role_verbose,
-                                                        entity.scope.name)
+    context['page_name'] = '%s to become a %s for %s' % (context['page_name'],
+                                                         entity.role_verbose,
+                                                         entity.scope.name)
 
   @decorators.merge_params
   @decorators.check_access

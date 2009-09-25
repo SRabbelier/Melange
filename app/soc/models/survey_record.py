@@ -30,6 +30,7 @@ from django.utils.translation import ugettext
 
 from soc.models.expando_base import ExpandoBase
 from soc.models.survey import Survey
+
 import soc.models.user
 
 

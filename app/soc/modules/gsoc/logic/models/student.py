@@ -30,6 +30,7 @@ from soc.modules.gsoc.logic.models import program as program_logic
 
 import soc.modules.gsoc.models.student
 
+
 class Logic(student.Logic):
   """Logic methods for the GSoCStudent model.
   """

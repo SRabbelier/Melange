@@ -519,9 +519,12 @@ class View(base.View):
 
     filter = {
         'user': user_account,
-        'scope': fields['scope'],
         'status': 'active'
         }
+    if not entity:
+      filter['scope'] = fields['scope']
+    else:
+      filter['scope'] = entity.program
 
     role_entity = ghop_org_admin_logic.logic.getForFields(
         filter, unique=True)

@@ -586,8 +586,36 @@ class Logic(object):
       offset = offset + chunk
 
     return result
+
+  def getBatchOfData(self, filter=None, order=None, next_key=None):
+    """Returns one batch of entities
+
+    Args:
+      filter: a dict for the properties that the entities should have
+      order: a list with the sort order
+      next_key: a key for the first entity that should be returned
+
+    Returns:
+      A tuple: list of fetched entities and key value for the entity
+      that should be fetched at first for the next batch
+    """
+
+    query = self.getQueryForFields(filter=filter, order=order)
+
+    if next_key is not None:
+      query.filter('__key__ >=', next_key)
+
+    entities = query.fetch(self.BATCH_SIZE + 1)
+
+    next_key = None
+    if len(entities) == self.BATCH_SIZE + 1:
+      next_entity = entities.pop()
+      next_key = next_entity.key()
+
+    return entities, next_key
+
   # pylint: disable-msg=C0103
-  def entityIterator(self, queryGen, batch_size = 100):
+  def entityIterator(self, queryGen, batch_size=100):
     """Iterator that yields an entity in batches.
 
     Args:

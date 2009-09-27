@@ -102,12 +102,12 @@ class ModelWithFieldAttributes(db.Model):
       class FieldsProxy(forms_helper.BaseForm):
         """Form used as a proxy to access User model properties attributes.
         """
-      
+
         class Meta:
           """Inner Meta class that pairs the User Model with this "form".
           """
           #: db.Model subclass for which to access model properties attributes
           model = cls
-      
+
       cls._fields_cache = FieldsProxy()
     return cls._fields_cache

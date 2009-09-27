@@ -802,14 +802,10 @@ class View(base.View):
       return helper.responses.errorResponse(
           error, request, template=params['error_public'], context=context)
 
-    if entity.status in ['Claimed', 'NeedsReview',
-                         'ActionNeeded', 'NeedsWork']:
-      entity, comment_entity, ws_entity = (
-          ghop_task_logic.logic.updateTaskStatus(entity))
-      if comment_entity:
-        comment_entities.append(comment_entity)
-      if ws_entity:
-        ws_entities.append(ws_entity)
+    # because we are not sure if the Task API has called this for us we do it
+    entity, comment_entity = ghop_task_logic.logic.updateTaskStatus(entity)
+    if comment_entity:
+      comment_entities.append(comment_entity)
 
     context['entity'] = entity
     context['entity_key_name'] = entity.key().id_or_name() 

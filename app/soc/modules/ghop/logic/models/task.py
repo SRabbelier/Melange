@@ -141,9 +141,9 @@ class Logic(base.Logic):
           }
       entity_properties.update(history_property)
 
-      # call the base logic method to store the updated Task entity
-      return super(Logic, self).updateEntityProperties(
-          entity, entity_properties, siltent=silent, store=store)
+    # call the base logic method to store the updated Task entity
+    return super(Logic, self).updateEntityProperties(
+        entity, entity_properties, silent=silent, store=store)
 
   def updateEntityPropertiesWithCWS(self, entity, entity_properties,
                                     comment_properties=None, 

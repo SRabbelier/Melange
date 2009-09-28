@@ -31,7 +31,7 @@ from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
-from soc.logic import tasks
+from soc.tasks import responses as task_responses
 from soc.views.helper import responses
 
 
@@ -130,12 +130,12 @@ def task(func):
 
     try:
       return func(request, *args, **kwargs)
-    except tasks.FatalTaskError, error:
+    except task_responses.FatalTaskError, error:
       logging.exception(error)
-      return tasks.terminateTask()
+      return task_responses.terminateTask()
     except Exception, exception:
       logging.exception(exception)
-      return tasks.repeatTask()
+      return task_responses.repeatTask()
 
   return wrapper
 
@@ -161,7 +161,7 @@ def iterative_task(func):
     post_dict = request.POST
 
     if 'logic' not in post_dict:
-       return tasks.terminateTask()
+       return task_responses.terminateTask()
 
     _temp = __import__(post_dict['logic'], globals(), locals(), ['logic'], -1)
     logic = _temp.logic
@@ -186,12 +186,12 @@ def iterative_task(func):
 
     try:
       new_json = func(request, entities=entities, json=json, *args, **kwargs)
-    except tasks.FatalTaskError, error:
+    except task_responses.FatalTaskError, error:
       logging.error(error)
-      return tasks.terminateTask()
+      return task_responses.terminateTask()
     except Exception, exception:
       logging.error(exception)
-      return tasks.repeatTask()
+      return task_responses.repeatTask()
 
     if start_key is None:
       logging.debug('Task sucessfully completed')
@@ -206,8 +206,8 @@ def iterative_task(func):
       if new_json is not None:
         context.update({'json': new_json})
 
-      tasks.startTask(url=request.path, context=context)
+      task_responses.startTask(url=request.path, context=context)
 
-    return tasks.terminateTask()
+    return task_responses.terminateTask()
 
   return wrapper

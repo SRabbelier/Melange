@@ -587,7 +587,7 @@ class Logic(object):
 
     return result
 
-  def getBatchOfData(self, filter=None, order=None, next_key=None, batch_size=10):
+  def getBatchOfData(self, filter=None, order=None, start_key=None, batch_size=10):
     """Returns one batch of entities
 
     Args:
@@ -605,17 +605,17 @@ class Logic(object):
 
     query = self.getQueryForFields(filter=filter, order=order)
 
-    if next_key is not None:
-      query.filter('__key__ >=', next_key)
+    if start_key:
+      query.filter('__key__ >=', start_key)
 
     entities = query.fetch(batch_size + 1)
 
-    next_key = None
+    next_start_key = None
     if len(entities) == batch_size + 1:
       next_entity = entities.pop()
-      next_key = next_entity.key()
+      next_start_key = next_entity.key()
 
-    return entities, next_key
+    return entities, next_start_key
 
   # pylint: disable-msg=C0103
   def entityIterator(self, queryGen, batch_size=100):

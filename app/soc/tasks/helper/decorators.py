@@ -86,7 +86,7 @@ def iterative_task(func):
       order = simplejson.loads(post_dict['order'])
 
     start_key = None
-    if 'next_key' in post_dict:
+    if 'start_key' in post_dict:
       start_key = db.Key(post_dict['start_key'])
 
     json = None

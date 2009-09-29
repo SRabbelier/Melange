@@ -93,7 +93,7 @@ def iterative_task(func):
     if 'json' in post_dict:
       json = post_dict['json']
 
-    entities, start_key = logic.getBatchOfData(filter, order, start_key)
+    entities, next_start_key = logic.getBatchOfData(filter, order, start_key)
 
     try:
       new_json = func(request, entities=entities, json=json, *args, **kwargs)
@@ -104,15 +104,13 @@ def iterative_task(func):
       logging.error(exception)
       return task_responses.repeatTask()
 
-    if start_key is None:
-      logging.debug('Task sucessfully completed')
-    else:
+    if next_start_key:
       context = post_dict.copy()
 
       if 'json' in context:
         del context['json']
 
-      context.update({'start_key': start_key})
+      context.update({'start_key': next_start_key})
 
       if new_json is not None:
         context.update({'json': new_json})

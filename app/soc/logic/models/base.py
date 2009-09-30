@@ -587,12 +587,11 @@ class Logic(object):
 
     return result
 
-  def getBatchOfData(self, filter=None, order=None, start_key=None, batch_size=10):
+  def getBatchOfData(self, filter=None, start_key=None, batch_size=10):
     """Returns one batch of entities
 
     Args:
       filter: a dict for the properties that the entities should have
-      order: a list with the sort order
       next_key: a key for the first entity that should be returned
       batch_size: the maximum amount of entities that should be fetched
 
@@ -603,7 +602,7 @@ class Logic(object):
 
     batch_size = min(999, batch_size)
 
-    query = self.getQueryForFields(filter=filter, order=order)
+    query = self.getQueryForFields(filter=filter)
 
     if start_key:
       query.filter('__key__ >=', start_key)

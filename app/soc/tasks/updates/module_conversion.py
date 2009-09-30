@@ -27,6 +27,8 @@ from google.appengine.ext import db
 
 from django.http import HttpResponse
 
+from soc.logic.models.program import logic as program_logic
+from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
 
@@ -51,38 +53,18 @@ def startUpdateWithUrl(request, task_url):
   return True
 
 
-def runProgramConversionUpdate(request, *args, **kwargs):
-  """Appengine Task that converts Programs into GSoCPrograms.
 
-  The POST dict can contain the key where to start the conversion.
+@decorators.iterative_task(program_logic)
+def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
+  """Appengine Task that converts Programs into GSoCPrograms.
 
   Args:
     request: Django Request object
+    entities: list of Program entities to convert
+    context: the context of this task
   """
 
-  from soc.logic.models.program import logic as program_logic
-
   from soc.modules.gsoc.models.program import GSoCProgram
-
-  fields = {}
-
-  post_dict = request.POST
-
-  start_key = post_dict.get('start_key')
-
-  if start_key:
-    # retrieve the last Program entity that was converted
-    start = program_logic.getFromKeyName(start_key)
-
-    if not start:
-      # invalid starting key specified, log and return OK
-      return error_handler.logErrorAndReturnOK(
-          'Invalid Program Key specified: %s' %(start_key))
-
-    fields['__key__ >'] = start.key()
-
-  # get batch_size number of Programs
-  entities = program_logic.getForFields(fields, limit=DEF_BATCH_SIZE)
 
   # get all the properties that are part of each Programs
   program_model = program_logic.getModel()
@@ -105,16 +87,5 @@ def runProgramConversionUpdate(request, *args, **kwargs):
     # store all the new GSoCPrograms
     db.put(gsoc_programs)
 
-  if len(entities) == DEF_BATCH_SIZE:
-    # spawn new task starting from the last
-    new_start = entities[DEF_BATCH_SIZE-1].key().id_or_name()
-
-    # pass along these params as POST to the new task
-    task_params = {'start_key': new_start}
-
-    new_task = taskqueue.Task(params=task_params,
-                              url=request.META['PATH_INFO'])
-    new_task.add()
-
-  # task completed, return OK
-  return HttpResponse('OK')
+  # task completed, return
+  return

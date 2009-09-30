@@ -27,6 +27,8 @@ import logging
 
 from functools import wraps
 
+from google.appengine.ext import db
+
 from soc.tasks import responses as task_responses
 
 
@@ -51,72 +53,68 @@ def task(func):
   return wrapper
 
 
-def iterative_task(func):
+def iterative_task(logic, **task_default):
   """Iterative wrapper method
+
+  Args:
+    logic: the Logic instance to get entities for
+    task_default: keyword arguments which can contain the following options:
+      fields: dictionary to filter the entities on
+      start_key: the default key where to start this iterative task
   """
 
-  @wraps(func)
-  def wrapper(request, *args, **kwargs):
-    """Decorator wrapper method
+  def wrapper(func):
+    def iterative_wrapped(request, *args, **kwargs):
+      """Decorator wrapper method
 
-    Params usage:
-      logic: name of the logic for the data model to iterate through
-      filter: a dict for the properties that the entities should have
-      order: a list with the sort order
-      json: json object with additional parameters
+      Args:
+        request: Django HTTP Request object
 
-    Returns:
-      Standard http django response
-    """
+      request.POST usage:
+        fields: a JSON dict for the properties that the entities should have.
+          This updates values from the task_default entry.
+        start_key: the key of the next entity to fetch
 
-    post_dict = request.POST
+      Returns:
+        Standard HTTP Django response
+      """
 
-    if 'logic' not in post_dict:
-       return task_responses.terminateTask()
+      post_dict = request.POST
 
-    _temp = __import__(post_dict['logic'], globals(), locals(), ['logic'], -1)
-    logic = _temp.logic
+      fields = task_default.get('fields', {})
+      if 'fields' in post_dict:
+        fields.update(simplejson.loads(post_dict['fields']))
 
-    filter = None
-    if 'filter' in post_dict:
-      filter = simplejson.loads(post_dict['filter'])
+      start_key = task_default.get('start_key', None)
+      if 'start_key' in post_dict:
+        # get the key where to start this iteration
+        start_key = post_dict['start_key']
+      if start_key:
+        start_key = db.Key(start_key)
 
-    order = None
-    if 'order' in post_dict:
-      order = simplejson.loads(post_dict['order'])
+      # get the entities for this iteration
+      entities, next_start_key = logic.getBatchOfData(filter=fields,
+                                                      start_key=start_key)
 
-    start_key = None
-    if 'start_key' in post_dict:
-      start_key = db.Key(post_dict['start_key'])
-
-    json = None
-    if 'json' in post_dict:
-      json = post_dict['json']
-
-    entities, next_start_key = logic.getBatchOfData(filter, order, start_key)
-
-    try:
-      new_json = func(request, entities=entities, json=json, *args, **kwargs)
-    except task_responses.FatalTaskError, error:
-      logging.error(error)
-      return task_responses.terminateTask()
-    except Exception, exception:
-      logging.error(exception)
-      return task_responses.repeatTask()
-
-    if next_start_key:
+      # copy the post_dict so that the wrapped function can edit what it needs
       context = post_dict.copy()
 
-      if 'json' in context:
-        del context['json']
+      try:
+        func(request, entities=entities, context=context, *args, **kwargs)
+      except task_responses.FatalTaskError, error:
+        logging.error(error)
+        return task_responses.terminateTask()
+      except Exception, exception:
+        logging.error(exception)
+        return task_responses.repeatTask()
 
-      context.update({'start_key': next_start_key})
+      if next_start_key:
+        # set the key to use for the next iteration
+        context.update({'start_key': next_start_key})
 
-      if new_json is not None:
-        context.update({'json': new_json})
+        task_responses.startTask(url=request.path, context=context)
 
-      task_responses.startTask(url=request.path, context=context)
+      return task_responses.terminateTask()
 
-    return task_responses.terminateTask()
-
+    return iterative_wrapped
   return wrapper

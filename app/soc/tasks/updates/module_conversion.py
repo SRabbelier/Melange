@@ -28,9 +28,10 @@ from google.appengine.ext import db
 from django.http import HttpResponse
 
 from soc.logic.models.mentor import logic as mentor_logic
-from soc.logic.models.program import logic as program_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
+from soc.logic.models.program import logic as program_logic
+from soc.logic.models.student import logic as student_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
@@ -194,7 +195,7 @@ def _runOrgRoleConversionUpdate(entities, from_role_logic, to_role_model):
     gsoc_properties = {}
 
     for role_property in role_properties:
-      # copy over all the information from the Organization entity
+      # copy over all the information from the Role entity
       gsoc_properties[role_property] = getattr(entity, role_property)
 
       # get the Program key belonging to the old Role
@@ -220,3 +221,47 @@ def _runOrgRoleConversionUpdate(entities, from_role_logic, to_role_model):
   # task completed, return
   return
 
+
+@decorators.iterative_task(student_logic)
+def runStudentConversionUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that converts Students into GSoCStudents.
+
+  Args:
+    request: Django Request object
+    entities: list of Student entities to convert
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+  from soc.modules.gsoc.models.student import GSoCStudent
+
+  # get all the properties that are part of each Student
+  student_model = student_logic.getModel()
+  student_properties = student_model.properties().keys()
+
+  # use this to store all the new GSoCStudents
+  gsoc_students = []
+
+  for entity in entities:
+    gsoc_properties = {}
+
+    for student_property in student_properties:
+      # copy over all the information from the Student entity
+      gsoc_properties[student_property] = getattr(entity, student_property)
+
+    # get the Program key belonging to the old Student
+    program_key = entity.scope.key().id_or_name()
+    # get the new GSoCProgram and set it as scope for the GSoCStudent
+    gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
+    gsoc_properties['scope'] = gsoc_program
+
+    # create the new GSoCStudent entity and prepare it to be stored
+    gsoc_student_entity = GSoCStudent(key_name=entity.key().name(),
+                                      **gsoc_properties)
+    gsoc_students.append(gsoc_student_entity)
+
+  # store all the new GSoCStudents
+  db.put(gsoc_students)
+
+  # task completed, return
+  return

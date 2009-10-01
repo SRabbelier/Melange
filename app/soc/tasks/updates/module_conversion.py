@@ -27,7 +27,9 @@ from google.appengine.ext import db
 
 from django.http import HttpResponse
 
+from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.program import logic as program_logic
+from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
@@ -54,10 +56,9 @@ def startUpdateWithUrl(request, task_url):
   return True
 
 
-
 @decorators.iterative_task(program_logic)
 def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
-  """Appengine Task that converts Programs into GSoCPrograms.
+  """AppEngine Task that converts Programs into GSoCPrograms.
 
   Args:
     request: Django Request object
@@ -95,7 +96,7 @@ def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
 
 @decorators.iterative_task(org_logic)
 def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
-  """Appengine Task that converts Organizations into GSoCOrganizations.
+  """AppEngine Task that converts Organizations into GSoCOrganizations.
 
   Args:
     request: Django Request object
@@ -136,3 +137,86 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
 
   # task completed, return
   return
+
+
+@decorators.iterative_task(org_admin_logic)
+def runOrgAdminConversionUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that converts OrgAdmins into GSoCOrgAdmins.
+
+  Args:
+    request: Django Request object
+    entities: list of OrgAdmin entities to convert
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
+
+  return _runOrgRoleConversionUpdate(entities, org_admin_logic, GSoCOrgAdmin)
+
+
+@decorators.iterative_task(mentor_logic)
+def runMentorConversionUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that converts Mentors into GSoCMentors.
+
+  Args:
+    request: Django Request object
+    entities: list of Mentor entities to convert
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.models.mentor import GSoCMentor
+
+  return _runOrgRoleConversionUpdate(entities, mentor_logic, GSoCMentor)
+
+
+def _runOrgRoleConversionUpdate(entities, from_role_logic, to_role_model):
+  """AppEngine Task that converts a normal Organization Role into a
+  GSoCOrganization Role.
+
+  Args:
+    entities: Role entities to convert
+    from_role_logic: the Role Logic instance where to convert from
+    to_role_model: the role Model class where to convert to
+  """
+
+  from soc.modules.gsoc.logic.models.organization import logic as \
+      gsoc_org_logic
+  from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+
+  # get all the properties that are part of each Organization's Role
+  role_model = from_role_logic.getModel()
+  role_properties = role_model.properties().keys()
+
+  # use this to store all the new Roles
+  gsoc_roles = []
+
+  for entity in entities:
+    gsoc_properties = {}
+
+    for role_property in role_properties:
+      # copy over all the information from the Organization entity
+      gsoc_properties[role_property] = getattr(entity, role_property)
+
+      # get the Program key belonging to the old Role
+      program_key = entity.program.key().id_or_name()
+      # get the new GSoCProgram and set it for the Role
+      gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
+      gsoc_properties['program'] = gsoc_program
+
+      # get the Organization key belonging to the old Role
+      org_key = entity.scope.key().id_or_name()
+      # get the new GSoCOrganization and set it as scope for the Role
+      gsoc_org = gsoc_org_logic.getFromKeyName(org_key)
+      gsoc_properties['scope'] = gsoc_org
+
+    # create the new GSoC Role entity and prepare it to be stored
+    gsoc_role_entity = to_role_model(key_name=entity.key().name(),
+                                        **gsoc_properties)
+    gsoc_roles.append(gsoc_role_entity)
+
+  # store all the new GSoC Roles
+  db.put(gsoc_roles)
+
+  # task completed, return
+  return
+

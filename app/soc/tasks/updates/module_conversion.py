@@ -122,11 +122,11 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
       # copy over all the information from the Organization entity
       gsoc_properties[org_property] = getattr(entity, org_property)
 
-      # get the Program key belonging to the old Organization
-      program_key = entity.scope.key().id_or_name()
-      # get the new GSoCProgram and set it as scope for the GSoCOrganzation
-      gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
-      gsoc_properties['scope'] = gsoc_program
+    # get the Program key belonging to the old Organization
+    program_key = entity.scope.key().id_or_name()
+    # get the new GSoCProgram and set it as scope for the GSoCOrganzation
+    gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
+    gsoc_properties['scope'] = gsoc_program
 
     # create the new GSoCOrganization entity and prepare it to be stored
     gsoc_org_entity = GSoCOrganization(key_name=entity.key().name(),
@@ -198,17 +198,17 @@ def _runOrgRoleConversionUpdate(entities, from_role_logic, to_role_model):
       # copy over all the information from the Role entity
       gsoc_properties[role_property] = getattr(entity, role_property)
 
-      # get the Program key belonging to the old Role
-      program_key = entity.program.key().id_or_name()
-      # get the new GSoCProgram and set it for the Role
-      gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
-      gsoc_properties['program'] = gsoc_program
+    # get the Program key belonging to the old Role
+    program_key = entity.program.key().id_or_name()
+    # get the new GSoCProgram and set it for the Role
+    gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
+    gsoc_properties['program'] = gsoc_program
 
-      # get the Organization key belonging to the old Role
-      org_key = entity.scope.key().id_or_name()
-      # get the new GSoCOrganization and set it as scope for the Role
-      gsoc_org = gsoc_org_logic.getFromKeyName(org_key)
-      gsoc_properties['scope'] = gsoc_org
+    # get the Organization key belonging to the old Role
+    org_key = entity.scope.key().id_or_name()
+    # get the new GSoCOrganization and set it as scope for the Role
+    gsoc_org = gsoc_org_logic.getFromKeyName(org_key)
+    gsoc_properties['scope'] = gsoc_org
 
     # create the new GSoC Role entity and prepare it to be stored
     gsoc_role_entity = to_role_model(key_name=entity.key().name(),

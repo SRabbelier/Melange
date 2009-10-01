@@ -28,6 +28,7 @@ from google.appengine.ext import db
 from django.http import HttpResponse
 
 from soc.logic.models.program import logic as program_logic
+from soc.logic.models.organization import logic as org_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
@@ -81,11 +82,57 @@ def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
       gsoc_properties[program_property] = getattr(entity, program_property)
 
     # create the new GSoCProgram entity and prepare it to be stored
-    gsoc_program_entity = GSoCProgram(key_name=entity.key().name(), **gsoc_properties)
+    gsoc_program_entity = GSoCProgram(key_name=entity.key().name(),
+                                      **gsoc_properties)
     gsoc_programs.append(gsoc_program_entity)
 
     # store all the new GSoCPrograms
     db.put(gsoc_programs)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(org_logic)
+def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
+  """Appengine Task that converts Organizations into GSoCOrganizations.
+
+  Args:
+    request: Django Request object
+    entities: list of Organization entities to convert
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+  from soc.modules.gsoc.models.organization import GSoCOrganization
+
+  # get all the properties that are part of each Organization
+  org_model = org_logic.getModel()
+  org_properties = org_model.properties().keys()
+
+  # use this to store all the new GSoCOrganization
+  gsoc_orgs = []
+
+  for entity in entities:
+    gsoc_properties = {}
+
+    for org_property in org_properties:
+      # copy over all the information from the Organization entity
+      gsoc_properties[org_property] = getattr(entity, org_property)
+
+      # get the Program key belonging to the old Organization
+      program_key = entity.scope.key().id_or_name()
+      # get the new GSoCProgram and set it as scope for the GSoCOrganzation
+      gsoc_program = gsoc_program_logic.getFromKeyName(program_key)
+      gsoc_properties['scope'] = gsoc_program
+
+    # create the new GSoCOrganization entity and prepare it to be stored
+    gsoc_org_entity = GSoCOrganization(key_name=entity.key().name(),
+                                       **gsoc_properties)
+    gsoc_orgs.append(gsoc_org_entity)
+
+    # store all the new GSoCOrganizations
+    db.put(gsoc_orgs)
 
   # task completed, return
   return

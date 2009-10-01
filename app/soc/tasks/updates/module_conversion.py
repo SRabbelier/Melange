@@ -87,8 +87,8 @@ def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
                                       **gsoc_properties)
     gsoc_programs.append(gsoc_program_entity)
 
-    # store all the new GSoCPrograms
-    db.put(gsoc_programs)
+  # store all the new GSoCPrograms
+  db.put(gsoc_programs)
 
   # task completed, return
   return
@@ -132,8 +132,8 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
                                        **gsoc_properties)
     gsoc_orgs.append(gsoc_org_entity)
 
-    # store all the new GSoCOrganizations
-    db.put(gsoc_orgs)
+  # store all the new GSoCOrganizations
+  db.put(gsoc_orgs)
 
   # task completed, return
   return

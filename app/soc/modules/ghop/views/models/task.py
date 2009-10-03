@@ -860,13 +860,9 @@ class View(base.View):
 
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
-      deadline = datetime.datetime.now() + datetime.timedelta(
-            hours=entity.time_to_complete)
-
       properties = {
           'status': 'ClaimRequested',
           'user': user_account,
-          'deadline': deadline,
           }
 
       st_filter = {

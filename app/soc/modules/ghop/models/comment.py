@@ -54,7 +54,7 @@ class GHOPComment(soc.models.base.ModelWithFieldAttributes):
   #: A required many:1 relationship with a comment entity indicating
   #: the user who provided that comment.
   created_by = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                    required=True,
+                                    required=False,
                                     collection_name="commented_by")
 
   #: Date when the comment was added

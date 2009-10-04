@@ -27,6 +27,7 @@ from google.appengine.ext import db
 
 from django.http import HttpResponse
 
+from soc.logic.models import survey as survey_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
@@ -323,6 +324,62 @@ def runStudentProjectUpdate(request, entities, context, *args, **kwargs):
     entity.additional_mentors = new_mentors
 
   # store all StudentProjects
+  db.put(entities)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(survey_logic.logic)
+def runSurveyUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates Survey entities.
+
+  Args:
+    request: Django Request object
+    entities: list of Survey entities to update
+    context: the context of this task
+  """
+  return _runSurveyUpdate(entities)
+
+
+@decorators.iterative_task(survey_logic.project_logic)
+def runProjectSurveyUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates ProjectSurvey entities.
+
+  Args:
+    request: Django Request object
+    entities: list of ProjectSurvey entities to update
+    context: the context of this task
+  """
+  return _runSurveyUpdate(entities)
+
+
+@decorators.iterative_task(survey_logic.grading_logic)
+def runGradingProjectSurveyUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates GradingProjectSurvey entities.
+
+  Args:
+    request: Django Request object
+    entities: list of GradingProjectSurvey entities to update
+    context: the context of this task
+  """
+  return _runSurveyUpdate(entities)
+
+
+def _runSurveyUpdate(entities):
+  """AppEngine Task that updates Survey entities.
+
+  Args:
+    entities: list of Survey entities to update
+  """
+
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+
+  for entity in entities:
+    entity.scope = program_logic.getFromKeyName(
+        entity.scope.key().id_or_name())
+
+  # store all Surveys
   db.put(entities)
 
   # task completed, return

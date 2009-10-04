@@ -33,6 +33,7 @@ from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.review import logic as review_logic
 from soc.logic.models.student import logic as student_logic
+from soc.logic.models.student_project import logic as student_project_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
@@ -270,7 +271,7 @@ def runStudentConversionUpdate(request, entities, context, *args, **kwargs):
 
 @decorators.iterative_task(review_logic)
 def runReviewUpdate(request, entities, context, *args, **kwargs):
-  """AppEngine Task that updated Review entities.
+  """AppEngine Task that updates Review entities.
 
   Args:
     request: Django Request object
@@ -282,6 +283,46 @@ def runReviewUpdate(request, entities, context, *args, **kwargs):
     entity.reviewer = None
 
   # store all Reviews
+  db.put(entities)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(student_project_logic)
+def runStudentProjectUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates StudentProject entities.
+
+  Args:
+    request: Django Request object
+    entities: list of StudentProject entities to update
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+  from soc.modules.gsoc.logic.models.organization import logic as org_logic
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+  from soc.modules.gsoc.logic.models.student import logic as student_logic
+
+  for entity in entities:
+    entity.scope = org_logic.getFromKeyName(entity.scope.key().id_or_name())
+    entity.mentor = mentor_logic.getFromKeyName(
+        entity.mentor.key().id_or_name())
+    entity.student = student_logic.getFromKeyName(
+        entity.student.key().id_or_name())
+    entity.program = program_logic.getFromKeyName(
+        entity.program.key().id_or_name())
+
+    old_mentors = entity.additional_mentors
+    new_mentors = []
+
+    for old_mentor in old_mentors:
+      new_mentors.append(
+        mentor_logic.getFromKeyName(old_mentor.id_or_name()))
+
+    entity.additional_mentors = new_mentors
+
+  # store all StudentProjects
   db.put(entities)
 
   # task completed, return

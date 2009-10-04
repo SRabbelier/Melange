@@ -91,8 +91,7 @@ def updateGHOPTask(request, *args, **kwargs):
 
   entity = ghop_task_logic.logic.getFromKeyNameOr404(key_name)
 
-  entity, comment_entity, ws_entity = ghop_task_logic.logic.updateTaskStatus(
-      entity)
+  entity, comment_entity = ghop_task_logic.logic.updateTaskStatus(entity)
 
   if entity:
     # TODO(madhusudan): does this really mean an unsuccessful update?

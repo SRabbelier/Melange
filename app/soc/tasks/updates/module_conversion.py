@@ -36,6 +36,7 @@ from soc.logic.models.program import logic as program_logic
 from soc.logic.models.review import logic as review_logic
 from soc.logic.models.student import logic as student_logic
 from soc.logic.models.student_project import logic as student_project_logic
+from soc.logic.models.timeline import logic as timeline_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
@@ -457,6 +458,48 @@ def runDocumentUpdate(request, entities, context, *args, **kwargs):
 
   # store all Documents
   db.put(entities)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(timeline_logic)
+def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that converts Timelines into GSoCTimelines.
+
+  Args:
+    request: Django Request object
+    entities: list of Timeline entities to convert
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.models.timeline import GSoCTimeline
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+
+  # get all the properties that are part of each Timeline
+  timeline_model = timeline_logic.getModel()
+  timeline_properties = timeline_model.properties().keys()
+
+  # use this to store all the new GSoCTimelines
+  gsoc_timeline = []
+
+  for entity in entities:
+    gsoc_properties = {}
+
+    for timeline_property in timeline_properties:
+      # copy over all the information from the timeline entity
+      gsoc_properties[timeline_property] = getattr(entity, timeline_property)
+
+    gsoc_program = program_logic.getFromKeyName(entity.scope.key().id_or_name())
+    gsoc_properties['scope'] = gsoc_program
+
+    # create the new GSoCTimeline entity and prepare it to be stored
+    gsoc_timeline_entity = GSoCTimeline(key_name=entity.key().name(),
+                                        **gsoc_properties)
+    gsoc_timelines.append(gsoc_timeline_entity)
+
+  # store all the new GSoCPrograms
+  db.put(gsoc_timelines)
 
   # task completed, return
   return

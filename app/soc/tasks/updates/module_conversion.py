@@ -429,3 +429,34 @@ def _runSurveyRecordUpdate(entities):
 
   # task completed, return
   return
+
+
+@decorators.iterative_task(document_logic)
+def runDocumentUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates Document entities.
+
+  Args:
+    request: Django Request object
+    entities: list of Document entities to update
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.logic.models.organization import logic as org_logic
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+
+  for entity in entities:
+    if entity.prefix == 'org':
+      org_entity = org_logic.getFromKeyName(entity.key().id_or_name())
+      entity.scope = org_entity
+      entity.home_for = org_entity if entity.home_for else None
+
+    if entity.prefix == 'program':
+      program_entity = program_logic.getFromKeyName(entity.key().id_or_name())
+      entity.scope = program_entity
+      entity.home_for = program_entity if entity.home_for else None
+
+  # store all Documents
+  db.put(entities)
+
+  # task completed, return
+  return

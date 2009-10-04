@@ -31,6 +31,7 @@ from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
+from soc.logic.models.review import logic as review_logic
 from soc.logic.models.student import logic as student_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
@@ -262,6 +263,26 @@ def runStudentConversionUpdate(request, entities, context, *args, **kwargs):
 
   # store all the new GSoCStudents
   db.put(gsoc_students)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(review_logic)
+def runReviewUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updated Review entities.
+
+  Args:
+    request: Django Request object
+    entities: list of Review entities to update
+    context: the context of this task
+  """
+
+  for entity in entities:
+    entity.reviewer = None
+
+  # store all Reviews
+  db.put(entities)
 
   # task completed, return
   return

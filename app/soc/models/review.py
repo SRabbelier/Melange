@@ -35,6 +35,7 @@ class Review(soc.models.comment.Comment):
   #: the score given by the reviewer
   score = db.IntegerProperty(required=True, default=0)
 
+  # TODO(ljvderijk): Remove this property
   #: An optional reference property to a reviewer so the information
   #: from the Role can be used as well
   reviewer = db.ReferenceProperty(reference_class=soc.models.role.Role,

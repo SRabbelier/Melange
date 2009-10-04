@@ -28,6 +28,7 @@ from google.appengine.ext import db
 from django.http import HttpResponse
 
 from soc.logic.models import survey as survey_logic
+from soc.logic.models import survey_record as survey_record_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
@@ -380,6 +381,50 @@ def _runSurveyUpdate(entities):
         entity.scope.key().id_or_name())
 
   # store all Surveys
+  db.put(entities)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(survey_record.project_logic)
+def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates ProjectSurveyRecord entities.
+
+  Args:
+    request: Django Request object
+    entities: list of ProjectSurveyRecord entities to update
+    context: the context of this task
+  """
+
+  return _runSurveyRecordUpdate(entities)
+
+
+@decorators.iterative_task(survey_record.grading_logic)
+def runGradingProjectSurveyRecordsUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates GradingProjectSurveyRecord entities.
+
+  Args:
+    request: Django Request object
+    entities: list of GradingProjectSurveyRecord entities to update
+    context: the context of this task
+  """
+
+  return _runSurveyRecordUpdate(entities)
+
+
+def _runSurveyRecordUpdate(entities):
+  """AppEngine Task taht updates SurveyRecord entities.
+
+  Args:
+    entities: list of SurveyRecord entities to update 
+  """
+
+  from soc.modules.gsoc.logic.models.organization import logic as org_logic
+
+  for entity in entities:
+    entity.org = org_logic.getFromKeyName(entity.org.key().id_or_name())
+
   db.put(entities)
 
   # task completed, return

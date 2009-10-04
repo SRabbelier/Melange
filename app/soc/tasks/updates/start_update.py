@@ -139,7 +139,7 @@ class TaskRunner(object):
     """
     return '/tasks/update/run/%s' % option
 
-  def runTask(self, request, option_name, **kwargs):
+  def runTask(self, request, option_name, *args, **kwargs):
     """Runs the specified Task for the given option.
     """
 
@@ -148,7 +148,7 @@ class TaskRunner(object):
     if not option:
       error_handler('Uknown Updater option "%s".' % option_name)
     else:
-      return option['runner'](request, **kwargs)
+      return option['runner'](request, *args, **kwargs)
 
 
 task_runner = TaskRunner()

@@ -580,6 +580,159 @@ def saveDataToCSV(csv_filename, data, key_order):
   csv_file.close()
 
 
+def exportOrgsForGoogleCode(csv_filename, gc_project_prefix='', 
+                            scope_path_start=''):
+  """Export all Organizations from given program as CSV.
+      
+  CSV file will contain 3 columns: organization name, organization google 
+  code project name, organization description.
+  
+  Args:
+    csv_filename: the name of the csv file to save
+    gc_project_prefix: Google Code project prefix for example
+      could be google-summer-of-code-2009- for GSoC 2009
+    scope_path_start: the start of the scope path of the roles to get could be
+      google/gsoc2009 if you want to export all GSoC 2009 Organizations.
+  """
+  from soc.models.organization import Organization
+  
+  print 'Retrieving all Organizations'
+  orgs = getEntities(Organization)()
+  orgs_export = []
+  
+  print 'Preparing data for CSV export'
+  for key in orgs.keys():
+    if not orgs[key].scope_path.startswith(scope_path_start):
+      continue
+    
+    org_for_export = {} 
+    org_short_name = orgs[key].short_name
+    org_short_name = org_short_name.replace(' ','-').replace('.', '')
+    org_short_name = org_short_name.replace('/','-').replace('!','').lower()
+    org_for_export['org_description'] = orgs[key].description
+    org_for_export['org_name'] = orgs[key].name
+    org_for_export['google_code_project_name'] = gc_project_prefix + \
+        org_short_name
+    orgs_export.append(org_for_export)
+
+  export_fields = ['org_name', 'google_code_project_name', 'org_description']
+  print 'Exporting the data to CSV'
+  saveDataToCSV(csv_filename, orgs_export, export_fields)
+  print "Exported Organizations for Google Code to %s file." % csv_filename
+
+
+def exportRolesForGoogleCode(csv_filename, gc_project_prefix='', 
+                             scope_path_start=''):
+  """Export all Students/Mentors/OrgAdmins Roles from given program as CSV.
+      
+  CSV file will contain 3 columns: google_account, organization google 
+  code project name and role (project member or project owner).
+  
+  Args:
+    csv_filename: the name of the csv file to save
+    gc_project_prefix: Google Code project prefix for example
+      could be google-summer-of-code-2009- for GSoC 2009
+    scope_path_start: the start of the scope path of the roles to get could be
+      google/gsoc2009 if you want to export all GSoC 2009 Organizations.
+  """
+  from soc.models.org_admin import OrgAdmin
+  from soc.models.student_project import StudentProject
+  
+  # get all projects
+  getStudentProjects = getEntities(StudentProject)
+  student_projects = getStudentProjects()
+  org_admins = getEntities(OrgAdmin)()
+  all_org_admins = org_admins.values()
+  
+  org_admins_by_orgs = {}
+  students_by_orgs = {}
+  mentors_by_orgs = {}
+  
+  for org_admin in all_org_admins:
+      
+    if not org_admin.scope_path.startswith(scope_path_start):
+      continue
+      
+    org_short_name = org_admin.scope.short_name
+    org_short_name = org_short_name.replace(' ','-').replace('.', '')
+    org_short_name = org_short_name.replace('/','-').replace('!','').lower()
+    if gc_project_prefix + org_short_name not in org_admins_by_orgs.keys():
+      org_admins_by_orgs[gc_project_prefix + org_short_name] = []
+    
+    org_admins_by_orgs[gc_project_prefix + \
+        org_short_name].append(str(org_admin.user.account))
+    print 'OrgAdmin ' + str(org_admin.user.account) + \
+        ' for ' + gc_project_prefix + org_short_name
+  
+  for student_project in student_projects.values():
+
+    if student_project.status != 'accepted' or not \
+      student_project.scope_path.startswith(scope_path_start):
+      # no need to export this project
+      continue
+    
+    student_entity = student_project.student
+    mentor_entity = student_project.mentor
+    org_short_name = student_project.scope.short_name
+    org_short_name = org_short_name.replace(' ','-').replace('.', '')
+    org_short_name = org_short_name.replace('/','-').replace('!','').lower()
+    if gc_project_prefix + org_short_name not in students_by_orgs.keys():
+      students_by_orgs[gc_project_prefix + org_short_name] = []
+    students_by_orgs[gc_project_prefix + \
+        org_short_name].append(str(student_entity.user.account))
+    print 'Student ' + str(student_entity.user.account) + \
+        ' for ' + gc_project_prefix + org_short_name
+    if gc_project_prefix + org_short_name not in mentors_by_orgs.keys():
+      mentors_by_orgs[gc_project_prefix + org_short_name] = []
+    mentors_by_orgs[gc_project_prefix + \
+        org_short_name].append(str(mentor_entity.user.account))
+    print 'Mentor ' + str(mentor_entity.user.account) + \
+        ' for ' + gc_project_prefix + org_short_name
+  
+  roles_data = {}
+  
+  # prepare org admins data
+  for org_key in org_admins_by_orgs.keys():
+    for org_admin in org_admins_by_orgs[org_key]:
+      roles_data[org_admin + '|' + org_key] = \
+          {'role': 'project_owner', 
+           'google_code_project_name': org_key, 
+           'google_account': org_admin}
+
+  # prepare mentors data
+  for org_key in mentors_by_orgs.keys():
+    for mentor in mentors_by_orgs[org_key]:
+      if mentor + '|' + org_key not in roles_data.keys():
+        roles_data[mentor + '|' + org_key] = \
+            {'role': 'project_member', 
+             'google_code_project_name': org_key, 
+             'google_account': mentor}
+
+  # prepare students data
+  for org_key in students_by_orgs.keys():
+    for student in students_by_orgs[org_key]:
+      roles_data[student + '|' + org_key] = \
+          {'role': 'project_member', 
+           'google_code_project_name': org_key, 
+           'google_account': student}
+   
+  data = []
+  
+  # add @gmail.com to all accounts that don't have @ in the account string
+  # gmail.com is authorized domain for Google AppEngine that's why it's
+  # missing
+  for roles_key in roles_data.keys():
+    if roles_data[roles_key]['google_account'].find('@') == -1:
+      roles_data[roles_key]['google_account'] = \
+        roles_data[roles_key]['google_account'] + '@gmail.com'
+    data.append(roles_data[roles_key])
+  
+  export_fields = ['google_account', 'google_code_project_name', 'role']
+  print 'Exporting the data to CSV'
+  saveDataToCSV(csv_filename, data, export_fields)
+  print "Exported Roles for Google Code to %s file." % csv_filename
+
+
 def main(args):
   """Main routine.
   """
@@ -637,6 +790,8 @@ def main(args):
       'deidleJobs': deidleJobs,
       'exportStudentsWithProjects': exportStudentsWithProjects,
       'exportUniqueOrgAdminsAndMentors': exportUniqueOrgAdminsAndMentors,
+      'exportOrgsForGoogleCode': exportOrgsForGoogleCode,
+      'exportRolesForGoogleCode': exportRolesForGoogleCode,
       'startUniqueUserIdConversion': startUniqueUserIdConversion,
   }
 

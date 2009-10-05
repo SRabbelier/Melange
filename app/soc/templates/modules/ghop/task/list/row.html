@@ -1,12 +1,11 @@
+{% block first %}
 <tr class="off" onmouseover="this.className='on'; do_redirect=true" onmouseout="this.className='off'" 
 onclick="if (do_redirect) document.location.href='{{ list.redirect }}'" name="name">
-  {% block first %}
-  <!-- to be used in the inherited block -->
-  {% endblock %}
   <td align="right"><div class="title"><a class="noul" onclick="do_redirect=false"
          href="{{ list.redirect }}">{{ list.item.title }}</a>
      </div>
   </td>
+{% endblock first %}
   <td><div class="difficulty">{{ list.item.difficulty.0.tag }}</a></div></td>
   <td><div class="task_type">
   {% for task_type in list.item.task_type %}

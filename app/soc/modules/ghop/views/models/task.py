@@ -680,18 +680,36 @@ class View(base.View):
     """Handles the POST request for the list tasks view.
     """
 
-    # update the status of task entities that have been approved
-    # and published
+    # get the org entity for which we are listing these tasks
+    org_entity = ghop_org_logic.logic.getFromKeyNameOr404(kwargs['scope_path'])
+
+    # save the state to which the selected tasks must be changed
+    # to based on the actions.
+    if request.POST.get('Approve'):
+      changed_status = 'Unpublished'
+    elif request.POST.get('Publish'):
+      changed_status = 'Open'
+
+    # update the status of task entities that should be approved or published
     task_entities = []
-    for key_name, published in request.POST.items():
+
+    # get all the task keys to update, will return empty list if doesn't exist
+    task_keys = request.POST.getlist('task_id')
+
+    for key_name in task_keys:
+
       task_entity = ghop_task_logic.logic.getFromKeyName(key_name)
-      if task_entity:
-        task_entity.status = 'Open'
+
+      # Of course only the tasks from this organization and those with a valid 
+      # state can be updated.
+      if task_entity and task_entity.scope.key() == org_entity.key() and \
+          task_entity.status in ['Unapproved', 'Unpublished']:
+        task_entity.status = changed_status
 
         task_entities.append(task_entity)
 
-    # bulk update the task_entities
-    # TODO: Have to be replaced by Task Queue APIs later
+    # bulk put the task_entities
+    # TODO: replace with Task API call?
     db.put(task_entities)
 
     # redirect to the same page
@@ -728,11 +746,11 @@ class View(base.View):
                                 up_params)
 
     up_params['list_description'] = ugettext(
-       'List of Unapproved or Unpublished tasks')
+       'List of Unapproved tasks.')
 
     filter = {
         'scope': org_entity,
-        'status': ['Unapproved', 'Unpublished'],
+        'status': 'Unapproved',
         }
 
     up_list = lists.getListContent(request, up_params, filter, idx=0,
@@ -748,6 +766,33 @@ class View(base.View):
       contents.append(up_list)
       context['up_list'] = True
 
+    aup_params = params.copy()
+    aup_params['list_heading'] = 'modules/ghop/task/approve/heading.html'
+    aup_params['list_row'] = 'modules/ghop/task/approve/row.html'
+
+    aup_params['list_action'] = (redirects.getPublicRedirect,
+                                 aup_params)
+
+    aup_params['list_description'] = ugettext(
+       'List of Approved but Unpublished tasks.')
+
+    filter = {
+        'scope': org_entity,
+        'status': 'Unpublished',
+        }
+
+    aup_list = lists.getListContent(request, aup_params, filter, idx=1,
+                                    need_content=True)
+
+    if aup_list:
+      aup_mentors_list = {}
+      for task_entity in aup_list['data']:
+        aup_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+
+      aup_list['info'] = (list_info_helper.getTasksInfo(aup_mentors_list), None)
+
+      contents.append(aup_list)
+
     ap_params = up_params.copy()
     ap_params['list_template'] = 'soc/models/list.html'
     ap_params['list_heading'] = 'modules/ghop/task/list/heading.html'
@@ -757,7 +802,7 @@ class View(base.View):
                                 ap_params)
 
     ap_params['list_description'] = ugettext(
-       'List of published tasks')
+       'List of Published tasks.')
 
     filter = {
         'scope': org_entity,
@@ -766,7 +811,7 @@ class View(base.View):
             'NeedsWork', 'NeedsReview'],
         }
 
-    ap_list = lists.getListContent(request, ap_params, filter, idx=1,
+    ap_list = lists.getListContent(request, ap_params, filter, idx=2,
                                    need_content=True)
 
     if ap_list:

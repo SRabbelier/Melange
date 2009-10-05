@@ -1,11 +1,14 @@
 {% extends "modules/ghop/task/list/row.html" %}
-
 {% block first %}
-<td>
-  <div class="approve" id="id_approve_{{ list.item.link_id }}">
-  <input type="checkbox" id="id_approve_{{ list.item.key.name }}"
-   name="{{ list.item.key.name }}"/>
-  </div>
-</td>
-{% endblock %}
-
+<tr class="off" onmouseover="this.className='on'" onmouseout="this.className='off'" name="name">
+  <td>
+    <div class="select">
+    <input type="checkbox" value="{{list.item.key.name}}" name="task_id"/>
+    </div>
+  </td>
+  <td>
+    <div class="title"><a class="noul" onclick="do_redirect=false"
+         href="{{ list.redirect }}">{{ list.item.title }}</a>
+    </div>
+  </td>
+{% endblock first %}

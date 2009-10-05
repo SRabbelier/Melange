@@ -733,6 +733,119 @@ def exportRolesForGoogleCode(csv_filename, gc_project_prefix='',
   print "Exported Roles for Google Code to %s file." % csv_filename
 
 
+def entityToDict(entity, field_names=None):
+  """Returns a dict with all specified values of this entity.
+
+  Args:
+    entity: entity that will be converted to dictionary
+    field_names: the fields that should be included, defaults to
+      all fields that are of a type that is in DICT_TYPES.
+  """
+  from google.appengine.ext import db
+
+  DICT_TYPES = (db.StringProperty, db.IntegerProperty)
+  result = {}
+
+  if not field_names:
+    props = entity.properties().iteritems()
+    field_names = [k for k, v in props if isinstance(v, DICT_TYPES)]
+
+  for key in field_names:
+    # Skip everything that is not valid
+    if not hasattr(entity, key):
+      continue
+
+    result[key] = getattr(entity, key)
+
+  if hasattr(entity, 'name'):
+    name_prop = getattr(entity, 'name')
+    if callable(name_prop):
+      result['name'] = name_prop()
+
+  return result
+
+
+def surveyRecordCSVExport(csv_filename, survey_record_model, 
+                          survey_model, survey_key):
+  """CSV export for Survey Records for selected survey type and given survey key.
+  
+  Args:
+    csv_filename: the name of the csv file to save
+    survey_record_model: model of surver record that will be exported
+    survey_model: model of the survey that wil be exported
+    survey_key: key of the survey that records will be exported
+  """
+  from soc.models.project_survey import ProjectSurvey
+  from soc.models.grading_project_survey import GradingProjectSurvey
+
+  # fetch survey
+  survey = survey_model.get(survey_key)
+
+  if not survey:
+    print "Survey of given model and key doesn't exist."
+    return
+
+  schema = eval(survey.survey_content.schema)
+  ordered_properties = survey.survey_content.orderedProperties()
+
+  getSurveyRecords = getEntities(survey_record_model)
+  survey_records = getSurveyRecords()
+  survey_records_amount = len(survey_records)
+  print "Fetched %d Survey Records." % survey_records_amount
+
+  count = 0
+
+  print "Preparing SurveyRecord data for export."
+
+  sr_key = {}
+  comments_properties = []
+  for property_name in ordered_properties:
+    sr_key[property_name] = schema[property_name]['question']
+    if schema[property_name]['has_comment']:
+      sr_key['comment_for_' + property_name] = 'None'
+      comments_properties.append('comment_for_' + property_name)
+
+  for comment in comments_properties:
+    ordered_properties.append(comment)
+
+  survey_record_data = []
+  for i in survey_records.keys():
+    if str(survey_records[i].survey.key()) != survey_key:
+        continue
+    data = entityToDict(survey_records[i], ordered_properties)
+
+    if (survey_model == GradingProjectSurvey) or \
+        (survey_model == ProjectSurvey):
+      data['organization'] = survey_records[i].org.name
+      data['project_title'] = survey_records[i].project.title
+      data['user_link_id'] = survey_records[i].user.link_id
+
+      if survey_model == GradingProjectSurvey:
+        data['project_grade'] = survey_records[i].grade
+
+    survey_record_data.append(data)
+
+    count += 1
+    print str(count) + '/' + str(survey_records_amount) + ' ' + str(i)
+
+  if (survey_model == GradingProjectSurvey) or (survey_model == ProjectSurvey):
+    ordered_properties.append('organization')
+    ordered_properties.append('project_title')
+    ordered_properties.append('user_link_id')
+    sr_key['organization'] = 'None'
+    sr_key['project_title'] = 'None'
+    sr_key['user_link_id'] = 'None'
+
+    if survey_model == GradingProjectSurvey:
+      ordered_properties.append('project_grade')
+      sr_key['project_grade'] = 'None'
+
+  survey_record_data.insert(0, sr_key)
+
+  saveDataToCSV(csv_filename, survey_record_data, ordered_properties)
+  print "Survey Records exported to %s file." % csv_filename
+
+
 def main(args):
   """Main routine.
   """
@@ -793,6 +906,7 @@ def main(args):
       'exportOrgsForGoogleCode': exportOrgsForGoogleCode,
       'exportRolesForGoogleCode': exportRolesForGoogleCode,
       'startUniqueUserIdConversion': startUniqueUserIdConversion,
+      'surveyRecordCSVExport': surveyRecordCSVExport,
   }
 
   interactive.remote(args, context)

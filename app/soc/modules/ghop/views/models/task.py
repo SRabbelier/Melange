@@ -80,7 +80,7 @@ class View(base.View):
 
   DEF_MAX_TASK_LIMIT_MSG_FMT = ugettext(
       'The task is open but you cannot claim this task since you '
-      'either have already claimed %d task.')
+      'have already claimed %d task(s).')
 
   DEF_SIGNIN_TO_COMMENT_MSG = ugettext(
       '<a href=%s>Sign in</a> to perform any action or comment on '
@@ -91,7 +91,7 @@ class View(base.View):
       'before you proceed further.')
 
   DEF_TASK_CLAIMED_BY_YOU_MSG = ugettext( 
-      'This task has been claimed by you!')
+      'You have claimed this task!')
 
   DEF_TASK_CLAIMED_BY_STUDENT_MSG = ugettext(
       'This task has been claimed by a student!')
@@ -101,9 +101,9 @@ class View(base.View):
 
   DEF_TASK_CLAIM_REQUESTED_MSG = ugettext(
       'A student has requested to claim this task. Accept or '
-      'Reject the request.')
+      'reject the request.')
 
-  DEF_TASK_CLOSED_MSG = ugettext('The task is closed.')
+  DEF_TASK_CLOSED_MSG = ugettext('This task is closed.')
 
   DEF_TASK_CMPLTD_BY_YOU_MSG = ugettext(
       'You have successfully completed this task!')
@@ -120,11 +120,11 @@ class View(base.View):
       'Student has submitted his work for this task! It needs review.')
 
   DEF_TASK_OPEN_MSG = ugettext(
-      'This task is open. If you are GHOP student, you can claim it!')
+      'This task is open. If you are a GHOP student, you can claim it!')
 
   DEF_TASK_REOPENED_MSG = ugettext(
       'This task has been reopened. If you are a GHOP student, '
-      'you can clam it!')
+      'you can claim it!')
 
   DEF_TASK_REQ_CLAIMED_BY_YOU_MSG = ugettext(
       'You have requested to claim this task!')

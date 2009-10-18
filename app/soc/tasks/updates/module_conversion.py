@@ -536,6 +536,8 @@ def runDocumentUpdate(request, entities, context, *args, **kwargs):
 def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that converts Timelines into GSoCTimelines.
 
+  It also updates all GSoCPrograms with a reference to the new GSoCTimeline.
+
   Args:
     request: Django Request object
     entities: list of Timeline entities to convert
@@ -549,8 +551,9 @@ def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
   timeline_model = timeline_logic.getModel()
   timeline_properties = timeline_model.properties().keys()
 
-  # use this to store all the new GSoCTimelines
-  gsoc_timeline = []
+  # use this to store all the new GSoCTimelines and GSoCPrograms
+  gsoc_timelines = []
+  gsoc_programs = []
 
   for entity in entities:
     gsoc_properties = {}
@@ -559,7 +562,7 @@ def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
       # copy over all the information from the timeline entity
       gsoc_properties[timeline_property] = getattr(entity, timeline_property)
 
-    gsoc_program = program_logic.getFromKeyName(entity.scope.key().id_or_name())
+    gsoc_program = program_logic.getFromKeyName(entity.key().id_or_name())
     gsoc_properties['scope'] = gsoc_program
 
     # create the new GSoCTimeline entity and prepare it to be stored
@@ -567,8 +570,13 @@ def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
                                         **gsoc_properties)
     gsoc_timelines.append(gsoc_timeline_entity)
 
-  # store all the new GSoCPrograms
+    # set the timeline for the GSoCProgram entity and prepare it for storage
+    gsoc_program.timeline = gsoc_timeline_entity
+    gsoc_programs.append(gsoc_program)
+
+  # store all the new GSoCTimelines and GSoCPrograms
   db.put(gsoc_timelines)
+  db.put(gsoc_programs)
 
   # task completed, return
   return

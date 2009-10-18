@@ -29,6 +29,7 @@ from django.http import HttpResponse
 
 from soc.logic.models import survey as survey_logic
 from soc.logic.models import survey_record as survey_record_logic
+from soc.logic.models.document import logic as document_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
@@ -430,7 +431,7 @@ def _runSurveyUpdate(entities):
   return
 
 
-@decorators.iterative_task(survey_record.project_logic)
+@decorators.iterative_task(survey_record_logic.project_logic)
 def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates ProjectSurveyRecord entities.
 
@@ -443,7 +444,7 @@ def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
   return _runSurveyRecordUpdate(entities)
 
 
-@decorators.iterative_task(survey_record.grading_logic)
+@decorators.iterative_task(survey_record_logic.grading_logic)
 def runGradingProjectSurveyRecordsUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates GradingProjectSurveyRecord entities.
 

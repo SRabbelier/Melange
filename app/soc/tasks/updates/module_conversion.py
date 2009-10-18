@@ -292,11 +292,13 @@ def runStudentProposalUpdate(request, entities, context, *args, **kwargs):
   for entity in entities:
     entity.scope = student_logic.getFromKeyName(
         entity.scope.key().id_or_name())
-    entity.mentor = mentor_logic.getFromKeyName(
-        entity.mentor.key().id_or_name())
     entity.org = org_logic.getFromKeyName(entity.org.key().id_or_name())
     entity.program = program_logic.getFromKeyName(
         entity.program.key().id_or_name())
+
+    if entity.mentor:
+      entity.mentor = mentor_logic.getFromKeyName(
+          entity.mentor.key().id_or_name())
 
     old_mentors = entity.possible_mentors
     new_mentors = []
@@ -312,7 +314,6 @@ def runStudentProposalUpdate(request, entities, context, *args, **kwargs):
 
   # task completed, return
   return
-
 
 
 @decorators.iterative_task(review_logic)

@@ -448,7 +448,7 @@ def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
 
 
 @decorators.iterative_task(survey_record_logic.grading_logic)
-def runGradingProjectSurveyRecordsUpdate(request, entities, context, *args, **kwargs):
+def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates GradingProjectSurveyRecord entities.
 
   Args:

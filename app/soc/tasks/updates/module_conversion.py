@@ -515,12 +515,13 @@ def runDocumentUpdate(request, entities, context, *args, **kwargs):
 
   for entity in entities:
     if entity.prefix == 'org':
-      org_entity = org_logic.getFromKeyName(entity.key().id_or_name())
+      org_entity = org_logic.getFromKeyName(entity.scope.key().id_or_name())
       entity.scope = org_entity
       entity.home_for = org_entity if entity.home_for else None
 
     if entity.prefix == 'program':
-      program_entity = program_logic.getFromKeyName(entity.key().id_or_name())
+      program_entity = program_logic.getFromKeyName(
+          entity.scope.key().id_or_name())
       entity.scope = program_entity
       entity.home_for = program_entity if entity.home_for else None
 

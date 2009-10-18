@@ -510,18 +510,18 @@ def runDocumentUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
+  import logging
   from soc.modules.gsoc.logic.models.organization import logic as org_logic
   from soc.modules.gsoc.logic.models.program import logic as program_logic
 
   for entity in entities:
     if entity.prefix == 'org':
-      org_entity = org_logic.getFromKeyName(entity.scope.key().id_or_name())
+      org_entity = org_logic.getFromKeyName(entity.scope_path)
       entity.scope = org_entity
       entity.home_for = org_entity if entity.home_for else None
 
     if entity.prefix == 'program':
-      program_entity = program_logic.getFromKeyName(
-          entity.scope.key().id_or_name())
+      program_entity = program_logic.getFromKeyName(entity.scope_path)
       entity.scope = program_entity
       entity.home_for = program_entity if entity.home_for else None
 

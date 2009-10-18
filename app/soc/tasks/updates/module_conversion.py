@@ -30,6 +30,8 @@ from django.http import HttpResponse
 from soc.logic.models import survey as survey_logic
 from soc.logic.models import survey_record as survey_record_logic
 from soc.logic.models.document import logic as document_logic
+from soc.logic.models.grading_survey_group import logic as \
+    grading_survey_group_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
@@ -469,6 +471,28 @@ def _runSurveyRecordUpdate(entities):
 
   for entity in entities:
     entity.org = org_logic.getFromKeyName(entity.org.key().id_or_name())
+
+  db.put(entities)
+
+  # task completed, return
+  return
+
+
+@decorators.iterative_task(grading_survey_group_logic)
+def runGradingSurveyGroupUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates GradingSurveyGroup entities.
+
+  Args:
+    request: Django Request object
+    entities: list of Document entities to update
+    context: the context of this task
+  """
+
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+
+  for entity in entities:
+    entity.scope = program_logic.getFromKeyName(
+        entity.scope.key().id_or_name())
 
   db.put(entities)
 

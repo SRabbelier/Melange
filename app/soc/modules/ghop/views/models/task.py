@@ -629,6 +629,16 @@ class View(base.View):
     else:
       # TODO: Redirect to standard edit page which already has the ability to
       # hide certain fields.
+      # get the mentor entity of the current user that is suggesting the task
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      filter = {'user': user_entity,
+                'scope': fields['scope'],
+                'status': 'active'}
+
+      mentor_entity = ghop_mentor_logic.logic.getForFields(filter, unique=True)
+      fields['mentors'] = [mentor_entity.key()]
+
       entity = logic.updateOrCreateFromFields(fields)
 
     redirect = ghop_redirects.getSuggestTaskRedirect(

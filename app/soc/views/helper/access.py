@@ -1231,13 +1231,15 @@ class Checker(object):
     # no roles found, access granted
     return
 
-  def checkIsNotStudentForProgramInScope(self, django_args, program_logic):
+  def checkIsNotStudentForProgramInScope(self, django_args, program_logic,
+                                         student_logic):
     """Checks if the current user is not a student for the given
        program in django_args.
 
     Args:
       django_args: a dictionary with django's arguments
       program_logic: Program Logic instance
+      student_logic: Student Logic instance
 
      Raises:
        AccessViolationResponse: if the current user has a student
@@ -1265,12 +1267,14 @@ class Checker(object):
 
     return
 
-  def checkIsNotStudentForProgramOfOrg(self, django_args):
+  def checkIsNotStudentForProgramOfOrg(self, django_args, org_logic, student_logic):
     """Checks if the current user has no active Student role for the program
        that the organization in the scope_path is participating in.
 
     Args:
       django_args: a dictionary with django's arguments
+      org_logic: Organization logic instance
+      student_logic: Student logic instance
 
      Raises:
        AccessViolationResponse: if the current user is a student for the

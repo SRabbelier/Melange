@@ -28,6 +28,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.models import organization as org_logic
+from soc.logic.models import student as student_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -60,8 +61,11 @@ class View(role.View):
     rights['invite'] = [('checkHasActiveRoleForScope',
                          soc.logic.models.org_admin.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'mentor'),
-        'checkIsNotStudentForProgramOfOrg']
-    rights['request'] = ['checkIsNotStudentForProgramOfOrg',
+        ('checkIsNotStudentForProgramOfOrg', [org_logic.logic,
+                                              student_logic.logic])]
+    rights['request'] = [
+        ('checkIsNotStudentForProgramOfOrg',
+            [org_logic.logic, student_logic.logic]),
         ('checkCanMakeRequestToGroup', org_logic)]
     rights['process_request'] = [
         ('checkHasActiveRoleForScope', soc.logic.models.org_admin.logic),

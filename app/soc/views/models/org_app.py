@@ -31,8 +31,9 @@ from soc.logic import dicts
 from soc.logic import mail_dispatcher
 from soc.logic import models as model_logic
 from soc.logic import system
-from soc.logic.models import program as program_logic
 from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import program as program_logic
+from soc.logic.models import student as student_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -76,7 +77,8 @@ class View(group_app.View):
     rights['apply'] = ['checkIsUser',
                              ('checkCanCreateOrgApp', 
                               ['org_signup', program_logic.logic]),
-                       ('checkIsNotStudentForProgramInScope', [program_logic.logic])]
+                       ('checkIsNotStudentForProgramInScope',
+                        [program_logic.logic, student_logic.logic])]
 
     new_params = {}
 

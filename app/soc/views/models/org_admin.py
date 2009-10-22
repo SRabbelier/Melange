@@ -30,6 +30,7 @@ from soc.logic import dicts
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import student as student_logic
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -65,7 +66,8 @@ class View(role.View):
     rights['invite'] = [('checkHasActiveRoleForScope',
                          org_admin_logic.logic)]
     rights['accept_invite'] = [('checkCanCreateFromRequest', 'org_admin'),
-        'checkIsNotStudentForProgramOfOrg']
+        ('checkIsNotStudentForProgramOfOrg', [org_logic.logic,
+                                              student_logic.logic])]
     rights['process_request'] = [
         ('checkHasActiveRoleForScope', org_admin_logic.logic),
         ('checkCanProcessRequest', 'org_admin')]

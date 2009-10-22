@@ -415,44 +415,29 @@ class View(base.View):
       return helper.responses.errorResponse(
           error, request, context=context)
 
-    user_account = user_logic.logic.getForCurrentAccount()
-
-    filter = {
-        'user': user_account,
-        }
-
     # extend edit_form to include difficulty levels
     params['edit_form'] = self._getTagsForProgram(
         'edit_form', params, **kwargs)
 
-    org_admin_entities = ghop_org_admin_logic.logic.getForFields(filter) 
+    if entity.status == 'Unapproved':
+      dynafields = [
+          {'name': 'approved',
+           'required': False,
+           'initial': False,
+           'base': forms.fields.BooleanField,
+           'label': 'Approve the task',
+           'help_text': 'By ticking this box, the task will be'
+               'will be approved for publishing.',
+          }
+          ]
 
-    if entity and entity.status == 'Unapproved':
-      approval_req = True 
-      for org_admin_entity in org_admin_entities:
-        if org_admin_entity.key().name() == entity.created_by.key().name():
-          approval_req = False
-          break
+      dynaproperties = params_helper.getDynaFields(dynafields)
 
-      if approval_req:
-        dynafields = [
-            {'name': 'approved',
-             'required': False,
-             'initial': False,
-             'base': forms.fields.BooleanField,
-             'label': 'Approve the task',
-             'help_text': 'By ticking this box, the task will be'
-                 'will be approved for publishing.',
-            }
-            ]
+      edit_form = dynaform.extendDynaForm(
+          dynaform=params['edit_form'],
+          dynaproperties=dynaproperties)
 
-        dynaproperties = params_helper.getDynaFields(dynafields)
-
-        edit_form = dynaform.extendDynaForm(
-            dynaform=params['edit_form'],
-            dynaproperties=dynaproperties)
-
-        params['edit_form'] = edit_form
+      params['edit_form'] = edit_form
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
@@ -642,6 +627,8 @@ class View(base.View):
     if entity:
       entity = logic.updateEntityProperties(entity, fields)
     else:
+      # TODO: Redirect to standard edit page which already has the ability to
+      # hide certain fields.
       entity = logic.updateOrCreateFromFields(fields)
 
     page_params = params['edit_params']

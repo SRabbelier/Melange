@@ -165,7 +165,7 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['ghop/org_admin', 'ghop/mentor'], ['active'], 
-            []])]
+            ['Unapproved']])]
     rights['search'] = ['allow']
 
     new_params = {}
@@ -608,7 +608,7 @@ class View(base.View):
                                   params, entity)
     else:
       return self.suggestTaskGet(request, context,
-                                 params, entity, **kwargs)
+                                 params, entity, kwargs)
 
   def suggestTaskPost(self, request, context, params, entity):
     """Handles the POST request for the suggest task view.
@@ -631,14 +631,12 @@ class View(base.View):
       # hide certain fields.
       entity = logic.updateOrCreateFromFields(fields)
 
-    page_params = params['edit_params']
-
     redirect = ghop_redirects.getSuggestTaskRedirect(
         entity, params)
 
     return http.HttpResponseRedirect(redirect)
 
-  def suggestTaskGet(self, request, context, params, entity, **kwargs):
+  def suggestTaskGet(self, request, context, params, entity, seed):
     """Handles the GET request for the suggest task view.
     """
 
@@ -647,6 +645,8 @@ class View(base.View):
       form = params['mentor_form'](instance=entity)
 
       self._editGet(request, entity, form)
+    elif seed:
+      form = params['mentor_form'](initial=seed)
     else:
       form = params['mentor_form']()
 

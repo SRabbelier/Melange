@@ -78,6 +78,7 @@ preconfigured to return all matching comments:
 
 
 
+import base64
 import copy
 import datetime
 import logging
@@ -90,6 +91,7 @@ from google.appengine.api import datastore
 from google.appengine.api import datastore_errors
 from google.appengine.api import datastore_types
 from google.appengine.api import users
+from google.appengine.datastore import datastore_pb
 
 Error = datastore_errors.Error
 BadValueError = datastore_errors.BadValueError
@@ -123,6 +125,9 @@ Text = datastore_types.Text
 Blob = datastore_types.Blob
 ByteString = datastore_types.ByteString
 BlobKey = datastore_types.BlobKey
+
+READ_CAPABILITY = datastore.READ_CAPABILITY
+WRITE_CAPABILITY = datastore.WRITE_CAPABILITY
 
 _kind_map = {}
 
@@ -616,7 +621,6 @@ class Model(object):
   def __init__(self,
                parent=None,
                key_name=None,
-               key=None,
                _app=None,
                _from_entity=False,
                **kwds):
@@ -642,10 +646,11 @@ class Model(object):
       parent: Parent instance for this instance or None, indicating a top-
         level instance.
       key_name: Name for new model instance.
-      key: Key instance for this instance, overrides parent and key_name
       _from_entity: Intentionally undocumented.
-      args: Keyword arguments mapping to properties of model.
+      kwds: Keyword arguments mapping to properties of model.  Also:
+        key: Key instance for this instance, overrides parent and key_name
     """
+    key = kwds.get('key', None)
     if key is not None:
       if isinstance(key, (tuple, list)):
         key = Key.from_path(*key)
@@ -698,6 +703,11 @@ class Model(object):
       self._key = None
 
     self._entity = None
+    if _app is not None and isinstance(_app, Key):
+      raise BadArgumentError('_app should be a string; received Key(\'%s\'):\n'
+                             '  This may be the result of passing \'key\' as '
+                             'a positional parameter in SDK 1.2.6.  Please '
+                             'only pass \'key\' as a keyword parameter.' % _app)
     self._app = _app
 
     for prop in self.properties().values():
@@ -1336,7 +1346,7 @@ class Expando(Model):
     super(Expando, self).__init__(parent, key_name, _app, **kwds)
     self._dynamic_properties = {}
     for prop, value in kwds.iteritems():
-      if prop not in self.properties() and value is not None:
+      if prop not in self.properties():
         setattr(self, prop, value)
 
   def __setattr__(self, key, value):
@@ -1452,16 +1462,21 @@ class Expando(Model):
 
 class _BaseQuery(object):
   """Base class for both Query and GqlQuery."""
-
-  def __init__(self, model_class=None, keys_only=False):
+  _compile = False
+  def __init__(self, model_class=None, keys_only=False, compile=True,
+               cursor=None):
     """Constructor.
 
     Args:
       model_class: Model class from which entities are constructed.
       keys_only: Whether the query should return full entities or only keys.
+      compile: Whether the query should also return a compiled query.
+      cursor: A compiled query from which to resume.
     """
     self._model_class = model_class
     self._keys_only = keys_only
+    self._compile = compile
+    self._cursor = cursor
 
   def is_keys_only(self):
     """Returns whether this query is keys only.
@@ -1488,7 +1503,10 @@ class _BaseQuery(object):
     Returns:
       Iterator for this query.
     """
-    iterator = self._get_query().Run()
+    self._compile = False
+    raw_query = self._get_query()
+    iterator = raw_query.Run()
+
     if self._keys_only:
       return iterator
     else:
@@ -1529,7 +1547,10 @@ class _BaseQuery(object):
     Returns:
       Number of entities this query fetches.
     """
-    return self._get_query().Count(limit=limit)
+    self._compile = False
+    raw_query = self._get_query()
+    result = raw_query.Count(limit=limit)
+    return result
 
   def fetch(self, limit, offset=0):
     """Return a list of items selected using SQL-like limit and offset.
@@ -1554,7 +1575,13 @@ class _BaseQuery(object):
       raise ValueError('Arguments to fetch() must be >= 0')
     if limit == 0:
       return []
-    raw = self._get_query().Get(limit, offset)
+    raw_query = self._get_query()
+    raw = raw_query.Get(limit, offset)
+    if self._compile:
+      try:
+        self._compiled_query = raw_query.GetCompiledQuery()
+      except AssertionError, e:
+        self._compiled_query = e
 
     if self._keys_only:
       return raw
@@ -1563,6 +1590,36 @@ class _BaseQuery(object):
         return [self._model_class.from_entity(e) for e in raw]
       else:
         return [class_for_kind(e.kind()).from_entity(e) for e in raw]
+
+  def cursor(self):
+    if not self._compile:
+      raise AssertionError('No cursor available, this action does not support '
+                           'cursors (try "fetch" instead)')
+    try:
+      if not self._compiled_query:
+        return self._compiled_query
+      if isinstance(self._compiled_query, Exception):
+        raise self._compiled_query
+      return base64.urlsafe_b64encode(self._compiled_query.Encode())
+    except AttributeError:
+      raise AssertionError('No cursor available, this query has not been '
+                           'executed')
+
+  def with_cursor(self, cursor):
+    try:
+      assert cursor, "Cursor cannot be empty"
+      cursor = datastore_pb.CompiledQuery(base64.urlsafe_b64decode(cursor))
+      assert cursor.IsInitialized()
+    except (AssertionError, TypeError), e:
+      raise datastore_errors.BadValueError(
+        'Invalid cursor %s. Details: %s' % (cursor, e))
+    except Exception, e:
+      if e.__class__.__name__ == 'ProtocolBufferDecodeError':
+        raise datastore_errors.BadValueError('Invalid cursor %s.' % cursor)
+      else:
+        raise
+    self._cursor = cursor
+    return self
 
   def __getitem__(self, arg):
     """Support for query[index] and query[start:stop].
@@ -1707,14 +1764,15 @@ class Query(_BaseQuery):
        print story.title
   """
 
-  def __init__(self, model_class=None, keys_only=False):
+  def __init__(self, model_class=None, keys_only=False, cursor=None):
     """Constructs a query over instances of the given Model.
 
     Args:
       model_class: Model class to build query for.
       keys_only: Whether the query should return full entities or only keys.
+      cursor: A compiled query from which to resume.
     """
-    super(Query, self).__init__(model_class, keys_only)
+    super(Query, self).__init__(model_class, keys_only, cursor=cursor)
     self.__query_sets = [{}]
     self.__orderings = []
     self.__ancestor = None
@@ -1730,7 +1788,9 @@ class Query(_BaseQuery):
         kind = None
       query = _query_class(kind,
                            query_set,
-                           keys_only=self._keys_only)
+                           keys_only=self._keys_only,
+                           compile=self._compile,
+                           cursor=self._cursor)
       query.Order(*self.__orderings)
       if self.__ancestor is not None:
         query.Ancestor(self.__ancestor)

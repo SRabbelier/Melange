@@ -62,7 +62,7 @@ class View(mentor.View):
     rights['request'] = [
         ('checkIsNotStudentForProgramOfOrg',
          [ghop_org_logic.logic, ghop_student_logic.logic]),
-        ('checkCanMakeRequestToGroup', ghop_org_logic)]
+        ('checkCanMakeRequestToGroup', ghop_org_logic.logic)]
     rights['process_request'] = [
         ('checkHasActiveRoleForScope', ghop_org_admin_logic.logic),
         ('checkCanProcessRequest', 'ghop/mentor')]

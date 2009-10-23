@@ -66,7 +66,7 @@ class View(role.View):
     rights['request'] = [
         ('checkIsNotStudentForProgramOfOrg',
             [org_logic.logic, student_logic.logic]),
-        ('checkCanMakeRequestToGroup', org_logic)]
+        ('checkCanMakeRequestToGroup', org_logic.logic)]
     rights['process_request'] = [
         ('checkHasActiveRoleForScope', soc.logic.models.org_admin.logic),
         ('checkCanProcessRequest', 'mentor')]

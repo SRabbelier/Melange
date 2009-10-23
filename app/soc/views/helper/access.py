@@ -822,12 +822,12 @@ class Checker(object):
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
     """
-    
+
     prefix = django_args['prefix']
     if self.SCOPE_DEPTH.get(prefix):
       scope_logic, depths = self.SCOPE_DEPTH[prefix]
@@ -870,13 +870,12 @@ class Checker(object):
 
     Args:
       django_args: a dictionary with django's arguments
-      group_logic: Logic module for the type of group which the request is for
+      group_logic: Logic instance for the group which the request is for
     """
 
     self.checkIsUser(django_args)
 
-    group_entity = role_logic.getGroupEntityFromScopePath(
-        group_logic.logic, django_args['scope_path'])
+    group_entity = group_logic.getFromKeyName(django_args['scope_path'])
 
     if not group_entity:
       raise out_of_band.Error(DEF_GROUP_NOT_FOUND_MSG, status=404)
@@ -891,7 +890,7 @@ class Checker(object):
     """Raises an alternate HTTP response if the specified request does not exist
        or if it's status is not group_accepted. Also when the group this request
        is from is in an inactive or invalid status access will be denied.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       role_name: name of the role

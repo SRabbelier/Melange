@@ -34,7 +34,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import host as host_logic 
+from soc.logic.models import host as host_logic
 from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
@@ -90,7 +90,7 @@ class View(base.View):
       'You have successfully completed this task. Sign up as a student '
       'before you proceed further.')
 
-  DEF_TASK_CLAIMED_BY_YOU_MSG = ugettext( 
+  DEF_TASK_CLAIMED_BY_YOU_MSG = ugettext(
       'You have claimed this task!')
 
   DEF_TASK_CLAIMED_BY_STUDENT_MSG = ugettext(
@@ -150,12 +150,12 @@ class View(base.View):
     rights['create'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
-            [['ghop/org_admin'], ['active'], 
+            [['ghop/org_admin'], ['active'],
             []])]
     rights['edit'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False]),
         ('checkRoleAndStatusForTask',
-            [['ghop/org_admin'], ['active'], 
+            [['ghop/org_admin'], ['active'],
             ['Unapproved', 'Unpublished', 'Open']])]
     rights['delete'] = ['checkIsDeveloper']
     rights['show'] = ['checkStatusForTask']
@@ -164,7 +164,7 @@ class View(base.View):
     rights['suggest_task'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
-            [['ghop/org_admin', 'ghop/mentor'], ['active'], 
+            [['ghop/org_admin', 'ghop/mentor'], ['active'],
             ['Unapproved']])]
     rights['search'] = ['allow']
 
@@ -182,11 +182,11 @@ class View(base.View):
     new_params['scope_view'] = ghop_org_view
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
-    new_params['list_heading'] = 'modules/ghop/task/list/heading.html' 
+    new_params['list_heading'] = 'modules/ghop/task/list/heading.html'
     new_params['list_row'] = 'modules/ghop/task/list/row.html'
 
     new_params['extra_dynaexclude'] = ['task_type', 'mentors', 'user',
-                                       'student', 'program', 'status', 
+                                       'student', 'program', 'status',
                                        'deadline', 'created_by',
                                        'created_on', 'modified_by',
                                        'modified_on', 'history',
@@ -248,7 +248,7 @@ class View(base.View):
 
     # holds the base form for the task creation and editing
     self._params['base_create_form'] = self._params['create_form']
-    self._params['base_edit_form'] = self._params['edit_form'] 
+    self._params['base_edit_form'] = self._params['edit_form']
 
     # extend create and edit form for org admins
     dynafields = [
@@ -305,8 +305,8 @@ class View(base.View):
     dynaproperties['clean'] = ghop_cleaning.cleanTaskComment(
         'comment', 'action', 'work_submission')
 
-    comment_form = dynaform.newDynaForm(dynamodel=None, 
-        dynabase=helper.forms.BaseForm, dynainclude=None, 
+    comment_form = dynaform.newDynaForm(dynamodel=None,
+        dynabase=helper.forms.BaseForm, dynainclude=None,
         dynaexclude=None, dynaproperties=dynaproperties)
     self._params['comment_form'] = comment_form
 
@@ -318,7 +318,7 @@ class View(base.View):
      params: the params for the view
     """
 
-    # obtain program_entity using scope_path which holds 
+    # obtain program_entity using scope_path which holds
     # the org_entity key_name
     org_entity = ghop_org_logic.logic.getFromKeyName(kwargs['scope_path'])
     program_entity = ghop_program_logic.logic.getFromKeyName(
@@ -326,20 +326,20 @@ class View(base.View):
 
     # get a list difficulty levels stored for the program entity
     tds = ghop_task_model.TaskDifficultyTag.get_by_scope(
-        program_entity) 
+        program_entity)
 
     difficulties = []
     for td in tds:
       difficulties.append((td.tag, td.tag))
 
     # get a list of task type tags stored for the program entity
-    tts = ghop_task_model.TaskTypeTag.get_by_scope(program_entity) 
+    tts = ghop_task_model.TaskTypeTag.get_by_scope(program_entity)
 
     type_tags = []
     for tt in tts:
       type_tags.append((tt.tag, tt.tag))
 
-    # create the difficultly level field containing the choices 
+    # create the difficultly level field containing the choices
     # defined in the program entity
     dynafields = [
         {'name': 'difficulty',
@@ -456,7 +456,7 @@ class View(base.View):
           entity.arbit_tag)
 
     if entity.difficulty:
-      form.fields['difficulty'].initial = entity.tags_string( 
+      form.fields['difficulty'].initial = entity.tags_string(
           entity.difficulty)
 
     if entity.mentors and 'mentors_list' in form.fields:
@@ -475,9 +475,9 @@ class View(base.View):
         form.fields['approved'].initial = False
       else:
         form.fields['approved'].initial = True
- 
+
     # checks if the task is already published or not and sets
-    # the form published field 
+    # the form published field
     if 'published' in form.fields:
       if entity.status == 'Unapproved' or entity.status == 'Unpublished':
         form.fields['published'].initial = False
@@ -498,7 +498,7 @@ class View(base.View):
       program_entity = fields['scope'].scope
       fields['program'] = program_entity
     else:
-      program_entity = entity.program 
+      program_entity = entity.program
 
     user_account = user_logic.logic.getForCurrentAccount()
 
@@ -547,7 +547,7 @@ class View(base.View):
     if not entity:
       fields['link_id'] = 't%i' % (int(time.time()*100))
       fields['modified_by'] = role_entity
-      fields['created_by'] = role_entity 
+      fields['created_by'] = role_entity
       fields['created_on'] = datetime.datetime.now()
     else:
       fields['link_id'] = entity.link_id
@@ -574,9 +574,9 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def suggestTask(self, request, access_type, page_name=None, 
+  def suggestTask(self, request, access_type, page_name=None,
                   params=None, **kwargs):
-    """View used to allow mentors to create or edit a task. 
+    """View used to allow mentors to create or edit a task.
 
     Tasks created by mentors must be approved by org admins
     before they are published.
@@ -697,7 +697,7 @@ class View(base.View):
 
       task_entity = ghop_task_logic.logic.getFromKeyName(key_name)
 
-      # Of course only the tasks from this organization and those with a valid 
+      # Of course only the tasks from this organization and those with a valid
       # state can be updated.
       if task_entity and task_entity.scope.key() == org_entity.key() and \
           task_entity.status in ['Unapproved', 'Unpublished']:
@@ -804,7 +804,7 @@ class View(base.View):
     filter = {
         'scope': org_entity,
         'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
-            'ActionNeeded', 'Closed', 'AwaitingRegistration', 
+            'ActionNeeded', 'Closed', 'AwaitingRegistration',
             'NeedsWork', 'NeedsReview'],
         }
 
@@ -850,7 +850,7 @@ class View(base.View):
       comment_entities.append(comment_entity)
 
     context['entity'] = entity
-    context['entity_key_name'] = entity.key().id_or_name() 
+    context['entity_key_name'] = entity.key().id_or_name()
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
 
@@ -860,13 +860,13 @@ class View(base.View):
     self.updatePublicContext(context, entity, comment_entities,
                              ws_entities, user_account, params)
 
-    validation = self._constructActionsList(context, entity, 
+    validation = self._constructActionsList(context, entity,
                                             user_account, params)
 
     context = dicts.merge(params['context'], context)
 
     if request.method == 'POST':
-      return self.publicPost(request, context, params, entity, 
+      return self.publicPost(request, context, params, entity,
                              user_account, validation, **kwargs)
     else: # request.method == 'GET'
       return self.publicGet(request, context, params, entity,
@@ -918,11 +918,11 @@ class View(base.View):
       if student_entity:
         properties['student'] = student_entity
 
-      changes.extend([ugettext('User-Student'), 
-                      ugettext('Action-Claim Requested'), 
+      changes.extend([ugettext('User-Student'),
+                      ugettext('Action-Claim Requested'),
                       ugettext('Status-%s' % (properties['status']))
                       ])
-    elif (validation == 'claim_withdraw' or 
+    elif (validation == 'claim_withdraw' or
         validation == 'needs_review') and action == 'withdraw':
       properties = {
           'user': None,
@@ -1086,7 +1086,7 @@ class View(base.View):
     if mentors_str:
       context['mentors_str'] = mentors_str[:-2]
     else:
-      context['mentors_str'] = "Not Assigned" 
+      context['mentors_str'] = "Not Assigned"
 
     context['difficulty_str'] = entity.tags_string(entity.difficulty)
 
@@ -1125,7 +1125,7 @@ class View(base.View):
     """Constructs a list of actions for the task page and extends
     the comment form with this list.
 
-    This method also returns the validation used by POST method to 
+    This method also returns the validation used by POST method to
     validate the user input data.
 
     Args:
@@ -1182,7 +1182,7 @@ class View(base.View):
             context, entity, user_account)
         actions += student_actions
 
-      # create the difficultly level field containing the choices 
+      # create the difficultly level field containing the choices
       # defined in the program entity
       dynafields = [
           {'name': 'action',
@@ -1292,7 +1292,7 @@ class View(base.View):
     if entity.status in ['Open', 'Reopened']:
       task_filter = {
           'user': user_account,
-          'status': ['ClaimRequested', 'Claimed', 'ActionNeeded', 
+          'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
                      'NeedsWork', 'NeedsReview']
           }
       task_entities = ghop_task_logic.logic.getForFields(task_filter)
@@ -1319,7 +1319,7 @@ class View(base.View):
         context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
         actions.append(('withdraw', 'Withdraw from the task'))
         validation = 'claim_withdraw'
-      elif entity.status in ['Claimed', 'NeedsWork', 
+      elif entity.status in ['Claimed', 'NeedsWork',
                              'NeedsReview', 'ActionNeeded']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
         actions.extend([
@@ -1338,7 +1338,7 @@ class View(base.View):
       elif entity.status == 'Closed':
         context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
     else:
-      if entity.status in ['ClaimRequested', 'Claimed', 
+      if entity.status in ['ClaimRequested', 'Claimed',
                            'ActionNeeded', 'NeedsWork',
                            'NeedsReview']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_MSG

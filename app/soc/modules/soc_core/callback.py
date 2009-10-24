@@ -145,7 +145,7 @@ class Callback(object):
     self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)
 
   def registerRights(self):
-    """Called by the server when the documetn rights should be registerd.
+    """Called by the server when the document rights should be registered.
     """
 
     site_membership = {

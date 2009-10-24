@@ -509,7 +509,7 @@ class View(base.View):
     if not entity:
       filter['scope'] = fields['scope']
     else:
-      filter['scope'] = entity.program
+      filter['scope'] = entity.scope
 
     role_entity = ghop_org_admin_logic.logic.getForFields(
         filter, unique=True)

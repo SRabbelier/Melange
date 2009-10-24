@@ -64,7 +64,7 @@ class Logic(base.Logic):
 
     for name, value in entity_properties.iteritems():
       # if the property is not to be updated, skip it
-      if name in self._skip_properties:
+      if self.skipField(name):
         continue
 
       if self._updateField(entity, entity_properties, name):

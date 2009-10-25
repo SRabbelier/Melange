@@ -178,7 +178,7 @@ def errorResponse(error, request, template=None, context=None):
   """Creates an HTTP response from the soc.views.out_of_band.Error exception.
 
   Args:
-    errror: a out_of_band.Error object
+    error: a out_of_band.Error object
     request: a Django HTTP request
     template: the "sibling" template (or a search list of such templates)
       from which to construct the actual template name (or names)

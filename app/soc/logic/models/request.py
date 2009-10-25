@@ -34,30 +34,47 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.request.Request,
-               base_model=None, scope_logic=linkable_logic):
+               base_model=None, id_based=True):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                id_based=id_based)
 
-  def getKeyValuesFromEntity(self, entity):
-    """See base.Logic.getKeyNameValues.
+  def isValidNewRequest(self, fields, role_logic):
+    """Returns True iff the given fields are for a valid new request.
+
+    Args:
+      fields: fields for the new Request
+      logic: the Logic for the Role that is being requested
     """
 
-    return [entity.scope.link_id, entity.role, entity.link_id]
+    # check for already outstanding or ignored requests
+    request_fields = {
+        'user': fields['user'],
+        'group': fields['group'],
+        'status': ['new', 'group_accepted', 'ignored']
+        }
 
-  def getKeyValuesFromFields(self, fields):
-    """See base.Logic.getKeyValuesFromFields.
-    """
+    request_entity = self.getForFields(request_fields, unique=True)
 
-    return [fields['scope_path'], fields['role'], fields['link_id']]
+    if request_entity:
+      return False
 
-  def getKeyFieldNames(self):
-    """See base.Logic.getKeyFieldNames.
-    """
+    # check whether the user in the request already has the requested role
+    role_fields = {
+        'user': fields['user'],
+        'scope': fields['group'],
+        'status': ['active', 'inactive']
+        }
 
-    return ['scope_path', 'role', 'link_id']
+    role_entity = role_logic.getForFields(role_fields, unique=True)
+
+    if role_entity:
+      return False
+
+    # seems to be a valid new request, so return True
+    return True
 
   def _onCreate(self, entity):
     """Sends out a message notifying users about the new invite/request.

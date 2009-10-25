@@ -17,9 +17,9 @@ limitations under the License.
 {% block body %}
 <p>
 <div="text"> 
-{% ifequal request_status "new" %}
-  This is the request from <b>{{ user_in_request.name }}({{ entity.link_id }})</b> 
-  to become a <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.</br>
+{% ifnotequal request_status "group_accepted" %}
+  This is the request from <b>{{ entity.user.name }}({{ entity.user.link_id }})</b> 
+  to become a <b>{{ role_verbose }}</b> for <b>{{entity.group.name }}</b>.</br>
   Please select your response by using the buttons below.
 </div>
 </p>
@@ -27,17 +27,17 @@ limitations under the License.
 <table>
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=group_accepted'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Reject"/>
-    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=ignored'" value="Ignore"/>
+    <input type="button" onclick="location.href='/{{ url_name }}/process_request/{{ entity.key.id_or_name }}?status=group_accepted'" value="Accept"/>
+    <input type="button" onclick="location.href='/{{ url_name }}/process_request/{{ entity.key.id_or_name }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ url_name }}/process_request/{{ entity.key.id_or_name }}?status=ignored'" value="Ignore"/>
   </td>
 </tr>
 </table>
 {% else %}
 <p>
 <div="text"> 
-  This is the invitation to <b>{{ user_in_request.name }}({{ entity.link_id }})</b> to become a 
-  <b>{{ entity.role_verbose }}</b> for <b>{{entity.scope.name }}</b>.<br/> 
+  This is the invitation to <b>{{ entity.user.name }}({{ entity.user.link_id }})</b> to become a 
+  <b>{{ role_verbose }}</b> for <b>{{entity.group.name }}</b>.<br/> 
   If you would like to withdraw this invite please press the withdraw button below.
 </div>
 </p>
@@ -45,10 +45,10 @@ limitations under the License.
 <table>
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ role_name }}/process_request/{{ entity.scope_path }}/{{ entity.link_id }}?status=rejected'" value="Withdraw"/>
+    <input type="button" onclick="location.href='/{{ url_name }}/process_request/{{ entity.key.id_or_name }}?status=rejected'" value="Withdraw"/>
     <input type="button" value="Back to Previous Page" onClick="javascript: history.go(-1)">
   </td>
 </tr>
 </table>
-{% endifequal %}
+{% endifnotequal %}
 {% endblock body %}

@@ -208,3 +208,15 @@ def errorResponse(error, request, template=None, context=None):
 
   return respond(request, sibling_templates, context=context,
                  response_args=error.response_args)
+
+
+def redirectLegacyRequest(request, *args, **kwargs):
+  """Redirects a request to a legacy url to the new '/gsoc' suffix.
+
+  Args:
+    request: a Django HTTP request
+  """
+
+  url = '/gsoc' + request.path
+
+  return http.HttpResponseRedirect(url)

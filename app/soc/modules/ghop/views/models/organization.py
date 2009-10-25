@@ -259,7 +259,7 @@ class View(organization.View):
           "List Documents", 'any_access')
       submenus.append(submenu)
 
-    if roles.get('org_admin'):
+    if roles.get('ghop_org_admin'):
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['ghop_org_admin'],
           {'url_name': 'ghop/org_admin'}),

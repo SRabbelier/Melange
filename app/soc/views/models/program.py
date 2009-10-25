@@ -48,6 +48,7 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import presence
 from soc.views.models import document as document_view
@@ -842,18 +843,18 @@ class View(presence.View):
 
 view = View()
 
-accepted_orgs = decorators.view(view.acceptedOrgs)
-list_projects = decorators.view(view.acceptedProjects)
-admin = decorators.view(view.admin)
-assign_slots = decorators.view(view.assignSlots)
-assigned_proposals = decorators.view(view.assignedProposals)
-create = decorators.view(view.create)
-delete = decorators.view(view.delete)
-edit = decorators.view(view.edit)
-list = decorators.view(view.list)
-public = decorators.view(view.public)
-export = decorators.view(view.export)
-show_duplicates = decorators.view(view.showDuplicates)
-slots = decorators.view(view.slots)
-home = decorators.view(view.home)
-pick = decorators.view(view.pick)
+accepted_orgs = responses.redirectLegacyRequest
+list_projects = responses.redirectLegacyRequest
+admin = responses.redirectLegacyRequest
+assign_slots = responses.redirectLegacyRequest
+assigned_proposals = responses.redirectLegacyRequest
+create = responses.redirectLegacyRequest
+delete = responses.redirectLegacyRequest
+edit = responses.redirectLegacyRequest
+list = responses.redirectLegacyRequest
+public = responses.redirectLegacyRequest
+export = responses.redirectLegacyRequest
+show_duplicates = responses.redirectLegacyRequest
+slots = responses.redirectLegacyRequest
+home = responses.redirectLegacyRequest
+pick = responses.redirectLegacyRequest

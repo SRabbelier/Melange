@@ -276,12 +276,12 @@ class View(role.View):
 
 view = View()
 
-apply = decorators.view(view.apply)
-create = decorators.view(view.create)
-delete = decorators.view(view.delete)
-edit = decorators.view(view.edit)
-list = decorators.view(view.list)
-list_projects = decorators.view(view.listProjects)
-manage = decorators.view(view.manage)
-public = decorators.view(view.public)
-export = decorators.view(view.export)
+apply = responses.redirectLegacyRequest
+create = responses.redirectLegacyRequest
+delete = responses.redirectLegacyRequest
+edit = responses.redirectLegacyRequest
+list = responses.redirectLegacyRequest
+list_projects = responses.redirectLegacyRequest
+manage = responses.redirectLegacyRequest
+public = responses.redirectLegacyRequest
+export = responses.redirectLegacyRequest

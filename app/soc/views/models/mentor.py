@@ -33,6 +33,7 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import params as params_helper
 from soc.views.helper import widgets
 from soc.views.models import organization as org_view
@@ -218,17 +219,16 @@ class View(role.View):
 
 view = View()
 
-accept_invite = decorators.view(view.acceptInvite)
-admin = decorators.view(view.admin)
-create = decorators.view(view.create)
-delete = decorators.view(view.delete)
-edit = decorators.view(view.edit)
-invite = decorators.view(view.invite)
-list = decorators.view(view.list)
-manage = decorators.view(view.manage)
-process_request = decorators.view(view.processRequest)
-role_request = decorators.view(view.request)
-public = decorators.view(view.public)
-export = decorators.view(view.export)
-pick = decorators.view(view.pick)
-
+accept_invite = responses.redirectLegacyRequest
+admin = responses.redirectLegacyRequest
+create = responses.redirectLegacyRequest
+delete = responses.redirectLegacyRequest
+edit = responses.redirectLegacyRequest
+invite = responses.redirectLegacyRequest
+list = responses.redirectLegacyRequest
+manage = responses.redirectLegacyRequest
+process_request = responses.redirectLegacyRequest
+role_request = responses.redirectLegacyRequest
+public = responses.redirectLegacyRequest
+export = responses.redirectLegacyRequest
+pick = responses.redirectLegacyRequest

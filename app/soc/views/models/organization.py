@@ -48,6 +48,7 @@ from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import group
 
@@ -645,18 +646,18 @@ class View(group.View):
 
 view = View()
 
-admin = decorators.view(view.admin)
-applicant = decorators.view(view.applicant)
-apply_mentor = decorators.view(view.applyMentor)
-create = decorators.view(view.create)
-delete = decorators.view(view.delete)
-edit = decorators.view(view.edit)
-home = decorators.view(view.home)
-list = decorators.view(view.list)
-list_proposals = decorators.view(view.listProposals)
-list_public = decorators.view(view.listPublic)
-list_requests = decorators.view(view.listRequests)
-list_roles = decorators.view(view.listRoles)
-public = decorators.view(view.public)
-export = decorators.view(view.export)
-pick = decorators.view(view.pick)
+admin = responses.redirectLegacyRequest
+applicant = responses.redirectLegacyRequest
+apply_mentor = responses.redirectLegacyRequest
+create = responses.redirectLegacyRequest
+delete = responses.redirectLegacyRequest
+edit = responses.redirectLegacyRequest
+home = responses.redirectLegacyRequest
+list = responses.redirectLegacyRequest
+list_proposals = responses.redirectLegacyRequest
+list_public = responses.redirectLegacyRequest
+list_requests = responses.redirectLegacyRequest
+list_roles = responses.redirectLegacyRequest
+public = responses.redirectLegacyRequest
+export = responses.redirectLegacyRequest
+pick = responses.redirectLegacyRequest

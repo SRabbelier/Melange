@@ -32,6 +32,7 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import params as params_helper
+from soc.views.helper import responses
 from soc.views.models import base
 
 import gsoc.logic.models.timeline
@@ -85,5 +86,5 @@ class View(base.View):
 
 view = View()
 
-edit = decorators.view(view.edit)
-public = decorators.view(view.public)
+edit = responses.redirectLegacyRequest
+public = responses.redirectLegacyRequest

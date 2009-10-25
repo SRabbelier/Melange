@@ -26,21 +26,35 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
-import soc.models.user
-import soc.models.group
+from soc.models.base import ModelWithFieldAttributes
+from soc.models.group import Group
+from soc.models.user import User
 
 
-class Request(soc.models.linkable.Linkable):
+class Request(ModelWithFieldAttributes):
   """A request is made to allow a person to create a new Role entity.
   """
 
+  #: The internal name of the role
   role = db.StringProperty(required=True)
-  role.help_text = ugettext(
-      'This should be the type of the role that is requested')
 
-  role_verbose = db.StringProperty(required=True)
-  role_verbose.help_text = ugettext(
-      'This should be the verbose name of the role that is in this request')
+  #: The user this request is from
+  user = db.ReferenceProperty(
+      reference_class=User,
+      required=True, collection_name='requests',
+      verbose_name=ugettext('User'))
+
+  #: The group this request is for
+  group = db.ReferenceProperty(
+      reference_class=Group,
+      required=True, collection_name='requests',
+      verbose_name=ugettext('Group'))
+
+  #: An optional message shown to the receiving end of this request
+  message = db.TextProperty(required=False, default='',
+                            verbose_name=ugettext("Message"))
+  message.help_text = ugettext(
+      'This is an optional message shown to the receiver of this request.')
 
   # property that determines the status of the request
   # new : new Request
@@ -52,7 +66,10 @@ class Request(soc.models.linkable.Linkable):
   #           the user access to create the role
   status = db.StringProperty(required=True, default='new',
       choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
-  status.help_text = ugettext('Shows the status of the request')
+  status.help_text = ugettext('Shows the status of the request.')
 
   #: DateTime when the request was created
   created_on = db.DateTimeProperty(auto_now_add=True)
+
+  #: DateTime when this request was last modified
+  modified_on = db.DateTimeProperty(auto_now=True)

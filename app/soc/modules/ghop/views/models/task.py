@@ -490,6 +490,7 @@ class View(base.View):
     """See base._editPost().
     """
 
+    # set the scope field
     super(View, self)._editPost(request, entity, fields)
 
     # TODO: this method can be made more clear, it seems a bit of a mess
@@ -516,11 +517,9 @@ class View(base.View):
 
     if role_entity:
       # this user can publish/approve the task
-      if fields.get('approved') and fields.get('published'):
+      if fields.get('published'):
         fields['status'] = 'Open'
-      elif not fields.get('approved'):
-        fields['status'] = 'Unapproved'
-      else:
+      elif fields.get('approved'):
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = []

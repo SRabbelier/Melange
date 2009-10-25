@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Mario Ferraro" <fadinlight@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -62,6 +63,7 @@ DEF_JS_USES_LIST = [
     'jq_thickbox',
     'jq_ui_core',
     'menu',
+    'melange',
     'bulk_review',
     'tinymce',
     ]

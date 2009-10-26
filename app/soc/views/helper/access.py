@@ -125,6 +125,9 @@ DEF_REVIEW_COMPLETED_MSG = ugettext('This Application can not be reviewed '
 DEF_REQUEST_COMPLETED_MSG = ugettext(
     'This request cannot be accepted (it is either completed or denied).')
 
+DEF_REQUEST_NOT_ACCEPTED_MSG = ugettext(
+    'This request has not been accepted by the group (it can also be completed already).')
+
 DEF_SCOPE_INACTIVE_MSG = ugettext(
     'The scope for this request is not active.')
 
@@ -717,7 +720,7 @@ class Checker(object):
 
     Only group where both the link_id and the scope_path match the value
     of the link_id and the scope_path from the django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -731,7 +734,7 @@ class Checker(object):
 
     Only group where the link_id matches the value of the link_id
     from the django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -741,7 +744,7 @@ class Checker(object):
 
   def checkHasActiveRole(self, django_args, logic):
     """Checks that the user has the specified active role.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -756,7 +759,7 @@ class Checker(object):
 
     Only roles where the field as specified by field_name matches the
     scope_path from the django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -769,7 +772,7 @@ class Checker(object):
 
   def checkHasActiveRoleForKeyFieldsAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -784,7 +787,7 @@ class Checker(object):
 
     Only roles where the scope_path matches the scope_path from the
     django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -797,7 +800,7 @@ class Checker(object):
 
     Only roles where the link_id matches the link_id from the
     django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
@@ -886,68 +889,97 @@ class Checker(object):
 
     return
 
-  def checkCanCreateFromRequest(self, django_args, role_name):
+  def checkCanCreateFromRequest(self, django_args):
     """Raises an alternate HTTP response if the specified request does not exist
        or if it's status is not group_accepted. Also when the group this request
        is from is in an inactive or invalid status access will be denied.
 
     Args:
       django_args: a dictionary with django's arguments
-      role_name: name of the role
-    """
-
-    self.checkIsUserSelf(django_args, 'link_id')
-
-    fields = {
-        'link_id': django_args['link_id'],
-        'scope_path': django_args['scope_path'],
-        'role': role_name,
-        'status': 'group_accepted',
-        }
-
-    entity = request_logic.getForFields(fields, unique=True)
-    # pylint: disable-msg=E1103
-    if entity and (entity.scope.status not in ['invalid', 'inactive']):
-      return
-
-    raise out_of_band.AccessViolation(message_fmt=DEF_NO_REQUEST_MSG)
-
-  def checkIsMyGroupAcceptedRequest(self, django_args):
-    """Checks whether the user can accept the specified request.
-    
-    Args:
-      django_args: a dictionary with django's arguments
-    """
-
-    self.checkCanCreateFromRequest(django_args, django_args['role'])
-
-  def checkCanProcessRequest(self, django_args, role_name):
-    """Raises an alternate HTTP response if the specified request does not exist
-       or if it's status is completed or denied. Also Raises an alternate HTTP response
-       whenever the group in the request is not active.
-       
-    Args:
-      django_args: a dictionary with django's arguments
-      role_name: name of the role
     """
 
     self.checkIsUser(django_args)
 
-    fields = {
-        'link_id': django_args['link_id'],
-        'scope_path': django_args['scope_path'],
-        'role': role_name,
-        }
+    id = int(django_args['id'])
 
-    request_entity = request_logic.getFromKeyFieldsOr404(fields)
+    request_entity = request_logic.getFromIDOr404(id)
 
-    if request_entity.status in ['completed', 'denied']:
-      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_COMPLETED_MSG)
+    if request_entity.status != 'group_accepted':
+      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
 
-    if request_entity.scope.status == 'active':
+    if request_entity.group.status in ['invalid', 'inactive']:
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
+
+    if request_entity.user.key() != self.user.key():
+      # this request does not belong to the user creating the role
+      raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    return
+
+  def checkIsMyGroupAcceptedRequest(self, django_args):
+    """Checks whether the user can accept the specified request.
+
+    Args:
+      django_args: a dictionary with django's arguments
+    """
+
+    self.checkIsUser(django_args)
+
+    id = int(django_args['id'])
+
+    request_entity = request_logic.getFromIDOr404(id)
+
+    if request_entity.user.key() != self.user.key():
+      # this is not the current user's request
+      raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    if request_entity.status != 'group_accepted':
+      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
+
+    if request_entity.group.status == 'active':
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
+
+  def checkCanProcessRequest(self, django_args, role_logics):
+    """Raises an alternate HTTP response if the specified request does not exist
+       or if it's status is completed or rejected. Also Raises an alternate HTTP response
+       whenever the group in the request is not active.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      role_logics: list with Logic instances for roles who can process
+          requests for the group the request is for.
+    """
+
+    self.checkIsUser(django_args)
+
+    id = int(django_args['id'])
+
+    request_entity = request_logic.getFromIDOr404(id)
+
+    if request_entity.status in ['completed', 'rejected']:
+      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_COMPLETED_MSG)
+
+    if request_entity.group.status != 'active':
+      raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
+
+    role_fields = {'user': self.user,
+                   'scope': request_entity.group,
+                   'status': 'active'}
+    role_entity = None
+
+    for role_logic in role_logics:
+      role_entity = role_logic.getForFields(role_fields, unique=True)
+
+      if role_entity:
+        break;
+
+    if not role_entity:
+      # the current user does not have the necessary role
+      raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
+
+    return
 
   @allowDeveloper
   @denySidebar
@@ -1283,8 +1315,10 @@ class Checker(object):
     if not django_args.get('scope_path'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
 
+    self.checkIsUser(django_args)
+
     org_entity = org_logic.getFromKeyNameOr404(django_args['scope_path'])
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = self.user
 
     filter = {'scope': org_entity.scope,
               'user': user_entity,
@@ -1297,6 +1331,27 @@ class Checker(object):
           message_fmt=DEF_ALREADY_STUDENT_ROLE_MSG)
 
     return
+
+  def checkIsNotStudentForProgramOfOrgInRequest(self, django_args, org_logic,
+                                                student_logic):
+    """Checks if the current user has no active Student role for the program
+       that the organization in the request is participating in.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      org_logic: Organization logic instance
+      student_logic: Student logic instance
+
+     Raises:
+       AccessViolationResponse: if the current user is a student for the
+                                program the organization is in.
+    """
+
+    request_entity = request_logic.getFromIDOr404(int(django_args['id']))
+
+    django_args['scope_path'] = request_entity.group.key().id_or_name()
+
+    return self.checkIsNotStudentForProgramOfOrg(django_args, org_logic, student_logic)
 
   @allowDeveloper
   def checkRoleAndStatusForStudentProposal(self, django_args, allowed_roles,

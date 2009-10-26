@@ -20,6 +20,14 @@ limitations under the License.
 {% ifnotequal request_status "group_accepted" %}
   This is the request from <b>{{ entity.user.name }}({{ entity.user.link_id }})</b> 
   to become a <b>{{ role_verbose }}</b> for <b>{{entity.group.name }}</b>.</br>
+
+  {% if entity.message %}
+    <p>
+      <i>Request Message:</i>
+      {{ entity.message|linebreaks }}
+    </p>
+  {% endif %}
+
   Please select your response by using the buttons below.
 </div>
 </p>

@@ -15,12 +15,21 @@ limitations under the License.
 {% load forms_helpers %}
 
 {% block body %}
+<div="text">
+You have been invited to become a {{ role_name }} for {{ entity.group.name }}.<br/>
+
+{% if entity.message %}
 <p>
-<div="text"> 
-You have been invited to become a {{ role_name }} for {{ entity.group.name }}. 
-Please select your response.
-</div>
+<i>Invitation Message:</i><br/>
+{{entity.message|linebreaks }}
 </p>
+{% endif %}
+
+<p>
+If you wish to accept this invitation please click the Accept button and fill out the required information.
+If you wish to reject this invitation please click the Reject button, this invitation will then disappear from your invitation list.
+</p>
+</div>
 
 <tr>
   <td>

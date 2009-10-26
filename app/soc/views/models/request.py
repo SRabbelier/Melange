@@ -31,6 +31,7 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
+from soc.logic.models.request import logic as request_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -41,7 +42,6 @@ from soc.views.helper import widgets
 from soc.views.models import base
 
 import soc.models.request
-import soc.logic.models.request
 import soc.logic.dicts
 import soc.views.helper
 import soc.views.helper.lists
@@ -71,7 +71,7 @@ class View(base.View):
 
     new_params = {}
     new_params['rights'] = rights
-    new_params['logic'] = soc.logic.models.request.logic
+    new_params['logic'] = request_logic
 
     new_params['name'] = "Request"
 
@@ -80,22 +80,10 @@ class View(base.View):
 
     new_params['create_template'] = ['soc/request/create.html']
 
-    new_params['extra_dynaexclude'] = ['status', 'role_verbose', 'created_on']
+    new_params['extra_dynaexclude'] = ['user', 'role', 'group', 'status']
 
-    new_params['create_extra_dynaproperties'] = {
-        'link_id': widgets.ReferenceField(reference_url='user'),
-        'role': forms.CharField(widget=widgets.ReadOnlyInput(),
-                                   required=True),
-        'clean_link_id': cleaning.clean_existing_user('link_id'),
-        }
-
-    new_params['edit_extra_dynaproperties'] = {
-        'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                        required=True),
-        }
-
-    patterns = [(r'^%(url_name)s/(?P<access_type>process_invite)/'
-          '%(key_fields)s$',
+    patterns = [
+        (r'^%(url_name)s/(?P<access_type>process_invite)/(?P<id>[0-9]*)$',
           'soc.views.models.%(module_name)s.process_invite',
           'Process Invite to become')]
 
@@ -110,19 +98,20 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
     # create and store the special forms for invite and requests
-    self._params['invite_form'] = self._params['create_form']
+    self._params['request_form'] = self._params['create_form']
 
     updated_fields = {
-        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=True),
-        'group_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=True)}
+        'user_id': widgets.ReferenceField(reference_url='user'),
+        'clean_user_id': cleaning.clean_existing_user('user_id'),
+        }
 
-    request_form = dynaform.extendDynaForm(
+    invite_form = dynaform.extendDynaForm(
         dynaform = self._params['create_form'],
         dynaproperties = updated_fields)
+    # reverse the fields so that user_id field comes first
+    invite_form.base_fields.keyOrder.reverse()
 
-    self._params['request_form'] = request_form
+    self._params['invite_form'] = invite_form
 
   def _edit(self, request, entity, context, params):
     """Hook for edit View.
@@ -131,6 +120,8 @@ class View(base.View):
 
     For args see base.View._edit().
     """
+
+    # TODO: editing request, so you can also edit message
     context['page_name'] = '%s to become a %s for %s' % (context['page_name'],
                                                          entity.role_verbose,
                                                          entity.scope.name)
@@ -149,22 +140,20 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
+    from soc.views.models.role import ROLE_VIEWS
+
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
 
-    request_logic = params['logic']
-
     # get the request entity using the information from kwargs
-    fields = {'link_id': kwargs['link_id'],
-        'scope_path': kwargs['scope_path'],
-        'role': kwargs['role'],
-        'status': 'group_accepted'}
-    request_entity = request_logic.getForFields(fields, unique=True)
+    request_entity = request_logic.getFromIDOr404(int(kwargs['id']))
+
+    role_params = ROLE_VIEWS[request_entity.role].getParams()
 
     # set the page name using the request_entity
     context['page_name'] = '%s %s for %s' % (page_name, 
-        request_entity.role_verbose, request_entity.scope.name)
+        role_params['url_name'], request_entity.group.name)
 
     get_dict = request.GET
 
@@ -180,6 +169,7 @@ class View(base.View):
     # put the entity in the context
     context['entity'] = request_entity
     context['module_name'] = params['module_name']
+    context['role_name'] = role_params['name']
     context['invite_accepted_redirect'] = (
         redirects.getInviteAcceptedRedirect(request_entity, self._params))
 
@@ -209,7 +199,7 @@ class View(base.View):
 
     # only select the Invites for this user that haven't been handled yet
     # pylint: disable-msg=E1103
-    filter = {'link_id': user_entity.link_id,
+    filter = {'user': user_entity,
               'status': 'group_accepted'}
 
     uh_params = params.copy()
@@ -224,7 +214,7 @@ class View(base.View):
 
     # only select the requests from the user
     # that haven't been accepted by an admin yet
-    filter = {'link_id': user_entity.link_id,
+    filter = {'user': user_entity,
               'status': 'new'}
 
     ar_params = params.copy()

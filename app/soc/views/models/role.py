@@ -29,9 +29,8 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import request as request_logic
 from soc.logic.models import user as user_logic
-from soc.logic.helper import request as request_helper
+from soc.logic.models.request import logic as request_logic
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import responses
@@ -65,10 +64,10 @@ class View(base.View):
   """
 
   DEF_INVITE_INSTRUCTION_MSG_FMT = ugettext(
-      'Please use this form to invite someone to become a %(name)s.')
+      'Please use this form to invite someone to become a %s for %s.')
 
   DEF_REQUEST_INSTRUCTION_MSG_FMT = ugettext(
-      'Please use this form to request to become a %(name)s')
+      'Please use this form to request to become a %s for %s.')
 
   DEF_INVITE_ERROR_MSG_FMT = ugettext(
       'This user can not receive an invite to become a %(name)s. <br/>'
@@ -82,7 +81,8 @@ class View(base.View):
 
 
   def __init__(self, params=None):
-    """
+    """Defines the fields and methods required for the base View class
+    to provide the user with list, public, create, edit and delete views.
 
     Args:
       params: This dictionary should be filled with the parameters
@@ -100,10 +100,10 @@ class View(base.View):
       patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
           '%(module_package)s.%(module_name)s.invite',
           'Create invite for %(name)s'),
-          (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
+          (r'^%(url_name)s/(?P<access_type>accept_invite)/(?P<id>[0-9]*)$',
           '%(module_package)s.%(module_name)s.accept_invite',
           'Accept invite for %(name)s'),
-          (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
+          (r'^%(url_name)s/(?P<access_type>process_request)/(?P<id>[0-9]*)$',
           '%(module_package)s.%(module_name)s.process_request',
           'Process request'),
           (r'^%(url_name)s/(?P<access_type>request)/%(scope)s$',
@@ -114,7 +114,7 @@ class View(base.View):
       patterns += [(r'^%(url_name)s/(?P<access_type>invite)/%(scope)s$',
           '%(module_package)s.%(module_name)s.invite',
           'Create invite for %(name)s'),
-          (r'^%(url_name)s/(?P<access_type>accept_invite)/%(scope)s/%(lnp)s$',
+          (r'^%(url_name)s/(?P<access_type>accept_invite)/(?P<id>[0-9]*)$',
           '%(module_package)s.%(module_name)s.accept_invite',
           'Accept invite for %(name)s'),
           (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
@@ -190,11 +190,14 @@ class View(base.View):
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
+
+    group_entity = params['group_logic'].getFromKeyName(kwargs['scope_path'])
+
     context['instruction_message'] = (self.DEF_INVITE_INSTRUCTION_MSG_FMT %
-        params)
+        (params['name'], group_entity.name))
 
     if request.method == 'POST':
-      return self.invitePost(request, context, params, **kwargs)
+      return self.invitePost(request, context, params, group_entity, **kwargs)
     else:
       # request.method == 'GET'
       return self.inviteGet(request, context, params, **kwargs)
@@ -210,18 +213,15 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-    # set the role to the right name
-    fields = {'role': params['logic'].role_name}
-
-    # get the request view parameters and initialize the create form
+    # get the request view parameters and initialize the invite form
     request_params = request_view.view.getParams()
-    form = request_params['invite_form'](initial=fields)
+    form = request_params['invite_form']()
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=request_params)
 
-  def invitePost(self, request, context, params, **kwargs):
+  def invitePost(self, request, context, params, group_entity, **kwargs):
     """Handles the POST request concerning the view that creates an invite
     for attaining a certain Role.
 
@@ -229,6 +229,7 @@ class View(base.View):
       request: the standard Django HTTP request object
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
+      group_entity: Group entity which this invite is from
       kwargs: the Key Fields for the specified entity
     """
 
@@ -242,58 +243,33 @@ class View(base.View):
           form=form, params=request_params)
 
     # collect the cleaned data from the valid form
-    key_name, form_fields = soc.views.helper.forms.collectCleanedFields(form)
-
-    # get the group entity for which this request is via the scope_path
-    group = self._logic.getGroupEntityFromScopePath(params['group_logic'],
-         kwargs['scope_path'])
-
-    # get the request scope path
-    request_scope_path = self._getRequestScopePathFromGroup(group)
+    _, form_fields = soc.views.helper.forms.collectCleanedFields(form)
 
     # create the fields for the new request entity
-    request_fields = {'link_id': form_fields['link_id'].link_id,
-        'scope': group,
-        'scope_path': request_scope_path,
+    request_fields = {
+        'user': form_fields['user_id'],
+        'group': group_entity,
         'role': params['logic'].role_name,
-        'role_verbose': params['name'],
         'status': 'group_accepted'}
 
-    if not self._isValidNewRequest(request_fields, params):
+    if not request_logic.isValidNewRequest(request_fields, params['logic']):
       # not a valid invite
       context['error_message'] = self.DEF_INVITE_ERROR_MSG_FMT % (
           params)
-      return self.inviteGet(request, context, params, **kwargs)
-
-    # extract the key_name for the new request entity
-    key_name = request_logic.logic.getKeyNameFromFields(request_fields)
+      return super(View, self)._constructResponse(request, entity=None,
+          context=context, form=form, params=request_params)
 
     # create the request entity
-    request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
+    request_logic.updateOrCreateFromFields(request_fields)
 
     group_view = params.get('group_view')
+
     if not group_view:
       return http.HttpResponseRedirect('/')
     else:
       # redirect to the requests list
       return http.HttpResponseRedirect(
-          redirects.getListRequestsRedirect(group, group_view.getParams()))
-
-  def _getRequestScopePathFromGroup(self, group_entity):
-    """Returns the scope_path that should be put in a request for a given group.
-
-    Args:
-      group_entity: The group entity for which the request scope_path should
-                    be returned.
-    """
-
-    if group_entity.scope_path:
-      request_scope_path = '%s/%s' % (
-          group_entity.scope_path, group_entity.link_id)
-    else:
-      request_scope_path = group_entity.link_id
-
-    return request_scope_path
+          redirects.getListRequestsRedirect(group_entity, group_view.getParams()))
 
   @decorators.merge_params
   @decorators.check_access
@@ -306,8 +282,10 @@ class View(base.View):
       access_type : the name of the access type which should be checked
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
-      kwargs: the Key Fields for the specified entity
+      kwargs: contains the ID for the Request entity
     """
+
+    request_entity = request_logic.getFromIDOr404(int(kwargs['id']))
 
      # get the context for this webpage
     context = responses.getUniversalContext(request)
@@ -315,12 +293,15 @@ class View(base.View):
     context['page_name'] = page_name
 
     if request.method == 'POST':
-      return self.acceptInvitePost(request, context, params, **kwargs)
+      return self.acceptInvitePost(request, context, params, request_entity,
+                                   **kwargs)
     else:
       # request.method == 'GET'
-      return self.acceptInviteGet(request, context, params, **kwargs)
+      return self.acceptInviteGet(request, context, params, request_entity,
+                                  **kwargs)
 
-  def acceptInviteGet(self, request, context, params, **kwargs):
+  def acceptInviteGet(self, request, context, params, request_entity,
+                      **kwargs):
     """Handles the GET request concerning the creation of a Role via an
     invite.
 
@@ -328,20 +309,21 @@ class View(base.View):
       request: the standard Django HTTP request object
       context: dictionary containing the context for this view
       params: a dict with params for this View
-      kwargs: the Key Fields for the specified entity
+      request_entity: Request that is being accepted
+      kwargs: contains the ID for the Request entity
     """
 
     # create the form using the scope_path and link_id from kwargs 
     # as initial value
-    fields = {'link_id': kwargs['link_id'],
-              'scope_path': kwargs['scope_path']}
+    fields = {'link_id': request_entity.user.link_id,
+              'scope_path': request_entity.group.key().id_or_name()}
     form = params['invited_create_form'](initial=fields)
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=params)
 
-  def acceptInvitePost(self, request, context, params, **kwargs):
+  def acceptInvitePost(self, request, context, params, request_entity, **kwargs):
     """Handles the POST request concerning the creation of a Role via an
     invite.
 
@@ -349,7 +331,8 @@ class View(base.View):
       request: the standard Django HTTP request object
       context: dictionary containing the context for this view
       params: a dict with params for this View
-      kwargs: the Key Fields for the specified entity
+      request_entity: Request that is being accepted
+      kwargs: contains the ID for the Request entity
     """
 
     # populate the form using the POST data
@@ -363,16 +346,17 @@ class View(base.View):
     # collect the cleaned data from the valid form
     key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
 
-    # call the post process method
-    self._acceptInvitePost(fields, request, context, params, **kwargs)
-
-    group_logic = params['group_logic']
-    group_entity = group_logic.getFromKeyName(fields['scope_path'])
-    fields['scope'] = group_entity
-
+    # set the user and link_id fields to the right property
+    fields['user'] = request_entity.user
+    fields['link_id'] = request_entity.user.link_id
+    fields['scope'] = request_entity.group
+    fields['scope_path'] = request_entity.group.key().id_or_name()
     # make sure that this role becomes active once more in case this user
     # has been reinvited
     fields ['status'] = 'active'
+
+    # call the post process method
+    self._acceptInvitePost(fields, request, context, params, **kwargs)
 
     # get the key_name for the new entity
     key_name = self._logic.getKeyNameFromFields(fields)
@@ -381,7 +365,8 @@ class View(base.View):
     entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     # mark the request as completed
-    request_helper.completeRequestForRole(entity, params['logic'].role_name)
+    request_fields = {'status': 'completed'}
+    request_logic.updateEntityProperties(request_entity, request_fields)
 
     # redirect to the roles overview page
     return http.HttpResponseRedirect('/user/roles')
@@ -476,11 +461,14 @@ class View(base.View):
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
+
+    group_entity = params['group_logic'].getFromKeyName(kwargs['scope_path'])
+
     context['instruction_message'] = (self.DEF_REQUEST_INSTRUCTION_MSG_FMT %
-        params)
+        (params['name'], group_entity.name))
 
     if request.method == 'POST':
-      return self.requestPost(request, context, params, **kwargs)
+      return self.requestPost(request, context, params, group_entity, **kwargs)
     else:
       # request.method == 'GET'
       return self.requestGet(request, context, params, **kwargs)
@@ -496,22 +484,15 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-    # set right fields for the request form
-    user_entity = user_logic.logic.getForCurrentAccount()
-    # pylint: disable-msg=E1103
-    fields = {'link_id' : user_entity.link_id,
-              'role' : params['logic'].role_name,
-              'group_id' : kwargs['scope_path']}
-
     # get the request view parameters and initialize the create form
     request_params = request_view.view.getParams()
-    form = request_params['request_form'](initial=fields)
+    form = request_params['request_form']()
 
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=request_params)
 
-  def requestPost(self, request, context, params, **kwargs):
+  def requestPost(self, request, context, params, group_entity, **kwargs):
     """Handles the POST request concerning the creation of a request
     to attain a role.
 
@@ -519,46 +500,40 @@ class View(base.View):
       request: the standard Django HTTP request object
       context: dictionary containing the context for this view
       params: a dict with params for this View
+      group_entity: the Group entity this request is for
       kwargs: the Key Fields for the specified entity
     """
 
     # get the request view parameters and populate the form using POST data
     request_params = request_view.view.getParams()
-    form = request_params['invite_form'](request.POST)
+    form = request_params['request_form'](request.POST)
 
     if not form.is_valid():
       # return the invalid form response
       return self._constructResponse(request, entity=None, context=context,
           form=form, params=request_params)
 
-    # get the group entity for which this request is via the scope_path
-    group = self._logic.getGroupEntityFromScopePath(params['group_logic'],
-         kwargs['scope_path'])
+    _, fields = soc.views.helper.forms.collectCleanedFields(form)
 
-    # get the request scope path
-    request_scope_path = self._getRequestScopePathFromGroup(group)
-
-    # defensively set the fields we need for this request and set status to new
+    # set the fields for the new request
     user_entity = user_logic.logic.getForCurrentAccount()
-    # pylint: disable-msg=E1103
-    request_fields = {'link_id' : user_entity.link_id,
-        'scope' : group,
-        'scope_path' : request_scope_path,
+
+    request_fields = {
+        'user': user_entity,
+        'group' : group_entity,
+        'message': fields['message'],
         'role' : params['logic'].role_name,
-        'role_verbose' : params['name'],
         'status' : 'new'}
 
-    if not self._isValidNewRequest(request_fields, params):
+    if not request_logic.isValidNewRequest(request_fields, params['logic']):
       # not a valid request
       context['error_message'] = self.DEF_REQUEST_ERROR_MSG_FMT % (
           params)
-      return self.requestGet(request, context, params, **kwargs)
-
-    # extract the key_name for the new request entity
-    key_name = request_logic.logic.getKeyNameFromFields(request_fields)
+      return super(View, self)._constructResponse(request, entity=None,
+          context=context, form=form, params=request_params)
 
     # create the request entity
-    request_logic.logic.updateOrCreateFromKeyName(request_fields, key_name)
+    request_logic.updateOrCreateFromFields(request_fields)
 
     # redirect to requests overview
     return http.HttpResponseRedirect('/user/requests')
@@ -577,22 +552,15 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-
     # get the request entity using the information from kwargs
-    fields = {'link_id': kwargs['link_id'],
-        'scope_path': kwargs['scope_path'],
-        'role': params['logic'].role_name}
-    request_entity = request_logic.logic.getForFields(fields, unique=True)
+    request_entity = request_logic.getFromIDOr404(int(kwargs['id']))
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
 
-    # pylint: disable-msg=E1103
-    user_entity = user_logic.logic.getFromKeyNameOr404(request_entity.link_id)
-
     context['page_name'] = '%s from %s to become a %s' %(
-        page_name, user_entity.name, request_entity.role_verbose)
+        page_name, request_entity.user.name, params['name'])
 
     get_dict = request.GET
 
@@ -603,7 +571,7 @@ class View(base.View):
 
         # only update when the status is changing
         if request_status != request_entity.status:
-          request_logic.logic.updateEntityProperties(request_entity, {
+          request_logic.updateEntityProperties(request_entity, {
               'status': get_dict['status']})
 
         group_view = params.get('group_view')
@@ -612,47 +580,16 @@ class View(base.View):
         else:
           # redirect to the requests list
           return http.HttpResponseRedirect(
-              redirects.getListRequestsRedirect(request_entity.scope, 
+              redirects.getListRequestsRedirect(request_entity.group,
                   group_view.getParams()))
 
     # put the entity in the context
     context['entity'] = request_entity
-    context['user_in_request'] = user_entity
     context['request_status'] = request_entity.status 
-    context['role_name'] = params['logic'].role_name
+    context['role_verbose'] = params['name']
+    context['url_name'] = params['url_name']
 
     #display the request processing page using the appropriate template
     template = request_view.view.getParams()['request_processing_template']
 
     return responses.respond(request, template, context=context)
-
-  def _isValidNewRequest(self, request_fields, params):
-    """Checks if this is a valid Request object to make.
-
-    Args:
-    request_fields: dict containing the fields for the new request entity.
-    params: parameters for the current view
-    """
-    fields = request_fields.copy()
-    fields['status'] = ['new', 'group_accepted', 'ignored']
-
-    request_entity = request_logic.logic.getForFields(fields, unique=True)
-    
-    if request_entity:
-      # already outstanding request
-      return False
-
-    # check if the role already exists
-    fields = {'scope': request_fields['scope'],
-        'link_id': request_fields['link_id'],
-        'status': ['active','inactive'],
-        }
-
-    role_entity = params['logic'].getForFields(fields, unique=True)
-
-    if role_entity:
-      # already has this role
-      return False
-
-    # no oustanding request or a valid role
-    return True

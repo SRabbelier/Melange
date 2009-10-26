@@ -264,8 +264,12 @@ def getProcessRequestRedirect(entity, _):
   """Returns the redirect for processing the specified request entity.
   """
 
-  result = '/%s/process_request/%s/%s' % (
-      entity.role, entity.scope_path, entity.link_id)
+  from soc.views.models.role import ROLE_VIEWS
+
+  role_view = ROLE_VIEWS[entity.role]
+
+  result = '/%s/process_request/%s' % (
+      role_view.getParams()['url_name'], entity.key().id_or_name())
 
   return result
 
@@ -303,17 +307,21 @@ def getSelectRedirect(params):
 def getInviteAcceptedRedirect(entity, _):
   """Returns the redirect for accepting an invite.
   """
-  # TODO: redesign this redirect to use ROLE_VIEWS from the Role View
-  return '/%s/accept_invite/%s/%s' % (
-      entity.role, entity.scope_path, entity.link_id)
+
+  from soc.views.models.role import ROLE_VIEWS
+
+  role_params = ROLE_VIEWS[entity.role].getParams()
+
+  return '/%s/accept_invite/%s' % (
+      role_params['url_name'], entity.key().id_or_name())
 
 
 def getInviteProcessRedirect(entity, _):
   """Returns the redirect for processing an invite.
   """
 
-  return '/request/process_invite/%s/%s/%s' % (
-      entity.scope_path, entity.role, entity.link_id)
+  return '/request/process_invite/%s' % (
+      entity.key().id_or_name())
 
 
 def getApplicantRedirect(entity, params):

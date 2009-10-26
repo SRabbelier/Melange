@@ -75,32 +75,31 @@ def sendInviteNotification(entity):
   """
 
   from soc.logic.models.user import logic as user_logic
-
-  # get the user the request is for
-  properties = {'link_id': entity.link_id }
-  to_user = user_logic.getForFields(properties, unique=True)
+  from soc.views.models.role import ROLE_VIEWS
 
   invitation_url = "http://%(host)s%(index)s" % {
       'host' : system.getHostname(),
       'index': redirects.getInviteProcessRedirect(entity, None),
       }
 
+  role_params = ROLE_VIEWS[entity.role].getParams()
+
   message_properties = {
-      'role_verbose' : entity.role_verbose,
-      'group': entity.scope.name,
+      'role_verbose' : role_params['name'],
+      'group': entity.group.name,
       'invitation_url': invitation_url,
       }
 
   subject = DEF_INVITATION_MSG_FMT % {
-      'role_verbose' : entity.role_verbose,
-      'group' : entity.scope.name
+      'role_verbose' : role_params['name'],
+      'group' : entity.group.name
       }
 
   template = DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE
 
   from_user = user_logic.getForCurrentAccount()
 
-  sendNotification(to_user, from_user, message_properties, subject, template)
+  sendNotification(entity.user, from_user, message_properties, subject, template)
 
 
 def sendNewRequestNotification(request_entity):
@@ -122,7 +121,7 @@ def sendNewRequestNotification(request_entity):
   role_logics_to_notify = role_logic.getRoleLogicsToNotifyUponNewRequest()
 
   # the scope of the roles is the same as the scope of the Request entity
-  fields = {'scope': request_entity.scope,
+  fields = {'scope': request_entity.group,
             'status': 'active'}
 
   for role_logic in role_logics_to_notify:
@@ -133,8 +132,7 @@ def sendNewRequestNotification(request_entity):
       to_users.append(role_entity.user)
 
   # get the user the request is from
-  properties = {'link_id': request_entity.link_id }
-  user_entity = user_logic.getForFields(properties, unique=True)
+  user_entity = request_entity.user
 
   message_properties = {
       'requester_name': user_entity.name,
@@ -143,8 +141,8 @@ def sendNewRequestNotification(request_entity):
 
   subject = DEF_NEW_REQUEST_MSG_FMT % {
       'requester': user_entity.name,
-      'role_verbose' : request_entity.role_verbose,
-      'group' : request_entity.scope.name
+      'role_verbose' : request_entity.role,
+      'group' : request_entity.group.name
       }
 
   template = DEF_NEW_REQUEST_NOTIFICATION_TEMPLATE

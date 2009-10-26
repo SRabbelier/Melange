@@ -56,12 +56,11 @@ class View(role.View):
     rights['edit'] = [('checkIsMyActiveRole', club_member_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope', club_admin_logic.logic)]
-    rights['accept_invite'] = [('checkCanCreateFromRequest','club_member')]
+    rights['accept_invite'] = ['checkCanCreateFromRequest']
     rights['request'] = ['checkIsUser',
                          ('checkCanMakeRequestToGroup', club_logic.logic)]
-    rights['process_request'] = [('checkHasActiveRoleForScope', 
-                                  club_admin_logic.logic),
-                                  ('checkCanProcessRequest','club_member')]
+    rights['process_request'] = [('checkCanProcessRequest', 
+                                  [[club_admin_logic.logic]])]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [soc.logic.models.club_member.logic,
                           club_admin_logic.logic])]
@@ -109,15 +108,6 @@ class View(role.View):
       fields['link_id'] = fields['user'].link_id
 
     super(View, self)._editPost(request, entity, fields)
-
-  def _acceptInvitePost(self, fields, request, context, params, **kwargs):
-    """Fills in the fields that were missing in the invited_created_form.
-    
-    For params see base.View._acceptInvitePost()
-    """
-    # fill in the appropriate fields that were missing in the form
-    fields['user'] = fields['link_id']
-    fields['link_id'] = fields['user'].link_id
 
 
 view = View()

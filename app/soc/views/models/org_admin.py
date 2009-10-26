@@ -65,12 +65,11 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          org_admin_logic.logic)]
-    rights['accept_invite'] = [('checkCanCreateFromRequest', 'org_admin'),
-        ('checkIsNotStudentForProgramOfOrg', [org_logic.logic,
+    rights['accept_invite'] = ['checkCanCreateFromRequest',
+        ('checkIsNotStudentForProgramOfOrgInRequest', [org_logic.logic,
                                               student_logic.logic])]
     rights['process_request'] = [
-        ('checkHasActiveRoleForScope', org_admin_logic.logic),
-        ('checkCanProcessRequest', 'org_admin')]
+        ('checkCanProcessRequest', [[org_admin_logic.logic]])]
     rights['manage'] = [
         ('checkIsAllowedToManageRole', [org_admin_logic.logic,
              org_admin_logic.logic])]
@@ -165,8 +164,6 @@ class View(role.View):
     """
 
     # fill in the appropriate fields that were missing in the form
-    fields['user'] = fields['link_id']
-    fields['link_id'] = fields['user'].link_id
     fields['agreed_to_tos'] = fields['agreed_to_admin_agreement']
 
     group_logic = params['group_logic']

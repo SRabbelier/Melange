@@ -56,16 +56,15 @@ class View(mentor.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          ghop_org_admin_logic.logic)]
-    rights['accept_invite'] = [('checkCanCreateFromRequest', 'ghop/mentor'),
-        ('checkIsNotStudentForProgramOfOrg',
+    rights['accept_invite'] = ['checkCanCreateFromRequest',
+        ('checkIsNotStudentForProgramOfOrgInRequest',
          [ghop_org_logic.logic, ghop_student_logic.logic])]
     rights['request'] = [
         ('checkIsNotStudentForProgramOfOrg',
          [ghop_org_logic.logic, ghop_student_logic.logic]),
         ('checkCanMakeRequestToGroup', ghop_org_logic.logic)]
     rights['process_request'] = [
-        ('checkHasActiveRoleForScope', ghop_org_admin_logic.logic),
-        ('checkCanProcessRequest', 'ghop/mentor')]
+        ('checkCanProcessRequest', [[ghop_org_admin_logic.logic]])]
     rights['manage'] = [
         ('checkIsAllowedToManageRole', [ghop_mentor_logic.logic,
                                         ghop_org_admin_logic.logic])]

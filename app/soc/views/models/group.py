@@ -267,7 +267,7 @@ class View(presence.View):
 
     # list all incoming requests
     filter = {
-        'scope': group_entity,
+        'group': group_entity,
         'role': role_names,
         'status': 'new'
         }
@@ -285,7 +285,7 @@ class View(presence.View):
 
     # list all outstanding invites
     filter = {
-        'scope': group_entity,
+        'group': group_entity,
         'role': role_names,
         'status': 'group_accepted'
         }
@@ -303,7 +303,7 @@ class View(presence.View):
 
     # list all ignored requests
     filter = {
-        'scope': group_entity,
+        'group': group_entity,
         'role': role_names,
         'status': 'ignored'
         }

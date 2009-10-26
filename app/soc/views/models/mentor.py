@@ -60,16 +60,15 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          soc.logic.models.org_admin.logic)]
-    rights['accept_invite'] = [('checkCanCreateFromRequest', 'mentor'),
-        ('checkIsNotStudentForProgramOfOrg', [org_logic.logic,
-                                              student_logic.logic])]
+    rights['accept_invite'] = ['checkCanCreateFromRequest',
+        ('checkIsNotStudentForProgramOfOrgInRequest',[org_logic.logic,
+                                                      student_logic.logic])]
     rights['request'] = [
         ('checkIsNotStudentForProgramOfOrg',
             [org_logic.logic, student_logic.logic]),
         ('checkCanMakeRequestToGroup', org_logic.logic)]
     rights['process_request'] = [
-        ('checkHasActiveRoleForScope', soc.logic.models.org_admin.logic),
-        ('checkCanProcessRequest', 'mentor')]
+        ('checkCanProcessRequest', [[soc.logic.models.org_admin.logic]])]
     rights['manage'] = [
         ('checkIsAllowedToManageRole', [soc.logic.models.mentor.logic,
              soc.logic.models.org_admin.logic])]
@@ -161,13 +160,11 @@ class View(role.View):
 
   def _acceptInvitePost(self, fields, request, context, params, **kwargs):
     """Fills in the fields that were missing in the invited_created_form.
-    
+
     For params see base.View._acceptInvitePost()
     """
 
     # fill in the appropriate fields that were missing in the form
-    fields['user'] = fields['link_id']
-    fields['link_id'] = fields['user'].link_id
     fields['agreed_to_tos'] = fields['agreed_to_mentor_agreement']
 
     group_logic = params['group_logic']

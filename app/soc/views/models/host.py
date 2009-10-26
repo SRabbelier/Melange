@@ -59,10 +59,9 @@ class View(role.View):
     rights['edit'] = [('checkIsMyActiveRole', host_logic.logic)]
     rights['invite'] = [('checkHasActiveRoleForScope', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
-    rights['accept_invite'] = [('checkCanCreateFromRequest','host')]
-    rights['process_request'] = [('checkHasActiveRoleForScope', 
-                                 host_logic.logic),
-                                 ('checkCanProcessRequest','host')]
+    rights['accept_invite'] = ['checkCanCreateFromRequest']
+    rights['process_request'] = [('checkCanProcessRequest', 
+                                 [[host_logic.logic]])]
     rights['manage'] = [('checkIsAllowedToManageRole',
                          [host_logic.logic, host_logic.logic])]
 
@@ -117,15 +116,6 @@ class View(role.View):
       fields['link_id'] = fields['link_id'].link_id
 
     super(View, self)._editPost(request, entity, fields)
-
-  def _acceptInvitePost(self, fields, request, context, params, **kwargs):
-    """Fills in the fields that were missing in the invited_created_form.
-    
-    For params see base.View._acceptInvitePost()
-    """
-    # fill in the appropriate fields that were missing in the form
-    fields['user'] = fields['link_id']
-    fields['link_id'] = fields['link_id'].link_id
 
 
 view = View()

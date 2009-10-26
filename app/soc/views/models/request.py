@@ -153,7 +153,7 @@ class View(base.View):
 
     # set the page name using the request_entity
     context['page_name'] = '%s %s for %s' % (page_name, 
-        role_params['url_name'], request_entity.group.name)
+        role_params['name'], request_entity.group.name)
 
     get_dict = request.GET
 

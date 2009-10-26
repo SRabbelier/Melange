@@ -160,8 +160,9 @@ class Logic(base.Logic):
       silent: iff True does not call post store methods.
     """
 
-    from soc.modules.ghop.logic.models import comment as ghop_comment_logic
-    from soc.modules.ghop.logic.models import work_submission as \
+    from soc.modules.ghop.logic.models.comment import logic as \
+        ghop_comment_logic
+    from soc.modules.ghop.logic.models.work_submission import logic as \
         ghop_work_submission_logic
     from soc.modules.ghop.models import comment as ghop_comment_model
     from soc.modules.ghop.models import work_submission as \
@@ -199,7 +200,7 @@ class Logic(base.Logic):
     if not silent:
       # call the _onCreate methods for the Comment and WorkSubmission
       if comment_entity:
-        ghop_comment_logic.logic._onCreate(comment_entity)
+        ghop_comment_logic._onCreate(comment_entity)
 
       if ws_entity:
         ghop_work_submission_logic._onCreate(ws_entity)
@@ -262,16 +263,17 @@ class Logic(base.Logic):
     For args see base.getFromKeyFieldsOr404().
     """
 
-    from soc.modules.ghop.logic.models import comment as ghop_comment_logic
-    from soc.modules.ghop.logic.models import work_submission as \
+    from soc.modules.ghop.logic.models.comment import logic as \
+        ghop_comment_logic
+    from soc.modules.ghop.logic.models.work_submission import logic as \
         ghop_work_submission_logic
  
     entity = self.getFromKeyFieldsOr404(fields)
 
-    comment_entities = ghop_comment_logic.logic.getForFields(
+    comment_entities = ghop_comment_logic.getForFields(
         ancestors=[entity], order=['created_on'])
 
-    ws_entities = ghop_work_submission_logic.logic.getForFields(
+    ws_entities = ghop_work_submission_logic.getForFields(
         ancestors=[entity], order=['submitted_on'])
 
     return entity, comment_entities, ws_entities

@@ -946,9 +946,8 @@ class View(base.View):
 
       ws_properties = {
           'parent': entity,
-          'link_id': 't%i' % (int(time.time()*100)),
-          'scope_path': entity.key().name(),
-          'scope': entity.scope,
+          'program': entity.program,
+          'org': entity.scope,
           'user': user_account,
           'information': fields['comment'],
           'url_to_work': fields['work_submission'],

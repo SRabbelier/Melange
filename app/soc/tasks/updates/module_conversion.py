@@ -108,11 +108,15 @@ def runProgramConversionUpdate(request, entities, context, *args, **kwargs):
 def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that converts Organizations into GSoCOrganizations.
 
+  Also updates the RankerRoots that are associated with the Organization.
+
   Args:
     request: Django Request object
     entities: list of Organization entities to convert
     context: the context of this task
   """
+
+  from soc.logic.models.ranker_root import logic as ranker_root_logic
 
   from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
   from soc.modules.gsoc.models.organization import GSoCOrganization
@@ -123,6 +127,7 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
 
   # use this to store all the new GSoCOrganization
   gsoc_orgs = []
+  gsoc_rankers = []
 
   for entity in entities:
     gsoc_properties = {}
@@ -142,8 +147,19 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
                                        **gsoc_properties)
     gsoc_orgs.append(gsoc_org_entity)
 
+    # retrieve the RankerRoots belonging to the Organization
+    fields = {'scope': entity}
+    rankers = ranker_root_logic.getForFields(fields)
+
+    for ranker in rankers:
+      ranker.scope = gsoc_org_entity
+      # append the adjusted ranker
+      gsoc_rankers.append(ranker)
+
   # store all the new GSoCOrganizations
   db.put(gsoc_orgs)
+  # store all the new rankers
+  db.put(gsoc_rankers)
 
   # task completed, return
   return

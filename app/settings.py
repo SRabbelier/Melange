@@ -17,6 +17,8 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -98,7 +100,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'soc.middleware.value_store.ValueStoreMiddleware',
     'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
-    'app_profiler.app_profiler.ProfileMiddleware',    
+    'app_profiler.app_profiler.ProfileMiddleware',
     'soc.middleware.maintenance.MaintenanceMiddleware',
 #    'django.middleware.common.CommonMiddleware',
 #    'django.contrib.sessions.middleware.SessionMiddleware',

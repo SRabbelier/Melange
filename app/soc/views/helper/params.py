@@ -62,6 +62,7 @@ DEF_JS_USES_LIST = [
     'jq_progressbar',
     'jq_thickbox',
     'jq_ui_core',
+    'json',
     'menu',
     'melange',
     'bulk_review',

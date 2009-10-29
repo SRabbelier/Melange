@@ -128,7 +128,7 @@ class GHOPChecker(access.Checker):
           'link_id': django_args['link_id'],
           'scope_path': django_args['scope_path'],
           }
-      task_entity = ghop_task_logic.logic.getFromKeyFields(task_filter)
+      task_entity = ghop_task_logic.logic.getFromKeyFieldsOr404(task_filter)
 
       if task_entity.status not in ['Unapproved', 'Unpublished', 'Open']:
         # task is claimed at least once

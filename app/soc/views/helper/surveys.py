@@ -803,6 +803,14 @@ class PickManyField(forms.MultipleChoiceField):
   def __init__(self, *args, **kwargs):
     super(PickManyField, self).__init__(*args, **kwargs)
 
+  def clean(self, value):
+    """Validates that the input is a list or tuple. If no fields are marked,
+    an empty string is returned istead of an empty list.
+    """
+    
+    value = super(PickManyField, self).clean(value)
+    return value if value else ''
+
 
 class PickQuantField(forms.ChoiceField):
   """Stub for customizing the choice field.

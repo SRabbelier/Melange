@@ -88,20 +88,19 @@ class View(program.View):
     rights['show'] = ['allow']
     rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',
                                          host_logic.logic])]
-    rights['edit'] = [('checkIsHostForProgram',
-                       [ghop_program_logic.logic])]
+    rights['edit'] = [('checkIsHostForProgram', [ghop_program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['student_signup_start',
          '__all__', ghop_program_logic.logic])]
     rights['task_difficulty'] = [('checkIsHostForProgram',
-                                  [ghop_program_logic.logic])]
+        [ghop_program_logic.logic])]
     rights['task_type'] = [('checkIsHostForProgram',
-                            [ghop_program_logic.logic])]
+        [ghop_program_logic.logic])]
     rights['difficulty_tag_edit'] = [('checkIsHostForProgram',
-                                      [ghop_program_logic.logic])]
+        [ghop_program_logic.logic])]
     rights['type_tag_edit'] = [('checkIsHostForProgram',
-                                [ghop_program_logic.logic])]
+        [ghop_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.program.logic

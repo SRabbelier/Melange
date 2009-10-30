@@ -983,12 +983,17 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsHostForProgram(self, django_args):
+  def checkIsHostForProgram(self, django_args, logic):
     """Checks if the user is a host for the specified program.
 
     Args:
       django_args: a dictionary with django's arguments
+      logic: the logic used to look up for program entity; if not specified
+        standard program_logic will be used      
     """
+
+    if not logic:
+      logic = program_logic
 
     program = program_logic.getFromKeyFields(django_args)
 

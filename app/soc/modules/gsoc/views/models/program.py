@@ -49,12 +49,14 @@ class View(program.View):
     rights['show'] = ['allow']
     rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',
         host_logic])]
-    rights['edit'] = ['checkIsHostForProgram']
+    rights['edit'] = [('checkIsHostForProgram', [program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']
-    rights['assign_slots'] = ['checkIsHostForProgram']
-    rights['slots'] = ['checkIsHostForProgram']
-    rights['show_duplicates'] = ['checkIsHostForProgram']
-    rights['assigned_proposals'] = ['checkIsHostForProgram']
+    rights['assign_slots'] = [('checkIsHostForProgram', [program_logic.logic])]
+    rights['slots'] = [('checkIsHostForProgram', [program_logic.logic])]
+    rights['show_duplicates'] = [('checkIsHostForProgram',
+        [program_logic.logic])]
+    rights['assigned_proposals'] = [('checkIsHostForProgram',
+        [program_logic.logic])]
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['accepted_organization_announced_deadline',
          '__all__', program_logic])]

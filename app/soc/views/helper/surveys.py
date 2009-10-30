@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Daniel Diniz" <ajaksu@gmail.com>',
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"James Levy" <jamesalexanderlevy@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]

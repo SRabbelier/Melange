@@ -21,6 +21,7 @@ See soc.views.helper.access module.
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -28,7 +29,7 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import host as host_logic 
+from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -72,7 +73,7 @@ class GHOPChecker(access.Checker):
 
   @access.allowDeveloper
   @access.denySidebar
-  def checkCanOrgAdminOrMentorEdit(self, django_args, 
+  def checkCanOrgAdminOrMentorEdit(self, django_args,
                                    key_location, check_limit):
     """Checks if the mentors can create task for this program,
     and obeys the task quota limit assigned for their org when check_limit is
@@ -82,7 +83,7 @@ class GHOPChecker(access.Checker):
       django_args: a dictionary with django's arguments
       key_location: the key for django_args in which the key_name
                     from the mentor is stored
-      check_limit: iff true checks if the organization reached the 
+      check_limit: iff true checks if the organization reached the
                    task quota limit for the given program.
     """
 
@@ -96,20 +97,17 @@ class GHOPChecker(access.Checker):
         'status': 'active'
         }
 
-    role_entity = ghop_org_admin_logic.logic.getForFields(
-        filter, unique=True) 
+    role_entity = ghop_org_admin_logic.logic.getForFields(filter, unique=True)
     if not role_entity:
-      role_entity = ghop_mentor_logic.logic.getForFields(
-          filter, unique=True)
+      role_entity = ghop_mentor_logic.logic.getForFields(filter, unique=True)
 
     if not role_entity:
       raise out_of_band.AccessViolation(
-        message_fmt=DEF_SIGN_UP_AS_OA_MENTOR_MSG)
+          message_fmt=DEF_SIGN_UP_AS_OA_MENTOR_MSG)
 
     program_entity = role_entity.program
 
-    if not timeline_helper.isActivePeriod(program_entity.timeline,
-        'program'):
+    if not timeline_helper.isActivePeriod(program_entity.timeline, 'program'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
     org_entity = role_entity.scope
@@ -121,14 +119,11 @@ class GHOPChecker(access.Checker):
 
       if task_query.count() >= org_entity.task_quota_limit:
         # too many tasks access denied
-        raise out_of_band.AccessViolation(message_fmt=DEF_MAX_TASKS_REACHED_MSG)
+        raise out_of_band.AccessViolation(
+            message_fmt=DEF_MAX_TASKS_REACHED_MSG)
 
     if 'link_id' in django_args:
-      task_filter = {
-          'link_id': django_args['link_id'],
-          'scope_path': django_args['scope_path'],
-          }
-      task_entity = ghop_task_logic.logic.getFromKeyFieldsOr404(task_filter)
+      task_entity = ghop_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
       if task_entity.status not in ['Unapproved', 'Unpublished', 'Open']:
         # task is claimed at least once
@@ -173,26 +168,22 @@ class GHOPChecker(access.Checker):
 
     filter = {
         'user': user_entity,
-        'status': role_status}
+        'scope_path': django_args['scope_path'],
+        'status': role_status
+        }
 
     if 'host' in allowed_roles:
       # check if the current user is a host for this proposal's program
-      filter['scope'] =  task_entity.program
-
       if host_logic.logic.getForFields(filter, unique=True):
         return
 
     if 'ghop/org_admin' in allowed_roles:
       # check if the current user is an admin for this task's org
-      filter['scope_path'] = django_args['scope_path']
-
       if ghop_org_admin_logic.logic.getForFields(filter, unique=True):
         return
 
     if 'ghop/mentor' in allowed_roles:
       # check if the current user is a mentor for this task's org
-      filter['scope_path'] = django_args['scope_path']
-
       if ghop_mentor_logic.logic.getForFields(filter, unique=True):
         return
 
@@ -200,8 +191,7 @@ class GHOPChecker(access.Checker):
       return
 
     # no roles found, access denied
-    raise out_of_band.AccessViolation(
-        message_fmt=DEF_NEED_ROLE_MSG)
+    raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
 
   def checkStatusForTask(self, django_args):
     """Checks if the current user has access to the given task.

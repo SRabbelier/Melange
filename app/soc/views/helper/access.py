@@ -983,19 +983,15 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsHostForProgram(self, django_args, logic):
+  def checkIsHostForProgram(self, django_args, logic=program_logic):
     """Checks if the user is a host for the specified program.
 
     Args:
       django_args: a dictionary with django's arguments
-      logic: the logic used to look up for program entity; if not specified
-        standard program_logic will be used      
+      logic: the logic used to look up for program entity
     """
 
-    if not logic:
-      logic = program_logic
-
-    program = program_logic.getFromKeyFields(django_args)
+    program = logic.getFromKeyFields(django_args)
 
     if not program or program.status == 'invalid':
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)

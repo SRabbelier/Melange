@@ -14,17 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A script to generate the app.yaml from the template with an application
-name filled in.
+"""gen_app_yaml.py [-f] (-i | APPLICATION_NAME)
 
-Usage:
-  gen_app_yaml.py [-f] APPLICATION_NAME
+A script to generate the app.yaml from the template with an application
+name filled in.
 
 Arguments:
   APPLICATION_NAME: the name to use for the application (no underscores)
-
-Flags:
-  -f:  overwrite an existing app.yaml (default=false)
 """
 
 from __future__ import with_statement
@@ -37,6 +33,7 @@ __authors__ = [
 
 import os
 import sys
+from optparse import OptionParser
 
 
 def generateAppYaml(application_name, force=False):
@@ -84,21 +81,25 @@ def main(args):
   """Main program.
   """
 
-  if not args:
-    usage("No arguments supplied.")
+  parser = OptionParser(usage=__doc__)
+  parser.add_option("-f", "--force", action="store_true", default=False,
+                    help="Overwrite existing app.yaml")
+  parser.add_option("-i", "--interactive", action="store_true", default=False,
+                    help="Ask for the application name interactively")
 
-  if args[0] == '-f':
-    force = True
-    args = args[1:]
+  options, args = parser.parse_args(args)
+
+  if options.interactive:
+    if args:
+      parser.error("Cannot combine application name with -i")
+    sys.stdout.write("Application name: ")
+    application_name = sys.stdin.readline().strip()
   else:
-    force = False
+    if len(args) != 1:
+      parser.error("No application name supplied.")
+    application_name = args[0]
 
-  if len(args) != 1:
-    usage("No application name supplied.")
-
-  application_name = args[0]
-  generateAppYaml(application_name, force=force)
-
+  generateAppYaml(application_name, force=options.force)
 
 if __name__ == '__main__':
   main(sys.argv[1:]) # strip off the binary name

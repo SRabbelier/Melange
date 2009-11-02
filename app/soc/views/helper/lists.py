@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Chen Lunpeng" <forever.clp@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
@@ -131,6 +132,7 @@ def generateLinkForRequest(request, base_params, updated_params):
     base_params: the base parameters
     updated_params: the parameters to update
   """
+
   params = base_params.copy()
   params.update(updated_params)
   return generateLinkFromGetArgs(request, params)
@@ -171,23 +173,52 @@ def getListContent(request, params, filter=None, order=None,
       'last': offset of the last item in the list
     }
   """
+
+  list_params = getListParameters(request, idx)
+  limit, offset = list_params['limit'], list_params['offset']
+
+  # Fetch one more to see if there should be a 'next' link
+  logic = params['logic']
+  data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
+                            order=order, prefetch=prefetch)
+
+  return getListContentForData(request, params, data=data, idx=idx,
+       limit=limit, offset=offset, need_content=need_content)
+
+
+def getListContentForData(request, params, data=None, idx=0,
+                          limit=DEF_DEFAULT_PAGINATION, offset=0,
+                          need_content=False):
+  """Returns a dict with fields used for rendering lists.
+
+  TODO(dbentley): we need better terminology. List, in this context, can have
+    one of two meanings.
+    Meaning 1:  the underlying list, which may be very large.
+    Meaning 2:  the returned list, which is at most 'limit' items.
+
+  Args:
+    request: the Django HTTP request object
+    params: a dict with params for the View this list belongs to
+    data: list of entities to fill the list with
+    idx: the index of this list
+    limit: number of entities on a single list page
+    offset: length of offset of the entities
+    need_content: iff True will return None if there is no data
+
+  Returns:
+    See getListContent() for details.
+  """
+
+  if need_content and not data:
+    return None
+
   # TODO(dbentley): this appears to be unnecessary indirection,
   # as we only use this logic for getForFields, which is never overridden
   logic = params['logic']
 
   limit_key, offset_key = makeLimitKey(idx), makeOffsetKey(idx)
 
-  list_params = getListParameters(request, idx)
-  limit, offset = list_params['limit'], list_params['offset']
-  pagination_form = makePaginationForm(request, list_params['limit'],
-                                       limit_key)
-
-  # Fetch one more to see if there should be a 'next' link
-  data = logic.getForFields(filter=filter, limit=limit+1, offset=offset,
-                            order=order, prefetch=prefetch)
-
-  if need_content and not data:
-    return None
+  pagination_form = makePaginationForm(request, limit, limit_key)
 
   more = len(data) > limit
 
@@ -204,7 +235,7 @@ def getListContent(request, params, filter=None, order=None,
 
   if more:
     # TODO(dbentley): here we need to implement a new field "last_key"
-    next = generateLinkForRequest(request, base_params, 
+    next = generateLinkForRequest(request, base_params,
                                   {offset_key: offset + limit,
                                    limit_key: limit})
 

@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -438,8 +439,8 @@ class View(program.View):
     if timeline_helper.isAfterEvent(timeline_entity,
                                    'student_signup_start'):
       # add a link to show all projects
-      items += [(redirects.getListProjectsRedirect(ghop_program_entity,
-          {'url_name':'ghop/task'}),
+      items += [(ghop_redirects.getListStudentTasksRedirect(
+          student_entity, {'url_name':'ghop/student'}),
           "List my Tasks", 'any_access')]
 
     items += [(redirects.getEditRedirect(student_entity, 

@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   ]
 
 
@@ -47,6 +48,16 @@ def getListTasksRedirect(entity, params):
   """
 
   result = '/%s/list_org_tasks/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
+
+def getListStudentTasksRedirect(entity, params):
+  """Returns the redirect for the List Projects page for the given entity.
+  """
+
+  result = '/%s/list_student_tasks/%s' % (
       params['url_name'], entity.key().id_or_name())
 
   return result

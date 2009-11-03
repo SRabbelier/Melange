@@ -54,7 +54,7 @@ def getListTasksRedirect(entity, params):
 
 
 def getListStudentTasksRedirect(entity, params):
-  """Returns the redirect for the List Projects page for the given entity.
+  """Returns the redirect for the List Student Tasks page for the given entity.
   """
 
   result = '/%s/list_student_tasks/%s' % (

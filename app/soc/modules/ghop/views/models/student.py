@@ -27,13 +27,13 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.logic.models import user as user_logic
+
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.models import student
-
-from soc.logic.models import user as user_logic
 
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import organization as ghop_org_logic
@@ -43,6 +43,7 @@ from soc.modules.ghop.logic.models import student as ghop_student_logic
 from soc.modules.ghop.logic.models import task as ghop_task_logic
 from soc.modules.ghop.views.helper import access as ghop_access
 from soc.modules.ghop.views.models import program as ghop_program_view
+from soc.modules.ghop.views.models import task as ghop_task_view
 
 import soc.modules.ghop.logic.models.student
 
@@ -63,7 +64,7 @@ class View(student.View):
 
     patterns = []
     patterns += [
-        (r'^%(url_name)s/(?P<access_type>list_student_tasks)/%(key_fields)s$',
+        (r'^%(url_name)s/(?P<access_type>list_student_tasks)/%(scope)s$',
         '%(module_package)s.%(module_name)s.list_student_tasks',
         'List Student tasks')]
 
@@ -77,7 +78,7 @@ class View(student.View):
         ghop_mentor_logic.logic]),
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', ghop_student_logic.logic)]
-    rights['list_student_tasks'] = [('checkIsMyActiveRole',
+    rights['list_student_tasks'] = [('checkHasActiveRoleForScope',
         ghop_student_logic.logic)]
 
     new_params = {}
@@ -126,32 +127,41 @@ class View(student.View):
 
     tasks_by_orgs = {}
     for task in tasks:
-      if task.scope.name in tasks_by_orgs:
-        tasks_by_orgs[task.scope.name].append(task)
+      key = task.scope.key().id_or_name()
+      if key in tasks_by_orgs:
+        tasks_by_orgs[key][1].append(task)
       else:
-        tasks_by_orgs[task.scope.name] = [task]
+        tasks_by_orgs[key] = (task.scope.name, [task])
 
     contents = []
     context = {}
 
-    sp_params = params.copy()
-    sp_params['list_template'] = 'soc/models/list.html'
-    sp_params['list_heading'] = 'modules/ghop/task/list/heading.html'
-    sp_params['list_row'] = 'modules/ghop/task/list/row.html'
-    sp_params['pagination'] = 'soc/list/no_pagination.html'
-    sp_params['list_action'] = (redirects.getPublicRedirect, sp_params)
+    st_params = ghop_task_view.view.getParams().copy()
+    st_params['list_template'] = 'soc/models/list.html'
+    st_params['list_heading'] = 'modules/ghop/task/list/heading.html'
+    st_params['list_row'] = 'modules/ghop/task/list/row.html'
+    st_params['list_action'] = (redirects.getPublicRedirect, st_params)
 
-    sp_org_params = sp_params.copy()
-    for org in tasks_by_orgs.keys():
-      sp_org_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % org
+    st_org_params = st_params.copy()
+    for k, v in tasks_by_orgs.iteritems():
+      st_org_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % v[0]
 
-      sp_org_list = lists.getListContentForData(request, sp_org_params,
-          data=tasks_by_orgs[org], idx=1, need_content=True)
+      st_org_list = self._listStudentTasks(tasks_by_orgs[k][1], st_org_params)
 
-      contents.append(sp_org_list)
+      contents.append(st_org_list)
 
-    return self._list(request, sp_params, contents, page_name, context)
+    return self._list(request, st_params, contents, page_name, context)
 
+  def _listStudentTasks(self, data, params):
+    """Returns a list with all entities specified in data.
+    """
+
+    result = dicts.rename(params, params['list_params'])
+    result['action'] = (redirects.getPublicRedirect, params)
+    result['data'] = data
+    result['pagination'] = 'soc/list/no_pagination.html'
+
+    return result
 
 view = View()
 

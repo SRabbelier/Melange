@@ -440,7 +440,7 @@ class View(program.View):
                                    'student_signup_start'):
       # add a link to show all projects
       items += [(ghop_redirects.getListStudentTasksRedirect(
-          student_entity, {'url_name':'ghop/student'}),
+          ghop_program_entity, {'url_name':'ghop/student'}),
           "List my Tasks", 'any_access')]
 
     items += [(redirects.getEditRedirect(student_entity, 

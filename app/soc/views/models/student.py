@@ -147,7 +147,7 @@ class View(role.View):
 
     new_params['show_in_roles_overview'] = True
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

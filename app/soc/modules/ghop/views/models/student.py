@@ -72,10 +72,11 @@ class View(student.View):
     rights['edit'] = [('checkIsMyActiveRole', ghop_student_logic.logic)]
     rights['apply'] = [
         'checkIsUser',
-        ('checkIsActivePeriod', ['student_signup', 'scope_path']),
+        ('checkIsActivePeriod', ['student_signup', 'scope_path',
+            ghop_program_logic.logic]),
         ('checkIsNotParticipatingInProgramInScope',
-        [ghop_student_logic.logic, ghop_org_admin_logic.logic,
-        ghop_mentor_logic.logic]),
+            [ghop_program_logic.logic, ghop_student_logic.logic,
+            ghop_org_admin_logic.logic, ghop_mentor_logic.logic]),
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', ghop_student_logic.logic)]
     rights['list_student_tasks'] = [('checkHasActiveRoleForScope',
@@ -162,6 +163,7 @@ class View(student.View):
     result['pagination'] = 'soc/list/no_pagination.html'
 
     return result
+
 
 view = View()
 

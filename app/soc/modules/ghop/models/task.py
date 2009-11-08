@@ -42,7 +42,7 @@ import soc.modules.ghop.models.program
 class TaskTag(Tag):
   """Model for storing all Task tags.
   """
-  
+
   #: Each task_type tag is scoped under the program. 
   scope = db.ReferenceProperty(reference_class=soc.models.linkable.Linkable,
                                required=True,
@@ -180,7 +180,12 @@ class TaskArbitraryTag(TaskTag):
   """Model for storing of arbitrary tags.
   """
 
-  pass
+  def __init__(self, *args, **kwds):
+    """Initialization function.
+    """
+
+    TaskTag.__init__(self, *args, **kwds)
+    self.auto_delete = True
 
 
 class GHOPTask(Taggable, soc.models.linkable.Linkable):

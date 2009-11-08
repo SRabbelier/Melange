@@ -113,8 +113,10 @@ class Logic(base.Logic):
           # initialize history
           task_history = {}
       # extract the existing json history from the entity to update it
-    else:
+    elif entity.history:
       task_history = simplejson.loads(entity.history)
+    else:
+      task_history = {}
 
       # we construct history for only changed entity properties
       if entity_properties:

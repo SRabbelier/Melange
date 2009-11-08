@@ -16,6 +16,9 @@ class Tag(db.Model):
   tagged_count = db.IntegerProperty(default=0)
   "The number of entities in tagged."
 
+  auto_delete = db.BooleanProperty(required=True, default=False)
+  "If true, a tag instance should be deleted when tagged_count reaches zero."
+
   @classmethod
   def __key_name(cls, tag_name):
     return cls.__name__ + '_' + tag_name
@@ -25,7 +28,10 @@ class Tag(db.Model):
       if key in self.tagged:
         self.tagged.remove(key)
         self.tagged_count -= 1
-        self.put()
+        if not self.tagged_count and self.auto_delete:
+          self.delete()
+        else:
+          self.put()
     db.run_in_transaction(remove_tagged_txn)
     self.__class__.expire_cached_tags()
 
@@ -40,9 +46,12 @@ class Tag(db.Model):
     
   def clear_tagged(self):
     def clear_tagged_txn():
-      self.tagged = []
-      self.tagged_count = 0
-      self.put()
+      if self.auto_delete:
+        self.delete()
+      else:
+        self.tagged = []
+        self.tagged_count = 0
+        self.put()
     db.run_in_transaction(clear_tagged_txn)
     self.__class__.expire_cached_tags()
         

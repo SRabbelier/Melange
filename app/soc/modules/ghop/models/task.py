@@ -129,8 +129,7 @@ class TaskTag(Tag):
 
   @classmethod
   def delete_tag(cls, scope, tag_name):
-    """Copy a tag with a given scope and tag_name to another tag with
-    new tag_name.
+    """Delete a tag with a given scope and tag_name.
     """
     tag = cls.get_by_scope_and_name(scope, tag_name)
 

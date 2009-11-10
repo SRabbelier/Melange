@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
@@ -43,27 +44,14 @@ class TaskTag(Tag):
   """Model for storing all Task tags.
   """
 
-  #: Each task_type tag is scoped under the program.
-
   order = db.IntegerProperty(required=True, default=0)
 
   @classmethod
-  def __key_name(cls, scope_path, tag_name):
-    """Create the key_name from program key_name as scope_path and tag_name.
-    """
-    return scope_path + '/' + tag_name
-
-  @classmethod
-  def get_by_name(cls, tag_name):
-    """Get the list of tag objects that has the given tag_name.
-    """
-    tags = db.Query(cls).filter('tag =', tag_name).fetch(1000)
-    return tags
-
-  @classmethod
   def get_by_scope(cls, scope):
-    """Get the list of tag objects that has the given scope.
+    """Get the list of tag objects that has the given scope and sorts the
+       result by order values.
     """
+
     tags = db.Query(cls).filter('scope =', scope).order('order').fetch(1000)
     return tags
 
@@ -71,25 +59,12 @@ class TaskTag(Tag):
   def get_highest_order(cls, scope):
     """Get a tag with highest order.
     """
-    tags = db.Query(cls).filter('scope =', scope).order('-order').fetch(1)
-    if tags:
-      return tags[0].order
+
+    tag = db.Query(cls).filter('scope =', scope).order('-order').get()
+    if tag:
+      return tag.order
     else:
       return -1
-
-  @classmethod
-  def get_by_scope_and_name(cls, scope, tag_name):
-    """Get a tag by scope and name.
-
-    There can be only one such tag.
-    """
-
-    tags = db.Query(cls).filter(
-        'scope =', scope).filter('tag =', tag_name).fetch(1)
-    if tags:
-      return tags[0]
-    else:
-      return None
 
   @classmethod
   def update_order(cls, scope, tag_name, order):
@@ -102,64 +77,6 @@ class TaskTag(Tag):
       tag.put()
 
     return tag
-
-  @classmethod
-  def copy_tag(cls, scope, tag_name, new_tag_name):
-    """Copy a tag with a given scope and tag_name to another tag with
-    new tag_name.
-    """
-    tag = cls.get_by_scope_and_name(scope, tag_name)
-
-    if tag:
-      tag_key_name = cls.__key_name(scope.key().name(), new_tag_name)
-      existing_tag = cls.get_by_key_name(tag_key_name)
-
-      if existing_tag is None:
-        new_tag = cls(key_name=tag_key_name, tag=new_tag_name, scope=scope, 
-                      added=tag.added, tagged=tag.tagged,
-                      tagged_count=tag.tagged_count)
-        new_tag.put()
-        tag.delete()
-
-        return new_tag
-
-      return existing_tag
-
-    return None
-
-  @classmethod
-  def delete_tag(cls, scope, tag_name):
-    """Delete a tag with a given scope and tag_name.
-    """
-    tag = cls.get_by_scope_and_name(scope, tag_name)
-
-    if tag:
-      tag.delete()
-      return True
-
-    return False
-
-  @classmethod
-  def get_or_create(cls, scope, tag_name, order=0):
-    """Get the Tag object that has the tag value given by tag_value.
-    """
-
-    if not scope:
-      return None
-
-    tag_key_name = cls.__key_name(scope.key().name(), tag_name)
-    existing_tag = cls.get_by_key_name(tag_key_name)
-    if existing_tag is None:
-      # the tag does not yet exist, so create it.
-      if not order:
-        order = cls.get_highest_order(scope=scope) + 1
-      def create_tag_txn():
-        new_tag = cls(key_name=tag_key_name, tag=tag_name,
-                      scope=scope, order=order)
-        new_tag.put()
-        return new_tag
-      existing_tag = db.run_in_transaction(create_tag_txn)
-    return existing_tag
 
 
 class TaskTypeTag(TaskTag):
@@ -202,12 +119,12 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   title.help_text = ugettext('Title of the task')
 
   #: Required field containing the description of the task
-  description = db.TextProperty(required=True, 
+  description = db.TextProperty(required=True,
                                 verbose_name=ugettext('Description'))
   description.help_text = ugettext('Complete description of the task')
 
   #: Field indicating the difficulty level of the Task. This is not
-  #: mandatory so the it can be assigned at any later stage. 
+  #: mandatory so the it can be assigned at any later stage.
   #: The options are configured by a Program Admin.
   difficulty = tag_property('difficulty')
 
@@ -260,7 +177,7 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #:   reopened.
   #: ClaimRequested: A Student has requested to claim this task.
   #: Claimed: This Task has been claimed and someone is working on it.
-  #: ActionNeeded: Work on this Task must be submitted for review within 
+  #: ActionNeeded: Work on this Task must be submitted for review within
   #:   24 hours.
   #: Closed: Work on this Task has been completed to the org's content.
   #: AwaitingRegistration: Student has completed work on this task, but
@@ -272,8 +189,8 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: Invalid: The Task is deleted either by an Org Admin/Mentor
   status = db.StringProperty(
       required=True, verbose_name=ugettext('Status'),
-      choices=['Unapproved', 'Unpublished', 'Open', 'Reopened', 
-               'ClaimRequested', 'Claimed', 'ActionNeeded', 
+      choices=['Unapproved', 'Unpublished', 'Open', 'Reopened',
+               'ClaimRequested', 'Claimed', 'ActionNeeded',
                'Closed', 'AwaitingRegistration', 'NeedsWork',
                'NeedsReview', 'Invalid'],
       default='Unapproved')
@@ -318,7 +235,7 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #:                   "state": "Unapproved"
   #:                   ...
   #:                   "edited_by": Role reference
-  #:                   
+  #:
   #:               }
   #:    timestamp2: {
   #:                   "state": "Unpublished"
@@ -330,10 +247,10 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
   #: Reference properties will be stored by calling str() on their Key.
   history = db.TextProperty(required=False, default='')
 
-  def __init__(self, parent=None, key_name=None, 
+  def __init__(self, parent=None, key_name=None,
                app=None, **entity_values):
     """Constructor for GHOPTask Model.
-    
+
     Args:
         See Google App Engine APIs.
     """
@@ -343,6 +260,6 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
 
     # call the Taggable constructor to initialize the tags specified as
     # keyword arguments
-    Taggable.__init__(self, task_type=TaskTypeTag, 
+    Taggable.__init__(self, task_type=TaskTypeTag,
                       difficulty=TaskDifficultyTag,
                       arbit_tag=TaskArbitraryTag)

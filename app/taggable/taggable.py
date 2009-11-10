@@ -2,9 +2,10 @@ from google.appengine.ext import db
 
 import string
 import soc.models.linkable
-    
+
 class Tag(db.Model):
-  "Google AppEngine model for store of tags."
+  """Google AppEngine model for store of tags.
+  """
 
   tag = db.StringProperty(required=True)
   "The actual string value of the tag."
@@ -27,9 +28,12 @@ class Tag(db.Model):
   "Each tag is scoped under some linkable model."
 
   @classmethod
-  def __key_name(cls, tag_name):
-    return cls.__name__ + '_' + tag_name
-    
+  def __key_name(cls, scope_path, tag_name):
+    """Create the key_name from program key_name as scope_path and tag_name.
+    """
+
+    return scope_path + '/' + tag_name
+
   def remove_tagged(self, key):
     def remove_tagged_txn():
       if key in self.tagged:
@@ -50,7 +54,7 @@ class Tag(db.Model):
         self.put()
     db.run_in_transaction(add_tagged_txn)
     self.__class__.expire_cached_tags()
-    
+
   def clear_tagged(self):
     def clear_tagged_txn():
       if self.auto_delete:
@@ -61,47 +65,70 @@ class Tag(db.Model):
         self.put()
     db.run_in_transaction(clear_tagged_txn)
     self.__class__.expire_cached_tags()
-        
+
   @classmethod
   def get_by_name(cls, tag_name):
-    return cls.get_by_key_name(cls.__key_name(tag_name))
-    
-  @classmethod
-  def get_tags_for_key(cls, key):
-    "Set the tags for the datastore object represented by key."
-    tags = db.Query(cls).filter('tagged =', key).fetch(1000)
+    """Get the list of tag objects that has the given tag_name.
+    """
+
+    tags = db.Query(cls).filter('tag =', tag_name).fetch(1000)
     return tags
-    
+
   @classmethod
-  def get_or_create(cls, tag_name):
-    "Get the Tag object that has the tag value given by tag_value."
-    tag_key_name = cls.__key_name(tag_name)
+  def get_by_scope_and_name(cls, scope, tag_name):
+    """Get a tag by scope and name.
+
+    There may be only one such tag.
+    """
+
+    return db.Query(cls).filter(
+        'scope =', scope).filter('tag =', tag_name).get()
+
+  @classmethod
+  def get_tags_for_key(cls, key, limit=1000):
+    """Get the tags for the datastore object represented by key.
+    """
+
+    tags = db.Query(cls).filter('tagged =', key).fetch(limit)
+    return tags
+
+  @classmethod
+  def get_or_create(cls, scope, tag_name, order=0):
+    """Get the Tag object that has the tag value given by tag_value.
+    """
+
+    tag_key_name = cls.__key_name(scope.key().name(), tag_name)
     existing_tag = cls.get_by_key_name(tag_key_name)
     if existing_tag is None:
-      # The tag does not yet exist, so create it.
+      # the tag does not yet exist, so create it.
+      if not order:
+        order = cls.get_highest_order(scope=scope) + 1
       def create_tag_txn():
-        new_tag = cls(key_name=tag_key_name, tag=tag_name)
+        new_tag = cls(key_name=tag_key_name, tag=tag_name,
+                      scope=scope, order=order)
         new_tag.put()
         return new_tag
       existing_tag = db.run_in_transaction(create_tag_txn)
     return existing_tag
-    
+
   @classmethod
   def get_tags_by_frequency(cls, limit=1000):
-    """Return a list of Tags sorted by the number of objects to 
-    which they have been applied, most frequently-used first. 
-    If limit is given, return only that many tags; otherwise,
-    return all."""
+    """Return a list of Tags sorted by the number of objects to which they
+    have been applied, most frequently-used first. If limit is given, return
+    only return only that many tags; otherwise, return all.
+    """
+
     tag_list = db.Query(cls).filter('tagged_count >', 0).order(
         "-tagged_count").fetch(limit)
-            
+
     return tag_list
 
   @classmethod
   def get_tags_by_name(cls, limit=1000, ascending=True):
     """Return a list of Tags sorted alphabetically by the name of the tag.
     If a limit is given, return only that many tags; otherwise, return all.
-    If ascending is True, sort from a-z; otherwise, sort from z-a."""
+    If ascending is True, sort from a-z; otherwise, sort from z-a.
+    """
 
     from google.appengine.api import memcache
 
@@ -127,7 +154,48 @@ class Tag(db.Model):
     return tags
 
   @classmethod
+  def copy_tag(cls, scope, tag_name, new_tag_name):
+    """Copy a tag with a given scope and tag_name to another tag with
+    new tag_name.
+    """
+    tag = cls.get_by_scope_and_name(scope, tag_name)
+
+    if tag:
+      tag_key_name = cls.__key_name(scope.key().name(), new_tag_name)
+      existing_tag = cls.get_by_key_name(tag_key_name)
+
+      if existing_tag is None:
+        new_tag = cls(key_name=tag_key_name, tag=new_tag_name, scope=scope, 
+                      added=tag.added, tagged=tag.tagged,
+                      tagged_count=tag.tagged_count)
+        new_tag.put()
+        tag.delete()
+
+        return new_tag
+
+      return existing_tag
+
+    return None
+
+  @classmethod
+  def delete_tag(cls, scope, tag_name):
+    """Delete a tag with a given scope and tag_name.
+    """
+
+    tag = cls.get_by_scope_and_name(scope, tag_name)
+
+    if tag:
+      tag.delete()
+      return True
+
+    return False
+
+  @classmethod
   def popular_tags(cls, limit=5):
+    """Get the most popular tags from memcache, or if they are not defined
+    there, it retrieves them from datastore and sets in memcache.
+    """
+
     from google.appengine.api import memcache
 
     tags = memcache.get(cls.__name__ + '_popular_tags')
@@ -139,6 +207,9 @@ class Tag(db.Model):
 
   @classmethod
   def expire_cached_tags(cls):
+    """Expire all tag lists which exist in memcache.
+    """
+
     from google.appengine.api import memcache
 
     memcache.delete(cls.__name__ + '_popular_tags')
@@ -151,8 +222,9 @@ class Tag(db.Model):
 
     return self.tag
 
+
 def tag_property(tag_name):
-  """Decorator that creates and returns a tag property to be used 
+  """Decorator that creates and returns a tag property to be used
   in Google AppEngine model.
 
   Args:
@@ -170,7 +242,7 @@ def tag_property(tag_name):
     return self._tags[tag_name]
 
   def set_tags(self, seed):
-    """Set a list of Tag objects for all Tags that apply to 
+    """Set a list of Tag objects for all Tags that apply to
     the specified entity.
     """
 
@@ -212,10 +284,10 @@ def tag_property(tag_name):
 class Taggable(object):
   """A mixin class that is used for making GAE Model classes taggable.
 
-  This is an extended version of Taggable-mixin which allows for 
+  This is an extended version of Taggable-mixin which allows for
   multiple tag properties in the same AppEngine Model class.
   """
-    
+
   def __init__(self, **kwargs):
     """The constructor class for Taggable, that creates a dictionary of tags.
 
@@ -239,7 +311,7 @@ class Taggable(object):
 
   def tags_string(self, tag_name, ret_list=False):
     """Create a formatted string version of this entity's tags.
-    
+
     Args:
       tag_name: the name of the tag which must be formatted
       ret_list: if False sends a string, otherwise sends a Python list

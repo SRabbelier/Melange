@@ -43,10 +43,7 @@ class TaskTag(Tag):
   """Model for storing all Task tags.
   """
 
-  #: Each task_type tag is scoped under the program. 
-  scope = db.ReferenceProperty(reference_class=soc.models.linkable.Linkable,
-                               required=True,
-                               collection_name='task_type_tags')
+  #: Each task_type tag is scoped under the program.
 
   order = db.IntegerProperty(required=True, default=0)
 
@@ -147,6 +144,10 @@ class TaskTag(Tag):
   def get_or_create(cls, scope, tag_name, order=0):
     """Get the Tag object that has the tag value given by tag_value.
     """
+
+    if not scope:
+      return None
+
     tag_key_name = cls.__key_name(scope.key().name(), tag_name)
     existing_tag = cls.get_by_key_name(tag_key_name)
     if existing_tag is None:

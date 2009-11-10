@@ -1,5 +1,7 @@
 from google.appengine.ext import db
+
 import string
+import soc.models.linkable
     
 class Tag(db.Model):
   "Google AppEngine model for store of tags."
@@ -18,6 +20,11 @@ class Tag(db.Model):
 
   auto_delete = db.BooleanProperty(required=True, default=False)
   "If true, a tag instance should be deleted when tagged_count reaches zero."
+
+  scope = db.ReferenceProperty(reference_class=soc.models.linkable.Linkable,
+                               required=False,
+                               collection_name='task_type_tags')
+  "Each tag is scoped under some linkable model."
 
   @classmethod
   def __key_name(cls, tag_name):

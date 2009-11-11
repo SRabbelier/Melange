@@ -1,0 +1,15 @@
+Melange taggable module
+Copyright 2008-2009 Adam Crossland and Melange authors.
+
+This software contains code derived from the taggable-mixin open source project developed by Adam Crossland.
+
+Melange developers and contributors have introduced various modifications. The most significant ones are listed below:
+
+* taggable.py
+- tag_property function added; its purpose is to support more than one tag per data model
+- Taggable class serves as a sort of tags container
+- scope property added to the Tag model; most class methods are extended to support that field
+- auto_delete property added to the Tag model in order to automatically get rid of unused tag instances
+
+The original software is available from 
+  http://code.google.com/p/taggable-mixin/

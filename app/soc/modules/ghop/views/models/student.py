@@ -79,8 +79,7 @@ class View(student.View):
             ghop_org_admin_logic.logic, ghop_mentor_logic.logic]),
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', ghop_student_logic.logic)]
-    rights['list_student_tasks'] = [('checkHasActiveRoleForScope',
-        ghop_student_logic.logic)]
+    rights['list_student_tasks'] = ['checkCanOpenTaskList']
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.student.logic

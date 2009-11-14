@@ -24,7 +24,10 @@ __authors__ = [
 
 import time
 
+from google.appengine.ext import db
+
 from django import forms
+from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -100,6 +103,8 @@ class View(base.View):
 
     new_params['edit_redirect'] = '/%(url_name)s/list'
 
+    new_params['list_template'] = 'soc/notification/list/notification.html'
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -107,10 +112,51 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None, order=None, **kwargs):
+            page_name=None, params=None, filter=None, order=None, **kwargs):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
+    """
+
+    if request.method == 'POST':
+      return self.listPost(request, params, **kwargs)
+    else: # request.method == 'GET'
+      return self.listGet(request, page_name, params, **kwargs)
+
+  def listPost(self, request, params, **kwargs):
+    """Handles the POST request for the list of notifications.
+    """
+
+    post_dict = request.POST
+    notification_keys = post_dict.getlist('notification_key')
+
+    # if delete all the specified notifications
+    if post_dict.get('delete'):
+      db.delete([notification_logic.getFromKeyName(key_name) 
+                 for key_name in notification_keys])
+    else:
+      # determine the action
+      filter = {}
+      if post_dict.get('unread'):
+        filter['unread'] = True
+      elif post_dict.get('read'):
+        filter['unread'] = False
+
+      entities = []
+      # perform the action for each notification
+      for key_name in notification_keys:
+        entity = notification_logic.getFromKeyName(key_name)
+        entity = notification_logic.updateEntityProperties(
+            entity, filter, store=False)
+        entities.append(entity)
+
+      db.put(entities)
+
+    # redirect to the same page
+    return http.HttpResponseRedirect('')
+
+  def listGet(self, request, page_name=None, params=None, **kwargs):
+    """Handles the GET request for the list of notifications.
     """
 
     # get the current user
@@ -211,4 +257,3 @@ delete = decorators.view(view.delete)
 list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
-

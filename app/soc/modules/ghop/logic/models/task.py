@@ -150,6 +150,8 @@ class Logic(base.Logic):
           }
       entity_properties.update(history_property)
 
+    entity = self.tags_service.setTagValuesForEntity(entity, entity_properties)
+
     # call the base logic method to store the updated Task entity
     return super(Logic, self).updateEntityProperties(
         entity, entity_properties, silent=silent, store=store)
@@ -256,12 +258,7 @@ class Logic(base.Logic):
 
     entity = super(Logic, self).updateOrCreateFromFields(properties, silent)
 
-    if entity:
-      if properties.get('task_type'):
-        setattr(entity, 'task_type', properties['task_type'])
-
-      if properties.get('difficulty'):
-        setattr(entity, 'difficulty', properties['difficulty'])
+    self.tags_service.setTagValuesForEntity(entity, properties)
 
     return entity
 

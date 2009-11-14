@@ -84,7 +84,7 @@ class TagsService(object):
       return
 
     for tag_name in tag_names:
-      if tag_name in tag_names:
+      if tag_name in self.tag_names:
         cls = entity.tags_class(tag_name)
         tags = cls.get_tags_for_key(entity.key())
         for tag in tags:

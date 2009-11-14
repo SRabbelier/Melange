@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -31,6 +32,9 @@ from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic.models import base
+from soc.logic import tags
+
+from soc.modules.ghop.logic.models import comment as ghop_comment_logic
 
 import soc.models.linkable
 
@@ -45,6 +49,7 @@ STATE_TRANSITIONS = {
     'NeedsWork': 'transitFromNeedsWork',
     }
 
+TAG_NAMES = ['arbit_tag', 'difficulty', 'task_type']
 
 class Logic(base.Logic):
   """Logic methods for the GHOPTask model.
@@ -69,6 +74,8 @@ class Logic(base.Logic):
                scope_logic=soc.modules.ghop.logic.models.organization):
     """Defines the name, key_name and model for this entity.
     """
+
+    self.tags_service = tags.TagsService(TAG_NAMES)
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
@@ -430,6 +437,24 @@ class Logic(base.Logic):
         }
 
     return update_dict
+
+  def delete(self, entity):
+    """Delete existing entity from datastore.
+    """
+    
+    def task_delete_txn(entity):
+      """Performs all necessary operations in a single transaction when a task
+      is deleted.
+      """
+
+      to_delete = []    
+      to_delete += ghop_comment_logic.logic.getForFields(ancestors=[entity])
+      to_delete += [entity]
+    
+      db.delete(to_delete)
+  
+    self.tags_service.removeAllTagsForEntity(entity)
+    db.run_in_transaction(task_delete_txn, entity)
 
 
 logic = Logic()

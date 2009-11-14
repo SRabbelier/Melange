@@ -323,3 +323,9 @@ class Taggable(object):
       return tag_list
     else:
       return self.tag_separator.join(tag_list)
+
+  def tags_class(self, tag_name):
+    """Return a class instance object for a given tag name.
+    """
+
+    return self._tag_model[tag_name]

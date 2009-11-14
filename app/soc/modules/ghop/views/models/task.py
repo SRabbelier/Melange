@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -157,7 +158,10 @@ class View(base.View):
         ('checkRoleAndStatusForTask',
             [['ghop/org_admin'], ['active'],
             ['Unapproved', 'Unpublished', 'Open']])]
-    rights['delete'] = ['checkIsDeveloper']
+    rights['delete'] = [
+        ('checkRoleAndStatusForTask', 
+            [['ghop/org_admin'], ['active'],
+            ['Unapproved', 'Unpublished', 'Open']])]
     rights['show'] = ['checkStatusForTask']
     rights['list_org_tasks'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False])]
@@ -1441,6 +1445,28 @@ class View(base.View):
 
     # call the _list method from base to display the list
     return self._list(request, task_params, contents, page_name, context)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def delete(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Shows the delete page for the entity specified by **kwargs.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    params = params.copy()
+
+    params['delete_redirect'] = '/%s/list_org_tasks/%s' % (
+        params['url_name'], kwargs['scope_path'])
+
+    return super(View, self).delete(request, access_type, page_name=page_name,
+        params=params, **kwargs)
 
 
 view = View()

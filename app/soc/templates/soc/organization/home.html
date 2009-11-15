@@ -16,17 +16,13 @@ limitations under the License.
 {% block scripts %}
 {{ block.super }}
 {% if gmaps_api_key %}
-	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ gmaps_api_key }}" type="text/javascript"></script>
-	<script type="text/javascript" src="/soc/content/js/map-090917.js"></script>
+	<script src="http://www.google.com/jsapi?key={{ gmaps_api_key }}" type="text/javascript"></script>
+	<script type="text/javascript" src="/soc/content/js/templates/soc/organization/home-091027.js" melangeContext="{map_data: {{ org_map_data }} }"></script>
 {% endif %}
 {% endblock %}
 
 {% block body_tag %}
-  {% if gmaps_api_key %}
-    <body onLoad="org_home_gmap.map_load({{ org_map_data }})" onunload="GUnload()">
-  {% else %}
-    {{ block.super }}
-  {% endif %}
+  {{ block.super }}
 {% endblock %}
 
 {% block instructions %}

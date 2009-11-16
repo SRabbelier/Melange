@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
 
 
@@ -33,6 +34,12 @@ class GHOPTimeline(soc.models.timeline.Timeline):
   """GHOP Timeline model extends the basic Timeline model. It implements
      the GHOP specific timeline entries.
   """
+
+  tasks_publicly_visible = db.DateTimeProperty(
+      verbose_name=ugettext('Tasks Publicly Visible date'))
+  tasks_publicly_visible.help_text = ugettext(
+      'Tasks published by Organizations become publicly visible '
+      'after this date.')
 
   task_claim_deadline = db.DateTimeProperty(
       verbose_name=ugettext('Task Claim Deadline date'))

@@ -23,6 +23,7 @@ __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -234,10 +235,17 @@ class GHOPChecker(access.Checker):
     except out_of_band.Error:
       pass
 
+    program_entity = ghop_program_logic.logic.getFromKeyNameOr404(
+        django_args['scope_path'])
+    
+    if not timeline_helper.isAfterEvent(program_entity.timeline,
+        'tasks_publicly_visible'):
+      raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+      
     # bail out with 404 if no task is found
     task_entity = ghop_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
-    if task_entity.status  in ['Unapproved', 'Unpublished', 'Invalid']:
+    if task_entity.status in ['Unapproved', 'Unpublished', 'Invalid']:
       # this proposal can not be task at the moment
       raise out_of_band.AccessViolation(
           message_fmt=DEF_NO_PUB_TASK_MSG)

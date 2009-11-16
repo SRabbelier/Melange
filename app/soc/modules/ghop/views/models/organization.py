@@ -18,7 +18,8 @@
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
 
@@ -127,8 +128,13 @@ class View(organization.View):
 
     ghop_program_entity = entity.scope
 
-    if timeline_helper.isAfterEvent(ghop_program_entity.timeline,
-                                    'student_signup_start'):
+    is_after_student_signup = timeline_helper.isAfterEvent(
+        ghop_program_entity.timeline, 'student_signup_start')
+
+    is_after_tasks_become_public = timeline_helper.isAfterEvent(
+        ghop_program_entity.timeline, 'tasks_publicly_visible')
+
+    if is_after_student_signup and is_after_tasks_become_public:
       # open tasks
       to_params = ghop_task_view.view.getParams().copy()
 

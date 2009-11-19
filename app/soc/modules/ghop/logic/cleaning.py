@@ -74,25 +74,26 @@ def cleanMentorsList(field_name):
 
     mentors_list_str = cleaning.str2set(field_name)(self)
 
-    filter = {
+    fields = {
         'scope_path': self.cleaned_data.get('scope_path'),
         'status': 'active'
         }
 
-    mentors_list = []
+    mentors = []
     for link_id in mentors_list_str:
 
       if not validate.isLinkIdFormatValid(link_id):
         raise forms.ValidationError(
             "%s is not a valid link ID." % link_id)
 
-      filter['link_id'] = link_id
+      fields['link_id'] = link_id
 
-      if not ghop_mentor_logic.getFromKeyFields(filter):
+      mentor = ghop_mentor_logic.getFromKeyFields(fields)
+      if not mentor:
         raise forms.ValidationError(
             'link_id "%s" is not a valid Mentor.' % link_id)
 
-      mentors_list.append(link_id)
+      mentors.append(mentor.key())
 
-    return mentors_list
+    return mentors
   return wrapper

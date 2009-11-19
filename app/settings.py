@@ -129,6 +129,6 @@ INSTALLED_APPS = (
 
 MODULE_FMT = 'soc.modules.%s.callback'
 # TODO: to enable GHOP change the MODULES line have the following entries:
-MODULES = ['ghop']
+#MODULES = ['ghop']
 #MODULES = ['gsoc']
-#MODULES = []
+MODULES = []

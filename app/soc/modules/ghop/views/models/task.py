@@ -526,17 +526,7 @@ class View(base.View):
       elif fields.get('approved'):
         fields['status'] = 'Unpublished'
 
-      fields['mentors'] = []
-      if fields.get('mentors_list'):
-
-        for mentor_link_id in fields['mentors_list']:
-          properties = {
-              'scope_path': fields['scope_path'],
-              'link_id': mentor_link_id,
-              }
-
-          mentor_entity = ghop_mentor_logic.logic.getFromKeyFields(properties)
-          fields['mentors'].append(mentor_entity.key())
+      fields['mentors'] = fields.get('mentors_list', [])
     else:
       role_entity = ghop_mentor_logic.logic.getForFields(
           filter, unique=True)

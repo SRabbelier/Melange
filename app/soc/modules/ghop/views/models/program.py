@@ -404,30 +404,33 @@ class View(program.View):
           'user': user,
           'program': ghop_program_entity,
           }
-      if ghop_task_logic.logic.getForFields(filter, unique=True):
+      if user and ghop_task_logic.logic.getForFields(filter, unique=True):
         items += [(ghop_redirects.getListStudentTasksRedirect(
             ghop_program_entity, {'url_name':'ghop/student'}),
             "List my Tasks", 'any_access')]
 
-    # get mentor and org_admin entity for this user and program
-    filter = {'user': user,
-              'program': ghop_program_entity,
-              'status': 'active'}
-    mentor_entity = ghop_mentor_logic.logic.getForFields(filter, unique=True)
-    org_admin_entity = ghop_org_admin_logic.logic.getForFields(
-        filter, unique=True)
+      filter['status'] = 'AwaitingRegistration'
+      if ghop_task_logic.logic.getForFields(filter, unique=True):
+        if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+          # this user does not have a role yet for this program
+          items += [('/ghop/student/apply/%s' % (
+              ghop_program_entity.key().id_or_name()),
+              "Register as a Student", 'any_access')]
 
-    if mentor_entity or org_admin_entity:
-      items += self._getOrganizationEntries(
-          ghop_program_entity, org_admin_entity,
-          mentor_entity, params, id, user)
+      # get mentor and org_admin entity for this user and program
+      filter = {
+          'user': user,
+          'program': ghop_program_entity,
+          'status': 'active'
+          }
+      mentor_entity = ghop_mentor_logic.logic.getForFields(filter, unique=True)
+      org_admin_entity = ghop_org_admin_logic.logic.getForFields(
+          filter, unique=True)
 
-    if user and not (student_entity or mentor_entity or org_admin_entity):
-      if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-        # this user does not have a role yet for this program
-        items += [('/ghop/student/apply/%s' % (
-            ghop_program_entity.key().id_or_name()),
-            "Register as a Student", 'any_access')]
+      if mentor_entity or org_admin_entity:
+        items += self._getOrganizationEntries(
+            ghop_program_entity, org_admin_entity,
+            mentor_entity, params, id, user)
 
     if timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
       url = redirects.getAcceptedOrgsRedirect(

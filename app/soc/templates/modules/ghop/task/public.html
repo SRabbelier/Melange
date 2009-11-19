@@ -19,16 +19,24 @@ limitations under the License.
 {{ block.super }}
 
 <script type="text/javascript">
+
+  var showWorkSubmissionInput = function () {
+    $('[for^=id_work_submission]').show("normal");
+    $('#id_work_submission').show("normal");
+    $('td.formfielderror').show("normal");    
+  };
+	  
   $(document).ready(function(){
 	  if (!$('#id_work_submission').val()) {
 		  $('[for^=id_work_submission]').hide();
 		  $('#id_work_submission').hide();
 		}
+	$("#id_action > *[value='needs_review'][selected='true']").each(function () {
+	  showWorkSubmissionInput(); 
+	});
     $('#id_action').change(function() {
       if ($(this).val() == 'needs_review') {
-        $('[for^=id_work_submission]').show("normal");
-        $('#id_work_submission').show("normal");
-        $('td.formfielderror').show("normal");
+        showWorkSubmissionInput();
       }
       else if ($(this).val() != 'needs_work'){
         $('[for^=id_work_submission]').hide("normal");

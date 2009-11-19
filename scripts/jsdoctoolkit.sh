@@ -1,5 +1,13 @@
 #!/bin/bash
-#Requires java installed
+<<JSDOCTOOLKIT
+Script to run JSDocToolkit over our JS files.
+
+It creates a documentation directory under app/soc/content/js
+with the output for private and public docs, with or without
+undocumented functions.
+
+Requires Java installed.
+JSDOCTOOLKIT
 
 jsdoc_dir="../thirdparty/jsdoctoolkit"
 

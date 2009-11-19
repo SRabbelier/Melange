@@ -216,8 +216,9 @@ class GHOPChecker(access.Checker):
          - If the task is not in one of the required states.
     """
 
+    self.checkIsUser(django_args)
+
     try:
-      self.checkIsUser(django_args)
       user_entity = self.user
 
       filter = {

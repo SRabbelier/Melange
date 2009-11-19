@@ -44,7 +44,7 @@ from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
-from soc.views.models import program 
+from soc.views.models import program
 from soc.views.sitemap import sidebar
 
 import soc.cache.logic
@@ -209,7 +209,7 @@ class View(program.View):
     """View that allows to assign task quotas for accepted GHOP organization.
 
     This view allows the program admin to set the task quota limits
-    and change them at any time when the program is active. 
+    and change them at any time when the program is active.
     """
 
     # TODO: Once GAE Task APIs arrive, this view will be managed by them
@@ -223,15 +223,15 @@ class View(program.View):
     context = {}
 
     if request.method == 'POST':
-      return self.assignTaskQuotasPost(request, context, org_params, 
+      return self.assignTaskQuotasPost(request, context, org_params,
                                        page_name, params, program,
                                        **kwargs)
     else: # request.method == 'GET'
       return self.assignTaskQuotasGet(request, context, org_params,
-                                      page_name, params, program, 
+                                      page_name, params, program,
                                       **kwargs)
 
-  def assignTaskQuotasPost(self, request, context, org_params, 
+  def assignTaskQuotasPost(self, request, context, org_params,
                            page_name, params, entity, **kwargs):
     """Handles the POST request for the task quota allocation page.
 
@@ -260,20 +260,20 @@ class View(program.View):
           raise ValueError
       except ValueError:
         org_entity = ghop_org_logic.getFromKeyName(key_name)
-        error_orgs += org_entity.name + ', ' 
+        error_orgs += org_entity.name + ', '
 
     if error_orgs:
       context['error_message'] = self.DEF_TASK_QUOTA_ERROR_MSG_FMT % (
-          error_orgs[:-2])    
+          error_orgs[:-2])
 
       return self.assignTaskQuotasGet(request, context, org_params,
                                       page_name, params, entity,
-                                      **kwargs) 
+                                      **kwargs)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
 
-  def assignTaskQuotasGet(self, request, context, org_params, 
+  def assignTaskQuotasGet(self, request, context, org_params,
                           page_name, params, entity, **kwargs):
     """Handles the GET request for the task quota allocation page.
 
@@ -378,7 +378,7 @@ class View(program.View):
       menu['items'] = items
       menu['group'] = 'Programs'
       menus.append(menu)
-    
+
     return menus
 
   def _getTimeDependentEntries(self, ghop_program_entity, params, id, user):
@@ -398,7 +398,7 @@ class View(program.View):
     if student_entity:
       items += self._getStudentEntries(ghop_program_entity, student_entity,
                                        params, id, user)
-    else:  
+    else:
       # if a user has a task assigned, he or she still may list it
       filter = {
           'user': user,
@@ -437,7 +437,7 @@ class View(program.View):
 
     return items
 
-  def _getStudentEntries(self, ghop_program_entity, student_entity, 
+  def _getStudentEntries(self, ghop_program_entity, student_entity,
                          params, id, user):
     """Returns a list with menu items for students in a specific program.
     """
@@ -453,7 +453,7 @@ class View(program.View):
           ghop_program_entity, {'url_name':'ghop/student'}),
           "List my Tasks", 'any_access')]
 
-    items += [(redirects.getEditRedirect(student_entity, 
+    items += [(redirects.getEditRedirect(student_entity,
         {'url_name': 'ghop/student'}),
         "Edit my Student Profile", 'any_access')]
 

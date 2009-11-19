@@ -1,5 +1,12 @@
 #!/bin/bash
-#Requires java installed
+<<SHRINKSAFE
+Scripts to run Shrinksafe over JS files during build.
+
+This function is separated from build.sh so it can be run standalone
+without building if needed.
+
+Requires Java installed.
+SHRINKSAFE
 
 echo "*** SHRINKSAFE: running shrinksafe ***"
 

@@ -237,11 +237,11 @@ class GHOPChecker(access.Checker):
 
     program_entity = ghop_program_logic.logic.getFromKeyNameOr404(
         django_args['scope_path'])
-    
+
     if not timeline_helper.isAfterEvent(program_entity.timeline,
         'tasks_publicly_visible'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
-      
+
     # bail out with 404 if no task is found
     task_entity = ghop_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
@@ -292,6 +292,8 @@ class GHOPChecker(access.Checker):
         - if the user has not claimed a single task
     """
 
+    self.checkIsUser(django_args)
+
     try:
       return self.checkHasActiveRoleForScope(django_args, ghop_student_logic)
     except out_of_band.Error:
@@ -303,8 +305,6 @@ class GHOPChecker(access.Checker):
     filter = {
         'user': self.user,
         'program': program,
-        'status': ['ClaimRequested', 'Claimed', 'ActionNeeded', 'NeedsWork',
-            'AwaitingRegistration', 'NeedsReview']
         }
 
     if not ghop_task_logic.logic.getForFields(filter, unique=True):

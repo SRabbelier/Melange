@@ -403,12 +403,8 @@ class View(program.View):
       filter = {
           'user': user,
           'program': ghop_program_entity,
-          'status': ['ClaimRequested', 'Claimed', 'ActionNeeded', 'NeedsWork',
-              'AwaitingRegistration', 'NeedsReview'] 
           }
-      tasks = ghop_task_logic.logic.getForFields(filter)
-
-      if tasks:
+      if ghop_task_logic.logic.getForFields(filter, unique=True):
         items += [(ghop_redirects.getListStudentTasksRedirect(
             ghop_program_entity, {'url_name':'ghop/student'}),
             "List my Tasks", 'any_access')]

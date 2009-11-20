@@ -477,7 +477,7 @@ def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, **kwa
 
 
 def _runSurveyRecordUpdate(entities):
-  """AppEngine Task taht updates SurveyRecord entities.
+  """AppEngine Task that updates SurveyRecord entities.
 
   Args:
     entities: list of SurveyRecord entities to update 
@@ -526,23 +526,55 @@ def runDocumentUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  import logging
   from soc.modules.gsoc.logic.models.organization import logic as org_logic
   from soc.modules.gsoc.logic.models.program import logic as program_logic
 
+  # get all the properties that are part of each Document
+  document_model = document_logic.getModel()
+  document_properties = document_model.properties().keys()
+
+  # use this to store all the new Documents and Presences
+  documents = []
+  presences = []
+
   for entity in entities:
+
+    if entity.prefix not in ['org', 'program']:
+      # we do not want to convert this Document
+      continue
+
+    new_document_properties = {}
+
+    for document_property in document_properties:
+      # copy over all the information from the Document entity
+      new_document_properties[document_property] = getattr(entity,
+                                                           document_property)
+
     if entity.prefix == 'org':
-      org_entity = org_logic.getFromKeyName(entity.scope_path)
-      entity.scope = org_entity
-      entity.home_for = org_entity if entity.home_for else None
+      new_document_prefix = 'gsoc_org'
+      presence_entity = org_logic.getFromKeyName(entity.scope_path)
+    elif entity.prefix == 'program':
+      new_document_prefix = 'gsoc_program'
+      presence_entity = program_logic.getFromKeyName(entity.scope_path)
 
-    if entity.prefix == 'program':
-      program_entity = program_logic.getFromKeyName(entity.scope_path)
-      entity.scope = program_entity
-      entity.home_for = program_entity if entity.home_for else None
+    new_document_properties['prefix'] = new_document_prefix
+    new_document_properties['scope'] = presence_entity
+    new_document_properties['home_for'] = presence_entity if entity.home_for else None
 
-  # store all Documents
-  db.put(entities)
+    # create the new Document entity and prepare it to be stored
+    new_document_entity = document_model(
+        key_name=document_logic.getKeyNameFromFields(new_document_properties),
+        **new_document_properties)
+    documents.append(new_document_entity)
+
+    if entity.home_for:
+      # update the presence for which this document was the home page
+      presence_entity.home = new_document_entity
+      presences.append(presence_entity)
+
+  # store all the new Documents and updated Presences
+  db.put(documents)
+  db.put(presences)
 
   # task completed, return
   return

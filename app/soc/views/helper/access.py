@@ -65,6 +65,13 @@ from soc.modules.ghop.logic.models.org_admin import logic as \
 from soc.modules.ghop.logic.models.program import logic as ghop_program_logic
 from soc.modules.ghop.logic.models.student import logic as ghop_student_logic
 
+from soc.modules.gsoc.logic.models.mentor import logic as gsoc_mentor_logic
+from soc.modules.gsoc.logic.models.organization import logic as gsoc_org_logic
+from soc.modules.gsoc.logic.models.org_admin import logic as \
+    gsoc_org_admin_logic
+from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+from soc.modules.gsoc.logic.models.student import logic as gsoc_student_logic
+
 
 DEF_NO_USER_LOGIN_MSG = ugettext(
     'Please create <a href="/user/create_profile">User Profile</a>'
@@ -272,6 +279,9 @@ class Checker(object):
     'ghop_org_admin': ('checkHasDocumentAccess', [ghop_org_admin_logic, 'org']),
     'ghop_org_mentor': ('checkHasDocumentAccess', [ghop_mentor_logic, 'org']),
     'ghop_org_student': ('checkHasDocumentAccess', [ghop_student_logic, 'org']),
+    'gsoc_org_admin': ('checkHasDocumentAccess', [gsoc_org_admin_logic, 'org']),
+    'gsoc_org_mentor': ('checkHasDocumentAccess', [gsoc_mentor_logic, 'org']),
+    'gsoc_org_student': ('checkHasDocumentAccess', [gsoc_student_logic, 'org']),
     'user': 'checkIsUser',
     'user_self': ('checkIsUserSelf', 'scope_path'),
     }
@@ -284,9 +294,13 @@ class Checker(object):
       'program': (program_logic, {'sponsor': 1, 'program': 0}),
       'ghop_program': (
           ghop_program_logic, {'sponsor': 1, 'ghop_program': 0}),
+      'gsoc_program': (
+          gsoc_program_logic, {'sponsor': 1, 'gsoc_program': 0}),
       'org': (org_logic, {'sponsor': 2, 'program': 1, 'org': 0}),
       'ghop_org': (
           ghop_org_logic, {'sponsor': 2, 'ghop_program': 1, 'ghop_org': 0}),
+      'gsoc_org': (
+          gsoc_org_logic, {'sponsor': 2, 'gsoc_program': 1, 'gsoc_org': 0}),
       }
 
   def __init__(self, params):

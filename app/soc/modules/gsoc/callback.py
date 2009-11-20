@@ -67,3 +67,26 @@ class Callback(object):
     self.core.registerSidebarEntry(program.view.getSidebarMenus)
     self.core.registerSidebarEntry(student.view.getSidebarMenus)
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)
+
+  def registerRights(self):
+    """Called by the server when the document rights should be registered.
+    """
+
+    gsoc_program_membership  = {
+        'admin': ['host'],
+        'restricted': ['host', 'gsoc_org_admin'],
+        'member': ['host', 'gsoc_org_admin', 'gsoc_org_mentor',
+                   'gsoc_org_student'],
+        'list': ['host', 'gsoc_org_admin', 'gsoc_org_mentor'],
+        }
+
+    gsoc_organization_membership = {
+        'admin': ['host', 'gsoc_org_admin'],
+        'restricted': ['host', 'gsoc_org_admin', 'gsoc_org_mentor'],
+        'member': ['host', 'gsoc_org_admin', 'gsoc_org_mentor',
+                   'gsoc_org_student'],
+        'list': ['host', 'gsoc_org_admin', 'gsoc_org_mentor'],
+        }
+
+    self.core.registerRight('gsoc_program', gsoc_program_membership)
+    self.core.registerRight('gsoc_org', gsoc_organization_membership)

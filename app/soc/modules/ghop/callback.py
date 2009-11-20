@@ -82,7 +82,7 @@ class Callback(object):
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)
 
   def registerRights(self):
-    """Called by the server when the documetn rights should be registerd.
+    """Called by the server when the document rights should be registered.
     """
 
     ghop_program_membership  = {

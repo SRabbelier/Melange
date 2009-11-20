@@ -662,7 +662,8 @@ class View(presence.View):
         items += [(redirects.getEditRedirect(entity, {'url_name': 'timeline'}),
             "Edit Program Timeline", 'any_access')]
         # add link to create a new Program Document
-        items += [(redirects.getCreateDocumentRedirect(entity, 'program'),
+        items += [(redirects.getCreateDocumentRedirect(
+            entity, params['document_prefix']),
             "Create a New Document", 'any_access')]
         # add link to list all Program Document
         items += [(redirects.getListDocumentsRedirect(entity, 'program'),

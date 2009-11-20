@@ -71,6 +71,7 @@ class View(program.View):
     new_params['name'] = "GSoC Program"
     new_params['module_name'] = "program"
     new_params['sidebar_grouping'] = 'Programs'
+    new_params['document_prefix'] = 'gsoc_program'
 
     new_params['module_package'] = 'soc.modules.gsoc.views.models'
     new_params['url_name'] = 'gsoc/program'

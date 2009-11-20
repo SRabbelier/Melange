@@ -110,6 +110,7 @@ class View(program.View):
     new_params['name'] = "GHOP Program"
     new_params['module_name'] = "program"
     new_params['sidebar_grouping'] = 'Programs'
+    new_params['document_prefix'] = 'ghop_program'
 
     new_params['module_package'] = 'soc.modules.ghop.views.models'
     new_params['url_name'] = 'ghop/program'

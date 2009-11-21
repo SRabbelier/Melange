@@ -52,7 +52,7 @@ handlers:
   script: shell/shell.py
   login: admin
 
-- url: /tasks/*
+- url: /tasks/.*
   script: main.py
   login: admin
 

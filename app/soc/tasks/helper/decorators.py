@@ -25,6 +25,8 @@ __authors__ = [
 
 import logging
 
+from django.utils import simplejson
+
 from functools import wraps
 
 from google.appengine.ext import db

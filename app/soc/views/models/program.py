@@ -154,7 +154,7 @@ class View(presence.View):
     new_params['create_extra_dynaproperties'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
-        'accepted_orgs_msg': forms.fields.CharField(
+        'accepted_orgs_msg': forms.fields.CharField(required=False,
             widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         }
@@ -262,7 +262,10 @@ class View(presence.View):
       contents.append(aa_list)
 
     use_cache = not aa_list # only cache if there are no aa's left
-    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+    if not program_entity.accepted_orgs_msg:
+      description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+    else:
+      description = ''
 
     filter['status'] = ['new', 'active']
 

@@ -173,11 +173,17 @@ class View(role.View):
     """
 
     user_entity = user_logic.logic.getForCurrentAccount()
+
+    logic = params['logic']
+    fields = logic.getSuggestedInitialProperties(user_entity)
+    fields['link_id'] = user_entity.link_id
+
     params['create_form'] = params['user_create_form']
 
+    kwargs.update(fields)
     # pylint: disable-msg=E1103
     return self.create(request, access_type='unspecified', page_name=page_name,
-        params=params, link_id=user_entity.link_id, **kwargs)
+        params=params, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

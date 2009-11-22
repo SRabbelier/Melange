@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -31,6 +32,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.logic.models.request import logic as request_logic
+from soc.logic.models.role import logic as role_logic
 from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import responses
@@ -317,8 +319,11 @@ class View(base.View):
     # as initial value
     fields = {'link_id': request_entity.user.link_id,
               'scope_path': request_entity.group.key().id_or_name()}
-    form = params['invited_create_form'](initial=fields)
 
+    fields.update(role_logic.getSuggestedInitialProperties(
+        request_entity.user))
+
+    form = params['invited_create_form'](initial=fields)
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=params)

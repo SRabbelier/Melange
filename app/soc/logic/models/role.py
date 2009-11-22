@@ -18,8 +18,9 @@
 """
 
 __authors__ = [
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
+    '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -35,6 +36,12 @@ DEF_LAST_RESIGN_ERROR_FMT = "This user can't be " \
 
 ROLE_LOGICS = {}
 
+SUGGESTED_FIELDS = ['given_name', 'surname', 'name_on_documents', 'phone',
+    'im_network', 'im_handle', 'home_page', 'blog', 'photo_url', 'latitude',
+    'longitude', 'email', 'res_street', 'res_city', 'res_state', 'res_country',
+    'res_postalcode', 'ship_street', 'ship_city', 'ship_state', 'ship_country',
+    'ship_postalcode', 'birth_date', 'tshirt_size', 'tshirt_style'
+    ]
 
 def registerRoleLogic(role_logic):
   """Adds the specified Role Logic to the known ones.
@@ -126,6 +133,33 @@ class Logic(base.Logic):
     """
 
     return []
+
+  def getSuggestedInitialProperties(self, user):
+    """Suggest role properties for a given user based on its previous entries.
+
+    Args:
+      user: a user entity
+
+    Returns:
+      A dict with values for fields defined in SUGGESTED_FIELDS or an empty
+      dictionary if no previous roles were found.
+    """
+
+    filter = {
+        'status': ['active', 'inactive'],
+        'user': user,
+        }
+    role = None
+
+    for role_logic in ROLE_LOGICS.values():
+      role = role_logic.getForFields(filter, unique=True)
+      if role:
+        break
+
+    if not role:
+      return {}
+
+    return dict([(field, getattr(role, field)) for field in SUGGESTED_FIELDS])
 
 
 logic = Logic()

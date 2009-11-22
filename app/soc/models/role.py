@@ -314,6 +314,12 @@ class Role(soc.models.linkable.Linkable):
   birth_date.example_text = ugettext(
       'e.g. 1999-12-31 or 12/31/1999')
 
+  #: Optional field indicating choice of t-shirt fit; kept private.
+  tshirt_style = db.StringProperty(
+      verbose_name=ugettext('T-shirt Style'),
+      choices=('male', 'female'))
+  tshirt_style.group = ugettext("4. Private Info")
+
   #: Optional field indicating choice of t-shirt, from XXS to XXXL;
   #: kept private.
   tshirt_size = db.StringProperty(
@@ -323,12 +329,6 @@ class Role(soc.models.linkable.Linkable):
   tshirt_size.example_text = ugettext('See also '
       '<a href="http://en.wikipedia.org/wiki/US_standard_clothing_size">'
       'this article</a>.')
-
-  #: Optional field indicating choice of t-shirt fit; kept private.
-  tshirt_style = db.StringProperty(
-      verbose_name=ugettext('T-shirt Style'),
-      choices=('male', 'female'))
-  tshirt_style.group = ugettext("4. Private Info")
 
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present

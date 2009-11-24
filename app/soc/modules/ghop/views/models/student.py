@@ -30,13 +30,10 @@ from soc.logic import dicts
 from soc.logic.models import user as user_logic
 
 from soc.views.helper import decorators
-from soc.views.helper import dynaform
-from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.models import student
 
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
-from soc.modules.ghop.logic.models import organization as ghop_org_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
 from soc.modules.ghop.logic.models import program as ghop_program_logic
 from soc.modules.ghop.logic.models import student as ghop_student_logic

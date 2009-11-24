@@ -36,7 +36,6 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
-from soc.logic.models import student as student_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -44,14 +43,12 @@ from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import params as params_helper
-from soc.views.helper import requests
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
 
 from soc.modules.ghop.logic import cleaning as ghop_cleaning
-from soc.modules.ghop.logic.models import comment as ghop_comment_logic
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import organization as ghop_org_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
@@ -630,6 +627,8 @@ class View(base.View):
                 'status': 'active'}
 
       mentor_entity = ghop_mentor_logic.logic.getForFields(filter, unique=True)
+
+      # pylint: disable-msg=E1103
       fields['mentors'] = [mentor_entity.key()]
 
       entity = logic.updateOrCreateFromFields(fields)
@@ -1353,8 +1352,6 @@ class View(base.View):
       kwargs: the Key Fields for the specified entity
     """
 
-    from soc.modules.ghop.views.helper import list_info as list_info_helper
-
     get_params = request.GET
 
     contents = []
@@ -1417,7 +1414,7 @@ class View(base.View):
       org_entities = ghop_org_logic.logic.getForFields(org_fields)
       filter['scope'] = org_entities
     if status_filter:
-      filter['status']= status_filter
+      filter['status'] = status_filter
     else:
       filter['status'] = public_status
     if df_filter:

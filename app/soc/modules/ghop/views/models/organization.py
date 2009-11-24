@@ -23,9 +23,6 @@ __authors__ = [
   ]
 
 
-import datetime
-
-from django import forms
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -35,7 +32,6 @@ from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.models import organization
-from soc.views.sitemap import sidebar
 
 import soc.cache.logic
 
@@ -140,7 +136,7 @@ class View(organization.View):
 
       # define the list redirect action to show the task public page
       to_params['list_action'] = (redirects.getPublicRedirect, to_params)
-      to_params['list_description'] = self.DEF_OPEN_PROJECTS_MSG_FMT %(
+      to_params['list_description'] = self.DEF_OPEN_PROJECTS_MSG_FMT % (
           entity.name)
       to_params['list_heading'] = 'modules/ghop/task/list/heading.html'
       to_params['list_row'] = 'modules/ghop/task/list/row.html'
@@ -159,7 +155,7 @@ class View(organization.View):
       # claimed tasks
       tc_params = to_params.copy()
 
-      tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT %(
+      tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT % (
           entity.name)
 
       filter = {'scope': entity,
@@ -177,7 +173,7 @@ class View(organization.View):
       # closed tasks
       tcs_params = to_params.copy()
 
-      tcs_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT %(
+      tcs_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
           entity.name)
 
       filter = {'scope': entity,
@@ -205,7 +201,6 @@ class View(organization.View):
     submenus = []
 
     group_entity = role_description['group']
-    program_entity = group_entity.scope
     roles = role_description['roles']
 
     if roles.get('ghop_org_admin') or roles.get('ghop_mentor'):

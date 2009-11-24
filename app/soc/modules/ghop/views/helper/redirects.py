@@ -23,9 +23,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.ext import db
-
-
 def getAssignTaskQuotasRedirect(entity, params):
   """Returns the assign task quotas redirect for the specified entity.
   """

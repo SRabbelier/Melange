@@ -103,6 +103,7 @@ class View(base.View):
     remove = False
 
     for subscriber in subscribers:
+      # pylint: disable-msg=E1103
       if subscriber.key() == user_account.key():
         remove = True
         break

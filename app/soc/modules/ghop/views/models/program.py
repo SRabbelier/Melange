@@ -24,14 +24,10 @@ __authors__ = [
   ]
 
 
-import datetime
-import os
-
 from django import forms
 from django import http
 from django.utils.translation import ugettext
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
@@ -214,7 +210,7 @@ class View(program.View):
     """
 
     # TODO: Once GAE Task APIs arrive, this view will be managed by them
-    program = ghop_program_logic.logic.getFromKeyFieldsOr404(kwargs)
+    program_entity = ghop_program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
     from soc.modules.ghop.views.models import \
         organization as ghop_organization_view
@@ -225,11 +221,11 @@ class View(program.View):
 
     if request.method == 'POST':
       return self.assignTaskQuotasPost(request, context, org_params,
-                                       page_name, params, program,
+                                       page_name, params, program_entity,
                                        **kwargs)
     else: # request.method == 'GET'
       return self.assignTaskQuotasGet(request, context, org_params,
-                                      page_name, params, program,
+                                      page_name, params, program_entity,
                                       **kwargs)
 
   def assignTaskQuotasPost(self, request, context, org_params,

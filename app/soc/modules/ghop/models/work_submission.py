@@ -32,7 +32,6 @@ import soc.models.user
 
 from soc.modules.ghop.models import organization as ghop_org_model
 from soc.modules.ghop.models import program as ghop_program_model
-from soc.modules.ghop.models import task as task_model
 
 
 class GHOPWorkSubmission(soc.models.base.ModelWithFieldAttributes):

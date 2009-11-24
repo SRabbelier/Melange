@@ -256,6 +256,7 @@ class GHOPTask(Taggable, soc.models.linkable.Linkable):
     """
 
     # explicitly call the AppEngine datastore Model constructor
+    # pylint: disable-msg=W0233
     db.Model.__init__(self, parent, key_name, app, **entity_values)
 
     # call the Taggable constructor to initialize the tags specified as

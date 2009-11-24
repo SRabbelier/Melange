@@ -28,8 +28,6 @@ from soc.logic.models import student
 
 import soc.models.student
 
-from soc.modules.ghop.logic.models import task as ghop_task_logic
-
 import soc.modules.ghop.logic.models.program
 import soc.modules.ghop.models.student
 

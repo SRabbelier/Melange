@@ -22,10 +22,6 @@ __authors__ = [
   ]
 
 
-import os
-import time
-
-from django.template import loader
 from django.utils.encoding import force_unicode
 
 from soc.logic import accounts

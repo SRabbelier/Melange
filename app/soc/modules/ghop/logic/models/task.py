@@ -88,8 +88,6 @@ class Logic(base.Logic):
     datastore operation.
     """
 
-    from soc.logic.models import base as base_logic
-
     # TODO: History needs a proper test drive and perhaps a refactoring
     history = {}
 
@@ -171,6 +169,7 @@ class Logic(base.Logic):
       silent: iff True does not call post store methods.
     """
 
+    # pylint: disable-msg=W0621    
     from soc.modules.ghop.logic.models.comment import logic as \
         ghop_comment_logic
     from soc.modules.ghop.logic.models.work_submission import logic as \
@@ -269,6 +268,7 @@ class Logic(base.Logic):
     For args see base.getFromKeyFieldsOr404().
     """
 
+    # pylint: disable-msg=W0621
     from soc.modules.ghop.logic.models.comment import logic as \
         ghop_comment_logic
     from soc.modules.ghop.logic.models.work_submission import logic as \
@@ -318,7 +318,7 @@ class Logic(base.Logic):
         # only if there is a deadline set we should schedule another task
         task_update.spawnUpdateTask(entity)
     else:
-      comment_entity=None
+      comment_entity = None
 
     return entity, comment_entity
 

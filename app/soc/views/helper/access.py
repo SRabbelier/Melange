@@ -904,12 +904,12 @@ class Checker(object):
 
     return
 
-  def checkIsMyRequestWithStatus(self, django_args, statusses):
+  def checkIsMyRequestWithStatus(self, django_args, statuses):
     """Checks whether the user is allowed to visit the page regarding Request.
 
     Args:
       django_args: a dictionary with django's arguments
-      statusses: the statusses in which the Request may be to allow access
+      statuses: the statuses in which the Request may be to allow access
     """
 
     self.checkIsUser(django_args)
@@ -922,7 +922,7 @@ class Checker(object):
       # this is not the current user's request
       raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
-    if request_entity.status not in statusses:
+    if request_entity.status not in statuses:
       raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
 
     if request_entity.group.status != 'active':

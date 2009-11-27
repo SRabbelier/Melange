@@ -46,7 +46,6 @@ class Document(soc.models.work.Work):
     work.content:  the rich-text contents of the Document
   """
 
-  URL_NAME = 'document'
   DOCUMENT_ACCESS = ['admin', 'restricted', 'member', 'user']
 
   #: field storing the prefix of this document

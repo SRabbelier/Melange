@@ -64,7 +64,8 @@ class View(base.View):
     rights['listSelf'] = ['checkIsUser']
     rights['create'] = ['deny']
     rights['edit'] = ['checkIsDeveloper']
-    rights['process_invite'] = ['checkIsMyGroupAcceptedRequest']
+    rights['process_invite'] = [
+        ('checkIsMyRequestWithStatus', [['group_accepted']])]
     rights['list'] = ['checkIsDeveloper']
     rights['delete'] = ['checkIsDeveloper']
     rights['roles'] = ['checkIsUser']

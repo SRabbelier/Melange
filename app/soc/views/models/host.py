@@ -59,7 +59,8 @@ class View(role.View):
     rights['edit'] = [('checkIsMyActiveRole', host_logic.logic)]
     rights['invite'] = [('checkHasActiveRoleForScope', host_logic.logic)]
     rights['list'] = ['checkIsDeveloper']
-    rights['accept_invite'] = ['checkCanCreateFromRequest']
+    rights['accept_invite'] = [
+        ('checkIsMyRequestWithStatus', [['group_accepted']])]
     rights['process_request'] = [('checkCanProcessRequest', 
                                  [[host_logic.logic]])]
     rights['manage'] = [('checkIsAllowedToManageRole',

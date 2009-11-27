@@ -54,7 +54,8 @@ class View(org_admin.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          ghop_org_admin_logic.logic)]
-    rights['accept_invite'] = ['checkCanCreateFromRequest',
+    rights['accept_invite'] = [
+        ('checkIsMyRequestWithStatus', [['group_accepted']]),
         ('checkIsNotStudentForProgramOfOrgInRequest', 
          [ghop_org_logic.logic, ghop_student_logic.logic])]
     rights['process_request'] = [

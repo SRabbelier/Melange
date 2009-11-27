@@ -904,38 +904,12 @@ class Checker(object):
 
     return
 
-  def checkCanCreateFromRequest(self, django_args):
-    """Raises an alternate HTTP response if the specified request does not exist
-       or if it's status is not group_accepted. Also when the group this request
-       is from is in an inactive or invalid status access will be denied.
+  def checkIsMyRequestWithStatus(self, django_args, statusses):
+    """Checks whether the user is allowed to visit the page regarding Request.
 
     Args:
       django_args: a dictionary with django's arguments
-    """
-
-    self.checkIsUser(django_args)
-
-    id = int(django_args['id'])
-
-    request_entity = request_logic.getFromIDOr404(id)
-
-    if request_entity.status != 'group_accepted':
-      raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
-
-    if request_entity.group.status in ['invalid', 'inactive']:
-      raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_GROUP_MSG)
-
-    if request_entity.user.key() != self.user.key():
-      # this request does not belong to the user creating the role
-      raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
-
-    return
-
-  def checkIsMyGroupAcceptedRequest(self, django_args):
-    """Checks whether the user can accept the specified request.
-
-    Args:
-      django_args: a dictionary with django's arguments
+      statusses: the statusses in which the Request may be to allow access
     """
 
     self.checkIsUser(django_args)
@@ -948,13 +922,13 @@ class Checker(object):
       # this is not the current user's request
       raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
-    if request_entity.status != 'group_accepted':
+    if request_entity.status not in statusses:
       raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
 
-    if request_entity.group.status == 'active':
-      return
+    if request_entity.group.status != 'active':
+      raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
+    return
 
   def checkCanProcessRequest(self, django_args, role_logics):
     """Raises an alternate HTTP response if the specified request does not exist

@@ -55,7 +55,8 @@ class View(role.View):
     rights['edit'] = [('checkIsMyActiveRole', club_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope', club_admin_logic.logic)]
-    rights['accept_invite'] = ['checkCanCreateFromRequest']
+    rights['accept_invite'] = [
+        ('checkIsMyRequestWithStatus', [['group_accepted']])]
     rights['process_request'] = [('checkCanProcessRequest', 
                                  [[club_admin_logic.logic]])]
     rights['manage'] = [('checkIsAllowedToManageRole',

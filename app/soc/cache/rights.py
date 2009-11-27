@@ -26,7 +26,6 @@ from google.appengine.api import memcache
 
 
 RIGHTS = [
-    'checkCanCreateFromRequest',
     'checkCanEditTimeline',
     'checkCanMakeRequestToGroup',
     'checkCanProcessRequest',
@@ -42,7 +41,7 @@ RIGHTS = [
     'checkIsHostForProgram',
     'checkIsLoggedIn',
     'checkIsMyEntity',
-    'checkIsMyGroupAcceptedRequest',
+    'checkIsMyRequestWithStatus',
     'checkIsUnusedAccount',
     'checkIsUser',
     'checkIsUserSelf',

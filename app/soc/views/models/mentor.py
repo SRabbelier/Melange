@@ -60,7 +60,8 @@ class View(role.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['invite'] = [('checkHasActiveRoleForScope',
                          soc.logic.models.org_admin.logic)]
-    rights['accept_invite'] = ['checkCanCreateFromRequest',
+    rights['accept_invite'] = [
+        ('checkIsMyRequestWithStatus', [['group_accepted']]),
         ('checkIsNotStudentForProgramOfOrgInRequest',[org_logic.logic,
                                                       student_logic.logic])]
     rights['request'] = [

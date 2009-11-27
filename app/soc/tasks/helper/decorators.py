@@ -24,8 +24,7 @@ __authors__ = [
 
 
 import logging
-
-from django.utils import simplejson
+import pickle
 
 from functools import wraps
 
@@ -85,7 +84,7 @@ def iterative_task(logic, **task_default):
 
       fields = task_default.get('fields', {})
       if 'fields' in post_dict:
-        fields.update(simplejson.loads(post_dict['fields']))
+        fields.update(pickle.loads(str(post_dict['fields'])))
 
       start_key = task_default.get('start_key', None)
       if 'start_key' in post_dict:

@@ -54,7 +54,7 @@ class ExceptionHandlerMiddleware(object):
     if isinstance(exception, AssertionError):
       template = 'soc/assertion_error.html'
     if isinstance(exception, out_of_band.Error):
-      return responses.errorResponse(error, request)
+      return responses.errorResponse(exception, request)
 
     if template:
       logging.exception(exception)

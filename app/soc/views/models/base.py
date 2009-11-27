@@ -485,7 +485,7 @@ class View(object):
     """
 
     # logic = params['logic']
-    suffix = entity.key().id_or_name() if entity else None
+    suffix = str(entity.key().id_or_name()) if entity else None
 
     # remove the params from the request, this is relevant only if
     # someone bookmarked a POST page.

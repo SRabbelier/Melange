@@ -1481,8 +1481,9 @@ class Checker(object):
     return
 
   @allowDeveloper
-  def checkIsMyStudentProject(self, django_args):
-    """Checks whether the project belongs to the current user.
+  def checkCanEditStudentProjectAsStudent(self, django_args):
+    """Checks whether the project can be edited in a student mode
+    by the current user.
 
     Args:
       django_args: a dictionary with django's arguments
@@ -1496,10 +1497,15 @@ class Checker(object):
     self.checkIsUser()
 
     project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+    student_entity = project_entity.student
 
-    if project_entity.student.user.key() != self.user.key():
+    if student_entity.user.key() != self.user.key():
       raise out_of_band.AccessViolation(
           message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    if student_entity.status != 'active':
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
     return
 

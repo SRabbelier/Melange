@@ -164,6 +164,7 @@ class Logic(work.Logic):
 
     # use prefix to generate dict key
     scope_types = {
+        "gsoc_program": soc.modules.gsoc.models.program.GSoCProgram,
         "program": soc.models.program.Program,
         "org": soc.models.organization.Organization,
         "user": soc.models.user.User,

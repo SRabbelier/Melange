@@ -18,7 +18,8 @@
 """
 
 __authors__ = [
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -41,6 +42,7 @@ from soc.logic.models.student import logic as student_logic
 from soc.logic.models.student_project import logic as student_project_logic
 from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.logic.models.timeline import logic as timeline_logic
+
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
@@ -403,7 +405,8 @@ def runSurveyUpdate(request, entities, context, *args, **kwargs):
     entities: list of Survey entities to update
     context: the context of this task
   """
-  return _runSurveyUpdate(entities)
+
+  return _runSurveyUpdate(entities, survey_logic.logic)
 
 
 @decorators.iterative_task(survey_logic.project_logic)
@@ -415,7 +418,8 @@ def runProjectSurveyUpdate(request, entities, context, *args, **kwargs):
     entities: list of ProjectSurvey entities to update
     context: the context of this task
   """
-  return _runSurveyUpdate(entities)
+
+  return _runSurveyUpdate(entities, survey_logic.project_logic) 
 
 
 @decorators.iterative_task(survey_logic.grading_logic)
@@ -427,27 +431,67 @@ def runGradingProjectSurveyUpdate(request, entities, context, *args, **kwargs):
     entities: list of GradingProjectSurvey entities to update
     context: the context of this task
   """
-  return _runSurveyUpdate(entities)
+
+  return _runSurveyUpdate(entities, survey_logic.grading_logic)
 
 
-def _runSurveyUpdate(entities):
+def _runSurveyUpdate(entities, logic):
   """AppEngine Task that updates Survey entities.
 
   Args:
     entities: list of Survey entities to update
+    logic: concrete logic instance which the surveys are to be updated for
+
+  Returns:
+    A list of pairs that maps the old surveys with the corresponding new ones.
   """
 
   from soc.modules.gsoc.logic.models.program import logic as program_logic
 
+  # get all the properties that are part of each Document
+  survey_model = logic.getModel()
+  survey_properties = survey_model.properties().keys()
+
+  new_surveys = []
+
   for entity in entities:
-    entity.scope = program_logic.getFromKeyName(
+    new_survey_properties = {}
+
+    for survey_property in survey_properties:
+      # copy over all the information from the Survey entity
+      new_survey_properties[survey_property] = getattr(entity,
+                                                       survey_property)
+
+    new_survey_properties['prefix'] = 'gsoc_program'
+    new_survey_properties['scope'] = program_logic.getFromKeyName(
         entity.scope.key().id_or_name())
 
-  # store all Surveys
-  db.put(entities)
+    new_survey_key = logic.getKeyNameFromFields(new_survey_properties)
+    new_survey = survey_model(key_name=new_survey_key, **new_survey_properties)
+
+    # force the prefix to gsoc_program before saving it for storage
+    new_survey.prefix = 'gsoc_program'
+
+    new_surveys.append(new_survey)
+
+  # batch put the new Surveys
+  db.put(new_surveys)
 
   # task completed, return
   return
+
+
+@decorators.iterative_task(survey_record_logic.logic)
+def runSurveyRecordUpdate(request, entities, context, *args, **kwargs):
+  """AppEngine Task that updates ProjectSurveyRecord entities.
+
+  Args:
+    request: Django Request object
+    entities: list of SurveyRecord entities to update
+    context: the context of this task
+  """
+
+  return _runSurveyRecordUpdate(entities, survey_logic.logic)
 
 
 @decorators.iterative_task(survey_record_logic.project_logic)
@@ -460,11 +504,14 @@ def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  return _runSurveyRecordUpdate(entities)
+  entities = _runSurveyRecordUpdate(entities, survey_logic.project_logic)
+
+  return _runOrgSurveyRecordUpdate(entities)
 
 
 @decorators.iterative_task(survey_record_logic.grading_logic)
-def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
+def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, 
+                                        **kwargs):
   """AppEngine Task that updates GradingProjectSurveyRecord entities.
 
   Args:
@@ -473,25 +520,69 @@ def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, **kwa
     context: the context of this task
   """
 
-  return _runSurveyRecordUpdate(entities)
+  entities = _runSurveyRecordUpdate(entities, survey_logic.grading_logic)
+
+  return _runOrgSurveyRecordUpdate(entities)
 
 
-def _runSurveyRecordUpdate(entities):
+def _runSurveyRecordUpdate(entities, survey_logic):
   """AppEngine Task that updates SurveyRecord entities.
 
   Args:
-    entities: list of SurveyRecord entities to update 
+    entities: list of SurveyRecord entities to update
+    survey_logic: survey specific logic to get a new survey reference
   """
 
-  from soc.modules.gsoc.logic.models.organization import logic as org_logic
+  cached_surveys = {}
 
   for entity in entities:
-    entity.org = org_logic.getFromKeyName(entity.org.key().id_or_name())
+
+    # update only the entities which has 'program' prefix
+    if not entity.survey.prefix == 'program':
+      continue
+
+    survey_key_name = 'gsoc_' + entity.survey.key().id_or_name()
+    survey_entity = cached_surveys.get(survey_key_name)
+
+    if not survey_entity:
+      survey_entity = survey_logic.getFromKeyName(survey_key_name)
+      cached_surveys[survey_key_name] = survey_entity
+
+    entity.survey = survey_entity
 
   db.put(entities)
 
   # task completed, return
-  return
+  return entities
+
+
+def _runOrgSurveyRecordUpdate(entities):
+  """AppEngine Task that updates SurveyRecord entities which refer to
+  an organization. In particular, these are GradingProjectSurvey and
+  ProjectSurvey records.
+
+  Args:
+    entities: list of SurveyRecord entities to update
+  """
+
+  from soc.modules.gsoc.logic.models.organization import logic as org_logic
+
+  cached_orgs = {}
+
+  for entity in entities:
+    org_key_name = entity.org.key().id_or_name()
+    org_entity = cached_orgs.get(org_key_name)
+
+    if not org_entity:
+      org_entity = org_logic.getFromKeyName(org_key_name)
+      cached_orgs[org_key_name] = org_entity
+
+    entity.org = org_entity
+
+  db.put(entities)
+
+  # task completed, return
+  return entities
 
 
 @decorators.iterative_task(grading_survey_group_logic)

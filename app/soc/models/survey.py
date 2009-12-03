@@ -100,7 +100,8 @@ class Survey(soc.models.work.Work):
   SURVEY_TAKING_ACCESS = ['student', 'mentor', 'org_admin', 'org', 'user']
 
   prefix = db.StringProperty(default='program', required=True,
-      choices=['site', 'club', 'sponsor', 'program', 'org', 'user'],
+      choices=['site', 'club', 'sponsor', 'program', 'org', 'user',
+               'gsoc_program'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the survey,'

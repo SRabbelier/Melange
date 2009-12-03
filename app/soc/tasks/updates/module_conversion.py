@@ -601,6 +601,24 @@ def runGradingSurveyGroupUpdate(request, entities, context, *args, **kwargs):
     entity.scope = program_logic.getFromKeyName(
         entity.scope.key().id_or_name())
 
+    survey_attrs = ['grading_survey', 'student_survey']
+    for survey_attr in survey_attrs:
+      survey = getattr(entity, survey_attr)
+
+      # update if the survey field is defined and its prefix is 'program'
+      if not survey or not survey.prefix == 'program':
+        continue
+
+      survey_key_name = 'gsoc_' + survey.key().id_or_name()
+
+      if survey_attr == 'student_survey':
+        logic = survey_logic.project_logic
+      else:
+        logic = survey_logic.grading_logic
+
+      new_survey = logic.getFromKeyName(survey_key_name)
+      setattr(entity, survey_attr, new_survey)
+
   db.put(entities)
 
   # task completed, return

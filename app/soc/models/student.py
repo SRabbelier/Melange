@@ -44,7 +44,7 @@ class Student(soc.models.role.Role):
   school_name.help_text = ugettext(
       'Please enter the full name of your school, college or university in'
       ' this field. Please use the complete formal name of your school, e.g.'
-      ' UC Berekeley instead of Cal or UCB. It would be most wonderful if you'
+      ' UC Berkeley instead of Cal or UCB. It would be most wonderful if you'
       ' could provide your school\'s name in English, as all the program '
       'administrators speak English as their first language and it will make'
       ' it much easier for us to assemble program statistics, etc., later if'
@@ -78,8 +78,8 @@ class Student(soc.models.role.Role):
   grade.group = ugettext("5. Education")
   grade.help_text = ugettext(
       'Please enter your grade in the school, e.g. 8 if you are in 8th' 
-      'grade. In some parts of the world it is called as, e.g. 8th'
-      'Standard')
+      ' grade. In some parts of the world it is called as, e.g. 8th'
+      ' Standard')
 
   expected_graduation = db.IntegerProperty(required=True,
       verbose_name=ugettext('Expected Graduation Year'))

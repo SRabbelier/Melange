@@ -745,6 +745,11 @@ def validate_student(birth_date_field, school_type_field, major_field,
       if grade is None: 
         raise forms.ValidationError("Grade cannot be left blank.")
 
+      # check if the grade value is in proper range
+      if grade < 0 or grade > 20:
+        raise forms.ValidationError("Grade value must be an integer "
+                                    "between 0 and 20.")
+
       # make sure that neither major nor degree are set
       if major or degree:
         raise forms.ValidationError("If school type is High School, "

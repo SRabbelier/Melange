@@ -17,38 +17,37 @@ limitations under the License.
 <script type="text/javascript">
   $(document).ready( function() {
     function swap_fields(school_type) {
-      if (school_type == "University") { 
-    	  $("tr:contains('Grade cannot be left blank')").hide();
+      if (school_type == "University") {
+    	$("tr:contains('Grade cannot be left blank')").hide();
         $("label[for=id_grade]").hide();
-        $("#id_grade").hide();
+        $("#id_grade").val('').hide();
         $("tr:contains('Major cannot be left blank'):parent").show();
         $("tr:contains('Degree must be selected from the given options')").show();
         $("label[for=id_major]").show();
         $("#id_major").show();
         $("label[for=id_degree]").show();
         $("#id_degree").show();
-	    } else if (school_type == "High School") {
-	    	$("tr:contains('Grade cannot be left blank')").show();
-	      $("label[for=id_grade]").show();
+	  } else if (school_type == "High School") {
+	    $("tr:contains('Grade cannot be left blank')").show();
+	    $("label[for=id_grade]").show();
         $("#id_grade").show();
         $("tr:contains('Major cannot be left blank')").hide();
         $("tr:contains('Degree must be selected from the given options')").hide();
         $("label[for=id_major]").hide();
-        $("#id_major").hide();
+        $("#id_major").val('').hide();
         $("label[for=id_degree]").hide();
-        $("#id_degree").hide();
-	    }
-	    else { 
-	    	$("td.formfielderror:contains('Grade cannot be left blank')").hide();
-	      $("label[for=id_major]").hide();
-	      $("#id_major").hide();
-	      $("td.formfielderror:contains('Major cannot be left blank')").hide();
-	      $("td.formfielderror:contains('Degree must be selected from the given options')").hide();
+        $("#id_degree").val('').hide();
+	  } else {
+	    $("td.formfielderror:contains('Grade cannot be left blank')").hide();
+	    $("label[for=id_major]").hide();
+	    $("#id_major").val('').hide();
+	    $("td.formfielderror:contains('Major cannot be left blank')").hide();
+	    $("td.formfielderror:contains('Degree must be selected from the given options')").hide();
   	    $("label[for=id_degree]").hide();
-	      $("#id_degree").hide();
-	      $("label[for=id_grade]").hide();
-	      $("#id_grade").hide();
-	    }
+        $("#id_degree").val('').hide();
+	    $("label[for=id_grade]").hide();
+        $("#id_grade").val('').hide();
+	  }
     }
     swap_fields($("#id_school_type").val());
     $("#id_school_type").change(function() {

@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Todd Larsen" <tlarsen@google.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -281,7 +282,7 @@ def clean_user_account_not_in_use(field_name):
 
     if user_entity or user_logic.isFormerAccount(user_account):
       raise forms.ValidationError("There is already a user "
-          "with this email adress.")
+          "with this email address.")
 
     return user_account
   return wrapped
@@ -389,20 +390,20 @@ def clean_html_content(field_name):
 
     content = self.cleaned_data.get(field_name)
 
-    # clean_html_content is called when writing data into GAE rather than 
-    # when reading data from GAE. This short-circuiting of the sanitizer 
-    # only affects html authored by developers. The isDeveloper test for 
+    # clean_html_content is called when writing data into GAE rather than
+    # when reading data from GAE. This short-circuiting of the sanitizer
+    # only affects html authored by developers. The isDeveloper test for
     # example allows developers to add javascript.
     if user_logic.isDeveloper():
       return content
-    
+
     try:
       cleaner = HtmlSanitizer.Cleaner()
       cleaner.string = content
       cleaner.clean()
     except HTMLParseError, msg:
       raise forms.ValidationError(msg)
-    
+
     content = cleaner.string
     content = content.strip().replace('\r\n', '\n')
 
@@ -616,7 +617,7 @@ def validate_student_project(org_field, mentor_field, student_field):
     student_field: Field containing the student link_id
 
   Raises ValidationError if:
-    -A valid Organization does not exist for the given keyname
+    -A valid Organization does not exist for the given key_name
     -The mentor link_id does not match a mentor for the active organization
     -The student link_id does not match a student in the org's Program
   """
@@ -675,7 +676,7 @@ def validate_student_project(org_field, mentor_field, student_field):
 
 def validate_student(birth_date_field, school_type_field, major_field,
                      degree_field, grade_field, scope_field, program_logic):
-  """Checks if the student is eligible to sign up, determined 
+  """Checks if the student is eligible to sign up, determined
   by his birth_date given in field_name.
 
   Also checks if the school information has been correctly filled in.
@@ -730,7 +731,7 @@ def validate_student(birth_date_field, school_type_field, major_field,
         raise forms.ValidationError("Major cannot be left blank.")
 
       # check for degree
-      if not degree: 
+      if not degree:
         raise forms.ValidationError("Degree must be selected from "
                                     "the given options.")
 
@@ -742,7 +743,7 @@ def validate_student(birth_date_field, school_type_field, major_field,
     # if school_type is High School, check the rest of data is correct
     if school_type == 'High School':
       # check for grade
-      if grade is None: 
+      if grade is None:
         raise forms.ValidationError("Grade cannot be left blank.")
 
       # check if the grade value is in proper range

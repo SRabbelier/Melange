@@ -717,25 +717,39 @@ def validate_student(birth_date_field, school_type_field, major_field,
     school_type = cleaned_data.get(school_type_field)
     major = cleaned_data.get(major_field)
     degree = cleaned_data.get(degree_field)
+    grade = cleaned_data.get(grade_field)
 
     # TODO: when school_type is required this can be removed
     if not school_type:
       raise forms.ValidationError("School type cannot be left blank.")
 
-    # if school_type is University, check for major
-    if school_type == 'University' and not major:
-      raise forms.ValidationError("Major cannot be left blank.")
+    # if school_type is University, check if the rest of data is correct
+    if school_type == 'University':
+      # check for major
+      if not major:
+        raise forms.ValidationError("Major cannot be left blank.")
 
-    # if school_type is University, check for degree
-    if school_type == 'University' and not degree: 
-      raise forms.ValidationError("Degree must be selected from "
-                                  "the given options.")
+      # check for degree
+      if not degree: 
+        raise forms.ValidationError("Degree must be selected from "
+                                    "the given options.")
 
-    grade = cleaned_data.get(grade_field)
+      # make sure that grade is not set
+      if grade is not None:
+        raise forms.ValidationError("If school type is University, "
+                                    "grade value must be left blank.")
 
-    # if school_type is High School check for grade
-    if school_type == 'High School' and not grade: 
-      raise forms.ValidationError("Grade cannot be left blank.")
+    # if school_type is High School, check the rest of data is correct
+    if school_type == 'High School':
+      # check for grade
+      if grade is None: 
+        raise forms.ValidationError("Grade cannot be left blank.")
+
+      # make sure that neither major nor degree are set
+      if major or degree:
+        raise forms.ValidationError("If school type is High School, "
+                                    "both major and degree values must be "
+                                    "left blank.")
 
     if entity.student_min_age and entity.student_min_age_as_of:
       # only check if both the min_age and min_age_as_of are defined

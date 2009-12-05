@@ -35,7 +35,7 @@ from soc.views.helper import params as params_helper
 from soc.views.helper import responses
 from soc.views.models import base
 
-import gsoc.logic.models.timeline
+import soc.logic.models.timeline
 
 
 class View(base.View):
@@ -55,8 +55,7 @@ class View(base.View):
 
     new_params = {}
     new_params['rights'] = rights
-    # TODO: Change to basic timeline when GSoC has been moved to module system
-    new_params['logic'] = gsoc.logic.models.timeline.logic
+    new_params['logic'] = soc.logic.models.timeline.logic
     new_params['edit_template'] = 'soc/timeline/edit.html'
     new_params['name'] = "Timeline"
 

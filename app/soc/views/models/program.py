@@ -300,7 +300,7 @@ class View(presence.View):
     fmt = {'name': program_entity.name}
     description = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % fmt
 
-    from soc.views.models import student_project as sp_view
+    from soc.modules.gsoc.views.models import student_project as sp_view
 
     ap_params = sp_view.view.getParams().copy() # accepted projects
     ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)

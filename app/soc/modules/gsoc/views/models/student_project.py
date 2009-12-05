@@ -46,9 +46,10 @@ from soc.views.models import organization as org_view
 
 import soc.logic.models.student_project
 
+from soc.modules.gsoc.logic.models import student as student_logic
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
-from soc.modules.gsoc.logic.models import student as student_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.views.helper import access
 
@@ -225,7 +226,7 @@ class View(base.View):
     filter = {'scope': organization,
               'link_id': fields['mentor_id'],
               'status': 'active'}
-    fields['mentor'] = mentor_logic.logic.getForFields(filter, unique=True)
+    fields['mentor'] = mentor_logic.getForFields(filter, unique=True)
 
   def _public(self, request, entity, context):
     """Adds the names of all additional mentors to the context.
@@ -241,7 +242,7 @@ class View(base.View):
       mentor_names = []
 
       for mentor_key in additional_mentors:
-        additional_mentor = mentor_logic.logic.getFromKeyName(
+        additional_mentor = mentor_logic.getFromKeyName(
             mentor_key.id_or_name())
         mentor_names.append(additional_mentor.name())
 
@@ -389,7 +390,7 @@ class View(base.View):
     # get all mentors for this organization
     fields = {'scope': entity.scope,
               'status': 'active'}
-    mentors = mentor_logic.logic.getForFields(fields)
+    mentors = mentor_logic.getForFields(fields)
 
     choices = [(mentor.link_id,'%s (%s)' %(mentor.name(), mentor.link_id))
                   for mentor in mentors]
@@ -420,7 +421,7 @@ class View(base.View):
     additional_mentors_context = []
 
     for mentor_key in additional_mentors:
-      mentor_entity = mentor_logic.logic.getFromKeyName(
+      mentor_entity = mentor_logic.getFromKeyName(
           mentor_key.id_or_name())
       additional_mentors_context.append(mentor_entity)
 
@@ -538,7 +539,7 @@ class View(base.View):
       # get the mentor to remove
       fields = {'link_id': get_dict['remove'],
                 'scope': entity.scope}
-      mentor = mentor_logic.logic.getForFields(fields, unique=True)
+      mentor = mentor_logic.getForFields(fields, unique=True)
 
       additional_mentors = entity.additional_mentors
       # pylint: disable-msg=E1103
@@ -608,7 +609,7 @@ class View(base.View):
     fields = {'link_id': fields['mentor_id'],
               'scope': entity.scope,
               'status': 'active'}
-    mentor = mentor_logic.logic.getForFields(fields, unique=True)
+    mentor = mentor_logic.getForFields(fields, unique=True)
 
     # update the project with the assigned mentor
     fields = {'mentor': mentor}
@@ -655,7 +656,7 @@ class View(base.View):
     fields = {'link_id': fields['mentor_id'],
               'scope': entity.scope,
               'status': 'active'}
-    mentor = mentor_logic.logic.getForFields(fields, unique=True)
+    mentor = mentor_logic.getForFields(fields, unique=True)
 
     # add this mentor to the additional mentors
     if not entity.additional_mentors:

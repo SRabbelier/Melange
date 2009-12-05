@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import os
+
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 from django import http
@@ -71,8 +73,11 @@ class MaintenanceMiddleware(object):
     """
 
     context = responses.getUniversalContext(request)
+    allowed = (context['is_admin']
+        or ('HTTP_X_APPENGINE_CRON' in os.environ)
+        or ('HTTP_X_APPENGINE_QUEUENAME' in os.environ))
 
-    if not context['is_admin'] and context['in_maintenance']:
+    if not allowed and context['in_maintenance']:
       return self.maintenance(request)
 
   def process_exception(self, request, exception):

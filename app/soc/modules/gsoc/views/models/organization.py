@@ -26,13 +26,13 @@ from soc.logic import dicts
 from soc.logic.models.org_app import logic as org_app_logic
 from soc.views.helper import decorators
 from soc.views.models import organization
-from soc.views.helper import access # TODO
 from soc.views.models import group
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.views.models import program as program_view
+from soc.modules.gsoc.views.helper import access
 
 
 class View(organization.View):
@@ -47,7 +47,7 @@ class View(organization.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']

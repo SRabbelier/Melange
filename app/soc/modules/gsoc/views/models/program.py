@@ -24,12 +24,12 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.views.helper import decorators
-from soc.views.helper import access # TODO
 from soc.views.models import program
 
 from soc.logic.models.host import logic as host_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.views.helper import access
 
 
 class View(program.View):
@@ -44,7 +44,7 @@ class View(program.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',

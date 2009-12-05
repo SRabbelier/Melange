@@ -31,8 +31,8 @@ from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
+from soc.modules.gsoc.views.helper import access
 from soc.modules.gsoc.views.models import organization as org_view
-from soc.views.helper import access # TODO
 
 
 class View(mentor.View):
@@ -47,7 +47,7 @@ class View(mentor.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkIsMyActiveRole', mentor_logic)]
     rights['delete'] = ['checkIsDeveloper']

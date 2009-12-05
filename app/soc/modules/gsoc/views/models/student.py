@@ -24,7 +24,6 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.views.helper import decorators
-from soc.views.helper import access # TODO
 from soc.views.models import student
 
 from soc.logic.models.host import logic as host_logic
@@ -32,6 +31,7 @@ from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.views.helper import access
 from soc.modules.gsoc.views.models import program as program_view
 
 
@@ -47,7 +47,7 @@ class View(student.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkIsMyActiveRole', student_logic)]
     rights['delete'] = ['checkIsDeveloper']

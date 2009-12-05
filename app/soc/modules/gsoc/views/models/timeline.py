@@ -22,13 +22,12 @@ __authors__ = [
   ]
 
 from soc.logic import dicts
-from soc.views.helper import access # TODO
 from soc.views.helper import decorators
 from soc.views.models import timeline
 
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
-
+from soc.modules.gsoc.views.helper import access
 
 import soc.modules.ghop.logic.models.timeline
 
@@ -45,7 +44,7 @@ class View(timeline.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['edit'] = [('checkCanEditTimeline', [program_logic])]
 
     new_params = {}

@@ -138,22 +138,22 @@ class View(base.View):
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>manage_overview)/%(scope)s$',
-        'soc.views.models.%(module_name)s.manage_overview',
+        'soc.modules.gsoc.views.models.%(module_name)s.manage_overview',
         'Overview of %(name_plural)s to Manage for'),
         (r'^%(url_name)s/(?P<access_type>manage)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.manage',
+        'soc.modules.gsoc.views.models.%(module_name)s.manage',
         'Manage %(name)s'),
         (r'^%(url_name)s/(?P<access_type>st_edit)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.st_edit',
+        'soc.modules.gsoc.views.models.%(module_name)s.st_edit',
         'Edit my %(name)s'),
         (r'^%(url_name)s/(?P<access_type>withdraw)/(?P<scope_path>%(ulnp)s)/%(lnp)s$',
-        'soc.views.models.%(module_name)s.withdraw',
+        'soc.modules.gsoc.views.models.%(module_name)s.withdraw',
         'Withdraw %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>withdraw_project)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.withdraw_project',
+        'soc.modules.gsoc.views.models.%(module_name)s.withdraw_project',
         'Withdraw a %(name)s'),
         (r'^%(url_name)s/(?P<access_type>accept_project)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.accept_project',
+        'soc.modules.gsoc.views.models.%(module_name)s.accept_project',
         'Accept a %(name)s'),
     ]
 

@@ -107,16 +107,16 @@ class View(base.View):
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
-        'soc.views.models.%(module_name)s.apply',
+        'soc.modules.gsoc.views.models.%(module_name)s.apply',
         'Create a new %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_self)/%(scope)s$',
-        'soc.views.models.%(module_name)s.list_self',
+        'soc.modules.gsoc.views.models.%(module_name)s.list_self',
         'List my %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>list_orgs)/%(scope)s$',
-        'soc.views.models.%(module_name)s.list_orgs',
+        'soc.modules.gsoc.views.models.%(module_name)s.list_orgs',
         'List my %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.review',
+        'soc.modules.gsoc.views.models.%(module_name)s.review',
         'Review %(name)s'),
     ]
 

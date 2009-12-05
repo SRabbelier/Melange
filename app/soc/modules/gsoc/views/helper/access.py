@@ -28,11 +28,21 @@ from django.utils.translation import ugettext
 
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.student_project import logic as student_project_logic
-from soc.views import out_of_band
+from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.views.helper import access
+from soc.views import out_of_band
 
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.logic.models.student import logic as student_logic
 
+
+DEF_SIGN_UP_AS_STUDENT_MSG = ugettext(
+    'You need to sign up as a Student first.')
+
+DEF_MAX_PROPOSALS_REACHED = ugettext(
+    'You have reached the maximum number of Proposals allowed '
+    'for this program.')
 
 DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
     'You are not allowed to take this Survey for the specified Student'
@@ -42,6 +52,143 @@ DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
 class GSoCChecker(access.Checker):
   """See soc.views.helper.access.Checker.
   """
+
+  @access.allowDeveloper
+  def checkIsStudent(self, django_args, key_location, status):
+    """Checks if the current user is the given student.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      key_location: the key for django_args in which the key_name
+                    from the student is stored
+      status: the allowed status for the student
+    """
+
+    self.checkIsUser(django_args)
+
+    if 'seed' in django_args:
+      key_name = django_args['seed'][key_location]
+    else:
+      key_name = django_args[key_location]
+
+    student_entity = student_logic.getFromKeyName(key_name)
+
+    if not student_entity or student_entity.status not in status:
+      raise out_of_band.AccessViolation(
+        message_fmt=DEF_SIGN_UP_AS_STUDENT_MSG)
+
+    if student_entity.user.key() != self.user.key():
+      # this is not the page for the current user
+      self.deny(django_args)
+
+    return
+
+  @access.allowDeveloper
+  def checkRoleAndStatusForStudentProposal(self, django_args, allowed_roles,
+                                           role_status, proposal_status):
+    """Checks if the current user has access to the given proposal.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      allowed_roles: list with names for the roles allowed to pass access check
+      role_status: list with states allowed for the role
+      proposal_status: a list with states allowed for the proposal
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no proposal found
+         - If the proposal is not in one of the required states.
+         - If the user does not have any ofe the required roles
+    """
+
+    self.checkIsUser(django_args)
+
+    # bail out with 404 if no proposal is found
+    proposal_entity = student_proposal_logic.getFromKeyFieldsOr404(django_args)
+
+    if not proposal_entity.status in proposal_status:
+      # this proposal can not be accessed at the moment
+      raise out_of_band.AccessViolation(
+          message_fmt=access.DEF_NO_ACTIVE_ENTITY_MSG)
+
+    user_entity = self.user
+
+    if 'proposer' in allowed_roles:
+      # check if this proposal belongs to the current user
+      student_entity = proposal_entity.scope
+      if (user_entity.key() == student_entity.user.key()) and (
+          student_entity.status in role_status):
+        return
+
+    filter = {'user': user_entity,
+        'status': role_status}
+
+    if 'host' in allowed_roles:
+      # check if the current user is a host for this proposal's program
+      filter['scope'] =  proposal_entity.program
+
+      if host_logic.getForFields(filter, unique=True):
+        return
+
+    if 'org_admin' in allowed_roles:
+      # check if the current user is an admin for this proposal's org
+      filter['scope'] = proposal_entity.org
+
+      if org_admin_logic.getForFields(filter, unique=True):
+        return
+
+    if 'mentor' in allowed_roles:
+      # check if the current user is a mentor for this proposal's org
+      filter['scope'] = proposal_entity.org
+
+      if mentor_logic.getForFields(filter, unique=True):
+        return
+
+    # no roles found, access denied
+    raise out_of_band.AccessViolation(
+        message_fmt=access.DEF_NEED_ROLE_MSG)
+
+  @access.allowDeveloper
+  def checkCanStudentPropose(self, django_args, key_location, check_limit):
+    """Checks if the program for this student accepts proposals.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      key_location: the key for django_args in which the key_name
+                    from the student is stored
+      check_limit: iff true checks if the student reached the apps_tasks_limit
+                   for the given program.
+    """
+
+    self.checkIsUser(django_args)
+
+    if django_args.get('seed'):
+      key_name = django_args['seed'][key_location]
+    else:
+      key_name = django_args[key_location]
+
+    student_entity = student_logic.getFromKeyName(key_name)
+
+    if not student_entity or student_entity.status == 'invalid':
+      raise out_of_band.AccessViolation(
+        message_fmt=DEF_SIGN_UP_AS_STUDENT_MSG)
+
+    program_entity = student_entity.scope
+
+    if not timeline_helper.isActivePeriod(program_entity.timeline,
+                                          'student_signup'):
+      raise out_of_band.AccessViolation(message_fmt=access.DEF_PAGE_INACTIVE_MSG)
+
+    if check_limit:
+      # count all studentproposals by the student
+      fields = {'scope': student_entity}
+      proposal_query = student_proposal_logic.getQueryForFields(fields)
+
+      if proposal_query.count() >= program_entity.apps_tasks_limit:
+        # too many proposals access denied
+        raise out_of_band.AccessViolation(message_fmt=DEF_MAX_PROPOSALS_REACHED)
+
+    return
 
   @access.allowDeveloper
   def checkStudentProjectHasStatus(self, django_args, allowed_status):

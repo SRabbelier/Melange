@@ -324,8 +324,8 @@ def runStudentProposalUpdate(request, entities, context, *args, **kwargs):
     new_mentors = []
 
     for old_mentor in old_mentors:
-      new_mentors.append(
-        mentor_logic.getFromKeyName(old_mentor.id_or_name()))
+      new_mentor = mentor_logic.getFromKeyName(old_mentor.id_or_name())
+      new_mentors.append(new_mentor.key())
 
     entity.possible_mentors = new_mentors
 
@@ -384,8 +384,8 @@ def runStudentProjectUpdate(request, entities, context, *args, **kwargs):
     new_mentors = []
 
     for old_mentor in old_mentors:
-      new_mentors.append(
-        mentor_logic.getFromKeyName(old_mentor.id_or_name()))
+      new_mentor = mentor_logic.getFromKeyName(old_mentor.id_or_name())
+      new_mentors.append(new_mentor.key())
 
     entity.additional_mentors = new_mentors
 

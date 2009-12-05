@@ -608,8 +608,8 @@ class View(presence.View):
     """
 
     from soc.views.models import survey as survey_view
-    from soc.views.models import project_survey as project_survey_view
-    from soc.views.models import grading_project_survey as grading_survey_view
+    from soc.modules.gsoc.views.models import project_survey as project_survey_view
+    from soc.modules.gsoc.views.models import grading_project_survey as grading_survey_view
 
     logic = params['logic']
     rights = params['rights']

@@ -32,6 +32,5 @@ class ProjectSurvey(Survey):
 
   def __init__(self, *args, **kwargs):
     super(ProjectSurvey, self).__init__(*args, **kwargs)
-    # TODO: prefix has to be set to gsoc_program once data has been transferred
-    self.prefix = 'program'
+    self.prefix = 'gsoc_program'
     self.taking_access = 'student'

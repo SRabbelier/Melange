@@ -356,29 +356,8 @@ class View(base.View):
     comment = fields['comment']
 
     if comment:
-      # create a new public review containing the comment
-      user_entity = user_logic.logic.getForCurrentAccount()
-      # pylint: disable-msg=E1103
-      if user_entity.key() == entity.scope.user.key():
-        # student is posting
-        reviewer = entity.scope
-      else:
-        # check if the person commenting is an org_admin
-        # or a mentor for the given proposal
-        fields = {'user': user_entity,
-                  'scope': entity.org,
-                  'status': 'active',
-                  }
-
-        reviewer = org_admin_logic.logic.getForFields(fields, unique=True)
-
-        if not reviewer:
-          # no org_admin found, maybe it's a mentor?
-          reviewer = mentor_logic.logic.getForFields(fields, unique=True)
-
-      # create the review (reviewer might be None 
-      # if a Host or Developer is posting)
-      self._createReviewFor(entity, reviewer, comment, is_public=True)
+      # create the review
+      self._createReviewFor(entity, comment, is_public=True)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
@@ -518,7 +497,6 @@ class View(base.View):
 
       proposal_logic = params['logic']
       student_proposal_entity = proposal_logic.getForFields(filter, unique=True)
-      reviewer = student_proposal_entity.scope
 
       # update the entity mark it as invalid
       proposal_logic.updateEntityProperties(student_proposal_entity,
@@ -529,7 +507,7 @@ class View(base.View):
           {'url_name': 'program'})
 
       comment = "Student withdrew proposal."
-      self._createReviewFor(student_proposal_entity, reviewer, comment)
+      self._createReviewFor(student_proposal_entity, comment)
       return http.HttpResponseRedirect(redirect_url)
 
     return super(View, self).edit(request=request, access_type=access_type,
@@ -696,7 +674,6 @@ class View(base.View):
     if org_admin:
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
-      reviewer = org_admin
 
       # try to see if the rank is given and adjust the given_score if needed
       rank = fields['rank']
@@ -712,14 +689,11 @@ class View(base.View):
         # calculate the score that should be given to end up at the given rank
         # give +1 to make sure that in the case of a tie they end up top
         given_score = score_at_rank - entity.score + 1
-    else:
-      # might be None (if Host or Developer is commenting)
-      reviewer = mentor
 
     # store the properties to update the proposal with
     properties = {}
 
-    if reviewer and (not is_public) and (given_score is not 0):
+    if (org_admin or mentor) and (not is_public) and (given_score is not 0):
       # if it is not a public comment and it's made by a member of the
       # organization we update the score of the proposal
       new_score = given_score + entity.score
@@ -731,7 +705,7 @@ class View(base.View):
         properties['status'] = 'pending'
 
       # create the review entity
-      self._createReviewFor(entity, reviewer, comment, given_score, is_public)
+      self._createReviewFor(entity, comment, given_score, is_public)
 
     if properties.values():
       # there is something to update
@@ -764,11 +738,6 @@ class View(base.View):
 
     ineligible = get_dict.get('ineligible')
 
-    if org_admin:
-      reviewer = org_admin
-    elif mentor:
-      reviewer = mentor
-
     if (org_admin or mentor) and (ineligible != None) and (
         entity.status not in ['accepted', 'rejected']):
       ineligible = int(ineligible)
@@ -780,7 +749,7 @@ class View(base.View):
         redirect = redirects.getListProposalsRedirect(entity.org,
                                                       {'url_name': 'org'})
         comment = "Marked Student Proposal as Ineligible."
-        self._createReviewFor(entity, reviewer, comment, is_public=False)
+        self._createReviewFor(entity, comment, is_public=False)
         return http.HttpResponseRedirect(redirect)
       elif ineligible == 0:
         # mark the proposal as new and return to the list
@@ -790,7 +759,7 @@ class View(base.View):
         redirect = redirects.getListProposalsRedirect(entity.org,
                                                       {'url_name': 'org'})
         comment = "Marked Student Proposal as Eligible."
-        self._createReviewFor(entity, reviewer, comment, is_public=False)
+        self._createReviewFor(entity, comment, is_public=False)
         return http.HttpResponseRedirect(redirect)
 
     # check if we should change the subscription state for the current user
@@ -953,12 +922,13 @@ class View(base.View):
     review_summary = {}
 
     for private_review in private_reviews:
-      # make sure there is a reviewer
-      reviewer = private_review.reviewer
-      if not reviewer:
+
+      if private.review.score == 0:
         continue
 
-      reviewer_key = reviewer.key()
+      reviewer = private_review.author
+
+      reviewer_key = reviewer.key().id_or_name()
       reviewer_summary = review_summary.get(reviewer_key)
 
       if reviewer_summary:
@@ -970,7 +940,7 @@ class View(base.View):
         reviewer_summary['total_comments'] = old_total_comments + 1
       else:
         review_summary[reviewer_key] = {
-            'name': reviewer.name(),
+            'name': reviewer.name,
             'total_comments': 1,
             'total_score': private_review.score}
 
@@ -1058,14 +1028,12 @@ class View(base.View):
     properties = {'mentor': mentor_entity}
     self._logic.updateEntityProperties(entity, properties)
 
-  def _createReviewFor(self, entity, reviewer, comment, 
-                       score=0, is_public=True):
+  def _createReviewFor(self, entity, comment, score=0, is_public=True):
     """Creates a review for the given proposal and sends 
        out a message to all followers.
 
     Args:
       entity: Student Proposal entity for which the review should be created
-      reviewer: A role entity of the reviewer (if possible, else None)
       comment: The textual contents of the review
       score: The score of the review (only used if the review is not public)
       is_public: Determines if the review is a public review
@@ -1082,7 +1050,6 @@ class View(base.View):
         'author': user_logic.logic.getForCurrentAccount(),
         'content': comment,
         'is_public': is_public,
-        'reviewer': reviewer
         }
 
     # add the given score if the review is not public

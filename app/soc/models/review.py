@@ -35,16 +35,8 @@ class Review(soc.models.comment.Comment):
   #: the score given by the reviewer
   score = db.IntegerProperty(required=True, default=0)
 
-  # TODO(ljvderijk): Remove this property
-  #: An optional reference property to a reviewer so the information
-  #: from the Role can be used as well
-  reviewer = db.ReferenceProperty(reference_class=soc.models.role.Role,
-                                  required=False, collection_name="reviews")
 
   def author_name(self):
     """Property as 'author_name' for use in common templates.
     """
-    if self.reviewer:
-      return self.reviewer.name()
-    else:
-      return self.author.name
+    return self.author.name

@@ -19,11 +19,17 @@ __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+
+from soc.modules.gsoc.views.models import grading_project_survey as grading_survey
+from soc.modules.gsoc.views.models import grading_survey_group
 from soc.modules.gsoc.views.models import mentor
 from soc.modules.gsoc.views.models import org_admin
 from soc.modules.gsoc.views.models import organization
 from soc.modules.gsoc.views.models import program
+from soc.modules.gsoc.views.models import project_survey
 from soc.modules.gsoc.views.models import student
+from soc.modules.gsoc.views.models import student_project
+from soc.modules.gsoc.views.models import student_proposal
 from soc.modules.gsoc.views.models import timeline
 
 
@@ -46,12 +52,18 @@ class Callback(object):
     self.core.requireUniqueService('registerWithSitemap')
 
     # register the GSoC Views
+    self.core.registerSitemapEntry(grading_survey_group.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(grading_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(project_survey.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(student_project.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(student_proposal.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
+
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.
@@ -61,10 +73,15 @@ class Callback(object):
     self.core.requireUniqueService('registerWithSidebar')
 
     # register the GHOP menu entries
+    self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)
+    self.core.registerSidebarEntry(grading_survey.view.getSidebarMenus)
     self.core.registerSidebarEntry(mentor.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)
     self.core.registerSidebarEntry(organization.view.getSidebarMenus)
     self.core.registerSidebarEntry(program.view.getSidebarMenus)
+    self.core.registerSidebarEntry(project_survey.view.getSidebarMenus)
+    self.core.registerSidebarEntry(student_project.view.getSidebarMenus)
+    self.core.registerSidebarEntry(student_proposal.view.getSidebarMenus)
     self.core.registerSidebarEntry(student.view.getSidebarMenus)
     self.core.registerSidebarEntry(timeline.view.getSidebarMenus)
 

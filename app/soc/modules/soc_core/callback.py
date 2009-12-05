@@ -125,15 +125,6 @@ class Callback(object):
     self.core.registerSidebarEntry(sponsor.view.getExtraMenus)
     self.core.registerSidebarEntry(host.view.getSidebarMenus)
     self.core.registerSidebarEntry(request.view.getSidebarMenus)
-    self.core.registerSidebarEntry(program.view.getSidebarMenus)
-    self.core.registerSidebarEntry(program.view.getExtraMenus)
-    self.core.registerSidebarEntry(student.view.getSidebarMenus)
-    self.core.registerSidebarEntry(student_project.view.getSidebarMenus)
-    self.core.registerSidebarEntry(student_proposal.view.getSidebarMenus)
-    self.core.registerSidebarEntry(organization.view.getSidebarMenus)
-    self.core.registerSidebarEntry(organization.view.getExtraMenus)
-    self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)
-    self.core.registerSidebarEntry(mentor.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_app.view.getSidebarMenus)
 
   def registerRights(self):

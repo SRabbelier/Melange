@@ -26,12 +26,13 @@ from soc.logic import dicts
 from soc.logic.models.survey import project_logic as project_survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import survey
+
+from soc.modules.gsoc.views.helper import access
 
 
 class View(survey.View):
@@ -46,7 +47,7 @@ class View(survey.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['any_access'] = ['allow']
     rights['show'] = [('checkIsSurveyReadable', project_survey_logic)]
     rights['create'] = ['checkIsUser']

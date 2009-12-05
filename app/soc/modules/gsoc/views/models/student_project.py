@@ -38,7 +38,6 @@ from soc.logic.models import student as student_logic
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.student_project import logic as project_logic
 from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import forms as forms_helper
@@ -51,6 +50,8 @@ from soc.views.models import base
 from soc.views.models import organization as org_view
 
 import soc.logic.models.student_project
+
+from soc.modules.gsoc.views.helper import access
 
 
 class View(base.View):
@@ -65,7 +66,7 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['any_access'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = ['checkIsDeveloper']

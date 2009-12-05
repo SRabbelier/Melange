@@ -41,7 +41,6 @@ from soc.models.grading_survey_group import GradingSurveyGroup
 from soc.models.grading_project_survey import GradingProjectSurvey
 from soc.models.project_survey import ProjectSurvey
 from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import forms as forms_helper
@@ -52,6 +51,8 @@ from soc.views.models import base
 from soc.views.models import program as program_view
 
 import soc.views.helper.forms
+
+from soc.modules.gsoc.views.helper import access
 
 
 class View(base.View):
@@ -66,7 +67,7 @@ class View(base.View):
       params: a dict with params for this View
     """
 
-    rights = access.Checker(params)
+    rights = access.GSoCChecker(params)
     rights['create'] = ['checkIsHostForProgramInScope']
     rights['edit'] = ['checkIsHostForProgramInScope']
     rights['delete'] = ['checkIsDeveloper']

@@ -22,6 +22,10 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import db
+
+from django.utils.translation import ugettext
+
 import soc.models.timeline
 
 
@@ -30,47 +34,47 @@ class GSoCTimeline(soc.models.timeline.Timeline):
   """
 
   accepted_organization_announced_deadline = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Accepted Organizations Announced Deadline'))
+      verbose_name=ugettext('Accepted Organizations Announced Deadline'))
 
   application_review_deadline = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Application Review Deadline'))
+      verbose_name=ugettext('Application Review Deadline'))
 
   student_application_matched_deadline = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Student Application Matched Deadline'))
+      verbose_name=ugettext('Student Application Matched Deadline'))
 
   accepted_students_announced_deadline = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Accepted Students Announced Deadline'))
+      verbose_name=ugettext('Accepted Students Announced Deadline'))
 
   bonding_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Community Bonding Period Start date'))
+      verbose_name=ugettext('Community Bonding Period Start date'))
 
   bonding_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Community Bonding Period End date'))
+      verbose_name=ugettext('Community Bonding Period End date'))
 
   coding_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Coding Start date'))
+      verbose_name=ugettext('Coding Start date'))
 
   coding_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Coding End date'))
+      verbose_name=ugettext('Coding End date'))
 
   suggested_coding_deadline = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Suggested Coding Deadline'))
+      verbose_name=ugettext('Suggested Coding Deadline'))
 
   midterm_survey_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Midterm Survey Start date'))
+      verbose_name=ugettext('Midterm Survey Start date'))
 
   midterm_survey_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Midterm Survey End date'))
+      verbose_name=ugettext('Midterm Survey End date'))
 
   final_survey_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Final Survey Start date'))
+      verbose_name=ugettext('Final Survey Start date'))
 
   final_survey_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Final Survey End date'))
+      verbose_name=ugettext('Final Survey End date'))
 
   mentor_summit_start = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Mentor Summit Start date'))
+      verbose_name=ugettext('Mentor Summit Start date'))
 
   mentor_summit_end = db.DateTimeProperty(
-      verbose_name=ugettext_lazy('Mentor Summit End date'))
+      verbose_name=ugettext('Mentor Summit End date'))
 

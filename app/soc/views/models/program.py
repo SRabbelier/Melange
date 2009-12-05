@@ -717,80 +717,11 @@ class View(presence.View):
     return menus
 
   def _getTimeDependentEntries(self, program_entity, params, id, user):
-    """Returns a list with time dependent menu items.
+    """Returns a list with time dependent menu items. Should be redefined
+    in a module specific view.
     """
-    items = []
 
-    #TODO(ljvderijk) Add more timeline dependent entries
-    timeline_entity = program_entity.timeline
-
-    if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
-      # add the organization signup link
-      items += [
-          (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
-          "Apply to become an Organization", 'any_access')]
-
-    if user and timeline_helper.isAfterEvent(timeline_entity,
-        'org_signup_start'):
-      filter = {
-          'applicant': user,
-          'scope': program_entity,
-          }
-
-      if org_app_logic.logic.getForFields(filter, unique=True):
-        # add the 'List my Organization Applications' link
-        items += [
-            (redirects.getListSelfRedirect(program_entity,
-                                           {'url_name' : 'org_app'}),
-             "List My Organization Applications", 'any_access')]
-
-    # get the student entity for this user and program
-    filter = {'user': user,
-              'scope': program_entity,
-              'status': 'active'}
-    student_entity = student_logic.logic.getForFields(filter, unique=True)
-
-    if student_entity:
-      items += self._getStudentEntries(program_entity, student_entity,
-                                       params, id, user)
-
-    # get mentor and org_admin entity for this user and program
-    filter = {'user': user,
-              'program': program_entity,
-              'status': 'active'}
-    mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
-    org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
-
-    if mentor_entity or org_admin_entity:
-      items += self._getOrganizationEntries(program_entity, org_admin_entity,
-                                            mentor_entity, params, id, user)
-
-    if user and not (student_entity or mentor_entity or org_admin_entity):
-      if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-        # this user does not have a role yet for this program
-        items += [('/student/apply/%s' % (program_entity.key().id_or_name()),
-            "Register as a Student", 'any_access')]
-
-    deadline = 'accepted_organization_announced_deadline'
-
-    if timeline_helper.isAfterEvent(timeline_entity, deadline):
-      url = redirects.getAcceptedOrgsRedirect(program_entity, params)
-      # add a link to list all the organizations
-      items += [(url, "List participating Organizations", 'any_access')]
-
-      if not student_entity:
-        # add apply to become a mentor link
-        items += [('/org/apply_mentor/%s' % (program_entity.key().id_or_name()),
-         "Apply to become a Mentor", 'any_access')]
-
-    deadline = 'accepted_students_announced_deadline'
-
-    if timeline_helper.isAfterEvent(timeline_entity, deadline):
-      items += [(redirects.getListProjectsRedirect(program_entity,
-          {'url_name':'program'}),
-          "List all student projects", 'any_access')]
-
-    return items
+    return []
 
   def _getStudentEntries(self, program_entity, student_entity,
                          params, id, user):

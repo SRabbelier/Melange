@@ -103,9 +103,11 @@ def iterative_task(logic, **task_default):
       try:
         func(request, entities=entities, context=context, *args, **kwargs)
       except task_responses.FatalTaskError, error:
+        logging.debug(post_dict)
         logging.error(error)
         return task_responses.terminateTask()
       except Exception, exception:
+        logging.debug(post_dict)
         logging.error(exception)
         return task_responses.repeatTask()
 

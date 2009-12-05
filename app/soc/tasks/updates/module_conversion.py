@@ -720,7 +720,7 @@ def runTimelineConversionUpdate(request, entities, context, *args, **kwargs):
       gsoc_properties[timeline_property] = getattr(entity, timeline_property)
 
     gsoc_program = program_logic.getFromKeyName(entity.key().id_or_name())
-    gsoc_properties['scope'] = gsoc_program
+    gsoc_properties['scope'] = gsoc_program.scope
 
     # create the new GSoCTimeline entity and prepare it to be stored
     gsoc_timeline_entity = GSoCTimeline(key_name=entity.key().name(),

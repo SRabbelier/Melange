@@ -31,11 +31,6 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import mentor as mentor_logic
-from soc.logic.models.organization import logic as org_logic
-from soc.logic.models.org_admin import logic as org_admin_logic
-from soc.logic.models import student as student_logic
-from soc.logic.models.program import logic as program_logic
 from soc.logic.models.student_project import logic as project_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
@@ -51,6 +46,10 @@ from soc.views.models import organization as org_view
 
 import soc.logic.models.student_project
 
+from soc.modules.gsoc.logic.models.organization import logic as org_logic
+from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.logic.models import student as student_logic
+from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.views.helper import access
 
 

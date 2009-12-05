@@ -26,6 +26,7 @@ __authors__ = [
 
 from django.utils.translation import ugettext
 
+from soc.logic.models.host import logic as host_logic
 from soc.logic.models.student_project import logic as student_project_logic
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -41,6 +42,81 @@ DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
 class GSoCChecker(access.Checker):
   """See soc.views.helper.access.Checker.
   """
+
+  @access.allowDeveloper
+  def checkStudentProjectHasStatus(self, django_args, allowed_status):
+    """Checks whether the Project has one of the given statuses.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      allowed_status: list with the allowed statuses for the entity
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the project is not in the requested status
+    """
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+
+    if not project_entity.status in allowed_status:
+      raise out_of_band.AccessViolation(
+          message_fmt=access.DEF_NO_ACTIVE_ENTITY_MSG)
+
+    return
+
+  @access.allowDeveloper
+  def checkCanEditStudentProjectAsStudent(self, django_args):
+    """Checks whether the project can be edited in a student mode
+    by the current user.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the project does not belong to the current user
+    """
+
+    self.checkIsUser()
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+    student_entity = project_entity.student
+
+    if student_entity.user.key() != self.user.key():
+      raise out_of_band.AccessViolation(
+          message_fmt=access.DEF_NOT_YOUR_ENTITY_MSG)
+
+    if student_entity.status != 'active':
+      raise out_of_band.AccessViolation(
+          message_fmt=access.DEF_NO_ACTIVE_ENTITY_MSG)
+
+    return
+
+  @access.allowDeveloper
+  def checkIsHostForStudentProject(self, django_args):
+    """Checks whether the user is Host for the Program of the
+    specified StudentProject.
+
+    Args:
+      django_args: a dictionary with django's arguments
+
+     Raises:
+       AccessViolationResponse:
+         - If there is no project found
+         - If the user is not a host for the specified project
+    """
+
+    self.checkIsUser()
+
+    project_entity = student_project_logic.getFromKeyFieldsOr404(django_args)
+    program_entity = project_entity.program
+
+    new_args = {'scope_path': program_entity.scope_path}
+    self.checkHasActiveRoleForScope(new_args, host_logic)
+
+    return
 
   @access.denySidebar
   @access.allowDeveloper

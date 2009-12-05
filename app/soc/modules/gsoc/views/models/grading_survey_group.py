@@ -32,7 +32,6 @@ from django import forms
 from django import http
 
 from soc.logic import dicts
-from soc.logic.models.program import logic as program_logic
 from soc.logic.models.survey import grading_logic
 from soc.logic.models.survey import project_logic
 from soc.logic.models.user import logic as user_logic
@@ -52,6 +51,7 @@ from soc.views.models import program as program_view
 
 import soc.views.helper.forms
 
+from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.views.helper import access
 
 
@@ -68,13 +68,13 @@ class View(base.View):
     """
 
     rights = access.GSoCChecker(params)
-    rights['create'] = ['checkIsHostForProgramInScope']
-    rights['edit'] = ['checkIsHostForProgramInScope']
+    rights['create'] = [('checkIsHostForProgramInScope', program_logic)]
+    rights['edit'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['show'] = ['checkIsHostForProgramInScope']
+    rights['show'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['list'] = ['checkIsDeveloper']
-    rights['records'] = ['checkIsHostForProgramInScope']
-    rights['edit_record'] = ['checkIsHostForProgramInScope']
+    rights['records'] = [('checkIsHostForProgramInScope', program_logic)]
+    rights['edit_record'] = [('checkIsHostForProgramInScope', program_logic)]
 
     new_params = {}
     new_params['logic'] = survey_group_logic

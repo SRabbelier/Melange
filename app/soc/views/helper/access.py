@@ -986,11 +986,12 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsHostForProgramInScope(self, django_args):
+  def checkIsHostForProgramInScope(self, django_args, logic=program_logic):
     """Checks if the user is a host for the specified program.
 
     Args:
       django_args: a dictionary with django's arguments
+      logic: Program Logic instance
     """
 
     scope_path = django_args.get('scope_path')
@@ -998,7 +999,7 @@ class Checker(object):
     if not scope_path:
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_DENIED_MSG)
 
-    program = program_logic.getFromKeyName(scope_path)
+    program = logic.getFromKeyName(scope_path)
 
     if not program or program.status == 'invalid':
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)

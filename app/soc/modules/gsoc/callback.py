@@ -74,14 +74,12 @@ class Callback(object):
 
     # register the GHOP menu entries
     self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)
-    self.core.registerSidebarEntry(grading_survey.view.getSidebarMenus)
     self.core.registerSidebarEntry(mentor.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)
     self.core.registerSidebarEntry(organization.view.getSidebarMenus)
     self.core.registerSidebarEntry(organization.view.getExtraMenus)
     self.core.registerSidebarEntry(program.view.getSidebarMenus)
     self.core.registerSidebarEntry(program.view.getExtraMenus)
-    self.core.registerSidebarEntry(project_survey.view.getSidebarMenus)
     self.core.registerSidebarEntry(student_project.view.getSidebarMenus)
     self.core.registerSidebarEntry(student_proposal.view.getSidebarMenus)
     self.core.registerSidebarEntry(student.view.getSidebarMenus)

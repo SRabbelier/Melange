@@ -26,6 +26,8 @@ from soc.logic.models import program
 
 import soc.models.program
 
+from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
+
 import soc.modules.gsoc.models.program
 
 
@@ -34,10 +36,12 @@ class Logic(program.Logic):
   """
 
   def __init__(self, model=soc.modules.gsoc.models.program.GSoCProgram,
-               base_model=soc.models.program.Program):
+               base_model=soc.models.program.Program,
+               timeline_logic=gsoc_timeline_logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model, base_model=base_model)
+    super(Logic, self).__init__(model, base_model=base_model,
+                                timeline_logic=timeline_logic)
 
 logic = Logic()

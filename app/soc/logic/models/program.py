@@ -29,8 +29,6 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
-from gsoc.logic.models.timeline import logic as gsoc_timeline_logic
-
 
 class Logic(presence_with_tos.Logic):
   """Logic methods for the Program model.
@@ -38,7 +36,7 @@ class Logic(presence_with_tos.Logic):
 
   def __init__(self, model=soc.models.program.Program, 
                base_model=None, scope_logic=sponsor_logic,
-               timeline_logic=gsoc_timeline_logic):
+               timeline_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 

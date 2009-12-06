@@ -552,6 +552,24 @@ class View(presence.View):
 
     return items
 
+  def _getStudentEntries(self, program_entity, student_entity,
+                         params, id, user, prefix):
+    """Returns a list with menu items for students in a specific program.
+    """
+
+    items = []
+
+    items += [(redirects.getEditRedirect(student_entity,
+        {'url_name': prefix + '/student'}),
+        "Edit my Student Profile", 'any_access')]
+
+
+    items += [(redirects.getManageRedirect(student_entity,
+        {'url_name': prefix + '/student'}),
+        "Resign as a Student", 'any_access')]
+
+    return items
+
   def _getOrganizationEntries(self, program_entity, org_admin_entity,
                               mentor_entity, params, id, user):
     """Returns a list with menu items for org admins and mentors in a

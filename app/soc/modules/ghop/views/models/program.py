@@ -382,7 +382,7 @@ class View(program.View):
 
     if student_entity:
       items += self._getStudentEntries(ghop_program_entity, student_entity,
-                                       params, id, user)
+                                       params, id, user, 'ghop')
     else:
       # if a user has a task assigned, he or she still may list it
       filter = {
@@ -425,29 +425,24 @@ class View(program.View):
 
     return items
 
-  def _getStudentEntries(self, ghop_program_entity, student_entity,
-                         params, id, user):
+  def _getStudentEntries(self, program_entity, student_entity,
+                         params, id, user, prefix):
     """Returns a list with menu items for students in a specific program.
     """
 
     items = []
 
-    timeline_entity = ghop_program_entity.timeline
+    timeline_entity = program_entity.timeline
 
     if timeline_helper.isAfterEvent(timeline_entity,
                                    'student_signup_start'):
       # add a link to show all projects
       items += [(ghop_redirects.getListStudentTasksRedirect(
-          ghop_program_entity, {'url_name':'ghop/student'}),
+          program_entity, {'url_name':'ghop/student'}),
           "List my Tasks", 'any_access')]
 
-    items += [(redirects.getEditRedirect(student_entity,
-        {'url_name': 'ghop/student'}),
-        "Edit my Student Profile", 'any_access')]
-
-    items += [(redirects.getManageRedirect(student_entity,
-        {'url_name':'ghop/student'}),
-        "Resign as a Student", 'any_access')]
+    items += super(View, self)._getStudentEntries(program_entity,
+        student_entity, params, id, user, prefix)
 
     return items
 

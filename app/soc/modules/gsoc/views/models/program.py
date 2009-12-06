@@ -318,10 +318,6 @@ class View(program.View):
           {'url_name': prefix + '/student_proposal'}),
           "List my Student Proposals", 'any_access')]
 
-    items += [(redirects.getEditRedirect(student_entity,
-        {'url_name': prefix + '/student'}),
-        "Edit my Student Profile", 'any_access')]
-
     if timeline_helper.isAfterEvent(timeline_entity,
                                    'accepted_students_announced_deadline'):
       # add a link to show all projects
@@ -329,9 +325,8 @@ class View(program.View):
           {'url_name': prefix + '/student'}),
           "List my Student Projects", 'any_access')]
 
-    items += [(redirects.getManageRedirect(student_entity,
-        {'url_name': prefix + '/student'}),
-        "Resign as a Student", 'any_access')]
+    items += super(View, self)._getStudentEntries(program_entity,
+        student_entity, params, id, user, prefix)
 
     return items
 

@@ -63,7 +63,7 @@ class View(program.View):
 
   DEF_PARTICIPATING_ORGS_MSG_FMT = ugettext(
       'The following is a list of all the participating organizations under '
-      'the programme %(name)s. To know more about each organization and see '
+      'the program %(name)s. To know more about each organization and see '
       'the tasks published by them please visit the corresponding links.')
 
   DEF_TASK_QUOTA_ALLOCATION_MSG = ugettext(

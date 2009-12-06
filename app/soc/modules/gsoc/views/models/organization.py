@@ -18,13 +18,16 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
 from soc.logic import dicts
+from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.org_app import logic as org_app_logic
 from soc.views.helper import decorators
+from soc.views.helper import redirects
 from soc.views.models import organization
 from soc.views.models import group
 
@@ -88,6 +91,100 @@ class View(organization.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)
+
+  # TODO (dhans): merge common items with the GHOP module in a single function
+  def _getExtraMenuItems(self, role_description, params=None):
+    """Used to create the specific Organization menu entries.
+
+    For args see group.View._getExtraMenuItems().
+    """
+    submenus = []
+
+    group_entity = role_description['group']
+    program_entity = group_entity.scope
+    roles = role_description['roles']
+
+    if roles.get('org_admin') or roles.get('mentor'):
+      # add a link to view all the student proposals
+      submenu = (redirects.getListProposalsRedirect(group_entity, params),
+          "View all Student Proposals", 'any_access')
+      submenus.append(submenu)
+
+
+    if roles.get('org_admin'):
+      # add a link to manage student projects after they have been announced
+      if timeline_helper.isAfterEvent(program_entity.timeline,
+                                     'accepted_students_announced_deadline'):
+        submenu = (redirects.getManageOverviewRedirect(group_entity,
+            {'url_name': 'gsoc/student_project'}),
+            "Manage Student Projects", 'any_access')
+        submenus.append(submenu)
+
+      # add a link to the management page
+      submenu = (redirects.getListRolesRedirect(group_entity, params),
+          "Manage Admins and Mentors", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite an org admin
+      submenu = (
+          redirects.getInviteRedirectForRole(group_entity, 'gsoc/org_admin'),
+          "Invite an Admin", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to invite a member
+      submenu = (
+          redirects.getInviteRedirectForRole(group_entity, 'gsoc/mentor'),
+          "Invite a Mentor", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the request page
+      submenu = (redirects.getListRequestsRedirect(group_entity, params),
+          "List Requests and Invites", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(group_entity, params),
+          "Edit Organization Profile", 'any_access')
+      submenus.append(submenu)
+
+    if roles.get('org_admin') or roles.get('mentor'):
+      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'org'),
+          "Create a New Document", 'any_access')
+      submenus.append(submenu)
+
+      submenu = (redirects.getListDocumentsRedirect(group_entity, 'org'),
+          "List Documents", 'any_access')
+      submenus.append(submenu)
+
+
+    if roles.get('org_admin'):
+      # add a link to the resign page
+      submenu = (redirects.getManageRedirect(roles['org_admin'],
+          {'url_name': 'gsoc/org_admin'}),
+          "Resign as Admin", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(roles['org_admin'],
+          {'url_name': 'gsoc/org_admin'}),
+          "Edit My Admin Profile", 'any_access')
+      submenus.append(submenu)
+
+
+    if roles.get('mentor'):
+      # add a link to the resign page
+      submenu = (redirects.getManageRedirect(roles['mentor'],
+          {'url_name' : 'gsoc/mentor'}),
+          "Resign as Mentor", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to the edit page
+      submenu = (redirects.getEditRedirect(roles['mentor'],
+          {'url_name': 'gsoc/mentor'}),
+          "Edit My Mentor Profile", 'any_access')
+      submenus.append(submenu)
+
+    return submenus
 
 
 view = View()

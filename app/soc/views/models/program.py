@@ -659,7 +659,7 @@ class View(presence.View):
                                    'accepted_students_announced_deadline'):
       # add a link to show all projects
       items += [(redirects.getListProjectsRedirect(program_entity,
-          {'url_name':'student'}),
+          {'url_name':'gsoc/student'}),
           "List my Student Projects", 'any_access')]
 
     items += [(redirects.getManageRedirect(student_entity,

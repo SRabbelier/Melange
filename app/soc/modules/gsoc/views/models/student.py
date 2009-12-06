@@ -88,6 +88,13 @@ class View(student.View):
     new_params['module_package'] = 'soc.modules.gsoc.views.models'
     new_params['url_name'] = 'gsoc/student'
 
+    patterns = [
+        (r'^%(url_name)s/(?P<access_type>list_projects)/%(scope)s$',
+        '%(module_package)s.%(module_name)s.list_projects',
+        'List of my Student Projects')]
+
+    new_params['extra_django_patterns'] = patterns
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)

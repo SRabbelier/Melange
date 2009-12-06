@@ -26,8 +26,10 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.models import student
 
 from soc.logic.models.host import logic as host_logic

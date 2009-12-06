@@ -923,7 +923,7 @@ class View(base.View):
 
     for private_review in private_reviews:
 
-      if private.review.score == 0:
+      if private_review.score == 0:
         continue
 
       reviewer = private_review.author

@@ -66,10 +66,6 @@ class View(presence.View):
 
   DEF_SLOTS_ALLOCATION_MSG = ugettext("Use this view to assign slots.")
 
-  DEF_ACCEPTED_PROJECTS_MSG_FMT = ugettext("These projects have been"
-      " accepted into %(name)s. You can learn more about each project"
-      " by visiting the links below.")
-
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.

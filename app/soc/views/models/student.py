@@ -245,7 +245,6 @@ create = responses.redirectLegacyRequest
 delete = responses.redirectLegacyRequest
 edit = responses.redirectLegacyRequest
 list = responses.redirectLegacyRequest
-list_projects = responses.redirectLegacyRequest
 manage = responses.redirectLegacyRequest
 public = responses.redirectLegacyRequest
 export = responses.redirectLegacyRequest

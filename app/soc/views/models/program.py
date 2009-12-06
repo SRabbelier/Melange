@@ -125,7 +125,7 @@ class View(presence.View):
           "List all accepted organizations"),
         (r'^%(url_name)s/(?P<access_type>list_projects)/%(key_fields)s$',
           '%(module_package)s.%(module_name)s.list_projects',
-          "List all student projects"),
+          "List all Student Projects"),
         ]
 
     new_params['extra_django_patterns'] = patterns

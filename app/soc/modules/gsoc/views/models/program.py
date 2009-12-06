@@ -177,7 +177,7 @@ class View(program.View):
     if timeline_helper.isAfterEvent(timeline_entity, deadline):
       items += [(redirects.getListProjectsRedirect(program_entity,
           {'url_name':'program'}),
-          "List all student projects", 'any_access')]
+          "List all Student Projects", 'any_access')]
 
     return items
 

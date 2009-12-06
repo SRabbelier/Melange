@@ -185,39 +185,6 @@ class View(role.View):
     return self.create(request, access_type='unspecified', page_name=page_name,
         params=params, **kwargs)
 
-  @decorators.merge_params
-  @decorators.check_access
-  def listProjects(self, request, access_type,
-                   page_name=None, params=None, **kwargs):
-    """View that lists all of the current user's Student Projects for the
-    Program given as Scope.
-    """
-
-    from soc.views.models import student_project as project_view
-
-    user_entity = user_logic.logic.getForCurrentAccount()
-
-    # pylint: disable-msg=E1103
-    fields = {'link_id': user_entity.link_id,
-        'scope_path': kwargs['scope_path']}
-
-    try:
-      student_entity = student_logic.logic.getFromKeyFieldsOr404(fields)
-    except out_of_band.Error, error:
-      return responses.errorResponse(
-          error, request, template=params['error_public'])
-
-    # set the fields we need for the Student Project list
-    fields = {'student': student_entity}
-
-    list_params = project_view.view.getParams().copy()
-    list_params['list_description'] = ugettext(
-        'List of my Student Projects for %s') %(student_entity.scope.name)
-    list_params['list_action'] = (redirects.getStudentEditRedirect, list_params)
-
-    return project_view.view.list(request, access_type, page_name=page_name,
-                                  params=list_params, filter=fields)
-
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().
     """

@@ -18,15 +18,20 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
+from django.utils.translation import ugettext
+
 from soc.logic import dicts
 from soc.views.helper import decorators
+from soc.views.helper import redirects
 from soc.views.models import student
 
 from soc.logic.models.host import logic as host_logic
+from soc.logic.models.user import logic as user_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
@@ -38,6 +43,9 @@ from soc.modules.gsoc.views.models import program as program_view
 class View(student.View):
   """View methods for the Student model.
   """
+
+  DEF_STUDENT_PROJECTS_MSG_FMT = ugettext("List of my Student Projects "
+      " for %(name)s")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -83,6 +91,43 @@ class View(student.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listProjects(self, request, access_type,
+                   page_name=None, params=None, **kwargs):
+    """View that lists all of the current user's Student Projects for the
+    Program given as Scope.
+    """
+
+    from soc.modules.gsoc.views.models import student_project as project_view
+
+    user_entity = user_logic.getForCurrentAccount()
+
+    # pylint: disable-msg=E1103
+    fields = {
+        'link_id': user_entity.link_id,
+        'scope_path': kwargs['scope_path']
+        }
+
+    try:
+      student_entity = student_logic.getFromKeyFieldsOr404(fields)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # set the fields we need for the Student Project list
+    fields = {'student': student_entity}
+
+    list_params = project_view.view.getParams().copy()
+    
+    fmt = {'name': student_entity.scope.name}
+    list_params['list_description'] = self.DEF_STUDENT_PROJECTS_MSG_FMT % fmt
+    list_params['list_action'] = (redirects.getStudentEditRedirect,
+                                  list_params)
+
+    return project_view.view.list(request, access_type, page_name=page_name,
+                                  params=list_params, filter=fields)
 
 
 view = View()

@@ -18,12 +18,14 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
 from soc.logic import dicts
 from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.models import program
 
 from soc.logic.helper import timeline as timeline_helper
@@ -163,6 +165,62 @@ class View(program.View):
 
     return items
 
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptedOrgs(self, request, access_type,
+                   page_name=None, params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+
+    from soc.modules.gsoc.views.models.organization import view as org_view
+
+    contents = []
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    aa_list = self._getOrgsWithAcceptedApps(request, program_entity, params)
+    if aa_list:
+      contents.append(aa_list)
+
+    fmt = {'name': program_entity.name}
+    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+
+    use_cache = not aa_list # only cache if there are no aa's left
+
+    ap_list = self._getOrgsWithProfilesList(program_entity, org_view,
+        description, use_cache)
+    contents.append(ap_list)
+
+    params = params.copy()
+    params['list_msg'] = program_entity.accepted_orgs_msg
+
+    return self._list(request, params, contents, page_name)
+
+  def _getOrgsWithAcceptedApps(self, request, program_entity, params):
+    """
+    """
+
+    fmt = {'name': program_entity.name}
+    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
+
+    filter = {
+        'status': 'accepted',
+        'scope': program_entity,
+        }
+
+    from soc.views.models import org_app as org_app_view
+    aa_params = org_app_view.view.getParams().copy() # accepted applications
+
+    # define the list redirect action to show the notification
+    del aa_params['list_key_order']
+    aa_params['list_action'] = (redirects.getHomeRedirect, aa_params)
+    aa_params['list_description'] = description
+
+    aa_list = lists.getListContent(request, aa_params, filter, idx=0,
+                                   need_content=True)
+
+    return aa_list
 
 view = View()
 

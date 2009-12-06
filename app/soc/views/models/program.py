@@ -199,88 +199,42 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
-  def _getAcceptedOrgsList(self, description, params, filter, use_cache):
-    """Returns a list with all accepted orgs.
-
+  def _getOrgsWithProfilesList(self, program_entity, org_view, description, 
+                               use_cache):
+    """Returns a content of a list of all organizations that got accepted to
+    the program and there is an Organization-like entity in datastore.
+    
     Args:
+      program_entity: program which list the organizations for
+      use_cache: whether or not to use the memcache
+      org_view: a view for organization model
       description: the description of the list
-      params: the params to use
-      filter: the filter to use
-      use_cache: whether or not to use the cache
     """
 
-    logic = params['logic']
+    ao_params = org_view.getParams().copy()
 
+    org_logic = ao_params['logic']
+
+    filter = {
+        'scope': program_entity,
+        'status': ['new', 'active']
+        }
     order = ['name']
 
     if not use_cache:
-      fun = self._getData
+      entities = org_logic.getForFields(filter=filter, order=order)
     else:
       # only cache if all profiles are created
       fun =  soc.cache.logic.cache(self._getData)
-    entities = fun(logic.getModel(), filter, order, logic)
+      entities = fun(org_logic.getModel(), filter, order, org_logic)
 
-    result = dicts.rename(params, params['list_params'])
-    result['action'] = (redirects.getHomeRedirect, params)
+    result = dicts.rename(ao_params, ao_params['list_params'])
+    result['action'] = (redirects.getHomeRedirect, ao_params)
     result['description'] = description
     result['pagination'] = 'soc/list/no_pagination.html'
     result['data'] = entities
 
     return result
-
-  @decorators.merge_params
-  @decorators.check_access
-  def acceptedOrgs(self, request, access_type,
-                   page_name=None, params=None, filter=None, **kwargs):
-    """See base.View.list.
-    """
-
-    contents = []
-    logic = params['logic']
-
-    program_entity = logic.getFromKeyFieldsOr404(kwargs)
-
-    fmt = {'name': program_entity.name}
-    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
-
-    filter = {
-        'status': 'accepted',
-        'scope': program_entity,
-        }
-
-    from soc.views.models import org_app as org_app_view
-    aa_params = org_app_view.view.getParams().copy() # accepted applications
-
-    # define the list redirect action to show the notification
-    del aa_params['list_key_order']
-    aa_params['list_action'] = (redirects.getHomeRedirect, aa_params)
-    aa_params['list_description'] = description
-
-    aa_list = lists.getListContent(request, aa_params, filter, idx=0,
-                                   need_content=True)
-
-    if aa_list:
-      contents.append(aa_list)
-
-    use_cache = not aa_list # only cache if there are no aa's left
-    if not program_entity.accepted_orgs_msg:
-      description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
-    else:
-      description = ''
-
-    filter['status'] = ['new', 'active']
-
-    from soc.views.models.organization import view as org_view
-    ao_params = org_view.getParams().copy() # active orgs
-    ao_list = self._getAcceptedOrgsList(description, ao_params,
-        filter, use_cache)
-
-    contents.append(ao_list)
-
-    params = params.copy()
-    params['list_msg'] = program_entity.accepted_orgs_msg
-
-    return self._list(request, params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

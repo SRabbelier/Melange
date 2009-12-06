@@ -607,37 +607,22 @@ class View(program.View):
     """List all the accepted orgs for the given program.
     """
 
-    from soc.modules.ghop.views.models.organization import view as \
-        ghop_org_view
+    from soc.modules.ghop.views.models.organization import view as org_view
 
-    contents = []
     logic = params['logic']
 
-    ghop_program_entity = logic.getFromKeyFieldsOr404(kwargs)
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
-    ao_params = ghop_org_view.getParams().copy()
-    ao_params['list_action'] = (redirects.getHomeRedirect,
-                                ao_params)
-    ao_params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % {
-        'name': ghop_program_entity.name
-        }
+    fmt = {'name': program_entity.name}
+    description = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
 
-    filter = {
-        'scope': ghop_program_entity,
-        'status': ['new', 'active'],
-        }
-
-    order = ['name']
-
-    ao_list = lists.getListContent(request, ao_params, filter=filter,
-                                   order=order, idx=0)
-
-    contents.append(ao_list)
+    ao_list = self._getOrgsWithProfilesList(program_entity, org_view,
+        description, False)
 
     params = params.copy()
-    params['list_msg'] = ghop_program_entity.accepted_orgs_msg
+    params['list_msg'] = program_entity.accepted_orgs_msg
 
-    return self._list(request, params, contents, page_name)
+    return self._list(request, params, [ao_list], page_name)
 
 
 view = View()

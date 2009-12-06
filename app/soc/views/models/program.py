@@ -504,126 +504,17 @@ class View(presence.View):
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
 
-  @decorators.merge_params
-  def getExtraMenus(self, id, user, params=None):
-    """Returns the extra menu's for this view.
-
-    A menu item is generated for each program that is currently
-    running. The public page for each program is added as menu item,
-    as well as all public documents for that program.
-
-    Args:
-      params: a dict with params for this View.
+  def _getVisibleProgramEntries(self, entity, id, user, params):
+    """Get entries for a visible program.
     """
 
-    from soc.views.models import survey as survey_view
-    from soc.modules.gsoc.views.models import project_survey as project_survey_view
-    from soc.modules.gsoc.views.models import grading_project_survey as grading_survey_view
+    items = []
 
-    logic = params['logic']
-    rights = params['rights']
+    # show the documents for this program, even for not logged in users
+    items += document_view.view.getMenusForScope(entity, params)
+    items += self._getTimeDependentEntries(entity, params, id, user)
 
-    # only get all invisible and visible programs
-    fields = {'status': ['invisible', 'visible']}
-    entities = logic.getForFields(fields)
-
-    menus = []
-
-    rights.setCurrentUser(id, user)
-
-    for entity in entities:
-      items = []
-
-      if entity.status == 'visible':
-        # show the documents for this program, even for not logged in users
-        items += document_view.view.getMenusForScope(entity, params)
-        items += survey_view.view.getMenusForScope(entity, params, id, user)
-        items += project_survey_view.view.getMenusForScope(
-            entity, params, id, user)
-        items += grading_survey_view.view.getMenusForScope(
-            entity, params, id, user)
-        items += self._getTimeDependentEntries(entity, params, id, user)
-      try:
-        # check if the current user is a host for this program
-        rights.doCachedCheck('checkIsHostForProgram',
-                             {'scope_path': entity.scope_path,
-                              'link_id': entity.link_id}, [])
-
-        if entity.status == 'invisible':
-          # still add the document links so hosts can see how it looks like
-          items += document_view.view.getMenusForScope(entity, params)
-          items += survey_view.view.getMenusForScope(entity, params, id, user)
-          items += project_survey_view.view.getMenusForScope(
-              entity, params, id, user)
-          items += grading_survey_view.view.getMenusForScope(
-              entity, params, id, user)
-          items += self._getTimeDependentEntries(entity, params, id, user)
-
-        items += [(redirects.getReviewOverviewRedirect(
-            entity, {'url_name': 'org_app'}),
-            "Review Organization Applications", 'any_access')]
-        # add link to edit Program Profile
-        items += [(redirects.getEditRedirect(entity, params),
-            'Edit Program Profile', 'any_access')]
-        # add link to Assign Slots
-        items += [(redirects.getAssignSlotsRedirect(entity, params),
-            'Assign Slots', 'any_access')]
-        # add link to Show Duplicate project assignments
-        items += [(redirects.getShowDuplicatesRedirect(entity, params),
-            'Show Duplicate Project Assignments', 'any_access')]
-        # add link to edit Program Timeline
-        items += [(redirects.getEditRedirect(entity, {'url_name': 'timeline'}),
-            "Edit Program Timeline", 'any_access')]
-        # add link to create a new Program Document
-        items += [(redirects.getCreateDocumentRedirect(
-            entity, params['document_prefix']),
-            "Create a New Document", 'any_access')]
-        # add link to list all Program Document
-        items += [(redirects.getListDocumentsRedirect(entity, 'program'),
-            "List Documents", 'any_access')]
-        # add link to create a new Program Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-            'survey'),
-            "Create a New Survey", 'any_access')]
-        # add link to list all Program Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'program',
-            'survey'),
-            "List Surveys", 'any_access')]
-        # add link to create a new Project Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-            'project_survey'),
-            "Create a New Project Survey", 'any_access')]
-        # add link to list all Project Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'program',
-            'project_survey'),
-            "List Project Surveys", 'any_access')]
-        # add link to create a new Grading Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-            'grading_project_survey'),
-            "Create a New Grading Survey", 'any_access')]
-        # add link to list all Grading Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'program',
-            'grading_project_survey'),
-            "List Grading Surveys", 'any_access')]
-        # add link to withdraw Student Projects
-        items += [(redirects.getWithdrawRedirect(
-            entity, {'url_name': 'student_project'}),
-            "Withdraw Student Projects", 'any_access')]
-
-      except out_of_band.Error:
-        pass
-
-      items = sidebar.getSidebarMenu(id, user, items, params=params)
-      if not items:
-        continue
-
-      menu = {}
-      menu['heading'] = entity.short_name
-      menu['items'] = items
-      menu['group'] = 'Programs'
-      menus.append(menu)
-
-    return menus
+    return items
 
   def _getTimeDependentEntries(self, program_entity, params, id, user):
     """Returns a list with time dependent menu items. Should be redefined
@@ -631,6 +522,35 @@ class View(presence.View):
     """
 
     return []
+
+  def _getHostEntries(self, entity, params, prefix):
+    """Returns a list with menu items for program host.
+    
+    Args:
+      entity: program entity to get the entries for
+      params: view specific params
+      prefix: module prefix for the program entity
+    """
+
+    items = []
+
+    # add link to edit Program Profile
+    items += [(redirects.getEditRedirect(entity, params),
+            'Edit Program Profile', 'any_access')]
+    # add link to edit Program Timeline
+    items += [(redirects.getEditRedirect(entity, 
+            {'url_name': prefix + '/timeline'}),
+            "Edit Program Timeline", 'any_access')]
+    # add link to create a new Program Document
+    items += [(redirects.getCreateDocumentRedirect(
+            entity, params['document_prefix']),
+            "Create a New Document", 'any_access')]
+    # add link to list all Program Document
+    items += [(redirects.getListDocumentsRedirect(
+            entity, params['document_prefix']),
+            "List Documents", 'any_access')]
+
+    return items
 
   def _getStudentEntries(self, program_entity, student_entity,
                          params, id, user):

@@ -332,28 +332,16 @@ class View(program.View):
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like
-          items += document_view.view.getMenusForScope(entity, params)
           items += self._getTimeDependentEntries(entity, params, id, user)
+
+        items += self._getHostEntries(entity, params, 'ghop')
 
         items += [(redirects.getReviewOverviewRedirect(
             entity, {'url_name': 'ghop/org_app', 'scope_view': self}),
             "Review Organization Applications", 'any_access')]
-        # add link to edit Program Profile
-        items += [(redirects.getEditRedirect(entity, params),
-            'Edit Program Profile', 'any_access')]
         # add link to Assign Task Quota limits
         items += [(ghop_redirects.getAssignTaskQuotasRedirect(entity, params),
             'Assign Task Quota limits', 'any_access')]
-        # add link to edit Program Timeline
-        items += [(redirects.getEditRedirect(
-            entity, {'url_name': 'ghop/timeline'}),
-            "Edit Program Timeline", 'any_access')]
-        # add link to create a new Program Document
-        items += [(redirects.getCreateDocumentRedirect(entity, 'ghop/program'),
-            "Create a New Document", 'any_access')]
-        # add link to list all Program Document
-        items += [(redirects.getListDocumentsRedirect(entity, 'ghop/program'),
-            "List Documents", 'any_access')]
         # add link to edit Task Difficulty Levels
         items += [(ghop_redirects.getDifficultyEditRedirect(
             entity, {'url_name': 'ghop/program'}),

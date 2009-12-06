@@ -26,9 +26,11 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.models import program
+from soc.views.sitemap import sidebar
 
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import org_app as org_app_logic
@@ -103,6 +105,101 @@ class View(program.View):
 
     super(View, self).__init__(params)
 
+  @decorators.merge_params
+  def getExtraMenus(self, id, user, params=None):
+    """Returns the extra menu's for this view.
+
+    A menu item is generated for each program that is currently
+    running. The public page for each program is added as menu item,
+    as well as all public documents for that program.
+
+    Args:
+      params: a dict with params for this View.
+    """
+
+    logic = params['logic']
+    rights = params['rights']
+
+    # only get all invisible and visible programs
+    fields = {'status': ['invisible', 'visible']}
+    entities = logic.getForFields(fields)
+
+    menus = []
+
+    rights.setCurrentUser(id, user)
+
+    for entity in entities:
+      items = []
+
+      if entity.status == 'visible':
+        items += self._getVisibleProgramEntries(entity, id, user, params)
+        items += self._getSurveyEntries(entity, params, id, user)
+      try:
+        # check if the current user is a host for this program
+        rights.doCachedCheck('checkIsHostForProgram',
+                             {'scope_path': entity.scope_path,
+                              'link_id': entity.link_id}, [])
+
+        if entity.status == 'invisible':
+          # still add the document links so hosts can see how it looks like
+          items += self._getVisibleProgramEntries(entity, id, user, params)
+          items += self._getSurveyEntries(entity, params, id, user)
+
+        items += self._getHostEntries(entity, params, 'gsoc')
+
+        items += [(redirects.getReviewOverviewRedirect(
+            entity, {'url_name': 'org_app'}),
+            "Review Organization Applications", 'any_access')]
+
+        # add link to Assign Slots
+        items += [(redirects.getAssignSlotsRedirect(entity, params),
+            'Assign Slots', 'any_access')]
+        # add link to Show Duplicate project assignments
+        items += [(redirects.getShowDuplicatesRedirect(entity, params),
+            'Show Duplicate Project Assignments', 'any_access')]
+        # add link to create a new Program Survey
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+            'survey'),
+            "Create a New Survey", 'any_access')]
+        # add link to list all Program Surveys
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+            'survey'),
+            "List Surveys", 'any_access')]
+        # add link to create a new Project Survey
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+            'project_survey'),
+            "Create a New Project Survey", 'any_access')]
+        # add link to list all Project Surveys
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+            'project_survey'),
+            "List Project Surveys", 'any_access')]
+        # add link to create a new Grading Survey
+        items += [(redirects.getCreateSurveyRedirect(entity, 'program',
+            'grading_project_survey'),
+            "Create a New Grading Survey", 'any_access')]
+        # add link to list all Grading Surveys
+        items += [(redirects.getListSurveysRedirect(entity, 'program',
+            'grading_project_survey'),
+            "List Grading Surveys", 'any_access')]
+        # add link to withdraw Student Projects
+        items += [(redirects.getWithdrawRedirect(
+            entity, {'url_name': 'student_project'}),
+            "Withdraw Student Projects", 'any_access')]
+
+      except out_of_band.Error:
+        pass
+
+      items = sidebar.getSidebarMenu(id, user, items, params=params)
+      if not items:
+        continue
+
+      menu = {}
+      menu['heading'] = entity.short_name
+      menu['items'] = items
+      menu['group'] = 'Programs'
+      menus.append(menu)
+
+    return menus
 
   def _getTimeDependentEntries(self, program_entity, params, id, user):
     """Returns a list with time dependent menu items.
@@ -178,6 +275,27 @@ class View(program.View):
       items += [(redirects.getListProjectsRedirect(program_entity,
           {'url_name':'program'}),
           "List all Student Projects", 'any_access')]
+
+    return items
+
+  def _getSurveyEntries(self, entity, params, id, user):
+    """Returns a list of entries specific for surveys which should be visible
+    for users.
+    """
+
+    from soc.views.models import survey as survey_view
+    from soc.modules.gsoc.views.models import project_survey \
+        as project_survey_view
+    from soc.modules.gsoc.views.models import grading_project_survey \
+        as grading_survey_view
+
+    items = []
+
+    items += survey_view.view.getMenusForScope(entity, params, id, user)
+    items += project_survey_view.view.getMenusForScope(entity, params, id, 
+                                                       user)
+    items += grading_survey_view.view.getMenusForScope(entity, params, id,
+                                                       user)
 
     return items
 

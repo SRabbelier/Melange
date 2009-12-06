@@ -552,42 +552,6 @@ class View(presence.View):
 
     return items
 
-  def _getStudentEntries(self, program_entity, student_entity,
-                         params, id, user):
-    """Returns a list with menu items for students in a specific program.
-    """
-
-    items = []
-
-    timeline_entity = program_entity.timeline
-
-    if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-      items += [('/student_proposal/list_orgs/%s' % (
-          student_entity.key().id_or_name()),
-          "Submit your Student Proposal", 'any_access')]
-
-    if timeline_helper.isAfterEvent(timeline_entity, 'student_signup_start'):
-      items += [(redirects.getListSelfRedirect(student_entity,
-          {'url_name':'student_proposal'}),
-          "List my Student Proposals", 'any_access')]
-
-    items += [(redirects.getEditRedirect(student_entity,
-        {'url_name': 'student'}),
-        "Edit my Student Profile", 'any_access')]
-
-    if timeline_helper.isAfterEvent(timeline_entity,
-                                   'accepted_students_announced_deadline'):
-      # add a link to show all projects
-      items += [(redirects.getListProjectsRedirect(program_entity,
-          {'url_name':'gsoc/student'}),
-          "List my Student Projects", 'any_access')]
-
-    items += [(redirects.getManageRedirect(student_entity,
-        {'url_name':'student'}),
-        "Resign as a Student", 'any_access')]
-
-    return items
-
   def _getOrganizationEntries(self, program_entity, org_admin_entity,
                               mentor_entity, params, id, user):
     """Returns a list with menu items for org admins and mentors in a

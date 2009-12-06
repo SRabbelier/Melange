@@ -237,7 +237,7 @@ class View(program.View):
 
     if student_entity:
       items += self._getStudentEntries(program_entity, student_entity,
-                                       params, id, user)
+                                       params, id, user, 'gsoc')
 
     # get mentor and org_admin entity for this user and program
     filter = {'user': user,
@@ -296,6 +296,42 @@ class View(program.View):
                                                        user)
     items += grading_survey_view.view.getMenusForScope(entity, params, id,
                                                        user)
+
+    return items
+
+  def _getStudentEntries(self, program_entity, student_entity,
+                         params, id, user, prefix):
+    """Returns a list with menu items for students in a specific program.
+    """
+
+    items = []
+
+    timeline_entity = program_entity.timeline
+
+    if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+      items += [('/student_proposal/list_orgs/%s' % (
+          student_entity.key().id_or_name()),
+          "Submit your Student Proposal", 'any_access')]
+
+    if timeline_helper.isAfterEvent(timeline_entity, 'student_signup_start'):
+      items += [(redirects.getListSelfRedirect(student_entity,
+          {'url_name': prefix + '/student_proposal'}),
+          "List my Student Proposals", 'any_access')]
+
+    items += [(redirects.getEditRedirect(student_entity,
+        {'url_name': prefix + '/student'}),
+        "Edit my Student Profile", 'any_access')]
+
+    if timeline_helper.isAfterEvent(timeline_entity,
+                                   'accepted_students_announced_deadline'):
+      # add a link to show all projects
+      items += [(redirects.getListProjectsRedirect(program_entity,
+          {'url_name': prefix + '/student'}),
+          "List my Student Projects", 'any_access')]
+
+    items += [(redirects.getManageRedirect(student_entity,
+        {'url_name': prefix + '/student'}),
+        "Resign as a Student", 'any_access')]
 
     return items
 

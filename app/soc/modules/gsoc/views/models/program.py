@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from django.utils.translation import ugettext
+
 from soc.logic import dicts
 from soc.views.helper import decorators
 from soc.views.helper import lists
@@ -231,6 +233,7 @@ class View(program.View):
                                    need_content=True)
 
     return aa_list
+
 
 view = View()
 

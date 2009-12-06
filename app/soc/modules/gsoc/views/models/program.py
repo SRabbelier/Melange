@@ -234,6 +234,36 @@ class View(program.View):
 
     return aa_list
 
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptedProjects(self, request, access_type,
+                       page_name=None, params=None, filter=None, **kwargs):
+    """See base.View.list.
+    """
+    contents = []
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    filter = {
+        'status': 'accepted',
+        'program': program_entity}
+
+    fmt = {'name': program_entity.name}
+    description = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % fmt
+
+    from soc.modules.gsoc.views.models import student_project as sp_view
+
+    ap_params = sp_view.view.getParams().copy() # accepted projects
+    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+    ap_params['list_description'] = description
+    ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
+    ap_params['list_row'] = 'soc/student_project/list/row_all.html'
+
+    prefetch = ['mentor', 'student', 'scope']
+
+    return self.list(request, access_type, page_name=page_name,
+                     params=ap_params, filter=filter, prefetch=prefetch)
 
 view = View()
 

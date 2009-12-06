@@ -64,16 +64,6 @@ class View(presence.View):
   """View methods for the Program model.
   """
 
-  DEF_ACCEPTED_ORGS_MSG_FMT = ugettext("These organizations have"
-      " been accepted into %(name)s, but they have not yet completed"
-      " their organization profile. You can still learn more about"
-      " each organization by visiting the links below.")
-
-  DEF_CREATED_ORGS_MSG_FMT = ugettext("These organizations have been"
-      " accepted into %(name)s and have completed their organization"
-      " profiles. You can learn more about each organization by"
-      " visiting the links below.")
-
   DEF_SLOTS_ALLOCATION_MSG = ugettext("Use this view to assign slots.")
 
   DEF_ACCEPTED_PROJECTS_MSG_FMT = ugettext("These projects have been"
@@ -199,11 +189,11 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
-  def _getOrgsWithProfilesList(self, program_entity, org_view, description, 
+  def _getOrgsWithProfilesList(self, program_entity, org_view, description,
                                use_cache):
     """Returns a content of a list of all organizations that got accepted to
     the program and there is an Organization-like entity in datastore.
-    
+
     Args:
       program_entity: program which list the organizations for
       use_cache: whether or not to use the memcache

@@ -43,6 +43,16 @@ class View(program.View):
   """View methods for the Program model.
   """
 
+  DEF_ACCEPTED_ORGS_MSG_FMT = ugettext("These organizations have"
+      " been accepted into %(name)s, but they have not yet completed"
+      " their organization profile. You can still learn more about"
+      " each organization by visiting the links below.")
+
+  DEF_CREATED_ORGS_MSG_FMT = ugettext("These organizations have been"
+      " accepted into %(name)s and have completed their organization"
+      " profiles. You can learn more about each organization by"
+      " visiting the links below.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.

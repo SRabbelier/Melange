@@ -255,7 +255,7 @@ class View(program.View):
       if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
         # this user does not have a role yet for this program
         items += [
-            ('gsoc/student/apply/%s' % (program_entity.key().id_or_name()),
+            ('/gsoc/student/apply/%s' % (program_entity.key().id_or_name()),
             "Register as a Student", 'any_access')]
 
     deadline = 'accepted_organization_announced_deadline'
@@ -268,7 +268,7 @@ class View(program.View):
       if not student_entity:
         # add apply to become a mentor link
         items += [
-            ('gsoc/org/apply_mentor/%s' % (program_entity.key().id_or_name()),
+            ('/gsoc/org/apply_mentor/%s' % (program_entity.key().id_or_name()),
            "Apply to become a Mentor", 'any_access')]
 
     deadline = 'accepted_students_announced_deadline'

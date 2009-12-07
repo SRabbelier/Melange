@@ -219,6 +219,7 @@ class View(group.View):
     from soc.logic.models.student_proposal import logic as sp_logic
     from soc.models import student_proposal
     from soc.views.helper import list_info as list_info_helper
+
     from soc.modules.gsoc.views.models import student_proposal as student_proposal_view
 
     try:

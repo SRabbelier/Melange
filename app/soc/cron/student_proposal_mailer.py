@@ -27,7 +27,8 @@ from soc.logic.models.job import logic as job_logic
 from soc.logic.models.priority_group import logic as priority_logic
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.student import logic as student_logic
-from soc.logic.models.student_proposal import logic as proposal_logic
+
+from soc.modules.gsoc.logic.models.student_proposal import logic as proposal_logic
 
 
 # amount of students to create jobs for before updating

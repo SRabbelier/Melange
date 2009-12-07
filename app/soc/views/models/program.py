@@ -39,7 +39,6 @@ from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
-from soc.logic.models import student_proposal as student_proposal_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import student as student_logic
 from soc.views import helper
@@ -54,6 +53,8 @@ from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
+
+from soc.modules.gsoc.logic.models import student_proposal as student_proposal_logic
 
 import soc.cache.logic
 import soc.logic.models.program

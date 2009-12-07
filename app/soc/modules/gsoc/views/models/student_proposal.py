@@ -44,12 +44,11 @@ from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import student as student_view
 
-import soc.logic.models.student_proposal
-
 from soc.modules.gsoc.logic.models import mentor as mentor_logic
-from soc.modules.gsoc.logic.models import organization as org_logic
 from soc.modules.gsoc.logic.models import org_admin as org_admin_logic
+from soc.modules.gsoc.logic.models import organization as org_logic
 from soc.modules.gsoc.logic.models import student as student_logic
+from soc.modules.gsoc.logic.models import student_proposal as student_proposal_logic
 from soc.modules.gsoc.views.helper import access
 
 
@@ -91,7 +90,7 @@ class View(base.View):
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.student_proposal.logic
+    new_params['logic'] = student_proposal_logic.logic
     new_params['rights'] = rights
     new_params['name'] = "Student Proposal"
     new_params['url_name'] = "gsoc/student_proposal"

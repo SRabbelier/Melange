@@ -24,7 +24,8 @@ __authors__ = [
 
 from soc.logic.models import base
 from soc.logic.models import program as program_logic
-from soc.logic.models.grading_record import logic as record_logic
+
+from soc.modules.gsoc.logic.models.grading_record import logic as record_logic
 
 import soc.models.grading_survey_group
 

@@ -22,7 +22,7 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import follower as follower_logic
+from soc.modules.gsoc.logic.models import follower as follower_logic
 
 import soc.models.follower
 import soc.models.review_follower

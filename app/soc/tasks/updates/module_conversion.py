@@ -31,8 +31,6 @@ from django.http import HttpResponse
 from soc.logic.models import survey as survey_logic
 from soc.logic.models import survey_record as survey_record_logic
 from soc.logic.models.document import logic as document_logic
-from soc.logic.models.grading_survey_group import logic as \
-    grading_survey_group_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
@@ -43,9 +41,13 @@ from soc.logic.models.timeline import logic as timeline_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
+from soc.modules.gsoc.logic.models.grading_survey_group import logic as \
+    grading_survey_group_logic
 from soc.modules.gsoc.logic.models.review import logic as review_logic
-from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
-from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal_logic
+from soc.modules.gsoc.logic.models.student_project import logic as \
+    student_project_logic
+from soc.modules.gsoc.logic.models.student_proposal import logic as \
+    student_proposal_logic
 
 # batch size to use when going through the entities
 DEF_BATCH_SIZE = 10

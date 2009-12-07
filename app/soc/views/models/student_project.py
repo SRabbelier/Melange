@@ -23,10 +23,10 @@ __authors__ = [
 
 
 from soc.logic import dicts
-from soc.logic.models.student_project import logic as student_project_logic
 from soc.views.helper import responses
 from soc.views.models import base
 
+from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
 
 class View(base.View):
   """View methods for the Student Project model.

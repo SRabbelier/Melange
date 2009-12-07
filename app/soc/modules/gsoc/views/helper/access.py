@@ -27,7 +27,6 @@ __authors__ = [
 from django.utils.translation import ugettext
 
 from soc.logic.models.host import logic as host_logic
-from soc.logic.models.student_project import logic as student_project_logic
 from soc.logic.models.student_proposal import logic as student_proposal_logic
 from soc.views.helper import access
 from soc.views import out_of_band
@@ -35,6 +34,7 @@ from soc.views import out_of_band
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
+from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
 
 
 DEF_SIGN_UP_AS_STUDENT_MSG = ugettext(

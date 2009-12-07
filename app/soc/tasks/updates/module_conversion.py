@@ -37,13 +37,13 @@ from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
-from soc.logic.models.review import logic as review_logic
 from soc.logic.models.student import logic as student_logic
 from soc.logic.models.timeline import logic as timeline_logic
 
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
+from soc.modules.gsoc.logic.models.review import logic as review_logic
 from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
 from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal_logic
 

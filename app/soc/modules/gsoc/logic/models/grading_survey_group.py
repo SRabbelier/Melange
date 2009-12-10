@@ -27,16 +27,17 @@ from soc.logic.models import program as program_logic
 
 from soc.modules.gsoc.logic.models.grading_record import logic as record_logic
 
-import soc.models.grading_survey_group
+import soc.modules.gsoc.models.grading_survey_group
 
 
 class Logic(base.Logic):
   """Logic methods for the GradingSurveyGroup model.
   """
 
-  def __init__(self, model=soc.models.grading_survey_group.GradingSurveyGroup,
-               base_model=None, scope_logic=program_logic,
-               record_logic=record_logic):
+  def __init__(self,
+      model=soc.modules.gsoc.models.grading_survey_group.GradingSurveyGroup,
+      base_model=None, scope_logic=program_logic,
+      record_logic=record_logic):
     """Defines the name, key_name and model for this entity.
     """
 

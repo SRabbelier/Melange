@@ -54,7 +54,8 @@ class Logic(base.Logic):
       Ranker object which is used to rank the given entity
     """
 
-    from soc.logic.models.ranker_root import logic as ranker_root_logic
+    from soc.modules.gsoc.logic.models.ranker_root import logic \
+        as ranker_root_logic
 
     fields = {
         'link_id': soc.modules.gsoc.models.student_proposal.DEF_RANKER_NAME,

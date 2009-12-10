@@ -26,14 +26,14 @@ from soc.logic.models import base
 from soc.logic.models import linkable as linkable_logic
 
 import soc.models.comment
-import soc.models.review
+import soc.modules.gsoc.models.review
 
 
 class Logic(base.Logic):
   """Logic methods for the review model.
   """
 
-  def __init__(self, model=soc.models.review.Review,
+  def __init__(self, model=soc.modules.gsoc.models.review.Review,
                base_model=soc.models.comment.Comment,
                scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.

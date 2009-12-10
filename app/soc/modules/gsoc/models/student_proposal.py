@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,10 +63,10 @@ class StudentProposal(soc.models.linkable.Linkable):
       'Link to a resource containing more information about your proposal')
 
   #: A property containing which mentor has assigned himself to this proposal.
-  #: Only a proposal with an assigned mentor can be turned into 
+  #: Only a proposal with an assigned mentor can be turned into
   #: a accepted proposal. A proposal can only have one mentor.
   mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
-                                required=False, 
+                                required=False,
                                 collection_name='student_proposals')
 
   #: A property containing a list of possible Mentors for this proposal
@@ -92,7 +92,7 @@ class StudentProposal(soc.models.linkable.Linkable):
 
   #: program in which this proposal has been created
   program = db.ReferenceProperty(reference_class=soc.models.program.Program,
-                                 required=True, 
+                                 required=True,
                                  collection_name='student_proposals')
 
   #: date when the proposal was created

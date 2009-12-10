@@ -52,11 +52,12 @@ class Logic(group.Logic):
   getKeyFieldNames = base.Logic.getKeyFieldNames
 
 
+  # TODO: this function should be probably moved to gsoc module
   def _onCreate(self, entity):
     """Invites the group admin and backup admin and creates a RankerRoot entity.
     """
 
-    from soc.models import student_proposal
+    from soc.modules.gsoc.models import student_proposal
 
     # create a new ranker
     ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,

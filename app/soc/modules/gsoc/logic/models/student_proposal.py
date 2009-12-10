@@ -24,17 +24,17 @@ __authors__ = [
 
 from soc.logic.models import base
 from soc.logic.models import student as student_logic
-from soc.models import student_proposal
 
 import soc.models.linkable
-import soc.models.student_proposal
+import soc.modules.gsoc.models.student_proposal
 
 
 class Logic(base.Logic):
   """Logic methods for the Student Proposal model.
   """
 
-  def __init__(self, model=soc.models.student_proposal.StudentProposal,
+  def __init__(self,
+               model=soc.modules.gsoc.models.student_proposal.StudentProposal,
                base_model=soc.models.linkable.Linkable, 
                scope_logic=student_logic):
     """Defines the name, key_name and model for this entity.
@@ -56,8 +56,10 @@ class Logic(base.Logic):
 
     from soc.logic.models.ranker_root import logic as ranker_root_logic
 
-    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-        'scope': entity.org}
+    fields = {
+        'link_id': soc.modules.gsoc.models.student_proposal.DEF_RANKER_NAME,
+        'scope': entity.org
+        }
 
     ranker_root = ranker_root_logic.getForFields(fields, unique=True)
     ranker = ranker_root_logic.getRootFromEntity(ranker_root)
@@ -131,14 +133,15 @@ class Logic(base.Logic):
     """Called when the fields of the student_proposal are updated.
 
       - Update the ranker if the score changes and keep the score within bounds
-      - Remove the entity from the ranker when the status changes to invalid or rejected
+      - Remove the entity from the ranker when the status changes to invalid or
+        rejected
     """
 
     value = entity_properties[name]
 
     if name == 'score':
       # keep the score within bounds
-      min_score, max_score = student_proposal.DEF_SCORE
+      min_score, max_score = soc.modules.gsoc.models.student_proposal.DEF_SCORE
 
       value = max(min_score, min(value, max_score-1))
       entity_properties[name] = value

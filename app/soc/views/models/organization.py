@@ -206,6 +206,7 @@ class View(group.View):
     return self.list(request, access_type,
         page_name, params=list_params, filter=filter)
 
+  # TODO: This function should probably be moved to gsoc module.
   @decorators.merge_params
   @decorators.check_access
   def listProposals(self, request, access_type,
@@ -217,10 +218,11 @@ class View(group.View):
 
     from soc.logic.models.ranker_root import logic as ranker_root_logic
     from soc.logic.models.student_proposal import logic as sp_logic
-    from soc.models import student_proposal
+    from soc.modules.gsoc.models import student_proposal
     from soc.views.helper import list_info as list_info_helper
 
-    from soc.modules.gsoc.views.models import student_proposal as student_proposal_view
+    from soc.modules.gsoc.views.models import student_proposal as \
+        student_proposal_view
 
     try:
       org_entity = self._logic.getFromKeyFieldsOr404(kwargs)

@@ -23,10 +23,10 @@ __authors__ = [
 
 from google.appengine.ext import db
 
-import soc.models.follower
+import soc.modules.gsoc.models.follower
 
 
-class ReviewFollower(soc.models.follower.Follower):
+class ReviewFollower(soc.modules.gsoc.models.follower.Follower):
   """Details specific to a Review Follower.
   """
 

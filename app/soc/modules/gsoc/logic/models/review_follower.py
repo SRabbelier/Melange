@@ -24,7 +24,7 @@ __authors__ = [
 
 from soc.modules.gsoc.logic.models import follower as follower_logic
 
-import soc.models.follower
+import soc.modules.gsoc.models.follower
 import soc.models.review_follower
 
 
@@ -33,7 +33,7 @@ class Logic(follower_logic.Logic):
   """
 
   def __init__(self, model=soc.models.review_follower.ReviewFollower,
-               base_model=soc.models.follower.Follower,
+               base_model=soc.modules.gsoc.models.follower.Follower,
                scope_logic=follower_logic):
     """Defines the name, key_name and model for this entity.
     """

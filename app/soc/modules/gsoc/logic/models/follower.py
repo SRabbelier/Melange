@@ -25,14 +25,14 @@ __authors__ = [
 from soc.logic.models import base
 from soc.logic.models import linkable as linkable_logic
 
-import soc.models.follower
+import soc.modules.gsoc.models.follower
 
 
 class Logic(base.Logic):
   """Logic methods for the Follower model.
   """
 
-  def __init__(self, model=soc.models.follower.Follower,
+  def __init__(self, model=soc.modules.gsoc.models.follower.Follower,
                base_model=None, scope_logic=linkable_logic):
     """Defines the name, key_name and model for this entity.
     """

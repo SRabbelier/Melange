@@ -25,15 +25,16 @@ __authors__ = [
 from soc.logic.models import base
 from soc.logic.models import program as program_logic
 
-import soc.models.proposal_duplicates
+import soc.modules.gsoc.models.proposal_duplicates
 
 
 class Logic(base.Logic):
   """Logic methods for the Role model.
   """
 
-  def __init__(self, model=soc.models.proposal_duplicates.ProposalDuplicates,
-               base_model=None, scope_logic=program_logic):
+  def __init__(self,
+      model=soc.modules.gsoc.models.proposal_duplicates.ProposalDuplicates,
+      base_model=None, scope_logic=program_logic):
     """Defines the name, key_name and model for this entity.
     """
 

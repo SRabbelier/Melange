@@ -342,6 +342,7 @@ class View(presence.View):
 
     return self._list(request, org_params, contents, page_name, context)
 
+  # TODO: This function should be probably moved to gsoc module
   @decorators.merge_params
   @decorators.check_access
   def showDuplicates(self, request, access_type, page_name=None,

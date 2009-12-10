@@ -28,7 +28,8 @@ from google.appengine.ext import db
 from soc.models.organization import Organization
 from soc.models.survey_record import SurveyRecord
 from soc.models.project_survey import ProjectSurvey
-import soc.models.student_project
+
+import soc.modules.gsoc.models.student_project
 
 
 class ProjectSurveyRecord(SurveyRecord):
@@ -38,7 +39,7 @@ class ProjectSurveyRecord(SurveyRecord):
 
   #: Reference to the Project that this record belongs to.
   project = db.ReferenceProperty(
-      reference_class=soc.models.student_project.StudentProject,
+      reference_class=soc.modules.gsoc.models.student_project.StudentProject,
       required=True, collection_name="survey_records")
 
   #: A many:1 relationship associating ProjectSurveyRecords 

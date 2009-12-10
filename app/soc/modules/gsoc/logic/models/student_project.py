@@ -28,14 +28,15 @@ from soc.logic.models import base
 from soc.logic.models import organization as org_logic
 
 import soc.models.linkable
-import soc.models.student_project
+import soc.modules.gsoc.models.student_project
 
 
 class Logic(base.Logic):
   """Logic methods for the Student Project model.
   """
 
-  def __init__(self, model=soc.models.student_project.StudentProject,
+  def __init__(self,
+               model=soc.modules.gsoc.models.student_project.StudentProject,
                base_model=soc.models.linkable.Linkable, 
                scope_logic=org_logic):
     """Defines the name, key_name and model for this entity.

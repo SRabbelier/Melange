@@ -28,8 +28,8 @@ from google.appengine.ext import db
 
 from django.http import HttpResponse
 
-from soc.logic.models import survey as survey_logic
-from soc.logic.models import survey_record as survey_record_logic
+from soc.logic.models.survey import logic as survey_logic
+from soc.logic.models.survey_record import logic as record_logic
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
@@ -41,6 +41,14 @@ from soc.logic.models.timeline import logic as timeline_logic
 from soc.tasks.helper import decorators
 from soc.tasks.helper import error_handler
 
+from soc.modules.gsoc.logic.models.survey import grading_logic as \
+    grading_survey_logic
+from soc.modules.gsoc.logic.models.survey import project_logic as \
+    project_survey_logic
+from soc.modules.gsoc.logic.models.survey_record import grading_logic as \
+    grading_record_logic
+from soc.modules.gsoc.logic.models.survey_record import project_logic as \
+    project_record_logic
 from soc.modules.gsoc.logic.models.grading_survey_group import logic as \
     grading_survey_group_logic
 from soc.modules.gsoc.logic.models.review import logic as review_logic
@@ -398,7 +406,7 @@ def runStudentProjectUpdate(request, entities, context, *args, **kwargs):
   return
 
 
-@decorators.iterative_task(survey_logic.logic)
+@decorators.iterative_task(survey_logic)
 def runSurveyUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates Survey entities.
 
@@ -408,10 +416,10 @@ def runSurveyUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  return _runSurveyUpdate(entities, survey_logic.logic)
+  return _runSurveyUpdate(entities, survey_logic)
 
 
-@decorators.iterative_task(survey_logic.project_logic)
+@decorators.iterative_task(project_survey_logic)
 def runProjectSurveyUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates ProjectSurvey entities.
 
@@ -421,10 +429,10 @@ def runProjectSurveyUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  return _runSurveyUpdate(entities, survey_logic.project_logic) 
+  return _runSurveyUpdate(entities, project_survey_logic)
 
 
-@decorators.iterative_task(survey_logic.grading_logic)
+@decorators.iterative_task(grading_survey_logic)
 def runGradingProjectSurveyUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates GradingProjectSurvey entities.
 
@@ -434,7 +442,7 @@ def runGradingProjectSurveyUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  return _runSurveyUpdate(entities, survey_logic.grading_logic)
+  return _runSurveyUpdate(entities, grading_survey_logic)
 
 
 def _runSurveyUpdate(entities, logic):
@@ -483,7 +491,7 @@ def _runSurveyUpdate(entities, logic):
   return
 
 
-@decorators.iterative_task(survey_record_logic.logic)
+@decorators.iterative_task(record_logic)
 def runSurveyRecordUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates ProjectSurveyRecord entities.
 
@@ -493,10 +501,10 @@ def runSurveyRecordUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  return _runSurveyRecordUpdate(entities, survey_logic.logic)
+  return _runSurveyRecordUpdate(entities, survey_logic)
 
 
-@decorators.iterative_task(survey_record_logic.project_logic)
+@decorators.iterative_task(project_record_logic)
 def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
   """AppEngine Task that updates ProjectSurveyRecord entities.
 
@@ -506,12 +514,12 @@ def runProjectSurveyRecordUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  entities = _runSurveyRecordUpdate(entities, survey_logic.project_logic)
+  entities = _runSurveyRecordUpdate(entities, project_survey_logic)
 
   return _runOrgSurveyRecordUpdate(entities)
 
 
-@decorators.iterative_task(survey_record_logic.grading_logic)
+@decorators.iterative_task(grading_record_logic)
 def runGradingProjectSurveyRecordUpdate(request, entities, context, *args, 
                                         **kwargs):
   """AppEngine Task that updates GradingProjectSurveyRecord entities.
@@ -522,7 +530,7 @@ def runGradingProjectSurveyRecordUpdate(request, entities, context, *args,
     context: the context of this task
   """
 
-  entities = _runSurveyRecordUpdate(entities, survey_logic.grading_logic)
+  entities = _runSurveyRecordUpdate(entities, grading_survey_logic)
 
   return _runOrgSurveyRecordUpdate(entities)
 
@@ -614,9 +622,9 @@ def runGradingSurveyGroupUpdate(request, entities, context, *args, **kwargs):
       survey_key_name = 'gsoc_' + survey.key().id_or_name()
 
       if survey_attr == 'student_survey':
-        logic = survey_logic.project_logic
+        logic = project_survey_logic
       else:
-        logic = survey_logic.grading_logic
+        logic = grading_survey_logic
 
       new_survey = logic.getFromKeyName(survey_key_name)
       setattr(entity, survey_attr, new_survey)

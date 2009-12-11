@@ -32,8 +32,6 @@ from django import forms
 from django import http
 
 from soc.logic import dicts
-from soc.logic.models.survey import grading_logic
-from soc.logic.models.survey import project_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.grading_project_survey import GradingProjectSurvey
 from soc.models.project_survey import ProjectSurvey
@@ -49,6 +47,8 @@ from soc.views.models import program as program_view
 
 import soc.views.helper.forms
 
+from soc.modules.gsoc.logic.models.survey import grading_logic
+from soc.modules.gsoc.logic.models.survey import project_logic
 from soc.modules.gsoc.logic.models.grading_survey_group import logic \
     as survey_group_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic

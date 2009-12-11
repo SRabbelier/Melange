@@ -61,33 +61,4 @@ class Logic(expando_base.Logic):
     return entity
 
 
-class ProjectLogic(Logic):
-  """Logic class for ProjectSurveyRecord.
-  """
-
-  def __init__(self, model=ProjectSurveyRecord,
-               base_model=SurveyRecord, scope_logic=None):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(ProjectLogic, self).__init__(model=model, base_model=base_model,
-                                       scope_logic=scope_logic)
-
-
-class GradingProjectLogic(ProjectLogic):
-  """Logic class for GradingProjectSurveyRecord.
-  """
-
-  def __init__(self, model=GradingProjectSurveyRecord,
-               base_model=ProjectSurveyRecord, scope_logic=None):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(GradingProjectLogic, self).__init__(model=model,
-                                              base_model=base_model,
-                                              scope_logic=scope_logic)
-
-
 logic = Logic()
-project_logic = ProjectLogic()
-grading_logic = GradingProjectLogic()

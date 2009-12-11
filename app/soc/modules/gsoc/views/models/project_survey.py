@@ -23,7 +23,6 @@ __authors__ = [
 
 
 from soc.logic import dicts
-from soc.logic.models.survey import project_logic as project_survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
@@ -32,6 +31,8 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import survey
 
+from soc.modules.gsoc.logic.models.survey import project_logic as \
+    project_survey_logic
 from soc.modules.gsoc.views.helper import access
 
 

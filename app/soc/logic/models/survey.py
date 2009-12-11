@@ -203,37 +203,4 @@ class Logic(work.Logic):
     super(Logic, self)._onCreate(entity)
 
 
-class ProjectLogic(Logic):
-  """Logic class for ProjectSurvey.
-  """
-
-  def __init__(self, model=ProjectSurvey,
-               base_model=Survey, scope_logic=linkable_logic,
-               record_logic=survey_record_logic.project_logic):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(ProjectLogic, self).__init__(model=model, base_model=base_model,
-                                       scope_logic=scope_logic,
-                                       record_logic=record_logic)
-
-
-class GradingProjectLogic(ProjectLogic):
-  """Logic class for GradingProjectSurvey.
-  """
-
-  def __init__(self, model=GradingProjectSurvey,
-               base_model=ProjectSurvey, scope_logic=linkable_logic,
-               record_logic=survey_record_logic.grading_logic):
-    """Defines the name, key_name and model for this entity.
-    """
-
-    super(GradingProjectLogic, self).__init__(model=model,
-                                              base_model=base_model,
-                                              scope_logic=scope_logic,
-                                              record_logic=record_logic)
-
-
 logic = Logic()
-project_logic = ProjectLogic()
-grading_logic = GradingProjectLogic()

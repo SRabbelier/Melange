@@ -27,12 +27,13 @@ __authors__ = [
 from django import forms
 
 from soc.logic import dicts
-from soc.logic.models.survey import grading_logic as grading_survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views.helper import decorators
 from soc.views.helper import surveys
 from soc.views.helper import widgets as custom_widgets
 
+from soc.modules.gsoc.logic.models.survey import grading_logic as \
+    grading_survey_logic
 from soc.modules.gsoc.views.helper import access
 from soc.modules.gsoc.views.models import project_survey
 

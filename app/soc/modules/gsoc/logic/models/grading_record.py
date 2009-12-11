@@ -25,8 +25,9 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc.logic.models import base
-from soc.logic.models.survey_record import grading_logic
-from soc.logic.models.survey_record import project_logic
+
+from soc.modules.gsoc.logic.models.survey_record import grading_logic
+from soc.modules.gsoc.logic.models.survey_record import project_logic
 
 import soc.models.grading_record
 

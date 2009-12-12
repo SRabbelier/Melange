@@ -37,12 +37,12 @@ from soc.models.program import Program
 
 from soc.models.grading_record import GradingRecord
 from soc.models.survey_record import SurveyRecord
+from soc.models.survey import Survey
+from soc.models.survey import SurveyContent
 from soc.models.work import Work
 
 from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
 from soc.modules.gsoc.models.project_survey import ProjectSurvey
-from soc.modules.gsoc.models.survey import Survey
-from soc.modules.gsoc.models.survey import SurveyContent
 
 
 class Logic(work.Logic):

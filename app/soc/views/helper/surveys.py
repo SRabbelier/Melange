@@ -45,10 +45,10 @@ from django.utils.html import escape
 from soc.logic import dicts
 from soc.logic.lists import Lists
 
-from soc.views.helper import widgets as custom_widgets
+from soc.models.survey import COMMENT_PREFIX
+from soc.models.survey import SurveyContent
 
-from soc.modules.gsoc.models.survey import COMMENT_PREFIX
-from soc.modules.gsoc.models.survey import SurveyContent
+from soc.views.helper import widgets as custom_widgets
 
 
 CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))

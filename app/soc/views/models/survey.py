@@ -51,7 +51,7 @@ from soc.views.helper import surveys
 from soc.views.helper import widgets
 from soc.views.models import base
 
-from soc.modules.gsoc.models.survey import Survey
+from soc.models.survey import Survey
 
 
 DEF_CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))

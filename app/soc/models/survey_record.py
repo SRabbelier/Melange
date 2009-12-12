@@ -29,7 +29,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models.expando_base import ExpandoBase
-from soc.modules.gsoc.models.survey import Survey
+from soc.models.survey import Survey
 
 import soc.models.user
 

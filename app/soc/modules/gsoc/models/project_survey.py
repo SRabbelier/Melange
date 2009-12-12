@@ -23,7 +23,7 @@ __authors__ = [
 ]
 
 
-from soc.models.survey import Survey
+from soc.modules.gsoc.models.survey import Survey
 
 
 class ProjectSurvey(Survey):

@@ -38,7 +38,6 @@ from soc.logic import dicts
 from soc.logic.helper import timeline
 from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.user import logic as user_logic
-from soc.models.survey import Survey
 from soc.models.survey_record import SurveyRecord
 from soc.models.user import User
 from soc.views import out_of_band
@@ -51,6 +50,8 @@ from soc.views.helper import responses
 from soc.views.helper import surveys
 from soc.views.helper import widgets
 from soc.views.models import base
+
+from soc.modules.gsoc.models.survey import Survey
 
 
 DEF_CHOICE_TYPES = set(('selection', 'pick_multi', 'choice', 'pick_quant'))

@@ -27,7 +27,8 @@ from google.appengine.ext import db
 
 from soc.models.organization import Organization
 from soc.models.survey_record import SurveyRecord
-from soc.models.project_survey import ProjectSurvey
+
+from soc.modules.gsoc.models.project_survey import ProjectSurvey
 
 import soc.modules.gsoc.models.student_project
 

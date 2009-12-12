@@ -775,8 +775,9 @@ def surveyRecordCSVExport(csv_filename, survey_record_model,
     survey_model: model of the survey that wil be exported
     survey_key: key of the survey that records will be exported
   """
-  from soc.models.project_survey import ProjectSurvey
-  from soc.models.grading_project_survey import GradingProjectSurvey
+
+  from soc.modules.gsoc.models.project_survey import ProjectSurvey
+  from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
 
   # fetch survey
   survey = survey_model.get(survey_key)

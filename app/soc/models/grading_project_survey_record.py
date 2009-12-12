@@ -28,7 +28,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models.project_survey_record import ProjectSurveyRecord
-from soc.models.grading_project_survey import GradingProjectSurvey
+from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
 
 
 class GradingProjectSurveyRecord(ProjectSurveyRecord):

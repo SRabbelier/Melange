@@ -30,15 +30,17 @@ from google.appengine.ext import db
 
 from soc.logic.models import linkable as linkable_logic
 from soc.logic.models import survey as survey_logic
-from soc.models.grading_project_survey import GradingProjectSurvey
+
 from soc.models.grading_record import GradingRecord
-from soc.models.project_survey import ProjectSurvey
-from soc.models.survey import Survey
 
 from soc.modules.gsoc.logic.models.survey_record import grading_logic as \
     grading_record_logic
 from soc.modules.gsoc.logic.models.survey_record import project_logic as \
     project_record_logic
+
+from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
+from soc.modules.gsoc.models.project_survey import ProjectSurvey
+from soc.modules.gsoc.models.survey import Survey
 
 
 class ProjectLogic(survey_logic.Logic):

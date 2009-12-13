@@ -42,7 +42,7 @@ class FatalTaskError(Error):
 
 
 def startTask(url, queue_name='default', context=None, **kwargs):
-  """Adds a new task to one of the queues
+  """Adds a new task to one of the queues.
   """
 
   queue = taskqueue.Queue(name=queue_name)
@@ -51,14 +51,14 @@ def startTask(url, queue_name='default', context=None, **kwargs):
 
 def terminateTask():
   """Generates http response which causes that the task is
-     is not added to the queue again
+     is not added to the queue again.
   """
 
   return http.HttpResponse(status=200)
 
 def repeatTask():
-  """Generates http response which causes that the task is
-     added to the queue again
+  """Generates http error response which causes that the task is
+     added to the queue again.
   """
 
   return http.HttpResponse(status=500)

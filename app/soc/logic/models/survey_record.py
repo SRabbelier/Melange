@@ -24,8 +24,9 @@ __authors__ = [
 
 from soc.logic.models import expando_base
 from soc.models.survey_record import SurveyRecord
-from soc.models.grading_project_survey_record import GradingProjectSurveyRecord
-from soc.models.project_survey_record import ProjectSurveyRecord
+
+from soc.modules.gsoc.models.grading_project_survey_record import GradingProjectSurveyRecord
+from soc.modules.gsoc.models.project_survey_record import ProjectSurveyRecord
 
 
 class Logic(expando_base.Logic):

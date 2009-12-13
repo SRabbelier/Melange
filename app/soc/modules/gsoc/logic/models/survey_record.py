@@ -23,9 +23,12 @@ __authors__ = [
 
 
 from soc.logic.models import survey_record as survey_record_logic
-from soc.models.grading_project_survey_record import GradingProjectSurveyRecord
-from soc.models.project_survey_record import ProjectSurveyRecord
 from soc.models.survey_record import SurveyRecord
+
+from soc.modules.gsoc.models.grading_project_survey_record \
+    import GradingProjectSurveyRecord
+from soc.modules.gsoc.models.project_survey_record import ProjectSurveyRecord
+
 
 
 class ProjectLogic(survey_record_logic.Logic):

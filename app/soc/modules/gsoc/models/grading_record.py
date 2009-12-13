@@ -30,10 +30,11 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 from soc.models import base
-from soc.models.grading_project_survey_record import GradingProjectSurveyRecord
-from soc.models.project_survey_record import ProjectSurveyRecord
 
+from soc.modules.gsoc.models.grading_project_survey_record \
+    import GradingProjectSurveyRecord
 from soc.modules.gsoc.models.grading_survey_group import GradingSurveyGroup
+from soc.modules.gsoc.models.project_survey_record import ProjectSurveyRecord
 from soc.modules.gsoc.models.student_project import StudentProject
 
 

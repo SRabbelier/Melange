@@ -29,14 +29,15 @@ from soc.logic.models import base
 from soc.modules.gsoc.logic.models.survey_record import grading_logic
 from soc.modules.gsoc.logic.models.survey_record import project_logic
 
-import soc.models.grading_record
+import soc.modules.gsoc.models.grading_record
 
 
 class Logic(base.Logic):
   """Logic methods for the GradingRecord model.
   """
 
-  def __init__(self, model=soc.models.grading_record.GradingRecord,
+  def __init__(self,
+               model=soc.modules.gsoc.models.grading_record.GradingRecord,
                base_model=None, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """

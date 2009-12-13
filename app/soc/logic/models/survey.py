@@ -35,7 +35,6 @@ from soc.logic.models.user import logic as user_logic
 from soc.logic.models import work
 from soc.models.program import Program
 
-from soc.models.grading_record import GradingRecord
 from soc.models.survey_record import SurveyRecord
 from soc.models.survey import Survey
 from soc.models.survey import SurveyContent

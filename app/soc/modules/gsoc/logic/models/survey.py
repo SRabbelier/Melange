@@ -31,7 +31,6 @@ from google.appengine.ext import db
 from soc.logic.models import linkable as linkable_logic
 from soc.logic.models import survey as survey_logic
 
-from soc.models.grading_record import GradingRecord
 from soc.models.survey import Survey
 
 from soc.modules.gsoc.logic.models.survey_record import grading_logic as \
@@ -40,6 +39,7 @@ from soc.modules.gsoc.logic.models.survey_record import project_logic as \
     project_record_logic
 
 from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
+from soc.modules.gsoc.models.grading_record import GradingRecord
 from soc.modules.gsoc.models.project_survey import ProjectSurvey
 
 

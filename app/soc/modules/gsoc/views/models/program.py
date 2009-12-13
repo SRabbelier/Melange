@@ -167,19 +167,19 @@ class View(program.View):
             "List Surveys", 'any_access')]
         # add link to create a new Project Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-            'project_survey'),
+            'gsoc/project_survey'),
             "Create a New Project Survey", 'any_access')]
         # add link to list all Project Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-            'project_survey'),
+            'gsoc/project_survey'),
             "List Project Surveys", 'any_access')]
         # add link to create a new Grading Survey
         items += [(redirects.getCreateSurveyRedirect(entity, 'program',
-            'grading_project_survey'),
+            'gsoc/grading_project_survey'),
             "Create a New Grading Survey", 'any_access')]
         # add link to list all Grading Surveys
         items += [(redirects.getListSurveysRedirect(entity, 'program',
-            'grading_project_survey'),
+            'gsoc/grading_project_survey'),
             "List Grading Surveys", 'any_access')]
         # add link to withdraw Student Projects
         items += [(redirects.getWithdrawRedirect(

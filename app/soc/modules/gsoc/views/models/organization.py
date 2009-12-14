@@ -23,10 +23,19 @@ __authors__ = [
   ]
 
 
+import itertools
+
+from django.utils.translation import ugettext
+
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
+from soc.logic.models.user import logic as user_logic
 from soc.logic.models.org_app import logic as org_app_logic
+
+from soc.views import helper
+from soc.views import out_of_band
 from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.models import organization
 from soc.views.models import group
@@ -185,6 +194,195 @@ class View(organization.View):
       submenus.append(submenu)
 
     return submenus
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listProposals(self, request, access_type,
+                    page_name=None, params=None, **kwargs):
+    """Lists all proposals for the organization given in kwargs.
+
+    For params see base.View.public().
+    """
+
+    from soc.views.helper import list_info as list_info_helper
+
+    from soc.modules.gsoc.logic.models.ranker_root import logic \
+        as ranker_root_logic
+    from soc.modules.gsoc.logic.models.student_proposal import logic \
+        as sp_logic
+    from soc.modules.gsoc.models import student_proposal
+    from soc.modules.gsoc.views.models import student_proposal \
+        as student_proposal_view
+
+    try:
+      org_entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    context = {}
+    context['entity'] = org_entity
+
+    list_params = student_proposal_view.view.getParams().copy()
+    list_params['list_template'] = 'soc/student_proposal/list_for_org.html'
+    list_params['list_key_order'] = [
+         'title', 'abstract', 'content', 'additional_info', 'mentor',
+         'possible_mentors', 'score', 'status', 'created_on',
+         'last_modified_on']
+
+    description = ugettext('%s already under review sent to %s') %(
+        ranked_params['name_plural'], org_entity.name)
+
+    ranked_params = list_params.copy()# ranked proposals
+    ranked_params['list_row'] = ('soc/%(module_name)s/list/'
+        'detailed_row.html' % list_params)
+    ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
+        'detailed_heading.html' % list_params)
+    ranked_params['list_description'] = description
+    ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
+
+    # TODO(ljvderijk) once sorting with IN operator is fixed, 
+    # make this list show more
+    filter = {'org': org_entity,
+              'status': 'pending'}
+
+    # order by descending score
+    order = ['-score']
+
+    prop_list = lists.getListContent(
+        request, ranked_params, filter, order=order, idx=0)
+
+    proposals = prop_list['data']
+
+    # get a list of scores
+    scores = [[proposal.score] for proposal in proposals]
+
+    # retrieve the ranker
+    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
+              'scope': org_entity}
+
+    ranker_root = ranker_root_logic.getForFields(fields, unique=True)
+    ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+
+    # retrieve the ranks for these scores
+    ranks = [rank+1 for rank in ranker.FindRanks(scores)]
+
+    # link the proposals to the rank
+    ranking = dict([i for i in itertools.izip(proposals, ranks)])
+
+    assigned_proposals = []
+
+    # only when the program allows allocations 
+    # to be seen we should color the list
+    if org_entity.scope.allocations_visible:
+      assigned_proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
+
+      # show the amount of slots assigned on the webpage
+      context['slots_visible'] = True
+
+    ranking_keys = dict([(k.key(), v) for k, v in ranking.iteritems()])
+    proposal_keys = [i.key() for i in assigned_proposals]
+
+    # update the prop_list with the ranking and coloring information
+    prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking_keys,
+        proposal_keys), None)
+
+    # check if the current user is a mentor
+    user_entity = user_logic.getForCurrentAccount()
+
+    fields = {'user': user_entity,
+        'scope': org_entity,}
+    mentor_entity = mentor_logic.getForFields(fields, unique=True)
+
+    if mentor_entity:
+      mp_params = list_params.copy() # proposals mentored by current user
+
+      description = ugettext('List of %s sent to %s you are mentoring') % (
+          mp_params['name_plural'], org_entity.name)
+      mp_params['list_description'] = description
+      mp_params['list_action'] = (redirects.getReviewRedirect, mp_params)
+
+      filter = {'org': org_entity,
+                'mentor': mentor_entity,
+                'status': 'pending'}
+
+      mp_list = lists.getListContent(
+          request, mp_params, filter, idx=1, need_content=True)
+
+    new_params = list_params.copy() # new proposals
+    new_params['list_description'] = 'List of new %s sent to %s ' % (
+        new_params['name_plural'], org_entity.name)
+    new_params['list_action'] = (redirects.getReviewRedirect, new_params)
+
+    filter = {'org': org_entity,
+              'status': 'new'}
+
+    contents = []
+    new_list = lists.getListContent(
+        request, new_params, filter, idx=2, need_content=True)
+
+    ap_params = list_params.copy() # accepted proposals
+
+    description = ugettext('List of accepted %s sent to %s ') % (
+        ap_params['name_plural'], org_entity.name)
+
+    ap_params['list_description'] = description
+    ap_params['list_action'] = (redirects.getReviewRedirect, ap_params)
+
+    filter = {'org': org_entity,
+              'status': 'accepted'}
+
+    ap_list = lists.getListContent(
+        request, ap_params, filter, idx=3, need_content=True)
+
+    rp_params = list_params.copy() # rejected proposals
+
+    description = ugettext('List of rejected %s sent to %s ') % (
+        rp_params['name_plural'], org_entity.name)
+
+    rp_params['list_description'] = description
+    rp_params['list_action'] = (redirects.getReviewRedirect, rp_params)
+
+    filter = {'org': org_entity,
+              'status': 'rejected'}
+
+    rp_list = lists.getListContent(
+        request, rp_params, filter, idx=4, need_content=True)
+
+    ip_params = list_params.copy() # ineligible proposals
+
+    description = ugettext('List of ineligible %s sent to %s ') % (
+        ip_params['name_plural'], org_entity.name)
+
+    ip_params['list_description'] = description
+    ip_params['list_action'] = (redirects.getReviewRedirect, ip_params)
+
+    filter = {'org': org_entity,
+              'status': 'invalid'}
+
+    ip_list = lists.getListContent(
+        request, ip_params, filter, idx=5, need_content=True)
+
+    # fill contents with all the needed lists
+    if new_list != None:
+      contents.append(new_list)
+
+    contents.append(prop_list)
+
+    if mentor_entity and mp_list != None:
+      contents.append(mp_list)
+
+    if ap_list != None:
+      contents.append(ap_list)
+
+    if rp_list != None:
+      contents.append(rp_list)
+
+    if ip_list != None:
+      contents.append(ip_list)
+
+    # call the _list method from base to display the list
+    return self._list(request, list_params, contents, page_name, context)
 
 
 view = View()

@@ -190,7 +190,7 @@ class View(base.View):
     super(View, self)._editGet(request, entity, form)
 
   def getMenusForScope(self, entity, params):
-    """Returns the featured menu items for one specifc entity.
+    """Returns the featured menu items for one specific entity.
 
     A link to the home page of the specified entity is also included.
 
@@ -210,7 +210,7 @@ class View(base.View):
     submenus = []
 
     # add a link to the home page
-    submenu = (redirects.getHomeRedirect(entity, params), "Home", 'show')
+    submenu = (redirects.getHomeRedirect(entity, params), 'Home', 'show')
     submenus.append(submenu)
 
     # add a link to all featured documents

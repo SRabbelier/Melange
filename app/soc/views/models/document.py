@@ -200,7 +200,7 @@ class View(base.View):
     """
 
     filter = {
-        'prefix' : params['url_name'],
+        'prefix' : params['document_prefix'],
         'scope_path': entity.key().id_or_name(),
         'is_featured': True,
         }

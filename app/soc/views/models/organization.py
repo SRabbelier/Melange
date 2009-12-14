@@ -26,8 +26,6 @@ __authors__ = [
   ]
 
 
-import itertools
-
 from django import forms
 from django.utils import simplejson
 from django.utils.translation import ugettext

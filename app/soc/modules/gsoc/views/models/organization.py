@@ -160,11 +160,13 @@ class View(organization.View):
       submenus.append(submenu)
 
     if roles.get('org_admin') or roles.get('mentor'):
-      submenu = (redirects.getCreateDocumentRedirect(group_entity, 'org'),
+      submenu = (redirects.getCreateDocumentRedirect(group_entity, 
+                                                     params['document_prefix']),
           "Create a New Document", 'any_access')
       submenus.append(submenu)
 
-      submenu = (redirects.getListDocumentsRedirect(group_entity, 'org'),
+      submenu = (redirects.getListDocumentsRedirect(group_entity,
+                                                    params['document_prefix']),
           "List Documents", 'any_access')
       submenus.append(submenu)
 

@@ -249,8 +249,9 @@ class View(group.View):
       A JSON object containing map data.
     """
 
-    from soc.logic.models.student_project import logic as student_project_logic
-    from soc.views.models import student_project as student_project_view
+    from soc.modules.gsoc.logic.models.student_project import logic as \
+        student_project_logic
+    from soc.modules.gsoc.views.models import student_project as student_project_view
 
     sp_params = student_project_view.view.getParams().copy()
 
@@ -322,8 +323,8 @@ class View(group.View):
   def _public(self, request, entity, context):
     """See base.View._public().
     """
-
-    from soc.views.models import student_project as student_project_view
+    # TODO: This needs to be moved to the GSoC module
+    from soc.modules.gsoc.views.models import student_project as student_project_view
 
     program_entity = entity.scope
 

@@ -78,7 +78,7 @@ class View(survey.View):
 
     new_params['extra_django_patterns'] = [
          (r'^%(url_name)s/(?P<access_type>send_reminder)/%(key_fields)s$',
-          'soc.views.models.%(module_name)s.send_reminder',
+          '%(module_package)s.%(module_name)s.send_reminder',
          'Send Reminder for %(name)s')]
 
     new_params['take_template'] = 'soc/project_survey/take.html'

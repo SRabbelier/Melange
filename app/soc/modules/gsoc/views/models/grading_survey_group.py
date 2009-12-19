@@ -108,10 +108,10 @@ class View(base.View):
 
     patterns = [
         (r'^%(url_name)s/(?P<access_type>records)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.view_records',
+        '%(module_package)s.%(module_name)s.view_records',
         'Overview of GradingRecords'),
         (r'^%(url_name)s/(?P<access_type>edit_record)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.edit_record',
+        '%(module_package)s.models.%(module_name)s.edit_record',
         'Edit a GradingRecord'),
     ]
 

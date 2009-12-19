@@ -123,19 +123,19 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = [
          (r'^%(url_name)s/(?P<access_type>take)/%(key_fields)s$',
-         'soc.views.models.%(module_name)s.take',
+         '%(module_package)s.%(module_name)s.take',
          'Take %(name)s'),
          (r'^%(url_name)s/(?P<access_type>json)/%(scope)s$',
-         'soc.views.models.%(module_name)s.json',
+         '%(module_package)s.%(module_name)s.json',
          'Export %(name)s as JSON'),
         (r'^%(url_name)s/(?P<access_type>record)/%(key_fields)s$',
-         'soc.views.models.%(module_name)s.record',
+         '%(module_package)s.%(module_name)s.record',
          'View survey record for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>results)/%(key_fields)s$',
-         'soc.views.models.%(module_name)s.results',
+         '%(module_package)s.%(module_name)s.results',
          'View survey results for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>show)/user/(?P<link_id>)\w+$',
-         'soc.views.models.%(module_name)s.results',
+         '%(module_package)s.%(module_name)s.results',
          'View survey results for user'),
         ]
 

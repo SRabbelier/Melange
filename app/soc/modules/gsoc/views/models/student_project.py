@@ -472,7 +472,7 @@ class View(base.View):
       A List Object as specified by this method.
     """
 
-    from soc.views.helper import list_info
+    from soc.modules.gsoc.views.helper import list_info
     from soc.views.models.grading_project_survey import view as \
         grading_survey_view
     from soc.views.models.project_survey import view as project_survey_view
@@ -680,7 +680,7 @@ class View(base.View):
     For params see base.View().public()
     """
 
-    from soc.views.helper import list_info
+    from soc.modules.gsoc.views.helper import list_info
 
     # make sure the organization exists
     org_entity = org_logic.getFromKeyNameOr404(kwargs['scope_path'])

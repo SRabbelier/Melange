@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers used for list info functions.
+"""Helpers used for list info functions in the GSoC module.
 """
 
 __authors__ = [

@@ -233,16 +233,16 @@ class View(organization.View):
          'possible_mentors', 'score', 'status', 'created_on',
          'last_modified_on']
 
-    description = ugettext('%s already under review sent to %s') %(
-        ranked_params['name_plural'], org_entity.name)
-
     ranked_params = list_params.copy()# ranked proposals
     ranked_params['list_row'] = ('soc/%(module_name)s/list/'
         'detailed_row.html' % list_params)
     ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
         'detailed_heading.html' % list_params)
-    ranked_params['list_description'] = description
     ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
+
+    description = ugettext('%s already under review sent to %s') %(
+        ranked_params['name_plural'], org_entity.name)
+    ranked_params['list_description'] = description
 
     # TODO(ljvderijk) once sorting with IN operator is fixed, 
     # make this list show more

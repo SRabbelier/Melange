@@ -66,10 +66,12 @@ def setStudentProjectSurveyInfo(list_content, program_entity):
     The original list_content with info set
   """
 
-  from soc.logic.models.survey import grading_logic as grading_survey_logic
-  from soc.logic.models.survey import project_logic as project_survey_logic
-  from soc.logic.models.survey_record import grading_logic
-  from soc.logic.models.survey_record import project_logic
+  from soc.modules.gsoc.logic.models.survey import grading_logic as \
+      grading_survey_logic
+  from soc.modules.gsoc.logic.models.survey import project_logic as \
+      project_survey_logic
+  from soc.modules.gsoc.logic.models.survey_record import grading_logic
+  from soc.modules.gsoc.logic.models.survey_record import project_logic
 
   if not list_content:
     # this can happen because of the need_content parameter for getListContent

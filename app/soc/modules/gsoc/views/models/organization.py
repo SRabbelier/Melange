@@ -209,13 +209,13 @@ class View(organization.View):
     For params see base.View.public().
     """
 
-    from soc.modules.gsoc.views.helper import list_info as list_info_helper
 
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
     from soc.modules.gsoc.logic.models.student_proposal import logic \
         as sp_logic
     from soc.modules.gsoc.models import student_proposal
+    from soc.modules.gsoc.views.helper import list_info as list_info_helper
     from soc.modules.gsoc.views.models import student_proposal \
         as student_proposal_view
 

@@ -472,10 +472,12 @@ class View(base.View):
       A List Object as specified by this method.
     """
 
+    import soc.logic.lists
+
     from soc.modules.gsoc.views.helper import list_info
-    from soc.views.models.grading_project_survey import view as \
+    from soc.modules.gsoc.views.models.grading_project_survey import view as \
         grading_survey_view
-    from soc.views.models.project_survey import view as project_survey_view
+    from soc.modules.gsoc.views.models.project_survey import view as project_survey_view
 
     fields = {'scope_path': entity.program.key().id_or_name()}
 

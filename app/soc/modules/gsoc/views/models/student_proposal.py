@@ -874,8 +874,9 @@ class View(base.View):
       mentor: mentor entity for the current user/proposal (iff available)
     """
 
-    from soc.logic.models.review import logic as review_logic
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review import logic as review_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     context = {}
 

@@ -97,6 +97,9 @@ class View(organization.View):
 
     new_params['mentor_role_name'] = 'gsoc_mentor'
 
+    new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
+                                       'nr_applications', 'nr_mentors']
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)

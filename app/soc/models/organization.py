@@ -52,27 +52,3 @@ class Organization(soc.models.group.Group):
   ideas.example_text = ugettext('For instance a link to a Melange public '
       'document or some other URL')
 
-  slots = db.IntegerProperty(required=False, default=0,
-      verbose_name=ugettext('Slots allocated'))
-  slots.help_text = ugettext(
-      'The amount of slots allocated to this organization.')
-
-  slots_desired = db.IntegerProperty(required=False, default=0,
-      verbose_name=ugettext('Slots desired'))
-  slots_desired.help_text = ugettext(
-      'The amount of slots desired by this organization.')
-
-  slots_calculated = db.IntegerProperty(required=False, default=0,
-      verbose_name=ugettext('Slots calculated'))
-  slots_calculated.help_text = ugettext(
-      'The amount of slots calculated for this organization.')
-
-  nr_applications = db.IntegerProperty(required=False, default=0,
-      verbose_name=ugettext('Amount of applications received'))
-  nr_applications.help_text = ugettext(
-      'The amount of applications received by this organization.')
-
-  nr_mentors = db.IntegerProperty(required=False, default=0,
-      verbose_name=ugettext('Amount of mentors assigned'))
-  nr_mentors.help_text = ugettext(
-      'The amount of mentors assigned to a proposal by this organization.')

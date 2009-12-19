@@ -105,7 +105,7 @@ class View(presence.View):
     new_params['document_prefix'] = 'program'
 
     new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement',
-        'mentor_agreement', 'student_agreement', 'slots_allocation']
+        'mentor_agreement', 'student_agreement']
 
     patterns = []
     patterns += [

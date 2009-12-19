@@ -101,6 +101,8 @@ class View(program.View):
     new_params['module_package'] = 'soc.modules.gsoc.views.models'
     new_params['url_name'] = 'gsoc/program'
 
+    new_params['extra_dynaexclude'] = ['slots_allocation']
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)

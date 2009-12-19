@@ -76,41 +76,6 @@ class Program(soc.models.presence.Presence):
       ' each mentoring organization below.</tt><br><br>'
       '<small><i>(rich text formatting is supported)</i></small>')
 
-  #: Required field storing application/tasks limit of the program.
-  apps_tasks_limit = db.IntegerProperty(required=True,
-      verbose_name=ugettext('Application/Tasks Limit'))
-  apps_tasks_limit.example_text = ugettext(
-      '<small><i>e.g.</i></small> '
-      '<tt><b>20</b> is the student applications limit for <i>Google Summer '
-      'of Code</i>, but <b>1</b> is the tasks limit that the student can work '
-      'on at the same time during <i>GHOP</i></tt>')
-
-  #: Optional field storing minimum slots per organization
-  min_slots = db.IntegerProperty(required=False, default=2,
-      verbose_name=ugettext('Min slots per org'))
-  min_slots.help_text = ugettext(
-      'The amount of slots each org should get at the very least')
-
-  #: Optional field storing maximum slots per organization
-  max_slots = db.IntegerProperty(required=False, default=50,
-      verbose_name=ugettext('Max slots per org'))
-  max_slots.help_text = ugettext(
-      'The amount of slots each organization should get at most')
-
-  #: Required field storing slots limit of the program.
-  slots = db.IntegerProperty(required=True,
-      verbose_name=ugettext('Slots'))
-  slots.example_text = ugettext(
-      '<small><i>e.g.</i></small> '
-      '<tt><b>500</b> might be an amount of slots for <i>Google Summer '
-      'of Code</i>, which indicates how many students can be accepted '
-      'to the program.<br>For <i>GHOP</i> this indicates how '
-      'many tasks can be completed.</tt>')
-
-  #: Optional field storing the allocation of slots for this program
-  slots_allocation = db.TextProperty(required=False,
-      verbose_name=ugettext('the allocation of slots'))
-
   #: Property that contains the minimum age of a student allowed to
   #: participate
   student_min_age = db.IntegerProperty(
@@ -135,12 +100,6 @@ class Program(soc.models.presence.Presence):
   timeline = db.ReferenceProperty(reference_class=soc.models.timeline.Timeline,
                                  required=True, collection_name="program",
                                  verbose_name=ugettext('Timeline'))
-
-  #: Whether the slots allocations are visible
-  allocations_visible = db.BooleanProperty(default=False,
-      verbose_name=ugettext('Slot allocations visible'))
-  allocations_visible.help_text = ugettext(
-      'Field used to indicate if the slot allocations should be visible.')
 
   #: Document reference property used for the Org Admin Agreement
   org_admin_agreement = db.ReferenceProperty(

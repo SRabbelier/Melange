@@ -111,11 +111,7 @@ class View(program.View):
     new_params['module_package'] = 'soc.modules.ghop.views.models'
     new_params['url_name'] = 'ghop/program'
 
-    # TODO: this list can be reduced after GSoC has been moved
-    new_params['extra_dynaexclude'] = ['min_slots', 'max_slots',
-                                       'slot_allocation', 'allocations_visible',
-                                       'task_difficulties', 'task_types',
-                                       ]
+    new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types']
 
     patterns = []
     patterns += [

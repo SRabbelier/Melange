@@ -41,25 +41,26 @@ from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.document import Document
 from soc.models.host import Host
-from soc.models import student_proposal
+
 from soc.models.mentor import Mentor
 from soc.models.notification import Notification
 from soc.models.org_admin import OrgAdmin
 from soc.models.organization import Organization
 from soc.models.org_app import OrgApplication
 from soc.models.program import Program
-from soc.models.ranker_root import RankerRoot
 from soc.models.site import Site
 from soc.models.sponsor import Sponsor
 from soc.models.student import Student
-from soc.models.student_project import StudentProject
-from soc.models.student_proposal import StudentProposal
 from soc.models.survey import Survey, SurveyContent
 from soc.models.survey_record import SurveyRecord
 from soc.models.timeline import Timeline
 from soc.models.user import User
 
-from soc.gsoc.models.logic.models.ranker_root import logic as ranker_root_logic
+from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
+from soc.modules.gsoc.models import student_proposal
+from soc.modules.gsoc.models.ranker_root import RankerRoot
+from soc.modules.gsoc.models.student_project import StudentProject
+from soc.modules.gsoc.models.student_proposal import StudentProposal
 
 
 class Error(Exception):

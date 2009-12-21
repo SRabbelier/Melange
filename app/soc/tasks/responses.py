@@ -51,7 +51,7 @@ def startTask(url, queue_name='default', context=None, **kwargs):
 
 def terminateTask():
   """Generates http response which causes that the task is
-     is not added to the queue again.
+     not added to the queue again.
   """
 
   return http.HttpResponse(status=200)

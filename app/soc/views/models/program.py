@@ -26,7 +26,6 @@ __authors__ = [
 
 
 from django import forms
-from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
@@ -342,72 +341,6 @@ class View(presence.View):
 
     return self._list(request, org_params, contents, page_name, context)
 
-  # TODO: This function should be probably moved to gsoc module
-  @decorators.merge_params
-  @decorators.check_access
-  def showDuplicates(self, request, access_type, page_name=None,
-                     params=None, **kwargs):
-    """View in which a host can see which students have been assigned
-       multiple slots.
-
-    For params see base.view.Public().
-    """
-
-    from django.utils import simplejson
-
-    from soc.logic.models.proposal_duplicates import logic as duplicates_logic
-
-    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
-
-    if request.POST and request.POST.get('result'):
-      # store result in the datastore
-      fields = {'link_id': program_entity.link_id,
-                'scope': program_entity,
-                'scope_path': program_entity.key().id_or_name(),
-                'json_representation' : request.POST['result']
-                }
-      key_name = duplicates_logic.getKeyNameFromFields(fields)
-      duplicates_logic.updateOrCreateFromKeyName(fields, key_name)
-
-      response = simplejson.dumps({'status': 'done'})
-      return http.HttpResponse(response)
-
-    context = helper.responses.getUniversalContext(request)
-    helper.responses.useJavaScript(context, params['js_uses_all'])
-    context['uses_duplicates'] = True
-    context['uses_json'] = True
-    context['page_name'] = page_name
-
-    # get all orgs for this program who are active and have slots assigned
-    fields = {'scope': program_entity,
-              'slots >': 0,
-              'status': 'active'}
-
-    query = org_logic.logic.getQueryForFields(fields)
-
-    to_json = {
-        'nr_of_orgs': query.count(),
-        'program_key': program_entity.key().id_or_name()}
-    json = simplejson.dumps(to_json)
-    context['info'] = json
-    context['offset_length'] = 10
-
-    fields = {'link_id': program_entity.link_id,
-              'scope': program_entity}
-    duplicates = duplicates_logic.getForFields(fields, unique=True)
-
-    if duplicates:
-      # we have stored information
-      # pylint: disable-msg=E1103
-      context['duplicate_cache_content'] = duplicates.json_representation
-      context['date_of_calculation'] = duplicates.calculated_on
-    else:
-      # no information stored
-      context['duplicate_cache_content'] = simplejson.dumps({})
-
-    template = 'soc/program/show_duplicates.html'
-
-    return helper.responses.respond(request, template=template, context=context)
 
   @decorators.merge_params
   @decorators.check_access

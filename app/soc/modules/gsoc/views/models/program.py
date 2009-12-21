@@ -23,9 +23,11 @@ __authors__ = [
   ]
 
 
+from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
@@ -34,6 +36,7 @@ from soc.views.sitemap import sidebar
 
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import organization as org_logic
 from soc.logic.models.host import logic as host_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
@@ -391,6 +394,72 @@ class View(program.View):
 
     return aa_list
 
+  @decorators.merge_params
+  @decorators.check_access
+  def showDuplicates(self, request, access_type, page_name=None,
+                     params=None, **kwargs):
+    """View in which a host can see which students have been assigned
+       multiple slots.
+
+    For params see base.view.Public().
+    """
+
+    from django.utils import simplejson
+
+    from soc.modules.gsoc.logic.models.proposal_duplicates import logic as duplicates_logic
+
+    program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.POST and request.POST.get('result'):
+      # store result in the datastore
+      fields = {'link_id': program_entity.link_id,
+                'scope': program_entity,
+                'scope_path': program_entity.key().id_or_name(),
+                'json_representation' : request.POST['result']
+                }
+      key_name = duplicates_logic.getKeyNameFromFields(fields)
+      duplicates_logic.updateOrCreateFromKeyName(fields, key_name)
+
+      response = simplejson.dumps({'status': 'done'})
+      return http.HttpResponse(response)
+
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['uses_duplicates'] = True
+    context['uses_json'] = True
+    context['page_name'] = page_name
+
+    # get all orgs for this program who are active and have slots assigned
+    fields = {'scope': program_entity,
+              'slots >': 0,
+              'status': 'active'}
+
+    query = org_logic.logic.getQueryForFields(fields)
+
+    to_json = {
+        'nr_of_orgs': query.count(),
+        'program_key': program_entity.key().id_or_name()}
+    json = simplejson.dumps(to_json)
+    context['info'] = json
+    context['offset_length'] = 10
+
+    fields = {'link_id': program_entity.link_id,
+              'scope': program_entity}
+    duplicates = duplicates_logic.getForFields(fields, unique=True)
+
+    if duplicates:
+      # we have stored information
+      # pylint: disable-msg=E1103
+      context['duplicate_cache_content'] = duplicates.json_representation
+      context['date_of_calculation'] = duplicates.calculated_on
+    else:
+      # no information stored
+      context['duplicate_cache_content'] = simplejson.dumps({})
+
+    template = 'soc/program/show_duplicates.html'
+
+    return helper.responses.respond(request, template=template, context=context)
+    
   @decorators.merge_params
   @decorators.check_access
   def acceptedProjects(self, request, access_type,

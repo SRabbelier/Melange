@@ -128,9 +128,9 @@ def runOrgConversionUpdate(request, entities, context, *args, **kwargs):
     context: the context of this task
   """
 
-  from soc.logic.models.ranker_root import logic as ranker_root_logic
-
   from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+  from soc.modules.gsoc.logic.models.ranker_root import logic as \
+      ranker_root_logic
   from soc.modules.gsoc.models.organization import GSoCOrganization
 
   # get all the properties that are part of each Organization

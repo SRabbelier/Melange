@@ -41,26 +41,35 @@ from soc.logic.models.survey import logic as survey_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models.document import Document
 from soc.models.host import Host
-
-from soc.models.mentor import Mentor
 from soc.models.notification import Notification
-from soc.models.org_admin import OrgAdmin
-from soc.models.organization import Organization
 from soc.models.org_app import OrgApplication
-from soc.models.program import Program
+
 from soc.models.site import Site
 from soc.models.sponsor import Sponsor
-from soc.models.student import Student
+
 from soc.models.survey import Survey, SurveyContent
 from soc.models.survey_record import SurveyRecord
-from soc.models.timeline import Timeline
+
 from soc.models.user import User
+
+from soc.modules.ghop.models.mentor import GHOPMentor
+from soc.modules.ghop.models.org_admin import GHOPOrgAdmin
+from soc.modules.ghop.models.organization import GHOPOrganization
+from soc.modules.ghop.models.program import GHOPProgram
+from soc.modules.ghop.models.student import GHOPStudent
+from soc.modules.ghop.models.timeline import GHOPTimeline
 
 from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.modules.gsoc.models import student_proposal
+from soc.modules.gsoc.models.mentor import GSoCMentor
+from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
+from soc.modules.gsoc.models.organization import GSoCOrganization
+from soc.modules.gsoc.models.program import GSoCProgram
 from soc.modules.gsoc.models.ranker_root import RankerRoot
+from soc.modules.gsoc.models.student import GSoCStudent
 from soc.modules.gsoc.models.student_project import StudentProject
 from soc.modules.gsoc.models.student_proposal import StudentProposal
+from soc.modules.gsoc.models.timeline import GSoCTimeline
 
 
 class Error(Exception):
@@ -147,11 +156,11 @@ class UserSeeder(Seeder):
     return {}
 
 
-class OrganizationSeeder(Seeder):
+class GSoCOrganizationSeeder(Seeder):
   """A Seeder for Melange Organization model.
   """
   def type(self):
-    return Organization
+    return GSoCOrganization
   
   # pylint: disable-msg=W0221
   def seed(self, i, entities=None, current_user=None, gsoc2009=None):
@@ -176,7 +185,7 @@ class OrganizationSeeder(Seeder):
         'ideas': 'http://code.google.com/p/soc/issues',
         }
 
-    org = Organization(**properties)
+    org = GSoCOrganization(**properties)
     if entities is None:
       org.put()
     else:
@@ -184,7 +193,7 @@ class OrganizationSeeder(Seeder):
 
   def commonSeedArgs(self, request):
     _, current_user = ensureUser()
-    gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+    gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
 
     if not gsoc2009:
       raise Error('Run seed_db first')
@@ -201,7 +210,7 @@ class OrgApplicationSeeder(Seeder):
 
   def commonSeedArgs(self, request):
     _, current_user = ensureUser()
-    gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+    gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
 
     if not gsoc2009:
       raise Error('Run seed_db first')
@@ -314,7 +323,6 @@ def seed(request, *args, **kwargs):
   google_host = Host(**role_properties)
   google_host.put()
 
-
   timeline_properties = {
         'key_name': 'google/gsoc2009',
         'link_id': 'gsoc2009',
@@ -322,7 +330,7 @@ def seed(request, *args, **kwargs):
         'scope': google,
         }
 
-  gsoc2009_timeline = Timeline(**timeline_properties)
+  gsoc2009_timeline = GSoCTimeline(**timeline_properties)
   gsoc2009_timeline.put()
 
 
@@ -341,7 +349,7 @@ def seed(request, *args, **kwargs):
       'status': 'visible',
       }
 
-  gsoc2009 = Program(**program_properties)
+  gsoc2009 = GSoCProgram(**program_properties)
   gsoc2009.put()
 
   # TODO: Use real GHOPProgram here
@@ -352,7 +360,7 @@ def seed(request, *args, **kwargs):
         'scope': google,
         }
 
-  ghop2009_timeline = Timeline(**timeline_properties)
+  ghop2009_timeline = GHOPTimeline(**timeline_properties)
   ghop2009_timeline.put()
 
 
@@ -366,7 +374,7 @@ def seed(request, *args, **kwargs):
       'timeline': ghop2009_timeline,
       })
 
-  ghop2009 = Program(**program_properties)
+  ghop2009 = GHOPProgram(**program_properties)
   ghop2009.put()
 
 
@@ -423,7 +431,7 @@ def seed(request, *args, **kwargs):
     'ideas': 'http://code.google.com/p/soc/issues',
     })
 
-  melange = Organization(**group_properties)
+  melange = GHOPOrganization(**group_properties)
   melange.put()
   # create a new ranker
   ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
@@ -445,7 +453,7 @@ def seed(request, *args, **kwargs):
         'description': 'Organization %d!' % i,
         })
 
-    entity = Organization(**group_properties)
+    entity = GSoCOrganization(**group_properties)
     orgs.append(entity)
     entity.put()
     # create a new ranker
@@ -463,14 +471,14 @@ def seed(request, *args, **kwargs):
 
       # Admin for the first org
       if i == 0:
-        org_1_admin = OrgAdmin(**role_properties)
+        org_1_admin = GSoCOrgAdmin(**role_properties)
         org_1_admin.put()
 
       # Only a mentor for the second org
       if i == 1:
-        org_1_admin = OrgAdmin(**role_properties)
+        org_1_admin = GSoCOrgAdmin(**role_properties)
         org_1_admin.put()
-        org_1_mentor = Mentor(**role_properties)
+        org_1_mentor = GSoCMentor(**role_properties)
         org_1_mentor.put()
 
   role_properties.update({
@@ -481,10 +489,10 @@ def seed(request, *args, **kwargs):
       'program': ghop2009,
       })
 
-  melange_admin = OrgAdmin(**role_properties)
+  melange_admin = GHOPOrgAdmin(**role_properties)
   melange_admin.put()
 
-  melange_mentor = Mentor(**role_properties)
+  melange_mentor = GHOPMentor(**role_properties)
   melange_mentor.put()
 
   student_id = 'test'
@@ -522,7 +530,7 @@ def seed(request, *args, **kwargs):
       'program_knowledge': 'I heard about this program through a friend.'
       }
 
-  melange_student = Student(**student_properties)
+  melange_student = GSoCStudent(**student_properties)
   melange_student.put()
 
   student_id = 'test2'
@@ -532,7 +540,7 @@ def seed(request, *args, **kwargs):
       'user': current_user 
       })
 
-  melange_student2 = Student(**student_properties)
+  melange_student2 = GSoCStudent(**student_properties)
   melange_student2.put()
                                        
   project_id = 'test_project'
@@ -626,7 +634,7 @@ def seed_org_app(request, i):
 
   _, current_user = ensureUser()
   status = request.GET.get('status', 'pre-accepted')
-  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+  gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
 
   if not gsoc2009:
     raise Error('Run seed_db first')
@@ -664,7 +672,7 @@ def seed_org(unused_request, i):
   """
 
   _, current_user = ensureUser()
-  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+  gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
 
   if not gsoc2009:
     raise Error('Run seed_db first')
@@ -699,7 +707,7 @@ def seed_survey(request, i):
   """
 
   _, current_user = ensureUser()
-  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+  gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
 
   if not gsoc2009:
     raise Error('Run seed_db first')
@@ -746,7 +754,7 @@ def seed_survey_answer(request, i):
   ensureUser()
   survey = Survey.get_by_key_name('program/google/gsoc2009/survey_%d' % i)
   user = User.get_by_key_name('user_%d' % i)
-  #student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+  #student = GSoCStudent.get_by_key_name('google/gsoc2009/student_%d' % i)
 
   if not user:
     raise Error('Run seed_many for at least %d users first.' % i)
@@ -759,7 +767,7 @@ def seed_survey_answer(request, i):
   checkbox = 'PickMultipleQ Checkbox 2 for survey_%d' % i
   # pylint: disable-msg=E1103
   for i in range(5):
-    #student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+    #student = GSoCStudent.get_by_key_name('google/gsoc2009/student_%d' % i)
     user = User.get_by_key_name('user_%d' % i)
 
     properties = {
@@ -783,7 +791,7 @@ def seed_mentor(request, i):
   """
 
   _, current_user = ensureUser()
-  org = Organization.get_by_key_name('google/gsoc2009/org_%d' % i)
+  org = GSoCOrganization.get_by_key_name('google/gsoc2009/org_%d' % i)
 
   if not org:
     raise Error('Run seed_many for at least %d orgs first.' % i)
@@ -817,7 +825,7 @@ def seed_student(request, i):
   """Returns the properties for a new student entity.
   """
 
-  gsoc2009 = Program.get_by_key_name('google/gsoc2009')
+  gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
   user = User.get_by_key_name('user_%d' % i)
 
   if not gsoc2009:
@@ -862,10 +870,10 @@ def seed_student_proposal(request, i):
   """
 
   ensureUser()
-  org = Organization.get_by_key_name('google/gsoc2009/org_%d' % i)
-  mentor = Mentor.get_by_key_name('google/gsoc2009/org_%d/mentor' % i)
+  org = GSoCOrganization.get_by_key_name('google/gsoc2009/org_%d' % i)
+  mentor = GSoCMentor.get_by_key_name('google/gsoc2009/org_%d/mentor' % i)
   user = User.get_by_key_name('user_%d' % i)
-  student = Student.get_by_key_name('google/gsoc2009/student_%d' % i)
+  student = GSoCStudent.get_by_key_name('google/gsoc2009/student_%d' % i)
 
   if not user:
     raise Error('Run seed_many for at least %d users first.' % i)
@@ -908,7 +916,7 @@ def seed_student_proposal(request, i):
 
 SEEDABLE_MODEL_TYPES = {
     'user' : UserSeeder(),
-    'organization' : OrganizationSeeder(),
+    'organization' : GSoCOrganizationSeeder(),
     'org_application' : OrgApplicationSeeder(),
     }
 
@@ -1003,10 +1011,10 @@ def seed_many(request, *args, **kwargs):
 
   seed_types = {
     'user': (seed_user, User),
-    'org': (seed_org, Organization),
+    'org': (seed_org, GSoCOrganization),
     'org_app': (seed_org_app, OrgApplication),
-    'mentor': (seed_mentor, Mentor),
-    'student': (seed_student, Student),
+    'mentor': (seed_mentor, GSoCMentor),
+    'student': (seed_student, GSoCStudent),
     'student_proposal': (seed_student_proposal, StudentProposal),
     'survey': (seed_survey, Survey),
     'survey_answer': (seed_survey_answer, SurveyRecord),
@@ -1078,19 +1086,25 @@ def clear(*args, **kwargs):
   # call .all(), delete all those, and loop until .all() is empty.
   entities = itertools.chain(*[
       Notification.all(),
-      Mentor.all(),
-      Student.all(),
+      GSoCMentor.all(),
+      GHOPMentor.all(),
+      GSoCStudent.all(),
+      GHOPStudent.all(),
       Survey.all(),
       SurveyContent.all(),
       SurveyRecord.all(),
-      OrgAdmin.all(),
+      GSoCOrgAdmin.all(),
+      GHOPOrgAdmin.all(),
       ranker.all(),
       RankerRoot.all(),
       StudentProposal.all(),
-      Organization.all(),
+      GSoCOrganization.all(),
+      GHOPOrganization.all(),
       OrgApplication.all(),
-      Timeline.all(),
-      Program.all(),
+      GSoCTimeline.all(),
+      GHOPTimeline.all(),
+      GSoCProgram.all(),
+      GHOPProgram.all(),
       Host.all(),
       Sponsor.all(),
       User.all(),

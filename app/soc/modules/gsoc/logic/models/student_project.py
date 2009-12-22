@@ -45,6 +45,14 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model=model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+  def canChangeMentors(self, entity):
+    """Returns true iff the Project's mentors may be changed.
+    """
+    project_status = entity.status
+    org_status = entity.scope.status
+
+    return project_status == 'accepted' and org_status == 'active'
+
   def updateProjectsForGradingRecords(self, record_entities):
     """Updates StudentProjects using a list of GradingRecord entities.
 

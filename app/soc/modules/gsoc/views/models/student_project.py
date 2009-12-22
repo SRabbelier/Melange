@@ -362,8 +362,7 @@ class View(base.View):
                                                 entity.student.name())
     context['entity'] = entity
 
-
-    if entity.status == 'accepted':
+    if project_logic.canChangeMentors(entity):
       # only accepted project can have their mentors managed
       self._enableMentorManagement(entity, params, context)
 
@@ -385,6 +384,8 @@ class View(base.View):
       params: params dict for the manage view
       context: context for the manage view
     """
+
+    context['can_manage_mentors'] = True
 
     # get all mentors for this organization
     fields = {'scope': entity.scope,
@@ -555,7 +556,7 @@ class View(base.View):
       redirect = request.path
       return http.HttpResponseRedirect(redirect)
 
-    if entity.status == 'accepted':
+    if project_logic.canChangeMentors(entity):
       # populate forms with the current mentors set
       initial = {'mentor_id': entity.mentor.link_id}
       context['mentor_edit_form'] = params['mentor_edit_form'](initial=initial)
@@ -574,11 +575,12 @@ class View(base.View):
 
     post_dict = request.POST
 
-    if 'set_mentor' in post_dict and entity.status == 'accepted':
+    if 'set_mentor' in post_dict and project_logic.canChangeMentors(entity):
       form = params['mentor_edit_form'](post_dict)
       return self._manageSetMentor(request, template, context, params, entity,
                                    form)
-    elif 'add_additional_mentor' in post_dict and entity.status == 'accepted':
+    elif 'add_additional_mentor' in post_dict and \
+        project_logic.canChangeMentors(entity):
       form = params['additional_mentor_form'](post_dict)
       return self._manageAddAdditionalMentor(request, template, context,
                                              params, entity, form)

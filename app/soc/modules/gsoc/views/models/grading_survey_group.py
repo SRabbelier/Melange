@@ -453,7 +453,8 @@ class View(base.View):
     """
 
     from google.appengine.api.labs import taskqueue
-    from soc.logic.models.student_project import logic as student_project_logic
+    from soc.modules.gsoc.logic.models.student_project import logic as \
+        student_project_logic
 
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()

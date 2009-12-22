@@ -48,7 +48,8 @@ from soc.modules.gsoc.logic.models import mentor as mentor_logic
 from soc.modules.gsoc.logic.models import org_admin as org_admin_logic
 from soc.modules.gsoc.logic.models import organization as org_logic
 from soc.modules.gsoc.logic.models import student as student_logic
-from soc.modules.gsoc.logic.models import student_proposal as student_proposal_logic
+from soc.modules.gsoc.logic.models import student_proposal as \
+    student_proposal_logic
 from soc.modules.gsoc.views.helper import access
 
 
@@ -369,7 +370,8 @@ class View(base.View):
         rest see base.View.public()
     """
 
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     get_dict = request.GET
 
@@ -417,8 +419,9 @@ class View(base.View):
       params: dict with params for the view using this context
     """
 
-    from soc.logic.models.review import logic as review_logic
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review import logic as review_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     student_entity = entity.scope
 
@@ -521,7 +524,7 @@ class View(base.View):
     For params see base.View.public().
     """
 
-    from soc.views.models import organization as org_view
+    from soc.modules.gsoc.views.models import organization as org_view
 
     student_entity = student_logic.logic.getFromKeyName(kwargs['scope_path'])
 
@@ -725,7 +728,8 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     get_dict = request.GET
 
@@ -1040,8 +1044,9 @@ class View(base.View):
     """
 
     from soc.logic.helper import notifications as notifications_helper
-    from soc.logic.models.review import logic as review_logic
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review import logic as review_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     # create the fields for the review entity
     fields = {'link_id': 't%i' % (int(time.time()*100)),

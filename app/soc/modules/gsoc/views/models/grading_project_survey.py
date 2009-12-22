@@ -103,7 +103,7 @@ class View(project_survey.View):
     For args see project_survey.View._constructFilterForProjectSelection().
     """
 
-    from soc.logic.models.mentor import logic as mentor_logic
+    from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 
     survey_logic = params['logic']
 
@@ -133,8 +133,9 @@ class View(project_survey.View):
       Returns the dictionary containing the fields to filter on
     """
 
-    from soc.logic.models.mentor import logic as mentor_logic
-    from soc.logic.models.org_admin import logic as org_admin_logic
+    from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+    from soc.modules.gsoc.logic.models.org_admin import logic as \
+        org_admin_logic
 
     if allowed_to_read:
       return super(View, self)._getResultsViewRecordFields(survey,

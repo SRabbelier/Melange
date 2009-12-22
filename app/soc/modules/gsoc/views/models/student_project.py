@@ -48,7 +48,8 @@ from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.student_project import logic as project_logic
+from soc.modules.gsoc.logic.models.student_project import logic as \
+    project_logic
 from soc.modules.gsoc.views.helper import access
 
 
@@ -477,7 +478,8 @@ class View(base.View):
     from soc.modules.gsoc.views.helper import list_info
     from soc.modules.gsoc.views.models.grading_project_survey import view as \
         grading_survey_view
-    from soc.modules.gsoc.views.models.project_survey import view as project_survey_view
+    from soc.modules.gsoc.views.models.project_survey import view as \
+        project_survey_view
 
     fields = {'scope_path': entity.program.key().id_or_name()}
 

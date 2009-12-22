@@ -134,7 +134,8 @@ class View(survey.View):
     For params see survey.View._getSurveyRecordFor().
     """
 
-    from soc.logic.models.student_project import logic as student_project_logic
+    from soc.modules.gsoc.logic.models.student_project import logic as \
+        student_project_logic
 
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
@@ -166,7 +167,8 @@ class View(survey.View):
     For params see survey.View._takePost().
     """
 
-    from soc.logic.models.student_project import logic as student_project_logic
+    from soc.modules.gsoc.logic.models.student_project import logic as \
+        student_project_logic
 
     # retrieve the project using the key name in the GET param
     get_dict = request.GET
@@ -189,7 +191,8 @@ class View(survey.View):
         survey_record: a SurveyRecordEntity
     """
 
-    from soc.logic.models.student_project import logic as student_project_logic
+    from soc.modules.gsoc.logic.models.student_project import logic as \
+        student_project_logic
 
     # call super first to set the other context items
     super(View, self)._setSurveyTakeContext(request, params, context, survey,
@@ -214,7 +217,8 @@ class View(survey.View):
       Dictionary that can be used as a input for a query.
     """
 
-    from soc.logic.models.student import logic as student_logic
+    from soc.modules.gsoc.logic.models.student import logic as \
+        student_logic
 
     survey_logic = params['logic']
 
@@ -242,7 +246,8 @@ class View(survey.View):
       rest: see base.View.public()
     """
 
-    from soc.views.models.student_project import view as student_project_view
+    from soc.modules.gsoc.views.models.student_project import view as \
+        student_project_view
 
     student_project_params = student_project_view.getParams().copy()
 
@@ -269,8 +274,10 @@ class View(survey.View):
       Returns the dictionary containing the fields to filter on
     """
 
-    from soc.logic.models.org_admin import logic as org_admin_logic
-    from soc.logic.models.student import logic as student_logic
+    from soc.modules.gsoc.logic.models.org_admin import logic as \
+        org_admin_logic
+    from soc.modules.gsoc.logic.models.student import logic as \
+        student_logic
 
     if allowed_to_read:
       return super(View, self)._getResultsViewRecordFields(survey,

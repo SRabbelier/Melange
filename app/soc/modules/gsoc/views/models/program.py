@@ -316,7 +316,7 @@ class View(program.View):
     timeline_entity = program_entity.timeline
 
     if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-      items += [('/student_proposal/list_orgs/%s' % (
+      items += [('/gsoc/student_proposal/list_orgs/%s' % (
           student_entity.key().id_or_name()),
           "Submit your Student Proposal", 'any_access')]
 

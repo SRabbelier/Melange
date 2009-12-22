@@ -497,14 +497,14 @@ class View(presence.View):
 
     items = []
 
-    items += [(redirects.getEditRedirect(student_entity,
-        {'url_name': prefix + '/student'}),
-        "Edit my Student Profile", 'any_access')]
+    if timeline_helper.isBeforeEvent(program_entity.timeline, 'program_end'):
+      items += [(redirects.getEditRedirect(student_entity,
+          {'url_name': prefix + '/student'}),
+          "Edit my Student Profile", 'any_access')]
 
-
-    items += [(redirects.getManageRedirect(student_entity,
-        {'url_name': prefix + '/student'}),
-        "Resign as a Student", 'any_access')]
+      items += [(redirects.getManageRedirect(student_entity,
+          {'url_name': prefix + '/student'}),
+          "Resign as a Student", 'any_access')]
 
     return items
 

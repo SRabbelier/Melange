@@ -439,14 +439,17 @@ class View(presence.View):
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
 
-  def _getVisibleProgramEntries(self, entity, id, user, params):
-    """Get entries for a visible program.
+  def _getStandardProgramEntries(self, entity, id, user, params):
+    """Returns those entries for a program which are available to regular users,
+    not only to hosts or developers. 
     """
 
     items = []
 
     # show the documents for this program, even for not logged in users
     items += document_view.view.getMenusForScope(entity, params)
+
+    # also show time-dependent entities for a given user
     items += self._getTimeDependentEntries(entity, params, id, user)
 
     return items

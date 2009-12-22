@@ -137,7 +137,7 @@ class View(program.View):
       items = []
 
       if entity.status == 'visible':
-        items += self._getVisibleProgramEntries(entity, id, user, params)
+        items += self._getStandardProgramEntries(entity, id, user, params)
         items += self._getSurveyEntries(entity, params, id, user)
       try:
         # check if the current user is a host for this program
@@ -147,7 +147,7 @@ class View(program.View):
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like
-          items += self._getVisibleProgramEntries(entity, id, user, params)
+          items += self._getStandardProgramEntries(entity, id, user, params)
           items += self._getSurveyEntries(entity, params, id, user)
 
         items += self._getHostEntries(entity, params, 'gsoc')

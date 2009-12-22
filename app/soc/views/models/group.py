@@ -399,9 +399,11 @@ class View(presence.View):
 
     params = dicts.merge(params, self._params)
 
-    # set fields to match every active role this user has
-    fields = {'user': user,
-              'status': 'active'}
+    # set fields to match every active/inactive role this user has
+    fields = {
+        'user': user,
+        'status': ['active', 'inactive']
+        }
 
     # get the role views and start filling group_entities
     role_views = self._params['role_views']

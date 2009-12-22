@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
@@ -203,7 +204,13 @@ class View(organization.View):
     group_entity = role_description['group']
     roles = role_description['roles']
 
-    if roles.get('ghop_org_admin') or roles.get('ghop_mentor'):
+    mentor_entity = roles.get('ghop_mentor')
+    admin_entity = roles.get('ghop_org_admin')
+
+    is_active_mentor = mentor_entity and mentor_entity.status == 'active'
+    is_active_admin = admin_entity and admin_entity.status == 'active'
+
+    if admin_entity or mentor_entity:
       # add a link to view all the organization tasks.
       submenu = (ghop_redirects.getListTasksRedirect(
           group_entity, {'url_name': 'ghop/task'}),
@@ -211,7 +218,7 @@ class View(organization.View):
       submenus.append(submenu)
 
 
-    if roles.get('ghop_org_admin'):
+    if is_active_admin:
       # add a link to create task
       submenu = (redirects.getCreateRedirect(
            group_entity, {'url_name': 'ghop/task'}),
@@ -244,14 +251,14 @@ class View(organization.View):
           "Edit Organization Profile", 'any_access')
       submenus.append(submenu)
 
-    if roles.get('ghop_mentor'):
+    if is_active_mentor:
       # add a link to suggest task
       submenu = (ghop_redirects.getSuggestTaskRedirect(
           group_entity, {'url_name': 'ghop/task'}),
           "Suggest a Task", 'any_access')
       submenus.append(submenu)
 
-    if roles.get('ghop_org_admin') or roles.get('ghop_mentor'):
+    if is_active_admin or is_active_mentor:
       submenu = (redirects.getCreateDocumentRedirect(group_entity, 'ghop_org'),
           "Create a New Document", 'any_access')
       submenus.append(submenu)
@@ -260,7 +267,7 @@ class View(organization.View):
           "List Documents", 'any_access')
       submenus.append(submenu)
 
-    if roles.get('ghop_org_admin'):
+    if is_active_admin:
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['ghop_org_admin'],
           {'url_name': 'ghop/org_admin'}),
@@ -274,7 +281,7 @@ class View(organization.View):
       submenus.append(submenu)
 
 
-    if roles.get('ghop_mentor'):
+    if is_active_mentor:
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['ghop_mentor'],
           {'url_name' : 'ghop/mentor'}),

@@ -116,17 +116,23 @@ class View(organization.View):
     program_entity = group_entity.scope
     roles = role_description['roles']
 
-    if roles.get('org_admin') or roles.get('mentor'):
+    mentor_entity = roles.get('mentor')
+    admin_entity = roles.get('org_admin')
+
+    is_active_mentor = mentor_entity and mentor_entity.status == 'active'
+    is_active_admin = admin_entity and admin_entity.status == 'active'
+
+    if admin_entity or mentor_entity:
       # add a link to view all the student proposals
       submenu = (redirects.getListProposalsRedirect(group_entity, params),
           "View all Student Proposals", 'any_access')
       submenus.append(submenu)
 
 
-    if roles.get('org_admin'):
+    if is_active_admin:
       # add a link to manage student projects after they have been announced
       if timeline_helper.isAfterEvent(program_entity.timeline,
-                                     'accepted_students_announced_deadline'):
+                                      'accepted_students_announced_deadline'):
         submenu = (redirects.getManageOverviewRedirect(group_entity,
             {'url_name': 'gsoc/student_project'}),
             "Manage Student Projects", 'any_access')
@@ -159,19 +165,21 @@ class View(organization.View):
           "Edit Organization Profile", 'any_access')
       submenus.append(submenu)
 
-    if roles.get('org_admin') or roles.get('mentor'):
-      submenu = (redirects.getCreateDocumentRedirect(group_entity, 
-                                                     params['document_prefix']),
+    if is_active_admin or is_active_mentor:
+      submenu = (redirects.getCreateDocumentRedirect(
+          group_entity, 
+          params['document_prefix']),
           "Create a New Document", 'any_access')
       submenus.append(submenu)
 
-      submenu = (redirects.getListDocumentsRedirect(group_entity,
-                                                    params['document_prefix']),
+      submenu = (redirects.getListDocumentsRedirect(
+          group_entity,
+          params['document_prefix']),
           "List Documents", 'any_access')
       submenus.append(submenu)
 
 
-    if roles.get('org_admin'):
+    if is_active_admin:
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['org_admin'],
           {'url_name': 'gsoc/org_admin'}),
@@ -185,7 +193,7 @@ class View(organization.View):
       submenus.append(submenu)
 
 
-    if roles.get('mentor'):
+    if is_active_mentor:
       # add a link to the resign page
       submenu = (redirects.getManageRedirect(roles['mentor'],
           {'url_name' : 'gsoc/mentor'}),

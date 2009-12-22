@@ -1026,7 +1026,7 @@ class Checker(object):
     program_entity = program_logic.getFromKeyName(key_name)
 
     if not program_entity or (
-        program_entity.status in ['inactive', 'invalid']):
+        program_entity.status in ['invalid']):
       raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
     if timeline_helper.isActivePeriod(program_entity.timeline, period_name):
@@ -1062,7 +1062,7 @@ class Checker(object):
     program_entity = program_logic.getFromKeyName(key_name)
 
     if not program_entity or (
-        program_entity.status in ['inactive', 'invalid']):
+        program_entity.status in ['invalid']):
       raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
     if timeline_helper.isAfterEvent(program_entity.timeline, event_name):

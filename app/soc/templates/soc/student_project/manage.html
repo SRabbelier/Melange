@@ -28,7 +28,7 @@ Use this page to manage the Student Project. You can (re)assign Mentors here and
 </table>
 </p>
 
-{% ifequal entity.status "accepted" %}
+{% if can_manage_mentors %}
   <p>
   <b>Primary Mentor</b><br />
   In this section you can assign a new Primary Mentor.
@@ -88,7 +88,7 @@ Use this page to manage the Student Project. You can (re)assign Mentors here and
    </table>
   </form>
   </p>
-{% endifequal %}
+{% endif %}
 
 <p>
 <b>Evaluations</b><br />

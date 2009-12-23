@@ -1,4 +1,8 @@
+{% if subitem.collapse %}
+	<li class="expandable-collapsed">
+{% else %}
     <li class="expandable">
+{% endif %}
       <span>{{ subitem.heading }}</span>
       <ul>
 {% for item in subitem.items %}

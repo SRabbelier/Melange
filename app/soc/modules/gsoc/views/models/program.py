@@ -125,8 +125,8 @@ class View(program.View):
     logic = params['logic']
     rights = params['rights']
 
-    # only get all invisible and visible programs
-    fields = {'status': ['invisible', 'visible']}
+    # only get all valid programs
+    fields = {'status': ['invisible', 'visible', 'inactive']}
     entities = logic.getForFields(fields)
 
     menus = []
@@ -136,7 +136,8 @@ class View(program.View):
     for entity in entities:
       items = []
 
-      if entity.status == 'visible':
+      # some entries should be shown for all programs which are not hidden
+      if entity.status in ['visible', 'inactive']:
         items += self._getStandardProgramEntries(entity, id, user, params)
         items += self._getSurveyEntries(entity, params, id, user)
       try:
@@ -146,7 +147,7 @@ class View(program.View):
                               'link_id': entity.link_id}, [])
 
         if entity.status == 'invisible':
-          # still add the document links so hosts can see how it looks like
+          # still add the standard entries so hosts can see how it looks like
           items += self._getStandardProgramEntries(entity, id, user, params)
           items += self._getSurveyEntries(entity, params, id, user)
 
@@ -209,6 +210,7 @@ class View(program.View):
   def _getTimeDependentEntries(self, program_entity, params, id, user):
     """Returns a list with time dependent menu items.
     """
+
     items = []
 
     #TODO(ljvderijk) Add more timeline dependent entries
@@ -235,9 +237,11 @@ class View(program.View):
              "List My Organization Applications", 'any_access')]
 
     # get the student entity for this user and program
-    filter = {'user': user,
-              'scope': program_entity,
-              'status': 'active'}
+    filter = {
+        'user': user,
+        'scope': program_entity,
+        'status': 'active'
+        }
     student_entity = student_logic.getForFields(filter, unique=True)
 
     if student_entity:
@@ -245,12 +249,13 @@ class View(program.View):
                                        params, id, user, 'gsoc')
 
     # get mentor and org_admin entity for this user and program
-    filter = {'user': user,
-              'program': program_entity,
-              'status': 'active'}
+    filter = {
+        'user': user,
+        'program': program_entity,
+        'status': ['active', 'inactive']
+        }
     mentor_entity = mentor_logic.getForFields(filter, unique=True)
-    org_admin_entity = org_admin_logic.getForFields(filter,
-                                                               unique=True)
+    org_admin_entity = org_admin_logic.getForFields(filter, unique=True)
 
     if mentor_entity or org_admin_entity:
       items += self._getOrganizationEntries(program_entity, org_admin_entity,
@@ -270,7 +275,8 @@ class View(program.View):
       # add a link to list all the organizations
       items += [(url, "List participating Organizations", 'any_access')]
 
-      if not student_entity:
+      if not student_entity and \
+          timeline_helper.isBeforeEvent(timeline_entity, 'program_end'):
         # add apply to become a mentor link
         items += [
             ('/gsoc/org/apply_mentor/%s' % (program_entity.key().id_or_name()),

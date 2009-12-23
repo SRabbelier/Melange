@@ -83,7 +83,7 @@ class View(program.View):
 
     rights = ghop_access.GHOPChecker(params)
     rights['show'] = ['allow']
-    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',
+    rights['create'] = [('checkSeeded', ['checkHasRoleForScope',
                                          host_logic.logic])]
     rights['edit'] = [('checkIsHostForProgram', [ghop_program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']

@@ -298,7 +298,7 @@ class GHOPChecker(access.Checker):
     self.checkIsUser(django_args)
 
     try:
-      return self.checkHasActiveRoleForScope(django_args, ghop_student_logic)
+      return self.checkHasRoleForScope(django_args, ghop_student_logic)
     except out_of_band.Error:
       pass
 

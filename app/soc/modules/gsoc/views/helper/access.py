@@ -261,7 +261,7 @@ class GSoCChecker(access.Checker):
     program_entity = project_entity.program
 
     new_args = {'scope_path': program_entity.scope_path}
-    self.checkHasActiveRoleForScope(new_args, host_logic)
+    self.checkHasRoleForScope(new_args, host_logic)
 
     return
 

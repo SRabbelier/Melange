@@ -52,7 +52,7 @@ class View(org_admin.View):
     rights['edit'] = [
         ('checkIsMyActiveRole', ghop_org_admin_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['invite'] = [('checkHasActiveRoleForScope',
+    rights['invite'] = [('checkHasRoleForScope',
                          ghop_org_admin_logic.logic)]
     rights['accept_invite'] = [
         ('checkIsMyRequestWithStatus', [['group_accepted']]),

@@ -56,7 +56,7 @@ class View(group.View):
     rights['edit'] = [('checkHasActiveRoleForLinkIdAsScope', host_logic),
                       ('checkGroupIsActiveForLinkId', sponsor_logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['home'] = [('checkHasActiveRoleForScope', host_logic)]
+    rights['home'] = [('checkHasRoleForScope', host_logic)]
     rights['list'] = ['checkIsDeveloper']
     rights['list_requests'] = [('checkHasActiveRoleForLinkIdAsScope', 
                                 host_logic)]

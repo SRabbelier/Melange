@@ -257,8 +257,8 @@ class Checker(object):
 
   MEMBERSHIP = {
     'anyone': 'allow',
-    'club_admin': ('checkHasActiveRoleForScope', club_admin_logic),
-    'club_member': ('checkHasActiveRoleForScope', club_member_logic),
+    'club_admin': ('checkHasRoleForScope', club_admin_logic),
+    'club_member': ('checkHasRoleForScope', club_member_logic),
     'host': ('checkHasDocumentAccess', [host_logic, 'sponsor']),
     'org_admin': ('checkHasDocumentAccess', [org_admin_logic, 'org']),
     'org_mentor': ('checkHasDocumentAccess', [mentor_logic, 'org']),
@@ -784,7 +784,7 @@ class Checker(object):
     new_args = {'scope_path': key_fields}
     return self._checkHasActiveRoleFor(new_args, logic, 'scope_path')
 
-  def checkHasActiveRoleForScope(self, django_args, logic):
+  def checkHasRoleForScope(self, django_args, logic):
     """Checks that the user has the specified active role.
 
     Only roles where the scope_path matches the scope_path from the
@@ -843,7 +843,7 @@ class Checker(object):
 
     # nothing to do
     if not (scope_logic and depth):
-      return self.checkHasActiveRoleForScope(django_args, logic)
+      return self.checkHasRoleForScope(django_args, logic)
 
     # we don't want to modify the original django args
     django_args = django_args.copy()
@@ -860,7 +860,7 @@ class Checker(object):
 
     django_args['scope_path'] = entity.key().id_or_name()
 
-    self.checkHasActiveRoleForScope(django_args, logic)
+    self.checkHasRoleForScope(django_args, logic)
 
   def checkSeeded(self, django_args, checker_name, *args):
     """Wrapper to update the django_args with the contens of seed first.
@@ -973,7 +973,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
 
     new_args = {'scope_path': program.scope_path }
-    self.checkHasActiveRoleForScope(new_args, host_logic)
+    self.checkHasRoleForScope(new_args, host_logic)
 
   @allowDeveloper
   @denySidebar
@@ -996,7 +996,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
 
     django_args = {'scope_path': program.scope_path}
-    self.checkHasActiveRoleForScope(django_args, host_logic)
+    self.checkHasRoleForScope(django_args, host_logic)
 
   @allowDeveloper
   @denySidebar
@@ -1407,7 +1407,7 @@ class Checker(object):
 
     try:
       # check if it is the user's own role
-      self.checkHasActiveRoleForScope(django_args, logic_for_role)
+      self.checkHasRoleForScope(django_args, logic_for_role)
       self.checkIsMyEntity(django_args, logic_for_role, 'user', True)
       return
     except out_of_band.Error:
@@ -1594,7 +1594,7 @@ class Checker(object):
       # check if the current user is a student for the program in survey.scope
       django_args['scope'] = survey_scope
       # program is the 'scope' attribute for students
-      return self.checkHasActiveRoleForScope(django_args, student_logic)
+      return self.checkHasRoleForScope(django_args, student_logic)
 
     # unknown role
     self.deny(django_args)

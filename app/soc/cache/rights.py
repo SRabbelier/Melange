@@ -30,7 +30,7 @@ RIGHTS = [
     'checkCanMakeRequestToGroup',
     'checkCanProcessRequest',
     'checkHasPickGetArgs',
-    'checkHasActiveRoleForScope',
+    'checkHasRoleForScope',
     'checkHasUserEntity',
     'checkIsActive',
     'checkIsAllowedToManageRole',

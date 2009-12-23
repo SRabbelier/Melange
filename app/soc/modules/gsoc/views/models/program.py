@@ -75,7 +75,7 @@ class View(program.View):
     rights = access.GSoCChecker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
-    rights['create'] = [('checkSeeded', ['checkHasActiveRoleForScope',
+    rights['create'] = [('checkSeeded', ['checkHasRoleForScope',
         host_logic])]
     rights['edit'] = [('checkIsHostForProgram', [program_logic])]
     rights['delete'] = ['checkIsDeveloper']

@@ -51,7 +51,7 @@ class View(mentor.View):
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkIsMyActiveRole', org_admin_logic)]
     rights['delete'] = ['checkIsDeveloper']
-    rights['invite'] = [('checkHasActiveRoleForScope',
+    rights['invite'] = [('checkHasRoleForScope',
                          org_admin_logic)]
     rights['accept_invite'] = [
         ('checkIsMyRequestWithStatus', [['group_accepted']]),

@@ -70,7 +70,7 @@ class View(student.View):
         ]
     rights['manage'] = [('checkIsMyActiveRole', student_logic)]
     rights['list_projects'] = [
-        ('checkHasRoleForScope', student_logic),
+        ('checkHasRoleForScope', [student_logic, ['active', 'inactive']]),
         ('checkIsAfterEvent', ['accepted_students_announced_deadline',
                                'scope_path', program_logic])]
 

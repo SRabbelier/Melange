@@ -88,10 +88,6 @@ class View(group.View):
                              org_admin_logic.logic)]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
-    rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasRoleForKeyFieldsAsScope', [org_admin_logic.logic]),
-         ('checkHasRoleForKeyFieldsAsScope', [mentor_logic.logic])]
-        ])]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic

@@ -77,8 +77,10 @@ class View(organization.View):
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic)]
     rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasRoleForKeyFieldsAsScope', [org_admin_logic]),
-         ('checkHasRoleForKeyFieldsAsScope', [mentor_logic])]
+        [('checkHasRoleForKeyFieldsAsScope', 
+          [org_admin_logic, ['active', 'inactive']]),
+         ('checkHasRoleForKeyFieldsAsScope', 
+          [mentor_logic, ['active', 'inactive']])]
         ])]
 
     new_params = {}

@@ -73,11 +73,11 @@ class View(base.View):
     rights['show'] = ['allow']
     rights['list'] = ['checkIsDeveloper']
     rights['manage'] = [('checkHasRoleForScope',
-                         org_admin_logic),
+                         [org_admin_logic, ['active', 'inactive']]),
         ('checkStudentProjectHasStatus', [['accepted', 'failed', 'completed',
                                            'withdrawn']])]
-    rights['manage_overview'] = [('checkHasRoleForScope',
-                         org_admin_logic)]
+    rights['manage_overview'] = [('checkHasRoleForScope', [
+        org_admin_logic, ['active', 'inactive']])]
     # TODO: lack of better name here!
     rights['st_edit'] = [
         'checkCanEditStudentProjectAsStudent',

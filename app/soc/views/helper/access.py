@@ -797,7 +797,7 @@ class Checker(object):
 
     return self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
 
-  def checkHasActiveRoleForLinkId(self, django_args, logic):
+  def checkHasRoleForLinkId(self, django_args, logic):
     """Checks that the user has the specified active role.
 
     Only roles where the link_id matches the link_id from the
@@ -810,7 +810,7 @@ class Checker(object):
 
     return self._checkHasActiveRoleFor(django_args, logic, 'link_id')
 
-  def checkHasActiveRoleForLinkIdAsScope(self, django_args, logic):
+  def checkHasRoleForLinkIdAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
 
     Only roles where the scope_path matches the link_id from the

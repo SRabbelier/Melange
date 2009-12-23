@@ -762,8 +762,8 @@ class Checker(object):
     django_args['user'] = self.user
     return self._checkHasStatus(django_args, logic, ['user'])
 
-  def _checkHasRoleFor(self, django_args, logic, field_name):
-    """Checks that the user has the specified active role.
+  def _checkHasRoleFor(self, django_args, logic, field_name, status='active'):
+    """Checks that the user has the specified role and status.
 
     Only roles where the field as specified by field_name matches the
     scope_path from the django_args are considered.
@@ -771,12 +771,13 @@ class Checker(object):
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: the status the role can have.
     """
 
     fields = [field_name, 'user']
     django_args = django_args.copy()
     django_args['user'] = self.user
-    return self._checkHasStatus(django_args, logic, fields)
+    return self._checkHasStatus(django_args, logic, fields, status=status)
 
   def checkHasRoleForKeyFieldsAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.

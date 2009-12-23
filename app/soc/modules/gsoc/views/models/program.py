@@ -203,6 +203,7 @@ class View(program.View):
       menu['heading'] = entity.short_name
       menu['items'] = items
       menu['group'] = 'Programs'
+      menu['collapse'] = 'collapse' if entity.status == 'inactive' else ''
       menus.append(menu)
 
     return menus

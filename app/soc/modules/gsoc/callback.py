@@ -20,6 +20,7 @@ __authors__ = [
   ]
 
 
+from soc.modules.gsoc.tasks import program_freezer
 from soc.modules.gsoc.views.models import grading_project_survey as grading_survey
 from soc.modules.gsoc.views.models import grading_survey_group
 from soc.modules.gsoc.views.models import mentor
@@ -64,6 +65,8 @@ class Callback(object):
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
 
+    # register the GSoC Tasks
+    self.core.registerSitemapEntry(program_freezer.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

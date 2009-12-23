@@ -598,7 +598,7 @@ class Checker(object):
     if not django_args:
       django_args = {}
 
-    return self.checkHasActiveRole(django_args, host_logic)
+    return self.checkHasRole(django_args, host_logic)
 
   @allowDeveloper
   def checkIsUserSelf(self, django_args, field_name):
@@ -744,7 +744,7 @@ class Checker(object):
 
     return self._checkIsActive(django_args, logic, ['link_id'])
 
-  def checkHasActiveRole(self, django_args, logic):
+  def checkHasRole(self, django_args, logic):
     """Checks that the user has the specified active role.
 
     Args:
@@ -756,7 +756,7 @@ class Checker(object):
     django_args['user'] = self.user
     return self._checkIsActive(django_args, logic, ['user'])
 
-  def _checkHasActiveRoleFor(self, django_args, logic, field_name):
+  def _checkHasRoleFor(self, django_args, logic, field_name):
     """Checks that the user has the specified active role.
 
     Only roles where the field as specified by field_name matches the
@@ -782,7 +782,7 @@ class Checker(object):
 
     key_fields = "%(scope_path)s/%(link_id)s" % django_args
     new_args = {'scope_path': key_fields}
-    return self._checkHasActiveRoleFor(new_args, logic, 'scope_path')
+    return self._checkHasRoleFor(new_args, logic, 'scope_path')
 
   def checkHasRoleForScope(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -795,7 +795,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    return self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
+    return self._checkHasRoleFor(django_args, logic, 'scope_path')
 
   def checkHasRoleForLinkId(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -808,7 +808,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    return self._checkHasActiveRoleFor(django_args, logic, 'link_id')
+    return self._checkHasRoleFor(django_args, logic, 'link_id')
 
   def checkHasRoleForLinkIdAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -823,7 +823,7 @@ class Checker(object):
 
     django_args = django_args.copy()
     django_args['scope_path'] = django_args['link_id']
-    return self._checkHasActiveRoleFor(django_args, logic, 'scope_path')
+    return self._checkHasRoleFor(django_args, logic, 'scope_path')
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.
@@ -837,7 +837,7 @@ class Checker(object):
     if self.SCOPE_DEPTH.get(prefix):
       scope_logic, depths = self.SCOPE_DEPTH[prefix]
     else:
-      return self.checkHasActiveRole(django_args, logic)
+      return self.checkHasRole(django_args, logic)
 
     depth = depths.get(target_scope, 0)
 
@@ -1566,13 +1566,13 @@ class Checker(object):
       # check if the current user is a mentor for the program in survey.scope
       django_args['program'] = survey_scope
       # program is the 'program' attribute for mentors and org_admins
-      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+      return self._checkHasRoleFor(django_args, mentor_logic, 'program')
 
     if role == 'org_admin':
       # check if the current user is an org admin for the program
       django_args['program'] = survey_scope
       # program is the 'program' attribute for mentors and org_admins
-      return self._checkHasActiveRoleFor(django_args, org_admin_logic,
+      return self._checkHasRoleFor(django_args, org_admin_logic,
                                          'program')
 
     if role == 'org':
@@ -1581,14 +1581,14 @@ class Checker(object):
 
       try:
         # program is the 'program' attribute for mentors and org_admins
-        return self._checkHasActiveRoleFor(django_args, org_admin_logic,
+        return self._checkHasRoleFor(django_args, org_admin_logic,
                                           'program')
       except:
         # the current user is no org admin
         pass
 
       # try to check if the current user is a mentor instead
-      return self._checkHasActiveRoleFor(django_args, mentor_logic, 'program')
+      return self._checkHasRoleFor(django_args, mentor_logic, 'program')
 
     if role == 'student':
       # check if the current user is a student for the program in survey.scope

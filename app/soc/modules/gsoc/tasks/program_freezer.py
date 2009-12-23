@@ -127,7 +127,7 @@ def _processProgramFreezing(program_entity, mode):
   return
 
 
-def manageModelStatus(role_logic, status_retriever=None):
+def manageModelStatus(entity_logic, status_retriever=None):
   """Wrapper to manage status for several models.
 
   Args:
@@ -154,7 +154,7 @@ def manageModelStatus(role_logic, status_retriever=None):
 
     fields = pickle.loads(str(post_dict['fields']))
 
-    entities = role_logic.getForFields(fields, limit=BATCH_SIZE)
+    entities = entity_logic.getForFields(fields, limit=BATCH_SIZE)
 
     for entity in entities:
       if new_status:

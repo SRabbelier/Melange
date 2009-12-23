@@ -44,4 +44,32 @@ class Logic(program.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 timeline_logic=timeline_logic)
 
+
+  def _updateField(self, entity, entity_properties, name):
+    """Hook called when a field is updated.
+
+    Args:
+      entity: the unaltered entity
+      entity_properties: keyword arguments that correspond to entity
+        properties and their values
+      name: the name of the field to be changed
+    """
+
+    from soc.modules.gsoc.tasks import program_freezer
+
+    if not super(Logic,self)._updateField(entity, entity_properties, name):
+      return False
+
+    if name == 'status':
+      new_status = entity_properties[name]
+
+      # Check if we are switching from active->inactive or vice-versa and
+      # start the appropriate task.
+      if entity.status != new_status and new_status == 'inactive':
+        program_freezer.startProgramFreezing(entity)
+      elif entity.status == 'inactive' and new_status != 'inactive':
+        program_freezer.startProgramUnfreezing(entity)
+
+    return True
+
 logic = Logic()

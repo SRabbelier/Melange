@@ -772,7 +772,7 @@ class Checker(object):
     django_args['user'] = self.user
     return self._checkIsActive(django_args, logic, fields)
 
-  def checkHasActiveRoleForKeyFieldsAsScope(self, django_args, logic):
+  def checkHasRoleForKeyFieldsAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.
 
     Args:

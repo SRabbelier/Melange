@@ -75,22 +75,22 @@ class View(group.View):
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['edit'] = [('checkHasRoleForKeyFieldsAsScope',
                            org_admin_logic.logic,),
                       ('checkGroupIsActiveForLinkId', org_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
     rights['apply_mentor'] = ['checkIsUser']
-    rights['list_requests'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 org_admin_logic.logic)]
-    rights['list_roles'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              org_admin_logic.logic)]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic.logic)]
     rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasActiveRoleForKeyFieldsAsScope', [org_admin_logic.logic]),
-         ('checkHasActiveRoleForKeyFieldsAsScope', [mentor_logic.logic])]
+        [('checkHasRoleForKeyFieldsAsScope', [org_admin_logic.logic]),
+         ('checkHasRoleForKeyFieldsAsScope', [mentor_logic.logic])]
         ])]
 
     new_params = {}

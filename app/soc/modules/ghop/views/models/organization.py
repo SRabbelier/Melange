@@ -69,16 +69,16 @@ class View(organization.View):
 
     rights = ghop_access.GHOPChecker(params)
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['edit'] = [('checkHasRoleForKeyFieldsAsScope',
                            ghop_org_admin_logic.logic,),
                       ('checkGroupIsActiveForLinkId', ghop_org_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
     rights['apply_mentor'] = ['checkIsUser']
-    rights['list_requests'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 ghop_org_admin_logic.logic)]
-    rights['list_roles'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              ghop_org_admin_logic.logic)]
 
     new_params = {}

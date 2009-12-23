@@ -63,22 +63,22 @@ class View(organization.View):
     rights['any_access'] = ['allow']
     rights['show'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
-    rights['edit'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['edit'] = [('checkHasRoleForKeyFieldsAsScope',
                            org_admin_logic),
                       ('checkGroupIsActiveForLinkId', org_logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
     rights['apply_mentor'] = ['checkIsUser']
-    rights['list_requests'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 org_admin_logic)]
-    rights['list_roles'] = [('checkHasActiveRoleForKeyFieldsAsScope',
+    rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              org_admin_logic)]
     rights['applicant'] = [('checkIsApplicationAccepted',
                             org_app_logic)]
     rights['list_proposals'] = [('checkHasAny', [
-        [('checkHasActiveRoleForKeyFieldsAsScope', [org_admin_logic]),
-         ('checkHasActiveRoleForKeyFieldsAsScope', [mentor_logic])]
+        [('checkHasRoleForKeyFieldsAsScope', [org_admin_logic]),
+         ('checkHasRoleForKeyFieldsAsScope', [mentor_logic])]
         ])]
 
     new_params = {}

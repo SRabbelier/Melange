@@ -95,6 +95,9 @@ DEF_NEED_ROLE_MSG = ugettext(
 DEF_NOT_YOUR_ENTITY_MSG = ugettext(
     'This entity does not belong to you.')
 
+DEF_ENTITY_DOES_NOT_HAVE_STATUS = ugettext(
+    'There is no entity with the required status.')
+
 DEF_NO_ACTIVE_ENTITY_MSG = ugettext(
     'There is no such active entity.')
 
@@ -690,14 +693,16 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def _checkIsActive(self, django_args, logic, fields):
-    """Raises an alternate HTTP response if the entity is not active.
+  def _checkHasStatus(self, django_args, logic, fields, status='active'):
+    """Raises an alternate HTTP response if the entity does not have the 
+    specified status.
 
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
       fields: the name of the fields that should be copied verbatim
               from the django_args as filter
+      status: string or list of strings specifying possible status
 
     Raises:
       AccessViolationResponse:
@@ -708,14 +713,15 @@ class Checker(object):
     self.checkIsUser()
 
     fields = dicts.filter(django_args, fields)
-    fields['status'] = 'active'
+    fields['status'] = status
 
     entity = logic.getForFields(fields, unique=True)
 
     if entity:
       return entity
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
+    raise out_of_band.AccessViolation(
+        message_fmt=DEF_ENTITY_DOES_NOT_HAVE_STATUS)
 
   def checkGroupIsActiveForScopeAndLinkId(self, django_args, logic):
     """Checks that the specified group is active.
@@ -729,7 +735,7 @@ class Checker(object):
     """
 
     fields = ['scope_path', 'link_id']
-    return self._checkIsActive(django_args, logic, fields)
+    return self._checkHasStatus(django_args, logic, fields)
 
   def checkGroupIsActiveForLinkId(self, django_args, logic):
     """Checks that the specified group is active.
@@ -742,7 +748,7 @@ class Checker(object):
       logic: the logic that should be used to look up the entity
     """
 
-    return self._checkIsActive(django_args, logic, ['link_id'])
+    return self._checkHasStatus(django_args, logic, ['link_id'])
 
   def checkHasRole(self, django_args, logic):
     """Checks that the user has the specified active role.
@@ -754,7 +760,7 @@ class Checker(object):
 
     django_args = django_args.copy()
     django_args['user'] = self.user
-    return self._checkIsActive(django_args, logic, ['user'])
+    return self._checkHasStatus(django_args, logic, ['user'])
 
   def _checkHasRoleFor(self, django_args, logic, field_name):
     """Checks that the user has the specified active role.
@@ -770,7 +776,7 @@ class Checker(object):
     fields = [field_name, 'user']
     django_args = django_args.copy()
     django_args['user'] = self.user
-    return self._checkIsActive(django_args, logic, fields)
+    return self._checkHasStatus(django_args, logic, fields)
 
   def checkHasRoleForKeyFieldsAsScope(self, django_args, logic):
     """Checks that the user has the specified active role.

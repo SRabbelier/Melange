@@ -750,17 +750,18 @@ class Checker(object):
 
     return self._checkHasStatus(django_args, logic, ['link_id'])
 
-  def checkHasRole(self, django_args, logic):
-    """Checks that the user has the specified active role.
+  def checkHasRole(self, django_args, logic, status='active'):
+    """Checks that the user has the specified role and status.
 
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: the status or list of status that the role may have
     """
 
     django_args = django_args.copy()
     django_args['user'] = self.user
-    return self._checkHasStatus(django_args, logic, ['user'])
+    return self._checkHasStatus(django_args, logic, ['user'], status=status)
 
   def _checkHasRoleFor(self, django_args, logic, field_name, status='active'):
     """Checks that the user has the specified role and status.
@@ -779,20 +780,21 @@ class Checker(object):
     django_args['user'] = self.user
     return self._checkHasStatus(django_args, logic, fields, status=status)
 
-  def checkHasRoleForKeyFieldsAsScope(self, django_args, logic):
-    """Checks that the user has the specified active role.
+  def checkHasRoleForKeyFieldsAsScope(self, django_args, logic, status='active'):
+    """Checks that the user has the specified role and status.
 
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: string or list of strings indicating the status of the role
     """
 
     key_fields = "%(scope_path)s/%(link_id)s" % django_args
     new_args = {'scope_path': key_fields}
-    return self._checkHasRoleFor(new_args, logic, 'scope_path')
+    return self._checkHasRoleFor(new_args, logic, 'scope_path', status=status)
 
-  def checkHasRoleForScope(self, django_args, logic):
-    """Checks that the user has the specified active role.
+  def checkHasRoleForScope(self, django_args, logic, status='active'):
+    """Checks that the user has the specified role and status.
 
     Only roles where the scope_path matches the scope_path from the
     django_args are considered.
@@ -800,11 +802,13 @@ class Checker(object):
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: string or list of strings indicating the status of the role
     """
 
-    return self._checkHasRoleFor(django_args, logic, 'scope_path')
+    return self._checkHasRoleFor(django_args, logic, 'scope_path',
+                                 status=status)
 
-  def checkHasRoleForLinkId(self, django_args, logic):
+  def checkHasRoleForLinkId(self, django_args, logic, status='active'):
     """Checks that the user has the specified active role.
 
     Only roles where the link_id matches the link_id from the
@@ -813,24 +817,28 @@ class Checker(object):
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: string or list of strings indicating the status of the role
     """
 
-    return self._checkHasRoleFor(django_args, logic, 'link_id')
+    return self._checkHasRoleFor(django_args, logic, 'link_id', status=status)
 
-  def checkHasRoleForLinkIdAsScope(self, django_args, logic):
+  def checkHasRoleForLinkIdAsScope(self, django_args, logic, status='active'):
     """Checks that the user has the specified active role.
 
     Only roles where the scope_path matches the link_id from the
     django_args are considered.
-    
+
     Args:
       django_args: a dictionary with django's arguments
       logic: the logic that should be used to look up the entity
+      status: string or list of strings indicating the status of the role
     """
 
     django_args = django_args.copy()
     django_args['scope_path'] = django_args['link_id']
-    return self._checkHasRoleFor(django_args, logic, 'scope_path')
+
+    return self._checkHasRoleFor(django_args, logic, 'scope_path',
+                                 status=status)
 
   def checkHasDocumentAccess(self, django_args, logic, target_scope):
     """Checks that the user has access to the specified document scope.

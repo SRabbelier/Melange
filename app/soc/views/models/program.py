@@ -53,8 +53,6 @@ from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 from soc.views.sitemap import sidebar
 
-from soc.modules.gsoc.logic.models import student_proposal as student_proposal_logic
-
 import soc.cache.logic
 import soc.logic.models.program
 import soc.models.work
@@ -341,90 +339,6 @@ class View(presence.View):
 
     return self._list(request, org_params, contents, page_name, context)
 
-
-  @decorators.merge_params
-  @decorators.check_access
-  def assignedProposals(self, request, access_type, page_name=None,
-                        params=None, filter=None, **kwargs):
-    """Returns a JSON dict containing all the proposals that would have
-    a slot assigned for a specific set of orgs.
-
-    The request.GET limit and offset determines how many and which
-    organizations should be returned.
-
-    For params see base.View.public().
-
-    Returns: JSON object with a collection of orgs and proposals. Containing
-             identification information and contact information.
-    """
-
-    get_dict = request.GET
-
-    if not (get_dict.get('limit') and get_dict.get('offset')):
-      return self.json(request, {})
-
-    try:
-      limit = max(0, int(get_dict['limit']))
-      offset = max(0, int(get_dict['offset']))
-    except ValueError:
-      return self.json(request, {})
-
-    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
-
-    fields = {'scope': program_entity,
-              'slots >': 0,
-              'status': 'active'}
-
-    org_entities = org_logic.logic.getForFields(fields,
-        limit=limit, offset=offset)
-
-    orgs_data = {}
-    proposals_data = []
-
-    # for each org get the proposals who will be assigned a slot
-    for org in org_entities:
-
-      org_data = {'name': org.name}
-
-      fields = {'scope': org,
-                'status': 'active',
-                'user': org.founder}
-
-      org_admin = org_admin_logic.logic.getForFields(fields, unique=True)
-
-      if org_admin:
-        # pylint: disable-msg=E1103
-        org_data['admin_name'] = org_admin.name()
-        org_data['admin_email'] = org_admin.email
-
-      proposals = student_proposal_logic.logic.getProposalsToBeAcceptedForOrg(
-          org, step_size=program_entity.max_slots)
-
-      if not proposals:
-        # nothing to accept, next organization
-        continue
-
-      # store information about the org
-      orgs_data[org.key().id_or_name()] = org_data
-
-      # store each proposal in the dictionary
-      for proposal in proposals:
-        student_entity = proposal.scope
-
-        proposals_data.append(
-            {'key_name': proposal.key().id_or_name(),
-            'proposal_title': proposal.title,
-            'student_key': student_entity.key().id_or_name(),
-            'student_name': student_entity.name(),
-            'student_contact': student_entity.email,
-            'org_key': org.key().id_or_name()
-            })
-
-    # return all the data in JSON format
-    data = {'orgs': orgs_data,
-            'proposals': proposals_data}
-
-    return self.json(request, data)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().

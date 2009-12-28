@@ -34,24 +34,17 @@ from soc.logic import dicts
 from soc.logic import system
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
-from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
-from soc.logic.models import org_admin as org_admin_logic
-from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import program as program_logic
-from soc.logic.models import student as student_logic
 from soc.views import helper
-from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
-from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
-from soc.views.sitemap import sidebar
 
 import soc.cache.logic
 import soc.logic.models.program
@@ -135,7 +128,7 @@ class View(presence.View):
          },
         ]
 
-    # TODO add clean field to check for uniqueness in link_id and scope_path
+    # TODO: add clean field to check for uniqueness in link_id and scope_path
     new_params['create_extra_dynaproperties'] = {
         'description': forms.fields.CharField(widget=helper.widgets.TinyMCE(
             attrs={'rows':10, 'cols':40})),
@@ -428,7 +421,7 @@ class View(presence.View):
        specific program.
     """
 
-    # TODO(ljvderijk) think about adding specific org items like submit review
+    # TODO(ljvderijk): think about adding specific org items like submit review
 
     items = []
 

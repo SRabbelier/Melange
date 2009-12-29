@@ -24,7 +24,6 @@ __authors__ = [
   ]
 
 
-from django import forms
 from django import http
 from django.utils.translation import ugettext
 
@@ -40,12 +39,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
-
-import soc.models.request
-import soc.logic.dicts
-import soc.views.helper
-import soc.views.helper.lists
-import soc.views.helper.responses
 
 
 class View(base.View):

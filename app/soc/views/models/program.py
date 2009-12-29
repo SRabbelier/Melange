@@ -28,17 +28,13 @@ __authors__ = [
 from django import forms
 from django.utils.translation import ugettext
 
-from soc.logic import allocations
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic import system
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
-from soc.logic.models import organization as org_logic
 from soc.logic.models import program as program_logic
 from soc.views import helper
 from soc.views.helper import access
-from soc.views.helper import decorators
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
@@ -212,122 +208,6 @@ class View(presence.View):
     result['data'] = entities
 
     return result
-
-  @decorators.merge_params
-  @decorators.check_access
-  #TODO: this method should be moved to GSoC module
-  def slots(self, request, acces_type, page_name=None, params=None, **kwargs):
-    """Returns a JSON object with all orgs allocation.
-
-    Args:
-      request: the standard Django HTTP request object
-      access_type : the name of the access type which should be checked
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View, not used
-    """
-
-    from django.utils import simplejson
-
-    program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
-    program_slots = program.slots
-
-    filter = {
-          'scope': program,
-          'status': 'active',
-          }
-
-    query = org_logic.logic.getQueryForFields(filter=filter)
-    organizations = org_logic.logic.getAll(query)
-
-    locked_slots = adjusted_slots = {}
-
-    if request.method == 'POST' and 'result' in request.POST:
-      result = request.POST['result']
-      submit = request.GET.get('submit')
-      load = request.GET.get('load')
-      stored = program.slots_allocation
-
-      if load and stored:
-        result = stored
-
-      from_json = simplejson.loads(result)
-
-      locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
-
-      if submit:
-        program.slots_allocation = result
-        program.put()
-
-    orgs = {}
-    applications = {}
-    max = {}
-
-    for org in organizations:
-      orgs[org.link_id] = org
-      applications[org.link_id] = org.nr_applications
-      max[org.link_id] = min(org.nr_mentors, org.slots_desired)
-
-    max_slots_per_org = program.max_slots
-    min_slots_per_org = program.min_slots
-    algorithm = 2
-
-    allocator = allocations.Allocator(orgs.keys(), applications, max,
-                                      program_slots, max_slots_per_org,
-                                      min_slots_per_org, algorithm)
-
-    result = allocator.allocate(locked_slots)
-
-    data = []
-
-    # TODO: remove adjustment here and in the JS
-    for link_id, count in result.iteritems():
-      org = orgs[link_id]
-      data.append({
-          'link_id': link_id,
-          'slots': count,
-          'locked': locked_slots.get(link_id, 0),
-          'adjustment': adjusted_slots.get(link_id, 0),
-          })
-
-    return self.json(request, data)
-
-  @decorators.merge_params
-  @decorators.check_access
-  #TODO: this method should be moved to GSoC module
-  def assignSlots(self, request, access_type, page_name=None,
-                  params=None, **kwargs):
-    """View that allows to assign slots to orgs.
-    """
-
-    from soc.views.models.organization import view as org_view
-
-    org_params = org_view.getParams().copy()
-    org_params['list_template'] = 'soc/program/allocation/allocation.html'
-    org_params['list_heading'] = 'soc/program/allocation/heading.html'
-    org_params['list_row'] = 'soc/program/allocation/row.html'
-    org_params['list_pagination'] = 'soc/list/no_pagination.html'
-
-    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
-
-    description = self.DEF_SLOTS_ALLOCATION_MSG
-
-    content = self._getOrgsWithProfilesList(program_entity, org_view,
-        description, False)
-    contents = [content]
-
-    return_url =  "http://%(host)s%(index)s" % {
-      'host' : system.getHostname(),
-      'index': redirects.getSlotsRedirect(program_entity, params)
-      }
-
-    context = {
-        'total_slots': program_entity.slots,
-        'uses_json': True,
-        'uses_slot_allocator': True,
-        'return_url': return_url,
-        }
-
-    return self._list(request, org_params, contents, page_name, context)
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().

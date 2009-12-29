@@ -128,6 +128,6 @@ INSTALLED_APPS = (
 )
 
 MODULE_FMT = 'soc.modules.%s.callback'
-MODULES = ['gsoc']
+#MODULES = ['gsoc']
 # TODO: to enable GHOP uncomment the following line:
-#MODULES = ['gsoc', 'ghop']
+MODULES = ['gsoc', 'ghop']

@@ -35,7 +35,6 @@ from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
-from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
 from soc.views.helper import widgets
@@ -275,6 +274,11 @@ class View(program.View):
         rest see base.View.public()
     """
 
+    from soc.modules.ghop.views.models.organization import view as org_view
+    
+    logic = params['logic']
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+    
     org_params['list_template'] = ('modules/ghop/program/'
         'allocation/allocation.html')
     org_params['list_heading'] = ('modules/ghop/program/'
@@ -284,13 +288,8 @@ class View(program.View):
 
     description = self.DEF_TASK_QUOTA_ALLOCATION_MSG
 
-    filter = {
-        'scope': entity,
-        'status': 'active',
-        }
-
-    content = self._getAcceptedOrgsList(description, org_params,
-                                        filter, False)
+    content = self._getOrgsWithProfilesList(program_entity, org_view,
+        description, False)
 
     contents = [content]
 

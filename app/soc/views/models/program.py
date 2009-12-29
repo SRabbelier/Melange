@@ -183,9 +183,9 @@ class View(presence.View):
 
     Args:
       program_entity: program which list the organizations for
-      use_cache: whether or not to use the memcache
       org_view: a view for organization model
       description: the description of the list
+      use_cache: whether or not to use the memcache
     """
 
     ao_params = org_view.getParams().copy()
@@ -215,6 +215,7 @@ class View(presence.View):
 
   @decorators.merge_params
   @decorators.check_access
+  #TODO: this method should be moved to GSoC module
   def slots(self, request, acces_type, page_name=None, params=None, **kwargs):
     """Returns a JSON object with all orgs allocation.
 
@@ -292,46 +293,41 @@ class View(presence.View):
 
   @decorators.merge_params
   @decorators.check_access
+  #TODO: this method should be moved to GSoC module
   def assignSlots(self, request, access_type, page_name=None,
                   params=None, **kwargs):
     """View that allows to assign slots to orgs.
     """
 
-    from soc.views.models import organization as organization_view
+    from soc.views.models.organization import view as org_view
 
-    org_params = organization_view.view.getParams().copy()
+    org_params = org_view.getParams().copy()
     org_params['list_template'] = 'soc/program/allocation/allocation.html'
     org_params['list_heading'] = 'soc/program/allocation/heading.html'
     org_params['list_row'] = 'soc/program/allocation/row.html'
     org_params['list_pagination'] = 'soc/list/no_pagination.html'
 
-    program = program_logic.logic.getFromKeyFieldsOr404(kwargs)
+    program_entity = program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
     description = self.DEF_SLOTS_ALLOCATION_MSG
 
-    filter = {
-        'scope': program,
-        'status': 'active',
-        }
-
-    content = self._getAcceptedOrgsList(description, org_params, filter, False)
-
+    content = self._getOrgsWithProfilesList(program_entity, org_view,
+        description, False)
     contents = [content]
 
     return_url =  "http://%(host)s%(index)s" % {
       'host' : system.getHostname(),
-      'index': redirects.getSlotsRedirect(program, params)
+      'index': redirects.getSlotsRedirect(program_entity, params)
       }
 
     context = {
-        'total_slots': program.slots,
+        'total_slots': program_entity.slots,
         'uses_json': True,
         'uses_slot_allocator': True,
         'return_url': return_url,
         }
 
     return self._list(request, org_params, contents, page_name, context)
-
 
   def _editPost(self, request, entity, fields):
     """See base._editPost().

@@ -25,9 +25,11 @@ __authors__ = [
 from google.appengine.ext import db
 
 from soc.logic.models import base
-from soc.logic.models import organization as org_logic
+
+from soc.modules.gsoc.logic.models import organization as org_logic
 
 import soc.models.linkable
+
 import soc.modules.gsoc.models.student_project
 
 

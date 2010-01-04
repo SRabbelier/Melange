@@ -52,11 +52,6 @@ class Lists(object):
 
     # For iterating over all the lists
     self._lists = range(len(contents))
-    self._list_data = []
-
-    # For iterating over the rows
-    self._rows = []
-    self._row_data = []
 
   def __getattr__(self, attr):
     """Delegate field lookup to the current list if appropriate.
@@ -91,24 +86,8 @@ class Lists(object):
     self._contents = self._contents[1:]
 
     # Update internal 'iterators'
-    self._list_data = self.get('data')
-    self._rows = range(len(self._list_data))
 
     return self.get('main')
-
-  def nextRow(self):
-    """Returns the next list row for the current list.
-
-    Before calling this method, nextList should be called at least once.
-    """
-
-    # Update internal 'iterators'
-    self._row_data =  self._list_data[0]
-
-    # Advance the row data once
-    self._list_data = self._list_data[1:]
-
-    return self.get('row')
 
   def empty(self):
     """Returns true iff there are no lists
@@ -124,40 +103,3 @@ class Lists(object):
     """
 
     return self._lists
-
-  def rows(self):
-    """Returns a list of numbers the size of the amount of items.
-
-    This method can be used to iterate over all items with next for
-    the current list, without using a while loop.
-    """
-
-    return self._rows
-
-  def item(self):
-    """Returns the current row item for the current list.
-
-    Before calling this method, nextRow should be called at least once.
-    """
-
-    return self._row_data
-
-  def info(self):
-    """Returns additional info on the current row item in the current list.
-    """
-
-    if 'info' not in self._content:
-      return ""
-
-    action, args = self.get('info')
-    return action(self._row_data, args)
-
-  def redirect(self):
-    """Returns the redirect for the current row item in the current list.
-    """
-
-    if 'action' not in self._content:
-      return ""
-
-    action, args = self.get('action')
-    return action(self._row_data, args)

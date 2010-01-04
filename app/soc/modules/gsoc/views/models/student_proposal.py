@@ -42,7 +42,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
-from soc.views.models import student as student_view
 
 from soc.modules.gsoc.logic.models import mentor as mentor_logic
 from soc.modules.gsoc.logic.models import org_admin as org_admin_logic
@@ -50,6 +49,7 @@ from soc.modules.gsoc.logic.models import organization as org_logic
 from soc.modules.gsoc.logic.models import student as student_logic
 from soc.modules.gsoc.logic.models import student_proposal as \
     student_proposal_logic
+from soc.modules.gsoc.views.models import student as student_view
 from soc.modules.gsoc.views.helper import access
 
 

@@ -23,9 +23,11 @@ __authors__ = [
 
 
 from soc.logic.models import base
-from soc.logic.models import student as student_logic
+
+from soc.modules.gsoc.logic.models import student as student_logic
 
 import soc.models.linkable
+
 import soc.modules.gsoc.models.student_proposal
 
 

@@ -300,6 +300,8 @@ class View(program.View):
     """See soc.views.models.program.View.getExtraMenus().
     """
 
+    # TODO: the largest part of this method can be moved to the core Program
+
     logic = params['logic']
     rights = params['rights']
 
@@ -323,7 +325,7 @@ class View(program.View):
         # check if the current user is a host for this program
         rights.doCachedCheck('checkIsHostForProgram',
                              {'scope_path': entity.scope_path,
-                              'link_id': entity.link_id}, [])
+                              'link_id': entity.link_id}, [logic])
 
         if entity.status == 'invisible':
           # still add the document links so hosts can see how it looks like

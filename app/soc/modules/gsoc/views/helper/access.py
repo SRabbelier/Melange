@@ -160,6 +160,8 @@ class GSoCChecker(access.Checker):
                    for the given program.
     """
 
+    from soc.logic.helper import timeline as timeline_helper
+
     self.checkIsUser(django_args)
 
     if django_args.get('seed'):

@@ -8,17 +8,9 @@ directory and subdirectories to check JS code guidelines compliance.
 Requires Java installed.
 JSLINT
 
-echo "JSLINT: running jslint"
+echo "JSLINT: skipping jslint"
 
-JS_DIRECTORY="../app/soc/content/js"
-JSLINT="../thirdparty/jslint/jslint.js"
-RHINO="../thirdparty/shrinksafe/js.jar"
+exit 0
 
-for dir in $(find $JS_DIRECTORY -type d); do
-  for i in $(find $dir/*.js -type f); do
-    echo "JSLINT: Processing $i"
-    java -jar $RHINO $JSLINT $i
-  done
-done
+# TODO(dbentley): use some sort of javascript linter/compiler.
 
-echo "JSLINT: process finished"

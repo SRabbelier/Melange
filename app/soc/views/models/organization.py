@@ -187,7 +187,7 @@ class View(group.View):
 
     list_params = params.copy()
     list_params['list_action'] = (redirects.getRequestRedirectForRole,
-                                  params['mentor_role_name'])
+                                  params['mentor_url_name'])
     list_params['list_description'] = ugettext('Choose an Organization which '
         'you want to become a Mentor for.')
 

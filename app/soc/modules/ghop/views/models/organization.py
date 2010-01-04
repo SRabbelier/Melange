@@ -106,6 +106,7 @@ class View(organization.View):
                                        'task_quota_limit']
 
     new_params['mentor_role_name'] = 'ghop_mentor'
+    new_params['mentor_url_name'] = 'ghop/mentor'
 
     new_params['edit_extra_dynaproperties'] = {
         'clean': cleaning.clean_refs(new_params, ['home_link_id'])

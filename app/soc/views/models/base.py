@@ -513,7 +513,7 @@ class View(object):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type, page_name=None, params=None,
-           filter=None, order=None, prefetch=None, **kwargs):
+           filter=None, order=None, prefetch=None, visibility=None, **kwargs):
     """Displays the list page for the entity type.
 
     Args:
@@ -531,8 +531,20 @@ class View(object):
       the _list method. See the docstring for _list on how it uses it.
     """
 
-    content = helper.lists.getListContent(request, params, filter,
-                                          order=order, prefetch=prefetch)
+    get_args = request.GET
+    fmt = get_args.get('fmt')
+    idx = get_args.get('idx', '')
+
+    if fmt == 'json':
+      if not (idx.isdigit() and int(idx) == 0):
+        return responses.jsonErrorResponse(request, "idx not valid")
+
+      contents = helper.lists.getListData(request, params, filter, visibility)
+      json = simplejson.dumps(contents)
+
+      return responses.jsonResponse(request, json)
+
+    content = helper.lists.getListGenerator(request, params, idx=0)
     contents = [content]
 
     return self._list(request, params, contents, page_name)
@@ -744,19 +756,7 @@ class View(object):
     else:
       json = data
 
-    context = {'json': json}
-    template = 'soc/json.html'
-
-    response_args = {'mimetype': 'application/json'}
-    headers = {'Cache-Control': 'no-store, no-cache, must-revalidate, '
-                                'post-check=0, pre-check=0',  # HTTP/1.1, IE7
-               'Pragma': 'no-cache',  # HTTP/1.0
-               'Content-Type': 'application/json', }
-
-    response = responses.respond(request, template, context, response_args,
-                                 headers)
-
-    return response
+    return responses.jsonResponse(request, json)
 
   def csv(self, request, data, filename, params, key_order=None):
     """Returns data as a csv file.

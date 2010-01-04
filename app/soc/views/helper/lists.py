@@ -138,6 +138,129 @@ def generateLinkForRequest(request, base_params, updated_params):
   return generateLinkFromGetArgs(request, params)
 
 
+def entityToRowDict(entity, key_order, extra_cols_func,
+                    button_ops_func, row_ops_func, args):
+  """
+  """
+
+  extra_cols = extra_cols_func(entity, *args)
+  button_ops = button_ops_func(entity, *args)
+  row_ops = row_ops_func(entity, *args)
+
+  fields = set(key_order).difference(set(extra_cols))
+
+  columns = entity.toDict(list(fields))
+  columns.update(extra_cols)
+  columns['key'] = str(entity.key().id_or_name())
+
+  operations = {
+      "row": row_ops,
+      "buttons": button_ops,
+  }
+
+  result = {
+      "columns": columns,
+      "operations": operations,
+  }
+
+  return result
+
+
+def getListData(request, params, fields, visibility=None, order=[], args=[]):
+  """
+  Args:
+    args: list of arguments to be passed to extract funcs
+  """
+
+  get_args = request.GET
+
+  start = get_args.get('start', '')
+  limit = get_args.get('limit', 50)
+  limit = int(limit)
+
+  logic = params['logic']
+
+  if not visibility:
+    visibility = 'public'
+
+  if not fields:
+    fields = {}
+
+  if start:
+    start_entity = logic.getFromKeyNameOrID(start)
+
+    if not start_entity:
+      return {'data': {start: []}}
+
+    fields['__key__ >'] = start_entity.key()
+
+  entities = logic.getForFields(filter=fields, limit=limit)
+
+  key_order = ["key"] + params.get('%s_field_keys' % visibility)
+  col_names = ["Key"] + params.get('%s_field_names' % visibility)
+  row_action = params.get('%s_row_action' % visibility, {})
+  column = params.get('%s_field_extra' % visibility, lambda *args: {})
+  button = params.get('%s_button_extra' % visibility, lambda *args: {})
+  row = params.get('%s_row_extra' % visibility, lambda *args: {})
+  ignore = params.get('%s_field_ignore' % visibility, [])
+
+  for field in ignore:
+    if field not in key_order:
+      continue
+
+    pos = key_order.index(field)
+    key_order = key_order[:pos] + key_order[pos+1:]
+    col_names = col_names[:pos] + col_names[pos+1:]
+
+  # TODO(SRabbelier): remove debug code, error instead
+  if not (key_order and col_names):
+    key_order = col_names = ['kind']
+
+  col_model = [{'name': i, 'index': i, 'resizable': True} for i in key_order]
+
+  extract_args = [key_order, column, button, row, args]
+  columns = [entityToRowDict(i, *extract_args) for i in entities]
+
+  rowList = [5, 10, 20, 50, 100, 500, 1000]
+  rowNum = min(rowList) if len(columns) >= min(rowList) else len(columns)
+
+  sortorder = "asc"
+  sortname = order[0] if order else "key"
+  if sortname and sortname[0] == '-':
+    sortorder = "desc"
+    sortname = sortname[1:]
+
+  configuration = {
+      "autowidth": True,
+      "colModel": col_model,
+      "colNames": col_names,
+      "height": "auto",
+      "rowList": rowList,
+      "rowNum": max(1, rowNum),
+      "sortname": sortname,
+      "sortorder": sortorder,
+      "toolbar": [True, "top"],
+      "multiselect": False,
+  }
+
+  operations = {
+      "buttons": [],
+      "row": row_action,
+  }
+
+  data = {
+      start: columns,
+  }
+
+  contents = {'data': data}
+
+  if not start:
+    contents['configuration'] = configuration
+    contents['operations'] = operations
+
+  return contents
+
+
 def getListContent(request, params, filter=None, order=None,
                    idx=0, need_content=False, prefetch=None):
   """Returns a dict with fields used for rendering lists.
@@ -268,6 +391,25 @@ def getListContentForData(request, params, data=None, idx=0,
       'next': next,
       'pagination_form': pagination_form,
       'prev': prev,
+      }
+
+  updates = dicts.rename(params, params['list_params'])
+  content.update(updates)
+
+  return content
+
+
+def getListGenerator(request, params, idx=0):
+  """Returns a dict with fields used for rendering lists.
+
+  Args:
+    request: the Django HTTP request object
+    params: a dict with params for the View this list belongs to
+    idx: the index of this list
+  """
+
+  content = {
+      'idx': idx,
       }
 
   updates = dicts.rename(params, params['list_params'])

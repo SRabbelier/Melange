@@ -27,8 +27,10 @@ __authors__ = [
 import datetime
 
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from django import forms
+from django.utils import simplejson
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
@@ -42,6 +44,7 @@ from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import role as role_view
@@ -220,6 +223,37 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
+  def getRolesListData(self, request):
+    """Returns the list data for roles.
+    """
+
+    user = user_logic.getForCurrentAccount()
+
+    # only select the roles for the current user
+    # pylint: disable-msg=E1103
+    fields = {
+        'link_id': user.link_id,
+        'status': ['active', 'inactive']
+        }
+
+    keys = role_view.ROLE_VIEWS.keys()
+    keys.sort()
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if not 0 <= idx < len(keys):
+        return responses.jsonErrorResponse(request, "idx not valid")
+
+    idx = int(idx)
+    key = keys[idx]
+    list_params = role_view.ROLE_VIEWS[key].getParams()
+
+    contents = helper.lists.getListData(request, list_params, fields)
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def roles(self, request, access_type,
@@ -234,36 +268,23 @@ class View(base.View):
       kwargs: not used
     """
 
-    user = user_logic.getForCurrentAccount()
-
-    # only select the roles for the current user
-    # pylint: disable-msg=E1103
-    filter = {
-        'link_id': user.link_id,
-        'status': ['active', 'inactive']
-        }
+    if request.GET.get('fmt') == 'json':
+      return self.getRolesListData(request)
 
     contents = []
-
-    i = 0
-
-    for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
-      list_params = loop_view.getParams().copy()
-      list_params['list_action'] = (redirects.getEditRedirect, list_params)
-      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
-
-      list = helper.lists.getListContent(request, list_params, filter,
-                                         idx=i, need_content=True)
-
-      if list:
-        contents.append(list)
-        i += 1
 
     site = site_logic.getSingleton()
     site_name = site.site_name
 
     params = params.copy()
     params['no_lists_msg'] = self.DEF_NO_ROLES_MSG_FMT % site_name
+
+    i = 0
+    for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
+      list_params = loop_view.getParams().copy()
+      list = helper.lists.getListGenerator(request, list_params, idx=i)
+      contents.append(list)
+      i += 1
 
     return self._list(request, params, contents, page_name)
 

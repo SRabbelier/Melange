@@ -41,7 +41,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
-from soc.views.models import organization as org_view
 
 from soc.modules.gsoc.logic.models import student as student_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
@@ -51,6 +50,7 @@ from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student_project import logic as \
     project_logic
 from soc.modules.gsoc.views.helper import access
+from soc.modules.gsoc.views.models import organization as org_view
 
 
 class View(base.View):

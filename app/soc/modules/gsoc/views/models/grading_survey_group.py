@@ -41,7 +41,6 @@ from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import base
-from soc.views.models import program as program_view
 
 import soc.views.helper.forms
 
@@ -54,6 +53,7 @@ from soc.modules.gsoc.models.grading_survey_group import GradingSurveyGroup
 from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
 from soc.modules.gsoc.models.project_survey import ProjectSurvey
 from soc.modules.gsoc.views.helper import access
+from soc.modules.gsoc.views.models import program as program_view
 
 
 class View(base.View):

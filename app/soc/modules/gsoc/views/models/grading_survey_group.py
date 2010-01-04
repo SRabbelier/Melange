@@ -41,7 +41,6 @@ from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import base
-from soc.views.models import program as program_view
 
 import soc.views.helper.forms
 
@@ -54,6 +53,7 @@ from soc.modules.gsoc.models.grading_survey_group import GradingSurveyGroup
 from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
 from soc.modules.gsoc.models.project_survey import ProjectSurvey
 from soc.modules.gsoc.views.helper import access
+from soc.modules.gsoc.views.models import program as program_view
 
 
 class View(base.View):
@@ -111,7 +111,7 @@ class View(base.View):
         '%(module_package)s.%(module_name)s.view_records',
         'Overview of GradingRecords'),
         (r'^%(url_name)s/(?P<access_type>edit_record)/%(key_fields)s$',
-        '%(module_package)s.models.%(module_name)s.edit_record',
+        '%(module_package)s.%(module_name)s.edit_record',
         'Edit a GradingRecord'),
     ]
 

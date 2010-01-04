@@ -30,6 +30,8 @@ from google.appengine.ext import db
 
 from soc.views.helper import forms as forms_helper
 
+import datetime
+
 
 class ModelWithFieldAttributes(db.Model):
   """A db.Model extension that provides access to Model properties attributes.
@@ -49,6 +51,7 @@ class ModelWithFieldAttributes(db.Model):
 
   _fields_cache = None
   DICT_TYPES = (db.StringProperty, db.IntegerProperty)
+  STR_TYPES = (datetime.datetime)
 
   def toDict(self, field_names=None):
     """Returns a dict with all specified values of this entity.
@@ -73,6 +76,9 @@ class ModelWithFieldAttributes(db.Model):
 
       if callable(value):
         value = value()
+
+      if isinstance(value, self.STR_TYPES):
+        value = str(value)
 
       result[key] = value
 

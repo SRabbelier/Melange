@@ -28,6 +28,7 @@ from google.appengine.api import users
 
 from django import http
 from django.template import loader
+from django.utils import simplejson
 
 from soc.logic import accounts
 from soc.logic import system
@@ -178,6 +179,37 @@ def redirectToChangedSuffix(
                                        params=params)
   return http.HttpResponseRedirect(path)
 
+
+def jsonErrorResponse(request, msg):
+  """Returns an error response in json format.
+  """
+
+  json = simplejson.dumps({'data': [], 'error': msg})
+
+  return jsonResponse(request, json)
+
+
+def jsonResponse(request, json):
+  """Returns a response in json format.
+  """
+
+  context = {'json': json}
+  template = 'soc/json.html'
+
+  response_args = {'mimetype': 'application/json'}
+  response = respond(request, template, context, response_args)
+
+  # if the browser supports HTTP/1.1
+  # post-check and pre-check and no-store for IE7
+  response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
+                              'post-check=0, pre-check=0',  # HTTP/1.1, IE7
+
+  response['Content-Type'] = 'application/json'
+
+  # if the browser supports HTTP/1.0
+  response['Pragma'] = 'no-cache'
+
+  return response
 
 def errorResponse(error, request, template=None, context=None):
   """Creates an HTTP response from the soc.views.out_of_band.Error exception.

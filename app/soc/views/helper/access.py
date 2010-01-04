@@ -1721,4 +1721,4 @@ class Checker(object):
         time_line_keyname)
 
     fields = program_logic.getKeyFieldsFromFields(django_args)
-    self.checkIsHostForProgram(fields)
+    self.checkIsHostForProgram(fields, logic=program_logic)

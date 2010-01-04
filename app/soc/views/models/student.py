@@ -90,6 +90,9 @@ class View(role.View):
     new_params['create_template'] = 'soc/student/edit.html'
     new_params['edit_template'] = 'soc/student/edit.html'
 
+    new_params['public_field_keys'] = ["name", "link_id", "scope_path"]
+    new_params['public_field_names'] = ["Student Name", "Student ID", "Program ID"]
+
     # add apply pattern
     patterns = [(r'^%(url_name)s/(?P<access_type>apply)/%(scope)s$',
         '%(module_package)s.%(module_name)s.apply',

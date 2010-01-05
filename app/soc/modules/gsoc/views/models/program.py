@@ -23,10 +23,12 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import system
 from soc.views import helper
@@ -109,6 +111,22 @@ class View(program.View):
     new_params['url_name'] = 'gsoc/program'
 
     new_params['extra_dynaexclude'] = ['slots_allocation']
+
+    new_params['create_dynafields'] = [
+        {'name': 'org_tags',
+         'base': forms.fields.Field,
+         'widget': forms.widgets.Textarea,
+         'label': 'Upload organization tags',
+         'required': False,
+         'group': ugettext('Manage organization tags'),
+         'help_text': ugettext('Enter predefined tags to be used by '
+              'organization admins to tag their organizations. Each line '
+              'should contain only one tag')},
+        ]
+
+    new_params['create_extra_dynaproperties'] = {
+        'clean_org_tags': cleaning.str2set('org_tags', '\n')
+        }
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

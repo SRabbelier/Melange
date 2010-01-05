@@ -40,12 +40,14 @@ def cleanTagsList(field_name):
 
     tag_values = cleaning.str2set(field_name, '\n')(self)
 
-    for tag_value in tag_values:
+    for index, tag_value in enumerate(tag_values):
 
-      if not re.search('\A[a-z0-9_#+\-\.]*\Z', tag_value):
+      if not re.search('\A[a-zA-Z0-9_#+\-\.]*\Z', tag_value):
         raise forms.ValidationError(ugettext(
             ('%s is not a valid tag value. Please see help for more details.'
             % tag_value)))
+
+      tag_values[index] = tag_value.lower()
 
     return tag_values
   return wrapper

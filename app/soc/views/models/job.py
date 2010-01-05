@@ -62,6 +62,13 @@ class View(base.View):
       'task': forms.CharField(widget=widgets.PlainTextWidget()),
       }
 
+    new_params['public_field_extra'] = lambda entity: {
+        "id": entity.key().id_or_name(),
+        "priority_group": entity.priority_group.name,
+    }
+    new_params['public_field_keys'] = ["id", "task_name", "priority_group"]
+    new_params['public_field_names'] = ["ID", "Name", "Priority Group"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

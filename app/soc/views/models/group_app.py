@@ -103,6 +103,22 @@ class View(base.View):
         'clean_link_id' : cleaning.clean_link_id('link_id'),
         }
 
+    new_params['public_field_extra'] = lambda entity: {
+        'ideas': list_helper.urlize(entity.ideas),
+    }
+    new_params['public_field_keys'] = new_params['self_field_keys'] = [
+        "name", "link_id", "ideas", "status",
+    ]
+    new_params['public_field_names'] = new_params['self_field_names'] = [
+        "Name", "Link ID", "Ideas Page", "Status",
+    ]
+    new_params['self_field_extra'] = lambda entity: {
+        'ideas': list_helper.urlize(entity.ideas),
+        'status': "accepted" if entity.status == "accepted" else
+                  "rejected" if entity.status == "rejected" else
+                  "under review",
+    }
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -134,77 +150,6 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-
-  @decorators.merge_params
-  @decorators.check_access
-  def list(self, request, access_type,
-           page_name=None, params=None, filter=None, order=None, **kwargs):
-    """Lists all notifications in separate tables, depending on their status.
-
-    for parameters see base.list()
-    """
-
-    # create the selection list
-    selection = [('needs review', (redirects.getEditRedirect, params)), 
-                 ('pre-accepted', (redirects.getEditRedirect, params)),
-                 ('accepted', (redirects.getEditRedirect, params)),
-                 ('pre-rejected', (redirects.getEditRedirect, params)),
-                 ('rejected', (redirects.getEditRedirect, params)),
-                 ('ignored', (redirects.getEditRedirect, params)),]
-
-    return self._applicationListConstructor(request, params, page_name, 
-        filter=filter, selection=selection, **kwargs)
-
-
-  def _applicationListConstructor(self, request, params, page_name, filter={}, 
-                                  selection=[], **kwargs):
-    """Constructs the list containing applications for the given the arguments.
-    
-    Args:
-      filter: This is the filter used for all application
-      selection: This is a list containing tuples stating the status for an
-        application and the redirect action.
-      See base.View.public() for the rest.
-    
-    Returns:
-      HTTP Response containing the list view.
-
-    """
-
-    contents = []
-    list_params = params.copy()
-    index = 0
-
-    if not filter:
-      filter = {}
-
-    for status, action in selection:
-      # only select the requests that have been pre-accpeted
-      filter['status'] = status
-
-      name = status[0] if isinstance(status, list) else status
-
-      list_params['list_description'] = (
-          DEF_APPLICATION_LIST_DESCRIPTION_FMT % (
-          {'name_plural': params['name_plural'], 'status': name}))
-      list_params['list_action'] = action
-
-      list_content = list_helper.getListContent(
-          request, list_params, filter, idx=index)
-
-      contents += [list_content]
-
-      index += 1
-
-    # call the _list method from base to display the list
-    if kwargs.get('context'):
-      context = kwargs['context']
-    else:
-      context = {}
-
-    return self._list(request, params, contents, page_name, context=context)
-
-
   @decorators.merge_params
   @decorators.check_access
   def listSelf(self, request, access_type,
@@ -220,15 +165,8 @@ class View(base.View):
     if kwargs['scope_path']:
       filter['scope_path'] = kwargs['scope_path']
 
-    # create the selection list
-    selection = [(['needs review', 'pre-accepted', 'pre-rejected'],
-                  (redirects.getEditRedirect, params)),
-                 ('accepted', (redirects.getApplicantRedirect, 
-                    {'url_name': params['group_url_name']})),
-                 ('rejected', (redirects.getPublicRedirect, params))]
-
-    return self._applicationListConstructor(request, params, page_name,
-        filter=filter, selection=selection, **kwargs)
+    return self.list(request, access_type, page_name=page_name, params=params,
+                     filter=filter, visibility="self", **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

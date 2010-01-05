@@ -28,7 +28,6 @@ from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import system
 from soc.views import helper
@@ -42,6 +41,8 @@ from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models.host import logic as host_logic
+
+from soc.modules.gsoc.logic import cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
@@ -125,7 +126,7 @@ class View(program.View):
         ]
 
     new_params['create_extra_dynaproperties'] = {
-        'clean_org_tags': cleaning.str2set('org_tags', '\n')
+        'clean_org_tags': cleaning.cleanTagsList('org_tags')
         }
 
     params = dicts.merge(params, new_params, sub_merge=True)

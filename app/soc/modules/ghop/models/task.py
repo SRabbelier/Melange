@@ -78,6 +78,25 @@ class TaskTag(Tag):
 
     return tag
 
+  @classmethod
+  def get_or_create(cls, scope, tag_name, order=0):
+    """Get the Tag object that has the tag value given by tag_value.
+    """
+
+    tag_key_name = cls._key_name(scope.key().name(), tag_name)
+    existing_tag = cls.get_by_key_name(tag_key_name)
+    if existing_tag is None:
+      # the tag does not yet exist, so create it.
+      if not order:
+        order = cls.get_highest_order(scope=scope) + 1
+      def create_tag_txn():
+        new_tag = cls(key_name=tag_key_name, tag=tag_name,
+                      scope=scope, order=order)
+        new_tag.put()
+        return new_tag
+      existing_tag = db.run_in_transaction(create_tag_txn)
+    return existing_tag
+
 
 class TaskTypeTag(TaskTag):
   """Model for storing of task type tags.

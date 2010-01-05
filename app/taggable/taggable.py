@@ -28,7 +28,7 @@ class Tag(db.Model):
   "Each tag is scoped under some linkable model."
 
   @classmethod
-  def __key_name(cls, scope_path, tag_name):
+  def _key_name(cls, scope_path, tag_name):
     """Create the key_name from program key_name as scope_path and tag_name.
     """
 
@@ -93,25 +93,6 @@ class Tag(db.Model):
     return tags
 
   @classmethod
-  def get_or_create(cls, scope, tag_name, order=0):
-    """Get the Tag object that has the tag value given by tag_value.
-    """
-
-    tag_key_name = cls.__key_name(scope.key().name(), tag_name)
-    existing_tag = cls.get_by_key_name(tag_key_name)
-    if existing_tag is None:
-      # the tag does not yet exist, so create it.
-      if not order:
-        order = cls.get_highest_order(scope=scope) + 1
-      def create_tag_txn():
-        new_tag = cls(key_name=tag_key_name, tag=tag_name,
-                      scope=scope, order=order)
-        new_tag.put()
-        return new_tag
-      existing_tag = db.run_in_transaction(create_tag_txn)
-    return existing_tag
-
-  @classmethod
   def get_tags_by_frequency(cls, limit=1000):
     """Return a list of Tags sorted by the number of objects to which they
     have been applied, most frequently-used first. If limit is given, return
@@ -161,7 +142,7 @@ class Tag(db.Model):
     tag = cls.get_by_scope_and_name(scope, tag_name)
 
     if tag:
-      tag_key_name = cls.__key_name(scope.key().name(), new_tag_name)
+      tag_key_name = cls._key_name(scope.key().name(), new_tag_name)
       existing_tag = cls.get_by_key_name(tag_key_name)
 
       if existing_tag is None:

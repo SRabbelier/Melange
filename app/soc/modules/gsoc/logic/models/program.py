@@ -27,6 +27,7 @@ from soc.logic.models import program
 import soc.models.program
 
 from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
+from soc.modules.gsoc.models.organization import OrgTag
 
 import soc.modules.gsoc.models.program
 
@@ -71,5 +72,19 @@ class Logic(program.Logic):
         program_freezer.startProgramUnfreezing(entity)
 
     return True
+
+  def updatePredefinedOrgTags(self, entity, tag_values):
+    """
+
+    Args:
+      entity: program entity which the tags are being updated for
+      tag_values: a list of tag values that will be possibly added;
+      Only the tags which are not already used are actually added to the store. 
+    """
+
+    for tag_value in tag_values:
+      OrgTag.get_or_create(entity, tag_value)
+
+    return
 
 logic = Logic()

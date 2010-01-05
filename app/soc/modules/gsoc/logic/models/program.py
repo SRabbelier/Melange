@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -73,17 +74,44 @@ class Logic(program.Logic):
 
     return True
 
-  def updatePredefinedOrgTags(self, entity, tag_values):
+  def getPredefinedOrgTags(self, entity):
+    """Returns a list of names of all tags that has been defined
+    for a given program.
     """
+
+    return [tag.tag for tag in OrgTag.get_predefined_for_scope(entity)]
+
+  def updatePredefinedOrgTags(self, entity, new_values):
+    """Updates a list of predefined organization tags for a given program.
 
     Args:
       entity: program entity which the tags are being updated for
-      tag_values: a list of tag values that will be possibly added;
-      Only the tags which are not already used are actually added to the store. 
+      new_values: a list of tag values that will be possibly added;
+      Only the tags which are not already used are actually added to the store.
     """
 
-    for tag_value in tag_values:
-      OrgTag.get_or_create(entity, tag_value)
+    # list of tag entities which are currently marked as predefined
+    tag_entities = OrgTag.get_predefined_for_scope(entity)
+
+    # list of tag names of those predefined entities
+    tag_values = [tag.tag for tag in tag_entities]
+
+    # list of entities which are no longer to be predefined
+    to_undefine = [tag for tag in tag_entities if tag.tag not in new_values]
+
+    # list of new predefined tag names 
+    to_define = [tag for tag in new_values if tag not in tag_values]
+
+    for item in to_undefine:
+      # check if the tag is used
+      if item.tagged_count:
+        item.predefined = False
+        item.put()
+      else:        
+        OrgTag.delete_tag(entity, item.tag)
+
+    for item in to_define:
+      OrgTag.get_or_create(entity, item, predefined=True)
 
     return
 

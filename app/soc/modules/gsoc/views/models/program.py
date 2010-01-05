@@ -133,6 +133,17 @@ class View(program.View):
     super(View, self).__init__(params)
 
   @decorators.merge_params
+  def _editGet(self, request, entity, form, params=None):
+    """See base._editGet().
+    """
+
+    super(View, self)._editGet(request, entity, form)
+
+    logic = params['logic']
+    org_tags = logic.getPredefinedOrgTags(entity)
+    form.fields['org_tags'].initial = '\n'.join(org_tags)
+
+  @decorators.merge_params
   def _editPost(self, request, entity, fields, params=None):
     """See base._editPost().
     """

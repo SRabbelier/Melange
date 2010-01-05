@@ -85,6 +85,13 @@ class Tag(db.Model):
         'scope =', scope).filter('tag =', tag_name).get()
 
   @classmethod
+  def get_by_scope(cls, scope):
+    """Get a list of tag objects that has a given scope.
+    """
+
+    return db.Query(cls).filter('scope = ', scope).fetch(1000)
+
+  @classmethod
   def get_tags_for_key(cls, key, limit=1000):
     """Get the tags for the datastore object represented by key.
     """

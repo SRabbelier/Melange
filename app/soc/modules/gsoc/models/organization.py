@@ -38,8 +38,38 @@ class OrgTag(Tag):
   """Model for storing all Organization tags.
   """
 
-  pass
+  predefined = db.BooleanProperty(required=True, default=False)
 
+  @classmethod
+  def get_or_create(cls, scope, tag_name, predefined=False):
+    """Get the Tag object that has the tag value given by tag_value.
+    """
+
+    tag_key_name = cls._key_name(scope.key().name(), tag_name)
+    existing_tag = cls.get_by_key_name(tag_key_name)
+    if existing_tag is None:
+      # the tag does not yet exist, so create it.
+      def create_tag_txn():
+        new_tag = cls(key_name=tag_key_name, tag=tag_name, scope=scope,
+            predefined=predefined)
+        new_tag.put()
+        return new_tag
+      existing_tag = db.run_in_transaction(create_tag_txn)
+    else:
+      # the tag exists, but if predefined argument is True, let us make sure
+      # that its value in the store is updated
+      if predefined and not existing_tag.predefined:
+        existing_tag.predefined = True
+        existing_tag.put()
+    return existing_tag
+
+  @classmethod
+  def get_predefined_for_scope(cls, scope):
+    """Get a list of predefined tag objects that has a given scope.
+    """
+
+    return db.Query(cls).filter('scope = ', scope).filter(
+        'predefined = ', True).fetch(1000)
 
 class GSoCOrganization(Taggable, soc.models.organization.Organization):
   """GSoC Organization model extends the basic Organization model.

@@ -101,6 +101,9 @@ class View(presence.View):
 
     new_params['role_views'] = {}
 
+    new_params['public_field_keys'] = ["name", "link_id", "short_name"]
+    new_params['public_field_names'] = ["Name", "Link ID", "Short name"]
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

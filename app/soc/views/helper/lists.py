@@ -62,6 +62,7 @@ def getPreferredListPagination(user=None):
 
 OFFSET_KEY = 'offset_%d'
 LIMIT_KEY = 'limit_%d'
+URL_PATTERN = '<a href="%(url)s"%(target)s%(nofollow)s>%(url)s</a>'
 
 
 def makeOffsetKey(limit_idx):
@@ -70,6 +71,17 @@ def makeOffsetKey(limit_idx):
 
 def makeLimitKey(limit_idx):
   return LIMIT_KEY % limit_idx
+
+
+def urlize(url, target="_blank", nofollow=False):
+  """
+  """
+
+  return URL_PATTERN % {
+      'url': url,
+      'target': ' target="%s"' % target if target else '',
+      'nofollow': ' rel="nofollow"',
+  }
 
 
 def getListParameters(request, list_index):

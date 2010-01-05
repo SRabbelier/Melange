@@ -134,6 +134,11 @@ class View(base.View):
 
     new_params['record_edit_form'] = record_edit_form
 
+    new_params['public_field_keys'] = ["name", "last_update_started",
+                                       "last_update_completed"]
+    new_params['public_field_names'] = ["Name", "Last update started",
+                                        "Last update completed"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

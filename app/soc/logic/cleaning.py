@@ -843,10 +843,10 @@ def validate_access(self, view, rights, prefix, scope_path, field):
     del self.cleaned_data[field]
 
 
-def str2set(string_field):
+def str2set(string_field, separator=','):
   """Clean method for cleaning comma separated strings.
 
-  Obtains the comma separated string from the form and returns it as
+  Obtains the separated string from the form and returns it as
   a set of strings.
   """
 
@@ -858,7 +858,7 @@ def str2set(string_field):
     string_data = cleaned_data.get(string_field)
 
     list_data = []
-    for string in string_data.split(','):
+    for string in string_data.split(separator):
       string_strip = string.strip()
       if string_strip and string_strip not in list_data:
         list_data.append(string_strip)

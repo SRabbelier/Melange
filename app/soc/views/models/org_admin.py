@@ -113,6 +113,9 @@ class View(role.View):
     new_params['allow_invites'] = True
     new_params['show_in_roles_overview'] = True
 
+    new_params['public_field_keys'] = ['name', 'link_id', 'scope_path']
+    new_params['public_field_names'] = ["Admin Name", "Admin ID", "Organization ID"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

@@ -135,6 +135,22 @@ class Tag(db.Model):
     return tags
 
   @classmethod
+  def get_or_create(cls, scope, tag_name):
+    """Get the Tag object that has the tag value given by tag_value.
+    """
+
+    tag_key_name = cls._key_name(scope.key().name(), tag_name)
+    existing_tag = cls.get_by_key_name(tag_key_name)
+    if existing_tag is None:
+      # the tag does not yet exist, so create it.
+      def create_tag_txn():
+        new_tag = cls(key_name=tag_key_name, tag=tag_name, scope=scope)
+        new_tag.put()
+        return new_tag
+      existing_tag = db.run_in_transaction(create_tag_txn)
+    return existing_tag
+
+  @classmethod
   def copy_tag(cls, scope, tag_name, new_tag_name):
     """Copy a tag with a given scope and tag_name to another tag with
     new tag_name.

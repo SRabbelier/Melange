@@ -32,6 +32,9 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models.notification import logic as notification_logic
+from soc.logic.models.site import logic as site_logic
+from soc.logic.models.user import logic as user_logic
 from soc.models import notification as notification_model
 from soc.views import helper
 from soc.views.helper import access
@@ -39,8 +42,6 @@ from soc.views.helper import decorators
 from soc.views.helper import lists as list_helper
 from soc.views.helper import redirects
 from soc.views.models import base
-from soc.logic.models.notification import logic as notification_logic
-from soc.logic.models.user import logic as user_logic
 
 
 class CreateForm(helper.forms.BaseForm):
@@ -105,6 +106,15 @@ class View(base.View):
 
     new_params['list_template'] = 'soc/notification/list/notification.html'
 
+    site_name = site_logic.getSingleton().site_name
+
+    new_params['public_configuration'] = {"multiselect": True}
+    new_params['public_field_extra'] = lambda entity: {
+        "from": entity.from_user.name if entity.from_user else site_name,
+    }
+    new_params['public_field_keys'] = ["unread", "from", "subject", "created_on",]
+    new_params['public_field_names'] = ["Unread", "From", "Subject", "Received on"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
@@ -122,7 +132,7 @@ class View(base.View):
     if request.method == 'POST':
       return self.listPost(request, params, **kwargs)
     else: # request.method == 'GET'
-      return self.listGet(request, page_name, params, **kwargs)
+      return super(View, self).list(request, access_type, page_name=page_name, params=params, filter=filter, order=order, **kwargs)
 
   def listPost(self, request, params, **kwargs):
     """Handles the POST request for the list of notifications.
@@ -155,51 +165,6 @@ class View(base.View):
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
-
-  def listGet(self, request, page_name=None, params=None, **kwargs):
-    """Handles the GET request for the list of notifications.
-    """
-
-    # get the current user
-    user_entity = user_logic.getForCurrentAccount()
-
-    # only select the notifications for this user so construct a filter
-    filter = {
-        'scope': user_entity,
-        'unread': True,
-        }
-
-    # create the list parameters
-    un_params = params.copy() # unread notifications
-
-    # define the list redirect action to show the notification
-    un_params['list_action'] = (redirects.getPublicRedirect, params)
-    un_params['list_description'] = ugettext(
-        "An overview of your unread Notifications.")
-
-    # TODO(Lennard) when list sorting is implemented sort on descending date
-    un_list = list_helper.getListContent(
-        request, un_params, filter, idx=0)
-
-    # Now get the read list
-
-    # Reuse the filter, but only for read notifications
-    filter['unread'] = False
-
-    rn_params = params.copy() # read notifications
-
-    rn_params['list_action'] = (redirects.getPublicRedirect, params)
-    rn_params['list_description'] = ugettext(
-        "An overview of your read Notifications.")
-
-    rn_list = list_helper.getListContent(
-        request, rn_params, filter, idx=1)
-
-    # fill contents with all the needed lists
-    contents = [un_list, rn_list]
-
-    # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

@@ -139,6 +139,27 @@ class View(base.View):
     new_params['public_field_names'] = ["Name", "Last update started",
                                         "Last update completed"]
 
+    new_params['records_field_extra'] = lambda entity: {
+        "project_title": entity.project.title,
+        "student_name": "%s (%s)" % (entity.project.student.name,
+                                     entity.project.student.link_id),
+        "organization": entity.project.name,
+        "mentor_name": "%s (%s)" % (entity.project.mentor.name,
+                                     entity.project.mentor.link_id),
+        "final_grade": entity.grade_decision.capitalize(),
+        "mentor_grade": ("Pass" if entity.mentor_record.grade else "Fail") if
+            entity.mentor_record else "Not Available",
+        "student_eval": "Yes" if entity.student_record else "Not Available",
+    }
+    new_params['records_field_keys'] = [
+        "project_title", "student_name", "organization", "mentor_name",
+        "final_grade", "mentor_grade", "student_eval", "locked"
+    ]
+    new_params['records_field_names'] = [
+        "Project Name", "Student (link id)","Organization", "Mentor (link id)",
+        "Final Grade", "Mentor Grade", "Student Eval", "Locked"
+    ]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

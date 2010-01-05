@@ -116,7 +116,7 @@ class View(program.View):
         {'name': 'org_tags',
          'base': forms.fields.Field,
          'widget': forms.widgets.Textarea,
-         'label': 'Upload organization tags',
+         'label': 'Predefined organization tags',
          'required': False,
          'group': ugettext('Manage organization tags'),
          'help_text': ugettext('Enter predefined tags to be used by '

@@ -28,6 +28,7 @@ __authors__ = [
 
 from django import forms
 from django.utils import simplejson
+from django.utils import html
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -154,9 +155,16 @@ class View(group.View):
 
     new_params['mentor_role_name'] = 'mentor'
 
+    new_params['public_field_extra'] = lambda entity: {
+        'ideas': lists.urlize(entity.ideas),
+    }
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+    self._params['public_field_keys'] = ["name", "link_id", "short_name", "ideas"]
+    self._params['public_field_names'] = ["Name", "Link ID", "Short Name", "Ideas Page"]
 
     # create and store the special form for applicants
     updated_fields = {

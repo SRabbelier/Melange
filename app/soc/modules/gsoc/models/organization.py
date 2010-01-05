@@ -18,17 +18,30 @@
 """
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
+
 
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from taggable.taggable import Tag
+from taggable.taggable import Taggable
+from taggable.taggable import tag_property
+
 import soc.models.organization
 
 
-class GSoCOrganization(soc.models.organization.Organization):
+class OrgTag(Tag):
+  """Model for storing all Organization tags.
+  """
+
+  pass
+
+
+class GSoCOrganization(Taggable, soc.models.organization.Organization):
   """GSoC Organization model extends the basic Organization model.
   """
 
@@ -56,3 +69,16 @@ class GSoCOrganization(soc.models.organization.Organization):
       verbose_name=ugettext('Amount of mentors assigned'))
   nr_mentors.help_text = ugettext(
       'The amount of mentors assigned to a proposal by this organization.')
+
+  org_tag = tag_property('org_tag')
+
+  def __init__(self, parent=None, key_name=None, app=None, **entity_values):
+    """Constructor for GSoCOrganization Model.
+
+    Args:
+        See Google App Engine APIs.
+    """
+
+    db.Model.__init__(self, parent, key_name, app, **entity_values)
+
+    Taggable.__init__(self, org_tag=OrgTag)

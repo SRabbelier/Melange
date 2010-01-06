@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -244,8 +245,6 @@ class View(base.View):
          'label': 'Set to rank',
          'help_text':
              'Set this proposal to the given rank (ignores the given score)',
-         'example_text': 'A rank will only be assigned if the '
-            'review is private!',
          'min_value': 1,
          'required': False,
          'passthrough': ['min_value', 'required', 'help_text'],
@@ -600,7 +599,6 @@ class View(base.View):
 
     from soc.logic.helper import timeline as timeline_helper
 
-
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
@@ -624,9 +622,11 @@ class View(base.View):
                                       **kwargs)
 
     # get the roles important for reviewing an application
-    filter = {'user': user_logic.logic.getForCurrentAccount(),
+    filter = {
+        'user': user_logic.logic.getForCurrentAccount(),
         'scope': entity.org,
-        'status': 'active'}
+        'status': 'active'
+        }
 
     org_admin_entity = org_admin_logic.logic.getForFields(filter, unique=True)
     mentor_entity = mentor_logic.logic.getForFields(filter, unique=True)
@@ -656,6 +656,7 @@ class View(base.View):
         mentor: mentor entity for the current user/proposal (iff available)
         rest: see base.View.public()
     """
+
     # populate the form using the POST data
     form = form(request.POST)
 
@@ -671,7 +672,7 @@ class View(base.View):
     fields = form.cleaned_data
     is_public = fields['public']
     comment = fields['comment']
-    given_score = int(fields['score'])
+    given_score = int(fields.get('score')) if fields.get('score') else 0
 
     if org_admin:
       # org admin found, try to adjust the assigned mentor

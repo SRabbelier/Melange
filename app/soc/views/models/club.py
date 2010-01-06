@@ -104,6 +104,9 @@ class View(group.View):
     new_params['edit_extra_dynaproperties'] = {
         'clean' : (lambda x: x.cleaned_data)}
 
+    new_params['public_field_keys'] = ["name", "link_id", "short_name"]
+    new_params['public_field_names'] = ["Name", "Link ID", "Short name"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

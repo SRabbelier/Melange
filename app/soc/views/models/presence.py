@@ -88,6 +88,14 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
 
+    new_params['public_field_extra'] = lambda entity: {
+        "path": entity.scope_path + '/' + entity.link_id if
+            entity.scope_path else entity.link_id,
+        "home": entity.home.title if entity.home else "",
+    }
+    new_params['public_field_keys'] = ["path", "home"]
+    new_params['public_field_names'] = ["Path", "Home Document"]
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

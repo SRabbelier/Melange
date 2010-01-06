@@ -89,6 +89,18 @@ class View(project_survey.View):
     new_params['manage_student_project_row'] = \
         'soc/grading_project_survey/list/row_manage_student_project.html'
 
+    new_params['public_field_extra'] = lambda entity: {
+        "path": entity.scope_path + '/' + entity.link_id,
+    }
+    new_params['public_field_keys'] = [
+        "path", "title", "link_id", "is_featured", "link_id",
+        "created", "mofidied",
+    ]
+    new_params['public_field_names'] = [
+        "Path", "Title", "Link ID", "Featured",
+        "Created By", "Created On", "Modified",
+    ]
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

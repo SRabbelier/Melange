@@ -222,7 +222,7 @@ class View(base.View):
     # construct the form to be shown on the page
     # TODO(ljvderijk) Generate SurveyForm without passing along the logic
     survey_form = self._params['survey_take_form'](
-        survey_content=entity.survey_content, survey_logic=self._params['logic'])
+        survey=entity, survey_logic=self._params['logic'])
 
     survey_form.getFields()
 
@@ -507,7 +507,7 @@ class View(base.View):
 
     # get an instance of SurveyTakeForm to use
     survey_form = params['survey_take_form'](
-        survey_content=entity.survey_content,
+        survey=entity,
         survey_record=survey_record,
         survey_logic=params['logic'],
         data=post_dict)
@@ -790,7 +790,7 @@ class View(base.View):
 
     # store the read only survey form in the context
     survey_form = params['survey_record_form'](
-       survey_content=survey_entity.survey_content,
+       survey=survey_entity,
        survey_record=record_entity,
        survey_logic=self._params['logic'],
        read_only=True)

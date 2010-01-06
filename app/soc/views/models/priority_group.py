@@ -53,6 +53,9 @@ class View(base.View):
     new_params['no_create_with_scope'] = True
     new_params['no_create_with_key_fields'] = True
 
+    new_params['public_field_keys'] = ["link_id", "name", "priority"]
+    new_params['public_field_names'] = ["Link ID", "Name", "Priority"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

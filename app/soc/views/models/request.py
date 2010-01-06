@@ -87,6 +87,15 @@ class View(base.View):
     new_params['request_processing_template'] = \
         'soc/request/process_request.html'
 
+    new_params['public_field_extra'] = lambda entity: {
+        "user": "%s (%s)" % (entity.user.name, entity.user.link_id),
+        "for": entity.group.name,
+    }
+    new_params['public_field_keys'] = ["role", "user", "for",
+                                       "status", "created_on"]
+    new_params['public_field_names'] = ["Role", "User", "For",
+                                        "Status", "Created On"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

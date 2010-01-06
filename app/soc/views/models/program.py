@@ -173,6 +173,9 @@ class View(presence.View):
 
     new_params['references'] = document_references
 
+    new_params['public_field_keys'] = ["name", "scope_path"]
+    new_params['public_field_names'] = ["Program Name", "Program Owner"]
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

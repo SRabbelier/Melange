@@ -42,7 +42,7 @@ def cleanTagsList(field_name):
 
     for index, tag_value in enumerate(tag_values):
 
-      if not re.search('\A[a-zA-Z0-9_#+\-\.]*\Z', tag_value):
+      if not re.search('\A[\w#+\-\.]*\Z', tag_value):
         raise forms.ValidationError(ugettext(
             ('%s is not a valid tag value. Please see help for more details.'
             % tag_value)))

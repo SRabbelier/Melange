@@ -88,16 +88,21 @@ class SurveyTakeForm(djangoforms.ModelForm):
     """Store special kwargs as attributes.
 
     params:
-      survey_content: a SuveryContent entity.
+      survey: a Survey entity
+      survey_content: a SuveryContent entity (if no Survey is provided).
       survey_logic: instance of SurveyLogic.
-      survey_record: a SurveyRecord entity.
+      survey_record: optionally a SurveyRecord entity.
       read_only: controls whether the survey taking UI allows data entry.
       data: dictionary mapping fields to data for validation.
     """
 
     self.kwargs = kwargs
 
-    self.survey_content = self.kwargs.pop('survey_content', None)
+    self.survey = self.kwargs.pop('survey', None)
+    if self.survey:
+      self.survey_content = self.survey.survey_content
+    else:
+      self.survey_content = self.kwargs.pop('survey_content', None)
     self.survey_logic = self.kwargs.pop('survey_logic', None)
     self.survey_record = self.kwargs.pop('survey_record', None)
     # TODO: This should be removed since readonly is covered by the RecordForm

@@ -165,6 +165,13 @@ class View(base.View):
     new_params['manage_overview_row'] = \
         'soc/student_project/list/row_manage.html'
 
+    new_params['public_field_extra'] = lambda entity: {
+        "student": entity.student.name(),
+        "mentor": entity.mentor.name(),
+    }
+    new_params['public_field_keys'] = ["student", "title", "mentor", "status"]
+    new_params['public_field_names'] = ["Student", "Title", "Mentor", "Status"]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

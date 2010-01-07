@@ -25,9 +25,6 @@ __authors__ = [
 import logging
 
 from google.appengine.runtime import DeadlineExceededError
-from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
-
-from django import http
 
 from soc.views.helper import responses
 from soc.views import out_of_band

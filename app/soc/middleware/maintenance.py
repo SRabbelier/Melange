@@ -26,7 +26,6 @@ import os
 
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
-from django import http
 from django.utils.translation import ugettext
 
 from soc.views.helper import responses
@@ -89,7 +88,7 @@ class MaintenanceMiddleware(object):
 
     if isinstance(exception, CapabilityDisabledError):
       # assume the site is in maintenance if we get CDE
-      return maintenance(request)
+      return self.maintenance(request)
 
     # let the exception handling middleware handle it
     return None

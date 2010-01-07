@@ -70,7 +70,6 @@ def runSchoolTypeUpdate(request, *args, **kwargs):
   """
 
   from soc.logic.models.student import logic as student_logic
-  from soc.models.student import Student
 
   fields = {}
 

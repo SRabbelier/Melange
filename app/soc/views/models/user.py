@@ -105,9 +105,8 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
 
-    new_params['sidebar_additional'] = [
-        ('/user/list_developers' % new_params,
-         'List Developers', 'list_developers'),]
+    new_params['sidebar_developer'] = [('/%s/list_developers', 'List Developers',
+                                        'list_developers')]
 
     params = dicts.merge(params, new_params)
 

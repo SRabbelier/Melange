@@ -76,7 +76,7 @@ class View(base.View):
 
     new_params['name'] = "Request"
 
-    new_params['sidebar_defaults'] = [('/%s/list', 'List %(name_plural)s', 
+    new_params['sidebar_developer'] = [('/%s/list', 'List %(name_plural)s',
         'list')]
 
     new_params['create_template'] = ['soc/request/create.html']

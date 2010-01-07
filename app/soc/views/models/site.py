@@ -67,6 +67,8 @@ class View(presence_with_tos.View):
     new_params['document_prefix'] = 'site'
     new_params['name_short'] = "Site"
 
+    new_params['sidebar_developer'] = []
+
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']
 

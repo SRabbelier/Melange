@@ -170,8 +170,10 @@ def getSidebarMenus(id, user, params=None):
   items = getSidebarItems(params)
   submenus = getSidebarMenu(id, user, items, params)
 
+  dev = getDevMenu(params)
+
   if not submenus:
-    return
+    return [dev] if dev else None
 
   menu = {}
 
@@ -182,6 +184,6 @@ def getSidebarMenus(id, user, params=None):
   menu['items'] = submenus
   menu['group'] = params['sidebar_grouping']
 
-  menus = [menu]
+  menus = [menu, dev] if dev else [menu]
 
   return menus

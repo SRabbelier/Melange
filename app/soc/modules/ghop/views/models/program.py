@@ -131,6 +131,9 @@ class View(program.View):
          'Edit a Task Type Tag'),
         ]
 
+    new_params['public_field_keys'] = ["name", "scope_path"]
+    new_params['public_field_names'] = ["Program Name", "Program Owner"]
+
     new_params['extra_django_patterns'] = patterns
 
     params = dicts.merge(params, new_params, sub_merge=True)

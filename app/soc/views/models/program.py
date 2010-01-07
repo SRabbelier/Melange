@@ -133,6 +133,10 @@ class View(presence.View):
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
         }
 
+    params = dicts.merge(params, new_params, sub_merge=True)
+
+    new_params = {}
+
     reference_fields = [
         ('org_admin_agreement_link_id', soc.models.work.Work.link_id.help_text,
          ugettext('Organization Admin Agreement Document link ID')),
@@ -149,10 +153,10 @@ class View(presence.View):
     for key, help_text, label in reference_fields:
       result[key] = widgets.ReferenceField(
           reference_url='document', filter=['__scoped__'],
-          filter_fields={'prefix': new_params['document_prefix']},
+          filter_fields={'prefix': params['document_prefix']},
           required=False, label=label, help_text=help_text)
 
-    result['clean'] = cleaning.clean_refs(new_params,
+    result['clean'] = cleaning.clean_refs(params,
                                           [i for i,_,_ in reference_fields])
 
     new_params['edit_extra_dynaproperties'] = result

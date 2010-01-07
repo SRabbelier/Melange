@@ -32,7 +32,6 @@ from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import student as student_logic
 from soc.views.helper import access
-from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import redirects
 from soc.views.helper import responses

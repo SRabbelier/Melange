@@ -36,8 +36,9 @@ from soc.views.models import organization
 
 import soc.cache.logic
 
-from soc.modules.ghop.logic.models import organization as ghop_org_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
+from soc.modules.ghop.logic.models import organization as ghop_org_logic
+from soc.modules.ghop.logic.models import task as ghop_task_logic
 from soc.modules.ghop.views.helper import access as ghop_access
 from soc.modules.ghop.views.models import program as ghop_program_view
 from soc.modules.ghop.views.helper import redirects as ghop_redirects
@@ -111,6 +112,31 @@ class View(organization.View):
     new_params['edit_extra_dynaproperties'] = {
         'clean': cleaning.clean_refs(new_params, ['home_link_id'])
         }
+
+    new_params['public_field_extra'] = lambda entity: {
+        "open_tasks": str(len(ghop_task_logic.logic.getForFields({
+            'scope': entity,
+            'status': ['Open', 'Reopened']
+        }))),
+        "claimed_tasks": str(len(ghop_task_logic.logic.getForFields({
+            'scope': entity,
+            'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                       'NeedsReview', 'NeedsWork'],
+        }))),
+        "closed_tasks": str(len(ghop_task_logic.logic.getForFields({
+            'scope': entity,
+            'status': ['AwaitingRegistration', 'Closed'],
+        }))),
+        "home_page": lists.urlize(entity.home_page),
+    }
+    new_params['public_field_keys'] = [
+        "name", "task_quota_limit", "open_tasks",
+        "claimed_tasks", "closed_tasks", "home_page",
+    ]
+    new_params['public_field_names'] = [
+        "Name", "Tasks Quota", "Open Tasks",
+        "Claimed Tasks", "Closed Tasks", "Home Page",
+    ]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

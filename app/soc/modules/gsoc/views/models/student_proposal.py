@@ -940,6 +940,7 @@ class View(base.View):
         # we already have something on file for this reviewer
         old_total_score = reviewer_summary['total_score']
         reviewer_summary['total_score'] = old_total_score + private_review.score
+        reviewer_summary['individual_scores'].append(private_review.score)
 
         old_total_comments = reviewer_summary['total_comments']
         reviewer_summary['total_comments'] = old_total_comments + 1
@@ -947,9 +948,24 @@ class View(base.View):
         review_summary[reviewer_key] = {
             'name': reviewer.name,
             'total_comments': 1,
-            'total_score': private_review.score}
+            'total_score': private_review.score,
+            'individual_scores': [private_review.score]
+            }
 
     context['review_summary'] = review_summary
+
+    # fill a score summary
+    score_summary = []
+    max_score = max([summary['total_score'] \
+                    for summary in review_summary.itervalues()])
+    min_score = min([summary['total_score'] \
+                    for summary in review_summary.itervalues()])
+    for score in xrange(min_score, max_score + 1):
+      number = len([summary for summary in review_summary.itervalues() \
+          if summary['total_score'] == score])
+      if number:
+        score_summary.append({'score': score, 'number': number})
+    context['score_summary'] = score_summary
 
     # which button should we show to the mentor?
     if mentor:

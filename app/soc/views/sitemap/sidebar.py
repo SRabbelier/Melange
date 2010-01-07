@@ -29,6 +29,23 @@ SIDEBAR_ACCESS_ARGS = ['SIDEBAR_CALLING']
 SIDEBAR_ACCESS_KWARGS = {'SIDEBAR_CALLING': True}
 
 
+def getItemsFromDefaults(defaults, params):
+  """Converts defaults to specific items for this view.
+
+  Args:
+    defaults: the defaults to instantiate
+    params: a dict with params for this View
+  """
+
+  result = []
+
+  for url, menu_text, access_type in defaults:
+    url = url % params['url_name'].lower()
+    item = (url, menu_text % params, access_type)
+    result.append(item)
+
+  return result
+
 
 def getSidebarItems(params):
   """Retrieves a list of sidebar entries for this view.
@@ -65,10 +82,7 @@ def getSidebarItems(params):
   for item in params['sidebar_additional']:
     result.append(item)
 
-  for url, menu_text, access_type in defaults:
-    url = url % params['url_name'].lower()
-    item = (url, menu_text % params, access_type)
-    result.append(item)
+  result += getItemsFromDefaults(defaults, params)
 
   return result
 

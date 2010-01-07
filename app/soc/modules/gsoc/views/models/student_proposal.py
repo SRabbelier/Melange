@@ -153,6 +153,17 @@ class View(base.View):
     new_params['review_after_deadline_template'] = \
         'soc/student_proposal/review_after_deadline.html'
 
+    new_params['public_field_extra'] = lambda entity: {
+        "student": entity.scope.name(),
+        "organization_name": entity.org.name,
+    }
+    new_params['public_field_keys'] = [
+        "title", "student", "organization_name", "last_modified_on",
+    ]
+    new_params['public_field_names'] = [
+        "Title", "Student", "Organization Name", "Last Modified On",
+    ]
+
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)

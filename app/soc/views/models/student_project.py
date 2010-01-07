@@ -26,7 +26,8 @@ from soc.logic import dicts
 from soc.views.helper import responses
 from soc.views.models import base
 
-from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
+from soc.modules.gsoc.logic.models.student_project import logic as \
+    student_project_logic
 
 class View(base.View):
   """View methods for the Student Project model.
@@ -55,7 +56,8 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>st_edit)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.st_edit',
         'Edit my %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>withdraw)/(?P<scope_path>%(ulnp)s)/%(lnp)s$',
+        (r'^%(url_name)s/(?P<access_type>withdraw)/'
+          '(?P<scope_path>%(ulnp)s)/%(lnp)s$',
         'soc.views.models.%(module_name)s.withdraw',
         'Withdraw %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>withdraw_project)/%(key_fields)s$',

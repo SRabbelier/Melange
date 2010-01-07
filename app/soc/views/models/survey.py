@@ -609,8 +609,8 @@ class View(base.View):
     self._takePost(request, params, entity, record, properties)
 
     # update the record entity if any and clear all dynamic properties
-    record_logic.updateOrCreateFromFields(record, properties,
-                                          clear_dynamic=True)
+    record = record_logic.updateOrCreateFromFields(record, properties,
+                                                   clear_dynamic=True)
 
     # TODO: add notice to page that the response has been saved successfully
     # get the path to redirect the user to

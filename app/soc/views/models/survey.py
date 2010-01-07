@@ -613,8 +613,9 @@ class View(base.View):
                                           clear_dynamic=True)
 
     # TODO: add notice to page that the response has been saved successfully
-    # redirect to the same page for now
-    redirect = request.path
+    # get the path to redirect the user to
+    redirect = self._getRedirectOnSuccessfulTake(request, params, entity,
+                                                 record)
     return http.HttpResponseRedirect(redirect)
 
   def _takePost(self, request, params, entity, record, properties):
@@ -661,6 +662,18 @@ class View(base.View):
     # update the context with the help_text and status
     context_update = dict(status=status, help_text=help_text)
     context.update(context_update)
+
+  def _getRedirectOnSuccessfulTake(self, request, params, survey, record):
+    """Returns a path to which the user should be redirected after successfully
+    taking a Survey.
+
+    Args:
+      request: current HTTPRequest
+      params: the params of the View
+      survey: Survey entity that was succesfully taken
+      record: SurveyRecord entity that has been stored/updated
+    """
+    return request.path
 
   @decorators.merge_params
   @decorators.check_access

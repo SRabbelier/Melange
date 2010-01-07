@@ -34,7 +34,6 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import accounts
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import mentor as mentor_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
 from soc.logic.models import org_app as org_app_logic
@@ -247,7 +246,8 @@ class View(group.View):
 
     from soc.modules.gsoc.logic.models.student_project import logic as \
         student_project_logic
-    from soc.modules.gsoc.views.models import student_project as student_project_view
+    from soc.modules.gsoc.views.models import student_project as \
+        student_project_view
 
     sp_params = student_project_view.view.getParams().copy()
 
@@ -320,7 +320,8 @@ class View(group.View):
     """See base.View._public().
     """
     # TODO: This needs to be moved to the GSoC module
-    from soc.modules.gsoc.views.models import student_project as student_project_view
+    from soc.modules.gsoc.views.models import student_project as \
+        student_project_view
 
     program_entity = entity.scope
 
@@ -331,7 +332,7 @@ class View(group.View):
 
       # define the list redirect action to show the notification
       ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
-      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT %(
+      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
           entity.name)
       ap_params['list_heading'] = 'soc/student_project/list/heading.html'
       ap_params['list_row'] = 'soc/student_project/list/row.html'

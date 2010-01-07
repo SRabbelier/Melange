@@ -135,6 +135,26 @@ def getSidebarMenu(id, user, items, params):
 
   return submenus
 
+def getDevMenu(params):
+  """Returns the developer menu entries for this view.
+
+  Args:
+    params: a dict with params for this View
+  """
+
+  dev_items = params['sidebar_developer']
+  items = getItemsFromDefaults(dev_items, params)
+
+  if not items:
+    return
+
+  dev = {}
+  dev['heading'] = ""
+  dev['items'] = [dict(url=u, title=t) for u, t, _ in items]
+  dev['group'] = "Developer"
+
+  return dev
+
 
 def getSidebarMenus(id, user, params=None):
   """Constructs the default sidebar menu for a View.

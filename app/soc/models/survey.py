@@ -80,7 +80,7 @@ class SurveyContent(ExpandoBase):
     """
     properties = []
     survey_order = self.getSurveyOrder().items()
-    for position,key in survey_order:
+    for position, key in survey_order:
       properties.insert(position, key)
     return properties
 

@@ -112,7 +112,8 @@ class View(base.View):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type,
-            page_name=None, params=None, filter=None, order=None, **kwargs):
+           page_name=None, params=None, filter=None, 
+           order=None, prefetch=None, **kwargs):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()
@@ -243,7 +244,7 @@ class View(base.View):
 
     context['entity_type_url'] = self._params['url_name']
     context['entity_suffix'] = entity.key().id_or_name() if entity else None
-    context['page_name'] = 'Notification - %s' %(entity.subject)
+    context['page_name'] = 'Notification - %s' % (entity.subject)
 
     return True
 

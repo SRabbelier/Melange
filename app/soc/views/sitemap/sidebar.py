@@ -29,6 +29,23 @@ SIDEBAR_ACCESS_ARGS = ['SIDEBAR_CALLING']
 SIDEBAR_ACCESS_KWARGS = {'SIDEBAR_CALLING': True}
 
 
+def getItemsFromDefaults(defaults, params):
+  """Converts defaults to specific items for this view.
+
+  Args:
+    defaults: the defaults to instantiate
+    params: a dict with params for this View
+  """
+
+  result = []
+
+  for url, menu_text, access_type in defaults:
+    url = url % params['url_name'].lower()
+    item = (url, menu_text % params, access_type)
+    result.append(item)
+
+  return result
+
 
 def getSidebarItems(params):
   """Retrieves a list of sidebar entries for this view.
@@ -65,10 +82,7 @@ def getSidebarItems(params):
   for item in params['sidebar_additional']:
     result.append(item)
 
-  for url, menu_text, access_type in defaults:
-    url = url % params['url_name'].lower()
-    item = (url, menu_text % params, access_type)
-    result.append(item)
+  result += getItemsFromDefaults(defaults, params)
 
   return result
 
@@ -121,6 +135,26 @@ def getSidebarMenu(id, user, items, params):
 
   return submenus
 
+def getDevMenu(params):
+  """Returns the developer menu entries for this view.
+
+  Args:
+    params: a dict with params for this View
+  """
+
+  dev_items = params['sidebar_developer']
+  items = getItemsFromDefaults(dev_items, params)
+
+  if not items:
+    return
+
+  dev = {}
+  dev['heading'] = ""
+  dev['items'] = [dict(url=u, title=t) for u, t, _ in items]
+  dev['group'] = "Developer"
+
+  return dev
+
 
 def getSidebarMenus(id, user, params=None):
   """Constructs the default sidebar menu for a View.
@@ -136,8 +170,10 @@ def getSidebarMenus(id, user, params=None):
   items = getSidebarItems(params)
   submenus = getSidebarMenu(id, user, items, params)
 
+  dev = getDevMenu(params)
+
   if not submenus:
-    return
+    return [dev] if dev else None
 
   menu = {}
 
@@ -148,6 +184,6 @@ def getSidebarMenus(id, user, params=None):
   menu['items'] = submenus
   menu['group'] = params['sidebar_grouping']
 
-  menus = [menu]
+  menus = [menu, dev] if dev else [menu]
 
   return menus

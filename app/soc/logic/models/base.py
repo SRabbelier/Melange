@@ -246,6 +246,20 @@ class Logic(object):
 
     return self._model.get_by_id(id, parent=parent)
 
+  def getFromKeyNameOrID(self, key_or_id, parent=None):
+    """Return entity for key_name_or_id or None if not found.
+
+    Args:
+      key_or_id: key name or id of entity
+      parent: parent of the entity
+    """
+
+    if self._id_based:
+      id = int(str(key_or_id))
+      return self.getFromID(id, parent=parent)
+
+    return self.getFromKeyName(key_or_id, parent=parent)
+
   def getFromKeyNameOr404(self, key_name):
     """Like getFromKeyName but expects to find an entity.
 

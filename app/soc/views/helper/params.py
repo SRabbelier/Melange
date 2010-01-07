@@ -141,7 +141,9 @@ def constructParams(params):
 
   new_params['sidebar'] = None
   new_params['sidebar_grouping'] = 'main'
-  new_params['sidebar_defaults'] = [
+  new_params['sidebar_defaults'] = []
+  new_params['sidebar_developer'] = [
+      # TODO(SRabbelier): remove create once new list code is in
       ('/%s/create', 'New %(name)s', 'create'),
       ('/%s/list', 'List %(name_plural)s', 'list'),
       ]

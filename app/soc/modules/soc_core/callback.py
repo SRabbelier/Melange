@@ -116,14 +116,16 @@ class Callback(object):
       self.core.registerSidebarEntry(club_member.view.getSidebarMenus)
       self.core.registerSidebarEntry(club_app.view.getSidebarMenus)
 
-    self.core.registerSidebarEntry(user_self.view.getSidebarMenus)
-    self.core.registerSidebarEntry(site.view.getSidebarMenus)
-    self.core.registerSidebarEntry(user.view.getSidebarMenus)
-    self.core.registerSidebarEntry(sponsor.view.getSidebarMenus)
-    self.core.registerSidebarEntry(sponsor.view.getExtraMenus)
     self.core.registerSidebarEntry(host.view.getSidebarMenus)
-    self.core.registerSidebarEntry(request.view.getSidebarMenus)
+    self.core.registerSidebarEntry(job.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_app.view.getSidebarMenus)
+    self.core.registerSidebarEntry(priority_group.view.getSidebarMenus)
+    self.core.registerSidebarEntry(request.view.getSidebarMenus)
+    self.core.registerSidebarEntry(site.view.getSidebarMenus)
+    self.core.registerSidebarEntry(sponsor.view.getExtraMenus)
+    self.core.registerSidebarEntry(sponsor.view.getSidebarMenus)
+    self.core.registerSidebarEntry(user_self.view.getSidebarMenus)
+    self.core.registerSidebarEntry(user.view.getSidebarMenus)
 
   def registerRights(self):
     """Called by the server when the document rights should be registered.

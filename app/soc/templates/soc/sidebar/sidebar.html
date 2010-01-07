@@ -11,7 +11,13 @@
 
 {% for grouped_item in grouped_items %}
   {% ifnotequal grouped_item.grouper 'main' %}
-  <li class="expandable">
+
+{% ifequal grouped_item.grouper 'Developer'%}
+	<li class="expandable-collapsed">
+{% else %}
+    <li class="expandable">
+{% endifequal %}
+
     <span>{{ grouped_item.grouper }}</span>
     <ul>
       {% for subitem in grouped_item.list %}

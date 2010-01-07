@@ -67,6 +67,8 @@ class View(presence_with_tos.View):
     new_params['document_prefix'] = 'site'
     new_params['name_short'] = "Site"
 
+    new_params['sidebar_developer'] = []
+
     new_params['sidebar_defaults'] = [('/%s/edit', 'Edit %(name)s', 'edit')]
     new_params['sidebar_heading'] = new_params['name_short']
 
@@ -142,8 +144,6 @@ class View(presence_with_tos.View):
 
       submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
           "List Documents", 'any_access')]
-    submenus += [('/priority_group/list', "List Priority Groups", 'edit')]
-    submenus += [('/job/list', "List Jobs", 'edit')]
 
     new_params = {}
     new_params['sidebar_additional'] = submenus

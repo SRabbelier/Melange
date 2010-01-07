@@ -3,10 +3,16 @@
 {% else %}
     <li class="expandable">
 {% endif %}
+{% if subitem.heading %}
       <span>{{ subitem.heading }}</span>
       <ul>
 {% for item in subitem.items %}
 {% include 'soc/sidebar/menuitem.html' %}
 {% endfor %}
       </ul>
+{% else %}
+{% for item in subitem.items %}
+{% include 'soc/sidebar/menuitem.html' %}
+{% endfor %}
+{% endif %}
     </li>

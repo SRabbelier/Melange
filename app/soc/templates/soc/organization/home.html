@@ -16,7 +16,6 @@ limitations under the License.
 {% block scripts %}
 {{ block.super }}
 {% if gmaps_api_key %}
-	<script src="http://www.google.com/jsapi?key={{ gmaps_api_key }}" type="text/javascript"></script>
 	<script type="text/javascript" src="/soc/content/js/templates/soc/organization/home-091027.js" melangeContext="{map_data: {{ org_map_data }} }"></script>
 {% endif %}
 {% endblock %}

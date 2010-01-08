@@ -42,9 +42,6 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 
-from soc.logic import dicts
-from soc.logic.lists import Lists
-
 from soc.models.survey import COMMENT_PREFIX
 from soc.models.survey import SurveyContent
 
@@ -128,8 +125,8 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
     # update with fields from subclasses
     if hasattr(self, 'data') and self.data:
-        clean_data.update(self.data)
-        delattr(self, 'data')
+      clean_data.update(self.data)
+      delattr(self, 'data')
 
     # pass data, so form is bound
     if data:
@@ -280,7 +277,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     survey_order = self.survey_content.getSurveyOrder()
 
     # first, insert dynamic survey fields
-    for position, property in sorted(survey_order.items()):
+    for _, property in sorted(survey_order.items()):
       fields.insert(len(fields) + 1, property, self.survey_fields[property])
 
       # add comment if field has one and this isn't an edit view
@@ -401,7 +398,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
       # pass value as 'initial' so MultipleChoiceField renders checked boxes
       value = value.split(',')
 
-    these_choices = [(v,v) for v in getattr(self.survey_content, field)]
+    these_choices = [(v, v) for v in getattr(self.survey_content, field)]
     if not tip:
       tip = 'Please select one or more of these choices.'
 
@@ -433,7 +430,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
     else:
       value = None
 
-    these_choices = [(v,v) for v in getattr(self.survey_content, field)]
+    these_choices = [(v, v) for v in getattr(self.survey_content, field)]
     if not tip:
       tip = 'Please select one of these choices.'
 
@@ -1028,7 +1025,7 @@ def getCSVHeader(survey_entity):
 
   # add static properties
   fields = ['# Melange Survey export for \n#  %s\n#\n' % survey_entity.title]
-  fields += [tpl % (k,v) for k,v in survey_entity.toDict().items()]
+  fields += [tpl % (k, v) for k, v in survey_entity.toDict().items()]
   fields += [tpl % (f, str(getattr(survey_entity, f))) for f in PLAIN.split()]
   fields += [tpl % (f, str(getattr(survey_entity, f).link_id))
              for f in FIELDS.split()]
@@ -1039,7 +1036,7 @@ def getCSVHeader(survey_entity):
   dynamic = survey_entity.survey_content.dynamic_properties()
   dynamic = [(prop, getattr(survey_entity.survey_content, prop))
              for prop in dynamic]
-  fields += [tpl % (k,v) for k,v in sorted(dynamic)]
+  fields += [tpl % (k, v) for k, v in sorted(dynamic)]
 
   # add schema
   fields += ['#\n#---\n#\n']
@@ -1086,7 +1083,7 @@ def toCSV(survey_view):
     record_query = record_logic.getQueryForFields(fields)
 
     try:
-      first = record_query.run().next()
+      _ = record_query.run().next()
     except StopIteration:
       # bail out early if survey_records.run() is empty
       return header, survey.link_id

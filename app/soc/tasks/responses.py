@@ -21,7 +21,7 @@ __authors__ = [
   '"Daniel Hans" <daniel.m.hans@gmail.com>',
   ]
 
-import logging
+
 from django import http
 
 # TODO(labs): fix when taskqueue graduates from labs

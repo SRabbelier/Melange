@@ -116,7 +116,8 @@ class View(base.View):
     super(View, self).__init__(params=params)
 
   def list(self, request, access_type,
-           page_name=None, params=None, filter=None, order=None, **kwargs):
+           page_name=None, params=None, filter=None, 
+           order=None, prefetch=None, **kwargs):
     """See base.View.list.
     """
 
@@ -159,8 +160,8 @@ class View(base.View):
     For args see base.View._edit().
     """
 
-    context['page_name'] = "%s titled '%s'" %(context['page_name'],
-                                              entity.title)
+    context['page_name'] = "%s titled '%s'" % (context['page_name'],
+                                               entity.title)
 
     return super(View, self)._edit(request, entity, context, params)
 

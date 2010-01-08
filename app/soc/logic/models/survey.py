@@ -24,24 +24,14 @@ __authors__ = [
   ]
 
 
-import logging
-
 from google.appengine.ext import db
 
-from soc.cache import sidebar
 from soc.logic.models import linkable as linkable_logic
 from soc.logic.models import survey_record as survey_record_logic
-from soc.logic.models.user import logic as user_logic
 from soc.logic.models import work
-from soc.models.program import Program
-
-from soc.models.survey_record import SurveyRecord
 from soc.models.survey import Survey
 from soc.models.survey import SurveyContent
 from soc.models.work import Work
-
-from soc.modules.gsoc.models.grading_project_survey import GradingProjectSurvey
-from soc.modules.gsoc.models.project_survey import ProjectSurvey
 
 
 class Logic(work.Logic):
@@ -120,14 +110,15 @@ class Logic(work.Logic):
     if 'mentor' in survey.taking_access:
       from soc.models.mentor import Mentor
       role = Mentor.get_by_key_name(
-      this_program.key().name() + "/org_1/test")
+          this_program.key().name() + "/org_1/test")
 
     if 'student' in survey.taking_access:
       from soc.models.student import Student
       role = Student.get_by_key_name(
-      this_program.key().name() + "/test")
+          this_program.key().name() + "/test")
 
-    if role: return role.user
+    if role: 
+      return role.user
 
   def getKeyValuesFromEntity(self, entity):
     """See base.Logic.getKeyNameValues.
@@ -175,7 +166,8 @@ class Logic(work.Logic):
 
     if not scope_type:
       # no matching scope type found
-      raise AttributeError('No Matching Scope type found for %s' % entity.prefix)
+      raise AttributeError('No Matching Scope type found for %s' \
+          % entity.prefix)
 
     # set the scope and update the entity
     entity.scope = scope_type.get_by_key_name(entity.scope_path)

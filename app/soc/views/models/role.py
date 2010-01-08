@@ -271,7 +271,8 @@ class View(base.View):
     else:
       # redirect to the requests list
       return http.HttpResponseRedirect(
-          redirects.getListRequestsRedirect(group_entity, group_view.getParams()))
+          redirects.getListRequestsRedirect(group_entity, 
+                                            group_view.getParams()))
 
   @decorators.merge_params
   @decorators.check_access
@@ -328,7 +329,8 @@ class View(base.View):
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=params)
 
-  def acceptInvitePost(self, request, context, params, request_entity, **kwargs):
+  def acceptInvitePost(self, request, context, params, 
+                       request_entity, **kwargs):
     """Handles the POST request concerning the creation of a Role via an
     invite.
 
@@ -367,7 +369,7 @@ class View(base.View):
     key_name = self._logic.getKeyNameFromFields(fields)
 
     # create new Role entity
-    entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+    _ = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     # mark the request as completed
     request_fields = {'status': 'completed'}
@@ -564,7 +566,7 @@ class View(base.View):
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
 
-    context['page_name'] = '%s from %s to become a %s' %(
+    context['page_name'] = '%s from %s to become a %s' % (
         page_name, request_entity.user.name, params['name'])
 
     get_dict = request.GET

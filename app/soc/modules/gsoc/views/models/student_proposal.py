@@ -239,37 +239,6 @@ class View(base.View):
         dynaexclude=None, dynaproperties=dynaproperties)
     self._params['mentor_review_form'] = mentor_review_form
 
-    dynafields = [
-      {'name': 'rank',
-         'base': forms.IntegerField,
-         'label': 'Set to rank',
-         'help_text':
-             'Set this proposal to the given rank (ignores the given score)',
-         'min_value': 1,
-         'required': False,
-         'passthrough': ['min_value', 'required', 'help_text'],
-      },
-      {'name': 'mentor',
-       'base': widgets.ReferenceField,
-       'passthrough': ['reference_url', 'required', 'label', 'filter'],
-       'reference_url': 'mentor',
-       'filter': ['__org__'],
-       'label': 'Assign Mentor (Link ID)',
-       'required': False,
-       'help_text': 'Fill in the Link ID of the Mentor '
-           'you would like to assign to this Proposal. '
-           'Leave this box empty if you don\'t want any mentor assigned.',
-      },
-      ]
-
-    dynaproperties = params_helper.getDynaFields(dynafields)
-    dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
-
-    admin_review_form = dynaform.extendDynaForm(dynaform=mentor_review_form, 
-        dynaproperties=dynaproperties)
-
-    self._params['admin_review_form'] = admin_review_form
-
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
@@ -633,7 +602,72 @@ class View(base.View):
 
     # decide which form to use
     if org_admin_entity:
-      form = params['admin_review_form']
+      # create a form for admin review
+      # it is done here, because of the dynamic choices list for the mentors
+
+      # firstly, get the list of all possible mentors to assign
+      choices = []
+      choices.append(('', 'No mentor'))
+
+      # prefer those mentors who volunteer to mentor this proposal 
+      filter = {
+          '__key__': entity.possible_mentors
+          }
+      order = ['name_on_documents']
+      possible_mentors = mentor_logic.logic.getForFields(filter, order=order)
+      for mentor in possible_mentors:
+        choices.append((mentor.link_id, mentor.document_name()))
+
+      # also list the rest of the mentors
+      filter = {
+          'scope': entity.org
+          }
+      all_mentors = mentor_logic.logic.getForFields(filter, order=order)
+      for mentor in all_mentors:
+        if mentor.key() in entity.possible_mentors:
+          continue
+        choices.append((mentor.link_id, mentor.document_name()))
+
+      if entity.mentor:
+        initial = entity.mentor.link_id
+      else:
+        initial = '' 
+
+      dynafields = [
+        {'name': 'rank',
+           'base': forms.IntegerField,
+           'label': 'Set to rank',
+           'help_text':
+               'Set this proposal to the given rank (ignores the given score)',
+           'min_value': 1,
+           'required': False,
+           'passthrough': ['min_value', 'required', 'help_text'],
+        },
+        {'name': 'mentor',
+         'base': forms.ChoiceField,
+         'passthrough': ['initial', 'required', 'choices'],
+         'label': 'Assign Mentor',
+         'choices': choices,
+         'initial': initial,
+         'required': False,
+         'help_text': 'Choose the mentor you would like to assign to this '
+             'Proposal. Choose "No mentor" if you don\'t want any '
+             'mentor assigned.'
+         },
+        {'name': 'org_admin_action',
+         'base': forms.fields.CharField,
+         'widget': forms.HiddenInput,
+         'required': False,
+         }
+        ]
+      
+      dynaproperties = params_helper.getDynaFields(dynafields)
+      dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
+  
+      form = dynaform.extendDynaForm(
+          dynaform=params['mentor_review_form'], 
+          dynaproperties=dynaproperties)
+
     else:
       form = params['mentor_review_form']
 
@@ -670,11 +704,8 @@ class View(base.View):
           form=form, params=params, template=params['review_template'])
 
     fields = form.cleaned_data
-    is_public = fields['public']
-    comment = fields['comment']
-    given_score = int(fields.get('score')) if fields.get('score') else 0
 
-    if org_admin:
+    if org_admin and 'org_admin_action' in fields.keys():
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
 
@@ -692,6 +723,13 @@ class View(base.View):
         # calculate the score that should be given to end up at the given rank
         # give +1 to make sure that in the case of a tie they end up top
         given_score = score_at_rank - entity.score + 1
+
+      # redirect to the same page
+      return http.HttpResponseRedirect('')
+
+    is_public = fields['public']
+    comment = fields['comment']
+    given_score = int(fields.get('score')) if fields.get('score') else 0
 
     # store the properties to update the proposal with
     properties = {}
@@ -805,10 +843,6 @@ class View(base.View):
 
     # set the initial score since the default is ignored
     initial = {'score': 0}
-
-    if org_admin and entity.mentor:
-      # set the mentor field to the current mentor
-      initial['mentor'] = entity.mentor.link_id
 
     context['form'] = form(initial)
 

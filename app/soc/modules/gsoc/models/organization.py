@@ -64,19 +64,13 @@ class OrgTag(Tag):
     return existing_tag
 
   @classmethod
-  def get_by_scope(cls, scope):
-    """Get the list of tag objects that has the given scope.
-    """
-
-    return db.Query(cls).filter('scope =', scope).fetch(1000)
-
-  @classmethod
   def get_predefined_for_scope(cls, scope):
     """Get a list of predefined tag objects that has a given scope.
     """
 
     return db.Query(cls).filter('scope = ', scope).filter(
         'predefined = ', True).fetch(1000)
+
 
 class GSoCOrganization(Taggable, soc.models.organization.Organization):
   """GSoC Organization model extends the basic Organization model.

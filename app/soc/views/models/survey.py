@@ -198,6 +198,19 @@ class View(base.View):
     new_params['survey_take_form'] = surveys.SurveyTakeForm
     new_params['survey_record_form'] = surveys.SurveyRecordForm
 
+    new_params['public_field_extra'] = lambda entity: {
+        "path": entity.scope_path + '/' + entity.link_id,
+        "created_by": entity.author.link_id,
+    }
+    new_params['public_field_keys'] = [
+        "path", "title", "link_id","is_featured",
+        "created_by", "created", "modified"
+    ]
+    new_params['public_field_names'] = [
+        "Path", "Title", "Link ID", "Featured",
+        "Created By", "Created On", "Modified",
+    ]
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

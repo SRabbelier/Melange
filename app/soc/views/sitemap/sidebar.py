@@ -135,12 +135,17 @@ def getSidebarMenu(id, user, items, params):
 
   return submenus
 
-def getDevMenu(params):
+def getDevMenu(id, user, params):
   """Returns the developer menu entries for this view.
 
   Args:
     params: a dict with params for this View
   """
+
+  from soc.logic.models.user import logic as user_logic
+
+  if not user_logic.isDeveloper(account=id, user=user):
+    return
 
   dev_items = params['sidebar_developer']
   items = getItemsFromDefaults(dev_items, params)
@@ -170,7 +175,7 @@ def getSidebarMenus(id, user, params=None):
   items = getSidebarItems(params)
   submenus = getSidebarMenu(id, user, items, params)
 
-  dev = getDevMenu(params)
+  dev = getDevMenu(id, user, params)
 
   if not submenus:
     return [dev] if dev else None

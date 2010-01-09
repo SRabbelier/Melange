@@ -38,7 +38,6 @@ from soc.views.models import program
 from soc.views.sitemap import sidebar
 
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import organization as org_logic
 from soc.logic.models.host import logic as host_logic
 
@@ -258,29 +257,43 @@ class View(program.View):
     """Returns a list with time dependent menu items.
     """
 
+    from soc.logic.models.org_app_survey import logic as org_app_logic
+
     items = []
 
-    #TODO(ljvderijk) Add more timeline dependent entries
     timeline_entity = program_entity.timeline
 
-    if timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+    org_app_survey = org_app_logic.getForProgram(program_entity)
+
+    if org_app_survey and \
+        timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
       # add the organization signup link
       items += [
-          (redirects.getApplyRedirect(program_entity, {'url_name': 'org_app'}),
+          (redirects.getTakeSurveyRedirect(
+               org_app_survey, {'url_name': 'gsoc/org_app'}),
           "Apply to become an Organization", 'any_access')]
 
-    if user and timeline_helper.isAfterEvent(timeline_entity,
-        'org_signup_start'):
-      filter = {
-          'applicant': user,
-          'scope': program_entity,
+    if user and org_app_survey and timeline_helper.isAfterEvent(
+        timeline_entity, 'org_signup_start'):
+
+      main_admin_fields = {
+          'main_admin': user,
+          'survey': org_app_survey,
           }
 
-      if org_app_logic.logic.getForFields(filter, unique=True):
+      backup_admin_fields = {
+          'backup_admin': user,
+          'survey': org_app_survey
+          }
+
+      org_app_record_logic = org_app_logic.getRecordLogic()
+
+      if org_app_record_logic.getForFields(main_admin_fields, unique=True) or \
+          org_app_record_logic.getForFields(backup_admin_fields, unique=True):
         # add the 'List my Organization Applications' link
         items += [
-            (redirects.getListSelfRedirect(program_entity,
-                                           {'url_name' : 'org_app'}),
+            (redirects.getListSelfRedirect(org_app_survey,
+                                           {'url_name' : 'gsoc/org_app'}),
              "List My Organization Applications", 'any_access')]
 
     # get the student entity for this user and program

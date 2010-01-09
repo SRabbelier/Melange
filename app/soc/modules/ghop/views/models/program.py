@@ -371,6 +371,39 @@ class View(program.View):
 
     timeline_entity = ghop_program_entity.timeline
 
+    org_app_survey = org_app_logic.getForProgram(program_entity)
+
+    if org_app_survey and \
+        timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+      # add the organization signup link
+      items += [
+          (redirects.getTakeSurveyRedirect(
+               org_app_survey, {'url_name': 'ghop/org_app'}),
+          "Apply to become an Organization", 'any_access')]
+
+    if user and org_app_survey and timeline_helper.isAfterEvent(
+        timeline_entity, 'org_signup_start'):
+
+      main_admin_fields = {
+          'main_admin': user,
+          'survey': org_app_survey,
+          }
+
+      backup_admin_fields = {
+          'backup_admin': user,
+          'survey': org_app_survey
+          }
+
+      org_app_record_logic = org_app_logic.getRecordLogic()
+
+      if org_app_record_logic.getForFields(main_admin_fields, unique=True) or \
+          org_app_record_logic.getForFields(backup_admin_fields, unique=True):
+        # add the 'List my Organization Applications' link
+        items += [
+            (redirects.getListSelfRedirect(org_app_survey,
+                                           {'url_name' : 'ghop/org_app'}),
+             "List My Organization Applications", 'any_access')]
+
     # get the student entity for this user and program
     filter = {'user': user,
               'scope': ghop_program_entity,

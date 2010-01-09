@@ -56,3 +56,5 @@ class Logic(survey.Logic):
     fields = {'scope': program}
 
     return self.getForFields(fields, unique=True)
+
+logic = Logic()

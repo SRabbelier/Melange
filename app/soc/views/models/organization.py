@@ -163,8 +163,20 @@ class View(group.View):
 
     super(View, self).__init__(params=params)
 
-    self._params['public_field_keys'] = ["name", "link_id", "short_name", "ideas"]
-    self._params['public_field_names'] = ["Name", "Link ID", "Short Name", "Ideas Page"]
+    self._params['public_field_keys'] = self._params['select_field_keys'] = [
+        "name", "link_id", "short_name", "ideas"
+    ]
+    self._params['public_field_names'] = self._params['select_field_names'] = [
+        "Name", "Link ID", "Short Name", "Ideas Page"
+    ]
+    self._params['select_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=True),
+    }
+    self._params['select_row_extra'] = lambda entity: {
+        "link": redirects.getRequestRedirectForRole(
+            entity, params['mentor_url_name'])
+    }
 
     # create and store the special form for applicants
     updated_fields = {
@@ -195,8 +207,6 @@ class View(group.View):
     """
 
     list_params = params.copy()
-    list_params['list_action'] = (redirects.getRequestRedirectForRole,
-                                  params['mentor_url_name'])
     list_params['list_description'] = ugettext('Choose an Organization which '
         'you want to become a Mentor for.')
 
@@ -204,7 +214,7 @@ class View(group.View):
               'status' : 'active'}
 
     return self.list(request, access_type,
-        page_name, params=list_params, filter=filter)
+        page_name, params=list_params, filter=filter, visibility='select')
 
 
   @decorators.merge_params

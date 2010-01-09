@@ -43,6 +43,7 @@ from soc.logic.models.document import logic as document_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.org_admin import logic as org_admin_logic
+from soc.logic.models.org_app_record import logic as org_app_record_logic
 from soc.logic.models.organization import logic as org_logic
 from soc.logic.models.program import logic as program_logic
 from soc.logic.models.request import logic as request_logic
@@ -1164,6 +1165,56 @@ class Checker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
+
+  @allowDeveloper
+  def checkCanViewOrgAppRecord(self, django_args):
+    """Checks if the current user is allowed to view the OrgAppSurveyRecord.
+
+    The ID of the OrgAppSurveyRecord is present in the GET dict.
+
+    Args:
+      django_args: a dictionary with django's arguments
+    """
+
+    self.checkIsUser(django_args)
+
+    get_dict = django_args['GET']
+    id = get_dict.get('id', None)
+
+    if not(id and id.isdigit()):
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NO_VALID_RECORD_ID)
+
+    id = int(id)
+    org_app_record = org_app_record_logic.getFromIDOr404(id)
+
+    admin_keys = [org_app_record.main_admin.key(), org_app_record.backup_admin.key()]
+
+    if not self.user.key() in admin_keys:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
+
+    return
+
+  @allowDeveloper
+  def checkOrgAppRecordIfPresent(self, django_args):
+    """Checks if the current user can see the OrgAppRecord iff present in GET.
+
+    Args:
+      django_args: a dictionary with django's arguments
+    """
+
+    self.checkIsUser(django_args)
+
+    get_dict = django_args['GET']
+    id = get_dict.get('id', None)
+
+    if id:
+      # id present so check wether the user can see it
+      return self.checkCanViewOrgAppRecord(django_args)
+
+    # no id present so return
+    return
 
   @allowDeveloper
   def checkIsApplicationAccepted(self, django_args, app_logic):

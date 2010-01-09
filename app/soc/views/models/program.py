@@ -33,6 +33,7 @@ from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import program as program_logic
+from soc.logic.models.org_app_survey import logic as org_app_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
@@ -250,7 +251,7 @@ class View(presence.View):
 
   def _getHostEntries(self, entity, params, prefix):
     """Returns a list with menu items for program host.
-    
+
     Args:
       entity: program entity to get the entries for
       params: view specific params
@@ -274,6 +275,15 @@ class View(presence.View):
     items += [(redirects.getListDocumentsRedirect(
             entity, params['document_prefix']),
             "List Documents", 'any_access')]
+
+    timeline_entity = entity.timeline
+
+    if not timeline_helper.isAfterEvent(timeline_entity, 'org_signup'):
+      # add link to create/edit OrgAppSurvey
+      org_app_survey = org_app_logic.getForProgram(entity)
+      items += [(redirects.getCreateSurveyRedirect(
+                    entity, params['document_prefix'], prefix + '/org_app'),
+                'Edit Org Application Survey','any_access')]
 
     return items
 

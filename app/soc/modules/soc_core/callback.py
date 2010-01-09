@@ -36,7 +36,6 @@ from soc.views.models import mentor
 from soc.views.models import notification
 from soc.views.models import organization
 from soc.views.models import org_admin
-from soc.views.models import org_app
 from soc.views.models import priority_group
 from soc.views.models import program
 from soc.views.models import request
@@ -85,7 +84,6 @@ class Callback(object):
     self.core.registerSitemapEntry(notification.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(org_app.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(priority_group.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(request.view.getDjangoURLPatterns())
@@ -118,7 +116,6 @@ class Callback(object):
 
     self.core.registerSidebarEntry(host.view.getSidebarMenus)
     self.core.registerSidebarEntry(job.view.getSidebarMenus)
-    self.core.registerSidebarEntry(org_app.view.getSidebarMenus)
     self.core.registerSidebarEntry(priority_group.view.getSidebarMenus)
     self.core.registerSidebarEntry(request.view.getSidebarMenus)
     self.core.registerSidebarEntry(site.view.getSidebarMenus)

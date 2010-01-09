@@ -56,6 +56,7 @@ class View(group_app.View):
       params: a dict with params for this View
     """
 
+    # TODO(ljvderijk): phase out this module + access checks
     rights = access.Checker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['delete'] = [('checkCanEditGroupApp',

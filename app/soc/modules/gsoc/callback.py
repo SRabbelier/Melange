@@ -25,6 +25,7 @@ from soc.modules.gsoc.views.models import grading_project_survey as grading_surv
 from soc.modules.gsoc.views.models import grading_survey_group
 from soc.modules.gsoc.views.models import mentor
 from soc.modules.gsoc.views.models import org_admin
+from soc.modules.gsoc.views.models import org_app_survey
 from soc.modules.gsoc.views.models import organization
 from soc.modules.gsoc.views.models import program
 from soc.modules.gsoc.views.models import project_survey
@@ -58,6 +59,7 @@ class Callback(object):
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(org_app_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(project_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student_project.view.getDjangoURLPatterns())

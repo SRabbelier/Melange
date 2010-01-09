@@ -24,6 +24,7 @@ from soc.modules.ghop.tasks import task_update
 from soc.modules.ghop.views.models import mentor
 from soc.modules.ghop.views.models import organization
 from soc.modules.ghop.views.models import org_admin
+from soc.modules.ghop.views.models import org_app_survey
 from soc.modules.ghop.views.models import program
 from soc.modules.ghop.views.models import student
 from soc.modules.ghop.views.models import task
@@ -53,6 +54,7 @@ class Callback(object):
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(org_app_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task.view.getDjangoURLPatterns())

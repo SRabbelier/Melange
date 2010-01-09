@@ -76,13 +76,6 @@ class View(presence.View):
         '%(module_package)s.%(module_name)s.list_roles',
         'List of roles for %(name)s')]
 
-    if params.get('group_applicant_url'):
-      # add the applicant pattern
-      patterns += [
-          (r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
-          '%(module_package)s.%(module_name)s.applicant', 
-          "%(name)s Creation via Accepted Application"),]
-
     new_params['extra_django_patterns'] = patterns
 
     # TODO(tlarsen): Add support for Django style template lookup

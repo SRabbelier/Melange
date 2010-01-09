@@ -28,7 +28,6 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import club_app as club_app_logic
 from soc.logic.models import club  as club_logic
 from soc.logic.models import club_admin as club_admin_logic
 from soc.views.helper import access
@@ -67,8 +66,6 @@ class View(group.View):
                                 club_admin_logic.logic)]
     rights['list_roles'] = [('checkHasRoleForLinkId', 
                              club_admin_logic.logic)]
-    rights['applicant'] = [('checkIsApplicationAccepted',
-                            club_app_logic.logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.club.logic
@@ -88,9 +85,6 @@ class View(group.View):
 
     new_params['extra_django_patterns'] = patterns
 
-    new_params['application_logic'] = club_app_logic
-    new_params['group_applicant_url'] = True
-
     new_params['sidebar_additional'] = [
         ('/' + new_params['url_name'] + '/apply_member', 
          'Join a Club', 'apply_member'),]
@@ -104,7 +98,7 @@ class View(group.View):
 
     new_params['create_extra_dynaproperties'] = {
         'clean' : cleaning.validate_new_group('link_id', 'scope_path',
-            club_logic, club_app_logic)}
+            club_logic, None)}
 
     # get rid of the clean method
     new_params['edit_extra_dynaproperties'] = {
@@ -217,7 +211,6 @@ class View(group.View):
 view = View()
 
 admin = decorators.view(view.admin)
-applicant = decorators.view(view.applicant)
 apply_member = decorators.view(view.applyMember)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)

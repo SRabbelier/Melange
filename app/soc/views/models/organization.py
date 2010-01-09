@@ -106,7 +106,6 @@ class View(group.View):
     new_params['home_template'] = 'soc/organization/home.html'
 
     new_params['application_logic'] = org_app_logic
-    new_params['group_applicant_url'] = True
     new_params['sans_link_id_public_list'] = True
 
     patterns = []
@@ -118,6 +117,9 @@ class View(group.View):
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
         '%(module_package)s.%(module_name)s.list_proposals',
         "List of all Student Proposals for this %(name)s"),
+        (r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
+        '%(module_package)s.%(module_name)s.applicant', 
+        "%(name)s Creation via Accepted Application"),
         ]
 
     new_params['extra_django_patterns'] = patterns

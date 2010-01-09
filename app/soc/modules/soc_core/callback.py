@@ -25,7 +25,6 @@ from soc.tasks import grading_survey_group as grading_group_tasks
 from soc.tasks import surveys as survey_tasks
 from soc.tasks.updates import start_update
 from soc.views.models import club
-from soc.views.models import club_app
 from soc.views.models import club_admin
 from soc.views.models import club_member
 from soc.views.models import cron
@@ -73,7 +72,6 @@ class Callback(object):
     if self.enable_clubs:
       self.core.registerSitemapEntry(club.view.getDjangoURLPatterns())
       self.core.registerSitemapEntry(club_admin.view.getDjangoURLPatterns())
-      self.core.registerSitemapEntry(club_app.view.getDjangoURLPatterns())
       self.core.registerSitemapEntry(club_member.view.getDjangoURLPatterns())
 
     self.core.registerSitemapEntry(cron.view.getDjangoURLPatterns())
@@ -112,7 +110,6 @@ class Callback(object):
       self.core.registerSidebarEntry(club.view.getExtraMenus)
       self.core.registerSidebarEntry(club_admin.view.getSidebarMenus)
       self.core.registerSidebarEntry(club_member.view.getSidebarMenus)
-      self.core.registerSidebarEntry(club_app.view.getSidebarMenus)
 
     self.core.registerSidebarEntry(host.view.getSidebarMenus)
     self.core.registerSidebarEntry(job.view.getSidebarMenus)

@@ -533,7 +533,10 @@ def validate_new_group(link_id_field, scope_path_field,
         fields['scope_path'] = scope_path
 
       # get the application
-      group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
+      if group_app_logic:
+        group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
+      else:
+        group_app_entity = None
 
       # get the current user
       user_entity = user_logic.getForCurrentAccount()

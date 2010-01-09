@@ -114,13 +114,15 @@ class SurveyTakeForm(djangoforms.ModelForm):
         )
 
     # get the POST data dict if present
-    data = self.kwargs.pop('data', None)
+    post_data = self.kwargs.pop('data', None)
 
     # set cleaner methods for fields, only needed if we have POST data
-    if data:
+    if post_data:
       # prepare to render a bound, validating form
-      clean_data = self.setCleaners(data)
+      self.has_post = True
+      clean_data = self.setCleaners(post_data)
     else:
+      self.has_post = False
       clean_data = self.setCleaners()
 
     # update with fields from subclasses
@@ -129,7 +131,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
       delattr(self, 'data')
 
     # pass data, so form is bound
-    if data:
+    if post_data:
       self.kwargs['data'] = clean_data
 
     super(SurveyTakeForm, self).__init__(*args, **self.kwargs)

@@ -18,12 +18,11 @@
 """
 
 __authors__ = [
-  '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Doug Coker" <dcoker@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Pawel Solyga" <pawel.solyga@gmail.com>',
   ]
 
-
-import logging
 
 from functools import wraps
 
@@ -37,7 +36,7 @@ from soc.views.helper import responses
 class Error(Exception):
   """Base class for all exceptions raised by this module.
   """
-  
+
   pass
 
 
@@ -117,3 +116,18 @@ def check_access(func):
 
   return wrapper
 
+
+def mutation(func):
+  """This decorator indicates that the view is a mutation operation and is
+  therefore restricted to POST requests.
+
+  XSRF checking is performed automatically by the xsrf middleware.
+  """
+  @wraps(func)
+  def wrapper(self, request, *args, **kwargs):
+    if request.method != "POST":
+      return http.HttpResponse("Invoked a mutation view w/o POST.", status=403)
+
+    return func(self, request, *args, **kwargs)
+
+  return wrapper

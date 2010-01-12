@@ -77,9 +77,6 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# TODO  Make this unique, and don't share it with anybody.
-SECRET_KEY = 'hvhxfm5u=^*v&doo#oq8x*eg8+1&9sxbye@=umutgn^t_sg_nx'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
@@ -102,6 +99,7 @@ MIDDLEWARE_CLASSES = (
     'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
     'app_profiler.app_profiler.ProfileMiddleware',
     'soc.middleware.maintenance.MaintenanceMiddleware',
+    'soc.middleware.xsrf.XsrfMiddleware',
 #    'django.middleware.common.CommonMiddleware',
 #    'django.contrib.sessions.middleware.SessionMiddleware',
 #    'django.contrib.auth.middleware.AuthenticationMiddleware',

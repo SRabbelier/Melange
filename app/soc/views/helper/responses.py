@@ -32,6 +32,7 @@ from django.template import loader
 from soc.logic import accounts
 from soc.logic import system
 from soc.logic.helper import timeline
+from soc.logic.helper import xsrfutil
 from soc.logic.models import site
 from soc.logic.models.user import logic as user_logic
 from soc.modules import callback
@@ -86,13 +87,13 @@ def respond(request, template, context=None, response_args=None,
 
 def getUniversalContext(request):
   """Constructs a template context dict will many common variables defined.
-  
+
   Args:
     request: the Django HTTP request object
 
   Returns:
     a new context dict containing:
-    
+
     {
       'request': the Django HTTP request object passed in by the caller
       'account': the logged-in Google Account if there is one
@@ -145,7 +146,11 @@ def getUniversalContext(request):
   context['site_notice'] = settings.site_notice
   context['tos_link'] = redirects.getToSRedirect(settings)
   context['in_maintenance'] = timeline.isActivePeriod(settings, 'maintenance')
- 
+
+  # Only one xsrf_token is generated per request.
+  xsrf_secret_key = site.logic.getXsrfSecretKey(settings)
+  context['xsrf_token'] = xsrfutil.getGeneratedTokenForCurrentUser(xsrf_secret_key)
+
   core.setRequestValue('context', context)
 
   return context
@@ -160,12 +165,12 @@ def useJavaScript(context, uses):
 def redirectToChangedSuffix(
     request, old_suffix, new_suffix=None, params=None):
   """Changes suffix of URL path and returns an HTTP redirect response.
-  
+
   Args:
     request: the Django HTTP request object; redirect path is derived from
       request.path
     old_suffix, new_suffix, params:  see helper.requests.replaceSuffix()
-      
+
   Returns:
     a Django HTTP redirect response pointing to the altered path.
   """

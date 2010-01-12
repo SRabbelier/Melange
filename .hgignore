@@ -21,3 +21,4 @@ develop-eggs
 .gitignore
 .DS_Store
 .settings
+.nfs*

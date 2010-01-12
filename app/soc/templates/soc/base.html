@@ -108,6 +108,9 @@ limitations under the License.
   {% if uses_melange %}
   <script type="text/javascript" src="/soc/content/js/melange-091015.js"></script>
   {% endif %}
+  <script type="text/javascript">
+    var xsrf_token = '{{xsrf_token}}';
+  </script>
 {% endblock %}
 </head>
 

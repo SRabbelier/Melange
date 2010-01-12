@@ -319,6 +319,7 @@ class View(object):
 
     return self._constructResponse(request, None, context, form, params)
 
+  @decorators.mutation
   def createPost(self, request, context, params):
     """See editPost.
 
@@ -402,6 +403,7 @@ class View(object):
       return self.editGet(request, entity, context, params=params)
 
   @decorators.merge_params
+  @decorators.mutation
   def editPost(self, request, entity, context, params=None):
     """Processes POST requests for the specified entity.
 
@@ -592,6 +594,7 @@ class View(object):
 
   @decorators.merge_params
   @decorators.check_access
+  @decorators.mutation
   def delete(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by **kwargs.
@@ -744,15 +747,14 @@ class View(object):
     context = {'json': json}
     template = 'soc/json.html'
 
-    response = responses.respond(request, template, context)
+    response_args = {'mimetype': 'application/json'}
+    headers = {'Cache-Control': 'no-store, no-cache, must-revalidate, '
+                                'post-check=0, pre-check=0',  # HTTP/1.1, IE7
+               'Pragma': 'no-cache',  # HTTP/1.0
+               'Content-Type': 'application/json', }
 
-    # if the browser supports HTTP/1.1
-    # post-check and pre-check and no-store for IE7
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
-        'post-check=0, pre-check=0'
-
-    # if the browser supports HTTP/1.0
-    response['Pragma'] = 'no-cache'
+    response = responses.respond(request, template, context, response_args,
+                                 headers)
 
     return response
 
@@ -921,7 +923,7 @@ class View(object):
         there is no existing entity.
     """
 
-    # logic = params['logic']
+    logic = params['logic']
     suffix = entity.key().id_or_name() if entity else None
 
     context['form'] = form
@@ -933,6 +935,8 @@ class View(object):
     context['entity_type_url'] = params['url_name']
     context['cancel_redirect'] = params.get('cancel_redirect')
     context['return_url'] = request.path
+    if entity:  # when creating, the entity does not exist.
+      context['is_deletable'] = logic.isDeletable(entity)
 
     if params.get('export_content_type') and entity:
       context['export_link'] = redirects.getExportRedirect(entity, params)

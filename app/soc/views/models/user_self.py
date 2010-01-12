@@ -86,7 +86,7 @@ class View(base.View):
     new_params['edit_redirect'] = '/%(url_name)s/edit_profile'
 
     # set the specific fields for the users profile page
-    new_params['extra_dynaexclude'] = ['former_accounts', 
+    new_params['extra_dynaexclude'] = ['former_accounts',
         'account', 'is_developer', 'status', 'agreed_to_tos_on']
 
     new_params['create_extra_dynaproperties'] = {
@@ -103,9 +103,9 @@ class View(base.View):
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         (users.create_login_url("/"), 'Sign In', 'signIn'),
-        ('/' + new_params['url_name'] + '/create_profile', 
+        ('/' + new_params['url_name'] + '/create_profile',
             'Create Profile', 'create_profile'),
-        ('/' + new_params['url_name'] + '/edit_profile', 
+        ('/' + new_params['url_name'] + '/edit_profile',
             'Edit Profile', 'edit_profile'),
         ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
         ('/' + new_params['url_name'] + '/requests', 'Requests', 'requests'),
@@ -153,7 +153,7 @@ class View(base.View):
     # pylint: disable-msg=E1103
     link_id = user_entity.link_id
 
-    return self.edit(request, access_type, page_name=page_name, 
+    return self.edit(request, access_type, page_name=page_name,
         params=params, link_id=link_id, **kwargs)
 
   def editGet(self, request, entity, context, params=None):
@@ -177,11 +177,12 @@ class View(base.View):
 
     if entity.agreed_to_tos:
       form.fields['agreed_to_tos_on'].initial = entity.agreed_to_tos_on
-      # replace the 'agreed_to_tos' field with a hidden field so 
+      # replace the 'agreed_to_tos' field with a hidden field so
       # that the form checks still pass
       form.fields['agreed_to_tos'] = forms.fields.BooleanField(
           widget=forms.HiddenInput, initial=entity.agreed_to_tos, required=True)
 
+  @decorators.mutation
   def editPost(self, request, entity, context, params=None):
     """Overwrite so we can add the contents of the ToS.
     For params see base.View.editPost().

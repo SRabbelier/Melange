@@ -18,10 +18,14 @@
 """
 
 __authors__ = [
+  '"Doug Coker" <dcoker@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
+from google.appengine.api import memcache
+
+from soc.logic.helper import xsrfutil
 from soc.logic.models import presence_with_tos
 
 import soc.models.presence_with_tos
@@ -44,7 +48,7 @@ class Logic(presence_with_tos.Logic):
   def getKeyValuesFromEntity(self, entity):
     """Returns the key values for the site settings.
 
-    The Site entity is a singleton, so this method returns 
+    The Site entity is a singleton, so this method returns
     a hard-coded link_id.
 
     Args:
@@ -56,7 +60,7 @@ class Logic(presence_with_tos.Logic):
   def getKeyValuesFromFields(self, fields):
     """Extracts the key values from a dict and returns them.
 
-    The Site entity is a singleton, so this method returns 
+    The Site entity is a singleton, so this method returns
     a hard-coded link_id.
 
     Args:
@@ -90,5 +94,26 @@ class Logic(presence_with_tos.Logic):
       singleton = self.updateOrCreateFromKeyName(fields, key_name)
 
     return singleton
+
+  def getXsrfSecretKey(self, settings):
+    """Return the secret key for use by the XSRF middleware.
+
+    If the Site entity does not have a secret key, this method will also create
+    one and persist it.
+
+    Args:
+      settings: the singleton Site entity
+
+    Returns:
+      a secret key.
+    """
+    if not settings.xsrf_secret_key:
+      key = xsrfutil.newXsrfSecretKey()
+      if not memcache.add("new_xsrf_secret_key", key):
+        key = memcache.get("new_xsrf_secret_key")
+      settings.xsrf_secret_key = key
+      settings.put()
+    return settings.xsrf_secret_key
+
 
 logic = Logic()

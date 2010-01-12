@@ -94,6 +94,9 @@ class View(presence_with_tos.View):
         'clean_noreply_email': cleaning.clean_empty_field('noreply_email'),
         }
 
+    # XSRF secret key is not editable by mere mortals.
+    new_params['extra_dynaexclude'] = ['xsrf_secret_key']
+
     patterns = []
 
     page_name = "Home Page"

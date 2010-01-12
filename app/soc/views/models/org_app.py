@@ -23,7 +23,6 @@ __authors__ = [
 
 
 from django import forms
-from django.utils import simplejson
 
 from soc.logic import accounts
 from soc.logic import cleaning
@@ -65,7 +64,7 @@ class View(group_app.View):
                         ['org_signup', 'scope_path', program_logic.logic])]
     rights['edit'] = [('checkCanEditGroupApp',
                        [org_app_logic.logic]),
-                       ('checkIsActivePeriod', 
+                       ('checkIsActivePeriod',
                         ['org_signup', 'scope_path', program_logic.logic])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_self'] = ['checkIsUser']
@@ -76,7 +75,7 @@ class View(group_app.View):
     rights['bulk_accept'] = ['checkIsHostForProgramInScope']
     rights['bulk_reject'] = ['checkIsHostForProgramInScope']
     rights['apply'] = ['checkIsUser',
-                             ('checkCanCreateOrgApp', 
+                             ('checkCanCreateOrgApp',
                               ['org_signup', program_logic.logic]),
                        ('checkIsNotStudentForProgramInScope',
                         [program_logic.logic, student_logic.logic])]
@@ -300,7 +299,7 @@ class View(group_app.View):
     # get the program entity from the keyname
     program_entity = program_logic.logic.getFromKeyName(program_keyname)
 
-    # get all the organization applications for the 
+    # get all the organization applications for the
     # given program and from_status
     filter = {'scope': program_entity,
               'status': from_status}
@@ -321,13 +320,7 @@ class View(group_app.View):
             params['url_name'] ,program_entity.key().id_or_name(), to_status),
         }
 
-    json = simplejson.dumps(to_json)
-
-    # use the standard JSON template to return our response
-    context = {'json': json}
-    template = 'soc/json.html'
-
-    return responses.respond(request, template, context)
+    return self.json(request, to_json)
 
 
 view = View()

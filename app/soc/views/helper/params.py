@@ -270,7 +270,14 @@ def constructParams(params):
   new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
   new_params['list_heading'] = 'soc/%(module_name)s/list/heading.html' % params
 
-  new_params['list_action'] = (redirects.getEditRedirect, params)
+  new_params['public_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=True),
+    }
+  new_params['public_row_extra'] = lambda entity, *args: {
+        "link": redirects.getEditRedirect(entity, params),
+    }
+
   new_params['list_params'] = {
       'list_action': 'action',
       'list_description': 'description',

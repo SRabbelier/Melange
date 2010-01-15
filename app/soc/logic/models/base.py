@@ -102,6 +102,12 @@ class Logic(object):
 
     return False
 
+  def isIdBased(self):
+    """Returns whether this logic is id based.
+    """
+
+    return self._id_based
+
   def getModel(self):
     """Returns the model this logic class uses.
     """

@@ -441,7 +441,12 @@ def getKeyFieldsPattern(params):
   """Returns the Django pattern for this View's entity.
   """
 
-  names = params['logic'].getKeyFieldNames()
+  logic = params['logic']
+
+  if logic.isIdBased():
+    return r"(?P<id>[0-9]*)"
+
+  names = logic.getKeyFieldNames()
   scope_path_pattern = params['scope_path_pattern']
 
   return getPattern(names, scope_path_pattern)

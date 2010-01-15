@@ -25,6 +25,7 @@ __authors__ = [
 
 
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -181,6 +182,34 @@ class View(base.View):
 
     return responses.respond(request, template, context=context)
 
+  def getListSelfData(self, request, uh_params, ar_params):
+    """Returns the list data for getListSelf.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # get the current user
+    user_entity = user_logic.logic.getForCurrentAccount()
+
+    # only select the Invites for this user that haven't been handled yet
+    # pylint: disable-msg=E1103
+    filter = {'user': user_entity}
+
+    if idx == 0:
+      filter['status'] = 'group_accepted'
+      params = uh_params
+    elif idx == 1:
+      filter['status'] = 'new'
+      params = ar_params
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = helper.lists.getListData(request, params, filter, 'public')
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listSelf(self, request, access_type,
@@ -195,37 +224,28 @@ class View(base.View):
       kwargs: not used
     """
 
-    # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
-
     # construct the Unhandled Invites list
 
-    # only select the Invites for this user that haven't been handled yet
-    # pylint: disable-msg=E1103
-    filter = {'user': user_entity,
-              'status': 'group_accepted'}
-
     uh_params = params.copy()
-    uh_params['list_action'] = (redirects.getInviteProcessRedirect, None)
+    uh_params['public_row_extra'] = lambda entity: {
+        "link": redirects.getInviteProcessRedirect(entity, None),
+    }
     uh_params['list_description'] = ugettext(
         "An overview of your unhandled invites.")
 
-    uh_list = helper.lists.getListContent(
-        request, uh_params, filter, idx=0)
-
     # construct the Open Requests list
 
-    # only select the requests from the user
-    # that haven't been accepted by an admin yet
-    filter = {'user': user_entity,
-              'status': 'new'}
-
     ar_params = params.copy()
+    ar_params['public_row_action'] = {}
+    ar_params['public_row_extra'] = lambda x: {}
     ar_params['list_description'] = ugettext(
         "List of your pending requests.")
 
-    ar_list = helper.lists.getListContent(
-        request, ar_params, filter, idx=1)
+    if request.GET.get('fmt') == 'json':
+      return self.getListSelfData(request, uh_params, ar_params)
+
+    uh_list = helper.lists.getListGenerator(request, uh_params, idx=0)
+    ar_list = helper.lists.getListGenerator(request, ar_params, idx=1)
 
     # fill contents with all the needed lists
     contents = [uh_list, ar_list]

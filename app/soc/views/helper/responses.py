@@ -196,7 +196,10 @@ def jsonResponse(request, json):
   context = {'json': json}
   template = 'soc/json.html'
 
-  response_args = {'mimetype': 'application/json'}
+  # allow for easy debugging of json responses by setting &plain=1
+  no_plain = not (system.isLocal() and request.GET.get('plain'))
+
+  response_args = {'mimetype': 'application/json'} if no_plain else {}
   response = respond(request, template, context, response_args)
 
   # if the browser supports HTTP/1.1
@@ -204,7 +207,8 @@ def jsonResponse(request, json):
   response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
                               'post-check=0, pre-check=0',  # HTTP/1.1, IE7
 
-  response['Content-Type'] = 'application/json'
+  if no_plain:
+    response['Content-Type'] = 'application/json'
 
   # if the browser supports HTTP/1.0
   response['Pragma'] = 'no-cache'

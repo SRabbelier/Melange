@@ -70,6 +70,7 @@ from google.appengine.api import mail
 from google.appengine.runtime.apiproxy_errors import OverQuotaError
 
 from soc.logic import dicts
+from soc.logic import system
 
 
 def sendMailFromTemplate(template, context):
@@ -114,6 +115,10 @@ def sendMail(context):
   # construct the EmailMessage from the given context
   message = mail.EmailMessage(**context)
   message.check_initialized()
+
+  # don't send out emails in non-local debug mode
+  if not system.isLocal() and system.isDebug():
+    return
 
   try:
     # send the message

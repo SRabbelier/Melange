@@ -1,18 +1,19 @@
+{% if subitem.heading %}
 {% if subitem.collapse %}
 	<li class="expandable-collapsed">
 {% else %}
     <li class="expandable">
 {% endif %}
-{% if subitem.heading %}
+
       <span>{{ subitem.heading }}</span>
       <ul>
 {% for item in subitem.items %}
 {% include 'soc/sidebar/menuitem.html' %}
 {% endfor %}
       </ul>
+    </li>
 {% else %}
 {% for item in subitem.items %}
 {% include 'soc/sidebar/menuitem.html' %}
 {% endfor %}
 {% endif %}
-    </li>

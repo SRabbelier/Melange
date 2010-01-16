@@ -67,6 +67,7 @@ __authors__ = [
 from django.template import loader
 
 from google.appengine.api import mail
+from google.appengine.runtime.apiproxy_errors import OverQuotaError
 
 from soc.logic import dicts
 
@@ -117,7 +118,7 @@ def sendMail(context):
   try:
     # send the message
     message.send()
-  except mail.Error, exception:
+  except (mail.Error, OverQuotaError), exception:
     import logging
     logging.info(context)
     logging.exception(exception)

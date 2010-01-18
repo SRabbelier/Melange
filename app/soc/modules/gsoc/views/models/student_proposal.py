@@ -513,9 +513,11 @@ class View(base.View):
     list_params = org_view.view.getParams().copy()
     list_params['list_description'] = ('List of %(name_plural)s you can send '
         'your proposal to.') % list_params
-    list_params['list_action'] = (redirects.getStudentProposalRedirect,
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getStudentProposalRedirect(entity,
         {'student_key': student_entity.key().id_or_name(),
             'url_name': params['url_name']})
+    }
 
     return self.list(request, access_type=access_type, page_name=page_name,
                      params=list_params, filter=filter, **kwargs)

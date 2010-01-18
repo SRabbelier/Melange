@@ -25,6 +25,7 @@ __authors__ = [
 
 import itertools
 
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -37,6 +38,7 @@ from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.models import organization
 from soc.views.models import group
 
@@ -213,6 +215,77 @@ class View(organization.View):
 
     return submenus
 
+
+  def getListProposalsData(self, request, rp_params, mp_params,
+                           p_params, org_entity):
+    """Returns the list data for listProposals.
+    """
+
+    from soc.modules.gsoc.logic.models.ranker_root import logic \
+        as ranker_root_logic
+    from soc.modules.gsoc.logic.models.student_proposal import logic \
+        as sp_logic
+    from soc.modules.gsoc.models import student_proposal
+    from soc.modules.gsoc.views.helper import list_info as list_info_helper
+    from soc.modules.gsoc.views.models import student_proposal \
+        as student_proposal_view
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    args = order = []
+
+    if idx == 0:
+      # retrieve the ranker
+      fields = {'link_id': student_proposal.DEF_RANKER_NAME,
+                'scope': org_entity}
+
+      ranker_root = ranker_root_logic.getForFields(fields, unique=True)
+      ranker = ranker_root_logic.getRootFromEntity(ranker_root)
+
+      keys = []
+
+      # only when the program allows allocations
+      # to be seen we should color the list
+      if org_entity.scope.allocations_visible:
+        proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
+        keys = [i.key() for i in proposals]
+
+        # show the amount of slots assigned on the webpage
+        context['slots_visible'] = True
+
+      # TODO(ljvderijk) once sorting with IN operator is fixed,
+      # make this list show more
+      filter = {'org': org_entity,
+                'status': 'pending'}
+      params = rp_params
+      # order by descending score
+      order = ['-score']
+      args = [ranker, keys]
+    elif idx == 1:
+      # check if the current user is a mentor
+      user_entity = user_logic.getForCurrentAccount()
+
+      fields = {'user': user_entity,
+          'scope': org_entity,}
+      mentor_entity = mentor_logic.getForFields(fields, unique=True)
+
+      filter = {'org': org_entity,
+                'mentor': mentor_entity,
+                'status': 'pending'}
+      params = mp_params
+    elif idx == 2:
+      filter = {'org': org_entity}
+      params = p_params
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = helper.lists.getListData(request, params, filter, 'public',
+                                        order=order, args=args)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listProposals(self, request, access_type,
@@ -248,158 +321,49 @@ class View(organization.View):
          'possible_mentors', 'score', 'status', 'created_on',
          'last_modified_on']
 
-    ranked_params = list_params.copy()# ranked proposals
-    ranked_params['list_row'] = ('soc/%(module_name)s/list/'
+    rp_params = list_params.copy()# ranked proposals
+    rp_params['list_row'] = ('soc/%(module_name)s/list/'
         'detailed_row.html' % list_params)
-    ranked_params['list_heading'] = ('soc/%(module_name)s/list/'
+    rp_params['list_heading'] = ('soc/%(module_name)s/list/'
         'detailed_heading.html' % list_params)
-    ranked_params['list_action'] = (redirects.getReviewRedirect, ranked_params)
+    rp_params['public_row_extra'] = lambda entity, *args: {
+        'link': redirects.getReviewRedirect(entity, rp_params)
+    }
+    rp_params['public_field_extra'] = lambda entity, ranker, keys: {
+          'rank': ranker.FindRanks([[entity.score]])[0] + 1,
+          'item_class': entity.key() in keys,
+    }
 
     description = ugettext('%s already under review sent to %s') %(
-        ranked_params['name_plural'], org_entity.name)
-    ranked_params['list_description'] = description
-
-    # TODO(ljvderijk) once sorting with IN operator is fixed, 
-    # make this list show more
-    filter = {'org': org_entity,
-              'status': 'pending'}
-
-    # order by descending score
-    order = ['-score']
-
-    prop_list = lists.getListContent(
-        request, ranked_params, filter, order=order, idx=0)
-
-    proposals = prop_list['data']
-
-    # get a list of scores
-    scores = [[proposal.score] for proposal in proposals]
-
-    # retrieve the ranker
-    fields = {'link_id': student_proposal.DEF_RANKER_NAME,
-              'scope': org_entity}
-
-    ranker_root = ranker_root_logic.getForFields(fields, unique=True)
-    ranker = ranker_root_logic.getRootFromEntity(ranker_root)
-
-    # retrieve the ranks for these scores
-    ranks = [rank+1 for rank in ranker.FindRanks(scores)]
-
-    # link the proposals to the rank
-    ranking = dict([i for i in itertools.izip(proposals, ranks)])
-
-    assigned_proposals = []
-
-    # only when the program allows allocations 
-    # to be seen we should color the list
-    if org_entity.scope.allocations_visible:
-      assigned_proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
-
-      # show the amount of slots assigned on the webpage
-      context['slots_visible'] = True
-
-    ranking_keys = dict([(k.key(), v) for k, v in ranking.iteritems()])
-    proposal_keys = [i.key() for i in assigned_proposals]
-
-    # update the prop_list with the ranking and coloring information
-    prop_list['info'] = (list_info_helper.getStudentProposalInfo(ranking_keys,
-        proposal_keys), None)
-
-    # check if the current user is a mentor
-    user_entity = user_logic.getForCurrentAccount()
-
-    fields = {'user': user_entity,
-        'scope': org_entity,}
-    mentor_entity = mentor_logic.getForFields(fields, unique=True)
-
-    if mentor_entity:
-      mp_params = list_params.copy() # proposals mentored by current user
-
-      description = ugettext('List of %s sent to %s you are mentoring') % (
-          mp_params['name_plural'], org_entity.name)
-      mp_params['list_description'] = description
-      mp_params['list_action'] = (redirects.getReviewRedirect, mp_params)
-
-      filter = {'org': org_entity,
-                'mentor': mentor_entity,
-                'status': 'pending'}
-
-      mp_list = lists.getListContent(
-          request, mp_params, filter, idx=1, need_content=True)
-
-    new_params = list_params.copy() # new proposals
-    new_params['list_description'] = 'List of new %s sent to %s ' % (
-        new_params['name_plural'], org_entity.name)
-    new_params['list_action'] = (redirects.getReviewRedirect, new_params)
-
-    filter = {'org': org_entity,
-              'status': 'new'}
-
-    contents = []
-    new_list = lists.getListContent(
-        request, new_params, filter, idx=2, need_content=True)
-
-    ap_params = list_params.copy() # accepted proposals
-
-    description = ugettext('List of accepted %s sent to %s ') % (
-        ap_params['name_plural'], org_entity.name)
-
-    ap_params['list_description'] = description
-    ap_params['list_action'] = (redirects.getReviewRedirect, ap_params)
-
-    filter = {'org': org_entity,
-              'status': 'accepted'}
-
-    ap_list = lists.getListContent(
-        request, ap_params, filter, idx=3, need_content=True)
-
-    rp_params = list_params.copy() # rejected proposals
-
-    description = ugettext('List of rejected %s sent to %s ') % (
         rp_params['name_plural'], org_entity.name)
-
     rp_params['list_description'] = description
-    rp_params['list_action'] = (redirects.getReviewRedirect, rp_params)
 
-    filter = {'org': org_entity,
-              'status': 'rejected'}
+    mp_params = list_params.copy() # proposals mentored by current user
+    description = ugettext('List of %s sent to %s you are mentoring') % (
+        mp_params['name_plural'], org_entity.name)
+    mp_params['list_description'] = description
+    mp_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getReviewRedirect(entity, mp_params),
+    }
 
-    rp_list = lists.getListContent(
-        request, rp_params, filter, idx=4, need_content=True)
-
-    ip_params = list_params.copy() # ineligible proposals
-
-    description = ugettext('List of ineligible %s sent to %s ') % (
-        ip_params['name_plural'], org_entity.name)
-
-    ip_params['list_description'] = description
-    ip_params['list_action'] = (redirects.getReviewRedirect, ip_params)
-
-    filter = {'org': org_entity,
-              'status': 'invalid'}
-
-    ip_list = lists.getListContent(
-        request, ip_params, filter, idx=5, need_content=True)
+    p_params = list_params.copy() # proposals
+    p_params['list_description'] = ugettext('List of %s sent to %s ') % (
+        p_params['name_plural'], org_entity.name)
+    p_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getReviewRedirect(entity, p_params),
+    }
 
     # fill contents with all the needed lists
-    if new_list != None:
-      contents.append(new_list)
+    if request.GET.get('fmt') == 'json':
+      return self.getListProposalsData(request, rp_params, mp_params,
+                                       p_params, org_entity)
 
-    contents.append(prop_list)
+    rp_list = helper.lists.getListGenerator(request, rp_params, idx=0)
+    mp_list = helper.lists.getListGenerator(request, mp_params, idx=1)
+    p_list = helper.lists.getListGenerator(request, p_params, idx=2)
 
-    if mentor_entity and mp_list != None:
-      contents.append(mp_list)
+    contents = [rp_list, mp_list, p_list]
 
-    if ap_list != None:
-      contents.append(ap_list)
-
-    if rp_list != None:
-      contents.append(rp_list)
-
-    if ip_list != None:
-      contents.append(ip_list)
-
-    # call the _list method from base to display the list
     return self._list(request, list_params, contents, page_name, context)
 
 

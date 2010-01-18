@@ -990,10 +990,9 @@ class View(base.View):
 
     # fill a score summary
     score_summary = []
-    max_score = max([summary['total_score'] \
-                    for summary in review_summary.itervalues()])
-    min_score = min([summary['total_score'] \
-                    for summary in review_summary.itervalues()])
+    total_scores = [i['total_score'] for i in review_summary.itervalues()]
+    max_score = max(total_scores) if total_scores else 0
+    min_score = min(total_scores) if total_scores else 0
     for score in xrange(min_score, max_score + 1):
       number = len([summary for summary in review_summary.itervalues() \
           if summary['total_score'] == score])

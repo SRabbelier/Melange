@@ -46,7 +46,7 @@ class View(org_app_survey.View):
       params: a dict with params for this View
     """
 
-    rights = access.GSoCChecker(params)
+    rights = access.GHOPChecker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['checkIsDeveloper']
     rights['create'] = [('checkIsHostForProgramInScope', program_logic)]

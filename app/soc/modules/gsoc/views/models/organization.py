@@ -132,7 +132,7 @@ class View(organization.View):
       submenus.append(submenu)
 
 
-    if is_active_admin:
+    if admin_entity:
       # add a link to manage student projects after they have been announced
       if timeline_helper.isAfterEvent(program_entity.timeline,
                                       'accepted_students_announced_deadline'):
@@ -141,6 +141,8 @@ class View(organization.View):
             "Manage Student Projects", 'any_access')
         submenus.append(submenu)
 
+
+    if is_active_admin:
       # add a link to the management page
       submenu = (redirects.getListRolesRedirect(group_entity, params),
           "Manage Admins and Mentors", 'any_access')

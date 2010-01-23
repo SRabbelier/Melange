@@ -294,7 +294,8 @@ class View(presence.View):
 
     items = []
 
-    if timeline_helper.isBeforeEvent(program_entity.timeline, 'program_end'):
+    if timeline_helper.isBeforeEvent(program_entity.timeline, 'program_end') \
+        and student_entity.status == 'active':
       items += [(redirects.getEditRedirect(student_entity,
           {'url_name': prefix + '/student'}),
           "Edit my Student Profile", 'any_access')]

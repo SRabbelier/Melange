@@ -301,7 +301,7 @@ class View(program.View):
     filter = {
         'user': user,
         'scope': program_entity,
-        'status': 'active'
+        'status': ['active', 'inactive']
         }
     student_entity = student_logic.getForFields(filter, unique=True)
 
@@ -382,7 +382,8 @@ class View(program.View):
 
     timeline_entity = program_entity.timeline
 
-    if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+    if timeline_helper.isActivePeriod(timeline_entity, 'student_signup') and \
+        student_entity.status == 'active':
       items += [('/gsoc/student_proposal/list_orgs/%s' % (
           student_entity.key().id_or_name()),
           "Submit your Student Proposal", 'any_access')]

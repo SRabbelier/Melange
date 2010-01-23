@@ -410,7 +410,7 @@ class View(program.View):
     # get the student entity for this user and program
     filter = {'user': user,
               'scope': ghop_program_entity,
-              'status': 'active'}
+              'status': ['active', 'inactive']}
     student_entity = ghop_student_logic.logic.getForFields(filter, unique=True)
 
     if student_entity:

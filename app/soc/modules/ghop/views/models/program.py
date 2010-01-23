@@ -367,11 +367,13 @@ class View(program.View):
     """Returns a list with time dependent menu items.
     """
 
+    from soc.modules.ghop.logic.models.org_app_survey import logic as org_app_logic
+
     items = []
 
     timeline_entity = ghop_program_entity.timeline
 
-    org_app_survey = org_app_logic.getForProgram(program_entity)
+    org_app_survey = org_app_logic.getForProgram(ghop_program_entity)
 
     if org_app_survey and \
         timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):

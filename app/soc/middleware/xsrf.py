@@ -16,16 +16,18 @@
 """Middleware to protect against cross site request forgeries.
 
 This middleware will automatically add a hidden form input containing the XSRF
-token to any <form> sent to the browser, and any POST requests will
-be rejected if the provided token is invalid.
+token to any <form> sent to the browser, and any (non-AppEngine) POST requests
+will be rejected if the provided token is invalid.
 """
 
 __authors__ = [
   '"Doug Coker" <dcoker@google.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 import itertools
+import os
 import re
 
 from django import http
@@ -50,11 +52,19 @@ class XsrfMiddleware(object):
 
   def process_request(self, request):
     """Requires a valid XSRF token on POST requests."""
-    # We only care about POST
+    # we only care about POST
     if request.method != 'POST':
       return None
 
+    # HTTPRequests from AppEngine do not have to have a key
+    app_engine_request = ('HTTP_X_APPENGINE_CRON' in os.environ) or \
+        ('HTTP_X_APPENGINE_QUEUENAME' in os.environ)
+
+    if app_engine_request:
+      return None
+
     post_token = request.POST.get('xsrf_token')
+
     if not post_token:
       return http.HttpResponse('Missing XSRF token.', status=403)
 
@@ -69,10 +79,10 @@ class XsrfMiddleware(object):
       xsrf_token = \
         xsrfutil.getGeneratedTokenForCurrentUser(self._getSecretKey(request))
 
-      # There may be multiple forms per page, but we only id= one of them.
+      # there may be multiple forms per page, but we only id= one of them
       idattributes = itertools.chain(("id='xsrftoken'",), itertools.repeat(''))
 
-      # Invoked on every matching <form> tag.
+      # invoked on every matching <form> tag
       def add_xsrf_field(match):
         """Returns the matched <form> tag plus the added <input> element"""
         return mark_safe(match.group() + ("<div style='display:none;'>" +
@@ -82,7 +92,7 @@ class XsrfMiddleware(object):
 
       response.content, n = _POST_FORM_RE.subn(add_xsrf_field, response.content)
       if n > 0:
-        # Content has changed, so ETag would be invalid.
+        # content has changed, so ETag would be invalid
         del response['ETag']
 
     return response

@@ -367,7 +367,8 @@ class View(program.View):
     """Returns a list with time dependent menu items.
     """
 
-    from soc.modules.ghop.logic.models.org_app_survey import logic as org_app_logic
+    from soc.modules.ghop.logic.models.org_app_survey import logic as \
+        org_app_logic
 
     items = []
 

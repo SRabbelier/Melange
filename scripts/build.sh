@@ -96,7 +96,4 @@ do
     fi
 done
 
-# Run shrinksafe
-bash ../scripts/shrinksafe.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json
-
 echo "Build results in $APP_BUILD."

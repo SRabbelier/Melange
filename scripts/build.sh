@@ -96,4 +96,7 @@ do
     fi
 done
 
+# Run closure
+bash ../scripts/closure.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json
+
 echo "Build results in $APP_BUILD."

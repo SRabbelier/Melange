@@ -222,7 +222,7 @@ class Logic(base.Logic):
     """
 
     # TODO: History needs to be tested and perhaps refactored
-    if 'status' in properties and properties['status'] == 'Open':
+    if properties.get('status') == 'Open':
       history = {
           'title': properties['title'],
           'description': properties['description'],

@@ -56,6 +56,7 @@ class View(presence_with_tos.View):
     rights = access.Checker(params)
     rights['unspecified'] = ['checkIsDeveloper']
     rights['any_access'] = ['allow']
+    rights['home'] = ['allow']
     rights['show'] = ['checkIsDeveloper']
 
     new_params = {}

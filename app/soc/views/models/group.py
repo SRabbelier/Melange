@@ -265,59 +265,21 @@ class View(presence.View):
     filter = {
         'group': group_entity,
         'role': role_names,
-        'status': 'new'
         }
 
     # create the list parameters
-    inc_req_params = request_view.getParams()
+    req_params = request_view.getParams()
 
     # define the list redirect action to the request processing page
-    inc_req_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    inc_req_params['list_description'] = ugettext(
-        "An overview of the %(name)s's incoming requests." % params)
+    req_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getProcessRequestRedirect(entity, None)
+    }
+    req_params['public_field_ignore'] = ['for']
+    req_params['list_description'] = ugettext(
+        "An overview of the %(name)s's invites and requests." % params)
 
-    inc_req_content = list_helper.getListContent(
-        request, inc_req_params, filter, idx=0)
-
-    # list all outstanding invites
-    filter = {
-        'group': group_entity,
-        'role': role_names,
-        'status': 'group_accepted'
-        }
-
-    # create the list parameters
-    out_inv_params = request_view.getParams()
-
-    # define the list redirect action to the request processing page
-    out_inv_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    out_inv_params['list_description'] = ugettext(
-        "An overview of the %(name)s's outstanding invites." % params)
-
-    out_inv_content = list_helper.getListContent(
-        request, out_inv_params, filter, idx=1)
-
-    # list all ignored requests
-    filter = {
-        'group': group_entity,
-        'role': role_names,
-        'status': 'ignored'
-        }
-
-    # create the list parameters
-    ignored_params = request_view.getParams()
-
-    # define the list redirect action to the request processing page
-    ignored_params['list_action'] = (redirects.getProcessRequestRedirect, None)
-    ignored_params['list_description'] = ugettext(
-        "An overview of the %(name)s's ignored requests." % params)
-
-    ignored_content = list_helper.getListContent(
-        request, ignored_params, filter, idx=2)
-
-    contents = [inc_req_content, out_inv_content, ignored_content]
-
-    return self._list(request, params, contents, page_name)
+    return self.list(request, access_type, page_name=page_name,
+                     params=req_params, filter=filter, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

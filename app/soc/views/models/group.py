@@ -25,6 +25,7 @@ __authors__ = [
 
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -281,6 +282,28 @@ class View(presence.View):
     return self.list(request, access_type, page_name=page_name,
                      params=req_params, filter=filter, **kwargs)
 
+  def getListRolesData(self, request, list_params, group_entity):
+    """Returns the list data for listRoles.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if not 0 <= idx < len(list_params):
+        return responses.jsonErrorResponse(request, "idx not valid")
+
+    # create the filter
+    fields= {
+        'scope' : group_entity,
+        'status': 'active'
+        }
+
+    params = list_params[idx]
+    contents = list_helper.getListData(request, params, fields)
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listRoles(self, request, access_type,
@@ -298,36 +321,34 @@ class View(presence.View):
     # set the pagename to include the link_id
     page_name = '%s %s' % (page_name, kwargs['link_id'])
 
-    # get the group from the request
-    group_logic = params['logic']
-
-    group_entity = group_logic.getFromKeyFields(kwargs)
-
-    # create the filter
-    filter = {
-        'scope' : group_entity,
-        'status': 'active'
-        }
-
     role_views = params['role_views']
-    contents = []
-    index = 0
 
-    # for each role we create a separate list
-    for role_name in role_views.keys():
+    lists_params = []
+
+    for role_name in sorted(role_views.keys()):
       # create the list parameters
       list_params = role_views[role_name].getParams().copy()
 
-      list_params['list_action'] = (redirects.getManageRedirect, list_params)
+      list_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getManageRedirect(entity, list_params)
+      }
       list_params['list_description'] = ugettext(
           "An overview of the %s for this %s." % (
           list_params['name_plural'], params['name']))
 
-      new_list_content = list_helper.getListContent(
-          request, list_params, filter, idx=index)
+      lists_params.append(list_params)
 
-      contents += [new_list_content]
+    if request.GET.get('fmt') == 'json':
+      group_logic = params['logic']
+      group_entity = group_logic.getFromKeyFields(kwargs)
+      return self.getListRolesData(request, lists_params, group_entity)
 
+    contents = []
+
+    index = 0
+    for list_params in lists_params:
+      list = list_helper.getListGenerator(request, list_params, idx=index)
+      contents.append(list)
       index += 1
 
     # call the _list method from base.View to show the list
@@ -419,8 +440,6 @@ class View(presence.View):
       # add the items together
       menu['items'] = doc_items + group_items
       menu['group'] = params['name_plural']
-      menu['collapse'] = 'collapse' if group_entity.status == 'inactive' \
-          else ''
 
       # append this as a new menu
       menus.append(menu)

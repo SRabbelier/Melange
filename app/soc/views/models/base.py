@@ -512,8 +512,9 @@ class View(object):
 
   @decorators.merge_params
   @decorators.check_access
-  def list(self, request, access_type, page_name=None, params=None,
-           filter=None, order=None, prefetch=None, visibility=None, **kwargs):
+  def list(self, request, access_type, page_name=None,
+           params=None, filter=None, order=None, prefetch=None,
+           visibility=None, context=None, **kwargs):
     """Displays the list page for the entity type.
 
     Args:
@@ -547,7 +548,7 @@ class View(object):
     content = helper.lists.getListGenerator(request, params, idx=0)
     contents = [content]
 
-    return self._list(request, params, contents, page_name)
+    return self._list(request, params, contents, page_name, context=context)
 
   def _list(self, request, params, contents, page_name, context=None):
     """Returns the list page for the specified contents.

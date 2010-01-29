@@ -747,14 +747,12 @@ class View(base.View):
     list_params['list_description'] = \
         "List of Records for the %s titled '%s'." %(list_params['name'],
                                                     entity.title)
-    list_params['list_action'] = (redirects.getViewSurveyRecordRedirect,
-                                  list_params)
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
+    }
 
-    record_list = lists.getListContent(request, list_params, fields, idx=0)
-
-    contents = [record_list]
-
-    return self._list(request, list_params, contents, page_name, context)
+    return self.list(request, 'any_access', page_name=page_name,
+                     params=list_params, context=context)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):
     """Retrieves the Results View filter for SurveyRecords.

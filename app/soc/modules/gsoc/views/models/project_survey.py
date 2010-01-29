@@ -260,10 +260,8 @@ class View(survey.View):
         "Select a %s for which to fill in the %s named %s" %(
             student_project_params['name'], params['name'], survey.title))
 
-    content = lists.getListContent(request, student_project_params, fields)
-    contents = [content]
-
-    return self._list(request, student_project_params, contents, page_name)
+    return self.list(request, 'any_access', page_name=page_name,
+                     params=student_project_params)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):
     """Get the Results View filter for ProjectSurveyRecords.

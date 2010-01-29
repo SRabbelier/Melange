@@ -248,10 +248,8 @@ class View(group.View):
     new_filter['status'] = 'active'
     filter = dicts.merge(filter, new_filter)
 
-    content = lists.getListContent(request, params, filter)
-    contents = [content]
-
-    return self._list(request, params, contents, page_name)
+    return self.list(request, 'any_access', page_name=page_name,
+                      params=params, filter=filter)
 
   def _getMapData(self, filter=None):
     """Constructs the JSON object required to generate 

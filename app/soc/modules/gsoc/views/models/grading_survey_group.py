@@ -521,13 +521,10 @@ class View(base.View):
     # get the list content for all records
     list_params['list_description'] = \
         'List of all GradingRecords. Pick one to edit it.'
-    list_content = lists.getListContent(
-        request, list_params, fields, idx=0)
-
-    contents = [list_content]
 
     # return the view which renders the set content
-    return self._list(request, list_params, contents, page_name)
+    return self.list(request, 'any_access', page_name=page_name,
+                     params=list_params)
 
 
 view = View()

@@ -124,7 +124,7 @@ def _processProgramFreezing(program_entity, mode):
   responses.startTask(_constructRequestURL(ORG_MODEL_URL_PATTERNS[0]),
       context=new_context)
 
-  return
+  return 
 
 
 def manageModelStatus(entity_logic, status_retriever=None):
@@ -170,7 +170,8 @@ def manageModelStatus(entity_logic, status_retriever=None):
       # we might not have exhausted all the roles that can be updated,
       # so start the same task again
       context = post_dict.copy()
-      return responses.startTask(request.path, context=context)
+      responses.startTask(request.path, context=context)
+      return responses.terminateTask()
 
     # exhausted all the entities the task has been completed
     return responses.terminateTask()

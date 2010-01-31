@@ -27,6 +27,7 @@ import time
 
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -254,6 +255,33 @@ class View(base.View):
 
       context['additional_mentors'] = ', '.join(mentor_names)
 
+  def getWithdrawData(self, request, ap_params, wp_params, program_kwargs):
+    """Return data for withdraw.
+    """
+
+    program = program_logic.getFromKeyFieldsOr404(program_kwargs)
+
+    fields = {
+        'program': program,
+        }
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if idx == 0:
+      fields['status'] = ['accepted', 'completed']
+      params = ap_params
+    elif idx == 1:
+      fields['status'] = ['withdrawn']
+      params = wp_params
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = lists.getListData(request, params, fields, 'public')
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def withdraw(self, request, access_type,
@@ -263,13 +291,6 @@ class View(base.View):
     For params see base.View().public()
     """
 
-    program = program_logic.getFromKeyFieldsOr404(kwargs)
-
-    fields = {
-        'program': program,
-        'status': ['accepted', 'completed'],
-        }
-
     ap_params = params.copy() # accepted projects
 
     ap_params['list_action'] = (redirects.getWithdrawProjectRedirect,
@@ -278,11 +299,6 @@ class View(base.View):
         "An overview of accepted and completed Projects. "
         "Click on a project to withdraw it.")
 
-    ap_list = lists.getListContent(
-        request, ap_params, fields, idx=0)
-
-    fields['status'] = ['withdrawn']
-
     wp_params = params.copy() # withdrawn projects
 
     wp_params['list_action'] = (redirects.getAcceptProjectRedirect, wp_params)
@@ -290,8 +306,11 @@ class View(base.View):
         "An overview of withdrawn Projects. "
         "Click on a project to undo the withdrawal.")
 
-    wp_list = lists.getListContent(
-        request, wp_params, fields, idx=1)
+    if request.GET.get('fmt') == 'json':
+      return self.getWithdrawData(request, ap_params, wp_params, kwargs)
+
+    ap_list = lists.getListGenerator(request, ap_params, idx=0)
+    wp_list = lists.getListGenerator(request, wp_params, idx=1)
 
     # fill contents with all the needed lists
     contents = [ap_list, wp_list]

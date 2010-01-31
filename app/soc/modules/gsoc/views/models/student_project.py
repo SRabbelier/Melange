@@ -301,7 +301,7 @@ class View(base.View):
     For params see base.View().public()
 
     """
-
+# TODO(POST)
     logic = params['logic']
     entity = logic.getFromKeyFieldsOr404(kwargs)
 
@@ -324,7 +324,7 @@ class View(base.View):
     For params see base.View().public()
 
     """
-
+# TODO(POST)
     logic = params['logic']
     entity = logic.getFromKeyFieldsOr404(kwargs)
 

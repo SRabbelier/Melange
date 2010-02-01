@@ -40,5 +40,46 @@ class Logic(survey_record.Logic):
     super(Logic, self).__init__(
         model=model, base_model=base_model, scope_logic=scope_logic)
 
+  def processRecord(self, record):
+    """Processes an OrgAppRecord that is in the pre-accepted/pre-rejected
+    state.
+
+    The status of such an OrgAppRecord is updated to either accepted or
+    rejected based on the current status.
+
+    Args:
+      record: OrgAppRecord entity
+    """
+
+    current_status = record.status
+
+    if current_status == 'pre-accepted':
+      new_status = 'accepted'
+    elif current_status == 'pre-rejected':
+      new_status = 'rejected'
+    else:
+      # no work to be done
+      return record
+
+    fields = {'status': new_status}
+    return self.updateEntityProperties(record, fields)
+
+  def _updateField(self, entity, entity_properties, name):
+    """Hook for when a field in the OrgAppRecord is updated.
+
+    Responds to change in the status field to accepted/rejected by sending out
+    a notification and an email to the users set in the record.
+    """
+
+    value = entity_properties[name]
+
+    if name == 'status' and value in ['accepted', 'rejected'] and \
+        entity.status != value:
+      # TODO(ljvderijk) Make a notification and sent out email where further
+      # processing can be done.
+      pass
+
+    return True
+
 
 logic = Logic()

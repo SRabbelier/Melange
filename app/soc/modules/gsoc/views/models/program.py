@@ -458,7 +458,7 @@ class View(program.View):
         'link': redirects.getHomeRedirect(entity, aa_params)
     }
     aa_params['list_description'] = description
-
+# TODO(LIST)
     aa_list = lists.getListContent(request, aa_params, filter, idx=0,
                                    need_content=True)
 

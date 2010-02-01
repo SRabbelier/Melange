@@ -353,6 +353,7 @@ class View(base.View):
     list_params['public_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
     }
+# TODO(LIST)
     fields = {'grading_survey_group': entity}
 
     # list all records with grading_decision set to pass
@@ -537,6 +538,7 @@ class View(base.View):
     list_params['public_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
     }
+# TODO(LIST)
     fields = {'grading_survey_group': survey_group}
 
     # get the list content for all records

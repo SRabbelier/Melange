@@ -206,7 +206,7 @@ class View(survey_view.View):
         'List of Applications for which you are Main Admin.'
     main_list = lists.getListContent(request, list_params, fields,
                                      need_content=True, idx=0)
-
+# TODO(LIST)
     if main_list:
       list_contents.append(main_list)
 

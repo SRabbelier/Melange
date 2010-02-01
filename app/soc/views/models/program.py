@@ -208,7 +208,7 @@ class View(presence.View):
       # only cache if all profiles are created
       fun =  soc.cache.logic.cache(self._getData)
       entities = fun(org_logic.getModel(), filter, order, org_logic)
-
+# TODO(LIST)
     result = dicts.rename(ao_params, ao_params['list_params'])
     result['action'] = (redirects.getHomeRedirect, ao_params)
     result['description'] = description

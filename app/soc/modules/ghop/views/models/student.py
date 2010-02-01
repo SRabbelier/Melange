@@ -140,6 +140,7 @@ class View(student.View):
     st_params['public_row_extra'] = lambda entity: {
         'link': redirects.getPublicRedirect(entity, st_params)
     }
+# TODO(LIST)
     st_org_params = st_params.copy()
     for k, v in tasks_by_orgs.iteritems():
       st_org_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % v[0]
@@ -158,7 +159,7 @@ class View(student.View):
     result['action'] = (redirects.getPublicRedirect, params)
     result['data'] = data
     result['pagination'] = 'soc/list/no_pagination.html'
-
+# TODO(LIST)
     return result
 
 

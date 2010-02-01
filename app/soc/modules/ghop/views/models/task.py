@@ -754,6 +754,7 @@ class View(base.View):
     up_params['public_row_entity'] = lambda entity: {
         'link': redirects.getPublicRedirect(entity, up_params)
     }
+# TODO(LIST)
     up_params['list_description'] = ugettext(
        'List of Unapproved tasks.')
 
@@ -1393,6 +1394,7 @@ class View(base.View):
     task_params['public_row_extra'] = lambda entity: {
         'link': redirects.getPublicRedirect(entity, task_params)
     }
+# TODO(LIST)
     task_params['list_description'] = ugettext(
        'Search results: ')
 

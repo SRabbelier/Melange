@@ -145,7 +145,7 @@ class View(organization.View):
   def _public(self, request, entity, context):
     """See base.View._public().
     """
-
+#TODO(LIST)
     from soc.modules.ghop.views.models import task as ghop_task_view
 
     contents = []

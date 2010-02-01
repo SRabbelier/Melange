@@ -360,7 +360,7 @@ class View(group.View):
           entity.name)
       ap_params['list_heading'] = 'soc/student_project/list/heading.html'
       ap_params['list_row'] = 'soc/student_project/list/row.html'
-
+# TODO(LIST)
       # only show projects that have not failed
       filter = {'scope': entity,
                 'status': ['accepted', 'completed']}

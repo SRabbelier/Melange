@@ -40,6 +40,10 @@ handlers:
   static_dir: gsoc/content
   expiration: 1d
 
+- url: /jlinq
+  static_dir: jlinq
+  expiration: 1d
+
 - url: /jquery
   static_dir: jquery
   expiration: 1d

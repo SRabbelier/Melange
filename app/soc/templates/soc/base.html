@@ -33,6 +33,11 @@ limitations under the License.
   {% if uses_jq_datetimepicker %}
   <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.datetimepicker-090304.css">
   {% endif %}
+  {% if uses_jq_grid %}
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.all.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.jqgrid-091228.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.jqgrid.searchFilter-091207.css" />
+  {% endif %}
 	{% endblock %}
   <title>
     {% block page_title %}
@@ -93,6 +98,20 @@ limitations under the License.
   <script type="text/javascript" src="/soc/content/js/datetime-loader-090825.js"></script>
   <script type="text/javascript" src="/soc/content/js/datetimepicker-090825.js"></script>
   {% endif %}
+  {% if uses_jq_grid %}
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.locale-en.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.base.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.common.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.custom.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.formedit.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.jqDnR.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.jqModal.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.searchFilter.js"></script>
+  <script type="text/javascript" src="/jquery/jquery-jqgrid.setcolumns.js"></script>
+  {% endif %}
+  {% if uses_jlinq %}
+  <script type="text/javascript" src="/jlinq/jLinq-2.2.1.js"></script>
+  {% endif %}
   {% if uses_slot_allocator %}
   <script type="text/javascript" src="/soc/content/js/slot-allocator-090825.js"></script>
   {% endif %}
@@ -111,6 +130,9 @@ limitations under the License.
   <script type="text/javascript">
     var xsrf_token = '{{xsrf_token}}';
   </script>
+  {% if uses_melangelist %}
+  <script type="text/javascript" src="/soc/content/js/melange.list-091122.js"></script>
+  {% endif %}
 {% endblock %}
 </head>
 

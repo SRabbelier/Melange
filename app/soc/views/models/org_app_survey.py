@@ -31,6 +31,7 @@ from soc.logic.helper import timeline as timeline_helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
@@ -68,11 +69,34 @@ class View(survey_view.View):
          (r'^%(url_name)s/(?P<access_type>list_self)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.list_self',
          'Overview of %(name_plural)s Taken by You'),
+         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.review',
+         'Review %(name)s from '),
          ]
+
+    new_params['review_template'] = 'soc/org_app_survey/review.html'
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+    # create the form to edit status
+    dynaproperties = {
+        'status': forms.fields.ChoiceField(required=True,
+            label = 'New Status',
+            choices = [('accepted', 'Accept'),
+                       ('pre-accepted', 'Pre-Accept'),
+                       ('rejected', 'Reject'),
+                       ('pre-rejected', 'Pre-Reject'),
+                       ('ignored', 'Ignore'),])
+        }
+
+    review_form = dynaform.newDynaForm(
+        dynabase = self._params['dynabase'],
+        dynaproperties = dynaproperties,
+    )
+
+    self._params['review_form'] = review_form
 
   @decorators.check_access
   def create(self, request, access_type,
@@ -222,6 +246,109 @@ class View(survey_view.View):
 
     return self._list(request, list_params, list_contents, page_name, context)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def review(self, request, access_type, page_name=None, params=None,
+             **kwargs):
+    """View that lists a OrgAppSurveyRecord to be reviewed.
+
+    For Args see base.View().public().
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    try:
+      survey_entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    get_dict = request.GET
+    record_id = get_dict.get('id')
+
+    if record_id and record_id.isdigit():
+      record_id = int(record_id)
+      record_entity = record_logic.getFromIDOr404(record_id)
+    else:
+      raise out_of_band.Error('No valid Record ID given')
+
+    if record_entity.survey.key() != survey_entity.key():
+      # record does not match the retrieved survey
+      raise out_of_band.Error('Record ID does not match the given survey')
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = '%s %s' %(page_name, record_entity.name)
+    context['entity'] = survey_entity
+    context['record'] = record_entity
+
+    # store the read only survey form in the context
+    survey_form = params['survey_record_form'](
+       survey=survey_entity,
+       survey_record=record_entity,
+       survey_logic=self._params['logic'],
+       read_only=True)
+    survey_form.getFields()
+    context['survey_form'] = survey_form
+
+    if request.POST:
+      return self.reviewPost(request, params, context, survey_entity,
+                             record_entity)
+    else:
+      return self.reviewGet(request, params, context, survey_entity,
+                            record_entity)
+
+  def reviewGet(self, request, params, context, survey, record):
+    """Handles the GET request for reviewing an OrgAppSurveyRecord.
+
+    Args:
+      request: HTTPRequest object
+      params: View params dict
+      context: page context dictionary
+      survey: OrgAppSurvey entity
+      record: OrgAppSurveyRecord under review
+    """
+
+    review_form = params['review_form']()
+    review_form.fields['status'].initial = record.status
+    context['review_form'] = review_form
+
+    template = params['review_template']
+    return responses.respond(request, template, context)
+
+  def reviewPost(self, request, params, context, survey, record):
+    """Handles the GET request for reviewing an OrgAppSurveyRecord.
+
+    Args:
+      request: HTTPRequest object
+      params: View params dict
+      context: page context dictionary
+      survey: OrgAppSurvey entity
+      record: OrgAppSurveyRecord under review
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    post_dict = request.POST
+    review_form = params['review_form'](post_dict)
+
+    if not review_form.is_valid():
+      context['review_form'] = review_form
+      template = params['review_template']
+      return responses.respond(request, template, context)
+
+    new_status = review_form.cleaned_data['status']
+
+    # only update if the status actually changes
+    if record.status != new_status:
+      fields = {'status' : new_status}
+      record_logic.updateEntityProperties(record, fields)
+
+    # TODO(ljvderijk) fix redirect
+    return http.HttpResponseRedirect('')
 
 class OrgAppSurveyForm(surveys.SurveyTakeForm):
   """Extends SurveyTakeForm by adding fields required for OrgAppSurvey.

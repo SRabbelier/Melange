@@ -13,7 +13,7 @@ DEFAULT_APP_FOLDER="../app"
 DEFAULT_APP_FILES="app.yaml cron.yaml index.yaml queue.yaml main.py settings.py
 shell.py urls.py gae_django.py profiler.py"
 DEFAULT_APP_DIRS="soc ghop gsoc feedparser python25src reflistprop jquery \
-    ranklist shell json htmlsanitizer taggable gviz app_profiler"
+    ranklist shell json jlinq htmlsanitizer taggable gviz app_profiler"
 DEFAULT_ZIP_FILES="tiny_mce.zip"
 
 APP_BUILD=${APP_BUILD:-"${DEFAULT_APP_BUILD}"}
@@ -96,7 +96,7 @@ do
     fi
 done
 
-# Run closure
-bash ../scripts/closure.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json
+# Run shrinksafe
+bash ../scripts/closure.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json $APP_BUILD/jlinq
 
 echo "Build results in $APP_BUILD."

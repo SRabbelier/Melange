@@ -59,6 +59,7 @@ class View(org_app_survey.View):
         ('checkIsSurveyReadable', [org_app_logic])]
         ])]
     rights['results'] = [('checkIsHostForProgramInScope', program_logic)]
+    rights['review'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['take'] = [
         'checkOrgAppRecordIfPresent',
         ('checkIsActivePeriod',
@@ -91,4 +92,5 @@ list_self = decorators.view(view.list_self)
 public = decorators.view(view.public)
 record = decorators.view(view.viewRecord)
 results = decorators.view(view.viewResults)
+review = decorators.view(view.review)
 take = decorators.view(view.take)

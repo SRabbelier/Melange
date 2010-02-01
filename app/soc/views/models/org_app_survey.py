@@ -68,7 +68,12 @@ class View(survey_view.View):
          (r'^%(url_name)s/(?P<access_type>list_self)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.list_self',
          'Overview of %(name_plural)s Taken by You'),
+         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.review',
+         'Review %(name)s from '),
          ]
+
+    new_params['review_template'] = ''
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -219,6 +224,97 @@ class View(survey_view.View):
       list_contents.append(backup_list)
 
     return self._list(request, list_params, list_contents, page_name, context)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def review(self, request, access_type, page_name=None, params=None,
+             **kwargs):
+    """View that lists a OrgAppSurvey to be reviewed.
+
+    For Args see base.View().public().
+    """
+
+    survey_logic = params['logic']
+    record_logic = survey_logic.getRecordLogic()
+
+    try:
+      survey_entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    get_dict = request.GET
+    record_id = get_dict.get('id')
+
+    if record_id and record_id.isdigit():
+      record_id = int(record_id)
+      record_entity = record_logic.getFromIDOr404(record_id)
+    else:
+      raise out_of_band.Error('No valid Record ID given')
+
+    if record_entity.survey.key() != survey_entity.key():
+      # record does not match the retrieved survey
+      raise out_of_band.Error('Record ID does not match the given survey')
+
+    if request.POST:
+      return self.reviewPost(request, params, survey_entity, record_entity)
+    else:
+      return self.reviewGet(request, params, page_name, survey_entity,
+                            record_entity)
+
+  def reviewGet(self, request, params, page_name, survey, record):
+    """
+    """
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = '%s %s' %(page_name, record.name)
+    context['entity'] = survey
+    context['record'] = record
+
+    # store the read only survey form in the context
+    survey_form = params['survey_record_form'](
+       survey=survey,
+       survey_record=record,
+       survey_logic=self._params['logic'],
+       read_only=True)
+    survey_form.getFields()
+    context['survey_form'] = survey_form
+
+    template = params['review_template']
+    return responses.respond(request, template, context)
+
+  def reviewPost(self, request, survey, record):
+    """
+    """
+
+    post_dict = request.POST
+
+    # check to see if we can make a decision for this application
+    if 'status' in get_dict:
+      status_value = get_dict['status']
+
+      if status_value in ['accepted', 'rejected', 'ignored', 'pre-accepted',
+          'pre-rejected']:
+        # this application has been properly reviewed update the status
+
+        # only update if the status actually changes
+        if entity.status != status_value:
+          fields = {'status' : status_value}
+
+          self._logic.updateEntityProperties(entity, fields)
+
+        # TODO fix the redirect
+        # redirect to the review overview
+        fields = {'url_name': params['url_name']}
+
+        return http.HttpResponseRedirect(
+            '/%(url_name)s/review_overview/%(scope_path)s' %fields)
+    else:
+      # no valid POST data found
+      raise out_of_band.Error(
+          'The requested action in the POST data could not be processed')
 
 
 class OrgAppSurveyForm(surveys.SurveyTakeForm):

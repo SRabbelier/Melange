@@ -215,6 +215,7 @@ class View(group_app.View):
     For params see group_app.View._review().
     """
 
+    # TODO move this to the OrgApp Logic _onUpdateFields or something :)
     if status == 'accepted' or status == 'rejected':
 
       default_sender = mail_dispatcher.getDefaultMailSender()

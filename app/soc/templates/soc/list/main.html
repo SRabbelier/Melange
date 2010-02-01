@@ -1,19 +1,10 @@
 {{ list.description }}
 
-<div class="list">
-  {% include list.pagination %}
-
-  <table id="queues">
-    {% if not list.rows %}
-      <tr><td colspan="9"><span class="disabled">(None)</span></td></tr>
-    {% else %}
-      {% include list.heading %}
-      {% for row_number in list.rows %}
-        {% include list.nextRow %}
-      {% endfor %}
-    {% endif %}
-  </table>
-
-  {% include list.pagination %}
-
-</div>
+<script type="text/javascript">
+  jQuery(
+    function () {
+      melange.list.loadList("melangeList{{ list.idx }}",{{ list.idx }});
+    }
+  );
+</script>
+<div id="melangeList{{ list.idx }}"></div>

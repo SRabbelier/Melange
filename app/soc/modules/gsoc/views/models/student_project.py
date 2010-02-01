@@ -293,15 +293,19 @@ class View(base.View):
 
     ap_params = params.copy() # accepted projects
 
-    ap_params['list_action'] = (redirects.getWithdrawProjectRedirect,
-                                ap_params)
+    ap_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getWithdrawProjectRedirect(entity,ap_params)
+    }
+
     ap_params['list_description'] = ugettext(
         "An overview of accepted and completed Projects. "
         "Click on a project to withdraw it.")
 
     wp_params = params.copy() # withdrawn projects
 
-    wp_params['list_action'] = (redirects.getAcceptProjectRedirect, wp_params)
+    wp_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getAcceptProjectRedirect(entity, wp_params)
+    }
     wp_params['list_description'] = ugettext(
         "An overview of withdrawn Projects. "
         "Click on a project to undo the withdrawal.")
@@ -520,8 +524,9 @@ class View(base.View):
     fields['scope_path'] = entity.program.key().id_or_name()
     gps_params['list_description'] = \
         'List of all Mentor Evaluations for this Project'
-    gps_params['list_action'] = None
-
+    gps_params['public_row_extra'] = lambda entity: {}
+    gps_params['public_row_action'] = {}
+# TODO(LIST)
     gps_list = lists.getListContent(
         request, gps_params, fields, idx=0)
     list_info.setProjectSurveyInfoForProject(gps_list, entity, gps_params)
@@ -534,7 +539,8 @@ class View(base.View):
 
     ps_params['list_description'] = \
         'List of all Student Evaluations for this Project'
-    ps_params['list_action'] = None
+    ps_params['public_row_extra'] = lambda entity: {}
+    ps_params['public_row_action'] = {}
 
     # list all surveys for this Project's Program
     fields['scope_path'] = entity.program.key().id_or_name()
@@ -702,6 +708,56 @@ class View(base.View):
     redirect = request.path
     return http.HttpResponseRedirect(redirect)
 
+  def getManageOverviewData(self, request, mo_params, org_entity):
+    """Returns the manageOverview data.
+    """
+
+    args = []
+    fields = {}
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if idx == 0:
+      from soc.modules.gsoc.logic.models.survey import grading_logic as \
+          grading_survey_logic
+      from soc.modules.gsoc.logic.models.survey import project_logic as \
+          project_survey_logic
+      from soc.modules.gsoc.logic.models.survey_record import grading_logic
+      from soc.modules.gsoc.logic.models.survey_record import project_logic
+
+      program_entity = org_entity.scope
+
+      fields = {'scope_path': program_entity.key().id_or_name()}
+
+      # count the number of have been active ProjectSurveys
+      project_surveys = project_survey_logic.getForFields(fields)
+      project_survey_count = len(project_surveys)
+
+      for project_survey in project_surveys:
+        if not project_survey_logic.hasRecord(project_survey):
+          project_survey_count = project_survey_count - 1
+
+      # count the number of have been active GradingProjectSurveys
+      grading_surveys = grading_survey_logic.getForFields(fields)
+      grading_survey_count = len(grading_surveys)
+
+      for grading_survey in grading_surveys:
+        if not grading_survey_logic.hasRecord(grading_survey):
+          grading_survey_count = grading_survey_count - 1
+
+      fields = {'scope': org_entity}
+      params = mo_params
+      args = [project_surveys, project_survey_count,
+              grading_surveys, grading_survey_count]
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = lists.getListData(request, params, fields, 'public', args=args)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def manageOverview(self, request, access_type,
@@ -712,97 +768,50 @@ class View(base.View):
     For params see base.View().public()
     """
 
-    from soc.modules.gsoc.views.helper import list_info
+    from soc.modules.gsoc.logic.models.survey import grading_logic as \
+        grading_survey_logic
+    from soc.modules.gsoc.logic.models.survey import project_logic as \
+        project_survey_logic
+    from soc.modules.gsoc.logic.models.survey_record import grading_logic
+    from soc.modules.gsoc.logic.models.survey_record import project_logic
 
     # make sure the organization exists
     org_entity = org_logic.getFromKeyNameOr404(kwargs['scope_path'])
-    fields = {'scope': org_entity}
+    page_name = '%s %s' % (page_name, org_entity.name)
 
-    # get the context for this webpage
-    context = responses.getUniversalContext(request)
-    responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = '%s %s' % (page_name, org_entity.name)
-
-    prefetch = ['student', 'mentor']
-
-    list_params = params.copy()
-    list_params['list_heading'] = params['manage_overview_heading']
-    list_params['list_row'] = params['manage_overview_row']
+    mo_params = params.copy()
+    mo_params['list_heading'] = params['manage_overview_heading']
+    mo_params['list_row'] = params['manage_overview_row']
 
     #list all active projects
-    fields['status'] = 'accepted'
-    active_params = list_params.copy()
-    active_params['list_description'] = \
-        'List of all active %(name_plural)s' % list_params
-    active_params['list_action'] = (redirects.getManageRedirect, list_params)
+    mo_params['list_description'] = \
+        'List of all active %(name_plural)s' % mo_params
+    mo_params['public_field_names'] = params['public_field_names'] + [
+        "Mentor evaluation", "Student Evaluation"]
+    mo_params['public_field_keys'] = params['public_field_keys'] + [
+        "mentor_evaluation", "student_evaluation"]
+    mo_params['public_row_extra'] = lambda entity, *args: {
+        'link': redirects.getManageRedirect(entity, mo_params)
+    }
+    mo_params['public_field_extra'] = lambda entity, ps, psc, gs, gsc: {
+        "student": entity.student.name(),
+        "mentor": entity.mentor.name(),
+        "mentor_evaluation": "%d/%d" % (
+                project_logic.getQueryForFields({'project': entity}).count(),
+                psc),
+        "student_evaluation": "%d/%d" % (
+                grading_logic.getQueryForFields({'project': entity}).count(),
+                gsc),
+    }
 
-    active_list = lists.getListContent(request, active_params, fields, idx=0,
-                                       prefetch=prefetch)
-    # set the needed info
-    active_list = list_info.setStudentProjectSurveyInfo(active_list,
-                                                        org_entity.scope)
+    if request.GET.get('fmt') == 'json':
+      return self.getManageOverviewData(request, mo_params, org_entity)
 
-    # list all failed projects
-    fields['status'] = 'failed'
-    failed_params = list_params.copy()
-    failed_params['list_description'] = ('List of all %(name_plural)s who ' 
-                                         'failed the program.') % list_params
-    failed_params['list_action'] = (redirects.getManageRedirect, list_params)
-
-    failed_list = lists.getListContent(request, failed_params, fields, idx=1,
-                                       need_content=True, prefetch=prefetch)
-    # set the needed info
-    failed_list = list_info.setStudentProjectSurveyInfo(failed_list,
-                                                        org_entity.scope)
-
-    # list all completed projects
-    fields['status'] = 'completed'
-    completed_params = list_params.copy()
-    completed_params['list_description'] = (
-        'List of %(name_plural)s that have successfully completed the '
-        'program.' % list_params)
-    completed_params['list_action'] = (redirects.getManageRedirect, list_params)
-
-    completed_list = lists.getListContent(request, completed_params, fields,
-                                          idx=2, need_content=True,
-                                          prefetch=prefetch)
-    # set the needed info
-    completed_list = list_info.setStudentProjectSurveyInfo(completed_list,
-                                                           org_entity.scope)
-
-    # list all withdrawn projects
-    fields['status'] = 'withdrawn'
-    withdrawn_params = list_params.copy()
-    withdrawn_params['list_description'] = (
-        'List of %(name_plural)s that have withdrawn from the program.' %(
-            list_params))
-    withdrawn_params['list_action'] = (redirects.getManageRedirect, list_params)
-
-    withdrawn_list = lists.getListContent(request, withdrawn_params, fields,
-                                          idx=3, need_content=True,
-                                          prefetch=prefetch)
-    # set the needed info
-    withdrawn_list = list_info.setStudentProjectSurveyInfo(withdrawn_list,
-                                                           org_entity.scope)
-
-    # always show the list with active projects
-    content = [active_list]
-
-    if failed_list != None:
-      # do not show empty failed list
-      content.append(failed_list)
-
-    if completed_list != None:
-      # do not show empty completed list
-      content.append(completed_list)
-
-    if withdrawn_list != None:
-      # do not show empty withdrawn list
-      content.append(withdrawn_list)
+    mo_list = lists.getListGenerator(request, mo_params, idx=0)
+    contents = [mo_list]
 
     # call the _list method from base to display the list
-    return self._list(request, list_params, content,
-                      context['page_name'], context)
+    return self._list(request, mo_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

@@ -195,7 +195,7 @@ class View(presence.View):
 
     filter = {
         'scope': program_entity,
-        'status': ['new', 'active']
+        'status': ['new', 'active', 'inactive']
         }
     order = ['name']
 

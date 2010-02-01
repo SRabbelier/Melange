@@ -190,13 +190,15 @@ class View(survey_view.View):
     list_params['list_row'] = 'soc/org_app_survey/list/records_row.html'
 
     if timeline_helper.isActivePeriod(entity, 'survey'):
-      redirect_info = {'url_name': list_params['url_name'],
-                       'survey':entity}
-      list_params['list_action'] = (redirects.getRetakeOrgAppSurveyRedirect,
-                                    redirect_info)
+      info = {'url_name': list_params['url_name'],
+              'survey':entity}
+      list_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
+      }
     else:
-      list_params['list_action'] = (redirects.getViewSurveyRecordRedirect,
-                                    list_params)
+      list_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
+      }
 
     fields = {'survey': entity,
               'main_admin': user_entity}

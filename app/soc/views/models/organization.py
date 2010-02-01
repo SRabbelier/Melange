@@ -238,9 +238,13 @@ class View(group.View):
     params = params.copy()
 
     if is_host:
-      params['list_action'] = (redirects.getAdminRedirect, params)
+      params['public_row_extra'] = lambda entity: {
+          'link': redirects.getAdminRedirect(entity, params)
+      }
     else:
-      params['list_action'] = (redirects.getPublicRedirect, params)
+      params['public_row_extra'] = lambda entity: {
+          'link': redirects.getPublicRedirect(entity, params)
+      }
 
     new_filter = {}
 
@@ -349,7 +353,9 @@ class View(group.View):
       ap_params = student_project_view.view.getParams().copy()
 
       # define the list redirect action to show the notification
-      ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+      ap_params['public_row_extra'] = lambda entity: {
+          'link': (redirects.getPublicRedirect, ap_params)
+      }
       ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
           entity.name)
       ap_params['list_heading'] = 'soc/student_project/list/heading.html'

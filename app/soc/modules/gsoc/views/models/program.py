@@ -454,7 +454,9 @@ class View(program.View):
 
     # define the list redirect action to show the notification
     del aa_params['list_key_order']
-    aa_params['list_action'] = (redirects.getHomeRedirect, aa_params)
+    aa_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, aa_params)
+    }
     aa_params['list_description'] = description
 
     aa_list = lists.getListContent(request, aa_params, filter, idx=0,
@@ -748,7 +750,10 @@ class View(program.View):
     from soc.modules.gsoc.views.models import student_project as sp_view
 
     ap_params = sp_view.view.getParams().copy() # accepted projects
-    ap_params['list_action'] = (redirects.getPublicRedirect, ap_params)
+    ap_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getPublicRedirect(entity, ap_params)
+    }
+
     ap_params['list_description'] = description
     ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
     ap_params['list_row'] = 'soc/student_project/list/row_all.html'

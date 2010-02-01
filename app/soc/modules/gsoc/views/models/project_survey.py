@@ -267,8 +267,10 @@ class View(survey.View):
     redirect_dict = {'survey': survey,
                      'params': params}
 
-    student_project_params['list_action'] = (
-        redirects.getTakeProjectSurveyRedirect, redirect_dict)
+    student_project_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getTakeProjectSurveyRedirect(entity, redirect_dict)
+    }
+
     student_project_params['list_description'] = (
         "Select a %s for which to fill in the %s named %s" %(
             student_project_params['name'], params['name'], survey.title))

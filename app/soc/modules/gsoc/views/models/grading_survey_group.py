@@ -350,9 +350,9 @@ class View(base.View):
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
     list_params['list_row'] = params['records_row_template']
-    list_params['list_action'] = (redirects.getEditGradingRecordRedirect,
-                                  list_params)
-
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getEditGradingRecordRedirect(entity, list_params)
+    }
     fields = {'grading_survey_group': entity}
 
     # list all records with grading_decision set to pass
@@ -534,9 +534,9 @@ class View(base.View):
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
     list_params['list_row'] = params['records_row_template']
-    list_params['list_action'] = (redirects.getEditGradingRecordRedirect,
-                                  list_params)
-
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getEditGradingRecordRedirect(entity, list_params)
+    }
     fields = {'grading_survey_group': survey_group}
 
     # get the list content for all records

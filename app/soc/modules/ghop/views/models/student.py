@@ -137,8 +137,9 @@ class View(student.View):
     st_params['list_template'] = 'soc/models/list.html'
     st_params['list_heading'] = 'modules/ghop/task/list/heading.html'
     st_params['list_row'] = 'modules/ghop/task/list/row.html'
-    st_params['list_action'] = (redirects.getPublicRedirect, st_params)
-
+    st_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getPublicRedirect(entity, st_params)
+    }
     st_org_params = st_params.copy()
     for k, v in tasks_by_orgs.iteritems():
       st_org_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % v[0]

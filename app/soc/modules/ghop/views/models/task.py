@@ -167,7 +167,6 @@ class View(base.View):
         ('checkRoleAndStatusForTask',
             [['ghop/org_admin', 'ghop/mentor'], ['active'],
             ['Unapproved']])]
-    rights['search'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.task.logic
@@ -204,10 +203,6 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>list_org_tasks)/%(scope)s$',
         '%(module_package)s.%(module_name)s.list_org_tasks',
         'List Organization %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>search)/'
-         '(?P<scope_path>%(ulnp)s)/%(lnp)s$',
-        '%(module_package)s.%(module_name)s.search',
-        'Search for %(name)ss'),
         ]
 
     new_params['extra_django_patterns'] = patterns
@@ -1363,102 +1358,6 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def search(self, request, access_type, page_name=None,
-             params=None, filter=None, order=None,**kwargs):
-    """View method to search for GHOP Tasks.
-
-    Args:
-      request: the standard Django HTTP request object
-      access_type : the name of the access type which should be checked
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View
-      kwargs: the Key Fields for the specified entity
-    """
-
-    get_params = request.GET
-
-    contents = []
-    context = {}
-    if not filter:
-      filter = {}
-
-    public_status = ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
-                     'ActionNeeded', 'Closed', 'AwaitingRegistration',
-                     'NeedsWork', 'NeedsReview']
-
-    task_params = params.copy()
-    task_params['list_template'] = 'modules/ghop/task/search/search.html'
-    task_params['list_heading'] = 'modules/ghop/task/search/heading.html'
-    task_params['list_row'] = 'modules/ghop/task/search/row.html'
-
-    task_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, task_params)
-    }
-# TODO(LIST)
-    task_params['list_description'] = ugettext(
-       'Search results: ')
-
-    program_entity = ghop_program_logic.logic.getFromKeyFields(kwargs)
-
-    org_fields = {
-        'scope': program_entity,
-        }
-
-    org_entities = ghop_org_logic.logic.getForFields(org_fields)
-    org_names = []
-    for org in org_entities:
-      org_names.append(org.name)
-
-    df_entities = ghop_task_model.TaskDifficultyTag.get_by_scope(
-        program_entity)
-    difficulties = []
-    for df_entity in df_entities:
-      difficulties.append(df_entity.tag)
-
-    tt_entities = ghop_task_model.TaskTypeTag.get_by_scope(program_entity)
-    task_types = []
-    for tt_entity in tt_entities:
-      task_types.append(tt_entity.tag)
-
-    context['org_entities'] = org_names
-    context['public_status'] = public_status
-    context['difficulties'] =  difficulties
-    context['tags'] = task_types
-
-    org_filter = get_params.getlist('Organization')
-    status_filter = get_params.getlist('Status')
-    df_filter = get_params.getlist('Difficulty')
-    tag_filter = get_params.getlist('Tags')
-
-    if org_filter:
-      org_fields = {
-        'scope': program_entity,
-        'name': org_filter,
-      }
-      org_entities = ghop_org_logic.logic.getForFields(org_fields)
-      filter['scope'] = org_entities
-    if status_filter:
-      filter['status'] = status_filter
-    else:
-      filter['status'] = public_status
-    if df_filter:
-      filter['difficulty'] = df_filter
-    if tag_filter:
-      filter['task_type'] = tag_filter
-
-    filter['program'] = program_entity
-
-    task_list = lists.getListContent(request, task_params, filter,
-                                     order=order, idx=0, need_content=True)
-
-    if task_list:
-      contents.append(task_list)
-
-    # call the _list method from base to display the list
-    return self._list(request, task_params, contents, page_name, context)
-
-  @decorators.merge_params
-  @decorators.check_access
   def delete(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by **kwargs.
@@ -1489,4 +1388,3 @@ list = decorators.view(view.list)
 list_org_tasks = decorators.view(view.listOrgTasks)
 suggest_task = decorators.view(view.suggestTask)
 public = decorators.view(view.public)
-search = decorators.view(view.search)

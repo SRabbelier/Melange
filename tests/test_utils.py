@@ -33,7 +33,7 @@ class MockRequest(object):
   before calling start on a new request), end should be called.
   """
 
-  def __init__(self, path=None):
+  def __init__(self, path=None, method='GET'):
     """Creates a new empty request object.
 
     self.REQUEST, self.GET and self.POST are set to an empty
@@ -44,6 +44,7 @@ class MockRequest(object):
     self.GET = {}
     self.POST = {}
     self.path = path
+    self.method = method
 
   def start(self):
     """Readies the core for a new request.

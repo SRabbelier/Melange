@@ -182,7 +182,7 @@ class View(survey_view.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def list_self(self, request, access_type, page_name=None,
+  def listSelf(self, request, access_type, page_name=None,
            params=None, **kwargs):
     """View that lists all the OrgRecords you have access to.
 

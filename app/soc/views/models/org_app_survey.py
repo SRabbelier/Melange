@@ -194,11 +194,7 @@ class View(survey_view.View):
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    try:
-      entity = survey_logic.getFromKeyFieldsOr404(kwargs)
-    except out_of_band.Error, error:
-      return responses.errorResponse(
-          error, request, template=params['error_public'])
+    entity = survey_logic.getFromKeyFieldsOr404(kwargs)
 
     # get the context for this webpage
     context = responses.getUniversalContext(request)

@@ -180,6 +180,29 @@ class View(survey_view.View):
     """
     return request.path + '?id=' + str(record.key().id_or_name())
 
+  def getListSelfData(self, request, enity, user_entity, ma_params, ba_params):
+    """Returns the listSelf data.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if idx == 0:
+      fields = {'survey': entity,
+                'main_admin': user_entity}
+      params = ma_params
+    elif idx == 1:
+      fields = {'survey': entity,
+                'backup_admin': user_entity}
+      params = ba_params
+    else:
+        return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = helper.lists.getListData(request, params, fields)
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listSelf(self, request, access_type, page_name=None,
@@ -195,11 +218,6 @@ class View(survey_view.View):
     record_logic = survey_logic.getRecordLogic()
 
     entity = survey_logic.getFromKeyFieldsOr404(kwargs)
-
-    # get the context for this webpage
-    context = responses.getUniversalContext(request)
-    responses.useJavaScript(context, params['js_uses_all'])
-    context['entity'] = entity
 
     list_contents = []
     user_entity = user_logic.getForCurrentAccount()
@@ -220,25 +238,22 @@ class View(survey_view.View):
           'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
       }
 
-    fields = {'survey': entity,
-              'main_admin': user_entity}
-    list_params['list_description'] = \
+    ma_params = list_params.copy()
+    ma_params['list_description'] = \
         'List of Applications for which you are Main Admin.'
-    main_list = lists.getListContent(request, list_params, fields,
-                                     need_content=True, idx=0)
-# TODO(LIST)
-    if main_list:
-      list_contents.append(main_list)
 
-    fields = {'survey': entity,
-              'backup_admin': user_entity}
-    list_params['list_description'] = \
+    ba_params = list_params.copy()
+    ba_params['list_description'] = \
         'List of Applications for which your are Backup Admin.'
-    backup_list = lists.getListContent(request, list_params, fields,
-                                       need_content=True, idx=1)
 
-    if backup_list:
-      list_contents.append(backup_list)
+    if request.GET.get('fmt') == 'json':
+      return self.getListSelfData(request, entity, user_entity,
+          ma_params, ba_params)
+
+    ma_list = lists.getListGenerator(request, ma_params, idx=0)
+    ba_list = lists.getListGenerator(request, ba_params, idx=1)
+
+    contents = [ma_params, ba_params]
 
     return self._list(request, list_params, list_contents, page_name, context)
 

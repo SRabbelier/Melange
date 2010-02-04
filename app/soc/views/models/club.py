@@ -98,7 +98,7 @@ class View(group.View):
 
     new_params['create_extra_dynaproperties'] = {
         'clean' : cleaning.validate_new_group('link_id', 'scope_path',
-            club_logic, None)}
+            club_logic)}
 
     # get rid of the clean method
     new_params['edit_extra_dynaproperties'] = {

@@ -508,11 +508,10 @@ def validate_user_edit(link_id_field, account_field):
 
 
 def validate_new_group(link_id_field, scope_path_field,
-                       group_logic, group_app_logic):
+                       group_logic):
   """Clean method used to clean the group application or new group form.
 
     Raises ValidationError if:
-    -A application with this link id and scope path already exists
     -A group with this link id and scope path already exists
   """
 
@@ -531,26 +530,6 @@ def validate_new_group(link_id_field, scope_path_field,
       scope_path = cleaned_data.get(scope_path_field)
       if scope_path:
         fields['scope_path'] = scope_path
-
-      # get the application
-      if group_app_logic:
-        group_app_entity = group_app_logic.logic.getForFields(fields, unique=True)
-      else:
-        group_app_entity = None
-
-      # get the current user
-      user_entity = user_logic.getForCurrentAccount()
-
-      # if the proposal has not been accepted or it's not the applicant
-      # creating the new group then show link ID in use message
-      # pylint: disable-msg=E1103
-      if group_app_entity and (group_app_entity.status != 'accepted' or (
-          group_app_entity.applicant.key() != user_entity.key())):
-        # add the error message to the link id field
-        self._errors[link_id_field] = ErrorList([DEF_LINK_ID_IN_USE_MSG])
-        del cleaned_data[link_id_field]
-        # return the new cleaned_data
-        return cleaned_data
 
       # check if there is already a group for the given fields
       group_entity = group_logic.logic.getForFields(fields, unique=True)

@@ -37,7 +37,7 @@ from soc.logic import accounts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
-from soc.logic.models import org_app as org_app_logic
+from soc.logic.models import org_app_survey as org_app_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -146,7 +146,7 @@ class View(group.View):
             'contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
-            soc.logic.models.organization, org_app_logic)
+            soc.logic.models.organization)
         }
 
     new_params['edit_extra_dynaproperties'] = {

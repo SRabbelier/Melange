@@ -112,8 +112,10 @@ class View(base.View):
     new_params['public_field_extra'] = lambda entity: {
         "from": entity.from_user.name if entity.from_user else site_name,
     }
-    new_params['public_field_keys'] = ["unread", "from", "subject", "created_on",]
-    new_params['public_field_names'] = ["Unread", "From", "Subject", "Received on"]
+    new_params['public_field_keys'] = ["unread", "from", "subject",
+                                       "created_on",]
+    new_params['public_field_names'] = ["Unread", "From", "Subject",
+                                        "Received on"]
 
     params = dicts.merge(params, new_params)
 
@@ -132,7 +134,9 @@ class View(base.View):
     if request.method == 'POST':
       return self.listPost(request, params, **kwargs)
     else: # request.method == 'GET'
-      return super(View, self).list(request, access_type, page_name=page_name, params=params, filter=filter, order=order, **kwargs)
+      return super(View, self).list(request, access_type, page_name=page_name,
+                                    params=params, filter=filter, order=order,
+                                    **kwargs)
 
   def listPost(self, request, params, **kwargs):
     """Handles the POST request for the list of notifications.

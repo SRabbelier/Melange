@@ -101,6 +101,7 @@ class View(organization.View):
 
     new_params['mentor_role_name'] = 'gsoc_mentor'
     new_params['mentor_url_name'] = 'gsoc/mentor'
+    new_params['org_admin_role_name'] = 'gsoc_org_admin'
 
     new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
                                        'nr_applications', 'nr_mentors']

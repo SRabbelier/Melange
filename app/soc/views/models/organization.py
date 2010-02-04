@@ -150,8 +150,6 @@ class View(group.View):
         'clean': cleaning.clean_refs(new_params, ['home_link_id'])
         }
 
-    new_params['mentor_role_name'] = 'mentor'
-
     new_params['public_field_extra'] = lambda entity: {
         'ideas': lists.urlize(entity.ideas),
     }
@@ -248,6 +246,8 @@ class View(group.View):
       kwargs: the Key Fields for the specified entity
     """
 
+    from soc.logic.helper import org_app_survey as org_app_helper
+
     # populate the form using the POST data
     form = params['create_form'](request.POST)
 
@@ -265,9 +265,12 @@ class View(group.View):
     if not key_name:
       key_name = self._logic.getKeyNameFromFields(fields)
 
-    # TODO(ljvderijk): complete the OrgAppRecord and sent out Admin invites
     # create the Organization entity
-    self._logic.updateOrCreateFromKeyName(fields, key_name)
+    org_entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
+
+    # complete the application and sent out the OrgAdmin invites
+    org_app_helper.completeApplication(record_entity, org_entity,
+                                       params['org_admin_role_name'])
 
     # redirect to notifications list to see the admin invite
     return http.HttpResponseRedirect('/notification/list')

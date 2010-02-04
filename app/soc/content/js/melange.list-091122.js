@@ -484,7 +484,8 @@
   var default_pager_options = {
     edit: false,
     add: false,
-    del: false
+    del: false,
+    refresh: false
   };
 
   $m.loadList = function (div, idx) {

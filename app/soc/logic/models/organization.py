@@ -50,35 +50,4 @@ class Logic(group.Logic):
   getKeyFieldNames = base.Logic.getKeyFieldNames
 
 
-  def _onCreate(self, entity):
-    """Invites the group admin and backup admin.
-    """
-
-    # Find their application
-    application = org_app_logic.logic.getFromKeyFields(fields)
-
-    if application:
-      # only if there is an application send out the invites
-      properties = {
-          'scope': entity,
-          'scope_path': entity.key().id_or_name(),
-          'role': 'org_admin',
-          'role_verbose': 'Organization Admin',
-          'status': 'group_accepted',
-          }
-
-      for admin in [application.applicant, application.backup_admin]:
-        if not admin:
-          continue
-
-        properties['link_id'] = admin.link_id
-        key_name = request_logic.logic.getKeyNameFromFields(properties)
-        request_logic.logic.updateOrCreateFromKeyName(properties, key_name)
-
-      # set the application to completed
-      fields = {'status': 'completed'}
-      org_app_logic.logic.updateEntityProperties(application, fields)
-
-    super(Logic, self)._onCreate(entity)
-
 logic = Logic()

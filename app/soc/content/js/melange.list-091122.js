@@ -837,6 +837,9 @@
                         jQuery.each(iterate_through, function (row_index, row) {
                           csv_export[csv_export.length] = [];
                           jQuery.each(row, function (column_name, cell_value) {
+                            if (cell_value === null) {
+                              cell_value = "Not set";
+                            }
                             var field_text = cell_value;
                             if (field_text.indexOf("\"") !== -1) {
                               field_text = field_text.replace("\"","\"\"");

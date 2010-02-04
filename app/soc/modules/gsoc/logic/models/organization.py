@@ -43,4 +43,17 @@ class Logic(organization.Logic):
                                 scope_logic=scope_logic)
 
 
+  def _onCreate(self, entity):
+    """Creates a RankerRoot entity.
+    """
+
+    from soc.modules.gsoc.models import student_proposal
+
+    # create a new ranker
+    ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,
+        student_proposal.DEF_SCORE, 100)
+
+    super(Logic, self)._onCreate(entity)
+
+
 logic = Logic()

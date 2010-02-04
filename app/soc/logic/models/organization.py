@@ -53,7 +53,7 @@ class Logic(group.Logic):
 
 
   def _onCreate(self, entity):
-    """Invites the group admin and backup admin and creates a RankerRoot entity.
+    """Invites the group admin and backup admin.
     """
 
     # Find their application

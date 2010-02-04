@@ -544,7 +544,7 @@
                   (start === "" ? "" : "&start=" + start),
                   "&idx=", idx
                 ].join(""),
-                timeout: 10000,
+                timeout: 60000,
                 success: function (data) {
                   jQuery("#" + div).html("List number " + idx + " loaded");
                   //console.debug("I'm idx "+idx+" with start "+start);

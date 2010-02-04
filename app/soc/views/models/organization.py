@@ -222,12 +222,12 @@ class View(group.View):
     """
 
     # extract the application fields
-    # TODO(ljvderijk): Create the form using the fields from the application 
-    # as the initial value.
-    fields = {}
-    fields['scope_path'] = record_entity.survey.scope.key().id_or_name()
-    #fields = dict( [(i, getattr(application, i)) for i in field_names] )
-
+    fields = {'name': record_entity.name,
+              'description': record_entity.description,
+              'home_page': record_entity.home_page,
+              'scope_path': record_entity.survey.scope.key().id_or_name(),
+              }
+    # use the extracted fields to initialize the form
     form = params['create_form'](initial=fields)
 
     # construct the appropriate response

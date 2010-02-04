@@ -1216,38 +1216,6 @@ class Checker(object):
     # no id present so return
     return
 
-  @allowDeveloper
-  def checkIsApplicationAccepted(self, django_args, app_logic):
-    """Returns an alternate HTTP response if Google Account has no accepted
-       Group Application entity for the specified arguments.
-
-    Args:
-      django_args: a dictionary with django's arguments
-
-     Raises:
-       AccessViolationResponse: if the required authorization is not met
-
-    Returns:
-      None if the Accepted Group App exists for the specified program, or a subclass
-      of django.http.HttpResponse which contains the alternate response
-      should be returned by the calling view.
-    """
-
-    self.checkIsUser(django_args)
-
-    application = app_logic.getFromKeyFieldsOr404(django_args)
-    applicant = application.applicant.key()
-    backup_admin = application.backup_admin
-    backup_admin = backup_admin.key() if backup_admin else None
-    user = self.user.key()
-
-    # check if the application is accepted and the applicant is the current user
-    if application.status == 'accepted' and (applicant == user or
-                                             backup_admin == user):
-      return
-
-    raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
-
   def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic,
                                               student_logic, org_admin_logic,
                                               mentor_logic):

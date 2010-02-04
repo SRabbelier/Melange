@@ -34,7 +34,6 @@ RIGHTS = [
     'checkHasUserEntity',
     'checkIsActive',
     'checkIsAllowedToManageRole',
-    'checkIsApplicationAccepted',
     'checkIsDeveloper',
     'checkIsDocumentReadable',
     'checkIsDocumentWritable',

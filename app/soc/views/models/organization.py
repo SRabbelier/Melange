@@ -27,6 +27,7 @@ __authors__ = [
 
 
 from django import forms
+from django import http
 from django.utils import simplejson
 from django.utils import html
 from django.utils.translation import ugettext
@@ -37,7 +38,6 @@ from soc.logic import accounts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
-from soc.logic.models import org_app_survey as org_app_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
 from soc.views import out_of_band
@@ -86,8 +86,6 @@ class View(group.View):
                                 org_admin_logic.logic)]
     rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              org_admin_logic.logic)]
-    rights['applicant'] = [('checkIsApplicationAccepted',
-                            org_app_logic.logic)]
 
     new_params = {}
     new_params['logic'] = soc.logic.models.organization.logic
@@ -106,7 +104,6 @@ class View(group.View):
     new_params['list_heading'] = 'soc/organization/list/heading.html'
     new_params['home_template'] = 'soc/organization/home.html'
 
-    new_params['application_logic'] = org_app_logic
     new_params['sans_link_id_public_list'] = True
 
     patterns = []
@@ -118,7 +115,7 @@ class View(group.View):
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
         '%(module_package)s.%(module_name)s.list_proposals',
         "List of all Student Proposals for this %(name)s"),
-        (r'^%(url_name)s/(?P<access_type>applicant)/%(key_fields)s$',
+        (r'^%(url_name)s/(?P<access_type>applicant)/%(scope)s$',
         '%(module_package)s.%(module_name)s.applicant', 
         "%(name)s Creation via Accepted Application"),
         ]
@@ -178,18 +175,112 @@ class View(group.View):
             entity, params['mentor_url_name'])
     }
 
-    # create and store the special form for applicants
-    updated_fields = {
-        'link_id': forms.CharField(widget=widgets.ReadOnlyInput(),
-            required=False),
-        'clean_link_id': cleaning.clean_link_id('link_id')
-        }
+  @decorators.merge_params
+  @decorators.check_access
+  def applicant(self, request, access_type,
+                page_name=None, params=None, **kwargs):
+    """Handles the creation of an Organization via an approved application.
 
-    applicant_create_form = dynaform.extendDynaForm(
-        dynaform = self._params['create_form'],
-        dynaproperties = updated_fields)
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
 
-    self._params['applicant_create_form'] = applicant_create_form
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
+    get_dict = request.GET
+    record_id = get_dict.get('id', None)
+
+    org_app_logic = params['org_app_logic']
+    record_logic = org_app_logic.getRecordLogic()
+
+    if not record_id or not record_id.isdigit():
+      raise out_of_band.Error('No valid OrgAppRecord ID specified.')
+    else:
+      record_entity =  record_logic.getFromIDOr404(int(record_id))
+
+    if request.method == 'POST':
+      return self.applicantPost(request, context, params, record_entity, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.applicantGet(request, context, params, record_entity, **kwargs)
+
+  def applicantGet(self, request, context, params, record_entity, **kwargs):
+    """Handles the GET request concerning the creation of an Organization via
+    an approved Organization application.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      record_entity: OrgAppRecord entity
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # extract the application fields
+    # TODO(ljvderijk): Create the form using the fields from the application 
+    # as the initial value.
+    fields = {}
+    fields['scope_path'] = record_entity.survey.scope.key().id_or_name()
+    #fields = dict( [(i, getattr(application, i)) for i in field_names] )
+
+    form = params['create_form'](initial=fields)
+
+    # construct the appropriate response
+    return super(View, self)._constructResponse(request, entity=None,
+        context=context, form=form, params=params)
+
+  def applicantPost(self, request, context, params, record_entity, **kwargs):
+    """Handles the POST request concerning the creation of an Organization via
+    an approved Organization application.
+
+    Args:
+      request: the standard Django HTTP request object
+      context: dictionary containing the context for this view
+      params: a dict with params for this View
+      record_entity: OrgAppRecord entity
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # populate the form using the POST data
+    form = params['create_form'](request.POST)
+
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=None, context=context,
+          form=form, params=params)
+
+    # collect the cleaned data from the valid form
+    key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
+
+    # do post processing
+    self._applicantPost(request, context, fields)
+
+    if not key_name:
+      key_name = self._logic.getKeyNameFromFields(fields)
+
+    # TODO(ljvderijk): complete the OrgAppRecord and sent out Admin invites
+    # create the Organization entity
+    self._logic.updateOrCreateFromKeyName(fields, key_name)
+
+    # redirect to notifications list to see the admin invite
+    return http.HttpResponseRedirect('/notification/list')
+
+  def _applicantPost(self, request, context, fields):
+    """Performs any required processing on the entity to post its edit page.
+
+    Args:
+      request: the django request object
+      context: the context for the webpage
+      fields: the new field values
+    """
+    self._editPost(request, None, fields)
 
   @decorators.merge_params
   @decorators.check_access
@@ -391,7 +482,6 @@ class View(group.View):
 view = View()
 
 admin = responses.redirectLegacyRequest
-applicant = responses.redirectLegacyRequest
 apply_mentor = responses.redirectLegacyRequest
 create = responses.redirectLegacyRequest
 delete = responses.redirectLegacyRequest

@@ -44,6 +44,7 @@ from soc.views.models import group
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.views.models import program as program_view
 from soc.modules.gsoc.views.helper import access
@@ -71,13 +72,12 @@ class View(organization.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
+    rights['applicant'] = ['checkIsDeveloper']
     rights['apply_mentor'] = ['checkIsUser']
     rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 org_admin_logic)]
     rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              org_admin_logic)]
-    rights['applicant'] = [('checkIsApplicationAccepted',
-                            org_app_logic)]
     rights['list_proposals'] = [('checkHasAny', [
         [('checkHasRoleForKeyFieldsAsScope', 
           [org_admin_logic, ['active', 'inactive']]),
@@ -104,6 +104,8 @@ class View(organization.View):
 
     new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
                                        'nr_applications', 'nr_mentors']
+
+    new_params['org_app_logic'] = org_app_logic
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -370,7 +372,7 @@ class View(organization.View):
 view = View()
 
 admin = decorators.view(view.admin)
-#applicant = decorators.view(view.applicant) # TODO
+applicant = decorators.view(view.applicant)
 apply_mentor = decorators.view(view.applyMentor)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)

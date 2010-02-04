@@ -39,6 +39,7 @@ import soc.cache.logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
 from soc.modules.ghop.logic.models import organization as ghop_org_logic
 from soc.modules.ghop.logic.models import task as ghop_task_logic
+from soc.modules.ghop.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.ghop.views.helper import access as ghop_access
 from soc.modules.ghop.views.models import program as ghop_program_view
 from soc.modules.ghop.views.helper import redirects as ghop_redirects
@@ -76,6 +77,7 @@ class View(organization.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
+    rights['applicant'] = ['checkIsDeveloper']
     rights['apply_mentor'] = ['checkIsUser']
     rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 ghop_org_admin_logic.logic)]
@@ -137,6 +139,8 @@ class View(organization.View):
         "Name", "Tasks Quota", "Open Tasks",
         "Claimed Tasks", "Closed Tasks", "Home Page",
     ]
+
+    new_params['org_app_logic'] = org_app_logic
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -329,6 +333,7 @@ class View(organization.View):
 view = View()
 
 admin = decorators.view(view.admin)
+applicant = decorators.view(view.applicant)
 apply_mentor = decorators.view(view.applyMentor)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)

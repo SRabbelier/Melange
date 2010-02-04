@@ -54,7 +54,7 @@ class Logic(role.Logic):
     if org_entity.status == 'new':
       # this org is new so mark as active
       fields = {'status': 'active'}
-      org_logic.logic.updateEntityProperties(org_entity, fields)
+      self.getScopeLogic().logic.updateEntityProperties(org_entity, fields)
 
     # call super
     super(Logic, self)._onCreate(entity)

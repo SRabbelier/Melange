@@ -75,11 +75,53 @@ class Logic(survey_record.Logic):
 
     if name == 'status' and value in ['accepted', 'rejected'] and \
         entity.status != value:
-      # TODO(ljvderijk) Make a notification and sent out email where further
-      # processing can be done.
+      #self.sendMail(entity)
       pass
 
     return True
+
+  def sendMail(self, entity):
+    """
+    """
+    default_sender = mail_dispatcher.getDefaultMailSender()
+
+    if not default_sender:
+      # no default sender abort
+      return
+    else:
+      (sender_name, sender) = default_sender
+
+    # construct the contents of the email
+    admin_entity = entity.main_admin
+    backup_entity = entity.backup_admin
+
+    context = {
+        'sender': sender,
+        'sender_name': sender_name,
+        'program_name': entity.survey.scope.name,
+        'org_app_name': entity.name
+        }
+
+    if status == 'accepted':
+      # use the accepted template and subject
+      template = self.accepted_mail_template
+      context['subject'] = 'Congratulations!'
+      context['HTTP_host'] = 'http://%s' % (system.getHostname())
+    elif status == 'rejected':
+      # use the rejected template and subject
+      template = self.rejected_mail_template
+      context['subject'] = 'Thank you for your application'
+
+    for to in [admin_entity, backup_entity]:
+      if not to:
+        continue
+
+      email = accounts.denormalizeAccount(to.account).email()
+      context['to'] = email
+      context['to_name'] = to.name
+
+      # send out the constructed email
+      mail_dispatcher.sendMailFromTemplate(template, context)
 
 
 logic = Logic()

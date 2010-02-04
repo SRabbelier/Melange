@@ -141,7 +141,7 @@ class View(group_app.View):
             'contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
-            model_logic.organization, org_app_logic)}
+            model_logic.organization)}
 
     # get rid of the clean method
     new_params['edit_extra_dynaproperties'] = {
@@ -208,54 +208,6 @@ class View(group_app.View):
     widget = form.fields['admin_agreement'].widget
     widget.text = content
     widget.url = redirects.getPublicRedirect(agreement, params)
-
-  def _review(self, request, params, app_entity, status, **kwargs):
-    """Sends out an email if an org_app has been accepted or rejected.
-
-    For params see group_app.View._review().
-    """
-
-    if status == 'accepted' or status == 'rejected':
-
-      default_sender = mail_dispatcher.getDefaultMailSender()
-
-      if not default_sender:
-        # no default sender abort
-        return
-      else:
-        (sender_name, sender) = default_sender
-
-      # construct the contents of the email
-      admin_entity = app_entity.applicant
-      backup_entity = app_entity.backup_admin
-
-      context = {
-          'sender': sender,
-          'sender_name': sender_name,
-          'program_name': app_entity.scope.name,
-          'org_app_name': app_entity.name
-          }
-
-      if status == 'accepted':
-        # use the accepted template and subject
-        template = params['accepted_mail_template']
-        context['subject'] = 'Congratulations!'
-        context['HTTP_host'] = 'http://%s' % (system.getHostname())
-      elif status == 'rejected':
-        # use the rejected template and subject
-        template = params['rejected_mail_template']
-        context['subject'] = 'Thank you for your application'
-
-      for to in [admin_entity, backup_entity]:
-        if not to:
-          continue
-
-        email = accounts.denormalizeAccount(to.account).email()
-        context['to'] = email
-        context['to_name'] = to.name
-
-        # send out the constructed email
-        mail_dispatcher.sendMailFromTemplate(template, context)
 
   @decorators.merge_params
   @decorators.check_access

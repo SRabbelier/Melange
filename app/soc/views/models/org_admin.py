@@ -29,7 +29,6 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.models import organization as org_logic
 from soc.logic.models import org_admin as org_admin_logic
-from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import student as student_logic
 from soc.views.helper import access
 from soc.views.helper import dynaform
@@ -192,6 +191,8 @@ class View(role.View):
     """See base.View._editContext.
     """
 
+    from soc.logic.models.org_app_survey import logic as org_app_logic
+
     entity = context['entity']
     form = context['form']
 
@@ -203,20 +204,26 @@ class View(role.View):
       form.fields['admin_agreement'] = None
       return
 
-    org_app = org_app_logic.logic.getFromKeyName(scope_path)
+    org_entity = self._params['group_logic'].getFromKeyName(scope_path)
+    org_app = org_app_logic.getForProgram(org_entity.scope)
 
-    if not entity and org_app:
-      if org_app.applicant.key() == context['user'].key():
+    if org_app:
+      user_entity = context['user']
+      fields = {'main_admin': user_entity,
+                'survey': org_app}
+      record_logic = org_app_logic.getRecordLogic()
+      org_app_record = record_logic.logic.getFromFields(fields, unique=True)
+
+      if not entity and org_app_record:
         form.fields['agreed_to_admin_agreement'] = forms.fields.BooleanField(
             widget=widgets.ReadOnlyInput, initial=True, required=True,
             help_text=self.DEF_ALREADY_AGREED_MSG)
 
-    entity = org_logic.logic.getFromKeyName(scope_path)
-
-    if not (entity and entity.scope and entity.scope.org_admin_agreement):
+    if not (org_entity and org_entity.scope and 
+            org_entity.scope.org_admin_agreement):
       return
 
-    agreement = entity.scope.org_admin_agreement
+    agreement = org_entity.scope.org_admin_agreement
 
     content = agreement.content
     params = {'url_name': 'document'}

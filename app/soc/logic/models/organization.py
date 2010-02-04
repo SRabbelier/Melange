@@ -29,8 +29,6 @@ from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import program as program_logic
 from soc.logic.models import request as request_logic
 
-from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
-
 import soc.models.group
 import soc.models.organization
 

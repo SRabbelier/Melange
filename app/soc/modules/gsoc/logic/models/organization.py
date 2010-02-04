@@ -47,6 +47,7 @@ class Logic(organization.Logic):
     """Creates a RankerRoot entity.
     """
 
+    from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
     from soc.modules.gsoc.models import student_proposal
 
     # create a new ranker

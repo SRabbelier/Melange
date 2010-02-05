@@ -1167,13 +1167,14 @@ class Checker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
 
   @allowDeveloper
-  def checkCanViewOrgAppRecord(self, django_args):
+  def checkCanViewOrgAppRecord(self, django_args, org_app_logic):
     """Checks if the current user is allowed to view the OrgAppSurveyRecord.
 
     The ID of the OrgAppSurveyRecord is present in the GET dict.
 
     Args:
       django_args: a dictionary with django's arguments
+      org_app_logic: OrgAppSurveyLogic instance
     """
 
     self.checkIsUser(django_args)
@@ -1186,7 +1187,9 @@ class Checker(object):
           message_fmt=DEF_NO_VALID_RECORD_ID)
 
     id = int(id)
-    org_app_record = org_app_record_logic.getFromIDOr404(id)
+
+    record_logic = org_app_logic.getRecordLogic()
+    org_app_record = record_logic.getFromIDOr404(id)
 
     admin_keys = [org_app_record.main_admin.key(), org_app_record.backup_admin.key()]
 

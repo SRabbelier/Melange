@@ -55,7 +55,7 @@ class View(org_app_survey.View):
     rights['list'] = ['checkIsDeveloper']
     rights['list_self'] = ['checkIsUser']
     rights['record'] = [('checkHasAny', [
-        [('checkIsMyOrgAppRecord', []),
+        [('checkCanViewOrgAppRecord', [org_app_logic]),
         ('checkIsSurveyReadable', [org_app_logic])]
         ])]
     rights['results'] = [('checkIsHostForProgramInScope', program_logic)]

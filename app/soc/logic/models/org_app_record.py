@@ -33,9 +33,12 @@ class Logic(survey_record.Logic):
   """
 
   def __init__(self, model=org_app_model,
-               base_model=SurveyRecord, scope_logic=None):
+               base_model=SurveyRecord, scope_logic=None,
+               module_name=None, mail_templates=None):
     """Defines the name, key_name and model for this entity.
     """
+    self.module_name = module_name
+    self.mail_templates = mail_templates
 
     super(Logic, self).__init__(
         model=model, base_model=base_model, scope_logic=scope_logic)
@@ -71,13 +74,17 @@ class Logic(survey_record.Logic):
     a notification and an email to the users set in the record.
     """
 
+    from soc.logic.helper import org_app_survey as org_app_helper
+
     value = entity_properties[name]
 
     if name == 'status' and value in ['accepted', 'rejected'] and \
         entity.status != value:
-      # TODO(ljvderijk) sent out email with next steps (or sorry ^_^)
-      pass
+      # Sent email and notification that this application has been 
+      # accepted/rejected.
+      org_app_helper.sentApplicationProcessedNotification(
+          entity, value, self.module_name, self.mail_templates)
 
-    return True
+    return super(Logic, self)._updateField(entity, entity_properties, name)
 
 logic = Logic()

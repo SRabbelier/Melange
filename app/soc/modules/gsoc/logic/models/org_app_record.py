@@ -28,17 +28,25 @@ from soc.models.org_app_record import OrgAppRecord as \
 from soc.models.survey_record import SurveyRecord
 
 
+DEF_ACCEPTED_TEMPLATE = \
+    'modules/gsoc/org_app_survey/mail/accepted_gsoc2010.html'
+DEF_REJECTED_TEMPLATE = 'soc/org_app_survey/mail/rejected.html'
+
+
 class Logic(org_app_record.Logic):
   """Logic class for OrgAppRecord.
   """
 
   def __init__(self, model=org_app_model,
-               base_model=SurveyRecord, scope_logic=None):
+               base_model=SurveyRecord, scope_logic=None, module_name='gsoc',
+               mail_templates={'accepted': DEF_ACCEPTED_TEMPLATE,
+                               'rejected': DEF_REJECTED_TEMPLATE}):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(
-        model=model, base_model=base_model, scope_logic=scope_logic)
+        model=model, base_model=base_model, scope_logic=scope_logic,
+        module_name=module_name, mail_templates=mail_templates)
 
 
 logic = Logic()

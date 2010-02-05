@@ -180,9 +180,15 @@ class View(survey_view.View):
     """
     return request.path + '?id=' + str(record.key().id_or_name())
 
-  def getListSelfData(self, request, enity, user_entity, ma_params, ba_params):
+  def getListSelfData(self, request, entity, ma_params, ba_params):
     """Returns the listSelf data.
     """
+
+    from django.utils import simplejson
+
+    from soc.logic.models.user import logic as user_logic
+
+    user_entity = user_logic.getForCurrentAccount()
 
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
@@ -198,7 +204,7 @@ class View(survey_view.View):
     else:
         return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = helper.lists.getListData(request, params, fields)
+    contents = lists.getListData(request, params, fields)
 
     json = simplejson.dumps(contents)
     return responses.jsonResponse(request, json)
@@ -207,36 +213,40 @@ class View(survey_view.View):
   @decorators.check_access
   def listSelf(self, request, access_type, page_name=None,
            params=None, **kwargs):
-    """View that lists all the OrgRecords you have access to.
+    """View that lists all the OrgAppRecords you have access to.
 
     For Args see base.View().public().
     """
-
-    from soc.logic.models.user import logic as user_logic
 
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
     entity = survey_logic.getFromKeyFieldsOr404(kwargs)
 
-    list_contents = []
-    user_entity = user_logic.getForCurrentAccount()
-
     list_params = params.copy()
     list_params['logic'] = record_logic
-    list_params['list_heading'] = 'soc/org_app_survey/list/records_heading.html'
-    list_params['list_row'] = 'soc/org_app_survey/list/records_row.html'
 
     if timeline_helper.isActivePeriod(entity, 'survey'):
-      info = {'url_name': list_params['url_name'],
+      info = {'url_name': params['url_name'],
               'survey':entity}
       list_params['public_row_extra'] = lambda entity: {
           'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
       }
     else:
       list_params['public_row_extra'] = lambda entity: {
-          'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
+          'link': redirects.getViewSurveyRecordRedirect(entity, params)
       }
+
+    list_params['public_field_keys'] = [
+        'name', 'main_admin', 'backup_admin'
+    ]
+    list_params['public_field_names'] = [
+        'Organization Name', 'Main Admin', 'Backup Admin'
+    ]
+    list_params['public_field_ignore'] = ['key']
+    list_params['public_field_extra'] = lambda entity: {
+        'main_admin': entity.main_admin.name,
+        'backup_admin': entity.backup_admin.name}
 
     ma_params = list_params.copy()
     ma_params['list_description'] = \
@@ -247,15 +257,14 @@ class View(survey_view.View):
         'List of Applications for which your are Backup Admin.'
 
     if request.GET.get('fmt') == 'json':
-      return self.getListSelfData(request, entity, user_entity,
-          ma_params, ba_params)
+      return self.getListSelfData(request, entity, ma_params, ba_params)
 
     ma_list = lists.getListGenerator(request, ma_params, idx=0)
     ba_list = lists.getListGenerator(request, ba_params, idx=1)
 
-    contents = [ma_params, ba_params]
+    contents = [ma_list, ba_list]
 
-    return self._list(request, list_params, list_contents, page_name, context)
+    return self._list(request, list_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

@@ -145,6 +145,8 @@ class View(base.View):
     if request.method == 'POST':
       return self.listPost(request, params, **kwargs)
     else: # request.method == 'GET'
+      if not order:
+        order = ['-created_on']
       return super(View, self).list(request, access_type, page_name=page_name,
                                     params=params, filter=filter, order=order,
                                     **kwargs)

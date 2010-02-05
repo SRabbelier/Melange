@@ -152,7 +152,7 @@ def generateLinkForRequest(request, base_params, updated_params):
 
 def entityToRowDict(entity, key_order, extra_cols_func,
                     button_ops_func, row_ops_func, args):
-  """
+  """Returns the row dict for the specified entity.
   """
 
   extra_cols = extra_cols_func(entity, *args)
@@ -178,9 +178,31 @@ def entityToRowDict(entity, key_order, extra_cols_func,
   return result
 
 
-def getListData(request, params, fields, visibility=None, order=[], args=[]):
+def keyToColumnProperties(key, col_props):
+  """Returns the column properties for the specified key.
   """
+
+  props = {
+    'name': key,
+    'index': key,
+    'resizable': True,
+  }
+
+  if key == 'key':
+    props['hidden'] = True
+
+  extra_props = col_props.get(key, {})
+  props.update(extra_props)
+
+  return props
+
+def getListData(request, params, fields, visibility=None, order=[], args=[]):
+  """Returns the list data for the specified params.
+
   Args:
+    fields: a filter that should be applied to this list
+    visibility: determines which list will be used
+    order: the order the data should be sorted in
     args: list of arguments to be passed to extract funcs
   """
 
@@ -212,6 +234,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   col_names = ["Key"] + params.get('%s_field_names' % visibility)
   row_action = params.get('%s_row_action' % visibility, {})
   column = params.get('%s_field_extra' % visibility, lambda *args: {})
+  col_props = params.get('%s_field_props' % visibility, {})
   button = params.get('%s_button_extra' % visibility, lambda *args: {})
   row = params.get('%s_row_extra' % visibility, lambda *args: {})
   ignore = params.get('%s_field_ignore' % visibility, [])
@@ -228,7 +251,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   if not (key_order and col_names):
     key_order = col_names = ['kind']
 
-  col_model = [{'name': i, 'index': i, 'resizable': True} for i in key_order]
+  col_model = [keyToColumnProperties(i, col_props) for i in key_order]
 
   extract_args = [key_order, column, button, row, args]
   columns = [entityToRowDict(i, *extract_args) for i in entities]

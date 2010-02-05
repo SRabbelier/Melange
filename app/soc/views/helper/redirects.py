@@ -328,8 +328,9 @@ def getApplicantRedirect(entity, params):
   """Returns the redirect for processing accepted Applications.
   """
 
-  return '/%s/applicant/%s' % (
-      params['url_name'], entity.key().id_or_name())
+  return '/%s/applicant/%s?id=%s' % (
+      params['url_name'], params['program'].key().id_or_name(),
+      entity.key().id_or_name())
 
 
 def getStudentEditRedirect(entity, params):

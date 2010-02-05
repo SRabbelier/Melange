@@ -111,6 +111,7 @@ class View(base.View):
     new_params['public_configuration'] = {"multiselect": True}
     new_params['public_field_extra'] = lambda entity: {
         "from": entity.from_user.name if entity.from_user else site_name,
+        "unread": "Not Read" if entity.unread else "Read",
     }
     new_params['public_field_keys'] = ["unread", "from", "subject",
                                        "created_on",]

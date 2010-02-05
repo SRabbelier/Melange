@@ -23,10 +23,10 @@ __authors__ = [
 
 
 from soc.logic.models import org_app_survey
-from soc.logic.models.org_app_record import logic as \
-    org_app_record_logic
 from soc.models.org_app_survey import OrgAppSurvey
 
+from soc.modules.gsoc.logic.models.org_app_record import logic as \
+    org_app_record_logic
 from soc.modules.gsoc.logic.models import program as program_logic
 
 
@@ -35,11 +35,12 @@ class Logic(org_app_survey.Logic):
   """
 
   def __init__(self, model=OrgAppSurvey,
-               scope_logic=program_logic):
+               scope_logic=program_logic, record_logic=org_app_record_logic):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, scope_logic=scope_logic)
+    super(Logic, self).__init__(model=model, scope_logic=scope_logic,
+                                record_logic=record_logic)
 
 
 logic = Logic()

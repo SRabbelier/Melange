@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""OrgAppSurvey (Model) query functions for the GHOP module.
+"""OrgAppRecord (Model) query functions for the GSoC module.
 """
 
 __authors__ = [
@@ -22,25 +22,23 @@ __authors__ = [
   ]
 
 
-from soc.logic.models import org_app_survey
-from soc.models.org_app_survey import OrgAppSurvey
-
-from soc.modules.ghop.logic.models.org_app_record import logic as \
-    org_app_record_logic
-from soc.modules.ghop.logic.models import program as program_logic
+from soc.logic.models import org_app_record
+from soc.models.org_app_record import OrgAppRecord as \
+    org_app_model
+from soc.models.survey_record import SurveyRecord
 
 
-class Logic(org_app_survey.Logic):
-  """Logic class for OrgAppSurveys within the GHOP module.
+class Logic(org_app_record.Logic):
+  """Logic class for OrgAppRecord.
   """
 
-  def __init__(self, model=OrgAppSurvey,
-               scope_logic=program_logic, record_logic = org_app_record_logic):
+  def __init__(self, model=org_app_model,
+               base_model=SurveyRecord, scope_logic=None):
     """Defines the name, key_name and model for this entity.
     """
 
-    super(Logic, self).__init__(model=model, scope_logic=scope_logic,
-                                record_logic=record_logic)
+    super(Logic, self).__init__(
+        model=model, base_model=base_model, scope_logic=scope_logic)
 
 
 logic = Logic()

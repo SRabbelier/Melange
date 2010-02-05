@@ -540,7 +540,8 @@ class View(object):
       if not (idx.isdigit() and int(idx) == 0):
         return responses.jsonErrorResponse(request, "idx not valid")
 
-      contents = helper.lists.getListData(request, params, filter, visibility)
+      contents = helper.lists.getListData(request, params, filter,
+                                          visibility, order=order)
       json = simplejson.dumps(contents)
 
       return responses.jsonResponse(request, json)

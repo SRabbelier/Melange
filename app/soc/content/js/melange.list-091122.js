@@ -536,12 +536,18 @@
             list_objects[idx].pager.options = default_pager_options;
 
             var looping = function () {
+              // Preserve current query string
+              var ampersand_question = "?";
+              if (window.location.href.indexOf("?") !== -1) {
+                ampersand_question = "&";
+              }
               jQuery.ajax({
                 async: true,
                 cache: false,
                 url: [
                   window.location.href,
-                  "?fmt=json&limit=250",
+                  ampersand_question,
+                  "fmt=json&limit=250",
                   (start === "" ? "" : "&start=" + start),
                   "&idx=", idx
                 ].join(""),

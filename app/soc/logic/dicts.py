@@ -23,6 +23,15 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
+import datetime
+
+
+DICT_TYPES = (db.StringProperty, db.IntegerProperty)
+STR_TYPES = (datetime.datetime)
+
+
 def filter(target, keys):
   """Filters a dictonary to only allow items with the given keys.
   
@@ -232,3 +241,35 @@ def containsAll(target, keys):
 
   result = ((i in target) for i in keys)
   return all(result)
+
+def toDict(entity, field_names=None):
+  """Returns a dict with all specified values of this entity.
+
+  Args:
+    entity: entity to be put in a dictionary
+    field_names: the fields that should be included, defaults to
+      all fields that are of a type that is in DICT_TYPES.
+  """
+
+  result = {}
+
+  if not field_names:
+    props = entity.properties().iteritems()
+    field_names = [k for k, v in props if isinstance(v, DICT_TYPES)]
+
+  for key in field_names:
+    # Skip everything that is not valid
+    if not hasattr(entity, key):
+      continue
+
+    value = getattr(entity, key)
+
+    if callable(value):
+      value = value()
+
+    if isinstance(value, STR_TYPES):
+      value = str(value)
+
+    result[key] = value
+
+  return result

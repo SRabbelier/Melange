@@ -28,9 +28,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.logic import dicts
 from soc.views.helper import forms as forms_helper
-
-import datetime
 
 
 class ModelWithFieldAttributes(db.Model):
@@ -50,39 +49,6 @@ class ModelWithFieldAttributes(db.Model):
   """
 
   _fields_cache = None
-  DICT_TYPES = (db.StringProperty, db.IntegerProperty)
-  STR_TYPES = (datetime.datetime)
-
-  def toDict(self, field_names=None):
-    """Returns a dict with all specified values of this entity.
-
-    Args:
-      field_names: the fields that should be included, defaults to
-        all fields that are of a type that is in DICT_TYPES.
-    """
-
-    result = {}
-
-    if not field_names:
-      props = self.properties().iteritems()
-      field_names = [k for k, v in props if isinstance(v, self.DICT_TYPES)]
-
-    for key in field_names:
-      # Skip everything that is not valid
-      if not hasattr(self, key):
-        continue
-
-      value = getattr(self, key)
-
-      if callable(value):
-        value = value()
-
-      if isinstance(value, self.STR_TYPES):
-        value = str(value)
-
-      result[key] = value
-
-    return result
 
   @classmethod
   def fields(cls):
@@ -117,3 +83,6 @@ class ModelWithFieldAttributes(db.Model):
 
       cls._fields_cache = FieldsProxy()
     return cls._fields_cache
+
+
+  toDict = dicts.toDict

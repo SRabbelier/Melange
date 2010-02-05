@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module that cointains base class for Melange Expando models.
+"""Module that contains base class for Melange Expando models.
 """
 
 __authors__ = [
@@ -24,6 +24,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from soc.logic import dicts
+
 
 class ExpandoBase(db.Expando):
   """Expando Base model.
@@ -31,4 +33,5 @@ class ExpandoBase(db.Expando):
   This might later on contain general functionalities like the
   ModelWithFieldAttributes model.
   """
-  pass
+
+  toDict = dicts.toDict

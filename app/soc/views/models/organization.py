@@ -269,7 +269,8 @@ class View(group.View):
     org_entity = self._logic.updateOrCreateFromKeyName(fields, key_name)
 
     # complete the application and sent out the OrgAdmin invites
-    org_app_helper.completeApplication(record_entity, org_entity,
+    record_logic = params['org_app_logic'].getRecordLogic()
+    org_app_helper.completeApplication(record_entity, record_logic, org_entity,
                                        params['org_admin_role_name'])
 
     # redirect to notifications list to see the admin invite

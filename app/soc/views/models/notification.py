@@ -113,6 +113,12 @@ class View(base.View):
         "from": entity.from_user.name if entity.from_user else site_name,
         "unread": "Not Read" if entity.unread else "Read",
     }
+    new_params['public_field_props'] = {
+        "unread": {
+            "stype": "select",
+            "editoptions": {"value": ":All;^Read$:Read;^Not Read$:Not Read"}
+        }
+    }
     new_params['public_field_keys'] = ["unread", "from", "subject",
                                        "created_on",]
     new_params['public_field_names'] = ["Unread", "From", "Subject",

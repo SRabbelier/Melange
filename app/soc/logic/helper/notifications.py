@@ -47,8 +47,8 @@ DEF_NEW_REQUEST_MSG_FMT = ugettext(
     "New Request Received from %(requester)s to become a %(role_verbose)s "
     "for %(group)s")
 
-DEF_NEW_GROUP_MSG_FMT = ugettext(
-    "Your %(application_type)s for %(group_name)s has been accepted.")
+DEF_NEW_ORG_MSG_FMT = ugettext(
+    "Your Organization Application for %(group_name)s has been accepted.")
 
 DEF_NEW_REVIEW_SUBJECT_FMT = ugettext(
     "New %s Review on %s")
@@ -64,7 +64,7 @@ DEF_NEW_REQUEST_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
 DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
     'new_review.html'
 
-DEF_NEW_GROUP_TEMPLATE = 'soc/group/messages/accepted.html'
+DEF_NEW_ORG_TEMPLATE = 'soc/organization/messages/accepted.html'
 
 
 def sendInviteNotification(entity):
@@ -152,34 +152,35 @@ def sendNewRequestNotification(request_entity):
                                    subject, template)
 
 
-def sendNewGroupNotification(entity, params):
-  """Sends out an invite notification to the applicant of the group.
+def sendNewOrganizationNotification(entity, module_name):
+  """Sends out an invite notification to the applicant of the Organization.
 
   Args:
-    entity : An accepted group application
+    entity : An accepted OrgAppRecord
   """
+
+  program_entity = entity.survey.scope
 
   url = "http://%(host)s%(redirect)s" % {
       'redirect': redirects.getApplicantRedirect(entity,
-      {'url_name': params['group_url_name']}),
+      {'url_name': '%s/org' % module_name,
+       'program': program_entity}),
       'host': system.getHostname(),
       }
 
   message_properties = {
-      'application_type': params['name'],
-      'group_type': params['group_name'],
-      'group_name': entity.name,
-      'url': url,
+      'org_name': entity.name,
+      'program_name': program_entity.name,
+      'url': url
       }
 
-  subject = DEF_NEW_GROUP_MSG_FMT % {
-      'application_type': params['name'],
+  subject = DEF_NEW_ORG_MSG_FMT % {
       'group_name': entity.name,
       }
 
-  template = DEF_NEW_GROUP_TEMPLATE
+  template = DEF_NEW_ORG_TEMPLATE
 
-  for to in [entity.applicant, entity.backup_admin]:
+  for to in [entity.main_admin, entity.backup_admin]:
     if not to:
       continue
 

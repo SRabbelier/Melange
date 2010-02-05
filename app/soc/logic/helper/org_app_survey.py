@@ -29,17 +29,78 @@ DEF_INVITE_MSG = ugettext('This invite was automatically generated because you'
                           'completed the application process.')
 
 
-def completeApplication(record_entity, org_entity, role_name):
+def sentApplicationProcessedNotification(entity, status, module_name,
+                                         mail_templates):
+  """Sends out email about the processed Organization Application. If the 
+  application is accepted a Notification is also generated.
+
+  Args:
+    entity: OrgAppRecord entity
+    status: the new status of the OrgAppRecord entity
+    module_name: The name of the module the Organization entity is in
+    mail_templates: dictionary containing accepted and rejected keys mapping
+        to the location of the mail template to be used iff status is equal to
+        that key
+  """
+
+  from soc.logic import accounts
+  from soc.logic import mail_dispatcher
+  from soc.logic.helper import notifications
+
+  default_sender = mail_dispatcher.getDefaultMailSender()
+
+  if not default_sender:
+    # no default sender abort
+    return
+  else:
+    (sender_name, sender) = default_sender
+
+  # construct the contents of the email
+  admin_entity = entity.main_admin
+  backup_entity = entity.backup_admin
+
+  context = {
+      'sender': sender,
+      'sender_name': sender_name,
+      'program_name': entity.survey.scope.name,
+      'org_app_name': entity.name
+      }
+
+  if status == 'accepted':
+    # use the accepted template and subject
+    template = mail_templates['accepted']
+    context['subject'] = 'Congratulations!'
+  elif status == 'rejected':
+    # use the rejected template and subject
+    template = mail_templates['rejected']
+    context['subject'] = 'Thank you for your application'
+
+  for to in [admin_entity, backup_entity]:
+    if not to:
+      continue
+
+    email = accounts.denormalizeAccount(to.account).email()
+    context['to'] = email
+    context['to_name'] = to.name
+
+    # send out the constructed email
+    mail_dispatcher.sendMailFromTemplate(template, context)
+
+  # send out the notifications about what to do next to the accepted ones
+  if status == 'accepted':
+    notifications.sendNewOrganizationNotification(entity, module_name)
+
+def completeApplication(record_entity, record_logic, org_entity, role_name):
   """Sends out invites to the main and backup admin specified in the
-  OrgAppRecord entity and completes the application
+  OrgAppRecord entity and completes the application.
 
   Args:
     record_entity: OrgAppRecord entity
+    record_logic: OrgAppRecord Logic instance
     org_entity: The newly created Organization
     role_name: internal name for the role requested
   """
 
-  from soc.logic.models.org_app_record import logic as org_app_record_logic
   from soc.logic.models.request import logic as request_logic
 
   properties = {
@@ -57,4 +118,4 @@ def completeApplication(record_entity, org_entity, role_name):
     request_logic.updateOrCreateFromFields(properties)
 
   fields = {'status': 'completed'}
-  org_app_record_logic.updateEntityProperties(record_entity, fields)
+  record_logic.updateEntityProperties(record_entity, fields)

@@ -119,6 +119,10 @@ class View(base.View):
 
     params = dicts.merge(params, new_params)
 
+    params['public_row_extra'] = lambda entity: {
+        "link": redirects.getPublicRedirect(entity, params)
+    }
+
     super(View, self).__init__(params=params)
 
   @decorators.merge_params

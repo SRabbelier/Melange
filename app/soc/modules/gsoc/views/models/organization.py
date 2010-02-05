@@ -72,7 +72,7 @@ class View(organization.View):
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
     rights['public_list'] = ['allow']
-    rights['applicant'] = ['checkIsDeveloper']
+    rights['applicant'] = [('checkIsOrgAppAccepted', org_app_logic)]
     rights['apply_mentor'] = ['checkIsUser']
     rights['list_requests'] = [('checkHasRoleForKeyFieldsAsScope',
                                 org_admin_logic)]

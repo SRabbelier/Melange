@@ -1197,7 +1197,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(
           message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
 
-    return
+    return org_app_record
 
   @allowDeveloper
   def checkOrgAppRecordIfPresent(self, django_args):
@@ -1218,6 +1218,23 @@ class Checker(object):
 
     # no id present so return
     return
+
+  @allowDeveloper
+  def checkIsOrgAppAccepted(self, django_args, org_app_logic):
+    """Checks if the current user is an owner of the OrgApplication
+    and if the OrgApplication is accepted.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      org_app_logic: OrgAppSurvey Logic instance
+    """
+
+    self.checkIsUser(django_args)
+
+    org_app_record = self.checkCanViewOrgAppRecord(django_args, org_app_logic)
+
+    if org_app_record.status != 'accepted':
+      raise out_of_band.AccessViolation(message=DEF_NO_APPLICATION_MSG)
 
   def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic,
                                               student_logic, org_admin_logic,

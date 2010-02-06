@@ -58,6 +58,10 @@ class View(base.View):
   """View methods for the Student Project model.
   """
 
+  DEF_NO_RECORD_AVAILABLE_MSG = ugettext('No Record Available')
+  DEF_VIEW_RECORD_MSG = ugettext('View Record')
+  DEF_TAKE_SURVEY_MSG = ugettext('Take Survey')
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -368,6 +372,33 @@ class View(base.View):
 
     return http.HttpResponseRedirect(url)
 
+  def getManageData(self, request, gps_params, ps_params, entity):
+    """Returns the manage data.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if idx == 0:
+      params = gps_params
+    elif idx == 1:
+      params = ps_params
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    fields = {'project': entity}
+    record_logic = params['logic'].getRecordLogic()
+    record_entities = record_logic.getForFields(fields)
+    record_dict = dict((i.survey.key(), i) for i in record_entities)
+    record_getter = lambda entity: record_dict[entity.key()]
+    args = [record_getter]
+
+    fields = {'scope_path': entity.program.key().id_or_name()}
+    contents = lists.getListData(request, params, fields, args=args)
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def manage(self, request, access_type,
@@ -377,11 +408,15 @@ class View(base.View):
     For params see base.View().public()
     """
 
-    try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
-    except out_of_band.Error, error:
-      return responses.errorResponse(
-          error, request, template=params['error_public'])
+    import soc.logic.lists
+
+    from soc.modules.gsoc.views.helper import list_info
+    from soc.modules.gsoc.views.models.grading_project_survey import view as \
+        grading_survey_view
+    from soc.modules.gsoc.views.models.project_survey import view as \
+        project_survey_view
+
+    entity = self._logic.getFromKeyFieldsOr404(kwargs)
 
     template = params['manage_template']
 
@@ -396,8 +431,55 @@ class View(base.View):
       # only accepted project can have their mentors managed
       self._enableMentorManagement(entity, params, context)
 
-    context['evaluation_list'] = self._getEvaluationLists(request, params,
-                                                          entity)
+    # list all surveys for this Project's Program
+    gps_params = grading_survey_view.getParams().copy()
+    gps_params['list_description'] = \
+        'List of all Mentor Evaluations for this Project'
+    gps_params['public_row_extra'] = lambda entity, *args: {}
+    gps_params['public_row_action'] = {}
+    gps_params['public_field_keys'] = [
+        "title", "taken_by", "taken_on", "record_url", "take_url"
+    ]
+    gps_params['public_field_names'] = [
+        "Title", "Taken by", "Taken on", "View", "(Re) Take",
+    ]
+    no_record = self.DEF_NO_RECORD_AVAILABLE_MSG
+
+    # TODO(SRabbelier): use buttons instead
+    getExtra = lambda params: lambda entity, re: {
+        "taken_by": no_record if not re(entity) else re(entity).user.name,
+        "taken_on": no_record if not re(entity) else str(re(entity).modified),
+        "record_url": no_record if not re(entity) else lists.urlize(
+            redirects.getViewSurveyRecordRedirect(re(entity), gps_params),
+            name=self.DEF_VIEW_RECORD_MSG),
+        "take_url": lists.urlize(redirects.getTakeProjectSurveyRedirect(
+            re(entity), {'survey': entity, 'params': params}),
+            name=self.DEF_TAKE_SURVEY_MSG),
+    }
+
+    gps_params['public_field_extra'] = getExtra(gps_params)
+
+    # get the ProjectSurvey list
+    ps_params = project_survey_view.getParams().copy()
+    ps_params['list_description'] = \
+        'List of all Student Evaluations for this Project'
+    ps_params['public_row_extra'] = lambda entity, *args: {}
+    ps_params['public_row_action'] = {}
+    ps_params['public_field_keys'] = gps_params['public_field_keys']
+    ps_params['public_field_names'] = gps_params['public_field_names']
+    ps_params['public_field_ignore'] = ["take_url"]
+    ps_params['public_field_extra'] = getExtra(ps_params)
+
+    if request.GET.get('fmt') == 'json':
+      return self.getManageData(request, gps_params, ps_params, entity)
+
+    gps_list = lists.getListGenerator(request, gps_params, idx=0)
+    ps_list = lists.getListGenerator(request, ps_params, idx=1)
+
+    # store both lists in the content
+    content = [gps_list, ps_list]
+
+    context['evaluation_list'] = soc.logic.lists.Lists(content)
 
     if request.POST:
       return self.managePost(request, template, context, params, entity,
@@ -485,79 +567,6 @@ class View(base.View):
     )
 
     params['additional_mentor_form'] = additional_mentor_form
-
-  def _getEvaluationLists(self, request, params, entity):
-    """Returns List Object containing the list to be shown on the Student 
-    Project's manage page.
-
-    This list contains all Surveys that have at least one record and will also 
-    contain information about the presence (or absence) of a accompanying 
-    record for the given Student Project.
-
-    Args:
-      request: Django HTTP Request Object
-      params: the params dict for this View
-      entity: a StudentProject entity for which the Surveys(Records) should be
-              retrieved
-
-    Returns:
-      A List Object as specified by this method.
-    """
-
-    import soc.logic.lists
-
-    from soc.modules.gsoc.views.helper import list_info
-    from soc.modules.gsoc.views.models.grading_project_survey import view as \
-        grading_survey_view
-    from soc.modules.gsoc.views.models.project_survey import view as \
-        project_survey_view
-
-    fields = {'scope_path': entity.program.key().id_or_name()}
-
-    # get the GradingProjectSurvey list
-    gps_params = grading_survey_view.getParams().copy()
-    gps_params['list_key_order'] = None
-    gps_params['list_heading'] = gps_params['manage_student_project_heading']
-    gps_params['list_row'] = gps_params['manage_student_project_row']
-
-    # list all surveys for this Project's Program
-    fields['scope_path'] = entity.program.key().id_or_name()
-    gps_params['list_description'] = \
-        'List of all Mentor Evaluations for this Project'
-    gps_params['public_row_extra'] = lambda entity: {}
-    gps_params['public_row_action'] = {}
-# TODO(LIST)
-    gps_list = lists.getListContent(
-        request, gps_params, fields, idx=0)
-    list_info.setProjectSurveyInfoForProject(gps_list, entity, gps_params)
-
-    # get the ProjectSurvey list
-    ps_params = project_survey_view.getParams().copy()
-    ps_params['list_key_order'] = None
-    ps_params['list_heading'] = ps_params['manage_student_project_heading']
-    ps_params['list_row'] = ps_params['manage_student_project_row']
-
-    ps_params['list_description'] = \
-        'List of all Student Evaluations for this Project'
-    ps_params['public_row_extra'] = lambda entity: {}
-    ps_params['public_row_action'] = {}
-
-    # list all surveys for this Project's Program
-    fields['scope_path'] = entity.program.key().id_or_name()
-    ps_list = lists.getListContent(
-        request, ps_params, fields, idx=1)
-    list_info.setProjectSurveyInfoForProject(ps_list, entity, ps_params)
-
-    # store both lists in the content
-    content = [gps_list, ps_list]
-
-    for list in content:
-      # remove all the surveys that have no records attached
-      list['data'] = [i for i in list['data'] if
-                      list['logic'].hasRecord(i)]
-
-    # return the List Object with the filtered list content
-    return soc.logic.lists.Lists(content)
 
   def manageGet(self, request, template, context, params, entity, **kwargs):
     """Handles the GET request for the project's manage page.

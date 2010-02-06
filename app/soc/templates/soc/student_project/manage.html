@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load forms_helpers %}
+{% load list_helpers %}
 
 {% block body %}
 {% block instructions %}
@@ -94,13 +95,8 @@ Use this page to manage the Student Project. You can (re)assign Mentors here and
 <b>Evaluations</b><br />
 This section contains the Mentor and Student Evaluations.
 From here you can view the Mentor and Student Evaluations and if possible (re)take the evaluations given by your Mentor.
-
-{% with evaluation_list as list %}
-  {% for list_number in list.lists %}
-    <p>
-      {% include list.nextList %}
-    </p>
-  {% endfor %}
-{% endwith %}
 </p>
+
+{% as_lists evaluation_list %}
+
 {% endblock %}

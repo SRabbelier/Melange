@@ -85,9 +85,7 @@ class Lists(object):
     self._content = self._contents[0]
     self._contents = self._contents[1:]
 
-    # Update internal 'iterators'
-
-    return self.get('main')
+    return self
 
   def empty(self):
     """Returns true iff there are no lists

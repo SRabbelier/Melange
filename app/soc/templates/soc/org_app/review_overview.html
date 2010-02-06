@@ -1,4 +1,4 @@
-{% extends "soc/models/list.html" %}
+{% extends "soc/base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load list_helpers %}
 
 {% block body %}
 <input id="button_bulk_accept" type="button" class="button" 
@@ -24,6 +25,6 @@ limitations under the License.
 <span class="progressBar" style="display:none;" id="applications_progress_bar"></span>
 <span id="description_progressbar"></span><span id="description_done"></span>
 
-{{ block.super}}
+{% as_lists list %}
 
 {% endblock %}

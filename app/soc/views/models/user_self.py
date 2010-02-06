@@ -282,6 +282,7 @@ class View(base.View):
     i = 0
     for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
       list_params = loop_view.getParams().copy()
+      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
       list = helper.lists.getListGenerator(request, list_params, idx=i)
       contents.append(list)
       i += 1

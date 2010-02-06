@@ -55,7 +55,6 @@ class View(base.View):
   """
 
   DEF_ROLE_LIST_MSG_FMT = ugettext("Your roles as %(name)s.")
-  DEF_NO_ROLES_MSG_FMT = ugettext("You don't have any Roles in %s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -277,7 +276,6 @@ class View(base.View):
     site_name = site.site_name
 
     params = params.copy()
-    params['no_lists_msg'] = self.DEF_NO_ROLES_MSG_FMT % site_name
 
     i = 0
     for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):

@@ -265,11 +265,6 @@ def constructParams(params):
   new_params['error_export'] = new_params['error_public']
   new_params['error_edit'] = new_params['error_public']
 
-  new_params['list_main'] = 'soc/list/main.html'
-  new_params['list_pagination'] = 'soc/list/pagination.html'
-  new_params['list_row'] = 'soc/%(module_name)s/list/row.html' % params
-  new_params['list_heading'] = 'soc/%(module_name)s/list/heading.html' % params
-
   new_params['public_row_action'] = {
         "type": "redirect_custom",
         "parameters": dict(new_window=True),
@@ -280,16 +275,10 @@ def constructParams(params):
 
   new_params['list_params'] = {
       'list_description': 'description',
-      'list_info': 'info',
       'list_key_order': 'key_order',
-      'list_main': 'main',
-      'list_pagination': 'pagination',
-      'list_row': 'row',
-      'list_heading': 'heading',
       }
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
-  new_params['no_lists_msg'] = ""
   new_params['save_message'] = [ugettext('%(name)s saved.' % params),
                                 ugettext('Cannot delete %(name)s.' % params)]
   new_params['submit_msg_param_name'] = DEF_SUBMIT_MSG_PARAM_NAME

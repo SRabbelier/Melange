@@ -332,7 +332,6 @@ def constructParams(params):
   new_params['edit_dynainclude'] = None
   new_params['edit_dynaexclude'] = None
   new_params['edit_dynaproperties'] = edit_dynaproperties
-  new_params['list_msg'] = None
 
   params = dicts.merge(params, new_params)
 

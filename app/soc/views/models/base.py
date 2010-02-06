@@ -553,9 +553,6 @@ class View(object):
   def _list(self, request, params, contents, page_name, context=None):
     """Returns the list page for the specified contents.
 
-    If the export parameter is present in request.GET a csv export of
-    the specified list is returned instead, see csv().
-
     Args:
       request: the standard Django HTTP request object
       params: a dict with params for this View
@@ -564,31 +561,9 @@ class View(object):
       context: the context for this page
 
     Params usage:
-      name: The name value is used to set the entity_type in the
-        context so that the template can refer to it.
-      name_plural: The name_plural value is used to set
-        the entity_type_plural value in the context so that the
-        template can refer to it.
       list_template: The list_template value is used as template for
         to display the list of all entities for this View.
     """
-
-    try:
-      export = int(request.GET.get('export', -1))
-      export = export if export >= 0 else None
-    except ValueError:
-      export = None
-
-    content = [i for i in contents if i.get('idx') == export]
-    if len(content) == 1:
-      content = content[0]
-      key_order = content.get('key_order')
-
-      if key_order:
-        data = [i.toDict(key_order) for i in content['data']]
-
-        filename = "export_%d" % export
-        return self.csv(request, data, filename, params, key_order)
 
     context = dicts.merge(context,
         helper.responses.getUniversalContext(request))
@@ -596,10 +571,8 @@ class View(object):
     context['page_name'] = page_name
     context['list'] = soc.logic.lists.Lists(contents)
 
-    context['entity_type'] = params['name']
-    context['entity_type_plural'] = params['name_plural']
-    context['list_msg'] = params['list_msg']
-    context['no_lists_msg'] = params['no_lists_msg']
+    context['list_msg'] = params.get('list_msg', None)
+    context['no_lists_msg'] = params.get('no_lists_msg', None)
 
     template = params['list_template']
 

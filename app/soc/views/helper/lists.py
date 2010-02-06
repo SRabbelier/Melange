@@ -62,7 +62,7 @@ def getPreferredListPagination(user=None):
 
 OFFSET_KEY = 'offset_%d'
 LIMIT_KEY = 'limit_%d'
-URL_PATTERN = '<a href="%(url)s"%(target)s%(nofollow)s>%(url)s</a>'
+URL_PATTERN = '<a href="%(url)s"%(target)s%(nofollow)s>%(name)s</a>'
 
 
 def makeOffsetKey(limit_idx):
@@ -73,14 +73,21 @@ def makeLimitKey(limit_idx):
   return LIMIT_KEY % limit_idx
 
 
-def urlize(url, target="_blank", nofollow=False):
-  """
+def urlize(url, name=None, target="_blank", nofollow=True):
+  """Make an url clickable.
+
+  Args:
+    url: the actual url, such as '/user/list'
+    name: the display name, such as 'List Users', defaults to url
+    target: the 'target' attribute of the <a> element
+    nofollow: whether to add the 'rel="nofollow"' attribute
   """
 
   return URL_PATTERN % {
       'url': url,
+      'name': name if name else url,
       'target': ' target="%s"' % target if target else '',
-      'nofollow': ' rel="nofollow"',
+      'nofollow': ' rel="nofollow"' if nofollow else "",
   }
 
 

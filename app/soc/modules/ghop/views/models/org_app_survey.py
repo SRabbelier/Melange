@@ -59,7 +59,8 @@ class View(org_app_survey.View):
         ('checkIsSurveyReadable', [org_app_logic])]
         ])]
     rights['results'] = [('checkIsHostForProgramInScope', program_logic)]
-    rights['review'] = [('checkIsHostForProgramInScope', program_logic)]
+    rights['review'] = [('checkIsHostForProgramInScope', program_logic),
+                        ('checkCanReviewOrgAppRecord', [org_app_logic])]
     rights['review_overview'] = [('checkIsHostForProgramInScope',
                                   program_logic)]
     rights['take'] = [

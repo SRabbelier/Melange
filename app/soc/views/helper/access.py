@@ -130,7 +130,7 @@ DEF_NEED_PICK_ARGS_MSG = ugettext(
     'The "continue" and "field" args are not both present.')
 
 DEF_REVIEW_COMPLETED_MSG = ugettext('This Application can not be reviewed '
-    'anymore (it has been completed or rejected).')
+    'anymore because it has been completed already.')
 
 DEF_REQUEST_COMPLETED_MSG = ugettext(
     'This request cannot be accepted (it is either completed or denied).')
@@ -1087,35 +1087,43 @@ class Checker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
   @allowSidebar
-  def checkCanReviewGroupApp(self, django_args, group_app_logic):
-    """Checks if the group_app in args is valid to be reviewed.
+  def checkCanReviewOrgAppRecord(self, django_args, org_app_logic):
+    """Checks if the request to review an Organization Application Record is
+    valid.
 
     Args:
       django_args: a dictionary with django's arguments
-      group_app_logic: A logic instance for the Group Application
+      org_app_logic: A logic instance for the Organization Application
+
+    Raises AccessViolation if:
+      - No valid id parameter is found in the GET dictionary
+      - The key of the survey of the record does not match the record in the
+        django_args.
+      - The status of the OrgApplicationRecord is completed
     """
 
-    # TODO(ljvderijk) rewrite this to use the OrgAppSurveys
+    get_dict = django_args['GET']
+    id = get_dict.get('id', None)
 
-    if 'link_id' not in django_args:
-      # calling review overview, so we can't check a specified entity
-      return
+    if not(id and id.isdigit()):
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NO_VALID_RECORD_ID)
 
-    fields = {
-        'link_id': django_args['link_id'],
-        'status': ['needs review', 'accepted', 'rejected', 'ignored',
-            'pre-accepted', 'pre-rejected']
-        }
+    id = int(id)
 
-    if 'scope_path' in django_args:
-      fields['scope_path'] = django_args['scope_path']
+    record_logic = org_app_logic.getRecordLogic()
+    record = record_logic.getFromIDOr404(id)
 
-    entity = group_app_logic.getForFields(fields)
+    expected_application = org_app_logic.getFromKeyFieldsOr404(django_args)
+    found_application = record.survey
 
-    if entity:
-      return
+    if expected_application.key() != found_application.key():
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_VALID_RECORD_ID)
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
+    if record.status == 'completed':
+      raise out_of_band.AccessViolation(message_fmt=DEF_REVIEW_COMPLETED_MSG)
+
+    return
 
   @allowDeveloper
   def checkCanViewOrgAppRecord(self, django_args, org_app_logic):

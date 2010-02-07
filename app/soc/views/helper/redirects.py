@@ -418,6 +418,19 @@ def getTakeSurveyRedirect(entity, info):
                           survey_entity.key().id_or_name())
 
 
+def getReviewOrgAppSurvey(survey_record, info):
+  """Returns redirect to retake a OrgAppSurvey.
+
+  Args:
+    survey_record: OrgAppRecord entity
+    info: a dictionary with survey and url_name entry
+  """
+
+  return '/%s/review/%s?id=%s' % (
+      info['url_name'], info['survey'].key().id_or_name(),
+      survey_record.key().id_or_name())
+
+
 def getRetakeOrgAppSurveyRedirect(survey_record, info):
   """Returns redirect to retake a OrgAppSurvey.
 

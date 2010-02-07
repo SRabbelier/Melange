@@ -72,6 +72,9 @@ class View(survey_view.View):
          (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.review',
          'Review %(name)s from '),
+         (r'^%(url_name)s/(?P<access_type>review_overview)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.review_overview',
+         'Overview of %(name_plural)s for Review')
          ]
 
     new_params['review_template'] = 'soc/org_app_survey/review.html'
@@ -80,7 +83,7 @@ class View(survey_view.View):
 
     super(View, self).__init__(params=params)
 
-    # create the form to edit status
+    # create the form to review an Organization Application
     dynaproperties = {
         'status': forms.fields.ChoiceField(required=True,
             label = 'New Status',
@@ -97,6 +100,46 @@ class View(survey_view.View):
     )
 
     self._params['review_form'] = review_form
+
+    # define the params for the OrgAppSurveyRecord listing
+    record_list_params = dicts.rename(self._params,
+                                      self._params['list_params'])
+    record_list_params['list_params'] = self._params['list_params']
+    record_list_params['logic'] = self._params['logic'].getRecordLogic()
+    record_list_params['js_uses_all'] = self._params['js_uses_all']
+    record_list_params['list_template'] = self._params['list_template']
+
+    # define the fields for the self list
+    record_list_params['self_field_keys'] = [
+        'name', 'main_admin', 'backup_admin'
+    ]
+    record_list_params['self_field_names'] = [
+        'Organization Name', 'Main Admin', 'Backup Admin'
+    ]
+    record_list_params['self_field_extra'] = lambda entity: {
+        'main_admin': entity.main_admin.name,
+        'backup_admin': entity.backup_admin.name}
+
+    # define the fields for the overview list
+    record_list_params['overview_field_keys'] = [
+        'name', 'home_page', 'status'
+    ]
+    record_list_params['overview_field_names'] = [
+        'Organization Name', 'Home Page', 'Application Status'
+    ]
+    record_list_params['overview_field_extra'] = lambda entity: {
+        'home_page': lists.urlize(entity.home_page)}
+    record_list_params['overview_button_extra'] = [{
+          'bounds': [1,'all'],
+          'id': 'bulk_process',
+          'caption': 'Bulk Accept/Reject Organizations',
+          'type': 'post',
+          'parameters': {
+            'url': '',
+            'keys': ['key'],
+          }}]
+
+    self._params['record_list_params'] = record_list_params
 
   @decorators.check_access
   def create(self, request, access_type,
@@ -180,7 +223,51 @@ class View(survey_view.View):
     """
     return request.path + '?id=' + str(record.key().id_or_name())
 
-  def getListSelfData(self, request, entity, ma_params, ba_params):
+  @decorators.merge_params
+  @decorators.check_access
+  def listSelf(self, request, access_type, page_name=None,
+           params=None, **kwargs):
+    """View that lists all the OrgAppRecords you have access to.
+
+    For Args see base.View().public().
+    """
+
+    survey_logic = params['logic']
+
+    entity = survey_logic.getFromKeyFieldsOr404(kwargs)
+
+    list_params = params['record_list_params'].copy()
+
+    if timeline_helper.isActivePeriod(entity, 'survey'):
+      info = {'url_name': params['url_name'],
+              'survey':entity}
+      list_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
+      }
+    else:
+      list_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getViewSurveyRecordRedirect(entity, params)
+      }
+
+    ma_params = list_params.copy()
+    ma_params['list_description'] = \
+        'List of Applications for which you are Main Admin.'
+
+    ba_params = list_params.copy()
+    ba_params['list_description'] = \
+        'List of Applications for which your are Backup Admin.'
+
+    if request.GET.get('fmt') == 'json':
+      return self._getListSelfData(request, entity, ma_params, ba_params)
+
+    ma_list = lists.getListGenerator(request, ma_params, idx=0)
+    ba_list = lists.getListGenerator(request, ba_params, idx=1)
+
+    contents = [ma_list, ba_list]
+
+    return self._list(request, list_params, contents, page_name)
+
+  def _getListSelfData(self, request, entity, ma_params, ba_params):
     """Returns the listSelf data.
     """
 
@@ -204,65 +291,53 @@ class View(survey_view.View):
     else:
         return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields)
+    contents = lists.getListData(request, params, fields, visibility='self')
 
     json = simplejson.dumps(contents)
     return responses.jsonResponse(request, json)
 
   @decorators.merge_params
   @decorators.check_access
-  def listSelf(self, request, access_type, page_name=None,
-           params=None, **kwargs):
-    """View that lists all the OrgAppRecords you have access to.
-
-    For Args see base.View().public().
+  def reviewOverview(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Displays a list of applications that are in a different
+    status of the application process.
     """
 
+    from django.utils import simplejson
+
     survey_logic = params['logic']
-    record_logic = survey_logic.getRecordLogic()
 
     entity = survey_logic.getFromKeyFieldsOr404(kwargs)
 
-    list_params = params.copy()
-    list_params['logic'] = record_logic
+    if request.POST:
+      # TODO(ljvderijk): handle POST response when buttons are properly working
+      return http.HttpResponse('OK')
 
-    if timeline_helper.isActivePeriod(entity, 'survey'):
-      info = {'url_name': params['url_name'],
-              'survey':entity}
-      list_params['public_row_extra'] = lambda entity: {
-          'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
-      }
-    else:
-      list_params['public_row_extra'] = lambda entity: {
-          'link': redirects.getViewSurveyRecordRedirect(entity, params)
-      }
+    list_params = params['record_list_params'].copy()
+    list_params['list_description'] = (
+        'List of all the Organization Applications made to the %s program. '
+        'Click an application to review it, or use the buttons on the top of '
+        'the list for bulk actions.' %(entity.scope.name))
 
-    list_params['public_field_keys'] = [
-        'name', 'main_admin', 'backup_admin'
-    ]
-    list_params['public_field_names'] = [
-        'Organization Name', 'Main Admin', 'Backup Admin'
-    ]
-    list_params['public_field_ignore'] = ['key']
-    list_params['public_field_extra'] = lambda entity: {
-        'main_admin': entity.main_admin.name,
-        'backup_admin': entity.backup_admin.name}
-
-    ma_params = list_params.copy()
-    ma_params['list_description'] = \
-        'List of Applications for which you are Main Admin.'
-
-    ba_params = list_params.copy()
-    ba_params['list_description'] = \
-        'List of Applications for which your are Backup Admin.'
+    info = {'url_name': params['url_name'],
+            'survey':entity}
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
+    }
 
     if request.GET.get('fmt') == 'json':
-      return self.getListSelfData(request, entity, ma_params, ba_params)
+      # get all records for the entity specified in the URL
+      fields = {'survey': entity}
+      # use the overview visibility to show the correct columns to the Host
+      contents = lists.getListData(request, list_params, fields,
+                                   visibility='overview')
 
-    ma_list = lists.getListGenerator(request, ma_params, idx=0)
-    ba_list = lists.getListGenerator(request, ba_params, idx=1)
+      json = simplejson.dumps(contents)
+      return responses.jsonResponse(request, json)
 
-    contents = [ma_list, ba_list]
+    overview_list = lists.getListGenerator(request, list_params, idx=0)
+    contents = [overview_list]
 
     return self._list(request, list_params, contents, page_name)
 

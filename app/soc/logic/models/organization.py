@@ -25,9 +25,7 @@ __authors__ = [
 
 from soc.logic.models import base
 from soc.logic.models import group
-from soc.logic.models import org_app as org_app_logic
 from soc.logic.models import program as program_logic
-from soc.logic.models import request as request_logic
 
 import soc.models.group
 import soc.models.organization

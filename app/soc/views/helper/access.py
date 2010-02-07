@@ -1086,57 +1086,6 @@ class Checker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
-  def checkCanCreateOrgApp(self, django_args, period_name, program_logic):
-    """Checks to see if the program in the scope_path is accepting org apps
-    
-    Args:
-      django_args: a dictionary with django's arguments
-      period_name: the name of the period which is checked
-      program_logic: Program Logic instance
-    """
-
-    if 'seed' in django_args:
-      return self.checkIsActivePeriod(django_args['seed'],
-          period_name, 'scope_path', program_logic)
-    else:
-      return
-
-  @allowDeveloper
-  def checkCanEditGroupApp(self, django_args, group_app_logic):
-    """Checks if the group_app in args is valid to be edited by 
-       the current user.
-
-    Args:
-      django_args: a dictionary with django's arguments
-      group_app_logic: A logic instance for the Group Application
-    """
-
-    self.checkIsUser(django_args)
-
-    fields = {
-        'link_id': django_args['link_id'],
-        'applicant': self.user,
-        'status' : ['needs review', 'rejected']
-        }
-
-    if 'scope_path' in django_args:
-      fields['scope_path'] = django_args['scope_path']
-
-    entity = group_app_logic.getForFields(fields)
-
-    if entity:
-      return
-
-    del fields['applicant']
-    fields['backup_admin'] = self.user
-
-    entity = group_app_logic.getForFields(fields)
-
-    if entity:
-      return
-
-    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_ENTITY_MSG)
-
   @allowSidebar
   def checkCanReviewGroupApp(self, django_args, group_app_logic):
     """Checks if the group_app in args is valid to be reviewed.
@@ -1145,6 +1094,8 @@ class Checker(object):
       django_args: a dictionary with django's arguments
       group_app_logic: A logic instance for the Group Application
     """
+
+    # TODO(ljvderijk) rewrite this to use the OrgAppSurveys
 
     if 'link_id' not in django_args:
       # calling review overview, so we can't check a specified entity

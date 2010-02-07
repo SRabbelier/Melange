@@ -31,7 +31,6 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.user import logic as user_logic
-from soc.logic.models.org_app import logic as org_app_logic
 
 from soc.views import helper
 from soc.views import out_of_band

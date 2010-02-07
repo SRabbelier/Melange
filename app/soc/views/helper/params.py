@@ -68,7 +68,6 @@ DEF_JS_USES_LIST = [
     'menu',
     'melange',
     'melangelist',
-    'bulk_review',
     'tinymce',
     ]
 

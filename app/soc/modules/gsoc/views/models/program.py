@@ -209,28 +209,28 @@ class View(program.View):
         items += [(redirects.getShowDuplicatesRedirect(entity, params),
             'Show Duplicate Project Assignments', 'any_access')]
         # add link to create a new Program Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'gsoc_program',
-            'survey'),
+        items += [(redirects.getCreateSurveyRedirect(
+            entity, params['document_prefix'], 'survey'),
             "Create a New Survey", 'any_access')]
         # add link to list all Program Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'gsoc_program',
-            'survey'),
+        items += [(redirects.getListSurveysRedirect(
+            entity, params['document_prefix'], 'survey'),
             "List Surveys", 'any_access')]
         # add link to create a new Project Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'gsoc_program',
-            'gsoc/project_survey'),
+        items += [(redirects.getCreateSurveyRedirect(
+            entity, params['document_prefix'], 'gsoc/project_survey'),
             "Create a New Project Survey", 'any_access')]
         # add link to list all Project Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'gsoc_program',
-            'gsoc/project_survey'),
+        items += [(redirects.getListSurveysRedirect(
+            entity, params['document_prefix'], 'gsoc/project_survey'),
             "List Project Surveys", 'any_access')]
         # add link to create a new Grading Survey
-        items += [(redirects.getCreateSurveyRedirect(entity, 'gsoc_program',
-            'gsoc/grading_project_survey'),
+        items += [(redirects.getCreateSurveyRedirect(
+            entity, params['document_prefix'], 'gsoc/grading_project_survey'),
             "Create a New Grading Survey", 'any_access')]
         # add link to list all Grading Surveys
-        items += [(redirects.getListSurveysRedirect(entity, 'gsoc_program',
-            'gsoc/grading_project_survey'),
+        items += [(redirects.getListSurveysRedirect(
+            entity, params['document_prefix'], 'gsoc/grading_project_survey'),
             "List Grading Surveys", 'any_access')]
         # add link to withdraw Student Projects
         items += [(redirects.getWithdrawRedirect(

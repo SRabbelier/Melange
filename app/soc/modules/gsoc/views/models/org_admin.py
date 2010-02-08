@@ -25,7 +25,7 @@ __authors__ = [
 
 from soc.logic import dicts
 from soc.views.helper import decorators
-from soc.views.models import mentor
+from soc.views.models import org_admin
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
@@ -35,7 +35,7 @@ from soc.modules.gsoc.views.helper import access
 from soc.modules.gsoc.views.models import organization as org_view # TODO
 
 
-class View(mentor.View):
+class View(org_admin.View):
   """View methods for the GSoCMentor model.
   """
 

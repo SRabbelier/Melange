@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Mario Ferraro" <fadinlight@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
@@ -28,6 +29,8 @@ import re
 
 from django import template
 from django.forms import forms as forms_in
+from django.template import defaultfilters as djangofilter
+from django.utils import simplejson
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 
@@ -293,6 +296,8 @@ def as_table_helper(context, form):
       'groups': fields if fields else '',
       'hidden_fields': hidden_fields or '',
       'form': form,
+      'json_for_js': {},
+      'json_string_for_js': '',
       })
 
   return context
@@ -375,6 +380,19 @@ def as_table_row_helper(context, item):
   field_class_type = 'formfield%slabel' % ('error' if errors else '')
 
   help_text = field.help_text
+
+  context['json_for_js'][field.auto_id] = {
+    'autocomplete':
+      djangofilter.safe(select_url) if reference else None,
+    'tooltip':
+      djangofilter.linebreaksbr(
+        force_unicode(help_text)
+      ) if help_text else '',
+  }
+
+  context.update({
+      'json_string_for_js': simplejson.dumps(context['json_for_js'])
+      })
 
   context.update({
       'help_text': force_unicode(help_text) if help_text else '',

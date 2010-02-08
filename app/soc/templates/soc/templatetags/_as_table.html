@@ -42,6 +42,9 @@ Your changes have <i>not</i> been saved.
     {% block grouped_fields_loop %}
       {% as_table_row item %}
     {% endblock %}
+    {% if forloop.last %}
+      <script type="text/javascript" src="/soc/content/js/templates/soc/templatetags/_as_table-100204.js" melangeContext="{data: {{ json_string_for_js }} }"></script>
+    {% endif %}
   {% endfor %}
 {% endfor %}
 

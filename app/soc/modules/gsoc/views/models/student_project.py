@@ -372,8 +372,14 @@ class View(base.View):
 
     return http.HttpResponseRedirect(url)
 
-  def getManageData(self, request, gps_params, ps_params, entity):
-    """Returns the manage data.
+  def _getManageData(self, request, gps_params, ps_params, entity):
+    """Returns the JSONResponse for the Manage page.
+
+    Args:
+      request: HTTPRequest object
+      gps_params: GradingProjectSurvey list params
+      ps_params: ProjectSurvey list params
+      entity: StudentProject entity
     """
 
     idx = request.GET.get('idx', '')
@@ -393,7 +399,8 @@ class View(base.View):
     record_getter = lambda entity: record_dict[entity.key()]
     args = [record_getter]
 
-    fields = {'scope_path': entity.program.key().id_or_name()}
+    fields = {'scope': entity.program,
+              'prefix': 'gsoc_program'}
     contents = lists.getListData(request, params, fields, args=args)
 
     json = simplejson.dumps(contents)
@@ -471,7 +478,7 @@ class View(base.View):
     ps_params['public_field_extra'] = getExtra(ps_params)
 
     if request.GET.get('fmt') == 'json':
-      return self.getManageData(request, gps_params, ps_params, entity)
+      return self._getManageData(request, gps_params, ps_params, entity)
 
     gps_list = lists.getListGenerator(request, gps_params, idx=0)
     ps_list = lists.getListGenerator(request, ps_params, idx=1)

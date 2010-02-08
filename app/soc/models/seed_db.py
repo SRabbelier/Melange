@@ -42,7 +42,6 @@ from soc.logic.models.user import logic as user_logic
 from soc.models.document import Document
 from soc.models.host import Host
 from soc.models.notification import Notification
-from soc.models.org_app import OrgApplication
 
 from soc.models.site import Site
 from soc.models.sponsor import Sponsor
@@ -202,62 +201,6 @@ class GSoCOrganizationSeeder(Seeder):
                 gsoc2009=gsoc2009)
 
 
-class OrgApplicationSeeder(Seeder):
-  """A Seeder for Melange OrgApplication model.
-  """
-  def type(self):
-    return OrgApplication
-
-  def commonSeedArgs(self, request):
-    _, current_user = ensureUser()
-    gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
-
-    if not gsoc2009:
-      raise Error('Run seed_db first')
-
-    status = request.GET.get('status', 'pre-accepted')
-
-    return dict(current_user=current_user,
-                gsoc2009=gsoc2009,
-                status=status)
-
-  # pylint: disable-msg=W0221
-  def seed(self, i, entities=None, current_user=None, gsoc2009=None,
-           status=None):
-    properties = {
-        'key_name': 'google/gsoc2009/org_%04d' % i,
-        'link_id': 'org_%04d' % i,
-        'name': 'Org App %04d' % i,
-        'scope_path': 'google/gsoc2009',
-        'scope': gsoc2009,
-        'status': status,
-        'applicant': current_user,
-        'home_page': 'http://www.google.com',
-        'email': 'org@example.com',
-        'irc_channel': '#care',
-        'pub_mailing_list': 'http://groups.google.com',
-        'dev_mailing_list': 'http://groups.google.com',
-        'description': 'This is an awesome org!',
-        'why_applying': 'Because we can',
-        'member_criteria': 'They need to be awesome',
-        'license_name': 'Apache License, 2.0',
-        'ideas': 'http://code.google.com/p/soc/issues',
-        'contrib_disappears': 'We use google to find them',
-        'member_disappears': 'See above',
-        'encourage_contribs': 'We offer them cookies.',
-        'continued_contribs': 'We promise them a cake.',
-        'agreed_to_admin_agreement': True,
-        }
-
-    org_application = OrgApplication(**properties)
-    if entities is None:
-      org_application.put()
-    else:
-      entities.append(org_application)
-
-
-
-
 def seed(request, *args, **kwargs):
   """Seeds the datastore with some default values.
   """
@@ -376,46 +319,6 @@ def seed(request, *args, **kwargs):
 
   ghop2009 = GHOPProgram(**program_properties)
   ghop2009.put()
-
-
-  org_app_properties = {
-    'scope_path': 'google/gsoc2009',
-    'scope': gsoc2009,
-    'applicant': current_user,
-    'home_page': 'http://www.google.com',
-    'email': 'org@example.com',
-    'irc_channel': '#care',
-    'pub_mailing_list': 'http://groups.google.com',
-    'dev_mailing_list': 'http://groups.google.com',
-    'description': 'This is an awesome org!',
-    'why_applying': 'Because we can',
-    'member_criteria': 'They need to be awesome',
-    'status': 'pre-accepted',
-    'license_name': 'Apache License, 2.0',
-    'ideas': 'http://code.google.com/p/soc/issues',
-    'contrib_disappears': 'We use google to find them',
-    'member_disappears': 'See above',
-    'encourage_contribs': 'We offer them cookies.',
-    'continued_contribs': 'We promise them a cake.',
-    'agreed_to_admin_agreement': True,
-    }
-
-  for i in range(10):
-    org_app_properties['key_name'] = 'google/gsoc2009/org_%04d' % i
-    org_app_properties['link_id'] = 'org_%04d' % i
-    org_app_properties['name'] = 'Org App %04d' % i
-    entity = OrgApplication(**org_app_properties)
-    entity.put()
-
-
-  org_app_properties['status'] = 'pre-rejected'
-
-  for i in range(10, 20):
-    org_app_properties['key_name'] = 'google/gsoc2009/loser_%d' % i
-    org_app_properties['link_id'] = 'loser_%d' % i
-    org_app_properties['name'] = 'Loser %d' % i
-    entity = OrgApplication(**org_app_properties)
-    entity.put()
 
 
   group_properties.update({
@@ -623,45 +526,6 @@ def seed_user(unused_request, i):
       'link_id': 'user_%d' % i,
       'account': users.User(email='user_%d@example.com' % i),
       'name': 'User %d' % i,
-      }
-
-  return properties
-
-
-def seed_org_app(request, i):
-  """Returns the properties for a new org proposal,
-  """
-
-  _, current_user = ensureUser()
-  status = request.GET.get('status', 'pre-accepted')
-  gsoc2009 = GSoCProgram.get_by_key_name('google/gsoc2009')
-
-  if not gsoc2009:
-    raise Error('Run seed_db first')
-
-  properties = {
-      'key_name': 'google/gsoc2009/org_%d' % i,
-      'link_id': 'org_%d' % i,
-      'name': 'Org App %d' % i,
-      'scope_path': 'google/gsoc2009',
-      'scope': gsoc2009,
-      'status': status,
-      'applicant': current_user,
-      'home_page': 'http://www.google.com',
-      'email': 'org@example.com',
-      'irc_channel': '#care',
-      'pub_mailing_list': 'http://groups.google.com',
-      'dev_mailing_list': 'http://groups.google.com',
-      'description': 'This is an awesome org!',
-      'why_applying': 'Because we can',
-      'member_criteria': 'They need to be awesome',
-      'license_name': 'Apache License, 2.0',
-      'ideas': 'http://code.google.com/p/soc/issues',
-      'contrib_disappears': 'We use google to find them',
-      'member_disappears': 'See above',
-      'encourage_contribs': 'We offer them cookies.',
-      'continued_contribs': 'We promise them a cake.',
-      'agreed_to_admin_agreement': True,
       }
 
   return properties
@@ -917,7 +781,6 @@ def seed_student_proposal(request, i):
 SEEDABLE_MODEL_TYPES = {
     'user' : UserSeeder(),
     'organization' : GSoCOrganizationSeeder(),
-    'org_application' : OrgApplicationSeeder(),
     }
 
 
@@ -999,7 +862,7 @@ def seed_many(request, *args, **kwargs):
     goal: how many users to add in total, implies user_only
     step: how many users to add per request, defaults to 15
     seed_type: the type of entity to seed, should be one of:
-      user, org, org_app, mentor, student_proposal
+      user, org, mentor, student_proposal
 
     Redirects if end < goal, incrementing both start and end with step.
   """
@@ -1012,7 +875,6 @@ def seed_many(request, *args, **kwargs):
   seed_types = {
     'user': (seed_user, User),
     'org': (seed_org, GSoCOrganization),
-    'org_app': (seed_org_app, OrgApplication),
     'mentor': (seed_mentor, GSoCMentor),
     'student': (seed_student, GSoCStudent),
     'student_proposal': (seed_student_proposal, StudentProposal),
@@ -1100,7 +962,6 @@ def clear(*args, **kwargs):
       StudentProposal.all(),
       GSoCOrganization.all(),
       GHOPOrganization.all(),
-      OrgApplication.all(),
       GSoCTimeline.all(),
       GHOPTimeline.all(),
       GSoCProgram.all(),

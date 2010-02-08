@@ -845,7 +845,7 @@
                           csv_export[csv_export.length] = [];
                           jQuery.each(row, function (column_name, cell_value) {
                             if (cell_value === null) {
-                              cell_value = "Not set";
+                              cell_value = "";
                             }
                             var field_text = cell_value;
                             if (field_text.indexOf("\"") !== -1) {

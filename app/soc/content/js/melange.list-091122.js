@@ -704,7 +704,10 @@
                           });
                           jQuery.post(
                             parameters.url,
-                            {data: JSON.stringify(objects_to_send)},
+                            {
+                              xsrf_token: window.xsrf_token,
+                              data: JSON.stringify(objects_to_send)
+                            },
                             function (data) {
                               if (parameters.refresh == "table") {
                                 jQuery("#" + list_objects[parameters.idx].jqgrid.id).trigger("reloadGrid");

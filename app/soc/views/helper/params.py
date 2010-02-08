@@ -68,6 +68,8 @@ DEF_JS_USES_LIST = [
     'menu',
     'melange',
     'melangelist',
+    'melangetooltip',
+    'melangeautocomplete',
     'tinymce',
     ]
 

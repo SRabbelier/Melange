@@ -42,7 +42,7 @@ class Logic(org_admin.Logic):
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                scope_logic=scope_logic, role_name=role_name)
 
 
 logic = Logic()

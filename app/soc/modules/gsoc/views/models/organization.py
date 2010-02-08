@@ -123,8 +123,8 @@ class View(organization.View):
     program_entity = group_entity.scope
     roles = role_description['roles']
 
-    mentor_entity = roles.get('mentor')
-    admin_entity = roles.get('org_admin')
+    mentor_entity = roles.get('gsoc_mentor')
+    admin_entity = roles.get('gsoc_org_admin')
 
     is_active_mentor = mentor_entity and mentor_entity.status == 'active'
     is_active_admin = admin_entity and admin_entity.status == 'active'
@@ -190,13 +190,13 @@ class View(organization.View):
 
     if is_active_admin:
       # add a link to the resign page
-      submenu = (redirects.getManageRedirect(roles['org_admin'],
+      submenu = (redirects.getManageRedirect(roles['gsoc_org_admin'],
           {'url_name': 'gsoc/org_admin'}),
           "Resign as Admin", 'any_access')
       submenus.append(submenu)
 
       # add a link to the edit page
-      submenu = (redirects.getEditRedirect(roles['org_admin'],
+      submenu = (redirects.getEditRedirect(roles['gsoc_org_admin'],
           {'url_name': 'gsoc/org_admin'}),
           "Edit My Admin Profile", 'any_access')
       submenus.append(submenu)
@@ -204,13 +204,13 @@ class View(organization.View):
 
     if is_active_mentor:
       # add a link to the resign page
-      submenu = (redirects.getManageRedirect(roles['mentor'],
+      submenu = (redirects.getManageRedirect(roles['gsoc_mentor'],
           {'url_name' : 'gsoc/mentor'}),
           "Resign as Mentor", 'any_access')
       submenus.append(submenu)
 
       # add a link to the edit page
-      submenu = (redirects.getEditRedirect(roles['mentor'],
+      submenu = (redirects.getEditRedirect(roles['gsoc_mentor'],
           {'url_name': 'gsoc/mentor'}),
           "Edit My Mentor Profile", 'any_access')
       submenus.append(submenu)

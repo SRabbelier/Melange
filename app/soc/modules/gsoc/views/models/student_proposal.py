@@ -89,7 +89,7 @@ class View(base.View):
         ('checkCanStudentPropose', ['scope_path', True])]
     rights['review'] = [('checkRoleAndStatusForStudentProposal',
             [['org_admin', 'mentor', 'host'], 
-            ['active'],
+            ['active', 'inactive'],
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
 
     new_params = {}

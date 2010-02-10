@@ -144,16 +144,6 @@ class View(program.View):
     form.fields['org_tags'].initial = '\n'.join(org_tags)
 
   @decorators.merge_params
-  def _editPost(self, request, entity, fields, params=None):
-    """See base._editPost().
-    """
-
-    super(View, self)._editPost(request, entity, fields)
-
-    logic = params['logic']
-    logic.updatePredefinedOrgTags(entity, fields.get('org_tags'))
-
-  @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):
     """Returns the extra menu's for this view.
 

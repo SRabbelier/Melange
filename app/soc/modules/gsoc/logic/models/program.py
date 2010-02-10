@@ -99,7 +99,7 @@ class Logic(program.Logic):
     # list of entities which are no longer to be predefined
     to_undefine = [tag for tag in tag_entities if tag.tag not in new_values]
 
-    # list of new predefined tag names 
+    # list of new predefined tag names
     to_define = [tag for tag in new_values if tag not in tag_values]
 
     for item in to_undefine:
@@ -107,12 +107,36 @@ class Logic(program.Logic):
       if item.tagged_count:
         item.predefined = False
         item.put()
-      else:        
+      else:
         OrgTag.delete_tag(entity, item.tag)
 
     for item in to_define:
       OrgTag.get_or_create(entity, item, predefined=True)
 
     return
+
+  def updateOrCreateFromFields(self, fields):
+    """Creates a new entity or updates a current one. In addition, a list of
+    predefined tags for a program is updated.
+  
+    See base.updateOrCreateFromFields() for more details.
+    """
+  
+    entity = super(Logic, self).updateOrCreateFromFields(fields)
+    self.updatePredefinedOrgTags(entity, fields.get('org_tags'))
+  
+    return entity
+
+  def updateEntityProperties(self, entity, entity_properties, silent=False,
+                             store=True):
+    """Updates a list of predefined tags for a given program.
+    
+    See base.updateEntityProperties() for more details.
+    """
+
+    self.updatePredefinedOrgTags(entity, entity_properties.get('org_tags'))
+
+    return super(Logic, self).updateEntityProperties(entity, entity_properties,
+        silent, store)
 
 logic = Logic()

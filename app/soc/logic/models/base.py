@@ -707,7 +707,7 @@ class Logic(object):
 
     return True
 
-  def _onCreate(self, entity, **kwargs):
+  def _onCreate(self, entity):
     """Called when an entity has been created.
 
     Classes that override this can use it to do any post-creation operations.
@@ -718,7 +718,7 @@ class Logic(object):
 
     sidebar.flush()
 
-  def _onUpdate(self, entity, **kwargs):
+  def _onUpdate(self, entity):
     """Called when an entity has been updated.
 
     Classes that override this can use it to do any post-update operations.

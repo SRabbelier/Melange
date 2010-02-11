@@ -746,6 +746,10 @@
                         if (handle_all !== -1) {
                           operation.real_bounds[handle_all] = list_objects[idx].jqgrid.object.jqGrid('getGridParam','records');
                         }
+                        // the button should be disabled by default if lower bound is >0
+                        if (operation.real_bounds[0] > 0) {
+                          jQuery("#" + new_button_id).attr("disabled","disabled");
+                        }
                         /* Add button bounds on parameters to let POST
                            requests working also with [0,"all"] bounds */
                         operation.parameters.real_bounds = operation.real_bounds;

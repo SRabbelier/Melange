@@ -26,7 +26,7 @@ from django.utils.translation import ugettext
 
 
 DEF_INVITE_MSG = ugettext('This invite was automatically generated because you'
-                          'completed the application process.')
+                          ' completed the application process.')
 
 
 def sentApplicationProcessedNotification(entity, status, module_name,

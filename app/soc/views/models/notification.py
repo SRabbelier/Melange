@@ -147,6 +147,8 @@ class View(base.View):
     else: # request.method == 'GET'
       if not order:
         order = ['-created_on']
+      user_entity = user_logic.getForCurrentAccount()
+      filter = {'scope': user_entity}
       return super(View, self).list(request, access_type, page_name=page_name,
                                     params=params, filter=filter, order=order,
                                     **kwargs)

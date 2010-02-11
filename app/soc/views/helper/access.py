@@ -1550,10 +1550,18 @@ class Checker(object):
         start and end date.
     """
 
-    # TODO: Make this work with gsoc_program prefix perhaps by adding
+    # TODO: Make this work with other prefixes perhaps by adding
     # checkmembership on 'take'.
 
-    if django_args['prefix'] != 'program':
+    if django_args['prefix'] == 'gsoc_program':
+      org_admin_logic = gsoc_org_admin_logic
+      mentor_logic = gsoc_mentor_logic
+      student_logic = gsoc_student_logic
+    elif django_args['prefix'] == 'ghop_program':
+      org_admin_logic = ghop_org_admin_logic
+      mentor_logic = ghop_mentor_logic
+      student_logic = ghop_student_logic
+    else:
       # TODO: update when generic surveys are allowed
       return self.deny(django_args)
 
@@ -1596,7 +1604,7 @@ class Checker(object):
       try:
         # program is the 'program' attribute for mentors and org_admins
         return self._checkHasRoleFor(django_args, org_admin_logic,
-                                          'program')
+                                     'program')
       except:
         # the current user is no org admin
         pass

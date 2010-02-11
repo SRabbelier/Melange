@@ -407,3 +407,8 @@ def as_table_row_helper(context, item):
       })
 
   return context
+
+@register.simple_tag
+def tojson(json_dictionary):
+  json_string = simplejson.dumps(json_dictionary, ensure_ascii=False)
+  return json_string.replace('\"','&quot;')

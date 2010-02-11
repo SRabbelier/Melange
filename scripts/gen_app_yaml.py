@@ -1,4 +1,4 @@
-#! /usr/bin/python2.5
+#! /usr/bin/env python2.5
 
 # Copyright 2009 the Melange authors.
 #

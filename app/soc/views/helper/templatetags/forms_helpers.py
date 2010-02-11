@@ -297,7 +297,6 @@ def as_table_helper(context, form):
       'hidden_fields': hidden_fields or '',
       'form': form,
       'json_for_js': {},
-      'json_string_for_js': '',
       })
 
   return context
@@ -389,10 +388,6 @@ def as_table_row_helper(context, item):
         force_unicode(help_text)
       ) if help_text else '',
   }
-
-  context.update({
-      'json_string_for_js': simplejson.dumps(context['json_for_js'])
-      })
 
   context.update({
       'help_text': force_unicode(help_text) if help_text else '',

@@ -212,12 +212,10 @@ class View(role.View):
       fields = {'main_admin': user_entity,
                 'survey': org_app}
       record_logic = org_app_logic.getRecordLogic()
-      org_app_record = record_logic.logic.getFromFields(fields, unique=True)
+      org_app_record = record_logic.getForFields(fields, unique=True)
 
       if not entity and org_app_record:
-        form.fields['agreed_to_admin_agreement'] = forms.fields.BooleanField(
-            widget=widgets.ReadOnlyInput, initial=True, required=True,
-            help_text=self.DEF_ALREADY_AGREED_MSG)
+        form.fields['agreed_to_admin_agreement'].initial = True
 
     if not (org_entity and org_entity.scope and 
             org_entity.scope.org_admin_agreement):

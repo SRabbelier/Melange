@@ -398,6 +398,10 @@ table#queues td {
   border: 1px solid #aaa;
 }
 
+#body input[type^="button"][disabled] {
+  color: #949494;
+}
+
 #body a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
   border-color: #9cf #69e #69e #7af;
 }

@@ -1159,11 +1159,12 @@ class Checker(object):
     return org_app_record
 
   @allowDeveloper
-  def checkOrgAppRecordIfPresent(self, django_args):
+  def checkOrgAppRecordIfPresent(self, django_args, org_app_logic):
     """Checks if the current user can see the OrgAppRecord iff present in GET.
 
     Args:
       django_args: a dictionary with django's arguments
+      org_app_logic: OrgAppSurvey Logic instance
     """
 
     self.checkIsUser(django_args)
@@ -1173,7 +1174,7 @@ class Checker(object):
 
     if id:
       # id present so check wether the user can see it
-      return self.checkCanViewOrgAppRecord(django_args)
+      return self.checkCanViewOrgAppRecord(django_args, org_app_logic)
 
     # no id present so return
     return

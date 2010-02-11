@@ -717,6 +717,7 @@
                             parameters.url,
                             {
                               xsrf_token: window.xsrf_token,
+                              idx: parameters.idx,
                               button_id: parameters.button_id,
                               data: JSON.stringify(objects_to_send)
                             },

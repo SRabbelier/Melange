@@ -20,6 +20,8 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+
+from soc.modules.ghop.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.ghop.tasks import task_update
 from soc.modules.ghop.views.models import mentor
 from soc.modules.ghop.views.models import organization
@@ -58,17 +60,20 @@ class Callback(object):
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(task_subscription.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(
+        task_subscription.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
 
     # register GHOP GAE Tasks URL's
+    self.core.registerSitemapEntry(org_app_survey_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task_update.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.
     """
 
-    # require that we had the chance to register the urls we need with the sitemap
+    # Require that we had the chance to register the urls we need with the
+    # sitemap.
     self.core.requireUniqueService('registerWithSidebar')
 
     # register the GHOP menu entries

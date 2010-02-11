@@ -17,11 +17,14 @@
 
 __authors__ = [
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+from soc.modules.gsoc.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gsoc.tasks import program_freezer
-from soc.modules.gsoc.views.models import grading_project_survey as grading_survey
+from soc.modules.gsoc.views.models import grading_project_survey as \
+    grading_survey
 from soc.modules.gsoc.views.models import grading_survey_group
 from soc.modules.gsoc.views.models import mentor
 from soc.modules.gsoc.views.models import org_admin
@@ -54,7 +57,8 @@ class Callback(object):
     self.core.requireUniqueService('registerWithSitemap')
 
     # register the GSoC Views
-    self.core.registerSitemapEntry(grading_survey_group.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(
+        grading_survey_group.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(grading_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
@@ -68,16 +72,18 @@ class Callback(object):
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
 
     # register the GSoC Tasks
+    self.core.registerSitemapEntry(org_app_survey_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program_freezer.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.
     """
 
-    # require that we had the chance to register the urls we need with the sitemap
+    # Require that we had the chance to register the urls we need with the
+    # sitemap.
     self.core.requireUniqueService('registerWithSidebar')
 
-    # register the GHOP menu entries
+    # register the GSoC menu entries
     self.core.registerSidebarEntry(grading_survey_group.view.getSidebarMenus)
     self.core.registerSidebarEntry(mentor.view.getSidebarMenus)
     self.core.registerSidebarEntry(org_admin.view.getSidebarMenus)

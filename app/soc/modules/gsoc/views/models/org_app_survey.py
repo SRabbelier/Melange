@@ -30,6 +30,7 @@ from soc.views.models import org_app_survey
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
+from soc.modules.gsoc.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gsoc.views.helper import access
 from soc.modules.gsoc.views.models.program import view as program_view
 
@@ -79,6 +80,8 @@ class View(org_app_survey.View):
     new_params['url_name'] = 'gsoc/org_app'
     new_params['module_package'] = 'soc.modules.gsoc.views.models'
     new_params['module_name'] = 'org_app_survey'
+
+    new_params['bulk_process_task'] = org_app_survey_tasks.bulk_process
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

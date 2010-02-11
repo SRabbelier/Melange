@@ -129,15 +129,15 @@ class View(survey_view.View):
     ]
     record_list_params['overview_field_extra'] = lambda entity: {
         'home_page': lists.urlize(entity.home_page)}
-    record_list_params['overview_button_extra'] = [{
-          'bounds': [1,'all'],
-          'id': 'bulk_process',
-          'caption': 'Bulk Accept/Reject Organizations',
-          'type': 'post',
-          'parameters': {
-            'url': '',
-            'keys': ['key'],
-          }}]
+    # TODO: this button needs to be enabled
+    #record_list_params['overview_button_extra'] = [{
+    #      'bounds': [0,'all'],
+    #      'id': 'bulk_process',
+    #      'caption': 'Bulk Accept/Reject Organizations',
+    #      'type': 'post',
+    #      'parameters': {
+    #        'url': '',
+    #     }}]
 
     self._params['record_list_params'] = record_list_params
 
@@ -311,8 +311,13 @@ class View(survey_view.View):
     entity = survey_logic.getFromKeyFieldsOr404(kwargs)
 
     if request.POST:
-      # TODO(ljvderijk): handle POST response when buttons are properly working
-      return http.HttpResponse('OK')
+      # POST request received, check and respond to button actions
+      post_dict = request.POST
+
+      if post_dict.get('button_id') == 'bulk_process':
+        params['bulk_process_task'].start(entity.scope)
+
+      return http.HttpResponse()
 
     list_params = params['record_list_params'].copy()
     list_params['list_description'] = (

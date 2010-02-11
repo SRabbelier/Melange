@@ -22,20 +22,22 @@ __authors__ = [
   ]
 
 
-from soc.tasks import org_app_survey
+from soc.tasks.org_app_survey import BulkProcessing
 
+from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic 
 from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 
 
 def getDjangoURLPatterns():
-  """Returns the URL patterns for the tasks in this module.
+  """Returns the Django URL patterns for the Tasks.
   """
 
   patterns = [(r'tasks/gsoc/org_app_surveys/bulk_process$',
-               'soc.modules.gsoc.tasks.org_app_survey.bulkProcess')]
+               'soc.modules.gsoc.tasks.org_app_survey.run_bulk_process')]
 
   return patterns
 
 
-bulkProcess = org_app_survey.bulkProcess(program_logic, org_app_logic)
+bulk_process = BulkProcessing(program_logic, org_app_logic,
+                             '/tasks/gsoc/org_app_surveys/bulk_process')
+run_bulk_process = bulk_process.run

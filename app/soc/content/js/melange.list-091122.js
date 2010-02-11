@@ -101,6 +101,17 @@
             "keys": ["key","link_id"],
             "refresh": "table"
           }
+        },
+        {
+          "bounds": [0,"all"],
+          "id": "dummy_0_all",
+          "caption": "Test 0-all range in POST",
+          "type": "post",
+          "parameters": {
+            "url": "/user/roles",
+            "keys": ["key","link_id"],
+            "refresh": "table"
+          }
         }
       ],
       "row" : {
@@ -690,7 +701,7 @@
                           var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
                           if (!selected_ids instanceof Array) selected_ids = [selected_ids];
                           var objects_to_send = [];
-                          if (!selected_ids.length) {
+                          if (selected_ids.length < parameters.real_bounds[0] || selected_ids.length > parameters.real_bounds[1]) {
                             return;
                           }
                           jQuery.each(selected_ids, function (id_index, id) {
@@ -727,6 +738,15 @@
                         jQuery("#t_" + list_objects[idx].jqgrid.id).append("<input type='button' value='" + operation.caption + "' style='float:left' id='" + new_button_id + "'/>");
 
                         operation.parameters.idx = idx;
+                        // Substitute "all" string (if any) to actual number of records
+                        operation.real_bounds = operation.bounds;
+                        var handle_all = operation.real_bounds.indexOf("all");
+                        if (handle_all !== -1) {
+                          operation.real_bounds[handle_all] = list_objects[idx].jqgrid.object.jqGrid('getGridParam','records');
+                        }
+                        /* Add button bounds on parameters to let POST
+                           requests working also with [0,"all"] bounds */
+                        operation.parameters.real_bounds = operation.real_bounds;
                         // associate action
                         jQuery("#" + new_button_id).click(global_button_functions[operation.type](operation.parameters));
                         // If this is a partial function, than store it in a safe place
@@ -748,15 +768,11 @@
                         var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
                         if (!selected_ids instanceof Array) selected_ids = [selected_ids];
                         jQuery.each(list_objects[idx].operations.buttons, function (setting_index, operation) {
-                          var handle_all = operation.bounds.indexOf("all");
-                          if (handle_all !== -1) {
-                            operation.bounds[handle_all] = list_objects[idx].jqgrid.object.jqGrid('getGridParam','records');
-                          }
                           var button_object = jQuery("#" + list_objects[idx].jqgrid.id + "_buttonOp_" + operation.id);
-                          if (selected_ids.length >= operation.bounds[0] && selected_ids.length <= operation.bounds[1]) {
+                          if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
                             button_object.removeAttr("disabled");
                             // If this is a per-entity operation, substitute click event for button
-                            if (operation.bounds[0] === 1 && operation.bounds[1] === 1) {
+                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1) {
                               // get current selection
                               var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_ids[0]);
                               var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];

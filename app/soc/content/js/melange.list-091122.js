@@ -717,6 +717,7 @@
                             parameters.url,
                             {
                               xsrf_token: window.xsrf_token,
+                              button_id: parameters.button_id,
                               data: JSON.stringify(objects_to_send)
                             },
                             function (data) {
@@ -747,6 +748,9 @@
                         /* Add button bounds on parameters to let POST
                            requests working also with [0,"all"] bounds */
                         operation.parameters.real_bounds = operation.real_bounds;
+                        /* Add id of the button to parameters so the appropriate backend action
+                           can be identified if multiple buttons redirect to the same page. */
+                        operation.parameters.button_id = new_button_id;
                         // associate action
                         jQuery("#" + new_button_id).click(global_button_functions[operation.type](operation.parameters));
                         // If this is a partial function, than store it in a safe place

@@ -928,7 +928,7 @@ class Checker(object):
     if request_entity.status not in statuses:
       raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_NOT_ACCEPTED_MSG)
 
-    if request_entity.group.status != 'active':
+    if request_entity.group.status not in ['new', 'active']:
       raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
     return

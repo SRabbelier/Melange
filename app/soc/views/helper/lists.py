@@ -239,6 +239,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
 
   key_order = ["key"] + params.get('%s_field_keys' % visibility)
   col_names = ["Key"] + params.get('%s_field_names' % visibility)
+  button_global = params.get('%s_button_global' % visibility, [])
   row_action = params.get('%s_row_action' % visibility, {})
   column = params.get('%s_field_extra' % visibility, lambda *args: {})
   col_props = params.get('%s_field_props' % visibility, {})
@@ -286,7 +287,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   }
 
   operations = {
-      "buttons": [],
+      "buttons": button_global,
       "row": row_action,
   }
 

@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
+{% load list_helpers %}
 
 {% block body %}
 
@@ -43,11 +43,6 @@ limitations under the License.
   Last Record Update completed: {{ entity.last_update_complete|date:"jS F Y H:i"|default:"Never Completed" }} <br />
 </p>
 
-{% for list_number in list.lists %}
-<p>
-{% include list.nextList %}
-</p>
-
-{% endfor %}
+{% as_lists list %}
 
 {% endblock %}

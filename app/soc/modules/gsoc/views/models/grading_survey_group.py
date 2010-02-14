@@ -141,10 +141,10 @@ class View(base.View):
 
     new_params['records_field_extra'] = lambda entity: {
         "project_title": entity.project.title,
-        "student_name": "%s (%s)" % (entity.project.student.name,
+        "student_name": "%s (%s)" % (entity.project.student.name(),
                                      entity.project.student.link_id),
-        "organization": entity.project.name,
-        "mentor_name": "%s (%s)" % (entity.project.mentor.name,
+        "organization": entity.project.scope.name,
+        "mentor_name": "%s (%s)" % (entity.project.mentor.name(),
                                      entity.project.mentor.link_id),
         "final_grade": entity.grade_decision.capitalize(),
         "mentor_grade": ("Pass" if entity.mentor_record.grade else "Fail") if
@@ -152,13 +152,18 @@ class View(base.View):
         "student_eval": "Yes" if entity.student_record else "Not Available",
     }
     new_params['records_field_keys'] = [
-        "project_title", "student_name", "organization", "mentor_name",
-        "final_grade", "mentor_grade", "student_eval", "locked"
+        "project_title", "student_name", "organization",
+        "mentor_name", "final_grade", "mentor_grade",
+        "student_eval", "locked", "grade_decision",
     ]
     new_params['records_field_names'] = [
-        "Project Name", "Student (link id)","Organization", "Mentor (link id)",
-        "Final Grade", "Mentor Grade", "Student Eval", "Locked"
+        "Project Name", "Student (link id)","Organization",
+        "Mentor (link id)", "Final Grade", "Mentor Grade",
+        "Student Eval", "Locked", "Grade",
     ]
+    new_params['records_row_extra'] = lambda entity: {
+        "link": redirects.getEditRedirect(entity, params),
+    }
 
     params = dicts.merge(params, new_params)
 
@@ -301,7 +306,6 @@ class View(base.View):
     context['page_name'] = "%s for %s named '%s'" %(
         page_name, params['name'], entity.name)
     context['entity'] = entity
-    template = params['view_records_template']
 
     # get the POST request dictionary and check if we should take action
     post_dict = request.POST
@@ -350,47 +354,17 @@ class View(base.View):
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
     list_params['list_row'] = params['records_row_template']
-    list_params['public_row_extra'] = lambda entity: {
+    list_params['list_description'] = 'List of all Records.'
+    list_params['records_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
     }
-# TODO(LIST)
+    list_params['records_row_action'] = params['public_row_action']
+    list_params['list_template'] = params['view_records_template']
+
     fields = {'grading_survey_group': entity}
 
-    # list all records with grading_decision set to pass
-    fields['grade_decision'] = 'pass'
-
-    # get the list content for passing records
-    pr_params = list_params.copy()
-    pr_params['list_description'] = \
-        'List of all Records which have their grading outcome set to pass.'
-    pr_list = lists.getListContent(
-        request, pr_params, fields, idx=0)
-
-    # list all records with grading_decision set to fail
-    fields['grade_decision'] = 'fail'
-
-    # get the list content for all failing records
-    fr_params = list_params.copy()
-    fr_params['list_description'] = \
-        'List of all Records which have their grading outcome set to fail.'
-    fr_list = lists.getListContent(
-        request, fr_params, fields, idx=1)
-
-    # list all records with grading decision set to undecided
-    fields['grade_decision'] = 'undecided'
-
-    # get the list content for all undecided records
-    ur_params = list_params.copy()
-    ur_params['list_description'] = \
-        'List of all Records which have their grading outcome set to undecided.'
-    ur_list = lists.getListContent(
-        request, ur_params, fields, idx=2)
-
-    # specify the contents and create a Lists object for use in the context
-    contents = [pr_list, fr_list, ur_list]
-    context['list'] = lists_logic.Lists(contents)
-
-    return responses.respond(request, template, context)
+    return self.list(request, 'any_access', page_name=page_name,
+                     params=list_params, filter=fields, visibility='records')
 
   @decorators.merge_params
   @decorators.check_access

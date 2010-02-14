@@ -129,15 +129,14 @@ class View(survey_view.View):
     ]
     record_list_params['overview_field_extra'] = lambda entity: {
         'home_page': lists.urlize(entity.home_page)}
-    # TODO: this button needs to be enabled
-    #record_list_params['overview_button_extra'] = [{
-    #      'bounds': [0,'all'],
-    #      'id': 'bulk_process',
-    #      'caption': 'Bulk Accept/Reject Organizations',
-    #      'type': 'post',
-    #      'parameters': {
-    #        'url': '',
-    #     }}]
+    record_list_params['overview_button_global'] = [{
+          'bounds': [0,'all'],
+          'id': 'bulk_process',
+          'caption': 'Bulk Accept/Reject Organizations',
+          'type': 'post',
+          'parameters': {
+            'url': '',
+         }}]
 
     self._params['record_list_params'] = record_list_params
 

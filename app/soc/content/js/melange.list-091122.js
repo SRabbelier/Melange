@@ -797,9 +797,9 @@
                       }
                     });
 
-                    //Add row action if present and multiselect is false
+                    //Add row action if present
                     var multiselect = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect');
-                    if (!multiselect && list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined) {
+                    if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined) {
                       var operation = list_objects[idx].operations.row;
 
                       var row_functions = {
@@ -831,7 +831,13 @@
                       }
                       // associate action to row
                       list_objects[idx].jqgrid.object.jqGrid('setGridParam',{
-                        onSelectRow: function (row_number) {
+                        onCellSelect: function (row_number, cell_index, cell_content, event) {
+                          /* If this is a multiselect table, do not trigger row action
+                             if user clicks on a checkbox in the first column
+                          */
+                          if (multiselect && cell_index == 0) {
+                            return;
+                          }
                           var selected_id = list_objects[idx].jqgrid.object.jqGrid('getGridParam','selrow');
                           // get current selection
                           var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_id);

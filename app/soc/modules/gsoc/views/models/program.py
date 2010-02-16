@@ -428,19 +428,24 @@ class View(program.View):
     return self._list(request, params, contents, page_name)
 
   def _getOrgsWithAcceptedApps(self, request, program_entity, params):
+    """TODO: commentary?
     """
-    """
+
+    from soc.modules.gsoc.logic.models.org_app_survey import logic as \
+        org_app_logic
+    from soc.modules.gsoc.views.models import org_app_survey as org_app_view
+
+    org_app = org_app_logic.getForProgram(program_entity)
+    filter = {
+        'survey': org_app,
+        'status': 'accepted',
+        }
 
     fmt = {'name': program_entity.name}
     description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
 
-    filter = {
-        'status': 'accepted',
-        'scope': program_entity,
-        }
-
-    from soc.views.models import org_app as org_app_view
     aa_params = org_app_view.view.getParams().copy() # accepted applications
+    aa_params['logic'] = org_app_logic.getRecordLogic()
 
     # define the list redirect action to show the notification
     del aa_params['list_key_order']

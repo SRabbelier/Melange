@@ -18,10 +18,12 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
+from soc.logic import tags
 from soc.logic.models import organization
 
 import soc.models.organization
@@ -39,9 +41,31 @@ class Logic(organization.Logic):
     """Defines the name, key_name and model for this entity.
     """
 
+    self.tags_service = tags.TagsService('org_tag')
+
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic)
 
+
+  def updateOrCreateFromFields(self, properties, silent=False):
+    """See base.Logic.updateOrCreateFromFields().
+    """
+    
+    entity = super(Logic, self).updateOrCreateFromFields(properties, silent)
+    
+    return self.tags_service.setTagValuesForEntity(entity, properties)
+
+  def updateEntityProperties(self, entity, entity_properties, silent=False,
+                             store=True):
+    """See base.Logic.updateEntityProperties().
+    
+    Also ensures that all tags for the organization are properly updated.
+    """
+
+    entity = super(Logic, self).updateEntityProperties(entity,
+        entity_properties, silent, store)
+    
+    return self.tags_service.setTagValuesForEntity(entity, entity_properties)
 
   def _onCreate(self, entity):
     """Creates a RankerRoot entity.

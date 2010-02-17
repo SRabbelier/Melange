@@ -45,8 +45,14 @@ from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
+from soc.modules.gsoc.logic.models.program import logic as program_logic
+
+from soc.modules.gsoc.models.organization import OrgTag
+
 from soc.modules.gsoc.views.models import program as program_view
 from soc.modules.gsoc.views.helper import access
+
+import soc.cache.logic
 
 
 class View(organization.View):
@@ -101,6 +107,16 @@ class View(organization.View):
     new_params['mentor_role_name'] = 'gsoc_mentor'
     new_params['mentor_url_name'] = 'gsoc/mentor'
     new_params['org_admin_role_name'] = 'gsoc_org_admin'
+
+    patterns = []
+
+    patterns += [
+        (r'^org_tags/(?P<access_type>pick)$',
+        '%(module_package)s.%(module_name)s.pick_suggested_tags', 
+        "Pick a list of suggested tags."),
+        ]
+
+    new_params['extra_django_patterns'] = patterns
 
     new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
                                        'nr_applications', 'nr_mentors']
@@ -408,3 +424,5 @@ list_roles = decorators.view(view.listRoles)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
+pick_suggested_tags = decorators.view(view.pickSuggestedTags)
+                                      

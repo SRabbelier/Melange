@@ -136,6 +136,26 @@ class View(organization.View):
 
     super(View, self).__init__(params)
 
+  def _editGet(self, request, entity, form):
+    """See base.View._editGet().
+    """
+
+    if entity.org_tag:
+      form.fields['tags'].initial = entity.tags_string(entity.org_tag)
+
+    return super(View, self)._editGet(request, entity, form)
+
+  def _editPost(self, request, entity, fields):
+    """See base.View._editPost().
+    """
+
+    super(View, self)._editPost(request, entity, fields)
+
+    fields['org_tag'] = {
+        'tags': fields['tags'],
+        'scope': entity.scope
+        }
+
   @decorators.check_access
   def pickSuggestedTags(self, request, access_type,
                         page_name=None, params=None, **kwargs):

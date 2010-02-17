@@ -111,6 +111,28 @@ class View(organization.View):
 
     super(View, self).__init__(params)
 
+  @decorators.check_access
+  def pickSuggestedTags(self, request, access_type,
+                        page_name=None, params=None, **kwargs):
+    """Returns a JSON representation of a list of organization tags
+     that are suggested for a given GSoCProgram in scope.
+    """
+
+    if 'scope_path' not in request.GET:
+      data = []
+    else:
+      program = program_logic.getFromKeyName(request.GET.get('scope_path'))
+      if not program:
+        data = []
+      else:
+        fun = soc.cache.logic.cache(OrgTag.get_for_custom_query)
+        suggested_tags = fun(OrgTag, filter={'scope': program}, order=None)
+        # TODO: this should be refactored after the issue with autocompletion
+        #       is resolved
+        data = [{'link_id': item['tag']} for item in [dicts.toDict(tag, ['tag']) for tag in suggested_tags]]
+
+    return self.json(request, data)
+
   # TODO (dhans): merge common items with the GHOP module in a single function
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific Organization menu entries.

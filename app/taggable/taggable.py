@@ -99,6 +99,33 @@ class Tag(db.Model):
     tags = db.Query(cls).filter('tagged =', key).fetch(limit)
     return tags
 
+  @staticmethod
+  def get_for_custom_query(model, filter=None, order=None, limit=1000):
+    """Get a list of tag objects for a custom filter.
+    """
+
+    query = db.Query(model)
+
+    if not filter:
+      filter = {}
+
+    for key, value in filter.iteritems():
+      if isinstance(value, list) and len(value) == 1:
+        value = value[0]
+      if isinstance(value, list):
+        op = '%s IN' % key
+        query.filter(op, value)
+      else:
+        query.filter(key, value)
+
+    if not order:
+      order = []
+
+    for key in order:
+      filter.order(key)
+
+    return query.fetch(limit)
+
   @classmethod
   def get_tags_by_frequency(cls, limit=1000):
     """Return a list of Tags sorted by the number of objects to which they

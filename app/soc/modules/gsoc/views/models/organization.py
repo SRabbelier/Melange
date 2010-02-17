@@ -38,6 +38,7 @@ from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
+from soc.views.helper import widgets
 from soc.views.models import organization
 from soc.views.models import group
 
@@ -120,6 +121,14 @@ class View(organization.View):
 
     new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
                                        'nr_applications', 'nr_mentors']
+
+    new_params['edit_extra_dynaproperties']  = {
+        'tags': widgets.ReferenceField(
+              required=False,
+              reference_url='org_tags',
+              label=ugettext('Tags'),
+              filter=['scope_path']),
+        }
 
     new_params['org_app_logic'] = org_app_logic
 

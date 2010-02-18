@@ -122,7 +122,7 @@ class View(organization.View):
     new_params['extra_dynaexclude'] = ['slots', 'slots_calculated',
                                        'nr_applications', 'nr_mentors']
 
-    new_params['edit_extra_dynaproperties']  = {
+    new_params['create_extra_dynaproperties']  = {
         'tags': widgets.ReferenceField(
               required=False,
               reference_url='org_tags',
@@ -153,7 +153,7 @@ class View(organization.View):
 
     fields['org_tag'] = {
         'tags': fields['tags'],
-        'scope': entity.scope
+        'scope': entity.scope if entity else fields['scope']
         }
 
   @decorators.check_access

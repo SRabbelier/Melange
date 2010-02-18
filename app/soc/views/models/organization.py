@@ -127,11 +127,6 @@ class View(group.View):
          'base': forms.fields.CharField,
          'label': 'Organization Link ID',
          },
-        {'name': 'scope_path',
-         'base': forms.fields.CharField,
-         'widget': forms.HiddenInput,
-         'required': True,
-         },
         ]
 
     new_params['create_extra_dynaproperties'] = {
@@ -159,7 +154,7 @@ class View(group.View):
         'ideas': lists.urlize(entity.ideas),
     }
 
-    params = dicts.merge(params, new_params)
+    params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
 

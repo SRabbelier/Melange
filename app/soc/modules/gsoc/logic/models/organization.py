@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.logic import tags
 from soc.logic.models import organization
 
@@ -80,5 +82,18 @@ class Logic(organization.Logic):
 
     super(Logic, self)._onCreate(entity)
 
+  def delete(self, entity):
+    """Delete existing entity from datastore.
+    """
+
+    def org_delete_txn(entity):
+      """Performs all necessary operations in a single transaction when
+       an organization is deleted.
+      """
+
+      self.tags_service.removeAllTagsForEntity(entity)
+      db.delete(entity)
+
+    db.run_in_transaction(org_delete_txn, entity)
 
 logic = Logic()

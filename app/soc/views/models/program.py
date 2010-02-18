@@ -33,7 +33,6 @@ from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import program as program_logic
-from soc.logic.models.org_app_survey import logic as org_app_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import redirects
@@ -281,12 +280,20 @@ class View(presence.View):
 
     timeline_entity = entity.timeline
 
+    org_app_logic = params['org_app_logic']
+    org_app_survey = org_app_logic.getForProgram(entity)
+
     if not timeline_helper.isAfterEvent(timeline_entity, 'org_signup'):
       # add link to create/edit OrgAppSurvey
-      org_app_survey = org_app_logic.getForProgram(entity)
       items += [(redirects.getCreateSurveyRedirect(
                     entity, params['document_prefix'], prefix + '/org_app'),
                 'Edit Org Application Survey','any_access')]
+
+    if org_app_survey:
+      # add link to Review Org Applications
+        items += [(redirects.getReviewOverviewRedirect(
+            org_app_survey, params),
+            "Review Organization Applications", 'any_access')]
 
     return items
 

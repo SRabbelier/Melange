@@ -122,12 +122,15 @@ def getReviewRedirect(entity, params):
 
 
 def getReviewOverviewRedirect(entity, params):
-  """Returns the redirect to the review_overview using the
-     keyname of the specified entity.
+  """Returns the redirect to the Review Overview page for Org Applications.
+
+  Args:
+    entity: OrgAppSurvey entity
+    params: Program View params with org_app_prefix entry
   """
 
-  return '/%s/review_overview/%s' % (
-      params['url_name'], entity.key().id_or_name())
+  return '/%s/org_app/review_overview/%s' % (
+      params['org_app_prefix'], entity.key().id_or_name())
 
 
 def getCreateRequestRedirect(entity, params):

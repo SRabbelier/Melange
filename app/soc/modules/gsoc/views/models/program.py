@@ -45,6 +45,7 @@ from soc.modules.gsoc.logic import cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_proposal import logic \
     as student_proposal_logic
@@ -128,6 +129,9 @@ class View(program.View):
         'clean_org_tags': cleaning.cleanTagsList('org_tags')
         }
 
+    new_params['org_app_logic'] = org_app_logic
+    new_params['org_app_prefix'] = 'gsoc'
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params)
@@ -188,10 +192,6 @@ class View(program.View):
 
         items += self._getHostEntries(entity, params, 'gsoc')
 
-        items += [(redirects.getReviewOverviewRedirect(
-            entity, {'url_name': 'org_app'}),
-            "Review Organization Applications", 'any_access')]
-
         # add link to Assign Slots
         items += [(redirects.getAssignSlotsRedirect(entity, params),
             'Assign Slots', 'any_access')]
@@ -246,9 +246,6 @@ class View(program.View):
   def _getTimeDependentEntries(self, program_entity, params, id, user):
     """Returns a list with time dependent menu items.
     """
-
-    from soc.modules.gsoc.logic.models.org_app_survey import logic as \
-        org_app_logic
 
     items = []
 

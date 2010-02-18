@@ -127,6 +127,11 @@ class View(group.View):
          'base': forms.fields.CharField,
          'label': 'Organization Link ID',
          },
+        {'name': 'scope_path',
+         'base': forms.fields.CharField,
+         'widget': forms.HiddenInput,
+         'required': True,
+         },
         ]
 
     new_params['create_extra_dynaproperties'] = {

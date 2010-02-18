@@ -40,6 +40,14 @@ class OrgTag(Tag):
 
   predefined = db.BooleanProperty(required=True, default=False)
 
+  def __init__(self, *args, **kwds):
+    """Initialization function.
+    """
+
+    Tag.__init__(self, *args, **kwds)
+    if not self.predefined:
+      self.auto_delete = True
+
   @classmethod
   def get_or_create(cls, scope, tag_name, predefined=False):
     """Get the Tag object that has the tag value given by tag_value.

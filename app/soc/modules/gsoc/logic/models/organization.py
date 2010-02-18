@@ -57,6 +57,15 @@ class Logic(organization.Logic):
     
     return self.tags_service.setTagValuesForEntity(entity, properties)
 
+  def updateOrCreateFromKeyName(self, properties, key_name, silent=False):
+    """See base.Logic.updateOrCreateFromKeyName().
+    """
+
+    entity = super(Logic, self).updateOrCreateFromKeyName(
+        properties, key_name, silent)
+
+    return self.tags_service.setTagValuesForEntity(entity, properties)
+
   def updateEntityProperties(self, entity, entity_properties, silent=False,
                              store=True):
     """See base.Logic.updateEntityProperties().

@@ -104,8 +104,6 @@ class View(base.View):
 
     new_params['edit_redirect'] = '/%(url_name)s/list'
 
-    new_params['list_template'] = 'soc/notification/list/notification.html'
-
     site_name = site_logic.getSingleton().site_name
 
     new_params['public_configuration'] = {"multiselect": True}
@@ -123,6 +121,40 @@ class View(base.View):
                                        "created_on",]
     new_params['public_field_names'] = ["Unread", "From", "Subject",
                                         "Received on"]
+    new_params['public_button_global'] = [
+        {
+          'bounds': [1,'all'],
+          'id': 'mark_read',
+          'caption': 'Mark as Read',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+        },
+        {
+          'bounds': [1,'all'],
+          'id': 'mark_unread',
+          'caption': 'Mark as Unread',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+        },
+        {
+          'bounds': [1,'all'],
+          'id': 'delete',
+          'caption': 'Delete Notification',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+        }]
 
     params = dicts.merge(params, new_params)
 
@@ -142,6 +174,8 @@ class View(base.View):
     for parameters see base.list()
     """
 
+    # TODO(ljvderijk): this list should have checkboxes for selection
+
     if request.method == 'POST':
       return self.listPost(request, params, **kwargs)
     else: # request.method == 'GET'
@@ -157,32 +191,38 @@ class View(base.View):
     """Handles the POST request for the list of notifications.
     """
 
+    from django.utils import simplejson
+
     post_dict = request.POST
-    notification_keys = post_dict.getlist('notification_key')
 
-    # if delete all the specified notifications
-    if post_dict.get('delete'):
-      db.delete([notification_logic.getFromKeyName(key_name) 
-                 for key_name in notification_keys])
-    else:
-      # determine the action
-      filter = {}
-      if post_dict.get('unread'):
-        filter['unread'] = True
-      elif post_dict.get('read'):
-        filter['unread'] = False
+    data = simplejson.read(post_dict.get('data', '[]'))
+    button_id = post_dict.get('button_id', '')
 
-      entities = []
-      # perform the action for each notification
-      for key_name in notification_keys:
-        entity = notification_logic.getFromKeyName(key_name)
-        entity = notification_logic.updateEntityProperties(
-            entity, filter, store=False)
-        entities.append(entity)
+    user_entity = user_logic.getForCurrentAccount()
 
-      db.put(entities)
+    notifications = []
+    for selection in data:
+      notification = notification_logic.getFromKeyName(selection['key'])
+      if notification.scope.key() == user_entity.key():
+        notifications.append(notification)
 
-    # redirect to the same page
+    if button_id == 'delete':
+      for notification in notifications:
+        notification_logic.delete(notification)
+    elif button_id == 'mark_read' or button_id == 'mark_unread':
+      if button_id == 'mark_read':
+        # mark all the Notifications selected as read
+        fields = {'unread': False}
+      elif button_id == 'mark_unread':
+        # mark all the Notifications selected as unread
+        fields = {'unread': True}
+
+      for notification in notifications:
+        notification_logic.updateEntityProperties(notification, fields,
+                                                  store=False)
+      db.put(notifications)
+
+    # return a 200 response to signal that all is okay
     return http.HttpResponseRedirect('')
 
   def _editPost(self, request, entity, fields):

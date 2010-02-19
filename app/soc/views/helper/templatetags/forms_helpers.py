@@ -341,15 +341,14 @@ def as_table_row_helper(context, item):
   # Escape and cache in local variable.
   errors = [force_unicode(escape(error)) for error in field.errors]
 
-
   if reference:
     from soc.views.helper import redirects
     params = {
         'url_name': reference,
         }
+    args = {}
 
     if entity:
-      args = {}
       for filter_field, filter_value in filter_fields.iteritems():
         args[filter_field] = filter_value
       for filter_field in (i for i in filter if hasattr(entity, i)):
@@ -363,7 +362,12 @@ def as_table_row_helper(context, item):
       if '__org__' in filter:
         args['scope_path'] = entity.org.key().id_or_name()
 
-      params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
+    # even if the entity is not available, it can still be necessary
+    # to access its potential scope path
+    elif 'scope_path' in filter and 'scope_path' in context:
+      args['scope_path'] = context['scope_path']
+
+    params['args'] = '&'.join(['%s=%s' % item for item in args.iteritems()])
 
     select_url = redirects.getSelectRedirect(params)
 

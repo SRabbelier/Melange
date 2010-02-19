@@ -230,6 +230,8 @@ class View(group.View):
     # use the extracted fields to initialize the form
     form = params['create_form'](initial=fields)
 
+    context['scope_path'] = kwargs['scope_path']
+
     # construct the appropriate response
     return super(View, self)._constructResponse(request, entity=None,
         context=context, form=form, params=params)

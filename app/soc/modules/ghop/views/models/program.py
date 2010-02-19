@@ -49,6 +49,7 @@ from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
 from soc.modules.ghop.logic.models import program as ghop_program_logic
 from soc.modules.ghop.logic.models import student as ghop_student_logic
 from soc.modules.ghop.logic.models import task as ghop_task_logic
+from soc.modules.ghop.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.ghop.models import task as ghop_task_model
 from soc.modules.ghop.views.helper import access as ghop_access
 from soc.modules.ghop.views.helper import redirects as ghop_redirects
@@ -135,6 +136,9 @@ class View(program.View):
     new_params['public_field_names'] = ["Program Name", "Program Owner"]
 
     new_params['extra_django_patterns'] = patterns
+
+    new_params['org_app_logic'] = org_app_logic
+    new_params['org_app_prefix'] = 'ghop'
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -336,9 +340,6 @@ class View(program.View):
 
         items += self._getHostEntries(entity, params, 'ghop')
 
-        items += [(redirects.getReviewOverviewRedirect(
-            entity, {'url_name': 'ghop/org_app', 'scope_view': self}),
-            "Review Organization Applications", 'any_access')]
         # add link to Assign Task Quota limits
         items += [(ghop_redirects.getAssignTaskQuotasRedirect(entity, params),
             'Assign Task Quota limits', 'any_access')]
@@ -369,9 +370,6 @@ class View(program.View):
   def _getTimeDependentEntries(self, ghop_program_entity, params, id, user):
     """Returns a list with time dependent menu items.
     """
-
-    from soc.modules.ghop.logic.models.org_app_survey import logic as \
-        org_app_logic
 
     items = []
 

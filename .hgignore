@@ -22,3 +22,5 @@ develop-eggs
 .DS_Store
 .settings
 .nfs*
+\#*\#
+.\#*

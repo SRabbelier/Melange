@@ -78,6 +78,7 @@ class View(base.View):
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], 
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
+    rights['share'] = ['checkIsDeveloper']
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
@@ -120,6 +121,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.review',
         'Review %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>share)/%(key_fields)s$',
+        'soc.modules.gsoc.views.models.%(module_name)s.share',
+        'Share %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -151,6 +155,7 @@ class View(base.View):
 
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
+    new_params['share_template'] = 'soc/student_proposal/share.html'
     new_params['review_after_deadline_template'] = \
         'soc/student_proposal/review_after_deadline.html'
 
@@ -282,6 +287,42 @@ class View(base.View):
 
     # explicitly change the last_modified_on since the content has been edited
     fields['last_modified_on'] = datetime.datetime.now()
+
+  @decorators.merge_params
+  @decorators.check_access
+  def share(self, request, access_type, page_name=None, params=None, **kwargs):
+    """View which allows the student to show his or her proposal to other
+    users. Anyway, they can only see the content of the proposal itself,
+    without comments, scores, etc.
+    
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+
+    context['entity'] = entity
+    context['entity_type'] = params['name']
+    context['entity_type_url'] = params['url_name']
+    context['page_name'] = 'Proposal titled "%s" from %s' % (
+        entity.title, entity.scope.name())
+    context['form'] = params['public_review_form']()
+    context['student_name'] = entity.scope.name()
+
+    template = params['share_template']
+
+    return responses.respond(request, template, context=context)
 
   @decorators.merge_params
   @decorators.check_access
@@ -1176,5 +1217,6 @@ list_orgs = decorators.view(view.listOrgs)
 list_self = decorators.view(view.listSelf)
 public = decorators.view(view.public)
 review = decorators.view(view.review)
+share = decorators.view(view.share)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)

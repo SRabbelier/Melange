@@ -684,11 +684,6 @@ class View(base.View):
              'Proposal. Choose "No mentor" if you don\'t want any '
              'mentor assigned.'
          },
-        {'name': 'org_admin_action',
-         'base': forms.fields.CharField,
-         'widget': forms.HiddenInput,
-         'required': False,
-         }
         ]
       
       dynaproperties = params_helper.getDynaFields(dynafields)
@@ -735,7 +730,7 @@ class View(base.View):
 
     fields = form.cleaned_data
 
-    if org_admin and 'org_admin_action' in fields.keys():
+    if org_admin and 'org_admin_action' in request.POST:
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
 

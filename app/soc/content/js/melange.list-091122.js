@@ -74,6 +74,15 @@
       "buttons": [
         {
           "bounds": [0,"all"],
+          "id": "bulk_process",
+          "caption": "Bulk Accept/Reject Organizations",
+          "type": "post",
+          "parameters": {
+            "url": ""
+          }
+        },
+        {
+          "bounds": [0,"all"],
           "id": "add",
           "caption": "Add a user",
           "type": "redirect_simple",
@@ -713,6 +722,9 @@
                             });
                             objects_to_send.push(single_object);
                           });
+                          if (parameters.url === "") {
+                            parameters.url = window.location.href;
+                          }
                           jQuery.post(
                             parameters.url,
                             {

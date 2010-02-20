@@ -321,7 +321,6 @@ class View(base.View):
     context['entity_type_url'] = params['url_name']
     context['page_name'] = 'Proposal titled "%s" from %s' % (
         entity.title, entity.scope.name())
-    context['form'] = params['public_review_form']()
     context['student_name'] = entity.scope.name()
 
     template = params['share_template']

@@ -42,6 +42,7 @@ from soc.views.helper import widgets
 from soc.views.models import organization
 from soc.views.models import group
 
+from soc.modules.gsoc.logic import cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
@@ -128,6 +129,7 @@ class View(organization.View):
               reference_url='org_tags',
               label=ugettext('Tags'),
               filter=['scope_path']),
+        'clean_tags': cleaning.cleanTagsList('tags', cleaning.COMMA_SEPARATOR)
         }
 
     new_params['org_app_logic'] = org_app_logic

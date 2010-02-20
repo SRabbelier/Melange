@@ -30,7 +30,10 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 
 
-def cleanTagsList(field_name):
+NEWLINE_SEPATAROR = '\n'
+COMMA_SEPARATOR = ', '
+
+def cleanTagsList(field_name, separator=NEWLINE_SEPATAROR):
   """Clean method to check and validate list of tag values.
   """
 
@@ -38,7 +41,7 @@ def cleanTagsList(field_name):
     """Decorator wrapped method.
     """
 
-    tag_values = cleaning.str2set(field_name, '\n')(self)
+    tag_values = cleaning.str2set(field_name, separator)(self)
 
     for index, tag_value in enumerate(tag_values):
 

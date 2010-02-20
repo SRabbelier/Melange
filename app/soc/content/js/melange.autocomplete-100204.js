@@ -44,7 +44,7 @@
   $m.makeAutoComplete = function (id, url) {
     jQuery.getJSON(url,
       function(data){
-        $("#" + id).autocomplete(data.data, {
+        var default_autocomplete_options = {
           matchContains: true,
           formatItem: function(item) {
             return item.link_id+" ("+item.title+")";
@@ -52,7 +52,13 @@
           formatResult: function(item) {
             return item.link_id;
           }
-        });
+        };
+        if (data.autocomplete_options !== undefined) {
+          jQuery.extend(
+            default_autocomplete_options, data.autocomplete_options
+          );
+        }
+        jQuery("#" + id).autocomplete(data.data, default_autocomplete_options);
       }
     );
   }

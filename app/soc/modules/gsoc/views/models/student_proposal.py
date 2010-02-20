@@ -73,7 +73,7 @@ class View(base.View):
         ('checkRoleAndStatusForStudentProposal',
             [['proposer'], ['active'], ['new', 'pending', 'invalid']])]
     rights['delete'] = ['checkIsDeveloper']
-    rights['show'] = [
+    rights['private'] = [
         ('checkRoleAndStatusForStudentProposal',
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], 
@@ -124,6 +124,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>share)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.share',
         'Share %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>private)/%(key_fields)s$',
+        'soc.modules.gsoc.views.models.%(module_name)s.private',
+        'Private view of %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -154,6 +157,7 @@ class View(base.View):
         }
 
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
+    new_params['private_template'] = 'soc/student_proposal/private.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
     new_params['share_template'] = 'soc/student_proposal/share.html'
     new_params['review_after_deadline_template'] = \
@@ -326,7 +330,7 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def public(self, request, access_type,
+  def private(self, request, access_type,
              page_name=None, params=None, **kwargs):
     """View in which the student can see and reply to the comments on the
        Student Proposal.
@@ -349,11 +353,11 @@ class View(base.View):
         entity.title, entity.scope.name())
 
     if request.method == 'POST':
-      return self.publicPost(request, context, params, entity, **kwargs)
+      return self.privatePost(request, context, params, entity, **kwargs)
     else: # request.method == 'GET'
-      return self.publicGet(request, context, params, entity, **kwargs)
+      return self.privateGet(request, context, params, entity, **kwargs)
 
-  def publicPost(self, request, context, params, entity, **kwargs):
+  def privatePost(self, request, context, params, entity, **kwargs):
     """Handles the POST request for the entity's public page.
 
     Args:
@@ -366,7 +370,7 @@ class View(base.View):
 
     if not form.is_valid():
       # get some entity specific context
-      self.updatePublicContext(context, entity, params)
+      self.updatePrivateContext(context, entity, params)
 
       # return the invalid form response
       return self._constructResponse(request, entity=entity, context=context,
@@ -383,7 +387,7 @@ class View(base.View):
     # redirect to the same page
     return http.HttpResponseRedirect('')
 
-  def publicGet(self, request, context, params, entity, **kwargs):
+  def privateGet(self, request, context, params, entity, **kwargs):
     """Handles the GET request for the entity's public page.
 
     Args:
@@ -424,15 +428,16 @@ class View(base.View):
       review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
 
     # get some entity specific context
-    self.updatePublicContext(context, entity, params)
+    self.updatePrivateContext(context, entity, params)
 
     context['form'] = params['public_review_form']()
-    template = params['public_template']
+    template = params['private_template']
 
     return responses.respond(request, template, context=context)
 
-  def updatePublicContext(self, context, entity, params):
-    """Updates the context for the public page with information from the entity.
+  def updatePrivateContext(self, context, entity, params):
+    """Updates the context for the /private page with information 
+    from the entity.
 
     Args:
       context: the context that should be updated
@@ -1216,6 +1221,7 @@ list = decorators.view(view.list)
 list_orgs = decorators.view(view.listOrgs)
 list_self = decorators.view(view.listSelf)
 public = decorators.view(view.public)
+private = decorators.view(view.private)
 review = decorators.view(view.review)
 share = decorators.view(view.share)
 export = decorators.view(view.export)

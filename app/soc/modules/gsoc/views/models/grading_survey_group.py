@@ -509,10 +509,10 @@ class View(base.View):
     list_params['logic'] = record_logic
     list_params['list_heading'] = params['records_heading_template']
     list_params['list_row'] = params['records_row_template']
-    list_params['public_row_extra'] = lambda entity: {
+    list_params['records_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
     }
-# TODO(LIST)
+    list_params['records_row_action'] = params['public_row_action']
     fields = {'grading_survey_group': survey_group}
 
     # get the list content for all records
@@ -521,7 +521,7 @@ class View(base.View):
 
     # return the view which renders the set content
     return self.list(request, 'any_access', page_name=page_name,
-                     params=list_params)
+                     params=list_params, visibility='records')
 
 
 view = View()

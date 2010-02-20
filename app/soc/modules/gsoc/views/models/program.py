@@ -25,6 +25,7 @@ __authors__ = [
 
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
@@ -34,6 +35,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
+from soc.views.helper import responses
 from soc.views.models import program
 from soc.views.sitemap import sidebar
 
@@ -392,6 +394,39 @@ class View(program.View):
 
     return items
 
+  def getAcceptedOrgsData(self, request, aa_params, ap_params, program_entity):
+    """Get acceptedOrgs data.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    order = ['name']
+
+    if idx == 0:
+      params = aa_params
+
+      org_app = org_app_logic.getForProgram(program_entity)
+      fields = {
+          'survey': org_app,
+          'status': 'accepted',
+      }
+    elif idx == 1:
+      params = ap_params
+
+      fields = {
+          'scope': program_entity,
+          'status': ['new', 'active', 'inactive']
+      }
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = lists.getListData(request, params, fields, order=order)
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
+
   @decorators.merge_params
   @decorators.check_access
   def acceptedOrgs(self, request, access_type,
@@ -399,63 +434,40 @@ class View(program.View):
     """See base.View.list.
     """
 
+    from soc.modules.gsoc.views.models.org_app_survey import view as org_app_view
     from soc.modules.gsoc.views.models.organization import view as org_view
 
-    contents = []
     logic = params['logic']
 
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
-    aa_list = self._getOrgsWithAcceptedApps(request, program_entity, params)
-    if aa_list:
-      contents.append(aa_list)
-
-    fmt = {'name': program_entity.name}
-    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
-
-    use_cache = not aa_list # only cache if there are no aa's left
-
-    ap_list = self._getOrgsWithProfilesList(program_entity, org_view,
-        description, use_cache)
-    contents.append(ap_list)
-
-    params = params.copy()
-    params['list_msg'] = program_entity.accepted_orgs_msg
-
-    return self._list(request, params, contents, page_name)
-
-  def _getOrgsWithAcceptedApps(self, request, program_entity, params):
-    """TODO: commentary?
-    """
-
-    from soc.modules.gsoc.logic.models.org_app_survey import logic as \
-        org_app_logic
-    from soc.modules.gsoc.views.models import org_app_survey as org_app_view
-
-    org_app = org_app_logic.getForProgram(program_entity)
-    filter = {
-        'survey': org_app,
-        'status': 'accepted',
-        }
+    list_params = org_view.getParams().copy()
+    list_params['list_msg'] = program_entity.accepted_orgs_msg
 
     fmt = {'name': program_entity.name}
     description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
-
-    aa_params = org_app_view.view.getParams().copy() # accepted applications
-    aa_params['logic'] = org_app_logic.getRecordLogic()
-
-    # define the list redirect action to show the notification
-    del aa_params['list_key_order']
-    aa_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getHomeRedirect(entity, aa_params)
-    }
+    org_app_params = org_app_view.getParams()
+    aa_params = org_app_params['record_list_params'].copy() # accepted applications
+    aa_params['public_row_extra'] = lambda entity: {}
     aa_params['list_description'] = description
-# TODO(LIST)
-    aa_list = lists.getListContent(request, aa_params, filter, idx=0,
-                                   need_content=True)
 
-    return aa_list
+    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+    ap_params = org_view.getParams().copy()
+    ap_params['list_description'] = description
+    ap_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, ap_params),
+    }
 
+    if request.GET.get('fmt') == 'json':
+      return self.getAcceptedOrgsData(request, aa_params,
+                                      ap_params, program_entity)
+
+    aa_list = lists.getListGenerator(request, aa_params, idx=0)
+    ap_list = lists.getListGenerator(request, ap_params, idx=1)
+
+    contents = [aa_list, ap_list]
+
+    return self._list(request, list_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access
@@ -627,19 +639,21 @@ class View(program.View):
 
     from soc.modules.gsoc.views.models.organization import view as org_view
 
-    org_params = org_view.getParams().copy()
-    org_params['list_template'] = 'soc/program/allocation/allocation.html'
-    org_params['list_heading'] = 'soc/program/allocation/heading.html'
-    org_params['list_row'] = 'soc/program/allocation/row.html'
-    org_params['list_pagination'] = 'soc/list/no_pagination.html'
-
     program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
-
     description = self.DEF_SLOTS_ALLOCATION_MSG
 
-    content = self._getOrgsWithProfilesList(program_entity, org_view,
-        description, False)
-    contents = [content]
+    org_params = org_view.getParams().copy()
+    org_params['list_description'] = description
+    org_params['public_row_action'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, ao_params),
+    }
+
+    order = ['name']
+
+    fields = {
+        'scope': program_entity,
+        'status': ['new', 'active', 'inactive']
+        }
 
     return_url =  "http://%(host)s%(index)s" % {
       'host' : system.getHostname(),

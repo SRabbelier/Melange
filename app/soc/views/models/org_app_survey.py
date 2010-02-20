@@ -109,6 +109,10 @@ class View(survey_view.View):
     record_list_params['js_uses_all'] = self._params['js_uses_all']
     record_list_params['list_template'] = self._params['list_template']
 
+    # define the fields for the public list
+    record_list_params['public_field_keys'] = ['name', 'home_page']
+    record_list_params['public_field_names'] = ['Name', 'Home Page']
+
     # define the fields for the self list
     record_list_params['self_field_keys'] = [
         'name', 'main_admin', 'backup_admin'

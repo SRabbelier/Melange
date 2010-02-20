@@ -541,6 +541,10 @@ class OrgAppSurveyForm(surveys.SurveyTakeForm):
     if admin_agreement:
       tos_field.widget.text = admin_agreement.content
 
+      params = {'url_name': 'document'}
+      tos_field.widget.url = redirects.getPublicRedirect(admin_agreement,
+                                                         params)
+
     agreed_to_tos = forms.fields.BooleanField(
         label='I agree to the Admin Agreement',
         required=True, initial=self.data.get('agreed_to_tos'))

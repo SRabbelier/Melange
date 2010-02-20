@@ -174,9 +174,14 @@ class View(organization.View):
         suggested_tags = fun(OrgTag, filter={'scope': program}, order=None)
         # TODO: this should be refactored after the issue with autocompletion
         #       is resolved
-        data = [{'link_id': item['tag']} for item in [dicts.toDict(tag, ['tag']) for tag in suggested_tags]]
+        data = simplejson.dumps({
+            'data': [{'link_id': item['tag']} for item in [dicts.toDict(tag, ['tag']) for tag in suggested_tags]],
+            'autocomplete_options': {
+               'multiple': True
+            }            
+        })
 
-    return self.json(request, data)
+    return self.json(request, data, False)
 
   # TODO (dhans): merge common items with the GHOP module in a single function
   def _getExtraMenuItems(self, role_description, params=None):

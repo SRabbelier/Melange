@@ -292,15 +292,10 @@ class View(program.View):
         'allocation/heading.html')
     org_params['list_row'] = 'modules/ghop/program/allocation/row.html'
     org_params['list_pagination'] = 'soc/list/no_pagination.html'
+    org_params['list_description'] = self.DEF_TASK_QUOTA_ALLOCATION_MSG
+# TODO(LIST)
 
-    description = self.DEF_TASK_QUOTA_ALLOCATION_MSG
-
-    content = self._getOrgsWithProfilesList(program_entity, org_view,
-        description, False)
-
-    contents = [content]
-
-    return self._list(request, org_params, contents, page_name, context)
+    return self.list(request, 'any_access', page_name=page_name, params=org_params)
 
   @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):
@@ -631,15 +626,12 @@ class View(program.View):
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
     fmt = {'name': program_entity.name}
-    description = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
-
-    ao_list = self._getOrgsWithProfilesList(program_entity, org_view,
-        description, False)
 
     params = params.copy()
     params['list_msg'] = program_entity.accepted_orgs_msg
-
-    return self._list(request, params, [ao_list], page_name)
+    params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
+# TODO(LIST)
+    return self.list(request, 'any_access', page_name=page_name, params=params)
 
 
 view = View()

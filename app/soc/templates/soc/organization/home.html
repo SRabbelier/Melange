@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+{% load list_helpers %}
 
 {% block scripts %}
 {{ block.super }}
@@ -34,11 +35,8 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
 {% endblock %}
 {% block home_extras %}
 <div id="org_home_extras">
-  {% for list_number in list.lists %}
-  <p>
-    {% include list.nextList %}
-  </p>
-  {% endfor %}
+
+  {% as_lists list %}
 
   {% if gmaps_api_key and org_map_data %}
     <div id="org_home_map"></div>

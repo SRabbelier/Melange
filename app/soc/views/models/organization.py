@@ -435,14 +435,42 @@ class View(group.View):
 
     return simplejson.dumps(data)
 
-  def _public(self, request, entity, context):
+  def getHomeData(self, request, ap_params, entity):
+    """Returns the home data.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    order = ['name']
+
+    if idx == 0:
+      params = ap_params
+      # only show projects that have not failed
+      fields= {'scope': entity,
+               'status': ['accepted', 'completed']}
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = lists.getListData(request, params, fields,
+                                 'public', order=order)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
+  @decorators.check_access
+  def home(self, request, access_type,
+             page_name=None, params=None, **kwargs):
     """See base.View._public().
     """
     # TODO: This needs to be moved to the GSoC module
     from soc.modules.gsoc.views.models import student_project as \
         student_project_view
 
+    entity = self._logic.getFromKeyFieldsOr404(kwargs)
     program_entity = entity.scope
+
+    params = params.copy() if params else {}
 
     if timeline_helper.isAfterEvent(program_entity.timeline,
                                     'accepted_students_announced_deadline'):
@@ -451,38 +479,33 @@ class View(group.View):
 
       # define the list redirect action to show the notification
       ap_params['public_row_extra'] = lambda entity: {
-          'link': (redirects.getPublicRedirect, ap_params)
+          'link': redirects.getPublicRedirect(entity, ap_params)
       }
       ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
           entity.name)
       ap_params['list_heading'] = 'soc/student_project/list/heading.html'
       ap_params['list_row'] = 'soc/student_project/list/row.html'
-# TODO(LIST)
-      # only show projects that have not failed
-      filter = {'scope': entity,
-                'status': ['accepted', 'completed']}
 
-      ap_list = lists.getListContent(request, ap_params, filter, idx=0,
-                                     need_content=True)
+      if request.GET.get('fmt') == 'json':
+        return self.getHomeData(request, ap_params, entity)
 
-      contents = []
+      ap_list = lists.getListGenerator(request, ap_params, idx=0)
 
-      if ap_list:
-        # this is a temporary fix for sorting Student Projects 
-        # by Student name until we have a view that default 
-        # sorts it self by name (right now we can't do such query)
-        ap_list['data'].sort(key=lambda sp: sp.student.name().lower())
+      contents = [ap_list]
 
-        contents.append(ap_list)
-
+      extra_context = {}
       # construct the list and put it into the context
-      context['list'] = soc.logic.lists.Lists(contents)
+      extra_context['list'] = soc.logic.lists.Lists(contents)
+
+      fields= {'scope': entity,
+               'status': ['accepted', 'completed']}
 
       # obtain data to construct the organization map as json object
-      context['org_map_data'] = self._getMapData(filter)
+      extra_context['org_map_data'] = self._getMapData(fields)
+      params['context'] = extra_context
 
-    return super(View, self)._public(request=request, entity=entity,
-                                     context=context)
+    return super(View, self).home(request, 'any_access', page_name=page_name,
+                                  params=params, **kwargs)
 
 
 view = View()

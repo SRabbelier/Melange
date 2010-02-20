@@ -179,43 +179,6 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
-  def _getOrgsWithProfilesList(self, program_entity, org_view, description,
-                               use_cache):
-    """Returns a content of a list of all organizations that got accepted to
-    the program and there is an Organization-like entity in datastore.
-
-    Args:
-      program_entity: program which list the organizations for
-      org_view: a view for organization model
-      description: the description of the list
-      use_cache: whether or not to use the memcache
-    """
-
-    ao_params = org_view.getParams().copy()
-
-    org_logic = ao_params['logic']
-
-    filter = {
-        'scope': program_entity,
-        'status': ['new', 'active', 'inactive']
-        }
-    order = ['name']
-
-    if not use_cache:
-      entities = org_logic.getForFields(filter=filter, order=order)
-    else:
-      # only cache if all profiles are created
-      fun =  soc.cache.logic.cache(self._getData)
-      entities = fun(org_logic.getModel(), filter, order, org_logic)
-# TODO(LIST)
-    result = dicts.rename(ao_params, ao_params['list_params'])
-    result['action'] = (redirects.getHomeRedirect, ao_params)
-    result['description'] = description
-    result['pagination'] = 'soc/list/no_pagination.html'
-    result['data'] = entities
-
-    return result
-
   def _editPost(self, request, entity, fields):
     """See base._editPost().
     """

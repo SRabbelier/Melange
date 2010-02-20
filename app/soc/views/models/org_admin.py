@@ -110,7 +110,8 @@ class View(role.View):
         ]
 
     new_params['allow_invites'] = True
-    new_params['show_in_roles_overview'] = True
+    # only if subclassed, so params is not empty
+    new_params['show_in_roles_overview'] = bool(params)
 
     new_params['public_field_keys'] = ['name', 'link_id', 'scope_path']
     new_params['public_field_names'] = ["Admin Name", "Admin ID", "Organization ID"]

@@ -140,7 +140,8 @@ class View(role.View):
          },
         ]
 
-    new_params['show_in_roles_overview'] = True
+    # only if subclassed, so params is not empty
+    new_params['show_in_roles_overview'] = bool(params)
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

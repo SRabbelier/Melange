@@ -162,6 +162,8 @@ class View(base.View):
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
 
+    new_params['show_in_roles_overview'] = True
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
@@ -170,9 +172,8 @@ class View(base.View):
     template = 'soc/%(module_name)s/manage.html' % self._params
     self._params['manage_template'] = template
 
-    if self._params.get('show_in_roles_overview'):
-      # add to roles overview
-      addRole(self)
+    # register this View
+    addRole(self)
 
   @decorators.merge_params
   @decorators.check_access

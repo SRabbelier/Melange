@@ -792,8 +792,8 @@
                           var button_object = jQuery("#" + list_objects[idx].jqgrid.id + "_buttonOp_" + operation.id);
                           if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
                             button_object.removeAttr("disabled");
-                            // If this is a per-entity operation, substitute click event for button
-                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1) {
+                            // If this is a per-entity operation, substitute click event for button (if present)
+                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
                               // get current selection
                               var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_ids[0]);
                               var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];

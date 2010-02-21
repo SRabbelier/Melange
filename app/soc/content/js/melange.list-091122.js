@@ -850,9 +850,8 @@
                           if (multiselect && cell_index == 0) {
                             return;
                           }
-                          var selected_id = list_objects[idx].jqgrid.object.jqGrid('getGridParam','selrow');
                           // get current selection
-                          var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_id);
+                          var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',row_number);
                           var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
                           var partial_row_method = list_objects[idx].jqgrid.object.data('melange').rowsel;
                           partial_row_method(object.operations.row.link)();

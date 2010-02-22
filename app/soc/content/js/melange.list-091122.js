@@ -708,7 +708,14 @@
                         return function () {
                           var option_name = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect') ? 'selarrrow' : 'selrow'
                           var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
-                          if (!selected_ids instanceof Array) selected_ids = [selected_ids];
+                          if (!(selected_ids instanceof Array)) {
+                            if (selected_ids === null) {
+                              selected_ids = [];
+                            }
+                            else {
+                              selected_ids = [selected_ids];
+                            }
+                          }
                           var objects_to_send = [];
                           if (selected_ids.length < parameters.real_bounds[0] || selected_ids.length > parameters.real_bounds[1]) {
                             return;

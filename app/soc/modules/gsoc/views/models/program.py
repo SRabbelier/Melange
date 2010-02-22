@@ -645,6 +645,11 @@ class View(program.View):
     org_params = org_view.getParams().copy()
     org_params['list_description'] = description
     org_params['list_template'] = "modules/gsoc/program/list/allocation.html"
+    org_params['public_field_props'] = {
+        "link_id": {
+            "hidden": True,
+        }
+    }
     org_params['public_row_action'] = {}
     org_params['public_row_extra'] = lambda entity: {}
     org_params['public_conf_extra'] = {
@@ -653,11 +658,11 @@ class View(program.View):
     }
     org_params['public_field_keys'] = [
         "name", "slots_desired", "nr_applications", "nr_mentors",
-        "locked", "slots", "slots_calculated",
+        "locked", "slots", "slots_calculated", "link_id",
     ]
     org_params['public_field_names'] = [
         "Name", "Desired", "#Proposals", "#Mentors",
-        "Locked?", "Slots", "Raw",
+        "Locked?", "Slots", "Raw", "Link ID",
     ]
 
     order = ['name']

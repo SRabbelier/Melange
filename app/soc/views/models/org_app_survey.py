@@ -145,6 +145,10 @@ class View(survey_view.View):
           'parameters': {
             'url': '',
          }}]
+    record_list_params['overview_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=False),
+    }
 
     self._params['record_list_params'] = record_list_params
 
@@ -334,8 +338,8 @@ class View(survey_view.View):
 
     info = {'url_name': params['url_name'],
             'survey':entity}
-    list_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
+    list_params['overview_row_extra'] = lambda entity: {
+        'link': redirects.getReviewOrgAppSurvey(entity, info)
     }
 
     if request.GET.get('fmt') == 'json':

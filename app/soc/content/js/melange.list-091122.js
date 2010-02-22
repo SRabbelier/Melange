@@ -466,8 +466,14 @@
     temp_data = jLinq.from(temp_data).orderBy(order_type + sort_column).select();
     list_objects[my_index].filtered_data = temp_data;
 
+    // If pagination is disabled, change number or rows to length of filtered data
+    if (postdata.rows === -1) {
+      postdata.rows = list_objects[my_index].filtered_data.length;
+    }
+
     var offset_start = (postdata.page - 1) * postdata.rows;
     var offset_end = (postdata.page * postdata.rows) - 1;
+
     var json_to_return = {
       "page": postdata.page,
       "total": temp_data.length === 0 ? 0 : Math.ceil(temp_data.length / postdata.rows),

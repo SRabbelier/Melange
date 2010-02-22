@@ -885,10 +885,16 @@
                         });
                         csv_export[0] = csv_export[0].join(",");
 
+                        //Check the actual order of the column, so the data dictionary can be in any order
+                        var column_ids = [];
+                        jQuery.each(list_objects[idx].configuration.colModel, function (column, details) {
+                          column_ids.push(details.name);
+                        });
                         //now run through the columns
                         jQuery.each(iterate_through, function (row_index, row) {
                           csv_export[csv_export.length] = [];
-                          jQuery.each(row, function (column_name, cell_value) {
+                          jQuery.each(column_ids, function (column_index, column_id) {
+                            var cell_value = row[column_id];
                             if (cell_value === null) {
                               cell_value = "";
                             }

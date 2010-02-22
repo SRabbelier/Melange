@@ -648,6 +648,10 @@ class View(program.View):
     org_params['public_row_extra'] = lambda entity: {
         'link': redirects.getHomeRedirect(entity, org_params),
     }
+    org_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+    }
     org_params['public_field_keys'] = [
         "name", "slots_desired", "nr_applications", "nr_mentors",
         "locked", "slots", "slots_calculated",

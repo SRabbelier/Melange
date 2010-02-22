@@ -644,9 +644,18 @@ class View(program.View):
 
     org_params = org_view.getParams().copy()
     org_params['list_description'] = description
-    org_params['public_row_action'] = lambda entity: {
-        'link': redirects.getHomeRedirect(entity, ao_params),
+    org_params['list_template'] = "modules/gsoc/program/list/allocation.html"
+    org_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, org_params),
     }
+    org_params['public_field_keys'] = [
+        "name", "slots_desired", "nr_applications", "nr_mentors",
+        "locked", "slots", "slots_calculated",
+    ]
+    org_params['public_field_names'] = [
+        "Name", "Desired", "#Proposals", "#Mentors",
+        "Locked?", "Slots", "Raw",
+    ]
 
     order = ['name']
 
@@ -667,7 +676,7 @@ class View(program.View):
         'return_url': return_url,
         }
 
-    return self._list(request, org_params, contents, page_name, context)
+    return self.list(request, 'any_access', page_name=page_name, params=org_params, context=context)
 
   @decorators.merge_params
   @decorators.check_access

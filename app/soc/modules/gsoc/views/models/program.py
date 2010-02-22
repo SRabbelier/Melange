@@ -645,9 +645,8 @@ class View(program.View):
     org_params = org_view.getParams().copy()
     org_params['list_description'] = description
     org_params['list_template'] = "modules/gsoc/program/list/allocation.html"
-    org_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getHomeRedirect(entity, org_params),
-    }
+    org_params['public_row_action'] = {}
+    org_params['public_row_extra'] = lambda entity: {}
     org_params['public_conf_extra'] = {
         "rowNum": -1,
         "rowList": [],

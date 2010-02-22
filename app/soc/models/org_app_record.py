@@ -26,6 +26,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.models import licenses
 from soc.models.survey_record import SurveyRecord
 
 import soc.models.user
@@ -48,6 +49,11 @@ class OrgAppRecord(SurveyRecord):
   #: Required field storing a home page URL of the organization.
   home_page = db.LinkProperty(
       required=True, verbose_name=ugettext('Organization Home Page URL'))
+
+  #: Required field storing the main license an organization uses.
+  license = db.StringProperty(
+      required=True, choices=licenses.LICENSES,
+      verbose_name=ugettext('Main Organization License'))
 
   #: field storing the user which first created the OrgApplicationRecord and 
   #: is therefore the main admin if the application is accepted.

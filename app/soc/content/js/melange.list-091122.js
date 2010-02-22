@@ -346,6 +346,13 @@
     }
   };
 
+  var isEmptyObject = function (obj) {
+    //from jQuery 1.4 source, we can switch to it when we will upgrade to 1.4
+    for ( var name in obj ) {
+      return false;
+    }
+    return true;
+  }
 
   var list_objects = [];
 
@@ -824,7 +831,7 @@
 
                     //Add row action if present
                     var multiselect = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect');
-                    if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined) {
+                    if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined && !isEmptyObject(list_objects[idx].operations.row)) {
                       var operation = list_objects[idx].operations.row;
 
                       var row_functions = {

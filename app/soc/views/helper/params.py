@@ -268,7 +268,7 @@ def constructParams(params):
 
   new_params['public_row_action'] = {
         "type": "redirect_custom",
-        "parameters": dict(new_window=True),
+        "parameters": dict(new_window=False),
     }
   new_params['public_row_extra'] = lambda entity, *args: {
         "link": redirects.getEditRedirect(entity, params),

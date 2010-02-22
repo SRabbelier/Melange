@@ -123,6 +123,10 @@ class View(survey_view.View):
     record_list_params['self_field_extra'] = lambda entity: {
         'main_admin': entity.main_admin.name,
         'backup_admin': entity.backup_admin.name}
+    record_list_params['self_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=False),
+    }
 
     # define the fields for the overview list
     record_list_params['overview_field_keys'] = [
@@ -244,11 +248,11 @@ class View(survey_view.View):
     if timeline_helper.isActivePeriod(entity, 'survey'):
       info = {'url_name': params['url_name'],
               'survey':entity}
-      list_params['public_row_extra'] = lambda entity: {
+      list_params['self_row_extra'] = lambda entity: {
           'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
       }
     else:
-      list_params['public_row_extra'] = lambda entity: {
+      list_params['self_row_extra'] = lambda entity: {
           'link': redirects.getViewSurveyRecordRedirect(entity, params)
       }
 

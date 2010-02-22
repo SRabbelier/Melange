@@ -40,12 +40,12 @@ from soc.views.models import program
 from soc.views.sitemap import sidebar
 
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import organization as org_logic
 from soc.logic.models.host import logic as host_logic
 
 from soc.modules.gsoc.logic import cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
+from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
@@ -502,7 +502,7 @@ class View(program.View):
               'slots >': 0,
               'status': 'active'}
 
-    org_entities = org_logic.logic.getForFields(fields,
+    org_entities = org_logic.getForFields(fields,
         limit=limit, offset=offset)
 
     orgs_data = {}
@@ -575,8 +575,8 @@ class View(program.View):
           'status': 'active',
           }
 
-    query = org_logic.logic.getQueryForFields(filter=filter)
-    organizations = org_logic.logic.getAll(query)
+    query = org_logic.getQueryForFields(filter=filter)
+    organizations = org_logic.getAll(query)
 
     locked_slots = adjusted_slots = {}
 
@@ -726,7 +726,7 @@ class View(program.View):
               'slots >': 0,
               'status': 'active'}
 
-    query = org_logic.logic.getQueryForFields(fields)
+    query = org_logic.getQueryForFields(fields)
 
     to_json = {
         'nr_of_orgs': query.count(),

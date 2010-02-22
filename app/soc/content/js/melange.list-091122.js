@@ -923,6 +923,11 @@
                       tb_show("CSV export","#TB_inline?height=400&width=500&inlineId=csv_thickbox");
                       }
                     });
+
+                    //Trigger event when loading of the list is finished
+                    var loaded_event = jQuery.Event("melange_list_loaded");
+                    loaded_event.list_object = list_objects[idx];
+                    list_objects[idx].jqgrid.object.trigger(loaded_event);
                     //console.debug("void, skipping");
                   }
                 },

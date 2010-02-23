@@ -48,16 +48,15 @@
       var slots_colModel = "slots";
       var linkid_colModel = "link_id";
 
-      console.dir(list);
       var rows = list.jqgrid.object.jqGrid('getRowData');
       jQuery.each(rows, function (row_id,row_data) {
         var org_link_id = row_data[linkid_colModel];
 
         list.jqgrid.object.jqGrid(
           'setCell',
-          row_id,
+          (row_id + 1),
           slots_colModel,
-          '<div class="slots" id="id_slot_count_'+org_link_id+'"><input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
+          '<div class="slots" id="id_slot_count_'+org_link_id+'">'+org_link_id+'<input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
           null,
           null
         );
@@ -66,7 +65,7 @@
 
         list.jqgrid.object.jqGrid(
           'setCell',
-          row_id,
+          (row_id + 1),
           locked_colModel,
           '<div class="locked" id="locked_slot_count_'+org_link_id+'"><input type="checkbox" id="id_locked_slot_'+org_link_id+'"/></div>',
           null,

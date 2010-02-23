@@ -133,7 +133,9 @@ class View(student.View):
     fmt = {'name': student_entity.scope.name}
     list_params['list_description'] = self.DEF_STUDENT_PROJECTS_MSG_FMT % fmt
     list_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getStudentEditRedirect(entity, list_params)
+        'link': (redirects.getStudentEditRedirect(entity, list_params) if
+                entity.student.status != 'inactive' else
+                redirects.getPublicRedirect(entity, list_params))
     }
 
     return project_view.view.list(request, access_type, page_name=page_name,

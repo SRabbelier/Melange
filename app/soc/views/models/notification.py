@@ -117,6 +117,9 @@ class View(base.View):
             "editoptions": {"value": ":All;^Read$:Read;^Not Read$:Not Read"}
         }
     }
+    new_params['public_conf_extra'] = {
+        "multiselect": True,
+    }
     new_params['public_field_keys'] = ["unread", "from", "subject",
                                        "created_on",]
     new_params['public_field_names'] = ["Unread", "From", "Subject",

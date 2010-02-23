@@ -28,6 +28,7 @@ from django import http
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
+from soc.models import licenses
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -123,6 +124,10 @@ class View(survey_view.View):
     record_list_params['self_field_extra'] = lambda entity: {
         'main_admin': entity.main_admin.name,
         'backup_admin': entity.backup_admin.name}
+    record_list_params['self_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=False),
+    }
 
     # define the fields for the overview list
     record_list_params['overview_field_keys'] = [
@@ -141,6 +146,10 @@ class View(survey_view.View):
           'parameters': {
             'url': '',
          }}]
+    record_list_params['overview_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=False),
+    }
 
     self._params['record_list_params'] = record_list_params
 
@@ -244,11 +253,11 @@ class View(survey_view.View):
     if timeline_helper.isActivePeriod(entity, 'survey'):
       info = {'url_name': params['url_name'],
               'survey':entity}
-      list_params['public_row_extra'] = lambda entity: {
+      list_params['self_row_extra'] = lambda entity: {
           'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
       }
     else:
-      list_params['public_row_extra'] = lambda entity: {
+      list_params['self_row_extra'] = lambda entity: {
           'link': redirects.getViewSurveyRecordRedirect(entity, params)
       }
 
@@ -330,8 +339,8 @@ class View(survey_view.View):
 
     info = {'url_name': params['url_name'],
             'survey':entity}
-    list_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getRetakeOrgAppSurveyRedirect(entity, info)
+    list_params['overview_row_extra'] = lambda entity: {
+        'link': redirects.getReviewOrgAppSurvey(entity, info)
     }
 
     if request.GET.get('fmt') == 'json':
@@ -470,6 +479,7 @@ class OrgAppSurveyForm(surveys.SurveyTakeForm):
       clean_data['name'] = post_dict.get('name', None)
       clean_data['description'] = post_dict.get('description', None)
       clean_data['home_page'] = post_dict.get('home_page', None)
+      clean_data['license'] = post_dict.get('license', None)
       clean_data['backup_admin'] = post_dict.get('backup_admin', None)
       clean_data['agreed_to_tos'] = post_dict.get('agreed_to_tos', None)
 
@@ -508,6 +518,7 @@ class OrgAppSurveyForm(surveys.SurveyTakeForm):
       self.data['name'] = self.survey_record.name
       self.data['description'] = self.survey_record.description
       self.data['home_page'] = self.survey_record.home_page
+      self.data['license'] = self.survey_record.license
       self.data['backup_admin'] = self.survey_record.backup_admin.link_id
       self.data['agreed_to_tos'] = self.survey_record.agreed_to_admin_agreement
 
@@ -531,6 +542,11 @@ class OrgAppSurveyForm(surveys.SurveyTakeForm):
 
     home_page = forms.fields.URLField(
         label='Home page', required=True, initial=self.data.get('home_page'))
+
+    license_field = forms.fields.ChoiceField(
+        choices=[(license,license) for license in licenses.LICENSES],
+        label='Main Organization License', required=True,
+        initial=self.data.get('license'))
 
     backup_admin = forms.fields.CharField(
         label='Backup Admin (Link ID)', required=True,
@@ -557,6 +573,7 @@ class OrgAppSurveyForm(surveys.SurveyTakeForm):
     fields.insert(0, 'name', name)
     fields.insert(1, 'description', description)
     fields.insert(2, 'home_page', home_page)
+    fields.insert(3, 'license', license_field)
     # add fields to the bottom of the form
     fields['backup_admin'] = backup_admin
     fields['tos'] = tos_field
@@ -578,6 +595,7 @@ class OrgAppRecordForm(surveys.SurveyRecordForm):
       self.data['name'] = self.survey_record.name
       self.data['description'] = self.survey_record.description
       self.data['home_page'] = self.survey_record.home_page
+      self.data['license'] = self.survey_record.license
       self.data['backup_admin'] = self.survey_record.backup_admin.link_id
       self.data['agreed_to_tos'] = self.survey_record.agreed_to_admin_agreement
 
@@ -605,6 +623,10 @@ class OrgAppRecordForm(surveys.SurveyRecordForm):
         widget=widgets.PlainTextWidget,
         required=True, initial=self.data.get('home_page'))
 
+    license_field = forms.fields.CharField(
+        widget=widgets.PlainTextWidget,
+        required=True, initial=self.data.get('license'))
+
     backup_admin = forms.fields.CharField(
         label='Backup Admin (Link ID)',
         widget=widgets.PlainTextWidget,
@@ -619,6 +641,7 @@ class OrgAppRecordForm(surveys.SurveyRecordForm):
     fields.insert(0, 'name', name)
     fields.insert(1, 'description', description)
     fields.insert(2, 'home_page', home_page)
+    fields.insert(3, 'license', license_field)
     # add fields to the bottom of the form
     fields['backup_admin'] = backup_admin
     fields['agreed_to_tos'] = agreed_to_tos

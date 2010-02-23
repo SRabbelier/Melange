@@ -27,6 +27,7 @@ __authors__ = [
 from django import forms
 from django.forms import util
 from django.forms import widgets
+from django.utils import encoding
 from django.utils import html
 from django.utils import simplejson
 from django.utils import safestring
@@ -58,7 +59,8 @@ class PlainTextWidget(forms.widgets.Widget):
     """Render ReadOnlyInput widget as HTML.
     """
 
-    return html.linebreaks(str(value)) if value else ""
+    return html.linebreaks(html.escape(encoding.force_unicode(value))) if value \
+        else ""
 
 
 class FullTinyMCE(forms.widgets.Textarea):

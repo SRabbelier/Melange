@@ -239,6 +239,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
 
   key_order = ["key"] + params.get('%s_field_keys' % visibility)
   col_names = ["Key"] + params.get('%s_field_names' % visibility)
+  conf_extra = params.get('%s_conf_extra' % visibility, {})
   button_global = params.get('%s_button_global' % visibility, [])
   row_action = params.get('%s_row_action' % visibility, {})
   column = params.get('%s_field_extra' % visibility, lambda *args: {})
@@ -285,6 +286,8 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
       "toolbar": [True, "top"],
       "multiselect": False,
   }
+
+  configuration.update(conf_extra)
 
   operations = {
       "buttons": button_global,

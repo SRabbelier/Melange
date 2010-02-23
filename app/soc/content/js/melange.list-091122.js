@@ -346,6 +346,13 @@
     }
   };
 
+  var isEmptyObject = function (obj) {
+    //from jQuery 1.4 source, we can switch to it when we will upgrade to 1.4
+    for ( var name in obj ) {
+      return false;
+    }
+    return true;
+  }
 
   var list_objects = [];
 
@@ -466,8 +473,14 @@
     temp_data = jLinq.from(temp_data).orderBy(order_type + sort_column).select();
     list_objects[my_index].filtered_data = temp_data;
 
+    // If pagination is disabled, change number or rows to length of filtered data
+    if (postdata.rows === -1) {
+      postdata.rows = list_objects[my_index].filtered_data.length;
+    }
+
     var offset_start = (postdata.page - 1) * postdata.rows;
     var offset_end = (postdata.page * postdata.rows) - 1;
+
     var json_to_return = {
       "page": postdata.page,
       "total": temp_data.length === 0 ? 0 : Math.ceil(temp_data.length / postdata.rows),
@@ -708,7 +721,14 @@
                         return function () {
                           var option_name = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect') ? 'selarrrow' : 'selrow'
                           var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
-                          if (!selected_ids instanceof Array) selected_ids = [selected_ids];
+                          if (!(selected_ids instanceof Array)) {
+                            if (selected_ids === null) {
+                              selected_ids = [];
+                            }
+                            else {
+                              selected_ids = [selected_ids];
+                            }
+                          }
                           var objects_to_send = [];
                           if (selected_ids.length < parameters.real_bounds[0] || selected_ids.length > parameters.real_bounds[1]) {
                             return;
@@ -792,8 +812,8 @@
                           var button_object = jQuery("#" + list_objects[idx].jqgrid.id + "_buttonOp_" + operation.id);
                           if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
                             button_object.removeAttr("disabled");
-                            // If this is a per-entity operation, substitute click event for button
-                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1) {
+                            // If this is a per-entity operation, substitute click event for button (if present)
+                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
                               // get current selection
                               var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_ids[0]);
                               var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
@@ -811,7 +831,7 @@
 
                     //Add row action if present
                     var multiselect = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect');
-                    if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined) {
+                    if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined && !isEmptyObject(list_objects[idx].operations.row)) {
                       var operation = list_objects[idx].operations.row;
 
                       var row_functions = {
@@ -850,9 +870,8 @@
                           if (multiselect && cell_index == 0) {
                             return;
                           }
-                          var selected_id = list_objects[idx].jqgrid.object.jqGrid('getGridParam','selrow');
                           // get current selection
-                          var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_id);
+                          var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',row_number);
                           var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
                           var partial_row_method = list_objects[idx].jqgrid.object.data('melange').rowsel;
                           partial_row_method(object.operations.row.link)();
@@ -886,10 +905,16 @@
                         });
                         csv_export[0] = csv_export[0].join(",");
 
+                        //Check the actual order of the column, so the data dictionary can be in any order
+                        var column_ids = [];
+                        jQuery.each(list_objects[idx].configuration.colModel, function (column, details) {
+                          column_ids.push(details.name);
+                        });
                         //now run through the columns
                         jQuery.each(iterate_through, function (row_index, row) {
                           csv_export[csv_export.length] = [];
-                          jQuery.each(row, function (column_name, cell_value) {
+                          jQuery.each(column_ids, function (column_index, column_id) {
+                            var cell_value = row[column_id];
                             if (cell_value === null) {
                               cell_value = "";
                             }
@@ -911,6 +936,11 @@
                       tb_show("CSV export","#TB_inline?height=400&width=500&inlineId=csv_thickbox");
                       }
                     });
+
+                    //Trigger event when loading of the list is finished
+                    var loaded_event = jQuery.Event("melange_list_loaded");
+                    loaded_event.list_object = list_objects[idx];
+                    list_objects[idx].jqgrid.object.trigger(loaded_event);
                     //console.debug("void, skipping");
                   }
                 },

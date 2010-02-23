@@ -31,7 +31,7 @@ from soc.logic import cleaning
 
 
 NEWLINE_SEPATAROR = '\n'
-COMMA_SEPARATOR = ', '
+COMMA_SEPARATOR = ','
 
 def cleanTagsList(field_name, separator=NEWLINE_SEPATAROR):
   """Clean method to check and validate list of tag values.

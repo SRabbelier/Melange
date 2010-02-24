@@ -40,7 +40,7 @@
       */
       widget.find('textarea').each(
         function () {
-          $(this).attr('overflow', 'auto').growfield();
+          $(this).attr('overflow', 'auto').TextAreaExpander(100, 500);
         }
       );
     }
@@ -48,7 +48,7 @@
     else { // survey has saved results
       widget.find('textarea').each(
         function () {
-          $(this).attr('overflow', 'auto').growfield();
+          $(this).attr('overflow', 'auto').TextAreaExpander(100, 500);
         }
       ).end()
       .find('.pick_multi').each(

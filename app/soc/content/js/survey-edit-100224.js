@@ -177,7 +177,7 @@
             $(this).val() === DEFAULT_LONG_ANSWER_TEXT) {
               $(this).preserveDefaultText(DEFAULT_LONG_ANSWER_TEXT);
             }
-            $(this).growfield();
+            $(this).TextAreaExpander(100, 500);
           }
         );
 

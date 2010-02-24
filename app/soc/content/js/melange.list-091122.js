@@ -832,6 +832,20 @@
                     //Add row action if present
                     var multiselect = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect');
                     if (list_objects[idx].operations !== undefined && list_objects[idx].operations.row !== undefined && !isEmptyObject(list_objects[idx].operations.row)) {
+
+                      // if row action is present, than change cursor
+                      // FIXME: this is done by polling continuosly the body element
+                      // this is not so elegant nor efficient, need to find another solution
+                      jQuery("body").live("mouseover", function() {
+                          if (multiselect) {
+                            jQuery("#" + list_objects[idx].jqgrid.id + " tbody tr td:gt(0)").css("cursor","pointer")
+                          }
+                          else {
+                            jQuery("#" + list_objects[idx].jqgrid.id + " tbody tr td").css("cursor","pointer")
+                          }
+
+                      });
+
                       var operation = list_objects[idx].operations.row;
 
                       var row_functions = {

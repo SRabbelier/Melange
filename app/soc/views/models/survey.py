@@ -33,6 +33,7 @@ from google.appengine.ext import db
 from django import forms
 from django import http
 from django.utils import simplejson
+from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -212,6 +213,9 @@ class View(base.View):
         "Path", "Title", "Link ID", "Featured",
         "Created By", "Created On", "Modified",
     ]
+
+    new_params['successful_take_message'] = [
+        ugettext('Survey record submitted.')]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -676,7 +680,7 @@ class View(base.View):
 
     notice = requests.getSingleIndexedParamValue(
         request, params['submit_msg_param_name'],
-        values=params['save_message'])
+        values=params['successful_take_message'])
 
     # update the context with the help_text and status
     context_update = dict(status=status, help_text=help_text, notice=notice)

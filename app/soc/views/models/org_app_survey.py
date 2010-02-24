@@ -83,7 +83,7 @@ class View(survey_view.View):
 
     new_params['review_template'] = 'soc/org_app_survey/review.html'
 
-    new_params['save_message'] = [
+    new_params['successful_take_message'] = [
         ugettext('Organization Application submitted.')]
 
     params = dicts.merge(params, new_params, sub_merge=True)

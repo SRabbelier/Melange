@@ -19,12 +19,14 @@
 
 
 __authors__ = [
+  '"Daniel Hans <daniel.m.hans@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from django import forms
 from django import http
+from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
@@ -35,6 +37,7 @@ from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import requests
 from soc.views.helper import responses
 from soc.views.helper import surveys
 from soc.views.helper import widgets
@@ -79,6 +82,9 @@ class View(survey_view.View):
          ]
 
     new_params['review_template'] = 'soc/org_app_survey/review.html'
+
+    new_params['save_message'] = [
+        ugettext('Organization Application submitted.')]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -233,7 +239,11 @@ class View(survey_view.View):
     """Returns a path to which the user should be redirected after successfully
     taking a OrgAppSurvey.
     """
-    return request.path + '?id=' + str(record.key().id_or_name())
+
+    new_params = params['edit_params']
+    new_params['id'] = str(record.key().id_or_name())
+
+    return requests.replaceSuffix(request.path, None, params=new_params)
 
   @decorators.merge_params
   @decorators.check_access

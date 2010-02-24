@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Daniel Diniz" <ajaksu@gmail.com>',
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"James Levy" <jamesalexanderlevy@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -46,6 +47,7 @@ from soc.views.helper import decorators
 from soc.views.helper import forms as forms_helper
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import requests
 from soc.views.helper import responses
 from soc.views.helper import surveys
 from soc.views.helper import widgets
@@ -527,6 +529,7 @@ class View(base.View):
 
     # fill context with the survey_form and additional information
     context['survey_form'] = survey_form
+
     self._setSurveyTakeContext(request, params, context, entity, survey_record)
 
     if request.POST:
@@ -625,11 +628,10 @@ class View(base.View):
     record = record_logic.updateOrCreateFromFields(record, properties,
                                                    clear_dynamic=True)
 
-    # TODO: add notice to page that the response has been saved successfully
     # get the path to redirect the user to
-    redirect = self._getRedirectOnSuccessfulTake(request, params, entity,
+    path = self._getRedirectOnSuccessfulTake(request, params, entity,
                                                  record)
-    return http.HttpResponseRedirect(redirect)
+    return http.HttpResponseRedirect(path)
 
   def _takePost(self, request, params, entity, record, properties):
     """Hook for the POST request for the Survey's take page.
@@ -672,8 +674,12 @@ class View(base.View):
           survey_end_text)
       status = "create"
 
+    notice = requests.getSingleIndexedParamValue(
+        request, params['submit_msg_param_name'],
+        values=params['save_message'])
+
     # update the context with the help_text and status
-    context_update = dict(status=status, help_text=help_text)
+    context_update = dict(status=status, help_text=help_text, notice=notice)
     context.update(context_update)
 
   def _getRedirectOnSuccessfulTake(self, request, params, survey, record):
@@ -686,6 +692,7 @@ class View(base.View):
       survey: Survey entity that was succesfully taken
       record: SurveyRecord entity that has been stored/updated
     """
+
     return request.path
 
   @decorators.merge_params
@@ -887,7 +894,7 @@ class View(base.View):
     return keywords, schema, survey_content
 
   def getMenusForScope(self, entity, params, id, user):
-    """List featured surveys if after the survey_start date 
+    """List featured surveys if after the survey_start date
     and before survey_end an iff the current user has the right taking access.
 
     Args:

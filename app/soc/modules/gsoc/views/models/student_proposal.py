@@ -608,7 +608,7 @@ class View(base.View):
     list_params['list_description'] = \
         'List of my %(name_plural)s.' % list_params
     list_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, list_params)
+        'link': redirects.getStudentPrivateRedirect(entity, list_params)
     }
 
     ip_params = list_params.copy() # ineligible proposals

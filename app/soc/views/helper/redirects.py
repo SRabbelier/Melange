@@ -335,6 +335,12 @@ def getApplicantRedirect(entity, params):
       params['url_name'], params['program'].key().id_or_name(),
       entity.key().id_or_name())
 
+def getStudentPrivateRedirect(entity, params):
+  """Returns private redirect for the specified entity. 
+  """
+
+  return '/%s/private/%s' % (
+      params['url_name'], entity.key().id_or_name())
 
 def getStudentEditRedirect(entity, params):
   """Returns the redirect for Students to edit their Projects.

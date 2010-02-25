@@ -960,9 +960,9 @@ class View(base.View):
 
     return responses.respond(request, template, context=context)
 
-  @decoratos.merge_params
-  @decoratos.check_access
-  def comment(self, request, page_name, access_type,
+  @decorators.merge_params
+  @decorators.check_access
+  def comment(self, request, access_type,
               page_name=None, params=None, **kwargs):
     """View for org admins and mentors which is shown after the student
     application perdiod. The view displays scores, both public and private
@@ -988,22 +988,25 @@ class View(base.View):
     context['entity_type_url'] = params['url_name']
 
     if request.method == 'POST':
-      return self.commentPost(request, context, params, entity, form, **kwargs)
+      return self.commentPost(request, context, params, entity, **kwargs)
     else:
       # request.method == 'GET'
-      return self.commentGet(request, context, params, entity, form, **kwargs)
+      return self.commentGet(request, context, params, entity, **kwargs)
 
-  def commentPost(self, request, context, params, entity, form, **kwargs):
+  def commentPost(self, request, context, params, entity, **kwargs):
     """Handles the POST request for the proposal review view.
     """
+
+    form = params['public_review_form'](request.POST)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')
 
-  def commentGet(self, request, context, params, entity, form, **kwargs):
+  def commentGet(self, request, context, params, entity, **kwargs):
     """Handles the GET request for the proposal review view.
     """
 
+    context['form'] = params['public_review_form']()
     template = params['review_template']
 
     return responses.respond(request, template, context=context)

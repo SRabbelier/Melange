@@ -156,6 +156,7 @@ class View(base.View):
         'link_id': forms.CharField(widget=forms.HiddenInput)
         }
 
+    new_params['comment_template'] = 'soc/student_proposal/comment.html'
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
     new_params['private_template'] = 'soc/student_proposal/private.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
@@ -1002,6 +1003,8 @@ class View(base.View):
   def commentGet(self, request, context, params, entity, form, **kwargs):
     """Handles the GET request for the proposal review view.
     """
+
+    template = params['review_template']
 
     return responses.respond(request, template, context=context)
 

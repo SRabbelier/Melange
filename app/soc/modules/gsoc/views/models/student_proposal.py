@@ -1038,6 +1038,9 @@ class View(base.View):
     # update the reviews context
     self._updateReviewsContext(context, entity)
 
+    # update the scores context
+    self._updateScoresContext(context, entity)
+
   def _updateReviewsContext(self, context, entity):
     """Updates the context for the reviews related to a given student proposal.
 
@@ -1093,6 +1096,27 @@ class View(base.View):
     context['public_reviews'] = public_reviews
     context['private_reviews'] = private_reviews
     context['review_summary'] = review_summary
+
+  def _updateScoresContext(self, context, entity):
+    """Updates the context for the scores related to a given student proposal
+
+    Args:
+      context: the context that should be updated
+      entity: a student proposal_entity used to set context
+    """
+
+    review_summary = context['review_summary']
+
+    score_summary = []
+    total_scores = [i['total_score'] for i in review_summary.itervalues()]
+    max_score = max(total_scores) if total_scores else 0
+    min_score = min(total_scores) if total_scores else 0
+    for score in xrange(min_score, max_score + 1):
+      number = len([summary for summary in review_summary.itervalues() \
+          if summary['total_score'] == score])
+      if number:
+        score_summary.append({'score': score, 'number': number})
+    context['score_summary'] = score_summary
 
   def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
     """View that shows the review view after the accepted students 
@@ -1152,18 +1176,8 @@ class View(base.View):
     # update the reviews context
     self._updateReviewsContext(context, entity)
 
-    # fill a score summary
-    review_summary = context['review_summary']
-    score_summary = []
-    total_scores = [i['total_score'] for i in review_summary.itervalues()]
-    max_score = max(total_scores) if total_scores else 0
-    min_score = min(total_scores) if total_scores else 0
-    for score in xrange(min_score, max_score + 1):
-      number = len([summary for summary in review_summary.itervalues() \
-          if summary['total_score'] == score])
-      if number:
-        score_summary.append({'score': score, 'number': number})
-    context['score_summary'] = score_summary
+    # update the scores context
+    self._updateScoresContext(context, entity)
 
     # which button should we show to the mentor?
     if mentor:

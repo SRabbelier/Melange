@@ -994,10 +994,26 @@ class View(base.View):
       return self.commentGet(request, context, params, entity, **kwargs)
 
   def commentPost(self, request, context, params, entity, **kwargs):
-    """Handles the POST request for the proposal review view.
+    """Handles the POST request for the proposal comment view.
     """
 
     form = params['public_review_form'](request.POST)
+
+    if not form.is_valid():
+      # get some entity specific context
+      self.updateCommentContext(context, entity, params)
+
+      # return the invalid form response
+      return self._constructResponse(request, entity=entity, context=context,
+          form=form, params=params, template=params['comment_template'])
+
+    # get the commentary
+    fields = form.cleaned_data
+    comment = fields['comment']
+
+    if comment:
+      # create the review
+      self._createReviewFor(entity, comment, is_public=True)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

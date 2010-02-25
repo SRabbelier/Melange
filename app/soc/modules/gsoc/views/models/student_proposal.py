@@ -1009,7 +1009,7 @@ class View(base.View):
     self.updateCommentContext(context, entity, params)
 
     context['form'] = params['public_review_form']()
-    template = params['review_template']
+    template = params['comment_template']
 
     return responses.respond(request, template, context=context)
 

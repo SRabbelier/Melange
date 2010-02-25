@@ -79,6 +79,7 @@ class View(base.View):
             ['active', 'inactive'], 
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
     rights['share'] = ['checkIsDeveloper']
+    rights['comment'] = ['checkIsDeveloper']
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),

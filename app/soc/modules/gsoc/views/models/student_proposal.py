@@ -959,6 +959,52 @@ class View(base.View):
 
     return responses.respond(request, template, context=context)
 
+  @decoratos.merge_params
+  @decoratos.check_access
+  def comment(self, request, page_name, access_type,
+              page_name=None, params=None, **kwargs):
+    """View for org admins and mentors which is shown after the student
+    application perdiod. The view displays scores, both public and private
+    reviews and content of the proposal, but does not allow new scores
+    and ranks. 
+    
+    For Args see base.View.public()
+    """
+
+    try:
+      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    except out_of_band.Error, error:
+      return helper.responses.errorResponse(
+          error, request, template=params['error_public'])
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = '%s "%s" from %s' % (page_name, entity.title,
+        entity.scope.name())
+    context['entity'] = entity
+    context['entity_type'] = params['name']
+    context['entity_type_url'] = params['url_name']
+
+    if request.method == 'POST':
+      return self.commentPost(request, context, params, entity, form, **kwargs)
+    else:
+      # request.method == 'GET'
+      return self.commentGet(request, context, params, entity, form, **kwargs)
+
+  def commentPost(self, request, context, params, entity, form, **kwargs):
+    """Handles the POST request for the proposal review view.
+    """
+
+    # redirect to the same page
+    return http.HttpResponseRedirect('')
+
+  def commentGet(self, request, context, params, entity, form, **kwargs):
+    """Handles the GET request for the proposal review view.
+    """
+
+    return responses.respond(request, template, context=context)
+
   def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
     """View that shows the review view after the accepted students 
        announced deadline.
@@ -1219,6 +1265,7 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 list_orgs = decorators.view(view.listOrgs)
 list_self = decorators.view(view.listSelf)
+comment = decorators.view(view.comment)
 public = decorators.view(view.public)
 private = decorators.view(view.private)
 review = decorators.view(view.review)

@@ -78,7 +78,7 @@ class View(base.View):
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], 
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
-    rights['share'] = ['checkIsDeveloper']
+    rights['public'] = ['checkIsDeveloper']
     rights['comment'] = ['checkIsDeveloper']
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
@@ -122,9 +122,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>review)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.review',
         'Review %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>share)/%(key_fields)s$',
-        'soc.modules.gsoc.views.models.%(module_name)s.share',
-        'Share %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>public)/%(key_fields)s$',
+        'soc.modules.gsoc.views.models.%(module_name)s.public',
+        'Public view for %(name)s'),
         (r'^%(url_name)s/(?P<access_type>private)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.private',
         'Private view of %(name)s'),
@@ -164,7 +164,7 @@ class View(base.View):
     new_params['edit_template'] = 'soc/student_proposal/edit.html'
     new_params['private_template'] = 'soc/student_proposal/private.html'
     new_params['review_template'] = 'soc/student_proposal/review.html'
-    new_params['share_template'] = 'soc/student_proposal/share.html'
+    new_params['public_template'] = 'soc/student_proposal/public.html'
     new_params['review_after_deadline_template'] = \
         'soc/student_proposal/review_after_deadline.html'
 
@@ -299,7 +299,7 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def share(self, request, access_type, page_name=None, params=None, **kwargs):
+  def public(self, request, access_type, page_name=None, params=None, **kwargs):
     """View which allows the student to show his or her proposal to other
     users. Anyway, they can only see the content of the proposal itself,
     without comments, scores, etc.
@@ -328,7 +328,7 @@ class View(base.View):
         entity.title, entity.scope.name())
     context['student_name'] = entity.scope.name()
 
-    template = params['share_template']
+    template = params['public_template']
 
     return responses.respond(request, template, context=context)
 
@@ -1352,6 +1352,5 @@ comment = decorators.view(view.comment)
 public = decorators.view(view.public)
 private = decorators.view(view.private)
 review = decorators.view(view.review)
-share = decorators.view(view.share)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)

@@ -1035,6 +1035,65 @@ class View(base.View):
     else:
       context['mentor_name'] = None
 
+    # update the reviews context
+    self._updateReviewsContext(context, entity)
+
+  def _updateReviewsContext(self, context, entity):
+    """Updates the context for the reviews related to a given student proposal.
+
+    Args:
+      context: the context that should be updated
+      entity: a student proposal_entity used to set context
+    """
+
+    from soc.modules.gsoc.logic.models.review import logic as review_logic
+
+    # order the reviews by ascending creation date
+    order = ['created']
+
+    # get the public reviews
+    public_reviews = review_logic.getReviewsForEntity(entity,
+        is_public=True, order=order)
+
+    # get the private reviews
+    private_reviews = review_logic.getReviewsForEntity(entity,
+        is_public=False, order=order)
+
+    # create a summary of all the private reviews
+    review_summary = {}
+
+    for private_review in private_reviews:
+
+      if private_review.score == 0:
+        continue
+
+      reviewer = private_review.author
+
+      reviewer_key = reviewer.key().id_or_name()
+      reviewer_summary = review_summary.get(reviewer_key)
+
+      if reviewer_summary:
+        # we already have something on file for this reviewer
+        old_total_score = reviewer_summary['total_score']
+        reviewer_summary['total_score'] = old_total_score + private_review.score
+        reviewer_summary['individual_scores'].append(private_review.score)
+
+        old_total_comments = reviewer_summary['total_comments']
+        reviewer_summary['total_comments'] = old_total_comments + 1
+      else:
+        # create a new summary for this reviewer
+        review_summary[reviewer_key] = {
+            'name': reviewer.name,
+            'total_comments': 1,
+            'total_score': private_review.score,
+            'individual_scores': [private_review.score]
+            }
+
+    # update the reviews in the context
+    context['public_reviews'] = public_reviews
+    context['private_reviews'] = private_reviews
+    context['review_summary'] = review_summary
+
   def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
     """View that shows the review view after the accepted students 
        announced deadline.
@@ -1059,7 +1118,6 @@ class View(base.View):
       mentor: mentor entity for the current user/proposal (iff available)
     """
 
-    from soc.modules.gsoc.logic.models.review import logic as review_logic
     from soc.modules.gsoc.logic.models.review_follower import logic as \
         review_follower_logic
 
@@ -1091,50 +1149,11 @@ class View(base.View):
     # order the reviews by ascending creation date
     order = ['created']
 
-    # get the public reviews
-    public_reviews = review_logic.getReviewsForEntity(entity,
-        is_public=True, order=order)
-
-    # get the private reviews
-    private_reviews = review_logic.getReviewsForEntity(entity,
-        is_public=False, order=order)
-
-    # store the reviews in the context
-    context['public_reviews'] = public_reviews
-    context['private_reviews'] = private_reviews
-
-    # create a summary of all the private reviews
-    review_summary = {}
-
-    for private_review in private_reviews:
-
-      if private_review.score == 0:
-        continue
-
-      reviewer = private_review.author
-
-      reviewer_key = reviewer.key().id_or_name()
-      reviewer_summary = review_summary.get(reviewer_key)
-
-      if reviewer_summary:
-        # we already have something on file for this reviewer
-        old_total_score = reviewer_summary['total_score']
-        reviewer_summary['total_score'] = old_total_score + private_review.score
-        reviewer_summary['individual_scores'].append(private_review.score)
-
-        old_total_comments = reviewer_summary['total_comments']
-        reviewer_summary['total_comments'] = old_total_comments + 1
-      else:
-        review_summary[reviewer_key] = {
-            'name': reviewer.name,
-            'total_comments': 1,
-            'total_score': private_review.score,
-            'individual_scores': [private_review.score]
-            }
-
-    context['review_summary'] = review_summary
+    # update the reviews context
+    self._updateReviewsContext(context, entity)
 
     # fill a score summary
+    review_summary = context['review_summary']
     score_summary = []
     total_scores = [i['total_score'] for i in review_summary.itervalues()]
     max_score = max(total_scores) if total_scores else 0

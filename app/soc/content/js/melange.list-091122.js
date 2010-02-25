@@ -932,7 +932,7 @@
                             if (cell_value === null) {
                               cell_value = "";
                             }
-                            var field_text = cell_value;
+                            var field_text = cell_value.toString();
                             if (field_text.indexOf("\"") !== -1) {
                               field_text = field_text.replace("\"","\"\"");
                             }

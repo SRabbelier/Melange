@@ -1006,10 +1006,34 @@ class View(base.View):
     """Handles the GET request for the proposal review view.
     """
 
+    self.updateCommentContext(context, entity, params)
+
     context['form'] = params['public_review_form']()
     template = params['review_template']
 
     return responses.respond(request, template, context=context)
+
+  def updateCommentContext(self, context, entity, params):
+    """Updates the context for the /comment page with information 
+    from the entity.
+
+    Args:
+      context: the context that should be updated
+      entity: a student proposal_entity used to set context
+      params: dict with params for the view using this context
+    """
+
+    student_entity = entity.scope
+
+    # update the student data
+    context['student'] = student_entity
+    context['student_name'] = student_entity.name()
+
+    # update the mentor data
+    if entity.mentor:
+      context['mentor_name'] = entity.mentor.name()
+    else:
+      context['mentor_name'] = None
 
   def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
     """View that shows the review view after the accepted students 

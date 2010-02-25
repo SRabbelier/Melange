@@ -1,0 +1,128 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load comments_helpers %}
+{% load forms_helpers %}
+
+{% block header_title %}
+{{ page_name }} (Score: {{ entity.score }})
+{% endblock %}
+
+{% block body %}
+<table>
+ {% if is_subscribed_public %}
+ <td>
+   <input style="font-weight: bold" type="button" value="Unsubscribe from public updates"
+     onclick="location.href='?public_subscription=off'"/>
+ </td>
+ {% else %}
+ <td>
+   <input style="font-weight: bold" type="button" value="Subscribe to public updates"
+     onclick="location.href='?public_subscription=on'"/>
+ </td>
+ {% endif %}
+ {% if is_subscribed_private %}
+ <td>
+   <input style="font-weight: bold" type="button" value="Unsubscribe from private updates"
+     onclick="location.href='?private_subscription=off'"/>
+ </td>
+ {% else %}
+ <td>
+   <input style="font-weight: bold" type="button" value="Subscribe to private updates"
+     onclick="location.href='?private_subscription=on'"/>
+ </td>
+ {% endif %}
+</table>
+
+<p>
+ <table>
+  {% readonly_field_as_table_row entity.fields.title.label entity.title %}
+  {% readonly_field_as_table_row "Student" student_name %}
+  {% readonly_field_as_table_row "Mentor" mentor_name %}
+  {% readonly_field_as_table_row entity.fields.abstract.label entity.abstract %}
+  {% readonly_safe_field_as_table_row entity.fields.content.label entity.content %}
+  {% readonly_url_field_as_table_row entity.fields.additional_info.label entity.additional_info %}
+  {% readonly_field_as_table_row "Created on" entity.created_on %}
+  {% readonly_field_as_table_row "Last Modified on" entity.last_modified_on %}
+ </table>
+</p>
+
+<hr />
+<b>Summary of Reviews</b>:
+{% for key, value in review_summary.items %}
+    <li>{{ value.name }} - {{ value.total_comments }} posts, {{ value.total_score }} 
+    ({% for score in value.individual_scores %}{{ score }}{% if not forloop.last %},  {% endif %}{% endfor %})
+    points</li>
+{% endfor %}
+<hr/>
+<b>Summary of scores:</b>
+{% comment %}
+  TODO: Put this javascript into separate file
+{% endcomment %}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load('visualization', '1', {'packages':['columnchart']});
+  google.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+	  var data = new google.visualization.DataTable();
+	  data.addColumn('string', 'Score');
+	  data.addColumn('number', 'Number of scores');
+	  data.addRows(3);
+
+	  {% for item in score_summary %}
+	      data.setCell({{ forloop.counter }} - 1, 0, String({{ item.score }}));
+	      data.setCell({{ forloop.counter }} - 1, 1, {{ item.number}});
+	  {% endfor %}
+
+	  // Create and draw the visualization.
+	  new google.visualization.ColumnChart(document.getElementById('summary_chart')).
+	      draw(data, {width: 400, height: 240, is3D: true, titleY: 'Number of mentors', titleX: 'Total score value'});
+  }
+</script>
+<div id="summary_chart"></div>
+
+<hr />
+<form method="POST">
+  <table>
+    {% block form_table %}
+      {% as_table form %}
+    {% endblock %}
+  </table>
+ <table>
+  <tr>
+   <td colspan="4">&nbsp;</td>
+  </tr>
+  <tr>
+   <td> 
+    <input style="font-weight: bold" type="submit" value="Submit"/></span>
+   </td>
+  </tr>
+ </table>
+</form>
+
+<hr />
+<b>Public Reviews</b>
+{% for review in public_reviews %}
+  {% as_student_proposal_review review student %}
+{% endfor %}
+<hr />
+<b>Private Reviews</b>
+{% for review in private_reviews %}
+  {% as_student_proposal_review review student %}
+{% endfor %}
+<hr />
+
+{% endblock %}

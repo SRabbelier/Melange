@@ -127,6 +127,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>private)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.private',
         'Private view of %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>comment)/%(key_fields)s$',
+        'soc.modules.gsoc.views.models.%(module_name)s.comment',
+        'Comment view of %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns

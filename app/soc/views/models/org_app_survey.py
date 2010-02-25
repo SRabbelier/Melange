@@ -83,8 +83,8 @@ class View(survey_view.View):
 
     new_params['review_template'] = 'soc/org_app_survey/review.html'
 
-    new_params['successful_take_message'] = [
-        ugettext('Organization Application submitted.')]
+    new_params['successful_take_message'] = ugettext(
+        'Organization Application submitted.')
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -240,7 +240,7 @@ class View(survey_view.View):
     taking a OrgAppSurvey.
     """
 
-    new_params = params['edit_params']
+    new_params = params['take_params']
     new_params['id'] = str(record.key().id_or_name())
 
     return requests.replaceSuffix(request.path, None, params=new_params)

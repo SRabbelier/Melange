@@ -214,8 +214,10 @@ class View(base.View):
         "Created By", "Created On", "Modified",
     ]
 
-    new_params['successful_take_message'] = [
-        ugettext('Survey record submitted.')]
+    new_params['take_params'] = {'s': '0'}
+
+    new_params['successful_take_message'] = ugettext(
+        'Survey record submitted.')
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -678,9 +680,7 @@ class View(base.View):
           survey_end_text)
       status = "create"
 
-    notice = requests.getSingleIndexedParamValue(
-        request, params['submit_msg_param_name'],
-        values=params['successful_take_message'])
+    notice = params['successful_take_message'] if 's' in request.GET else None
 
     # update the context with the help_text and status
     context_update = dict(status=status, help_text=help_text, notice=notice)
@@ -697,7 +697,8 @@ class View(base.View):
       record: SurveyRecord entity that has been stored/updated
     """
 
-    return request.path
+    return requests.replaceSuffix(request.path, None,
+        params=params['take_params'])
 
   @decorators.merge_params
   @decorators.check_access

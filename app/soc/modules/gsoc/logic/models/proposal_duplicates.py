@@ -14,32 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""ProposalDuplicates (Model) query functions.
+"""ProposalDuplicate (Model) query functions.
 """
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from soc.logic.models import base
 
-from soc.modules.gsoc.logic.models import program as program_logic
-
-import soc.modules.gsoc.models.proposal_duplicates
+from soc.modules.gsoc.models.proposal_duplicates import ProposalDuplicate
 
 
 class Logic(base.Logic):
   """Logic methods for the Role model.
   """
 
-  def __init__(self,
-      model=soc.modules.gsoc.models.proposal_duplicates.ProposalDuplicates,
-      base_model=None, scope_logic=program_logic):
+  def __init__(self, model=ProposalDuplicate, base_model=None, id_based=True):
     """Defines the name, key_name and model for this entity.
     """
 
     super(Logic, self).__init__(model, base_model=base_model,
-                                scope_logic=scope_logic)
+                                id_based=id_based)
+
 
 logic = Logic()

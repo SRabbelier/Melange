@@ -36,7 +36,9 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
 {% block home_extras %}
 <div id="org_home_extras">
 
-  {% as_lists list %}
+  {% if list %}
+    {% as_lists list %}
+  {% endif %}
 
   {% if gmaps_api_key and org_map_data %}
     <div id="org_home_map"></div>

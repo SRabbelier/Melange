@@ -198,7 +198,7 @@ class View(base.View):
 
     post_dict = request.POST
 
-    data = simplejson.read(post_dict.get('data', '[]'))
+    data = simplejson.load(post_dict.get('data', '[]'))
     button_id = post_dict.get('button_id', '')
 
     user_entity = user_logic.getForCurrentAccount()

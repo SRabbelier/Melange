@@ -118,6 +118,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'soc.views.helper',
+    'soc.modules.gsoc.views.helper',
     'soc.modules.ghop.views.helper',
 #    'django.contrib.auth',
 #    'django.contrib.contenttypes',

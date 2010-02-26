@@ -485,7 +485,7 @@ class View(organization.View):
     fields = {'org': org_entity,
               'status': 'invalid'}
     invalid_proposal = sp_logic.getForFields(fields, unique=True)
-    if invalid_proposal:  
+    if invalid_proposal:
       ip_list = helper.lists.getListGenerator(request, ip_params, idx=3)
       contents.append(ip_list)
 

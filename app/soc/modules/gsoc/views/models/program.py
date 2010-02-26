@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
@@ -696,62 +697,49 @@ class View(program.View):
     For params see base.view.Public().
     """
 
-    from django.utils import simplejson
+    from google.appengine.api.labs import taskqueue
 
-    from soc.modules.gsoc.logic.models.proposal_duplicates import logic as duplicates_logic
+    from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
+        as duplicates_logic
+    from soc.modules.gsoc.logic.models.proposal_duplicates_status import \
+        logic as ds_logic
 
     program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
 
-    if request.POST and request.POST.get('result'):
-      # store result in the datastore
-      fields = {'link_id': program_entity.link_id,
-                'scope': program_entity,
-                'scope_path': program_entity.key().id_or_name(),
-                'json_representation' : request.POST['result']
-                }
-      key_name = duplicates_logic.getKeyNameFromFields(fields)
-      duplicates_logic.updateOrCreateFromKeyName(fields, key_name)
-
-      response = simplejson.dumps({'status': 'done'})
-      return http.HttpResponse(response)
-
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
-    context['uses_duplicates'] = True
-    context['uses_json'] = True
     context['page_name'] = page_name
 
-    # get all orgs for this program who are active and have slots assigned
-    fields = {'scope': program_entity,
-              'slots >': 0,
-              'status': 'active'}
-
-    query = org_logic.getQueryForFields(fields)
-
-    to_json = {
-        'nr_of_orgs': query.count(),
-        'program_key': program_entity.key().id_or_name()}
-    json = simplejson.dumps(to_json)
-    context['info'] = json
-    context['offset_length'] = 10
-
-    fields = {'link_id': program_entity.link_id,
-              'scope': program_entity}
-    duplicates = duplicates_logic.getForFields(fields, unique=True)
-
-    if duplicates:
-      # we have stored information
-      # pylint: disable-msg=E1103
-      context['duplicate_cache_content'] = duplicates.json_representation
-      context['date_of_calculation'] = duplicates.calculated_on
-    else:
-      # no information stored
-      context['duplicate_cache_content'] = simplejson.dumps({})
+    fields = {'program': program_entity}
 
     template = 'soc/program/show_duplicates.html'
 
-    return helper.responses.respond(request, template=template, context=context)
-    
+    context['duplicates'] = duplicates_logic.getForFields(fields)
+    context['duplicates_status'] = ds_logic.getOrCreateForProgram(program_entity)
+
+    if request.POST:
+      post_data = request.POST
+
+      # pass along these params as POST to the new task
+      task_params = {'program_key': program_entity.key().id_or_name()}
+      task_url = '/tasks/gsoc/proposal_duplicates/calculate'
+
+      # checks if the task newly added is the first task
+      # and must be performed repeatedly every hour or
+      # just be performed once right away
+      if 'calculate' in post_data:
+        task_params['repeat'] = 'yes'
+      elif 'recalculate' in post_data:
+        task_params['repeat'] = 'no'
+
+      # TODO: enable the tasks
+      # adds a new task
+      new_task = taskqueue.Task(params=task_params, url=task_url)
+      #new_task.add()
+
+    return helper.responses.respond(request, template=template,
+                                    context=context)
+
   @decorators.merge_params
   @decorators.check_access
   def acceptedProjects(self, request, access_type,

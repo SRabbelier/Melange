@@ -12,57 +12,37 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% load forms_helpers %}
+{% load student_proposal_helpers %}
 
 {% block header_title %}
 {{ page_name }}
 {% endblock %}
 
 {% block body %}
-<script language="javascript" type="text/javascript">
-  // variables from python context to get eventual cache
-  // number of orgs, offset and url for querying the apps
-  var infos = {{ info|safe }};
-  var cache = {{ duplicate_cache_content|safe }};
-  var offset_length = {{ offset_length }};
-  var number_of_orgs = infos.nr_of_orgs;
-  var url_to_query = infos.program_key;
-  // this global variable will contain the html to output
-  var html_string = '';
-  $(document).ready(function(){
-    // Initialize the progress bar
-    $("#duplicates_progress_bar").progressBar({showText: false});
-    // if there's data in the cache
-    if (cache.data!=undefined) {
-      // then the button will show "recalculate" instead of "calculate"
-      $("#id_button_duplicate_slots").val("Recalculate");
-      // and then we will show the html based on the cache
-      html_string = '';
-      for (var student_key in cache.data.students) {
-        duplicateSlots.showDuplicatesHtml(cache.data.orgs,cache.data.students[student_key],student_key,cache.data.students[student_key].proposals);
-      }
-      // if there's no data in the cache, tell the user
-      if (html_string=="") {
-        $("#div_duplicate_slots").html("<strong>No duplicate slot assignments found</strong>");
-      }
-    }
-    // else if there's no data in the cache
-    else {
-      // then the button will show "calculate"
-      $("#id_button_duplicate_slots").val("Calculate");
-    }
-  });
-</script>
-<input type="button" id="id_button_duplicate_slots" onclick="javascript:duplicateSlots.showDuplicatesInit();" class="button" />
-<span class="progressBar" style="display:none;" id="duplicates_progress_bar"></span>
-<span id="description_progressbar">
-  {% if date_of_calculation %}
-    Duplicates as calculated on: {{ date_of_calculation|date:"jS F Y H:i" }}
-  {% endif %}
+<ul>
+{% for duplicate in duplicates %}
+  {% as_proposal_duplicates duplicate %}
+{% endfor %}
+</ul>
+
+<span id="duplicates_calc_status">
+  Duplicates calculation status: 
+  <strong>{{ duplicates_status.status|capfirst|default:"N/A" }}</strong>
+</span>&nbsp;&nbsp;&nbsp;&nbsp;
+
+<span id="duplicates_calc_time">
+  Last calculated at: 
+  <strong>
+{{ duplicates_status.calculated_on|date:"jS F Y H:i"|default:"Not Calculated" }}
+  </strong>
 </span>
-
-<span id="description_done"></span>
-
-<br /><br />
-<div id="div_duplicate_slots"></div>
+<form method="post">
+<input type="submit" id="id_button_duplicate_slots" class="button"
+{% if duplicates_status.calculated_on %}
+value="Recalculate" name="recalculate"
+{% else %}
+value="Initialize Calculation" name="calculate"
+{% endif %}
+/>
+</form>
 {% endblock %}

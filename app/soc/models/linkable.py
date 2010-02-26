@@ -113,6 +113,7 @@ class Linkable(base.ModelWithFieldAttributes):
   #: the LINK_ID_REGEX.
   link_id = db.StringProperty(required=True,
       verbose_name=ugettext('Link ID'))
+  link_id.example_text = ugettext('Unique Name, see tooltip.')
   link_id.help_text = ugettext(
       'Link ID is used as part of various URL links throughout the site.'
       ' <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> '

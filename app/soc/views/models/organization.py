@@ -152,7 +152,7 @@ class View(group.View):
         }
 
     new_params['public_field_extra'] = lambda entity: {
-        'ideas': lists.urlize(entity.ideas),
+        'ideas': lists.urlize(entity.ideas, 'Click Here'),
     }
 
     params = dicts.merge(params, new_params, sub_merge=True)

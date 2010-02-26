@@ -119,6 +119,10 @@ class View(survey_view.View):
     # define the fields for the public list
     record_list_params['public_field_keys'] = ['name', 'home_page']
     record_list_params['public_field_names'] = ['Name', 'Home Page']
+    record_list_params['public_field_extra'] = lambda entity: {
+        'home_page': lists.urlize(entity.home_page, 'Click Here'),
+        }
+
 
     # define the fields for the self list
     record_list_params['self_field_keys'] = [

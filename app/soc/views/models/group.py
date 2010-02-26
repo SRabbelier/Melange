@@ -156,6 +156,7 @@ class View(presence.View):
     filter = {
         'group': group_entity,
         'role': role_names,
+        'status': ['new', 'group_accepted', 'ignored']
         }
 
     # create the list parameters

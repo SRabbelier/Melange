@@ -284,7 +284,8 @@ class View(base.View):
         list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
         list = helper.lists.getListGenerator(request, list_params, idx=i)
         contents.append(list)
-        i += 1
+      # keep on counting because index is important
+      i += 1
 
     return self._list(request, params, contents, page_name)
 

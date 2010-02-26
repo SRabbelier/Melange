@@ -56,7 +56,7 @@
           'setCell',
           (row_id + 1),
           slots_colModel,
-          '<div class="slots" id="id_slot_count_'+org_link_id+'">'+org_link_id+'<input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
+          '<div class="slots" id="id_slot_count_'+org_link_id+'"><input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
           null,
           null
         );

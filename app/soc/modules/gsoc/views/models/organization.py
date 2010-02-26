@@ -138,6 +138,13 @@ class View(organization.View):
 
     super(View, self).__init__(params)
 
+    self._params['public_field_keys'].append('tags')
+    self._params['public_field_names'].append("Tags")
+    self._params['public_field_extra'] = lambda entity: {
+        'ideas': lists.urlize(entity.ideas, 'Click Here'),
+        'tags': entity.tags_string(entity.org_tag),
+    }
+
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """

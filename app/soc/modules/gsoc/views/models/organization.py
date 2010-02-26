@@ -20,6 +20,7 @@
 __authors__ = [
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -299,9 +300,13 @@ class View(organization.View):
     return submenus
 
 
-  def getListProposalsData(self, request, rp_params, mp_params,
-                           p_params, org_entity):
+  def getListProposalsData(self, request, params_collection, org_entity):
     """Returns the list data for listProposals.
+
+    Args:
+      request: HTTPRequest object
+      params_collection: List of list Params indexed with the idx of the list
+      org_entity: GSoCOrganization entity for which the lists are generated
     """
 
     from soc.modules.gsoc.logic.models.ranker_root import logic \
@@ -316,9 +321,14 @@ class View(organization.View):
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
 
+    # default list settings
     args = order = []
+    visibility = 'public'
 
     if idx == 0:
+      filter = {'org': org_entity,
+                'status': 'new'}
+    elif idx == 1:
       # retrieve the ranker
       fields = {'link_id': student_proposal.DEF_RANKER_NAME,
                 'scope': org_entity}
@@ -337,15 +347,15 @@ class View(organization.View):
         # show the amount of slots assigned on the webpage
         context['slots_visible'] = True
 
-      # TODO(ljvderijk) once sorting with IN operator is fixed,
-      # make this list show more
       filter = {'org': org_entity,
-                'status': 'pending'}
-      params = rp_params
+                'status': ['accepted','pending','rejected']}
       # order by descending score
       order = ['-score']
+
+      # some extras for the list
       args = [ranker, keys]
-    elif idx == 1:
+      visibility = 'review'
+    elif idx == 2:
       # check if the current user is a mentor
       user_entity = user_logic.getForCurrentAccount()
 
@@ -356,14 +366,15 @@ class View(organization.View):
       filter = {'org': org_entity,
                 'mentor': mentor_entity,
                 'status': 'pending'}
-      params = mp_params
-    elif idx == 2:
-      filter = {'org': org_entity}
-      params = p_params
+    elif idx == 3:
+      filter = {'org': org_entity,
+                'status': 'invalid'}
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = helper.lists.getListData(request, params, filter, 'public',
+    params = params_collection[idx]
+    contents = helper.lists.getListData(request, params, filter,
+                                        visibility=visibility,
                                         order=order, args=args)
     json = simplejson.dumps(contents)
 
@@ -399,22 +410,33 @@ class View(organization.View):
 
     list_params = student_proposal_view.view.getParams().copy()
     list_params['list_template'] = 'soc/student_proposal/list_for_org.html'
-    list_params['list_key_order'] = [
-         'title', 'abstract', 'content', 'additional_info', 'mentor',
-         'possible_mentors', 'score', 'status', 'created_on',
-         'last_modified_on']
+
+    np_params = list_params.copy() # new proposals
+    description = ugettext('List of new %s sent to %s') % (
+        np_params['name_plural'], org_entity.name)
+    np_params['list_description'] = description
+    np_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getReviewRedirect(entity, mp_params),
+    }
 
     rp_params = list_params.copy()# ranked proposals
-    rp_params['list_row'] = ('soc/%(module_name)s/list/'
-        'detailed_row.html' % list_params)
-    rp_params['list_heading'] = ('soc/%(module_name)s/list/'
-        'detailed_heading.html' % list_params)
-    rp_params['public_row_extra'] = lambda entity, *args: {
-        'link': redirects.getReviewRedirect(entity, rp_params)
-    }
-    rp_params['public_field_extra'] = lambda entity, ranker, keys: {
+    rp_params['review_field_keys'] = ['rank', 'title', 'student', 'mentor',
+                                      'score', 'status', 'last_modified_on']
+    rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',
+                                       'Score', 'status', 'Last Modified On']
+    rp_params['review_field_extra'] = lambda entity, ranker, keys: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
           'item_class': entity.key() in keys,
+          'student': entity.scope.user.name,
+          'mentor': entity.mentor.user.name 
+              if entity.mentor else '%s Proposed' %len(entity.possible_mentors)
+    }
+    rp_params['review_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=True),
+    }
+    rp_params['review_row_extra'] = lambda entity, *args: {
+        'link': redirects.getReviewRedirect(entity, rp_params)
     }
 
     description = ugettext('%s already under review sent to %s') %(
@@ -429,23 +451,43 @@ class View(organization.View):
         'link': redirects.getReviewRedirect(entity, mp_params),
     }
 
-    p_params = list_params.copy() # proposals
-    p_params['list_description'] = ugettext('List of %s sent to %s ') % (
-        p_params['name_plural'], org_entity.name)
-    p_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getReviewRedirect(entity, p_params),
+    ip_params = list_params.copy() # invalid proposals
+    ip_params['list_description'] = ugettext('List of invalid %s sent to %s ') % (
+        ip_params['name_plural'], org_entity.name)
+    ip_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getReviewRedirect(entity, ip_params),
     }
 
-    # fill contents with all the needed lists
     if request.GET.get('fmt') == 'json':
-      return self.getListProposalsData(request, rp_params, mp_params,
-                                       p_params, org_entity)
+      # retrieving data for a list
+      return self.getListProposalsData(
+          request, [np_params, rp_params, mp_params, ip_params], org_entity)
 
-    rp_list = helper.lists.getListGenerator(request, rp_params, idx=0)
-    mp_list = helper.lists.getListGenerator(request, mp_params, idx=1)
-    p_list = helper.lists.getListGenerator(request, p_params, idx=2)
+    # fill contents for all the needed lists
+    contents = []
 
-    contents = [rp_list, mp_list, p_list]
+    # check if there are new proposals if so show them in a separate list
+    fields = {'org': org_entity,
+              'status': 'new'}
+    new_proposal = sp_logic.getForFields(fields, unique=True)
+
+    if new_proposal:
+      # we should add this list because there is a new proposal
+      np_list = helper.lists.getListGenerator(request, np_params, idx=0)
+      contents.append(np_list)
+
+    # these two lists are always shown
+    rp_list = helper.lists.getListGenerator(request, rp_params, idx=1)
+    mp_list = helper.lists.getListGenerator(request, mp_params, idx=2)
+    contents.extend([rp_list, mp_list])
+
+    # check if there are invalid proposals if so show them in a separate list
+    fields = {'org': org_entity,
+              'status': 'invalid'}
+    invalid_proposal = sp_logic.getForFields(fields, unique=True)
+    if invalid_proposal:  
+      ip_list = helper.lists.getListGenerator(request, ip_params, idx=3)
+      contents.append(ip_list)
 
     return self._list(request, list_params, contents, page_name, context)
 

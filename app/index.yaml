@@ -21,13 +21,6 @@ indexes:
   - name: scope
   - name: name_on_documents
 
-# used to determine which orgs have more then 0 slots assigned
-- kind: Organization
-  properties:
-  - name: scope
-  - name: status
-  - name: slots
-
 # used to determine which proposals have a mentor assigned
 - kind: StudentProposal
   properties:
@@ -84,6 +77,13 @@ indexes:
   - name: scope
   - name: status
   - name: name
+
+# used to determine which orgs have more then 0 slots assigned
+- kind: GSoCOrganization
+  properties:
+  - name: scope
+  - name: status
+  - name: slots
 
 # used to order GHOPComments under a GHOPTask with that GHOPTask being
 # its ancestor entity in the entity group.

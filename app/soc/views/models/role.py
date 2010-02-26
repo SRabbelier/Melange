@@ -119,7 +119,7 @@ class View(base.View):
           (r'^%(url_name)s/(?P<access_type>accept_invite)/(?P<id>[0-9]*)$',
           '%(module_package)s.%(module_name)s.accept_invite',
           'Accept invite for %(name)s'),
-          (r'^%(url_name)s/(?P<access_type>process_request)/%(scope)s/%(lnp)s$',
+          (r'^%(url_name)s/(?P<access_type>process_request)/(?P<id>[0-9]*)$',
           '%(module_package)s.%(module_name)s.process_request',
           'Process request for %(name)s')]
 

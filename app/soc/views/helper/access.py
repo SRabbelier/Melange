@@ -1194,7 +1194,7 @@ class Checker(object):
     org_app_record = self.checkCanViewOrgAppRecord(django_args, org_app_logic)
 
     if org_app_record.status != 'accepted':
-      raise out_of_band.AccessViolation(message=DEF_NO_APPLICATION_MSG)
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_APPLICATION_MSG)
 
   def checkIsNotParticipatingInProgramInScope(self, django_args, program_logic,
                                               student_logic, org_admin_logic,

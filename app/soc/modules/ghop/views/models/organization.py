@@ -112,10 +112,6 @@ class View(organization.View):
     new_params['mentor_url_name'] = 'ghop/mentor'
     new_params['org_admin_role_name'] = 'ghop_org_admin'
 
-    new_params['edit_extra_dynaproperties'] = {
-        'clean': cleaning.clean_refs(new_params, ['home_link_id'])
-        }
-
     new_params['public_field_extra'] = lambda entity: {
         "open_tasks": str(len(ghop_task_logic.logic.getForFields({
             'scope': entity,

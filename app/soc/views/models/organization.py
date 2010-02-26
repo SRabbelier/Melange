@@ -147,7 +147,8 @@ class View(group.View):
         }
 
     new_params['edit_extra_dynaproperties'] = {
-        'clean': cleaning.clean_refs(new_params, ['home_link_id'])
+        'clean': cleaning.clean_refs(params if params else new_params,
+                                     ['home_link_id'])
         }
 
     new_params['public_field_extra'] = lambda entity: {

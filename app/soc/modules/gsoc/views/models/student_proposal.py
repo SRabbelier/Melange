@@ -792,9 +792,9 @@ class View(base.View):
         # one that returns a score
         rank = min(ranker.TotalRankedScores(), rank)
         # ranker uses zero-based ranking
-        score_and_rank = ranker.FindScore(rank-1)
-        # get the score at the requested rank
-        score_at_rank = score_and_rank[0][0]
+        (scores, _) = ranker.FindScore(rank-1)
+        # since we only use one score we need to it out of the list with scores
+        score_at_rank = scores[0]
         # calculate the score that should be given to end up at the given rank
         # give +1 to make sure that in the case of a tie they end up top
         given_score = score_at_rank - entity.score + 1

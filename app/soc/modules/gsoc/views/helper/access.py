@@ -262,6 +262,13 @@ class GSoCChecker(access.Checker):
 
     proposal_entity = student_proposal_logic.getFromKeyFieldsOr404(django_args)
 
+    user = self.user
+    proposal_owner = proposal_entity.scope.user.key().id_or_name()
+
+    # student may see his own proposal even if public view is not available
+    if user and user.key().id_or_name() == proposal_owner:
+      return 
+
     if not proposal_entity.is_publicly_visible:
       raise out_of_band.AccessViolation(
           message_fmt=DEF_PROPOSAL_NOT_PUBLIC)

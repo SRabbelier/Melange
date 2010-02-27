@@ -248,6 +248,7 @@ class GSoCChecker(access.Checker):
 
     return
 
+  @access.allowDeveloper
   def checkIsStudentProposalPubliclyVisible(self, django_args):
     """Checks whether the proposal's content can be seen by everyone.
     

@@ -131,7 +131,8 @@ class Group(soc.models.presence.Presence):
   phone = db.PhoneNumberProperty(required=True,
       verbose_name=ugettext('Phone Number'))
   phone.help_text = ugettext(
-      'include complete international calling number with country code')
+      'include complete international calling number with country code, '
+      'use numbers only.')
   phone.example_text = ugettext(
       "e.g. 1650253000 for Google's Corp HQ number in the United States")
 

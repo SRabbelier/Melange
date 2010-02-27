@@ -230,7 +230,8 @@ class Role(soc.models.linkable.Linkable):
       required=True,
       verbose_name=ugettext('Phone Number'))
   phone.help_text = ugettext(
-      'include complete international calling number with country code')
+      'include complete international calling number with country code, '
+      'use numbers only')
   phone.example_text = ugettext(
       "e.g. 1650253000 for Google's Corp HQ number in the United States")
   phone.group = ugettext("2. Contact Info (Private)")
@@ -255,7 +256,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping Street address'))
   ship_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
       'fill in only if not same as above')
   ship_street.group = ugettext("3. Shipping Info (Private and Optional)")
 
@@ -265,7 +266,7 @@ class Role(soc.models.linkable.Linkable):
   ship_city = db.StringProperty(
       verbose_name=ugettext('Shipping City'))
   ship_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
       'fill in only if not same as above')
   ship_city.group = ugettext("3. Shipping Info (Private and Optional)")
 

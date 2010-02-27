@@ -78,6 +78,7 @@ class View(base.View):
             [['proposer', 'org_admin', 'mentor', 'host'], 
             ['active', 'inactive'], 
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
+    rights['show'] = ['checkIsStudentProposalPubliclyVisible']
     rights['comment'] = ['checkIsDeveloper']
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [

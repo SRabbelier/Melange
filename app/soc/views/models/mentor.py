@@ -205,7 +205,7 @@ class View(role.View):
       form.fields['mentor_agreement'] = None
       return
 
-    entity = org_logic.logic.getFromKeyName(scope_path)
+    entity = self._params['group_logic'].getFromKeyName(scope_path)
 
     if not (entity and entity.scope and entity.scope.mentor_agreement):
       return

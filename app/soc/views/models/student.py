@@ -222,7 +222,7 @@ class View(role.View):
       form.fields['student_agreement'] = None
       return
 
-    program = program_logic.logic.getFromKeyName(scope_path)
+    program = self._params['group_logic'].getFromKeyName(scope_path)
 
     if not (program and program.student_agreement):
       return

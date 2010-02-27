@@ -451,12 +451,20 @@ class View(program.View):
     aa_params = org_app_params['record_list_params'].copy() # accepted applications
     aa_params['public_row_extra'] = lambda entity: {}
     aa_params['list_description'] = description
+    aa_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+    }
 
     description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
     ap_params = org_view.getParams().copy()
     ap_params['list_description'] = description
     ap_params['public_row_extra'] = lambda entity: {
         'link': redirects.getHomeRedirect(entity, ap_params),
+    }
+    ap_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
     }
 
     if request.GET.get('fmt') == 'json':
@@ -768,6 +776,10 @@ class View(program.View):
     ap_params['list_description'] = description
     ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
     ap_params['list_row'] = 'soc/student_project/list/row_all.html'
+    ap_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+    }
 
     prefetch = ['mentor', 'student', 'scope']
 

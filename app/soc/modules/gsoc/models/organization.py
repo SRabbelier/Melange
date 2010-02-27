@@ -109,6 +109,11 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
   nr_mentors.help_text = ugettext(
       'The amount of mentors assigned to a proposal by this organization.')
 
+  reviews_disabled = db.BooleanProperty(required=False, default=False)
+  reviews_disabled.help_text = ugettext(
+      'Check this field if you want to disable private reviews for '
+      'student proposals which have been sent to your organization.')
+
   org_tag = tag_property('org_tag')
 
   def __init__(self, parent=None, key_name=None, app=None, **entity_values):

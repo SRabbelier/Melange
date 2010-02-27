@@ -20,6 +20,7 @@ See soc.views.helper.access module.
 """
 
 __authors__ = [
+    '"Daniel Hans <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -43,6 +44,10 @@ DEF_SIGN_UP_AS_STUDENT_MSG = ugettext(
 DEF_MAX_PROPOSALS_REACHED = ugettext(
     'You have reached the maximum number of Proposals allowed '
     'for this program.')
+
+DEF_PROPOSAL_NOT_PUBLIC = ugettext(
+    'The public view for proposal in request is not available.' 
+    )
 
 DEF_NOT_ALLOWED_PROJECT_FOR_SURVEY_MSG = ugettext(
     'You are not allowed to take this Survey for the specified Student'
@@ -240,6 +245,26 @@ class GSoCChecker(access.Checker):
     if student_entity.status != 'active':
       raise out_of_band.AccessViolation(
           message_fmt=access.DEF_NO_ACTIVE_ENTITY_MSG)
+
+    return
+
+  def checkIsStudentProposalPubliclyVisible(self, django_args):
+    """Checks whether the proposal's content can be seen by everyone.
+    
+    Args:
+      django_args: a dictionary with django's arguments
+
+    Raises:
+      AccessViolationResponse:
+        - If there is no proposal found
+        - If the proposal cannot be publicly seen
+    """
+
+    proposal_entity = student_proposal_logic.getFromKeyFieldsOr404(django_args)
+
+    if not proposal_entity.is_publicly_visible:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_PROPOSAL_NOT_PUBLIC)
 
     return
 

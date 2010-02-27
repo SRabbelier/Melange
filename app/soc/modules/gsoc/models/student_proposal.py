@@ -100,3 +100,10 @@ class StudentProposal(soc.models.linkable.Linkable):
 
   #: date when the proposal was last modified, should be set manually on edit
   last_modified_on = db.DateTimeProperty(required=True, auto_now_add=True)
+
+  #: indicates whether the proposal's content may be publicly seen or not
+  is_publicly_visible = db.BooleanProperty(required=False, default=False)
+  is_publicly_visible.help_text = ugettext(
+      'If you check here, the content of your proposal will be visible '
+      'for others. Please not that they still will not be able to see '
+      'any public comments and reviews of the proposal.')

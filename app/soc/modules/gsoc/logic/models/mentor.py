@@ -44,5 +44,15 @@ class Logic(mentor.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 scope_logic=scope_logic, role_name=role_name)
 
+  def getRoleLogicsToNotifyUponNewRequest(self):
+    """Returns a list with OrgAdmin logic which can be used to notify all
+    appropriate Organization Admins.
+    """
+
+    from soc.modules.gsoc.logic.models.org_admin import logic as \
+        org_admin_logic
+
+    return [org_admin_logic]
+
 
 logic = Logic()

@@ -45,5 +45,15 @@ class Logic(mentor.Logic):
                                 scope_logic=scope_logic, role_name=role_name,
                                 disallow_last_resign=disallow_last_resign)
 
+  def getRoleLogicsToNotifyUponNewRequest(self):
+    """Returns a list with OrgAdmin logic which can be used to notify all
+    appropriate Organization Admins.
+    """
+
+    from soc.modules.ghop.logic.models.org_admin import logic as \
+        org_admin_logic
+
+    return [org_admin_logic]
+
 
 logic = Logic()

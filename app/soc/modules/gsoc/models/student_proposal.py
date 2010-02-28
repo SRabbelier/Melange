@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Daniel Hans <daniel.m.hans@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
@@ -102,7 +103,8 @@ class StudentProposal(soc.models.linkable.Linkable):
   last_modified_on = db.DateTimeProperty(required=True, auto_now_add=True)
 
   #: indicates whether the proposal's content may be publicly seen or not
-  is_publicly_visible = db.BooleanProperty(required=False, default=False)
+  is_publicly_visible = db.BooleanProperty(required=False, default=False,
+      verobose_name=ugettext('Make public'))
   is_publicly_visible.help_text = ugettext(
       'If you check here, the content of your proposal will be visible '
       'for others. Please not that they still will not be able to see '

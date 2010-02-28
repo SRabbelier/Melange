@@ -146,9 +146,6 @@ class View(base.View):
     new_params['export_extension'] = '.csv'
     new_params['export_function'] = surveys.toCSV(self)
     new_params['delete_redirect'] = '/'
-    new_params['list_key_order'] = [
-        'link_id', 'scope_path', 'name', 'short_name', 'title',
-        'content', 'prefix','read_access','write_access']
 
     new_params['edit_template'] = 'soc/survey/edit.html'
     new_params['create_template'] = 'soc/survey/edit.html'

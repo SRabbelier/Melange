@@ -277,7 +277,6 @@ def constructParams(params):
   # TODO(ljvderijk): refactor this out of there
   new_params['list_params'] = {
       'list_description': 'description',
-      'list_key_order': 'key_order',
       }
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params

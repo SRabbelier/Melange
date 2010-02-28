@@ -108,7 +108,7 @@ def constructParams(params):
   else:
     rights = access.Checker(params)
 
-  rights['unspecified'] = []
+  rights['unspecified'] = ['deny']
   rights['any_access'] = ['checkIsLoggedIn']
   rights['show'] = ['checkIsUser']
   rights['create'] = ['checkIsDeveloper']

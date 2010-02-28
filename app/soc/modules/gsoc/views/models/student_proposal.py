@@ -48,6 +48,7 @@ from soc.views.models import base
 from soc.modules.gsoc.logic.models import mentor as mentor_logic
 from soc.modules.gsoc.logic.models import org_admin as org_admin_logic
 from soc.modules.gsoc.logic.models import organization as org_logic
+from soc.modules.gsoc.logic.models import program as program_logic
 from soc.modules.gsoc.logic.models import student as student_logic
 from soc.modules.gsoc.logic.models import student_proposal as \
     student_proposal_logic
@@ -89,7 +90,11 @@ class View(base.View):
     rights['apply'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
         ('checkCanStudentPropose', ['scope_path', True])]
-    rights['review'] = [('checkRoleAndStatusForStudentProposal',
+    rights['review'] = [
+            ('checkIsBeforeEvent',
+            ['accepted_students_announced_deadline', None,
+             program_logic.logic]),
+            ('checkRoleAndStatusForStudentProposal',
             [['org_admin', 'mentor', 'host'], 
             ['active', 'inactive'],
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]

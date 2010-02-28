@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan C.S." <madhusudancs@gmail.com>',
+  '"Daniel Hans <daniel.m.hans@gmail.com>',
   '"Todd Larsen" <tlarsen@google.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -131,6 +132,26 @@ class Logic(object):
 
     depth = self._scope_logic.logic.getScopeDepth()
     return None if (depth is None) else (depth + 1)
+
+  def retrieveKeyNameFromPath(self, path):
+    """Returns the KeyName constructed by cutting out suffix from
+    the given path.
+
+    One can compute the number of required parts, as it is the lenght of scope
+    plus one. Therefore, if the path contains more parts, there are cut out and
+    the prefix is returned.
+
+    Args:
+      path: a string whose format is string1/string2/.../stringN
+    """
+
+    key_name_parts = [item for item in path.split('/') if item]
+    required_parts_num = self.getScopeDepth() + 1
+
+    if len(key_name_parts) < required_parts_num:
+      raise InvalidArgumentError
+
+    return'/'.join(key_name_parts[:required_parts_num])
 
   def getKeyNameFromFields(self, fields):
     """Returns the KeyName constructed from fields dict for this type of entity.

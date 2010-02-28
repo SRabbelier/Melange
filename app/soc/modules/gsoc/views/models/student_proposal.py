@@ -202,7 +202,7 @@ class View(base.View):
     self._params['student_create_form'] = student_create_form
 
     # create the special form for public review
-    dynafields = [
+    base_fields = [
         {'name': 'comment',
          'base': forms.CharField,
          'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
@@ -212,6 +212,7 @@ class View(base.View):
          },
          ]
 
+    dynafields = [field.copy() for field in base_fields]
     dynaproperties = params_helper.getDynaFields(dynafields)
     dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
 
@@ -220,16 +221,35 @@ class View(base.View):
         dynaexclude=None, dynaproperties=dynaproperties)
     self._params['public_review_form'] = public_review_form
 
-    # create the special form for mentors
-    dynafields = [
+    # create the special form for mentors when the scoring is locked
+
+    # this fields is used by the on-page JS
+    base_fields.append(
+        {'name': 'public',
+         'base': forms.BooleanField,
+         'label': 'Review visible to Student',
+         'initial': False,
+         'required': False,
+         'help_text': 'By ticking this box the score will not be assigned, '
+             'and the review will be visible to the student.',
+         })
+
+    dynafields = [field.copy() for field in base_fields]
+    dynaproperties = params_helper.getDynaFields(dynafields)
+    dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
+    locked_review_form = dynaform.newDynaForm(dynamodel=None, 
+        dynabase=helper.forms.BaseForm, dynainclude=None, 
+        dynaexclude=None, dynaproperties=dynaproperties)
+    self._params['locked_review_form'] = locked_review_form
+
+    # create the form for mentors when the scoring is unlocked
+    base_fields.append(
         {'name': 'score',
          'base': forms.ChoiceField,
          'label': 'Score',
          'initial': 0,
          'required': False,
          'passthrough': ['initial', 'required', 'choices'],
-         'example_text':
-             'A score will only be assigned if the review is private!',
          'choices': [(-4,'-4'),
                      (-3,'-3'),
                      (-2,'-2'),
@@ -239,27 +259,11 @@ class View(base.View):
                      (2,'2'),
                      (3,'3'),
                      (4,'4')]
-        },
-        {'name': 'comment',
-         'base': forms.CharField,
-         'widget': widgets.FullTinyMCE(attrs={'rows': 10, 'cols': 40}),
-         'label': 'Comment',
-         'required': False,
-         'example_text': 'Caution, you will not be able to edit your review!',
-         },
-        {'name': 'public',
-         'base': forms.BooleanField,
-         'label': 'Review visible to Student',
-         'initial': False,
-         'required': False,
-         'help_text': 'By ticking this box the score will not be assigned, '
-             'and the review will be visible to the student.',
-         },
-         ]
+        })
 
+    dynafields = [field.copy() for field in base_fields]
     dynaproperties = params_helper.getDynaFields(dynafields)
     dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
-
     mentor_review_form = dynaform.newDynaForm(dynamodel=None, 
         dynabase=helper.forms.BaseForm, dynainclude=None, 
         dynaexclude=None, dynaproperties=dynaproperties)
@@ -735,16 +739,22 @@ class View(base.View):
              'mentor assigned.'
          },
         ]
-      
+
       dynaproperties = params_helper.getDynaFields(dynafields)
       dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
-  
+
       form = dynaform.extendDynaForm(
           dynaform=params['mentor_review_form'], 
           dynaproperties=dynaproperties)
 
     else:
-      form = params['mentor_review_form']
+      # the current user is not an org admin
+      if entity.org.reviews_disabled:
+        # reviews are disabled, don't show score field
+        form = params['locked_review_form']
+      else:
+        # reviews are enabled, show the score field
+        form = params['mentor_review_form']
 
     if request.method == 'POST':
       return self.reviewPost(request, context, params, entity,
@@ -804,7 +814,7 @@ class View(base.View):
 
     is_public = fields['public']
     comment = fields['comment']
-    given_score = int(fields.get('score')) if fields.get('score') else 0
+    given_score = int(fields.get('score', 0))
 
     # store the properties to update the proposal with
     properties = {}

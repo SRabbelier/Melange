@@ -1105,7 +1105,8 @@ class Checker(object):
     if key_name_arg and key_name_arg in django_args:
       key_name = django_args[key_name_arg]
     else:
-      key_name = program_logic.getKeyNameFromFields(django_args)
+      key_name = program_logic.retrieveKeyNameFromPath(
+          program_logic.getKeyNameFromFields(django_args))
 
     program_entity = program_logic.getFromKeyName(key_name)
 

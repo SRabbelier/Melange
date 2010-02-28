@@ -63,6 +63,14 @@ class StudentProposal(soc.models.linkable.Linkable):
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about your proposal')
 
+  #: indicates whether the proposal's content may be publicly seen or not
+  is_publicly_visible = db.BooleanProperty(required=False, default=False,
+      verbose_name=ugettext('Make public'))
+  is_publicly_visible.help_text = ugettext(
+      'If you check here, the content of your proposal will be visible '
+      'for others. Please not that they still will not be able to see '
+      'any public comments and reviews of the proposal.')
+
   #: A property containing which mentor has assigned himself to this proposal.
   #: Only a proposal with an assigned mentor can be turned into
   #: a accepted proposal. A proposal can only have one mentor.
@@ -101,11 +109,3 @@ class StudentProposal(soc.models.linkable.Linkable):
 
   #: date when the proposal was last modified, should be set manually on edit
   last_modified_on = db.DateTimeProperty(required=True, auto_now_add=True)
-
-  #: indicates whether the proposal's content may be publicly seen or not
-  is_publicly_visible = db.BooleanProperty(required=False, default=False,
-      verobose_name=ugettext('Make public'))
-  is_publicly_visible.help_text = ugettext(
-      'If you check here, the content of your proposal will be visible '
-      'for others. Please not that they still will not be able to see '
-      'any public comments and reviews of the proposal.')

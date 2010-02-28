@@ -389,6 +389,7 @@ class View(organization.View):
     For params see base.View.public().
     """
 
+    from soc.logic.helper import timeline as timeline_helper
 
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
@@ -405,6 +406,14 @@ class View(organization.View):
       return helper.responses.errorResponse(
           error, request, template=params['error_public'])
 
+    program_entity = org_entity.scope
+    is_after_deadline = timeline_helper.isAfterEvent(program_entity.timeline,
+        'accepted_students_announced_deadline')
+    if is_after_deadline:
+      redirect_fun = redirects.getProposalCommentRedirect
+    else:
+      redirect_fun = redirects.getReviewRedirect
+
     context = {}
     context['entity'] = org_entity
 
@@ -416,7 +425,7 @@ class View(organization.View):
         np_params['name_plural'], org_entity.name)
     np_params['list_description'] = description
     np_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getReviewRedirect(entity, mp_params),
+        'link': redirect_fun(entity, mp_params),
     }
 
     rp_params = list_params.copy()# ranked proposals
@@ -436,7 +445,7 @@ class View(organization.View):
         "parameters": dict(new_window=True),
     }
     rp_params['review_row_extra'] = lambda entity, *args: {
-        'link': redirects.getReviewRedirect(entity, rp_params)
+        'link': redirect_fun(entity, rp_params)
     }
 
     description = ugettext('%s already under review sent to %s') %(
@@ -448,14 +457,14 @@ class View(organization.View):
         mp_params['name_plural'], org_entity.name)
     mp_params['list_description'] = description
     mp_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getReviewRedirect(entity, mp_params),
+        'link': redirect_fun(entity, mp_params)
     }
 
     ip_params = list_params.copy() # invalid proposals
     ip_params['list_description'] = ugettext('List of invalid %s sent to %s ') % (
         ip_params['name_plural'], org_entity.name)
     ip_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getReviewRedirect(entity, ip_params),
+        'link': redirect_fun(entity, ip_params)
     }
 
     if request.GET.get('fmt') == 'json':

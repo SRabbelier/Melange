@@ -360,7 +360,8 @@ class View(organization.View):
       user_entity = user_logic.getForCurrentAccount()
 
       fields = {'user': user_entity,
-          'scope': org_entity,}
+                'scope': org_entity,
+                'status': ['active', 'inactive']}
       mentor_entity = mentor_logic.getForFields(fields, unique=True)
 
       filter = {'org': org_entity,
@@ -485,10 +486,22 @@ class View(organization.View):
       np_list = helper.lists.getListGenerator(request, np_params, idx=0)
       contents.append(np_list)
 
-    # these two lists are always shown
+    # the list of proposals that have been reviewed should always be shown
     rp_list = helper.lists.getListGenerator(request, rp_params, idx=1)
-    mp_list = helper.lists.getListGenerator(request, mp_params, idx=2)
-    contents.extend([rp_list, mp_list])
+    contents.append(rp_list)
+
+    # check whether the current user is a mentor for the organization
+    user_entity = user_logic.getForCurrentAccount()
+
+    fields = {'user': user_entity,
+              'scope': org_entity,
+              'status': ['active','inactive']}
+    mentor_entity = mentor_logic.getForFields(fields, unique=True)
+
+    if mentor_entity:
+      # show the list of all proposals that this user is mentoring
+      mp_list = helper.lists.getListGenerator(request, mp_params, idx=2)
+      contents.append(mp_list)
 
     # check if there are invalid proposals if so show them in a separate list
     fields = {'org': org_entity,

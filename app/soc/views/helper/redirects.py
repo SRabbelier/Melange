@@ -349,6 +349,12 @@ def getStudentEditRedirect(entity, params):
   return '/%s/st_edit/%s' % (
       params['url_name'], entity.key().id_or_name())
 
+def getProposalCommentRedirect(entity, params):
+  """Returns comment redirect for the specified student proposal.
+  """
+
+  return '/%s/comment/%s' % (
+      params['url_name'], entity.key().id_or_name()) 
 
 def getStudentProposalRedirect(entity, params):
   """Returns the student proposal redirect for the given org and student.

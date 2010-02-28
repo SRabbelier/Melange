@@ -749,7 +749,7 @@ class View(base.View):
 
     else:
       # the current user is not an org admin
-      if entity.org.reviews_disabled:
+      if entity.org.scoring_disabled:
         # reviews are disabled, don't show score field
         form = params['locked_review_form']
       else:

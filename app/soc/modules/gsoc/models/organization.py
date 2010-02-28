@@ -109,8 +109,8 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
   nr_mentors.help_text = ugettext(
       'The amount of mentors assigned to a proposal by this organization.')
 
-  reviews_disabled = db.BooleanProperty(required=False, default=False)
-  reviews_disabled.help_text = ugettext(
+  scoring_disabled = db.BooleanProperty(required=False, default=False)
+  scoring_disabled.help_text = ugettext(
       'Check this field if you want to disable private reviews for '
       'student proposals which have been sent to your organization.')
 

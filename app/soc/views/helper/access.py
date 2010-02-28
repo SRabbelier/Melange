@@ -1016,8 +1016,8 @@ class Checker(object):
 
   @allowDeveloper
   @denySidebar
-  def checkIsActivePeriod(self, django_args, period_name, 
-                          key_name_arg, program_logic):
+  def checkIsActivePeriod(self, django_args, period_name, key_name_arg,
+                          program_logic):
     """Checks if the given period is active for the given program.
 
     Args:
@@ -1034,26 +1034,13 @@ class Checker(object):
       * if the period is not active
     """
 
-    if key_name_arg and key_name_arg in django_args:
-      key_name = django_args[key_name_arg]
-    else:
-      key_name = program_logic.getKeyNameFromFields(django_args)
-
-    program_entity = program_logic.getFromKeyName(key_name)
-
-    if not program_entity or (
-        program_entity.status in ['invalid']):
-      raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
-
-    if timeline_helper.isActivePeriod(program_entity.timeline, period_name):
-      return
-
-    raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+    self._checkTimelineCondition(django_args, event_name, key_name_arg,
+        program_logic, timeline_helper.isActivePeriod)
 
   @allowDeveloper
   @denySidebar
-  def checkIsAfterEvent(self, django_args, event_name, 
-                        key_name_arg, program_logic):
+  def checkIsAfterEvent(self, django_args, event_name, key_name_arg,
+                        program_logic):
     """Checks if the given event has taken place for the given program.
 
     Args:
@@ -1063,6 +1050,51 @@ class Checker(object):
         keyname. If none is given the key_name is constructed from django_args
         itself.
       program_logic: Program Logic instance
+
+    Raises:
+      AccessViolationResponse:
+      * if no active Program is found
+      * if the event has not taken place yet
+    """
+
+    self._checkTimelineCondition(django_args, event_name, key_name_arg,
+        program_logic, timeline_helper.isAfterEvent)
+
+  @allowDeveloper
+  @denySidebar
+  def checkIsBeforeEvent(self, django_args, event_name, key_name_arg,
+                         program_logic):
+    """Checks if the given event has not taken place for the given program.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      event_name: the name of the event which is checked
+      key_name_arg: the entry in django_args that specifies the given program
+        keyname. If none is given the key_name is constructed from django_args
+        itself.
+      program_logic: Program Logic instance
+
+    Raises:
+      AccessViolationResponse:
+      * if no active Program is found
+      * if the event has not taken place yet
+    """
+
+    self._checkTimelineCondition(django_args, event_name, key_name_arg,
+        program_logic, timeline_helper.isBeforeEvent)
+
+  def _checkTimelineCondition(self, django_args, event_name, key_name_arg,
+                              program_logic, timeline_fun):
+    """Checks if the given event fulfills a certain timeline condition.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      event_name: the name of the event which is checked
+      key_name_arg: the entry in django_args that specifies the given program
+        keyname. If none is given the key_name is constructed from django_args
+        itself.
+      program_logic: Program Logic instance
+      timeline_fun: function checking for the main condition
 
     Raises:
       AccessViolationResponse:
@@ -1081,7 +1113,7 @@ class Checker(object):
         program_entity.status in ['invalid']):
       raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
 
-    if timeline_helper.isAfterEvent(program_entity.timeline, event_name):
+    if timeline_fun(program_entity.timeline, event_name):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)

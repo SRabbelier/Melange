@@ -178,7 +178,7 @@ class View(role.View):
 
     kwargs.update(fields)
     # pylint: disable-msg=E1103
-    return self.create(request, access_type='unspecified', page_name=page_name,
+    return self.create(request, access_type='allow', page_name=page_name,
         params=params, **kwargs)
 
   def _editPost(self, request, entity, fields):

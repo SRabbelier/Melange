@@ -65,7 +65,6 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['unspecified'] = ['deny']
     rights['any_access'] = ['allow']
     rights['create_profile'] = ['checkIsUnusedAccount']
     rights['edit_profile'] = ['checkHasUserEntity']

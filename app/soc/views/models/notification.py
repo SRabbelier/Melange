@@ -85,7 +85,6 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['unspecified'] = ['deny']
     rights['edit'] = ['deny']
     rights['show'] = [('checkIsMyEntity', [notification_logic, 'scope_path'])]
     rights['delete'] = [('checkIsMyEntity', [notification_logic, 'scope_path'])]

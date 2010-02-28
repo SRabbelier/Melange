@@ -226,6 +226,16 @@ def getListRolesRedirect(entity, params):
   return result
 
 
+def getListParticipantsRedirect(entity, params):
+  """Returns the redirect for the List of all participants in a program.
+  """
+
+  result = '/%s/list_participants/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
+
 def getAcceptProjectRedirect(entity, params):
   """Returns the redirect for accept_project access type.
   """

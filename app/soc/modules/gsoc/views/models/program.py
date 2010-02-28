@@ -98,6 +98,7 @@ class View(program.View):
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['accepted_organization_announced_deadline',
          '__all__', program_logic])]
+    rights['list_participants'] = [('checkIsHostForProgram', [program_logic])]
     rights['list_projects'] = [('checkIsAfterEvent',
         ['accepted_students_announced_deadline',
          '__all__', program_logic])]
@@ -134,6 +135,12 @@ class View(program.View):
 
     new_params['org_app_logic'] = org_app_logic
     new_params['org_app_prefix'] = 'gsoc'
+
+    # used to list the participants in this program
+    new_params['participants_logic'] = [
+        (org_admin_logic, 'program'),
+        (mentor_logic, 'program'),
+        (student_logic, 'scope')]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -797,6 +804,7 @@ create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
+list_participants = decorators.view(view.listParticipants)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 show_duplicates = decorators.view(view.showDuplicates)

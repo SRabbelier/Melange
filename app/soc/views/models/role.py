@@ -28,6 +28,7 @@ from django import forms
 from django import http
 from django.utils.translation import ugettext
 
+from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
@@ -163,6 +164,27 @@ class View(base.View):
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
 
     new_params['show_in_roles_overview'] = True
+
+    # define the fields for the admin list
+    new_params['admin_field_keys'] = [
+        'link_id', 'name', 'document_name', 'email', 'res_street',
+        'res_city', 'res_state', 'res_country', 'res_postalcode', 'phone',
+        'shipping_street', 'shipping_city', 'shipping_state',
+        'shipping_country', 'shipping_postalcode', 'birth_date',
+        'tshirt_style', 'tshirt_size', 'group_name', 'status', 'account_name'
+        ]
+    new_params['admin_field_names'] = [
+        'Link ID', 'Name', 'Name on Documents', 'Email', 'Street', 'City',
+        'State', 'Country', 'Postal Code', 'Phone Number', 'Shipping Street',
+        'Shipping City', 'Shipping State', 'Shipping Country',
+        'Shipping Postal Code', 'Birth Date', 'T-Shirt Style', 'T-Shirt Size',
+        'Group Name', 'Status', 'Account Name'
+    ]
+    new_params['admin_field_extra'] = lambda entity: {
+        'group_name': entity.scope.name,
+        'birth_date': entity.birth_date.isoformat(),
+        'account_name': accounts.normalizeAccount(entity.user.account).email()
+    }
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

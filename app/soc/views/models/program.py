@@ -35,6 +35,8 @@ from soc.logic.models import host as host_logic
 from soc.logic.models import program as program_logic
 from soc.views import helper
 from soc.views.helper import access
+from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
@@ -68,15 +70,8 @@ class View(presence.View):
         host_logic.logic])]
     rights['edit'] = ['checkIsHostForProgram']
     rights['delete'] = ['checkIsDeveloper']
-    rights['assign_slots'] = ['checkIsHostForProgram']
-    rights['slots'] = ['checkIsHostForProgram']
-    rights['show_duplicates'] = ['checkIsHostForProgram']
-    rights['assigned_proposals'] = ['checkIsHostForProgram']
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['accepted_organization_announced_deadline',
-         '__all__', program_logic.logic])]
-    rights['list_projects'] = [('checkIsAfterEvent',
-        ['accepted_students_announced_deadline',
          '__all__', program_logic.logic])]
 
     new_params = {}
@@ -113,6 +108,9 @@ class View(presence.View):
         (r'^%(url_name)s/(?P<access_type>list_projects)/%(key_fields)s$',
           '%(module_package)s.%(module_name)s.list_projects',
           "List all Student Projects"),
+        (r'^%(url_name)s/(?P<access_type>list_participants)/%(key_fields)s$',
+          '%(module_package)s.%(module_name)s.list_participants',
+          "List all Participants for"),
         ]
 
     new_params['extra_django_patterns'] = patterns
@@ -192,6 +190,68 @@ class View(presence.View):
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
 
+  @decorators.merge_params
+  @decorators.check_access
+  def listParticipants(self, request, access_type, page_name=None,
+                       params=None, **kwargs):
+    """View that lists the roles of all the participants for a single Program.
+
+    For args see base.list().
+    """
+
+    from django.utils import simplejson
+
+    from soc.views.models.role import ROLE_VIEWS
+
+    program_logic = params['logic']
+    program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.GET.get('fmt') == 'json':
+      # get index
+      idx = request.GET.get('idx', '')
+      idx = int(idx) if idx.isdigit() else -1
+
+      participants_logic = params['participants_logic']
+
+      if idx == -1 or idx > len(participants_logic):
+        return responses.jsonErrorResponse(request, "idx not valid")
+
+      # get role params that belong to the given index
+      (role_logic, query_field) = participants_logic[idx]
+      role_view = ROLE_VIEWS[role_logic.role_name]
+      role_params = role_view.getParams().copy()
+
+      # construct the query for the specific list
+      fields = {query_field: program_entity,
+                'status': ['active','inactive']}
+
+      # return getListData
+      contents = lists.getListData(request, role_params, fields,
+                                   visibility='admin')
+
+      json = simplejson.dumps(contents)
+      return responses.jsonResponse(request, json)
+
+    # we need to generate the lists to be shown on this page
+    participants = []
+
+    idx = 0
+    for (role_logic, _) in params['participants_logic']:
+      # retrieve the role view belonging to the logic
+      role_view = ROLE_VIEWS[role_logic.role_name]
+      role_params = role_view.getParams().copy()
+      role_params['list_description'] = 'List of All %s' %(
+          role_params['name_plural'])
+
+      role_list = lists.getListGenerator(request, role_params, idx=idx)
+      participants.append(role_list)
+
+      idx = idx + 1
+
+    page_name = '%s %s' %(page_name, program_entity.name)
+    return self._list(request, params, contents=participants,
+                      page_name=page_name)
+
   def _getStandardProgramEntries(self, entity, id, user, params):
     """Returns those entries for a program which are available to regular users,
     not only to hosts or developers. 
@@ -240,6 +300,9 @@ class View(presence.View):
     items += [(redirects.getListDocumentsRedirect(
             entity, params['document_prefix']),
             "List Documents", 'any_access')]
+    # add link to list all participants
+    items += [(redirects.getListParticipantsRedirect(entity, params),
+               "List Participants", 'any_access')]
 
     timeline_entity = entity.timeline
 

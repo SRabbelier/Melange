@@ -90,6 +90,8 @@ class View(program.View):
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['student_signup_start',
          '__all__', ghop_program_logic.logic])]
+    rights['list_participants'] = [('checkIsHostForProgram',
+                                    [ghop_program_logic.logic])]
     rights['task_difficulty'] = [('checkIsHostForProgram',
         [ghop_program_logic.logic])]
     rights['task_type'] = [('checkIsHostForProgram',
@@ -139,6 +141,12 @@ class View(program.View):
 
     new_params['org_app_logic'] = org_app_logic
     new_params['org_app_prefix'] = 'ghop'
+
+    # used to list the participants in this program
+    new_params['participants_logic'] = [
+        (ghop_org_admin_logic.logic, 'program'),
+        (ghop_mentor_logic.logic, 'program'),
+        (ghop_student_logic.logic, 'scope')]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -643,6 +651,7 @@ create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
+list_participants = decorators.view(view.listParticipants)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 home = decorators.view(view.home)

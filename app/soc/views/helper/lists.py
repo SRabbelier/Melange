@@ -44,12 +44,20 @@ def urlize(url, name=None, target="_blank", nofollow=True):
     nofollow: whether to add the 'rel="nofollow"' attribute
   """
 
-  return URL_PATTERN % {
-      'url': url,
-      'name': name if name else url,
+  from django.utils.safestring import mark_safe
+  from django.utils.html import escape
+
+  safe_url = escape(url)
+  safe_name = escape(name)
+
+  link = URL_PATTERN % {
+      'url': safe_url,
+      'name': safe_name if safe_name else safe_url,
       'target': ' target="%s"' % target if target else '',
       'nofollow': ' rel="nofollow"' if nofollow else "",
   }
+
+  return mark_safe(link)
 
 
 def entityToRowDict(entity, key_order, extra_cols_func,

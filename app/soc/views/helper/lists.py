@@ -60,7 +60,7 @@ def urlize(url, name=None, target="_blank", nofollow=True):
   return mark_safe(link)
 
 
-def entityToRowDict(entity, key_order, extra_cols_func,
+def entityToRowDict(entity, key_order, no_filter, extra_cols_func,
                     button_ops_func, row_ops_func, args):
   """Returns the row dict for the specified entity.
   """
@@ -74,6 +74,10 @@ def entityToRowDict(entity, key_order, extra_cols_func,
   columns = entity.toDict(list(fields))
   columns.update(extra_cols)
   columns['key'] = str(entity.key().id_or_name())
+
+  filter_fields = [i for i in columns.keys() if i not in no_filter]
+
+  columns = dicts.cleanDict(columns, filter_fields)
 
   operations = {
       "row": row_ops,
@@ -150,6 +154,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   button = params.get('%s_button_extra' % visibility, lambda *args: {})
   row = params.get('%s_row_extra' % visibility, lambda *args: {})
   ignore = params.get('%s_field_ignore' % visibility, [])
+  no_filter = params.get('%s_field_no_filter' % visibility, [])
 
   for field in ignore:
     if field not in key_order:
@@ -164,7 +169,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
 
   col_model = [keyToColumnProperties(i, col_props) for i in key_order]
 
-  extract_args = [key_order, column, button, row, args]
+  extract_args = [key_order, no_filter, column, button, row, args]
   columns = [entityToRowDict(i, *extract_args) for i in entities]
 
   rowList = [5, 10, 20, 50, 100, 500, 1000]

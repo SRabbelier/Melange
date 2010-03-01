@@ -273,3 +273,27 @@ def toDict(entity, field_names=None):
     result[key] = value
 
   return result
+
+def cleanDict(target, filter_fields, escape_safe=False):
+  """Returns a version of target with all specified fields html escaped
+
+  Args:
+    target: the dictionary that should be escaped
+    filter_fields: the fields that should be escaped
+    escape_false: also escape fields marked as safe
+  """
+
+  from django.utils.html import escape
+  from django.utils.safestring import SafeData
+
+  result = target.copy()
+
+  for field in filter_fields:
+    data = result[field]
+
+    if not escape_safe and isinstance(data, SafeData):
+      continue
+
+    result[field] = escape(data)
+
+  return result

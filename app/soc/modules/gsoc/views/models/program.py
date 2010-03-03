@@ -730,14 +730,15 @@ class View(program.View):
     template = 'soc/program/show_duplicates.html'
 
     context['duplicates'] = duplicates_logic.getForFields(fields)
-    context['duplicates_status'] = ds_logic.getOrCreateForProgram(program_entity)
+    duplicates_status = ds_logic.getOrCreateForProgram(program_entity)
+    context['duplicates_status'] = duplicates_status
 
     if request.POST:
       post_data = request.POST
 
       # pass along these params as POST to the new task
       task_params = {'program_key': program_entity.key().id_or_name()}
-      task_url = '/tasks/gsoc/proposal_duplicates/calculate'
+      task_url = '/tasks/gsoc/proposal_duplicates/start'
 
       # checks if the task newly added is the first task
       # and must be performed repeatedly every hour or
@@ -747,10 +748,9 @@ class View(program.View):
       elif 'recalculate' in post_data:
         task_params['repeat'] = 'no'
 
-      # TODO: enable the tasks
       # adds a new task
       new_task = taskqueue.Task(params=task_params, url=task_url)
-      #new_task.add()
+      new_task.add()
 
     return helper.responses.respond(request, template=template,
                                     context=context)

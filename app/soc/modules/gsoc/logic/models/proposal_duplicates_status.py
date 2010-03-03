@@ -54,7 +54,7 @@ class Logic(base.Logic):
     pds_entity = self.getForFields(fields, unique=True)
 
     if not pds_entity:
-      pds_entity = self.updateOrCreateFromFields(properties)
+      pds_entity = self.updateOrCreateFromFields(fields)
 
     return pds_entity
 

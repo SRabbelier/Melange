@@ -117,7 +117,7 @@ class Linkable(base.ModelWithFieldAttributes):
   link_id.help_text = ugettext(
       'Link ID is used as part of various URL links throughout the site.'
       ' <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> '
-      ' characters, digits, and underscores only.'
+      ' alphanumeric characters, digits, and underscores only.'
       ' The regexp used to validate is "%s".') % LINK_ID_PATTERN_CORE
 
   #: Optional Self Reference property to another Linkable entity which defines

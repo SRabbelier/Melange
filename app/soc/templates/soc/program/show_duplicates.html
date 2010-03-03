@@ -20,29 +20,42 @@ limitations under the License.
 
 {% block body %}
 <ul>
-{% for duplicate in duplicates %}
-  {% as_proposal_duplicates duplicate %}
-{% endfor %}
+{% if duplicates %}
+  {% for duplicate in duplicates %}
+    {% as_proposal_duplicates duplicate %}
+  {% endfor %}
+{% else %}
+<strong>There are no existing duplicate proposals at the time of
+last calculation</strong><br/>
+{% endif %} 
 </ul>
 
 <span id="duplicates_calc_status">
-  Duplicates calculation status: 
-  <strong>{{ duplicates_status.status|capfirst|default:"N/A" }}</strong>
+  Duplicates calculation status:
+  <strong>
+  {{ duplicates_status.status|capfirst }}
+  </strong>
 </span>&nbsp;&nbsp;&nbsp;&nbsp;
 
 <span id="duplicates_calc_time">
   Last calculated at: 
   <strong>
-{{ duplicates_status.calculated_on|date:"jS F Y H:i"|default:"Not Calculated" }}
+  {% if duplicates_status.calculated_on %}
+  {{ duplicates_status.calculated_on|date:"jS F Y H:i" }}
+  {% else %}
+  Not Calculated
+  {% endif %}
   </strong>
 </span>
-<form method="post">
-<input type="submit" id="id_button_duplicate_slots" class="button"
-{% if duplicates_status.calculated_on %}
-value="Recalculate" name="recalculate"
-{% else %}
-value="Initialize Calculation" name="calculate"
-{% endif %}
-/>
-</form>
+{% ifnotequal duplicates_status.status "processing" %}
+  <form method="post">
+  <input type="submit" id="id_button_duplicate_slots" class="button"
+  {% if not duplicates_status.calculated_on %}
+    value="Initialize Calculation" name="calculate"
+  {% else %}
+    value="Recalculate" name="recalculate"
+  {% endif %}
+  />
+  </form>
+{% endifnotequal %}
 {% endblock %}

@@ -1034,7 +1034,7 @@ class Checker(object):
       * if the period is not active
     """
 
-    self._checkTimelineCondition(django_args, event_name, key_name_arg,
+    self._checkTimelineCondition(django_args, period_name, key_name_arg,
         program_logic, timeline_helper.isActivePeriod)
 
   @allowDeveloper

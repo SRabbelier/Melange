@@ -51,3 +51,7 @@ class ProposalDuplicate(soc.models.base.ModelWithFieldAttributes):
 
   #: List of all proposals that would be accepted for this student
   duplicates = db.ListProperty(item_type=db.Key, default=[])
+
+  #: Property which specifies if number of proposals in duplicates
+  #: is more than allowed amount of the program.
+  is_duplicate = db.BooleanProperty(required=True, default=False)

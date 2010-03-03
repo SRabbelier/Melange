@@ -51,6 +51,7 @@ class Logic(base.Logic):
 
     # check for already outstanding or ignored requests
     request_fields = {
+        'role': role_logic.role_name,
         'user': fields['user'],
         'group': fields['group'],
         'status': ['new', 'group_accepted', 'ignored']

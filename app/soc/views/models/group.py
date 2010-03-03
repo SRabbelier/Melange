@@ -170,7 +170,7 @@ class View(presence.View):
     req_params['list_description'] = ugettext(
         "An overview of the %(name)s's invites and requests." % params)
 
-    return self.list(request, access_type, page_name=page_name,
+    return self.list(request, access_type='allow', page_name=page_name,
                      params=req_params, filter=filter, **kwargs)
 
   def getListRolesData(self, request, list_params, group_entity):

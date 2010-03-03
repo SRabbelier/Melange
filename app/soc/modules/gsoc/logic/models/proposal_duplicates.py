@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.logic.models import base
 
 from soc.modules.gsoc.models.proposal_duplicates import ProposalDuplicate
@@ -38,6 +40,28 @@ class Logic(base.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model,
                                 id_based=id_based)
+
+
+  def deleteAllForProgram(self, program_entity, non_dupes_only=False):
+    """Deletes all ProposalDuplicates for a given program.
+
+    Args:
+      program_entity: Program to delete the ProposalDuplicatesFor
+      non_dupes_only: Iff True removes only the ones which have is_duplicate
+        set to False. False by default.
+    """
+
+    if non_dupes_only:
+      fields = {'is_duplicate': False}
+    else:
+      fields = {}
+
+    fields['program'] = program_entity
+
+    proposal_duplicates = self.getForFields(fields)
+    while proposal_duplicates:
+      db.delete(proposal_duplicates)
+      proposal_duplicates = self.getForFields(fields)
 
 
 logic = Logic()

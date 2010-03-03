@@ -577,7 +577,7 @@ class View(base.View):
             'url_name': params['url_name']})
     }
 
-    return self.list(request, access_type=access_type, page_name=page_name,
+    return self.list(request, access_type='allow', page_name=page_name,
                      params=list_params, filter=filter, **kwargs)
 
   def getListSelfData(self, request, list_params, ip_params, scope_path):

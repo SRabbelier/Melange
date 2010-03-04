@@ -760,7 +760,7 @@ class View(base.View):
         'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
     }
 
-    return self.list(request, 'any_access', page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                      params=list_params, context=context)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):

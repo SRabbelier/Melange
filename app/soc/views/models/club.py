@@ -53,6 +53,7 @@ class View(group.View):
     """
 
     rights = access.Checker(params)
+    rights['any_access'] = ['allow']
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasRoleForLinkId', club_admin_logic.logic),
                       ('checkGroupIsActiveForLinkId', club_logic.logic)]
@@ -145,7 +146,7 @@ class View(group.View):
     list_params['list_description'] = ugettext('Choose a club to ' 
                                                'apply to become a Club Member.')
 
-    return self.list(request, access_type, 
+    return self.list(request, 'allow', 
         page_name, params=list_params, filter=None)
 
 

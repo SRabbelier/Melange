@@ -311,7 +311,7 @@ class View(group.View):
     filter = {'scope_path': kwargs['scope_path'],
               'status' : 'active'}
 
-    return self.list(request, access_type,
+    return self.list(request, 'allow',
         page_name, params=list_params, filter=filter, visibility='select')
 
 
@@ -350,7 +350,7 @@ class View(group.View):
     new_filter['status'] = 'active'
     filter = dicts.merge(filter, new_filter)
 
-    return self.list(request, 'any_access', page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                       params=params, filter=filter)
 
   def _getMapData(self, filter=None):

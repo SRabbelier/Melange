@@ -700,7 +700,8 @@ class View(program.View):
         'return_url': return_url,
         }
 
-    return self.list(request, 'any_access', page_name=page_name, params=org_params, context=context)
+    return self.list(request, 'allow', page_name=page_name, params=org_params,
+                     context=context)
 
   @decorators.merge_params
   @decorators.check_access
@@ -790,7 +791,7 @@ class View(program.View):
 
     prefetch = ['mentor', 'student', 'scope']
 
-    return self.list(request, access_type, page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                      params=ap_params, filter=filter, prefetch=prefetch)
 
 view = View()

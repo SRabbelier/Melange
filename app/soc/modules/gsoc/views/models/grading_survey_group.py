@@ -363,7 +363,7 @@ class View(base.View):
 
     fields = {'grading_survey_group': entity}
 
-    return self.list(request, 'any_access', page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                      params=list_params, filter=fields, visibility='records')
 
   @decorators.merge_params
@@ -520,7 +520,7 @@ class View(base.View):
         'List of all GradingRecords. Pick one to edit it.'
 
     # return the view which renders the set content
-    return self.list(request, 'any_access', page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                      params=list_params, visibility='records')
 
 

@@ -122,7 +122,7 @@ class View(survey.View):
       # show project selection screen using the given filter
       return self._selectProjects(request, page_name, params, entity, fields)
 
-    return super(View, self).take(request, 'any_access', page_name=page_name,
+    return super(View, self).take(request, 'allow', page_name=page_name,
                                   params=params, **kwargs)
 
   def _getSurveyRecordFor(self, survey, request, params):
@@ -262,7 +262,7 @@ class View(survey.View):
         "Select a %s for which to fill in the %s named %s" %(
             student_project_params['name'], params['name'], survey.title))
 
-    return self.list(request, 'any_access', page_name=page_name,
+    return self.list(request, 'allow', page_name=page_name,
                      params=student_project_params)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):

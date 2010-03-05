@@ -92,7 +92,7 @@ def entityToRowDict(entity, key_order, no_filter, extra_cols_func,
   return result
 
 
-def keyToColumnProperties(key, col_props):
+def keyToColumnProperties(key, col_props, hidden):
   """Returns the column properties for the specified key.
   """
 
@@ -102,13 +102,17 @@ def keyToColumnProperties(key, col_props):
     'resizable': True,
   }
 
-  if key == 'key':
+  if key == 'key' or key in hidden:
     props['hidden'] = True
+
+  if key in hidden:
+    props['searchoptions'] = {"searchhidden": True}
 
   extra_props = col_props.get(key, {})
   props.update(extra_props)
 
   return props
+
 
 def getListData(request, params, fields, visibility=None, order=[], args=[]):
   """Returns the list data for the specified params.
@@ -154,7 +158,10 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   button = params.get('%s_button_extra' % visibility, lambda *args: {})
   row = params.get('%s_row_extra' % visibility, lambda *args: {})
   ignore = params.get('%s_field_ignore' % visibility, [])
+  hidden = params.get('%s_field_hidden' % visibility, [])
   no_filter = params.get('%s_field_no_filter' % visibility, [])
+
+  key_order = key_order + hidden
 
   for field in ignore:
     if field not in key_order:
@@ -167,7 +174,7 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   if not (key_order and col_names):
     key_order = col_names = ['kind']
 
-  col_model = [keyToColumnProperties(i, col_props) for i in key_order]
+  col_model = [keyToColumnProperties(i, col_props, hidden) for i in key_order]
 
   extract_args = [key_order, no_filter, column, button, row, args]
   columns = [entityToRowDict(i, *extract_args) for i in entities]

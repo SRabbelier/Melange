@@ -17,7 +17,7 @@ On {{ created|date:"jS F Y H:i" }}
 {% if is_public %}
 {{ author }} wrote:
 {% else %}
-{{ author }} gave a score of <b>{{ score }}</b> and wrote:
+{{ author }} {% if score %}gave a score of <b>{{ score }}</b> and {% endif %}wrote:
 {% endif %}
 <p>{{ content|safe }}</p>
 </li>

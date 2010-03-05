@@ -18,7 +18,7 @@ limitations under the License.
     {% if is_public %}
       {{ author }} wrote:
     {% else %}
-      {{ author }} gave a score of <b>{{ score }}</b> and wrote:
+      {{ author }} {% if score %}gave a score of <b>{{ score }}</b> and {% endif %}wrote:
     {% endif %}
   </div>
   {% if from_student %}

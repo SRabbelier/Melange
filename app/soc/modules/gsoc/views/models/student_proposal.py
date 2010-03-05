@@ -80,7 +80,11 @@ class View(base.View):
             ['active', 'inactive'], 
             ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
     rights['show'] = ['checkIsStudentProposalPubliclyVisible']
-    rights['comment'] = ['checkIsDeveloper']
+    rights['comment'] = [
+        ('checkRoleAndStatusForStudentProposal',
+            [['org_admin', 'mentor', 'host'], 
+            ['active', 'inactive'],
+            ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
     rights['list'] = ['checkIsDeveloper']
     rights['list_orgs'] = [
         ('checkIsStudent', ['scope_path', ['active']]),
@@ -96,8 +100,8 @@ class View(base.View):
              program_logic.logic]),
             ('checkRoleAndStatusForStudentProposal',
             [['org_admin', 'mentor', 'host'], 
-            ['active', 'inactive'],
-            ['new', 'pending', 'accepted', 'rejected', 'invalid']])]
+            ['active'],
+            ['new', 'pending', 'accepted', 'invalid']])]
 
     new_params = {}
     new_params['logic'] = student_proposal_logic.logic

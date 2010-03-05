@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""gen_app_yaml.py [-f] (-i | APPLICATION_NAME)
+"""gen_app_yaml.py [-f] [-o] (-i | APPLICATION_NAME)
 
 A script to generate the app.yaml from the template with an application
 name filled in.
@@ -36,12 +36,13 @@ import sys
 from optparse import OptionParser
 
 
-def generateAppYaml(application_name, force=False):
+def generateAppYaml(application_name, force=False, override_version=None):
   """Generate the app.yaml file.
 
   Args:
     application_name: str, the name to write into the application filed
     force: bool, whether to overwrite an existing app.yaml
+    override_version: str, the manual version to use
   """
 
   scripts_directory = os.path.dirname(__file__)
@@ -60,9 +61,19 @@ def generateAppYaml(application_name, force=False):
   with open(template_path) as infile:
     template_contents = infile.read()
 
-  app_yaml_contents = template_contents.replace(
+  contents = template_contents.replace(
       '# application: FIXME',
       'application: '+ application_name)
+
+  if override_version:
+    # find the "version" field
+    stop = contents.find("version: ")
+    # find the next \n after it
+    end = contents.find("\n", stop)
+    # insert new version
+    app_yaml_contents = contents[:stop+9] + override_version + contents[end:]
+  else:
+    app_yaml_contents = contents
 
   with open(app_yaml_path, 'w') as outfile:
     outfile.write(app_yaml_contents)
@@ -86,6 +97,8 @@ def main(args):
                     help="Overwrite existing app.yaml")
   parser.add_option("-i", "--interactive", action="store_true", default=False,
                     help="Ask for the application name interactively")
+  parser.add_option("-o", "--override-version",
+                    help="Uses the specified version instead of the one from app.yaml.template")
 
   options, args = parser.parse_args(args)
 
@@ -99,7 +112,8 @@ def main(args):
       parser.error("No application name supplied.")
     application_name = args[0]
 
-  generateAppYaml(application_name, force=options.force)
+  generateAppYaml(application_name, force=options.force,
+                  override_version=options.override_version)
 
 if __name__ == '__main__':
   main(sys.argv[1:]) # strip off the binary name

@@ -56,7 +56,12 @@ def getDjangoURLPatterns():
 
 
 def convert_proposals(request, *args, **kwargs):
-  """Convert proposals for all organizations"""
+  """Convert proposals for all organizations.
+
+  POST Args:
+    programkey: the key of the program whose proposals should be converted
+    orgkey: the organization key to start at
+  """
 
   # Setup an artifical request deadline
   timelimit = 20000
@@ -85,7 +90,7 @@ def convert_proposals(request, *args, **kwargs):
     org = org_logic.getFromKeyName(params["orgkey"])
 
     if not org:
-      logging.error("missing programkey in params: '%s'" % params)
+      logging.error("invalid orgkey in params: '%s'" % params)
       return responses.terminateTask()
 
     fields["__key__ >="] = org
@@ -227,7 +232,8 @@ def reject_proposal_email(proposal):
 
 # Logic below ported from scripts/stats.py
 def accept_proposal(proposal):
-  """Accept a single proposal"""
+  """Accept a single proposal.
+  """
 
   fields = {
     'link_id': 't%i' % (int(time.time()*100)),
@@ -247,7 +253,7 @@ def accept_proposal(proposal):
 
 
 def reject_proposal(proposal):
-  """Reject a single proposal
+  """Reject a single proposal.
   """
 
   fields = {'status':'rejected'}

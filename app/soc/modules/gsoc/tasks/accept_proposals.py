@@ -20,6 +20,7 @@ __authors__ = [
   '"John Westbrook" <johnwestbrook@google.com>',
   ]
 
+
 import logging
 import time
 
@@ -28,16 +29,20 @@ from google.appengine.api.labs import taskqueue
 from google.appengine.runtime import DeadlineExceededError
 
 from soc.logic import mail_dispatcher
+from soc.logic import dicts
 from soc.tasks.helper import error_handler
 from soc.tasks.helper.timekeeper import Timekeeper
 from soc.tasks import responses
-from soc.modules.gsoc.logic.models.organization import logic as organization
-from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal
-from soc.modules.gsoc.logic.models.student_project import logic as student_project
+
+from soc.modules.gsoc.logic.models.organization import logic as org_logic
+from soc.modules.gsoc.logic.models.program import logic as program_logic
+from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal_logic
+from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
 
 
 def getDjangoURLPatterns():
-  """Returns the URL patterns for the tasks in this module"""
+  """Returns the URL patterns for the tasks in this module
+  """
 
   patterns = [
       (r'tasks/accept_proposals/main$',
@@ -54,36 +59,59 @@ def convert_proposals(request, *args, **kwargs):
   """Convert proposals for all organizations"""
 
   # Setup an artifical request deadline
-  timelimit = int(request.REQUEST.get("timelimit", 20000))
+  timelimit = 20000
   timekeeper = Timekeeper(timelimit)
 
   # Copy for modification below
-  params = request.POST.copy()
-  params["timelimit"] = timelimit
+  params = dicts.merge(request.POST, request.GET)
+
+  if "programkey" not in params:
+    logging.error("missing programkey in params: '%s'" % params)
+    return responses.terminateTask()
+
+  program = program_logic.getFromKeyName(params["programkey"])
+
+  if not program:
+    logging.error("invalid programkey in params: '%s'" % params)
+    return responses.terminateTask()
+
+  fields = {
+      "scope": program,
+      "status": "active",
+  }
 
   # Continue from the next organization
-  filter = dict()
   if "orgkey" in params:
-    filter["__key__ >="] = organization.getFromKeyName(params["orgkey"]).key()
+    org = org_logic.getFromKeyName(params["orgkey"])
+
+    if not org:
+      logging.error("missing programkey in params: '%s'" % params)
+      return responses.terminateTask()
+
+    fields["__key__ >="] = org
 
   # Add a task for each organization
   org = None
   try:
-    orgs = organization.getQueryForFields(filter=filter)
+    orgs = org_logic.getQueryForFields(filter=fields)
+
     for remain, org in timekeeper.iterate(orgs):
       logging.info("convert %s %s", remain, org.key())
 
       # Compound accept/reject taskflow
       taskqueue.add(
         url = "/tasks/accept_proposals/accept",
-        params = dict(
-          orgkey = org.key().id_or_name(),
-          timelimit = timelimit,
-          nextpath = "/tasks/accept_proposals/reject"))
+        params = {
+          "orgkey": org.key().id_or_name(),
+          "timelimit": timelimit,
+          "nextpath": "/tasks/accept_proposals/reject"
+        })
 
   # Requeue this task for continuation
   except DeadlineExceededError:
-    if org: params["orgkey"] = org.key().id_or_name()
+    if org:
+      params["orgkey"] = org.key().id_or_name()
+
     taskqueue.add(url=request.path, params=params)
 
   # Exit this task successfully
@@ -91,7 +119,8 @@ def convert_proposals(request, *args, **kwargs):
 
 
 def accept_proposals(request, *args, **kwargs):
-  """Accept proposals for an organization"""
+  """Accept proposals for an organization
+  """
 
   params = request.POST
 
@@ -100,8 +129,8 @@ def accept_proposals(request, *args, **kwargs):
   timekeeper = Timekeeper(timelimit)
 
   # Query proposals based on status
-  org = organization.getFromKeyName(params["orgkey"])
-  proposals = student_proposal.getProposalsToBeAcceptedForOrg(org)
+  org = org_logic.getFromKeyName(params["orgkey"])
+  proposals = student_proposal_logic.getProposalsToBeAcceptedForOrg(org)
 
   # Accept proposals
   try:
@@ -121,7 +150,8 @@ def accept_proposals(request, *args, **kwargs):
 
 
 def reject_proposals(request, *args, **kwargs):
-  """Reject proposals for an organization"""
+  """Reject proposals for an org_logic
+  """
 
   params = request.POST
 
@@ -130,7 +160,7 @@ def reject_proposals(request, *args, **kwargs):
   timekeeper = Timekeeper(timelimit)
 
   # Query proposals
-  org = organization.getFromKeyName(params["orgkey"])
+  org = org_logic.getFromKeyName(params["orgkey"])
   proposals = reject_proposals_query(org)
 
   # Reject proposals
@@ -150,6 +180,8 @@ def reject_proposals(request, *args, **kwargs):
 
 # Logic below ported from student_proposal_mailer.py
 def accept_proposal_email(proposal):
+  """Send an acceptance mail for the specified proposal.
+  """
 
   sender_name, sender = mail_dispatcher.getDefaultMailSender()
 
@@ -172,6 +204,8 @@ def accept_proposal_email(proposal):
 
 
 def reject_proposal_email(proposal):
+  """Send an reject mail for the specified proposal.
+  """
 
   sender_name, sender = mail_dispatcher.getDefaultMailSender()
 
@@ -206,25 +240,27 @@ def accept_proposal(proposal):
     'mentor': proposal.mentor,
     }
 
-  project = student_project.updateOrCreateFromFields(fields, silent=True)
+  project = student_project_logic.updateOrCreateFromFields(fields, silent=True)
 
   fields = {'status':'accepted'}
-  student_proposal.updateEntityProperties(proposal, fields, silent=True)
+  student_proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
 
 def reject_proposal(proposal):
-  """Reject a single proposal"""
+  """Reject a single proposal
+  """
 
   fields = {'status':'rejected'}
-  student_proposal.updateEntityProperties(proposal, fields, silent=True)
+  student_proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
 
 def reject_proposals_query(org):
-  """Query proposals to reject"""
+  """Query proposals to reject
+  """
 
   fields = {
     'status': ['new', 'pending'],
     'org': org,
     }
 
-  return student_proposal.getQueryForFields(fields)
+  return student_proposal_logic.getQueryForFields(fields)

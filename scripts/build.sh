@@ -97,6 +97,8 @@ do
 done
 
 # Run shrinksafe
-bash ../scripts/closure.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json $APP_BUILD/jlinq
+if [[ $1 != "-c" ]]; then
+    bash ../scripts/closure.sh $APP_BUILD/soc/content/js $APP_BUILD/jquery $APP_BUILD/json $APP_BUILD/jlinq
+fi
 
 echo "Build results in $APP_BUILD."

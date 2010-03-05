@@ -1295,8 +1295,13 @@ class View(base.View):
       # reset to None
       mentor_entity = None
 
-    # update the proposal
     properties = {'mentor': mentor_entity}
+
+    if entity.status == 'new':
+      # transition to pending status
+      properties['status'] = 'pending'
+
+    # update the proposal
     self._logic.updateEntityProperties(entity, properties)
 
   def _createReviewFor(self, entity, comment, score=0, is_public=True):

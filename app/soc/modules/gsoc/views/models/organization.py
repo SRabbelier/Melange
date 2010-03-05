@@ -432,14 +432,20 @@ class View(organization.View):
     rp_params = list_params.copy()# ranked proposals
     rp_params['review_field_keys'] = ['rank', 'title', 'student', 'mentor',
                                       'score', 'status', 'last_modified_on']
+    rp_params['review_field_hidden'] = ['abstract', 'content', 'additional_info',
+                                      'possible_mentors', 'created_on']
     rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',
-                                       'Score', 'status', 'Last Modified On']
+                                       'Score', 'status', 'Last Modified On',
+                                      'Abstract', 'Content', 'Additional Info',
+                                      'Possible mentors', 'Created On']
     rp_params['review_field_extra'] = lambda entity, ranker, keys: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
           'item_class': entity.key() in keys,
           'student': entity.scope.user.name,
           'mentor': entity.mentor.user.name 
-              if entity.mentor else '%s Proposed' %len(entity.possible_mentors)
+              if entity.mentor else '%s Proposed' %len(entity.possible_mentors),
+          'possible_mentors': ", ".join(
+              [i.id_or_name() for i in entity.possible_mentors]),
     }
     rp_params['review_row_action'] = {
         "type": "redirect_custom",
@@ -532,4 +538,3 @@ public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
 pick_suggested_tags = decorators.view(view.pickSuggestedTags)
-                                      

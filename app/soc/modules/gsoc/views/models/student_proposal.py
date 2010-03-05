@@ -1216,15 +1216,16 @@ class View(base.View):
     # update the scores context
     self._updateScoresContext(context, entity)
 
-    # which button should we show to the mentor?
     if mentor:
       context['is_mentor'] = True
-      if mentor.key() in possible_mentors:
-        # show "No longer willing to mentor"
-        context['remove_me_as_mentor'] = True
-      else:
-        # show "I am willing to mentor"
-        context['add_me_as_mentor'] = True
+      if not entity.mentor or entity.mentor.key() != mentor.key():
+        # which button to (un)propose yourself as mentor should we show
+        if mentor.key() in possible_mentors:
+          # show "No longer willing to mentor"
+          context['remove_me_as_mentor'] = True
+        else:
+          # show "I am willing to mentor"
+          context['add_me_as_mentor'] = True
 
     if org_admin:
       context['is_org_admin'] = True

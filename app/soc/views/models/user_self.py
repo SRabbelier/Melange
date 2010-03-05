@@ -128,7 +128,7 @@ class View(base.View):
 
     page_name = ugettext("List of your requests")
     patterns += [(r'^%(url_name)s/(?P<access_type>requests)$',
-                   'soc.views.models.request.list_self', page_name)]
+                   'soc.views.models.user_self.requests', page_name)]
 
     new_params['django_patterns_defaults'] = patterns
 
@@ -288,6 +288,80 @@ class View(base.View):
 
     return self._list(request, params, contents, page_name)
 
+  def getRequestsListData(self, request, uh_params, ar_params):
+    """Returns the list data for getRequestsList.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # get the current user
+    user_entity = user_logic.getForCurrentAccount()
+
+    # only select the Invites for this user that haven't been handled yet
+    # pylint: disable-msg=E1103
+    filter = {'user': user_entity}
+
+    if idx == 0:
+      filter['status'] = 'group_accepted'
+      params = uh_params
+    elif idx == 1:
+      filter['status'] = 'new'
+      params = ar_params
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = helper.lists.getListData(request, params, filter, 'public')
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def requests(self, request, access_type,
+               page_name=None, params=None, **kwargs):
+    """Displays the unhandled requests for this user.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: not used
+    """
+
+    from soc.views.models.request import view as request_view
+
+    req_params = request_view.getParams()
+
+    # construct the Unhandled Invites list
+    uh_params = req_params.copy()
+    uh_params['public_row_extra'] = lambda entity: {
+        "link": redirects.getInviteProcessRedirect(entity, None),
+    }
+    uh_params['list_description'] = ugettext(
+        "An overview of your unhandled invites.")
+
+    # construct the Open Requests list
+
+    ar_params = req_params.copy()
+    ar_params['public_row_action'] = {}
+    ar_params['public_row_extra'] = lambda x: {}
+    ar_params['list_description'] = ugettext(
+        "List of your pending requests.")
+
+    if request.GET.get('fmt') == 'json':
+      return self.getRequestsListData(request, uh_params, ar_params)
+
+    uh_list = helper.lists.getListGenerator(request, uh_params, idx=0)
+    ar_list = helper.lists.getListGenerator(request, ar_params, idx=1)
+
+    # fill contents with all the needed lists
+    contents = [uh_list, ar_list]
+
+    # call the _list method from base to display the list
+    return self._list(request, req_params, contents, page_name)
+
   def getSidebarMenus(self, id, user, params=None):
     """See base.View.getSidebarMenus().
     """
@@ -328,4 +402,5 @@ view = View()
 create = decorators.view(view.create)
 edit = decorators.view(view.editProfile)
 export = decorators.view(view.export)
+requests = decorators.view(view.requests)
 roles = decorators.view(view.roles)

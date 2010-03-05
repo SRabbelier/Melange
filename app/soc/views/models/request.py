@@ -30,7 +30,6 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
-from soc.logic.models import user as user_logic
 from soc.logic.models.request import logic as request_logic
 from soc.views import helper
 from soc.views.helper import access
@@ -182,77 +181,6 @@ class View(base.View):
 
     return responses.respond(request, template, context=context)
 
-  def getListSelfData(self, request, uh_params, ar_params):
-    """Returns the list data for getListSelf.
-    """
-
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
-
-    # get the current user
-    user_entity = user_logic.logic.getForCurrentAccount()
-
-    # only select the Invites for this user that haven't been handled yet
-    # pylint: disable-msg=E1103
-    filter = {'user': user_entity}
-
-    if idx == 0:
-      filter['status'] = 'group_accepted'
-      params = uh_params
-    elif idx == 1:
-      filter['status'] = 'new'
-      params = ar_params
-    else:
-      return responses.jsonErrorResponse(request, "idx not valid")
-
-    contents = helper.lists.getListData(request, params, filter, 'public')
-    json = simplejson.dumps(contents)
-
-    return responses.jsonResponse(request, json)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def listSelf(self, request, access_type,
-               page_name=None, params=None, **kwargs):
-    """Displays the unhandled requests for this user.
-
-    Args:
-      request: the standard Django HTTP request object
-      access_type : the name of the access type which should be checked
-      page_name: the page name displayed in templates as page and header title
-      params: a dict with params for this View
-      kwargs: not used
-    """
-
-    # construct the Unhandled Invites list
-
-    uh_params = params.copy()
-    uh_params['public_row_extra'] = lambda entity: {
-        "link": redirects.getInviteProcessRedirect(entity, None),
-    }
-    uh_params['list_description'] = ugettext(
-        "An overview of your unhandled invites.")
-
-    # construct the Open Requests list
-
-    ar_params = params.copy()
-    ar_params['public_row_action'] = {}
-    ar_params['public_row_extra'] = lambda x: {}
-    ar_params['list_description'] = ugettext(
-        "List of your pending requests.")
-
-    if request.GET.get('fmt') == 'json':
-      return self.getListSelfData(request, uh_params, ar_params)
-
-    uh_list = helper.lists.getListGenerator(request, uh_params, idx=0)
-    ar_list = helper.lists.getListGenerator(request, ar_params, idx=1)
-
-    # fill contents with all the needed lists
-    contents = [uh_list, ar_list]
-
-    # call the _list method from base to display the list
-    return self._list(request, params, contents, page_name)
-
 
 view = View()
 
@@ -261,7 +189,6 @@ create = decorators.view(view.create)
 edit = decorators.view(view.edit)
 delete = decorators.view(view.delete)
 list = decorators.view(view.list)
-list_self = decorators.view(view.listSelf)
 process_invite = decorators.view(view.processInvite)
 public = decorators.view(view.public)
 export = decorators.view(view.export)

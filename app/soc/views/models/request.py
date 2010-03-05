@@ -54,7 +54,6 @@ class View(base.View):
     """
 
     rights = access.Checker(params)
-    rights['listSelf'] = ['checkIsUser']
     rights['create'] = ['deny']
     rights['edit'] = ['checkIsDeveloper']
     rights['process_invite'] = [
@@ -87,11 +86,8 @@ class View(base.View):
     new_params['request_processing_template'] = \
         'soc/request/process_request.html'
 
-    new_params['public_field_extra'] = lambda entity: {
-        "user": "%s (%s)" % (entity.user.name, entity.user.link_id),
-        "for": entity.group.name,
-    }
-    new_params['public_field_keys'] = ["role", "user", "for",
+    new_params['public_field_extra'] = publicFieldExtra
+    new_params['public_field_keys'] = ["role_name", "user", "for",
                                        "status", "created_on"]
     new_params['public_field_names'] = ["Role", "User", "For",
                                         "Status", "Created On"]
@@ -180,6 +176,24 @@ class View(base.View):
     template = params['invite_processing_template']
 
     return responses.respond(request, template, context=context)
+
+
+def publicFieldExtra(entity):
+  """Separate function for the public_field_extra param.
+
+  Separated because Role view needs to be imported otherwise a cyclic import
+  would occur.
+  """
+
+  from soc.views.models.role import ROLE_VIEWS
+
+  field_extra = {
+        "user": "%s (%s)" % (entity.user.name, entity.user.link_id),
+        "for": entity.group.name,
+        "role_name": ROLE_VIEWS[entity.role].getParams()['name'],
+        }
+
+  return field_extra
 
 
 view = View()

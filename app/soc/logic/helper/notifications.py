@@ -112,6 +112,7 @@ def sendNewRequestNotification(request_entity):
   from soc.logic.helper import notifications
   from soc.logic.models.role import ROLE_LOGICS
   from soc.logic.models.user import logic as user_logic
+  from soc.views.models.role import ROLE_VIEWS
 
   # get the users who should get the notification
   to_users = []
@@ -134,14 +135,17 @@ def sendNewRequestNotification(request_entity):
   # get the user the request is from
   user_entity = request_entity.user
 
+  role_params = ROLE_VIEWS[request_entity.role].getParams()
+
   message_properties = {
-      'requester_name': user_entity.name,
-      'entity': request_entity,
+      'requester': user_entity.name,
+      'role_verbose': role_params['name'],
+      'group': request_entity.group.name,
       'request_url': redirects.getProcessRequestRedirect(request_entity, None)}
 
   subject = DEF_NEW_REQUEST_MSG_FMT % {
       'requester': user_entity.name,
-      'role_verbose' : request_entity.role,
+      'role_verbose' : role_params['name'],
       'group' : request_entity.group.name
       }
 

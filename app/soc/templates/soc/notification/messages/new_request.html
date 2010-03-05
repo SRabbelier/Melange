@@ -13,6 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block content %}
-{{ requester_name }} has requested to become a {{ entity.role_verbose }} for {{ entity.scope.name }}.<br />
+{{ requester }} has requested to become a {{ role_verbose }} for {{ group }}.<br />
 Please click <a href="{{ request_url }}">here</a> to accept or reject this request.
 {% endblock %}

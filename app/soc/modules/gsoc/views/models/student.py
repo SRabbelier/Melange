@@ -138,7 +138,7 @@ class View(student.View):
                 redirects.getPublicRedirect(entity, list_params))
     }
 
-    return project_view.view.list(request, access_type, page_name=page_name,
+    return project_view.view.list(request, 'allow', page_name=page_name,
                                   params=list_params, filter=fields)
 
 

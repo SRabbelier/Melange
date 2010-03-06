@@ -580,7 +580,7 @@
                 url: [
                   window.location.href,
                   ampersand_question,
-                  "fmt=json&limit=250",
+                  "fmt=json&limit=50",
                   (start === "" ? "" : "&start=" + start),
                   "&idx=", idx
                 ].join(""),

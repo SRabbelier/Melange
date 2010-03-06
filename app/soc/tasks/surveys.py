@@ -62,8 +62,9 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
   
   from google.appengine.ext import db
 
-  from soc.logic.models.program import logic as program_logic
-  from soc.logic.models.student_project import logic as student_project_logic
+  from soc.modules.gsoc.logic.models.program import logic as program_logic
+  from soc.modules.gsoc.logic.models.student_project import logic as \
+      student_project_logic
 
   # set default batch size
   batch_size = 10
@@ -157,12 +158,14 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
   """
 
   from soc.logic import mail_dispatcher
-  from soc.logic.models.org_admin import logic as org_admin_logic
   from soc.logic.models.site import logic as site_logic
-  from soc.logic.models.student_project import logic as student_project_logic
-  from soc.logic.models.survey import grading_logic
-  from soc.logic.models.survey import project_logic
   from soc.views.helper import redirects
+
+  from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+  from soc.modules.gsoc.logic.models.student_project import logic as \
+      student_project_logic
+  from soc.modules.gsoc.logic.models.survey import grading_logic
+  from soc.modules.gsoc.logic.models.survey import project_logic
 
   post_dict = request.POST
 

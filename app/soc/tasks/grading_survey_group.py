@@ -148,9 +148,12 @@ def updateProjectsForSurveyGroup(request, *args, **kwargs):
     request: Django Request object
   """
 
-  from soc.logic.models.grading_record import logic as grading_record_logic
-  from soc.logic.models.grading_survey_group import logic as survey_group_logic
-  from soc.logic.models.student_project import logic as student_project_logic
+  from soc.modules.gsoc.logic.models.grading_record import logic as \
+      grading_record_logic
+  from soc.modules.gsoc.logic.models.grading_survey_group import logic as \
+      survey_group_logic
+  from soc.modules.gsoc.logic.models.student_project import logic as \
+      student_project_logic
 
   post_dict = request.POST
 
@@ -236,9 +239,11 @@ def sendMailAboutGradingRecordResult(request, *args, **kwargs):
   """
 
   from soc.logic import mail_dispatcher
-  from soc.logic.models.grading_record import logic as grading_record_logic
-  from soc.logic.models.org_admin import logic as org_admin_logic
   from soc.logic.models.site import logic as site_logic
+
+  from soc.modules.gsoc.logic.models.grading_record import logic as \
+      grading_record_logic
+  from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 
   post_dict = request.POST
 

@@ -453,6 +453,7 @@ class View(base.View):
     no_record = self.DEF_NO_RECORD_AVAILABLE_MSG
 
     # TODO(SRabbelier): use buttons instead
+    project_entity = entity
     getExtra = lambda params: lambda entity, re: {
         "taken_by": no_record if not re(entity) else re(entity).user.name,
         "taken_on": no_record if not re(entity) else str(re(entity).modified),
@@ -460,7 +461,7 @@ class View(base.View):
             redirects.getViewSurveyRecordRedirect(re(entity), gps_params),
             name=self.DEF_VIEW_RECORD_MSG),
         "take_url": lists.urlize(redirects.getTakeProjectSurveyRedirect(
-            re(entity), {'survey': entity, 'params': params}),
+            project_entity, {'survey': entity, 'params': params}),
             name=self.DEF_TAKE_SURVEY_MSG),
     }
 

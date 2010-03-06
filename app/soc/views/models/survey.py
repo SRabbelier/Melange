@@ -114,7 +114,8 @@ class View(base.View):
         [('checkIsSurveyReadable', [survey_logic]),
          ('checkIsMySurveyRecord', [survey_logic, 'id'])]
         ])]
-    rights['results'] = ['checkIsUser']
+    # TODO: change to checkIsUser when when result view is fixed
+    rights['results'] = ['checkIsDeveloper']
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}

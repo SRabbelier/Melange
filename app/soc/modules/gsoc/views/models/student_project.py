@@ -396,7 +396,7 @@ class View(base.View):
     record_logic = params['logic'].getRecordLogic()
     record_entities = record_logic.getForFields(fields)
     record_dict = dict((i.survey.key(), i) for i in record_entities)
-    record_getter = lambda entity: record_dict[entity.key()]
+    record_getter = lambda entity: record_dict.get(entity.key())
     args = [record_getter]
 
     fields = {'scope': entity.program,

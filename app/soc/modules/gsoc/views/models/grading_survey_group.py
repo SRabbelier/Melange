@@ -352,8 +352,6 @@ class View(base.View):
 
     list_params = params.copy()
     list_params['logic'] = record_logic
-    list_params['list_heading'] = params['records_heading_template']
-    list_params['list_row'] = params['records_row_template']
     list_params['list_description'] = 'List of all Records.'
     list_params['records_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
@@ -507,8 +505,6 @@ class View(base.View):
 
     list_params = params.copy()
     list_params['logic'] = record_logic
-    list_params['list_heading'] = params['records_heading_template']
-    list_params['list_row'] = params['records_row_template']
     list_params['records_row_extra'] = lambda entity: {
         'link': redirects.getEditGradingRecordRedirect(entity, list_params)
     }

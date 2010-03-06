@@ -100,8 +100,6 @@ class View(group.View):
     new_params['sidebar_grouping'] = 'Organizations'
 
     new_params['public_template'] = 'soc/organization/public.html'
-    new_params['list_row'] = 'soc/organization/list/row.html'
-    new_params['list_heading'] = 'soc/organization/list/heading.html'
     new_params['home_template'] = 'soc/organization/home.html'
 
     new_params['sans_link_id_public_list'] = True
@@ -484,8 +482,6 @@ class View(group.View):
       }
       ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
           entity.name)
-      ap_params['list_heading'] = 'soc/student_project/list/heading.html'
-      ap_params['list_row'] = 'soc/student_project/list/row.html'
 
       if request.GET.get('fmt') == 'json':
         return self.getHomeData(request, ap_params, entity)

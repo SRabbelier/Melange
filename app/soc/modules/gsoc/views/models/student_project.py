@@ -797,8 +797,6 @@ class View(base.View):
     page_name = '%s %s' % (page_name, org_entity.name)
 
     mo_params = params.copy()
-    mo_params['list_heading'] = params['manage_overview_heading']
-    mo_params['list_row'] = params['manage_overview_row']
 
     #list all active projects
     mo_params['list_description'] = \

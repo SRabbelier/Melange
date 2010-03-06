@@ -782,8 +782,6 @@ class View(program.View):
     }
 
     ap_params['list_description'] = description
-    ap_params['list_heading'] = 'soc/student_project/list/heading_all.html'
-    ap_params['list_row'] = 'soc/student_project/list/row_all.html'
     ap_params['public_conf_extra'] = {
         "rowNum": -1,
         "rowList": [],

@@ -82,9 +82,6 @@ class View(presence.View):
     # TODO(tlarsen): Add support for Django style template lookup
     new_params['public_template'] = 'soc/group/public.html'
 
-    new_params['list_row'] = 'soc/group/list/row.html'
-    new_params['list_heading'] = 'soc/group/list/heading.html'
-
     new_params['create_extra_dynaproperties'] = {
        'email': forms.fields.EmailField(required=True),
        'clean_phone': cleaning.clean_phone_number('phone'),

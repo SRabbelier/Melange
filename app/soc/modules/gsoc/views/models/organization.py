@@ -431,7 +431,9 @@ class View(organization.View):
 
     rp_params = list_params.copy()# ranked proposals
     rp_params['review_field_keys'] = ['rank', 'title', 'student', 'mentor',
-                                      'score', 'status', 'last_modified_on']
+                                      'score', 'status', 'last_modified_on',
+                                      'abstract', 'content', 'additional_info',
+                                      'possible_mentors', 'created_on']
     rp_params['review_field_hidden'] = ['abstract', 'content', 'additional_info',
                                       'possible_mentors', 'created_on']
     rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',

@@ -161,8 +161,6 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   hidden = params.get('%s_field_hidden' % visibility, [])
   no_filter = params.get('%s_field_no_filter' % visibility, [])
 
-  key_order = key_order + hidden
-
   for field in ignore:
     if field not in key_order:
       continue

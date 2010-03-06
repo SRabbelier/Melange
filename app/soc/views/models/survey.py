@@ -226,6 +226,9 @@ class View(base.View):
     """See base.View.list.
     """
 
+    if not filter:
+      filter=kwargs
+
     return super(View, self).list(request, access_type, page_name=page_name,
                                   params=params, filter=kwargs)
 

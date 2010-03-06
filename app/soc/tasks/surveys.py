@@ -214,12 +214,12 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
 
     if survey_type == 'project':
       survey_redirect = redirects.getTakeSurveyRedirect(
-          survey,{'url_name': 'project_survey'})
+          survey,{'url_name': 'gsoc/project_survey'})
       to_role = student_entity
       mail_template = 'soc/project_survey/mail/reminder_gsoc.html'
     elif survey_type == 'grading':
       survey_redirect = redirects.getTakeSurveyRedirect(
-          survey,{'url_name': 'grading_project_survey'})
+          survey,{'url_name': 'gsoc/grading_project_survey'})
       to_role = student_project.mentor
       mail_template = 'soc/grading_project_survey/mail/reminder_gsoc.html'
 

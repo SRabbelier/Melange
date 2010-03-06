@@ -114,8 +114,7 @@ class View(base.View):
         [('checkIsSurveyReadable', [survey_logic]),
          ('checkIsMySurveyRecord', [survey_logic, 'id'])]
         ])]
-    # TODO: change to checkIsUser when when result view is fixed
-    rights['results'] = ['checkIsDeveloper']
+    rights['results'] = ['checkIsUser']
     rights['take'] = [('checkIsSurveyTakeable', survey_logic)]
 
     new_params = {}
@@ -755,8 +754,6 @@ class View(base.View):
 
     list_params = params.copy()
     list_params['logic'] = record_logic
-    list_params['list_heading'] = 'soc/survey/list/records_heading.html'
-    list_params['list_row'] = 'soc/survey/list/records_row.html'
     list_params['list_description'] = \
         "List of Records for the %s titled '%s'." %(list_params['name'],
                                                     entity.title)
@@ -765,7 +762,7 @@ class View(base.View):
     }
 
     return self.list(request, 'allow', page_name=page_name,
-                     params=list_params, context=context)
+                     params=list_params, filter=fields, context=context)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):
     """Retrieves the Results View filter for SurveyRecords.

@@ -344,9 +344,6 @@ class View(organization.View):
         proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
         keys = [i.key() for i in proposals]
 
-        # show the amount of slots assigned on the webpage
-        context['slots_visible'] = True
-
       filter = {'org': org_entity,
                 'status': ['accepted','pending','rejected']}
       # order by descending score
@@ -417,6 +414,8 @@ class View(organization.View):
 
     context = {}
     context['entity'] = org_entity
+    # wether or not the amount of slots assigned should be shown
+    context['slots_visible'] = org_entity.scope.allocations_visible
 
     list_params = student_proposal_view.view.getParams().copy()
     list_params['list_template'] = 'soc/student_proposal/list_for_org.html'

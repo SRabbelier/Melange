@@ -211,6 +211,16 @@ class View(base.View):
         "Created By", "Created On", "Modified",
     ]
 
+    new_params['records_field_keys'] = [
+        'taken_by', 'modified'
+    ]
+    new_params['records_field_names'] = [
+        'Taken By', 'Taken On',
+    ]
+    new_params['records_field_extra'] = lambda entity: {
+        'taken_by': '%s (%s)' %(entity.user.name, entity.user.link_id),
+    }
+
     new_params['take_params'] = {'s': '0'}
 
     new_params['successful_take_message'] = ugettext(
@@ -757,12 +767,17 @@ class View(base.View):
     list_params['list_description'] = \
         "List of Records for the %s titled '%s'." %(list_params['name'],
                                                     entity.title)
-    list_params['public_row_extra'] = lambda entity: {
+    list_params['records_row_extra'] = lambda entity: {
         'link': redirects.getViewSurveyRecordRedirect(entity, list_params)
+    }
+    list_params['records_row_action'] = {
+        'type': 'redirect_custom',
+        'parameters': dict(new_window=False),
     }
 
     return self.list(request, 'allow', page_name=page_name,
-                     params=list_params, filter=fields, context=context)
+                     params=list_params, filter=fields, visibility='records',
+                     context=context)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):
     """Retrieves the Results View filter for SurveyRecords.

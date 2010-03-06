@@ -229,7 +229,7 @@ class View(base.View):
       filter=kwargs
 
     return super(View, self).list(request, access_type, page_name=page_name,
-                                  params=params, filter=kwargs)
+                                  params=params, filter=filter, **kwargs)
 
   def _public(self, request, entity, context):
     """Add a preview version of the Survey to the page's context.

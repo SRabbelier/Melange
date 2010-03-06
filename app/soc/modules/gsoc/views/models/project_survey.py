@@ -263,7 +263,7 @@ class View(survey.View):
             student_project_params['name'], params['name'], survey.title))
 
     return self.list(request, 'allow', page_name=page_name,
-                     params=student_project_params)
+                     params=student_project_params, **fields)
 
   def _getResultsViewRecordFields(self, survey, allowed_to_read):
     """Get the Results View filter for ProjectSurveyRecords.

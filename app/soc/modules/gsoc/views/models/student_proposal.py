@@ -783,11 +783,10 @@ class View(base.View):
     if post_dict.get('subscribe') or post_dict.get('unsubscribe'):
       self._handleSubscribePost(request, entity)
       return http.HttpResponseRedirect('')
-    elif post_dict.get('want_mentor') or post_dict.get('not_want_mentor'):
+    elif post_dict.get('want_mentor'):
       # Check if the current user is a mentor
-      add = bool(post_dict.get('want_mentor'))
       if mentor:
-        self._adjustPossibleMentors(entity, mentor, add)
+        self._adjustPossibleMentors(entity, mentor)
       return http.HttpResponseRedirect('')
     elif post_dict.get('ineligble'):
       self._handleIneligiblePost(request, entity)
@@ -1174,15 +1173,22 @@ class View(base.View):
 
     return context
 
-  def _adjustPossibleMentors(self, entity, mentor, add):
+  def _adjustPossibleMentors(self, entity, mentor):
     """Adjusts the possible mentors list for a proposal.
 
     Args:
       entity: Student Proposal entity
       mentor: Mentor entity
-      add: True for adding, False if to remove this mentor
     """
+
+    if not mentor:
+      # nothing to do here
+      return
+
     possible_mentors = entity.possible_mentors
+
+    # determine wether we need to add or remove this mentor
+    add = mentor.key() in possible_mentors
 
     if add:
       # add the mentor to possible mentors list if not already in

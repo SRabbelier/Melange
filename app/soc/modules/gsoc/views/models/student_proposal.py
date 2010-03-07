@@ -783,6 +783,13 @@ class View(base.View):
     if post_dict.get('subscribe') or post_dict.get('unsubscribe'):
       self._handleSubscribePost(request, entity)
       return http.HttpResponseRedirect('')
+    elif post_dict.get('want_mentor') or post_dict.get('not_want_mentor'):
+      # Check if the current user is a mentor and wants 
+      # to change his role for this app.
+      add = bool(post_dict.get('want_mentor'))
+      if mentor:
+        self._adjustPossibleMentors(entity, mentor, add)
+      return http.HttpResponseRedirect('')
 
     # populate the form using the POST data
     form = form(post_dict)
@@ -861,12 +868,6 @@ class View(base.View):
     """
 
     get_dict = request.GET
-
-    # check if the current user is a mentor and wants 
-    # to change his role for this app
-    choice = get_dict.get('mentor')
-    if mentor and choice:
-      self._adjustPossibleMentors(entity, mentor, choice)
 
     ineligible = get_dict.get('ineligible')
 
@@ -1196,23 +1197,23 @@ class View(base.View):
 
     return context
 
-  def _adjustPossibleMentors(self, entity, mentor, choice):
+  def _adjustPossibleMentors(self, entity, mentor, add):
     """Adjusts the possible mentors list for a proposal.
 
     Args:
       entity: Student Proposal entity
       mentor: Mentor entity
-      choice: 1 means want to mentor, 0 do not want to mentor
+      add: True for adding, False if to remove this mentor
     """
     possible_mentors = entity.possible_mentors
 
-    if choice == '1':
+    if add:
       # add the mentor to possible mentors list if not already in
       if mentor.key() not in possible_mentors:
         possible_mentors.append(mentor.key())
         fields = {'possible_mentors': possible_mentors}
         self._logic.updateEntityProperties(entity, fields)
-    elif choice == '0':
+    else:
       # remove the mentor from the possible mentors list
       if mentor.key() in possible_mentors:
         possible_mentors.remove(mentor.key())

@@ -149,19 +149,21 @@ limitations under the License.
   <td><b>Other Options:</b></td>
   </tr>
   <tr>
-   {% if add_me_as_mentor %}
-   <td>
-   <input style="font-weight: bold" type="button" value="I am willing to mentor this student"
-     onclick="location.href='?mentor=1'"/>
-   </td>
-   {% else %} 
-     {% if remove_me_as_mentor %}
+  <form method="POST">
+     {% if add_me_as_mentor %}
      <td>
-       <input style="font-weight: bold" type="button" value="I am no longer willing to mentor this student"
-       onclick="location.href='?mentor=0'"/>
+     <input style="font-weight: bold" type="submit" name="want_mentor"
+       value="I am willing to mentor this student"/>
      </td>
+     {% else %} 
+       {% if remove_me_as_mentor %}
+       <td>
+         <input style="font-weight: bold" type="submit" name="not_want_mentor"
+           value="I am no longer willing to mentor this student"/>
+       </td>
+       {% endif %}
      {% endif %}
-   {% endif %}
+   </form>
    {% if is_org_admin or is_mentor %}
      {% ifequal entity.status "invalid" %}
      <td>

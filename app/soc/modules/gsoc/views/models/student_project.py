@@ -458,7 +458,7 @@ class View(base.View):
         "taken_by": no_record if not re(entity) else re(entity).user.name,
         "taken_on": no_record if not re(entity) else str(re(entity).modified),
         "record_url": no_record if not re(entity) else lists.urlize(
-            redirects.getViewSurveyRecordRedirect(re(entity), gps_params),
+            redirects.getViewSurveyRecordRedirect(re(entity), params),
             name=self.DEF_VIEW_RECORD_MSG),
         "take_url": lists.urlize(redirects.getTakeProjectSurveyRedirect(
             project_entity, {'survey': entity, 'params': params}),

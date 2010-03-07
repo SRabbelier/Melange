@@ -784,12 +784,17 @@ class View(base.View):
       self._handleSubscribePost(request, entity)
       return http.HttpResponseRedirect('')
     elif post_dict.get('want_mentor') or post_dict.get('not_want_mentor'):
-      # Check if the current user is a mentor and wants 
-      # to change his role for this app.
+      # Check if the current user is a mentor
       add = bool(post_dict.get('want_mentor'))
       if mentor:
         self._adjustPossibleMentors(entity, mentor, add)
       return http.HttpResponseRedirect('')
+    elif post_dict.get('ineligble'):
+      self._handleIneligiblePost(request, entity)
+
+      redirect = redirects.getListProposalsRedirect(
+          entity.org, {'url_name': 'gsoc/org'})
+      return http.HttpResponseRedirect(redirect)
 
     # populate the form using the POST data
     form = form(post_dict)
@@ -866,34 +871,6 @@ class View(base.View):
         mentor: mentor entity for the current user/proposal (iff available)
         rest: see base.View.public()
     """
-
-    get_dict = request.GET
-
-    ineligible = get_dict.get('ineligible')
-
-    if (org_admin or mentor) and (ineligible != None) and (
-        entity.status not in ['accepted', 'rejected']):
-      ineligible = int(ineligible)
-      if ineligible == 1:
-        # mark the proposal invalid and return to the list
-        properties = {'status': 'invalid'}
-        self._logic.updateEntityProperties(entity, properties)
-
-        redirect = redirects.getListProposalsRedirect(entity.org,
-                                                      {'url_name': 'org'})
-        comment = "Marked Student Proposal as Ineligible."
-        self._createReviewFor(entity, comment, is_public=False)
-        return http.HttpResponseRedirect(redirect)
-      elif ineligible == 0:
-        # mark the proposal as new and return to the list
-        properties = {'status': 'new'}
-        self._logic.updateEntityProperties(entity, properties)
-
-        redirect = redirects.getListProposalsRedirect(entity.org,
-                                                      {'url_name': 'org'})
-        comment = "Marked Student Proposal as Eligible."
-        self._createReviewFor(entity, comment, is_public=False)
-        return http.HttpResponseRedirect(redirect)
 
     # set the initial score since the default is ignored
     initial = {'score': 0}
@@ -1313,7 +1290,6 @@ class View(base.View):
         notifications_helper.sendNewReviewNotification(follower.user,
             review_entity, entity.title, redirect_url)
 
-
   def _handleSubscribePost(self, request, entity):
     """Handles the POST request for subscription management.
 
@@ -1356,6 +1332,34 @@ class View(base.View):
 
       # update the ReviewFollower
       return review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
+
+  def _handleIneligiblePost(self, request, entity):
+    """Handles the POST request for eligibilety management.
+
+    Args:
+      request: The HTTPRequest object
+      entity: The StudentProposal entity to make (in)eligible to
+    """
+
+    if not request.POST.get('ineligble'):
+      return
+
+    if entity.status not in ['accepted', 'rejeceted', 'invalid']:
+      # mark the proposal invalid
+      properties = {'status': 'invalid'}
+      self._logic.updateEntityProperties(entity, properties)
+
+      comment = "Marked Student Proposal as Ineligible."
+      self._createReviewFor(entity, comment, is_public=False)
+    elif entity.status == 'invalid':
+      # mark the proposal as new
+      properties = {'status': 'new'}
+      self._logic.updateEntityProperties(entity, properties)
+
+      comment = "Marked Student Proposal as Eligible."
+      self._createReviewFor(entity, comment, is_public=False)
+
+    return entity
 
 
 view = View()

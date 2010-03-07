@@ -165,17 +165,21 @@ limitations under the License.
      {% endif %}
    </form>
    {% if is_org_admin or is_mentor %}
+     <form method="POST">
      {% ifequal entity.status "invalid" %}
      <td>
-       <input style="font-weight: bold" type="button" value="Mark as Eligible"
-       onclick="if (confirm('Are you sure you want to mark this proposal as eligible?')) { location.href='?ineligible=0'; }"/>
+       <input style="font-weight: bold" type="submit" name="ineligble"
+         value="Mark as Eligible"
+         onclick="if (confirm('Are you sure you want to mark this proposal as eligible?')) {}"/>
      </td>
      {% else %}
      <td>
-       <input style="font-weight: bold" type="button" value="Mark as Ineligible"
-       onclick="if (confirm('Are you sure you want to mark this proposal as ineligible?')) { location.href='?ineligible=1'; }"/>
+       <input style="font-weight: bold" type="submit" name="ineligble"
+         value="Mark as Ineligible"
+         onclick="if (confirm('Are you sure you want to mark this proposal as ineligible?')) {}"/>
      </td>
      {% endifequal %}
+     </form>
    {% endif %}
    </tr>
  </table>

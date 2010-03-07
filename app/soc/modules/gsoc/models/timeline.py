@@ -44,37 +44,3 @@ class GSoCTimeline(soc.models.timeline.Timeline):
 
   accepted_students_announced_deadline = db.DateTimeProperty(
       verbose_name=ugettext('Accepted Students Announced Deadline'))
-
-  bonding_start = db.DateTimeProperty(
-      verbose_name=ugettext('Community Bonding Period Start date'))
-
-  bonding_end = db.DateTimeProperty(
-      verbose_name=ugettext('Community Bonding Period End date'))
-
-  coding_start = db.DateTimeProperty(
-      verbose_name=ugettext('Coding Start date'))
-
-  coding_end = db.DateTimeProperty(
-      verbose_name=ugettext('Coding End date'))
-
-  suggested_coding_deadline = db.DateTimeProperty(
-      verbose_name=ugettext('Suggested Coding Deadline'))
-
-  midterm_survey_start = db.DateTimeProperty(
-      verbose_name=ugettext('Midterm Survey Start date'))
-
-  midterm_survey_end = db.DateTimeProperty(
-      verbose_name=ugettext('Midterm Survey End date'))
-
-  final_survey_start = db.DateTimeProperty(
-      verbose_name=ugettext('Final Survey Start date'))
-
-  final_survey_end = db.DateTimeProperty(
-      verbose_name=ugettext('Final Survey End date'))
-
-  mentor_summit_start = db.DateTimeProperty(
-      verbose_name=ugettext('Mentor Summit Start date'))
-
-  mentor_summit_end = db.DateTimeProperty(
-      verbose_name=ugettext('Mentor Summit End date'))
-

@@ -163,6 +163,7 @@ class View(group.View):
     self._params['public_field_names'] = self._params['select_field_names'] = [
         "Name", "Link ID", "Short Name", "Ideas Page"
     ]
+    self._params['select_field_extra'] = self._params['public_field_extra']
     self._params['select_row_action'] = {
         "type": "redirect_custom",
         "parameters": dict(new_window=True),

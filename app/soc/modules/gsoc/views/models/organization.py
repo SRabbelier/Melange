@@ -145,6 +145,7 @@ class View(organization.View):
         'ideas': lists.urlize(entity.ideas, 'Click Here'),
         'tags': entity.tags_string(entity.org_tag),
     }
+    self._params['select_field_extra'] = self._params['public_field_extra']
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().

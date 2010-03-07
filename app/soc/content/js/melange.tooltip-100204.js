@@ -58,6 +58,21 @@
     var documented = jQuery("#" + id);
     var not_fieldset = documented.attr('tagName') !== 'FIELDSET';
     if (not_fieldset) {
+      if (documented.attr("type") === "checkbox") {
+        documented.hover(
+          function() {
+            if (tooltip_object==null) {
+              tooltip_object = jQuery(tooltip).purr({usingTransparentPNG: true,removeTimer: 10000});
+            }
+          },
+          function() {
+            if (tooltip_object!==null) {
+              tooltip_object.remove();
+              tooltip_object=null;
+            }
+          }
+        );
+      }
       documented.focus(function() {
         if (tooltip_object==null) {
           tooltip_object = jQuery(tooltip).purr({usingTransparentPNG: true,removeTimer: 10000});

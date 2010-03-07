@@ -614,9 +614,41 @@
 
                     //if jqGrid is not present, create it
                     if (list_objects[idx].jqgrid.object === undefined) {
+                      var enableDisableButtons = function () {
+                        var option_name = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect') ? 'selarrrow' : 'selrow'
+                        var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
+                        if (!selected_ids instanceof Array) selected_ids = [selected_ids];
+                        jQuery.each(list_objects[idx].operations.buttons, function (setting_index, operation) {
+                          var button_object = jQuery("#" + list_objects[idx].jqgrid.id + "_buttonOp_" + operation.id);
+                          if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
+                            button_object.removeAttr("disabled");
+                            // If this is a per-entity operation, substitute click event for button (if present)
+                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
+                              // get current selection
+                              var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_ids[0]);
+                              var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
+                              var partial_click_method = button_object.data('melange').click;
+                              button_object.click(partial_click_method(object.operations.buttons[operation.id].link));
+                              button_object.attr("value",object.operations.buttons[operation.id].caption);
+                            }
+                          }
+                          else {
+                            button_object.attr("disabled","disabled");
+                          }
+                        });
+                      }
+
                       var extended_config = list_objects[idx].configuration || {};
                       //giving index of the table in post data
-                      jQuery.extend(extended_config, {postData: {my_index: idx}});
+                      jQuery.extend(
+                        extended_config,
+                        {
+                          postData: {my_index: idx},
+                          // Disable or enable button depending on how many rows are selected
+                          onSelectAll: enableDisableButtons,
+                          onSelectRow: enableDisableButtons
+                        }
+                      );
 
                       var table_id = list_objects[idx].jqgrid.id;
                       var jqgrid_options = list_objects[idx].jqgrid.options;
@@ -801,33 +833,6 @@
                         }
                       });
                     }
-
-                    // Disable or enable button depending on how many rows are selected
-                    list_objects[idx].jqgrid.object.jqGrid('setGridParam',{
-                      onSelectRow: function (row_number) {
-                        var option_name = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect') ? 'selarrrow' : 'selrow'
-                        var selected_ids = list_objects[idx].jqgrid.object.jqGrid('getGridParam',option_name);
-                        if (!selected_ids instanceof Array) selected_ids = [selected_ids];
-                        jQuery.each(list_objects[idx].operations.buttons, function (setting_index, operation) {
-                          var button_object = jQuery("#" + list_objects[idx].jqgrid.id + "_buttonOp_" + operation.id);
-                          if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
-                            button_object.removeAttr("disabled");
-                            // If this is a per-entity operation, substitute click event for button (if present)
-                            if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
-                              // get current selection
-                              var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',selected_ids[0]);
-                              var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
-                              var partial_click_method = button_object.data('melange').click;
-                              button_object.click(partial_click_method(object.operations.buttons[operation.id].link));
-                              button_object.attr("value",object.operations.buttons[operation.id].caption);
-                            }
-                          }
-                          else {
-                            button_object.attr("disabled","disabled");
-                          }
-                        });
-                      }
-                    });
 
                     //Add row action if present
                     var multiselect = list_objects[idx].jqgrid.object.jqGrid('getGridParam','multiselect');

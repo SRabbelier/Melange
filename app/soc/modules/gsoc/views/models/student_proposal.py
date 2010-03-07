@@ -676,11 +676,6 @@ class View(base.View):
 
     program_entity = entity.program
 
-    if timeline_helper.isAfterEvent(program_entity.timeline,
-                                    'accepted_students_announced_deadline'):
-      return self.reviewAfterDeadline(request, context, params, entity,
-                                      **kwargs)
-
     # get the roles important for reviewing an application
     filter = {
         'user': user_logic.logic.getForCurrentAccount(),
@@ -1154,20 +1149,6 @@ class View(base.View):
       if number:
         score_summary.append({'score': score, 'number': number})
     context['score_summary'] = score_summary
-
-  def reviewAfterDeadline(self, request, context, params, entity, **kwargs):
-    """View that shows the review view after the accepted students 
-       announced deadline.
-
-    For Args see base.View.public().
-    """
-
-    review_context = self._getDefaultReviewContext(entity, None, None)
-    context = dicts.merge(context, review_context)
-
-    template = params['review_after_deadline_template']
-
-    return responses.respond(request, template, context=context)
 
   def _getDefaultReviewContext(self, entity, org_admin,
                                mentor):

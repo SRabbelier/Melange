@@ -170,13 +170,13 @@ limitations under the License.
      <td>
        <input style="font-weight: bold" type="submit" name="ineligble"
          value="Mark as Eligible"
-         onclick="if (confirm('Are you sure you want to mark this proposal as eligible?')) {}"/>
+         onclick="if (!confirm('Are you sure you want to mark this proposal as eligible?')) {return false;}"/>
      </td>
      {% else %}
      <td>
        <input style="font-weight: bold" type="submit" name="ineligble"
          value="Mark as Ineligible"
-         onclick="if (confirm('Are you sure you want to mark this proposal as ineligible?')) {}"/>
+         onclick="if (!confirm('Are you sure you want to mark this proposal as ineligible?')) {return false;}"/>
      </td>
      {% endifequal %}
      </form>

@@ -21,19 +21,21 @@ limitations under the License.
 
 {% block body %}
 
-<table>
- {% if is_subscribed %}
- <td>
-   <input style="font-weight: bold" type="button" value="Unsubscribe from updates"
-     onclick="location.href='?subscription=off'"/>
- </td>
- {% else %}
- <td>
-   <input style="font-weight: bold" type="button" value="Subscribe to updates"
-     onclick="location.href='?subscription=on'"/>
- </td>
- {% endif %}
-</table>
+<form method="post">
+  <table>
+   {% if is_subscribed %}
+   <td>
+    <input type="submit" name="unsubscribe" value="Unsubscribe from updates" 
+      style="font-weight: bold;">
+   </td>
+   {% else %}
+   <td>
+    <input type="submit" name="subscribe" value="Subscribe to updates" 
+      style="font-weight: bold;">
+   </td>
+   {% endif %}
+  </table>
+</form>
 
 <p>
  <table>

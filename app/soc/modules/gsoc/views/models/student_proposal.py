@@ -778,8 +778,14 @@ class View(base.View):
         rest: see base.View.public()
     """
 
+    post_dict = request.POST
+
+    if post_dict.get('subscribe') or post_dict.get('unsubscribe'):
+      self._handleSubscribePost(request, entity)
+      return http.HttpResponseRedirect('')
+
     # populate the form using the POST data
-    form = form(request.POST)
+    form = form(post_dict)
 
     if not form.is_valid():
       # return the invalid form response
@@ -854,9 +860,6 @@ class View(base.View):
         rest: see base.View.public()
     """
 
-    from soc.modules.gsoc.logic.models.review_follower import logic as \
-        review_follower_logic
-
     get_dict = request.GET
 
     # check if the current user is a mentor and wants 
@@ -890,34 +893,6 @@ class View(base.View):
         comment = "Marked Student Proposal as Eligible."
         self._createReviewFor(entity, comment, is_public=False)
         return http.HttpResponseRedirect(redirect)
-
-    # check if we should change the subscription state for the current user
-    subscribe = None
-
-    if get_dict.get('subscription', None) in ['on', 'off']:
-      subscribe = get_dict['subscription'] == 'on'
-
-    if subscribe != None:
-      # get the current user
-      user_entity = user_logic.logic.getForCurrentAccount()
-
-      # create the fields that should be in the ReviewFollower entity
-      # pylint: disable-msg=E1103
-      fields = {'link_id': user_entity.link_id,
-                'scope': entity,
-                'scope_path': entity.key().id_or_name(),
-                'user': user_entity
-               }
-      # get the keyname for the ReviewFollower entity
-      key_name = review_follower_logic.getKeyNameFromFields(fields)
-
-      # set both the subscription properties, this is a requested enhancement
-      # see also Issue 538.
-      fields['subscribed_public'] = subscribe
-      fields['subscribed_private'] = subscribe
-
-      # update the ReviewFollower
-      review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
 
     # set the initial score since the default is ignored
     initial = {'score': 0}
@@ -1004,7 +979,13 @@ class View(base.View):
     """Handles the POST request for the proposal comment view.
     """
 
-    form = params['public_review_form'](request.POST)
+    post_dict = request.POST
+
+    if post_dict.get('subscribe') or post_dict.get('unsubscribe'):
+      self._handleSubscribePost(request, entity)
+      return http.HttpResponseRedirect('')
+
+    form = params['public_review_form'](post_dict)
 
     if not form.is_valid():
       # get some entity specific context
@@ -1330,6 +1311,50 @@ class View(base.View):
       if follower.user.key() != review_entity.author.key():
         notifications_helper.sendNewReviewNotification(follower.user,
             review_entity, entity.title, redirect_url)
+
+
+  def _handleSubscribePost(self, request, entity):
+    """Handles the POST request for subscription management.
+
+    Args:
+      request: The HTTPRequest object
+      entity: The StudentProposal entity to (un)subscribe to
+    """
+
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
+
+    post_dict = request.POST
+
+    # check if we should change the subscription state for the current user
+    subscribe = None
+
+    if post_dict.get('subscribe'):
+      subscribe = True
+    elif post_dict.get('unsubscribe'):
+      subscribe = False
+
+    if subscribe != None:
+      # get the current user
+      user_entity = user_logic.logic.getForCurrentAccount()
+
+      # create the fields that should be in the ReviewFollower entity
+      # pylint: disable-msg=E1103
+      fields = {'link_id': user_entity.link_id,
+                'scope': entity,
+                'scope_path': entity.key().id_or_name(),
+                'user': user_entity
+               }
+      # get the keyname for the ReviewFollower entity
+      key_name = review_follower_logic.getKeyNameFromFields(fields)
+
+      # set both the subscription properties, this is a requested enhancement
+      # see also Issue 538.
+      fields['subscribed_public'] = subscribe
+      fields['subscribed_private'] = subscribe
+
+      # update the ReviewFollower
+      return review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
 
 
 view = View()

@@ -855,8 +855,11 @@
 
                       var row_functions = {
                         redirect_custom: function (parameters) {
-                          return function (link) {
-                            if (parameters.new_window) {
+                          return function (link, event) {
+                            /* Even if default is not to open in a new window/tab, will open
+                               if middle button click or if ctrl+left button click.
+                            */
+                            if ((parameters.new_window) || (event.which === 2) || ((event.which === 1) && (event.ctrlKey))) {
                               return function () {
                                 window.open(link);
                               }
@@ -893,7 +896,7 @@
                           var row = jQuery("#" + list_objects[idx].jqgrid.id).jqGrid('getRowData',row_number);
                           var object = jLinq.from(list_objects[idx].all_data).equals("columns.key",row.key).select()[0];
                           var partial_row_method = list_objects[idx].jqgrid.object.data('melange').rowsel;
-                          partial_row_method(object.operations.row.link)();
+                          partial_row_method(object.operations.row.link, event)();
                         }
                       });
                     }

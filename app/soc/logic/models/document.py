@@ -86,5 +86,17 @@ class Logic(work.Logic):
 
     return True
 
+  def _onCreate(self, entity):
+    """Set the scope of the document.
+
+    Args:
+      entity: Document entity
+    """
+
+    from soc.logic.helper import prefixes
+
+    prefixes.getOrSetScope(entity)
+    super(Logic, self)._onCreate(entity)
+
 
 logic = Logic()

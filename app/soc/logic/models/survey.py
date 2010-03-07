@@ -145,36 +145,9 @@ class Logic(work.Logic):
       entity = Survey entity
     """
 
-    if getattr(entity, 'scope', None):
-      return entity.scope
+    from soc.logic.helper import prefixes
 
-    import soc.models.program
-    import soc.models.organization
-    import soc.models.user
-    import soc.models.site
-
-    # use prefix to generate dict key
-    scope_types = {
-        "gsoc_program": soc.modules.gsoc.models.program.GSoCProgram,
-        "program": soc.models.program.Program,
-        "org": soc.models.organization.Organization,
-        "user": soc.models.user.User,
-        "site": soc.models.site.Site}
-
-    # determine the type of the scope
-    scope_type = scope_types.get(entity.prefix)
-
-    if not scope_type:
-      # no matching scope type found
-      raise AttributeError('No Matching Scope type found for %s' \
-          % entity.prefix)
-
-    # set the scope and update the entity
-    entity.scope = scope_type.get_by_key_name(entity.scope_path)
-    entity.put()
-
-    # return the scope
-    return entity.scope
+    return prefixes.getOrSetScope(entity)
 
   def hasRecord(self, survey_entity):
     """Returns True iff the given Survey has at least one SurveyRecord.

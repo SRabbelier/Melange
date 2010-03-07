@@ -892,19 +892,12 @@ class View(base.View):
         return http.HttpResponseRedirect(redirect)
 
     # check if we should change the subscription state for the current user
-    public_subscription = None
-    private_subscription = None
+    subscribe = None
 
-    if get_dict.get('public_subscription') and (
-      get_dict['public_subscription'] in ['on', 'off']):
+    if get_dict.get('subscription', None) in ['on', 'off']:
+      subscribe = get_dict['subscription'] == 'on'
 
-      public_subscription = get_dict['public_subscription'] == 'on'
-
-    if get_dict.get('private_subscription') and (
-      get_dict['private_subscription'] in ['on', 'off']):
-      private_subscription = get_dict['private_subscription'] == 'on'
-
-    if public_subscription != None or private_subscription != None:
+    if subscribe != None:
       # get the current user
       user_entity = user_logic.logic.getForCurrentAccount()
 
@@ -918,12 +911,10 @@ class View(base.View):
       # get the keyname for the ReviewFollower entity
       key_name = review_follower_logic.getKeyNameFromFields(fields)
 
-      # determine which subscription properties we should change
-      if public_subscription != None:
-        fields['subscribed_public'] = public_subscription
-
-      if private_subscription != None:
-        fields['subscribed_private'] = private_subscription
+      # set both the subscription properties, this is a requested enhancement
+      # see also Issue 538.
+      fields['subscribed_public'] = subscribe
+      fields['subscribed_private'] = subscribe
 
       # update the ReviewFollower
       review_follower_logic.updateOrCreateFromKeyName(fields, key_name)
@@ -1220,8 +1211,7 @@ class View(base.View):
 
     if follower_entity:
       # pylint: disable-msg=E1103
-      context['is_subscribed_public'] =  follower_entity.subscribed_public
-      context['is_subscribed_private'] = follower_entity.subscribed_private
+      context['is_subscribed'] =  follower_entity.subscribed_public
 
     return context
 

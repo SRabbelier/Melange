@@ -389,12 +389,18 @@ class Logic(object):
       return
 
     keys = [prop.get_value_for_datastore(i) for i in data]
+    keys = [i for i in keys if i]
 
     prefetched_entities = db.get(keys)
     prefetched_dict = dict((i.key(), i) for i in prefetched_entities)
 
     for i in data:
-      value = prefetched_dict[prop.get_value_for_datastore(i)]
+      key = prop.get_value_for_datastore(i)
+
+      if key not in prefetched_dict:
+        continue
+
+      value = prefetched_dict[key]
       setattr(i, field, value)
 
   def getForFields(self, filter=None, unique=False, limit=1000, offset=0,

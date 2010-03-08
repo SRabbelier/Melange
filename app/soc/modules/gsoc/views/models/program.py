@@ -726,7 +726,8 @@ class View(program.View):
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
-    fields = {'program': program_entity}
+    fields = {'program': program_entity,
+              'is_duplicate': True}
 
     template = 'soc/program/show_duplicates.html'
 

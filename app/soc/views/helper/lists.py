@@ -52,7 +52,7 @@ def urlize(url, name=None, target="_blank", nofollow=True):
 
   link = URL_PATTERN % {
       'url': safe_url,
-      'name': safe_name if safe_name else safe_url,
+      'name': safe_name if name else safe_url,
       'target': ' target="%s"' % target if target else '',
       'nofollow': ' rel="nofollow"' if nofollow else "",
   }

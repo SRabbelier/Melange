@@ -443,5 +443,5 @@ class GSoCChecker(access.Checker):
 
     # The current user is no Org Admin, has not taken the Survey and is not
     # the one responsible for taking this survey.
-    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_YOUR_RECORD)
+    raise out_of_band.AccessViolation(message_fmt=access.DEF_NOT_YOUR_RECORD)
 

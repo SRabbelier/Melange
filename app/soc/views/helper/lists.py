@@ -147,6 +147,7 @@ def getListConfiguration(request, params, visibility, order):
   key_order, col_names = getKeyOrderAndColNames(params, visibility)
 
   conf_extra = params.get('%s_conf_extra' % visibility, {})
+  conf_min_num = params.get('%s_conf_min_num' % visibility, 0)
   button_global = params.get('%s_button_global' % visibility, [])
   row_action = params.get('%s_row_action' % visibility, {})
   col_props = params.get('%s_field_props' % visibility, {})
@@ -155,6 +156,7 @@ def getListConfiguration(request, params, visibility, order):
   col_model = [keyToColumnProperties(i, col_props, hidden) for i in key_order]
 
   rowList = [5, 10, 20, 50, 100, 500, 1000]
+  rowList = [i for i in rowList if i >= conf_min_num]
   rowNum = min(rowList)
 
   sortorder = "asc"

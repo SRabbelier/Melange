@@ -455,6 +455,7 @@ class View(organization.View):
     rp_params['review_row_extra'] = lambda entity, *args: {
         'link': redirect_fun(entity, rp_params)
     }
+    rp_params['review_conf_min_num'] = 50
 
     description = ugettext('%s already under review sent to %s') %(
         rp_params['name_plural'], org_entity.name)

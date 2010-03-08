@@ -176,8 +176,6 @@ class View(base.View):
     for parameters see base.list()
     """
 
-    # TODO(ljvderijk): this list should have checkboxes for selection
-
     if request.method == 'POST':
       return self.listPost(request, params, **kwargs)
     else: # request.method == 'GET'
@@ -193,6 +191,8 @@ class View(base.View):
     """Handles the POST request for the list of notifications.
     """
 
+    import logging
+
     from django.utils import simplejson
 
     post_dict = request.POST
@@ -205,6 +205,11 @@ class View(base.View):
     notifications = []
     for selection in data:
       notification = notification_logic.getFromKeyName(selection['key'])
+
+      if not notification:
+        logging.error('No notification found for %(key)s' %selection)
+        continue
+
       if notification.scope.key() == user_entity.key():
         notifications.append(notification)
 

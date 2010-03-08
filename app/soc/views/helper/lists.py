@@ -114,52 +114,13 @@ def keyToColumnProperties(key, col_props, hidden):
   return props
 
 
-def getListData(request, params, fields, visibility=None, order=[], args=[]):
-  """Returns the list data for the specified params.
-
-  Args:
-    fields: a filter that should be applied to this list
-    visibility: determines which list will be used
-    order: the order the data should be sorted in
-    args: list of arguments to be passed to extract funcs
+def getKeyOrderAndColNames(params, visibility):
+  """Retrieve key order and col names
   """
-
-  get_args = request.GET
-
-  start = get_args.get('start', '')
-  limit = get_args.get('limit', 50)
-  limit = int(limit)
-
-  logic = params['logic']
-
-  if not visibility:
-    visibility = 'public'
-
-  if not fields:
-    fields = {}
-
-  if start:
-    start_entity = logic.getFromKeyNameOrID(start)
-
-    if not start_entity:
-      return {'data': {start: []}}
-
-    fields['__key__ >'] = start_entity.key()
-
-  entities = logic.getForFields(filter=fields, limit=limit)
 
   key_order = ["key"] + params.get('%s_field_keys' % visibility)
   col_names = ["Key"] + params.get('%s_field_names' % visibility)
-  conf_extra = params.get('%s_conf_extra' % visibility, {})
-  button_global = params.get('%s_button_global' % visibility, [])
-  row_action = params.get('%s_row_action' % visibility, {})
-  column = params.get('%s_field_extra' % visibility, lambda *args: {})
-  col_props = params.get('%s_field_props' % visibility, {})
-  button = params.get('%s_button_extra' % visibility, lambda *args: {})
-  row = params.get('%s_row_extra' % visibility, lambda *args: {})
   ignore = params.get('%s_field_ignore' % visibility, [])
-  hidden = params.get('%s_field_hidden' % visibility, [])
-  no_filter = params.get('%s_field_no_filter' % visibility, [])
 
   for field in ignore:
     if field not in key_order:
@@ -172,16 +133,33 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
   if not (key_order and col_names):
     key_order = col_names = ['kind']
 
+  return key_order, col_names
+
+
+def getListConfiguration(request, params, visibility, order):
+  """Returns the list data for the specified params.
+
+  Args:
+    visibility: determines which list will be used
+    order: the order the data should be sorted in
+  """
+
+  key_order, col_names = getKeyOrderAndColNames(params, visibility)
+
+  conf_extra = params.get('%s_conf_extra' % visibility, {})
+  button_global = params.get('%s_button_global' % visibility, [])
+  row_action = params.get('%s_row_action' % visibility, {})
+  col_props = params.get('%s_field_props' % visibility, {})
+  hidden = params.get('%s_field_hidden' % visibility, [])
+
   col_model = [keyToColumnProperties(i, col_props, hidden) for i in key_order]
 
-  extract_args = [key_order, no_filter, column, button, row, args]
-  columns = [entityToRowDict(i, *extract_args) for i in entities]
-
   rowList = [5, 10, 20, 50, 100, 500, 1000]
-  rowNum = min(rowList) if len(columns) >= min(rowList) else len(columns)
+  rowNum = min(rowList)
 
   sortorder = "asc"
   sortname = order[0] if order else "key"
+
   if sortname and sortname[0] == '-':
     sortorder = "desc"
     sortname = sortname[1:]
@@ -206,15 +184,85 @@ def getListData(request, params, fields, visibility=None, order=[], args=[]):
       "row": row_action,
   }
 
+  contents = {
+    'configuration': configuration,
+    'operations': operations,
+  }
+
+  return contents
+
+
+def _getListData(request, params, fields, visibility, args=[]):
+  """Returns the list data for the specified params.
+
+  Args:
+    fields: a filter that should be applied to this list
+    visibility: determines which list will be used
+    args: list of arguments to be passed to extract funcs
+  """
+
+  get_args = request.GET
+
+  if not fields:
+    fields = {}
+
+  start = get_args.get('start', '')
+  limit = get_args.get('limit', 50)
+  limit = int(limit)
+
+  logic = params['logic']
+
+  if start:
+    start_entity = logic.getFromKeyNameOrID(start)
+
+    if not start_entity:
+      return {'data': {start: []}}
+
+    fields['__key__ >'] = start_entity.key()
+
+  key_order, _ = getKeyOrderAndColNames(params, visibility)
+
+  column = params.get('%s_field_extra' % visibility, lambda *args: {})
+  row = params.get('%s_row_extra' % visibility, lambda *args: {})
+  button = params.get('%s_button_extra' % visibility, lambda *args: {})
+  no_filter = params.get('%s_field_no_filter' % visibility, [])
+
+  entities = logic.getForFields(filter=fields, limit=limit, prefetch)
+
+  extract_args = [key_order, no_filter, column, button, row, args]
+  columns = [entityToRowDict(i, *extract_args) for i in entities]
+
   data = {
       start: columns,
   }
 
   contents = {'data': data}
 
+  return contents
+
+
+def getListData(request, params, fields, visibility=None, order=[], args=[]):
+  """Returns the list data for the specified params.
+
+  Args:
+    fields: a filter that should be applied to this list
+    visibility: determines which list will be used
+    order: the order the data should be sorted in
+    args: list of arguments to be passed to extract funcs
+  """
+
+  contents = {}
+  start = request.GET.get('start')
+
+  if not visibility:
+    visibility = 'public'
+
+  data = _getListData(request, params, fields, visibility, args)
+  contents.update(data)
+
   if not start:
-    contents['configuration'] = configuration
-    contents['operations'] = operations
+    configuration = getListConfiguration(request, params, visibility, order)
+    contents.update(configuration)
 
   return contents
 

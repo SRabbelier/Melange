@@ -433,13 +433,13 @@ class View(organization.View):
     rp_params['review_field_keys'] = ['rank', 'title', 'student', 'mentor',
                                       'score', 'status', 'last_modified_on',
                                       'abstract', 'content', 'additional_info',
-                                      'possible_mentors', 'created_on']
+                                      'created_on']
     rp_params['review_field_hidden'] = ['abstract', 'content', 'additional_info',
-                                      'possible_mentors', 'created_on']
+                                        'created_on']
     rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',
                                        'Score', 'status', 'Last Modified On',
-                                      'Abstract', 'Content', 'Additional Info',
-                                      'Possible mentors', 'Created On']
+                                       'Abstract', 'Content', 'Additional Info',
+                                       'Created On']
     rp_params['review_field_prefetch'] = ['scope', 'mentor']
     rp_params['review_field_extra'] = lambda entity, ranker, keys: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
@@ -447,9 +447,6 @@ class View(organization.View):
           'student': entity.scope.name(),
           'mentor': entity.mentor.name() if entity.mentor else
               '%s Proposed' % len(entity.possible_mentors),
-          'possible_mentors': ", ".join(
-              # TODO(ljvderijk): does this work?
-              [i.id_or_name() for i in entity.possible_mentors]),
     }
     rp_params['review_row_action'] = {
         "type": "redirect_custom",

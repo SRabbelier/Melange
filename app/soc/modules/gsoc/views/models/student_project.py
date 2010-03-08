@@ -170,6 +170,7 @@ class View(base.View):
     new_params['manage_overview_row'] = \
         'soc/student_project/list/row_manage.html'
 
+    new_params['public_field_prefetch'] = ['mentor', 'student', 'scope']
     new_params['public_field_extra'] = lambda entity: {
         "student": entity.student.name(),
         "mentor": entity.mentor.name(),
@@ -808,6 +809,7 @@ class View(base.View):
     mo_params['public_row_extra'] = lambda entity, *args: {
         'link': redirects.getManageRedirect(entity, mo_params)
     }
+    mo_params['public_field_prefetch'] = ['student', 'mentor']
     mo_params['public_field_extra'] = lambda entity, ps, psc, gs, gsc: {
         "student": entity.student.name(),
         "mentor": entity.mentor.name(),

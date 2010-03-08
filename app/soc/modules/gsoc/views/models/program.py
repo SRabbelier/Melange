@@ -788,10 +788,8 @@ class View(program.View):
         "rowList": [],
     }
 
-    prefetch = ['mentor', 'student', 'scope']
-
     return self.list(request, 'allow', page_name=page_name,
-                     params=ap_params, filter=filter, prefetch=prefetch)
+                     params=ap_params, filter=filter)
 
 view = View()
 

@@ -513,7 +513,7 @@ class View(object):
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type, page_name=None,
-           params=None, filter=None, order=None, prefetch=None,
+           params=None, filter=None, order=None,
            visibility=None, context=None, **kwargs):
     """Displays the list page for the entity type.
 
@@ -523,7 +523,6 @@ class View(object):
       page_name: the page name displayed in templates as page and header title
       params: a dict with params for this View
       filter: a dict for the properties that the entities should have
-      prefetch: the fields of the data that should be pre-fetched
 
     Params usage:
       The params dictionary is passed as argument to getListContent in

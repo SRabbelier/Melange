@@ -226,8 +226,9 @@ def _getListData(request, params, fields, visibility, args=[]):
   row = params.get('%s_row_extra' % visibility, lambda *args: {})
   button = params.get('%s_button_extra' % visibility, lambda *args: {})
   no_filter = params.get('%s_field_no_filter' % visibility, [])
+  prefetch = params.get('%s_field_prefetch' % visibility, [])
 
-  entities = logic.getForFields(filter=fields, limit=limit, prefetch)
+  entities = logic.getForFields(filter=fields, limit=limit, prefetch=prefetch)
 
   extract_args = [key_order, no_filter, column, button, row, args]
   columns = [entityToRowDict(i, *extract_args) for i in entities]

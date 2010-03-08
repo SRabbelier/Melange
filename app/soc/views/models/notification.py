@@ -168,9 +168,8 @@ class View(base.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def list(self, request, access_type,
-           page_name=None, params=None, filter=None, 
-           order=None, prefetch=None, **kwargs):
+  def list(self, request, access_type, page_name=None, params=None,
+           filter=None, order=None, **kwargs):
     """Lists all notifications that the current logged in user has stored.
 
     for parameters see base.list()

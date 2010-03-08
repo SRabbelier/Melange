@@ -36,11 +36,11 @@ DEF_STUDENT_STEP_SIZE = 10
 
 # template for the accepted proposal mail
 DEF_ACCEPTED_MAIL_TEMPLATE = \
-    'soc/templates/modules/gsoc/student_proposal/mail/accepted_gsoc2009.html'
+    'soc/templates/modules/gsoc/student_proposal/mail/accepted_gsoc2010.html'
 
 # template for the rejected proposal mail
 DEF_REJECTED_MAIL_TEMPLATE = \
-    'soc/templates/modules/gsoc/student_proposal/mail/rejected_gsoc2009.html'
+    'soc/templates/modules/gsoc/student_proposal/mail/rejected_gsoc2010.html'
 
 
 def setupStudentProposalMailing(job_entity):

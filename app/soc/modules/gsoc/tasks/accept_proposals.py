@@ -204,7 +204,7 @@ def accept_proposal_email(proposal):
     'org_name': proposal.org.name
     }
 
-  template = 'modules/gsoc/student_proposal/mail/accepted_gsoc2009.html'
+  template = 'modules/gsoc/student_proposal/mail/accepted_gsoc2010.html'
   mail_dispatcher.sendMailFromTemplate(template, context)
 
 
@@ -226,7 +226,7 @@ def reject_proposal_email(proposal):
     'subject': 'Thank you for applying to %s' % (program_entity.name)
     }
 
-  template = 'modules/gsoc/student_proposal/mail/rejected_gsoc2009.html'
+  template = 'modules/gsoc/student_proposal/mail/rejected_gsoc2010.html'
   mail_dispatcher.sendMailFromTemplate(template, context)
 
 

@@ -108,6 +108,7 @@ class View(base.View):
         'clean': cleaning.validate_document_acl(self),
         }
 
+    new_params['public_field_prefetch'] = ['author']
     new_params['public_field_extra'] = lambda entity: {
         'path': entity.scope_path + '/' + entity.link_id,
         'author_id': entity.author.link_id,

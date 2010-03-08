@@ -198,6 +198,7 @@ class View(base.View):
     new_params['survey_take_form'] = surveys.SurveyTakeForm
     new_params['survey_record_form'] = surveys.SurveyRecordForm
 
+    new_params['public_field_prefetch'] = ['author']
     new_params['public_field_extra'] = lambda entity: {
         "path": entity.scope_path + '/' + entity.link_id,
         "created_by": entity.author.link_id,
@@ -217,6 +218,7 @@ class View(base.View):
     new_params['records_field_names'] = [
         'Taken By', 'Taken On',
     ]
+    new_params['records_field_prefetch'] = ['user']
     new_params['records_field_extra'] = lambda entity: {
         'taken_by': '%s (%s)' %(entity.user.name, entity.user.link_id),
     }

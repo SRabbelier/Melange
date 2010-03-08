@@ -62,6 +62,7 @@ class View(base.View):
       'task': forms.CharField(widget=widgets.PlainTextWidget()),
       }
 
+    new_params['public_field_prefetch'] = ['priority_group']
     new_params['public_field_extra'] = lambda entity: {
         "id": entity.key().id_or_name(),
         "priority_group": entity.priority_group.name,

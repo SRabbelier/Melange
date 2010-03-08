@@ -139,6 +139,11 @@ class View(base.View):
     new_params['public_field_names'] = ["Name", "Last update started",
                                         "Last update completed"]
 
+    new_params['records_field_prefetch'] = [
+        'project', 'mentor_record', 'student_record',
+      # TODO(SRabbelier): Enable when we support multi-level prefetching
+      # 'project.student', 'project.scope', 'project.mentor',
+    ]
     new_params['records_field_extra'] = lambda entity: {
         "project_title": entity.project.title,
         "student_name": "%s (%s)" % (entity.project.student.name(),

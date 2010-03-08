@@ -106,6 +106,7 @@ class View(base.View):
     site_name = site_logic.getSingleton().site_name
 
     new_params['public_configuration'] = {"multiselect": True}
+    new_params['public_field_prefetch'] = ['from_user']
     new_params['public_field_extra'] = lambda entity: {
         "from": entity.from_user.name if entity.from_user else site_name,
         "unread": "Not Read" if entity.unread else "Read",

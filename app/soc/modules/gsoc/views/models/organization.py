@@ -440,13 +440,15 @@ class View(organization.View):
                                        'Score', 'status', 'Last Modified On',
                                       'Abstract', 'Content', 'Additional Info',
                                       'Possible mentors', 'Created On']
+    rp_params['review_field_prefetch'] = ['scope', 'mentor']
     rp_params['review_field_extra'] = lambda entity, ranker, keys: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
           'item_class': entity.key() in keys,
-          'student': entity.scope.user.name,
-          'mentor': entity.mentor.user.name 
-              if entity.mentor else '%s Proposed' %len(entity.possible_mentors),
+          'student': entity.scope.name(),
+          'mentor': entity.mentor.name() if entity.mentor else
+              '%s Proposed' % len(entity.possible_mentors),
           'possible_mentors': ", ".join(
+              # TODO(ljvderijk): does this work?
               [i.id_or_name() for i in entity.possible_mentors]),
     }
     rp_params['review_row_action'] = {

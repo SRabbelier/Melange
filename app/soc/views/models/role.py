@@ -180,6 +180,7 @@ class View(base.View):
         'Shipping Postal Code', 'Birth Date', 'T-Shirt Style', 'T-Shirt Size',
         'Group Name', 'Status', 'Account Name'
     ]
+    new_params['admin_field_prefetch'] = ['scope', 'user']
     new_params['admin_field_extra'] = lambda entity: {
         'group_name': entity.scope.name,
         'birth_date': entity.birth_date.isoformat(),

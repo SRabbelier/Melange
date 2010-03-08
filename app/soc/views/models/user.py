@@ -108,7 +108,10 @@ class View(base.View):
     new_params['sidebar_developer'] = [('/%s/list_developers', 'List Developers',
                                         'list_developers')]
 
-    new_params['public_field_extra'] = lambda x: {"email": x.account.email()}
+    new_params['public_field_prefetch'] = ['account']
+    new_params['public_field_extra'] = lambda entity: {
+        "email": entity.account.email(),
+    }
     new_params['public_field_keys'] = ['email', 'name', 'link_id']
     new_params['public_field_names'] = ['Email', 'Public name', 'Link ID']
 

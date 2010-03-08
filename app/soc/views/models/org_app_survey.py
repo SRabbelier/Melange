@@ -131,6 +131,7 @@ class View(survey_view.View):
     record_list_params['self_field_names'] = [
         'Organization Name', 'Main Admin', 'Backup Admin'
     ]
+    record_list_params['self_field_prefetch'] = ['main_admin', 'backup_admin']
     record_list_params['self_field_extra'] = lambda entity: {
         'main_admin': entity.main_admin.name,
         'backup_admin': entity.backup_admin.name}
@@ -147,7 +148,8 @@ class View(survey_view.View):
         'Organization Name', 'Home Page', 'Application Status'
     ]
     record_list_params['overview_field_extra'] = lambda entity: {
-        'home_page': lists.urlize(entity.home_page)}
+        'home_page': lists.urlize(entity.home_page)
+    }
     record_list_params['overview_button_global'] = [{
           'bounds': [0,'all'],
           'id': 'bulk_process',

@@ -112,6 +112,7 @@ class View(organization.View):
     new_params['mentor_url_name'] = 'ghop/mentor'
     new_params['org_admin_role_name'] = 'ghop_org_admin'
 
+    # TODO(ljvderijk): prefetch these entities and pass as args
     new_params['public_field_extra'] = lambda entity: {
         "open_tasks": str(len(ghop_task_logic.logic.getForFields({
             'scope': entity,

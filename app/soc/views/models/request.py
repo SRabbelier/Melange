@@ -86,6 +86,7 @@ class View(base.View):
     new_params['request_processing_template'] = \
         'soc/request/process_request.html'
 
+    new_params['public_field_prefetch'] = ['user', 'group']
     new_params['public_field_extra'] = publicFieldExtra
     new_params['public_field_keys'] = ["role_name", "user", "for",
                                        "status", "created_on"]

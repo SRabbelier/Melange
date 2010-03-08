@@ -88,6 +88,7 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
 
+    new_params['public_field_prefetch'] = ['home']
     new_params['public_field_extra'] = lambda entity: {
         "path": entity.scope_path + '/' + entity.link_id if
             entity.scope_path else entity.link_id,

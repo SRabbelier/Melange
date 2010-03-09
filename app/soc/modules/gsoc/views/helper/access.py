@@ -428,13 +428,13 @@ class GSoCChecker(access.Checker):
       role_entity = record_entity.project.mentor
 
     if role_entity.user.key() == user_entity.key() and (
-        role_entity.status == 'active'):
+        role_entity.status in ['active', 'inactive']):
       # this user has the role required
       return
 
     fields = {'user': user_entity,
               'scope': record_entity.org,
-              'status': 'active'}
+              'status': ['active','inactive']}
     admin_entity = org_admin_logic.getForFields(fields, unique=True)
 
     if admin_entity:

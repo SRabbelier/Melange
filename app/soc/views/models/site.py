@@ -158,7 +158,10 @@ class View(presence_with_tos.View):
       submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
           "List Documents", 'any_access')]
 
-    submenus += [('/site/search', 'Search', 'any_access')]
+    if entity.cse_key:
+      # only add the search entry if a key is defined
+      submenus += [('/site/search', 'Search', 'any_access')]
+
     new_params = {}
     new_params['sidebar_additional'] = submenus
 

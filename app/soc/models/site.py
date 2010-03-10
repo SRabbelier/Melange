@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Doug Coker" <dcoker@google.com>',
+  '"Leon Palm" <lpalm@google.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
 ]
@@ -52,6 +53,13 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
 
   maintenance_end = db.DateTimeProperty(
       verbose_name=ugettext('Maintenance end date'))
+
+  #: Valid Google Custom Search Engine key. Used to load the appropriate
+  #: search box in the search page.
+  cse_key = db.StringProperty(verbose_name=ugettext('Custom Search Engine key'))
+  cse_key.help_text = ugettext(
+      'Google Custom Search Engine key for embedding a '
+      'CSE search box into the website.')
 
   #: Valid Google Analytics tracking number, if entered every page
   #: is going to have Google Analytics JS initialization code in

@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Leon Palm" <lpalm@google.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -27,6 +28,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -57,6 +59,7 @@ class View(presence_with_tos.View):
     rights['unspecified'] = ['checkIsDeveloper']
     rights['any_access'] = ['allow']
     rights['home'] = ['allow']
+    rights['search'] = ['allow']
     rights['show'] = ['checkIsDeveloper']
 
     new_params = {}
@@ -75,6 +78,7 @@ class View(presence_with_tos.View):
 
     new_params['edit_template'] = 'soc/site/edit.html'
     new_params['home_template'] = 'soc/site/home.html'
+    new_params['search_template'] = 'soc/site/search.html'
 
     new_params['create_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
@@ -107,6 +111,11 @@ class View(presence_with_tos.View):
     page_name = "Edit Site"
     patterns += [(r'^%(url_name)s/(?P<access_type>edit)$',
                   'soc.views.models.%(module_name)s.main_edit',
+                  page_name)]
+
+    page_name = "Search"
+    patterns += [(r'^%(url_name)s/(?P<access_type>search)$',
+                  'soc.views.models.%(module_name)s.search',
                   page_name)]
 
     if soc.logic.system.isDebug():
@@ -149,6 +158,7 @@ class View(presence_with_tos.View):
       submenus += [(redirects.getListDocumentsRedirect(entity, 'site'),
           "List Documents", 'any_access')]
 
+    submenus += [('/site/search', 'Search', 'any_access')]
     new_params = {}
     new_params['sidebar_additional'] = submenus
 
@@ -191,6 +201,39 @@ class View(presence_with_tos.View):
 
     return self.edit(request, "edit", page_name, seed=key_values, **key_values)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def search(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """Displays the search page for the entity specified by **kwargs.
+
+    Params usage:
+      rights: The rights dictionary is used to check if the user has
+        the required rights to view the admin page for this entity.
+        See checkAccess for more details on how the rights dictionary
+        is used to check access rights.
+      name: The name value is used to set the entity_type in the
+        context so that the template can refer to it.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    # create default template context for use with any templates
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+
+    context['page_name'] = page_name
+    settings = soc.logic.models.site.logic.getSingleton()
+    context['cse_key'] = settings.cse_key
+    template = params['search_template']
+
+    return helper.responses.respond(request, template, context)
+
 
 view = View()
 
@@ -204,3 +247,4 @@ export = decorators.view(view.export)
 main_public = decorators.view(view.mainPublic)
 main_edit = decorators.view(view.mainEdit)
 home = decorators.view(view.home)
+search = decorators.view(view.search)

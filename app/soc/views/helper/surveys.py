@@ -468,7 +468,7 @@ class SurveyRecordForm(SurveyTakeForm):
   """SurveyContent form for showing record of survey answers.
   """
 
-  def addLongField(self, field, value, attrs, schema, **kwargs):
+  def addLongField(self, field, value, attrs, schema, label='', **kwargs):
     """Add plain text long answer fields to this form.
 
     params:
@@ -476,12 +476,14 @@ class SurveyRecordForm(SurveyTakeForm):
       value: the initial value for this field
       attrs: additional attributes for field
       schema: schema for survey
+      label: label for this field
     """
 
-    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value)
+    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value,
+                         label=label)
     self.survey_fields[field] = question
 
-  def addShortField(self, field, value, attrs, schema, **kwargs):
+  def addShortField(self, field, value, attrs, schema, label='', **kwargs):
     """Add plain text short answer fields to this form.
 
     params:
@@ -489,9 +491,11 @@ class SurveyRecordForm(SurveyTakeForm):
       value: the initial value for this field
       attrs: additional attributes for field
       schema: schema for survey
+      label: label for this field
     """
 
-    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value)
+    question = CharField(widget=custom_widgets.PlainTextWidget, initial=value,
+                         label=label)
     self.survey_fields[field] = question
 
   def addCommentField(self, field, comment, attrs, tip):

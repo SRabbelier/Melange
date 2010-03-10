@@ -28,6 +28,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.models.site import logic as site_logic
 from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import access
@@ -37,7 +38,6 @@ from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import presence_with_tos
 
-import soc.models.site
 import soc.logic.models.site
 import soc.logic.dicts
 import soc.logic.system
@@ -63,7 +63,7 @@ class View(presence_with_tos.View):
     rights['show'] = ['checkIsDeveloper']
 
     new_params = {}
-    new_params['logic'] = soc.logic.models.site.logic
+    new_params['logic'] = site_logic
     new_params['rights'] = rights
 
     new_params['name'] = "Site Settings"
@@ -139,7 +139,7 @@ class View(presence_with_tos.View):
     Returns a custom sidebar entry for the 'site' singleton.
     """
 
-    entity = self._logic.getSingleton()
+    entity = site_logic.getSingleton()
 
     submenus = document_view.view.getMenusForScope(entity, self._params)
 
@@ -174,7 +174,7 @@ class View(presence_with_tos.View):
       kwargs: not used
     """
 
-    keys = self._logic.getKeyFieldNames()
+    keys = site_logic.getKeyFieldNames()
 
     # No entity in this case, since Site key values are hard-coded for the
     # Site singleton, so pass in None to match parent method footprint.
@@ -192,11 +192,11 @@ class View(presence_with_tos.View):
       kwargs: not used
     """
 
-    keys = self._logic.getKeyFieldNames()
+    keys = site_logic.getKeyFieldNames()
 
     # No entity in this case, since Site key values are hard-coded for the
     # Site singleton, so pass in None to match parent method footprint.
-    values = self._logic.getKeyValuesFromEntity(None)
+    values = site_logic.getKeyValuesFromEntity(None)
     key_values = dicts.zip(keys, values)
 
     return self.edit(request, "edit", page_name, seed=key_values, **key_values)
@@ -228,7 +228,7 @@ class View(presence_with_tos.View):
     helper.responses.useJavaScript(context, params['js_uses_all'])
 
     context['page_name'] = page_name
-    settings = soc.logic.models.site.logic.getSingleton()
+    settings = site_logic.getSingleton()
     context['cse_key'] = settings.cse_key
     template = params['search_template']
 

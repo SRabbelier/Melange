@@ -546,6 +546,9 @@
             var table_id = "jqgrid_" + div;
             var pager_id = "jqgrid_pager_" + div;
             initial_div.replaceWith([
+              '<p id="temporary_list_placeholder_',idx,'">',
+              'Please wait while list is loading',
+              '</p>',
               '<table id="' + table_id + '"',
               ' cellpadding="0" cellspacing="0"',
               '></table>',
@@ -697,6 +700,7 @@
                         );
                       jQuery("#" + table_id).jqGrid('filterToolbar', {});
 
+                      jQuery("#temporary_list_placeholder_" + idx).remove();
                       // Show Loading message
                       jQuery("#load_"+table_id).show();
 

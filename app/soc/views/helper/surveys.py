@@ -724,6 +724,11 @@ class SurveyContentSchema(object):
 
     return label
 
+  def getAllFieldKeys(self):
+    """Returns a list of all field keys present in this SurveyContentSchema.
+    """
+    return self.schema.keys()
+
 
 class UniversalChoiceEditor(widgets.Widget):
   """Edit interface for choice questions.

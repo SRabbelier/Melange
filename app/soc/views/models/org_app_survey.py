@@ -123,7 +123,6 @@ class View(survey_view.View):
         'home_page': lists.urlize(entity.home_page, 'Click Here'),
         }
 
-
     # define the fields for the self list
     record_list_params['self_field_keys'] = [
         'name', 'main_admin', 'backup_admin'
@@ -136,29 +135,6 @@ class View(survey_view.View):
         'main_admin': entity.main_admin.name,
         'backup_admin': entity.backup_admin.name}
     record_list_params['self_row_action'] = {
-        "type": "redirect_custom",
-        "parameters": dict(new_window=False),
-    }
-
-    # define the fields for the overview list
-    record_list_params['overview_field_keys'] = [
-        'name', 'home_page', 'status'
-    ]
-    record_list_params['overview_field_names'] = [
-        'Organization Name', 'Home Page', 'Application Status'
-    ]
-    record_list_params['overview_field_extra'] = lambda entity: {
-        'home_page': lists.urlize(entity.home_page)
-    }
-    record_list_params['overview_button_global'] = [{
-          'bounds': [0,'all'],
-          'id': 'bulk_process',
-          'caption': 'Bulk Accept/Reject Organizations',
-          'type': 'post',
-          'parameters': {
-            'url': '',
-         }}]
-    record_list_params['overview_row_action'] = {
         "type": "redirect_custom",
         "parameters": dict(new_window=False),
     }
@@ -359,6 +335,31 @@ class View(survey_view.View):
         'link': redirects.getReviewOrgAppSurvey(entity, info)
     }
 
+    # define the basic fields for the overview list
+    list_params['overview_field_keys'] = [
+        'name', 'home_page', 'status'
+    ]
+    list_params['overview_field_names'] = [
+        'Organization Name', 'Home Page', 'Application Status'
+    ]
+    list_params['overview_field_extra'] = lambda entity: {
+        'home_page': lists.urlize(entity.home_page)
+    }
+    list_params['overview_button_global'] = [{
+          'bounds': [0,'all'],
+          'id': 'bulk_process',
+          'caption': 'Bulk Accept/Reject Organizations',
+          'type': 'post',
+          'parameters': {
+            'url': '',
+         }}]
+    list_params['overview_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=False),
+    }
+
+    self._extendListWithSurveyAnswers(list_params, entity, 'overview')
+
     if request.GET.get('fmt') == 'json':
       # get all records for the entity specified in the URL
       fields = {'survey': entity}
@@ -373,6 +374,49 @@ class View(survey_view.View):
     contents = [overview_list]
 
     return self._list(request, list_params, contents, page_name)
+
+  def _extendListWithSurveyAnswers(self, list_params, survey, visibility):
+    """Extends the given params with entries for each answer that can be given
+    for the given Survey.
+
+    Used for listing SurveyRecords.
+
+    TODO(ljvderijk): This might also work for basic Surveys
+
+    Args:
+      list_params: Params dict for the list
+      survey: Survey entity
+      visibility: Visibility of the list
+    """
+
+    from soc.models.survey import COMMENT_PREFIX
+
+    survey_content = survey.survey_content
+    survey_schema = surveys.SurveyContentSchema(survey_content.schema)
+
+    fields = survey_schema.getAllFieldKeys()
+
+    field_keys = list_params.get('%s_field_keys' % visibility, [])
+    field_hidden = list_params.get('%s_field_hidden' % visibility, [])
+    field_names = list_params.get('%s_field_names' % visibility, [])
+
+    for field in fields:
+      question = survey_schema.getLabel(field)
+
+      field_keys.append(field)
+      field_hidden.append(field)
+      field_names.append(
+          '%s (ID=%s)' %(question, field))
+
+      if survey_schema.getHasComment(field):
+        comment_name = COMMENT_PREFIX + field
+        field_keys.append(comment_name)
+        field_hidden.append(comment_name)
+        field_names.append('Comment on %s' %field)
+
+    list_params['%s_field_keys' % visibility] = field_keys
+    list_params['%s_field_hidden' % visibility] = field_hidden
+    list_params['%s_field_names' % visibility] = field_names
 
   @decorators.merge_params
   @decorators.check_access

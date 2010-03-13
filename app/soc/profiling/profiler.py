@@ -71,7 +71,7 @@ class GAEProfiler(object):
         self.is_profiling = True
 
     def has_profiler(self):
-        return self._profiler is not None
+        return self.pstats_obj or (self._profiler is not None)
 
     def get_pstats(self):
         "return a ppstats object from current profile data"
@@ -249,7 +249,7 @@ class send_profile_data(webapp.RequestHandler):
 class show_profiler_status(webapp.RequestHandler):
     def get(self):
         gp = get_global_profiler()
-        if not gp.has_profiler:
+        if not gp.has_profiler():
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
             return
 

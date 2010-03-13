@@ -44,7 +44,7 @@ class ProfileMiddleware(object):
     the method signature.
     """
 
-    self.profiler = soc.profiling.profiler.get_global_profiler()
+    self.profiler = soc.profiling.profiler.GAEProfiler(request.path)
 
   def process_view(self, request, callback, callback_args, callback_kwargs):
     """Called when a request is made.
@@ -53,5 +53,4 @@ class ProfileMiddleware(object):
     the method signature.
     """
 
-    if self.profiler.is_profiling:
-      return self.profiler.runcall(callback, request, *callback_args, **callback_kwargs)
+    return self.profiler.runcall(callback, request, *callback_args, **callback_kwargs)

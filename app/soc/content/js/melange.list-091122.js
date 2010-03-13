@@ -922,7 +922,11 @@
                           // check index for column name
                           var field_text = column_name;
                           if (field_text.indexOf("\"") !== -1) {
-                            field_text = field_text.replace("\"","\"\"");
+                            field_text = field_text.replace(/\"/g,"\"\"");
+                          }
+                          // Check for &quot;, which is translated to " when output to textarea
+                          if (field_text.indexOf("&quot;") !== -1) {
+                            field_text = field_text.replace(/&quot;/g,"\"\"");
                           }
                           if (field_text.indexOf(",") !== -1 || field_text.indexOf("\"") !== -1 || field_text.indexOf("\r\n") !== -1) {
                             field_text = "\"" + field_text + "\"";
@@ -946,8 +950,12 @@
                             }
                             var field_text = cell_value.toString();
                             if (field_text.indexOf("\"") !== -1) {
-                              field_text = field_text.replace("\"","\"\"");
+                              field_text = field_text.replace(/\"/g,"\"\"");
                             }
+                          // Check for &quot;, which is translated to " when output to textarea
+                          if (field_text.indexOf("&quot;") !== -1) {
+                            field_text = field_text.replace(/&quot;/g,"\"\"");
+                          }
                             if (field_text.indexOf(",") !== -1 || field_text.indexOf("\"") !== -1 || field_text.indexOf("\r\n") !== -1) {
                               field_text = "\"" + field_text + "\"";
                             }

@@ -1,8 +1,8 @@
 import gae_django
-import app_profiler.app_profiler
+from soc.profiling import profiler
 
 def main():
-   app_profiler.app_profiler.main()
+   profiler.main()
 
 if __name__ == '__main__':
    main()

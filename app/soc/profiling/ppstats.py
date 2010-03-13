@@ -39,7 +39,7 @@ def from_gz(gz_string):
     return Stats(PickleStats(cPickle.loads(zlib.decompress(gz_string))))
 
 def from_stats(stats):
-    "load ppstats from a stats object" 
+    "load ppstats from a stats object"
     return Stats(PickleStats(stats))
 
 def from_string(stats_string):
@@ -58,7 +58,7 @@ class Stats(pstats.Stats):
     def hide_directory(self, dirname, replacement=''):
         "replace occurences of <dirname> in filenames with <replacement>"
         self.replace_dirs[dirname] = replacement
-        
+
     def hide_regex(self, pattern, replacement=''):
         "call re.sub(pattern, replacement) on each filename"
         self.replace_regexes[pattern] = replacement

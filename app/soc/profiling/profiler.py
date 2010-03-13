@@ -1,3 +1,21 @@
+#!/usr/bin/python2.5
+#
+# Copyright 2010 the Melange authors.
+# Copyright 2009 Jake McGuire.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import cProfile
 import ppstats
 
@@ -32,6 +50,7 @@ class GAEProfiler(object):
         self.requests_profiled = 0
         self.request_regex = None
         self.profile_key = ''.join([random.choice(alphanumeric) for x in range(4)])
+        self.pstats_obj = None
 
     def start_profiling(self, request_regex=None, num_requests=0):
         "start profiling with this object, setting # of requests and filter"
@@ -50,12 +69,18 @@ class GAEProfiler(object):
 
     def resume_profiling(self):
         self.is_profiling = True
-    
+
     def has_profiler(self):
         return self._profiler is not None
 
     def get_pstats(self):
         "return a ppstats object from current profile data"
+        if self.pstats_obj:
+            return self.pstats_obj
+
+        if not self._profiler:
+            return None
+
         gae_base_dir = '/'.join(webapp.__file__.split('/')[:-5])
         sys_base_dir = '/'.join(logging.__file__.split('/')[:-2])
 
@@ -63,16 +88,20 @@ class GAEProfiler(object):
         stats.hide_directory(gae_base_dir, 'GAEHome')
         stats.hide_directory(sys_base_dir, 'SysHome')
         stats.strip_dirs()
+
+        self.pstats_obj = stats
+
         return stats
 
     def runcall(self, func, *args, **kwargs):
         "profile one call, incrementing requests_profiled and maybe saving stats"
         self.requests_profiled += 1
+        self.pstats_obj = None
         if self._profiler:
             ret = self._profiler.runcall(func, *args, **kwargs)
         else:
             ret = func(*args, **kwargs)
-        
+
 #        if (self.requests_profiled % self._save_every) == 0 or \
 #                self.requests_profiled == self.num_requests:
 #            self.save_pstats_to_memcache()
@@ -84,7 +113,7 @@ class GAEProfiler(object):
         env = dict(os.environ)
         script_name = env.get('SCRIPT_NAME', '')
         logging.info(script_name)
-        
+
         if self.num_requests and self.requests_profiled >= self.num_requests:
             return False
 
@@ -102,15 +131,13 @@ class GAEProfiler(object):
         mc_client.set(cache_key, compressed_data)
         logging.info("Saved pstats to memcache with key %s" % cache_key)
 
-
-
 def get_global_profiler():
     global global_profiler
     if not global_profiler:
         global_profiler = GAEProfiler()
 
     return global_profiler
-    
+
 def new_global_profiler():
     global global_profiler
     global_profiler = GAEProfiler()
@@ -133,13 +160,14 @@ def get_stats_from_global_or_request(request_obj):
     key = request_obj.get('key', '')
     if key:
         gp = GAEProfiler()
-        gp.profile_obj = load_pstats_from_memcache(key)
+        gp.pstats_obj = load_pstats_from_memcache(key)
+        if not gp.pstats_obj:
+            return None
         gp.profile_key = key
         return gp
     else:
         gp = get_global_profiler()
-        if not gp.has_profiler():
-            return None
+        gp.get_pstats()
         return gp
 
 def mime_upload_data_as_file(field_name, filename, body):
@@ -160,15 +188,15 @@ def mime_form_value(name, value):
 class show_profile(webapp.RequestHandler):
     def get(self):
         ps = get_stats_from_global_or_request(self.request)
-        if not ps:
+        if not ps or not ps.has_profiler():
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
             return
 
-        ps.profile_obj.set_output(self.response.out)
+        ps.pstats_obj.set_output(self.response.out)
         sort = self.request.get('sort', 'time')
-        ps.profile_obj.sort_stats(sort)
+        ps.pstats_obj.sort_stats(sort)
         self.response.out.write("<body><html><pre>\n")
-        ps.profile_obj.print_stats(30)
+        ps.pstats_obj.print_stats(30)
         self.response.out.write("</pre></html></body>")
 
 class download_profile_data(webapp.RequestHandler):
@@ -176,9 +204,9 @@ class download_profile_data(webapp.RequestHandler):
         ps = get_stats_from_global_or_request(self.request)
         if not ps:
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
-            return            
+            return
 
-        output = ps.profile_obj.dump_stats_pickle()
+        output = ps.pstats_obj.dump_stats_pickle()
 
         self.response.headers['Content-Type'] = 'application/octet-stream'
 
@@ -189,7 +217,7 @@ class send_profile_data(webapp.RequestHandler):
         ps = get_stats_from_global_or_request(self.request)
         if not ps:
             self.response.out.write("<body><html><h3>No profiler.</h3><html></body>")
-            return            
+            return
 
         dest = self.request.get('dest', '')
         if not dest:
@@ -200,12 +228,14 @@ class send_profile_data(webapp.RequestHandler):
         upload_filename =  'profile.%s.pstats' % ps.profile_key
         upload_field_name = 'profile_file'
 
-        upload_form.attach(mime_upload_data_as_file('profile_file', upload_field_name, zlib.compress(ps.profile_obj.dump_stats_pickle())))
+        upload_form.attach(mime_upload_data_as_file('profile_file',
+                                                    upload_field_name,
+                                                    zlib.compress(ps.pstats_obj.dump_stats_pickle())))
         upload_form.attach(mime_form_value('key_only', '1'))
 
         http_conn = httplib.HTTPConnection(dest)
         http_conn.connect()
-        http_conn.request('POST', '/upload_profile', upload_form.as_string(), 
+        http_conn.request('POST', '/upload_profile', upload_form.as_string(),
                           {'Content-Type': 'multipart/form-data; boundary=%s' % upload_form.get_boundary()})
 
         http_resp = http_conn.getresponse()
@@ -215,7 +245,7 @@ class send_profile_data(webapp.RequestHandler):
             self.response.out.write("<html><body>Success! <a href='%s'>%s</a></body></html>" % (remote_url, remote_url))
         else:
             self.response.out.write("Failure!\n%s: %s\n%s" % (http_resp.status, http_resp.reason, remote_data))
-            
+
 class show_profiler_status(webapp.RequestHandler):
     def get(self):
         gp = get_global_profiler()
@@ -238,6 +268,7 @@ class start_profiler(webapp.RequestHandler):
         self.response.headers['Content-Type'] = "text/plain"
         self.response.out.write("Started profiling (key: %s).\n" % gp.profile_key)
         self.response.out.write("Retrieve saved results at <a href='/profiler/show?key=%(key)s'>/profiler/show?key=%(key)s).\n" % {'key':gp.profile_key})
+        logging.info("Started profiler %s", gp.profile_key)
 
 class stop_profiler(webapp.RequestHandler):
     def get(self):
@@ -249,7 +280,7 @@ class stop_profiler(webapp.RequestHandler):
 class save_profile_data(webapp.RequestHandler):
     def get(self):
         gp = get_global_profiler()
-        
+
 
 def _add_our_endpoints(application):
     "insert our URLs into the application map"
@@ -292,7 +323,7 @@ application = webapp.WSGIApplication(
      ],
     debug=True)
 
-    
+
 def main():
     google.appengine.ext.webapp.util.run_wsgi_app(application)
 

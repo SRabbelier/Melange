@@ -51,7 +51,4 @@ def store(key, path, profile, user):
   """Stores the profile data with the specified attributes.
   """
 
-  import logging
-  logging.info(dir(user))
-
   ProfileData.get_or_insert(key, path=path, profile=profile, user=user)

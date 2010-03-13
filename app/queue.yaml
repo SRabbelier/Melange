@@ -14,6 +14,10 @@
 
 queue:
 
+- name: profiler
+  rate: 30/s
+  bucket_size: 30
+
 # queue used for tasks that send out mail
 - name: mail
   rate: 1/s

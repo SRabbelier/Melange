@@ -921,13 +921,9 @@
                         jQuery.each(list_objects[idx].configuration.colNames, function (column_index, column_name) {
                           // check index for column name
                           var field_text = column_name;
-                          if (field_text.indexOf("\"") !== -1) {
-                            field_text = field_text.replace(/\"/g,"\"\"");
-                          }
                           // Check for &quot;, which is translated to " when output to textarea
-                          if (field_text.indexOf("&quot;") !== -1) {
-                            field_text = field_text.replace(/&quot;/g,"\"\"");
-                          }
+                          field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");
+
                           if (field_text.indexOf(",") !== -1 || field_text.indexOf("\"") !== -1 || field_text.indexOf("\r\n") !== -1) {
                             field_text = "\"" + field_text + "\"";
                           }
@@ -949,13 +945,9 @@
                               cell_value = "";
                             }
                             var field_text = cell_value.toString();
-                            if (field_text.indexOf("\"") !== -1) {
-                              field_text = field_text.replace(/\"/g,"\"\"");
-                            }
-                          // Check for &quot;, which is translated to " when output to textarea
-                          if (field_text.indexOf("&quot;") !== -1) {
-                            field_text = field_text.replace(/&quot;/g,"\"\"");
-                          }
+                            // Check for &quot;, which is translated to " when output to textarea
+                            field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");
+
                             if (field_text.indexOf(",") !== -1 || field_text.indexOf("\"") !== -1 || field_text.indexOf("\r\n") !== -1) {
                               field_text = "\"" + field_text + "\"";
                             }

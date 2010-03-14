@@ -718,7 +718,7 @@ class View(program.View):
         }
 
     return self.list(request, 'allow', page_name=page_name, params=org_params,
-                     context=context)
+                     filter=fields, context=context)
 
   @decorators.merge_params
   @decorators.check_access

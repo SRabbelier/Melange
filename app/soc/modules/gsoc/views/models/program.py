@@ -453,10 +453,22 @@ class View(program.View):
     list_params['list_msg'] = program_entity.accepted_orgs_msg
 
     fmt = {'name': program_entity.name}
-    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
+
     org_app_params = org_app_view.getParams()
+
+    # try to retrieve an accepted record
+    org_app_logic = org_app_params['logic']
+    org_app = org_app_logic.getForProgram(program_entity)
+    fields = {
+        'survey': org_app,
+        'status': 'accepted',
+    }
+    org_app_record_logic = org_app_logic.getRecordLogic()
+    record = org_app_record_logic.getForFields(fields, unique=True)
+
     aa_params = org_app_params['record_list_params'].copy() # accepted applications
     aa_params['public_row_extra'] = lambda entity: {}
+    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
     aa_params['list_description'] = description
     aa_params['public_conf_extra'] = {
         "rowNum": -1,
@@ -478,10 +490,15 @@ class View(program.View):
       return self.getAcceptedOrgsData(request, aa_params,
                                       ap_params, program_entity)
 
-    aa_list = lists.getListGenerator(request, aa_params, idx=0)
-    ap_list = lists.getListGenerator(request, ap_params, idx=1)
+    contents = []
 
-    contents = [aa_list, ap_list]
+    if record:
+      # only if there is a record we should show this list
+      aa_list = lists.getListGenerator(request, aa_params, idx=0)
+      contents.append(aa_list)
+
+    ap_list = lists.getListGenerator(request, ap_params, idx=1)
+    contents.append(ap_list)
 
     return self._list(request, list_params, contents, page_name)
 

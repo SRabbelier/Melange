@@ -252,7 +252,7 @@ class store_profile_data(SimpleHandler):
 
     user = users.User(email=email)
 
-    storage.store(profile_key, path, data, user)
+    storage.store(path, data, user)
     mc_client.delete(cache_key)
 
     self.response.out.write("Stored successfully")

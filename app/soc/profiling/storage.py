@@ -44,11 +44,11 @@ def from_key(key):
   """Returns profile data for the specified key.
   """
 
-  return ProfileData.get_by_key_name(key)
+  return ProfileData.get_by_id(int(key))
 
 
-def store(key, path, profile, user):
+def store(path, profile, user):
   """Stores the profile data with the specified attributes.
   """
 
-  ProfileData.get_or_insert(key, path=path, profile=profile, user=user)
+  ProfileData(path=path, profile=profile, user=user).put()

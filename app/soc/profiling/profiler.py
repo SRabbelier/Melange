@@ -56,6 +56,7 @@ class GAEProfiler(object):
     self.loaded = False
     self.task_url = '/profiler/store'
 
+    key = int(key) if key and key.isdigit() else None
     data = storage.from_key(key) if key else None
 
     if data:

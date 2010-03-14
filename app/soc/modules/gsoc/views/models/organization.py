@@ -426,7 +426,7 @@ class View(organization.View):
         np_params['name_plural'], org_entity.name)
     np_params['list_description'] = description
     np_params['public_row_extra'] = lambda entity: {
-        'link': redirect_fun(entity, mp_params),
+        'link': redirect_fun(entity, np_params),
     }
 
     rp_params = list_params.copy()# ranked proposals

@@ -67,6 +67,8 @@ def start(request, *args, **kwargs):
     request: Django Request object
   """
 
+  from soc.logic.helper import timeline as timeline_helper
+
   post_dict = request.POST
 
   # retrieve the program_key and survey_key from POST data
@@ -107,8 +109,10 @@ def start(request, *args, **kwargs):
     pds_logic.updateEntityProperties(pds_entity, fields)
 
   # Add a new clone of this task that must be performed an hour later because
-  # the current task is part of the task that repeatedly runs.
-  if repeat == 'yes':
+  # the current task is part of the task that repeatedly runs but repeat
+  # it before accepted students are announced only.
+  if repeat == 'yes' and timeline_helper.isBeforeEvent(
+      program_entity.timeline, 'accepted_students_announced_deadline'):
     # pass along these params as POST to the new task
     task_params = {'program_key': program_key,
                    'repeat': 'yes'}

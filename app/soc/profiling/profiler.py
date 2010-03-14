@@ -26,6 +26,7 @@ __authors__ = [
 
 import cProfile
 import logging
+import os
 import ppstats
 import random
 import string
@@ -116,6 +117,7 @@ class GAEProfiler(object):
         'key': self.profile_key,
         'path': self.path,
         'user': users.get_current_user(),
+        'version': os.environ.get('CURRENT_VERSION_ID'),
     })
     new_task.add('profiler')
 

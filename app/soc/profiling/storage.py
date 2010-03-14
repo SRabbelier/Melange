@@ -39,6 +39,12 @@ class ProfileData(db.Model):
   #: the user that made the request this profile data belongs to, if any
   user = db.UserProperty()
 
+  #: the time at which the profile data was stored
+  timestamp = db.DateTimeProperty(auto_now=True)
+
+  #: the version off the app when profile data was collected
+  version = db.StringProperty()
+
 
 def from_key(key):
   """Returns profile data for the specified key.
@@ -47,8 +53,8 @@ def from_key(key):
   return ProfileData.get_by_id(int(key))
 
 
-def store(path, profile, user):
+def store(path, profile, user, version):
   """Stores the profile data with the specified attributes.
   """
 
-  ProfileData(path=path, profile=profile, user=user).put()
+  ProfileData(path=path, profile=profile, user=user, version=version).put()

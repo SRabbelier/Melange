@@ -232,10 +232,12 @@ class store_profile_data(SimpleHandler):
     profile_key = self.request.get('key')
     path = self.request.get('path')
     email = self.request.get('user')
+    version = self.request.get('version')
 
-    status = "key='%s', path='%s', email='%s'" % (profile_key, path, email)
+    status = "key='%s', path='%s', email='%s', version='%s'" % (
+        profile_key, path, email, version)
 
-    if not (profile_key and path and email):
+    if not (profile_key and path and email and version):
       message = "Missing task parameters " + status
       logging.error(message)
       self.response.out.write(message)
@@ -252,7 +254,7 @@ class store_profile_data(SimpleHandler):
 
     user = users.User(email=email)
 
-    storage.store(path, data, user)
+    storage.store(path, data, user, version)
     mc_client.delete(cache_key)
 
     self.response.out.write("Stored successfully")

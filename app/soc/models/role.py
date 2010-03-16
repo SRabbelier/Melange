@@ -183,11 +183,22 @@ class Role(soc.models.linkable.Linkable):
   #: Residence street address can only be ASCII, not UTF-8 text, because
   #: it may be used as a shipping address.
   res_street = db.StringProperty(required=True,
-      verbose_name=ugettext('Street address'))
+      verbose_name=ugettext('Street Address 1'))
   res_street.help_text = ugettext(
       'street number and name, '
       '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
   res_street.group = ugettext("2. Contact Info (Private)")
+
+  #: Optional field containing the 2nd line for the residence street address;
+  #: kept private.
+  #: Can only be ASCII, not UTF-8 text, because
+  #: it may be used as a shipping address.
+  res_street_extra = db.StringProperty(required=False,
+      verbose_name=ugettext('Street Address 2'))
+  res_street_extra.help_text = ugettext(
+      '2nd address line usually for apartment numbers. '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+  res_street_extra.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address city; kept private.
   #: Residence city can only be ASCII, not UTF-8 text, because it
@@ -247,18 +258,45 @@ class Role(soc.models.linkable.Linkable):
   publish_location.example_text = ugettext('You can set your location below')
   publish_location.group = ugettext("2. Contact Info (Private)")
 
+  #: Optional field containing a separate recipient name; kept
+  #: private. Recipient name can only be ASCII, not UTF-8 text
+  ship_name = db.StringProperty(
+      verbose_name=ugettext('Full Recipient Name'))
+  ship_name.example_text = ugettext(
+      'Make sure to complete all fields if differs from contact address')
+  ship_name.help_text = ugettext(
+      'Fill in the name of the person who should be receiving your packages. '
+      'Fill in only if you want your shipping address to differ from your '
+      'contact address.')
+  ship_name.group = ugettext("3. Shipping Info (Private and Optional)")
+
   #: Optional field containing a separate shipping street address; kept
   #: private.  If shipping address is not present in its entirety, the
   #: residence address will be used instead.  Shipping street address can only
   #: be ASCII, not UTF-8 text, because, if supplied, it is used as a
   #: shipping address.
   ship_street = db.StringProperty(
-      verbose_name=ugettext('Shipping Street address'))
+      verbose_name=ugettext('Shipping Street Address 1'))
   ship_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
-      'fill in only if not same as above')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'Fill in only if you want your shipping address to differ from your '
+      'contact address.')
   ship_street.group = ugettext("3. Shipping Info (Private and Optional)")
+
+  #: Optional field containing a 2nd line for the shipping street address; kept
+  #: private. If shipping address is not present in its entirety, the
+  #: residence address will be used instead.  Shipping street address can only
+  #: be ASCII, not UTF-8 text, because, if supplied, it is used as a
+  #: shipping address.
+  ship_street_extra = db.StringProperty(
+      verbose_name=ugettext('Shipping Street Address 2'))
+  ship_street_extra.help_text = ugettext(
+      '2nd address line usually used for apartment numbers, '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'Fill in only if you want your shipping address to differ from your '
+      'contact address.')
+  ship_street_extra.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address city; kept private.
   #: Shipping city can only be ASCII, not UTF-8 text, because, if
@@ -267,7 +305,8 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping City'))
   ship_city.help_text = ugettext(
       '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
-      'fill in only if not same as above')
+      'fill in only if you want your shipping address to differ from your '
+      'contact address.')
   ship_city.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address state or province; kept
@@ -278,7 +317,8 @@ class Role(soc.models.linkable.Linkable):
   ship_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
       '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
-      'fill in only if not same as above')
+      'fill in only if you want your shipping address to differ from your '
+      'contact address.')
   ship_state.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address country or territory; kept
@@ -286,7 +326,9 @@ class Role(soc.models.linkable.Linkable):
   ship_country = db.StringProperty(
       verbose_name=ugettext('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
-  ship_country.help_text = ugettext('fill in only if not same as above')
+  ship_country.help_text = ugettext(
+      'Fill in only if you want your shipping address to differ from your '
+      'contact address.')
   ship_country.group = ugettext("3. Shipping Info (Private and Optional)")
 
   #: Optional field containing shipping address postal code (ZIP code in
@@ -375,11 +417,26 @@ class Role(soc.models.linkable.Linkable):
     else:
       return self.name()
 
+  def recipient_name(self):
+    """Property recipient_name that returns the name used for shipping.
+
+    Does not check hasShippingAddress because this field was added later and
+    would be None for old roles.
+    """
+    return self.ship_name if self.ship_name else self.name()
+
   def shipping_street(self):
     """Property shipping_street that returns shipping street if
     shipping address is set else the residential street.
     """
     return self.ship_street if self.hasShippingAddress() else self.res_street
+
+  def shipping_street_extra(self):
+    """Property shipping_street_extra that returns the 2nd shipping address line
+    if shipping address is set else the residential 2nd address line.
+    """
+    return self.ship_street_extra if self.hasShippingAddress() else \
+        self.res_street_extra
 
   def shipping_city(self):
     """Property shipping_city that returns shipping city if

@@ -147,10 +147,14 @@ class View(base.View):
        'clean_surname': cleaning.clean_ascii_only('surname'),
        'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_res_street': cleaning.clean_ascii_only('res_street'),
+       'clean_res_street_extra': cleaning.clean_ascii_only('res_street_extra'),
        'clean_res_city': cleaning.clean_ascii_only('res_city'),
        'clean_res_state': cleaning.clean_ascii_only('res_state'),
        'clean_res_postalcode': cleaning.clean_ascii_only('res_postalcode'),
+       'clean_ship_name': cleaning.clean_ascii_only('ship_name'),
        'clean_ship_street': cleaning.clean_ascii_only('ship_street'),
+       'clean_ship_street_extra': cleaning.clean_ascii_only(
+                                      'ship_street_extra'),
        'clean_ship_city': cleaning.clean_ascii_only('ship_city'),
        'clean_ship_state': cleaning.clean_ascii_only('ship_state'),
        'clean_ship_postalcode': cleaning.clean_ascii_only('ship_postalcode'),
@@ -158,7 +162,7 @@ class View(base.View):
        'clean_blog': cleaning.clean_url('blog'),
        'clean_photo_url': cleaning.clean_url('photo_url'),
        'scope_path': forms.CharField(widget=forms.HiddenInput,
-                                  required=True),
+                                     required=True),
        }
 
     new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
@@ -168,17 +172,19 @@ class View(base.View):
     # define the fields for the admin list
     new_params['admin_field_keys'] = [
         'link_id', 'name', 'document_name', 'email', 'res_street',
-        'res_city', 'res_state', 'res_country', 'res_postalcode', 'phone',
-        'shipping_street', 'shipping_city', 'shipping_state',
+        'res_street_extra', 'res_city', 'res_state', 'res_country',
+        'res_postalcode', 'phone', 'recipient_name', 'shipping_street',
+        'shipping_street_extra', 'shipping_city', 'shipping_state',
         'shipping_country', 'shipping_postalcode', 'birth_date',
         'tshirt_style', 'tshirt_size', 'group_name', 'status', 'account_name'
         ]
     new_params['admin_field_names'] = [
-        'Link ID', 'Name', 'Name on Documents', 'Email', 'Street', 'City',
-        'State', 'Country', 'Postal Code', 'Phone Number', 'Shipping Street',
-        'Shipping City', 'Shipping State', 'Shipping Country',
-        'Shipping Postal Code', 'Birth Date', 'T-Shirt Style', 'T-Shirt Size',
-        'Group Name', 'Status', 'Account Name'
+        'Link ID', 'Name', 'Name on Documents', 'Email', 'Street Address 1',
+        'Street Address 2', 'City', 'State', 'Country', 'Postal Code',
+        'Phone Number', 'Recipient Name', 'Shipping Street Address 1',
+        'Shipping Street Address 2', 'Shipping City', 'Shipping State',
+        'Shipping Country', 'Shipping Postal Code', 'Birth Date',
+        'T-Shirt Style', 'T-Shirt Size', 'Group Name', 'Status', 'Account Name'
     ]
     new_params['admin_field_prefetch'] = ['scope', 'user']
     new_params['admin_field_extra'] = lambda entity: {

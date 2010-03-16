@@ -1093,6 +1093,10 @@ class View(base.View):
     max_score = max(total_scores) if total_scores else 0
     min_score = min(total_scores) if total_scores else 0
     for score in xrange(min_score, max_score + 1):
+      # do not display info if the total score is 0
+      if not score:
+        continue
+
       number = len([summary for summary in review_summary.itervalues() \
           if summary['total_score'] == score])
       if number:

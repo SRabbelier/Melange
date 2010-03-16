@@ -164,10 +164,10 @@ class GHOPTimelineData(DataSet):
     link_id = 'ghop2009'
     scope_path = 'google'
     scope = SponsorData.google
-    program_start = datetime(2009, 9, 11)
-    program_end = datetime(2010, 2, 10)
-    org_signup_start = datetime(2009, 9, 18)
-    org_signup_end = datetime(2010, 2, 01)
+	program_start =  datetime.today() - timedelta(days=30)
+	program_end = datetime.today() + timedelta(days=30)
+	org_signup_start = datetime.today() - timedelta(days=25)
+	org_signup_end = datetime.today() + timedelta(days=25)
 
 
 class ProgramData(DataSet):

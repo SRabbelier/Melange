@@ -254,12 +254,13 @@ class TaskTest(unittest.TestCase):
     other users don't have.
     """
 
-    request = MockRequest("/test/ghop/task/create/google/ghop2009/melange")
+    request = MockRequest(
+        "/test/ghop/task/suggest_task/google/ghop2009/melange")
 
     # test if mentor of the Organization passes the access check
     os.environ['USER_EMAIL'] = 'melange_mentor_0001@example.com'
     request.start()
-    access_type = "suggest"
+    access_type = "suggest_task"
     page_name = "Suggest Task"
     kwargs = {'scope_path': 'google/ghop2009/melange'}
     actual = self.view.suggestTask(request, access_type,

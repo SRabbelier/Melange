@@ -91,9 +91,18 @@ class Group(soc.models.presence.Presence):
   #: Group street address can only be ASCII, not UTF-8 text,
   #: because, if supplied, it might be used as a shipping address.
   contact_street = db.StringProperty(required=True,
-      verbose_name=ugettext('Street address'))
+      verbose_name=ugettext('Street Address 1'))
   contact_street.help_text = ugettext(
       'street number and name, '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+
+  #: Optional field containing the 2nd group street address.
+  #: Group street address can only be ASCII, not UTF-8 text,
+  #: because, if supplied, it might be used as a shipping address.
+  contact_street_extra = db.StringProperty(required=False,
+      verbose_name=ugettext('Street Address 2'))
+  contact_street_extra.help_text = ugettext(
+      '2nd address line usually used for apartment numbers, '
       '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
 
   #: Required field containing group address city.
@@ -144,10 +153,25 @@ class Group(soc.models.presence.Presence):
   #: Group street address can only be ASCII, not UTF-8 text,
   #: because, if supplied, it is used as a shipping address.
   shipping_street = db.StringProperty(required=False,
-      verbose_name=ugettext('Shipping Street address'))
+      verbose_name=ugettext('Shipping Street Address 1'))
   shipping_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Fill in only if you want the shipping address to differ from the '
+      'contact address.')
+
+  #: Optional field containing a 2nd line for the shipping street address; kept
+  #: private. If shipping address is not present in its entirety, the
+  #: group contact address will be used instead. Shipping street address can
+  #: only be ASCII, not UTF-8 text, because, if supplied, it is used as a
+  #: shipping address.
+  shipping_street_extra = db.StringProperty(
+      verbose_name=ugettext('Shipping Street Address 2'))
+  shipping_street_extra.help_text = ugettext(
+      '2nd address line usually used for apartment numbers, '
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'Fill in only if you want the shipping address to differ from the '
+      'contact address.')
 
   #: Optional field containing group address city.
   #: City can only be ASCII, not UTF-8 text, because, if
@@ -155,7 +179,9 @@ class Group(soc.models.presence.Presence):
   shipping_city = db.StringProperty(required=False,
       verbose_name=ugettext('Shipping City'))
   shipping_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Fill in only if you want the shipping address to differ from the '
+      'contact address.')
 
   #: Optional field containing group address state or province.
   #: Group state/province can only be ASCII, not UTF-8
@@ -164,7 +190,9 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Shipping State/Province'))
   shipping_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Fill in only if you want the shipping address to differ from the '
+      'contact address.')
 
   #: Optional field containing address postal code of the group (ZIP code in
   #: the United States). Postal code can only be ASCII, not UTF-8
@@ -172,12 +200,17 @@ class Group(soc.models.presence.Presence):
   shipping_postalcode = db.StringProperty(required=False,
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
   shipping_postalcode.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Fill in only if you want the shipping address to differ from the '
+      'contact address.')
 
   #: Optional field containing address country or territory of the group.
   shipping_country = db.StringProperty(required=False,
       verbose_name=ugettext('Shipping Country/Territory'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
+  shipping_country.help_text = ugettext(
+      'Choose one only if you want the shipping address to differ from the '
+      'contact address.')
 
   #: Required property showing the current status of the group
   #: new: the group has not been active yet
@@ -186,4 +219,3 @@ class Group(soc.models.presence.Presence):
   #: invalid: the group has been marked as removed
   status = db.StringProperty(required=True, default='new',
       choices=['new', 'active', 'inactive', 'invalid'])
-

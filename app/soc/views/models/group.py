@@ -86,11 +86,15 @@ class View(presence.View):
        'email': forms.fields.EmailField(required=True),
        'clean_phone': cleaning.clean_phone_number('phone'),
        'clean_contact_street': cleaning.clean_ascii_only('contact_street'),
+       'clean_contact_street_extra': cleaning.clean_ascii_only(
+                                         'contact_street_extra'),
        'clean_contact_city': cleaning.clean_ascii_only('contact_city'),
        'clean_contact_state': cleaning.clean_ascii_only('contact_state'),
        'clean_contact_postalcode': cleaning.clean_ascii_only(
           'contact_postalcode'),
        'clean_shipping_street': cleaning.clean_ascii_only('shipping_street'),
+       'clean_shipping_street_extra': cleaning.clean_ascii_only(
+                                          'shipping_street_extra'),
        'clean_shipping_city': cleaning.clean_ascii_only('shipping_city'),
        'clean_shipping_state': cleaning.clean_ascii_only('shipping_state'),
        'clean_shipping_postalcode': cleaning.clean_ascii_only(

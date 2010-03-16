@@ -46,7 +46,9 @@ from soc.modules.ghop.views.models import task
 
 
 def error_raw(error, request, template=None, context=None):
-  """
+  """Sends a raw error response, that is the parameters
+  passed to the  error return function that is mentioned
+  in corresponding stubout.Set
   """
 
   return {
@@ -57,7 +59,8 @@ def error_raw(error, request, template=None, context=None):
       }
 
 def respond_raw(request, template, context=None, args=None, headers=None):
-  """
+  """Sends a raw response, that is the parameters passed to the
+  respond function that is mentioned in corresponding stubout.Set
   """
 
   return {
@@ -68,6 +71,18 @@ def respond_raw(request, template, context=None, args=None, headers=None):
       'headers': headers,
       }
 
+def select_raw(request, view, redirect, *args, **kwargs):
+  """Sends a raw response, that is the parameters passed to the
+  select function that is mentioned in corresponding stubout.Set
+  """
+
+  return {
+      'request': request,
+      'view': view,
+      'redirect': redirect,
+      'args': args,
+      'kwargs': kwargs,
+      }
 
 class TestView(task.View):
   """
@@ -123,6 +138,7 @@ class TaskTest(unittest.TestCase):
     self.stubout = stubout.StubOutForTesting()
     self.stubout.Set(responses, 'respond', respond_raw)
     self.stubout.Set(responses, 'errorResponse', error_raw)
+    self.stubout.Set(task.View, 'select', select_raw)
 
     # map all the models
     models_dict = {
@@ -161,6 +177,8 @@ class TaskTest(unittest.TestCase):
     all the Organizations under the Program to chose from
     """
 
+    from soc.modules.ghop.views.models.organization import View
+
     request = MockRequest("/test/ghop/task/create")
     request.start()
     access_type = "create"
@@ -170,9 +188,8 @@ class TaskTest(unittest.TestCase):
                               page_name=page_name, **kwargs)
     request.end()
 
-    org_list = actual['context']['list']
-
-    self.assertTrue(len(org_list._contents[0]['data']) > 0)
+    self.assertTrue('redirect' in actual
+        and isinstance(actual['redirect'], View))
 
   def testCreateRights(self):
     """Tests if the Developer/Org Admin have rights create tasks and

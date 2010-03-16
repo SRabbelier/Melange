@@ -291,7 +291,7 @@ def cleanDict(target, filter_fields, escape_safe=False):
   for field in filter_fields:
     data = result[field]
 
-    if not escape_safe and isinstance(data, SafeData):
+    if not data or (not escape_safe and isinstance(data, SafeData)):
       continue
 
     result[field] = escape(data)

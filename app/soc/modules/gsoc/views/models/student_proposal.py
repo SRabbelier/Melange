@@ -714,11 +714,6 @@ class View(base.View):
           continue
         choices.append((mentor.link_id, mentor.document_name()))
 
-      if entity.mentor:
-        initial = entity.mentor.link_id
-      else:
-        initial = '' 
-
       dynafields = [
         {'name': 'rank',
            'base': forms.IntegerField,
@@ -734,7 +729,6 @@ class View(base.View):
          'passthrough': ['initial', 'required', 'choices'],
          'label': 'Assign Mentor',
          'choices': choices,
-         'initial': initial,
          'required': False,
          'help_text': 'Choose the mentor you would like to assign to this '
              'Proposal. Choose "No mentor" if you don\'t want any '
@@ -871,8 +865,14 @@ class View(base.View):
         rest: see base.View.public()
     """
 
+    initial = {}
+
     # set the initial score since the default is ignored
-    initial = {'score': 0}
+    initial['score'] = 0
+
+    # set initial values for fields that are available only for org admins
+    if org_admin and entity.mentor:
+      initial['mentor'] = entity.mentor.link_id
 
     context['form'] = form(initial)
 

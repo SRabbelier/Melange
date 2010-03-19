@@ -317,7 +317,13 @@ class View(presence.View):
       group_entity = role_description['group']
 
       # set the menu header name
-      menu['heading'] = group_entity.short_name
+      heading = group_entity.short_name
+
+      if group_entity.scope:
+        scope = group_entity.scope
+        heading = '%s (%s)' %(heading, scope.short_name)
+
+      menu['heading'] = heading
 
       # get the documents for this group entity
       doc_items = document_view.view.getMenusForScope(group_entity, params)

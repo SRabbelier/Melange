@@ -442,9 +442,7 @@ class View(base.View):
     logic = params['logic']
 
     # get the entity for the given fields in kwargs
-    fields = {'scope_path': kwargs['scope_path'],
-        'link_id': kwargs['link_id']}
-    role_entity = logic.getForFields(kwargs, unique=True)
+    role_entity = logic.getFromKeyFieldsOr404(kwargs)
 
     # get the redirect for the cancel button or when the resignation is done
     redirect = params['manage_redirect'](role_entity.scope,
@@ -456,7 +454,7 @@ class View(base.View):
 
     if resign == 'true':
 
-      resign_error = params['logic'].canResign(role_entity)
+      resign_error = logic.canResign(role_entity)
 
       if not resign_error:
         # change the status of this role_entity to invalid

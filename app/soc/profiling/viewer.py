@@ -248,7 +248,7 @@ class store_profile_data(SimpleHandler):
 
     if not data:
       message = "Data removed from memcache " + status
-      logging.error(message)
+      logging.debug(message)
       self.response.out.write(message)
       return
 

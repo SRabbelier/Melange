@@ -221,9 +221,13 @@ class View(presence.View):
       # create the list parameters
       list_params = role_views[role_name].getParams().copy()
 
-      list_params['public_row_extra'] = lambda entity: {
-          'link': redirects.getManageRedirect(entity, list_params)
-      }
+      # Required because without this the lambda refers to list_params,
+      # which is set to a different value due to the iteration.
+      def getter(list_params):
+        return lambda entity: {
+            'link': redirects.getManageRedirect(entity, list_params)
+        }
+      list_params['public_row_extra'] = getter(list_params)
       list_params['list_description'] = ugettext(
           "An overview of the %s for this %s." % (
           list_params['name_plural'], params['name']))

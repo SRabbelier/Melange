@@ -412,19 +412,19 @@ class View(program.View):
     order = ['name']
 
     if idx == 0:
+      params = ap_params
+
+      fields = {
+          'scope': program_entity,
+          'status': ['new', 'active', 'inactive']
+      }
+    elif idx == 1:
       params = aa_params
 
       org_app = org_app_logic.getForProgram(program_entity)
       fields = {
           'survey': org_app,
           'status': 'accepted',
-      }
-    elif idx == 1:
-      params = ap_params
-
-      fields = {
-          'scope': program_entity,
-          'status': ['new', 'active', 'inactive']
       }
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
@@ -433,7 +433,6 @@ class View(program.View):
 
     json = simplejson.dumps(contents)
     return responses.jsonResponse(request, json)
-
 
   @decorators.merge_params
   @decorators.check_access
@@ -492,13 +491,13 @@ class View(program.View):
 
     contents = []
 
+    ap_list = lists.getListGenerator(request, ap_params, idx=0)
+    contents.append(ap_list)
+
     if record:
       # only if there is a record we should show this list
-      aa_list = lists.getListGenerator(request, aa_params, idx=0)
+      aa_list = lists.getListGenerator(request, aa_params, idx=1)
       contents.append(aa_list)
-
-    ap_list = lists.getListGenerator(request, ap_params, idx=1)
-    contents.append(ap_list)
 
     return self._list(request, list_params, contents, page_name)
 

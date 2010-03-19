@@ -418,6 +418,10 @@ class View(organization.View):
     # wether or not the amount of slots assigned should be shown
     context['slots_visible'] = org_entity.scope.allocations_visible
 
+    program_entity = org_entity.scope
+    page_name = '%s %s (%s)' %(page_name, org_entity.name,
+                               program_entity.short_name)
+
     list_params = student_proposal_view.view.getParams().copy()
     list_params['list_template'] = 'soc/student_proposal/list_for_org.html'
 

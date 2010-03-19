@@ -112,7 +112,7 @@ class View(group.View):
         "List of all %(name_plural)s you can apply to"),
         (r'^%(url_name)s/(?P<access_type>list_proposals)/%(key_fields)s$',
         '%(module_package)s.%(module_name)s.list_proposals',
-        "List of all Student Proposals for this %(name)s"),
+        "List of all Student Proposals for "),
         (r'^%(url_name)s/(?P<access_type>applicant)/%(scope)s$',
         '%(module_package)s.%(module_name)s.applicant', 
         "%(name)s Creation via Accepted Application"),

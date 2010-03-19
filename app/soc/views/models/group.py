@@ -332,6 +332,8 @@ class View(presence.View):
       # add the items together
       menu['items'] = doc_items + group_items
       menu['group'] = params['name_plural']
+      menu['collapse'] = 'collapse' if group_entity.status == 'inactive' \
+          else ''
 
       # append this as a new menu
       menus.append(menu)

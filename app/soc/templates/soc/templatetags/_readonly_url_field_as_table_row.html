@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+{% load filters %}
+
 {% block field_value_column %}
-{{ field_value|urlize }}
+{{ field_value|urlize_safe }}
 {% endblock %}

@@ -73,3 +73,17 @@ class Request(ModelWithFieldAttributes):
 
   #: DateTime when this request was last modified
   modified_on = db.DateTimeProperty(auto_now=True)
+
+  def statusMessage(self):
+    """Returns a status message for the current request status.
+    """
+
+    statuses =  {
+        'new': 'You requested has had no reply yet.',
+        'group_accepted': 'You can now fill out your profile',
+        'completed': 'You are done, no further action needed',
+        'rejected': 'You cannot do anything with this request since it was denied',
+        'ignored': 'This request was marked as spam, and has been ignored',
+    }
+
+    return statuses.get(self.status, "Unknown request status.")

@@ -191,6 +191,7 @@ def publicFieldExtra(entity):
   field_extra = {
         "user": "%s (%s)" % (entity.user.name, entity.user.link_id),
         "for": entity.group.name,
+        "status": entity.statusMessage(),
         "role_name": ROLE_VIEWS[entity.role].getParams()['name'],
         }
 

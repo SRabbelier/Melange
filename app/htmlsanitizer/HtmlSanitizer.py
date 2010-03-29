@@ -5,6 +5,8 @@ browser-based editors into some semblance of sanity
 
 TODO: turn the messy setting[method_name]=True filter syntax into a list of cleaning methods to invoke, so that they can be invoked in a specific order and multiple times.
 
+Edited by: Lennard de Rijk - Removed Wrap String from paranoid filters
+
 AUTHORS:
 Dan MacKinlay - https://launchpad.net/~dan-possumpalace
 Collin Grady - http://launchpad.net/~collin-collingrady
@@ -58,7 +60,7 @@ block_elements = dict.fromkeys(["p", "h1","h2", "h3", "h4", "h5", "h6", "ol", "u
 
 #convenient default filter lists.
 paranoid_filters = ["strip_comments", "strip_tags", "strip_attrs",
-  "strip_schemes", "rename_tags", "wrap_string", "strip_empty_tags", "strip_empty_tags", ]
+  "strip_schemes", "rename_tags", "strip_empty_tags", "strip_empty_tags", ]
 complete_filters = ["strip_comments", "rename_tags", "strip_tags", "strip_attrs",
     "strip_cdata", "strip_schemes",  "wrap_string", "strip_empty_tags", "rebase_links", "reparse"]
 

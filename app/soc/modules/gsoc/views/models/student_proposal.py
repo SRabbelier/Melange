@@ -1192,20 +1192,18 @@ class View(base.View):
     possible_mentors = entity.possible_mentors
 
     # determine wether we need to add or remove this mentor
-    add = mentor.key() in possible_mentors
+    add = mentor.key() not in possible_mentors
 
     if add:
       # add the mentor to possible mentors list if not already in
-      if mentor.key() not in possible_mentors:
-        possible_mentors.append(mentor.key())
-        fields = {'possible_mentors': possible_mentors}
-        self._logic.updateEntityProperties(entity, fields)
+      possible_mentors.append(mentor.key())
+      fields = {'possible_mentors': possible_mentors}
+      self._logic.updateEntityProperties(entity, fields)
     else:
       # remove the mentor from the possible mentors list
-      if mentor.key() in possible_mentors:
-        possible_mentors.remove(mentor.key())
-        fields = {'possible_mentors': possible_mentors}
-        self._logic.updateEntityProperties(entity, fields)
+      possible_mentors.remove(mentor.key())
+      fields = {'possible_mentors': possible_mentors}
+      self._logic.updateEntityProperties(entity, fields)
 
   def _adjustMentor(self, entity, mentor_id):
     """Changes the mentor to the given link_id.

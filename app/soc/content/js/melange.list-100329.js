@@ -468,7 +468,9 @@
       order_type = "-";
     }
 
-    temp_data = jLinq.from(temp_data).orderBy(order_type + sort_column).select();
+    if (temp_data.length > 0) {
+      temp_data = jLinq.from(temp_data).orderBy(order_type + sort_column).select();
+    }
     list_objects.get(my_index).data.filtered_data = temp_data;
 
     // If pagination is disabled, change number or rows to length of filtered data

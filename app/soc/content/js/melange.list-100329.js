@@ -759,7 +759,7 @@
               }
               else {
                 //else trigger new data in jqgrid object
-                //jqgrid.object.trigger("reloadGrid");
+                _self.jqgrid.object.trigger("reloadGrid");
               }
 
               //call next iteration

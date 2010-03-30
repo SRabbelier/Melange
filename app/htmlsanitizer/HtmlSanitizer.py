@@ -6,6 +6,7 @@ browser-based editors into some semblance of sanity
 TODO: turn the messy setting[method_name]=True filter syntax into a list of cleaning methods to invoke, so that they can be invoked in a specific order and multiple times.
 
 Edited by: Lennard de Rijk - Removed Wrap String from paranoid filters
+Matthew Wilkes - Refactored wrap_string and re-add it with tests.
 
 AUTHORS:
 Dan MacKinlay - https://launchpad.net/~dan-possumpalace
@@ -60,7 +61,7 @@ block_elements = dict.fromkeys(["p", "h1","h2", "h3", "h4", "h5", "h6", "ol", "u
 
 #convenient default filter lists.
 paranoid_filters = ["strip_comments", "strip_tags", "strip_attrs",
-  "strip_schemes", "rename_tags", "strip_empty_tags", "strip_empty_tags", ]
+  "strip_schemes", "rename_tags", "wrap_string", "strip_empty_tags", "strip_empty_tags", ]
 complete_filters = ["strip_comments", "rename_tags", "strip_tags", "strip_attrs",
     "strip_cdata", "strip_schemes",  "wrap_string", "strip_empty_tags", "rebase_links", "reparse"]
 
@@ -361,7 +362,10 @@ class Cleaner(object):
         >>> c('A <p>B C</p>D')
         u'<p>A </p><p>B C</p><p>D</p>'
         """
-        if not start_at : start_at = self.root
+        wasRoot = False
+        if not start_at:
+            wasRoot = True
+            start_at = self.root
         if not block_elems : block_elems = self.settings['block_elements']
         e = (wrapping_element or self.settings['wrapping_element'])
         paragraph_list = []
@@ -393,12 +397,17 @@ class Cleaner(object):
                 paragraph_list.append(node)
             
             last_state = state
+
         
-        #can't use append since it doesn't work on empty elements...
-        paragraph_list.reverse()
-        for paragraph in paragraph_list:
-            start_at.insert(0, paragraph)
         
+        output = ''.join(unicode(a) for a in paragraph_list)
+        new_root = BeautifulSoup.Tag(self._soup, start_at.name)
+        new_root.append(BeautifulSoup.BeautifulSoup(output, convertEntities=self.settings['convert_entities']))
+        if wasRoot:
+            self.root = new_root
+        else:
+            start_at.replaceWith(new_root)
+
     def strip_empty_tags(self):
         """
         strip out all empty tags

@@ -547,7 +547,11 @@
       edit: false,
       add: false,
       del: false,
-      refresh: false
+      afterRefresh:
+        function() {
+          _self.refreshData();
+          _self.jqgrid.object.trigger("reloadGrid");
+        }
     };
 
     // Init data
@@ -671,6 +675,7 @@
               },
               function (data) {
                 if (parameters.refresh == "table") {
+                  list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
                 }
               }
@@ -777,6 +782,9 @@
             else {
               //loading data finished, hiding loading message
               jQuery("#load_" + _self.jqgrid.id).hide();
+
+              // Delete previous buttons, if any
+              jQuery("#t_" + _self.jqgrid.id).children().remove();
 
               // Add global action buttons on the toolbar
               if (_self.operations !== undefined && _self.operations.buttons !== undefined) {
@@ -933,6 +941,15 @@
       };
       setTimeout(server_loop, 100);
     };
+
+    this.refreshData = function () {
+      _self.data = {
+        data: [],
+        all_data: [],
+        filtered_data: null
+      };
+      fetchDataFromServer();
+    }
 
     var initJQGrid = function () {
       var final_jqgrid_configuration = jQuery.extend(

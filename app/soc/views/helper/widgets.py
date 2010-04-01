@@ -125,6 +125,13 @@ tinyMCE.init(%(settings_json)s)
   def render(self, name, value, attrs=None):
     """Render TinyMCE widget as HTML.
     """
+
+    from soc.logic.models.user import logic as user_logic
+    user = user_logic.getForCurrentAccount()
+
+    if user and user.disable_tinymce:
+      return super(FullTinyMCE, self).render(name, value, attrs)
+
     if value is None:
       value = ''
     value = util.smart_unicode(value)

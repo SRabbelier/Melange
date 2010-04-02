@@ -68,7 +68,7 @@ class StudentProposal(soc.models.linkable.Linkable):
       verbose_name=ugettext('Make public'))
   is_publicly_visible.help_text = ugettext(
       'If you check here, the content of your proposal will be visible '
-      'for others. Please not that they still will not be able to see '
+      'for others. Please note that they still will not be able to see '
       'any public comments and reviews of the proposal.')
 
   #: A property containing which mentor has assigned himself to this proposal.

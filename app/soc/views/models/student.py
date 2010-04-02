@@ -188,6 +188,7 @@ class View(role.View):
     if not entity:
       fields['user'] = fields['link_id']
       fields['link_id'] = fields['user'].link_id
+      fields['status'] = 'active'
 
     fields['agreed_to_tos'] = fields['agreed_to_student_agreement']
 

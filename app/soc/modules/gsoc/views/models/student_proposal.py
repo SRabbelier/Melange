@@ -1287,7 +1287,7 @@ class View(base.View):
 
     if is_public:
       # redirect to public page
-      redirect_url = redirects.getPublicRedirect(entity, self._params)
+      redirect_url = redirects.getStudentPrivateRedirect(entity, self._params)
     else:
       # redirect to review page
       redirect_url = redirects.getReviewRedirect(entity, self._params)

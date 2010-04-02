@@ -854,14 +854,14 @@ def main(args):
 
   interactive.setup()
 
-  from soc.models.organization import Organization
   from soc.models.user import User
-  from soc.models.student import Student
-  from soc.models.mentor import Mentor
-  from soc.models.org_admin import OrgAdmin
-  from soc.models.job import Job
-  from soc.models.student_proposal import StudentProposal
-  from soc.models.student_project import StudentProject
+  from soc.modules.gsoc.models.program import GSoCProgram
+  from soc.modules.gsoc.models.organization import GSoCOrganization
+  from soc.modules.gsoc.models.student import GSoCStudent
+  from soc.modules.gsoc.models.mentor import GSoCMentor
+  from soc.modules.gsoc.models import org_admin
+  from soc.modules.gsoc.models.student_proposal import StudentProposal
+  from soc.modules.gsoc.models.student_project import StudentProject
 
   def slotSaver(org, value):
     org.slots = value
@@ -878,23 +878,24 @@ def main(args):
       'saveValues': saveValues,
       'getEntities': getEntities,
       'deleteEntities': deleteEntities,
-      'getOrgs': getEntities(Organization),
+      'getOrgs': getEntities(GSoCOrganization),
       'getUsers': getEntities(User),
-      'getStudents': getEntities(Student),
-      'getMentors': getEntities(Mentor),
-      'getOrgAdmins': getEntities(OrgAdmin),
+      'getStudents': getEntities(GSoCStudent),
+      'getMentors': getEntities(GSoCMentor),
+      'getOrgAdmins': getEntities(org_admin.GSoCOrgAdmin),
       'getStudentProjects': getEntities(StudentProject),
+      'getStudentProjects': getEntities(StudentProposal),
       'getProps': getProps,
       'countStudentsWithProposals': countStudentsWithProposals,
       'setOrganizationInSurveyRecords': setOrganizationInSurveyRecords,
       'convertProposals': convertProposals,
       'addFollower': addFollower,
-      'Organization': Organization,
-      'Job': Job,
+      'GSoCOrganization': GSoCOrganization,
       'User': User,
-      'Student': Student,
-      'Mentor': Mentor,
-      'OrgAdmin': OrgAdmin,
+      'GSoCStudent': GSoCStudent,
+      'GSoCMentor': GSoCMentor,
+      'GSoCOrgAdmin': org_admin.GSoCOrgAdmin,
+      'GSoCProgram': GSoCProgram,
       'StudentProject': StudentProject,
       'StudentProposal': StudentProposal,
       'slotSaver': slotSaver,

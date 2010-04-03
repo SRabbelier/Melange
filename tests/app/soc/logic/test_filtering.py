@@ -96,3 +96,19 @@ class FilteringTest(unittest.TestCase):
     cleaner.string = dirty
     cleaner.clean()
     self.assertEqual(dirty, cleaner.string)
+
+  def test_xss_gets_filtered(self):
+    """Test that the XSS as described in [0] gets filtered.
+
+    [0] http://stackoverflow.com/questions/699468/python-html-sanitizer-scrubber-filter/812785#812785
+    """
+    from HTMLParser import HTMLParseError
+
+    dirty = u'''<<script>script> alert("Haha, I hacked your page."); </</script>script>'''
+    cleaner = HtmlSanitizer.Cleaner()
+    try:
+      cleaner.string = dirty
+      cleaner.clean()
+      self.fail("Invalid html should generate an error message.")
+    except HTMLParseError, msg:
+      pass

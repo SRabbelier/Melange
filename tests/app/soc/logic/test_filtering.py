@@ -88,3 +88,11 @@ class FilteringTest(unittest.TestCase):
     cleaner.string = dirty
     cleaner.clean()
     self.assertEqual(cleaner.string, expected)
+
+  def test_no_extra_paragraphs_are_inserted(self):
+    """Test that no extra paragraph tags are incerted"""
+    dirty = u'''<p>Bob</p>\n<p>Hello Bob</p>'''
+    cleaner = HtmlSanitizer.Cleaner()
+    cleaner.string = dirty
+    cleaner.clean()
+    self.assertEqual(dirty, cleaner.string)

@@ -72,7 +72,7 @@ class FilteringTest(unittest.TestCase):
     other equal tags being left at the end of the stream.
     """
     dirty = u'''<div>\n<h1>One</h1>\n<div>\n<h2>Repeat</h2>\n</div>\n</div>\n<div>\n<h1>Two</h1>\n<div>\n<h2>Repeat</h2>\n</div>\n</div>'''
-    expected = u'''<p>\n</p><h1>One</h1><p>\n</p><h2>Repeat</h2><p>\n</p><h1>Two</h1><p>\n</p><h2>Repeat</h2><p>\n</p>'''
+    expected = u'''\n<h1>One</h1>\n<h2>Repeat</h2>\n<h1>Two</h1>\n<h2>Repeat</h2>\n'''
 
     cleaner = HtmlSanitizer.Cleaner()
     cleaner.string = dirty

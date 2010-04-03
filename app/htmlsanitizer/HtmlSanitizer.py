@@ -94,6 +94,10 @@ XML_ENTITIES = { u"'" : u"&apos;",
 LINE_EXTRACTION_RE = re.compile(".+", re.MULTILINE)
 BR_EXTRACTION_RE = re.compile("</?br ?/?>", re.MULTILINE)
 
+def isWhitespaceString(x):
+    return isinstance(x, basestring) and x.isspace()
+
+
 class Stop:
     """
     handy class that we use as a stop input for our state machine in lieu of falling
@@ -375,7 +379,7 @@ class Cleaner(object):
         last_state = 'block'
         paragraph = BeautifulSoup.Tag(self._soup, e)
         
-        for node in children :
+        for node in children:
             if isinstance(node, Stop) :
                 state = 'end'
             elif hasattr(node, 'name') and node.name in block_elems:
@@ -391,6 +395,13 @@ class Cleaner(object):
                 paragraph.append(node)
                 
             if ((state <> 'inline') and last_state == 'inline') :
+                contents = list(paragraph)
+                if all(isWhitespaceString(element) for element in contents):
+                    if state == 'end' and not paragraph_list:
+                        # We do want to wrap whitespace if that's all we got
+                        pass
+                    else:
+                        paragraph = u''.join(contents)
                 paragraph_list.append(paragraph)
                 
             if state == 'block' :

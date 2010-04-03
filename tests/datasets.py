@@ -24,6 +24,7 @@ __authors__ = [
 
 
 from datetime import datetime
+from datetime import timedelta
 
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -164,10 +165,10 @@ class GHOPTimelineData(DataSet):
     link_id = 'ghop2009'
     scope_path = 'google'
     scope = SponsorData.google
-	program_start =  datetime.today() - timedelta(days=30)
-	program_end = datetime.today() + timedelta(days=30)
-	org_signup_start = datetime.today() - timedelta(days=25)
-	org_signup_end = datetime.today() + timedelta(days=25)
+    program_start =  datetime.today() - timedelta(days=30)
+    program_end = datetime.today() + timedelta(days=30)
+    org_signup_start = datetime.today() + timedelta(days=25)
+    org_signup_end = datetime.today() + timedelta(days=25)
 
 
 class ProgramData(DataSet):

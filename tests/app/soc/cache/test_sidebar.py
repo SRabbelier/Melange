@@ -57,34 +57,34 @@ class SidebarCacheTest(unittest.TestCase):
     """Test that get without setting something returns None.
     """
 
-    self.assertEqual((None, self.memcache_key), sidebar.get('id'))
+    self.assertEqual((None, self.memcache_key), sidebar.get(None, 'id'))
 
   def testGetPut(self):
     """Test that getting after putting gives back what you put in.
     """
 
-    sidebar.put(42, self.memcache_key)
-    self.assertEqual((42, self.memcache_key), sidebar.get('id'))
+    sidebar.put(42, self.memcache_key, None)
+    self.assertEqual((42, self.memcache_key), sidebar.get(None, 'id'))
 
   def testFlush(self):
     """Test that getting after putting and flushing returns None.
     """
 
-    sidebar.put(42, self.memcache_key)
+    sidebar.put(42, self.memcache_key, None)
     sidebar.flush('id')
-    self.assertEqual((None, self.memcache_key), sidebar.get('id'))
+    self.assertEqual((None, self.memcache_key), sidebar.get(None, 'id'))
 
   def testCache(self):
     """Test that the result of a cached sidebar is cached.
     """
 
     @sidebar.cache
-    def getAnswer(x):
+    def getAnswer(x, y):
       self.called = self.called + 1
       return 42
 
-    self.assertEqual(42, getAnswer('id'))
-    self.assertEqual(42, getAnswer('id'))
+    self.assertEqual(42, getAnswer(None, 'id'))
+    self.assertEqual(42, getAnswer(None, 'id'))
     self.assertEqual(self.called, 1)
 
 

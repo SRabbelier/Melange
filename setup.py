@@ -30,6 +30,7 @@ setup(
         'nose',
         ],
     entry_points = {'console_scripts': ['run-tests = tests.run:main',
+                                        'gen-app-yaml = scripts.gen_app_yaml:main',
                                         ],
                     },
     include_package_data = True,

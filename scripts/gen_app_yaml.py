@@ -88,9 +88,11 @@ def usage(msg):
   sys.exit('Error: %s\n\n%s' % (msg, __doc__))
 
 
-def main(args):
+def main():
   """Main program.
   """
+
+  args = sys.argv[1:]
 
   parser = OptionParser(usage=__doc__)
   parser.add_option("-f", "--force", action="store_true", default=False,
@@ -116,4 +118,4 @@ def main(args):
                   override_version=options.override_version)
 
 if __name__ == '__main__':
-  main(sys.argv[1:]) # strip off the binary name
+  main() # strip off the binary name

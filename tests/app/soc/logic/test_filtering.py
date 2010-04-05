@@ -90,7 +90,7 @@ class FilteringTest(unittest.TestCase):
     self.assertEqual(cleaner.string, expected)
 
   def test_no_extra_paragraphs_are_inserted(self):
-    """Test that no extra paragraph tags are incerted"""
+    """Test that no extra paragraph tags are inserted"""
     dirty = u'''<p>Bob</p>\n<p>Hello Bob</p>'''
     cleaner = HtmlSanitizer.Cleaner()
     cleaner.string = dirty
@@ -112,3 +112,11 @@ class FilteringTest(unittest.TestCase):
       self.fail("Invalid html should generate an error message.")
     except HTMLParseError, msg:
       pass
+
+  def test_anchor_tags_are_preserved(self):
+    """Test that anchor tags are preserved"""
+    dirty = u'''<p><a name="there"></a></p>'''
+    cleaner = HtmlSanitizer.Cleaner()
+    cleaner.string = dirty
+    cleaner.clean()
+    self.assertEqual(dirty, cleaner.string)

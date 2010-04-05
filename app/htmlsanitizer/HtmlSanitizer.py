@@ -52,7 +52,7 @@ ANTI_JS_RE=re.compile('j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:', re.IGNORECASE
 #These tags and attrs are sufficently liberal to let microformats through...
 #it ruthlessly culls all the rdf, dublin core metadata and so on.
 valid_tags = dict.fromkeys('p i em strong b u a h1 h2 h3 pre abbr br img dd dt ol ul li span sub sup ins del blockquote table tr td th address cite'.split()) #div?
-valid_attrs = dict.fromkeys('href src rel title'.split())
+valid_attrs = dict.fromkeys('href src rel title name'.split())
 valid_schemes = dict.fromkeys('http https'.split())
 elem_map = {'b' : 'strong', 'i': 'em'}
 attrs_considered_links = dict.fromkeys("src href".split()) #should include

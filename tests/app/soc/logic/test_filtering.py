@@ -120,3 +120,15 @@ class FilteringTest(unittest.TestCase):
     cleaner.string = dirty
     cleaner.clean()
     self.assertEqual(dirty, cleaner.string)
+
+  def test_partial_quoted_tags_are_no_problem(self):
+    """If some partial HTML is quoted it should be treated as text and not
+    subject to validation errors.
+    """
+    dirty = u'''<p>&lt;a href=&quot;http://www.example.com&quot;</p>'''
+    expected = u'''<p>&lt;a href=&quot;http://www.example.com&quot;</p>'''
+
+    cleaner = HtmlSanitizer.Cleaner()
+    cleaner.string = dirty
+    cleaner.clean()
+    self.assertEqual(cleaner.string, expected)

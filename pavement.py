@@ -11,18 +11,16 @@ for more information, or ``paver help`` for a list of all the valid commands.
 
     ``paver build``
         Builds the project. This essentially just runs a bunch of other tasks,
-        like ``pylint``, ``django_zip`` and ``tinymce_zip``, etc.
+        like ``pylint`` and ``tinymce_zip``, etc.
     ``paver pylint``
         Runs PyLint on the project.
-    ``paver django_zip``
-        Builds the Django zip file.
     ``paver tinymce_zip``
         Builds the TinyMCE zip file.
 
 If you specify ``--dry-run`` before a task, then the action of that task will
 not actually be carried out, although logging output will be displayed as if
-it were. For example, you could run ``paver --dry-run django_zip`` to see what
-files would be added to the ``django.zip`` file, etc.
+it were. For example, you could run ``paver --dry-run tinymce_zip`` to see what
+files would be added to the ``tinymce.zip`` file, etc.
 """
 
 from cStringIO import StringIO
@@ -38,7 +36,7 @@ from paver.path import path
 
 # Paver comes with Jason Orendorff's 'path' module; this makes path
 # manipulation easy and far more readable.
-PROJECT_DIR = path(__file__).dirname()
+PROJECT_DIR = path(__file__).dirname().abspath()
 
 
 # Set some default options. Having the options at the top of the file cleans
@@ -49,13 +47,14 @@ options(
         app_build = PROJECT_DIR / 'build',
         app_folder = PROJECT_DIR / 'app',
         app_files = ['app.yaml', 'cron.yaml', 'index.yaml', 'queue.yaml',
-		     'main.py', 'settings.py', 'shell.py', 'urls.py', 
-		     'gae_django.py'],
-        app_dirs =  ['soc', 'ghop', 'gsoc', 'feedparser', 'python25src',
-                     'reflistprop', 'jquery', 'ranklist', 'shell', 'json',
-                     'htmlsanitizer', 'taggable-mixin', 'gviz'],
+                     'main.py', 'settings.py', 'urls.py', 'gae_django.py',
+                     'profiler.py'],
+        app_dirs =  ["soc", "feedparser", "python25src", "reflistprop",
+                     "jquery", "ranklist", "shell", "json", "jlinq",
+                     "htmlsanitizer", "taggable", "gviz", "django"],
         zip_files = ['tiny_mce.zip'],
         skip_pylint = False,
+        skip_closure = False,
     )
 )
 
@@ -64,13 +63,6 @@ options(
 options(
     clean_build = options.build,
     tinymce_zip = options.build,
-    
-    django_zip = Bunch(
-        prune_dirs = ['.svn', 'gis', 'admin', 'localflavor', 'mysql',
-                      'mysql_old', 'oracle', 'postgresql',
-                      'postgresql_psycopg2', 'sqlite3', 'test'],
-        **options.build
-    ),
     
     pylint = Bunch(
         check_modules = ['soc', 'reflistprop', 'settings.py', 'urls.py',
@@ -87,35 +79,16 @@ options(
 
 # Utility functions
 
-def django_zip_files(django_src_dir):
-    """Yields each filename which should go into ``django.zip``."""
-    for filename in django_src_dir.walkfiles():
-        # The following seems unnecessarily unreadable, but unfortunately
-        # it seems it cannot be unobfuscated any more (if someone finds a
-        # nicer way of writing it, please tell me).
-        if not (filename.ext in ['.pyc', '.pyo', '.po', '.mo'] or
-                any(name in filename.splitall()
-                    for name in options.django_zip.prune_dirs)):
-            # The filename is suitable to be added to the archive. In this
-            # case, we yield the filename and the name it should be given in
-            # the Zip archive.
-            paver.tasks.environment.info(
-                '%-4sdjango.zip <- %s', '', filename)
-            arcname = path('django') / django_src_dir.relpathto(filename)
-            yield filename, arcname
-
-
 def tinymce_zip_files(tiny_mce_dir):
     """Yields each filename which should go into ``tiny_mce.zip``."""
     for filename in tiny_mce_dir.walkfiles():
-        if '.svn' not in filename.splitall():
-            # In this case, `tiny_mce/*` is in the root of the zip file, so
-            # we do not need to prefix `arcname` with 'tinymce/' (like we did
-            # with `django.zip`).
-            paver.tasks.environment.info(
-                '%-4stiny_mce.zip <- %s', '', filename)
-            arcname = tiny_mce_dir.relpathto(filename)
-            yield filename, arcname
+        if '.svn' in filename.splitall():
+            continue
+
+        paver.tasks.environment.info(
+            '%-4stiny_mce.zip <- %s', '', filename)
+        arcname = tiny_mce_dir.relpathto(filename)
+        yield filename, arcname
 
 
 def write_zip_file(zip_file_handle, files):
@@ -219,9 +192,6 @@ def build(options):
     # Clean the App build directory by removing and re-creating it.
     clean_build(options)
     
-    # Build the django.zip file.
-    django_zip(options)
-    
     # Build the tiny_mce.zip file.
     tinymce_zip(options)
     
@@ -243,7 +213,7 @@ def build_symlinks(options):
         link = path(options.app_build) / filename
         dry(
             '%-4s%-20s <- %s' % ('', target, link),
-            lambda: symlink(target, link))
+            lambda: symlink(target, link.abspath()))
 
 
 @task
@@ -265,48 +235,10 @@ def clean_build(options):
 ])
 def clean_zip(options):
     """Remove all the generated zip files from the app folder."""
-    for zip_file in options.zip_files + ['django.zip']:
+    for zip_file in options.zip_files:
         zip_path = path(options.app_folder) / zip_file
         if zip_path.exists():
             zip_path.remove()
-
-
-@task
-@cmdopts([
-    ('app-build=', 'b', 'App build directory (default /build)'),
-    ('app-folder=', 'a', 'App folder directory (default /app)'),
-])
-def django_zip(options):
-    """Create the zip file containing Django (minus unwanted stuff)."""
-    # Write the `django.zip` file. This requires finding all of the necessary
-    # files and writing them to a `zipfile.ZipFile` instance. Python's
-    # stdlib `zipfile` module is written in C, so it's fast and doesn't incur
-    # much overhead.
-    django_src_dir = path(options.app_folder) / 'django'
-    django_zip_filename = path(options.app_build) / 'django.zip'
-    if paver.tasks.environment.dry_run:
-        django_zip_fp = StringIO()
-    else:
-        # Ensure the parent directories exist.
-        django_zip_filename.dirname().makedirs()
-        django_zip_fp = open(django_zip_filename, mode='w')
-    
-    # Write the zip file to disk; this uses the `write_zip_file()` function
-    # defined above. The try/except/finally makes sure the `django.zip` file
-    # handle is properly closed no matter what happens.
-    try:
-        write_zip_file(django_zip_fp, django_zip_files(django_src_dir))
-    except Exception, exc:
-        # Close and delete the (possibly corrupted) `django.zip` file.
-        django_zip_fp.close()
-        django_zip_filename.remove()
-        # Raise the error, causing Paver to exit with a non-zero exit code.
-        raise paver.tasks.BuildFailure(
-            'Error occurred creating django.zip: %r' % (exc,))
-    finally:
-        # Close the file handle if it isn't already.
-        if not django_zip_fp.closed:
-            django_zip_fp.close()
 
 
 @task
@@ -315,8 +247,6 @@ def django_zip(options):
 ])
 def tinymce_zip(options):
     """Create the zip file containing TinyMCE."""
-    # This is very similar to django_zip; see the comments there for
-    # explanations.
     tinymce_dir = path(options.app_folder) / 'tiny_mce'
     tinymce_zip_filename = path(options.app_folder) / 'tiny_mce.zip'
     if paver.tasks.environment.dry_run:

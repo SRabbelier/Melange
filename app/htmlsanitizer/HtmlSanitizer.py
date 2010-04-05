@@ -69,7 +69,7 @@ complete_filters = ["strip_comments", "rename_tags", "strip_tags", "strip_attrs"
 default_settings = {
     "filters" : paranoid_filters,
     "block_elements" : block_elements, #xml or None for a more liberal version
-    "convert_entities" : "html", #xml or None for a more liberal version
+    "convert_entities" : None, #xml or None for a more liberal version
     "valid_tags" : valid_tags,
     "valid_attrs" : valid_attrs,
     "valid_schemes" : valid_schemes,

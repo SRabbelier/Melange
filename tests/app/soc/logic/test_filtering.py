@@ -132,3 +132,11 @@ class FilteringTest(unittest.TestCase):
     cleaner.string = dirty
     cleaner.clean()
     self.assertEqual(cleaner.string, expected)
+
+  def test_hr_tags_are_preserved(self):
+    """Test that hr tags are preserved"""
+    dirty = u'''<p><hr></p>'''
+    cleaner = HtmlSanitizer.Cleaner()
+    cleaner.string = dirty
+    cleaner.clean()
+    self.assertEqual(dirty, cleaner.string)

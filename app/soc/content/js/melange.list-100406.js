@@ -360,7 +360,6 @@
   }
 
   var retrieveData = function (postdata) {
-console.dir(postdata);
     var my_index = postdata.my_index;
     var original_data = list_objects.get(my_index).data.data;
     var temp_data = original_data;

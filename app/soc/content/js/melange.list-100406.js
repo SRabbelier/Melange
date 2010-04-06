@@ -174,11 +174,12 @@
   };
   dummy_source[1] = {
     "configuration": {
-      "colNames": ["Key", "Link ID", "Name", "Program Owner"],
+      "colNames": ["Key", "Link ID", "Name", "Rank", "Program Owner"],
       "colModel": [
         {name: "key", index: "key", resizable: true},
         {name: "link_id", index: "link_id", resizable: true},
         {name: "name", index: "name", resizable: true},
+        {name: "rank", index: "rank", resizable: true, sorttype: "integer"},
         {name: "program_owner", index: "program_owner", resizable: true}
       ],
       rowNum: 4,
@@ -195,6 +196,7 @@
             "key": "key_test3",
             "link_id": "test3",
             "name": "Mentor Test Example",
+            "rank": "10",
             "program_owner": "melange"
           },
           "operations": {
@@ -210,6 +212,7 @@
             "key": "key_test4",
             "link_id": "test4",
             "name": "Mentor Test Example",
+            "rank": "12",
             "program_owner": "google1"
           },
           "operations": {
@@ -227,6 +230,7 @@
             "key": "key_test5",
             "link_id": "test5",
             "name": "Mentor Test Example Loaded Incrementally",
+            "rank": "1",
             "program_owner": "google1"
           },
           "operations": {
@@ -244,6 +248,7 @@
             "key": "key_test6",
             "link_id": "test6",
             "name": "Mentor Test Example Loaded Incrementally 2",
+            "rank": "2",
             "program_owner": "google1"
           },
           "operations": {
@@ -355,6 +360,7 @@
   }
 
   var retrieveData = function (postdata) {
+console.dir(postdata);
     var my_index = postdata.my_index;
     var original_data = list_objects.get(my_index).data.data;
     var temp_data = original_data;
@@ -461,6 +467,19 @@
     // Process index/sorting filters
     var sort_column = postdata.sidx;
     var order_type = postdata.sord;
+
+    // Do internal conversion if sort type is number
+    jQuery.each(list_objects.get(my_index).configuration.colModel, function (column_index, column) {
+      if (column.name === sort_column && (column.sorttype === "integer" || column.sorttype === "int")) {
+        jQuery.each(temp_data, function (datum_index, datum) {
+          var parsed_int = parseInt(datum[sort_column], 10);
+          if (!isNaN(parsed_int)) {
+            datum[sort_column] = parsed_int;
+          }
+        });
+      }
+    });
+
     if (order_type === "asc") {
       order_type = "";
     }

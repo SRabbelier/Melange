@@ -37,10 +37,13 @@ from google.appengine.api import yaml_object
 _URL_REGEX = r'(?!\^)/|\.|(\(.).*(?!\$).'
 _FILES_REGEX = r'(?!\^).*(?!\$).'
 
-_DELTA_REGEX = r'([1-9][0-9]*)([DdHhMm]|[sS]?)'
+_DELTA_REGEX = r'([0-9]+)([DdHhMm]|[sS]?)'
 _EXPIRATION_REGEX = r'\s*(%s)(\s+%s)*\s*' % (_DELTA_REGEX, _DELTA_REGEX)
 
-_SERVICE_RE_STRING = r'(mail|xmpp_message)'
+_SERVICE_RE_STRING = r'(mail|xmpp_message|rest)'
+
+_PAGE_NAME_REGEX = r'^.+$'
+
 
 _EXPIRATION_CONVERSIONS = {
     'd': 60 * 60 * 24,
@@ -111,6 +114,11 @@ SKIP_FILES = 'skip_files'
 SERVICES = 'inbound_services'
 DERIVED_FILE_TYPE = 'derived_file_type'
 JAVA_PRECOMPILED = 'java_precompiled'
+PYTHON_PRECOMPILED = 'python_precompiled'
+ADMIN_CONSOLE = 'admin_console'
+
+PAGES = 'pages'
+NAME = 'name'
 
 
 class URLMap(validation.Validated):
@@ -299,6 +307,23 @@ class URLMap(validation.Validated):
     self.GetHandlerType()
 
 
+class AdminConsolePage(validation.Validated):
+  """Class representing admin console page in AdminConsole object.
+  """
+  ATTRIBUTES = {
+      URL: _URL_REGEX,
+      NAME: _PAGE_NAME_REGEX,
+      }
+
+
+class AdminConsole(validation.Validated):
+  """Class representing admin console directives in application info.
+  """
+  ATTRIBUTES = {
+      PAGES: validation.Optional(validation.Repeated(AdminConsolePage)),
+  }
+
+
 class AppInfoExternal(validation.Validated):
   """Class representing users application info.
 
@@ -337,7 +362,8 @@ class AppInfoExternal(validation.Validated):
       DEFAULT_EXPIRATION: validation.Optional(_EXPIRATION_REGEX),
       SKIP_FILES: validation.RegexStr(default=DEFAULT_SKIP_FILES),
       DERIVED_FILE_TYPE: validation.Optional(validation.Repeated(
-          validation.Options(JAVA_PRECOMPILED)))
+          validation.Options(JAVA_PRECOMPILED, PYTHON_PRECOMPILED))),
+      ADMIN_CONSOLE: validation.Optional(AdminConsole),
   }
 
   def CheckInitialized(self):

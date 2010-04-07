@@ -58,9 +58,6 @@ MemcacheFlushRequest = memcache_service_pb.MemcacheFlushRequest
 MemcacheStatsRequest = memcache_service_pb.MemcacheStatsRequest
 MemcacheStatsResponse = memcache_service_pb.MemcacheStatsResponse
 
-MemcacheGrabTailResponse = memcache_service_pb.MemcacheGrabTailResponse
-MemcacheGrabTailRequest = memcache_service_pb.MemcacheGrabTailRequest
-
 DELETE_NETWORK_FAILURE = 0
 DELETE_ITEM_MISSING = 1
 DELETE_SUCCESSFUL = 2
@@ -86,6 +83,23 @@ TYPE_LONG = 4
 TYPE_BOOL = 5
 
 CAPABILITY = capabilities.CapabilitySet('memcache')
+
+
+def _add_name_space(message, namespace=None):
+  """Populate the name_space field in a messagecol buffer.
+
+  Args:
+    message: A messagecol buffer supporting the set_name_space() operation.
+    namespace: The name of the namespace part. If None, use the
+      default namespace. The empty namespace (i.e. '') will clear
+      the name_space field.
+  """
+  if namespace is None:
+    namespace = namespace_manager.get_namespace()
+  if not namespace:
+    message.clear_name_space()
+  else:
+    message.set_name_space(namespace)
 
 
 def _key_string(key, key_prefix='', server_to_user_dict=None):
@@ -408,7 +422,7 @@ class Client(object):
     """
     request = MemcacheGetRequest()
     request.add_key(_key_string(key))
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheGetResponse()
     try:
       self._make_sync_call('memcache', 'Get', request, response)
@@ -444,7 +458,7 @@ class Client(object):
       the keys in the returned dictionary.
     """
     request = MemcacheGetRequest()
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheGetResponse()
     user_key = {}
     for key in keys:
@@ -489,7 +503,7 @@ class Client(object):
       raise ValueError('Delete timeout must be non-negative.')
 
     request = MemcacheDeleteRequest()
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheDeleteResponse()
 
     delete_item = request.add_item()
@@ -533,7 +547,7 @@ class Client(object):
       raise ValueError('Delete timeout must not be negative.')
 
     request = MemcacheDeleteRequest()
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheDeleteResponse()
 
     for key in keys:
@@ -644,7 +658,7 @@ class Client(object):
     item.set_flags(flags)
     item.set_set_policy(policy)
     item.set_expiration_time(int(math.ceil(time)))
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheSetResponse()
     try:
       self._make_sync_call('memcache', 'Set', request, response)
@@ -685,6 +699,7 @@ class Client(object):
       raise ValueError('Expiration must not be negative.')
 
     request = MemcacheSetRequest()
+    _add_name_space(request, namespace)
     user_key = {}
     server_keys = []
     for key, value in mapping.iteritems():
@@ -698,7 +713,6 @@ class Client(object):
       item.set_flags(flags)
       item.set_set_policy(policy)
       item.set_expiration_time(int(math.ceil(time)))
-    namespace_manager._add_name_space(request, namespace)
 
     response = MemcacheSetResponse()
     try:
@@ -905,7 +919,7 @@ class Client(object):
         pass
 
     request = MemcacheIncrementRequest()
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
     response = MemcacheIncrementResponse()
     request.set_key(_key_string(key))
     request.set_delta(delta)
@@ -924,52 +938,6 @@ class Client(object):
     if response.has_new_value():
       return response.new_value()
     return None
-
-  def grab_tail(self, item_count, namespace):
-    """Grab items from the tail of namespace's LRU cache.
-
-    Grab means atomically get and delete.
-
-    This method can be used to create queue systems with very high throughput
-    and low latency, but low reliability.
-
-    Args:
-      item_count: Number of items to retrieve off the tail of LRU cache.
-      namespace: a string specifying namespace to use in the request. Can't
-        be empty.
-
-    Returns:
-      A list of values that were present in memcache.
-
-    Raises:
-      ValueError: if namespace is empty.
-    """
-    if not isinstance(item_count, int):
-      raise TypeError('Item count must be an integer.')
-    if item_count < 0:
-      raise ValueError('Item count must not be negative.')
-    if item_count >= 0x80000000:
-      raise ValueError('Item count must be less than 2147483648.')
-    if not namespace:
-      raise ValueError('Namespace must not be empty.')
-    if not isinstance(namespace, str):
-      raise TypeError('Namespace must be a string.')
-
-    request = MemcacheGrabTailRequest()
-    namespace_manager._add_name_space(request, namespace)
-    response = MemcacheGrabTailResponse()
-    request.set_item_count(item_count)
-    try:
-      self._make_sync_call('memcache', 'GrabTail', request, response)
-    except apiproxy_errors.Error:
-      return []
-
-    return_value = []
-    for returned_item in response.item_list():
-      value = _decode_value(returned_item.value(), returned_item.flags(),
-                            self._do_unpickle)
-      return_value.append(value)
-    return return_value
 
   def offset_multi(self, mapping, key_prefix='',
                    namespace=None, initial_value=None):
@@ -999,7 +967,7 @@ class Client(object):
 
     request = MemcacheBatchIncrementRequest()
     response = MemcacheBatchIncrementResponse()
-    namespace_manager._add_name_space(request, namespace)
+    _add_name_space(request, namespace)
 
     for key, delta in mapping.iteritems():
       if not isinstance(delta, (int, long)):
@@ -1071,7 +1039,6 @@ def setup_client(client_obj):
   var_dict['decr'] = _CLIENT.decr
   var_dict['flush_all'] = _CLIENT.flush_all
   var_dict['get_stats'] = _CLIENT.get_stats
-  var_dict['grab_tail'] = _CLIENT.grab_tail
   var_dict['offset_multi'] = _CLIENT.offset_multi
 
 

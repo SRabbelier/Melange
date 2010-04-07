@@ -29,7 +29,8 @@ from google.appengine.datastore import datastore_index
 from google.appengine.datastore import datastore_pb
 from google.appengine.runtime import apiproxy_errors
 
-def GetSchema(_app=None, properties=True, start_kind=None, end_kind=None):
+def GetSchema(_app=None, namespace=None, properties=True, start_kind=None,
+              end_kind=None):
   """Infers an app's schema from the entities in the datastore.
 
   Note that the PropertyValue PBs in the returned EntityProtos are empty
@@ -42,12 +43,16 @@ def GetSchema(_app=None, properties=True, start_kind=None, end_kind=None):
     properties: boolean, whether to include property names and types
     start_kind, end_kind: optional range endpoints for the kinds to return,
       compared lexicographically
+    namespace: string, specified namespace of schema to be fetched
 
   Returns:
     list of entity_pb.EntityProto, with kind and property names and types
   """
   req = datastore_pb.GetSchemaRequest()
   req.set_app(datastore_types.ResolveAppId(_app))
+  namespace = datastore_types.ResolveNamespace(namespace)
+  if namespace:
+    req.set_name_space(namespace)
   req.set_properties(properties)
   if start_kind is not None:
     req.set_start_kind(start_kind)
@@ -55,7 +60,7 @@ def GetSchema(_app=None, properties=True, start_kind=None, end_kind=None):
     req.set_end_kind(end_kind)
   resp = datastore_pb.Schema()
 
-  _Call('GetSchema', req, resp)
+  resp = _Call('GetSchema', req, resp)
   return resp.kind_list()
 
 
@@ -68,11 +73,7 @@ def GetIndices(_app=None):
   req = api_base_pb.StringProto()
   req.set_value(datastore_types.ResolveAppId(_app))
   resp = datastore_pb.CompositeIndices()
-  try:
-    apiproxy_stub_map.MakeSyncCall('datastore_v3', 'GetIndices', req, resp)
-  except apiproxy_errors.ApplicationError, err:
-    raise datastore._ToDatastoreError(err)
-
+  resp = _Call('GetIndices', req, resp)
   return resp.index_list()
 
 
@@ -86,7 +87,7 @@ def CreateIndex(index):
     int, the id allocated to the index
   """
   resp = api_base_pb.Integer64Proto()
-  _Call('CreateIndex', index, resp)
+  resp = _Call('CreateIndex', index, resp)
   return resp.value()
 
 
@@ -118,10 +119,13 @@ def _Call(call, req, resp):
     resp: the response PB
   """
   if hasattr(req, 'app_id'):
-    req.set_app_id(datastore_types.ResolveAppId(req.app_id(), 'req.app_id()'))
+    req.set_app_id(datastore_types.ResolveAppId(req.app_id()))
 
   try:
-    apiproxy_stub_map.MakeSyncCall('datastore_v3', call, req, resp)
+    result = apiproxy_stub_map.MakeSyncCall('datastore_v3', call, req, resp)
+    if result:
+      return result
+    return resp
   except apiproxy_errors.ApplicationError, err:
     raise datastore._ToDatastoreError(err)
 

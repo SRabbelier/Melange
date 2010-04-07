@@ -140,15 +140,13 @@ def ValidateInteger(value,
   if value < 0 and not negative_ok:
     raise exception('%s must not be negative.' % name)
 
-
-def ResolveAppId(app, name='_app'):
+def ResolveAppId(app):
   """Validate app id, providing a default.
 
   If the argument is None, $APPLICATION_ID is substituted.
 
   Args:
     app: The app id argument value to be validated.
-    name: The argument name, for error messages.
 
   Returns:
     The value of app, or the substituted default.  Always a non-empty string.
@@ -158,81 +156,55 @@ def ResolveAppId(app, name='_app'):
   """
   if app is None:
     app = os.environ.get('APPLICATION_ID', '')
-  ValidateString(app, '_app', datastore_errors.BadArgumentError)
+  ValidateString(app, 'app', datastore_errors.BadArgumentError)
   return app
 
 
-class AppIdNamespace(object):
-  """Combined AppId and Namespace
+def ResolveNamespace(namespace):
+  """Validate app namespace, providing a default.
 
-  An identifier that combines the application identifier and the
-  namespace.
+  If the argument is None, namespace_manager.get_namespace() is substituted.
+
+  Args:
+    namespace: The namespace argument value to be validated.
+
+  Returns:
+    The value of namespace, or the substituted default.
+    Always a non-empty string or None.
+
+  Raises:
+    BadArgumentError if the value is not a string.
   """
-  __app_id = None
-  __namespace = None
+  if namespace is None:
+    namespace = namespace_manager.get_namespace();
+  ValidateString(
+    namespace, 'namespace', datastore_errors.BadArgumentError, empty_ok=True)
+  return namespace
 
-  def __init__(self, app_id, namespace):
-    """Constructor. Creates a AppIdNamespace from two strings.
 
-    Args:
-      app_id: application identifier string
-      namespace: namespace identifier string
-    Raises:
-      BadArgumentError if the values contain
-      the _NAMESPACE_SEPARATOR character (!) or
-      the app_id is empty.
-    """
-    self.__app_id = app_id
-    if namespace:
-      self.__namespace = namespace
-    else:
-      self.__namespace = None
-    ValidateString(self.__app_id, 'app_id', datastore_errors.BadArgumentError)
-    ValidateString(self.__namespace,
-                   'namespace', datastore_errors.BadArgumentError,
-                   empty_ok=True)
-    if _NAMESPACE_SEPARATOR in self.__app_id:
-      raise datastore_errors.BadArgumentError(
-        'app_id must not contain a "%s"' % _NAMESPACE_SEPARATOR)
-    if self.__namespace and _NAMESPACE_SEPARATOR in self.__namespace:
-      raise datastore_errors.BadArgumentError(
-        'namespace must not contain a "%s"' % _NAMESPACE_SEPARATOR)
+def EncodeAppIdNamespace(app_id, namespace):
+  """Concatenates app id and namespace into a single string.
 
-  def __cmp__(self, other):
-    """Returns negative, zero, or positive when comparing two AppIdNamespace.
+     This method is needed for xml and datastore_file_stub.
+  """
+  if not namespace:
+    return app_id
+  else:
+    return app_id + _NAMESPACE_SEPARATOR + namespace
 
-    Args:
-      other: AppIdNamespace to compare to.
 
-    Returns:
-      Negative if self is less than "other"
-      Zero if "other" is equal to self
-      Positive if self is greater than "other"
-    """
-    if not isinstance(other, AppIdNamespace):
-      return cmp(id(self), id(other))
-    return cmp((self.__app_id, self.__namespace),
-               (other.__app_id, other.__namespace))
+def SetNamespace(proto, namespace):
+  """Sets the namespace for a protocol buffer or clears the field.
 
-  def to_encoded(self):
-    """Returns this AppIdNamespace's string equivalent
-
-    i.e. "app!namespace"
-    """
-    if not self.__namespace:
-      return self.__app_id
-    else:
-      return self.__app_id + _NAMESPACE_SEPARATOR + self.__namespace
-
-  def app_id(self):
-    """Returns this AppId portion of this AppIdNamespace.
-    """
-    return self.__app_id;
-
-  def namespace(self):
-    """Returns this namespace portion of this AppIdNamespace.
-    """
-    return self.__namespace;
+  Args:
+    proto: the protocol buffer to update
+    namespace: the new namespace (None or an empty string will clear out the
+        field).
+  """
+  if not namespace:
+    proto.clear_name_space()
+  else:
+    proto.set_name_space(namespace)
 
 
 def PartitionString(value, separator):
@@ -249,64 +221,6 @@ def PartitionString(value, separator):
   else:
     return (value[0:index], separator, value[index+len(separator):len(value)])
 
-
-def parse_app_id_namespace(app_id_namespace):
-  """
-  An app_id_namespace string is valid if it's not empty, and contains
-  at most one namespace separator ('!').  Also, an app_id_namespace
-  with an empty namespace must not contain a namespace separator.
-
-  Args:
-    app_id_namespace: an encoded app_id_namespace.
-  Raises exception if format of app_id_namespace is invalid.
-  """
-  if not app_id_namespace:
-    raise datastore_errors.BadArgumentError(
-        'app_id_namespace must be non empty')
-  parts = PartitionString(app_id_namespace, _NAMESPACE_SEPARATOR)
-  if parts[1] == _NAMESPACE_SEPARATOR:
-    if not parts[2]:
-      raise datastore_errors.BadArgumentError(
-        'app_id_namespace must not contain a "%s" if the namespace is empty' %
-        _NAMESPACE_SEPARATOR)
-  if parts[2]:
-    return AppIdNamespace(parts[0], parts[2])
-  return AppIdNamespace(parts[0], None)
-
-
-def ResolveAppIdNamespace(
-    app_id=None, namespace=None, app_id_namespace=None):
-  """Validate an app id/namespace and substitute default values.
-
-  If the argument is None, $APPLICATION_ID!$NAMESPACE is substituted.
-
-  Args:
-    app_id: The app id argument value to be validated.
-    namespace: The namespace argument value to be validated.
-    app_id_namespace: An AppId/Namespace pair
-
-  Returns:
-    An AppIdNamespace object initialized with AppId and Namespace.
-
-  Raises:
-    BadArgumentError if the value is empty or not a string.
-  """
-  if app_id_namespace is None:
-    if app_id is None:
-      app_id = os.environ.get('APPLICATION_ID', '')
-    if namespace is None:
-      namespace = namespace_manager.get_namespace();
-  else:
-    if not app_id is None:
-      raise datastore_errors.BadArgumentError(
-          'app_id is overspecified.  Cannot define app_id_namespace and app_id')
-    if not namespace is None:
-      raise datastore_errors.BadArgumentError(
-          'namespace is overspecified.  ' +
-          'Cannot define app_id_namespace and namespace')
-    return parse_app_id_namespace(app_id_namespace)
-
-  return AppIdNamespace(app_id, namespace)
 
 
 class Key(object):
@@ -398,12 +312,9 @@ class Key(object):
     Args:
       kind: the entity kind (a str or unicode instance)
       id_or_name: the id (an int or long) or name (a str or unicode instance)
-
-    Additional positional arguments are allowed and should be
-    alternating kind and id/name.
-
-    Keyword args:
       parent: optional parent Key; default None.
+      namespace: optional namespace to use otherwise namespace_manager's
+        default namespace is used.
 
     Returns:
       A new Key instance whose .kind() and .id() or .name() methods return
@@ -414,10 +325,9 @@ class Key(object):
       BadKeyError if the parent key is incomplete.
     """
     parent = kwds.pop('parent', None)
-    _app_id_namespace_obj = ResolveAppIdNamespace(
-        kwds.pop('_app', None),
-        kwds.pop('_namespace', None),
-        kwds.pop('_app_id_namespace', None))
+    app_id = ResolveAppId(kwds.pop('_app', None))
+
+    namespace = kwds.pop('namespace', None)
 
     if kwds:
       raise datastore_errors.BadArgumentError(
@@ -433,21 +343,26 @@ class Key(object):
         raise datastore_errors.BadArgumentError(
             'Expected None or a Key as parent; received %r (a %s).' %
             (parent, typename(parent)))
+      if namespace is None:
+        namespace = parent.namespace()
       if not parent.has_id_or_name():
         raise datastore_errors.BadKeyError(
             'The parent Key is incomplete.')
-      if _app_id_namespace_obj != parent.app_id_namespace():
+      if app_id != parent.app() or namespace != parent.namespace():
         raise datastore_errors.BadArgumentError(
-            'The app_id/namespace arguments (%r) should match ' +
-            'parent.app_id_namespace().to_encoded() (%s)' %
-            (_app_id_namespace_obj, parent.app_id_namespace()))
+            'The app/namespace arguments (%s/%s) should match '
+            'parent.app/namespace() (%s/%s)' %
+            (app_id, namespace, parent.app(), parent.namespace()))
+
+    namespace = ResolveNamespace(namespace)
 
     key = Key()
     ref = key.__reference
     if parent is not None:
       ref.CopyFrom(parent.__reference)
     else:
-      ref.set_app(_app_id_namespace_obj.to_encoded())
+      ref.set_app(app_id)
+      SetNamespace(ref, namespace)
 
     path = ref.mutable_path()
     for i in xrange(0, len(args), 2):
@@ -476,23 +391,16 @@ class Key(object):
   def app(self):
     """Returns this entity's app id, a string."""
     if self.__reference.app():
-      return self.app_id_namespace().app_id().decode('utf-8')
+      return self.__reference.app().decode('utf-8')
     else:
       return None
 
   def namespace(self):
-    """Returns this entity's app id, a string."""
-    if self.__reference.app():
-      return self.app_id_namespace().namespace().decode('utf-8')
+    """Returns this entity's namespace, a string."""
+    if self.__reference.has_name_space():
+      return self.__reference.name_space().decode('utf-8')
     else:
-      return None
-
-  def app_id_namespace(self):
-    """Returns this entity's app id/namespace, an appIdNamespace object."""
-    if self.__reference.app():
-      return parse_app_id_namespace(self.__reference.app())
-    else:
-      return None
+      return ''
 
   def kind(self):
     """Returns this entity's kind, as a string."""
@@ -567,7 +475,8 @@ class Key(object):
         'ToTagUri() called for an entity with an incomplete key.')
 
     return u'tag:%s.%s,%s:%s[%s]' % (
-        saxutils.escape(self.app_id_namespace().to_encoded()),
+
+        saxutils.escape(EncodeAppIdNamespace(self.app(), self.namespace())),
         os.environ['AUTH_DOMAIN'],
         datetime.date.today().isoformat(),
         saxutils.escape(self.kind()),
@@ -672,7 +581,10 @@ class Key(object):
       else:
         args.append(repr(elem.id()))
 
-    args.append('_app_id_namespace=%r' % self.__reference.app().decode('utf-8'))
+    args.append('_app=%r' % self.__reference.app().decode('utf-8'))
+    if self.__reference.has_name_space():
+      args.append('namespace=%r' %
+          self.__reference.name_space().decode('utf-8'))
     return u'datastore_types.Key.from_path(%s)' % ', '.join(args)
 
   def __cmp__(self, other):
@@ -692,10 +604,10 @@ class Key(object):
     if not isinstance(other, Key):
       return -2
 
-    self_args = [self.__reference.app()]
+    self_args = [self.__reference.app(), self.__reference.name_space()]
     self_args += self.to_path(_default_id=0)
 
-    other_args = [other.__reference.app()]
+    other_args = [other.__reference.app(), other.__reference.name_space()]
     other_args += other.to_path(_default_id=0)
 
     for self_component, other_component in zip(self_args, other_args):
@@ -1472,6 +1384,7 @@ def PackKey(name, value, pbvalue):
   """
   ref = value._Key__reference
   pbvalue.mutable_referencevalue().set_app(ref.app())
+  SetNamespace(pbvalue.mutable_referencevalue(), ref.name_space())
   for elem in ref.path().element_list():
     pbvalue.mutable_referencevalue().add_pathelement().CopyFrom(elem)
 
@@ -1602,6 +1515,7 @@ def FromReferenceProperty(value):
   key = Key()
   key_ref = key._Key__reference
   key_ref.set_app(ref.app())
+  SetNamespace(key_ref, ref.name_space())
 
   for pathelem in ref.pathelement_list():
     key_ref.mutable_path().add_element().CopyFrom(pathelem)
@@ -1788,3 +1702,4 @@ def PropertyValueFromString(type_,
   elif type_ == type(None):
     return None
   return type_(value_string)
+

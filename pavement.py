@@ -73,6 +73,12 @@ options(
         pylint_args = [],
         ignore = False,
         **options.build
+    ),
+
+    closure = Bunch(
+        js_dirs = ["soc/content/js", "jquery", "jlinq"],
+        closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
+        **options.build
     )
 )
 
@@ -266,3 +272,52 @@ def tinymce_zip(options):
     finally:
         if not tinymce_zip_fp.closed:
             tinymce_zip_fp.close()
+
+def run_closure(f):
+    """Runs the closure compiler over one JS file"""
+
+    tmp = f + ".tmp.js"
+    f.move(tmp)
+
+    try:
+        sh("java -jar %s --js=%s > %s" % (options.closure_bin, tmp, f))
+    except BuildFailure, e:
+        paver.tasks.environment.error(
+            "%s minimization failed, copying plain file", f)
+        tmp.copy(f)
+
+    tmp.remove()
+
+@task
+@cmdopts([
+    ('app-folder=', 'a', 'App folder directory (default /app)'),
+    ('js-dir=', 'j', 'JS directory to minimize, relative to /app'),
+])
+def closure(options):
+    """Runs the closure compiler over the JS files."""
+
+    if options.js_dir:
+      dirs = [options.app_folder / options.js_dir]
+    else:
+      dirs = [options.app_folder / i for i in options.js_dirs]
+    old_size = 0
+    new_size = 0
+
+    for js_dir in dirs:
+        min_dir = js_dir + ".min"
+        min_dir.rmtree()
+        js_dir.copytree(min_dir)
+        for f in min_dir.walkfiles("*.js"):
+            paver.tasks.environment.info(
+            '%-4sCLOSURE: Processing %s', '', f)
+
+            old_size += f.size
+
+            run_closure(f)
+
+            new_size += f.size
+
+    rate = new_size*100 / old_size
+    paver.tasks.environment.info(
+        "%-4sCLOSURE: Source file sizes: %s, Dest file sizes: %s, Rate: %s",
+        '', old_size, new_size, rate)

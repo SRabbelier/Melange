@@ -76,7 +76,7 @@ options(
     ),
 
     closure = Bunch(
-        js_dirs = ["soc/content/js", "jquery", "jlinq"],
+        js_dirs = ["soc/content/js", "jquery", "jlinq", "json"],
         closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
         **options.build
     )

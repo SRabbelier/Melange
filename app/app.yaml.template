@@ -53,7 +53,7 @@ handlers:
   expiration: 1d
 
 - url: /json
-  static_dir: json
+  static_dir: json.min
   expiration: 1d
 
 - url: /admin/shell.*

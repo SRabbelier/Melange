@@ -32,6 +32,10 @@ handlers:
 - url: /tiny_mce/.*
   script: $PYTHON_LIB/google/appengine/ext/zipserve
 
+- url: /soc/content/js
+  static_dir: soc/content/js.min
+  expiration: 1d
+
 - url: /soc/content
   static_dir: soc/content
   expiration: 1d
@@ -41,11 +45,11 @@ handlers:
   expiration: 1d
 
 - url: /jlinq
-  static_dir: jlinq
+  static_dir: jlinq.min
   expiration: 1d
 
 - url: /jquery
-  static_dir: jquery
+  static_dir: jquery.min
   expiration: 1d
 
 - url: /json

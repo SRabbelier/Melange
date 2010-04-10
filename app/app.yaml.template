@@ -45,7 +45,7 @@ handlers:
   expiration: 1d
 
 - url: /jlinq
-  static_dir: jlinq.min
+  static_dir: jlinq
   expiration: 1d
 
 - url: /jquery

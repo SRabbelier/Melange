@@ -50,7 +50,7 @@ options(
                      'main.py', 'settings.py', 'urls.py', 'gae_django.py',
                      'profiler.py'],
         app_dirs =  ["soc", "feedparser", "python25src", "reflistprop",
-                     "jquery.min", "ranklist", "shell", "json.min", "jlinq.min",
+                     "jquery.min", "ranklist", "shell", "json.min", "jlinq",
                      "htmlsanitizer", "taggable", "gviz", "django"],
         zip_files = ['tiny_mce.zip'],
         skip_pylint = False,

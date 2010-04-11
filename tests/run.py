@@ -102,7 +102,7 @@ def main():
     plugins.append(plugin)
 
     args = ['--with-coverage',
-            '--cover-package=soc',
+            '--cover-package=soc.',
             '--cover-erase',
             '--cover-html',
             '--cover-html-dir=coverageResults']

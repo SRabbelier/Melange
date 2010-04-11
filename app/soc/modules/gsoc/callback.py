@@ -24,6 +24,7 @@ __authors__ = [
 from soc.modules.gsoc.tasks import accept_proposals
 from soc.modules.gsoc.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gsoc.tasks import program_freezer
+from soc.modules.gsoc.tasks import slot_assignment
 from soc.modules.gsoc.tasks import proposal_duplicates as \
     proposal_duplicates_tasks
 from soc.modules.gsoc.views.models import grading_project_survey as \
@@ -80,6 +81,7 @@ class Callback(object):
     self.core.registerSitemapEntry(
         proposal_duplicates_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(accept_proposals.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(slot_assignment.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

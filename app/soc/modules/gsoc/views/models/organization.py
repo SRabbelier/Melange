@@ -462,7 +462,10 @@ class View(organization.View):
     rp_params['review_field_props'] = {
         "score": {
             "sorttype": "integer",
-        }
+        },
+        "rank": {
+            "sorttype": "integer",
+        },
     }
     rp_params['review_conf_min_num'] = 50
 

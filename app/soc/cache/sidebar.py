@@ -77,4 +77,4 @@ def flush(id=None):
 
 
 # define the cache function
-cache = soc.cache.base.getCacher(get, put)
+cache = soc.cache.base.getSoftCacher(get, put)

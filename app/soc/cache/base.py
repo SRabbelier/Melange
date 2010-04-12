@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -25,8 +26,12 @@ __authors__ = [
 from functools import wraps
 
 
-def getCacher(get, put):
-  """Returns a caching decorator that uses get and put.
+def getSoftCacher(get, add):
+  """Returns a caching decorator that uses get and add.
+
+  Its main attitude is that the desired key is looked up in the current cache
+  memory and if it is found, the associated value is returned. Otherwise,
+  the data store is queried.
   """
 
   # TODO(SRabbelier) possibly accept 'key' instead, and define
@@ -47,7 +52,7 @@ def getCacher(get, put):
       result = func(*args, **kwargs)
 
       if key:
-        put(result, key, *args, **kwargs)
+        add(result, key, *args, **kwargs)
 
       return result
 

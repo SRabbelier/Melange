@@ -33,7 +33,7 @@ class CacheDecoratorTest(unittest.TestCase):
 
   def setUp(self):
     self.called = 0
-    decorator = base.getCacher(self.get, self.put)
+    decorator = base.getSoftCacher(self.get, self.put)
 
     @decorator
     def failOnSecondCall():

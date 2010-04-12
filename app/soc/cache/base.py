@@ -59,3 +59,22 @@ def getSoftCacher(get, add):
     return wrapper
 
   return cache
+
+
+def getHardCacher(key, set):
+  """ Returns a caching function that puts data in cache.
+
+  It is a hard cacher as it always writes new data into the cache memory and
+  possibly overrides the existing one. 
+  """
+
+  def cache(*args, **kwargs):
+    """ Sets data in cache.
+    """
+
+    memcache_key = key(*args, **kwargs)
+    data = kwargs.get('data')
+    if memcache_key and data:
+      set(data, memcache_key)
+
+  return cache

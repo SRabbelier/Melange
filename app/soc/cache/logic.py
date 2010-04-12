@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -28,7 +29,7 @@ from google.appengine.ext import db
 import soc.cache.base
 
 
-def key(model, filter, order):
+def key(model, filter, order, *args, **kwargs):
   """Returns the memcache key for this query.
   """
 
@@ -57,8 +58,10 @@ def get(model, filter, order, *args, **kwargs):
   return memcache.get(memcache_key), memcache_key
 
 
-def put(data, memcache_key, *args, **kwargs):
-  """Sets the data for the specified query in the memcache.
+def add(data, memcache_key, *args, **kwargs):
+  """Add the data for the specified query in the memcache.
+
+  The data is added if and only if it is not already stored.
 
   Args:
     data: the data to be cached
@@ -80,4 +83,4 @@ def flush(model, filter):
 
 
 # define the cache function
-cache = soc.cache.base.getSoftCacher(get, put)
+cache = soc.cache.base.getSoftCacher(get, add)

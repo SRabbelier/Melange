@@ -33,7 +33,7 @@ class CacheDecoratorTest(unittest.TestCase):
 
   def setUp(self):
     self.called = 0
-    decorator = base.getSoftCacher(self.get, self.put)
+    decorator = base.getSoftCacher(self.get, self.add)
 
     @decorator
     def failOnSecondCall():
@@ -49,7 +49,7 @@ class CacheDecoratorTest(unittest.TestCase):
   def get(self):
     return memcache.get('answer_to_life'), 'answer_to_life'
 
-  def put(self, answer, memcache_key):
+  def add(self, answer, memcache_key):
     memcache.add(memcache_key, 42)
 
   def testMemcache(self):

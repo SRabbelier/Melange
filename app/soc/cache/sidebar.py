@@ -45,8 +45,8 @@ def get(core, id, *args, **kwargs):
   return memcache.get(memcache_key), memcache_key
 
 
-def put(sidebar, memcache_key, core, *args, **kwargs):
-  """Sets the sidebar for the specified user in the memcache.
+def add(sidebar, memcache_key, core, *args, **kwargs):
+  """Adds the sidebar for the specified user in the memcache.
 
   Args:
     sidebar: the sidebar to be cached
@@ -77,4 +77,4 @@ def flush(id=None):
 
 
 # define the cache function
-cache = soc.cache.base.getSoftCacher(get, put)
+cache = soc.cache.base.getSoftCacher(get, add)

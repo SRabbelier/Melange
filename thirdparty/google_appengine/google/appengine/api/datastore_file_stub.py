@@ -162,7 +162,8 @@ class _Cursor(object):
       offset += query.offset()
 
     if offset > 0:
-      self.__last_result = results[offset - 1]
+      last_index = min(len(results), offset) - 1
+      self.__last_result = results[last_index]
     else:
       self.__last_result = cursor_entity
 

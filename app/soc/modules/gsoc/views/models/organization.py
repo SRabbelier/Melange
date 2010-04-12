@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    'Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -337,13 +338,17 @@ class View(organization.View):
       ranker_root = ranker_root_logic.getForFields(fields, unique=True)
       ranker = ranker_root_logic.getRootFromEntity(ranker_root)
 
-      keys = []
+      status = {}
 
       # only when the program allows allocations
-      # to be seen we should color the list
+      # we show that proposals are likely to be
+      # accepted or rejected
       if org_entity.scope.allocations_visible:
         proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
-        keys = [i.key() for i in proposals]
+
+        for proposal in proposals:
+          if proposal.status == 'pending':
+            status[proposal.key()] = 'Pending acceptance'
 
       filter = {'org': org_entity,
                 'status': ['accepted','pending','rejected']}
@@ -351,7 +356,7 @@ class View(organization.View):
       order = ['-score']
 
       # some extras for the list
-      args = [ranker, keys]
+      args = [ranker, status]
       visibility = 'review'
     elif idx == 2:
       # check if the current user is a mentor
@@ -444,13 +449,16 @@ class View(organization.View):
                                        'Score', 'status', 'Last Modified On',
                                        'Abstract', 'Content', 'Additional Info',
                                        'Created On']
-    rp_params['review_field_prefetch'] = ['scope', 'mentor']
-    rp_params['review_field_extra'] = lambda entity, ranker, keys: {
+    rp_params['review_field_prefetch'] = ['scope', 'mentor', 'program']
+    rp_params['review_field_extra'] = lambda entity, ranker, status: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
-          'item_class': entity.key() in keys,
           'student': entity.scope.name(),
           'mentor': entity.mentor.name() if entity.mentor else
               '%s Proposed' % len(entity.possible_mentors),
+          'status': status.get(entity.key(),
+              "Pending rejection") if (
+              entity.program.allocations_visible \
+              and entity.status == 'pending') else entity.status,
     }
     rp_params['review_row_action'] = {
         "type": "redirect_custom",

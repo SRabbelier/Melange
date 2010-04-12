@@ -97,5 +97,6 @@ def flush(model, filter):
   memcache.delete(memcache_key)
 
 
-# define the cache function
+# define the cache functions
 cache = soc.cache.base.getSoftCacher(get, add)
+force_cache = soc.cache.base.getHardCacher(key, set)

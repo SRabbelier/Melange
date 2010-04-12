@@ -56,7 +56,7 @@
           'setCell',
           (row_id + 1),
           slots_colModel,
-          '<div class="slots" id="id_slot_count_'+org_link_id+'"><input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
+          '<div class="slots" id="id_slot_count_container_'+org_link_id+'"><input type="text" id="id_spin_slot_count_'+org_link_id+'" size="3" value="0"/></div>',
           null,
           null
         );
@@ -67,12 +67,12 @@
           'setCell',
           (row_id + 1),
           locked_colModel,
-          '<div class="locked" id="locked_slot_count_'+org_link_id+'"><input type="checkbox" id="id_locked_slot_'+org_link_id+'"/></div>',
+          '<div class="locked" id="id_locked_slot_container_'+org_link_id+'"><input type="checkbox" id="id_locked_slot_'+org_link_id+'"/></div>',
           null,
           null
         );
 
-        jQuery("#id_locked_slot_count_"+org_link_id).bind("change", lockSlots);
+        jQuery("#id_locked_slot_"+org_link_id).bind("change", lockSlots);
       });
       jQuery('[id^=id_spin_slot_count_]').spin({min:0, max:MAX_AVAILABLE_SLOTS});
 
@@ -139,6 +139,7 @@
       );
       updateOverlay();
     }
+    jQuery("[id^=button_slot_]").removeAttr('disabled');
   }
 
   function retrieveJSON() {
@@ -153,16 +154,19 @@
   }
 
   function reCalculate() {
+    jQuery("#button_slot_allocation_recalculate").attr('disabled', 'disabled');
     var url = RETURN_URL + "?_=" + (new Date().getTime());
     jQuery.postJSON(url, current_slots, updateFromJSON);
   }
 
   function submitSlots() {
+    jQuery("#button_slot_allocation_submit").attr('disabled', 'disabled');
     var url = RETURN_URL + "?submit=1&_=" + (new Date().getTime());
     jQuery.postJSON(url, current_slots, updateFromJSON);
   }
 
   function loadSlots() {
+    jQuery("#button_slot_allocation_load").attr('disabled', 'disabled');
     var url = RETURN_URL + "?load=1&_=" + (new Date().getTime());
     jQuery.postJSON(url, current_slots, updateFromJSON);
   }

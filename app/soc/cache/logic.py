@@ -59,7 +59,7 @@ def get(model, filter, order, *args, **kwargs):
 
 
 def add(data, memcache_key, *args, **kwargs):
-  """Add the data for the specified query in the memcache.
+  """Adds the data for the specified query in the memcache.
 
   The data is added if and only if it is not already stored.
 
@@ -71,6 +71,21 @@ def add(data, memcache_key, *args, **kwargs):
   retention = 15*60
   # pylint: disable-msg=E1101
   memcache.add(memcache_key, data, retention)
+
+
+def set(data, memcache_key):
+  """Sets the data for the specified query in the memcache.
+
+  The data is always added to memcache.
+
+  Args:
+    data: the data to be cached
+  """
+
+  # Store data for fifteen minutes to force a refresh every so often
+  retention = 15*60
+  # pylint: disable-msg=E1101
+  memcache.set(memcache_key, data, retention)
 
 
 def flush(model, filter):

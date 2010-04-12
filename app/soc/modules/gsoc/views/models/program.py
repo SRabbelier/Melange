@@ -604,7 +604,7 @@ class View(program.View):
 
     filter = {
           'scope': program_entity,
-          'status': 'active',
+          'status': ['new', 'active', 'inactive'],
           }
 
     query = org_logic.getQueryForFields(filter=filter)

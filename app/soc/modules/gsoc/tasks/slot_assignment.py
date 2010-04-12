@@ -70,6 +70,10 @@ def assignProgramSlots(request, *args, **kwargs):
     logging.error("programkey not in params")
     return responses.terminateTask()
 
+  if not program:
+    logging.error("no such program '%s'" % params["programkey"])
+    return responses.terminateTask()
+
   if not program.slots_allocation:
     logging.error("empty slots_allocation")
     return responses.terminateTask()
@@ -78,7 +82,6 @@ def assignProgramSlots(request, *args, **kwargs):
   taskqueue.add(
     url = "/gsoc/tasks/assignslots/assign",
     params = {
-        'slots': program.slots_allocation,
         'programkey': params["programkey"],
     })
 
@@ -97,14 +100,17 @@ def assignSlots(request, *args, **kwargs):
   timekeeper = Timekeeper(timelimit)
 
   program_key = request.REQUEST.get("programkey")
+  last_key = request.REQUEST.get("lastkey", "")
+  program = program_logic.getFromKeyName(program_key)
 
   # Copy for modification below
   params = request.POST.copy()
   params["timelimit"] = timelimit
 
   # Parse the JSON org:slots dictionary
-  slots = simplejson.loads(params["slots"])
-  org_keys = slots.keys()
+  slots = simplejson.loads(program.slots_allocation)
+  org_keys = [i for i in sorted(slots.keys()) if i > last_key]
+  logging.info(org_keys)
 
   # Assign slots for each organization
   try:
@@ -130,11 +136,11 @@ def assignSlots(request, *args, **kwargs):
       org.put()
 
       # Mark the organization as done
-      del slots[org_key]
+      last_key = org_key
 
   # Requeue this task for continuation
   except DeadlineExceededError:
-    params["slots"] = simplejson.dumps(slots)
+    params["lastkey"] = last_key
     taskqueue.add(url=request.path, params=params)
 
   # Exit this task successfully

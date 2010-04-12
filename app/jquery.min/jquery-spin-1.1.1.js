@@ -1,5 +1,139 @@
-(function(f){var m={get:function(d){d=d.toString();if(d.indexOf(".")==-1)return[0,eval(d)];var b=d.split(".");d=b[1].length;b=b.join("");var a="";if(b.charAt(0)=="-"){b=b.substr(1);a="-"}for(var e=0;e<b.length;++e)if(b.charAt(0)=="0")b=b.substr(1,b.length);b=a+b;return[d,eval(b)]},getInt:function(d,b){Math.pow(10,b);d=this.get(d);b=eval("num * d");var a=eval("n[1] * d");if(this.get(b)[1]==a)return b;return d[0]==0?b:eval(a+"/Math.pow(10, n[0])")},sum:function(d,b){var a=this.get(d),e=this.get(b);
-a=a[0]>e[0]?a[0]:e[0];this.getInt(d,a);this.getInt(b,a);return eval("v1 + v2")/Math.pow(10,a)}};f.extend({spin:{imageBasePath:"/soc/content/images/",spinBtnImage:"spin-button.png",spinUpImage:"spin-up.png",spinDownImage:"spin-down.png",interval:1,max:null,min:null,timeInterval:500,timeBlink:200,btnClass:null,btnCss:{cursor:"pointer",padding:0,margin:0,verticalAlign:"middle"},txtCss:{marginRight:0,paddingRight:0},lock:false,decimal:null,beforeChange:null,changed:null,buttonUp:null,buttonDown:null}});
-f.fn.extend({spin:function(d){return this.each(function(){function b(g){var c=e.val(),j=c;if(a.decimal)c=c.replace(a.decimal,".");if(!isNaN(c)){c=m.sum(c,g*a.interval);if(a.min!==null&&c<a.min)c=a.min;if(a.max!==null&&c>a.max)c=a.max;if(c!=e.val()){if(a.decimal)c=c.toString().replace(".",a.decimal);if((f.isFunction(a.beforeChange)?a.beforeChange.apply(e,[c,j]):true)!==false){e.val(c);f.isFunction(a.changed)&&a.changed.apply(e,[c]);e.change();src=g>0?k:l;h.attr("src",src);a.timeBlink<a.timeInterval&&
-setTimeout(function(){h.attr("src",i)},a.timeBlink)}}}if(g>0)f.isFunction(a.buttonUp)&&a.buttonUp.apply(e,[c]);else f.isFunction(a.buttonDown)&&a.buttonDown.apply(e,[c])}d=d||{};var a={};f.each(f.spin,function(g,c){a[g]=typeof d[g]!="undefined"?d[g]:c});var e=f(this),i=a.imageBasePath+a.spinBtnImage;(new Image).src=i;var k=a.imageBasePath+a.spinUpImage;(new Image).src=k;var l=a.imageBasePath+a.spinDownImage;(new Image).src=l;var h=f(document.createElement("img"));h.attr("src",i);a.btnClass&&h.addClass(a.btnClass);
-a.btnCss&&h.css(a.btnCss);a.txtCss&&e.css(a.txtCss);e.after(h);a.lock&&e.focus(function(){e.blur()});h.mousedown(function(g){g=g.pageY-h.offset().top;var c=h.height()/2>g?1:-1;(function(){b(c);var j=setTimeout(arguments.callee,a.timeInterval);f(document).one("mouseup",function(){clearTimeout(j);h.attr("src",i)})})();return false})})}})})(jQuery);
+/**
+ * jQuery Spin 1.1.1
+ *
+ * Copyright (c) 2009 Naohiko MORI
+ * Dual licensed under the MIT and GPL licenses.
+ *
+ **/
+(function($){
+  var calcFloat = {
+    get: function(num){
+      var num = num.toString();
+      if(num.indexOf('.')==-1) return[0, eval(num)];
+      var nn = num.split('.');
+      var po = nn[1].length;
+      var st = nn.join('');
+      var sign = '';
+      if(st.charAt(0)=='-'){
+        st = st.substr(1);
+        sign = '-';
+      }
+      for(var i=0; i<st.length; ++i) if(st.charAt(0)=='0') st=st.substr(1, st.length);
+      st = sign + st;
+      return [po, eval(st)];
+    },
+    getInt: function(num, figure){
+      var d = Math.pow(10, figure);
+      var n = this.get(num);
+      var v1 = eval('num * d');
+      var v2 = eval('n[1] * d');
+      if(this.get(v1)[1]==v2) return v1;
+      return(n[0]==0 ? v1 : eval(v2 + '/Math.pow(10, n[0])'));
+    },
+    sum: function(v1, v2){
+      var n1 = this.get(v1);
+      var n2 = this.get(v2);
+      var figure = (n1[0] > n2[0] ? n1[0] : n2[0]);
+      v1 = this.getInt(v1, figure);
+      v2 = this.getInt(v2, figure);
+      return eval('v1 + v2')/Math.pow(10, figure);
+    }
+  };
+  $.extend({
+    spin: {
+      imageBasePath: '/soc/content/images/',
+      spinBtnImage: 'spin-button.png',
+      spinUpImage: 'spin-up.png',
+      spinDownImage: 'spin-down.png',
+      interval: 1,
+      max: null,
+      min: null,
+      timeInterval: 500,
+      timeBlink: 200,
+      btnClass: null,
+      btnCss: {cursor: 'pointer', padding: 0, margin: 0, verticalAlign: 'middle'},
+      txtCss: {marginRight: 0, paddingRight: 0},
+      lock: false,
+      decimal: null,
+      beforeChange: null,
+      changed: null,
+      buttonUp: null,
+      buttonDown: null
+    }
+  });
+  $.fn.extend({
+    spin: function(o){
+      return this.each(function(){
+				o = o || {};
+				var opt = {};
+				$.each($.spin, function(k,v){
+					opt[k] = (typeof o[k]!='undefined' ? o[k] : v);
+				});
+        
+        var txt = $(this);
+        
+        var spinBtnImage = opt.imageBasePath+opt.spinBtnImage;
+        var btnSpin = new Image();
+        btnSpin.src = spinBtnImage;
+        var spinUpImage = opt.imageBasePath+opt.spinUpImage;
+        var btnSpinUp = new Image();
+        btnSpinUp.src = spinUpImage;
+        var spinDownImage = opt.imageBasePath+opt.spinDownImage;
+        var btnSpinDown = new Image();
+        btnSpinDown.src = spinDownImage;
+        
+        var btn = $(document.createElement('img'));
+        btn.attr('src', spinBtnImage);
+        if(opt.btnClass) btn.addClass(opt.btnClass);
+        if(opt.btnCss) btn.css(opt.btnCss);
+        if(opt.txtCss) txt.css(opt.txtCss);
+        txt.after(btn);
+				if(opt.lock){
+					txt.focus(function(){txt.blur();});
+        }
+        
+        function spin(vector){
+          var val = txt.val();
+          var org_val = val;
+          if(opt.decimal) val=val.replace(opt.decimal, '.');
+          if(!isNaN(val)){
+            val = calcFloat.sum(val, vector * opt.interval);
+            if(opt.min!==null && val<opt.min) val=opt.min;
+            if(opt.max!==null && val>opt.max) val=opt.max;
+            if(val != txt.val()){
+              if(opt.decimal) val=val.toString().replace('.', opt.decimal);
+              var ret = ($.isFunction(opt.beforeChange) ? opt.beforeChange.apply(txt, [val, org_val]) : true);
+              if(ret!==false){
+                txt.val(val);
+                if($.isFunction(opt.changed)) opt.changed.apply(txt, [val]);
+                txt.change();
+                src = (vector > 0 ? spinUpImage : spinDownImage);
+                btn.attr('src', src);
+                if(opt.timeBlink<opt.timeInterval)
+                  setTimeout(function(){btn.attr('src', spinBtnImage);}, opt.timeBlink);
+              }
+            }
+          }
+          if(vector > 0){
+            if($.isFunction(opt.buttonUp)) opt.buttonUp.apply(txt, [val]);
+          }else{
+            if($.isFunction(opt.buttonDown)) opt.buttonDown.apply(txt, [val]);
+          }
+        }
+        
+        btn.mousedown(function(e){
+          var pos = e.pageY - btn.offset().top;
+          var vector = (btn.height()/2 > pos ? 1 : -1);
+          (function(){
+            spin(vector);
+            var tk = setTimeout(arguments.callee, opt.timeInterval);
+            $(document).one('mouseup', function(){
+              clearTimeout(tk); btn.attr('src', spinBtnImage);
+            });
+          })();
+          return false;
+        });
+      });
+    }
+  });
+})(jQuery);

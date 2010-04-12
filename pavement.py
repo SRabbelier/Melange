@@ -77,8 +77,10 @@ options(
     ),
 
     closure = Bunch(
+        js_dir = None,
         js_dirs = ["soc/content/js", "jquery", "jlinq", "json"],
         closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
+        no_optimize = ["jquery-spin-1.1.1.js", "jquery-jqgrid.base.js"],
         **options.build
     )
 )
@@ -309,6 +311,11 @@ def closure(options):
         min_dir.rmtree()
         js_dir.copytree(min_dir)
         for f in min_dir.walkfiles("*.js"):
+            if f.name in options.no_optimize:
+                paver.tasks.environment.info(
+                '%-4sCLOSURE: Skipping %s', '', f)
+                continue
+
             paver.tasks.environment.info(
             '%-4sCLOSURE: Processing %s', '', f)
 

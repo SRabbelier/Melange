@@ -477,7 +477,7 @@ class View(organization.View):
           'mentor': entity.mentor.name() if entity.mentor else
               '%s Proposed' % len(entity.possible_mentors),
           'status': status.get(entity.key(),
-              "Pending rejection") if (
+              '<font color="red">Pending rejection</font>') if (
               entity.program.allocations_visible \
               and entity.status == 'pending') else entity.status,
     }

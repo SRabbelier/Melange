@@ -1113,6 +1113,10 @@ class View(base.View):
       mentor: mentor entity for the current user/proposal (iff available)
     """
 
+    from google.appengine.ext import db
+
+    from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
+        as duplicates_logic
     from soc.modules.gsoc.logic.models.review_follower import logic as \
         review_follower_logic
 
@@ -1163,6 +1167,20 @@ class View(base.View):
 
     if org_admin:
       context['is_org_admin'] = True
+
+      # when the slot allocation is visible obtain
+      # the duplicates for this proposal
+      if entity.program.allocations_visible:
+        fields = {'student': entity.scope,
+                      'is_duplicate': True}
+
+        duplicate_entity = duplicates_logic.getForFields(fields, unique=True)
+
+        # this list also contains the current proposal
+        # entity, so remove it 
+        duplicate_keys = duplicate_entity.duplicates
+        duplicate_keys.remove(entity.key())
+        context['sp_duplicates'] = db.get(duplicate_keys)
 
     user_entity = user_logic.logic.getForCurrentAccount()
 

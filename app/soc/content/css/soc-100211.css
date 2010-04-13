@@ -623,6 +623,13 @@ span.edited {
   background: #d0f5a9;
 }
 
+.studentproposalreview .orgadmins{
+  background: #d0f5a9;
+  position: relative;
+  left: 2%;
+  width: 98%;
+}
+
 .studentproposalcomment-public,
 .studentproposalreview-public .other {
   background: #f5f6ce;

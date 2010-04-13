@@ -68,3 +68,27 @@ def as_proposal_duplicates(context, proposal_duplicate):
 
   context['orgs'] = orgs_details
   return context
+
+
+@register.inclusion_tag(
+    'modules/gsoc/templatetags/_as_student_proposal_review_duplicate.html',
+    takes_context=True)
+def as_student_proposal_review_duplicate(context, proposal):
+  """Returns a HTML representation of a proposal duplicates for the Proposal
+  Review page.
+  """
+
+  org_entity = proposal.org
+
+  fields = {'scope': org_entity,
+                'status': 'active'}
+  org_admin_entities = org_admin_logic.getForFields(fields)
+
+  org_admins = [(org_admin.name(), org_admin.email) 
+                        for org_admin in org_admin_entities]
+
+  context.update({'title': proposal.title,
+                           'org_name': org_entity.name,
+                           'org_admins': org_admins })
+
+  return context

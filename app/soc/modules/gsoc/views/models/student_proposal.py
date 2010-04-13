@@ -1168,9 +1168,9 @@ class View(base.View):
     if org_admin:
       context['is_org_admin'] = True
 
-      # when the slot allocation is visible obtain
-      # the duplicates for this proposal
-      if entity.program.allocations_visible:
+      # when the duplicates can be visible obtain the
+      # duplicates for this proposal
+      if entity.program.duplicates_visible:
         fields = {'student': entity.scope,
                       'is_duplicate': True}
 

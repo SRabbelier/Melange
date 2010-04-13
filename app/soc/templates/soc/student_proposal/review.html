@@ -187,7 +187,7 @@ limitations under the License.
 <!-- /form> -->
 
 <hr />
-{% if is_org_admin and sp_duplicates %}
+{% if is_org_admin and sp_duplicates and entity.program.duplicates_visible %}
 <b>Duplicates</b>
 {% for duplicate in sp_duplicates %}
   {% as_student_proposal_review_duplicate duplicate %}

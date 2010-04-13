@@ -757,6 +757,33 @@
             "&idx=", idx
           ].join(""),
           timeout: 60000,
+          tryCount: 1,
+          retryLimit: 5,
+          error: function (xhr, textStatus, errorThrown) {
+            // retry on 500 errors from server
+            if (xhr.status == 500) {
+              this.tryCount++;
+              if (this.tryCount <= this.retryLimit) {
+                jQuery.ajax(this);
+                return;
+              }
+              // retryLimit is reached, show a message
+              jQuery("#temporary_list_placeholder_" + idx).html([
+                '<span style="color:red">',
+                'Error retrieving data: please refresh the list or the whole page to try again',
+                '</span>'].join("")
+              );
+              jQuery("#load_" + _self.jqgrid.id).hide();
+            } else {
+              // another error from server, show a message
+              jQuery("#temporary_list_placeholder_" + idx).html([
+                '<span style="color:red">',
+                'Error retrieving data: please refresh the list or the whole page to try again',
+                '</span>'].join("")
+              );
+              jQuery("#load_" + _self.jqgrid.id).hide();
+            }
+          },
           success: function (data_from_server) {
             var source = JSON.parse(data_from_server);
             var first_batch_received = (current_loop > 0);
@@ -794,11 +821,13 @@
                 current_loop++;
               }
               else {
+                jQuery("#temporary_list_placeholder_" + idx).remove();
                 jQuery("#load_" + _self.jqgrid.id).hide();
               }
             }
             else {
               //loading data finished, hiding loading message
+              jQuery("#temporary_list_placeholder_" + idx).remove();
               jQuery("#load_" + _self.jqgrid.id).hide();
 
               // Delete previous buttons, if any
@@ -1022,7 +1051,6 @@
         );
       jQuery("#" + _self.jqgrid.id).jqGrid('filterToolbar', {});
 
-      jQuery("#temporary_list_placeholder_" + idx).remove();
       // Show Loading message
       jQuery("#load_" + _self.jqgrid.id).show();
 

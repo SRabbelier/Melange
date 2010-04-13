@@ -647,11 +647,10 @@ class View(program.View):
 
     data = []
 
-    for link_id, count in result.iteritems():
-      org = orgs[link_id]
+    for link_id in orgs.keys():
       data.append({
           'link_id': link_id,
-          'slots': count,
+          'slots': result.get(link_id,0),
           'locked': bool(locked_slots.get(link_id))
           })
 

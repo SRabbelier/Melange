@@ -642,17 +642,17 @@ class View(program.View):
 
     from_json = simplejson.loads(program_entity.slots_allocation)
     locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
+
     result = allocator.allocate(locked_slots)
 
     data = []
 
-    # TODO: remove adjustment here and in the JS
     for link_id, count in result.iteritems():
       org = orgs[link_id]
       data.append({
           'link_id': link_id,
           'slots': count,
-          'locked': locked_slots.get(link_id, 0),
+          'locked': bool(locked_slots.get(link_id))
           })
 
     return self.json(request, data)

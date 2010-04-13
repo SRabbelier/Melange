@@ -311,6 +311,8 @@ class View(organization.View):
       org_entity: GSoCOrganization entity for which the lists are generated
     """
 
+    from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
+        as pd_logic
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
     from soc.modules.gsoc.logic.models.student_proposal import logic \
@@ -340,15 +342,33 @@ class View(organization.View):
 
       status = {}
 
+      program_entity = org_entity.scope
+
       # only when the program allows allocations
       # we show that proposals are likely to be
       # accepted or rejected
-      if org_entity.scope.allocations_visible:
+      if program_entity.allocations_visible:
         proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
 
+        duplicate_proposals = []
+
+        # get all the duplicate entities if duplicates can be shown
+        # to the organizations and make a list of all such proposals.
+        if program_entity.duplicates_visible:
+          duplicate_properties = {'orgs': org_entity}
+          duplicates = pd_logic.getForFields(duplicate_properties)
+
+          for duplicate in duplicates:
+            duplicate_proposals.extend(duplicate.duplicates)
+
         for proposal in proposals:
-          if proposal.status == 'pending':
-            status[proposal.key()] = 'Pending acceptance'
+          proposal_key =  proposal.key()
+          if proposal.status == 'pending' and proposal_key in duplicate_proposals:
+            status[proposal_key] = """<strong><font color="red">
+                Duplicate</font></strong>"""
+          else:
+            status[proposal_key] = """<strong><font color="green">
+                Pending acceptance</font><strong>"""
 
       filter = {'org': org_entity,
                 'status': ['accepted','pending','rejected']}
@@ -446,9 +466,10 @@ class View(organization.View):
     rp_params['review_field_hidden'] = ['abstract', 'content', 'additional_info',
                                         'created_on']
     rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',
-                                       'Score', 'status', 'Last Modified On',
+                                       'Score', 'Status', 'Last Modified On',
                                        'Abstract', 'Content', 'Additional Info',
                                        'Created On']
+    rp_params['review_field_no_filter'] = ['status']
     rp_params['review_field_prefetch'] = ['scope', 'mentor', 'program']
     rp_params['review_field_extra'] = lambda entity, ranker, status: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,

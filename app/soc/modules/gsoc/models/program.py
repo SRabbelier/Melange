@@ -70,3 +70,9 @@ class GSoCProgram(soc.models.program.Program):
       verbose_name=ugettext('Slot allocations visible'))
   allocations_visible.help_text = ugettext(
       'Field used to indicate if the slot allocations should be visible.')
+
+  #: Whether the duplicates are visible
+  duplicates_visible = db.BooleanProperty(default=False,
+      verbose_name=ugettext('Duplicate proposals visible'))
+  duplicates_visible.help_text = ugettext(
+      'Field used to indicate if the duplicate proposal should be visible.')

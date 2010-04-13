@@ -78,7 +78,6 @@
       });
       jQuery('[id^=id_spin_slot_count_]').spin({min:0, max:MAX_AVAILABLE_SLOTS});
 
-      jQuery('[id^=id_spin_adjustment_count_]').spin();
       jQuery(tooltip).purr({usingTransparentPNG: true, isSticky: true});
       jQuery("#p_total_slots").html("<strong>Max slots:</strong> "+MAX_AVAILABLE_SLOTS);
 
@@ -133,13 +132,10 @@
           list_row.locked = item.locked;
           current_slots[item.link_id] = {
             slots: item.slots,
-            locked: item.locked,
-            adjustment: item.adjustment
+            locked: item.locked
           };
           jQuery("#id_locked_slot_" + item.link_id)
             .attr("checked", item.locked);
-          jQuery("#id_spin_adjustment_count_" + item.link_id)
-            .val(item.adjustment);
         }
       );
       updateOverlay();
@@ -195,12 +191,5 @@
     list_row.slots = jQuery(counter).val();
     updateCurrentSlots();
     updateOverlay();
-  }
-
-  function assignAdjustment() {
-    var counter = this;
-    var re = /^id_spin_adjustment_count_(\w*)/;
-    var org_link_id = counter.id.match(re)[1];
-    current_slots[org_link_id].adjustment = jQuery(counter).val();
   }
 }());

@@ -97,7 +97,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'soc.middleware.value_store.ValueStoreMiddleware',
     'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
-    'soc.middleware.profiler.ProfileMiddleware',
+#    'soc.middleware.profiler.ProfileMiddleware',
     'soc.middleware.maintenance.MaintenanceMiddleware',
     'soc.middleware.xsrf.XsrfMiddleware',
 #    'django.middleware.common.CommonMiddleware',

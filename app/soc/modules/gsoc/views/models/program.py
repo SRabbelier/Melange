@@ -636,7 +636,7 @@ class View(program.View):
     for org in organizations:
       orgs[org.link_id] = org
       applications[org.link_id] = org.nr_applications
-      max[org.link_id] = min(org.nr_mentors, org.slots_desired)
+      max[org.link_id] = org.slots_desired
 
     max_slots_per_org = program_entity.max_slots
     min_slots_per_org = program_entity.min_slots

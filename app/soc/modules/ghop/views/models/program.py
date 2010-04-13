@@ -35,8 +35,10 @@ from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import program
@@ -67,7 +69,7 @@ class View(program.View):
       'the tasks published by them please visit the corresponding links.')
 
   DEF_TASK_QUOTA_ALLOCATION_MSG = ugettext(
-      "Use this view to assign task quotas.")
+      "Assign task quotas to each organization.")
 
   DEF_TASK_QUOTA_ERROR_MSG_FMT = ugettext(
       "Task Quota limit for the organizations %s do not contain"
@@ -87,6 +89,8 @@ class View(program.View):
                                          host_logic.logic])]
     rights['edit'] = [('checkIsHostForProgram', [ghop_program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']
+    rights['assign_task_quotas'] = [
+        ('checkIsHostForProgram', [ghop_program_logic.logic])]
     rights['accepted_orgs'] = [('checkIsAfterEvent',
         ['student_signup_start',
          '__all__', ghop_program_logic.logic])]
@@ -212,7 +216,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def assignTaskQuotas(self, request, access_type, page_name=None,
-                       params=None, filter=None, **kwargs):
+                                       params=None, filter=None, **kwargs):
     """View that allows to assign task quotas for accepted GHOP organization.
 
     This view allows the program admin to set the task quota limits
@@ -220,90 +224,27 @@ class View(program.View):
     """
 
     # TODO: Once GAE Task APIs arrive, this view will be managed by them
-    program_entity = ghop_program_logic.logic.getFromKeyFieldsOr404(kwargs)
 
-    from soc.modules.ghop.views.models import \
-        organization as ghop_organization_view
+    from soc.modules.ghop.views.models import organization as ghop_org_view
 
-    org_params = ghop_organization_view.view.getParams().copy()
-
-    context = {}
-
-    if request.method == 'POST':
-      return self.assignTaskQuotasPost(request, context, org_params,
-                                       page_name, params, program_entity,
-                                       **kwargs)
-    else: # request.method == 'GET'
-      return self.assignTaskQuotasGet(request, context, org_params,
-                                      page_name, params, program_entity,
-                                      **kwargs)
-
-  def assignTaskQuotasPost(self, request, context, org_params,
-                           page_name, params, entity, **kwargs):
-    """Handles the POST request for the task quota allocation page.
-
-    Args:
-        entity: the program entity
-        rest: see base.View.public()
-    """
-
-    ghop_org_logic = org_params['logic']
-
-    error_orgs = ''
-    for link_id, task_count in request.POST.items():
-      fields = {
-          'link_id': link_id,
-          'scope': entity,
-          'scope_path': entity.key().id_or_name(),
-          }
-      key_name = ghop_org_logic.getKeyNameFromFields(fields)
-
-      try:
-        task_count = int(task_count)
-        if task_count >= 0:
-          fields['task_quota_limit'] = task_count
-          ghop_org_logic.updateOrCreateFromKeyName(fields, key_name)
-        else:
-          raise ValueError
-      except ValueError:
-        org_entity = ghop_org_logic.getFromKeyName(key_name)
-        error_orgs += org_entity.name + ', '
-
-    if error_orgs:
-      context['error_message'] = self.DEF_TASK_QUOTA_ERROR_MSG_FMT % (
-          error_orgs[:-2])
-
-      return self.assignTaskQuotasGet(request, context, org_params,
-                                      page_name, params, entity,
-                                      **kwargs)
-
-    # redirect to the same page
-    return http.HttpResponseRedirect('')
-
-  def assignTaskQuotasGet(self, request, context, org_params,
-                          page_name, params, entity, **kwargs):
-    """Handles the GET request for the task quota allocation page.
-
-    Args:
-        entity: the program entity
-        rest see base.View.public()
-    """
-
-    from soc.modules.ghop.views.models.organization import view as org_view
-    
     logic = params['logic']
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
-    
-    org_params['list_template'] = ('modules/ghop/program/'
-        'allocation/allocation.html')
-    org_params['list_heading'] = ('modules/ghop/program/'
-        'allocation/heading.html')
-    org_params['list_row'] = 'modules/ghop/program/allocation/row.html'
-    org_params['list_pagination'] = 'soc/list/no_pagination.html'
-    org_params['list_description'] = self.DEF_TASK_QUOTA_ALLOCATION_MSG
-# TODO(LIST)
 
-    return self.list(request, 'any_access', page_name=page_name, params=org_params)
+    slots_params = ghop_org_view.view.getParams().copy()
+
+    # TODO(Edit quotas inline - Madhu and Mario)
+
+    slots_params['list_description'] = self.DEF_TASK_QUOTA_ALLOCATION_MSG
+    slots_params['quota_field_keys'] = ['name', 'task_quota_limit']
+    slots_params['quota_field_names'] = ['Organization', 'Task Quota']
+
+    filter = {'scope': program_entity,
+                 'status': ['new', 'active']
+                }
+
+    return self.list(request, access_type, page_name=page_name,
+                          params=slots_params, filter=filter,
+                          visibility='quota')
 
   @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):
@@ -627,6 +568,7 @@ class View(program.View):
     """List all the accepted orgs for the given program.
     """
 
+    from soc.views.models import base as base_view
     from soc.modules.ghop.views.models.organization import view as org_view
 
     logic = params['logic']
@@ -635,11 +577,31 @@ class View(program.View):
 
     fmt = {'name': program_entity.name}
 
-    params = params.copy()
-    params['list_msg'] = program_entity.accepted_orgs_msg
-    params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
-# TODO(LIST)
-    return self.list(request, 'any_access', page_name=page_name, params=params)
+    aa_params = org_view.getParams().copy()
+    aa_params['list_msg'] = program_entity.accepted_orgs_msg
+    aa_params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
+
+    aa_params['participating_field_keys'] = [
+        'name', 'short_name', 'home_page', 'pub_mailing_list', 'open_tasks']
+    aa_params['participating_field_names'] = [
+        'Organization', 'Short Name', 'Home Page', 'Public Mailing List', 'Open Tasks']
+    aa_params['participating_field_extra'] = lambda entity: {
+        'open_tasks': len(ghop_task_logic.logic.getForFields({
+            'scope': entity, 'status': ['Open', 'Reopened']}))
+    }
+    aa_params['participating_row_action'] = {
+        "type": "redirect_custom",
+        "parameters": dict(new_window=True),
+    }
+    aa_params['participating_row_extra'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, aa_params),
+    }
+
+    filter = {'scope': program_entity,
+                 'status': 'active'}
+
+    return self.list(request, 'any_access', page_name=page_name,
+                          params=aa_params, filter=filter, visibility='participating')
 
 
 view = View()

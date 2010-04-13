@@ -92,7 +92,7 @@ class View(organization.View):
 
     new_params['name'] = "GHOP Organization"
     new_params['module_name'] = "organization"
-    new_params['sidebar_grouping'] = 'Organizations'
+    new_params['sidebar_grouping'] = 'GHOP Organizations'
 
     new_params['public_template'] = 'modules/ghop/organization/public.html'
     new_params['list_row'] = 'modules/ghop/organization/list/row.html'

@@ -101,7 +101,7 @@ class Survey(soc.models.work.Work):
 
   prefix = db.StringProperty(default='program', required=True,
       choices=['site', 'club', 'sponsor', 'program', 'org', 'user',
-               'gsoc_program'],
+               'gsoc_program', 'ghop_program'],
       verbose_name=ugettext('Prefix'))
   prefix.help_text = ugettext(
       'Indicates the prefix of the survey,'

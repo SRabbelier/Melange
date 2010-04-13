@@ -41,9 +41,11 @@
     "</div>"
   ].join('');
 
+  var list;
+
   jQuery(function() {
     jQuery(document).bind("melange_list_loaded", function (event) {
-      var list = event.list_object;
+      list = event.list_object;
       var locked_colModel = "locked";
       var slots_colModel = "slots";
       var linkid_colModel = "link_id";
@@ -126,6 +128,9 @@
       jQuery(data.data).each(
         function (intIndex, item) {
           jQuery("#id_spin_slot_count_" + item.link_id).val(item.slots);
+          var list_row = jLinq.from(list.data.data).equals("link_id",item.link_id).select()[0];
+          list_row.slots = item.slots;
+          list_row.locked = item.locked;
           current_slots[item.link_id] = {
             slots: item.slots,
             locked: item.locked,
@@ -177,6 +182,8 @@
     var re = /^id_locked_slot_(\w*)/;
     var org_link_id = checkbox.id.match(re)[1];
     current_slots[org_link_id].locked = locked;
+    var list_row = jLinq.from(list.data.data).equals("link_id",org_link_id).select()[0];
+    list_row.locked = locked;
   }
 
   function assignSlots() {
@@ -184,6 +191,8 @@
     var re = /^id_spin_slot_count_(\w*)/;
     var org_link_id = counter.id.match(re)[1];
     current_slots[org_link_id].slots = jQuery(counter).val();
+    var list_row = jLinq.from(list.data.data).equals("link_id",org_link_id).select()[0];
+    list_row.slots = jQuery(counter).val();
     updateCurrentSlots();
     updateOverlay();
   }

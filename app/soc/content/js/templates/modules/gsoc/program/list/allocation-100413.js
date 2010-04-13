@@ -47,7 +47,7 @@
     jQuery(document).bind("melange_list_loaded", function (event) {
       list = event.list_object;
       var locked_colModel = "locked";
-      var slots_colModel = "slots";
+      var slots_colModel = "slots_ass";
       var linkid_colModel = "link_id";
 
       var rows = list.jqgrid.object.jqGrid('getRowData');

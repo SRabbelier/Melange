@@ -685,11 +685,11 @@ class View(program.View):
     }
     org_params['public_field_keys'] = [
         "name", "slots_desired", "nr_applications", "nr_mentors",
-        "locked", "slots", "link_id",
+        "locked", "slots_ass", "slots", "link_id",
     ]
     org_params['public_field_names'] = [
         "Name", "Desired", "#Proposals", "#Mentors",
-        "Locked?", "Slots Assigned", "Link ID",
+        "Locked?", "Slots Assigned", "Slots Visible to Org", "Link ID",
     ]
 
     order = ['name']

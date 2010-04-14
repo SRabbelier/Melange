@@ -73,8 +73,8 @@ def deepFetch(queryGen, key=None, filters=None, batchSize = 100):
     query = queryGen()
 
     if filters:
-      for key, value in filters.items():
-        query.filter(key, value)
+      for filter_key, value in filters.items():
+        query.filter(filter_key, value)
 
     if key:
       query.filter("__key__ > ", key)

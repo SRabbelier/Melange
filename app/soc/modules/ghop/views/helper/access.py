@@ -96,6 +96,10 @@ class GHOPChecker(access.Checker):
 
     user_account = user_logic.logic.getForCurrentAccount()
 
+    if key_location not in django_args:
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_NEED_ROLE_MSG)
+
     filter = {
         'user': user_account,
         'scope_path': django_args[key_location],

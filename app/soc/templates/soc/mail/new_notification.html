@@ -17,6 +17,11 @@ limitations under the License.
 {% block content %}
 You have received a new notification entitled "{{ notification.subject }}".
 To read, respond to, or delete this notification please visit <a href="{{ notification_url }}">{{ notification_url }}</a>.
+
+The notification content is:
+<p>
+{{ notification.message|safe }}
+</p>
 {% endblock %}
 
 {% block signature %}

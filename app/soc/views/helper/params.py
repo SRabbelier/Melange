@@ -275,10 +275,6 @@ def constructParams(params):
   new_params['public_row_extra'] = lambda entity, *args: {
         "link": redirects.getEditRedirect(entity, params),
     }
-  # TODO(ljvderijk): refactor this out of there
-  new_params['list_params'] = {
-      'list_description': 'description',
-      }
 
   new_params['list_description'] = DEF_LIST_DESCRIPTION_FMT % params
   new_params['save_message'] = [ugettext('%(name)s saved.' % params),

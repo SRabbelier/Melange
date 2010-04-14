@@ -109,9 +109,7 @@ class View(survey_view.View):
     self._params['review_form'] = review_form
 
     # define the params for the OrgAppSurveyRecord listing
-    record_list_params = dicts.rename(self._params,
-                                      self._params['list_params'])
-    record_list_params['list_params'] = self._params['list_params']
+    record_list_params = {}
     record_list_params['logic'] = self._params['logic'].getRecordLogic()
     record_list_params['js_uses_all'] = self._params['js_uses_all']
     record_list_params['list_template'] = self._params['list_template']
@@ -264,8 +262,8 @@ class View(survey_view.View):
     if request.GET.get('fmt') == 'json':
       return self._getListSelfData(request, entity, ma_params, ba_params)
 
-    ma_list = lists.getListGenerator(request, ma_params, idx=0)
-    ba_list = lists.getListGenerator(request, ba_params, idx=1)
+    ma_list = lists.getListGenerator(request, ma_params, visibility='self', idx=0)
+    ba_list = lists.getListGenerator(request, ba_params, visibility='self', idx=1)
 
     contents = [ma_list, ba_list]
 
@@ -370,7 +368,8 @@ class View(survey_view.View):
       json = simplejson.dumps(contents)
       return responses.jsonResponse(request, json)
 
-    overview_list = lists.getListGenerator(request, list_params, idx=0)
+    overview_list = lists.getListGenerator(request, list_params,
+                                           visibility='overview', idx=0)
     contents = [overview_list]
 
     return self._list(request, list_params, contents, page_name)

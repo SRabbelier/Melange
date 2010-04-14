@@ -419,8 +419,6 @@ class View(program.View):
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
 
-    order = ['name']
-
     if idx == 0:
       params = ap_params
 
@@ -439,7 +437,7 @@ class View(program.View):
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields, order=order)
+    contents = lists.getListData(request, params, fields)
 
     json = simplejson.dumps(contents)
     return responses.jsonResponse(request, json)
@@ -500,13 +498,14 @@ class View(program.View):
                                       ap_params, program_entity)
 
     contents = []
+    order = ['name']
 
-    ap_list = lists.getListGenerator(request, ap_params, idx=0)
+    ap_list = lists.getListGenerator(request, ap_params, order=order, idx=0)
     contents.append(ap_list)
 
     if record:
       # only if there is a record we should show this list
-      aa_list = lists.getListGenerator(request, aa_params, idx=1)
+      aa_list = lists.getListGenerator(request, aa_params, order=order, idx=1)
       contents.append(aa_list)
 
     return self._list(request, list_params, contents, page_name)

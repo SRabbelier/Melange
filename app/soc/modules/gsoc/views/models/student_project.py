@@ -328,7 +328,7 @@ class View(base.View):
     if idx != 0:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields, 'admin')
+    contents = lists.getListData(request, params, fields, visibility='admin')
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)
@@ -826,7 +826,7 @@ class View(base.View):
     else:
       return responses.jsonErrorResponse(request, 'idx not valid')
 
-    contents = lists.getListData(request, params, fields, 'public', args=args)
+    contents = lists.getListData(request, params, fields, args=args)
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)

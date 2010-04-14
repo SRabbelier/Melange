@@ -323,8 +323,8 @@ class View(organization.View):
     idx = int(idx) if idx.isdigit() else -1
 
     # default list settings
-    args = order = []
-    visibility = 'public'
+    args = []
+    visibility = None
 
     if idx == 0:
       filter = {'org': org_entity,
@@ -372,8 +372,6 @@ class View(organization.View):
 
       filter = {'org': org_entity,
                 'status': ['accepted','pending','rejected']}
-      # order by descending score
-      order = ['-score']
 
       # some extras for the list
       args = [ranker, status]
@@ -398,8 +396,7 @@ class View(organization.View):
 
     params = params_collection[idx]
     contents = helper.lists.getListData(request, params, filter,
-                                        visibility=visibility,
-                                        order=order, args=args)
+                                        visibility=visibility, args=args)
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)
@@ -531,8 +528,10 @@ class View(organization.View):
       np_list = helper.lists.getListGenerator(request, np_params, idx=0)
       contents.append(np_list)
 
+    order = ['-score']
     # the list of proposals that have been reviewed should always be shown
-    rp_list = helper.lists.getListGenerator(request, rp_params, idx=1)
+    rp_list = helper.lists.getListGenerator(request, rp_params, order=order,
+                                            visibility='review', idx=1)
     contents.append(rp_list)
 
     # check whether the current user is a mentor for the organization

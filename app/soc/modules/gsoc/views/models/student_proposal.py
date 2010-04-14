@@ -603,7 +603,7 @@ class View(base.View):
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields, 'public')
+    contents = lists.getListData(request, params, fields)
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)

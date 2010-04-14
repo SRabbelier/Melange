@@ -883,7 +883,6 @@
     var createListHTML = function () {
         jQuery("#" + div).replaceWith([
           '<p id="temporary_list_placeholder_',idx,'">',
-          'Please wait while list is loading',
           '</p>',
           '<table id="' + _self.jqgrid.id + '"',
           ' cellpadding="0" cellspacing="0"',
@@ -1248,6 +1247,9 @@
       _self.jqgrid.object = jQuery("#" + _self.jqgrid.id);
     };
 
+    this.getDiv = function () {return div;};
+    this.getIdx = function () {return idx;};
+
     var init = function () {
       jQuery(
         function () {
@@ -1260,19 +1262,20 @@
           _self.jqgrid.options = jQuery.extend(default_jqgrid_options, {pager: "#" + _self.jqgrid.pager.id});
           _self.jqgrid.pager.options = default_pager_options;
 
+          list_objects.add(_self);
+
           createListHTML();
+          initJQGrid();
           fetchDataFromServer();
         }
       );
 
     }();
-
-    this.getDiv = function () {return div;};
-    this.getIdx = function () {return idx;};
   };
 
-  $m.loadList = function (div, idx) {
+  $m.loadList = function (div, init, idx) {
     var idx = parseInt(idx, 10);
+    var init = JSON.parse(init);
     if (isNaN(idx) || idx < 0) {
       throw new melange.error.listIndexNotValid("List index " + idx + " is not valid");
     }
@@ -1280,9 +1283,6 @@
       throw new melange.error.indexAlreadyExistent("Index " + idx + " is already existent");
     }
 
-    var list = new List(div, idx, null, null);
-
-    list_objects.add(list);
-
+    var list = new List(div, idx, init.configuration, init.operations);
   };
 }());

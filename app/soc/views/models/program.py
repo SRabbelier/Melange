@@ -251,7 +251,8 @@ class View(presence.View):
       role_params['list_description'] = 'List of All %s' %(
           role_params['name_plural'])
 
-      role_list = lists.getListGenerator(request, role_params, idx=idx)
+      role_list = lists.getListGenerator(request, role_params,
+                                         visibility='admin', idx=idx)
       participants.append(role_list)
 
       idx = idx + 1

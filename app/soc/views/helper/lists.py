@@ -25,6 +25,8 @@ __authors__ = [
   ]
 
 
+from django.utils import simplejson
+
 from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
 
@@ -194,7 +196,7 @@ def getListConfiguration(request, params, visibility, order):
   return contents
 
 
-def _getListData(request, params, fields, visibility, args=[]):
+def getListData(request, params, fields, visibility=None, args=[]):
   """Returns the list data for the specified params.
 
   Args:
@@ -204,6 +206,9 @@ def _getListData(request, params, fields, visibility, args=[]):
   """
 
   get_args = request.GET
+
+  if not visibility:
+    visibility = 'public'
 
   if not fields:
     fields = {}
@@ -244,33 +249,7 @@ def _getListData(request, params, fields, visibility, args=[]):
   return contents
 
 
-def getListData(request, params, fields, visibility=None, order=[], args=[]):
-  """Returns the list data for the specified params.
-
-  Args:
-    fields: a filter that should be applied to this list
-    visibility: determines which list will be used
-    order: the order the data should be sorted in
-    args: list of arguments to be passed to extract funcs
-  """
-
-  contents = {}
-  start = request.GET.get('start')
-
-  if not visibility:
-    visibility = 'public'
-
-  data = _getListData(request, params, fields, visibility, args)
-  contents.update(data)
-
-  if not start:
-    configuration = getListConfiguration(request, params, visibility, order)
-    contents.update(configuration)
-
-  return contents
-
-
-def getListGenerator(request, params, idx=0):
+def getListGenerator(request, params, visibility=None, order=[], idx=0):
   """Returns a dict with fields used for rendering lists.
 
   Args:
@@ -279,11 +258,15 @@ def getListGenerator(request, params, idx=0):
     idx: the index of this list
   """
 
+  if not visibility:
+    visibility = 'public'
+
+  configuration = getListConfiguration(request, params, visibility, order)
+
   content = {
       'idx': idx,
+      'configuration': simplejson.dumps(configuration),
+      'description': params['list_description'],
       }
-
-  updates = dicts.rename(params, params['list_params'])
-  content.update(updates)
 
   return content

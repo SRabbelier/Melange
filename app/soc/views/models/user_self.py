@@ -327,7 +327,8 @@ class View(base.View):
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = helper.lists.getListData(request, params, filter, 'public')
+    contents = helper.lists.getListData(request, params, filter,
+                                        visibility='public')
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)
@@ -369,8 +370,10 @@ class View(base.View):
     if request.GET.get('fmt') == 'json':
       return self.getRequestsListData(request, uh_params, ar_params)
 
-    uh_list = helper.lists.getListGenerator(request, uh_params, idx=0)
-    ar_list = helper.lists.getListGenerator(request, ar_params, idx=1)
+    uh_list = helper.lists.getListGenerator(request, uh_params,
+                                            visibility='public', idx=0)
+    ar_list = helper.lists.getListGenerator(request, ar_params,
+                                            visibility='public', idx=1)
 
     # fill contents with all the needed lists
     contents = [uh_list, ar_list]

@@ -27,19 +27,9 @@ class Lists(object):
   """
 
   DEF_PASSTHROUGH_FIELDS = [
-      'pagination',
-      'pagination_form',
       'description',
-      'export',
-      'heading',
-      'row',
-      'limit',
-      'newest',
-      'prev',
-      'next',
-      'first',
-      'last',
       'idx',
+      'configuration'
       ]
 
   def __init__(self, contents):

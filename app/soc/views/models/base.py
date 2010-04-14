@@ -510,6 +510,22 @@ class View(object):
 
     return self._constructResponse(request, entity, context, form, params)
 
+  def getListData(self, request, params, visibility, filter):
+    """Returns the list data.
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    if idx != 0:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    contents = helper.lists.getListData(request, params, filter,
+                                        visibility=visibility)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def list(self, request, access_type, page_name=None,
@@ -531,21 +547,11 @@ class View(object):
       the _list method. See the docstring for _list on how it uses it.
     """
 
-    get_args = request.GET
-    fmt = get_args.get('fmt')
-    idx = get_args.get('idx', '')
+    if request.GET.get('fmt') == 'json':
+      return self.getListData(request, params, visibility, filter)
 
-    if fmt == 'json':
-      if not (idx.isdigit() and int(idx) == 0):
-        return responses.jsonErrorResponse(request, "idx not valid")
-
-      contents = helper.lists.getListData(request, params, filter,
-                                          visibility, order=order)
-      json = simplejson.dumps(contents)
-
-      return responses.jsonResponse(request, json)
-
-    content = helper.lists.getListGenerator(request, params, idx=0)
+    content = helper.lists.getListGenerator(request, params, order=order,
+                                            visibility=visibility, idx=0)
     contents = [content]
 
     return self._list(request, params, contents, page_name, context=context)

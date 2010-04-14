@@ -18,6 +18,11 @@ limitations under the License.
 Notification about: {{ entity.subject }}
 {% endblock %}
 
+{% block scripts %}
+  {{ block.super }}
+  <script type="text/javascript" src="/jquery/jquery-ui.dialog.js"></script>
+{% endblock %}
+
 {% block body %}
 <table>
 
@@ -41,9 +46,9 @@ Notification about: {{ entity.subject }}
 
 <tr>
   <td>
-    <input type="button" onclick="location.href='/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}'" value="Delete"/>
+    <input id="button_confirm_delete" type="button" value="Delete" onclick="javascript:melange.form.postDelete(this,'{{ entity_type }}','/{{ entity_type_url|lower }}/delete/{{ entity_suffix }}')" />
   </td>
 </tr>
 </table>
-
+<div id="post_error_container" style="color:red;"></div>
 {% endblock %}

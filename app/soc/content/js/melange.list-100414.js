@@ -458,7 +458,14 @@
     else if (original_data[0] !== undefined) {
       jQuery.each(original_data[0], function (element_key, element_value) {
         if (postdata[element_key] !== undefined) {
-          temp_data = jLinq.from(temp_data).match(element_key, postdata[element_key]).select();
+          // Search by regular expression if switch is on
+          if (jQuery("#regexp_" + list_objects.get(my_index).jqgrid.id).is(":checked")) {
+            temp_data = jLinq.from(temp_data).match(element_key, postdata[element_key]).select();
+          }
+          // else search by simple text
+          else {
+            temp_data = jLinq.from(temp_data).contains(element_key, postdata[element_key]).select();
+          }
         }
       });
     }
@@ -918,10 +925,11 @@
                 });
               }
 
-              //Add CSV Export button only once all data is loaded
+              //Add CSV Export button and RegEx switch only once all data is loaded
 
               //Add some padding at the bottom of the toolbar to display buttons correctly
               jQuery("#t_" + _self.jqgrid.id).css("padding-bottom","3px");
+
               //Add CSV export button
               jQuery("#t_" + _self.jqgrid.id).append("<input type='button' value='CSV Export' style='float:right' id='csvexport_" + _self.jqgrid.id + "'/>");
               //Add Click event to CSV export button
@@ -976,6 +984,15 @@
                   tb_show("CSV export","#TB_inline?height=400&width=500&inlineId=csv_thickbox");
                 }
               });
+
+              //Add RegExp switch
+              jQuery("#t_" + _self.jqgrid.id).append("<div style='float:right;margin-right:4px;'><input type='checkbox' id='regexp_" + _self.jqgrid.id + "'/>RegExp Search</div>");
+
+              //Make the switch trigger a new search when clicked
+              jQuery("#regexp_" + _self.jqgrid.id).click(function () {
+                jQuery("#" + _self.jqgrid.id).jqGrid().trigger("reloadGrid");
+              });
+
 
               //Trigger event when loading of the list is finished
               var loaded_event = jQuery.Event("melange_list_loaded");

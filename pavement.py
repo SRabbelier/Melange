@@ -283,7 +283,7 @@ def run_closure(f):
     f.move(tmp)
 
     try:
-        sh("java -jar %s --js=%s > %s" % (options.closure_bin, tmp, f))
+        sh("java -jar '%s' --js='%s' > '%s'" % (options.closure_bin, tmp, f))
     except BuildFailure, e:
         paver.tasks.environment.error(
             "%s minimization failed, copying plain file", f)

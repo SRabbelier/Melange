@@ -313,7 +313,8 @@ def closure(options):
 
         if not options.js_filter:
           min_dir.rmtree()
-          js_dir.copytree(min_dir)
+
+        js_dir.copytree(min_dir)
 
         for f in min_dir.walkfiles(options.js_filter):
             if f.name in options.no_optimize:

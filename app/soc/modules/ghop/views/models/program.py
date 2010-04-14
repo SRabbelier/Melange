@@ -104,6 +104,7 @@ class View(program.View):
         [ghop_program_logic.logic])]
     rights['type_tag_edit'] = [('checkIsHostForProgram',
         [ghop_program_logic.logic])]
+    rights['search'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.program.logic
@@ -133,9 +134,14 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>difficulty_tag_edit)$',
          '%(module_package)s.%(module_name)s.difficulty_tag_edit',
          'Edit a Difficulty Tag'),
+        # TODO(madhu): This one should use key_fields at the end for access
+        # checks
         (r'^%(url_name)s/(?P<access_type>type_tag_edit)$',
          '%(module_package)s.%(module_name)s.task_type_tag_edit',
          'Edit a Task Type Tag'),
+        (r'^%(url_name)s/(?P<access_type>search)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.search',
+         'Search Page for all Tasks in'),
         ]
 
     new_params['public_field_keys'] = ["name", "scope_path"]
@@ -427,7 +433,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def taskDifficultyEdit(self, request, access_type, page_name=None,
-                         params=None, filter=None, **kwargs):
+                         params=None, **kwargs):
     """View method used to edit Difficulty Level tags.
     """
 
@@ -455,7 +461,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def difficultyTagEdit(self, request, access_type, page_name=None,
-                        params=None, filter=None, **kwargs):
+                        params=None, **kwargs):
     """View method used to edit a supplied Difficulty level tag.
     """
 
@@ -494,7 +500,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def taskTypeEdit(self, request, access_type, page_name=None,
-                   params=None, filter=None, **kwargs):
+                   params=None, **kwargs):
     """View method used to edit Task Type tags.
     """
 
@@ -522,7 +528,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def taskTypeTagEdit(self, request, access_type, page_name=None,
-                      params=None, filter=None, **kwargs):
+                      params=None, **kwargs):
     """View method used to edit a supplied Task Type tag.
     """
 
@@ -564,7 +570,7 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def acceptedOrgs(self, request, access_type,
-                   page_name=None, params=None, filter=None, **kwargs):
+                   page_name=None, params=None, **kwargs):
     """List all the accepted orgs for the given program.
     """
 
@@ -584,7 +590,8 @@ class View(program.View):
     aa_params['participating_field_keys'] = [
         'name', 'short_name', 'home_page', 'pub_mailing_list', 'open_tasks']
     aa_params['participating_field_names'] = [
-        'Organization', 'Short Name', 'Home Page', 'Public Mailing List', 'Open Tasks']
+        'Organization', 'Short Name', 'Home Page', 'Public Mailing List',
+        'Open Tasks']
     aa_params['participating_field_extra'] = lambda entity: {
         'open_tasks': len(ghop_task_logic.logic.getForFields({
             'scope': entity, 'status': ['Open', 'Reopened']}))
@@ -601,8 +608,42 @@ class View(program.View):
                  'status': 'active'}
 
     return self.list(request, 'any_access', page_name=page_name,
-                          params=aa_params, filter=filter, visibility='participating')
+                          params=aa_params, filter=filter,
+                          visibility='participating')
 
+  @decorators.merge_params
+  @decorators.check_access
+  def search(self, request, access_type, page_name=None, params=None,
+             **kwargs):
+    """View where all the public tasks can be searched from.
+    """
+
+    from soc.modules.ghop.views.models.task import view as task_view
+
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    page_name = '%s %s' %(page_name, program_entity.name)
+
+    list_params = task_view.getParams().copy()
+    list_params['list_description'] = ugettext(
+        'This page lists all publicly visible tasks. Use this to find a task '
+        'suited for you.')
+    list_params['public_row_extra'] = lambda entity, *args: {
+        'link': redirects.getPublicRedirect(entity, list_params)
+        }
+
+    filter = {'program': program_entity,
+              'status': 
+                  ['Open', 'Reopened',
+                   'ClaimRequested', 'Claimed', 'ActionNeeded',
+                   'Closed', 'AwaitingRegistration', 'NeedsWork',
+                   'NeedsReview'],
+             }
+
+    return self.list(request, 'allow', page_name, params=list_params,
+                     filter=filter)
 
 view = View()
 
@@ -615,6 +656,7 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
 public = decorators.view(view.public)
+search = decorators.view(view.search)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
 difficulty_tag_edit = decorators.view(view.difficultyTagEdit)

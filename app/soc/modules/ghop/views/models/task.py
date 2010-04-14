@@ -239,14 +239,14 @@ class View(base.View):
     new_params['public_template'] = 'modules/ghop/task/public.html'
 
     def render(entities):
-      two = [i.name for i in entities[:2]]
+      two = [i.name() for i in entities[:2]]
       result = ", ".join(two)
       size = len(entities) - 2
-      return result if size > 0 else "%s + %d" % (result, size)
+      return result if size < 2 else "%s + %d" % (result, size)
 
     new_params['public_field_extra'] = lambda entity: {
         "difficulty": entity.difficulty[0].tag,
-        "task_type": ", ".join(entity.task_type),
+        "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
     }
     new_params['public_field_keys'] = [

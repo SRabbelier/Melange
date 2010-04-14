@@ -399,12 +399,25 @@ class View(base.View):
 
     params = dicts.merge(params, self._params)
 
+    # redirect to scope selection view
+    if ('scope_view' in params) and ('scope_path' not in kwargs):
+      view = params['scope_view'].view
+      redirect = params['scope_redirect']
+      return self.select(request, view, redirect,
+                         params=params, page_name=page_name, **kwargs)
+
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
     # extend create_form to include difficulty levels
     params['create_form'] = self._getTagsForProgram(
         'create_form', params, **kwargs)
 
-    return super(View, self).create(request, 'allow', page_name=page_name,
-                                    params=params, **kwargs)
+    if request.method == 'POST':
+      return self.createPost(request, context, params)
+    else:
+      return self.createGet(request, context, params, kwargs)
 
   @decorators.merge_params
   @decorators.check_access

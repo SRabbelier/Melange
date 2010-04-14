@@ -34,7 +34,7 @@ from tests.pymox import stubout
 from tests.test_utils import MockRequest
 
 from tests import datasets
-from tests.app.soc.logic.models.test_model import TestModelLogic
+from tests.app.soc.modules.ghop.logic.models import test_task as ghop_test_task
 
 from soc import models
 from soc.views.helper import responses
@@ -120,7 +120,7 @@ class TestView(task.View):
 
     params = {}
     params['name'] = "Test"
-    params['logic'] = TestModelLogic()
+    params['logic'] = ghop_test_task.Logic()
     params['rights'] = rights
 
     super(TestView, self).__init__(params=params)
@@ -362,11 +362,12 @@ class TaskTest(unittest.TestCase):
         "/test/ghop/task/edit/google/ghop2009/melange/t126518233415")
 
     # test if Developer passes the access check
-    request.start()
     os.environ['USER_EMAIL'] = 'test@example.com' 
     access_type = "edit"
     page_name = "Edit Task"
-    kwargs = {'scope_path': 'google/ghop2009/melange'}
+    kwargs = {'scope_path': 'google/ghop2009/melange',
+              'link_id': 't126518233415'}
+    request.start()
     actual = self.view.edit(request, access_type,
                             page_name=page_name, **kwargs)
     request.end()
@@ -375,8 +376,8 @@ class TaskTest(unittest.TestCase):
     # test if Org Admin of the Organization passes the access check
     os.environ['USER_EMAIL'] = 'melange_admin_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
-                                page_name=page_name, **kwargs)
+    actual = self.view.edit(request, access_type,
+                            page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' not in actual)
 
@@ -384,7 +385,7 @@ class TaskTest(unittest.TestCase):
     # access check
     os.environ['USER_EMAIL'] = 'asf_admin_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
@@ -394,7 +395,7 @@ class TaskTest(unittest.TestCase):
     # access check
     os.environ['USER_EMAIL'] = 'melange_mentor_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
@@ -404,7 +405,7 @@ class TaskTest(unittest.TestCase):
     # access check
     os.environ['USER_EMAIL'] = 'asf_mentor_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
@@ -414,7 +415,7 @@ class TaskTest(unittest.TestCase):
     # the access check
     os.environ['USER_EMAIL'] = 'melange_student_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
@@ -424,7 +425,7 @@ class TaskTest(unittest.TestCase):
     # the access check
     os.environ['USER_EMAIL'] = 'asf_student_0001@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
@@ -434,7 +435,7 @@ class TaskTest(unittest.TestCase):
     # doesn't pass the access check
     os.environ['USER_EMAIL'] = 'public@example.com'
     request.start()
-    actual = self.view.editTask(request, access_type,
+    actual = self.view.edit(request, access_type,
                                 page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(

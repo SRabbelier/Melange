@@ -386,6 +386,9 @@ class GHOPTaskData(DataSet):
     # simulating link id since this is constructed on the fly
     # when the task is created using the timestamp
     link_id = 't126518233415'
+    scope_path = GHOPOrganizationData.melange_ghop.key_name
+    scope = GHOPOrganizationData.melange_ghop
+    key_name = scope_path + "/" + link_id
     title = 'Melange is a great organization'
     description = """Melange is awesome. So help them improve their
         app. Work with the community."""
@@ -400,6 +403,9 @@ class GHOPTaskData(DataSet):
 
   class melange_task_unpublished:
     link_id = 't126518233416'
+    scope_path = GHOPOrganizationData.melange_ghop.key_name
+    scope = GHOPOrganizationData.melange_ghop
+    key_name = scope_path + "/" + link_id
     title = 'Fix GHOP issues'
     description = """There are a lot of GHOP related issues on issue
         tracker. There are tasks on GHOPTODO wiki page too. Please

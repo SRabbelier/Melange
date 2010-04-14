@@ -1303,16 +1303,21 @@ class View(base.View):
 
     followers = review_follower_logic.getForFields(fields)
 
-    if is_public:
-      # redirect to public page
-      redirect_url = redirects.getStudentPrivateRedirect(entity, self._params)
-    else:
-      # redirect to review page
-      redirect_url = redirects.getReviewRedirect(entity, self._params)
+    # retrieve the redirects for the student and one for the org members
+    private_redirect_url = redirects.getStudentPrivateRedirect(entity,
+                                                               self._params)
+    review_redirect_url = redirects.getReviewRedirect(entity, self._params)
+
+    student_id = entity.scope.link_id
 
     for follower in followers:
       # sent to every follower except the reviewer
       if follower.user.key() != review_entity.author.key():
+        if follower.user.link_id == student_id:
+          redirect_url = private_redirect_url
+        else:
+          redirect_url = review_redirect_url
+
         notifications_helper.sendNewReviewNotification(follower.user,
             review_entity, entity.title, redirect_url)
 

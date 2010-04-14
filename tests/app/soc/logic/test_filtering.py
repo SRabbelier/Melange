@@ -140,3 +140,11 @@ class FilteringTest(unittest.TestCase):
     cleaner.string = dirty
     cleaner.clean()
     self.assertEqual(dirty, cleaner.string)
+
+  def test_script_tags_are_filtered(self):
+    """Tests that script tags are filtered"""
+    dirty = u'''<script></script>'''
+    cleaner = HtmlSanitizer.Cleaner()
+    cleaner.string = dirty
+    cleaner.clean()
+    self.assertEqual(dirty, cleaner.string)

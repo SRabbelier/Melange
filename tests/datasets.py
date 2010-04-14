@@ -380,3 +380,35 @@ class GHOPStudentData(DataSet):
     phone = '1650253000'
     can_we_contact_you = True
     program_knowledge = 'From slashdot.org post last year.'
+
+class GHOPTaskData(DataSet):
+  class melange_task_unapproved:
+    # simulating link id since this is constructed on the fly
+    # when the task is created using the timestamp
+    link_id = 't126518233415'
+    title = 'Melange is a great organization'
+    description = """Melange is awesome. So help them improve their
+        app. Work with the community."""
+    difficulty = 'easy'
+    task_type = 'coding'
+    arbit_tag = 'web'
+    time_to_complete = 24
+    mentors = [GHOPMentorData.melange]
+    program = GHOPProgramData.ghop2009
+    status = 'Unapproved'
+    created_by = GHOPMentorData.melange
+
+  class melange_task_unpublished:
+    link_id = 't126518233416'
+    title = 'Fix GHOP issues'
+    description = """There are a lot of GHOP related issues on issue
+        tracker. There are tasks on GHOPTODO wiki page too. Please
+        pick one of them and complete them"""
+    difficulty = 'hard'
+    task_type = 'coding'
+    arbit_tag = 'python'
+    time_to_complete = 72
+    mentors = [GHOPOrgAdminData.melange]
+    program = GHOPProgramData.ghop2009
+    status = 'Unpublished'
+    created_by = GHOPOrgAdminData.melange

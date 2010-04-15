@@ -189,8 +189,8 @@ def calculate(request, *args, **kwargs):
         # non-counted (to-be) accepted proposal found
         pd_fields = {
             'duplicates': proposal_duplicate.duplicates + [ap.key()],
-            'is_duplicate': True
             }
+        pd_fields['is_duplicate'] = len(pd_fields['duplicates']) >= 2
         if org_entity.key() not in proposal_duplicate.orgs:
           pd_fields['orgs'] = proposal_duplicate.orgs + [org_entity.key()]
 

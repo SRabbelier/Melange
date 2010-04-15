@@ -58,10 +58,11 @@ class Logic(base.Logic):
 
     fields['program'] = program_entity
 
-    proposal_duplicates = self.getForFields(fields)
+    # can not delete more then 500 entities in one call
+    proposal_duplicates = self.getForFields(fields, limit=500)
     while proposal_duplicates:
       db.delete(proposal_duplicates)
-      proposal_duplicates = self.getForFields(fields)
+      proposal_duplicates = self.getForFields(fields, limit=500)
 
 
 logic = Logic()

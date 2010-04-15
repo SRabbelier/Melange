@@ -803,9 +803,30 @@ class View(base.View):
 
     fields = form.cleaned_data
 
+    given_score = fields.get('score')
+    # Doing this instead of get('score',0) because fields.get does not use the
+    # default argument for u''.
+    given_score = int(given_score) if given_score else 0
+
+    is_public = fields['public']
+
+    comment = fields.get('comment')
+    comment = comment if comment else ''
+
     if org_admin and 'org_admin_action' in request.POST:
+      # admin actions are not public, so force private comment
+      is_public = False
+
+      prev_mentor = entity.mentor.key() if entity.mentor else None
+
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
+
+      current_mentor = entity.mentor.key() if entity.mentor else None
+
+      if prev_mentor != current_mentor:
+        mentor_name = entity.mentor.name() if entity.mentor else 'None'
+        comment = '%s Changed mentor to %s.' %(comment, mentor_name)
 
       # try to see if the rank is given and adjust the given_score if needed
       rank = fields['rank']
@@ -821,13 +842,7 @@ class View(base.View):
         # calculate the score that should be given to end up at the given rank
         # give +1 to make sure that in the case of a tie they end up top
         given_score = score_at_rank - entity.score + 1
-
-      # redirect to the same page
-      return http.HttpResponseRedirect('')
-
-    is_public = fields['public']
-    comment = fields['comment']
-    given_score = int(fields.get('score', 0))
+        comment = '%s Proposal has been set to rank %i.' %(comment, rank)
 
     # store the properties to update the proposal with
     properties = {}
@@ -1281,7 +1296,7 @@ class View(base.View):
         'scope': entity,
         'scope_path': entity.key().id_or_name(),
         'author': user_logic.logic.getForCurrentAccount(),
-        'content': comment,
+        'content': comment if comment else '',
         'is_public': is_public,
         }
 

@@ -130,7 +130,7 @@ class GSoCChecker(access.Checker):
 
     if 'host' in allowed_roles:
       # check if the current user is a host for this proposal's program
-      filter['scope'] =  proposal_entity.program
+      filter['scope'] =  proposal_entity.program.scope
 
       if host_logic.getForFields(filter, unique=True):
         return

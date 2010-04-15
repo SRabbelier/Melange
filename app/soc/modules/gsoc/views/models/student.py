@@ -99,7 +99,39 @@ class View(student.View):
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
-    super(View, self).__init__(params)
+    super(View, self).__init__(params=params)
+
+    params = self.getParams()
+    params['admin_field_keys'].extend(['nr_projects', 'nr_failed'])
+    params['admin_field_names'].extend(['Number of Active/Completed Projects',
+                                        'Number of Failed/Withdrawn Projects'])
+    old_extra = params['admin_field_extra']
+
+    def admin_field_extra(entity):
+      """Adds two extra columns indicating the amount of active and the
+      amount of failed StudentProjects.
+      """
+      from soc.modules.gsoc.logic.models.student_project import logic as \
+          sp_logic
+      out = old_extra(entity)
+
+      # Find out whether the student has a project
+      fields = {'student': entity,
+                'status': ['accepted', 'completed']}
+      q = sp_logic.getQueryForFields(fields)
+      nr_projects = q.count()
+
+      fields = {'student': entity,
+                'status': ['withdrawn', 'failed']}
+      q = sp_logic.getQueryForFields(fields)
+      nr_failed = q.count()
+
+      out['nr_projects'] = nr_projects
+      out['nr_failed'] = nr_failed
+
+      return out
+
+    params['admin_field_extra'] = admin_field_extra
 
   @decorators.merge_params
   @decorators.check_access

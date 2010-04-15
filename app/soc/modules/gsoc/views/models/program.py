@@ -739,7 +739,7 @@ class View(program.View):
     fields = {'program': program_entity,
               'is_duplicate': True}
 
-    template = 'soc/program/show_duplicates.html'
+    template = 'modules/gsoc/program/show_duplicates.html'
 
     context['duplicates'] = duplicates_logic.getForFields(fields)
     duplicates_status = ds_logic.getOrCreateForProgram(program_entity)

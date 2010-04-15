@@ -562,6 +562,53 @@ class View(organization.View):
 
     return self._list(request, list_params, contents, page_name, context)
 
+  @decorators.check_access
+  def home(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """See base.View._public().
+    """
+
+    from soc.modules.gsoc.views.models import student_project as \
+        student_project_view
+
+    entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    program_entity = entity.scope
+
+    params = params.copy() if params else {}
+
+    if timeline_helper.isAfterEvent(program_entity.timeline,
+                                    'accepted_students_announced_deadline'):
+      # accepted projects
+      ap_params = student_project_view.view.getParams().copy()
+
+      # define the list redirect action to show the notification
+      ap_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getPublicRedirect(entity, ap_params)
+      }
+      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
+          entity.name)
+
+      if request.GET.get('fmt') == 'json':
+        return self.getHomeData(request, ap_params, entity)
+
+      ap_list = lists.getListGenerator(request, ap_params, idx=0)
+
+      contents = [ap_list]
+
+      extra_context = {}
+      # construct the list and put it into the context
+      extra_context['list'] = soc.logic.lists.Lists(contents)
+
+      fields= {'scope': entity,
+               'status': ['accepted', 'completed']}
+
+      # obtain data to construct the organization map as json object
+      extra_context['org_map_data'] = self._getMapData(fields)
+      params['context'] = extra_context
+
+    return super(View, self).home(request, 'any_access', page_name=page_name,
+                                  params=params, **kwargs)
+
 
 view = View()
 

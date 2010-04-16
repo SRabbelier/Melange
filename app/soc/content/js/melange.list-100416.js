@@ -458,8 +458,15 @@
     else if (original_data[0] !== undefined) {
       jQuery.each(original_data[0], function (element_key, element_value) {
         if (postdata[element_key] !== undefined) {
-          // Search by regular expression if switch is on
-          if (jQuery("#regexp_" + list_objects.get(my_index).jqgrid.id).is(":checked")) {
+          var search_by_reg_exp = jQuery("#regexp_" + list_objects.get(my_index).jqgrid.id).is(":checked");
+          var select_filter = false;
+          jQuery.each(list_objects.get(my_index).configuration.colModel, function (item_index, column) {
+            if (column.editoptions !== undefined && element_key === column.name) {
+              select_filter = true;
+            }
+          });
+          // Search by regular expression if switch is on or if there is a select box to filter
+          if (search_by_reg_exp || select_filter) {
             temp_data = jLinq.from(temp_data).match(element_key, postdata[element_key]).select();
           }
           // else search by simple text

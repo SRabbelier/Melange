@@ -244,19 +244,39 @@ class View(base.View):
       size = len(entities) - 2
       return result if size < 2 else "%s + %d" % (result, size)
 
+    # TODO (Madhu) Add mentors to prefetch of both public and home
+    # once prefetch for list of references is fixed
     new_params['public_field_extra'] = lambda entity: {
+        "org": entity.scope.name,
         "difficulty": entity.difficulty[0].tag,
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
     }
+    new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
-        "title", "difficulty", "task_type",
+        "title", "org", "difficulty", "task_type",
         "time_to_complete", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Difficulty", "Type",
+        "Title", "Organization", "Difficulty", "Type",
         "Time To Complete", "Status", "Mentors",
     ]
+
+    # parameters to list the task on the organization home page
+    new_params['home_field_extra'] = lambda entity: {
+        "difficulty": entity.tags_string(entity.difficulty),
+        "task_type": entity.tags_string(entity.task_type),
+        "arbit_tag": entity.tags_string(entity.arbit_tag),
+        "mentors": render(db.get(entity.mentors)),
+    }
+
+    new_params['home_field_keys'] = ["title", "difficulty", "task_type",
+                                     "arbit_tag", "time_to_complete",
+                                     "mentors", "modified_on"]
+    new_params['home_field_hidden'] = ["modified_on"]
+    new_params['home_field_names'] = ["Title", "Difficulty", "Type",
+                                     "Tags", "Time To Complete",
+                                     "Mentors", "Modified On"]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

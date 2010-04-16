@@ -24,6 +24,7 @@ __authors__ = [
   ]
 
 
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -32,9 +33,11 @@ from soc.logic.helper import timeline as timeline_helper
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.models import organization
 
 import soc.cache.logic
+import soc.logic.lists
 
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
 from soc.modules.ghop.logic.models import organization as ghop_org_logic
@@ -56,9 +59,6 @@ class View(organization.View):
 
   DEF_CLAIMED_PROJECTS_MSG_FMT = ugettext(
       'List of tasks published by %s that are claimed.')
-
-  DEF_CLOSED_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are closed.')
 
 
   def __init__(self, params=None):
@@ -95,8 +95,6 @@ class View(organization.View):
     new_params['sidebar_grouping'] = 'GHOP Organizations'
 
     new_params['public_template'] = 'modules/ghop/organization/public.html'
-    new_params['list_row'] = 'modules/ghop/organization/list/row.html'
-    new_params['list_heading'] = 'modules/ghop/organization/list/heading.html'
     new_params['home_template'] = 'modules/ghop/organization/home.html'
 
     new_params['module_package'] = 'soc.modules.ghop.views.models'
@@ -144,15 +142,53 @@ class View(organization.View):
 
     super(View, self).__init__(params=params)
 
-  def _public(self, request, entity, context):
+  def getListTasksData(self, request, params_collection, org_entity):
+    """Returns the list data for Organization Tasks list.
+
+    Args:
+      request: HTTPRequest object
+      params_collection: List of list Params indexed with the idx of the list
+      org_entity: GHOPOrganization entity for which the lists are generated
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # default list settings
+    args = []
+    order = ['modified_on']
+    visibility = 'home'
+
+    if idx == 0:
+      filter = {'scope': org_entity,
+                'status': ['Open', 'Reopened']}
+    elif idx == 1:
+      filter = {'scope': org_entity,
+                'status': ['ClaimRequested', 'Claimed', 'NeedsAction',
+                           'NeedsReview', 'NeedsWork']}
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    params = params_collection[idx]
+    contents = lists.getListData(request, params, filter,
+                                 visibility=visibility,
+                                 order=order, args=args)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
+  @decorators.check_access
+  def home(self, request, access_type,
+           page_name=None, params=None, **kwargs):
     """See base.View._public().
     """
-#TODO(LIST)
+
     from soc.modules.ghop.views.models import task as ghop_task_view
 
-    contents = []
-
+    entity = self._params['logic'].getFromKeyFieldsOr404(kwargs)
     ghop_program_entity = entity.scope
+
+    params = params.copy() if params else {}
 
     is_after_student_signup = timeline_helper.isAfterEvent(
         ghop_program_entity.timeline, 'student_signup_start')
@@ -161,28 +197,13 @@ class View(organization.View):
         ghop_program_entity.timeline, 'tasks_publicly_visible')
 
     if is_after_student_signup and is_after_tasks_become_public:
-      # open tasks
-      to_params = ghop_task_view.view.getParams().copy()
+      list_params = ghop_task_view.view.getParams().copy()
 
-      # define the list redirect action to show the task public page
-      to_params['public_row_extra'] = lambda entity: {
-          'link': redirects.getPublicRedirect(entity, to_params)
-      }
+      # open tasks
+      to_params = list_params.copy()
+
       to_params['list_description'] = self.DEF_OPEN_PROJECTS_MSG_FMT % (
           entity.name)
-      to_params['list_heading'] = 'modules/ghop/task/list/heading.html'
-      to_params['list_row'] = 'modules/ghop/task/list/row.html'
-
-      filter = {'scope': entity,
-                'status': ['Open', 'Reopened']}
-
-      to_list = lists.getListContent(request, to_params, filter, idx=0,
-                                     need_content=True)
-
-      if to_list:
-        to_list['data'].sort(key=lambda task: task.modified_on)
-
-        contents.append(to_list)
 
       # claimed tasks
       tc_params = to_params.copy()
@@ -190,40 +211,27 @@ class View(organization.View):
       tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT % (
           entity.name)
 
-      filter = {'scope': entity,
-                'status': ['ClaimRequested', 'Claimed', 'NeedsAction',
-                           'NeedsReview', 'NeedsWork']}
+      if request.GET.get('fmt') == 'json':
+        return self.getListTasksData(request, [to_params, tc_params], entity)
 
-      tc_list = lists.getListContent(request, tc_params, filter, idx=1,
-                                     need_content=True)
+      # check if there are new proposals if so show them in a separate list
+      fields = {'scope': entity,
+                'status': ['Open', 'Reopened']}
+      tasks_open = ghop_task_logic.logic.getForFields(fields, unique=True)
 
-      if tc_list:
-        tc_list['data'].sort(key=lambda task: task.modified_on)
+      contents = []
 
-        contents.append(tc_list)
+      if tasks_open:
+        # we should add this list because there is a new proposal
+        to_list = lists.getListGenerator(request, to_params, idx=0)
+        contents.append(to_list)
 
-      # closed tasks
-      tcs_params = to_params.copy()
+      context = {'list': soc.logic.lists.Lists(contents)}
 
-      tcs_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
-          entity.name)
+      params['context'] = context
 
-      filter = {'scope': entity,
-                'status': ['AwaitingRegistration', 'Closed']}
-
-      tcs_list = lists.getListContent(request, tcs_params, filter, idx=2,
-                                      need_content=True)
-
-      if tcs_list:
-        tcs_list['data'].sort(key=lambda task: task.modified_on)
-
-        contents.append(tcs_list)
-
-      # construct the list and put it into the context
-      context['list'] = soc.logic.lists.Lists(contents)
-
-    return super(View, self)._public(request=request, entity=entity,
-                                     context=context)
+    return super(View, self).home(request, 'any_access', page_name=page_name,
+                                  params=params, **kwargs)
 
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific GHOP Organization menu entries.
@@ -342,3 +350,4 @@ list_roles = decorators.view(view.listRoles)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
+

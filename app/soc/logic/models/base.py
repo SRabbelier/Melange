@@ -383,6 +383,8 @@ class Logic(object):
                         (self._model, field))
       return
 
+    # TODO(Madhu and Sverre): Prefetch fails when the property is a list of
+    # references.
     if not isinstance(prop, db.ReferenceProperty):
       logging.exception("Property %s of %s is not a ReferenceProperty but a %s" %
                         (field, self._model.kind(), prop.__class__.__name__))

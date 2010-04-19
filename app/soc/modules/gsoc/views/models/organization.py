@@ -415,6 +415,8 @@ class View(organization.View):
 
     from soc.logic.helper import timeline as timeline_helper
 
+    from soc.modules.gsoc.logic.models.proposal_duplicates_status import \
+        logic as ds_logic
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
     from soc.modules.gsoc.logic.models.student_proposal import logic \
@@ -440,8 +442,12 @@ class View(organization.View):
 
     context = {}
     context['entity'] = org_entity
-    # wether or not the amount of slots assigned should be shown
+    # whether or not the amount of slots assigned should be shown
     context['slots_visible'] = org_entity.scope.allocations_visible
+
+    # used to check the status of the duplicate process
+    context['duplicate_status'] = ds_logic.getOrCreateForProgram(
+        org_entity.scope)
 
     program_entity = org_entity.scope
     page_name = '%s %s (%s)' %(page_name, org_entity.name,

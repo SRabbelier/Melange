@@ -16,7 +16,20 @@ limitations under the License.
 {% block body %}
 
 {% if slots_visible %}
-<span="plaintext">Slots assigned: {{ entity.slots }}</span>
+<span="plaintext">Slots assigned: {{ entity.slots }}</span><br/>
+{% endif %}
+
+{% if entity.scope.duplicates_visible and duplicate_status %}
+  {% ifequal duplicate_status.status "processing" %}
+    The duplicates are being calculated, please note that what you are seeing might be incomplete.
+  {% else %}
+    {% if duplicate_status.calculated_on %}
+      The duplicates were last calculated on {{ duplicate_status.calculated_on|date:"jS F Y H:i" }} UTC.
+      Organization Admins can find the contact information necessary to resolve a duplicate on the
+      review page of the proposal.
+    {% endif %}
+  {% endifequal %}
+
 {% endif %}
 
 {% as_lists list %}

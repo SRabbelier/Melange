@@ -1191,11 +1191,12 @@ class View(base.View):
 
         duplicate_entity = duplicates_logic.getForFields(fields, unique=True)
 
-        # this list also contains the current proposal
-        # entity, so remove it 
-        duplicate_keys = duplicate_entity.duplicates
-        duplicate_keys.remove(entity.key())
-        context['sp_duplicates'] = db.get(duplicate_keys)
+        if duplicate_entity:
+          # this list also contains the current proposal
+          # entity, so remove it
+          duplicate_keys = duplicate_entity.duplicates
+          duplicate_keys.remove(entity.key())
+          context['sp_duplicates'] = db.get(duplicate_keys)
 
     user_entity = user_logic.logic.getForCurrentAccount()
 

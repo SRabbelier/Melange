@@ -21,7 +21,7 @@ limitations under the License.
   {% for admin in org_admins %}
   <div class="orgadmins">
       <p>
-              <a href="mailto: {{ duplicate.student.email }}">"{{ admin.0 }}" &lt;{{ admin.1 }}&gt;</a>{% if not forloop.last %}, {% endif %}
+              <a href="mailto:{{ admin.1 }}">"{{ admin.0 }}" &lt;{{ admin.1 }}&gt;</a>{% if not forloop.last %}, {% endif %}
       </p>
   </div>
   {% endfor %}

@@ -355,7 +355,10 @@ class View(organization.View):
         # get all the duplicate entities if duplicates can be shown
         # to the organizations and make a list of all such proposals.
         if program_entity.duplicates_visible:
-          duplicate_properties = {'orgs': org_entity}
+          duplicate_properties = {
+              'orgs': org_entity,
+              'is_duplicate': True
+              }
           duplicates = pd_logic.getForFields(duplicate_properties)
 
           for duplicate in duplicates:

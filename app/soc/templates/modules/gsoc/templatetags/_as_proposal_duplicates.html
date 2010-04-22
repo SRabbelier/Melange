@@ -22,7 +22,7 @@ limitations under the License.
   <li>Organization: 
     <a href="/org/show/{{ key }}">{{ org.name }}</a>
     Admins: {% for oa in org.admins %}
-    <a href="mailto: {{ oa.email }}">'"{{ oa.name }}" &lt;{{ oa.email }}&gt;'</a>
+    <a href="mailto: {{ oa.email }}">"{{ oa.name }}" &lt;{{ oa.email }}&gt;</a>{% if not forloop.last%},  {% endif %}
     {% endfor %}
     <ul>
     {% for proposal in org.proposals %}

@@ -99,7 +99,7 @@ class View(student.View):
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
-    super(View, self).__init__(params)
+    super(View, self).__init__(params=params)
 
   @decorators.merge_params
   @decorators.check_access

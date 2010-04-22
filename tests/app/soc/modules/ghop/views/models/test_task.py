@@ -34,7 +34,7 @@ from tests.pymox import stubout
 from tests.test_utils import MockRequest
 
 from tests import datasets
-from tests.app.soc.logic.models.test_model import TestModelLogic
+from tests.app.soc.modules.ghop.logic.models import test_task as ghop_test_task
 
 from soc import models
 from soc.views.helper import responses
@@ -120,7 +120,7 @@ class TestView(task.View):
 
     params = {}
     params['name'] = "Test"
-    params['logic'] = TestModelLogic()
+    params['logic'] = ghop_test_task.Logic()
     params['rights'] = rights
 
     super(TestView, self).__init__(params=params)
@@ -152,6 +152,7 @@ class TaskTest(unittest.TestCase):
         'GHOPOrgAdmin': ghop_models.org_admin.GHOPOrgAdmin,
         'GHOPMentor': ghop_models.mentor.GHOPMentor,
         'GHOPStudent': ghop_models.student.GHOPStudent,
+        'GHOPTask': ghop_models.task.GHOPTask,
         }
 
     # create a fixture for Appengine datastore using the previous map
@@ -163,7 +164,8 @@ class TaskTest(unittest.TestCase):
         datasets.UserData, datasets.SiteData, datasets.SponsorData,
         datasets.HostData, datasets.GHOPTimelineData, datasets.GHOPProgramData,
         datasets.GHOPOrganizationData, datasets.GHOPOrgAdminData,
-        datasets.GHOPMentorData, datasets.GHOPMentorData)
+        datasets.GHOPMentorData, datasets.GHOPMentorData,
+        datasets.GHOPTaskData)
 
     self.data.setup()
 
@@ -347,6 +349,94 @@ class TaskTest(unittest.TestCase):
     request.start()
     actual = self.view.suggestTask(request, access_type,
                                    page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+  def testEditTask(self):
+    """Tests if the Mentor/OrgAdmin have rights to edit tasks and
+    other users don't have.
+    """
+
+    request = MockRequest(
+        "/test/ghop/task/edit/google/ghop2009/melange/t126518233415")
+
+    # test if Developer passes the access check
+    os.environ['USER_EMAIL'] = 'test@example.com' 
+    access_type = "edit"
+    page_name = "Edit Task"
+    kwargs = {'scope_path': 'google/ghop2009/melange',
+              'link_id': 't126518233415'}
+    request.start()
+    actual = self.view.edit(request, access_type,
+                            page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' not in actual)
+
+    # test if Org Admin of the Organization passes the access check
+    os.environ['USER_EMAIL'] = 'melange_admin_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                            page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' not in actual)
+
+    # test if Org Admin of other Organization doesn't passes the
+    # access check
+    os.environ['USER_EMAIL'] = 'asf_admin_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+    # test if mentor of the Organization doesn't passes the
+    # access check
+    os.environ['USER_EMAIL'] = 'melange_mentor_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+    # test if mentor of other Organization doesn't passes the
+    # access check
+    os.environ['USER_EMAIL'] = 'asf_mentor_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+    # test if student of the Organization doesn't pass
+    # the access check
+    os.environ['USER_EMAIL'] = 'melange_student_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+    # test if student of other Organization doesn't pass
+    # the access check
+    os.environ['USER_EMAIL'] = 'asf_student_0001@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
+    request.end()
+    self.assertTrue('error' in actual and isinstance(
+        actual['error'], AccessViolation))
+
+    # test if user who doesn't have any role in Melange
+    # doesn't pass the access check
+    os.environ['USER_EMAIL'] = 'public@example.com'
+    request.start()
+    actual = self.view.edit(request, access_type,
+                                page_name=page_name, **kwargs)
     request.end()
     self.assertTrue('error' in actual and isinstance(
         actual['error'], AccessViolation))

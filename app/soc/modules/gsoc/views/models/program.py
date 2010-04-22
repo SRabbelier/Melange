@@ -597,8 +597,6 @@ class View(program.View):
       params: a dict with params for this View, not used
     """
 
-    from django.utils import simplejson
-
     program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
     program_slots = program_entity.slots
 
@@ -610,7 +608,7 @@ class View(program.View):
     query = org_logic.getQueryForFields(filter=filter)
     organizations = org_logic.getAll(query)
 
-    locked_slots = adjusted_slots = {}
+    locked_slots = {}
 
     if request.method == 'POST' and 'result' in request.POST:
       result = request.POST['result']
@@ -620,10 +618,6 @@ class View(program.View):
 
       if load and stored:
         result = stored
-
-      from_json = simplejson.loads(result)
-
-      locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
 
       if submit:
         program_entity.slots_allocation = result
@@ -636,7 +630,7 @@ class View(program.View):
     for org in organizations:
       orgs[org.link_id] = org
       applications[org.link_id] = org.nr_applications
-      max[org.link_id] = min(org.nr_mentors, org.slots_desired)
+      max[org.link_id] = org.slots_desired
 
     max_slots_per_org = program_entity.max_slots
     min_slots_per_org = program_entity.min_slots
@@ -646,18 +640,18 @@ class View(program.View):
                                       program_slots, max_slots_per_org,
                                       min_slots_per_org, algorithm)
 
+    from_json = simplejson.loads(program_entity.slots_allocation)
+    locked_slots = dicts.groupDictBy(from_json, 'locked', 'slots')
+
     result = allocator.allocate(locked_slots)
 
     data = []
 
-    # TODO: remove adjustment here and in the JS
-    for link_id, count in result.iteritems():
-      org = orgs[link_id]
+    for link_id in orgs.keys():
       data.append({
           'link_id': link_id,
-          'slots': count,
-          'locked': locked_slots.get(link_id, 0),
-          'adjustment': adjusted_slots.get(link_id, 0),
+          'slots': result.get(link_id,0),
+          'locked': bool(locked_slots.get(link_id))
           })
 
     return self.json(request, data)
@@ -690,11 +684,11 @@ class View(program.View):
     }
     org_params['public_field_keys'] = [
         "name", "slots_desired", "nr_applications", "nr_mentors",
-        "locked", "slots", "slots_calculated", "link_id",
+        "locked", "slots_ass", "slots", "link_id",
     ]
     org_params['public_field_names'] = [
         "Name", "Desired", "#Proposals", "#Mentors",
-        "Locked?", "Slots", "Raw", "Link ID",
+        "Locked?", "Slots Assigned", "Slots Visible to Org", "Link ID",
     ]
 
     order = ['name']
@@ -745,7 +739,7 @@ class View(program.View):
     fields = {'program': program_entity,
               'is_duplicate': True}
 
-    template = 'soc/program/show_duplicates.html'
+    template = 'modules/gsoc/program/show_duplicates.html'
 
     context['duplicates'] = duplicates_logic.getForFields(fields)
     duplicates_status = ds_logic.getOrCreateForProgram(program_entity)

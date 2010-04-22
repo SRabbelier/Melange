@@ -14,6 +14,7 @@ limitations under the License.
 {% endcomment %}
 {% load comments_helpers %}
 {% load forms_helpers %}
+{% load student_proposal_helpers %}
 
 {% block header_title %}
 {{ page_name }} (Score: {{ entity.score }})
@@ -186,6 +187,13 @@ limitations under the License.
 <!-- /form> -->
 
 <hr />
+{% if is_org_admin and sp_duplicates and entity.program.duplicates_visible %}
+<b>Duplicates</b>
+{% for duplicate in sp_duplicates %}
+  {% as_student_proposal_review_duplicate duplicate %}
+{% endfor %}
+<hr />
+{% endif %}
 <b>Public Reviews</b>
 {% for review in public_reviews %}
   {% as_student_proposal_review review student %}

@@ -161,7 +161,7 @@ class _Cursor(object):
     if query.has_offset():
       offset += query.offset()
 
-    if offset > 0:
+    if offset > 0 and results:
       last_index = min(len(results), offset) - 1
       self.__last_result = results[last_index]
     else:

@@ -239,24 +239,44 @@ class View(base.View):
     new_params['public_template'] = 'modules/ghop/task/public.html'
 
     def render(entities):
-      two = [i.name for i in entities[:2]]
+      two = [i.name() for i in entities[:2]]
       result = ", ".join(two)
       size = len(entities) - 2
-      return result if size > 0 else "%s + %d" % (result, size)
+      return result if size < 2 else "%s + %d" % (result, size)
 
+    # TODO (Madhu) Add mentors to prefetch of both public and home
+    # once prefetch for list of references is fixed
     new_params['public_field_extra'] = lambda entity: {
+        "org": entity.scope.name,
         "difficulty": entity.difficulty[0].tag,
-        "task_type": ", ".join(entity.task_type),
+        "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
     }
+    new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
-        "title", "difficulty", "task_type",
+        "title", "org", "difficulty", "task_type",
         "time_to_complete", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Difficulty", "Type",
+        "Title", "Organization", "Difficulty", "Type",
         "Time To Complete", "Status", "Mentors",
     ]
+
+    # parameters to list the task on the organization home page
+    new_params['home_field_extra'] = lambda entity: {
+        "difficulty": entity.tags_string(entity.difficulty),
+        "task_type": entity.tags_string(entity.task_type),
+        "arbit_tag": entity.tags_string(entity.arbit_tag),
+        "mentors": render(db.get(entity.mentors)),
+    }
+
+    new_params['home_field_keys'] = ["title", "difficulty", "task_type",
+                                     "arbit_tag", "time_to_complete",
+                                     "mentors", "modified_on"]
+    new_params['home_field_hidden'] = ["modified_on"]
+    new_params['home_field_names'] = ["Title", "Difficulty", "Type",
+                                     "Tags", "Time To Complete",
+                                     "Mentors", "Modified On"]
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -399,12 +419,25 @@ class View(base.View):
 
     params = dicts.merge(params, self._params)
 
+    # redirect to scope selection view
+    if ('scope_view' in params) and ('scope_path' not in kwargs):
+      view = params['scope_view'].view
+      redirect = params['scope_redirect']
+      return self.select(request, view, redirect,
+                         params=params, page_name=page_name, **kwargs)
+
+    context = helper.responses.getUniversalContext(request)
+    helper.responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
     # extend create_form to include difficulty levels
     params['create_form'] = self._getTagsForProgram(
         'create_form', params, **kwargs)
 
-    return super(View, self).create(request, 'allow', page_name=page_name,
-                                    params=params, **kwargs)
+    if request.method == 'POST':
+      return self.createPost(request, context, params)
+    else:
+      return self.createGet(request, context, params, kwargs)
 
   @decorators.merge_params
   @decorators.check_access

@@ -458,7 +458,21 @@
     else if (original_data[0] !== undefined) {
       jQuery.each(original_data[0], function (element_key, element_value) {
         if (postdata[element_key] !== undefined) {
-          temp_data = jLinq.from(temp_data).match(element_key, postdata[element_key]).select();
+          var search_by_reg_exp = jQuery("#regexp_" + list_objects.get(my_index).jqgrid.id).is(":checked");
+          var select_filter = false;
+          jQuery.each(list_objects.get(my_index).configuration.colModel, function (item_index, column) {
+            if (column.editoptions !== undefined && element_key === column.name) {
+              select_filter = true;
+            }
+          });
+          // Search by regular expression if switch is on or if there is a select box to filter
+          if (search_by_reg_exp || select_filter) {
+            temp_data = jLinq.from(temp_data).match(element_key, postdata[element_key]).select();
+          }
+          // else search by simple text
+          else {
+            temp_data = jLinq.from(temp_data).contains(element_key, postdata[element_key]).select();
+          }
         }
       });
     }
@@ -757,6 +771,33 @@
             "&idx=", idx
           ].join(""),
           timeout: 60000,
+          tryCount: 1,
+          retryLimit: 5,
+          error: function (xhr, textStatus, errorThrown) {
+            // retry on 500 errors from server
+            if (xhr.status == 500) {
+              this.tryCount++;
+              if (this.tryCount <= this.retryLimit) {
+                jQuery.ajax(this);
+                return;
+              }
+              // retryLimit is reached, show a message
+              jQuery("#temporary_list_placeholder_" + idx).html([
+                '<span style="color:red">',
+                'Error retrieving data: please refresh the list or the whole page to try again',
+                '</span>'].join("")
+              );
+              jQuery("#load_" + _self.jqgrid.id).hide();
+            } else {
+              // another error from server, show a message
+              jQuery("#temporary_list_placeholder_" + idx).html([
+                '<span style="color:red">',
+                'Error retrieving data: please refresh the list or the whole page to try again',
+                '</span>'].join("")
+              );
+              jQuery("#load_" + _self.jqgrid.id).hide();
+            }
+          },
           success: function (data_from_server) {
             var source = JSON.parse(data_from_server);
             var first_batch_received = (current_loop > 0);
@@ -794,11 +835,13 @@
                 current_loop++;
               }
               else {
+                jQuery("#temporary_list_placeholder_" + idx).remove();
                 jQuery("#load_" + _self.jqgrid.id).hide();
               }
             }
             else {
               //loading data finished, hiding loading message
+              jQuery("#temporary_list_placeholder_" + idx).remove();
               jQuery("#load_" + _self.jqgrid.id).hide();
 
               // Delete previous buttons, if any
@@ -889,10 +932,11 @@
                 });
               }
 
-              //Add CSV Export button only once all data is loaded
+              //Add CSV Export button and RegEx switch only once all data is loaded
 
               //Add some padding at the bottom of the toolbar to display buttons correctly
               jQuery("#t_" + _self.jqgrid.id).css("padding-bottom","3px");
+
               //Add CSV export button
               jQuery("#t_" + _self.jqgrid.id).append("<input type='button' value='CSV Export' style='float:right' id='csvexport_" + _self.jqgrid.id + "'/>");
               //Add Click event to CSV export button
@@ -947,6 +991,15 @@
                   tb_show("CSV export","#TB_inline?height=400&width=500&inlineId=csv_thickbox");
                 }
               });
+
+              //Add RegExp switch
+              jQuery("#t_" + _self.jqgrid.id).append("<div style='float:right;margin-right:4px;'><input type='checkbox' id='regexp_" + _self.jqgrid.id + "'/>RegExp Search</div>");
+
+              //Make the switch trigger a new search when clicked
+              jQuery("#regexp_" + _self.jqgrid.id).click(function () {
+                jQuery("#" + _self.jqgrid.id).jqGrid().trigger("reloadGrid");
+              });
+
 
               //Trigger event when loading of the list is finished
               var loaded_event = jQuery.Event("melange_list_loaded");
@@ -1022,8 +1075,9 @@
         );
       jQuery("#" + _self.jqgrid.id).jqGrid('filterToolbar', {});
 
-      jQuery("#temporary_list_placeholder_" + idx).remove();
-      // Show Loading message
+      // Show Loading message, after substituting it with an animated image
+      jQuery("#load_" + _self.jqgrid.id).closest("div").css("line-height","100%");
+      jQuery("#load_" + _self.jqgrid.id).html("<img src='/soc/content/images/jqgrid_loading.gif'></img>");
       jQuery("#load_" + _self.jqgrid.id).show();
 
       _self.jqgrid.object = jQuery("#" + _self.jqgrid.id);

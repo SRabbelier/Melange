@@ -311,6 +311,8 @@ class View(organization.View):
       org_entity: GSoCOrganization entity for which the lists are generated
     """
 
+    from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
+        as pd_logic
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
     from soc.modules.gsoc.logic.models.student_proposal import logic \
@@ -340,15 +342,36 @@ class View(organization.View):
 
       status = {}
 
+      program_entity = org_entity.scope
+
       # only when the program allows allocations
       # we show that proposals are likely to be
       # accepted or rejected
-      if org_entity.scope.allocations_visible:
+      if program_entity.allocations_visible:
         proposals = sp_logic.getProposalsToBeAcceptedForOrg(org_entity)
 
+        duplicate_proposals = []
+
+        # get all the duplicate entities if duplicates can be shown
+        # to the organizations and make a list of all such proposals.
+        if program_entity.duplicates_visible:
+          duplicate_properties = {
+              'orgs': org_entity,
+              'is_duplicate': True
+              }
+          duplicates = pd_logic.getForFields(duplicate_properties)
+
+          for duplicate in duplicates:
+            duplicate_proposals.extend(duplicate.duplicates)
+
         for proposal in proposals:
-          if proposal.status == 'pending':
-            status[proposal.key()] = 'Pending acceptance'
+          proposal_key =  proposal.key()
+          if proposal.status == 'pending' and proposal_key in duplicate_proposals:
+            status[proposal_key] = """<strong><font color="red">
+                Duplicate</font></strong>"""
+          else:
+            status[proposal_key] = """<strong><font color="green">
+                Pending acceptance</font><strong>"""
 
       filter = {'org': org_entity,
                 'status': ['accepted','pending','rejected']}
@@ -395,6 +418,8 @@ class View(organization.View):
 
     from soc.logic.helper import timeline as timeline_helper
 
+    from soc.modules.gsoc.logic.models.proposal_duplicates_status import \
+        logic as ds_logic
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
     from soc.modules.gsoc.logic.models.student_proposal import logic \
@@ -420,8 +445,12 @@ class View(organization.View):
 
     context = {}
     context['entity'] = org_entity
-    # wether or not the amount of slots assigned should be shown
+    # whether or not the amount of slots assigned should be shown
     context['slots_visible'] = org_entity.scope.allocations_visible
+
+    # used to check the status of the duplicate process
+    context['duplicate_status'] = ds_logic.getOrCreateForProgram(
+        org_entity.scope)
 
     program_entity = org_entity.scope
     page_name = '%s %s (%s)' %(page_name, org_entity.name,
@@ -446,9 +475,10 @@ class View(organization.View):
     rp_params['review_field_hidden'] = ['abstract', 'content', 'additional_info',
                                         'created_on']
     rp_params['review_field_names'] = ['Rank', 'Title', 'Student', 'Mentor',
-                                       'Score', 'status', 'Last Modified On',
+                                       'Score', 'Status', 'Last Modified On',
                                        'Abstract', 'Content', 'Additional Info',
                                        'Created On']
+    rp_params['review_field_no_filter'] = ['status']
     rp_params['review_field_prefetch'] = ['scope', 'mentor', 'program']
     rp_params['review_field_extra'] = lambda entity, ranker, status: {
           'rank': ranker.FindRanks([[entity.score]])[0] + 1,
@@ -456,7 +486,7 @@ class View(organization.View):
           'mentor': entity.mentor.name() if entity.mentor else
               '%s Proposed' % len(entity.possible_mentors),
           'status': status.get(entity.key(),
-              "Pending rejection") if (
+              '<font color="red">Pending rejection</font>') if (
               entity.program.allocations_visible \
               and entity.status == 'pending') else entity.status,
     }
@@ -540,6 +570,53 @@ class View(organization.View):
       contents.append(ip_list)
 
     return self._list(request, list_params, contents, page_name, context)
+
+  @decorators.check_access
+  def home(self, request, access_type,
+             page_name=None, params=None, **kwargs):
+    """See base.View._public().
+    """
+
+    from soc.modules.gsoc.views.models import student_project as \
+        student_project_view
+
+    entity = self._logic.getFromKeyFieldsOr404(kwargs)
+    program_entity = entity.scope
+
+    params = params.copy() if params else {}
+
+    if timeline_helper.isAfterEvent(program_entity.timeline,
+                                    'accepted_students_announced_deadline'):
+      # accepted projects
+      ap_params = student_project_view.view.getParams().copy()
+
+      # define the list redirect action to show the notification
+      ap_params['public_row_extra'] = lambda entity: {
+          'link': redirects.getPublicRedirect(entity, ap_params)
+      }
+      ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
+          entity.name)
+
+      if request.GET.get('fmt') == 'json':
+        return self.getHomeData(request, ap_params, entity)
+
+      ap_list = lists.getListGenerator(request, ap_params, idx=0)
+
+      contents = [ap_list]
+
+      extra_context = {}
+      # construct the list and put it into the context
+      extra_context['list'] = soc.logic.lists.Lists(contents)
+
+      fields= {'scope': entity,
+               'status': ['accepted', 'completed']}
+
+      # obtain data to construct the organization map as json object
+      extra_context['org_map_data'] = self._getMapData(fields)
+      params['context'] = extra_context
+
+    return super(View, self).home(request, 'any_access', page_name=page_name,
+                                  params=params, **kwargs)
 
 
 view = View()

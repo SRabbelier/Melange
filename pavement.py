@@ -77,6 +77,7 @@ options(
     ),
 
     closure = Bunch(
+        js_filter = "*.js",
         js_dir = None,
         js_dirs = ["soc/content/js", "jquery", "jlinq", "json"],
         closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
@@ -283,7 +284,7 @@ def run_closure(f):
     f.move(tmp)
 
     try:
-        sh("java -jar %s --js=%s > %s" % (options.closure_bin, tmp, f))
+        sh("java -jar '%s' --js='%s' > '%s'" % (options.closure_bin, tmp, f))
     except BuildFailure, e:
         paver.tasks.environment.error(
             "%s minimization failed, copying plain file", f)
@@ -295,6 +296,7 @@ def run_closure(f):
 @cmdopts([
     ('app-folder=', 'a', 'App folder directory (default /app)'),
     ('js-dir=', 'j', 'JS directory to minimize, relative to /app'),
+    ('js-filter=', 'f', 'Minimize files matching this regex, default "*.js"'),
 ])
 def closure(options):
     """Runs the closure compiler over the JS files."""
@@ -308,9 +310,13 @@ def closure(options):
 
     for js_dir in dirs:
         min_dir = js_dir + ".min"
-        min_dir.rmtree()
+
+        if not options.js_filter:
+          min_dir.rmtree()
+
         js_dir.copytree(min_dir)
-        for f in min_dir.walkfiles("*.js"):
+
+        for f in min_dir.walkfiles(options.js_filter):
             if f.name in options.no_optimize:
                 paver.tasks.environment.info(
                 '%-4sCLOSURE: Skipping %s', '', f)

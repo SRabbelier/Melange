@@ -1,4 +1,3 @@
-{% extends "soc/mail/base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,19 +11,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
-{% block content %}
-You have received a new notification entitled "{{ notification.subject }}".
-To read, respond to, or delete this notification please visit <a href="{{ notification_url }}">{{ notification_url }}</a>.
-
-The notification content is:
-<p>
-{{ notification.message|safe }}
-</p>
-{% endblock %}
-
-{% block signature %}
-Greetings, <br />
-The {{ site_name }} Team
-{% endblock %}
+<div class="studentproposalreview">
+  <div class="title">
+     <strong>Proposal:</strong> {{ title }} <strong>
+         Organization:</strong> {{ org_name }}
+  </div>
+  <p><strong>Org Admins:</strong></p>
+  {% for admin in org_admins %}
+  <div class="orgadmins">
+      <p>
+              <a href="mailto:{{ admin.1 }}">"{{ admin.0 }}" &lt;{{ admin.1 }}&gt;</a>{% if not forloop.last %}, {% endif %}
+      </p>
+  </div>
+  {% endfor %}
+</div>

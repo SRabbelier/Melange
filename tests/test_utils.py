@@ -43,6 +43,7 @@ class MockRequest(object):
     self.REQUEST = {}
     self.GET = {}
     self.POST = {}
+    self.META = {}
     self.path = path
     self.method = method
 

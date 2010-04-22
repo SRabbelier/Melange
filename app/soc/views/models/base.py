@@ -615,8 +615,8 @@ class View(object):
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
-      return helper.responses.errorResponse(
-          error, request, template=params['error_edit'])
+      return helper.responses.jsonErrorResponse(
+          request, "No such %s" % params['name'])
 
     if not logic.isDeletable(entity):
       page_params = params['cannot_delete_params']
@@ -625,13 +625,15 @@ class View(object):
 
       # redirect to the edit page
       # display notice that entity could not be deleted
-      return helper.responses.redirectToChangedSuffix(
-          request, None, params=page_params)
+      return helper.responses.jsonErrorResponse(
+          request, "That %s cannot be deleted" % params['name'])
 
     logic.delete(entity)
     redirect = params['delete_redirect']
 
-    return http.HttpResponseRedirect(redirect)
+    data = simplejson.dumps(dict(new_location=redirect))
+
+    return helper.responses.jsonResponse(request, data)
 
   def select(self, request, view, redirect,
              page_name=None, params=None, filter=None):

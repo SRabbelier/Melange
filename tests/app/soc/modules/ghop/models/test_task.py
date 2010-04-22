@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.5
 #
-# Copyright 2009 the Melange authors.
+# Copyright 2010 the Melange authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 
 __authors__ = [
-  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   ]
 
 
-from google.appengine.ext import db
+from soc.modules.ghop.models import task
 
 
-class TestModel(db.Model):
-  """Simple test model.
+class GHOPTask(task.GHOPTask):
+  """.
   """
 
-  value = db.IntegerProperty()
+  pass

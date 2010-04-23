@@ -245,7 +245,7 @@ class Logic(object):
     """Returns entity for key_name or None if not found.
 
     Args:
-      key_name: key name of entity
+      key_name: key name of entity, or a list of key names
       parent: parent of the entity
     """
 
@@ -261,7 +261,7 @@ class Logic(object):
     """Returns entity for id or None if not found.
 
     Args:
-      id: id of entity
+      id: id of entity or a list of ids
       parent: parent of the entity
     """
 

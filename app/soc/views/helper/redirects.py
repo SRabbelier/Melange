@@ -236,26 +236,6 @@ def getListParticipantsRedirect(entity, params):
   return result
 
 
-def getAcceptProjectRedirect(entity, params):
-  """Returns the redirect for accept_project access type.
-  """
-
-  result = '/%s/accept_project/%s' % (
-      params['url_name'], entity.key().id_or_name())
-
-  return result
-
-
-def getWithdrawProjectRedirect(entity, params):
-  """Returns the redirect for withdraw access type.
-  """
-
-  result = '/%s/withdraw_project/%s' % (
-      params['url_name'], entity.key().id_or_name())
-
-  return result
-
-
 def getWithdrawRedirect(entity, params):
   """Returns the redirect for withdraw_project access type.
   """
@@ -302,6 +282,16 @@ def getManageOverviewRedirect(entity, params):
   """
 
   result = '/%s/manage_overview/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
+
+def getOverviewRedirect(entity, params):
+  """Returns the redirect for the manage overview view of the given entity.
+  """
+
+  result = '/%s/overview/%s' % (
       params['url_name'], entity.key().id_or_name())
 
   return result

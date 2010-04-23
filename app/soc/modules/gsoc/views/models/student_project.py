@@ -89,21 +89,13 @@ class View(base.View):
         ('checkStudentProjectHasStatus',
             [['accepted', 'completed']])
         ]
-    rights['withdraw'] = ['checkIsHostForProgram']
-    rights['withdraw_project'] = ['checkIsHostForStudentProject',
-        ('checkStudentProjectHasStatus',
-            [['accepted', 'completed']])
-        ]
-    rights['accept_project'] = ['checkIsHostForStudentProject',
-        ('checkStudentProjectHasStatus',
-            [['withdrawn']])
-        ]
+    rights['overview'] = ['checkIsHostForProgram']
 
     new_params = {}
     new_params['logic'] = project_logic
     new_params['rights'] = rights
-    new_params['name'] = "Student Project"
-    new_params['url_name'] = "gsoc/student_project"
+    new_params['name'] = 'Student Project'
+    new_params['url_name'] = 'gsoc/student_project'
     new_params['module_package'] = 'soc.modules.gsoc.views.models'
     new_params['sidebar_grouping'] = 'Students'
 
@@ -150,33 +142,58 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>st_edit)/%(key_fields)s$',
         'soc.modules.gsoc.views.models.%(module_name)s.st_edit',
         'Edit my %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>withdraw)/(?P<scope_path>%(ulnp)s)/%(lnp)s$',
-        'soc.modules.gsoc.views.models.%(module_name)s.withdraw',
-        'Withdraw %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>withdraw_project)/%(key_fields)s$',
-        'soc.modules.gsoc.views.models.%(module_name)s.withdraw_project',
-        'Withdraw a %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>accept_project)/%(key_fields)s$',
-        'soc.modules.gsoc.views.models.%(module_name)s.accept_project',
-        'Accept a %(name)s'),
+        (r'^%(url_name)s/(?P<access_type>overview)/(?P<scope_path>%(ulnp)s)/%(lnp)s$',
+        'soc.modules.gsoc.views.models.%(module_name)s.overview',
+        'Overview of all %(name_plural)s for'),
     ]
 
     new_params['extra_django_patterns'] = patterns
 
     new_params['edit_template'] = 'soc/student_project/edit.html'
     new_params['manage_template'] = 'soc/student_project/manage.html'
-    new_params['manage_overview_heading'] = \
-        'soc/student_project/list/heading_manage.html'
-    new_params['manage_overview_row'] = \
-        'soc/student_project/list/row_manage.html'
 
     new_params['public_field_prefetch'] = ['mentor', 'student', 'scope']
     new_params['public_field_extra'] = lambda entity: {
-        "student": entity.student.name(),
-        "mentor": entity.mentor.name(),
+        'student': entity.student.name(),
+        'mentor': entity.mentor.name(),
     }
-    new_params['public_field_keys'] = ["student", "title", "mentor", "status"]
-    new_params['public_field_names'] = ["Student", "Title", "Mentor", "Status"]
+    new_params['public_field_keys'] = ['student', 'title', 'mentor', 'status', ]
+    new_params['public_field_names'] = ['Student', 'Title', 'Mentor', 'Status']
+
+    new_params['admin_field_prefetch'] = ['mentor', 'student', 'scope']
+    new_params['admin_field_extra'] = lambda entity: {
+        'student': entity.student.name(),
+        'mentor': entity.mentor.name(),
+    }
+    new_params['admin_field_keys'] = ['student', 'title', 'mentor', 'status']
+    new_params['admin_field_names'] = ['Student', 'Title', 'Mentor', 'Status']
+
+    new_params['admin_conf_extra'] = {
+        'multiselect': True,
+    }
+    new_params['admin_button_global'] = [
+        {
+          'bounds': [1,'all'],
+          'id': 'withdraw',
+          'caption': 'Withdraw Project',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+        },
+        {
+          'bounds': [1,'all'],
+          'id': 'accept',
+          'caption': 'Accept Project',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+        }]
 
     params = dicts.merge(params, new_params)
 
@@ -260,11 +277,9 @@ class View(base.View):
 
       context['additional_mentors'] = ', '.join(mentor_names)
 
-  def getWithdrawData(self, request, ap_params, wp_params, program_kwargs):
+  def getOverviewData(self, request, params, program):
     """Return data for withdraw.
     """
-
-    program = program_logic.getFromKeyFieldsOr404(program_kwargs)
 
     fields = {
         'program': program,
@@ -273,105 +288,108 @@ class View(base.View):
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
 
-    if idx == 0:
-      fields['status'] = ['accepted', 'completed']
-      params = ap_params
-    elif idx == 1:
-      fields['status'] = ['withdrawn']
-      params = wp_params
-    else:
+    if idx != 0:
       return responses.jsonErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields, 'public')
+    contents = lists.getListData(request, params, fields, 'admin')
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)
 
   @decorators.merge_params
   @decorators.check_access
-  def withdraw(self, request, access_type,
+  def overview(self, request, access_type,
                page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to accept or withdraw Student Projects.
+    """View that allows Program Admins to see/control all StudentProjects.
 
-    For params see base.View().public()
+    For args see base.View().public()
     """
 
-    ap_params = params.copy() # accepted projects
+    program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
 
-    ap_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getWithdrawProjectRedirect(entity,ap_params)
+    if request.POST:
+      return self.overviewPost(request, params, program_entity)
+    else: #request.GET
+      return self.overviewGet(request, page_name, params, program_entity,
+                              **kwargs)
+
+  def overviewPost(self, request, params, program):
+    """Handles the POST request for the Program Admins overview page.
+
+    Args:
+      request: Django HTTPRequest object
+      params: Params for this view
+      program: GSoCProgram entity
+    """
+
+    project_logic = params['logic']
+
+    post_dict = request.POST
+
+    data = simplejson.loads(post_dict.get('data', '[]'))
+    button_id = post_dict.get('button_id', '')
+
+    if button_id not in ['withdraw', 'accept']:
+      logging.warning('Invalid button ID found %s' %(button_id))
+      return http.HttpResponse()
+
+    project_keys = []
+
+    for selected in data:
+      project_keys.append(selected['key'])
+
+    # get all projects and prefetch the program field
+    projects = project_logic.getFromKeyName(project_keys)
+    project_logic.prefetchField('program', projects)
+
+    # filter out all projects not belonging to the current program
+    projects = [p for p in projects if p.program.key() == program.key()]
+
+    for p in projects:
+      fields = {}
+      if button_id == 'withdraw':
+        fields['status'] = 'withdrawn'
+      elif button_id == 'accept':
+        fields['status'] = 'accepted'
+
+      # update the project with the new status
+      project_logic.updateEntityProperties(p, fields)
+
+    # return a 200 response
+    return http.HttpResponse()
+
+  def overviewGet(self, request, page_name, params, program_entity, **kwargs):
+    """Handles the GET request for the Program Admins overview page.
+
+    Args:
+      request: Django HTTPRequest object
+      page_name: Name for this page
+      params: Params for this view
+      program_entity: GSocProgram entity
+    """
+
+    page_name = '%s %s' %(page_name, program_entity.name)
+
+    list_params = params.copy()
+    list_params['admin_row_extra'] = lambda entity: {
+        'link': redirects.getPublicRedirect(entity, list_params)
     }
 
-    ap_params['list_description'] = ugettext(
-        "An overview of accepted and completed Projects. "
-        "Click on a project to withdraw it.")
-
-    wp_params = params.copy() # withdrawn projects
-
-    wp_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getAcceptProjectRedirect(entity, wp_params)
-    }
-    wp_params['list_description'] = ugettext(
-        "An overview of withdrawn Projects. "
-        "Click on a project to undo the withdrawal.")
+    list_params['list_description'] = ugettext(
+        'An overview of all StudentProjects for %s. Click on an item to view '
+        'the project, use the buttons on the list for withdrawing a project.'%
+        (program_entity.name))
 
     if request.GET.get('fmt') == 'json':
-      return self.getWithdrawData(request, ap_params, wp_params, kwargs)
+      return self.getOverviewData(request, list_params, program_entity)
 
-    ap_list = lists.getListGenerator(request, ap_params, idx=0)
-    wp_list = lists.getListGenerator(request, wp_params, idx=1)
+    project_list = lists.getListGenerator(request, list_params, idx=0)
 
-    # fill contents with all the needed lists
-    contents = [ap_list, wp_list]
+    # fill contents with the list
+    contents = [project_list]
 
     # call the _list method from base to display the list
     return self._list(request, params, contents, page_name)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def withdrawProject(self, request, access_type,
-                      page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to withdraw Student Projects.
-
-    For params see base.View().public()
-
-    """
-# TODO(POST)
-    logic = params['logic']
-    entity = logic.getFromKeyFieldsOr404(kwargs)
-
-    fields = {
-        'status': 'withdrawn',
-        }
-
-    logic.updateEntityProperties(entity, fields)
-
-    url = redirects.getWithdrawRedirect(entity.program, params)
-
-    return http.HttpResponseRedirect(url)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def acceptProject(self, request, access_type,
-                    page_name=None, params=None, **kwargs):
-    """View that allows Program Admins to accept Student Projects.
-
-    For params see base.View().public()
-
-    """
-# TODO(POST)
-    logic = params['logic']
-    entity = logic.getFromKeyFieldsOr404(kwargs)
-
-    fields = {
-        'status': 'accepted',
-        }
-
-    logic.updateEntityProperties(entity, fields)
-
-    url = redirects.getWithdrawRedirect(entity.program, params)
-
-    return http.HttpResponseRedirect(url)
 
   def _getManageData(self, request, gps_params, ps_params, entity):
     """Returns the JSONResponse for the Manage page.
@@ -892,7 +910,6 @@ class View(base.View):
 
 view = View()
 
-accept_project = decorators.view(view.acceptProject)
 admin = decorators.view(view.admin)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
@@ -900,9 +917,8 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 manage = decorators.view(view.manage)
 manage_overview = decorators.view(view.manageOverview)
+overview = decorators.view(view.overview)
 public = decorators.view(view.public)
 st_edit = decorators.view(view.stEdit)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
-withdraw = decorators.view(view.withdraw)
-withdraw_project = decorators.view(view.withdrawProject)

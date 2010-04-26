@@ -129,7 +129,7 @@ class View(student.View):
     fields = {'student': student_entity}
 
     list_params = project_view.view.getParams().copy()
-    
+
     fmt = {'name': student_entity.scope.name}
     list_params['list_description'] = self.DEF_STUDENT_PROJECTS_MSG_FMT % fmt
     list_params['public_row_extra'] = lambda entity: {

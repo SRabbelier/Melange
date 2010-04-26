@@ -157,16 +157,20 @@ class View(base.View):
         'student': entity.student.name(),
         'mentor': entity.mentor.name(),
     }
-    new_params['public_field_keys'] = ['student', 'title', 'mentor', 'status', ]
+    new_params['public_field_keys'] = ['student', 'title', 'mentor', 'status']
     new_params['public_field_names'] = ['Student', 'Title', 'Mentor', 'Status']
 
     new_params['admin_field_prefetch'] = ['mentor', 'student', 'scope']
     new_params['admin_field_extra'] = lambda entity: {
         'student': entity.student.name(),
         'mentor': entity.mentor.name(),
+        'student_id': entity.student.link_id
     }
-    new_params['admin_field_keys'] = ['student', 'title', 'mentor', 'status']
-    new_params['admin_field_names'] = ['Student', 'Title', 'Mentor', 'Status']
+    new_params['admin_field_keys'] = ['student', 'title', 'mentor', 'status',
+                                      'student_id']
+    new_params['admin_field_names'] = ['Student', 'Title', 'Mentor', 'Status',
+                                       'Student Link ID']
+    new_params['admin_field_hidden'] = ['student_id']
 
     new_params['admin_conf_extra'] = {
         'multiselect': True,

@@ -120,8 +120,10 @@ class View(role.View):
 
     super(View, self).__init__(params=params)
 
+    params = self.getParams()
+
     # register the role with the group_view
-    self._params['group_view'].registerRole(self._logic.role_name, self)
+    params['group_view'].registerRole(self._logic.role_name, self)
 
     # create and store the special form for invited users
     dynafields = [
@@ -141,10 +143,15 @@ class View(role.View):
     dynaproperties = params_helper.getDynaFields(dynafields)
 
     invited_create_form = dynaform.extendDynaForm(
-        dynaform = self._params['create_form'],
+        dynaform = params['create_form'],
         dynaproperties = dynaproperties)
 
-    self._params['invited_create_form'] = invited_create_form
+    params['invited_create_form'] = invited_create_form
+
+    # add the contact field to the admin list
+    params['admin_field_keys'].append('can_we_contact_you')
+    params['admin_field_names'].append('Allowed to Contact?')
+    params['admin_field_hidden'].append('can_we_contact_you')
 
   def _editPost(self, request, entity, fields):
     """See base.View._editPost().

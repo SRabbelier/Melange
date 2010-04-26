@@ -192,6 +192,7 @@ class View(base.View):
         'birth_date': entity.birth_date.isoformat(),
         'account_name': accounts.normalizeAccount(entity.user.account).email()
     }
+    new_params['admin_field_hidden'] = []
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

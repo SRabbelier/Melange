@@ -89,7 +89,7 @@ class View(base.View):
         ('checkStudentProjectHasStatus',
             [['accepted', 'completed']])
         ]
-    rights['overview'] = ['checkIsHostForProgram']
+    rights['overview'] = [('checkIsHostForProgram', [program_logic])]
 
     new_params = {}
     new_params['logic'] = project_logic

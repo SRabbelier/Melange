@@ -190,6 +190,39 @@ class View(presence.View):
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
 
+  def getListParticipantsData(self, request, params, program_entity):
+    """Returns the list data.
+    """
+
+    from django.utils import simplejson
+
+    from soc.views.models.role import ROLE_VIEWS
+
+    # get index
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    participants_logic = params['participants_logic']
+
+    if idx == -1 or idx > len(participants_logic):
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    # get role params that belong to the given index
+    (role_logic, query_field) = participants_logic[idx]
+    role_view = ROLE_VIEWS[role_logic.role_name]
+    role_params = role_view.getParams().copy()
+
+    # construct the query for the specific list
+    fields = {query_field: program_entity,
+              'status': ['active','inactive']}
+
+    # return getListData
+    contents = lists.getListData(request, role_params, fields,
+                                 visibility='admin')
+
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listParticipants(self, request, access_type, page_name=None,
@@ -199,38 +232,13 @@ class View(presence.View):
     For args see base.list().
     """
 
-    from django.utils import simplejson
-
     from soc.views.models.role import ROLE_VIEWS
 
     program_logic = params['logic']
     program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
 
     if request.GET.get('fmt') == 'json':
-      # get index
-      idx = request.GET.get('idx', '')
-      idx = int(idx) if idx.isdigit() else -1
-
-      participants_logic = params['participants_logic']
-
-      if idx == -1 or idx > len(participants_logic):
-        return responses.jsonErrorResponse(request, "idx not valid")
-
-      # get role params that belong to the given index
-      (role_logic, query_field) = participants_logic[idx]
-      role_view = ROLE_VIEWS[role_logic.role_name]
-      role_params = role_view.getParams().copy()
-
-      # construct the query for the specific list
-      fields = {query_field: program_entity,
-                'status': ['active','inactive']}
-
-      # return getListData
-      contents = lists.getListData(request, role_params, fields,
-                                   visibility='admin')
-
-      json = simplejson.dumps(contents)
-      return responses.jsonResponse(request, json)
+      return self.getListParticipantsData(request, params, program_entity)
 
     # we need to generate the lists to be shown on this page
     participants = []

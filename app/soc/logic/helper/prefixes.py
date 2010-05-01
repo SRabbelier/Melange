@@ -35,8 +35,12 @@ def getOrSetScope(entity):
   import soc.models.user
   import soc.models.site
 
+  import soc.modules.gsoc.models.organization
   import soc.modules.gsoc.models.program
+
+  import soc.modules.ghop.models.organization
   import soc.modules.ghop.models.program
+
 
   if getattr(entity, 'scope', None):
     return entity.scope
@@ -46,6 +50,8 @@ def getOrSetScope(entity):
       "gsoc_program": soc.modules.gsoc.models.program.GSoCProgram,
       "ghop_program": soc.modules.ghop.models.program.GHOPProgram,
       "program": soc.models.program.Program,
+      "gsoc_org": soc.modules.gsoc.models.organization.GSoCOrganization,
+      "ghop_org": soc.modules.ghop.models.organization.GHOPOrganization,
       "org": soc.models.organization.Organization,
       "user": soc.models.user.User,
       "site": soc.models.site.Site}

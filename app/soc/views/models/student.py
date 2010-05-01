@@ -147,6 +147,8 @@ class View(role.View):
 
     super(View, self).__init__(params=params)
 
+    params = self.getParams()
+
     # create and store the special form for users
     updated_fields = {
         'link_id': forms.CharField(widget=forms.HiddenInput,
@@ -155,11 +157,20 @@ class View(role.View):
         }
 
     user_create_form = dynaform.extendDynaForm(
-        dynaform = self._params['create_form'],
+        dynaform = params['create_form'],
         dynaproperties = updated_fields)
 
-    self._params['user_create_form'] = user_create_form
+    params['user_create_form'] = user_create_form
 
+    params['admin_field_keys'].extend([
+        'school_name', 'school_country','school_type', 'major', 'degree',
+        'grade', 'expected_graduation', 'can_we_contact_you'])
+    params['admin_field_names'].extend([
+        'School Name', 'School Country', 'School Type', 'Major', 'Degree',
+        'Grade', 'Expected Graduation Year', 'Allowed to Contact?'])
+    params['admin_field_hidden'].extend([
+        'school_name', 'school_country','school_type', 'major', 'degree',
+        'grade', 'expected_graduation', 'can_we_contact_you'])
 
   @decorators.merge_params
   @decorators.check_access

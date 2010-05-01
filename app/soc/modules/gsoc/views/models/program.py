@@ -21,6 +21,7 @@ __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -232,10 +233,10 @@ class View(program.View):
         items += [(redirects.getListSurveysRedirect(
             entity, params['document_prefix'], 'gsoc/grading_project_survey'),
             "List Grading Surveys", 'any_access')]
-        # add link to withdraw Student Projects
-        items += [(redirects.getWithdrawRedirect(
-            entity, {'url_name': 'student_project'}),
-            "Withdraw Student Projects", 'any_access')]
+        # add link to view Student Projects
+        items += [(redirects.getOverviewRedirect(
+             entity,{'url_name': 'gsoc/student_project'}),
+            "View all Student Projects", 'any_access')]
 
       except out_of_band.Error:
         pass

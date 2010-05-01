@@ -171,20 +171,22 @@ class View(base.View):
 
     # define the fields for the admin list
     new_params['admin_field_keys'] = [
-        'link_id', 'name', 'document_name', 'email', 'res_street',
-        'res_street_extra', 'res_city', 'res_state', 'res_country',
-        'res_postalcode', 'phone', 'recipient_name', 'shipping_street',
-        'shipping_street_extra', 'shipping_city', 'shipping_state',
-        'shipping_country', 'shipping_postalcode', 'birth_date',
-        'tshirt_style', 'tshirt_size', 'group_name', 'status', 'account_name'
+        'link_id', 'given_name', 'surname', 'document_name', 'email',
+        'res_street', 'res_street_extra', 'res_city', 'res_state',
+        'res_country', 'res_postalcode', 'phone', 'recipient_name',
+        'shipping_street', 'shipping_street_extra', 'shipping_city',
+        'shipping_state', 'shipping_country', 'shipping_postalcode',
+        'birth_date', 'tshirt_style', 'tshirt_size', 'group_name', 'status',
+        'account_name',
         ]
     new_params['admin_field_names'] = [
-        'Link ID', 'Name', 'Name on Documents', 'Email', 'Street Address 1',
-        'Street Address 2', 'City', 'State', 'Country', 'Postal Code',
-        'Phone Number', 'Recipient Name', 'Shipping Street Address 1',
-        'Shipping Street Address 2', 'Shipping City', 'Shipping State',
-        'Shipping Country', 'Shipping Postal Code', 'Birth Date',
-        'T-Shirt Style', 'T-Shirt Size', 'Group Name', 'Status', 'Account Name'
+        'Link ID', 'Name', 'Surname', 'Name on Documents', 'Email',
+        'Street Address 1', 'Street Address 2', 'City', 'State', 'Country',
+        'Postal Code', 'Phone Number', 'Recipient Name',
+        'Shipping Street Address 1', 'Shipping Street Address 2',
+        'Shipping City', 'Shipping State', 'Shipping Country',
+        'Shipping Postal Code', 'Birth Date', 'T-Shirt Style', 'T-Shirt Size',
+        'Group Name', 'Status', 'Account Name',
     ]
     new_params['admin_field_prefetch'] = ['scope', 'user']
     new_params['admin_field_extra'] = lambda entity: {
@@ -192,6 +194,7 @@ class View(base.View):
         'birth_date': entity.birth_date.isoformat(),
         'account_name': accounts.normalizeAccount(entity.user.account).email()
     }
+    new_params['admin_field_hidden'] = ['tshirt_style', 'tshirt_size']
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

@@ -56,16 +56,6 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>st_edit)/%(key_fields)s$',
         'soc.views.models.%(module_name)s.st_edit',
         'Edit my %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>withdraw)/'
-          '(?P<scope_path>%(ulnp)s)/%(lnp)s$',
-        'soc.views.models.%(module_name)s.withdraw',
-        'Withdraw %(name_plural)s'),
-        (r'^%(url_name)s/(?P<access_type>withdraw_project)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.withdraw_project',
-        'Withdraw a %(name)s'),
-        (r'^%(url_name)s/(?P<access_type>accept_project)/%(key_fields)s$',
-        'soc.views.models.%(module_name)s.accept_project',
-        'Accept a %(name)s'),
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -77,7 +67,6 @@ class View(base.View):
 
 view = View()
 
-accept_project = responses.redirectLegacyRequest
 admin = responses.redirectLegacyRequest
 create = responses.redirectLegacyRequest
 delete = responses.redirectLegacyRequest
@@ -89,5 +78,3 @@ public = responses.redirectLegacyRequest
 st_edit = responses.redirectLegacyRequest
 export = responses.redirectLegacyRequest
 pick = responses.redirectLegacyRequest
-withdraw = responses.redirectLegacyRequest
-withdraw_project = responses.redirectLegacyRequest

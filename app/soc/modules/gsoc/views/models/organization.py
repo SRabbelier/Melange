@@ -216,7 +216,7 @@ class View(organization.View):
     if admin_entity or mentor_entity:
       # add a link to view all the student proposals
       submenu = (redirects.getListProposalsRedirect(group_entity, params),
-          "View all Student Proposals", 'any_access')
+          "Manage Student Proposals", 'any_access')
       submenus.append(submenu)
 
 

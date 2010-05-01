@@ -77,7 +77,7 @@ options(
     ),
 
     closure = Bunch(
-        js_filter = "*.js",
+        js_filter = None,
         js_dir = None,
         js_dirs = ["soc/content/js", "jquery", "jlinq", "json"],
         closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
@@ -308,15 +308,17 @@ def closure(options):
     old_size = 0
     new_size = 0
 
+    js_filter = options.js_filter if options.js_filter else "*.js"
+
     for js_dir in dirs:
         min_dir = js_dir + ".min"
 
         if not options.js_filter:
-          min_dir.rmtree()
+            min_dir.rmtree()
 
         js_dir.copytree(min_dir)
 
-        for f in min_dir.walkfiles(options.js_filter):
+        for f in min_dir.walkfiles(js_filter):
             if f.name in options.no_optimize:
                 paver.tasks.environment.info(
                 '%-4sCLOSURE: Skipping %s', '', f)

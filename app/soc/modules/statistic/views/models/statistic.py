@@ -534,7 +534,8 @@ class View(base.View):
 
   @view_decorators.merge_params
   @view_decorators.check_access
-  def csvExport(self, request, access_type, page_name=None, params=None, **kwargs):
+  def csvExport(self, request, access_type, page_name=None,
+                params=None, **kwargs):
     """CSV export of a statistic specified in request params.
     """
 
@@ -558,8 +559,9 @@ class View(base.View):
       writer.writerow(row)
 
     data = file_handler.getvalue()
+    filename = statistic.link_id + '_' + statistic.calculated_on.isoformat('_')
 
-    return self.download(request, data, "plik", params)
+    return self.download(request, data, filename, params)
 
   @view_decorators.merge_params
   def _getJsonResponseForAllStats(self, scope_path, params=None):

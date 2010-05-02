@@ -22,8 +22,9 @@ __authors__ = [
   ]
 
 
-import re
+import csv
 import logging
+import StringIO
 
 from google.appengine.api import memcache
 from google.appengine.ext import db
@@ -93,6 +94,7 @@ class View(base.View):
 
     rights = access.StatisticChecker(params)
 
+    rights['csv_export'] = [('checkCanManageStatistic', program_logic)]
     rights['get_json_response'] =  [('checkCanManageStatistic', program_logic)]
     rights['show'] = [('checkCanManageStatistic', program_logic)]
     rights['visualize'] = [('checkCanManageStatistic', program_logic)]
@@ -127,6 +129,9 @@ class View(base.View):
         (r'^%(url_name)s/(?P<access_type>visualize)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.visualize',
          'Visualize Statistic'),
+        (r'^%(url_name)s/(?P<access_type>csv_export)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.csv_export',
+         'Export Statistic'),
         (r'^%(url_name)s/(?P<access_type>get_json_response)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.get_json_response',
          'Get Json Response'),
@@ -528,6 +533,35 @@ class View(base.View):
     return self.json(request, data)
 
   @view_decorators.merge_params
+  @view_decorators.check_access
+  def csvExport(self, request, access_type, page_name=None, params=None, **kwargs):
+    """CSV export of a statistic specified in request params.
+    """
+
+    link_id = kwargs['link_id']
+    scope_path = kwargs['scope_path']
+    logic = params['logic']
+    data = []
+
+    statistic = self._getStatisticEntity(link_id, scope_path, logic)    
+    if statistic:
+      data = logic.getCSV(statistic)
+
+    params['export_extension'] = '.csv'
+    params['export_content_type'] = 'text/csv'
+
+    file_handler = StringIO.StringIO()
+    writer = csv.writer(file_handler, dialect='excel')
+
+    # encode the data to UTF-8 to ensure compatibiliy
+    for row in data:
+      writer.writerow(row)
+
+    data = file_handler.getvalue()
+
+    return self.download(request, data, "plik", params)
+
+  @view_decorators.merge_params
   def _getJsonResponseForAllStats(self, scope_path, params=None):
     """Returns json response with all statistics for a program.
     """
@@ -678,6 +712,7 @@ class View(base.View):
 
 view = View()
 
+csv_export = view_decorators.view(view.csvExport)
 manage_statistics = view_decorators.view(view.manageStatistics)
 update_stats = view_decorators.view(view.updateOrClearStats)
 visualize = view_decorators.view(view.visualize)

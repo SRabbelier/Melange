@@ -781,6 +781,54 @@ class Logic(base.Logic):
     else:
       return None
 
+  def getCSV(self, statistic):
+    """Returns CSV object for a given statistic.
+    """
+
+    if not statistic.final_json:
+      return ['The statistic has not been collected']
+
+    statistic_type = self._getStatisticType(statistic)
+    if statistic_type == 'per_field':
+      return self._getCSVForPerField(statistic)
+    elif statistic_type == 'overall':
+      return self._getCSVForOverall(statistic)
+
+  def _getCSVForPerField(self, statistic):
+    """Returns CSV object for a given statistic 'per field' statistic.
+    """
+
+    rows = []
+
+    chart_json = simplejson.loads(statistic.chart_json)
+    description = chart_json['description'] 
+    header = []
+    for item in description:
+      header.append(item[-1].encode('utf-8'))
+    rows.append(header)
+
+    final_stat = simplejson.loads(statistic.final_json)
+    for choice, result in final_stat.iteritems():
+      row = []
+      row.append(str(choice).encode('utf-8'))
+      for item in result:
+        row.append(str(item).encode('utf-8'))
+      rows.append(row)
+
+    return rows
+
+  def _getCSVForOverall(self, statistic):
+    """Returns CSV object for a given statistic 'overall' statistic.
+    """
+
+    rows = []
+
+    final_stat = simplejson.loads(statistic.final_json)
+    for name, result in final_stat.iteritems():
+      rows.append([name, result])
+
+    return rows
+
   def getVisualizationTypes(self, statistic):
     """Returns a list of visualization options for a given statistic.
     """

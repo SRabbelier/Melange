@@ -105,6 +105,7 @@ class Mapper(object):
 
     self.transformers_dict = {
         'enumerate': logic._enumerateTransformer,
+        'pretty_names': logic._getPrettyNamesTransformer,
         'remove-insufficient': logic._removeInsufficientTransformer,
         'remove-out-of-range': logic._removeOutOfRangeTransformer,
         'get-vis-names': logic._getCountriesTransformer

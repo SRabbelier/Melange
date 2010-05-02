@@ -108,8 +108,11 @@ class Logic(base.Logic):
     """Prepares all settings needed by 'per field' statistics to be collected.
     """
 
-    field = instructions.get('field')
+    params = instructions.get('params', {})
+    params['statistic'] = statistic
+    params['model'] = instructions.get('model')
 
+    field = instructions.get('field')
     choice_instructions = instructions.get('choice_instructions')
     # choices have to be collected manually; there is no predefined list
     if choice_instructions:
@@ -135,14 +138,12 @@ class Logic(base.Logic):
         # still there are choices to be collected; next task is needed
         if not choices:
           return statistic, False
+
+        params['choices_logic'] = choices_logic
       else:
         choices = simplejson.loads(statistic.choices_json)
     else:
       choices = self.helper.getChoices(field)
-
-    params = instructions.get('params', {})
-    params['statistic'] = statistic
-    params['model'] = instructions.get('model')
 
     filter = self.helper.getFilter(instructions, params)
     checker = self.helper.getChecker(instructions)
@@ -394,7 +395,7 @@ class Logic(base.Logic):
 
     # if next_entity is None, all data is gathered
     if not next_entity:
-      data = transformer(partial_stats)
+      data = transformer(partial_stats, params)
     else:
       data = partial_stats
 
@@ -476,7 +477,7 @@ class Logic(base.Logic):
 
     return statistic
 
-  def _defaultTransformer(self, working_stats):
+  def _defaultTransformer(self, working_stats, params):
     """Default transformer used when no transformer is defined for a statistic.
     """
 
@@ -488,18 +489,19 @@ class Logic(base.Logic):
 
     return True
 
-  def _enumerateTransformer(self, working_stats):
+  def _enumerateTransformer(self, working_stats, params):
     """Transforms json_string before saving it.
 
     Args:
       working_stats: a dict containing a collected statistic
+      params: a dictionary containing additional, statistic specific params
 
     Returns:
       a dict containing pairs (a value from working_stats, a number of keys
       from working_stats containing that value)
     """
 
-    filtred_stats = {}
+    filtered_stats = {}
 
     if len(working_stats.keys()) == 0:
       return filtred_stats
@@ -509,19 +511,40 @@ class Logic(base.Logic):
     max_value = max(values) + 1
 
     for i in range(0, max_value):
-      filtred_stats[str(i)] = [0]
+      filtered_stats[str(i)] = [0]
 
     for key in working_stats:
-      filtred_key = str(working_stats[key][0])
-      filtred_stats[filtred_key][0] += 1
+      filtered_key = str(working_stats[key][0])
+      filtered_stats[filtered_key][0] += 1
 
-    return filtred_stats
+    return filtered_stats
 
-  def _removeInsufficientTransformer(self, working_stats):
+  def _getPrettyNamesTransformer(self, working_stats, params):
     """Transforms json_string before saving it.
 
     Args:
       working_stats: a dict containing a collected stat
+      params: a dictionary containing additional, statistic specific params
+
+    Returns:
+      a dict containing the collected stat, but choices are represented
+      by thier names instead of their key names
+    """
+
+    filtered_stat = {}
+    logic = params['choices_logic']
+    for choice, result in working_stats.iteritems():
+      entity = logic.getFromKeyName(choice)
+      filtered_stat[entity.name] = result
+
+    return filtered_stat
+
+  def _removeInsufficientTransformer(self, working_stats, params):
+    """Transforms json_string before saving it.
+
+    Args:
+      working_stats: a dict containing a collected stat
+      params: a dictionary containing additional, statistic specific params
 
     Returns:
       a dict containing the collected stat, but without choices which
@@ -535,11 +558,12 @@ class Logic(base.Logic):
 
     return working_stats
 
-  def _removeOutOfRangeTransformer(self, working_stats):
+  def _removeOutOfRangeTransformer(self, working_stats, params):
     """Transforms json_string before saving it.
 
     Args:
       working_stats: a dict containing a collected stat
+      params: a dictionary containing additional, statistic specific params
 
     Returns:
       a dict containing the collected stat, but with choices limited to
@@ -558,11 +582,12 @@ class Logic(base.Logic):
 
     return working_stats
 
-  def _getCountriesTransformer(self, working_stats):
+  def _getCountriesTransformer(self, working_stats, params):
     """Transforms json_string before saving it.
 
     Args:
       working_stats: a dict containing a collected stat
+      params: a dictionary containing additional, statistic specific params
 
     Returns:
       a dict containing the collected stat, but with country names renamed

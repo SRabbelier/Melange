@@ -128,5 +128,6 @@ INSTALLED_APPS = (
 
 MODULE_FMT = 'soc.modules.%s.callback'
 MODULES = ['gsoc', 'statistic']
-# TODO: to enable GHOP uncomment the following line:
-#MODULES = ['gsoc', 'ghop']
+# TODO: to enable GHOP uncomment the following line (and of course
+# comment the previous line):
+#MODULES = ['gsoc', 'statistic', 'ghop']

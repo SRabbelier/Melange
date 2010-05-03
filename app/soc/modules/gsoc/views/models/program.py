@@ -789,9 +789,6 @@ class View(program.View):
     from soc.modules.gsoc.views.models import student_project as sp_view
 
     ap_params = sp_view.view.getParams().copy() # accepted projects
-    ap_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, ap_params)
-    }
 
     ap_params['list_description'] = description
     ap_params['public_conf_extra'] = {

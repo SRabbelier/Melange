@@ -591,7 +591,7 @@ class View(organization.View):
       ap_params = student_project_view.view.getParams().copy()
 
       # define the list redirect action to show the notification
-      ap_params['public_row_extra'] = lambda entity: {
+      ap_params['org_home_row_extra'] = lambda entity: {
           'link': redirects.getPublicRedirect(entity, ap_params)
       }
       ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (

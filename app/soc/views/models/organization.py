@@ -453,7 +453,7 @@ class View(group.View):
       return responses.jsonErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields,
-                                 'public', order=order)
+                                 'org_home', order=order)
     json = simplejson.dumps(contents)
 
     return responses.jsonResponse(request, json)

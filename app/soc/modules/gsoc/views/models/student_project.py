@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -156,9 +157,22 @@ class View(base.View):
     new_params['public_field_extra'] = lambda entity: {
         'student': entity.student.name(),
         'mentor': entity.mentor.name(),
+        'org': entity.scope.name,
     }
-    new_params['public_field_keys'] = ['student', 'title', 'mentor', 'status']
-    new_params['public_field_names'] = ['Student', 'Title', 'Mentor', 'Status']
+    new_params['public_field_keys'] = ['student', 'title', 'mentor',
+                                       'org', 'status']
+    new_params['public_field_names'] = ['Student', 'Title', 'Mentor',
+                                        'Organization', 'Status']
+
+    new_params['org_home_field_prefetch'] = ['mentor', 'student']
+    new_params['org_home_field_extra'] = lambda entity: {
+        'student': entity.student.name(),
+        'mentor': entity.mentor.name(),
+    }
+    new_params['org_home_field_keys'] = ['student', 'title', 'mentor',
+                                         'status']
+    new_params['org_home_field_names'] = ['Student', 'Title',
+                                          'Mentor', 'Status']
 
     new_params['admin_field_prefetch'] = ['mentor', 'student', 'scope']
     new_params['admin_field_extra'] = lambda entity: {

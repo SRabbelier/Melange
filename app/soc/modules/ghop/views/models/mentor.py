@@ -26,8 +26,6 @@ from soc.logic import dicts
 from soc.views.helper import decorators
 from soc.views.models import mentor
 
-import soc.cache.logic
-
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import organization as ghop_org_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
@@ -107,4 +105,3 @@ role_request = decorators.view(view.request)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 pick = decorators.view(view.pick)
-

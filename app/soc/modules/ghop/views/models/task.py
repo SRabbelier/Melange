@@ -791,6 +791,7 @@ class View(base.View):
         'status': 'Unapproved',
         }
 
+    # TODO (Fix this error): Something to do with change to new list protocol
     up_list = lists.getListContent(request, up_params, filter, idx=0,
                                    need_content=True)
 
@@ -820,6 +821,7 @@ class View(base.View):
         'status': 'Unpublished',
         }
 
+    # TODO (Fix this error): Something to do with change to new list protocol
     aup_list = lists.getListContent(request, aup_params, filter, idx=1,
                                     need_content=True)
 
@@ -851,6 +853,7 @@ class View(base.View):
             'NeedsWork', 'NeedsReview'],
         }
 
+    # TODO (Fix this error): Something to do with change to new list protocol
     ap_list = lists.getListContent(request, ap_params, filter, idx=2,
                                    need_content=True)
 

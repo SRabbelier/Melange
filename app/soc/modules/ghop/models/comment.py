@@ -28,8 +28,6 @@ from django.utils.translation import ugettext
 
 import soc.models.base
 
-import soc.modules.ghop.models.task
-
 
 class GHOPComment(soc.models.base.ModelWithFieldAttributes):
   """GHOP Comment model for tasks, extends the basic Comment model.

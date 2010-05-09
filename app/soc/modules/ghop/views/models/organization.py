@@ -27,7 +27,6 @@ __authors__ = [
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
-from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.views.helper import decorators
@@ -36,7 +35,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import organization
 
-import soc.cache.logic
 import soc.logic.lists
 
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic

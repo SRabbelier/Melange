@@ -35,16 +35,12 @@ from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
-from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import program
 from soc.views.sitemap import sidebar
-
-import soc.cache.logic
 
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
@@ -564,7 +560,6 @@ class View(program.View):
     """List all the accepted orgs for the given program.
     """
 
-    from soc.views.models import base as base_view
     from soc.modules.ghop.views.models.organization import view as org_view
 
     logic = params['logic']

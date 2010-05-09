@@ -34,7 +34,7 @@ from django.utils.translation import ugettext
 from soc.logic.models import base
 from soc.logic import tags
 
-from soc.modules.ghop.logic.models import comment as ghop_comment_logic
+from soc.modules.ghop.logic.models.comment import logic as ghop_comment_logic
 
 import soc.models.linkable
 
@@ -170,8 +170,6 @@ class Logic(base.Logic):
     """
 
     # pylint: disable-msg=W0621    
-    from soc.modules.ghop.logic.models.comment import logic as \
-        ghop_comment_logic
     from soc.modules.ghop.logic.models.work_submission import logic as \
         ghop_work_submission_logic
     from soc.modules.ghop.models import comment as ghop_comment_model
@@ -269,8 +267,6 @@ class Logic(base.Logic):
     """
 
     # pylint: disable-msg=W0621
-    from soc.modules.ghop.logic.models.comment import logic as \
-        ghop_comment_logic
     from soc.modules.ghop.logic.models.work_submission import logic as \
         ghop_work_submission_logic
  
@@ -445,7 +441,7 @@ class Logic(base.Logic):
       """
 
       to_delete = []    
-      to_delete += ghop_comment_logic.logic.getForFields(ancestors=[entity])
+      to_delete += ghop_comment_logic.getForFields(ancestors=[entity])
       to_delete += [entity]
     
       db.delete(to_delete)

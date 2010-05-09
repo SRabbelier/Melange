@@ -278,6 +278,16 @@ class View(base.View):
                                      "Tags", "Time To Complete",
                                      "Mentors", "Modified On"]
 
+    new_params['public_row_action'] = new_params['home_row_action'] = {
+          "type": "redirect_custom",
+          "parameters": dict(new_window=True),
+    }
+    new_params['public_row_extra'] = new_params['home_row_extra'] = \
+        lambda entity: {
+            'link': redirects.getPublicRedirect(
+                entity, {'url_name': new_params['url_name']})
+    }
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

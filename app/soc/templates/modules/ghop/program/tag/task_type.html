@@ -25,9 +25,8 @@ type='text/css' media='all' />
   <script type="text/javascript" src="/jquery/jquery-ui.sortable.js"></script>
   <script type="text/javascript">
    var submit_handler = function(element, id, value) {
-     $.get("/ghop/program/type_tag_edit", 
-           { 'tag_data': [$("#"+id).attr("name"), value], 
-             'program_key_name': '{{ program_key_name }}' },
+     $.get("/ghop/program/type_tag_edit/{{ program_key_name }}",
+           {'tag_data': [$("#"+id).attr("name"), value]},
            function(data) {
              if (!data) {
                $("#"+id).remove();
@@ -61,28 +60,27 @@ type='text/css' media='all' />
           if (order[i])
             new_order[i] = $("#"+order[i]).attr("name");
         }
-        $.get("/ghop/program/type_tag_edit", 
-              { 'order': new_order,
-                'program_key_name': '{{ program_key_name }}' }
-        ); 
-      } 
+        $.get("/ghop/program/type_tag_edit/{{ program_key_name }}", 
+              { 'order': new_order }
+        );
+      }
     });
   });
   </script>
 {% endblock %}
 
 {% block body %}
-To add new tags click on Add button. To edit a tag click on the tag. To 
+To add new tags click on Add button. To edit a tag click on the tag. To
 delete a tag click on it and make its content empty. To order them drag and
 drop the tags.
 <ul class="in-place-edit" id="dynamic-add">
  {% for task_type in task_types %}
- <li id="existing-{{ forloop.counter }}" 
+ <li id="existing-{{ forloop.counter }}"
  name="{{ task_type.tag }}" class="handle">{{ task_type.tag }}</li>
  {% endfor %}
 </ul>
 <p>
- <input style="font-weight: bold" type="button" 
+ <input style="font-weight: bold" type="button"
  value="Add" onclick="return add()"/>
 </p>
 

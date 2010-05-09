@@ -131,12 +131,10 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>task_type)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_edit',
          'Edit Task Type Tags'),
-        (r'^%(url_name)s/(?P<access_type>difficulty_tag_edit)$',
+        (r'^%(url_name)s/(?P<access_type>difficulty_tag_edit)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.difficulty_tag_edit',
          'Edit a Difficulty Tag'),
-        # TODO(madhu): This one should use key_fields at the end for access
-        # checks
-        (r'^%(url_name)s/(?P<access_type>type_tag_edit)$',
+        (r'^%(url_name)s/(?P<access_type>type_tag_edit)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_tag_edit',
          'Edit a Task Type Tag'),
         (r'^%(url_name)s/(?P<access_type>search)/%(key_fields)s$',
@@ -468,10 +466,8 @@ class View(program.View):
     get_params = request.GET
 
     order = get_params.getlist('order')
-    program_key_name = get_params.get('program_key_name')
 
-    program_entity = ghop_program_logic.logic.getFromKeyName(
-        program_key_name)
+    program_entity = ghop_program_logic.logic.getFromKeyFields(kwargs)
 
     if order:
       for index, elem in enumerate(order):
@@ -535,10 +531,8 @@ class View(program.View):
     get_params = request.GET
 
     order = get_params.getlist('order')
-    program_key_name = get_params.get('program_key_name')
 
-    program_entity = ghop_program_logic.logic.getFromKeyName(
-        program_key_name)
+    program_entity = ghop_program_logic.logic.getFromKeyFields(kwargs)
 
     if order:
       for index, elem in enumerate(order):
@@ -547,13 +541,9 @@ class View(program.View):
       return http.HttpResponse()
     else:
       tag_data = get_params.getlist('tag_data')
-      program_key_name = get_params.get('program_key_name')
 
       tag_name = tag_data[0].strip()
       tag_value = tag_data[1].strip()
-
-      program_entity = ghop_program_logic.logic.getFromKeyName(
-          program_key_name)
 
       if tag_name:
         if not tag_value:

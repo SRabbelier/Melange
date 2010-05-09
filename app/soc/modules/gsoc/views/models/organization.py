@@ -25,8 +25,6 @@ __authors__ = [
   ]
 
 
-import itertools
-
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
@@ -42,7 +40,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import organization
-from soc.views.models import group
 
 from soc.modules.gsoc.logic import cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
@@ -50,10 +47,15 @@ from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
+from soc.modules.gsoc.logic.models.student_proposal import logic \
+    as sp_logic
 
+from soc.modules.gsoc.models import student_proposal
 from soc.modules.gsoc.models.organization import OrgTag
 
 from soc.modules.gsoc.views.models import program as program_view
+from soc.modules.gsoc.views.models import student_proposal \
+    as student_proposal_view
 from soc.modules.gsoc.views.helper import access
 
 import soc.cache.logic
@@ -315,12 +317,6 @@ class View(organization.View):
         as pd_logic
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
-    from soc.modules.gsoc.logic.models.student_proposal import logic \
-        as sp_logic
-    from soc.modules.gsoc.models import student_proposal
-    from soc.modules.gsoc.views.helper import list_info as list_info_helper
-    from soc.modules.gsoc.views.models import student_proposal \
-        as student_proposal_view
 
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
@@ -416,18 +412,8 @@ class View(organization.View):
     For params see base.View.public().
     """
 
-    from soc.logic.helper import timeline as timeline_helper
-
     from soc.modules.gsoc.logic.models.proposal_duplicates_status import \
         logic as ds_logic
-    from soc.modules.gsoc.logic.models.ranker_root import logic \
-        as ranker_root_logic
-    from soc.modules.gsoc.logic.models.student_proposal import logic \
-        as sp_logic
-    from soc.modules.gsoc.models import student_proposal
-    from soc.modules.gsoc.views.helper import list_info as list_info_helper
-    from soc.modules.gsoc.views.models import student_proposal \
-        as student_proposal_view
 
     try:
       org_entity = self._logic.getFromKeyFieldsOr404(kwargs)

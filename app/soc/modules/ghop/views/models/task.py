@@ -145,6 +145,7 @@ class View(base.View):
     rights = access.GHOPChecker(params)
     # TODO: create and suggest_task don't need access checks which use state
     # also feels like roles are being checked twice?
+    rights['any_access'] = ['allow']
     rights['create'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',

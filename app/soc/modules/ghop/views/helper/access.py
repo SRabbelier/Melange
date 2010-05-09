@@ -222,7 +222,8 @@ class GHOPChecker(access.Checker):
          - If the task is not in one of the required states.
     """
 
-    self.checkIsUser(django_args)
+    from soc.modules.ghop.logic.models.organization import logic as \
+        ghop_org_logic
 
     try:
       user_entity = self.user
@@ -242,10 +243,9 @@ class GHOPChecker(access.Checker):
     except out_of_band.Error:
       pass
 
-    program_entity = ghop_program_logic.logic.getFromKeyNameOr404(
-        django_args['scope_path'])
+    org_entity = ghop_org_logic.getFromKeyNameOr404(django_args['scope_path'])
 
-    if not timeline_helper.isAfterEvent(program_entity.timeline,
+    if not timeline_helper.isAfterEvent(org_entity.scope.timeline,
         'tasks_publicly_visible'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 

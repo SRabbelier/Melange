@@ -200,8 +200,11 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
     reviewed_name: Name of the entity reviewed
     redirect_url: URL to which the follower should be sent for more information
   """
-
-  message_properties = {'redirect_url': redirect_url,
+  review_notification_url = "http://%(host)s%(redirect_url)s" % {
+      'host' : system.getHostname(),
+      'redirect_url': redirect_url}
+  
+  message_properties = {'review_notification_url': review_notification_url,
       'reviewer_name': review.author_name(),
       'reviewed_name': reviewed_name,
       }

@@ -82,8 +82,13 @@ class View(base.View):
                          [org_admin_logic, ['active', 'inactive']]),
         ('checkStudentProjectHasStatus', [['accepted', 'failed', 'completed',
                                            'withdrawn']])]
-    rights['manage_overview'] = [('checkHasRoleForScope', [
-        org_admin_logic, ['active', 'inactive']])]
+    rights['manage_overview'] = [
+        ('checkHasAny', [
+            [('checkHasRoleForScope', [org_admin_logic,
+                                       ['active', 'inactive']]),
+             ('checkHasRoleForScope', [mentor_logic,
+                                       ['active', 'inactive']])
+        ]])]
     # TODO: lack of better name here!
     rights['st_edit'] = [
         'checkCanEditStudentProjectAsStudent',
@@ -842,8 +847,11 @@ class View(base.View):
     mo_params = params.copy()
 
     #list all active projects
-    mo_params['list_description'] = \
-        'List of all active %(name_plural)s' % mo_params
+    mo_params['list_description'] = ugettext(
+        'List of all %s for %s, if you are an Org Admin you can click '
+        'a project for more actions. Such as reassigning mentors or viewing '
+        'results of the evaluations.' %(params['name_plural'], org_entity.name)
+        )
     mo_params['public_field_names'] = params['public_field_names'] + [
         'Mentor evaluation', 'Student Evaluation']
     mo_params['public_field_keys'] = params['public_field_keys'] + [
@@ -854,7 +862,7 @@ class View(base.View):
     mo_params['public_field_prefetch'] = ['student', 'mentor', 'scope']
     mo_params['public_field_extra'] = lambda entity, ps, psc, gs, gsc: {
         'org': entity.scope.name,
-        'student': entity.student.name(),
+        'student': '%s (%s)' % (entity.student.name(), entity.student.email),
         'mentor': entity.mentor.name(),
         'mentor_evaluation': '%d/%d' % (
                 project_logic.getQueryForFields({'project': entity}).count(),

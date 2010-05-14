@@ -811,7 +811,7 @@ class View(base.View):
       args = [project_surveys, project_survey_count,
               grading_surveys, grading_survey_count]
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return responses.jsonErrorResponse(request, 'idx not valid')
 
     contents = lists.getListData(request, params, fields, 'public', args=args)
     json = simplejson.dumps(contents)
@@ -845,20 +845,21 @@ class View(base.View):
     mo_params['list_description'] = \
         'List of all active %(name_plural)s' % mo_params
     mo_params['public_field_names'] = params['public_field_names'] + [
-        "Mentor evaluation", "Student Evaluation"]
+        'Mentor evaluation', 'Student Evaluation']
     mo_params['public_field_keys'] = params['public_field_keys'] + [
-        "mentor_evaluation", "student_evaluation"]
+        'mentor_evaluation', 'student_evaluation']
     mo_params['public_row_extra'] = lambda entity, *args: {
         'link': redirects.getManageRedirect(entity, mo_params)
     }
-    mo_params['public_field_prefetch'] = ['student', 'mentor']
+    mo_params['public_field_prefetch'] = ['student', 'mentor', 'scope']
     mo_params['public_field_extra'] = lambda entity, ps, psc, gs, gsc: {
-        "student": entity.student.name(),
-        "mentor": entity.mentor.name(),
-        "mentor_evaluation": "%d/%d" % (
+        'org': entity.scope.name,
+        'student': entity.student.name(),
+        'mentor': entity.mentor.name(),
+        'mentor_evaluation': '%d/%d' % (
                 project_logic.getQueryForFields({'project': entity}).count(),
                 psc),
-        "student_evaluation": "%d/%d" % (
+        'student_evaluation': '%d/%d' % (
                 grading_logic.getQueryForFields({'project': entity}).count(),
                 gsc),
     }

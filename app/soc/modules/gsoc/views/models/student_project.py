@@ -856,9 +856,21 @@ class View(base.View):
         'Mentor evaluation', 'Student Evaluation']
     mo_params['public_field_keys'] = params['public_field_keys'] + [
         'mentor_evaluation', 'student_evaluation']
-    mo_params['public_row_extra'] = lambda entity, *args: {
-        'link': redirects.getManageRedirect(entity, mo_params)
-    }
+
+    fields = {'scope': org_entity,
+              'status': ['active', 'inactive']}
+    org_admin = org_admin_logic.getForFields(fields, unique=True)
+
+    # Org Admins get a link to manage the project, others go to public page
+    if org_admin:
+      mo_params['public_row_extra'] = lambda entity, *args: {
+          'link': redirects.getManageRedirect(entity, mo_params)
+      }
+    else:
+      mo_params['public_row_extra'] = lambda entity, *args: {
+          'link': redirects.getPublicRedirect(entity, mo_params)
+      }
+
     mo_params['public_field_prefetch'] = ['student', 'mentor', 'scope']
     mo_params['public_field_extra'] = lambda entity, ps, psc, gs, gsc: {
         'org': entity.scope.name,

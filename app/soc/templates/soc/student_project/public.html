@@ -39,6 +39,8 @@ limitations under the License.
 <p>
  <table>
   {% readonly_field_as_table_row "Student Name" entity.student.name %}
+  {% readonly_field_as_table_row "Organization" entity.scope.name %}
+  {% readonly_url_field_as_table_row "Organization Home Page" entity.scope.home_page %}
   {% readonly_field_as_table_row "Mentor Name" entity.mentor.name %}
   {% if additional_mentors %}
     {% readonly_field_as_table_row "Co-Mentors" additional_mentors %}

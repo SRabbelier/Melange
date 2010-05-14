@@ -164,13 +164,16 @@ class View(role.View):
 
     params['admin_field_keys'].extend([
         'school_name', 'school_country','school_type', 'major', 'degree',
-        'grade', 'expected_graduation', 'can_we_contact_you'])
+        'grade', 'expected_graduation', 'program_knowledge',
+        'can_we_contact_you'])
     params['admin_field_names'].extend([
         'School Name', 'School Country', 'School Type', 'Major', 'Degree',
-        'Grade', 'Expected Graduation Year', 'Allowed to Contact?'])
+        'Grade', 'Expected Graduation Year', 'How did you hear about us?',
+        'Allowed to Contact?'])
     params['admin_field_hidden'].extend([
         'school_name', 'school_country','school_type', 'major', 'degree',
-        'grade', 'expected_graduation', 'can_we_contact_you'])
+        'grade', 'expected_graduation', 'program_knowledge',
+        'can_we_contact_you'])
 
   @decorators.merge_params
   @decorators.check_access

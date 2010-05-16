@@ -63,7 +63,7 @@ class Logic(base.Logic):
 
   ACCESS_TYPES = ['org_admin', 'host']
 
-  BATCH_SIZE = 10
+  BATCH_SIZE = 100
 
   def __init__(self, model=soc.modules.statistic.models.statistic.Statistic,
                base_model=None, scope_logic=program_logic):

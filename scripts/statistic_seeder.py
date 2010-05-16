@@ -111,14 +111,17 @@ STATISTIC_PROPERTIES = {
         "Applications Per Student",
         {
         "type": "per_field",
-        "logic": "gsoc_student_proposal",
+        "model": "gsoc_student_proposal",
         "choice_instructions":
         {
             "filter": "one_program_filter",
             "model": "gsoc_student",
         },
         "transformer": "enumerate",
-        "params": {"fields": ["scope", "__key__"]}
+        "params": {
+            "fields": ["scope", "__key__"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("app_number", "string", "Number of Applications"),
@@ -136,11 +139,11 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "field": "continent",
         "model": "gsoc_mentor",
-        "filter": "one_program_filter",
         "subsets": ["all", "referenced", "no-referenced"],
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "mentor",
+            "program_field": "program",
             }
         },
         {
@@ -174,7 +177,6 @@ STATISTIC_PROPERTIES = {
         {
         "type": "per_field",
         "field": "country",
-        "filter": "one_program_filter",
         "model": "gsoc_mentor",
         "subsets": ["all", "referenced", "no-referenced"],
         "transformer": "get-vis-names",
@@ -182,6 +184,7 @@ STATISTIC_PROPERTIES = {
             "fields": ["res_country"],
             "ref_logic": "gsoc_student_project",
             "ref_field": "mentor",
+            "program_field": "program",
             }
         },
         {
@@ -210,7 +213,7 @@ STATISTIC_PROPERTIES = {
             }
         },
         "org_admin"),
-    "mentors_per_organization": (
+    "mentors_per_organization": ( # visualization does not work
         "Mentors Per Organization",
         {
         "type": "per_field",
@@ -220,7 +223,10 @@ STATISTIC_PROPERTIES = {
             "model": "gsoc_organization",
             },
         "transformer": "pretty_names",
-        "params": {"fields": ["scope", "__key__"]}
+        "params": {
+            "fields": ["scope", "__key__"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("org_name", "string", "Organization"),
@@ -253,14 +259,16 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "organization_admins_per_age": (  # WORKS ON MELANGE-DEV
+    "organization_admins_per_age": (# strange visualizations
         "Organization Admins Per Age",
         {
         "type": "per_field",
         "field": "age",
-        "filter": "one_program_filter",
         "model": "gsoc_org_admin",
         "transformer": "remove-out-of-range",
+        "params": {
+              "program_field": "program",
+              }
         },
         {
         "description": [("age", "number", "Age"),
@@ -272,14 +280,16 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "student_projects_per_continent": ( # WORKS ON MELANGE-DEV
+    "student_projects_per_continent": (
         "Student Projects Per Continent",
         {
         "type": "per_field",
         "field": "continent",
-        "filter": "one_program_filter",
         "model": "gsoc_student_project",
-        "params": {"fields": ["student"]}
+        "params": {
+            "fields": ["student"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("continent", "string", "Continent"),
@@ -291,15 +301,17 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "student_projects_per_country": ( # WORKS ON MELANGE-DEV
+    "student_projects_per_country": (
         "Student Projects Per Country",
         {
         "type": "per_field",
         "model": "gsoc_student_project",
         "field": "country",
-        "filter": "one_program_filter",
         "transformer": "get-vis-names",
-        "params": {"fields": ["student", "res_country"]}
+        "params": {
+            "fields": ["student", "res_country"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("country", "string", "Country"),
@@ -316,9 +328,11 @@ STATISTIC_PROPERTIES = {
         {
         "type": "per_field",
         "field": "continent",
-        "filter": "one_program_filter",
         "model": "gsoc_student_proposal",
-        "params": {"fields": ["scope"]}
+        "params": {
+            "fields": ["scope"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("continent", "string", "Continent"),
@@ -336,9 +350,11 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "field": "country",
         "model": "gsoc_student_proposal",
-        "filter": "one_program_filter",
         "transformer": "get-vis-names",
-        "params": {"fields": ["scope", "res_country"]}
+        "params": {
+            "fields": ["scope", "res_country"],
+            "program_field": "program",
+            }
         },
         {
         "description": [("country", "string", "Country"),
@@ -360,7 +376,10 @@ STATISTIC_PROPERTIES = {
             "filter": "one_program_filter",
         },
         "transformer": "pretty_names",
-        "params": {"fields": ["org", "__key__"]}
+        "params": {
+            "fields": ["org", "__key__"],
+             "program_field": "program",
+             }
         },
         {
         "description": [("organization", "string", "Organization"),
@@ -384,6 +403,7 @@ STATISTIC_PROPERTIES = {
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
+            "program_field": "scope",
             }
         },
         {
@@ -424,6 +444,7 @@ STATISTIC_PROPERTIES = {
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
+            "program_field": "scope",
             }
         },
         {
@@ -458,12 +479,11 @@ STATISTIC_PROPERTIES = {
             },
         },
         "host"),
-    "students_per_country": ( # WORKS ON MELANGE-DEV
+    "students_per_country": (
         "Students Per Country",
         {
         "type": "per_field",
         "field": "country",
-        "filter": "one_program_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "transformer": "get-vis-names",
@@ -471,6 +491,7 @@ STATISTIC_PROPERTIES = {
             "fields": ["res_country"],
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
+            "program_field": "scope",
             }
         },
         {
@@ -500,7 +521,7 @@ STATISTIC_PROPERTIES = {
             },
         },
         "host"),
-    "students_per_degree": ( # WORKS ON MELANGE-DEV
+    "students_per_degree": (
         "Students Per Degree",
         {
         "type": "per_field",
@@ -512,6 +533,7 @@ STATISTIC_PROPERTIES = {
             "fields": ["degree"],
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
+            "program_field": "scope",
             }
         },
         {
@@ -541,7 +563,7 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "students_per_graduation_year": ( # WORKS ON MELANGE-DEV
+    "students_per_graduation_year": (
         "Students Per Graduation Year",
         {
         "type": "per_field",
@@ -554,6 +576,7 @@ STATISTIC_PROPERTIES = {
             "fields": ["expected_graduation"],
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
+            "program_field": "scope",
             }
         },
         {

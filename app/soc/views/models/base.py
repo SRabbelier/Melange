@@ -660,7 +660,7 @@ class View(object):
     view_params['list_description'] = self.DEF_CREATE_INSTRUCTION_MSG_FMT % (
         view_params['name'], self._params['name'])
     view_params['public_row_extra'] = lambda entity, *args: {
-        'link': redirect(entity, view_params, *args)
+        'link': redirect(entity, params, *args)
     }
 
     return view.list(request, 'any_access', page_name=page_name,

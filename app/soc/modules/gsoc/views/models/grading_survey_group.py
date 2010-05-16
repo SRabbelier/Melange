@@ -315,6 +315,10 @@ class View(base.View):
               }
         }]
 
+    params['public_row_extra'] = lambda entity: {
+        'link': redirects.getViewRecordsRedirect(entity, params),
+    }
+
     return super(View, self).list(
         request, 'allow', page_name=page_name,
         params=params, filter=filter, order=order,

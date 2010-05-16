@@ -500,6 +500,15 @@ def getEditGradingRecordRedirect(entity, params):
       entity.key().id_or_name())
 
 
+def getViewRecordsRedirect(entity, params):
+  """Returns the redirect to view all GradingRecords for one
+  GradingSurveyGroup.
+  """
+  return '/%s/records/%s?' % (
+      params['url_name'],
+      entity.key().id_or_name())
+
+
 def getToSRedirect(presence):
   """Returns link to 'show' the ToS Document if it exists, None otherwise.
 

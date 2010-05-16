@@ -321,7 +321,7 @@ class View(base.View):
             }
 
         task_url = '/%(url_name)s/collect_task/%(key_name)s' % fields
-        task = task_responses.startTask(task_url)
+        task = task_responses.startTask(task_url, queue_name='statistic')
 
         if not task:
           logging.error('There was an error. The task is not started')
@@ -391,7 +391,7 @@ class View(base.View):
         }
 
     task_url = '/%(url_name)s/collect_task/%(scope_path)s/%(link_id)s' % fields
-    task = task_responses.startTask(task_url, queue_name='statistic-queue')
+    task = task_responses.startTask(task_url, queue_name='statistic')
 
     if task is not None:
       return self.json(request, {'response': 'success'})
@@ -476,7 +476,7 @@ class View(base.View):
       self._updateCacheList(statistic, scope_path, logic)
       statistic.put()
     else:
-      task_responses.startTask(url=request.path)
+      task_responses.startTask(url=request.path, queue_name='statistic')
 
     return task_responses.terminateTask()
 

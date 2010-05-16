@@ -223,7 +223,6 @@ class Logic(base.Logic):
     filter = {}
     if filter_field:
       filter = {filter_field: statistic.scope}
-      filter_key = statistic.scope.key()
 
     query = logic.getQueryForFields(filter=filter)
 
@@ -242,10 +241,6 @@ class Logic(base.Logic):
       new_choices = []
 
       for entity in entities:
-
-        if filter_field:
-          if not entity.__getattribute__(filter_field).key() == filter_key:
-            continue
 
         for field in fields:
           entity = entity.__getattribute__(field)
@@ -349,10 +344,16 @@ class Logic(base.Logic):
 
     query = logic.getQueryForFields()
 
+    # if program_field is specified in params, only entities for one program
+    # are fetched
+    program_field = params.get('program_field')
+    if program_field:
+      query.filter(program_field=statistic.scope)
+
     # if the next_key field is specified, it is not the first batch
     if next_key:
       partial_stats = simplejson.loads(statistic.working_json)
-      query = query.filter('__key__ >=', next_key)
+      query.filter('__key__ >=', next_key)
     else:
       partial_stats = {}
       for choice in choices:

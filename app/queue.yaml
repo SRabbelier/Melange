@@ -27,3 +27,8 @@ queue:
 - name: ghop-update
   rate: 5/s
   bucket_size: 5
+
+# queue used by statistic module to collect data
+- name: statistic
+  rate: 5/s
+  bucket_size: 5

@@ -297,7 +297,11 @@ class View(base.View):
   def list(self, request, access_type, page_name=None,
            params=None, filter=None, order=None,
            visibility=None, context=None, **kwargs):
-    """Extends the list with an extra button.
+    """Overwrites the base list to add an extra button and use other redirect.
+
+    For normal listings of GradingSurveyGroups do not use this method.
+
+    For args see base.View.list().
     """
 
     program_entity = program_logic.getFromKeyNameOr404(kwargs['scope_path'])
@@ -322,7 +326,7 @@ class View(base.View):
     return super(View, self).list(
         request, 'allow', page_name=page_name,
         params=params, filter=filter, order=order,
-        visibility=visibility, context=context, **kwargs)
+        visibility='public', context=context, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

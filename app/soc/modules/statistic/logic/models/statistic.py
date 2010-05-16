@@ -117,11 +117,15 @@ class Logic(base.Logic):
     # choices have to be collected manually; there is no predefined list
     if choice_instructions:
 
+      model = choice_instructions.get('model')
+      if not model:
+        raise ProtocolError()
+
+      choices_collector, choices_logic = self.helper.getChoicesCollector(model)
+      params['choices_logic'] = choices_logic
+
       # all possible choices have not been collected yet
       if statistic.choices_json is None:
-        model = choice_instructions.get('model')
-        if not model:
-          raise ProtocolError()
 
         filter = choice_instructions.get('filter')
         program_field = None
@@ -130,8 +134,6 @@ class Logic(base.Logic):
           if not program_field:
             raise ProtocolError()
 
-        choices_collector, choices_logic = self.helper.getChoicesCollector(
-            model)
         choices = choices_collector(statistic, choices_logic,
             filter_field=program_field)
 
@@ -139,7 +141,6 @@ class Logic(base.Logic):
         if not choices:
           return statistic, False
 
-        params['choices_logic'] = choices_logic
       else:
         choices = simplejson.loads(statistic.choices_json)
     else:

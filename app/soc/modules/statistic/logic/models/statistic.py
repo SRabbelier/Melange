@@ -837,9 +837,9 @@ class Logic(base.Logic):
     final_stat = simplejson.loads(statistic.final_json)
     for choice, result in final_stat.iteritems():
       row = []
-      row.append(str(choice).encode('utf-8'))
+      row.append(unicode(choice).encode('utf-8'))
       for item in result:
-        row.append(str(item).encode('utf-8'))
+        row.append(unicode(item).encode('utf-8'))
       rows.append(row)
 
     return rows

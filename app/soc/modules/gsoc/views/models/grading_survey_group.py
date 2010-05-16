@@ -127,6 +127,7 @@ class View(base.View):
 
     new_params['extra_django_patterns'] = patterns
 
+    new_params['edit_template'] = 'soc/grading_survey_group/edit.html'
     new_params['view_records_template'] = 'soc/grading_survey_group/records.html'
     new_params['record_edit_template'] = 'soc/grading_record/edit.html'
 
@@ -402,7 +403,7 @@ class View(base.View):
 
     fields = {'grading_survey_group': entity}
 
-    return self.list(request, 'allow', page_name=page_name,
+    return super(View, self).list(request, 'allow', page_name=page_name,
                      params=list_params, filter=fields, visibility='records')
 
   @decorators.merge_params

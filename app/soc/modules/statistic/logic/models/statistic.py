@@ -635,7 +635,7 @@ class Logic(base.Logic):
     except Exception, e:
       raise ProtocolError()
 
-    return str(result)
+    return unicode(result)
 
   def _perAgeChoiceSelector(self, params):
     """Choice selector for per age statistics.
@@ -890,14 +890,14 @@ class Logic(base.Logic):
       row = []
 
       if column_types[0] == 'string':
-        row.append(str(k))
+        row.append(unicode(k))
       elif column_types[0] == 'number':
         row.append(int(k))
       row_data = [item for i, item in enumerate(v) if i in columns]
 
       for i, column_type in enumerate(column_types[1:]):
         if column_type == 'string':
-          row.append(str(row_data[i]))
+          row.append(unicode(row_data[i]))
         elif column_type == 'number':
           row.append(int(row_data[i]))
 

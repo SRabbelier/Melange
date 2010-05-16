@@ -73,7 +73,7 @@ class View(base.View):
     rights['edit'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['show'] = [('checkIsHostForProgramInScope', program_logic)]
-    rights['list'] = ['checkIsDeveloper']
+    rights['list'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['records'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['edit_record'] = [('checkIsHostForProgramInScope', program_logic)]
 
@@ -106,6 +106,16 @@ class View(base.View):
         'link_id': forms.CharField(widget=forms.HiddenInput),
         }
 
+    # remove the raw list and add the one without the link_id
+    new_params['no_list_raw'] = True
+    new_params['sans_link_id_list'] = True
+
+    # redefine the developer sidebar so that the list_raw is not shown
+    new_params['sidebar_developer'] = [
+        # TODO(SRabbelier): remove create once new list code is in
+        ('/%s/create', 'New %(name)s', 'create')
+    ]
+
     patterns = [
         (r'^%(url_name)s/(?P<access_type>records)/%(key_fields)s$',
         '%(module_package)s.%(module_name)s.view_records',
@@ -118,8 +128,6 @@ class View(base.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['view_records_template'] = 'soc/grading_survey_group/records.html'
-    new_params['records_heading_template'] = 'soc/grading_record/list/heading.html'
-    new_params['records_row_template'] = 'soc/grading_record/list/row.html'
     new_params['record_edit_template'] = 'soc/grading_record/edit.html'
 
     # create the form that will be used to edit a GradingRecord
@@ -282,6 +290,34 @@ class View(base.View):
     choices = tuple(choice_list)
 
     group_form.base_fields[field].choices = choices
+
+  @decorators.merge_params
+  @decorators.check_access
+  def list(self, request, access_type, page_name=None,
+           params=None, filter=None, order=None,
+           visibility=None, context=None, **kwargs):
+    """Extends the list with an extra button.
+    """
+
+    program_entity = program_logic.getFromKeyNameOr404(kwargs['scope_path'])
+
+    params = params.copy()
+    params['public_button_global'] = [
+        {
+          'bounds': [0,'all'],
+          'id': 'create_new',
+          'caption': 'Create new Grading Survey Group',
+          'type': 'redirect_simple',
+          'parameters': {
+              'link': redirects.getCreateRedirect(program_entity, params),
+              'new_window': False,
+              }
+        }]
+
+    return super(View, self).list(
+        request, 'allow', page_name=page_name,
+        params=params, filter=filter, order=order,
+        visibility=visibility, context=context, **kwargs)
 
   @decorators.merge_params
   @decorators.check_access

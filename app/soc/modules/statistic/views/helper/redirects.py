@@ -22,6 +22,13 @@ __authors__ = [
   ]
 
 
+def getManageRedirect(entity):
+  """Returns manage_statistics redirect for a particular program.
+  """
+
+  return '/statistic/manage_statistics/%s' % (
+      entity.key().id_or_name())
+
 def getVisualizeRedirect(entity, params):
   """Returns visualize redirect for particular statistic.
   """

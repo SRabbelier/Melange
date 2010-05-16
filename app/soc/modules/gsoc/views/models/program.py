@@ -37,6 +37,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
+from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import program
 from soc.views.sitemap import sidebar
@@ -54,7 +55,8 @@ from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_proposal import logic \
     as student_proposal_logic
 from soc.modules.gsoc.views.helper import access
-from soc.views.helper import redirects
+
+from soc.modules.statistic.views.helper import redirects as statistic_redirects
 
 
 class View(program.View):
@@ -209,6 +211,9 @@ class View(program.View):
         # add link to Show Duplicate project assignments
         items += [(redirects.getShowDuplicatesRedirect(entity, params),
             'Show Duplicate Project Assignments', 'any_access')]
+        # add link to Manage Statistics
+        items += [(statistic_redirects.getManageRedirect(entity),
+            'Manage Statistics', 'any_access')]
         # add link to create a new Program Survey
         items += [(redirects.getCreateSurveyRedirect(
             entity, params['document_prefix'], 'survey'),

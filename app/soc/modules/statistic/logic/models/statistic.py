@@ -446,10 +446,8 @@ class Logic(base.Logic):
         'working_json': None,
         'next_entity': None,
         'final_json': simplejson.dumps(items),
+        'calculated_on': datetime.utcnow(),
         }
-
-    if completed:
-      properties['calculated_on'] = datetime.utcnow()
 
     return self.updateEntityProperties(statistic, properties)
 

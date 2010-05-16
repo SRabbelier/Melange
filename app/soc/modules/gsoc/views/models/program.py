@@ -233,9 +233,13 @@ class View(program.View):
         items += [(redirects.getListSurveysRedirect(
             entity, params['document_prefix'], 'gsoc/grading_project_survey'),
             "List Grading Surveys", 'any_access')]
+        # add link to list all Grading Surveys
+        items += [(redirects.getListRedirect(
+             entity, {'url_name': 'gsoc/grading_survey_group'}),
+            "List Grading Survey Groups", 'any_access')]
         # add link to view Student Projects
         items += [(redirects.getOverviewRedirect(
-             entity,{'url_name': 'gsoc/student_project'}),
+             entity, {'url_name': 'gsoc/student_project'}),
             "View all Student Projects", 'any_access')]
 
       except out_of_band.Error:

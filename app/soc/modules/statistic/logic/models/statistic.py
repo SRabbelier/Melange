@@ -348,7 +348,7 @@ class Logic(base.Logic):
     # are fetched
     program_field = params.get('program_field')
     if program_field:
-      query.filter(program_field=statistic.scope)
+      query.filter(program_field +' = ', statistic.scope)
 
     # if the next_key field is specified, it is not the first batch
     if next_key:

@@ -391,7 +391,7 @@ class View(base.View):
         }
 
     task_url = '/%(url_name)s/collect_task/%(scope_path)s/%(link_id)s' % fields
-    task = task_responses.startTask(task_url)#, queue_name='statistic-queue')
+    task = task_responses.startTask(task_url, queue_name='statistic-queue')
 
     if task is not None:
       return self.json(request, {'response': 'success'})

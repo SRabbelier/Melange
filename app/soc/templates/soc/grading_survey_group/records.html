@@ -14,6 +14,11 @@ limitations under the License.
 {% endcomment %}
 {% load list_helpers %}
 
+{% block header_title %}
+ {{ page_name }}
+ <a href="/gsoc/grading_survey_group/edit/{{ entity.key.id_or_name }}">(Edit Group)</a>
+{% endblock %}
+
 {% block body %}
 
 <p>

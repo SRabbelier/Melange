@@ -201,7 +201,7 @@ class Logic(base.Logic):
       if result is not None:
         self._updateFinalJsonString(statistic, {name: result}, is_last_item)
 
-      return (statistic, True) if is_last_item else (statistic, False)
+      return (statistic, True) if is_last_item and result else (statistic, False)
 
   def _collectChoicesList(self, statistic, logic, fields=[], filter_field=None):
     """Collects list of choices for certain statistics.

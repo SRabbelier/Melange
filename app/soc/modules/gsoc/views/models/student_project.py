@@ -182,8 +182,12 @@ class View(base.View):
     # define the list redirect action to show the notification
     new_params['public_row_extra'] = new_params[
         'org_home_row_extra'] = lambda entity: {
-            'link': redirects.getPublicRedirect(entity, ap_params)
+            'link': redirects.getPublicRedirect(entity, new_params)
         }
+    new_params['org_home_row_action'] = {
+        'type': 'redirect_custom',
+        'parameters': dict(new_window=False),
+    }
 
     new_params['admin_field_prefetch'] = ['mentor', 'student', 'scope']
     new_params['admin_field_extra'] = lambda entity: {

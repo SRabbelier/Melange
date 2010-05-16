@@ -42,17 +42,4 @@ class StatisticChecker(access.Checker):
       program_logic: program logic instance
     """
 
-    statistic_keyname = statistic_logic.getKeyFieldsFromFields(django_args)
-    statistic = statistic_logic.getForFields(statistic_keyname, unique=True)
-
-    if not statistic:
-      self.deny(django_args)
-
-    try:  
-      self.checkIsHost(django_args)
-      if statistic.access_for_other_programs in access_types:
-        return
-    except Exception:
-      pass  
-
-    self.checkIsHostForProgramInScope(django_args, program_logic)
+    self.checkIsHost(django_args)

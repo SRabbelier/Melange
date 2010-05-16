@@ -99,8 +99,7 @@ class View(base.View):
     rights['show'] = [('checkCanManageStatistic', program_logic)]
     rights['visualize'] = [('checkCanManageStatistic', program_logic)]
     rights['update_stats'] = [('checkCanManageStatistic', program_logic)]
-    rights['manage_statistics'] = [
-        ('checkIsHostForProgramInScope', program_logic)]
+    rights['manage_statistics'] = [('checkCanManageStatistic', program_logic)]
     rights['set_collect_task'] = [('checkCanManageStatistic', program_logic)]
 
     new_params = {}

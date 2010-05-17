@@ -114,8 +114,12 @@ STATISTIC_PROPERTIES = {
         "model": "gsoc_student_proposal",
         "choice_instructions":
         {
-            "filter": "one_program_filter",
+            "program_field": "student",
             "model": "gsoc_student",
+            "filter": "property_filter",
+            "property_conditions": {
+                "status": ['active', 'inactive']
+                 },
         },
         "transformer": "enumerate",
         "params": {
@@ -140,10 +144,14 @@ STATISTIC_PROPERTIES = {
         "field": "continent",
         "model": "gsoc_mentor",
         "subsets": ["all", "referenced", "no-referenced"],
+        "filter": "property_filter",
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "mentor",
             "program_field": "program",
+            "property_conditions": {
+                "status": ["active", "inactive"]
+                 },
             }
         },
         {
@@ -179,12 +187,16 @@ STATISTIC_PROPERTIES = {
         "field": "country",
         "model": "gsoc_mentor",
         "subsets": ["all", "referenced", "no-referenced"],
+        "filter": "property_filter",
         "transformer": "get-vis-names",
         "params": {
             "fields": ["res_country"],
             "ref_logic": "gsoc_student_project",
             "ref_field": "mentor",
             "program_field": "program",
+            "property_conditions": {
+                "status": ["active", "inactive"]
+                 },
             }
         },
         {
@@ -219,13 +231,21 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "model": "gsoc_mentor",
         "choice_instructions": {
-            "filter": "one_program_filter",
+            "program_field": "scope",
             "model": "gsoc_organization",
+            "filter": "property_filter",
+            "property_conditions": {
+                "status": ['new', 'active', 'inactive']
+                 },
             },
         "transformer": "pretty_names",
+        "filter": "property_filter",
         "params": {
             "fields": ["scope", "__key__"],
             "program_field": "program",
+            "property_conditions": {
+                "status": ['active', 'inactive']
+                 },
             }
         },
         {
@@ -247,7 +267,13 @@ STATISTIC_PROPERTIES = {
             "model": "gsoc_program",
         },
         "transformer": "pretty_names",
-        "params": {"fields": ["scope", "__key__"]}
+        "filter": "property_filter",
+        "params": {
+            "fields": ["scope", "__key__"],
+            "property_conditions": {
+                "status": ['new', 'active', 'inactive']
+                 },
+            }
         },
         {
         "description": [("program", "string", "Program"),
@@ -266,9 +292,13 @@ STATISTIC_PROPERTIES = {
         "field": "age",
         "model": "gsoc_org_admin",
         "transformer": "remove-out-of-range",
+        "filter": "property_filter",
         "params": {
-              "program_field": "program",
-              }
+            "program_field": "program",
+            "property_conditions": {
+                "status": ['active', 'inactive']
+                 },
+            }
         },
         {
         "description": [("age", "number", "Age"),
@@ -380,8 +410,12 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "model": "gsoc_student_proposal",
         "choice_instructions": {
+            "program_field": "scope",
             "model": "gsoc_organization",
-            "filter": "one_program_filter",
+            "filter": "property_filter",
+            "property_conditions": {
+                "status": ['new', 'active', 'inactive']
+                 },
         },
         "transformer": "pretty_names",
         "params": {
@@ -399,12 +433,12 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "students_per_age": ( # WORKS ON MELANGE-DEV
+    "students_per_age": (
         "Students Per Age",
         {
         "type": "per_field",
         "field": "age",
-        "filter": "one_program_filter",
+        "filter": "property_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "transformer": "remove-out-of-range",
@@ -412,6 +446,9 @@ STATISTIC_PROPERTIES = {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
             "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
             }
         },
         {
@@ -441,18 +478,21 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "students_per_continent": ( # WORKS ON MELANGE-DEV
+    "students_per_continent": (
         "Students Per Continent",
         {
         "type": "per_field",
         "field": "continent",
-        "filter": "one_program_filter",
+        "filter": "property_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
             "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
             }
         },
         {
@@ -492,6 +532,7 @@ STATISTIC_PROPERTIES = {
         {
         "type": "per_field",
         "field": "country",
+        "filter": "property_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "transformer": "get-vis-names",
@@ -500,6 +541,9 @@ STATISTIC_PROPERTIES = {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
             "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
             }
         },
         {
@@ -534,7 +578,7 @@ STATISTIC_PROPERTIES = {
         {
         "type": "per_field",
         "field": "degree",
-        "filter": "one_program_filter",
+        "filter": "property_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "params": {
@@ -542,6 +586,9 @@ STATISTIC_PROPERTIES = {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
             "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
             }
         },
         {
@@ -576,7 +623,7 @@ STATISTIC_PROPERTIES = {
         {
         "type": "per_field",
         "field": "expected_graduation",
-        "filter": "one_program_filter",
+        "filter": "property_filter",
         "model": "gsoc_student",
         "subsets": ["all", "referenced", "no-referenced"],
         "transformer": "remove-out-of-range",
@@ -585,6 +632,9 @@ STATISTIC_PROPERTIES = {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
             "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
             }
         },
         {
@@ -614,7 +664,7 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
-    "gsoc2010b_overall": (
+    "gsoc2010_overall": (
         "GSoC2010 Overall",
         {
         "type": "overall",
@@ -622,50 +672,95 @@ STATISTIC_PROPERTIES = {
             {
             "name": "Number of Students",
             "type": "number",
-            "model": "gsoc_student"
+            "model": "gsoc_student",
+            "program_field": "scope",
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["active", "inactive"]
+                    },
+                }
             },
             {
             "name": "Number of Mentors",
             "type": "number",
-            "model": "gsoc_mentor"
+            "model": "gsoc_mentor",
+            "program_field": "program",
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["active", "inactive"]
+                    },
+                }
             },
             {
             "name": "Number of Student Proposals",
             "type": "number",
-            "model": "gsoc_student_proposal"
+            "model": "gsoc_student_proposal",
+            "program_field": "program",
             },
             {
             "name": "Number of Student Projects",
             "type": "number",
-            "model": "gsoc_student_project"
+            "model": "gsoc_student_project",
+            "program_field": "program",
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["accepted", "completed", "failed"]
+                    },
+                }
             },
             {
             "name": "Number of Organization Admins",
             "type": "number",
             "model": "gsoc_org_admin",
+            "program_field": "program",
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["active", "inactive"]
+                    },
+                }
             },
             {
             "name": "Number of Mentors With Projects",
             "type": "number",
             "model": "gsoc_student_project",
+            "program_field": "program",
             "fields": ["mentor"],
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["accepted", "completed", "failed"]
+                    },
+                }
             },
             {
             "name": "Number of Students With Projects",
             "type": "number",
             "model": "gsoc_student_project",
+            "program_field": "program",
             "fields": ["student"],
+            "filter": "property_filter",
+            "params": {
+                "property_conditions": {
+                    "status": ["accepted", "completed", "failed"]
+                    },
+                }
             },
             {
             "name": "Number of Students With Proposals",
             "type": "number",
             "model": "gsoc_student_proposal",
+            "program_field": "program",
             "fields": ["scope"]
             },
             {
             "name": "Average Number of Projects Per Mentor",
             "type": "average",
             "model": "gsoc_mentor",
+            "program_field": "program",
             "ref_logic": "gsoc_student_project",
             "ref_field": "mentor"
             },
@@ -673,6 +768,7 @@ STATISTIC_PROPERTIES = {
             "name": "Average Number of Proposals Per Student",
             "type": "average",
             "model": "gsoc_student",
+            "program_field": "scope",
             "ref_logic": "gsoc_student_proposal",
             "ref_field": "scope"
             },

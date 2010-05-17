@@ -33,7 +33,7 @@ class StatisticChecker(access.Checker):
 
   @access.denySidebar
   @access.allowDeveloper
-  def checkCanManageStatistic(self, django_args, access_types, program_logic):
+  def checkCanManageStatistic(self, django_args, program_logic):
     """Checks if the user can see a public page for a specified statistic.
 
     Args:

@@ -89,7 +89,7 @@ class Mapper(object):
         }
 
     self.filters_dict = {
-        'one_program_filter': logic._oneProgramFilter
+        'property_filter': logic._propertyFilter
         }
 
     self.selectors_dict = {
@@ -150,11 +150,12 @@ class Mapper(object):
     else:
       return self.default_checker
 
-  def getFilter(self, instructions, params):
+  def getFilter(self, instructions):
     """Returns filter for the collected entities based on instruction. 
     """
 
     filter = instructions.get('filter')
+
     if filter:
       return self.filters_dict.get(filter)
     else:

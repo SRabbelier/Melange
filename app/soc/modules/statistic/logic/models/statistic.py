@@ -146,7 +146,7 @@ class Logic(base.Logic):
     else:
       choices = self.helper.getChoices(field)
 
-    filter = self.helper.getFilter(instructions, params)
+    filter = self.helper.getFilter(instructions)
     checker = self.helper.getChecker(instructions)
     logic = self.helper.getLogicForItem(instructions, 'model')
     selector = self.helper.getSelector(field)
@@ -486,6 +486,21 @@ class Logic(base.Logic):
   def _defaultFilter(self, *args, **kwargs):
     """Default filter which does not check anything.
     """
+
+    return True
+
+  def _propertyFilter(self, entity, params):
+    """Filter which tests if an entity fulfills a number of condition on its
+    properties.
+    """
+
+    if 'property_conditions' not in params:
+      raise ProtocolError()
+
+    conditions = params['property_conditions']
+    for field, allowed_values in conditions.iteritems():
+      if entity.__getattribute__(field) not in allowed_values:
+        return False
 
     return True
 

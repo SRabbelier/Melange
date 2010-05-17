@@ -213,7 +213,7 @@ STATISTIC_PROPERTIES = {
             }
         },
         "org_admin"),
-    "mentors_per_organization": ( # visualization does not work
+    "mentors_per_organization": (
         "Mentors Per Organization",
         {
         "type": "per_field",
@@ -286,8 +286,12 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "field": "continent",
         "model": "gsoc_student_project",
+        "filter": "property_filter",
         "params": {
             "fields": ["student"],
+            "property_conditions": {
+                  "status": ["accepted", "completed", "failed"]
+                  },
             "program_field": "program",
             }
         },
@@ -308,8 +312,12 @@ STATISTIC_PROPERTIES = {
         "model": "gsoc_student_project",
         "field": "country",
         "transformer": "get-vis-names",
+        "filter": "property_filter",
         "params": {
             "fields": ["student", "res_country"],
+            "property_conditions": {
+                  "status": ["accepted", "completed", "failed"]
+                  },
             "program_field": "program",
             }
         },
@@ -694,7 +702,7 @@ CHARTS_DICT = dict((k, v) for k, (_, _, v, _)
 ACCESS_DICT = dict((k, v) for k, (_, _, _, v)
     in STATISTIC_PROPERTIES.iteritems())
 
-program_keyname = 'google/gsoc2010b'
+program_keyname = 'google/gsoc2010'
 
 def _getCommonProperties():
   """Returns properties that are common for all statistic entities.

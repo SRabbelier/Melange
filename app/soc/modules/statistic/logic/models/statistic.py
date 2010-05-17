@@ -127,15 +127,17 @@ class Logic(base.Logic):
       # all possible choices have not been collected yet
       if statistic.choices_json is None:
 
-        filter = choice_instructions.get('filter')
-        program_field = None
-        if filter == 'one_program_filter':
-          program_field = self.helper.getProgramFieldForModel(model)
-          if not program_field:
+        choice_params = {}
+        program_field = choice_instructions.get('program_field')
+        filter = self.helper.getFilter(choice_instructions)
+        if choice_instructions.get('filter'):
+          choice_params['property_conditions'] = choice_instructions.get(
+              'property_conditions')
+          if not choice_params['property_conditions']:
             raise ProtocolError()
 
-        choices = choices_collector(statistic, choices_logic,
-            filter_field=program_field)
+        choices = choices_collector(statistic, choices_logic, filter=filter,
+            program_field=program_field, params=choice_params)
 
         # still there are choices to be collected; next task is needed
         if not choices:
@@ -176,25 +178,27 @@ class Logic(base.Logic):
 
       type = item['type']
       if type == 'number':
-        model = item.get('model')
-        if not model:
+        program_field = item.get('program_field')
+        if not program_field:
           raise ProtocolError()
 
-        program_field = self.helper.getProgramFieldForModel(model)
         logic = self.helper.getLogicForItem(item, 'model')
         fields = item.get('fields', [])
-        filter_field = self.helper.getProgramFieldForModel(model)
-        result = self._collectNumber(statistic, logic, fields, program_field)
+        filter = self.helper.getFilter(item)
+        params = item.get('params', {})
+
+        result = self._collectNumber(statistic, logic, fields, filter,
+            program_field, params)
 
       elif type == "average":
-        model = item.get('model')
-        if not model:
+        program_field = item.get('program_field')
+        if not program_field:
           raise ProtocolError()
 
-        program_field = self.helper.getProgramFieldForModel(model)
         logic = self.helper.getLogicForItem(item, 'model')
         ref_logic = self.helper.getLogicForItem(item, 'ref_logic')
         ref_field = item['ref_field']
+
         result = self._collectAverage(statistic, logic, ref_logic, ref_field,
             program_field)
 
@@ -203,15 +207,18 @@ class Logic(base.Logic):
 
       return (statistic, True) if is_last_item and result else (statistic, False)
 
-  def _collectChoicesList(self, statistic, logic, fields=[], filter_field=None):
+  def _collectChoicesList(self, statistic, logic, fields=[], filter=None,
+                          program_field=None, params={}):
     """Collects list of choices for certain statistics.
 
     Args:
       statistic: statistic entity
       logic: logic for a model to collect choices from
       fields: attribute names to represent a choice
-      filter_field: collect choices only based only on the program
+      filter: a function which decides if an entity is correct for the stat
+      program_field: collect choices only based only on the program
         in scope for the statistic entity
+      params: a dict containing additional parameters
 
     Returns:
       List of choices if the list is completed or None otherwise.
@@ -221,11 +228,11 @@ class Logic(base.Logic):
     if statistic.working_json:
       choices = simplejson.loads(statistic.working_json)
 
-    filter = {}
-    if filter_field:
-      filter = {filter_field: statistic.scope}
+    query_filter = {}
+    if program_field:
+      query_filter = {program_field: statistic.scope}
 
-    query = logic.getQueryForFields(filter=filter)
+    query = logic.getQueryForFields(filter=query_filter)
 
     next_key = None
     if statistic.next_entity:
@@ -242,6 +249,9 @@ class Logic(base.Logic):
       new_choices = []
 
       for entity in entities:
+
+        if filter and not filter(entity, params):
+          continue
 
         for field in fields:
           entity = entity.__getattribute__(field)
@@ -265,11 +275,13 @@ class Logic(base.Logic):
     return result
 
 
-  def _collectNumber(self, statistic, model, fields, filter_field):
+  def _collectNumber(self, statistic, model, fields, filter, program_field,
+                     params):
     """Collects one batch of data for "number" statistics.
     """
 
-    choices = self._collectChoicesList(statistic, model, fields, filter_field)
+    choices = self._collectChoicesList(statistic, model, fields, filter,
+        program_field, params)
     return len(choices) if choices is not None else None
 
 
@@ -498,6 +510,7 @@ class Logic(base.Logic):
       raise ProtocolError()
 
     conditions = params['property_conditions']
+
     for field, allowed_values in conditions.iteritems():
       if entity.__getattribute__(field) not in allowed_values:
         return False

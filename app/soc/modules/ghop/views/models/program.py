@@ -242,9 +242,9 @@ class View(program.View):
                  'status': ['new', 'active']
                 }
 
-    return self.list(request, access_type, page_name=page_name,
-                          params=slots_params, filter=filter,
-                          visibility='quota')
+    return self.list(request, 'allow', page_name=page_name,
+                     params=slots_params, filter=filter,
+                     visibility='quota')
 
   @decorators.merge_params
   def getExtraMenus(self, id, user, params=None):
@@ -592,9 +592,9 @@ class View(program.View):
     filter = {'scope': program_entity,
                  'status': 'active'}
 
-    return self.list(request, 'any_access', page_name=page_name,
-                          params=aa_params, filter=filter,
-                          visibility='participating')
+    return self.list(request, 'allow', page_name=page_name,
+                     params=aa_params, filter=filter,
+                     visibility='participating')
 
   @decorators.merge_params
   @decorators.check_access

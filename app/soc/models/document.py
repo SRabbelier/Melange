@@ -41,8 +41,6 @@ class Document(soc.models.work.Work):
 
     work.title:  the title of the Document
 
-    work.reviews:  reviews of the Document by Reviewers
-
     work.content:  the rich-text contents of the Document
   """
 

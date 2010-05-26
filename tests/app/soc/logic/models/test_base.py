@@ -29,7 +29,7 @@ from tests.app.soc.models.test_model import TestModel
 
 
 class UserTest(unittest.TestCase):
-  """Tests related to user logic.
+  """Tests related to base logic.
   """
 
   def setUp(self):
@@ -66,7 +66,7 @@ class UserTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsWithOperator(self):
-    """Test that all entries matching the filter are retrieved.
+    """Test that all entries matching the filter with operator are retrieved.
     """
 
     fields = {'value <': 3}
@@ -77,7 +77,7 @@ class UserTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsNonMatching(self):
-    """Test that unique returns None instead of a list.
+    """Test that non matching returns an empty list.
     """
 
     fields = {'value': 1337}
@@ -87,7 +87,7 @@ class UserTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsUnique(self):
-    """Test that unique returns an entry instead of a list.
+    """Test that matching unique returns an entry instead of a list.
     """
 
     fields = {'value': 1}
@@ -96,7 +96,7 @@ class UserTest(unittest.TestCase):
     self.assertTrue(isinstance(actual, TestModel))
 
   def testGetForFieldsUniqueEmpty(self):
-    """Test that unique returns None instead of a list.
+    """Test that non matching unique returns None instead of a list.
     """
 
     fields = {'value': 1337}
@@ -115,8 +115,8 @@ class UserTest(unittest.TestCase):
     actual = len(self.logic.getForFields(fields))
     self.assertEqual(expected, actual)
 
-  def testGetFieldsOrdened(self):
-    """Test that fields can be ordened.
+  def testGetFieldsOrdered(self):
+    """Test that fields can be ordered.
     """
 
     order = ['value']
@@ -125,8 +125,8 @@ class UserTest(unittest.TestCase):
     actual = [i.value for i in self.logic.getForFields(order=order)]
     self.assertEqual(expected, actual)
 
-  def testGetFieldsReverseOrdened(self):
-    """Test that fields can be ordened in reverse.
+  def testGetFieldsReverseOrdered(self):
+    """Test that fields can be ordered in reverse.
     """
 
     order = ['-value']
@@ -136,13 +136,13 @@ class UserTest(unittest.TestCase):
     actual = [i.value for i in self.logic.getForFields(order=order)]
     self.assertEqual(expected, actual)
 
-  def testGetFieldsFilteredOrdened(self):
-    """Test that fields can be filtered and ordened.
+  def testGetFieldsFilteredOrdered(self):
+    """Test that fields can be filtered and ordered.
     """
 
     order = ['-value']
 
-    fields = {'value': [1,2, 3, 4]}
+    fields = {'value': [1, 2, 3, 4]}
 
     expected = [4, 3, 2, 1]
     actual = [i.value for i in self.logic.getForFields(fields, order=order)]

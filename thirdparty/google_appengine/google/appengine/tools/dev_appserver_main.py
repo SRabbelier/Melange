@@ -32,6 +32,8 @@ Options:
   --blobstore_path=PATH      Path to use for storing Blobstore file stub data.
   --datastore_path=PATH      Path to use for storing Datastore file stub data.
                              (Default %(datastore_path)s)
+  --use_sqlite               Use the new, SQLite based datastore stub.
+                             (Default false)
   --history_path=PATH        Path to use for storing Datastore history.
                              (Default %(history_path)s)
   --require_indexes          Disallows queries that require composite indexes
@@ -59,6 +61,12 @@ Options:
                              skipped_files (default False)
   --disable_static_caching   Never allow the browser to cache static files.
                              (Default enable if expiration set in app.yaml)
+  --disable_task_running     When supplied, tasks will not be automatically
+                             run after submission and must be run manually
+                             in the local admin console.
+  --task_retry_seconds       How long to wait in seconds before retrying a
+                             task after it fails during execution.
+                             (Default '%(task_retry_seconds)s')
 """
 
 
@@ -94,6 +102,7 @@ ARG_AUTH_DOMAIN = 'auth_domain'
 ARG_CLEAR_DATASTORE = 'clear_datastore'
 ARG_BLOBSTORE_PATH = 'blobstore_path'
 ARG_DATASTORE_PATH = 'datastore_path'
+ARG_USE_SQLITE = 'use_sqlite'
 ARG_DEBUG_IMPORTS = 'debug_imports'
 ARG_ENABLE_SENDMAIL = 'enable_sendmail'
 ARG_SHOW_MAIL_BODY = 'show_mail_body'
@@ -109,6 +118,8 @@ ARG_SMTP_PORT = 'smtp_port'
 ARG_SMTP_USER = 'smtp_user'
 ARG_STATIC_CACHING = 'static_caching'
 ARG_TEMPLATE_DIR = 'template_dir'
+ARG_DISABLE_TASK_RUNNING = 'disable_task_running'
+ARG_TASK_RETRY_SECONDS = 'task_retry_seconds'
 ARG_TRUSTED = 'trusted'
 
 SDK_PATH = os.path.dirname(
@@ -126,6 +137,7 @@ DEFAULT_ARGS = {
                                    'dev_appserver.blobstore'),
   ARG_DATASTORE_PATH: os.path.join(tempfile.gettempdir(),
                                    'dev_appserver.datastore'),
+  ARG_USE_SQLITE: False,
   ARG_HISTORY_PATH: os.path.join(tempfile.gettempdir(),
                                  'dev_appserver.datastore.history'),
   ARG_LOGIN_URL: '/_ah/login',
@@ -144,6 +156,8 @@ DEFAULT_ARGS = {
   ARG_ADMIN_CONSOLE_HOST: None,
   ARG_ALLOW_SKIPPED_FILES: False,
   ARG_STATIC_CACHING: True,
+  ARG_DISABLE_TASK_RUNNING: False,
+  ARG_TASK_RETRY_SECONDS: 30,
   ARG_TRUSTED: False,
 }
 
@@ -189,6 +203,7 @@ def ParseArguments(argv):
         'clear_datastore',
         'blobstore_path=',
         'datastore_path=',
+        'use_sqlite',
         'debug',
         'debug_imports',
         'enable_sendmail',
@@ -202,6 +217,8 @@ def ParseArguments(argv):
         'smtp_password=',
         'smtp_port=',
         'smtp_user=',
+        'disable_task_running',
+        'task_retry_seconds=',
         'template_dir=',
         'trusted',
       ])
@@ -233,6 +250,9 @@ def ParseArguments(argv):
 
     if option == '--datastore_path':
       option_dict[ARG_DATASTORE_PATH] = os.path.abspath(value)
+
+    if option == '--use_sqlite':
+      option_dict[ARG_USE_SQLITE] = True
 
     if option == '--history_path':
       option_dict[ARG_HISTORY_PATH] = os.path.abspath(value)
@@ -287,6 +307,18 @@ def ParseArguments(argv):
 
     if option == '--disable_static_caching':
       option_dict[ARG_STATIC_CACHING] = False
+
+    if option == '--disable_task_running':
+      option_dict[ARG_DISABLE_TASK_RUNNING] = True
+
+    if option == '--task_retry_seconds':
+      try:
+        option_dict[ARG_TASK_RETRY_SECONDS] = int(value)
+        if option_dict[ARG_TASK_RETRY_SECONDS] < 0:
+          raise ValueError
+      except ValueError:
+        print >>sys.stderr, 'Invalid value supplied for task_retry_seconds'
+        PrintUsageExit(1)
 
     if option == '--trusted':
       option_dict[ARG_TRUSTED] = True

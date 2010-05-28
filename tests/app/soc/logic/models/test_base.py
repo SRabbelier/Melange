@@ -28,7 +28,7 @@ from tests.app.soc.logic.models.test_model import TestModelLogic
 from tests.app.soc.models.test_model import TestModel
 
 
-class UserTest(unittest.TestCase):
+class BaseTest(unittest.TestCase):
   """Tests related to base logic.
   """
 
@@ -115,7 +115,7 @@ class UserTest(unittest.TestCase):
     actual = len(self.logic.getForFields(fields))
     self.assertEqual(expected, actual)
 
-  def testGetFieldsOrdered(self):
+  def testGetForFieldsOrdered(self):
     """Test that fields can be ordered.
     """
 
@@ -125,7 +125,7 @@ class UserTest(unittest.TestCase):
     actual = [i.value for i in self.logic.getForFields(order=order)]
     self.assertEqual(expected, actual)
 
-  def testGetFieldsReverseOrdered(self):
+  def testGetForFieldsReverseOrdered(self):
     """Test that fields can be ordered in reverse.
     """
 
@@ -136,7 +136,7 @@ class UserTest(unittest.TestCase):
     actual = [i.value for i in self.logic.getForFields(order=order)]
     self.assertEqual(expected, actual)
 
-  def testGetFieldsFilteredOrdered(self):
+  def testGetForFieldsFilteredOrdered(self):
     """Test that fields can be filtered and ordered.
     """
 

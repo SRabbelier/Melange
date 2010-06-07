@@ -63,14 +63,14 @@ class SidebarCacheTest(unittest.TestCase):
     """Test that getting after putting gives back what you put in.
     """
 
-    sidebar.put(42, self.memcache_key, None)
+    sidebar.add(42, self.memcache_key, None)
     self.assertEqual((42, self.memcache_key), sidebar.get(None, 'id'))
 
   def testFlush(self):
     """Test that getting after putting and flushing returns None.
     """
 
-    sidebar.put(42, self.memcache_key, None)
+    sidebar.add(42, self.memcache_key, None)
     sidebar.flush('id')
     self.assertEqual((None, self.memcache_key), sidebar.get(None, 'id'))
 

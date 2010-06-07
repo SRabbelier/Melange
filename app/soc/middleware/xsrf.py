@@ -75,7 +75,9 @@ class XsrfMiddleware(object):
 
   def process_response(self, request, response):
     """Alters HTML responses containing <form> tags to embed the XSRF token."""
-    if response['Content-Type'].split(';')[0] in _HTML_TYPES:
+
+    content_type = response.get('Content-Type')
+    if content_type and content_type.split(';')[0] in _HTML_TYPES:
       xsrf_token = \
         xsrfutil.getGeneratedTokenForCurrentUser(self._getSecretKey(request))
 

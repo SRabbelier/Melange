@@ -30,59 +30,19 @@ from fixture import DataSet
 from fixture import GoogleDatastoreFixture
 from fixture.style import NamedDataStyle
 
-from tests.pymox import stubout
 from tests.test_utils import MockRequest
+from tests.test_utils import StuboutHelper
 
 from tests import datasets
 from tests.app.soc.modules.ghop.logic.models import test_task as ghop_test_task
 
 from soc import models
-from soc.views.helper import responses
 from soc.views.out_of_band import AccessViolation
 
 from soc.modules.ghop import models as ghop_models
 from soc.modules.ghop.views.helper import access
 from soc.modules.ghop.views.models import task
 
-
-def error_raw(error, request, template=None, context=None):
-  """Sends a raw error response, that is the parameters
-  passed to the  error return function that is mentioned
-  in corresponding stubout.Set
-  """
-
-  return {
-      'error': error,
-      'request': request,
-      'template': template,
-      'context': context,
-      }
-
-def respond_raw(request, template, context=None, args=None, headers=None):
-  """Sends a raw response, that is the parameters passed to the
-  respond function that is mentioned in corresponding stubout.Set
-  """
-
-  return {
-      'request': request,
-      'template': template,
-      'context': context,
-      'args': args,
-      'headers': headers,
-      }
-
-def select_raw(request, view, redirect, *args, **kwargs):
-  """Sends a raw response, that is the parameters passed to the
-  select function that is mentioned in corresponding stubout.Set
-  """
-
-  return {
-      'request': request,
-      'view': view,
-      'redirect': redirect,
-      'args': args,
-      'kwargs': kwargs,
-      }
 
 class TestView(task.View):
   """
@@ -135,10 +95,9 @@ class TaskTest(unittest.TestCase):
     """
 
     self.view = TestView()
-    self.stubout = stubout.StubOutForTesting()
-    self.stubout.Set(responses, 'respond', respond_raw)
-    self.stubout.Set(responses, 'errorResponse', error_raw)
-    self.stubout.Set(task.View, 'select', select_raw)
+    self.stubout_helper = StuboutHelper()
+    self.stubout_helper.stuboutBase()
+    self.stubout_helper.stuboutElement(task.View, 'select', ['request', 'view', 'redirect'])
 
     # map all the models
     models_dict = {
@@ -172,7 +131,9 @@ class TaskTest(unittest.TestCase):
   def tearDown(self):
     """Clears everything that is setup for the tests
     """
+
     self.data.teardown()
+    self.stubout_helper.tearDown()
 
   def testCreateRedirectAsDeveloper(self):
     """Tests if the Developer is redirected to the page containing

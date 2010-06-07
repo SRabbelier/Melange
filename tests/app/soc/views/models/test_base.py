@@ -23,37 +23,12 @@ __authors__ = [
 import unittest
 
 from tests.test_utils import MockRequest
-from tests.pymox import stubout
+from tests.test_utils import StuboutHelper
 
 from tests.app.soc.logic.models.test_model import TestModelLogic
 
 from soc.views.helper import access
-from soc.views.helper import responses
 from soc.views.models import base
-
-
-def error_raw(error, request, template=None, context=None):
-  """
-  """
-
-  return {
-      'error': error,
-      'request': request,
-      'template': template,
-      'context': context,
-      }
-
-def respond_raw(request, template, context=None, args=None, headers=None):
-  """
-  """
-
-  return {
-      'request': request,
-      'template': template,
-      'context': context,
-      'args': args,
-      'headers': headers,
-      }
 
 
 class TestView(base.View):
@@ -86,9 +61,14 @@ class BaseTest(unittest.TestCase):
     """
 
     self.view = TestView()
-    self.stubout = stubout.StubOutForTesting()
-    self.stubout.Set(responses, 'respond', respond_raw)
-    self.stubout.Set(responses, 'errorResponse', error_raw)
+    self.stubout_helper = StuboutHelper()
+    self.stubout_helper.stuboutBase()
+
+  def tearDown(self):
+    """Tears down the test environment.
+    """
+
+    self.stubout_helper.tearDown()
 
   def testErrorOnNonExistantEntity(self):
     """

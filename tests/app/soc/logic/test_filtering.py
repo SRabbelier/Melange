@@ -146,5 +146,8 @@ class FilteringTest(unittest.TestCase):
     dirty = u'''<script></script>'''
     cleaner = HtmlSanitizer.Cleaner()
     cleaner.string = dirty
+  try:
     cleaner.clean()
-    self.assertEqual(dirty, cleaner.string)
+    self.fail("Invalid html should generate an error message.")
+  except Exception, msg:
+    pass

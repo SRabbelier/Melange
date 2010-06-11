@@ -22,6 +22,7 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+from django.test import TestCase
 
 from soc.modules import callback
 
@@ -120,3 +121,20 @@ class StuboutHelper(object):
     """
 
     self.stubout.Set(parent, child_name, get_general_raw(args_names))
+
+
+class DjangoTestCase(TestCase):
+  """Class extending Django TestCase in order to extend its functions as weel as remove the functions which are not supported by Google App Engine, e.g. database flush and fixtures loading without the assistance of Google App Engine Helper for Django.
+  """
+
+  def _pre_setup(self):
+    """Performs any pre-test setup.
+    """
+
+    pass
+
+  def _post_teardown(self):
+    """ Performs any post-test cleanup.
+    """
+
+    pass

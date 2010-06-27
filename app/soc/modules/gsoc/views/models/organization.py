@@ -386,7 +386,7 @@ class View(organization.View):
 
       filter = {'org': org_entity,
                 'mentor': mentor_entity,
-                'status': 'pending'}
+                'status': ['pending', 'accepted', 'rejected']}
     elif idx == 3:
       filter = {'org': org_entity,
                 'status': 'invalid'}

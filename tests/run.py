@@ -38,6 +38,33 @@ extra_paths = [HERE,
 import nose
 from nose import plugins
 
+import logging
+log =  logging.getLogger('nose.plugins.cover')
+
+
+def begin(self):
+  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that it loads Melange after coverage starts so the loading of models, logic and views can be tracked by coverage.
+  """
+  log.debug("Coverage begin")
+  import coverage
+  self.skipModules = sys.modules.keys()[:]
+  if self.coverErase:
+    log.debug("Clearing previously collected coverage statistics")
+    coverage.erase()
+  coverage.exclude('#pragma[: ]+[nN][oO] [cC][oO][vV][eE][rR]')
+  coverage.start()
+  load_melange()
+
+
+def load_melange():
+  # register a core for the test modules to use
+  from soc.modules import callback
+  from soc.modules import core
+
+  callback.registerCore(core.Core())
+  callback.getCore().registerModuleCallbacks()
+
+
 class AppEngineDatastoreClearPlugin(plugins.Plugin):
   """Nose plugin to clear the AppEngine datastore between tests.
   """
@@ -95,6 +122,13 @@ def main():
   callback.getCore().registerModuleCallbacks()
 
   if '--coverage' in sys.argv:
+    from nose.plugins import cover
+    plugin = cover.Coverage()
+    from tests.pymox import stubout
+    stubout_obj = stubout.StubOutForTesting()
+    stubout_obj.SmartSet(plugin, 'begin', begin)
+    plugins.append(plugin)
+
     args = ['--with-coverage',
             '--cover-package=soc.',
             '--cover-erase',
@@ -103,6 +137,8 @@ def main():
 
     sys.argv.remove('--coverage')
     sys.argv += args
+  else:
+    load_melange()
 
   nose.main(addplugins=[AppEngineDatastoreClearPlugin()])
 

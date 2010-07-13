@@ -881,11 +881,11 @@ class View(base.View):
         'student': '%s (%s)' % (entity.student.name(), entity.student.email),
         'mentor': entity.mentor.name(),
         'mentor_evaluation': '%d/%d' % (
-                project_logic.getQueryForFields({'project': entity}).count(),
-                psc),
-        'student_evaluation': '%d/%d' % (
                 grading_logic.getQueryForFields({'project': entity}).count(),
                 gsc),
+        'student_evaluation': '%d/%d' % (
+                project_logic.getQueryForFields({'project': entity}).count(),
+                psc),
     }
 
     if request.GET.get('fmt') == 'json':

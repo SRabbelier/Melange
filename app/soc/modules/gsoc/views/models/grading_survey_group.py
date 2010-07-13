@@ -323,6 +323,8 @@ class View(base.View):
         'link': redirects.getViewRecordsRedirect(entity, params),
     }
 
+    filter = {'scope': program_entity}
+
     return super(View, self).list(
         request, 'allow', page_name=page_name,
         params=params, filter=filter, order=order,

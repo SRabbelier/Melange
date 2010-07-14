@@ -94,13 +94,7 @@ def main():
   callback.registerCore(core.Core())
   callback.getCore().registerModuleCallbacks()
 
-  plugins = [AppEngineDatastoreClearPlugin()]
-
   if '--coverage' in sys.argv:
-    from nose.plugins import cover
-    plugin = cover.Coverage()
-    plugins.append(plugin)
-
     args = ['--with-coverage',
             '--cover-package=soc.',
             '--cover-erase',
@@ -110,7 +104,7 @@ def main():
     sys.argv.remove('--coverage')
     sys.argv += args
 
-  nose.main(plugins=plugins)
+  nose.main(addplugins=[AppEngineDatastoreClearPlugin()])
 
 
 if __name__ == '__main__':

@@ -54,7 +54,7 @@ def _generateToken(key, user_id, action_id="", when=None):
     A string XSRF protection token.
   """
   when = when or int(time.time())
-  digester = hmac.new(key)
+  digester = hmac.new(key.encode('utf-8'))
   digester.update(str(user_id))
   digester.update(DELIMITER)
   digester.update(action_id)

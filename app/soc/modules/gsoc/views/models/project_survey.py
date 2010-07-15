@@ -31,6 +31,7 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import survey
 
+from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.survey import project_logic as \
     project_survey_logic
 from soc.modules.gsoc.views.helper import access
@@ -64,7 +65,7 @@ class View(survey.View):
     rights['take'] = [('checkIsSurveyTakeable', project_survey_logic),
                       ('checkIsAllowedToTakeProjectSurveyAs',
                        [project_survey_logic, 'student', 'project'])]
-    rights['send_reminder'] = ['checkIsDeveloper'] #TODO: proper access check
+    rights['send_reminder'] = [('checkIsHostForProgramInScope', program_logic)]
 
     new_params = {}
     new_params['logic'] = project_survey_logic

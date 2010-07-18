@@ -777,6 +777,9 @@ class View(base.View):
         'parameters': dict(new_window=False),
     }
 
+    # add columns for each question
+    self._extendListWithSurveyAnswers(list_params, entity, 'records')
+
     return self.list(request, 'allow', page_name=page_name,
                      params=list_params, filter=fields, visibility='records',
                      context=context)
@@ -800,6 +803,47 @@ class View(base.View):
       fields['user'] = user_logic.getForCurrentAccount()
 
     return fields
+
+  def _extendListWithSurveyAnswers(self, list_params, survey, visibility):
+    """Extends the given params with entries for each answer that can be given
+    for the given Survey.
+
+    Used for listing SurveyRecords.
+
+    Args:
+      list_params: Params dict for the list
+      survey: Survey entity
+      visibility: Visibility of the list
+    """
+
+    from soc.models.survey import COMMENT_PREFIX
+
+    survey_content = survey.survey_content
+    survey_schema = surveys.SurveyContentSchema(survey_content.schema)
+
+    fields = survey_schema.getAllFieldKeys()
+
+    field_keys = list_params.get('%s_field_keys' % visibility, [])
+    field_hidden = list_params.get('%s_field_hidden' % visibility, [])
+    field_names = list_params.get('%s_field_names' % visibility, [])
+
+    for field in fields:
+      question = survey_schema.getLabel(field)
+
+      field_keys.append(field)
+      field_hidden.append(field)
+      field_names.append(
+          '%s (ID=%s)' %(question, field))
+
+      if survey_schema.getHasComment(field):
+        comment_name = COMMENT_PREFIX + field
+        field_keys.append(comment_name)
+        field_hidden.append(comment_name)
+        field_names.append('Comment on %s' %field)
+
+    list_params['%s_field_keys' % visibility] = field_keys
+    list_params['%s_field_hidden' % visibility] = field_hidden
+    list_params['%s_field_names' % visibility] = field_names
 
   @decorators.merge_params
   @decorators.check_access

@@ -375,49 +375,6 @@ class View(survey_view.View):
 
     return self._list(request, list_params, contents, page_name)
 
-  def _extendListWithSurveyAnswers(self, list_params, survey, visibility):
-    """Extends the given params with entries for each answer that can be given
-    for the given Survey.
-
-    Used for listing SurveyRecords.
-
-    TODO(ljvderijk): This might also work for basic Surveys
-
-    Args:
-      list_params: Params dict for the list
-      survey: Survey entity
-      visibility: Visibility of the list
-    """
-
-    from soc.models.survey import COMMENT_PREFIX
-
-    survey_content = survey.survey_content
-    survey_schema = surveys.SurveyContentSchema(survey_content.schema)
-
-    fields = survey_schema.getAllFieldKeys()
-
-    field_keys = list_params.get('%s_field_keys' % visibility, [])
-    field_hidden = list_params.get('%s_field_hidden' % visibility, [])
-    field_names = list_params.get('%s_field_names' % visibility, [])
-
-    for field in fields:
-      question = survey_schema.getLabel(field)
-
-      field_keys.append(field)
-      field_hidden.append(field)
-      field_names.append(
-          '%s (ID=%s)' %(question, field))
-
-      if survey_schema.getHasComment(field):
-        comment_name = COMMENT_PREFIX + field
-        field_keys.append(comment_name)
-        field_hidden.append(comment_name)
-        field_names.append('Comment on %s' %field)
-
-    list_params['%s_field_keys' % visibility] = field_keys
-    list_params['%s_field_hidden' % visibility] = field_hidden
-    list_params['%s_field_names' % visibility] = field_names
-
   @decorators.merge_params
   @decorators.check_access
   def review(self, request, access_type, page_name=None, params=None,

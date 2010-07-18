@@ -370,8 +370,8 @@ class Role(soc.models.linkable.Linkable):
       choices=('XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'))
   tshirt_size.group = ugettext("4. Private Info")
   tshirt_size.example_text = ugettext('See also '
-      '<a href="http://en.wikipedia.org/wiki/US_standard_clothing_size">'
-      'this article</a>.')
+      '<a href="http://bit.ly/ayGxJk"> for women</a> and '
+      '<a href="http://bit.ly/8ZrywF">for men</a>.')
 
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present

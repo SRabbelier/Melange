@@ -821,7 +821,7 @@ class View(base.View):
     survey_content = survey.survey_content
     survey_schema = surveys.SurveyContentSchema(survey_content.schema)
 
-    fields = survey_schema.getAllFieldKeys()
+    fields = survey_content.orderedProperties()
 
     field_keys = list_params.get('%s_field_keys' % visibility, [])
     field_hidden = list_params.get('%s_field_hidden' % visibility, [])

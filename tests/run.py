@@ -114,12 +114,7 @@ def main():
   import django.test.utils
   django.test.utils.setup_test_environment()
 
-  # register a core for the test modules to use
-  from soc.modules import callback
-  from soc.modules import core
-
-  callback.registerCore(core.Core())
-  callback.getCore().registerModuleCallbacks()
+  plugins = [AppEngineDatastoreClearPlugin()]
 
   if '--coverage' in sys.argv:
     from nose.plugins import cover
@@ -140,7 +135,7 @@ def main():
   else:
     load_melange()
 
-  nose.main(addplugins=[AppEngineDatastoreClearPlugin()])
+  nose.main(addplugins=plugins)
 
 
 if __name__ == '__main__':

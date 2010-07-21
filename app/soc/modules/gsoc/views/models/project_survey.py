@@ -93,6 +93,22 @@ class View(survey.View):
     new_params['manage_student_project_row'] = \
         'soc/project_survey/list/row_manage_student_project.html'
 
+    new_params['records_field_keys'] = [
+        'mentor_id', 'student_id'
+    ]
+    new_params['records_field_names'] = [
+        'Mentor Link ID', 'Student Link ID',
+    ]
+    new_params['records_field_prefetch'] = ['project']
+
+    # TODO(ljvderijk): If we ever fix the merging of field_extra remove the
+    # taken_by.
+    new_params['records_field_extra'] = lambda entity: { 
+        'mentor_id': entity.project.mentor.link_id,
+        'student_id': entity.project.student.link_id,
+        'taken_by': '%s (%s)' %(entity.user.name, entity.user.link_id),
+    }
+
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

@@ -101,8 +101,6 @@ class View(survey.View):
     ]
     new_params['records_field_prefetch'] = ['project']
 
-    new_params['records_field_ignore'] = ['taken_by']
-
     # TODO(ljvderijk): If we ever fix the merging of field_extra remove the
     # taken_by.
     new_params['records_field_extra'] = lambda entity: { 

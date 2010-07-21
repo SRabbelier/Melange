@@ -768,6 +768,25 @@ class Logic(base.Logic):
 
     return result
 
+  def _hasValuesCheckerWrapper(self, args):
+    """Wrapper for _hasValuesChecker function.
+    """
+    
+    constraints = args['constraints']
+    
+    def _hasValuesChecker(entity, params):
+      """Checks if values of specified properties of an entity are in
+      given sets. 
+      """
+    
+      for key, values in constraints.iteritems():
+         if entity.__getattribute__(key) not in values:
+           return False
+      
+      return True
+    
+    return _hasValuesChecker
+    
   def getDataTableObject(self, statistic, statistic_name):
     """Returns dataTable object for a specified virtual statistic.
     """

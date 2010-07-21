@@ -143,7 +143,7 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "field": "continent",
         "model": "gsoc_mentor",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "filter": "property_filter",
         "params": {
             "ref_logic": "gsoc_student_project",
@@ -186,7 +186,7 @@ STATISTIC_PROPERTIES = {
         "type": "per_field",
         "field": "country",
         "model": "gsoc_mentor",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "filter": "property_filter",
         "transformer": "get-vis-names",
         "params": {
@@ -361,6 +361,53 @@ STATISTIC_PROPERTIES = {
             }
         },
         "host"),
+    "student_projects_per_organization": (
+        "Student Projects Per Organization",
+        {
+        "type": "per_field",
+        "filter": "property_filter",
+        "model": "gsoc_student_project",
+        "transformer": "pretty_names",
+        "subsets": {
+            'all':{}, 
+            'with_values': {'constraints': {'status':['accepted']}}
+            },
+        "choice_instructions": {
+            "program_field": "scope",
+            "model": "gsoc_organization",
+            "filter": "property_filter",
+            "property_conditions": {
+                "status": ['new', 'active', 'inactive']
+                },
+            },
+        "params": {
+            "fields": ["scope", "__key__"],
+             "program_field": "program",
+             "property_conditions": {
+                  "status": ["accepted", "completed", "failed"]
+                  },
+             }            
+        },
+        {
+        "description": [("organization", "string", "Organization"),
+                        ("accepted_projects", "number", "Accepted projects"),
+                        ("passed_projects", "number", "Passed projects")],
+        "options": {
+            'Student Projects Per Organization (cumulative)': {
+                "visualizations": ['Table'],
+                "columns": [0, 1]
+                },
+            'Accepted Student Projects Per Organization': {
+                "visualizations": ["Table", "ColumnChart"],
+                "columns": [0]
+                },
+            'Passed Student Projects Per Organization': {
+                "visualizations": ["Table", "ColumnChart"],
+                "columns": [1]
+                },
+            }
+        },
+        "host"),
     "student_proposals_per_continent": (
         "Student Proposals Per Continent",
         {
@@ -440,7 +487,7 @@ STATISTIC_PROPERTIES = {
         "field": "age",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "transformer": "remove-out-of-range",
         "params": {
             "ref_logic": "gsoc_student_project",
@@ -485,7 +532,7 @@ STATISTIC_PROPERTIES = {
         "field": "continent",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "params": {
             "ref_logic": "gsoc_student_project",
             "ref_field": "student",
@@ -534,7 +581,7 @@ STATISTIC_PROPERTIES = {
         "field": "country",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "transformer": "get-vis-names",
         "params": {
             "fields": ["res_country"],
@@ -580,7 +627,7 @@ STATISTIC_PROPERTIES = {
         "field": "degree",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "params": {
             "fields": ["degree"],
             "ref_logic": "gsoc_student_project",
@@ -625,7 +672,7 @@ STATISTIC_PROPERTIES = {
         "field": "expected_graduation",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": ["all", "referenced", "no-referenced"],
+        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
         "transformer": "remove-out-of-range",
         "params": {
             "fields": ["expected_graduation"],

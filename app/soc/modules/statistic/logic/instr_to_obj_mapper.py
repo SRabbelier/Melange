@@ -100,7 +100,8 @@ class Mapper(object):
     self.subsets_dict = {
         'all': None,
         'referenced': logic._isReferencedChecker,
-        'no-referenced': logic._isNotReferencedChecker
+        'no-referenced': logic._isNotReferencedChecker,
+        'with_values': logic._hasValuesCheckerWrapper,
         }
 
     self.transformers_dict = {
@@ -183,7 +184,13 @@ class Mapper(object):
     if 'subsets' not in item:
       return self.default_subsets
     else:
-      return [self.subsets_dict[elem] for elem in item['subsets']]
+      subsets = []
+      for subset, args in item['subsets'].iteritems():
+        if not args:
+          subsets.append(self.subsets_dict[subset])
+        else:
+          subsets.append(self.subsets_dict[subset](args))
+      return subsets
 
   def getTransformer(self, item):
     """Tries to return transformer if it is defined.

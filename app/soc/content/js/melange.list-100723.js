@@ -121,6 +121,17 @@
             "keys": ["key","link_id"],
             "refresh": "table"
           }
+        },
+        {
+          "bounds": [0,"all"],
+          "id": "dummy_post_redirect",
+          "caption": "Test POST redirect",
+          "type": "post",
+          "parameters": {
+            "url": "/user/roles",
+            "keys": ["key","link_id"],
+            "redirect": "true"
+          }
         }
       ],
       "row" : {
@@ -706,6 +717,17 @@
                 data: JSON.stringify(objects_to_send)
               },
               function (data) {
+                if (parameters.redirect == "true") {
+                  try {
+                    var data_from_server = JSON.parse(data);
+                    if (data_from_server.data.url !== undefined) {
+                      window.location.href = data_from_server.data.url;
+                    }
+                  }
+                  catch (e) {
+                    //TODO (Mario): display an error message
+                  }
+                }
                 if (parameters.refresh == "table") {
                   list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");

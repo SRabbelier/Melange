@@ -28,6 +28,8 @@ from soc.modules import callback
 
 from soc.views.helper import responses
 from tests.pymox import stubout
+from soc.middleware.xsrf import XsrfMiddleware
+from soc.logic.helper import xsrfutil
 
 
 class MockRequest(object):
@@ -138,3 +140,20 @@ class DjangoTestCase(TestCase):
     """
 
     pass
+
+  def getXsrfToken(self, path=None, method='POST', data={}, **extra):
+    """Returns an XSRF token for request contex signed by Melange XSRF middleware. Add this token to POST data in order to pass the validation check of Melange XSRF middleware for HTTP POST.
+    """
+
+    """
+    request = HttpRequest()
+    request.path = path
+    request.method = method
+    """
+    # request is currently not used in _getSecretKey
+    request = None
+    xsrf = XsrfMiddleware()
+    key = xsrf._getSecretKey(request)
+    user_id = xsrfutil._getCurrentUserId()
+    xsrf_token = xsrfutil._generateToken(key, user_id)
+    return xsrf_token

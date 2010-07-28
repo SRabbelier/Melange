@@ -86,6 +86,7 @@ class Mapper(object):
         'expected_graduation': [str(i) for i in range(2008, 2031)],
         'gsoc_program': logic._collectChoicesList,
         'gsoc_student': logic._collectChoicesList,
+        'tshirt_style': student_model.Student.tshirt_style.choices,
         }
 
     self.filters_dict = {
@@ -102,6 +103,7 @@ class Mapper(object):
         'referenced': logic._isReferencedChecker,
         'no-referenced': logic._isNotReferencedChecker,
         'with_values': logic._hasValuesCheckerWrapper,
+        'within_range': logic._withinRangeCheckerWrapper,
         }
 
     self.transformers_dict = {
@@ -185,11 +187,12 @@ class Mapper(object):
       return self.default_subsets
     else:
       subsets = []
-      for subset, args in item['subsets'].iteritems():
+      for fun, args in item['subsets']:
         if not args:
-          subsets.append(self.subsets_dict[subset])
+          subsets.append(self.subsets_dict[fun])
         else:
-          subsets.append(self.subsets_dict[subset](args))
+          subsets.append(self.subsets_dict[fun](args))
+
       return subsets
 
   def getTransformer(self, item):

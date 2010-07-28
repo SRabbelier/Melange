@@ -133,6 +133,7 @@ class Logic(base.Logic):
         if choice_instructions.get('filter'):
           choice_params['property_conditions'] = choice_instructions.get(
               'property_conditions')
+
           if not choice_params['property_conditions']:
             raise ProtocolError()
 
@@ -782,11 +783,42 @@ class Logic(base.Logic):
       for key, values in constraints.iteritems():
          if entity.__getattribute__(key) not in values:
            return False
+
+      return True
+
+    return _hasValuesChecker
+
+  def _withinRangeCheckerWrapper(self, args):
+    """Wrapper for _withinRangeChecker function.
+    """
+
+    constraints = args['constraints']
+
+    def _withinRangeChecker(entity, params):
+      """Checks if certain properties are within given constrains. 
+      """
+
+      for constraint in constraints:
+        type = constraint.get('type')
+        field = constraint.get('field')
+
+        if not type or not field:
+          raise ProtocolError()
+
+        min_value = constraint.get('min_value', 0)
+        max_value = constraint.get('max_value', 1)
+
+        if type == 'size':
+          value = entity.__getattribute__(field)
+          if len(value) < min_value or len(value) > max_value:
+            return False
+        else:
+          raise ProtocolError()
       
       return True
     
-    return _hasValuesChecker
-    
+    return _withinRangeChecker
+
   def getDataTableObject(self, statistic, statistic_name):
     """Returns dataTable object for a specified virtual statistic.
     """

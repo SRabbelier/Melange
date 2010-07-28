@@ -368,10 +368,21 @@ STATISTIC_PROPERTIES = {
         "filter": "property_filter",
         "model": "gsoc_student_project",
         "transformer": "pretty_names",
-        "subsets": {
-            'all':{}, 
-            'with_values': {'constraints': {'status':['accepted']}}
-            },
+        "subsets": [
+            ('all', {}), 
+            ('within_range', {'constraints': [
+                {'field': 'passed_evaluations',
+                 'type': 'size',
+                 'min_value': 1,
+                 'max_value': 2}
+                ]}),
+            ('within_range', {'constraints': [
+                {'field': 'passed_evaluations',
+                 'type': 'size',
+                 'min_value': 2,
+                 'max_value': 2}
+                ]})
+            ],
         "choice_instructions": {
             "program_field": "scope",
             "model": "gsoc_organization",
@@ -390,20 +401,25 @@ STATISTIC_PROPERTIES = {
         },
         {
         "description": [("organization", "string", "Organization"),
-                        ("accepted_projects", "number", "Accepted projects"),
-                        ("passed_projects", "number", "Passed projects")],
+                        ("accepted_projects", "number", "Accepted"),
+                        ("midterm_projects", "number", "Midterm Passed"),
+                        ("passed_projects", "number", "Final Passed")],
         "options": {
             'Student Projects Per Organization (cumulative)': {
                 "visualizations": ['Table'],
-                "columns": [0, 1]
+                "columns": [0, 1, 2]
                 },
             'Accepted Student Projects Per Organization': {
                 "visualizations": ["Table", "ColumnChart"],
                 "columns": [0]
                 },
-            'Passed Student Projects Per Organization': {
+            'Midterm-Passed Student Projects Per Organization': {
                 "visualizations": ["Table", "ColumnChart"],
                 "columns": [1]
+                },
+            'Final-Passed Student Projects Per Organization': {
+                "visualizations": ["Table", "ColumnChart"],
+                "columns": [2]
                 },
             }
         },
@@ -627,7 +643,7 @@ STATISTIC_PROPERTIES = {
         "field": "degree",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
+        "subsets": [("all", {}), ("referenced", {}), ("no-referenced", {})],
         "params": {
             "fields": ["degree"],
             "ref_logic": "gsoc_student_project",
@@ -672,7 +688,7 @@ STATISTIC_PROPERTIES = {
         "field": "expected_graduation",
         "filter": "property_filter",
         "model": "gsoc_student",
-        "subsets": {"all":{}, "referenced":{}, "no-referenced":{}},
+        "subsets": [("all", {}), ("referenced", {}), ("no-referenced", {})],
         "transformer": "remove-out-of-range",
         "params": {
             "fields": ["expected_graduation"],
@@ -709,6 +725,59 @@ STATISTIC_PROPERTIES = {
                 "columns": [2]
                 }
             }
+        },
+        "host"),
+    "students_per_tshirt_style": (
+        "Students Per T-Shirt Style",
+        {
+        "type": "per_field",
+        "field": "tshirt_style",
+        "filter": "property_filter",
+        "model": "gsoc_student",
+        "subsets": [
+            ("all", {}), 
+            ("referenced", {}),
+            ("no-referenced", {})],
+        "params": {
+            "fields": ["tshirt_style"],
+            "ref_logic": "gsoc_student_project",
+            "ref_field": "student",
+            "program_field": "scope",
+            "property_conditions": {
+                  "status": ["active", "inactive"]
+                  },
+            }
+        },
+        {
+        "description": [("style", "string", "Style"),
+                        ("all_students", "number", "Students"),
+                        ("pro_students", "number",
+                         "Students with projects"),
+                        ("nop_students", "number",
+                         "Students without projects")],
+          "options": {
+            'Students Per T-Shirt Style (cumulative)': {
+                "visualizations": [
+                    "Table",
+                    "BarChart",
+                    "ColumnChart",
+                    "ImageChartBar",
+                ],
+                "columns": [0, 1, 2]
+                },
+            'Students Per T-Shirt Style (all)': {
+                "visualizations": VISUALIZATION_SETS['single_standard'],
+                "columns": [0]
+                },
+            'Students Per T-Shirt Style (with projects)': {
+                "visualizations": VISUALIZATION_SETS['single_standard'],
+                "columns": [1]
+                },
+            'Students Per T-Shirt Style (without projects)': {
+                "visualizations": VISUALIZATION_SETS['single_standard'],
+                "columns": [2]
+                }
+            },
         },
         "host"),
     "gsoc2010_overall": (

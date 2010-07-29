@@ -592,7 +592,7 @@ class View(base.View):
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      elif fields.get('approved'):
+      else:
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])
@@ -830,6 +830,11 @@ class View(base.View):
     tuapp_params = list_params.copy()
 
     tuapp_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
+
+    tuapp_params['public_row_extra'] = lambda entity: {
+            'link': redirects.getEditRedirect(
+                entity, {'url_name': tuapp_params['url_name']})
+    }
 
     user_account = user_logic.logic.getForCurrentAccount()
 

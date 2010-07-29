@@ -212,7 +212,7 @@ class View(organization.View):
       if request.GET.get('fmt') == 'json':
         return self.getListTasksData(request, [to_params, tc_params], entity)
 
-      # check if there are new proposals if so show them in a separate list
+      # check if there are new tasks if so show them in a separate list
       fields = {'scope': entity,
                 'status': ['Open', 'Reopened']}
       tasks_open = ghop_task_logic.logic.getForFields(fields, unique=True)
@@ -220,7 +220,7 @@ class View(organization.View):
       contents = []
 
       if tasks_open:
-        # we should add this list because there is a new proposal
+        # we should add this list because there is a new task
         to_list = lists.getListGenerator(request, to_params, idx=0)
         contents.append(to_list)
 

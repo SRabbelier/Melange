@@ -31,6 +31,7 @@ from google.appengine.ext import db
 
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -80,6 +81,9 @@ class View(base.View):
       'The task is open but you cannot claim this task since you '
       'have already claimed %d task(s).')
 
+  DEF_NO_TASKS_MSG = ugettext(
+      'There are no tasks under your organization. Please create tasks.')
+
   DEF_SIGNIN_TO_COMMENT_MSG = ugettext(
       '<a href=%s>Sign in</a> to perform any action or comment on '
       'this task.')
@@ -105,6 +109,18 @@ class View(base.View):
 
   DEF_TASK_CMPLTD_BY_YOU_MSG = ugettext(
       'You have successfully completed this task!')
+
+  DEF_TASKS_LIST_CLAIM_MSG = ugettext(
+       'List of claimed tasks.')
+
+  DEF_TASKS_LIST_CLOSE_MSG = ugettext(
+       'List of closed tasks.')
+
+  DEF_TASKS_LIST_OPEN_MSG = ugettext(
+       'List of open tasks.')
+
+  DEF_TASKS_LIST_UNAPPROVED_MSG = ugettext(
+       'List of non-public tasks.')
 
   DEF_TASK_NO_MORE_SUBMIT_MSG = ugettext(
       'You have submitted the work to this task, but deadline has passed '
@@ -182,9 +198,6 @@ class View(base.View):
 
     new_params['scope_view'] = ghop_org_view
     new_params['scope_redirect'] = redirects.getCreateRedirect
-
-    new_params['list_heading'] = 'modules/ghop/task/list/heading.html'
-    new_params['list_row'] = 'modules/ghop/task/list/row.html'
 
     new_params['extra_dynaexclude'] = ['task_type', 'mentors', 'user',
                                        'student', 'program', 'status',
@@ -729,23 +742,25 @@ class View(base.View):
     """
 
     # get the org entity for which we are listing these tasks
-    org_entity = ghop_org_logic.logic.getFromKeyNameOr404(kwargs['scope_path'])
+    org_entity = ghop_org_logic.logic.getFromKeyNameOr404(
+        kwargs['scope_path'])
 
-    # save the state to which the selected tasks must be changed
-    # to based on the actions.
-    if request.POST.get('Approve'):
+    post_dict = request.POST
+
+    items = simplejson.loads(post_dict.get('data', '[]'))
+    button_id = post_dict.get('button_id', '')
+
+    if button_id == 'approve':
       changed_status = 'Unpublished'
-    elif request.POST.get('Publish'):
+    elif button_id == 'publish':
       changed_status = 'Open'
+    elif button_id == 'unapprove':
+      changed_status = 'Unapproved'
 
-    # update the status of task entities that should be approved or published
-    task_entities = []
+    task_keys = [item['key'] for item in items]
 
-    # get all the task keys to update, will return empty list if doesn't exist
-    task_keys = request.POST.getlist('task_id')
-
+    tasks = []
     for key_name in task_keys:
-
       task_entity = ghop_task_logic.logic.getFromKeyName(key_name)
 
       # Of course only the tasks from this organization and those with a valid
@@ -754,26 +769,67 @@ class View(base.View):
           task_entity.status in ['Unapproved', 'Unpublished']:
         task_entity.status = changed_status
 
-        task_entities.append(task_entity)
+        tasks.append(task_entity)
 
     # bulk put the task_entities
-    # TODO: replace with Task API call?
-    db.put(task_entities)
+    db.put(tasks)
 
-    # redirect to the same page
+    # return a 200 response to signal that all is okay
     return http.HttpResponseRedirect('')
+
+  def getListTasksData(self, request, params_collection, org_entity):
+    """Returns the list data for Organization Tasks list.
+
+    Args:
+      request: HTTPRequest object
+      params_collection: List of list Params indexed with the idx of the list
+      org_entity: GHOPOrganization entity for which the lists are generated
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # default list settings
+    args = []
+    order = ['modified_on']
+    visibility = 'public'
+
+    filter = {
+        'scope': org_entity
+        }
+
+    if idx == 0:
+      filter['status'] = ['Unapproved', 'Unpublished']
+    elif idx == 1:
+      filter['status'] = ['Open', 'Reopened']
+    elif idx == 2:
+      filter['status'] = ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                          'NeedsWork', 'NeedsReview']
+    elif idx == 3:
+      filter['status'] = ['Closed', 'AwaitingRegistration']
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    params = params_collection[idx]
+    contents = lists.getListData(request, params, filter,
+                                 visibility=visibility,
+                                 order=order, args=args)
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
 
   def listOrgTasksGet(self, request, page_name, params, **kwargs):
     """Handles the GET request for the list tasks view.
     """
 
-    from soc.modules.ghop.views.helper import list_info as list_info_helper
-
     org_entity =  ghop_org_logic.logic.getFromKeyNameOr404(
         kwargs['scope_path'])
 
-    contents = []
-    context = {}
+    list_params = params.copy() if params else {}
+
+    tuapp_params = list_params.copy()
+
+    tuapp_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
 
     user_account = user_logic.logic.getForCurrentAccount()
 
@@ -783,102 +839,237 @@ class View(base.View):
         'status': 'active'
         }
 
-    up_params = params.copy()
     # give the capability to approve tasks for the org_admins
     if ghop_org_admin_logic.logic.getForFields(fields, unique=True):
-      up_params['list_template'] = 'modules/ghop/task/approve/approve.html'
-      up_params['list_heading'] = 'modules/ghop/task/approve/heading.html'
-      up_params['list_row'] = 'modules/ghop/task/approve/row.html'
+      tuapp_params['public_field_keys'] = [
+          'status', 'title', 'org', 'difficulty', 'task_type',
+          'time_to_complete', 'mentors'
+      ]
+      tuapp_params['public_field_names'] = [
+          'Status', 'Title', 'Organization', 'Difficulty', 'Type',
+          'Time To Complete', 'Mentors',
+      ]
 
-    up_params['public_row_entity'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, up_params)
-    }
-# TODO(LIST)
-    up_params['list_description'] = ugettext(
-       'List of Unapproved tasks.')
+      tuapp_params['public_field_props'] = {
+          'status': {
+              'stype': 'select',
+              'editoptions': {'value': ':All;^Unapproved$:Unapproved;'
+                  '^Unpublished$:Approved but unpublished'}
+          }
+      }
 
-    filter = {
-        'scope': org_entity,
-        'status': 'Unapproved',
-        }
+      tuapp_params['public_conf_extra'] = {
+          "multiselect": True,
+      }
 
-    # TODO (Fix this error): Something to do with change to new list protocol
-    up_list = lists.getListContent(request, up_params, filter, idx=0,
-                                   need_content=True)
+      tuapp_params['public_button_global'] = [
+          {
+          'bounds': [1,'all'],
+          'id': 'approve',
+          'caption': 'Approve',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+          },
+          {
+          'bounds': [1,'all'],
+          'id': 'publish',
+          'caption': 'Approve and/or Publish',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+          },
+          {
+          'bounds': [1,'all'],
+          'id': 'unapprove',
+          'caption': 'Unapprove',
+          'type': 'post',
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'table',
+              }
+          }]
 
-    if up_list:
-      up_mentors_list = {}
-      for task_entity in up_list['data']:
-        up_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+    topen_params = list_params.copy()
+    topen_params['list_description'] = self.DEF_TASKS_LIST_OPEN_MSG
 
-      up_list['info'] = (list_info_helper.getTasksInfo(up_mentors_list), None)
+    tclaim_params = list_params.copy()
+    tclaim_params['list_description'] = self.DEF_TASKS_LIST_CLAIM_MSG
 
-      contents.append(up_list)
-      context['up_list'] = True
+    tclose_params = list_params.copy()
+    tclose_params['list_description'] = self.DEF_TASKS_LIST_CLOSE_MSG
 
-    aup_params = params.copy()
-    aup_params['list_heading'] = 'modules/ghop/task/approve/heading.html'
-    aup_params['list_row'] = 'modules/ghop/task/approve/row.html'
+    if request.GET.get('fmt') == 'json':
+      return self.getListTasksData(
+          request, [tuapp_params, topen_params,
+          tclaim_params, tclose_params], org_entity)
 
-    aup_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, aup_params)
-    }
+    contents = []
 
-    aup_params['list_description'] = ugettext(
-       'List of Approved but Unpublished tasks.')
+    # add all non-public tasks to the list
+    fields = {'scope': org_entity,
+              'status': ['Unapproved', 'Unpublished']}
+    tasks_unapp = ghop_task_logic.logic.getForFields(fields, unique=True)
 
-    filter = {
-        'scope': org_entity,
-        'status': 'Unpublished',
-        }
+    if tasks_unapp:
+      # we should add this list because there is a new task
+      tuapp_list = lists.getListGenerator(request, tuapp_params, idx=0)
+      contents.append(tuapp_list)
 
-    # TODO (Fix this error): Something to do with change to new list protocol
-    aup_list = lists.getListContent(request, aup_params, filter, idx=1,
-                                    need_content=True)
+    # add all open tasks to the list
+    fields['status'] = ['Open', 'Reopened']
+    tasks_open = ghop_task_logic.logic.getForFields(fields, unique=True)
 
-    if aup_list:
-      aup_mentors_list = {}
-      for task_entity in aup_list['data']:
-        aup_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+    if tasks_open:
+      # we should add this list because there is an open task
+      topen_list = lists.getListGenerator(request, topen_params, idx=1)
+      contents.append(topen_list)
 
-      aup_list['info'] = (list_info_helper.getTasksInfo(aup_mentors_list), None)
+    # add all claimed tasks to the list
+    fields['status'] = ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                        'NeedsWork', 'NeedsReview']
+    tasks_claimed = ghop_task_logic.logic.getForFields(fields, unique=True)
 
-      contents.append(aup_list)
+    if tasks_claimed:
+      # we should add this list because there is an open task
+      tclaim_list = lists.getListGenerator(request, tclaim_params, idx=2)
+      contents.append(tclaim_list)
 
-    ap_params = up_params.copy()
-    ap_params['list_template'] = 'soc/models/list.html'
-    ap_params['list_heading'] = 'modules/ghop/task/list/heading.html'
-    ap_params['list_row'] = 'modules/ghop/task/list/row.html'
+    # add all closed tasks to the list
+    fields['status'] = ['Closed', 'AwaitingRegistration']
+    tasks_closed = ghop_task_logic.logic.getForFields(fields, unique=True)
 
-    ap_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, ap_params)
-    }
+    if tasks_closed:
+      # we should add this list because there is an open task
+      tclose_list = lists.getListGenerator(request, tclose_params, idx=3)
+      contents.append(tclose_list)
 
-    ap_params['list_description'] = ugettext(
-       'List of Published tasks.')
+    if contents:
+      return self._list(request, list_params, contents, page_name)
+    else:
+      raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
 
-    filter = {
-        'scope': org_entity,
-        'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
-            'ActionNeeded', 'Closed', 'AwaitingRegistration',
-            'NeedsWork', 'NeedsReview'],
-        }
-
-    # TODO (Fix this error): Something to do with change to new list protocol
-    ap_list = lists.getListContent(request, ap_params, filter, idx=2,
-                                   need_content=True)
-
-    if ap_list:
-      ap_mentors_list = {}
-      for task_entity in ap_list['data']:
-        ap_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
-
-      ap_list['info'] = (list_info_helper.getTasksInfo(ap_mentors_list), None)
-
-      contents.append(ap_list)
-
-    # call the _list method from base to display the list
-    return self._list(request, up_params, contents, page_name, context)
+#    from soc.modules.ghop.views.helper import list_info as list_info_helper
+#
+#    org_entity =  ghop_org_logic.logic.getFromKeyNameOr404(
+#        kwargs['scope_path'])
+#
+#    contents = []
+#    context = {}
+#
+#    user_account = user_logic.logic.getForCurrentAccount()
+#
+#    fields = {
+#        'user': user_account,
+#        'scope': org_entity,
+#        'status': 'active'
+#        }
+#
+#    up_params = params.copy()
+#    # give the capability to approve tasks for the org_admins
+#    if ghop_org_admin_logic.logic.getForFields(fields, unique=True):
+#      up_params['list_template'] = 'modules/ghop/task/approve/approve.html'
+#      up_params['list_heading'] = 'modules/ghop/task/approve/heading.html'
+#      up_params['list_row'] = 'modules/ghop/task/approve/row.html'
+#
+#    up_params['public_row_entity'] = lambda entity: {
+#        'link': redirects.getPublicRedirect(entity, up_params)
+#    }
+## TODO(LIST)
+#    up_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
+#
+#    if request.GET.get('fmt') == 'json':
+#      return self.getListTasksData(request, [to_params, tc_params], entity)
+#
+#    filter = {
+#        'scope': org_entity,
+#        'status': 'Unapproved',
+#        }
+#
+#    # TODO (Fix this error): Something to do with change to new list protocol
+#    up_list = lists.getListContent(request, up_params, filter, idx=0,
+#                                   need_content=True)
+#
+#    if up_list:
+#      up_mentors_list = {}
+#      for task_entity in up_list['data']:
+#        up_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+#
+#      up_list['info'] = (list_info_helper.getTasksInfo(up_mentors_list), None)
+#
+#      contents.append(up_list)
+#      context['up_list'] = True
+#
+#    aup_params = params.copy()
+#    aup_params['list_heading'] = 'modules/ghop/task/approve/heading.html'
+#    aup_params['list_row'] = 'modules/ghop/task/approve/row.html'
+#
+#    aup_params['public_row_extra'] = lambda entity: {
+#        'link': redirects.getPublicRedirect(entity, aup_params)
+#    }
+#
+#    aup_params['list_description'] = ugettext(
+#       'List of Approved but Unpublished tasks.')
+#
+#    filter = {
+#        'scope': org_entity,
+#        'status': 'Unpublished',
+#        }
+#
+#    # TODO (Fix this error): Something to do with change to new list protocol
+#    aup_list = lists.getListContent(request, aup_params, filter, idx=1,
+#                                    need_content=True)
+#
+#    if aup_list:
+#      aup_mentors_list = {}
+#      for task_entity in aup_list['data']:
+#        aup_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+#
+#      aup_list['info'] = (list_info_helper.getTasksInfo(aup_mentors_list), None)
+#
+#      contents.append(aup_list)
+#
+#    ap_params = up_params.copy()
+#    ap_params['list_template'] = 'soc/models/list.html'
+#    ap_params['list_heading'] = 'modules/ghop/task/list/heading.html'
+#    ap_params['list_row'] = 'modules/ghop/task/list/row.html'
+#
+#    ap_params['public_row_extra'] = lambda entity: {
+#        'link': redirects.getPublicRedirect(entity, ap_params)
+#    }
+#
+#    ap_params['list_description'] = ugettext(
+#       'List of Published tasks.')
+#
+#    filter = {
+#        'scope': org_entity,
+#        'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
+#            'ActionNeeded', 'Closed', 'AwaitingRegistration',
+#            'NeedsWork', 'NeedsReview'],
+#        }
+#
+#    # TODO (Fix this error): Something to do with change to new list protocol
+#    ap_list = lists.getListContent(request, ap_params, filter, idx=2,
+#                                   need_content=True)
+#
+#    if ap_list:
+#      ap_mentors_list = {}
+#      for task_entity in ap_list['data']:
+#        ap_mentors_list[task_entity.key()] = db.get(task_entity.mentors)
+#
+#      ap_list['info'] = (list_info_helper.getTasksInfo(ap_mentors_list), None)
+#
+#      contents.append(ap_list)
+#
+#    # call the _list method from base to display the list
+#    return self._list(request, up_params, contents, page_name, context)
 
   @decorators.merge_params
   @decorators.check_access

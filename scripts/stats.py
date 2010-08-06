@@ -636,13 +636,13 @@ def exportRolesForGoogleCode(csv_filename, gc_project_prefix='',
     scope_path_start: the start of the scope path of the roles to get could be
       google/gsoc2009 if you want to export all GSoC 2009 Organizations.
   """
-  from soc.models.org_admin import OrgAdmin
-  from soc.models.student_project import StudentProject
+  from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
+  from soc.modules.gsoc.models.student_project import StudentProject
   
   # get all projects
   getStudentProjects = getEntities(StudentProject)
   student_projects = getStudentProjects()
-  org_admins = getEntities(OrgAdmin)()
+  org_admins = getEntities(GSoCOrgAdmin)()
   all_org_admins = org_admins.values()
   
   org_admins_by_orgs = {}

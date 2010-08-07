@@ -101,6 +101,7 @@ def main():
   from google.appengine.api import user_service_stub
   from google.appengine.api import urlfetch_stub
   from google.appengine.api.memcache import memcache_stub
+  from google.appengine.api.labs.taskqueue import taskqueue_stub
   apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
   apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
                                           urlfetch_stub.URLFetchServiceStub())
@@ -111,6 +112,8 @@ def main():
   apiproxy_stub_map.apiproxy.RegisterStub('memcache',
     memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
+  yaml_location = os.path.join(HERE, 'app')
+  apiproxy_stub_map.apiproxy.RegisterStub('taskqueue', taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
   import django.test.utils
   django.test.utils.setup_test_environment()
 

@@ -217,3 +217,16 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
       else:
         failure_message += 'None'
       self.fail(failure_message)
+
+
+class TaskQueueTestCase(gaetestbed.taskqueue.TaskQueueTestCase, unittest.TestCase):
+  """Class extending gaetestbed.taskqueue.TaskQueueTestCase in order to extend its functions.
+  Difference:
+  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  """
+
+  def setUp(self):
+    """Sets up gaetestbed.taskqueue.TaskQueueTestCase.
+    """
+
+    super(TaskQueueTestCase, self).setUp()

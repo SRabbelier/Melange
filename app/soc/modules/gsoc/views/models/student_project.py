@@ -26,6 +26,8 @@ __authors__ = [
 import logging
 import time
 
+from google.appengine.ext import db
+
 from django import forms
 from django import http
 from django.utils import simplejson
@@ -172,7 +174,9 @@ class View(base.View):
     new_params['org_home_field_prefetch'] = ['mentor', 'student']
     new_params['org_home_field_extra'] = lambda entity: {
         'student': entity.student.name(),
-        'mentor': entity.mentor.name(),
+        'mentor': ', '.join(
+            mentor.name() for mentor in
+            [entity.mentor] + db.get(entity.additional_mentors))
     }
     new_params['org_home_field_keys'] = ['student', 'title', 'mentor',
                                          'status']

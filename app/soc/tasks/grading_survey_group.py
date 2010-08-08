@@ -26,6 +26,7 @@ import datetime
 import logging
 
 from google.appengine.api.labs import taskqueue
+from google.appengine.ext import db
 
 from django import http
 
@@ -296,14 +297,12 @@ def sendMailAboutGradingRecordResult(request, *args, **kwargs):
             'status': 'active'}
   org_admin_entities = org_admin_logic.getForFields(fields)
 
-  # collect email addresses for all found org admins
-  org_admin_addresses = []
+  # collect all helping mentors
+  additional_mentors = db.get(project_entity.additional_mentors)
 
-  for org_admin_entity in org_admin_entities:
-    org_admin_addresses.append(org_admin_entity.email)
-
-  if org_admin_addresses:
-    mail_context['cc'].extend(org_admin_addresses)
+  # add them all to the cc list
+  for org_member in org_admin_entities + additional_mentors:
+    mail_context['cc'].extend(org_member.email)
 
   # send out the email using a template
   mail_template = 'soc/grading_record/mail/result.html'

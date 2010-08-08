@@ -172,11 +172,11 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
 
     super(MailTestCase, self).setUp()
 
-  def assertEmailSent(self, to=None, sender=None, subject=None, body=None, html=None, num=None):
+  def assertEmailSent(self, to=None, sender=None, subject=None, body=None, html=None, n=None):
     """Override gaetestbed.mail.MailTestCase.assertEmailSent method.
     Difference:
     * It will print out all sent messages to facilitate debug in case of failure.
-    * It accepts an optional argument num which is used to assert exactly num messages satisfying the criteria are sent out.
+    * It accepts an optional argument n which is used to assert exactly n messages satisfying the criteria are sent out.
     """
 
     messages = self.get_sent_messages(
@@ -195,17 +195,17 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
         failure_message += ' with %s.' % details
       else:
         failure_message += '.'
-    elif num:
-      actual_num = len(messages)
-      if num != actual_num:
+    elif n:
+      actual_n = len(messages)
+      if n != actual_n:
         failed = True
-        failure_message = "Expected e-mail message sent. Expected %d messages sent" % num
+        failure_message = "Expected e-mail message sent. Expected %d messages sent" % n
         details = self._get_email_detail_string(to, sender, subject, body, html)
         if details:
           failure_message += ' with %s;' % details
         else:
           failure_message += ';'
-        failure_message += ' but actually %d.' % actual_num
+        failure_message += ' but actually %d.' % actual_n
     # If failed, raise error and display all messages sent
     if failed:
       all_messages = self.get_sent_messages()

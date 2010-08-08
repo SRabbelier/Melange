@@ -312,5 +312,7 @@ class StudentProposalMailerTest(MailTestCase):
           }
     job = job_logic.updateOrCreateFromFields(job_properties)
     sendStudentProposalMail(job)
-    self.assertEmailSent(to=self.students[1].email, html='not selected', num=1)
+    self.assertEmailSent(to=self.students[1].email, html='not selected', n=1)
     self.assertEmailNotSent(to=self.students[1].email, html='accepted')
+
+

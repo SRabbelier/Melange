@@ -47,7 +47,7 @@ def emailToAccountAndUserId(address):
   key = TempUserWithUniqueId(user=user).put()
   obj = TempUserWithUniqueId.get(key)
   # pylint: disable-msg=E1103
-  return (obj, obj.user.user_id())
+  return (obj.user, obj.user.user_id())
 
 
 def setupUniqueUserIdAdder(job_entity):

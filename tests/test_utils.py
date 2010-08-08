@@ -157,3 +157,63 @@ class DjangoTestCase(TestCase):
     user_id = xsrfutil._getCurrentUserId()
     xsrf_token = xsrfutil._generateToken(key, user_id)
     return xsrf_token
+
+
+class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
+  """Class extending gaetestbed.mail.MailTestCase in order to extend its functions.
+  Difference:
+  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  * Override assertEmailSent method.
+  """
+
+  def setUp(self):
+    """Sets up gaetestbed.mail.MailTestCase.
+    """
+
+    super(MailTestCase, self).setUp()
+
+  def assertEmailSent(self, to=None, sender=None, subject=None, body=None, html=None, num=None):
+    """Override gaetestbed.mail.MailTestCase.assertEmailSent method.
+    Difference:
+    * It will print out all sent messages to facilitate debug in case of failure.
+    * It accepts an optional argument num which is used to assert exactly num messages satisfying the criteria are sent out.
+    """
+
+    messages = self.get_sent_messages(
+        to = to,
+        sender = sender,
+        subject = subject,
+        body = body,
+        html = html,
+    )
+    failed = False
+    if not messages:
+      failed = True
+      failure_message = "Expected e-mail message sent. No messages sent"
+      details = self._get_email_detail_string(to, sender, subject, body, html)
+      if details:
+        failure_message += ' with %s.' % details
+      else:
+        failure_message += '.'
+    elif num:
+      actual_num = len(messages)
+      if num != actual_num:
+        failed = True
+        failure_message = "Expected e-mail message sent. Expected %d messages sent" % num
+        details = self._get_email_detail_string(to, sender, subject, body, html)
+        if details:
+          failure_message += ' with %s;' % details
+        else:
+          failure_message += ';'
+        failure_message += ' but actually %d.' % actual_num
+    # If failed, raise error and display all messages sent
+    if failed:
+      all_messages = self.get_sent_messages()
+      failure_message += '\nAll messages sent: '
+      if all_messages:
+        failure_message += '\n'
+        for message in all_messages:
+          failure_message += str(message)
+      else:
+        failure_message += 'None'
+      self.fail(failure_message)

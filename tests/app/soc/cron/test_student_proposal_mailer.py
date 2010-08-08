@@ -262,6 +262,12 @@ class StudentProposalMailerTest(MailTestCase):
     'status': 'rejected',
     })
     student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
+    # Create another rejected student proposal for student01
+    student_proposal_properties.update({
+    'link_id': 'another_proposal',
+    'status': 'rejected',
+    })
+    student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
 
   def testSetupStudentProposalMailing(self):
     """Test that the job of mailing student proposals has been created for all students.
@@ -295,7 +301,7 @@ class StudentProposalMailerTest(MailTestCase):
     self.assertEmailNotSent(to=self.students[0].email, html='not selected')
 
   def testSendStudentProposalMailRejected(self):
-    """Test that a confirmation email has been sent to a student whose proposal has been rejected.
+    """Test that a confirmation email has been sent to a student whose proposal has been rejected and only one rejection email is sent out even if the student has more than one rejected proposals.
     """
     # set the default fields for the jobs we are going to create
     priority_group = priority_group_logic.getGroup(priority_group_logic.EMAIL)
@@ -306,5 +312,5 @@ class StudentProposalMailerTest(MailTestCase):
           }
     job = job_logic.updateOrCreateFromFields(job_properties)
     sendStudentProposalMail(job)
-    self.assertEmailSent(to=self.students[1].email, html='not selected')
+    self.assertEmailSent(to=self.students[1].email, html='not selected', num=1)
     self.assertEmailNotSent(to=self.students[1].email, html='accepted')

@@ -57,13 +57,20 @@ def begin(self):
 
 
 def load_melange():
-  # register a core for the test modules to use
+  """
+  Registers a core, and SoC, GSoC and GHOP modules callbacks.
+  """
+  # Register a core for the test modules to use
   from soc.modules import callback
-  from soc.modules import core
-
-  callback.registerCore(core.Core())
-  callback.getCore().registerModuleCallbacks()
-
+  from soc.modules.core import Core
+  callback.registerCore(Core())
+  current_core = callback.getCore()
+  # Register SoC and GSoC modules callbacks
+  current_core.registerModuleCallbacks()
+  # Register GHOP modules callbacks
+  from soc.modules.ghop.callback import Callback
+  ghop_callback = Callback(current_core)
+  ghop_callback.registerWithSitemap()
 
 class AppEngineDatastoreClearPlugin(plugins.Plugin):
   """Nose plugin to clear the AppEngine datastore between tests.

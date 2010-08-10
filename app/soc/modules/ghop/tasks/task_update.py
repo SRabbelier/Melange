@@ -198,7 +198,8 @@ def createNotificationMail(request, *args, **kwargs):
       }
 
   for subscriber in subscribers:
-    ghop_notifications.sendTaskUpdate(entity, subject, message_properties)
+    ghop_notifications.sendTaskUpdateMail(subscriber, subject,
+                                          message_properties)
 
   if len(subscribers) == batch_size:
     # spawn task for sending out notifications to next set of subscribers

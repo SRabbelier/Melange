@@ -67,7 +67,7 @@ def sendTaskUpdateMail(subscriber, subject, message_properties=None):
 
   messageProperties = dicts.merge(message_properties, new_message_properties)
 
-  template = 'modules/ghop/task/update_notification'
+  template = 'modules/ghop/task/update_notification.html'
 
   # send out the message using the default new notification template
   mail_dispatcher.sendMailFromTemplate(template, messageProperties)

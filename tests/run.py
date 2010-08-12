@@ -43,7 +43,9 @@ log =  logging.getLogger('nose.plugins.cover')
 
 
 def begin(self):
-  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that it loads Melange after coverage starts so the loading of models, logic and views can be tracked by coverage.
+  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that
+  it loads Melange after coverage starts so the loading of models, logic and
+  views can be tracked by coverage.
   """
   log.debug("Coverage begin")
   import coverage
@@ -58,7 +60,8 @@ def begin(self):
 
 def load_melange():
   """
-  Registers a core, and SoC, GSoC and GHOP modules callbacks.
+  Registers a core, and SoC, GSoC and GHOP modules callbacks, sitemap, sidebar
+  and rights.
   """
   # Register a core for the test modules to use
   from soc.modules import callback
@@ -71,6 +74,19 @@ def load_melange():
   from soc.modules.ghop.callback import Callback
   ghop_callback = Callback(current_core)
   ghop_callback.registerWithSitemap()
+  ghop_callback.registerWithSidebar()
+  ghop_callback.registerRights()
+  from soc.modules.soc_core.callback import Callback as soc_core_Callback
+  soc_core_callback = soc_core_Callback(current_core)
+  soc_core_callback.registerWithSitemap()
+  soc_core_callback.registerWithSidebar()
+  soc_core_callback.registerRights()
+  from soc.modules.gsoc.callback import Callback as gsoc_Callback
+  gsoc_callback = gsoc_Callback(current_core)
+  gsoc_callback.registerWithSitemap()
+  gsoc_callback.registerWithSidebar()
+  gsoc_callback.registerRights()
+
 
 class AppEngineDatastoreClearPlugin(plugins.Plugin):
   """Nose plugin to clear the AppEngine datastore between tests.
@@ -120,7 +136,8 @@ def main():
     memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
   yaml_location = os.path.join(HERE, 'app')
-  apiproxy_stub_map.apiproxy.RegisterStub('taskqueue', taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
+  apiproxy_stub_map.apiproxy.RegisterStub('taskqueue',
+                 taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
   import django.test.utils
   django.test.utils.setup_test_environment()
 

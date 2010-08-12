@@ -31,10 +31,12 @@ from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
 from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
 from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
-from soc.modules.gsoc.logic.models.organization import logic as gsoc_organization_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
-from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal_logic
+from soc.modules.gsoc.logic.models.student_proposal import logic \
+    as student_proposal_logic
 
 from tests.test_utils import DjangoTestCase
 from tests.test_utils import TaskQueueTestCase
@@ -236,10 +238,12 @@ class SlotAssignmentTest(DjangoTestCase, TaskQueueTestCase):
     'scope': another_student,
     'score': 100,
     })
-    self.another_proposal = student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
+    self.another_proposal = student_proposal_logic.updateOrCreateFromFields(
+        student_proposal_properties)
 
   def testAssignProgramSlotsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to assign slots for organizations within a program is forbidden.
+    """Tests that without correct XSRF token, the attempt to assign slots
+    for organizations within a program is forbidden.
     """
     url = '/gsoc/tasks/assignslots/program'
     postdata = {'programkey': self.program.key().name()}
@@ -247,7 +251,9 @@ class SlotAssignmentTest(DjangoTestCase, TaskQueueTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testAssignProgramSlotsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, slots for organizations within a program can be assigned: a task of setting the slots attribute for each organization entity is spawned.
+    """Tests that through HTTP POST with correct XSRF token, slots for
+    organizations within a program can be assigned: a task of setting
+    the slots attribute for each organization entity is spawned.
     """
     url = '/gsoc/tasks/assignslots/program'
     postdata = {'programkey': self.program.key().name()}
@@ -259,7 +265,8 @@ class SlotAssignmentTest(DjangoTestCase, TaskQueueTestCase):
     self.assertTasksInQueue(n=1, url=task_url)
 
   def testAssignSlotsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to set the slots attribute for each organization entity is forbidden.
+    """Tests that without correct XSRF token, the attempt to set the slots
+    attribute for each organization entity is forbidden.
     """
     url = '/gsoc/tasks/assignslots/assign'
     postdata = {'programkey': self.program.key().name()}
@@ -267,7 +274,8 @@ class SlotAssignmentTest(DjangoTestCase, TaskQueueTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testAssignSlotsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, the slots attribute for each organization entity can be set.
+    """Tests that through HTTP POST with correct XSRF token, the slots attribute
+    for each organization entity can be set.
     """
     self.assertEqual(self.organization.slots, 0)
     self.assertEqual(self.organization.nr_applications, 0)

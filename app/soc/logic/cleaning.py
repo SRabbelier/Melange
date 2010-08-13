@@ -28,6 +28,7 @@ __authors__ = [
 
 
 from htmlsanitizer import HtmlSanitizer
+from htmlsanitizer import safe_html
 
 from google.appengine.api import users
 
@@ -401,7 +402,7 @@ def clean_html_content(field_name):
       cleaner = HtmlSanitizer.Cleaner()
       cleaner.string = content
       cleaner.clean()
-    except HTMLParseError, msg:
+    except (HTMLParseError, safe_html.IllegalHTML), msg:
       raise forms.ValidationError(msg)
 
     content = cleaner.string

@@ -299,7 +299,7 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     url = '/tasks/accept_proposals/accept'
     next_path = "/tasks/accept_proposals/reject"
     postdata = {'orgkey': self.organization.key().name(),
-        "timelimit": 1000,
+        "timelimit": 20000,
         "nextpath": next_path}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
@@ -315,7 +315,7 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     url = '/tasks/accept_proposals/accept'
     next_path = "/tasks/accept_proposals/reject"
     postdata = {'orgkey': self.organization.key().name(),
-        "timelimit": 1000,
+        "timelimit": 20000,
         "nextpath": next_path}
     xsrf_token = self.getXsrfToken(url, data=postdata)
     postdata.update(xsrf_token=xsrf_token)
@@ -333,7 +333,7 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     for an organization is forbidden.
     """
     url = '/tasks/accept_proposals/reject'
-    postdata = {'orgkey': self.organization.key().name(), "timelimit": 1000}
+    postdata = {'orgkey': self.organization.key().name(), "timelimit": 20000}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
@@ -345,7 +345,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(self.proposal.status, 'pending')
     self.assertEqual(self.another_proposal.status, 'pending')
     url = '/tasks/accept_proposals/reject'
-    postdata = {'orgkey': self.organization.key().name(), "timelimit": 1000}
+    # timelimit should be long enough; otherwise not all tasks can be completed.
+    postdata = {'orgkey': self.organization.key().name(),
+        "timelimit": 20000}
     xsrf_token = self.getXsrfToken(url, data=postdata)
     postdata.update(xsrf_token=xsrf_token)
     response = self.client.post(url, postdata)
@@ -354,3 +356,24 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEmailSent(to=self.student.email, html='not selected')
     self.assertEqual(db.get(self.another_proposal.key()).status, 'rejected')
     self.assertEmailSent(to=self.another_student.email, html='not selected')
+
+  def testRejectProposalsShortTimelimitThroughPostWithCorrectXsrfToken(self):
+    """Tests that through HTTP POST with correct XSRF token, if timelimit is
+    too short, not all tasks can be completed; in the extreme case, when
+    timelimit is 0, the status will not be changed and a confirmation email
+    will not be sent; however, a clone task will be spawned.
+    """
+    self.assertEqual(self.proposal.status, 'pending')
+    self.assertEqual(self.another_proposal.status, 'pending')
+    url = '/tasks/accept_proposals/reject'
+    postdata = {'orgkey': self.organization.key().name(), "timelimit": 0}
+    xsrf_token = self.getXsrfToken(url, data=postdata)
+    postdata.update(xsrf_token=xsrf_token)
+    response = self.client.post(url, postdata)
+    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(db.get(self.proposal.key()).status, 'pending')
+    self.assertEmailNotSent(to=self.student.email, html='not selected')
+    self.assertEqual(db.get(self.another_proposal.key()).status, 'pending')
+    self.assertEmailNotSent(to=self.another_student.email, html='not selected')
+    task_url = url
+    self.assertTasksInQueue(n=1, url=task_url)

@@ -25,7 +25,16 @@ limitations under the License.
     $('#id_work_submission').show("normal");
     $('td.formfielderror').show("normal");    
   };
-	  
+
+  var confirmation = function() {
+    if ($('#id_action').val() == "reopened") {
+      var answer = confirm("Are you sure you want to reopen this task?");
+      if (!answer){
+        return false;
+      }
+    }
+  };
+
   $(document).ready(function(){
 	  if (!$('#id_work_submission').val()) {
 		  $('[for^=id_work_submission]').hide();
@@ -104,6 +113,7 @@ limitations under the License.
      }
     );
   });
+
 </script>
 {% endblock %}
 
@@ -175,7 +185,8 @@ Title: {{ entity.title }}
   <tr>
    <td>
     <input style="font-weight: bold; float: right" type="submit"
-    name="submit" value="Save Changes"/></span>
+        name="submit" onclick="return confirmation();"
+        value="Save Changes"/></span>
    </td>
   </tr>
  </table>

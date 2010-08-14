@@ -27,7 +27,8 @@ from google.appengine.api import users
 from soc.logic.models.user import logic as user_logic
 from soc.logic.models.job import logic as job_logic
 from soc.logic.models.priority_group import logic as priority_group_logic
-from soc.cron.unique_user_id_adder import setupUniqueUserIdAdder, addUniqueUserIds, DEF_USER_STEP_SIZE
+from soc.cron.unique_user_id_adder import setupUniqueUserIdAdder, \
+    addUniqueUserIds, DEF_USER_STEP_SIZE
 
 
 class UniqueUserIdAdderTest(unittest.TestCase):
@@ -37,7 +38,8 @@ class UniqueUserIdAdderTest(unittest.TestCase):
     """Set up required for the tests.
     """
     # Create DEF_USER_STEP_SIZE+1 users
-    #The string order of users' link_id is the same with that of users in the array in order to make sure the last user is handled last
+    #The string order of users' link_id is the same with that of users in the
+    #array in order to make sure the last user is handled last
     size = DEF_USER_STEP_SIZE
     num_digits = 0
     while True:
@@ -60,12 +62,14 @@ class UniqueUserIdAdderTest(unittest.TestCase):
     self.user_entities = user_entities
 
   def testSetupUniqueUserIdAdder(self):
-    """Test that the job of add unique user ids to users has been created for all users.
+    """Test that the job of add unique user ids to users has been created for
+    all users.
     """
     priority_group_properties = {
         'link_id': 'a_priority_group',
         }
-    priority_group = priority_group_logic.updateOrCreateFromFields(priority_group_properties)
+    priority_group = priority_group_logic.updateOrCreateFromFields(
+                                                     priority_group_properties)
     job_properties = {
         'priority_group': priority_group,
         'task_name': 'addUniqueUserIds',

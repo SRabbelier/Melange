@@ -38,13 +38,16 @@ from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.organization import logic as gsoc_organization_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.logic.models.student import logic as student_logic
 from soc.logic.models.job import logic as job_logic
 from soc.logic.models.priority_group import logic as priority_group_logic
-from soc.cron.student_proposal_mailer import setupStudentProposalMailing, sendStudentProposalMail, DEF_STUDENT_STEP_SIZE
-from soc.modules.gsoc.logic.models.student_proposal import logic as student_proposal_logic
+from soc.cron.student_proposal_mailer import setupStudentProposalMailing, \
+    sendStudentProposalMail, DEF_STUDENT_STEP_SIZE
+from soc.modules.gsoc.logic.models.student_proposal import logic \
+    as student_proposal_logic
 
 from tests.test_utils import MailTestCase
 
@@ -65,7 +68,8 @@ class StudentProposalMailerTest(MailTestCase):
         'is_developer': True,
         }
     key_name = user_logic.getKeyNameFromFields(properties)
-    self.current_user = user_logic.updateOrCreateFromKeyName(properties, key_name)
+    self.current_user = user_logic.updateOrCreateFromKeyName(properties,
+                                                                    key_name)
     # Create another user
     email = "another_user@example.com"
     account = users.User(email=email)
@@ -77,7 +81,8 @@ class StudentProposalMailerTest(MailTestCase):
         'name': name,
         }
     key_name = user_logic.getKeyNameFromFields(properties)
-    self.another_entity = user_logic.updateOrCreateFromKeyName(properties, key_name)
+    self.another_entity = user_logic.updateOrCreateFromKeyName(properties,
+                                                                    key_name)
     # Create a user for the founder of sponsor
     email = "a_sponsor_user@example.com"
     account = users.User(email=email)
@@ -165,7 +170,8 @@ class StudentProposalMailerTest(MailTestCase):
         'email': email,
         'status': 'active',
       }
-    organization = gsoc_organization_logic.updateOrCreateFromFields(organization_properties)
+    organization = gsoc_organization_logic.updateOrCreateFromFields(
+                                                      organization_properties)
     # Create a mentor for an_org and a_program
     mentor_properties = sponsor_properties.copy()
     mentor_properties.update({
@@ -216,7 +222,8 @@ class StudentProposalMailerTest(MailTestCase):
         'can_we_contact_you': True,
         'program_knowledge': 'I heard about this program through a friend.'
         }
-    #The string order of students' link_id is the same with that of students in the array in order to make sure the last student is handled last
+    #The string order of students' link_id is the same with that of students
+    #in the array in order to make sure the last student is handled last
     size = DEF_STUDENT_STEP_SIZE
     num_digits = 0
     while True:
@@ -231,7 +238,8 @@ class StudentProposalMailerTest(MailTestCase):
           'link_id': link_id,
           'email': link_id + '@email.com',
           })
-      students.append(student_logic.updateOrCreateFromFields(student_properties))
+      students.append(student_logic.updateOrCreateFromFields(
+                                                           student_properties))
     self.students = students
     # Create an accepted student proposal for student0
     student_proposal_properties = {
@@ -270,12 +278,14 @@ class StudentProposalMailerTest(MailTestCase):
     student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
 
   def testSetupStudentProposalMailing(self):
-    """Test that the job of mailing student proposals has been created for all students.
+    """Test that the job of mailing student proposals has been created for all
+    students.
     """
     priority_group_properties = {
         'link_id': 'a_priority_group',
         }
-    priority_group = priority_group_logic.updateOrCreateFromFields(priority_group_properties)
+    priority_group = priority_group_logic.updateOrCreateFromFields(
+                                                      priority_group_properties)
     job_properties = {
         'priority_group': priority_group,
         'task_name': 'student_proposal_mailer',
@@ -286,7 +296,9 @@ class StudentProposalMailerTest(MailTestCase):
     self.assertEqual(job.key_data[1], self.students[-1].key())
 
   def testSendStudentProposalMailAccepted(self):
-    """Test that a confirmation email has been sent to a student whose proposal has been accepted and a confirmation email of rejection of his/her other proposals will not been sent out.
+    """Test that a confirmation email has been sent to a student whose proposal
+    has been accepted and a confirmation email of rejection of his/her other
+    proposals will not been sent out.
     """
     # set the default fields for the jobs we are going to create
     priority_group = priority_group_logic.getGroup(priority_group_logic.EMAIL)
@@ -301,7 +313,9 @@ class StudentProposalMailerTest(MailTestCase):
     self.assertEmailNotSent(to=self.students[0].email, html='not selected')
 
   def testSendStudentProposalMailRejected(self):
-    """Test that a confirmation email has been sent to a student whose proposal has been rejected and only one rejection email is sent out even if the student has more than one rejected proposals.
+    """Test that a confirmation email has been sent to a student whose proposal
+    has been rejected and only one rejection email is sent out even if the
+    student has more than one rejected proposals.
     """
     # set the default fields for the jobs we are going to create
     priority_group = priority_group_logic.getGroup(priority_group_logic.EMAIL)

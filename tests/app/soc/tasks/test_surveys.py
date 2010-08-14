@@ -31,12 +31,16 @@ from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.organization import logic as gsoc_organization_logic
-from soc.modules.gsoc.logic.models.org_admin import logic as gsoc_org_admin_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
+from soc.modules.gsoc.logic.models.org_admin import logic \
+    as gsoc_org_admin_logic
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
-from soc.modules.gsoc.logic.models.student_project import logic as student_project_logic
-from soc.modules.gsoc.logic.models.survey import project_logic as project_survey_logic, grading_logic as grading_survey_logic
+from soc.modules.gsoc.logic.models.student_project import logic \
+    as student_project_logic
+from soc.modules.gsoc.logic.models.survey import project_logic \
+    as project_survey_logic, grading_logic as grading_survey_logic
 
 from tests.test_utils import DjangoTestCase
 from tests.test_utils import TaskQueueTestCase, MailTestCase
@@ -138,7 +142,8 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'email': email,
         'status': 'active',
       }
-    organization = gsoc_organization_logic.updateOrCreateFromFields(organization_properties)
+    organization = gsoc_organization_logic.updateOrCreateFromFields(
+                                                        organization_properties)
     # Create a user for all roles except sponsor
     email = "a_role_user@example.com"
     account = users.User(email=email)
@@ -213,7 +218,8 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'mentor': mentor,
         'program': program,
          }
-    #The string order of students' link_id is the same with that of students in the array in order to make sure the last student is handled last
+    #The string order of students' link_id is the same with that of students
+    #in the array in order to make sure the last student is handled last
     size = 10
     self.num_projects = size + 1
     num_digits = 0
@@ -236,7 +242,8 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
           'link_id': project_link_id,
           'student': student,
           })
-      project = student_project_logic.updateOrCreateFromFields(project_properties)
+      project = student_project_logic.updateOrCreateFromFields(
+                                                            project_properties)
       projects.append(project)
     self.students = students
     self.projects = projects
@@ -273,7 +280,8 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'deadline': datetime.datetime.now() + datetime.timedelta(10),
         'taking_access': 'student',
         }
-    project_survey = project_survey_logic.updateOrCreateFromFields(survey_properties)
+    project_survey = project_survey_logic.updateOrCreateFromFields(
+                                                            survey_properties)
     self.project_survey = project_survey
     # Create a grading survey for a_program
     link_id = 'a_grading_survey'
@@ -283,22 +291,31 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'short_name': 'AGS',
         'taking_access': 'mentor',
         })
-    grading_survey = grading_survey_logic.updateOrCreateFromFields(survey_properties)
+    grading_survey = grading_survey_logic.updateOrCreateFromFields(
+                                                            survey_properties)
     self.grading_survey = grading_survey
 
   def testSpawnSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(self):
-    """Test that the attempt to spawn reminders for project survey without a correct XSRF token is forbidden.
+    """Test that the attempt to spawn reminders for project survey without
+    a correct XSRF token is forbidden.
     """
     url = 'tasks/surveys/projects/send_reminder/spawn'
-    postdata = {'program_key': self.program.key().name(), 'project_key': self.projects[0].key().name(), 'survey_key': self.project_survey.key().name(), 'survey_type': 'project'}
+    postdata = {'program_key': self.program.key().name(),
+                'project_key': self.projects[0].key().name(),
+                'survey_key': self.project_survey.key().name(),
+                'survey_type': 'project'}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testSpawnSurveyReminderForProjectThroughPostWithCorrectXsrfToken(self):
-    """Test that survey reminders are spawned for all projects with a correct XSRF token.
+    """Test that survey reminders are spawned for all projects
+    with a correct XSRF token.
     """
     url = '/tasks/surveys/projects/send_reminder/spawn'
-    postdata = {'program_key': self.program.key().name(), 'project_key': self.projects[0].key().name(), 'survey_key': self.project_survey.key().name(), 'survey_type': 'project'}
+    postdata = {'program_key': self.program.key().name(),
+                'project_key': self.projects[0].key().name(),
+                'survey_key': self.project_survey.key().name(),
+                'survey_type': 'project'}
     xsrf_token = self.getXsrfToken(url, data=postdata)
     postdata.update(xsrf_token=xsrf_token)
     response = self.client.post(url, postdata)
@@ -306,48 +323,65 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     task_url = '/tasks/surveys/projects/send_reminder/send'
     queue_names = ['mail']
     # The first project is not spawned
-    self.assertTasksInQueue(n=self.num_projects-1, url=task_url, queue_names=queue_names)
+    self.assertTasksInQueue(n=self.num_projects-1, url=task_url,
+                            queue_names=queue_names)
 
-  def testSendProjectSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(self):
-    """Test that without correct XSRF token, the attempt to send project survey reminders is forbidden.
+  def testSendProjectSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(
+                                                                          self):
+    """Test that without correct XSRF token, the attempt to send project survey
+    reminders is forbidden.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
     url = '/tasks/surveys/projects/send_reminder/send'
-    postdata = {'project_key': self.projects[0].key().name(), 'survey_key': self.project_survey.key().name(), 'survey_type': 'project'}
+    postdata = {'project_key': self.projects[0].key().name(),
+                'survey_key': self.project_survey.key().name(),
+                'survey_type': 'project'}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
-  def testSendProjectSurveyReminderForProjectThroughPostWithCorrectXsrfToken(self):
-    """Test that with correct XSRF token, project survey reminders for a project are sent to its student.
+  def testSendProjectSurveyReminderForProjectThroughPostWithCorrectXsrfToken(
+                                                                        self):
+    """Test that with correct XSRF token, project survey reminders for a project
+    are sent to its student.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
     url = '/tasks/surveys/projects/send_reminder/send'
-    postdata = {'project_key': self.projects[0].key().name(), 'survey_key': self.project_survey.key().name(), 'survey_type': 'project'}
+    postdata = {'project_key': self.projects[0].key().name(),
+                'survey_key': self.project_survey.key().name(),
+                'survey_type': 'project'}
     xsrf_token = self.getXsrfToken(url, data=postdata)
     postdata.update(xsrf_token=xsrf_token)
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.OK)
     self.assertEmailSent(to=self.students[0].email, html='survey')
 
-  def testSendGradingSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(self):
-    """Test that without correct XSRF token, the attempt to send grading survey reminders is forbidden.
+  def testSendGradingSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(
+                                                                          self):
+    """Test that without correct XSRF token, the attempt to send grading survey
+    reminders is forbidden.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
     url = '/tasks/surveys/projects/send_reminder/send'
-    postdata = {'project_key': self.projects[0].key().name(), 'survey_key': self.grading_survey.key().name(), 'survey_type': 'grading'}
+    postdata = {'project_key': self.projects[0].key().name(),
+                'survey_key': self.grading_survey.key().name(),
+                'survey_type': 'grading'}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
-  def testSendGradingSurveyReminderForProjectThroughPostWithCorrectXsrfToken(self):
-    """Test that with correct XSRF token, grading survey reminders for a project are sent to its mentor.
+  def testSendGradingSurveyReminderForProjectThroughPostWithCorrectXsrfToken(
+                                                                          self):
+    """Test that with correct XSRF token, grading survey reminders for a project
+    are sent to its mentor.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
     url = '/tasks/surveys/projects/send_reminder/send'
-    postdata = {'project_key': self.projects[0].key().name(), 'survey_key': self.grading_survey.key().name(), 'survey_type': 'grading'}
+    postdata = {'project_key': self.projects[0].key().name(),
+                'survey_key': self.grading_survey.key().name(),
+                'survey_type': 'grading'}
     xsrf_token = self.getXsrfToken(url, data=postdata)
     postdata.update(xsrf_token=xsrf_token)
     response = self.client.post(url, postdata)

@@ -62,11 +62,13 @@ class UserTestUnregistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/edit_profile.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
     self.assertContains(response, 'Create a New User Profile')
 
   def testEditUserProfile(self):
-    """Test that an unregistered user cannot edit his/her non existed user profile.
+    """Test that an unregistered user cannot edit his/her non existed
+    user profile.
     """
     url = '/user/edit_profile'
     response = self.client.get(url)
@@ -195,7 +197,8 @@ class UserTestUnregistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testShowUserNonExisted(self):
     """Test that an unregistered user cannot view a non existed user.
@@ -233,7 +236,8 @@ class UserTestRegistered(DjangoTestCase):
         'name': name,
         }
     key_name = user_logic.getKeyNameFromFields(properties)
-    self.another_entity = user_logic.updateOrCreateFromKeyName(properties, key_name)
+    self.another_entity = user_logic.updateOrCreateFromKeyName(properties,
+                                                               key_name)
 
   def testCreateUserProfile(self):
     """Test that a registered user cannot create a user profile.
@@ -254,7 +258,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/edit_profile.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testListUserRoles(self):
     """Test that a registered user can list his/her roles.
@@ -265,7 +270,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testListUserRequests(self):
     """Test that a registered user can list his/her requests.
@@ -276,7 +282,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testCreateUser(self):
     """Test that a registered user cannot create a user.
@@ -387,7 +394,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testShowUserAnotherExisted(self):
     """Test that a registered user can view another existed user.
@@ -398,7 +406,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testShowUserNonExisted(self):
     """Test that a registered user cannot view a non existed user.
@@ -437,10 +446,12 @@ class UserTestAdmin(DjangoTestCase):
         'name': name,
         }
     key_name = user_logic.getKeyNameFromFields(properties)
-    self.another_entity = user_logic.updateOrCreateFromKeyName(properties, key_name)
+    self.another_entity = user_logic.updateOrCreateFromKeyName(properties,
+                                                               key_name)
 
   def testCreateUserProfile(self):
-    """Test that a registered user with developer/admin privilege cannot create another user profile.
+    """Test that a registered user with developer/admin privilege cannot
+    create another user profile.
     """
     url = '/user/create_profile'
     response = self.client.get(url)
@@ -450,7 +461,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testEditUserProfile(self):
-    """Test that a registered user with developer/admin privilege can edit his/her user profile.
+    """Test that a registered user with developer/admin privilege can
+    edit his/her user profile.
     """
     url = '/user/edit_profile'
     response = self.client.get(url)
@@ -458,10 +470,12 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/edit_profile.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testListUserRoles(self):
-    """Test that a registered user with developer/admin privilege can list his/her roles.
+    """Test that a registered user with developer/admin privilege can
+    list his/her roles.
     """
     url = '/user/roles'
     response = self.client.get(url)
@@ -469,10 +483,12 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testListUserRequests(self):
-    """Test that a registered user with developer/admin privilege can list his/her requests.
+    """Test that a registered user with developer/admin privilege can
+    list his/her requests.
     """
     url = '/user/requests'
     response = self.client.get(url)
@@ -480,10 +496,12 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testCreateUser(self):
-    """Test that a registered user with developer/admin privilege can create a user.
+    """Test that a registered user with developer/admin privilege can
+    create a user.
     """
     url = '/user/create'
     response = self.client.get(url)
@@ -491,7 +509,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testCreateUserWithScopePath(self):
-    """Test that a registered user with developer/admin privilege can create a user with a scope_path.
+    """Test that a registered user with developer/admin privilege can
+    create a user with a scope_path.
     """
     url = '/user/create/'
     response = self.client.get(url)
@@ -499,7 +518,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testCreateUserWithLinkId(self):
-    """Test that a registered user with developer/admin privilege can create a user with a link_id.
+    """Test that a registered user with developer/admin privilege can
+    create a user with a link_id.
     """
     url = '/user/create/abc'
     response = self.client.get(url)
@@ -507,7 +527,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testEditUser(self):
-    """Test that a registered user with developer/admin privilege can edit a user.
+    """Test that a registered user with developer/admin privilege can
+    edit a user.
     """
     url = '/user/edit/current_user'
     response = self.client.get(url)
@@ -515,21 +536,24 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/edit.html')
 
   def testDeleteAnotherUser(self):
-    """Test that a registered user with developer/admin privilege cannot delete another user through HTTP GET.
+    """Test that a registered user with developer/admin privilege cannot
+    delete another user through HTTP GET.
     """
     url = '/user/delete/another_user'
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPost(self):
-    """Test that a registered user with developer/admin privilege cannot delete another user through HTTP POST without correct XSRF token.
+    """Test that a registered user with developer/admin privilege cannot
+    delete another user through HTTP POST without correct XSRF token.
     """
     url = '/user/delete/another_user'
     response = self.client.post(url)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPostWithIncorrectXsrfToken(self):
-    """Test that a registered user with developer/admin privilege cannot delete another user through HTTP POST with incorrect XSRF token.
+    """Test that a registered user with developer/admin privilege cannot
+    delete another user through HTTP POST with incorrect XSRF token.
     """
     url = '/user/delete/another_user'
     postdata = {'xsrf_token': 'incorrect_xsrf'}
@@ -537,7 +561,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPostWithCorrectXsrfToken(self):
-    """Test that a registered user with developer/admin privilege can delete another user through HTTP POST with correct XSRF token.
+    """Test that a registered user with developer/admin privilege can
+    delete another user through HTTP POST with correct XSRF token.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
@@ -570,7 +595,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(data.get("new_location", None), "/user/list")
 
   def testDeleteUserSelf(self):
-    """Test that a registered user with developer/admin privilege can delete him/herself.
+    """Test that a registered user with developer/admin privilege can
+    delete him/herself.
     """
     url = '/user/delete/current_user'
     # request is currently not used in _getSecretKey
@@ -589,10 +615,12 @@ class UserTestAdmin(DjangoTestCase):
     except AssertionError:
       pass
     else:
-      raise "A registered user with developer/admin privilege failed to delete him/herself"
+      raise "A registered user with developer/admin privilege failed" \
+          + "to delete him/herself"
 
   def testDeleteUserNonExisted(self):
-    """Test that a registered user with developer/admin privilege cannot delete a non existed user.
+    """Test that a registered user with developer/admin privilege cannot
+    delete a non existed user.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
@@ -613,7 +641,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(count_before, count_after)
 
   def testAdminUser(self):
-    """Test that a registered user with developer/admin privilege cannot admin a user.
+    """Test that a registered user with developer/admin privilege cannot
+    admin a user.
     """
     url = '/user/admin/another_user'
     response = self.client.get(url)
@@ -624,7 +653,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testListUser(self):
-    """Test that a registered user with developer/admin privilege can list users.
+    """Test that a registered user with developer/admin privilege
+    can list users.
     """
     url = '/user/list'
     response = self.client.get(url)
@@ -632,7 +662,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
 
   def testpickUser(self):
-    """Test that a registered user with developer/admin privilege can pick users.
+    """Test that a registered user with developer/admin privilege
+    can pick users.
     """
     url = '/user/pick'
     response = self.client.get(url)
@@ -642,7 +673,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue(self.entity.link_id in response.context['json'])
 
   def testListDevelopers(self):
-    """Test that a registered user with developer/admin privilege can list developers.
+    """Test that a registered user with developer/admin privilege
+    can list developers.
     """
     url = '/user/list_developers'
     response = self.client.get(url)
@@ -650,7 +682,8 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
 
   def testShowUserExisted(self):
-    """Test that a registered user with developer/admin privilege can view an existed user.
+    """Test that a registered user with developer/admin privilege
+    can view an existed user.
     """
     url = '/user/show/current_user'
     response = self.client.get(url)
@@ -658,10 +691,12 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testShowUserAnotherExisted(self):
-    """Test that a registered user with developer/admin privilege can view another existed user.
+    """Test that a registered user with developer/admin privilege
+    can view another existed user.
     """
     url = '/user/show/another_user'
     response = self.client.get(url)
@@ -669,10 +704,12 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testShowUserNonExisted(self):
-    """Test that a registered user with developer/admin privilege cannot view a non existed user.
+    """Test that a registered user with developer/admin privilege
+    cannot view a non existed user.
     """
     url = '/user/show/not_a_user'
     response = self.client.get(url)

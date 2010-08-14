@@ -152,7 +152,8 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
       })
     another_organization =  gsoc_organization_logic.updateOrCreateFromFields(
                                                         organization_properties)
-    # Create an organization to serve as cursor sub for a_program, which should come as the first result of query
+    # Create an organization to serve as cursor sub for a_program, which should
+    # come as the first result of query
     organization_properties.update({
       'link_id': 'aa_org',
       })
@@ -284,7 +285,8 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     orgs = q.fetch(1)
     org_cursor = q.cursor()
     url = '/tasks/gsoc/proposal_duplicates/calculate'
-    postdata = {'program_key': self.program.key().name(), 'org_cursor': unicode(org_cursor)}
+    postdata = {'program_key': self.program.key().name(),
+                'org_cursor': unicode(org_cursor)}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 

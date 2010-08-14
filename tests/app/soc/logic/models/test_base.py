@@ -16,6 +16,7 @@
 
 
 __authors__ = [
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -149,7 +150,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsWithLimit(self):
-    """Test that only the number of entries specified by the limit parameter are retrieved.
+    """Test that only the number of entries specified by the limit parameter
+    are retrieved.
     """
 
     n = len(self.entities)
@@ -167,7 +169,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsWithLimitMoreThanActual(self):
-    """Test that the limit parameter does not affect the result if the limit is more than the length of the result.
+    """Test that the limit parameter does not affect the result if the limit
+    is more than the length of the result.
     """
 
     n = len(self.entities)
@@ -193,7 +196,8 @@ class BaseTest(unittest.TestCase):
     order = ['value']
     expected = range(3)
     limit = 3
-    actual = actual = [i.value for i in self.logic.getForFields(order=order, limit=limit)]
+    actual = actual = [i.value for i in self.logic.getForFields(order=order,
+                                                               limit=limit)]
     self.assertEqual(expected, actual)
 
   def testGetForFieldsFilteredSortedWithLimit(self):
@@ -204,7 +208,8 @@ class BaseTest(unittest.TestCase):
     order = ['-value']
     expected = [4, 3, 2]
     limit = 3
-    actual = actual = [i.value for i in self.logic.getForFields(fields, order=order, limit=limit)]
+    actual = actual = [i.value for i in self.logic.getForFields(fields,
+                                                      order=order, limit=limit)]
     self.assertEqual(expected, actual)
 
   def testGetForFieldsOffset(self):
@@ -218,7 +223,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsOffsetEqualToActual(self):
-    """Test that an empty list is returned if the offset is equal to the number of retrieved entries.
+    """Test that an empty list is returned if the offset is equal to the number
+    of retrieved entries.
     """
 
     offset = len(self.entities)
@@ -227,7 +233,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetForFieldsOffsetMoreThanActual(self):
-    """Test that an empty list is returned if the offset is more than the number of retrieved entries.
+    """Test that an empty list is returned if the offset is more than the number
+    of retrieved entries.
     """
 
     offset = len(self.entities) + 5
@@ -252,11 +259,13 @@ class BaseTest(unittest.TestCase):
     order = ['value']
     offset = 2
     expected = range(2, 5)
-    actual = [i.value for i in (self.logic.getForFields(order=order, offset=offset))]
+    actual = [i.value for i in (self.logic.getForFields(order=order,
+                                                        offset=offset))]
     self.assertEqual(expected, actual)
 
   def testGetForFieldsOffsetWithLimit(self):
-    """Test that only the number of the offset entities specified by the limit parameter are retrieved.
+    """Test that only the number of the offset entities specified by the limit
+    parameter are retrieved.
     """
 
     offset = 2
@@ -272,32 +281,38 @@ class BaseTest(unittest.TestCase):
     order = ['-value']
     offset = 2
     expected = [2, 1]
-    actual = [i.value for i in (self.logic.getForFields(filter=fields, order=order, offset=offset))]
+    actual = [i.value for i in (self.logic.getForFields(filter=fields,
+      order=order, offset=offset))]
     self.assertEqual(expected, actual)
 
   def testGetForFieldsFilteredOffsetWithLimit(self):
-    """Test that only the limited number of the filtered and offset entries are retrieved.
+    """Test that only the limited number of the filtered and offset entries
+    are retrieved.
     """
 
     fields = {'value >': 0}
     offset = 1
     expected = limit = 2
-    actual = len(self.logic.getForFields(filter=fields, limit=limit, offset=offset))
+    actual = len(self.logic.getForFields(filter=fields, limit=limit,
+                                                              offset=offset))
     self.assertEqual(expected, actual)
 
   def testGetForFieldsOrderedOffsetWithLimit(self):
-    """Test that only the limited number of the ordered and offset entries are retrieved.
+    """Test that only the limited number of the ordered and offset entries are
+    retrieved.
     """
 
     limit = 2
     offset = 2
     order = ['-value']
     expected = [2, 1]
-    actual = [i.value for i in (self.logic.getForFields(order=order, limit=limit, offset=offset))]
+    actual = [i.value for i in (self.logic.getForFields(order=order,
+                                                limit=limit, offset=offset))]
     self.assertEqual(expected, actual)
 
   def testGetForFieldsFilteredOrderedOffsetWithLimit(self):
-    """Test that only with the limited number of the filtered, ordered and offset entries are retrieved.
+    """Test that only with the limited number of the filtered, ordered and
+    offset entries are retrieved.
     """
 
     fields = {'value >': 0}
@@ -305,7 +320,8 @@ class BaseTest(unittest.TestCase):
     limit = 1
     offset = 2
     expected = [2]
-    actual = [i.value for i in (self.logic.getForFields(filter=fields, order=order, limit=limit, offset=offset))]
+    actual = [i.value for i in (self.logic.getForFields(filter=fields,
+                                     order=order, limit=limit, offset=offset))]
     self.assertEqual(expected, actual)
 
   def testGetFromKeyName(self):
@@ -332,7 +348,8 @@ class BaseTest(unittest.TestCase):
 
     from soc.views import out_of_band
     key_name = "test/%d" % len(self.entities)
-    self.assertRaises(out_of_band.Error, self.logic.getFromKeyNameOr404, key_name=key_name)
+    self.assertRaises(out_of_band.Error, self.logic.getFromKeyNameOr404,
+                                                          key_name=key_name)
 
   def testGetFromKeyFields(self):
     """Test that the correct entry is returned.
@@ -359,7 +376,8 @@ class BaseTest(unittest.TestCase):
     from soc.logic.models.base import InvalidArgumentError
     expected = 3
     fields = {'invalid_scope_path': 'test', 'invalid_link_id': str(expected)}
-    self.assertRaises(InvalidArgumentError, self.logic.getFromKeyFields, fields=fields)
+    self.assertRaises(InvalidArgumentError, self.logic.getFromKeyFields,
+                                                                fields=fields)
 
   def testGetFromKeyFieldsOr404NonMatching(self):
     """Test that an error is raised when there is no match.
@@ -367,7 +385,8 @@ class BaseTest(unittest.TestCase):
 
     from soc.views import out_of_band
     fields = {'scope_path': 'test', 'link_id': str(len(self.entities))}
-    self.assertRaises(out_of_band.Error, self.logic.getFromKeyFieldsOr404, fields=fields)
+    self.assertRaises(out_of_band.Error, self.logic.getFromKeyFieldsOr404,
+                                                                fields=fields)
 
   def testUpdateOrCreateFromFieldsUpdate(self):
     """Test that the entry can be updated.
@@ -417,7 +436,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetAll(self):
-    """Test that all entries are retrieved. Note: an error will be raised if there are more than 1k entries in the current implementation.
+    """Test that all entries are retrieved. Note: an error will be raised if
+    there are more than 1k entries in the current implementation.
     """
 
     query = TestModel.all()
@@ -436,7 +456,8 @@ class BaseTest(unittest.TestCase):
     self.assertEqual(expected, actual)
 
   def testGetAllNoEntities(self):
-    """Test that it returns an empty list when there is no entity in the datastore.
+    """Test that it returns an empty list when there is no entity in the
+    datastore.
     """
 
     for entity in self.entities:

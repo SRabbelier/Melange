@@ -17,6 +17,7 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 import sys

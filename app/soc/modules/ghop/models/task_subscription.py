@@ -41,4 +41,3 @@ class GHOPTaskSubscription(soc.models.base.ModelWithFieldAttributes):
 
   # Property holding the list of users who are subscribed to the task.
   subscribers = db.ListProperty(item_type=db.Key, default=[])
-

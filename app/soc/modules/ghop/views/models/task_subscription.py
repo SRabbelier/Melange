@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.ext import db
-
 from django import http
 
 from soc.logic import dicts
@@ -32,8 +30,6 @@ from soc.views.helper import decorators
 from soc.views.models import base
 
 from soc.modules.ghop.logic.models import task as ghop_task_logic
-from soc.modules.ghop.logic.models import task_subscription as \
-    ghop_task_subscription_logic
 from soc.modules.ghop.views.helper import access as ghop_access
 
 import soc.modules.ghop.logic.models.task_subscription
@@ -88,47 +84,22 @@ class View(base.View):
       request: the standard Django HTTP request object
     """
 
+    data = None
     get_params = request.GET
 
     task_entity = ghop_task_logic.logic.getFromKeyNameOr404(
         get_params['key_name'])
+    user_entity = user_logic.logic.getForCurrentAccount()
 
-    user_account = user_logic.logic.getForCurrentAccount()
-
-    entity = params['logic'].getOrCreateTaskSubscriptionForTask(task_entity)
-
-    subscribers = db.get(entity.subscribers)
-
-    # TODO: this should not loop over all subscribers but use GET argument
-    remove = False
-
-    for subscriber in subscribers:
-      # pylint: disable-msg=E1103
-      if subscriber.key() == user_account.key():
-        remove = True
-        break
-
-    if remove:
-      subscribers.remove(subscriber)
-      data = 'remove'
-    else:
-      subscribers.append(user_account)
-      data = 'add'
-
-    # TODO: missing description for this argument, is it even necessary?
+    # this method gets called everytime the task public page gets loaded
+    # caused by jQuery. So this conditional is necessary to make sure
+    # toggling won't happen every time task public page is loaded but
+    # only when subscription star is clicked
     if not get_params.get('no_toggle'):
-      sub_keys = []
-      for subscriber in subscribers:
-        sub_keys.append(subscriber.key())
+      data = params['logic'].subscribeUser(
+          task_entity, user_entity, toggle=True)
 
-      properties = {
-          'subscribers': sub_keys,
-          }
-
-      ghop_task_subscription_logic.logic.updateEntityProperties(
-          entity, properties)
-
-    return http.HttpResponse(data)
+    return http.HttpResponse(data if data else '')
 
 
 view = View()

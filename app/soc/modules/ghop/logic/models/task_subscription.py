@@ -63,5 +63,35 @@ class Logic(base.Logic):
 
     return task_subscription
 
+  def subscribeUser(self, task_entity, user_entity, toggle=False):
+    """Adds a new subscriber to the subscription depending upon
+    the previous subscription
+
+    Args:
+      task_entity: GHOPTask entity
+      user_entity: User entity
+      toggle: If True and if the user already exists, removes the user
+              from subscription, if false only adds the user for subscription
+
+    Returns:
+      'add' if the user was added, 'remove' if the user was removed and
+      None if the operation failed.
+    """
+
+    data = None
+    entity = self.getOrCreateTaskSubscriptionForTask(task_entity)
+
+    if user_entity.key() not in entity.subscribers:
+      entity.subscribers.append(user_entity.key())
+      data = 'add'
+    elif toggle:
+      entity.subscribers.remove(user_entity.key())
+      data = 'remove'
+
+    if entity.put():
+      return data
+    else:
+      return None
+
 
 logic = Logic()

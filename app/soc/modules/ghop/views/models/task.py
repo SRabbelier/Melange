@@ -1020,6 +1020,8 @@ class View(base.View):
     """
 
     from soc.modules.ghop.logic.models import student as ghop_student_logic
+    from soc.modules.ghop.logic.models import task_subscription as \
+        ghop_ts_logic
 
     form = params['comment_form'](request.POST)
 
@@ -1052,6 +1054,10 @@ class View(base.View):
           }
       student_entity = ghop_student_logic.logic.getForFields(
           st_filter, unique=True)
+
+      # automatically subscribing the student to the task once he requests
+      # his claim for the task
+      ghop_ts_logic.logic.subscribeUser(entity, student_entity.user)
 
       if student_entity:
         properties['student'] = student_entity

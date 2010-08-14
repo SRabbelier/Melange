@@ -259,6 +259,17 @@ class Logic(base.Logic):
 
     return entity
 
+  def _onCreate(self, entity):
+    """See base.Logic._onCreate().
+    """
+
+    from soc.modules.ghop.logic.models import task_subscription as \
+        ghop_ts_logic
+
+    ghop_ts_logic.logic.subscribeUser(entity, entity.created_by.user)
+
+    return super(Logic, self)._onCreate(entity)
+
   def getFromKeyFieldsWithCWSOr404(self, fields):
     """Returns the Task, all Comments and all WorkSubmissions for the Task
     specified by the fields argument.

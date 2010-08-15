@@ -147,7 +147,7 @@ def main():
   if '--coverage' in sys.argv:
     from nose.plugins import cover
     plugin = cover.Coverage()
-    from tests.pymox import stubout
+    from mox import stubout
     stubout_obj = stubout.StubOutForTesting()
     stubout_obj.SmartSet(plugin, 'begin', begin)
     plugins.append(plugin)

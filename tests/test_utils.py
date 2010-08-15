@@ -22,12 +22,15 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+import unittest
+import gaetestbed
+
 from django.test import TestCase
 
 from soc.modules import callback
 
 from soc.views.helper import responses
-from tests.pymox import stubout
+from mox import stubout
 from soc.middleware.xsrf import XsrfMiddleware
 from soc.logic.helper import xsrfutil
 

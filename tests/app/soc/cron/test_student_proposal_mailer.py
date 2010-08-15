@@ -30,8 +30,6 @@ from django.utils import simplejson
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from tests.gaetestbed.mail import MailTestCase
-
 from soc.logic.models.user import logic as user_logic
 from soc.logic.models.org_admin import logic as admin_logic
 from soc.logic.models.sponsor import logic as sponsor_logic

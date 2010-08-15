@@ -27,6 +27,9 @@ setup(
     tests_require=[
         'zope.testbrowser',
         'gaeftest',
+        'gaetestbed',
+        'webtest',
+        'mox',
         'nose',
         ],
     entry_points = {'console_scripts': ['run-tests = tests.run:main',

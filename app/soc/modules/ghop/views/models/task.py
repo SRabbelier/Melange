@@ -1057,7 +1057,8 @@ class View(base.View):
 
       # automatically subscribing the student to the task once he requests
       # his claim for the task
-      ghop_ts_logic.logic.subscribeUser(entity, student_entity.user)
+      user_entity = user_logic.logic.getForCurrentAccount()
+      ghop_ts_logic.logic.subscribeUser(entity, user_entity)
 
       if student_entity:
         properties['student'] = student_entity

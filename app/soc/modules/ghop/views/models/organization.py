@@ -58,6 +58,8 @@ class View(organization.View):
   DEF_CLAIMED_PROJECTS_MSG_FMT = ugettext(
       'List of tasks published by %s that are claimed.')
 
+  DEF_CLOSED_PROJECTS_MSG_FMT = ugettext(
+      'List of tasks published by %s that are closed.')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
@@ -164,6 +166,9 @@ class View(organization.View):
       filter = {'scope': org_entity,
                 'status': ['ClaimRequested', 'Claimed', 'NeedsAction',
                            'NeedsReview', 'NeedsWork']}
+    elif idx == 2:
+      filter = {'scope': org_entity,
+                'status': ['Closed', 'AwaitingRegistration']}
     else:
       return responses.jsonErrorResponse(request, "idx not valid")
 
@@ -209,10 +214,17 @@ class View(organization.View):
       tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT % (
           entity.name)
 
-      if request.GET.get('fmt') == 'json':
-        return self.getListTasksData(request, [to_params, tc_params], entity)
+      # closed tasks
+      tcl_params = to_params.copy()
 
-      # check if there are new tasks if so show them in a separate list
+      tcl_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
+          entity.name)
+
+      if request.GET.get('fmt') == 'json':
+        return self.getListTasksData(
+            request, [to_params, tc_params, tcl_params], entity)
+
+      # check if there are opened if so show them in a separate list
       fields = {'scope': entity,
                 'status': ['Open', 'Reopened']}
       tasks_open = ghop_task_logic.logic.getForFields(fields, unique=True)
@@ -223,6 +235,27 @@ class View(organization.View):
         # we should add this list because there is a new task
         to_list = lists.getListGenerator(request, to_params, idx=0)
         contents.append(to_list)
+
+      # check if there are claimed if so show them in a separate list
+      fields = {'scope': entity,
+                'status': ['ClaimRequested', 'Claimed',
+                           'ActionNeeded', 'NeedsWork', 'NeedsReview']}
+      tasks_claimed = ghop_task_logic.logic.getForFields(fields, unique=True)
+
+      if tasks_claimed:
+        # we should add this list because there is a new task
+        tc_list = lists.getListGenerator(request, tc_params, idx=1)
+        contents.append(tc_list)
+
+      # check if there are claimed if so show them in a separate list
+      fields = {'scope': entity,
+                'status': ['Closed', 'AwaitingRegistration']}
+      tasks_closed = ghop_task_logic.logic.getForFields(fields, unique=True)
+
+      if tasks_closed:
+        # we should add this list because there is a new task
+        tcl_list = lists.getListGenerator(request, tcl_params, idx=2)
+        contents.append(tcl_list)
 
       context = {'list': soc.logic.lists.Lists(contents)}
 

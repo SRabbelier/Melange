@@ -1305,7 +1305,7 @@ class View(base.View):
 
       host_entity = host_logic.logic.getForFields(filter, unique=True)
 
-      filter['scope_path'] = entity.scope_path
+      filter['program'] = entity.program
       org_admin_entity = ghop_org_admin_logic.logic.getForFields(
           filter, unique=True)
       mentor_entity = ghop_mentor_logic.logic.getForFields(

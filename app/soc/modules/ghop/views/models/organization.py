@@ -164,7 +164,7 @@ class View(organization.View):
                 'status': ['Open', 'Reopened']}
     elif idx == 1:
       filter = {'scope': org_entity,
-                'status': ['ClaimRequested', 'Claimed', 'NeedsAction',
+                'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
                            'NeedsReview', 'NeedsWork']}
     elif idx == 2:
       filter = {'scope': org_entity,

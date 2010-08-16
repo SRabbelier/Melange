@@ -304,7 +304,7 @@ class Logic(base.Logic):
 
     from soc.modules.ghop.tasks import task_update
 
-    if entity.deadline and datetime.datetime.now() > entity.deadline:
+    if entity.deadline and datetime.datetime.now() >= entity.deadline:
       # calls a specific method to make a transition depending on the
       # task's current state
       transit_func = getattr(self, STATE_TRANSITIONS[entity.status])

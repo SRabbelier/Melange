@@ -62,7 +62,7 @@ def spawnUpdateTask(entity):
       }
   update_url = '/tasks/ghop/task/update'
 
-  new_task = taskqueue.Task(eta=entity.deadline, 
+  new_task = taskqueue.Task(eta=entity.deadline,
                             params=update_params,
                             url=update_url)
   new_task.add('ghop-update')

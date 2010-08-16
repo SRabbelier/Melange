@@ -1039,6 +1039,7 @@ class View(base.View):
 
     properties = None
     ws_properties = None
+    update_gae_task = False
 
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
@@ -1114,7 +1115,7 @@ class View(base.View):
                         ugettext('Status-%s' % (properties['status']))
                         ])
 
-        task_update.spawnUpdateTask(entity)
+        update_gae_task = True
       if action == 'reject':
         properties = {
             'user': None,
@@ -1148,7 +1149,7 @@ class View(base.View):
               fields['extended_deadline'], deadline.strftime(
                   '%d %B %Y, %H :%M'))))
 
-          task_update.spawnUpdateTask(entity)
+          update_gae_task = True
         else:
           changes.append(ugettext('NoDeadlineExtensionGiven'))
       elif action == 'reopened':
@@ -1190,8 +1191,12 @@ class View(base.View):
     else:
       comment_properties['content'] = fields['comment']
 
-    ghop_task_logic.logic.updateEntityPropertiesWithCWS(
-        entity, properties, comment_properties, ws_properties)
+    entity, comment_entity, ws_entity = \
+        ghop_task_logic.logic.updateEntityPropertiesWithCWS(
+            entity, properties, comment_properties, ws_properties)
+
+    if update_gae_task:
+      task_update.spawnUpdateTask(entity)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

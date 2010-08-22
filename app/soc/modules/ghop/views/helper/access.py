@@ -311,11 +311,20 @@ class GHOPChecker(access.Checker):
     program = ghop_program_logic.logic.getFromKeyNameOr404(
         django_args['scope_path'])
 
+    filter = {
+        'program': program,
+        }
+
     if role == 'ghop/student':
-      filter = {
+      filter['user'] = self.user
+    elif role == 'ghop/mentor':
+      mentor_filter = {
           'user': self.user,
           'program': program,
+          'status': 'active'
           }
+      mentor_entity = role_logic.getForFields(mentor_filter, unique=True)
+      filter['mentors'] = [mentor_entity]
 
     if not ghop_task_logic.logic.getForFields(filter, unique=True):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_TASKS_AFFILIATED)

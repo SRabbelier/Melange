@@ -33,9 +33,6 @@ class GSoCTimeline(soc.models.timeline.Timeline):
   """GSoC Timeline model extends the basic Program Timeline model.
   """
 
-  accepted_organization_announced_deadline = db.DateTimeProperty(
-      verbose_name=ugettext('Accepted Organizations Announced Deadline'))
-
   application_review_deadline = db.DateTimeProperty(
       verbose_name=ugettext('Application Review Deadline'))
 

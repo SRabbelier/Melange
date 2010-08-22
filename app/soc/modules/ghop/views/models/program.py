@@ -358,28 +358,19 @@ class View(program.View):
               'status': ['active', 'inactive']}
     student_entity = ghop_student_logic.logic.getForFields(filter, unique=True)
 
-    if student_entity:
+    # students can register after successfully completing their first
+    # task. So if a user has completed one task he is still a student
+    filter = {
+        'user': user,
+        'program': ghop_program_entity,
+        }
+    has_completed_task = ghop_task_logic.logic.getForFields(
+        filter, unique=True)
+
+    if student_entity or (user and has_completed_task):
       items += self._getStudentEntries(ghop_program_entity, student_entity,
                                        params, id, user, 'ghop')
     else:
-      # if a user has a task assigned, he or she still may list it
-      filter = {
-          'user': user,
-          'program': ghop_program_entity,
-          }
-      if user and ghop_task_logic.logic.getForFields(filter, unique=True):
-        items += [(ghop_redirects.getListStudentTasksRedirect(
-            ghop_program_entity, {'url_name':'ghop/student'}),
-            "List my Tasks", 'any_access')]
-
-      filter['status'] = 'AwaitingRegistration'
-      if ghop_task_logic.logic.getForFields(filter, unique=True):
-        if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
-          # this user does not have a role yet for this program
-          items += [('/ghop/student/apply/%s' % (
-              ghop_program_entity.key().id_or_name()),
-              "Register as a Student", 'any_access')]
-
       # get mentor and org_admin entity for this user and program
       filter = {
           'user': user,
@@ -403,24 +394,42 @@ class View(program.View):
 
     return items
 
-  def _getStudentEntries(self, program_entity, student_entity,
+  def _getStudentEntries(self, ghop_program_entity, student_entity,
                          params, id, user, prefix):
     """Returns a list with menu items for students in a specific program.
     """
 
     items = []
 
-    timeline_entity = program_entity.timeline
+    timeline_entity = ghop_program_entity.timeline
 
     if timeline_helper.isAfterEvent(timeline_entity,
-                                   'student_signup_start'):
+                                    'student_signup_start'):
       # add a link to show all projects
       items += [(ghop_redirects.getListStudentTasksRedirect(
-          program_entity, {'url_name':'ghop/student'}),
+          ghop_program_entity, {'url_name':'ghop/student'}),
           "List my Tasks", 'any_access')]
 
-    items += super(View, self)._getStudentEntries(program_entity,
-        student_entity, params, id, user, prefix)
+    # this check is done because of the GHOP student registration
+    # specification mentioned in previous method, a user can have
+    # a task and hence task listed without being a student
+    if student_entity:
+      items += super(View, self)._getStudentEntries(
+          ghop_program_entity, student_entity, params, id, user, prefix)
+    else:
+      # add a sidebar entry for the user to register as student if not
+      # since he has completed one task
+      filter = {
+          'user': user,
+          'program': ghop_program_entity,
+          'status': 'AwaitingRegistration'
+          }
+      if ghop_task_logic.logic.getForFields(filter, unique=True):
+        if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+          # this user does not have a role yet for this program
+          items += [('/ghop/student/apply/%s' % (
+              ghop_program_entity.key().id_or_name()),
+              "Register as a Student", 'any_access')]
 
     return items
 

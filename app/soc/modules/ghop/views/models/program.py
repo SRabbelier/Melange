@@ -381,12 +381,21 @@ class View(program.View):
       org_admin_entity = ghop_org_admin_logic.logic.getForFields(
           filter, unique=True)
 
-      if mentor_entity or org_admin_entity:
-        items += self._getOrganizationEntries(
-            ghop_program_entity, org_admin_entity,
-            mentor_entity, params, id, user)
+      if timeline_helper.isAfterEvent(
+          timeline_entity, 'accepted_organization_announced_deadline'):
+        if mentor_entity or org_admin_entity:
+          items += self._getOrganizationEntries(
+              ghop_program_entity, org_admin_entity,
+              mentor_entity, params, id, user)
+        elif timeline_helper.isBeforeEvent(timeline_entity, 'program_end'):
+          # add apply to become a mentor link
+          items += [
+              ('/ghop/org/apply_mentor/%s' % (
+                  ghop_program_entity.key().id_or_name()),
+                  "Apply to become a Mentor", 'any_access')]
 
-    if timeline_helper.isAfterEvent(timeline_entity, 'org_signup_start'):
+    if timeline_helper.isAfterEvent(
+        timeline_entity, 'accepted_organization_announced_deadline'):
       url = redirects.getAcceptedOrgsRedirect(
           ghop_program_entity, params)
       # add a link to list all the organizations
@@ -430,6 +439,17 @@ class View(program.View):
           items += [('/ghop/student/apply/%s' % (
               ghop_program_entity.key().id_or_name()),
               "Register as a Student", 'any_access')]
+
+    return items
+
+  def _getOrganizationEntries(self, ghop_program_entity, org_admin_entity,
+                              mentor_entity, params, id, user):
+    """Returns a list with menu items for org admins and mentors in a
+       specific program. Note: this method is called only after the
+       accepted organizations are announced
+    """
+
+    items = []
 
     return items
 

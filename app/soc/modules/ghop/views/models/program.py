@@ -451,6 +451,15 @@ class View(program.View):
 
     items = []
 
+    timeline_entity = ghop_program_entity.timeline
+
+    if mentor_entity and timeline_helper.isAfterEvent(
+        timeline_entity, 'accepted_organization_announced_deadline'):
+      # add a link to show all tasks that the mentor is assigned to
+      items += [(ghop_redirects.getListMentorTasksRedirect(
+          mentor_entity, {'url_name':'ghop/mentor'}),
+          "List my Tasks", 'any_access')]
+
     return items
 
   @decorators.merge_params

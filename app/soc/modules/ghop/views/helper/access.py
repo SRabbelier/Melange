@@ -38,7 +38,6 @@ from soc.views.helper import access
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
 from soc.modules.ghop.logic.models import org_admin as ghop_org_admin_logic
 from soc.modules.ghop.logic.models import program as ghop_program_logic
-from soc.modules.ghop.logic.models.student import logic as ghop_student_logic
 from soc.modules.ghop.logic.models import task as ghop_task_logic
 
 
@@ -68,8 +67,8 @@ DEF_PAGE_INACTIVE_MSG = ugettext(
 DEF_SIGN_UP_AS_OA_MENTOR_MSG = ugettext(
     'You first need to sign up as an Org Admin or a Mentor.')
 
-DEF_NO_TASKS_ASSIGNED = ugettext(
-    'There are no tasks which have been assigned to you.')
+DEF_NO_TASKS_AFFILIATED = ugettext(
+    'There are no tasks affiliated to you.')
 
 
 class GHOPChecker(access.Checker):
@@ -287,11 +286,14 @@ class GHOPChecker(access.Checker):
     raise out_of_band.AccessViolation(
         message_fmt=DEF_CANT_REGISTER)
 
-  def checkCanOpenTaskList(self, django_args):
+  def checkCanOpenTaskList(self, django_args, role_logic, role):
     """Checks if the current user is allowed to see a list of his tasks.
 
     Args:
       django_args: a dictionary with django's arguments
+      role_logic: the specific role whose logic must be used to check
+                  for the scope
+      role: name of the role for this check is performed
 
     Raises:
       AccessViolationResponse:
@@ -302,17 +304,18 @@ class GHOPChecker(access.Checker):
     self.checkIsUser(django_args)
 
     try:
-      return self.checkHasRoleForScope(django_args, ghop_student_logic)
+      return self.checkHasRoleForScope(django_args, role_logic)
     except out_of_band.Error:
       pass
 
     program = ghop_program_logic.logic.getFromKeyNameOr404(
         django_args['scope_path'])
 
-    filter = {
-        'user': self.user,
-        'program': program,
-        }
+    if role == 'ghop/student':
+      filter = {
+          'user': self.user,
+          'program': program,
+          }
 
     if not ghop_task_logic.logic.getForFields(filter, unique=True):
-      raise out_of_band.AccessViolation(message_fmt=DEF_NO_TASKS_ASSIGNED)
+      raise out_of_band.AccessViolation(message_fmt=DEF_NO_TASKS_AFFILIATED)

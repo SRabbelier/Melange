@@ -24,13 +24,15 @@ __authors__ = [
   ]
 
 
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
-
+from soc.views import out_of_band
 from soc.views.helper import decorators
-from soc.views.helper import redirects
+from soc.views.helper import lists
+from soc.views.helper import responses
 from soc.views.models import student
 
 from soc.modules.ghop.logic.models import mentor as ghop_mentor_logic
@@ -49,7 +51,10 @@ class View(student.View):
   """View methods for the GHOP Student model.
   """
 
-  DEF_STUDENT_TASKS_MSG_FMT = ugettext('Your tasks for %s.')
+  DEF_NO_TASKS_MSG = ugettext(
+      'There are no tasks affiliated to you.')
+
+  DEF_STUDENT_TASKS_MSG_FMT = ugettext('My tasks for %s.')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the student View class
@@ -76,8 +81,11 @@ class View(student.View):
             ghop_org_admin_logic.logic, ghop_mentor_logic.logic]),
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', ghop_student_logic.logic)]
-    rights['list_student_tasks'] = ['checkCanOpenTaskList',
-                                    ghop_student_logic.logic,  'ghop/student']
+    rights['list_student_tasks'] = [
+        ('checkCanOpenTaskList', [ghop_student_logic.logic, 'ghop/student']),
+        ('checkIsAfterEvent', ['student_signup_start',
+                               'scope_path', ghop_program_logic.logic])]
+
 
     new_params = {}
     new_params['logic'] = soc.modules.ghop.logic.models.student.logic
@@ -101,6 +109,34 @@ class View(student.View):
 
     super(View, self).__init__(params=params)
 
+  def getListStudentTasksData(self, request, params, filter):
+    """Returns the list data for Organization Tasks list.
+
+    Args:
+      request: HTTPRequest object
+      params: params of the task entity for the list
+      filter: properties on which the tasks must be listed
+    """
+
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # default list settings
+    args = []
+    order = ['modified_on']
+    visibility = 'public'
+
+    if idx == 0:
+      contents = lists.getListData(request, params, filter,
+                                   visibility=visibility,
+                                   order=order, args=args)
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
   @decorators.merge_params
   @decorators.check_access
   def listStudentTasks(self, request, access_type, page_name=None,
@@ -116,52 +152,34 @@ class View(student.View):
 
     user_account = user_logic.logic.getForCurrentAccount()
 
+    list_params = ghop_task_view.view.getParams().copy()
+
+    list_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % (
+          program.name)
+
     filter = {
+        'program': program,
         'user': user_account,
-        'program': program
+        'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                   'Closed', 'AwaitingRegistration', 'NeedsWork',
+                   'NeedsReview']
         }
+    if request.GET.get('fmt') == 'json':
+        return self.getListStudentTasksData(request, list_params,
+                                             filter)
 
-    tasks = ghop_task_logic.logic.getForFields(filter=filter)
-
-    tasks_by_orgs = {}
-    for task in tasks:
-      key = task.scope.key().id_or_name()
-      if key in tasks_by_orgs:
-        tasks_by_orgs[key][1].append(task)
-      else:
-        tasks_by_orgs[key] = (task.scope.name, [task])
+    tasks = ghop_task_logic.logic.getForFields(filter=filter, unique=True)
 
     contents = []
-    context = {}
 
-    st_params = ghop_task_view.view.getParams().copy()
-    st_params['list_template'] = 'soc/models/list.html'
-    st_params['list_heading'] = 'modules/ghop/task/list/heading.html'
-    st_params['list_row'] = 'modules/ghop/task/list/row.html'
-    st_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getPublicRedirect(entity, st_params)
-    }
-# TODO(LIST)
-    st_org_params = st_params.copy()
-    for k, v in tasks_by_orgs.iteritems():
-      st_org_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % v[0]
+    if tasks:
+      tasks_list = lists.getListGenerator(request, list_params, idx=0)
+      contents.append(tasks_list)
 
-      st_org_list = self._listStudentTasks(tasks_by_orgs[k][1], st_org_params)
-
-      contents.append(st_org_list)
-
-    return self._list(request, st_params, contents, page_name, context)
-
-  def _listStudentTasks(self, data, params):
-    """Returns a list with all entities specified in data.
-    """
-
-    result = dicts.rename(params, params['list_params'])
-    result['action'] = (redirects.getPublicRedirect, params)
-    result['data'] = data
-    result['pagination'] = 'soc/list/no_pagination.html'
-# TODO(LIST)
-    return result
+    if contents:
+      return self._list(request, list_params, contents, page_name)
+    else:
+      raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
 
 
 view = View()

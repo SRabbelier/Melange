@@ -237,6 +237,7 @@ class View(program.View):
     slots_params['list_description'] = self.DEF_TASK_QUOTA_ALLOCATION_MSG
     slots_params['quota_field_keys'] = ['name', 'task_quota_limit']
     slots_params['quota_field_names'] = ['Organization', 'Task Quota']
+    slots_params['quota_field_props'] = {'task_quota_limit':{'editable':True}}
 
     filter = {'scope': program_entity,
                  'status': ['new', 'active']

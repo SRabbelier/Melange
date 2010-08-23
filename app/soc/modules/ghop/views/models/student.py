@@ -157,6 +157,11 @@ class View(student.View):
     list_params['list_description'] = self.DEF_STUDENT_TASKS_MSG_FMT % (
           program.name)
 
+    list_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+        }
+
     filter = {
         'program': program,
         'user': user_account,

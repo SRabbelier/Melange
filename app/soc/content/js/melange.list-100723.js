@@ -610,6 +610,7 @@
       id: null,
       object: null,
       options: null,
+      last_selected_row: null,
       pager: {
         id: null,
         options: null
@@ -625,13 +626,25 @@
 
     // Functions for jqGrid
     var jqgrid_functions = {
+      //TODO (Mario): change the name of the functions to reflect the new editing feature
       enableDisableButtons: (function (list_object) {
-        return function () {
+        return function (row_id) {
           var option_name = list_object.jqgrid.object.jqGrid('getGridParam','multiselect') ? 'selarrrow' : 'selrow'
           var selected_ids = list_object.jqgrid.object.jqGrid('getGridParam',option_name);
           if (!selected_ids instanceof Array) {
             selected_ids = [selected_ids];
           }
+
+          // Enable editing if set by backend
+          // editable params for *_field_props available at http://www.trirand.com/jqgridwiki/doku.php?id=wiki:inline_editing
+          if (selected_ids.length === 1) {
+            if(row_id && row_id !== list_object.jqgrid.last_selected_row) {
+              jQuery("#" + list_object.jqgrid.id).restoreRow(list_object.jqgrid.last_selected_row);
+              jQuery("#" + list_object.jqgrid.id).jqGrid("editRow", row_id, true, null, null, 'clientArray');
+              list_object.jqgrid.last_selected_row = row_id;
+            }
+          }
+
           jQuery.each(list_object.operations.buttons, function (setting_index, operation) {
             var button_object = jQuery("#" + list_object.jqgrid.id + "_buttonOp_" + operation.id);
             if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {

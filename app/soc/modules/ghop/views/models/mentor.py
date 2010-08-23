@@ -131,7 +131,7 @@ class View(mentor.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
+    order = ['-modified_on']
     visibility = 'public'
 
     if idx == 0:

@@ -791,7 +791,7 @@ class View(base.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
+    order = ['-modified_on']
     visibility = 'public'
 
     filter = {

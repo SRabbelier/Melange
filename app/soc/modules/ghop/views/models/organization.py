@@ -156,7 +156,7 @@ class View(organization.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
+    order = ['-modified_on']
     visibility = 'home'
 
     if idx == 0:

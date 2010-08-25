@@ -76,12 +76,19 @@ def addKey(target, fieldname):
   return result
 
 
-def getEntities(model):
+def getEntities(model, fields=None):
   """Returns all entities as dictionary keyed on their id_or_name property.
   """
+  if not fields:
+    fields = {}
+
+  def gen():
+    q = model.all()
+    for key, value in fields.iteritems():
+      q.filter(key, value)
+    return q
 
   def wrapped():
-    gen = lambda: model.all()
     it = interactive.deepFetch(gen)
 
     entities = [(i.key().id_or_name(), i) for i in it]

@@ -587,8 +587,8 @@ def saveDataToCSV(csv_filename, data, key_order):
   csv_file.close()
 
 
-def exportOrgsForGoogleCode(csv_filename, gc_project_prefix='', 
-                            scope_path_start=''):
+def exportOrgsForGoogleCode(csv_filename, gc_project_prefix=None,
+                            scope_path=None, include_description=False):
   """Export all Organizations from given program as CSV.
       
   CSV file will contain 3 columns: organization name, organization google 
@@ -598,25 +598,28 @@ def exportOrgsForGoogleCode(csv_filename, gc_project_prefix='',
     csv_filename: the name of the csv file to save
     gc_project_prefix: Google Code project prefix for example
       could be google-summer-of-code-2009- for GSoC 2009
-    scope_path_start: the start of the scope path of the roles to get could be
+    scope_path: the scope path of the roles to get could be
       google/gsoc2009 if you want to export all GSoC 2009 Organizations.
+    include_description: if true, includes the orgs description in the export
   """
-  from soc.models.organization import Organization
+  from soc.modules.gsoc.models.organization import GSoCOrganization
   
+  if not gc_project_prefix:
+    gc_project_prefix = ''
+
   print 'Retrieving all Organizations'
-  orgs = getEntities(Organization)()
+  fields = {'scope_path': scope_path}
+  orgs = getEntities(GSoCOrganization, fields=fields)()
   orgs_export = []
   
   print 'Preparing data for CSV export'
   for key in orgs.keys():
-    if not orgs[key].scope_path.startswith(scope_path_start):
-      continue
-    
     org_for_export = {} 
     org_short_name = orgs[key].short_name
     org_short_name = org_short_name.replace(' ','-').replace('.', '')
     org_short_name = org_short_name.replace('/','-').replace('!','').lower()
-    org_for_export['org_description'] = orgs[key].description
+    if include_description:
+      org_for_export['org_description'] = orgs[key].description
     org_for_export['org_name'] = orgs[key].name
     org_for_export['google_code_project_name'] = gc_project_prefix + \
         org_short_name

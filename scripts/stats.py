@@ -434,8 +434,7 @@ def exportStudentsWithProjects(csv_filename, scope_path_start=''):
   from soc.models.organization import Organization
 
   # get all projects
-  getStudentProjects = getEntities(StudentProject)
-  student_projects = getStudentProjects()
+  student_projects = getEntities(StudentProject)()
 
   student_projects_amount = len(student_projects)
   print "Fetched %d Student Projects." % student_projects_amount

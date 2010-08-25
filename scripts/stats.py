@@ -632,7 +632,7 @@ def exportOrgsForGoogleCode(csv_filename, gc_project_prefix=None,
 
 
 def exportRolesForGoogleCode(csv_filename, gc_project_prefix='', 
-                             scope_path_start=''):
+                             scope_path=''):
   """Export all Students/Mentors/OrgAdmins Roles from given program as CSV.
       
   CSV file will contain 3 columns: google_account, organization google 
@@ -642,99 +642,136 @@ def exportRolesForGoogleCode(csv_filename, gc_project_prefix='',
     csv_filename: the name of the csv file to save
     gc_project_prefix: Google Code project prefix for example
       could be google-summer-of-code-2009- for GSoC 2009
-    scope_path_start: the start of the scope path of the roles to get could be
+    scope_path: the scope path of the roles to get could be
       google/gsoc2009 if you want to export all GSoC 2009 Organizations.
   """
+  from google.appengine.ext import db
+
   from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
+  from soc.modules.gsoc.models.mentor import GSoCMentor
+  from soc.modules.gsoc.models.student import GSoCStudent
+  from soc.modules.gsoc.models.organization import GSoCOrganization
   from soc.modules.gsoc.models.student_project import StudentProject
-  
-  # get all projects
-  getStudentProjects = getEntities(StudentProject)
-  student_projects = getStudentProjects()
-  org_admins = getEntities(GSoCOrgAdmin)()
-  all_org_admins = org_admins.values()
-  
+
+  # get orgs
+  fields = {'scope_path': scope_path}
+  orgs = getEntities(GSoCOrganization, fields=fields)()
+
   org_admins_by_orgs = {}
   students_by_orgs = {}
   mentors_by_orgs = {}
-  
-  for org_admin in all_org_admins:
-      
-    if not org_admin.scope_path.startswith(scope_path_start):
-      continue
-      
-    org_short_name = org_admin.scope.short_name
-    org_short_name = org_short_name.replace(' ','-').replace('.', '')
-    org_short_name = org_short_name.replace('/','-').replace('!','').lower()
-    if gc_project_prefix + org_short_name not in org_admins_by_orgs.keys():
-      org_admins_by_orgs[gc_project_prefix + org_short_name] = []
-    
-    org_admins_by_orgs[gc_project_prefix + \
-        org_short_name].append(str(org_admin.user.account))
-    print 'OrgAdmin ' + str(org_admin.user.account) + \
-        ' for ' + gc_project_prefix + org_short_name
-  
-  for student_project in student_projects.values():
+  resolved_keys = {}
 
-    if student_project.status != 'accepted' or not \
-      student_project.scope_path.startswith(scope_path_start):
-      # no need to export this project
-      continue
-    
-    student_entity = student_project.student
-    mentor_entity = student_project.mentor
-    org_short_name = student_project.scope.short_name
+  def get_new_keys(keys):
+    have = set(resolved_keys.keys())
+    want = set(keys).difference(have)
+    if not want:
+      return
+    resolved_keys.update(res)
+
+  def key(prop, item):
+    return prop.get_value_for_datastore(item)
+
+  def value(prop, item):
+    return resolved_keys[key(prop, item)]
+
+  def short_name(org):
+    org_short_name = org.short_name
     org_short_name = org_short_name.replace(' ','-').replace('.', '')
     org_short_name = org_short_name.replace('/','-').replace('!','').lower()
-    if gc_project_prefix + org_short_name not in students_by_orgs.keys():
-      students_by_orgs[gc_project_prefix + org_short_name] = []
-    students_by_orgs[gc_project_prefix + \
-        org_short_name].append(str(student_entity.user.account))
-    print 'Student ' + str(student_entity.user.account) + \
-        ' for ' + gc_project_prefix + org_short_name
-    if gc_project_prefix + org_short_name not in mentors_by_orgs.keys():
-      mentors_by_orgs[gc_project_prefix + org_short_name] = []
-    mentors_by_orgs[gc_project_prefix + \
-        org_short_name].append(str(mentor_entity.user.account))
-    print 'Mentor ' + str(mentor_entity.user.account) + \
-        ' for ' + gc_project_prefix + org_short_name
-  
+    return org_short_name
+
+  for org in orgs.values():
+    # get all projects
+    fields = {'scope_path': org.key().id_or_name()}
+    org_admins = getEntities(GSoCOrgAdmin, fields=fields)()
+
+    fields = {'scope_path': org.key().id_or_name(), 'status': 'accepted'}
+    student_projects = getEntities(StudentProject, fields=fields)()
+
+    org_short_name = short_name(org)
+
+    project_key = gc_project_prefix + org_short_name
+    org_admins_by_orgs[project_key] = []
+    students_by_orgs[project_key] = []
+    mentors_by_orgs[project_key] = []
+
+    keys = []
+    keys += [key(GSoCOrgAdmin.user, i) for i in org_admins.values()]
+    keys += [key(StudentProject.student, i) for i in student_projects.values()]
+    keys += [key(StudentProject.mentor, i) for i in student_projects.values()]
+
+    get_new_keys(keys)
+
+    org_short_name = short_name(org)
+
+    for org_admin in org_admins.values():
+      account_name = str(value(GSoCOrgAdmin.user, org_admin).account)
+      org_admins_by_orgs[project_key].append(account_name)
+      print 'OrgAdmin %s for %s' % (account_name, project_key)
+    
+    students = [value(StudentProject.student, i) for i in student_projects.values()]
+    mentors = [value(StudentProject.mentor, i) for i in student_projects.values()]
+
+    keys = []
+    keys += [key(GSoCStudent.user, i) for i in students]
+    keys += [key(GSoCMentor.user, i) for i in mentors]
+
+    get_new_keys(keys)
+
+    org_short_name = short_name(org)
+
+    for student_project in student_projects.values():
+      student_entity = value(StudentProject.student, student_project)
+
+      account_name = str(value(GSoCStudent.user, student_entity).account)
+      students_by_orgs[project_key].append(account_name)
+      print 'Student %s for %s' % (account_name, project_key)
+
+      mentor_entity = value(StudentProject.mentor, student_project)
+      account_name = str(value(GSoCMentor.user, mentor_entity).account)
+      mentors_by_orgs[project_key].append(account_name)
+      print 'Mentor %s for %s' % (account_name, project_key)
+    
   roles_data = {}
-  
+
   # prepare org admins data
   for org_key in org_admins_by_orgs.keys():
     for org_admin in org_admins_by_orgs[org_key]:
-      roles_data[org_admin + '|' + org_key] = \
-          {'role': 'project_owner', 
-           'google_code_project_name': org_key, 
-           'google_account': org_admin}
+      roles_data[org_admin + '|' + org_key] = {
+          'role': 'project_owner',
+          'google_code_project_name': org_key,
+          'google_account': org_admin
+          }
 
   # prepare mentors data
   for org_key in mentors_by_orgs.keys():
     for mentor in mentors_by_orgs[org_key]:
       if mentor + '|' + org_key not in roles_data.keys():
-        roles_data[mentor + '|' + org_key] = \
-            {'role': 'project_member', 
-             'google_code_project_name': org_key, 
-             'google_account': mentor}
+        roles_data[mentor + '|' + org_key] = {
+            'role': 'project_member',
+            'google_code_project_name': org_key,
+            'google_account': mentor
+            }
 
   # prepare students data
   for org_key in students_by_orgs.keys():
     for student in students_by_orgs[org_key]:
-      roles_data[student + '|' + org_key] = \
-          {'role': 'project_member', 
-           'google_code_project_name': org_key, 
-           'google_account': student}
+      roles_data[student + '|' + org_key] = {
+          'role': 'project_member',
+          'google_code_project_name': org_key,
+          'google_account': student
+          }
    
   data = []
   
-  # add @gmail.com to all accounts that don't have @ in the account string
-  # gmail.com is authorized domain for Google AppEngine that's why it's
-  # missing
   for roles_key in roles_data.keys():
+    # add @gmail.com to all accounts that don't have @ in the account string
+    # gmail.com is authorized domain for Google AppEngine that's why it's
+    # missing
     if roles_data[roles_key]['google_account'].find('@') == -1:
-      roles_data[roles_key]['google_account'] = \
-        roles_data[roles_key]['google_account'] + '@gmail.com'
+      account = roles_data[roles_key]['google_account'] + '@gmail.com'
+      roles_data[roles_key]['google_account'] = account
     data.append(roles_data[roles_key])
   
   export_fields = ['google_account', 'google_code_project_name', 'role']

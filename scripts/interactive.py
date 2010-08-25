@@ -41,6 +41,17 @@ def auth_func():
   """Returns a tuple with username and password.
   """
 
+  if os.path.exists('.appengine_auth'):
+    try:
+      f = open('.appengine_auth')
+      name = f.readline()
+      pwd = f.readline()
+      # nip off the newlines
+      return name[:-1], pwd[:-1]
+    finally:
+      f.close()
+    print "Could not read auth from .appengine_auth"
+
   return raw_input('Username:'), getpass.getpass('Password:')
 
 

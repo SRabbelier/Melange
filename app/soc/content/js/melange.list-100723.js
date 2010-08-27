@@ -611,6 +611,7 @@
       object: null,
       options: null,
       last_selected_row: null,
+      editable_rows: [],
       pager: {
         id: null,
         options: null
@@ -878,6 +879,13 @@
               //loading data finished, hiding loading message
               jQuery("#temporary_list_placeholder_" + idx).remove();
               jQuery("#load_" + _self.jqgrid.id).hide();
+
+              //check if there are editable columns
+              jQuery.each(_self.configuration.colModel, function (column_index, column) {
+                if (column.editable !== undefined && column.editable === true) {
+                  _self.jqgrid.editable_rows.push(column.name);
+                }
+              });
 
               // Delete previous buttons, if any
               jQuery("#t_" + _self.jqgrid.id).children().remove();

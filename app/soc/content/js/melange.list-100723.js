@@ -611,7 +611,8 @@
       object: null,
       options: null,
       last_selected_row: null,
-      editable_rows: [],
+      editable_columns: [],
+      dirty_fields: {},
       pager: {
         id: null,
         options: null
@@ -636,32 +637,83 @@
             selected_ids = [selected_ids];
           }
 
+          function updateDirtyField (row_id) {
+            var row = jQuery("#" + list_object.jqgrid.id).jqGrid('getRowData', row_id);
+            var original_data = jLinq.from(list_object.data.all_data).equals("columns.key",row.key).select()[0];
+            if (list_object.jqgrid.dirty_fields[row.key] === undefined) {
+              list_object.jqgrid.dirty_fields[row.key] = [];
+            }
+            var changed_columns = [];
+            var not_changed_columns = [];
+            jQuery.each(row, function (column_name, column_content) {
+              /* Need to have a loose comparison here, as e.g. previously integer values
+                 could be changed into strings by jqGrid
+              */
+              if (column_content != original_data.columns[column_name]) {
+                changed_columns.push(column_name);
+              } else {
+                not_changed_columns.push(column_name);
+              }
+            });
+
+            // Update dirty row with dirty columns
+            jQuery.each(changed_columns, function (column_index, column_name) {
+              if (jQuery.inArray(column_name, list_object.jqgrid.dirty_fields[row.key]) === -1) {
+                list_object.jqgrid.dirty_fields[row.key].push(column_name);
+              }
+            });
+
+            // Check if a previously dirty column has now the original value again
+            jQuery.each(not_changed_columns, function (column_index, column_name) {
+              var index_in_row_array = jQuery.inArray(column_name, list_object.jqgrid.dirty_fields[row.key]);
+              if (index_in_row_array !== -1) {
+                list_object.jqgrid.dirty_fields[row.key].splice(index_in_row_array, 1);
+              }
+            });
+
+            // if deleting the not-anymore-dirty column has left the row array empty, then delete it
+            if (list_object.jqgrid.dirty_fields[row.key].length === 0) {
+              delete list_object.jqgrid.dirty_fields[row.key];
+            }
+          }
+
           // Enable editing if set by backend
           // editable params for *_field_props available at http://www.trirand.com/jqgridwiki/doku.php?id=wiki:inline_editing
           if (selected_ids.length === 1) {
             if(row_id && row_id !== list_object.jqgrid.last_selected_row) {
               jQuery("#" + list_object.jqgrid.id).restoreRow(list_object.jqgrid.last_selected_row);
-              jQuery("#" + list_object.jqgrid.id).jqGrid("editRow", row_id, true, null, null, 'clientArray');
+              jQuery("#" + list_object.jqgrid.id).jqGrid("editRow", row_id, true, null, null, 'clientArray', null, updateDirtyField);
               list_object.jqgrid.last_selected_row = row_id;
             }
           }
 
           jQuery.each(list_object.operations.buttons, function (setting_index, operation) {
             var button_object = jQuery("#" + list_object.jqgrid.id + "_buttonOp_" + operation.id);
-            if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
-              button_object.removeAttr("disabled");
-              // If this is a per-entity operation, substitute click event for button (if present)
-              if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
-                // get current selection
-                var row = list_object.jqgrid.object.jqGrid('getRowData',selected_ids[0]);
-                var object = jLinq.from(list_object.data.all_data).equals("columns.key",row.key).select()[0];
-                var partial_click_method = button_object.data('melange').click;
-                button_object.click(partial_click_method(object.operations.buttons[operation.id].link));
-                button_object.attr("value",object.operations.buttons[operation.id].caption);
+            // if this button is a post_edit button then disable or enable the button if dirty_fields apply
+            if (operation.type === "post_edit") {
+              if (isEmptyObject(list_object.jqgrid.dirty_fields)) {
+                button_object.attr("disabled","disabled");
+              }
+              else {
+                button_object.removeAttr("disabled");
               }
             }
             else {
-              button_object.attr("disabled","disabled");
+              if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
+                button_object.removeAttr("disabled");
+                // If this is a per-entity operation, substitute click event for button (if present)
+                if (operation.real_bounds[0] === 1 && operation.real_bounds[1] === 1 && button_object.data('melange') !== undefined) {
+                  // get current selection
+                  var row = list_object.jqgrid.object.jqGrid('getRowData',selected_ids[0]);
+                  var object = jLinq.from(list_object.data.all_data).equals("columns.key",row.key).select()[0];
+                  var partial_click_method = button_object.data('melange').click;
+                  button_object.click(partial_click_method(object.operations.buttons[operation.id].link));
+                  button_object.attr("value",object.operations.buttons[operation.id].caption);
+                }
+              }
+              else {
+                button_object.attr("disabled","disabled");
+              }
             }
           });
         }
@@ -729,6 +781,56 @@
                 idx: parameters.idx,
                 button_id: parameters.button_id,
                 data: JSON.stringify(objects_to_send)
+              },
+              function (data) {
+                if (parameters.redirect == "true") {
+                  try {
+                    var data_from_server = JSON.parse(data);
+                    if (data_from_server.data.url !== undefined) {
+                      window.location.href = data_from_server.data.url;
+                    }
+                  }
+                  catch (e) {
+                    //TODO (Mario): display an error message
+                  }
+                }
+                if (parameters.refresh == "table") {
+                  list_objects.get(parameters.idx).refreshData();
+                  jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
+                }
+              }
+            )
+          }
+        },
+        post_edit: function (parameters) {
+          return function () {
+            var current_grid = list_objects.get(parameters.idx).jqgrid;
+            var rows_to_send = {};
+            if (current_grid.editable_columns.length === 0 && isEmptyObject(current_grid.dirty_fields)) {
+              return;
+            }
+            // This is done to make sure we detect rows by key column and not by row id
+            var number_of_records = current_grid.object.jqGrid('getGridParam','records');
+            for (var record_number = 1; record_number <= number_of_records; record_number++) {
+              var row = jQuery("#" + current_grid.id).jqGrid('getRowData',record_number);
+              if (current_grid.dirty_fields[row.key] !== undefined) {
+                // This row should be updated, create object
+                rows_to_send[row.key] = {};
+                jQuery.each(current_grid.dirty_fields[row.key], function (column_index, column_name) {
+                  rows_to_send[row.key][column_name] = row[column_name];
+                });
+              }
+            }
+            if (parameters.url === "") {
+              parameters.url = window.location.href;
+            }
+            jQuery.post(
+              parameters.url,
+              {
+                xsrf_token: window.xsrf_token,
+                idx: parameters.idx,
+                button_id: parameters.button_id,
+                data: JSON.stringify(rows_to_send)
               },
               function (data) {
                 if (parameters.redirect == "true") {
@@ -883,7 +985,7 @@
               //check if there are editable columns
               jQuery.each(_self.configuration.colModel, function (column_index, column) {
                 if (column.editable !== undefined && column.editable === true) {
-                  _self.jqgrid.editable_rows.push(column.name);
+                  _self.jqgrid.editable_columns.push(column.name);
                 }
               });
 
@@ -899,19 +1001,27 @@
                   jQuery("#t_" + _self.jqgrid.id).append("<input type='button' value='" + operation.caption + "' style='float:left' id='" + new_button_id + "'/>");
 
                   operation.parameters.idx = idx;
-                  // Substitute "all" string (if any) to actual number of records
-                  operation.real_bounds = operation.bounds;
-                  var handle_all = operation.real_bounds.indexOf("all");
-                  if (handle_all !== -1) {
-                    operation.real_bounds[handle_all] = _self.jqgrid.object.jqGrid('getGridParam','records');
+
+                  /* If this button is a post_edit button then button bounds should
+                     behave differently: the button should be disabled if no dirty
+                     fields are detected, then enabled the first time a cell content
+                     is changed
+                  */
+                  if (operation.type !== "post_edit") {
+                    // Substitute "all" string (if any) to actual number of records
+                    operation.real_bounds = operation.bounds;
+                    var handle_all = operation.real_bounds.indexOf("all");
+                    if (handle_all !== -1) {
+                      operation.real_bounds[handle_all] = _self.jqgrid.object.jqGrid('getGridParam','records');
+                    }
+                    /* Add button bounds on parameters to let POST
+                       requests working also with [0,"all"] bounds */
+                    operation.parameters.real_bounds = operation.real_bounds;
                   }
-                  // the button should be disabled by default if lower bound is >0
-                  if (operation.real_bounds[0] > 0) {
+                  // the button should be disabled by default if lower bound is >0 or operation is a post_edit one
+                  if (operation.type === "post_edit" || operation.real_bounds[0] > 0) {
                     jQuery("#" + new_button_id).attr("disabled","disabled");
                   }
-                  /* Add button bounds on parameters to let POST
-                     requests working also with [0,"all"] bounds */
-                  operation.parameters.real_bounds = operation.real_bounds;
                   /* Add id of the button operation to parameters so the appropriate backend action
                      can be identified if multiple buttons redirect to the same page. */
                   operation.parameters.button_id = operation.id;

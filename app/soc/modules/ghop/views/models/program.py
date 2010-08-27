@@ -238,6 +238,16 @@ class View(program.View):
     slots_params['quota_field_keys'] = ['name', 'task_quota_limit']
     slots_params['quota_field_names'] = ['Organization', 'Task Quota']
     slots_params['quota_field_props'] = {'task_quota_limit':{'editable':True}}
+    slots_params['quota_button_global'] = [
+      {
+        "id": "save_tasks_quota",
+        "caption": "Update Quotas",
+        "type": "post_edit",
+        "parameters": {
+          "url": ""
+        }
+      }
+    ]
 
     filter = {'scope': program_entity,
                  'status': ['new', 'active']

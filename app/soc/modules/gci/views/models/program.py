@@ -88,7 +88,7 @@ class View(program.View):
     rights['assign_task_quotas'] = [
         ('checkIsHostForProgram', [gci_program_logic.logic])]
     rights['accepted_orgs'] = [('checkIsAfterEvent',
-        ['student_signup_start',
+        ['accepted_organization_announced_deadline',
          '__all__', gci_program_logic.logic])]
     rights['list_participants'] = [('checkIsHostForProgram',
                                     [gci_program_logic.logic])]

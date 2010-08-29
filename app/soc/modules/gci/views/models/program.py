@@ -26,6 +26,7 @@ __authors__ = [
 
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -35,8 +36,10 @@ from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
+from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
+from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import program
@@ -58,6 +61,16 @@ import soc.modules.gci.logic.models.program
 class View(program.View):
   """View methods for the GCI Program model.
   """
+
+  DEF_LIST_PUBLIC_TASKS_MSG_FMT = ugettext(
+      'Lists all publicly visible tasks of %s. Use this to find '
+      'a task suited for you.')
+
+  DEF_LIST_VALID_TASKS_MSG_FMT = ugettext(
+      'Lists all the Unapproved, Unpublished and published tasks of %s.')
+
+  DEF_NO_TASKS_MSG = ugettext(
+      'There are no tasks to be listed.')
 
   DEF_PARTICIPATING_ORGS_MSG_FMT = ugettext(
       'The following is a list of all the participating organizations under '
@@ -100,7 +113,9 @@ class View(program.View):
         [gci_program_logic.logic])]
     rights['type_tag_edit'] = [('checkIsHostForProgram',
         [gci_program_logic.logic])]
-    rights['search'] = ['allow']
+    rights['list_tasks'] = [('checkIsAfterEvent',
+        ['tasks_publicly_visible',
+         '__all__', gci_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.program.logic
@@ -133,9 +148,9 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>type_tag_edit)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_tag_edit',
          'Edit a Task Type Tag'),
-        (r'^%(url_name)s/(?P<access_type>search)/%(key_fields)s$',
-         '%(module_package)s.%(module_name)s.search',
-         'Search Page for all Tasks in'),
+        (r'^%(url_name)s/(?P<access_type>list_tasks)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.list_tasks',
+         'List of all Tasks in'),
         ]
 
     new_params['public_field_keys'] = ["name", "scope_path"]
@@ -324,6 +339,9 @@ class View(program.View):
 
     timeline_entity = gci_program_entity.timeline
 
+    mentor_entity = None
+    org_admin_entity = None
+
     org_app_survey = org_app_logic.getForProgram(gci_program_entity)
 
     if org_app_survey and \
@@ -405,6 +423,25 @@ class View(program.View):
           gci_program_entity, params)
       # add a link to list all the organizations
       items += [(url, "List participating Organizations", 'any_access')]
+
+    user_fields = {
+        'user': user,
+        'status': 'active'
+        }
+    host_entity = host_logic.logic.getForFields(user_fields, unique=True)
+
+    # for org admins this link should be visible only after accepted
+    # organizations are announced and for other public after the tasks
+    # are public but for program host it must be visible always
+    if (host_entity or
+        ((org_admin_entity or mentor_entity) and timeline_helper.isAfterEvent(
+        timeline_entity, 'tasks_publicly_visible')) or
+        (timeline_helper.isAfterEvent(
+        timeline_entity, 'tasks_publicly_visible'))):
+      url = gci_redirects.getListAllTasksRedirect(
+          gci_program_entity, params)
+      # add a link to list all the organizations
+      items += [(url, "List all tasks", 'any_access')]
 
     return items
 
@@ -639,39 +676,99 @@ class View(program.View):
                      params=aa_params, filter=filter,
                      visibility='participating')
 
-  @decorators.merge_params
-  @decorators.check_access
-  def search(self, request, access_type, page_name=None, params=None,
-             **kwargs):
-    """View where all the public tasks can be searched from.
+  def getListTasksData(self, request, params, tasks_filter):
+    """Returns the list data for all tasks list for program host and
+    all public tasks for others.
+
+    Args:
+      request: HTTPRequest object
+      params: params of the task entity for the list
+      tasks_filter: dictionary that must be passed to obtain the tasks data
     """
 
+    idx = request.GET.get('idx', '')
+    idx = int(idx) if idx.isdigit() else -1
+
+    # default list settings
+    args = []
+    order = ['-modified_on']
+    visibility = 'public'
+
+    if idx == 0:
+      contents = lists.getListData(request, params, tasks_filter,
+                                   visibility=visibility,
+                                   order=order, args=args)
+    else:
+      return responses.jsonErrorResponse(request, "idx not valid")
+
+    json = simplejson.dumps(contents)
+
+    return responses.jsonResponse(request, json)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listTasks(self, request, access_type, page_name=None, params=None,
+                **kwargs):
+    """View where all the tasks can be searched from.
+    """
+
+    from soc.logic.models import user as user_logic
     from soc.modules.gci.views.models.task import view as task_view
 
     logic = params['logic']
 
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
-    page_name = '%s %s' %(page_name, program_entity.name)
+    page_name = '%s %s' % (page_name, program_entity.name)
 
     list_params = task_view.getParams().copy()
-    list_params['list_description'] = ugettext(
-        'This page lists all publicly visible tasks. Use this to find a task '
-        'suited for you.')
+
+    user_account = user_logic.logic.getForCurrentAccount()
+    user_fields = {
+        'user': user_account,
+        'status': 'active'
+        }
+
+    host_entity = host_logic.logic.getForFields(user_fields, unique=True)
+
+    tasks_filter = {
+        'program': program_entity,
+        'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
+                   'ActionNeeded', 'Closed', 'AwaitingRegistration',
+                   'NeedsWork', 'NeedsReview'],
+        }
+    if host_entity:
+      list_params['list_description'] = self.DEF_LIST_VALID_TASKS_MSG_FMT % (
+          program_entity.name)
+      tasks_filter['status'].extend(['Unapproved', 'Unpublished'])
+    else:
+      list_params['list_description'] = self.DEF_LIST_PUBLIC_TASKS_MSG_FMT % (
+          program_entity.name)
+
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': redirects.getPublicRedirect(entity, list_params)
         }
+    list_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+        }
 
-    filter = {'program': program_entity,
-              'status': 
-                  ['Open', 'Reopened',
-                   'ClaimRequested', 'Claimed', 'ActionNeeded',
-                   'Closed', 'AwaitingRegistration', 'NeedsWork',
-                   'NeedsReview'],
-             }
+    if request.GET.get('fmt') == 'json':
+        return self.getListTasksData(request, list_params, tasks_filter)
 
-    return self.list(request, 'allow', page_name, params=list_params,
-                     filter=filter)
+    tasks = gci_task_logic.logic.getForFields(filter=tasks_filter, unique=True)
+
+    contents = []
+
+    if tasks:
+      tasks_list = lists.getListGenerator(request, list_params, idx=0)
+      contents.append(tasks_list)
+
+    if contents:
+      return self._list(request, list_params, contents, page_name)
+    else:
+      raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
+
 
 view = View()
 
@@ -683,8 +780,8 @@ delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
+list_tasks = decorators.view(view.listTasks)
 public = decorators.view(view.public)
-search = decorators.view(view.search)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
 difficulty_tag_edit = decorators.view(view.difficultyTagEdit)

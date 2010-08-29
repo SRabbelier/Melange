@@ -49,6 +49,15 @@ def getListTasksRedirect(entity, params):
 
   return result
 
+def getListAllTasksRedirect(entity, params):
+  """Returns the redirect for the List of all tasks page for
+  the given program entity and Program View params.
+  """
+
+  result = '/%s/list_tasks/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
 
 def getListStudentTasksRedirect(entity, params):
   """Returns the redirect for the List Student Tasks page for the given entity.

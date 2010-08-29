@@ -23,8 +23,8 @@ queue:
   rate: 1/s
   bucket_size: 1
 
-# queue used by the GHOP module to do GHOP task related work
-- name: ghop-update
+# queue used by the GCI module to do GCI task related work
+- name: gci-update
   rate: 5/s
   bucket_size: 5
 

@@ -55,7 +55,7 @@ class Student(soc.models.role.Role):
       choices=countries.COUNTRIES_AND_TERRITORIES)
   school_country.group = ugettext("5. Education")
 
-  #: School type can be only High school for GHOP and can be University
+  #: School type can be only High school for GCI and can be University
   #: for GSoC.
   school_type = db.StringProperty(required=False,
                                   verbose_name=ugettext('School Type'),

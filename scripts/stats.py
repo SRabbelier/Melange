@@ -426,7 +426,7 @@ def exportStudentsWithProjects(csv_filename, scope_path_start=''):
   """
   # TODO(Pawel.Solyga): Add additional Program parameter to this method 
   # so we export students from different programs
-  # TODO(Pawel.Solyga): Make it universal so it works with both GHOP 
+  # TODO(Pawel.Solyga): Make it universal so it works with both GCI 
   # and GSoC programs
 
   from soc.models.student_project import StudentProject

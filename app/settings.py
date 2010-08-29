@@ -118,7 +118,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'soc.views.helper',
     'soc.modules.gsoc.views.helper',
-    'soc.modules.ghop.views.helper',
+    'soc.modules.gci.views.helper',
 #    'django.contrib.auth',
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',
@@ -127,6 +127,6 @@ INSTALLED_APPS = (
 
 MODULE_FMT = 'soc.modules.%s.callback'
 MODULES = ['gsoc', 'statistic']
-# TODO: to enable GHOP uncomment the following line (and of course
+# TODO: to enable GCI uncomment the following line (and of course
 # comment the previous line):
-#MODULES = ['gsoc', 'statistic', 'ghop']
+#MODULES = ['gsoc', 'statistic', 'gci']

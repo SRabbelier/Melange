@@ -38,8 +38,8 @@ def getOrSetScope(entity):
   import soc.modules.gsoc.models.organization
   import soc.modules.gsoc.models.program
 
-  import soc.modules.ghop.models.organization
-  import soc.modules.ghop.models.program
+  import soc.modules.gci.models.organization
+  import soc.modules.gci.models.program
 
 
   if getattr(entity, 'scope', None):
@@ -48,10 +48,10 @@ def getOrSetScope(entity):
   # use prefix to generate dict key
   scope_types = {
       "gsoc_program": soc.modules.gsoc.models.program.GSoCProgram,
-      "ghop_program": soc.modules.ghop.models.program.GHOPProgram,
+      "gci_program": soc.modules.gci.models.program.GCIProgram,
       "program": soc.models.program.Program,
       "gsoc_org": soc.modules.gsoc.models.organization.GSoCOrganization,
-      "ghop_org": soc.modules.ghop.models.organization.GHOPOrganization,
+      "gci_org": soc.modules.gci.models.organization.GCIOrganization,
       "org": soc.models.organization.Organization,
       "user": soc.models.user.User,
       "site": soc.models.site.Site}

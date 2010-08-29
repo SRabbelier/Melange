@@ -51,12 +51,12 @@ from soc.models.survey_record import SurveyRecord
 
 from soc.models.user import User
 
-from soc.modules.ghop.models.mentor import GHOPMentor
-from soc.modules.ghop.models.org_admin import GHOPOrgAdmin
-from soc.modules.ghop.models.organization import GHOPOrganization
-from soc.modules.ghop.models.program import GHOPProgram
-from soc.modules.ghop.models.student import GHOPStudent
-from soc.modules.ghop.models.timeline import GHOPTimeline
+from soc.modules.gci.models.mentor import GCIMentor
+from soc.modules.gci.models.org_admin import GCIOrgAdmin
+from soc.modules.gci.models.organization import GCIOrganization
+from soc.modules.gci.models.program import GCIProgram
+from soc.modules.gci.models.student import GCIStudent
+from soc.modules.gci.models.timeline import GCITimeline
 
 from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.modules.gsoc.models import student_proposal
@@ -295,46 +295,46 @@ def seed(request, *args, **kwargs):
   gsoc2009 = GSoCProgram(**program_properties)
   gsoc2009.put()
 
-  # TODO: Use real GHOPProgram here
+  # TODO: Use real GCIProgram here
   timeline_properties = {
-        'key_name': 'google/ghop2009',
-        'link_id': 'ghop2009',
+        'key_name': 'google/gci2009',
+        'link_id': 'gci2009',
         'scope_path': 'google',
         'scope': google,
         }
 
-  ghop2009_timeline = GHOPTimeline(**timeline_properties)
-  ghop2009_timeline.put()
+  gci2009_timeline = GCITimeline(**timeline_properties)
+  gci2009_timeline.put()
 
 
   program_properties.update({
-      'key_name': 'google/ghop2009',
-      'link_id': 'ghop2009',
-      'name': 'Google Highly Open Participation Contest 2009',
-      'short_name': 'GHOP 2009',
-      'group_label': 'GHOP',
-      'description': 'This is the program for GHOP 2009.',
-      'timeline': ghop2009_timeline,
+      'key_name': 'google/gci2009',
+      'link_id': 'gci2009',
+      'name': 'Google Code In Contest 2009',
+      'short_name': 'GCI 2009',
+      'group_label': 'GCI',
+      'description': 'This is the program for GCI 2009.',
+      'timeline': gci2009_timeline,
       })
 
-  ghop2009 = GHOPProgram(**program_properties)
-  ghop2009.put()
+  gci2009 = GCIProgram(**program_properties)
+  gci2009.put()
 
 
   group_properties.update({
-    'key_name': 'google/ghop2009/melange',
+    'key_name': 'google/gci2009/melange',
     'link_id': 'melange',
     'name': 'Melange Development Team',
     'short_name': 'Melange',
-    'scope_path': 'google/ghop2009',
-    'scope': ghop2009,
+    'scope_path': 'google/gci2009',
+    'scope': gci2009,
     'home_page': 'http://code.google.com/p/soc',
     'description': 'Melange, share the love!',
     'license_name': 'Apache License',
     'ideas': 'http://code.google.com/p/soc/issues',
     })
 
-  melange = GHOPOrganization(**group_properties)
+  melange = GCIOrganization(**group_properties)
   melange.put()
   # create a new ranker
   ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
@@ -385,17 +385,17 @@ def seed(request, *args, **kwargs):
         org_1_mentor.put()
 
   role_properties.update({
-      'key_name': 'google/ghop2009/melange/test',
+      'key_name': 'google/gci2009/melange/test',
       'link_id': 'test',
-      'scope_path': 'google/ghop2009/melange',
+      'scope_path': 'google/gci2009/melange',
       'scope': melange,
-      'program': ghop2009,
+      'program': gci2009,
       })
 
-  melange_admin = GHOPOrgAdmin(**role_properties)
+  melange_admin = GCIOrgAdmin(**role_properties)
   melange_admin.put()
 
-  melange_mentor = GHOPMentor(**role_properties)
+  melange_mentor = GCIMentor(**role_properties)
   melange_mentor.put()
 
   student_id = 'test'
@@ -949,23 +949,23 @@ def clear(*args, **kwargs):
   entities = itertools.chain(*[
       Notification.all(),
       GSoCMentor.all(),
-      GHOPMentor.all(),
+      GCIMentor.all(),
       GSoCStudent.all(),
-      GHOPStudent.all(),
+      GCIStudent.all(),
       Survey.all(),
       SurveyContent.all(),
       SurveyRecord.all(),
       GSoCOrgAdmin.all(),
-      GHOPOrgAdmin.all(),
+      GCIOrgAdmin.all(),
       ranker.all(),
       RankerRoot.all(),
       StudentProposal.all(),
       GSoCOrganization.all(),
-      GHOPOrganization.all(),
+      GCIOrganization.all(),
       GSoCTimeline.all(),
-      GHOPTimeline.all(),
+      GCITimeline.all(),
       GSoCProgram.all(),
-      GHOPProgram.all(),
+      GCIProgram.all(),
       Host.all(),
       Sponsor.all(),
       User.all(),

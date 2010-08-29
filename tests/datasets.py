@@ -159,10 +159,10 @@ class TimelineData(DataSet):
     scope = SponsorData.google
 
 
-class GHOPTimelineData(DataSet):
-  class ghop2009:
-    key_name = 'google/ghop2009'
-    link_id = 'ghop2009'
+class GCITimelineData(DataSet):
+  class gci2009:
+    key_name = 'google/gci2009'
+    link_id = 'gci2009'
     scope_path = 'google'
     scope = SponsorData.google
     program_start =  datetime.today() - timedelta(days=30)
@@ -187,25 +187,25 @@ class ProgramData(DataSet):
     status = 'visible'
 
 
-class GHOPProgramData(DataSet):
-  class ghop2009:
-    key_name = 'google/ghop2009'
-    link_id = 'ghop2009'
+class GCIProgramData(DataSet):
+  class gci2009:
+    key_name = 'google/gci2009'
+    link_id = 'gci2009'
     scope_path ='google'
     scope = SponsorData.google
-    name = 'Google Highly Open Participation Contest 2009'
-    short_name = 'GHOP 2009'
-    group_label = 'GHOP'
-    description = 'This is the program for GHOP 2009.'
+    name = 'Google Code In Contest 2009'
+    short_name = 'GCI 2009'
+    group_label = 'GCI'
+    description = 'This is the program for GCI 2009.'
     apps_tasks_limit = 42
     slots = 42
-    timeline = GHOPTimelineData.ghop2009
+    timeline = GCITimelineData.gci2009
     status = 'visible'
 
 
 class OrgData(DataSet):
   class melange_gsoc:
-    key_name = 'google/ghop2009/melange'
+    key_name = 'google/gci2009/melange'
     link_id = 'melange'
     name = 'Melange Development Team'
     short_name = 'Melange'
@@ -225,14 +225,14 @@ class OrgData(DataSet):
     status = 'active'
 
 
-class GHOPOrganizationData(DataSet):
-  class melange_ghop:
-    key_name = 'google/ghop2009/melange'
+class GCIOrganizationData(DataSet):
+  class melange_gci:
+    key_name = 'google/gci2009/melange'
     link_id = 'melange'
     name = 'Melange Development Team'
     short_name = 'Melange'
-    scope_path = 'google/ghop2009'
-    scope = GHOPProgramData.ghop2009
+    scope_path = 'google/gci2009'
+    scope = GCIProgramData.gci2009
     home_page = 'http://code.google.com/p/soc'
     description = 'Melange, share the love!'
     license_name = 'Apache License'
@@ -247,13 +247,13 @@ class GHOPOrganizationData(DataSet):
     status = 'active'
     task_quota_limit = 100
 
-  class asf_ghop:
-    key_name = 'google/ghop2009/asf'
+  class asf_gci:
+    key_name = 'google/gci2009/asf'
     link_id = 'asf'
     name = 'ASF Development Team'
     short_name = 'ASF'
-    scope_path = 'google/ghop2009'
-    scope = GHOPProgramData.ghop2009
+    scope_path = 'google/gci2009'
+    scope = GCIProgramData.gci2009
     home_page = 'http://apache.org'
     description = 'Apache Software Foundation'
     license_name = 'Apache License'
@@ -268,13 +268,13 @@ class GHOPOrganizationData(DataSet):
     status = 'active'
 
 
-class GHOPOrgAdminData(DataSet):
+class GCIOrgAdminData(DataSet):
   class melange:
-    key_name = 'google/ghop2009/melange/test'
+    key_name = 'google/gci2009/melange/test'
     link_id = 'test'
-    scope_path = 'google/ghop2009/melange'
-    scope = GHOPOrganizationData.melange_ghop
-    program = GHOPProgramData.ghop2009
+    scope_path = 'google/gci2009/melange'
+    scope = GCIOrganizationData.melange_gci
+    program = GCIProgramData.gci2009
     user = UserData.melange_admin_0001
     given_name = 'Test'
     surname = 'Example'
@@ -290,13 +290,13 @@ class GHOPOrgAdminData(DataSet):
     agreed_to_tos = True
 
 
-class GHOPMentorData(DataSet):
+class GCIMentorData(DataSet):
   class melange:
-    key_name = 'google/ghop2009/melange/test'
+    key_name = 'google/gci2009/melange/test'
     link_id = 'test'
-    scope_path = 'google/ghop2009/melange'
-    scope = GHOPOrganizationData.melange_ghop
-    program = GHOPProgramData.ghop2009
+    scope_path = 'google/gci2009/melange'
+    scope = GCIOrganizationData.melange_gci
+    program = GCIProgramData.gci2009
     user = UserData.melange_mentor_0001
     given_name = 'Test'
     surname = 'Example'
@@ -312,14 +312,14 @@ class GHOPMentorData(DataSet):
     agreed_to_tos = True
 
 
-class GHOPStudentData(DataSet):
+class GCIStudentData(DataSet):
   class melange_student_0001:
     student_id = 'melange_student_0001'
-    key_name = GHOPProgramData.ghop2009.key_name + "/" + student_id
+    key_name = GCIProgramData.gci2009.key_name + "/" + student_id
     link_id = student_id
-    scope_path = GHOPProgramData.ghop2009.key_name
-    scope = GHOPProgramData.ghop2009
-    program = GHOPProgramData.ghop2009
+    scope_path = GCIProgramData.gci2009.key_name
+    scope = GCIProgramData.gci2009
+    program = GCIProgramData.gci2009
     user = UserData.melange_student_0001
     given_name = 'Melange_Student'
     surname = 'Melfam'
@@ -349,11 +349,11 @@ class GHOPStudentData(DataSet):
 
   class asf_student_0001:
     student_id = 'asf_student_0001'
-    key_name = GHOPProgramData.ghop2009.key_name + "/" + student_id
+    key_name = GCIProgramData.gci2009.key_name + "/" + student_id
     link_id = student_id
-    scope_path = GHOPProgramData.ghop2009.key_name
-    scope = GHOPProgramData.ghop2009
-    program = GHOPProgramData.ghop2009
+    scope_path = GCIProgramData.gci2009.key_name
+    scope = GCIProgramData.gci2009
+    program = GCIProgramData.gci2009
     user = UserData.melange_student_0001
     given_name = 'ASF_Student'
     surname = 'Asffam'
@@ -381,13 +381,13 @@ class GHOPStudentData(DataSet):
     can_we_contact_you = True
     program_knowledge = 'From slashdot.org post last year.'
 
-class GHOPTaskData(DataSet):
+class GCITaskData(DataSet):
   class melange_task_unapproved:
     # simulating link id since this is constructed on the fly
     # when the task is created using the timestamp
     link_id = 't126518233415'
-    scope_path = GHOPOrganizationData.melange_ghop.key_name
-    scope = GHOPOrganizationData.melange_ghop
+    scope_path = GCIOrganizationData.melange_gci.key_name
+    scope = GCIOrganizationData.melange_gci
     key_name = scope_path + "/" + link_id
     title = 'Melange is a great organization'
     description = """Melange is awesome. So help them improve their
@@ -396,25 +396,25 @@ class GHOPTaskData(DataSet):
     task_type = 'coding'
     arbit_tag = 'web'
     time_to_complete = 24
-    mentors = [GHOPMentorData.melange]
-    program = GHOPProgramData.ghop2009
+    mentors = [GCIMentorData.melange]
+    program = GCIProgramData.gci2009
     status = 'Unapproved'
-    created_by = GHOPMentorData.melange
+    created_by = GCIMentorData.melange
 
   class melange_task_unpublished:
     link_id = 't126518233416'
-    scope_path = GHOPOrganizationData.melange_ghop.key_name
-    scope = GHOPOrganizationData.melange_ghop
+    scope_path = GCIOrganizationData.melange_gci.key_name
+    scope = GCIOrganizationData.melange_gci
     key_name = scope_path + "/" + link_id
-    title = 'Fix GHOP issues'
-    description = """There are a lot of GHOP related issues on issue
-        tracker. There are tasks on GHOPTODO wiki page too. Please
+    title = 'Fix GCI issues'
+    description = """There are a lot of GCI related issues on issue
+        tracker. There are tasks on GCITODO wiki page too. Please
         pick one of them and complete them"""
     difficulty = 'hard'
     task_type = 'coding'
     arbit_tag = 'python'
     time_to_complete = 72
-    mentors = [GHOPOrgAdminData.melange]
-    program = GHOPProgramData.ghop2009
+    mentors = [GCIOrgAdminData.melange]
+    program = GCIProgramData.gci2009
     status = 'Unpublished'
-    created_by = GHOPOrgAdminData.melange
+    created_by = GCIOrgAdminData.melange

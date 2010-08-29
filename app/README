@@ -49,7 +49,7 @@ a release:
    * A is a major number (currently '0' until at least GSoC functionality
      is completely implemented)
    * B is a (possibly multi-digit) minor number that is increased whenever
-     there is a major increase in functionality (some major GSoC or GHOP
+     there is a major increase in functionality (some major GSoC or GCI
      feature, e.g. student sign-ups and proposals, is implemented)
    * YYYY is the four digit year of the release date
    * MM is the (always) two digit month of the release date (zero-padded)

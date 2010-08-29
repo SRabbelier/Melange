@@ -197,7 +197,7 @@ class View(organization.View):
 
     return self.json(request, data, False)
 
-  # TODO (dhans): merge common items with the GHOP module in a single function
+  # TODO (dhans): merge common items with the GCI module in a single function
   def _getExtraMenuItems(self, role_description, params=None):
     """Used to create the specific Organization menu entries.
 

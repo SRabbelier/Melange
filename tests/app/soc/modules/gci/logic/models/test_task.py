@@ -1,0 +1,32 @@
+#!/usr/bin/env python2.5
+#
+# Copyright 2010 the Melange authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+__authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  ]
+
+
+from soc.modules.gci.logic.models import task
+from tests.app.soc.modules.gci.models.test_task import GCITask
+
+
+class Logic(task.Logic):
+  """Simple test logic.
+  """
+
+  def __init__(self):
+    super(Logic, self).__init__(GCITask)

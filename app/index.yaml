@@ -63,8 +63,8 @@ indexes:
   - name: grading_survey_group
   - name: __key__
 
-# used to order the accepted GHOPorganizations on there name
-- kind: GHOPOrganization
+# used to order the accepted GCIorganizations on there name
+- kind: GCIOrganization
   properties:
   - name: scope
   - name: status
@@ -84,21 +84,21 @@ indexes:
   - name: status
   - name: slots
 
-# used to order GHOPComments under a GHOPTask with that GHOPTask being
+# used to order GCIComments under a GCITask with that GCITask being
 # its ancestor entity in the entity group.
-- kind: GHOPComment
+- kind: GCIComment
   ancestor: yes
   properties:
   - name: created_on
 
-# used to order GHOPWorkSubmissions under a GHOPTask with that GHOPTask being
+# used to order GCIWorkSubmissions under a GCITask with that GCITask being
 # its ancestor entity in the entity group.
-- kind: GHOPWorkSubmission
+- kind: GCIWorkSubmission
   ancestor: yes
   properties:
   - name: submitted_on
 
-# used to fetch Task Difficulty levels for a given GHOP Program in the
+# used to fetch Task Difficulty levels for a given GCI Program in the
 # specified order of tags.
 - kind: TaskDifficultyTag
   properties:
@@ -106,7 +106,7 @@ indexes:
   - name: order
     direction: desc
 
-# used to fetch Task Difficulty levels for a given GHOP Program in the
+# used to fetch Task Difficulty levels for a given GCI Program in the
 # specified order of tags which is used to create a new tag. When creating
 # a TaskDifficultyTag we need to determine the highest order'ed Tag and then
 # assign an order of one greater than the highest order'ed tag to the newly
@@ -116,7 +116,7 @@ indexes:
   - name: scope
   - name: order
 
-# used to fetch Task Type tags for a given GHOP Program in the
+# used to fetch Task Type tags for a given GCI Program in the
 # specified order of tags.
 - kind: TaskTypeTag
   properties:
@@ -124,7 +124,7 @@ indexes:
   - name: order
     direction: desc
 
-# used to fetch Task Type tags for a given GHOP Program in the
+# used to fetch Task Type tags for a given GCI Program in the
 # specified order of tags which is used to create a new tag. When creating
 # a TaskTypeTag we need to determine the highest order'ed Tag and then
 # assign an order of one greater than the highest order'ed tag to the newly
@@ -134,7 +134,7 @@ indexes:
   - name: scope
   - name: order
 
-# used to fetch arbitrary tags for a given GHOP Program in the
+# used to fetch arbitrary tags for a given GCI Program in the
 # specified order of tags.
 - kind: TaskArbitraryTag
   properties:
@@ -143,7 +143,7 @@ indexes:
     direction: desc
 
 # used to fetch all the valid tasks for a given mentor under a program
-- kind: GHOPTask
+- kind: GCITask
   properties:
   - name: mentors
   - name: program

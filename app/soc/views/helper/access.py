@@ -57,12 +57,12 @@ from soc.modules import callback
 from soc.views.helper import redirects
 from soc.views import out_of_band
 
-from soc.modules.ghop.logic.models.mentor import logic as ghop_mentor_logic
-from soc.modules.ghop.logic.models.organization import logic as ghop_org_logic
-from soc.modules.ghop.logic.models.org_admin import logic as \
-    ghop_org_admin_logic
-from soc.modules.ghop.logic.models.program import logic as ghop_program_logic
-from soc.modules.ghop.logic.models.student import logic as ghop_student_logic
+from soc.modules.gci.logic.models.mentor import logic as gci_mentor_logic
+from soc.modules.gci.logic.models.organization import logic as gci_org_logic
+from soc.modules.gci.logic.models.org_admin import logic as \
+    gci_org_admin_logic
+from soc.modules.gci.logic.models.program import logic as gci_program_logic
+from soc.modules.gci.logic.models.student import logic as gci_student_logic
 
 from soc.modules.gsoc.logic.models.mentor import logic as gsoc_mentor_logic
 from soc.modules.gsoc.logic.models.organization import logic as gsoc_org_logic
@@ -267,9 +267,9 @@ class Checker(object):
     'org_admin': ('checkHasDocumentAccess', [org_admin_logic, 'org']),
     'org_mentor': ('checkHasDocumentAccess', [mentor_logic, 'org']),
     'org_student': ('checkHasDocumentAccess', [student_logic, 'org']),
-    'ghop_org_admin': ('checkHasDocumentAccess', [ghop_org_admin_logic, 'org']),
-    'ghop_org_mentor': ('checkHasDocumentAccess', [ghop_mentor_logic, 'org']),
-    'ghop_org_student': ('checkHasDocumentAccess', [ghop_student_logic, 'org']),
+    'gci_org_admin': ('checkHasDocumentAccess', [gci_org_admin_logic, 'org']),
+    'gci_org_mentor': ('checkHasDocumentAccess', [gci_mentor_logic, 'org']),
+    'gci_org_student': ('checkHasDocumentAccess', [gci_student_logic, 'org']),
     'gsoc_org_admin': ('checkHasDocumentAccess', [gsoc_org_admin_logic, 'org']),
     'gsoc_org_mentor': ('checkHasDocumentAccess', [gsoc_mentor_logic, 'org']),
     'gsoc_org_student': ('checkHasDocumentAccess', [gsoc_student_logic, 'org']),
@@ -283,13 +283,13 @@ class Checker(object):
       'site': None,
       'sponsor': (sponsor_logic, {'sponsor': 0}),
       'program': (program_logic, {'sponsor': 1, 'program': 0}),
-      'ghop_program': (
-          ghop_program_logic, {'sponsor': 1, 'ghop_program': 0}),
+      'gci_program': (
+          gci_program_logic, {'sponsor': 1, 'gci_program': 0}),
       'gsoc_program': (
           gsoc_program_logic, {'sponsor': 1, 'gsoc_program': 0}),
       'org': (org_logic, {'sponsor': 2, 'program': 1, 'org': 0}),
-      'ghop_org': (
-          ghop_org_logic, {'sponsor': 2, 'ghop_program': 1, 'ghop_org': 0}),
+      'gci_org': (
+          gci_org_logic, {'sponsor': 2, 'gci_program': 1, 'gci_org': 0}),
       'gsoc_org': (
           gsoc_org_logic, {'sponsor': 2, 'gsoc_program': 1, 'gsoc_org': 0}),
       }
@@ -1590,10 +1590,10 @@ class Checker(object):
       org_admin_logic = gsoc_org_admin_logic
       mentor_logic = gsoc_mentor_logic
       student_logic = gsoc_student_logic
-    elif django_args['prefix'] == 'ghop_program':
-      org_admin_logic = ghop_org_admin_logic
-      mentor_logic = ghop_mentor_logic
-      student_logic = ghop_student_logic
+    elif django_args['prefix'] == 'gci_program':
+      org_admin_logic = gci_org_admin_logic
+      mentor_logic = gci_mentor_logic
+      student_logic = gci_student_logic
     else:
       # TODO: update when generic surveys are allowed
       return self.deny(django_args)

@@ -142,7 +142,7 @@ th, td {
 }
 
 /*
- * GHOP TASK PAGE
+ * GCI TASK PAGE
  */
 #body #pageheader {
   margin: 0.5em 0 0em 0;
@@ -154,11 +154,11 @@ th, td {
   background: #c3d9ff;
 }
 
-.ghoptaskcomment {
+.gcitaskcomment {
   margin: 1em .7em 0 .7em;
 }
 
-.ghoptaskcomment .title {
+.gcitaskcomment .title {
   background: #f5f6ce;
   font-size: small;
 }
@@ -182,7 +182,7 @@ img#subscribe {
   top: 2px;
 }
 
-.ghoptaskcomment .title a {
+.gcitaskcomment .title a {
   color: #C60F0F;
 }
 

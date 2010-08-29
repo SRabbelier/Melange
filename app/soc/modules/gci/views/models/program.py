@@ -19,11 +19,12 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
-	'"Mario Ferraro <fadinlight@gmail.com>"',
+    '"Mario Ferraro <fadinlight@gmail.com>"',
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+from google.appengine.ext import db
 
 from django import forms
 from django import http
@@ -232,23 +233,57 @@ class View(program.View):
   @decorators.merge_params
   @decorators.check_access
   def assignTaskQuotas(self, request, access_type, page_name=None,
-                                       params=None, filter=None, **kwargs):
+                       params=None, filter=None, **kwargs):
     """View that allows to assign task quotas for accepted GCI organization.
 
     This view allows the program admin to set the task quota limits
     and change them at any time when the program is active.
     """
 
+    logic = params['logic']
+    entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.method == 'POST':
+      return self.assignTaskQuotasPost(request, entity, params=params)
+    else:
+      return self.assignTaskQuotasGet(request, entity, params=params)
+
+  def assignTaskQuotasPost(self, request, entity, params):
+    """Handles the POST request for the assign task quota limit list.
+    """
+
     # TODO: Once GAE Task APIs arrive, this view will be managed by them
+    # TODO to TODO(Lennard): GAE required anymore?
+
+    from soc.modules.gci.logic.models import organization as gci_org_logic
+
+    post_dict = request.POST
+
+    org_items = simplejson.loads(post_dict.get('data', '[]'))
+
+    org_entities = []
+    for org_key_name in org_items.keys():
+      org_entity = gci_org_logic.logic.getFromKeyName(org_key_name)
+
+      try:
+        org_task_quota = int(org_items[org_key_name]['task_quota_limit'])
+      except ValueError:
+        org_task_quota = 0
+
+      org_entity.task_quota_limit = org_task_quota
+      org_entities.append(org_entity)
+
+    db.put(org_entities)
+
+    return http.HttpResponseRedirect('')
+
+  def assignTaskQuotasGet(self, request, entity, params=None):
+    """Handles the GET request for the assign task quota limit list.
+    """
 
     from soc.modules.gci.views.models import organization as gci_org_view
 
-    logic = params['logic']
-    program_entity = logic.getFromKeyFieldsOr404(kwargs)
-
     slots_params = gci_org_view.view.getParams().copy()
-
-    # TODO(Edit quotas inline - Madhu and Mario)
 
     slots_params['list_description'] = self.DEF_TASK_QUOTA_ALLOCATION_MSG
     slots_params['quota_field_keys'] = ['name', 'task_quota_limit']
@@ -260,10 +295,12 @@ class View(program.View):
         'type': 'post_edit',
         'parameters': {'url': ''}}]
 
-    filter = {'scope': program_entity,
-                 'status': ['new', 'active']
-                }
+    filter = {
+        'scope': entity,
+        'status': ['new', 'active']
+        }
 
+    page_name = params.get('page_name', 'Assign task quota limits')
     return self.list(request, 'allow', page_name=page_name,
                      params=slots_params, filter=filter,
                      visibility='quota')

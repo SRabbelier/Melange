@@ -392,7 +392,7 @@ class View(program.View):
           items += self._getOrganizationEntries(
               gci_program_entity, org_admin_entity,
               mentor_entity, params, id, user)
-        elif timeline_helper.isBeforeEvent(timeline_entity, 'program_end'):
+        if timeline_helper.isBeforeEvent(timeline_entity, 'program_end'):
           # add apply to become a mentor link
           items += [
               ('/gci/org/apply_mentor/%s' % (

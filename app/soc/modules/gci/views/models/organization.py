@@ -188,6 +188,8 @@ class View(organization.View):
 
     from soc.modules.gci.views.models import task as gci_task_view
 
+    context = {'list': []}
+
     entity = self._params['logic'].getFromKeyFieldsOr404(kwargs)
     gci_program_entity = entity.scope
 
@@ -257,9 +259,9 @@ class View(organization.View):
         tcl_list = lists.getListGenerator(request, tcl_params, idx=2)
         contents.append(tcl_list)
 
-      context = {'list': soc.logic.lists.Lists(contents)}
+      context['list'] = soc.logic.lists.Lists(contents)
 
-      params['context'] = context
+    params['context'] = context
 
     return super(View, self).home(request, 'any_access', page_name=page_name,
                                   params=params, **kwargs)

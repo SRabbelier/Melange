@@ -94,9 +94,16 @@ class View(group.View):
     roles = role_description['roles']
   
     if roles.get('host'):
-      # add a link to create a new program
-      submenu = (redirects.getCreateRedirect(group_entity,
-          {'url_name': 'program'}),"Create a New Program", 'any_access')
+      # add a link to create a new GSoC program
+      submenu = (redirects.getCreateRedirect(
+          group_entity, {'url_name': 'gsoc/program'}),
+          "Create a New GSoC Program", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to create a new GCI program
+      submenu = (redirects.getCreateRedirect(
+          group_entity, {'url_name': 'gci/program'}),
+          "Create a New GCI Program", 'any_access')
       submenus.append(submenu)
 
       # add a link to the management page

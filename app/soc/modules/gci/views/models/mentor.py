@@ -26,7 +26,6 @@ from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
-from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import user as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
@@ -37,6 +36,7 @@ from soc.views.models import mentor
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
+from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import student as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.views.helper import access as gci_access
@@ -52,9 +52,6 @@ class View(mentor.View):
 
   DEF_NO_TASKS_MSG = ugettext(
       'There are no tasks affiliated to you.')
-
-  DEF_PAGE_INACTIVE_MSG = ugettext(
-    'This page is inactive at this time.')
 
   DEF_MENTOR_TASKS_MSG_FMT = ugettext('Tasks I am mentoring for %s.')
 
@@ -86,7 +83,9 @@ class View(mentor.View):
         ('checkIsAllowedToManageRole', [gci_mentor_logic.logic,
                                         gci_org_admin_logic.logic])]
     rights['list_mentor_tasks'] = [
-        ('checkCanOpenTaskList', [gci_mentor_logic.logic, 'gci/mentor'])]
+        ('checkCanOpenTaskList', [gci_mentor_logic.logic, 'gci/mentor']),
+        ('checkIsAfterEvent', ['accepted_organization_announced_deadline',
+                               '__all__', gci_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.mentor.logic
@@ -154,18 +153,10 @@ class View(mentor.View):
     See base.View.list() for more details.
     """
 
-    entity = self._params['logic'].getFromKeyFieldsOr404(kwargs)
+    entity = params['logic'].getFromKeyFieldsOr404(kwargs)
 
     # obtain program entity based on request params
     program = entity.program
-
-    # this check is performed here and not as part of access
-    # checks for this method because the scope for mentor entity
-    # is organization and not program so checkIsAfterEvent access
-    # check method cannot be used
-    if not timeline_helper.isAfterEvent(
-        program.timeline, 'accepted_organization_announced_deadline'):
-      raise out_of_band.Error(self.DEF_PAGE_INACTIVE_MSG)
 
     user_account = user_logic.logic.getForCurrentAccount()
 
@@ -174,7 +165,6 @@ class View(mentor.View):
         'program': program,
         'status': 'active'
         }
-    mentor_entity = self._params['logic'].getForFields(filter, unique=True)
 
     list_params = gci_task_view.view.getParams().copy()
 
@@ -183,7 +173,7 @@ class View(mentor.View):
 
     filter = {
         'program': program,
-        'mentors': [mentor_entity],
+        'mentors': [entity],
         'status': ['Unapproved', 'Unpublished', 'Open', 'Reopened',
                    'ClaimRequested', 'Claimed', 'ActionNeeded', 'Closed',
                    'AwaitingRegistration', 'NeedsWork', 'NeedsReview']

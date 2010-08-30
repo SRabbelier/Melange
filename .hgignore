@@ -4,13 +4,16 @@ syntax: glob
 *.pyc
 *.zip
 *~
+*.orig
+*.swp
 .project
 .pydevproject
+.ropeproject
 app.yaml
 build
-tests/coverageResults
+coverageResults
 *,cover
-tests/.coverage
+.coverage
 *.git
 *.egg-info
 eggs
@@ -19,7 +22,7 @@ parts
 bin
 develop-eggs
 .gitignore
-.DS_Store
+.DS_Store*
 .settings
 .nfs*
 \#*\#

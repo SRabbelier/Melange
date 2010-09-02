@@ -17,6 +17,7 @@
 
 __authors__ = [
   '"Madhusudan C.S." <madhusudancs@gmail.com>',
+  '"Daniel Hans" <dhans@google.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -28,6 +29,7 @@ from soc.modules.gci.views.models import organization
 from soc.modules.gci.views.models import org_admin
 from soc.modules.gci.views.models import org_app_survey
 from soc.modules.gci.views.models import program
+from soc.modules.gci.views.models import ranking
 from soc.modules.gci.views.models import student
 from soc.modules.gci.views.models import task
 from soc.modules.gci.views.models import task_subscription
@@ -58,6 +60,7 @@ class Callback(object):
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_app_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(ranking.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(

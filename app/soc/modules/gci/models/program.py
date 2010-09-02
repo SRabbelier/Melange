@@ -36,7 +36,7 @@ class GCIProgram(soc.models.program.Program):
   #: Required property containing the number of Tasks Students can work
   #: on simultaneously. For GCI it is 1
   nr_simultaneous_tasks = db.IntegerProperty(
-      required=True, default=1, 
+      required=True, default=1,
       verbose_name=ugettext('Simultaneous tasks'))
   nr_simultaneous_tasks.group = ugettext('Contest Rules')
   nr_simultaneous_tasks.help_text = ugettext(
@@ -73,3 +73,9 @@ class GCIProgram(soc.models.program.Program):
   task_types.group = ugettext('Task Settings')
   task_types.help_text = ugettext(
       'List all the types a task can be in.')
+
+  #: A Ranking entity which describes how to rank student participants
+  ranking = db.ReferenceProperty(
+      reference_class=soc.modules.gci.models.ranking.GCIRanking,
+      required=False, collection_name="program",
+      verbose_name=ugettext('Ranking'))

@@ -131,7 +131,8 @@ class View(program.View):
     new_params['module_package'] = 'soc.modules.gci.views.models'
     new_params['url_name'] = 'gci/program'
 
-    new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types']
+    new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types',
+]
 
     patterns = []
     patterns += [
@@ -229,6 +230,18 @@ class View(program.View):
       form.fields['overview_task_types'].initial = tt_str
 
     return super(View, self)._editGet(request, entity, form)
+
+  def _editPost(self, request, entity, fields):
+    """See base._editPost().
+    """
+
+    super(View, self)._editPost(request, entity, fields)
+
+    # if there is no entity, create a new ranking
+    if not entity:
+      fields['ranking'] = self._params['logic'].createRankingForType(fields)
+    else:
+      fields['ranking'] = program.ranking
 
   @decorators.merge_params
   @decorators.check_access
@@ -481,6 +494,29 @@ class View(program.View):
           gci_program_entity, params)
       # add a link to list all the organizations
       items += [(url, "List all tasks", 'any_access')]
+
+    return items
+
+  def _getHostEntries(self, entity, params, prefix):
+    """Returns a list with menu items for program host.
+
+    Args:
+      entity: program entity to get the entries for
+      params: view specific params
+      prefix: module prefix for the program entity
+    """
+
+    items = super(View, self)._getHostEntries(entity, params, prefix)
+
+    # add link to edit Program Ranking
+    if entity.ranking:
+      items += [(redirects.getEditRedirect(entity,
+          {'url_name': prefix + '/ranking'}),
+          "Edit Program Ranking", 'any_access')]
+    else:
+      items += [(redirects.getCreateRedirect(entity,
+          {'url_name': prefix + '/ranking'}),
+          "Edit Program Ranking", 'any_access')]      
 
     return items
 

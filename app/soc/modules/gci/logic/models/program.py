@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -28,7 +29,8 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
-from soc.modules.gci.logic.models.timeline import logic as gci_timeline_logic
+from soc.modules.gci.logic.models import ranking as gci_ranking_logic
+from soc.modules.gci.logic.models import timeline as gci_timeline_logic
 
 import soc.modules.gci.models.program
 
@@ -39,7 +41,8 @@ class Logic(program.Logic):
 
   def __init__(self, model=soc.modules.gci.models.program.GCIProgram,
                base_model=soc.models.program.Program,
-               scope_logic=sponsor_logic, timeline_logic=gci_timeline_logic):
+               scope_logic=sponsor_logic,
+               timeline_logic=gci_timeline_logic.logic):
     """Defines the name, key_name and model for this entity.
     """
 
@@ -47,5 +50,21 @@ class Logic(program.Logic):
                                 scope_logic=scope_logic,
                                 timeline_logic=timeline_logic)
 
+  def createRankingForType(self, fields):
+    """Creates a default ranking entity for a GCI program.
+    """
+
+    key_name = gci_ranking_logic.logic.getKeyNameFromFields(fields)
+
+    properties = {
+        'link_id': fields['link_id'],
+        'scope_path': fields['scope_path'],
+        'scope': fields['scope'],
+        }
+
+    ranking = gci_ranking_logic.logic.updateOrCreateFromKeyName(properties,
+        key_name)
+
+    return ranking
 
 logic = Logic()

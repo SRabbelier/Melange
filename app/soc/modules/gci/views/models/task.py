@@ -599,7 +599,7 @@ class View(base.View):
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      else:
+      elif fields.get('approved'):
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])

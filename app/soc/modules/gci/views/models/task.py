@@ -580,13 +580,20 @@ class View(base.View):
         'user': user_account,
         'status': 'active'
         }
+
+    # get the host entity if the current user is host
+    host_entity = host_logic.logic.getForFields(filter, unique=True)
+
     if not entity:
       filter['scope'] = fields['scope']
     else:
       filter['scope'] = entity.scope
 
-    role_entity = gci_org_admin_logic.logic.getForFields(
+    # get the entity if the current user is org admin
+    org_admin_entity = gci_org_admin_logic.logic.getForFields(
         filter, unique=True)
+
+    role_entity = host_entity or org_admin_entity
 
     if role_entity:
       # this user can publish/approve the task

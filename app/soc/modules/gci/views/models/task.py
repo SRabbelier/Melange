@@ -145,7 +145,7 @@ class View(base.View):
 
   DEF_TASK_UNPUBLISHED_MSG = ugettext(
       'The task is not yet published. It can be edited by clicking on '
-      'the edit button below.')
+      'the edit link next to the title above.')
 
   DEF_WS_MSG_FMT = ugettext(
       '(To see the work submitted <a href=#ws%d>click here</a>.)')

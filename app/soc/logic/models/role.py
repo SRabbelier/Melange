@@ -84,7 +84,7 @@ class Logic(base.Logic):
 
     value = entity_properties[name]
 
-    if (name == 'status') and (entity.status != value) and value == 'active':
+    if (name == 'status') and (entity.status != value):
       # in case the status of the role changes to active we flush the sidebar
       # cache. Other changes will be visible after the retention time expires.
       sidebar.flush(entity.user.account)

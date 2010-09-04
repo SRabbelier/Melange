@@ -25,7 +25,6 @@ import logging
 
 from django.conf.urls import defaults
 
-import settings
 import soc.cache.sidebar
 
 

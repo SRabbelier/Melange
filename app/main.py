@@ -90,6 +90,8 @@ def real_main():
   from soc.modules import callback
   from soc.modules import core
 
+  import settings
+
   callback.registerCore(core.Core())
   callback.getCore().registerModuleCallbacks(settings.MODULES,
                                              settings.MODULE_FMT)

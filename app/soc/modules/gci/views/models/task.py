@@ -183,7 +183,7 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin', 'gci/mentor'], ['active'],
-            ['Unapproved']])]
+            ['Unapproved', 'Unpublished', 'Open']])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.task.logic

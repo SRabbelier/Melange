@@ -60,33 +60,26 @@ def begin(self):
 
 
 def load_melange():
+  """Prepare Melange for usage.
+
+  Registers a core, the GSoC and GCI modules, and calls the sitemap, sidebar
+  and rights services.
   """
-  Registers a core, and SoC, GSoC and GHOP modules callbacks, sitemap, sidebar
-  and rights.
-  """
-  # Register a core for the test modules to use
+
   from soc.modules import callback
   from soc.modules.core import Core
+
+  # Register a core for the test modules to use
   callback.registerCore(Core())
   current_core = callback.getCore()
-  # Register SoC and GSoC modules callbacks
-  current_core.registerModuleCallbacks()
-  # Register GHOP modules callbacks
-  from soc.modules.ghop.callback import Callback
-  ghop_callback = Callback(current_core)
-  ghop_callback.registerWithSitemap()
-  ghop_callback.registerWithSidebar()
-  ghop_callback.registerRights()
-  from soc.modules.soc_core.callback import Callback as soc_core_Callback
-  soc_core_callback = soc_core_Callback(current_core)
-  soc_core_callback.registerWithSitemap()
-  soc_core_callback.registerWithSidebar()
-  soc_core_callback.registerRights()
-  from soc.modules.gsoc.callback import Callback as gsoc_Callback
-  gsoc_callback = gsoc_Callback(current_core)
-  gsoc_callback.registerWithSitemap()
-  gsoc_callback.registerWithSidebar()
-  gsoc_callback.registerRights()
+  modules = ['gsoc', 'gci']
+  fmt = 'soc.modules.%s.callback'
+  current_core.registerModuleCallbacks(modules, fmt)
+
+  # Make sure all services are called
+  current_core.callService('registerWithSitemap', True)
+  current_core.callService('registerWithSidebar', True)
+  current_core.callService('registerRights', True)
 
 
 class AppEngineDatastoreClearPlugin(plugins.Plugin):

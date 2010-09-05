@@ -265,82 +265,6 @@ def convertProposals(org):
     proposal_logic.updateEntityProperties(proposal, fields, silent=True)
 
 
-def startSpam():
-  """Creates the job that is responsible for sending mails.
-  """
-
-  from soc.logic.models.job import logic as job_logic
-  from soc.logic.models.priority_group import logic as priority_logic
-  from soc.logic.models.program import logic as program_logic
-
-  program_entity = program_logic.getFromKeyName('google/gsoc2009')
-
-  priority_group = priority_logic.getGroup(priority_logic.EMAIL)
-  job_fields = {
-      'priority_group': priority_group,
-      'task_name': 'setupStudentProposalMailing',
-      'key_data': [program_entity.key()]}
-
-  job_logic.updateOrCreateFromFields(job_fields)
-
-
-def startUniqueUserIdConversion():
-  """Creates the job that is responsible for adding unique user ids.
-  """
-
-  from soc.logic.models.job import logic as job_logic
-  from soc.logic.models.priority_group import logic as priority_logic
-
-  priority_group = priority_logic.getGroup(priority_logic.CONVERT)
-  job_fields = {
-      'priority_group': priority_group,
-      'task_name': 'setupUniqueUserIdAdder'}
-
-  job_logic.updateOrCreateFromFields(job_fields)
-
-
-def reviveJobs(amount):
-  """Sets jobs that are stuck in 'aborted' to waiting.
-
-  Args:
-    amount: the amount of jobs to revive
-  """
-
-  from soc.models.job import Job
-
-  query = Job.all().filter('status', 'aborted')
-  jobs = query.fetch(amount)
-
-  if not jobs:
-    print "no dead jobs"
-
-  for job in jobs:
-     job.status = 'waiting'
-     job.put()
-     print "restarted %d" % job.key().id()
-
-
-def deidleJobs(amount):
-  """Sets jobs that are stuck in 'started' to waiting.
-
-  Args:
-    amount: the amount of jobs to deidle
-  """
-
-  from soc.models.job import Job
-
-  query = Job.all().filter('status', 'started')
-  jobs = query.fetch(amount)
-
-  if not jobs:
-    print "no idle jobs"
-
-  for job in jobs:
-     job.status = 'waiting'
-     job.put()
-     print "restarted %d" % job.key().id()
-
-
 def deleteEntities(model, step_size=25):
   """Deletes all entities of the specified type
   """
@@ -947,14 +871,10 @@ def main(args):
       'slotSaver': slotSaver,
       'popSaver': popSaver,
       'rawSaver': rawSaver,
-      'startSpam': startSpam,
-      'reviveJobs': reviveJobs,
-      'deidleJobs': deidleJobs,
       'exportStudentsWithProjects': exportStudentsWithProjects,
       'exportUniqueOrgAdminsAndMentors': exportUniqueOrgAdminsAndMentors,
       'exportOrgsForGoogleCode': exportOrgsForGoogleCode,
       'exportRolesForGoogleCode': exportRolesForGoogleCode,
-      'startUniqueUserIdConversion': startUniqueUserIdConversion,
       'surveyRecordCSVExport': surveyRecordCSVExport,
   }
 

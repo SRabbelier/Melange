@@ -1110,7 +1110,7 @@ class View(base.View):
     elif validation == 'accept_claim':
       if action == 'accept':
         deadline = datetime.datetime.now() + datetime.timedelta(
-            seconds=entity.time_to_complete)
+            hours=entity.time_to_complete)
 
         properties = {
             'status': 'Claimed',
@@ -1148,7 +1148,7 @@ class View(base.View):
 
         if fields['extended_deadline'] > 0:
           deadline = entity.deadline + datetime.timedelta(
-              seconds=fields['extended_deadline'])
+              hours=fields['extended_deadline'])
 
           properties['deadline'] = deadline
 

@@ -339,7 +339,7 @@ class Logic(base.Logic):
 
     # deadline is extended by 24 hours.
     deadline = entity.deadline + datetime.timedelta(
-        seconds=24)
+        hours=24)
 
     properties = {
         'status': 'ActionNeeded',

@@ -675,6 +675,20 @@
             if (list_object.jqgrid.dirty_fields[row.key].length === 0) {
               delete list_object.jqgrid.dirty_fields[row.key];
             }
+
+            jQuery.each(list_object.operations.buttons, function (setting_index, operation) {
+              if (operation.type === "post_edit") {
+                var button_object = jQuery("#" + list_object.jqgrid.id + "_buttonOp_" + operation.id);
+                // if this button is a post_edit button then disable or enable the button if dirty_fields apply
+                if (isEmptyObject(list_object.jqgrid.dirty_fields)) {
+                  button_object.attr("disabled","disabled");
+                }
+                else {
+                  button_object.removeAttr("disabled");
+                }
+              }
+            });
+
           }
 
           // Enable editing if set by backend
@@ -689,16 +703,8 @@
 
           jQuery.each(list_object.operations.buttons, function (setting_index, operation) {
             var button_object = jQuery("#" + list_object.jqgrid.id + "_buttonOp_" + operation.id);
-            // if this button is a post_edit button then disable or enable the button if dirty_fields apply
-            if (operation.type === "post_edit") {
-              if (isEmptyObject(list_object.jqgrid.dirty_fields)) {
-                button_object.attr("disabled","disabled");
-              }
-              else {
-                button_object.removeAttr("disabled");
-              }
-            }
-            else {
+            // if this button is not a post_edit button (which is already autoupdated during updates of dirty fields)
+            if (operation.type !== "post_edit") {
               if (selected_ids.length >= operation.real_bounds[0] && selected_ids.length <= operation.real_bounds[1]) {
                 button_object.removeAttr("disabled");
                 // If this is a per-entity operation, substitute click event for button (if present)

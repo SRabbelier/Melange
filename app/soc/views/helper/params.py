@@ -296,7 +296,6 @@ def constructParams(params):
 
   create_dynaproperties = {
       'clean_link_id': cleaning.clean_link_id('link_id'),
-      'clean_feed_url': cleaning.clean_feed_url,
       }
   create_dynaproperties.update(params.get('create_extra_dynaproperties', {}))
 

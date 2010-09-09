@@ -363,20 +363,24 @@ def clean_phone_number(field_name):
   return wrapper
 
 
-def clean_feed_url(self):
+def clean_feed_url(field_name):
   """Clean method for cleaning feed url.
   """
 
-  feed_url = self.cleaned_data.get('feed_url')
+  def wrapper(self):
+    """Decorator wrapped method.
+    """
+    feed_url = self.cleaned_data.get(field_name)
 
-  if feed_url == '':
-    # feed url not supplied (which is OK), so do not try to validate it
-    return None
+    if feed_url == '':
+      # feed url not supplied (which is OK), so do not try to validate it
+      return None
 
-  if not validate.isFeedURLValid(feed_url):
-    raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
+    if not validate.isFeedURLValid(feed_url):
+      raise forms.ValidationError('This URL is not a valid ATOM or RSS feed.')
 
-  return feed_url
+    return feed_url
+  return wrapper
 
 
 def clean_html_content(field_name):

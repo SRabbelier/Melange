@@ -131,7 +131,7 @@ class View(base.View):
         'clean_student': cleaning.clean_link_id('student'),
         'clean_mentor': cleaning.clean_link_id('mentor'),
         'clean_additional_info': cleaning.clean_url('additional_info'),
-        'clean_feed_url': cleaning.clean_feed_url,
+        'clean_feed_url': cleaning.clean_feed_url('feed_url'),
         'clean': cleaning.validate_student_project('scope_path',
             'mentor_id', 'student_id')
         }
@@ -243,7 +243,7 @@ class View(base.View):
         'clean_abstract': cleaning.clean_content_length('abstract'),
         'clean_public_info': cleaning.clean_html_content('public_info'),
         'clean_additional_info': cleaning.clean_url('additional_info'),
-        'clean_feed_url': cleaning.clean_feed_url,
+        'clean_feed_url': cleaning.clean_feed_url('feed_url'),
         }
 
     student_edit_form = dynaform.newDynaForm(

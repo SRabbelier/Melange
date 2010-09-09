@@ -332,7 +332,7 @@ def as_table_row_helper(context, item):
   example_text = item['example_text']
 
   form = context['form']
-  entity = context['entity']
+  entity = context.get('entity', None)
 
   reference = item.get('reference_url')
   filter = item.get('filter')

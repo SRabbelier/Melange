@@ -25,7 +25,6 @@ import logging
 
 from django.conf.urls import defaults
 
-import settings
 import soc.cache.sidebar
 
 
@@ -266,15 +265,14 @@ class Core(object):
       logging.error("ending request: \n'%s'\n != \n'%s'\n" % (
           old_request, request))
 
-  def registerModuleCallbacks(self):
+  def registerModuleCallbacks(self, modules, fmt):
     """Retrieves all callbacks for the modules of this site.
 
     Callbacks for modules without a version number or the wrong API_VERSION
     number are dropped.  They won't be called.
     """
 
-    fmt = settings.MODULE_FMT
-    modules = ['soc_core'] + settings.MODULES
+    modules = ['soc_core'] + modules
     modules = [__import__(fmt % i, fromlist=['']) for i in modules]
 
     for callback_class in [i.Callback for i in modules]:

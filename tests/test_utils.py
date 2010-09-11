@@ -22,12 +22,17 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+import unittest
+import gaetestbed
+
 from django.test import TestCase
 
 from soc.modules import callback
 
 from soc.views.helper import responses
-from tests.pymox import stubout
+from mox import stubout
+from soc.middleware.xsrf import XsrfMiddleware
+from soc.logic.helper import xsrfutil
 
 
 class MockRequest(object):
@@ -138,3 +143,93 @@ class DjangoTestCase(TestCase):
     """
 
     pass
+
+  def getXsrfToken(self, path=None, method='POST', data={}, **extra):
+    """Returns an XSRF token for request contex signed by Melange XSRF middleware. Add this token to POST data in order to pass the validation check of Melange XSRF middleware for HTTP POST.
+    """
+
+    """
+    request = HttpRequest()
+    request.path = path
+    request.method = method
+    """
+    # request is currently not used in _getSecretKey
+    request = None
+    xsrf = XsrfMiddleware()
+    key = xsrf._getSecretKey(request)
+    user_id = xsrfutil._getCurrentUserId()
+    xsrf_token = xsrfutil._generateToken(key, user_id)
+    return xsrf_token
+
+
+class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
+  """Class extending gaetestbed.mail.MailTestCase in order to extend its functions.
+  Difference:
+  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  * Override assertEmailSent method.
+  """
+
+  def setUp(self):
+    """Sets up gaetestbed.mail.MailTestCase.
+    """
+
+    super(MailTestCase, self).setUp()
+
+  def assertEmailSent(self, to=None, sender=None, subject=None, body=None, html=None, n=None):
+    """Override gaetestbed.mail.MailTestCase.assertEmailSent method.
+    Difference:
+    * It will print out all sent messages to facilitate debug in case of failure.
+    * It accepts an optional argument n which is used to assert exactly n messages satisfying the criteria are sent out.
+    """
+
+    messages = self.get_sent_messages(
+        to = to,
+        sender = sender,
+        subject = subject,
+        body = body,
+        html = html,
+    )
+    failed = False
+    if not messages:
+      failed = True
+      failure_message = "Expected e-mail message sent. No messages sent"
+      details = self._get_email_detail_string(to, sender, subject, body, html)
+      if details:
+        failure_message += ' with %s.' % details
+      else:
+        failure_message += '.'
+    elif n:
+      actual_n = len(messages)
+      if n != actual_n:
+        failed = True
+        failure_message = "Expected e-mail message sent. Expected %d messages sent" % n
+        details = self._get_email_detail_string(to, sender, subject, body, html)
+        if details:
+          failure_message += ' with %s;' % details
+        else:
+          failure_message += ';'
+        failure_message += ' but actually %d.' % actual_n
+    # If failed, raise error and display all messages sent
+    if failed:
+      all_messages = self.get_sent_messages()
+      failure_message += '\nAll messages sent: '
+      if all_messages:
+        failure_message += '\n'
+        for message in all_messages:
+          failure_message += str(message)
+      else:
+        failure_message += 'None'
+      self.fail(failure_message)
+
+
+class TaskQueueTestCase(gaetestbed.taskqueue.TaskQueueTestCase, unittest.TestCase):
+  """Class extending gaetestbed.taskqueue.TaskQueueTestCase in order to extend its functions.
+  Difference:
+  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  """
+
+  def setUp(self):
+    """Sets up gaetestbed.taskqueue.TaskQueueTestCase.
+    """
+
+    super(TaskQueueTestCase, self).setUp()

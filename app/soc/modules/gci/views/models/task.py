@@ -145,7 +145,7 @@ class View(base.View):
 
   DEF_TASK_UNPUBLISHED_MSG = ugettext(
       'The task is not yet published. It can be edited by clicking on '
-      'the edit button below.')
+      'the edit link next to the title above.')
 
   DEF_WS_MSG_FMT = ugettext(
       '(To see the work submitted <a href=#ws%d>click here</a>.)')
@@ -183,7 +183,7 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin', 'gci/mentor'], ['active'],
-            ['Unapproved']])]
+            ['Unapproved', 'Unpublished', 'Open']])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.task.logic
@@ -580,19 +580,26 @@ class View(base.View):
         'user': user_account,
         'status': 'active'
         }
+
+    # get the host entity if the current user is host
+    host_entity = host_logic.logic.getForFields(filter, unique=True)
+
     if not entity:
       filter['scope'] = fields['scope']
     else:
       filter['scope'] = entity.scope
 
-    role_entity = gci_org_admin_logic.logic.getForFields(
+    # get the entity if the current user is org admin
+    org_admin_entity = gci_org_admin_logic.logic.getForFields(
         filter, unique=True)
+
+    role_entity = host_entity or org_admin_entity
 
     if role_entity:
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      else:
+      elif fields.get('approved'):
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])
@@ -1103,7 +1110,7 @@ class View(base.View):
     elif validation == 'accept_claim':
       if action == 'accept':
         deadline = datetime.datetime.now() + datetime.timedelta(
-            seconds=entity.time_to_complete)
+            hours=entity.time_to_complete)
 
         properties = {
             'status': 'Claimed',
@@ -1141,7 +1148,7 @@ class View(base.View):
 
         if fields['extended_deadline'] > 0:
           deadline = entity.deadline + datetime.timedelta(
-              seconds=fields['extended_deadline'])
+              hours=fields['extended_deadline'])
 
           properties['deadline'] = deadline
 

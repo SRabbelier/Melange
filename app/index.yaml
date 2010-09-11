@@ -41,13 +41,6 @@ indexes:
   - name: scope
   - name: __key__
 
-# used for the cron system
-- kind: Job
-  properties:
-  - name: priority_group
-  - name: status
-  - name: __key__
-
 # Used for bulk mailing student and mentors with survey reminders. Also used
 # for gathering GradingRecords for evaluation purposes.
 - kind: StudentProject

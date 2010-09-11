@@ -97,7 +97,8 @@ class TaskTest(unittest.TestCase):
     self.view = TestView()
     self.stubout_helper = StuboutHelper()
     self.stubout_helper.stuboutBase()
-    self.stubout_helper.stuboutElement(task.View, 'select', ['request', 'view', 'redirect'])
+    self.stubout_helper.stuboutElement(task.View, 'select',
+                                       ['request', 'view', 'redirect'])
 
     # map all the models
     models_dict = {

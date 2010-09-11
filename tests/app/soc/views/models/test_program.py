@@ -44,10 +44,11 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateProgramWithScopePath(self):
-    """Test that the create program page with scope path is redirected to its gsoc page.
+    """Test that the create program page with scope path is redirected to its
+    gsoc page.
     """
     url = '/program/create/' + self.scope_path
     response = self.client.get(url)
@@ -55,10 +56,11 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateProgramWithScopePathAndLinkId(self):
-    """Test that the create program page with scope path and link id is redirected to its gsoc page.
+    """Test that the create program page with scope path and link id is
+    redirected to its gsoc page.
     """
     url = '/program/create/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -66,7 +68,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testEditProgram(self):
     """Test that the edit program page is redirected to its gsoc page.
@@ -77,7 +79,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testDeleteProgram(self):
     """Test that the delete program page is redirected to its gsoc page.
@@ -88,7 +90,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testListPrograms(self):
     """Test that the list programs page is redirected to its gsoc page.
@@ -99,7 +101,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testShowProgram(self):
     """Test that the show program page is redirected to its gsoc page.
@@ -110,7 +112,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testAdminProgram(self):
     """Test that the admin program page is redirected to its gsoc page.
@@ -121,7 +123,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testAssignSlots(self):
     """Test that the assign slots program page is redirected to its gsoc page.
@@ -132,10 +134,11 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testAssignSlotsJson(self):
-    """Test that the assign slots JSON program page is redirected to its gsoc page.
+    """Test that the assign slots JSON program page is redirected to
+    its gsoc page.
     """
     url = '/program/slots/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -143,10 +146,11 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testShowDuplicateSlots(self):
-    """Test that the show duplicate slots program page is redirected to its gsoc page.
+    """Test that the show duplicate slots program page is redirected to
+    its gsoc page.
     """
     url = '/program/show_duplicates/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -154,7 +158,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testAssignedProposals(self):
     """Test that the assigned proposals page is redirected to its gsoc page.
@@ -165,10 +169,11 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testListAllAcceptedOrganizations(self):
-    """Test that the list all accepted organizations page is redirected to its gsoc page.
+    """Test that the list all accepted organizations page is redirected to
+    its gsoc page.
     """
     url = '/program/accepted_orgs/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -176,7 +181,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testListAllProjects(self):
     """Test that the list all projects page is redirected to its gsoc page.
@@ -187,7 +192,7 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
 # FIXME AttributeError: 'module' object has no attribute 'list_participants'
 #  def testListAllParticipants(self):
@@ -199,7 +204,7 @@ class ProgramTest(DjangoTestCase):
 #    actual_redirected_location = response.get('location', None)
 #    # Test that the request has been redirected
 #    expected_redirected_location ='http://testserver/gsoc' + url
-#    self.assertEqual(actual_redirected_location, expected_redirected_location )
+#    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testHome(self):
     """Test that the home page is redirected to its gsoc page.
@@ -210,4 +215,4 @@ class ProgramTest(DjangoTestCase):
     actual_redirected_location = response.get('location', None)
     # Test that the request has been redirected
     expected_redirected_location ='http://testserver/gsoc' + url
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    self.assertEqual(actual_redirected_location, expected_redirected_location)

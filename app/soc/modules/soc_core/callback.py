@@ -27,15 +27,12 @@ from soc.tasks.updates import start_update
 from soc.views.models import club
 from soc.views.models import club_admin
 from soc.views.models import club_member
-from soc.views.models import cron
 from soc.views.models import document
 from soc.views.models import host
-from soc.views.models import job
 from soc.views.models import mentor
 from soc.views.models import notification
 from soc.views.models import organization
 from soc.views.models import org_admin
-from soc.views.models import priority_group
 from soc.views.models import program
 from soc.views.models import request
 from soc.views.models import site
@@ -74,15 +71,12 @@ class Callback(object):
       self.core.registerSitemapEntry(club_admin.view.getDjangoURLPatterns())
       self.core.registerSitemapEntry(club_member.view.getDjangoURLPatterns())
 
-    self.core.registerSitemapEntry(cron.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(document.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(host.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(job.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(notification.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(organization.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_admin.view.getDjangoURLPatterns())
-    self.core.registerSitemapEntry(priority_group.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(request.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(site.view.getDjangoURLPatterns())
@@ -112,8 +106,6 @@ class Callback(object):
       self.core.registerSidebarEntry(club_member.view.getSidebarMenus)
 
     self.core.registerSidebarEntry(host.view.getSidebarMenus)
-    self.core.registerSidebarEntry(job.view.getSidebarMenus)
-    self.core.registerSidebarEntry(priority_group.view.getSidebarMenus)
     self.core.registerSidebarEntry(request.view.getSidebarMenus)
     self.core.registerSidebarEntry(site.view.getSidebarMenus)
     self.core.registerSidebarEntry(sponsor.view.getExtraMenus)

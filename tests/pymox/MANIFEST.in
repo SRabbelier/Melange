@@ -1,3 +1,0 @@
-include COPYING
-include mox_test.py
-include mox_test_helper.py

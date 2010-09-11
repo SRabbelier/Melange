@@ -17,6 +17,7 @@
 
 __authors__ = [
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 import sys
@@ -43,7 +44,9 @@ log =  logging.getLogger('nose.plugins.cover')
 
 
 def begin(self):
-  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that it loads Melange after coverage starts so the loading of models, logic and views can be tracked by coverage.
+  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that
+  it loads Melange after coverage starts so the loading of models, logic and
+  views can be tracked by coverage.
   """
   log.debug("Coverage begin")
   import coverage
@@ -57,12 +60,26 @@ def begin(self):
 
 
 def load_melange():
-  # register a core for the test modules to use
-  from soc.modules import callback
-  from soc.modules import core
+  """Prepare Melange for usage.
 
-  callback.registerCore(core.Core())
-  callback.getCore().registerModuleCallbacks()
+  Registers a core, the GSoC and GCI modules, and calls the sitemap, sidebar
+  and rights services.
+  """
+
+  from soc.modules import callback
+  from soc.modules.core import Core
+
+  # Register a core for the test modules to use
+  callback.registerCore(Core())
+  current_core = callback.getCore()
+  modules = ['gsoc', 'gci']
+  fmt = 'soc.modules.%s.callback'
+  current_core.registerModuleCallbacks(modules, fmt)
+
+  # Make sure all services are called
+  current_core.callService('registerWithSitemap', True)
+  current_core.callService('registerWithSidebar', True)
+  current_core.callService('registerRights', True)
 
 
 class AppEngineDatastoreClearPlugin(plugins.Plugin):
@@ -101,6 +118,7 @@ def main():
   from google.appengine.api import user_service_stub
   from google.appengine.api import urlfetch_stub
   from google.appengine.api.memcache import memcache_stub
+  from google.appengine.api.labs.taskqueue import taskqueue_stub
   apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
   apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
                                           urlfetch_stub.URLFetchServiceStub())
@@ -111,6 +129,9 @@ def main():
   apiproxy_stub_map.apiproxy.RegisterStub('memcache',
     memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
+  yaml_location = os.path.join(HERE, 'app')
+  apiproxy_stub_map.apiproxy.RegisterStub('taskqueue',
+                 taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
   import django.test.utils
   django.test.utils.setup_test_environment()
 
@@ -119,7 +140,7 @@ def main():
   if '--coverage' in sys.argv:
     from nose.plugins import cover
     plugin = cover.Coverage()
-    from tests.pymox import stubout
+    from mox import stubout
     stubout_obj = stubout.StubOutForTesting()
     stubout_obj.SmartSet(plugin, 'begin', begin)
     plugins.append(plugin)

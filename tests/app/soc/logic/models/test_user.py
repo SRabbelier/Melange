@@ -248,7 +248,8 @@ class UserTest(unittest.TestCase):
     return entity
 
   def testGetForCurrentAccount(self):
-    """Test that the entity of the current user can be retrieved through account.
+    """Test that the entity of the current user can be retrieved
+    through account.
     """
     current_user = self.createCurrentUser()
     entity = user_logic.getForCurrentAccount()

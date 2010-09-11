@@ -24,6 +24,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from django.utils import simplejson
+
 import soc.models.linkable
 
 
@@ -32,11 +34,25 @@ class GCIRanking(soc.models.linkable.Linkable):
   """
 
   #: collected data
-  raw_data = db.StringProperty()
+  raw_data = db.StringProperty(default='{}')
 
   #: Date of the last task that was taken into account by this ranking
-  last_data_from = db.DateTimeProperty(required=False)
+  date_point = db.DateTimeProperty(required=False, auto_now_add=True)
 
   #: JSON representation of how the statistic should be collected
   schema = db.StringProperty(default='{}')
 
+  def getData(self):
+    """Returns current ranking data.
+    """
+
+    if not self.raw_data:
+      return {}
+
+    return simplejson.loads(self.raw_data)
+
+  def setData(self, data):
+    """Sets data for the ranking entity.
+    """
+
+    self.raw_data = simplejson.dumps(data)

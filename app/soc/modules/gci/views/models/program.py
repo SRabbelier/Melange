@@ -132,7 +132,7 @@ class View(program.View):
     new_params['url_name'] = 'gci/program'
 
     new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types',
-]
+        'ranking']
 
     patterns = []
     patterns += [

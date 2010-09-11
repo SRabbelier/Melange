@@ -158,3 +158,15 @@ indexes:
 # manually, move them above the marker line.  The index.yaml file is
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
+
+- kind: GCITask
+  properties:
+  - name: program
+  - name: status
+  - name: completed_on
+
+- kind: GCITask
+  properties:
+  - name: program
+  - name: status
+  - name: modified_on

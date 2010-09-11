@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.modules.gci.tasks import org_app_survey as org_app_survey_tasks
+from soc.modules.gci.tasks import ranking_update
 from soc.modules.gci.tasks import task_update
 from soc.modules.gci.views.models import mentor
 from soc.modules.gci.views.models import organization
@@ -69,6 +70,7 @@ class Callback(object):
 
     # register GCI GAE Tasks URL's
     self.core.registerSitemapEntry(org_app_survey_tasks.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(ranking_update.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task_update.getDjangoURLPatterns())
 
   def registerWithSidebar(self):

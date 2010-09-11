@@ -244,10 +244,6 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
   modified_on = db.DateTimeProperty(required=True, auto_now_add=True,
                                     verbose_name=ugettext('Modified on'))
 
-  #: Date when the status of the proposal was set to Closed
-  completed_on = db.DateTimeProperty(required=False, 
-                                     verbose_name=ugettext('Completed on'))
-
   #: A field which holds the entire history of this task in JSON. The
   #: structure of this JSON string is as follows:
   #: {

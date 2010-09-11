@@ -22,14 +22,14 @@ __authors__ = [
 ]
 
 
-from soc.logic.models import base
+from google.appengine.ext import db
 
+from soc.logic.models import base
 from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.linkable
 
 import soc.modules.gci.models.ranking
-
 
 
 class Logic(base.Logic):
@@ -53,23 +53,36 @@ class Logic(base.Logic):
 
   def updateRanking(self, ranking):
     """Updates ranking with data about tasks that were recently completed.
+    It is executed by a task.
     """
 
-    program = ranking.scope
-    data = ranking.getData()
+    from soc.modules.gci.logic.models.program import logic as gci_program_logic
+    from soc.modules.gci.models.task import GCITask
+    from soc.modules.gci.models.task import TaskTypeTag
+    from soc.modules.gci.models.task import TaskDifficultyTag
 
+    filter = {
+        'link_id': ranking.link_id,
+        'scope_path': ranking.scope_path
+        }
+    program = gci_program_logic.getForFields(filter=filter, unique=True)
+
+    # retrieve only the tasks that have been completed after the last update
     query = db.Query(GCITask)
     query.filter('program = ', program)
     query.filter('status = ', 'Closed')
-    query.filter('completed_on > ', ranking.last_data_on)
-    query.order('completed_on')
-
+    query.filter('modified_on > ', ranking.date_point)
+    query.order('modified_on')
     tasks = query.fetch(1000)
 
+    # no new tasks have been completed
+    if not tasks:
+      return
+
+    data = ranking.getData()
     for task in tasks:
       student_key = task.student.key().name()
       org_key = task.scope.key().name()
-
       tasks_by_student = data.get(student_key, {})
       tasks_for_org = tasks_by_student.get(org_key, {})
 
@@ -77,16 +90,26 @@ class Logic(base.Logic):
       if not tasks_for_org:
 
         task_types = {}
-        for task_type in program.task_types:
-          task_types[task_type] = []
+        for task_type in TaskTypeTag.get_by_scope(program):
+          task_types[task_type.tag] = []
 
-        for task_difficulty in program.task_difficulties:
-          tasks_for_org[task_difficulty] = task_types.copy()
+        for task_difficulty in TaskDifficultyTag.get_by_scope(program):
+          tasks_for_org[task_difficulty.tag] = task_types.copy()
 
-      tasks_by_student[task.scope][task.difficulty.tag][task.type.tag].append(
-          task.key_or_name())
+      tasks_by_student[org_key] = tasks_for_org
+
+      task_difficulty = task.difficulty[0].tag
+      task_type = task.task_type[0].tag
+
+      tasks_by_student[org_key][task_difficulty][task_type].append(
+          task.key().name())
 
       data[student_key] = tasks_by_student
+    
+    # update the ranking data in the data store
+    ranking.setData(data)
+    ranking.date_point = tasks[-1].modified_on
+    ranking.put()
 
   def _onCreate(self, entity):
     """See base.Logic._onCreate()
@@ -99,7 +122,7 @@ class Logic(base.Logic):
         'ranking': entity
         }
     gci_program_logic.logic.updateEntityProperties(program, properties)
-    
+
     super(Logic, self)._onCreate(entity)
 
 logic = Logic()

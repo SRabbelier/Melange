@@ -23,11 +23,15 @@ __authors__ = [
 
 
 from django import forms
+from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
 
+from soc.tasks import responses as task_responses
+
+from soc.views import out_of_band
 from soc.views import helper
 
 from soc.views.helper import decorators
@@ -60,7 +64,8 @@ class View(base.View):
     rights['create'] = [('checkIsHostForProgram', [gci_program_logic.logic])]
     rights['edit'] = [('checkIsHostForProgram', [gci_program_logic.logic])]
     rights['show'] = ['any_access']
-    rights['update'] = [('checkIsHostForProgram', [gci_program_logic.logic])]
+    rights['force_update'] = ['any_access']#[('checkIsHostForProgram',
+        #[gci_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.ranking.logic
@@ -74,8 +79,8 @@ class View(base.View):
 
     patterns = []
     patterns += [
-        (r'^%(url_name)s/(?P<access_type>update)/%(key_fields)s$',
-          '%(module_package)s.%(module_name)s.update',
+        (r'^%(url_name)s/(?P<access_type>force_update)/%(key_fields)s$',
+          '%(module_package)s.%(module_name)s.force_update',
           'Update ranking'),
         ]
 
@@ -249,7 +254,31 @@ class View(base.View):
     # set the scope field
     super(View, self)._editPost(request, entity, fields)
 
+  @decorators.merge_params
+  def forceUpdate(self, request, access_type, page_name=None,
+                  params=None, **kwargs):
+    """Creates a new task which updates ranking for the GCI program.
+    """
+
+    url = '/tasks/gci/ranking/update'
+    context = {
+        'link_id': kwargs['link_id'],
+        'scope_path': kwargs['scope_path']
+        }
+
+    task_responses.startTask(url, 'gci-update', context)
+
+    fields = {
+        'url_name': params['url_name'],
+        'scope_path': kwargs['scope_path'],
+        'link_id': kwargs['link_id'],
+        }
+
+    return http.HttpResponseRedirect(
+        '/%(url_name)s/edit/%(scope_path)s/%(link_id)s' % fields)    
+    
 view = View()
 
 create = decorators.view(view.create)
 edit = decorators.view(view.edit)
+force_update = decorators.view(view.forceUpdate)

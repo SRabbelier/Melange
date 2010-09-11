@@ -84,6 +84,13 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
   """GSoC Organization model extends the basic Organization model.
   """
 
+  contrib_template = db.TextProperty(required=False, verbose_name=ugettext(
+      'Application template'))
+  contrib_template.help_text = ugettext(
+      'This template can be used by contributors, such as students'
+      ' and other non-member participants, when they apply to contribute'
+      ' to the organization.')
+
   slots = db.IntegerProperty(required=False, default=0,
       verbose_name=ugettext('Slots allocated'))
   slots.help_text = ugettext(

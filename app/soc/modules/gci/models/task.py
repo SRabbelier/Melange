@@ -214,6 +214,11 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
                'NeedsReview', 'Invalid'],
       default='Unapproved')
 
+  #: Indicates when the Task was closed. Its value is None before it is
+  #: completed.
+  closed_on = db.DateTimeProperty(required=False,
+                                 verbose_name=ugettext('Closed on'))
+
   #: This field is set to the next deadline that will have consequences for
   #: this Task. For instance this will store a DateTime property which will
   #: tell when this Task should be completed.

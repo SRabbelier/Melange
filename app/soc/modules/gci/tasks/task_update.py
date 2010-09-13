@@ -18,9 +18,12 @@
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Daniel Hans" <dhans@google.com>',
   ]
 
+
+import datetime
 
 from google.appengine.api.labs import taskqueue
 from google.appengine.ext import db
@@ -255,7 +258,10 @@ def updateTasksPostStudentSignUp(request, *args, **kwargs):
     if task_entity.status == 'AwaitingRegistration':
       task_entities.remove(task_entity)
 
-      properties = {'status': 'Closed'}
+      properties = {
+          'status': 'Closed',
+          'closed_on': datetime.datetime.utcnow()
+          }
       changes = [ugettext('User-MelangeAutomatic'),
                  ugettext('Action-Student registered'),
                  ugettext('Status-%s' % (properties['status']))]

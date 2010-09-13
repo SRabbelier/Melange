@@ -204,7 +204,7 @@ class View(base.View):
                                        'deadline', 'created_by',
                                        'created_on', 'modified_by',
                                        'modified_on', 'history',
-                                       'link_id', 'difficulty']
+                                       'link_id', 'difficulty', 'closed_on']
 
     patterns = []
     patterns += [
@@ -1178,6 +1178,7 @@ class View(base.View):
 
         if entity.student:
           properties['status'] = 'Closed'
+          properties['closed_on'] = datetime.datetime.utcnow()
         else:
           properties['status'] = 'AwaitingRegistration'
 

@@ -94,7 +94,10 @@ class Logic(base.Logic):
           task_types[task_type.tag] = []
 
         for task_difficulty in TaskDifficultyTag.get_by_scope(program):
-          tasks_for_org[task_difficulty.tag] = task_types.copy()
+          tasks_for_org[task_difficulty.tag] = {}
+          
+          for task_type in TaskTypeTag.get_by_scope(program):
+            tasks_for_org[task_difficulty.tag][task_type.tag] = []
 
       tasks_by_student[org_key] = tasks_for_org
 

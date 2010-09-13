@@ -34,7 +34,7 @@ class GCIRanking(soc.models.linkable.Linkable):
   """
 
   #: collected data
-  raw_data = db.StringProperty(default='{}')
+  raw_data = db.TextProperty(default='{}')
 
   #: Date of the last task that was taken into account by this ranking
   date_point = db.DateTimeProperty(required=False, auto_now_add=True)

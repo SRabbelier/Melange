@@ -71,8 +71,8 @@ class Logic(base.Logic):
     query = db.Query(GCITask)
     query.filter('program = ', program)
     query.filter('status = ', 'Closed')
-    query.filter('modified_on > ', ranking.date_point)
-    query.order('modified_on')
+    query.filter('closed_on > ', ranking.date_point)
+    query.order('closed_on')
     tasks = query.fetch(1000)
 
     # no new tasks have been completed
@@ -111,7 +111,7 @@ class Logic(base.Logic):
     
     # update the ranking data in the data store
     ranking.setData(data)
-    ranking.date_point = tasks[-1].modified_on
+    ranking.date_point = tasks[-1].closed_on
     ranking.put()
 
   def _onCreate(self, entity):

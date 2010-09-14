@@ -221,7 +221,7 @@ class View(base.View):
 
     super(View, self)._editPost(request, entity, fields)
 
-  def getRolesListData(self, request):
+  def getRolesListData(self, request, lists_params):
     """Returns the list data for roles.
     """
 
@@ -234,18 +234,17 @@ class View(base.View):
         'status': ['active', 'inactive']
         }
 
-    keys = role_view.ROLE_VIEWS.keys()
-    keys.sort()
-
     idx = request.GET.get('idx', '')
     idx = int(idx) if idx.isdigit() else -1
 
-    if not 0 <= idx < len(keys):
-        return responses.jsonErrorResponse(request, "idx not valid")
+    if not 0 <= idx < len(lists_params):
+      return responses.jsonErrorResponse(request, "idx not valid")
 
-    idx = int(idx)
-    key = keys[idx]
-    list_params = role_view.ROLE_VIEWS[key].getParams()
+    list_params = lists_params[idx]
+
+    if list_params is None:
+      return responses.jsonErrorResponse(
+          request, "idx not valid (list not in roles overview)")
 
     contents = helper.lists.getListData(request, list_params, fields)
 
@@ -266,25 +265,43 @@ class View(base.View):
       kwargs: not used
     """
 
+    lists_params = []
+
+    for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
+      list_params = loop_view.getParams()
+
+      if not list_params['show_in_roles_overview']:
+        # filler for easy indexing
+        lists_params.append(None)
+        continue
+
+      list_params = list_params.copy()
+      list_params['public_field_keys'] = list_params['public_field_keys'] + ["status"]
+      list_params['public_field_names'] = list_params['public_field_names'] + ["Status"]
+      list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
+      field_props = list_params.setdefault('public_field_props', {})
+      field_props["status"] = {
+          # TODO(srabbelier): enable when list code is updated
+          #"searchoptions": {"defaultValue": "Active"},
+          "stype": "select",
+          "editoptions": {"value": ":All;^active$:Active;^inactive$:Inactive"},
+      }
+
+      lists_params.append(list_params)
+
     if request.GET.get('fmt') == 'json':
-      return self.getRolesListData(request)
+      return self.getRolesListData(request, lists_params)
 
     contents = []
 
-    site = site_logic.getSingleton()
-    site_name = site.site_name
+    for i, list_params in enumerate(lists_params):
+      if list_params is None:
+        continue
+
+      list = helper.lists.getListGenerator(request, list_params, idx=i)
+      contents.append(list)
 
     params = params.copy()
-
-    i = 0
-    for _, loop_view in sorted(role_view.ROLE_VIEWS.iteritems()):
-      if loop_view.getParams()['show_in_roles_overview']:
-        list_params = loop_view.getParams().copy()
-        list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
-        list = helper.lists.getListGenerator(request, list_params, idx=i)
-        contents.append(list)
-      # keep on counting because index is important
-      i += 1
 
     return self._list(request, params, contents, page_name)
 

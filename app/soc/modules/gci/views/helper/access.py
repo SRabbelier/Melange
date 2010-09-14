@@ -358,9 +358,9 @@ class GCIChecker(access.Checker):
                                       'scope_path', gci_program_logic.logic)
     elif status is 'before':
       return self.checkIsBeforeEvent(program_args, period_name,
-                                      'scope_path', gci_program_logic.logic)
+                                     'scope_path', gci_program_logic.logic)
     elif status is 'after':
       return self.checkIsAfterEvent(program_args, period_name,
-                                      'scope_path', gci_program_logic.logic)
+                                    'scope_path', gci_program_logic.logic)
     # no right status set, but we can't give the user access
     raise out_of_band.AccessViolation(message_fmt=DEF_UNEXPECTED_ERROR)

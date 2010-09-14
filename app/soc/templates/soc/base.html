@@ -150,7 +150,11 @@ limitations under the License.
   <div id="login">
 	{% block login_links %}
 	{% if account %}
-	<b>{{ account.email }} ({{ account.nickname }})</b> |
+	<b>{{ account.email }}
+  {% if user %}
+  (link_id: {{ user.link_id }})
+  {% endif %}
+  </b> |
 	{% endif %}
 	{% if is_admin %}
 	Developer |

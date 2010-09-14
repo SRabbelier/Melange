@@ -13,6 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block content %}
+<p>
 You are receiving this message because you have subscribed to updates on "{{ reviewed_name }}".<br />
-{{ reviewer_name }} has left a new review click <a href={{ review_notification_url }}>here</a> to view it.
+{{ reviewer_name }} has left the following {{ review_visibility }} review at
+<a href={{ review_notification_url }}>{{ review_notification_url }}</a>:
+</p>
+<div id="review">
+<p>
+{{ review_content|safe }}
+</p>
+</div>
 {% endblock %}

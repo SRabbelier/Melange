@@ -208,6 +208,8 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
   message_properties = {'review_notification_url': review_notification_url,
       'reviewer_name': review.author_name(),
       'reviewed_name': reviewed_name,
+      'review_content': review.content,
+      'review_visibility': "public" if review.is_public else "private",
       }
 
   # determine the subject
@@ -217,6 +219,7 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
   template = DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE
 
   # send the notification from the system
+  # TODO(srabbelier): do this in a task instead
   sendNotification(to_user, None, message_properties, subject, template)
 
 

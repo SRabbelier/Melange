@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.modules.gci.tasks import bulk_create
 from soc.modules.gci.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gci.tasks import ranking_update
 from soc.modules.gci.tasks import task_update
@@ -69,6 +70,7 @@ class Callback(object):
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
 
     # register GCI GAE Tasks URL's
+    self.core.registerSitemapEntry(bulk_create.getDjangoURLPatterns())
     self.core.registerSitemapEntry(org_app_survey_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(ranking_update.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task_update.getDjangoURLPatterns())

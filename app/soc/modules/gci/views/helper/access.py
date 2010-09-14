@@ -36,6 +36,7 @@ from soc.views import out_of_band
 from soc.views.helper import access
 
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
+from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
@@ -70,6 +71,9 @@ DEF_SIGN_UP_AS_OA_MENTOR_MSG = ugettext(
 DEF_NO_TASKS_AFFILIATED = ugettext(
     'There are no tasks affiliated to you.')
 
+DEF_UNEXPECTED_ERROR = ugettext(
+  'An unexpected error occurred please file an issue report, make sure you '
+  'note the URL.')
 
 class GCIChecker(access.Checker):
   """See soc.views.helper.access.Checker.
@@ -84,9 +88,9 @@ class GCIChecker(access.Checker):
     True.
 
     Args:
-      django_args: a dictionary with django's arguments
+      django_args: a dictionary with django's arguments.
       key_location: the key for django_args in which the key_name
-                    from the mentor is stored
+                    of the org is stored.
       check_limit: iff true checks if the organization reached the
                    task quota limit for the given program.
     """
@@ -221,9 +225,6 @@ class GCIChecker(access.Checker):
          - If the task is not in one of the required states.
     """
 
-    from soc.modules.gci.logic.models.organization import logic as \
-        gci_org_logic
-
     try:
       user_entity = self.user
 
@@ -242,7 +243,8 @@ class GCIChecker(access.Checker):
     except out_of_band.Error:
       pass
 
-    org_entity = gci_org_logic.getFromKeyNameOr404(django_args['scope_path'])
+    org_entity = gci_org_logic.logic.getFromKeyNameOr404(
+        django_args['scope_path'])
 
     if not timeline_helper.isAfterEvent(org_entity.scope.timeline,
         'tasks_publicly_visible'):
@@ -328,3 +330,37 @@ class GCIChecker(access.Checker):
 
     if not gci_task_logic.logic.getForFields(filter, unique=True):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_TASKS_AFFILIATED)
+
+  def checkTimelineFromTaskScope(self, django_args, status, period_name):
+    """Checks the timeline for the program found in the scope variable of a
+    Task.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      status: one of three strings, during which calls isActivePeriod(),
+              before which calls isBeforeEvent() and after which calls
+              isAfterEvent().
+      period_name: the name of the period to check the timeline for.
+
+    Raises:
+      AccessViolationResponse:
+        - if the program is not in a valid state
+        - if the period specified does not pass the required status check
+    """
+
+    org_entity = gci_org_logic.logic.getFromKeyNameOr404(
+        django_args['scope_path'])
+
+    program_args = {'scope_path': org_entity.scope_path}
+
+    if status is 'during':
+      return self.checkIsActivePeriod(program_args, period_name,
+                                      'scope_path', gci_program_logic.logic)
+    elif status is 'before':
+      return self.checkIsBeforeEvent(program_args, period_name,
+                                      'scope_path', gci_program_logic.logic)
+    elif status is 'after':
+      return self.checkIsAfterEvent(program_args, period_name,
+                                      'scope_path', gci_program_logic.logic)
+    # no right status set, but we can't give the user access
+    raise out_of_band.AccessViolation(message_fmt=DEF_UNEXPECTED_ERROR)

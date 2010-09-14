@@ -1,0 +1,54 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% load forms_helpers %}
+
+{% block body %}
+<form method="POST">
+ {% if message %}
+  <div class="error">{{ message }}</div>
+ {% endif %}
+ <div>
+   For bulk uploading tasks please use your favorite spreadsheet editor that can export data in CSV format.
+   Structure your columns in the following order.
+   <ol>
+     <li>Title of the task.</li>
+     <li>Description, for markup use HTML.</li>
+     <li>Time to complete in hours, as integer.</li>
+     <li>Link ID's of mentors for this task, comma separated.</li>
+     <li>Difficulty, one of the allowed difficulties <i>({{ difficulties }})</i>.</li>
+     <li>Task types, one or more of the allowed types <i>({{ types }})</i>, comma separated.</li>
+     <li>Task tags, any tags you want to add, comma separated.</li>
+   </ol>
+ </div>
+ <table>
+   {% as_table bulk_create_form %}
+ </table>
+ <table>
+  <div>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <input type="submit" value="Submit" style="font-weight: bold;">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+ </table>
+</form>
+
+{% endblock %}
+

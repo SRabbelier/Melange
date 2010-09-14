@@ -72,7 +72,7 @@ class View(organization.View):
     rights = gci_access.GCIChecker(params)
     rights['create'] = ['checkIsDeveloper']
     rights['edit'] = [('checkHasRoleForKeyFieldsAsScope',
-                           gci_org_admin_logic.logic,),
+                           gci_org_admin_logic.logic),
                       ('checkGroupIsActiveForLinkId', gci_org_logic.logic)]
     rights['delete'] = ['checkIsDeveloper']
     rights['home'] = ['allow']
@@ -295,6 +295,11 @@ class View(organization.View):
       submenu = (redirects.getCreateRedirect(
            group_entity, {'url_name': 'gci/task'}),
           "Create a Task", 'any_access')
+      submenus.append(submenu)
+
+      # add a link to bulk create tasks
+      submenu = ('gci/task/bulk_create/%s' %group_entity.key().id_or_name(),
+          "Bulk Create Tasks", 'any_access')
       submenus.append(submenu)
 
       # add a link to the management page

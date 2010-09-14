@@ -53,14 +53,13 @@ from soc.modules.gci.logic import cleaning as gci_cleaning
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
-from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access
 from soc.modules.gci.views.helper import redirects as gci_redirects
 from soc.modules.gci.views.models import organization as gci_org_view
+from soc.modules.gci.tasks import bulk_create as bulk_create_tasks
 from soc.modules.gci.tasks import task_update
-
 import soc.modules.gci.logic.models.task
 
 
@@ -162,6 +161,9 @@ class View(base.View):
     # TODO: create and suggest_task don't need access checks which use state
     # also feels like roles are being checked twice?
     rights['any_access'] = ['allow']
+    rights['bulk_create'] = [
+        ('checkHasRoleForScope', gci_org_admin_logic.logic),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['create'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
@@ -208,6 +210,9 @@ class View(base.View):
 
     patterns = []
     patterns += [
+        (r'^%(url_name)s/(?P<access_type>bulk_create)/%(scope)s$',
+        '%(module_package)s.%(module_name)s.bulk_create',
+        'Bulk Create %(name_plural)s'),
         (r'^%(url_name)s/(?P<access_type>suggest_task)/%(scope)s$',
         '%(module_package)s.%(module_name)s.suggest_task',
         'Mentors suggest %(name)s'),
@@ -251,6 +256,7 @@ class View(base.View):
         }
 
     new_params['public_template'] = 'modules/gci/task/public.html'
+    new_params['bulk_create_template'] = 'modules/gci/task/bulk_create.html'
 
     def render(entities):
       two = [i.name() for i in entities[:2]]
@@ -346,7 +352,7 @@ class View(base.View):
 
     self._params['edit_form'] = edit_form
 
-    # create the comment form
+    # create the comment form TODO(LJ) Cleaning check CSV structure?
     dynafields = [
         {'name': 'comment',
          'base': forms.CharField,
@@ -370,6 +376,22 @@ class View(base.View):
         dynaexclude=None, dynaproperties=dynaproperties)
     self._params['comment_form'] = comment_form
 
+    # create the bulk create form
+    dynafields = [
+        {'name': 'data',
+         'base': forms.CharField,
+         'widget': forms.widgets.Textarea(attrs={'rows': 10, 'cols': 40}),
+         'label': 'Tasks',
+         'required': True,
+         'example_text': 'The tasks in CSV format',
+         },
+         ]
+    dynaproperties = params_helper.getDynaFields(dynafields)
+    bulk_form = dynaform.newDynaForm(dynamodel=None,
+        dynabase=helper.forms.BaseForm, dynainclude=None,
+        dynaexclude=None, dynaproperties=dynaproperties)
+    self._params['bulk_create_form'] = bulk_form
+
   def _getTagsForProgram(self, form_name, params, **kwargs):
     """Extends form dynamically from difficulty levels in program entity.
 
@@ -381,19 +403,16 @@ class View(base.View):
     # obtain program_entity using scope_path which holds
     # the org_entity key_name
     org_entity = gci_org_logic.logic.getFromKeyName(kwargs['scope_path'])
-    program_entity = gci_program_logic.logic.getFromKeyName(
-        org_entity.scope_path)
 
     # get a list difficulty levels stored for the program entity
-    tds = gci_task_model.TaskDifficultyTag.get_by_scope(
-        program_entity)
+    tds = gci_task_model.TaskDifficultyTag.get_by_scope(org_entity.scope)
 
     difficulties = []
     for td in tds:
       difficulties.append((td.tag, td.tag))
 
     # get a list of task type tags stored for the program entity
-    tts = gci_task_model.TaskTypeTag.get_by_scope(program_entity)
+    tts = gci_task_model.TaskTypeTag.get_by_scope(org_entity.scope)
 
     type_tags = []
     for tt in tts:
@@ -640,6 +659,76 @@ class View(base.View):
         }
 
     return
+
+  @decorators.merge_params
+  @decorators.check_access
+  def bulkCreate(self, request, access_type, page_name=None,
+                  params=None, **kwargs):
+    """View used to allow Org Admins to bulk create tasks.
+
+    For args see base.View.create().
+    """
+
+    template = params['bulk_create_template']
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
+    org_entity = gci_org_logic.logic.getFromKeyName(kwargs['scope_path'])
+
+    # get a list difficulty levels stored for the program entity
+    tds = gci_task_model.TaskDifficultyTag.get_by_scope(org_entity.scope)
+    context['difficulties'] = ', '.join([str(x) for x in tds])
+
+    # get a list of task type tags stored for the program entity
+    tts = gci_task_model.TaskTypeTag.get_by_scope(org_entity.scope)
+    context['types'] = ', '.join([str(x) for x in tts])
+
+    if request.POST:
+      return self._bulkCreatePost(request, params, template, context, **kwargs)
+    else:
+      return self._bulkCreateGet(request, params, template, context, **kwargs)
+
+  def _bulkCreateGet(self, request, params, template, context, **kwargs):
+    """Handles GET requests for the bulk create page.
+    """
+    context['bulk_create_form'] = params['bulk_create_form']()
+    return responses.respond(request, template, context)
+
+
+  def _bulkCreatePost(self, request, params, template, context, **kwargs):
+    """Handles POST requests for the bulk create page.
+    """
+
+    form = params['bulk_create_form'](request.POST)
+
+    if not form.is_valid():
+      # show the form errors
+      context['bulk_create_form'] = form
+      return self._constructResponse(request, entity=None, context=context,
+                                     form=form, params=params,
+                                     template=template)
+
+    # retrieve the data from the form
+    _, properties = helper.forms.collectCleanedFields(form)
+
+    user_entity = user_logic.logic.getForCurrentAccount()
+    fields = {'user': user_entity,
+              'scope_path': kwargs['scope_path'],
+              'status': 'active'}
+    org_admin_entity = gci_org_admin_logic.logic.getForFields(
+        fields, unique=True)
+
+    bulk_create_tasks.spawnBulkCreateTasks(properties['data'],
+                                           org_admin_entity.key().id_or_name())
+
+    context['message'] = ugettext(
+      'Successfully started processing your tasks, they should show up '
+      'shortly. Feel free to submit more.')
+
+    return self._bulkCreateGet(request, params, template, context)
 
   @decorators.merge_params
   @decorators.check_access
@@ -1529,6 +1618,7 @@ class View(base.View):
 
 view = View()
 
+bulk_create = decorators.view(view.bulkCreate)
 create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)

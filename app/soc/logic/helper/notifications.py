@@ -37,8 +37,8 @@ from soc.logic import system
 from soc.views.helper import redirects
 
 
-DEF_NEW_NOTIFICATION_MSG = ugettext(
-    "You have received a new Notification.")
+DEF_NEW_NOTIFICATION_MSG_SUBJECT_FMT = ugettext(
+    "New Notification: %s")
 
 DEF_INVITATION_MSG_FMT = ugettext(
     "Invitation to become a %(role_verbose)s for %(group)s.")
@@ -293,6 +293,7 @@ def sendNewNotificationMessage(notification_entity):
     (sender_name, sender) = default_sender
 
   to = accounts.denormalizeAccount(notification_entity.scope.account).email()
+  subject = DEF_NEW_NOTIFICATION_MSG_SUBJECT_FMT % notification_entity.subject
 
   # create the message contents
   messageProperties = {
@@ -301,7 +302,7 @@ def sendNewNotificationMessage(notification_entity):
       'to': to,
       'sender': sender,
       'site_name': site_name,
-      'subject': force_unicode(DEF_NEW_NOTIFICATION_MSG),
+      'subject': force_unicode(subject),
       'notification' : notification_entity,
       'notification_url' : notification_url
       }

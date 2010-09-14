@@ -80,9 +80,9 @@ class Logic(survey_record.Logic):
 
     if name == 'status' and value in ['accepted', 'rejected'] and \
         entity.status != value:
-      # Sent email and notification that this application has been 
+      # Send email and notification that this application has been
       # accepted/rejected.
-      org_app_helper.sentApplicationProcessedNotification(
+      org_app_helper.sendApplicationProcessedNotification(
           entity, value, self.module_name, self.mail_templates)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)

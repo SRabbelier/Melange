@@ -29,7 +29,7 @@ DEF_INVITE_MSG = ugettext('This invite was automatically generated because you'
                           ' completed the application process.')
 
 
-def sentApplicationProcessedNotification(entity, status, module_name,
+def sendApplicationProcessedNotification(entity, status, module_name,
                                          mail_templates):
   """Sends out email about the processed Organization Application. If the 
   application is accepted a Notification is also generated.

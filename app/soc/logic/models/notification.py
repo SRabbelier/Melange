@@ -47,17 +47,8 @@ class Logic(base.Logic):
     """Sends out a message if there is only one unread notification.
     """
 
-    # create a special query on which we can call count
-    query = db.Query(self._model)
-    query.filter('scope =', entity.scope)
-    query.filter('unread = ', True)
-
-    # count the number of results with a maximum of two
-    unread_count = query.count(2)
-
-    if unread_count == 1:
-      # there is only one unread notification so send out an email
-      notifications.sendNewNotificationMessage(entity)
+    # TODO(srabbelier): check user preference
+    notifications.sendNewNotificationMessage(entity)
 
     sidebar.flush(entity.scope.account)
     super(Logic, self)._onCreate(entity)

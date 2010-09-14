@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+import logging
 import time
 
 from django.template import loader
@@ -288,6 +289,7 @@ def sendNewNotificationMessage(notification_entity):
 
   if not default_sender:
     # no valid sender found, abort
+    logging.error("No default sender")
     return
   else:
     (sender_name, sender) = default_sender
@@ -330,6 +332,7 @@ def sendWelcomeMessage(user_entity):
 
   if not default_sender:
     # no valid sender found, should not happen but abort anyway
+    logging.error("No default sender")
     return
   else:
     sender_name, sender = default_sender

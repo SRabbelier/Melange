@@ -51,14 +51,13 @@ def isFeedURLValid(feed_url=None):
   if result.status_code != 200:
     return False
 
-  parsed_feed = feedparser.parse(result.content)
+  try:
+    parsed_feed = feedparser.parse(result.content)
+  except:
+    return False
 
   # version is always present if the feed is valid
   if not parsed_feed.version:
-    return False
-
-  # TODO: isn't this check redunant?
-  if parsed_feed.version == '':
     return False
 
   return True

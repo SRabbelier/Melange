@@ -1131,6 +1131,9 @@
                       if (cell_value === null) {
                         cell_value = "";
                       }
+                      if (cell_value === undefined) {
+                        cell_value = "";
+                      }
                       var field_text = cell_value.toString();
                       // Check for &quot;, which is translated to " when output to textarea
                       field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");

@@ -88,11 +88,6 @@ class View(survey.View):
     new_params['survey_type'] = 'project'
     new_params['reminder_template'] = 'soc/project_survey/reminder.html'
 
-    new_params['manage_student_project_heading'] = \
-        'soc/project_survey/list/heading_manage_student_project.html'
-    new_params['manage_student_project_row'] = \
-        'soc/project_survey/list/row_manage_student_project.html'
-
     new_params['records_field_keys'] = [
         'mentor_id', 'student_id'
     ]

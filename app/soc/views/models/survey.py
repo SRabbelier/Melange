@@ -735,11 +735,7 @@ class View(base.View):
     # get the context for this webpage
     context = responses.getUniversalContext(request)
     responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = "%s titled '%s'" % (page_name, entity.title)
     context['entity'] = entity
-
-    # add the first question to the context show a preview can be shown
-    context['first_question'] = entity.survey_content.orderedProperties()[0]
 
     # get the rights checker
     user_entity = user_logic.getForCurrentAccount()

@@ -20,25 +20,26 @@ __authors__ = [
   ]
 
 
-import httplib
 import datetime
+import httplib
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
-from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
-from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
+from soc.logic.models.user import logic as user_logic
+
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.organization import logic \
     as gsoc_organization_logic
-from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
+      as pd_logic
+from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_proposal import logic \
     as student_proposal_logic
-from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
-      as pd_logic
 
 from tests.test_utils import DjangoTestCase
 from tests.test_utils import TaskQueueTestCase
@@ -144,21 +145,21 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
       'status': 'active',
       }
     organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     self.organization = organization
     # Create another organization
     organization_properties.update({
       'link_id': 'another_org',
       })
     another_organization =  gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     # Create an organization to serve as cursor sub for a_program, which should
     # come as the first result of query
     organization_properties.update({
       'link_id': 'aa_org',
       })
     stub_organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     # Create a user for all roles except sponsor
     email = "a_role_user@example.com"
     account = users.User(email=email)
@@ -231,7 +232,7 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     'program': program,
     }
     self.student_proposal = student_proposal_logic.updateOrCreateFromFields(
-                                                    student_proposal_properties)
+        student_proposal_properties)
     # Create another student proposal to an_org for a_student
     student_proposal_properties.update({
     'link_id': 'another_proposal',
@@ -245,7 +246,9 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
 
   def testStartThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to start the task to
+    """Tests that finding duplicate is forbidden without a correct XSRF token.
+
+    Without correct XSRF token, the attempt to start the task to
     find all duplicate proposals which are about to be accepted for a single
     GSoCProgram is forbidden.
     """
@@ -255,7 +258,9 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testStartThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, the task of finding
+    """Tests that finding duplicate can be started with a correct XSRF token.
+
+    Through HTTP POST with correct XSRF token, the task of finding
     all duplicate proposals which are about to be accepted for a single
     GSoCProgram can be started, the task of calculating the duplicate proposals
     in a given program for a student on a per organization basis is spawned, and
@@ -273,7 +278,9 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     self.assertTasksInQueue(n=1, url=task_url)
 
   def testCalculateThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that through HTTP POST without correct XSRF token, the task of
+    """Tests that calculating duplicate is forbidden without correct XSRF token.
+
+    Through HTTP POST without correct XSRF token, the task of
     calculating the duplicate proposals in a given program for a student on
     a per organization basis is forbidden.
     """
@@ -291,7 +298,9 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testCalculateThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, the duplicate
+    """Tests that duplicate proposals can be calculated with correct XSRF token.
+
+    Through HTTP POST with correct XSRF token, the duplicate
     proposals in a given program for a student can be calculated on a per
     organization basis and a new taskqueue is spawned if there are more than
     one organization after the org_cursor.
@@ -319,8 +328,10 @@ class ProposalDuplicatesTest(DjangoTestCase, TaskQueueTestCase):
     self.assertTasksInQueue(n=1, url=task_url)
 
   def testCalculateFinishedThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, when finished
-    (there is no org to calculate), all pb records with no duplicate proposal
+    """Tests the result after calculating duplicate proposals is finished.
+
+    Through HTTP POST with correct XSRF token, when finished
+    (there is no org to calculate), all pb records with no duplicate proposals
     are deleted and there is no taskqueue spawned.
     """
     pd_fields  = {

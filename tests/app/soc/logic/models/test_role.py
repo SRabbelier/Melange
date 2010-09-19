@@ -25,16 +25,17 @@ import unittest
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.models import user
 from soc.logic import accounts
-from soc.models import role
-from soc.logic.models.user import logic as user_logic
 from soc.logic.models.role import logic as role_logic
+from soc.logic.models.user import logic as user_logic
+from soc.models import role
+from soc.models import user
 
 
 class RoleTest(unittest.TestCase):
   """Tests related to role logic.
   """
+
   def setUp(self):
     """Set up required for the role tests.
     """

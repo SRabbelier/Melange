@@ -21,23 +21,26 @@ __authors__ = [
 
 
 import httplib
-from django.http import HttpRequest
+
 from django.core import urlresolvers
+from django.http import HttpRequest
 from django.utils import simplejson
-from tests.test_utils import DjangoTestCase
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.sponsor import logic as sponsor_logic
-from soc.logic.models.host import logic as host_logic
-from soc.logic.models.timeline import logic as timeline_logic
-from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.organization import logic as gsoc_organization_logic
-from soc.middleware.xsrf import XsrfMiddleware
 from soc.logic.helper import xsrfutil
-from django.test.client import Client
+from soc.logic.models.host import logic as host_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
+from soc.logic.models.timeline import logic as timeline_logic
+from soc.logic.models.user import logic as user_logic
+from soc.middleware.xsrf import XsrfMiddleware
+
+from soc.modules.gsoc.logic.models.program import logic as program_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
+
+from tests.test_utils import DjangoTestCase
 
 
 class OrganizationTestForDeveloper(DjangoTestCase):
@@ -140,7 +143,8 @@ class OrganizationTestForDeveloper(DjangoTestCase):
         'email': email,
         'status': 'active',
       }
-    organization = gsoc_organization_logic.updateOrCreateFromFields(organization_properties)
+    organization = gsoc_organization_logic.updateOrCreateFromFields(
+        organization_properties)
     self.scope_path = organization.scope_path
     self.link_id = organization.link_id
 
@@ -153,10 +157,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testCreateOrganizationWithScopePath(self):
-    """Test that a developer user can create an organization of some program with a scope_path.
+    """Test that a developer user can create an organization of some program.
+
+    With a scope_path.
     """
     url = '/gsoc/org/create/' + self.scope_path
     response = self.client.get(url)
@@ -164,10 +171,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testCreateOrganizationWithScopePathAndLinkId(self):
-    """Test that a developer user can create an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can create an organization of some program.
+
+    With a scope_path and a link_id.
     """
     url = '/gsoc/org/create/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -175,10 +185,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testEditOrganization(self):
-    """Test that a developer user can edit an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can edit an organization of some program.
+
+    With a scope_path and a link_id.
     """
     url = '/gsoc/org/edit/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -186,17 +199,22 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testDeleteOrganization(self):
-    """Test that a developer user cannot delete an organization of some program with a scope_path and a link_id through HTTP GET.
+    """Test that a developer cannot delete an organization of some program.
+
+    With a scope_path and a link_id through HTTP GET.
     """
     url = '/gsoc/org/delete/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testShowOrganization(self):
-    """Test that a developer user can show an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can show an organization of some program
+
+    With a scope_path and a link_id.
     """
     url = '/gsoc/org/show/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -204,10 +222,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/organization/public.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testAdminOrganization(self):
-    """Test that a developer user cannot admin an organization of some program with a scope_path and a link_id.
+    """Test that a developer user cannot admin an organization.
+
+    Of some program with a scope_path and a link_id.
     """
     url = '/gsoc/org/admin/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -225,7 +246,8 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b'))
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b'))
 
   def testListPublicOrganizations(self):
     """Test that a developer user cannot list_public organizations.
@@ -238,7 +260,9 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testListProposals(self):
-    """Test that a developer user can list all proposals of an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can list all proposals.
+
+    Of an organization of some program with a scope_path and a link_id.
     """
     url = '/gsoc/org/list_proposals/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -247,10 +271,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     view_triple = urlresolvers.resolve(url)
     kwargs = view_triple[2]
     # The context has not full page name
-    self.assertEqual(kwargs.get('page_name', 'a'), response.context[0].get('page_name', 'b')[0:34])
+    self.assertEqual(kwargs.get('page_name', 'a'),
+                     response.context[0].get('page_name', 'b')[0:34])
 
   def testListRequests(self):
-    """Test that a developer user can list all requests of an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can list all requests.
+
+    Of an organization of some program with a scope_path and a link_id.
     """
     url = '/gsoc/org/list_requests/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -261,10 +288,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     # The context has not full page name
     expected_page_name = kwargs.get('page_name', 'a')
     actual_page_name = response.context[0].get('page_name', 'b')
-    self.assertEqual(expected_page_name, actual_page_name[0:len(expected_page_name)])
+    self.assertEqual(expected_page_name,
+                     actual_page_name[0:len(expected_page_name)])
 
   def testListRoles(self):
-    """Test that a developer user can list all roles of an organization of some program with a scope_path and a link_id.
+    """Test that a developer user can list all roles.
+
+    Of an organization of some program with a scope_path and a link_id.
     """
     url = '/gsoc/org/list_roles/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -275,10 +305,13 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     # The context has not full page name
     expected_page_name = kwargs.get('page_name', 'a')
     actual_page_name = response.context[0].get('page_name', 'b')
-    self.assertEqual(expected_page_name, actual_page_name[0:len(expected_page_name)])
+    self.assertEqual(expected_page_name,
+                     actual_page_name[0:len(expected_page_name)])
 
   def testApplyMentor(self):
-    """Test that a developer user can list all organizations of some program one can apply for a mentor to with a scope_path and a link_id.
+    """Test that a developer user can list all organizations.
+
+    Of some program one can apply for a mentor with a scope_path and a link_id.
     """
     url = '/gsoc/org/apply_mentor/' + self.scope_path
     response = self.client.get(url)
@@ -289,7 +322,8 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     # The context has not full page name
     expected_page_name = kwargs.get('page_name', 'a')
     actual_page_name = response.context[0].get('page_name', 'b')
-    self.assertEqual(expected_page_name, actual_page_name[0:len(expected_page_name)])
+    self.assertEqual(expected_page_name,
+                     actual_page_name[0:len(expected_page_name)])
 
   def testApplicant(self):
     """Test that an error is raised.
@@ -302,14 +336,17 @@ class OrganizationTestForDeveloper(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testHome(self):
-    """Test that the home of an organization of some program with a scope_path and a link_id is redirected to its show page.
+    """Test that the home of an organization of some program.
+
+    With a scope_path and a link_id is redirected to its show page.
     """
     url = '/gsoc/org/home/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.FOUND)
     actual_redirected_location = response.get('location', None)
-    expected_redirected_location = 'http://testserver/gsoc/org/show/' + self.scope_path + '/' + self.link_id
-    self.assertEqual(actual_redirected_location, expected_redirected_location )
+    expected_redirected_location = 'http://testserver/gsoc/org/show/%s/%s' \
+                                    % (self.scope_path, self.link_id)
+    self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testPickTags(self):
     """Test that a developer user can pick tags.

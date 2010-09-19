@@ -20,26 +20,28 @@ __authors__ = [
   ]
 
 
-import httplib
 import datetime
+import httplib
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
-from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
-from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
+from soc.logic.models.user import logic as user_logic
+
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.organization import logic \
     as gsoc_organization_logic
-from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+from soc.modules.gsoc.logic.models.timeline import logic as gsoc_timeline_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_proposal import logic \
     as student_proposal_logic
 
 from tests.test_utils import DjangoTestCase
-from tests.test_utils import TaskQueueTestCase, MailTestCase
+from tests.test_utils import MailTestCase
+from tests.test_utils import TaskQueueTestCase
 
 
 class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
@@ -142,21 +144,21 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
       'status': 'active',
       }
     organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     self.organization = organization
     # Create another organization for a_program
     organization_properties.update({
       'link_id': 'another_org',
       })
     another_organization =  gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     # Create an organization to serve as cursor sub for a_program, which should
     # come as the first result of query
     organization_properties.update({
       'link_id': 'aa_org',
       })
     stub_organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     self.stub_organization = stub_organization
     # Create a user for all roles except sponsor
     email = "a_role_user@example.com"
@@ -247,7 +249,7 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     'score': 90,
     }
     self.proposal = student_proposal_logic.updateOrCreateFromFields(
-                                                    student_proposal_properties)
+        student_proposal_properties)
     # Create another student proposal to an_org for another_student
     student_proposal_properties.update({
     'link_id': 'another_proposal',
@@ -268,8 +270,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     student_proposal_logic.updateOrCreateFromFields(student_proposal_properties)
 
   def testConvertProposalsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to convert proposals
-    is forbidden.
+    """Tests that converting proposals is forbidden without correct XSRF token.
+
+    Without a correct XSRF token, the attempt to convert proposals is forbidden.
     """
     url = '/tasks/accept_proposals/main'
     postdata = {'programkey': self.program.key().name(),
@@ -278,7 +281,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testConvertProposalsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, proposals of all
+    """Tests that tasks for converting proposals spawned with correct token.
+
+    Through HTTP POST with correct XSRF token, proposals of all
     organizations which have a key equal to or more than 'orgkey' are converted:
     tasks for converting them (one task for each organization) are spawned.
     """
@@ -293,7 +298,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertTasksInQueue(n=3, url=task_url)
 
   def testAcceptProposalsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to accept proposals
+    """Tests that accepting proposals is forbidden without correct XSRF token.
+
+    Without correct XSRF token, the attempt to accept proposals
     for an organization is forbidden.
     """
     url = '/tasks/accept_proposals/accept'
@@ -305,7 +312,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testAcceptProposalsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, proposals of
+    """Tests that proposals can be accepted with a correct XSRF token.
+
+    Through HTTP POST with correct XSRF token, proposals of
     an organization with higher score are accepted if the organization has
     enough slots, confirmation emails are sent to students, and a task of
     rejecting the remaining proposals is spawned.
@@ -329,7 +338,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertTasksInQueue(n=1, url=task_url)
 
   def testRejectProposalsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that without correct XSRF token, the attempt to reject proposals
+    """Tests that rejecting proposals is forbidden without correct XSRF token.
+
+    Without correct XSRF token, the attempt to reject proposals
     for an organization is forbidden.
     """
     url = '/tasks/accept_proposals/reject'
@@ -338,7 +349,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testRejectProposalsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, the remaining
+    """Tests that proposals can be rejected with a correct XSRF token.
+
+    Through HTTP POST with correct XSRF token, the remaining
     proposals whose status is still 'pending' are rejected and confirmation
     emails are sent to students,.
     """
@@ -358,7 +371,9 @@ class AcceptProposalsTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEmailSent(to=self.another_student.email, html='not selected')
 
   def testRejectProposalsShortTimelimitThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, if timelimit is
+    """Tests that not all tasks can be completed if timelimit is too short.
+
+    Through HTTP POST with correct XSRF token, if timelimit is
     too short, not all tasks can be completed; in the extreme case, when
     timelimit is 0, the status will not be changed and a confirmation email
     will not be sent; however, a clone task will be spawned.

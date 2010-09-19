@@ -21,9 +21,10 @@ __authors__ = [
 
 
 import httplib
-from tests.test_utils import DjangoTestCase
 
 from django.test.client import Client
+
+from tests.test_utils import DjangoTestCase
 
 
 class ProgramTest(DjangoTestCase):
@@ -47,8 +48,9 @@ class ProgramTest(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateProgramWithScopePath(self):
-    """Test that the create program page with scope path is redirected to its
-    gsoc page.
+    """Test that the create program page with scope path is redirected.
+
+    To its gsoc page.
     """
     url = '/program/create/' + self.scope_path
     response = self.client.get(url)
@@ -59,8 +61,9 @@ class ProgramTest(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateProgramWithScopePathAndLinkId(self):
-    """Test that the create program page with scope path and link id is
-    redirected to its gsoc page.
+    """Test that create program page with scope path and link id is redirected.
+
+    To its gsoc page.
     """
     url = '/program/create/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -137,8 +140,9 @@ class ProgramTest(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testAssignSlotsJson(self):
-    """Test that the assign slots JSON program page is redirected to
-    its gsoc page.
+    """Test that the assign slots JSON program page is redirected.
+
+    To its gsoc page.
     """
     url = '/program/slots/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -149,8 +153,9 @@ class ProgramTest(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testShowDuplicateSlots(self):
-    """Test that the show duplicate slots program page is redirected to
-    its gsoc page.
+    """Test that the show duplicate slots program page is redirected.
+
+    Redirected to its gsoc page.
     """
     url = '/program/show_duplicates/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -172,8 +177,9 @@ class ProgramTest(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testListAllAcceptedOrganizations(self):
-    """Test that the list all accepted organizations page is redirected to
-    its gsoc page.
+    """Test that the list all accepted organizations page is redirected.
+
+    To its gsoc page.
     """
     url = '/program/accepted_orgs/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)

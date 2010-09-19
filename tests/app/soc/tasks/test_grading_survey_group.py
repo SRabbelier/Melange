@@ -20,42 +20,48 @@ __authors__ = [
   ]
 
 
-import httplib
 import datetime
+import httplib
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.timeline import logic as timeline_logic
+from soc.logic.models.user import logic as user_logic
+
+from soc.modules.gsoc.logic.models.grading_record import logic \
+    as grading_record_logic
+from soc.modules.gsoc.logic.models.grading_survey_group import logic \
+    as survey_group_logic
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.organization import logic \
-    as gsoc_organization_logic
 from soc.modules.gsoc.logic.models.org_admin import logic \
     as gsoc_org_admin_logic
-from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_project import logic \
     as student_project_logic
 from soc.modules.gsoc.logic.models.survey import project_logic \
-    as project_survey_logic, grading_logic as grading_survey_logic
-from soc.modules.gsoc.logic.models.grading_survey_group import logic \
-    as survey_group_logic
-from soc.modules.gsoc.logic.models.grading_record import logic \
-    as grading_record_logic
+    as project_survey_logic
+from soc.modules.gsoc.logic.models.survey import grading_logic \
+    as grading_survey_logic
 
 from soc.tasks.grading_survey_group import DEF_BATCH_SIZE
 
 from tests.test_utils import DjangoTestCase
-from tests.test_utils import TaskQueueTestCase, MailTestCase
+from tests.test_utils import MailTestCase
+from tests.test_utils import TaskQueueTestCase
 
 
 class GradingSurveyGroupTasksTest(DjangoTestCase,
-                                  TaskQueueTestCase, MailTestCase):
-  """Tests related to the user view for unregistered users.
+                                  TaskQueueTestCase,
+                                  MailTestCase):
+  """Tests related to the soc.tasks.grading_survey_group view.
   """
+
   def setUp(self):
     """Set up required for the view tests.
     """
@@ -150,7 +156,7 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
         'status': 'active',
       }
     organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                      organization_properties)
+        organization_properties)
     # Create a user for all roles except sponsor
     email = "a_role_user@example.com"
     account = users.User(email=email)
@@ -249,7 +255,7 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
           'student': student,
           })
       project = student_project_logic.updateOrCreateFromFields(
-                                                           project_properties)
+          project_properties)
       projects.append(project)
     self.students = students
     self.projects = projects
@@ -287,7 +293,7 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
         'taking_access': 'student',
         }
     project_survey = project_survey_logic.updateOrCreateFromFields(
-                                                            survey_properties)
+        survey_properties)
     self.project_survey = project_survey
     # Create a grading survey for a_program
     link_id = 'a_grading_survey'
@@ -298,7 +304,7 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
         'taking_access': 'mentor',
         })
     grading_survey = grading_survey_logic.updateOrCreateFromFields(
-                                                              survey_properties)
+        survey_properties)
     self.grading_survey = grading_survey
     # Create a survey group for a_grading_survey and a_project_survey
     # of a_program
@@ -311,7 +317,7 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
         'student_survey': project_survey,
         }
     survey_group = survey_group_logic.updateOrCreateFromFields(
-                                                      survey_group_properties)
+        survey_group_properties)
     self.survey_group = survey_group
 
   def createGradingRecords(self):
@@ -330,13 +336,15 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
           'grade_decision': choices[i%3],
         })
       grading_record = grading_record_logic.updateOrCreateFromFields(
-                                                      grading_record_properties)
+          grading_record_properties)
       grading_records.append(grading_record)
       self.grading_records = grading_records
 
   def testUpdateRecordsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that the attempt to update or create records for survey group
-    records without a correct XSRF token is forbidden.
+    """Tests that it is forbidden to update records with incorrect XSRF token.
+
+    Without a correct XSRF token, the attempt to update or create records for
+    survey group records is forbidden.
     """
     url = '/tasks/grading_survey_group/update_records'
     postdata = {'group_key': self.survey_group.key().name(),
@@ -345,7 +353,9 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testUpdateRecordsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, DEF_BATCH_SIZE
+    """Tests that grading records are created with a correct XSRF.
+
+    With correct XSRF token, DEF_BATCH_SIZE
     grading records are created (one for each project) and a taskqueue to
     create more is spawned if there are more than DEF_BATCH_SIZE projects
     to update.
@@ -365,7 +375,9 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
     self.assertTasksInQueue(n=1, url=task_url)
 
   def testUpdateProjectsThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that  the attempt to update each student project for which
+    """Tests that it is forbidden to update project with incorrect XSRF token.
+
+    The attempt to update each student project for which
     a GradingRecord is found without a correct XSRF token is forbidden.
     """
     self.createGradingRecords()
@@ -377,7 +389,9 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testUpdateProjectsThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, DEF_BATCH_SIZE
+    """Tests that tasks are spawned with a correct XSRF token.
+
+    Through HTTP POST with correct XSRF token, DEF_BATCH_SIZE
     tasks of sending mails (one for each grading record) are spawned and a
     taskqueue to update more projects is spawned if there are more than
     DEF_BATCH_SIZE projects to update. Also Test that the status of the project
@@ -411,9 +425,11 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
     task_url = url
     self.assertTasksInQueue(n=1, url=task_url)
 
-  def testMailResultThroughPostWithoutCorrectXsrfToken(self):
-    """Tests that the attempt to send out a mail about the result of
-    one grading record without a correct XSRF token is forbidden.
+  def testMailResultWithoutCorrectXsrfToken(self):
+    """Tests that sending grading result is forbidden with incorrect XSRF token.
+
+    Without a correct XSRF token, The attempt to send out a mail about the
+    result of one grading record is forbidden.
     """
     self.createGradingRecords()
     url = '/tasks/grading_survey_group/mail_result'
@@ -421,9 +437,11 @@ class GradingSurveyGroupTasksTest(DjangoTestCase,
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
-  def testMailResultThroughPostWithCorrectXsrfToken(self):
-    """Tests that through HTTP POST with correct XSRF token, the result of
-    grading can be sent out to students.
+  def testMailResultWithCorrectXsrfToken(self):
+    """Tests that grading result can be sent out with correct XSRF token.
+
+    With a correct XSRF token, the result of grading
+    can be sent out to students.
     """
     self.createGradingRecords()
     url = '/tasks/grading_survey_group/mail_result'

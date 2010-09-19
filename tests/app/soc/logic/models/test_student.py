@@ -25,11 +25,11 @@ import unittest
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.models import user
 from soc.logic import accounts
-from soc.models import student
-from soc.logic.models.user import logic as user_logic
 from soc.logic.models.student import logic as student_logic
+from soc.logic.models.user import logic as user_logic
+from soc.models import student
+from soc.models import user
 
 
 class StudentTest(unittest.TestCase):

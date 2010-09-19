@@ -20,8 +20,8 @@ __authors__ = [
   ]
 
 
-import httplib
 import datetime
+import httplib
 
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -30,25 +30,30 @@ from soc.logic.models.user import logic as user_logic
 from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.timeline import logic as timeline_logic
-from soc.modules.gsoc.logic.models.program import logic as program_logic
-from soc.modules.gsoc.logic.models.organization import logic \
-    as gsoc_organization_logic
+
+from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic \
     as gsoc_org_admin_logic
-from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+from soc.modules.gsoc.logic.models.organization import logic \
+    as gsoc_organization_logic
+from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 from soc.modules.gsoc.logic.models.student_project import logic \
     as student_project_logic
 from soc.modules.gsoc.logic.models.survey import project_logic \
-    as project_survey_logic, grading_logic as grading_survey_logic
+    as project_survey_logic
+from soc.modules.gsoc.logic.models.survey import grading_logic \
+    as grading_survey_logic
 
 from tests.test_utils import DjangoTestCase
-from tests.test_utils import TaskQueueTestCase, MailTestCase
+from tests.test_utils import MailTestCase
+from tests.test_utils import TaskQueueTestCase
 
 
 class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
-  """Tests related to the user view for unregistered users.
+  """Tests related to soc.tasks.surveys.
   """
+
   def setUp(self):
     """Set up required for the view tests.
     """
@@ -143,7 +148,7 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'status': 'active',
       }
     organization = gsoc_organization_logic.updateOrCreateFromFields(
-                                                        organization_properties)
+        organization_properties)
     # Create a user for all roles except sponsor
     email = "a_role_user@example.com"
     account = users.User(email=email)
@@ -243,7 +248,7 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
           'student': student,
           })
       project = student_project_logic.updateOrCreateFromFields(
-                                                            project_properties)
+          project_properties)
       projects.append(project)
     self.students = students
     self.projects = projects
@@ -281,7 +286,7 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'taking_access': 'student',
         }
     project_survey = project_survey_logic.updateOrCreateFromFields(
-                                                            survey_properties)
+        survey_properties)
     self.project_survey = project_survey
     # Create a grading survey for a_program
     link_id = 'a_grading_survey'
@@ -292,12 +297,14 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
         'taking_access': 'mentor',
         })
     grading_survey = grading_survey_logic.updateOrCreateFromFields(
-                                                            survey_properties)
+        survey_properties)
     self.grading_survey = grading_survey
 
   def testSpawnSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(self):
-    """Test that the attempt to spawn reminders for project survey without
-    a correct XSRF token is forbidden.
+    """Tests that spawning reminders without a correct XSRF token is forbidden.
+
+    Without a correct XSRF token, The attempt to spawn reminders for
+    project survey is forbidden.
     """
     url = 'tasks/surveys/projects/send_reminder/spawn'
     postdata = {'program_key': self.program.key().name(),
@@ -308,8 +315,9 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testSpawnSurveyReminderForProjectThroughPostWithCorrectXsrfToken(self):
-    """Test that survey reminders are spawned for all projects
-    with a correct XSRF token.
+    """Tests that survey reminders are spawned with a correct XSRF token.
+
+    With a correct XSRF token, survey reminders are spawned for all projects.
     """
     url = '/tasks/surveys/projects/send_reminder/spawn'
     postdata = {'program_key': self.program.key().name(),
@@ -327,8 +335,10 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
                             queue_names=queue_names)
 
   def testSendProjectSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(
-                                                                          self):
-    """Test that without correct XSRF token, the attempt to send project survey
+      self):
+    """Tests that sending reminders without a correct XSRF token is forbidden.
+
+    Without correct XSRF token, the attempt to send project survey
     reminders is forbidden.
     """
     entities = user_logic.getForFields()
@@ -341,8 +351,10 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testSendProjectSurveyReminderForProjectThroughPostWithCorrectXsrfToken(
-                                                                        self):
-    """Test that with correct XSRF token, project survey reminders for a project
+      self):
+    """Tests that project survey reminders are sent out with correct XSRF token.
+
+    With a correct XSRF token, project survey reminders for a project
     are sent to its student.
     """
     entities = user_logic.getForFields()
@@ -358,8 +370,10 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEmailSent(to=self.students[0].email, html='survey')
 
   def testSendGradingSurveyReminderForProjectThroughPostWithoutCorrectXsrfToken(
-                                                                          self):
-    """Test that without correct XSRF token, the attempt to send grading survey
+      self):
+    """Tests that sending grading reminders is forbidden without correct token.
+
+    Without a correct XSRF token, the attempt to send grading survey
     reminders is forbidden.
     """
     entities = user_logic.getForFields()
@@ -372,8 +386,10 @@ class SurveysTasksTest(DjangoTestCase, TaskQueueTestCase, MailTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testSendGradingSurveyReminderForProjectThroughPostWithCorrectXsrfToken(
-                                                                          self):
-    """Test that with correct XSRF token, grading survey reminders for a project
+      self):
+    """Tests that grading survey reminders are sent out with correct XSRF token.
+
+    With correct XSRF token, grading survey reminders for a project
     are sent to its mentor.
     """
     entities = user_logic.getForFields()

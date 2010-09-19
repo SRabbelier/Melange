@@ -44,9 +44,10 @@ log =  logging.getLogger('nose.plugins.cover')
 
 
 def begin(self):
-  """Used to stub out nose.plugins.cover.Coverage.begin. The difference is that
-  it loads Melange after coverage starts so the loading of models, logic and
-  views can be tracked by coverage.
+  """Used to stub out nose.plugins.cover.Coverage.begin.
+
+  The difference is that it loads Melange after coverage starts, so
+  the loading of models, logic and views can be tracked by coverage.
   """
   log.debug("Coverage begin")
   import coverage
@@ -130,8 +131,8 @@ def main():
     memcache_stub.MemcacheServiceStub())
   apiproxy_stub_map.apiproxy.RegisterStub('mail', mail_stub.MailServiceStub())
   yaml_location = os.path.join(HERE, 'app')
-  apiproxy_stub_map.apiproxy.RegisterStub('taskqueue',
-                 taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
+  apiproxy_stub_map.apiproxy.RegisterStub(
+      'taskqueue', taskqueue_stub.TaskQueueServiceStub(root_path=yaml_location))
   import django.test.utils
   django.test.utils.setup_test_environment()
 

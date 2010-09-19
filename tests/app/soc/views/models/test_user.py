@@ -21,18 +21,20 @@ __authors__ = [
 
 
 import httplib
-from django.http import HttpRequest
+
 from django.core import urlresolvers
+from django.http import HttpRequest
 from django.utils import simplejson
-from tests.test_utils import DjangoTestCase
 
 from google.appengine.api import users
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.org_admin import logic as admin_logic
-from soc.middleware.xsrf import XsrfMiddleware
 from soc.logic.helper import xsrfutil
-from django.test.client import Client
+from soc.logic.models.org_admin import logic as admin_logic
+from soc.logic.models.user import logic as user_logic
+from soc.middleware.xsrf import XsrfMiddleware
+
+from tests.test_utils import DjangoTestCase
+
 
 class UserTestUnregistered(DjangoTestCase):
   """Tests related to the user view for unregistered users.
@@ -67,8 +69,7 @@ class UserTestUnregistered(DjangoTestCase):
     self.assertContains(response, 'Create a New User Profile')
 
   def testEditUserProfile(self):
-    """Test that an unregistered user cannot edit his/her non existed
-    user profile.
+    """Test that an unregistered user cannot edit his/her non existed profile.
     """
     url = '/user/edit_profile'
     response = self.client.get(url)
@@ -420,8 +421,8 @@ class UserTestRegistered(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
 
-class UserTestAdmin(DjangoTestCase):
-  """Tests related to the user view for administrator users.
+class UserTestDeveloper(DjangoTestCase):
+  """Tests related to the user view for developer users.
   """
   def setUp(self):
     """Set up required for the view tests.
@@ -450,8 +451,7 @@ class UserTestAdmin(DjangoTestCase):
                                                                key_name)
 
   def testCreateUserProfile(self):
-    """Test that a registered user with developer/admin privilege cannot
-    create another user profile.
+    """Test that a developer user cannot create another user profile.
     """
     url = '/user/create_profile'
     response = self.client.get(url)
@@ -461,8 +461,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testEditUserProfile(self):
-    """Test that a registered user with developer/admin privilege can
-    edit his/her user profile.
+    """Test that a developer user can edit his/her user profile.
     """
     url = '/user/edit_profile'
     response = self.client.get(url)
@@ -474,8 +473,7 @@ class UserTestAdmin(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListUserRoles(self):
-    """Test that a registered user with developer/admin privilege can
-    list his/her roles.
+    """Test that a developer user can list his/her roles.
     """
     url = '/user/roles'
     response = self.client.get(url)
@@ -487,8 +485,7 @@ class UserTestAdmin(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListUserRequests(self):
-    """Test that a registered user with developer/admin privilege can
-    list his/her requests.
+    """Test that a developer user can list his/her requests.
     """
     url = '/user/requests'
     response = self.client.get(url)
@@ -500,8 +497,7 @@ class UserTestAdmin(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testCreateUser(self):
-    """Test that a registered user with developer/admin privilege can
-    create a user.
+    """Test that a developer user can create a user.
     """
     url = '/user/create'
     response = self.client.get(url)
@@ -509,8 +505,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testCreateUserWithScopePath(self):
-    """Test that a registered user with developer/admin privilege can
-    create a user with a scope_path.
+    """Test that a developer user can create a user with a scope_path.
     """
     url = '/user/create/'
     response = self.client.get(url)
@@ -518,8 +513,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testCreateUserWithLinkId(self):
-    """Test that a registered user with developer/admin privilege can
-    create a user with a link_id.
+    """Test that a developer user can create a user with a link_id.
     """
     url = '/user/create/abc'
     response = self.client.get(url)
@@ -527,8 +521,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/edit.html')
 
   def testEditUser(self):
-    """Test that a registered user with developer/admin privilege can
-    edit a user.
+    """Test that a developer user can edit a user.
     """
     url = '/user/edit/current_user'
     response = self.client.get(url)
@@ -536,24 +529,27 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/user/edit.html')
 
   def testDeleteAnotherUser(self):
-    """Test that a registered user with developer/admin privilege cannot
-    delete another user through HTTP GET.
+    """Test that a developer user cannot delete another user.
+
+    Through HTTP GET.
     """
     url = '/user/delete/another_user'
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPost(self):
-    """Test that a registered user with developer/admin privilege cannot
-    delete another user through HTTP POST without correct XSRF token.
+    """Test that a developer user cannot delete another user.
+
+    Through HTTP POST without a correct XSRF token.
     """
     url = '/user/delete/another_user'
     response = self.client.post(url)
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPostWithIncorrectXsrfToken(self):
-    """Test that a registered user with developer/admin privilege cannot
-    delete another user through HTTP POST with incorrect XSRF token.
+    """Test that a developer user cannot delete another user.
+
+    Through HTTP POST with an incorrect XSRF token.
     """
     url = '/user/delete/another_user'
     postdata = {'xsrf_token': 'incorrect_xsrf'}
@@ -561,8 +557,9 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
   def testDeleteAnotherUserThroughPostWithCorrectXsrfToken(self):
-    """Test that a registered user with developer/admin privilege can
-    delete another user through HTTP POST with correct XSRF token.
+    """Test that a developer user can delete another user.
+
+    Through HTTP POST with a correct XSRF token.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
@@ -595,8 +592,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(data.get("new_location", None), "/user/list")
 
   def testDeleteUserSelf(self):
-    """Test that a registered user with developer/admin privilege can
-    delete him/herself.
+    """Test that a developer user can delete him/herself.
     """
     url = '/user/delete/current_user'
     # request is currently not used in _getSecretKey
@@ -615,12 +611,11 @@ class UserTestAdmin(DjangoTestCase):
     except AssertionError:
       pass
     else:
-      raise "A registered user with developer/admin privilege failed" \
-          + "to delete him/herself"
+      raise ("A registered user with developer/admin privilege failed"
+             "to delete him/herself")
 
   def testDeleteUserNonExisted(self):
-    """Test that a registered user with developer/admin privilege cannot
-    delete a non existed user.
+    """Test that a developer user cannot delete a non existed user.
     """
     entities = user_logic.getForFields()
     count_before = len(entities)
@@ -641,8 +636,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertEqual(count_before, count_after)
 
   def testAdminUser(self):
-    """Test that a registered user with developer/admin privilege cannot
-    admin a user.
+    """Test that a developer user cannot admin a user.
     """
     url = '/user/admin/another_user'
     response = self.client.get(url)
@@ -653,8 +647,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue('message' in response.context[0])
 
   def testListUser(self):
-    """Test that a registered user with developer/admin privilege
-    can list users.
+    """Test that a developer user can list users.
     """
     url = '/user/list'
     response = self.client.get(url)
@@ -662,8 +655,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
 
   def testpickUser(self):
-    """Test that a registered user with developer/admin privilege
-    can pick users.
+    """Test that a developer user can pick users.
     """
     url = '/user/pick'
     response = self.client.get(url)
@@ -673,8 +665,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTrue(self.entity.link_id in response.context['json'])
 
   def testListDevelopers(self):
-    """Test that a registered user with developer/admin privilege
-    can list developers.
+    """Test that a developer user can list developers.
     """
     url = '/user/list_developers'
     response = self.client.get(url)
@@ -682,8 +673,7 @@ class UserTestAdmin(DjangoTestCase):
     self.assertTemplateUsed(response, 'soc/models/list.html')
 
   def testShowUserExisted(self):
-    """Test that a registered user with developer/admin privilege
-    can view an existed user.
+    """Test that a developer user can view an existed user.
     """
     url = '/user/show/current_user'
     response = self.client.get(url)
@@ -695,8 +685,7 @@ class UserTestAdmin(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testShowUserAnotherExisted(self):
-    """Test that a registered user with developer/admin privilege
-    can view another existed user.
+    """Test that a developer user can view another existed user.
     """
     url = '/user/show/another_user'
     response = self.client.get(url)
@@ -708,8 +697,7 @@ class UserTestAdmin(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testShowUserNonExisted(self):
-    """Test that a registered user with developer/admin privilege
-    cannot view a non existed user.
+    """Test that a developer user cannot view a non existed user.
     """
     url = '/user/show/not_a_user'
     response = self.client.get(url)

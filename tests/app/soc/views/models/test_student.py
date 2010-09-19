@@ -21,24 +21,25 @@ __authors__ = [
 
 
 import httplib
-from tests.test_utils import DjangoTestCase
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.models.sponsor import logic as sponsor_logic
-from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.program import logic as program_logic
-from soc.logic.models.user import logic as user_logic
+from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.student import logic as student_logic
+from soc.logic.models.timeline import logic as timeline_logic
+from soc.logic.models.user import logic as user_logic
 
-from django.test.client import Client
+from tests.test_utils import DjangoTestCase
 
 
 class StudentTestNonexistent(DjangoTestCase):
-  """Tests related to the student view with non-existent sponsor,
-  program and student.
+  """Tests related to the student view.
+
+  With non-existent sponsor, program and student.
   """
+
   def setUp(self):
     """Set up required for the view tests.
     """
@@ -57,16 +58,16 @@ class StudentTestNonexistent(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateStudentWithScopePath(self):
-    """Test that the create student page with a non-existent scope path is
-    not found.
+    """Test that create student page with non-existent scope path is not found.
     """
     url = '/student/create/' + self.scope_path
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.NOT_FOUND)
 
   def testCreateStudentWithScopePathAndLinkId(self):
-    """Test that the create student page with scope path and link id is
-    redirected to its gsoc page.
+    """Test that the create student page is redirected to its gsoc page.
+
+    If a scope path and a link id are specified in the link.
     """
     url = '/student/create/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -77,16 +78,20 @@ class StudentTestNonexistent(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testEditStudent(self):
-    """Test that the edit student page with a non-existent scope path
-    and link id is not found.
+    """Test that the edit student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/edit/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.NOT_FOUND)
 
   def testDeleteStudent(self):
-    """Test that the delete student page with a non-existent scope path
-    and link id is not found.
+    """Test that the delete student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/delete/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -104,32 +109,40 @@ class StudentTestNonexistent(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testShowStudent(self):
-    """Test that the show student page with a non-existent scope path
-    and link id is not found.
+    """Test that the show student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/show/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.NOT_FOUND)
 
   def testAdminStudent(self):
-    """Test that the admin student page with a non-existent scope path
-    and link id is not found.
+    """Test that the admin student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/admin/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.NOT_FOUND)
 
   def testBecomeStudent(self):
-    """Test that the become a student page with a non-existent scope path
-    and link id is not found.
+    """Test that the become student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/apply/' + self.scope_path
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.NOT_FOUND)
 
   def testManageStudent(self):
-    """Test that the manage a student page with a non-existent scope path
-    and link id is not found.
+    """Test that the manage student page is not found.
+
+    If a non-existent scope path and a non-existent link id
+    are specified in the link.
     """
     url = '/student/manage/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)
@@ -137,8 +150,9 @@ class StudentTestNonexistent(DjangoTestCase):
 
 
 class StudentTestExistent(DjangoTestCase):
-  """Tests related to the student view with existent sponsor, program
-  and student.
+  """Tests related to the student view.
+
+  With existent sponsor, program and student.
   """
   def setUp(self):
     """Set up required for the view tests.
@@ -154,7 +168,7 @@ class StudentTestExistent(DjangoTestCase):
         'name': name,
         }
     self.sponsor_user = user_logic.updateOrCreateFromFields(
-                                                     sponsor_user_properties)
+        sponsor_user_properties)
     # Create sponsor role for a_sponsor_user
     link_id = 'a_sponsor'
     name = link_id
@@ -215,7 +229,7 @@ class StudentTestExistent(DjangoTestCase):
         'name': name,
         }
     self.student_user = user_logic.updateOrCreateFromFields(
-                                                      student_user_properties)
+        student_user_properties)
     # Create student role for a_user
     student_properties = {
         'link_id': 'a_student',
@@ -259,8 +273,9 @@ class StudentTestExistent(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateStudentWithScopePath(self):
-    """Test that the create student page with scope path is redirected to
-    its gsoc page.
+    """Test that create student page with scope path is redirected.
+
+    To its gsoc page.
     """
     url = '/student/create/' + self.scope_path
     response = self.client.get(url)
@@ -271,8 +286,9 @@ class StudentTestExistent(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testCreateStudentWithScopePathAndLinkId(self):
-    """Test that the create student page with scope path and link id is
-    redirected to its gsoc page.
+    """Test that create student page with scope path and link id is redirected.
+
+    To its gsoc page.
     """
     url = '/student/create/' + self.scope_path + '/' + self.link_id
     response = self.client.get(url)

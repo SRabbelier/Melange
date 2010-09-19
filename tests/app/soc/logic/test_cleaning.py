@@ -20,15 +20,16 @@ __authors__ = [
   ]
 
 
-from django import forms
 import unittest
 
-from google.appengine.api import users
-from google.appengine.ext import db
+from django import forms
 
-from soc.models import user
+from google.appengine.ext import db
+from google.appengine.api import users
+
 from soc.logic import accounts
 from soc.logic.models.user import logic as user_logic
+from soc.models import user
 
 from soc.logic import cleaning
 
@@ -63,7 +64,7 @@ class CleaningTest(unittest.TestCase):
         'name': 'Another User',
         }
     self.another_user = user_logic.updateOrCreateFromFields(
-                                                    another_user_properties)
+        another_user_properties)
     # Create a dummy form object
     self.form = Form()
 
@@ -115,18 +116,20 @@ class CleaningTest(unittest.TestCase):
     self.assertEqual(self.form._errors, {})
 
   def testCleanScopePath(self):
-    """Test that scope_path field can be cleaned.
+    """Tests that scope_path field can be cleaned.
     """
     field_name = 'scope_path'
     clean_field = cleaning.clean_scope_path(field_name)
-    # Test that the value will be returned if the value of field has a valid scope_path format
+    # Test that the value will be returned if the value of field
+    # has a valid scope_path format
     field_value = 'valid_scope_path'
     cleaned_data_before = {field_name: field_value}
     self.form.cleaned_data = cleaned_data_before.copy()
     self.assertEqual(clean_field(self.form), field_value)
     self.assertEqual(self.form.cleaned_data, cleaned_data_before)
     self.assertEqual(self.form._errors, {})
-    # Test that forms.ValidationError will be raised if the value of field has not a valid scope_path format
+    # Test that forms.ValidationError will be raised if the value of field
+    # has not a valid scope_path format
     field_value = 'v1_@?'
     cleaned_data_before = {field_name: field_value}
     self.form.cleaned_data = cleaned_data_before.copy()

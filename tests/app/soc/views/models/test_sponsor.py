@@ -21,22 +21,23 @@ __authors__ = [
 
 
 import httplib
-from django.http import HttpRequest
+
 from django.core import urlresolvers
+from django.http import HttpRequest
 from django.utils import simplejson
-from tests.test_utils import DjangoTestCase
 
 from google.appengine.api import users
 
-from soc.logic.models.user import logic as user_logic
-from soc.logic.models.sponsor import logic as sponsor_logic
-from soc.middleware.xsrf import XsrfMiddleware
 from soc.logic.helper import xsrfutil
-from django.test.client import Client
+from soc.logic.models.sponsor import logic as sponsor_logic
+from soc.logic.models.user import logic as user_logic
+from soc.middleware.xsrf import XsrfMiddleware
+
+from tests.test_utils import DjangoTestCase
 
 
 class SponsorTestForDeveloper(DjangoTestCase):
-  """Tests related to the user view for registered users.
+  """Tests related to the user view for developer users.
   """
   def setUp(self):
     """Set up required for the view tests.
@@ -65,7 +66,7 @@ class SponsorTestForDeveloper(DjangoTestCase):
                                                              key_name)
 
   def createSponsor(self, user):
-    """Create a sponsor role for user.
+    """Creates a sponsor role for user.
     """
     # Create a sponsor for a_user
     link_id = 'a_sponsor'
@@ -97,7 +98,7 @@ class SponsorTestForDeveloper(DjangoTestCase):
     return sponsor, properties
 
   def testCreateProgramOwner(self):
-    """Test that a developer user can create a program owner.
+    """Tests that a developer user can create a program owner.
     """
     url = '/sponsor/create'
     response = self.client.get(url)
@@ -109,8 +110,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testCreateProgramOwnerWithScopePath(self):
-    """Test that a developer user can create a program owner
-    with empty scope path.
+    """Test that a developer user can create a program owner.
+
+    Even if the specified link id is empty.
     """
     url = '/sponsor/create/'
     response = self.client.get(url)
@@ -137,8 +139,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertTrue(form.initial.get('link_id'), link_id)
 
   def testEditProgramOwnerSelfExisted(self):
-    """Test that a developer user can edit a program owner
-    with a link id (him/herself).
+    """Test that a developer user can edit a program owner with a link id.
+
+    The program owner is the user him/herself.
     """
     sponsor, properties = self.createSponsor(self.user)
     url = '/sponsor/edit/' + properties.get('link_id')
@@ -155,8 +158,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertTrue(form.initial.get('link_id'), properties.get('link_id'))
 
   def testEditProgramOwnerAnotherExisted(self):
-    """Test that a developer user can edit a program owner
-    with a link id (another user).
+    """Test that a developer user can edit a program owner with a link id.
+
+    The program owner is another user.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     url = '/sponsor/edit/' + properties.get('link_id')
@@ -173,8 +177,7 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertTrue(form.initial.get('link_id'), properties.get('link_id'))
 
   def testEditProgramOwnerNonExisted(self):
-    """Test that a developer user cannot edit an non existed program owner
-    with a link id.
+    """Test that a developer user cannot edit a non existed program owner.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/edit/' + link_id
@@ -184,8 +187,10 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertTemplateNotUsed(response, 'soc/models/edit.html')
 
   def testDeleteProgramOwnerSelfExisted(self):
-    """Test that the operation that a developer user deletes
-    a program owner (him/herself) through HTTP GET is forbidden.
+    """Test that deleting a program owner him/herself through GET is forbidden.
+
+    The attempt of a developer user to delete a program owner (him/herself)
+    through HTTP GET is forbidden.
     """
     sponsor, properties = self.createSponsor(self.user)
     url = '/sponsor/delete/' + properties.get('link_id')
@@ -194,8 +199,10 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(response.context, None)
 
   def testDeleteProgramOwnerAnotherExisted(self):
-    """Test that the operation that a developer user deletes
-    a program owner (another user) through HTTP GET is forbidden.
+    """Test that deleting a program owner another user through GET is forbidden.
+
+    The attempt of a developer user to delete a program owner (another user)
+    through HTTP GET is forbidden.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     url = '/sponsor/delete/' + properties.get('link_id')
@@ -204,8 +211,10 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(response.context, None)
 
   def testDeleteProgramOwnerNonExisted(self):
-    """Test that the operation that a developer user deletes
-    a non existed program owner (him/herself) through HTTP GET is forbidden.
+    """Test that deleting a non existed program owner through GET is forbidden.
+
+    The attempt of a developer user to delete a non existed program owner
+    through HTTP GET is forbidden.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/delete/' + link_id
@@ -213,38 +222,10 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
     self.assertEqual(response.context, None)
 
-  def testEditProgramOwnerAnotherExisted(self):
-    """Test that a developer user can edit a program owner
-    with a link id (another user).
-    """
-    sponsor, properties = self.createSponsor(self.another_user)
-    url = '/sponsor/edit/' + properties.get('link_id')
-    response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
-    self.assertTemplateUsed(response, 'soc/models/edit.html')
-    view_triple = urlresolvers.resolve(url)
-    kwargs = view_triple[2]
-    self.assertEqual(kwargs.get('page_name', 'a'),
-                     response.context[0].get('page_name', 'b'))
-    sponsor2 = response.context[0].get('entity')
-    self.assertEqual(sponsor.link_id, sponsor2.link_id)
-    form = response.context[0].get('form')
-    self.assertTrue(form.initial.get('link_id'), properties.get('link_id'))
-
-  def testEditProgramOwnerNonExisted(self):
-    """Test that a developer user cannot edit an non existed program owner
-    with a link id.
-    """
-    link_id = 'not_a_sponsor'
-    url = '/sponsor/edit/' + link_id
-    response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.NOT_FOUND)
-    self.assertTemplateUsed(response, 'soc/error.html')
-    self.assertTemplateNotUsed(response, 'soc/models/edit.html')
-
   def testShowProgramOwnerSelfExisted(self):
-    """Test that a developer user can show an existed program owner
-    with a link id (him/herself).
+    """Test that a developer user can show an existed program owner.
+
+    The existed program owner is the developer user him/herself.
     """
     sponsor, properties = self.createSponsor(self.user)
     url = '/sponsor/show/' + properties.get('link_id')
@@ -259,8 +240,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(sponsor.link_id, sponsor2.link_id)
 
   def testShowProgramOwnerAnotherExisted(self):
-    """Test that a developer user can show an existed program owner
-    with a link id (another user).
+    """Test that a developer user can show an existed program owner.
+
+    The existed program owner is another user.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     url = '/sponsor/show/' + properties.get('link_id')
@@ -275,8 +257,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(sponsor.link_id, sponsor2.link_id)
 
   def testShowProgramOwnerNonExisted(self):
-    """Test that error is returned if a developer user tries to
-    show an unexisted program owner.
+    """Test that error is returned.
+
+    If a developer user tries to show an unexisted program owner.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/show/' + link_id
@@ -317,7 +300,8 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(response.context[0].get('title'), 'Access denied')
 
   def testListProgramOwner(self):
-    """Test that a developer user can view all existed program owners
+    """Test that a developer user can view all existed program owners.
+
     (sponsors has not been listed/retrieved).
     """
     sponsor, properties = self.createSponsor(self.user)
@@ -332,8 +316,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRequestsForProgramOwnerSelfExisted(self):
-    """Test that a developer user can list requests for an existed
-    program owner (him/herself).
+    """Test that a developer can list requests for an existed program owner.
+
+    The existed program owner is the developer user him/herself.
     """
     sponsor, properties = self.createSponsor(self.user)
     link_id = properties.get('link_id')
@@ -347,8 +332,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRequestsForProgramOwnerAnotherExisted(self):
-    """Test that a developer user can list requests for an existed
-    program owner (another user).
+    """Test that a developer can list requests for an existed program owner.
+
+    The existed program owner is another user.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     link_id = properties.get('link_id')
@@ -362,8 +348,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRequestsForProgramOwnerNonExisted(self):
-    """Test that error is NOT returned if a developer user tries to list
-    requests for an nonexisted program owner.
+    """Test that error is NOT returned.
+
+    If a developer user tries to list requests for a nonexisted program owner.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/list_requests/' + link_id
@@ -376,8 +363,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRolesForProgramOwnerSelfExisted(self):
-    """Test that a developer user can list roles for an existed
-    program owner (him/herself).
+    """Test that a developer user can list roles for an existed program owner.
+
+    The existed program owner is the developer user him/herself.
     """
     sponsor, properties = self.createSponsor(self.user)
     link_id = properties.get('link_id')
@@ -391,8 +379,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRolesForProgramOwnerAnotherExisted(self):
-    """Test that a developer user can list roles for an existed
-    program owner (another user).
+    """Test that a developer user can list roles for an existed program owner.
+
+    The existed program owner is another user.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     link_id = properties.get('link_id')
@@ -406,8 +395,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testListRolesForProgramOwnerNonExisted(self):
-    """Test that error is NOT returned if a developer user tries to list roles
-    for an unexisted program owner.
+    """Test that error is NOT returned.
+
+    If a developer user tries to list roles for an unexisted program owner.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/list_roles/' + link_id
@@ -420,8 +410,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
                      response.context[0].get('page_name', 'b'))
 
   def testHomeSelf(self):
-    """Test that a developer user can show the home page of an existing
-    program owner (him/herself).
+    """Test that a developer can show the homepage of an existing program owner.
+
+    The existed program owner is the developer user him/herself.
     """
     sponsor, properties = self.createSponsor(self.user)
     url = '/sponsor/home/' + properties.get('link_id')
@@ -434,8 +425,9 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testHomeAnother(self):
-    """Test that a developer user can show the home page of
-    an existing program owner (another user).
+    """Test that a developer can show the homepage of an existing program owner.
+
+    The existed program owner is another user.
     """
     sponsor, properties = self.createSponsor(self.another_user)
     url = '/sponsor/home/' + properties.get('link_id')
@@ -448,8 +440,7 @@ class SponsorTestForDeveloper(DjangoTestCase):
     self.assertEqual(actual_redirected_location, expected_redirected_location)
 
   def testHomeNonExisted(self):
-    """Test that a developer user cannot show the home page of
-    a non-existing program owner.
+    """Test that a developer cannot show the homepage of a non-existent owner.
     """
     link_id = 'not_a_sponsor'
     url = '/sponsor/home/' + link_id

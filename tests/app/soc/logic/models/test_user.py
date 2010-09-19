@@ -25,9 +25,9 @@ import unittest
 
 from google.appengine.api import users
 
-from soc.models import user
 from soc.logic import accounts
 from soc.logic.models.user import logic as user_logic
+from soc.models import user
 
 
 class UserTest(unittest.TestCase):
@@ -38,17 +38,6 @@ class UserTest(unittest.TestCase):
     """Set up required for the slot allocation tests.
     """
 
-    """
-    # ensure that current user is created
-    properties = {
-        'account': users.get_current_user(),
-        'link_id': 'current_user',
-        'name': 'Current User',
-        }
-
-    key_name = user_logic.getKeyNameFromFields(properties)
-    user_logic.updateOrCreateFromKeyName(properties, key_name)
-    """
     # Create a user to experiment on
     email = "a_user@example.com"
     account = users.User(email=email)
@@ -248,8 +237,7 @@ class UserTest(unittest.TestCase):
     return entity
 
   def testGetForCurrentAccount(self):
-    """Test that the entity of the current user can be retrieved
-    through account.
+    """Test that the entity of current user can be retrieved through account.
     """
     current_user = self.createCurrentUser()
     entity = user_logic.getForCurrentAccount()

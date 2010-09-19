@@ -29,12 +29,10 @@ from django.utils import simplejson
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from soc.logic.helper import xsrfutil
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.timeline import logic as timeline_logic
 from soc.logic.models.user import logic as user_logic
-from soc.middleware.xsrf import XsrfMiddleware
 
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.organization import logic \

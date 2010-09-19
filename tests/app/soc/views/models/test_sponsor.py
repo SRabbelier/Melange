@@ -28,10 +28,8 @@ from django.utils import simplejson
 
 from google.appengine.api import users
 
-from soc.logic.helper import xsrfutil
 from soc.logic.models.sponsor import logic as sponsor_logic
 from soc.logic.models.user import logic as user_logic
-from soc.middleware.xsrf import XsrfMiddleware
 
 from tests.test_utils import DjangoTestCase
 

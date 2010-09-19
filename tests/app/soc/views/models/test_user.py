@@ -28,10 +28,7 @@ from django.utils import simplejson
 
 from google.appengine.api import users
 
-from soc.logic.helper import xsrfutil
-from soc.logic.models.org_admin import logic as admin_logic
 from soc.logic.models.user import logic as user_logic
-from soc.middleware.xsrf import XsrfMiddleware
 
 from tests.test_utils import DjangoTestCase
 
@@ -565,17 +562,7 @@ class UserTestDeveloper(DjangoTestCase):
     count_before = len(entities)
     link_id_another_user = self.another_entity.link_id
     url = '/user/delete/another_user'
-    """
-    request = HttpRequest()
-    request.path = url
-    request.method = 'POST'
-    """
-    # request is currently not used in _getSecretKey
-    request = None
-    xsrf = XsrfMiddleware()
-    key = xsrf._getSecretKey(request)
-    user_id = xsrfutil._getCurrentUserId()
-    xsrf_token = xsrfutil._generateToken(key, user_id)
+    xsrf_token = self.getXsrfToken(url)
     postdata = {'xsrf_token': xsrf_token}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.OK)
@@ -595,12 +582,7 @@ class UserTestDeveloper(DjangoTestCase):
     """Test that a developer user can delete him/herself.
     """
     url = '/user/delete/current_user'
-    # request is currently not used in _getSecretKey
-    request = None
-    xsrf = XsrfMiddleware()
-    key = xsrf._getSecretKey(request)
-    user_id = xsrfutil._getCurrentUserId()
-    xsrf_token = xsrfutil._generateToken(key, user_id)
+    xsrf_token = self.getXsrfToken(url)
     postdata = {'xsrf_token': xsrf_token}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.OK)
@@ -620,12 +602,7 @@ class UserTestDeveloper(DjangoTestCase):
     entities = user_logic.getForFields()
     count_before = len(entities)
     url = '/user/delete/not_a_user'
-    # request is currently not used in _getSecretKey
-    request = None
-    xsrf = XsrfMiddleware()
-    key = xsrf._getSecretKey(request)
-    user_id = xsrfutil._getCurrentUserId()
-    xsrf_token = xsrfutil._generateToken(key, user_id)
+    xsrf_token = self.getXsrfToken(url)
     postdata = {'xsrf_token': xsrf_token}
     response = self.client.post(url, postdata)
     self.assertEqual(response.status_code, httplib.OK)

@@ -23,16 +23,16 @@ __authors__ = [
   ]
 
 import unittest
+
 import gaetestbed
+from mox import stubout
 
 from django.test import TestCase
 
-from soc.modules import callback
-
-from soc.views.helper import responses
-from mox import stubout
-from soc.middleware.xsrf import XsrfMiddleware
 from soc.logic.helper import xsrfutil
+from soc.middleware.xsrf import XsrfMiddleware
+from soc.modules import callback
+from soc.views.helper import responses
 
 
 class MockRequest(object):
@@ -76,8 +76,9 @@ def get_general_raw(args_names):
   """
 
   def general_raw(*args, **kwargs):
-    """Sends a raw information, that is the parameters
-    passed to the return function that is mentioned
+    """Sends a raw information.
+
+    That is the parameters passed to the return function that is mentioned
     in corresponding stubout.Set
     """
 
@@ -115,21 +116,29 @@ class StuboutHelper(object):
     """Applies basic stubout replacements.
     """
 
-    self.stubout.Set(responses, 'respond', get_general_raw(['request', 'template', 'context', 'args', 'headers']))
-    self.stubout.Set(responses, 'errorResponse', get_general_raw(['error', 'request', 'template', 'context']))
+    self.stubout.Set(
+        responses, 'respond',
+        get_general_raw(['request', 'template', 'context', 'args', 'headers']))
+    self.stubout.Set(
+        responses, 'errorResponse',
+        get_general_raw(['error', 'request', 'template', 'context']))
 
   def stuboutElement(self, parent, child_name, args_names):
     """Applies a specific stubout replacement.
 
-    Replaces child_name's old definition with the new definition which has a list of arguments (args_names), in the context
-    of the given parent.
+    Replaces child_name's old definition with the new definition which has
+    a list of arguments (args_names), in the context of the given parent.
     """
 
     self.stubout.Set(parent, child_name, get_general_raw(args_names))
 
 
 class DjangoTestCase(TestCase):
-  """Class extending Django TestCase in order to extend its functions as weel as remove the functions which are not supported by Google App Engine, e.g. database flush and fixtures loading without the assistance of Google App Engine Helper for Django.
+  """Class extending Django TestCase in order to extend its functions.
+
+  As well as remove the functions which are not supported by Google App Engine,
+  e.g. database flush and fixtures loading without the assistance of Google
+  App Engine Helper for Django.
   """
 
   def _pre_setup(self):
@@ -145,7 +154,11 @@ class DjangoTestCase(TestCase):
     pass
 
   def getXsrfToken(self, path=None, method='POST', data={}, **extra):
-    """Returns an XSRF token for request contex signed by Melange XSRF middleware. Add this token to POST data in order to pass the validation check of Melange XSRF middleware for HTTP POST.
+    """Returns an XSRF token for request context.
+
+    It is signed by Melange XSRF middleware.
+    Add this token to POST data in order to pass the validation check of
+    Melange XSRF middleware for HTTP POST.
     """
 
     """
@@ -163,9 +176,11 @@ class DjangoTestCase(TestCase):
 
 
 class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
-  """Class extending gaetestbed.mail.MailTestCase in order to extend its functions.
+  """Class extending gaetestbed.mail.MailTestCase to extend its functions.
+
   Difference:
-  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  * Subclass unittest.TestCase so that all its subclasses need not subclass
+  unittest.TestCase in their code.
   * Override assertEmailSent method.
   """
 
@@ -175,11 +190,14 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
 
     super(MailTestCase, self).setUp()
 
-  def assertEmailSent(self, to=None, sender=None, subject=None, body=None, html=None, n=None):
+  def assertEmailSent(self, to=None, sender=None, subject=None,
+                      body=None, html=None, n=None):
     """Override gaetestbed.mail.MailTestCase.assertEmailSent method.
+
     Difference:
-    * It will print out all sent messages to facilitate debug in case of failure.
-    * It accepts an optional argument n which is used to assert exactly n messages satisfying the criteria are sent out.
+    * It prints out all sent messages to facilitate debug in case of failure.
+    * It accepts an optional argument n which is used to assert exactly n
+    messages satisfying the criteria are sent out.
     """
 
     messages = self.get_sent_messages(
@@ -202,7 +220,8 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
       actual_n = len(messages)
       if n != actual_n:
         failed = True
-        failure_message = "Expected e-mail message sent. Expected %d messages sent" % n
+        failure_message = ("Expected e-mail message sent."
+                           "Expected %d messages sent" % n)
         details = self._get_email_detail_string(to, sender, subject, body, html)
         if details:
           failure_message += ' with %s;' % details
@@ -222,10 +241,13 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
       self.fail(failure_message)
 
 
-class TaskQueueTestCase(gaetestbed.taskqueue.TaskQueueTestCase, unittest.TestCase):
-  """Class extending gaetestbed.taskqueue.TaskQueueTestCase in order to extend its functions.
+class TaskQueueTestCase(gaetestbed.taskqueue.TaskQueueTestCase,
+                        unittest.TestCase):
+  """Class extending gaetestbed.taskqueue.TaskQueueTestCase.
+
   Difference:
-  * Subclass unittest.TestCase so that all its subclasses need not subclass unittest.TestCase in their code.
+  * Subclass unittest.TestCase so that all its subclasses need not subclass
+  unittest.TestCase in their code.
   """
 
   def setUp(self):

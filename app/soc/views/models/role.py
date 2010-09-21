@@ -161,6 +161,7 @@ class View(base.View):
        'clean_home_page': cleaning.clean_url('home_page'),
        'clean_blog': cleaning.clean_url('blog'),
        'clean_photo_url': cleaning.clean_url('photo_url'),
+       'clean': cleaning.validate_role(),
        'scope_path': forms.CharField(widget=forms.HiddenInput,
                                      required=True),
        }

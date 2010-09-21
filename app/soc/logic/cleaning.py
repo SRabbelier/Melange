@@ -66,6 +66,15 @@ DEF_MUST_BE_ABOVE_LIMIT_FMT = ugettext(
 DEF_MUST_BE_UNDER_LIMIT_FMT = ugettext(
     "Must be under %d characters, it has %d characters.")
 
+DEF_2_LETTER_STATE_FMT = ugettext(
+    "State should be 2-letter field since country is '%s'.")
+
+
+DEF_ROLE_TARGET_COUNTRY = "United States"
+
+DEF_ROLE_COUNTRY_PAIRS = [("res_country", "res_state"),
+                          ("ship_country", "ship_state")]
+
 
 def check_field_is_empty(field_name):
   """Returns decorator that bypasses cleaning for empty fields.
@@ -661,6 +670,43 @@ def validate_student_project(org_field, mentor_field, student_field):
   return wrapper
 
 
+def validate_role():
+  """Validates the form of a user role.
+
+  Args:
+    pairs: a list of 'country'/'state' tuples
+
+  Raises ValidationError if:
+    - The country field has the specified value, and state is not a 2 letters
+  """
+
+  target_country = DEF_ROLE_TARGET_COUNTRY
+  pairs = DEF_ROLE_COUNTRY_PAIRS
+
+  def wrapper(self):
+    """Wrapper method.
+    """
+
+    cleaned_data = self.cleaned_data
+
+    for country_field, state_field in pairs:
+      country = cleaned_data.get(country_field)
+      state = cleaned_data.get(state_field)
+
+      if country is None or state is None:
+        continue
+
+      if country != target_country:
+        continue
+
+      if len(state) != 2:
+        raise forms.ValidationError(DEF_2_LETTER_STATE_FMT % target_country)
+
+    return cleaned_data
+
+  return wrapper
+
+
 def validate_student(program_logic):
   """Checks if the student is eligible to sign up, determined
   by his birth_date given in field_name.
@@ -685,7 +731,8 @@ def validate_student(program_logic):
     """Wrapper method.
     """
 
-    cleaned_data = self.cleaned_data
+    validator = validate_role()
+    cleaned_data = validator(self)
 
     birth_date = cleaned_data.get('birth_date')
     program_key_name = cleaned_data.get('scope_path')

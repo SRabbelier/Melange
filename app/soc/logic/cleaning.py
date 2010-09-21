@@ -836,14 +836,24 @@ def validate_document_acl(view, creating=False):
     rights.setCurrentUser(user.account, user)
 
     prefix = self.cleaned_data['prefix']
+    link_id = self.cleaned_data['link_id']
     scope_path = self.cleaned_data['scope_path']
 
     validate_access(self, view, rights, prefix, scope_path, 'read_access')
     validate_access(self, view, rights, prefix, scope_path, 'write_access')
 
-    if creating and not has_access(rights, 'restricted', scope_path, prefix):
-      raise forms.ValidationError(
-          "You do not have the required access to create this document.")
+    if creating:
+      key_fields = {
+          'prefix': prefix,
+          'link_id': link_id,
+          'scope_path': scope_path,
+          }
+      if document_logic.logic.getFromKeyFields(key_fields):
+        raise forms.ValidationError(
+            "A document with that link_id and scope already exists.")
+      if not has_access(rights, 'restricted', scope_path, prefix):
+        raise forms.ValidationError(
+            "You do not have the required access to create this document.")
 
     return cleaned_data
 

@@ -31,6 +31,9 @@ limitations under the License.
      <li>Task types, one or more of the allowed types <i>({{ types }})</i>, comma separated.</li>
      <li>Task tags, any tags you want to add, comma separated.</li>
    </ol>
+   The field seperator is the comma character. <br/>
+   If your field contains commas, use double quotes (&quot;field with a , comma&quot;) to quote the field content. <br/>
+   If your field contains double quotes, escape as two double quotes (&quot;field with &quot;&quot; double quotes&quot;). <br/>
  </div>
  <table>
    {% as_table bulk_create_form %}

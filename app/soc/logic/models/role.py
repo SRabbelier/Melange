@@ -24,14 +24,17 @@ __authors__ = [
   ]
 
 
+from django.utils.translation import ugettext
+
 from soc.cache import sidebar
 from soc.logic.models import base
 
 import soc.models.role
 
 
-DEF_LAST_RESIGN_ERROR_FMT = "This user can't be " \
-    "resigned, please make sure it's not the last %(name)s."
+DEF_LAST_RESIGN_ERROR_FMT = ugettext(
+    "This user can't be resigned,"
+    " please make sure they are not the last %(name)s.")
 
 
 ROLE_LOGICS = {}

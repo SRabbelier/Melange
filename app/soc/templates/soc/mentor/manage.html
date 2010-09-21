@@ -13,27 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+{% load misc_helpers %}
+
 {% block header_title %}
 {{ page_name }} {{ entity.link_id }} for {{ entity.scope_path }}
 {% endblock %}
 
-{% block manage %}
-<div class="error">{{ resign_error }}</div>
-<tr>
-  <td>
-    Please select the appropriate action:</br>
-    <input type="button" onclick="location.href='/{{ url_name }}/manage/{{ entity.scope_path }}/{{ entity.link_id }}?resign=true'" value="Resign"/>
-    {% if cancel_redirect %}
-    <input type="button" 
-      {% if entity %}
-      onclick="location.href='{{ cancel_redirect }}'" 
-      {% else %}
-      onClick="javascript: history.go(-1)">
-      {% endif %}
-    value="Cancel"/>
-    {% else %}
-    <input type="button" value="Back to Previous Page" onClick="javascript:history.go(-1)">
-    {% endif %}
-  </td>
-</tr>
+{% block body %}
+{{ block.super }}
+
+{% manage %}
+
 {% endblock %}

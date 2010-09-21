@@ -24,6 +24,8 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from django.utils.translation import ugettext
+
 from soc.logic.models import role
 from soc.logic.models import organization as org_logic
 
@@ -31,11 +33,13 @@ import soc.models.mentor
 import soc.models.role
 
 
-DEF_ALREADY_MENTORING_RPOJECT_MSG = "This Mentor is mentoring a Student "\
-    "Project and can therefore not be resigned. Please assign another Mentor."
+DEF_ALREADY_MENTORING_RPOJECT_MSG = ugettext(
+    "This Mentor is mentoring a Student Project and can therefore not be"
+    " resigned. Please assign another Mentor.")
 
-DEF_ALREADY_MENTORING_PROPOSAL_MSG = "This Mentor is mentoring a Student "\
-    "Proposal and can therefore not be resigned. Please assign another Mentor."
+DEF_ALREADY_MENTORING_PROPOSAL_MSG = ugettext(
+    "This Mentor is mentoring a Student Proposal and can therefore not be"
+    " resigned. Please assign another Mentor.")
 
 
 class Logic(role.Logic):

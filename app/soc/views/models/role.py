@@ -451,24 +451,13 @@ class View(base.View):
     redirect = params['manage_redirect'](role_entity.scope,
         params['group_view'].getParams())
 
-    # check to see if resign is true
-    get_dict = request.GET
-    resign = get_dict.get('resign')
-
-    if resign == 'true':
-
+    if request.method == 'POST':
       resign_error = logic.canResign(role_entity)
-
       if not resign_error:
-        # change the status of this role_entity to invalid
-        fields = {'status': 'invalid'}
-        logic.updateEntityProperties(role_entity, fields)
+        return self.managePost(request, params, role_entity, redirect)
 
-        # redirect to the roles listing
-        return http.HttpResponseRedirect(redirect)
-      else:
-        # show error to the user
-        context['resign_error'] = ugettext(resign_error %params)
+      # show error to the user
+      context['resign_error'] = resign_error % params
 
     # set the appropriate context
     context['entity'] = role_entity
@@ -480,6 +469,17 @@ class View(base.View):
 
     # return a proper response
     return responses.respond(request, template, context=context)
+
+  @decorators.mutation
+  def managePost(self, request, params, role_entity, redirect):
+    logic = params['logic']
+
+    # change the status of this role_entity to invalid
+    fields = {'status': 'invalid'}
+    logic.updateEntityProperties(role_entity, fields)
+
+    # redirect to the roles listing
+    return http.HttpResponseRedirect(redirect)
 
   @decorators.merge_params
   @decorators.check_access

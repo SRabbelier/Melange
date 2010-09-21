@@ -114,9 +114,7 @@ class View(role.View):
             choices=[(x,x) for x in allowed_years],
             coerce=lambda val: int(val)
             ),
-        'clean': cleaning.validate_student(
-            'birth_date', 'school_type', 'major', 'degree', 'grade', 
-            'scope_path', view_logic.getScopeLogic().logic),
+        'clean': cleaning.validate_student(view_logic.getScopeLogic().logic),
         }
 
     new_params['create_dynafields'] = [

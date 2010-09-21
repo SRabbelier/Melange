@@ -661,8 +661,7 @@ def validate_student_project(org_field, mentor_field, student_field):
   return wrapper
 
 
-def validate_student(birth_date_field, school_type_field, major_field,
-                     degree_field, grade_field, scope_field, program_logic):
+def validate_student(program_logic):
   """Checks if the student is eligible to sign up, determined
   by his birth_date given in field_name.
 
@@ -688,8 +687,8 @@ def validate_student(birth_date_field, school_type_field, major_field,
 
     cleaned_data = self.cleaned_data
 
-    birth_date = cleaned_data.get(birth_date_field)
-    program_key_name = cleaned_data.get(scope_field)
+    birth_date = cleaned_data.get('birth_date')
+    program_key_name = cleaned_data.get('scope_path')
 
     if not birth_date or not program_key_name:
       # nothing to check, field validator will find these errors
@@ -702,10 +701,10 @@ def validate_student(birth_date_field, school_type_field, major_field,
       raise forms.ValidationError(
           ugettext("No valid program found"))
 
-    school_type = cleaned_data.get(school_type_field)
-    major = cleaned_data.get(major_field)
-    degree = cleaned_data.get(degree_field)
-    grade = cleaned_data.get(grade_field)
+    school_type = cleaned_data.get('school_type')
+    major = cleaned_data.get('major')
+    degree = cleaned_data.get('degree')
+    grade = cleaned_data.get('grade')
 
     # TODO: when school_type is required this can be removed
     if not school_type:

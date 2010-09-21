@@ -132,6 +132,8 @@ class View(organization.View):
               required=False,
               reference_url='org_tags',
               label=ugettext('Tags'),
+              help_text=ugettext("A list of comma seperated tags"),
+              example_text="e.g. python, django, appengine",
               filter=['scope_path']),
         'clean_tags': cleaning.cleanTagsList('tags', cleaning.COMMA_SEPARATOR)
         }

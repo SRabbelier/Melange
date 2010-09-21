@@ -92,3 +92,11 @@ def getTaskTypeEditRedirect(entity, params):
 
   return'/%s/task_type/%s' % (
       params['url_name'], entity.key().id_or_name())
+
+
+def getBulkCreateRedirect(entity, params):
+  """Returns the bulk create redirect for the specified entity.
+  """
+
+  return '/%s/bulk_create/%s' % (
+      params['url_name'], entity.key().id_or_name())

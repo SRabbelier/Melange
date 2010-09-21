@@ -298,7 +298,8 @@ class View(organization.View):
       submenus.append(submenu)
 
       # add a link to bulk create tasks
-      submenu = ('gci/task/bulk_create/%s' %group_entity.key().id_or_name(),
+      submenu = (gci_redirects.getBulkCreateRedirect(
+          group_entity, {'url_name': 'gci/task'}),
           "Bulk Create Tasks", 'any_access')
       submenus.append(submenu)
 

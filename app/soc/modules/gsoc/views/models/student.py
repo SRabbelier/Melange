@@ -23,8 +23,10 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django.utils.translation import ugettext
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views import out_of_band
 from soc.views.helper import decorators
@@ -32,7 +34,6 @@ from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import student
 
-from soc.logic.models.host import logic as host_logic
 from soc.logic.models.user import logic as user_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
@@ -96,6 +97,11 @@ class View(student.View):
         'List of my Student Projects')]
 
     new_params['extra_django_patterns'] = patterns
+
+    new_params['create_extra_dynaproperties'] = {
+       'school_home_page': forms.fields.URLField(required=True),
+       'clean_school_home_page': cleaning.clean_url('school_home_page'),
+       }
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

@@ -55,6 +55,12 @@ class Student(soc.models.role.Role):
       choices=countries.COUNTRIES_AND_TERRITORIES)
   school_country.group = ugettext("5. Education")
 
+  #: School home page URL, not required here but enforced in the form for
+  #: backwards compatibility.
+  school_home_page = db.URLProperty(
+      required=False, verbose_name=ugettext("School Home Page URL"))
+  school_home_page.group = ugettext("5. Education")
+
   #: School type can be only High school for GCI and can be University
   #: for GSoC.
   school_type = db.StringProperty(required=False,

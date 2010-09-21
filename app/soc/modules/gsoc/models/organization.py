@@ -90,6 +90,7 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
       'This template can be used by contributors, such as students'
       ' and other non-member participants, when they apply to contribute'
       ' to the organization.')
+  contrib_template.group = ugettext("1. Public Info")
 
   slots = db.IntegerProperty(required=False, default=0,
       verbose_name=ugettext('Slots allocated'))
@@ -100,6 +101,7 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
       verbose_name=ugettext('Slots desired'))
   slots_desired.help_text = ugettext(
       'The amount of slots desired by this organization.')
+  slots_desired.group = ugettext("4. Organization Preferences")
 
   slots_calculated = db.IntegerProperty(required=False, default=0,
       verbose_name=ugettext('Slots calculated'))
@@ -120,6 +122,7 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
   scoring_disabled.help_text = ugettext(
       'Check this field if you want to disable private reviews for '
       'student proposals which have been sent to your organization.')
+  scoring_disabled.group = ugettext("4. Organization Preferences")
 
   org_tag = tag_property('org_tag')
 

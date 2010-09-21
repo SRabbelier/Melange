@@ -49,6 +49,7 @@ class Presence(soc.models.linkable.Linkable):
     collection_name='home')
   home.help_text = ugettext(
       'Document to be used as the "/home" page static contents.')
+  home.group = ugettext("1. Public Info")
 
   #: Valid ATOM or RSS feed url or None if unused. Feed entries are shown 
   #: on the site page using Google's JavaScript blog widget  
@@ -56,3 +57,4 @@ class Presence(soc.models.linkable.Linkable):
   feed_url.help_text = ugettext(
       'The URL should be a valid ATOM or RSS feed. '
       'Feed entries are shown on the home page.')
+  feed_url.group = ugettext("1. Public Info")

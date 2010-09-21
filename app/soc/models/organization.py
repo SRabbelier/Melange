@@ -38,10 +38,11 @@ class Organization(soc.models.group.Group):
     verbose_name=ugettext('Development Mailing List'))
   dev_mailing_list.help_text = ugettext(
     'Mailing list email address, URL to sign-up page, etc.')
+  dev_mailing_list.group = ugettext("1. Public Info")
 
   ideas = db.LinkProperty(required=False, verbose_name=ugettext('Ideas list'))
   ideas.help_text = ugettext(
       'The URL to the ideas list of your organization.')
   ideas.example_text = ugettext('For instance a link to a Melange public '
       'document or some other URL')
-
+  ideas.group = ugettext("1. Public Info")

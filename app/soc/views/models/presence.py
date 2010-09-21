@@ -76,7 +76,8 @@ class View(base.View):
             reference_url='document', filter=['__scoped__'],
             filter_fields={'prefix': params['document_prefix']},
             required=False, label=ugettext('Home page Document link ID'),
-            help_text=soc.models.work.Work.link_id.help_text),
+            help_text=soc.models.work.Work.link_id.help_text,
+            group=ugettext("1. Public Info")),
     }
 
     patterns = []

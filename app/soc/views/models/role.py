@@ -177,8 +177,8 @@ class View(base.View):
         'res_country', 'res_postalcode', 'phone', 'recipient_name',
         'shipping_street', 'shipping_street_extra', 'shipping_city',
         'shipping_state', 'shipping_country', 'shipping_postalcode',
-        'birth_date', 'tshirt_style', 'tshirt_size', 'group_name', 'status',
-        'account_name',
+        'birth_date', 'tshirt_style', 'tshirt_size', 'gender',
+        'group_name', 'status', 'account_name',
         ]
     new_params['admin_field_names'] = [
         'Link ID', 'Name', 'Surname', 'Name on Documents', 'Email',
@@ -187,7 +187,7 @@ class View(base.View):
         'Shipping Street Address 1', 'Shipping Street Address 2',
         'Shipping City', 'Shipping State', 'Shipping Country',
         'Shipping Postal Code', 'Birth Date', 'T-Shirt Style', 'T-Shirt Size',
-        'Group Name', 'Status', 'Account Name',
+        'Gender', 'Group Name', 'Status', 'Account Name',
     ]
     new_params['admin_field_prefetch'] = ['scope', 'user']
     new_params['admin_field_extra'] = lambda entity: {

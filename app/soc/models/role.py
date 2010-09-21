@@ -373,6 +373,13 @@ class Role(soc.models.linkable.Linkable):
       '<a href="http://bit.ly/ayGxJk"> for women</a> and '
       '<a href="http://bit.ly/8ZrywF">for men</a>.')
 
+  #: Optional field indicating gender;
+  #: kept private.
+  gender = db.StringProperty(
+      verbose_name=ugettext('Gender'),
+      choices=('male', 'female', 'other'))
+  gender.group = ugettext("4. Private Info")
+
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)

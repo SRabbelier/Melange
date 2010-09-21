@@ -96,7 +96,9 @@ class User(soc.models.linkable.Linkable):
   disable_tinymce = db.BooleanProperty(default=False,
       verbose_name=ugettext('Disable TinyMCE'))
   disable_tinymce.help_text = ugettext(
-      'Disable the TinyMCE.')
+      'Disable the TinyMCE editor.')
+  disable_tinymce.example_text = ugettext(
+      'If ticked, this will disable the TinyMCE editor')
 
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present

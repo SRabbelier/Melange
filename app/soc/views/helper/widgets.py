@@ -167,7 +167,7 @@ class ReferenceField(forms.CharField):
   """
 
   def __init__(self, reference_url, filter=None, filter_fields=None,
-               *args, **kwargs):
+               group=None, example_text=None, *args, **kwargs):
     """Initializes the widget with the specified url and filter.
     """
 
@@ -175,6 +175,8 @@ class ReferenceField(forms.CharField):
     self.rf['reference_url'] = reference_url
     self.rf['filter'] = filter if filter else []
     self.rf['filter_fields'] = filter_fields if filter_fields else {}
+    self.group = group if group else "0. "
+    self.example_text = example_text if example_text else ""
     super(ReferenceField, self).__init__(*args, **kwargs)
 
 

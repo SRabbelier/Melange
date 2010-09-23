@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% load misc_helpers %}
-
 {% block header_title %}
 {{ page_name }} {{ entity.link_id }} for {{ entity.scope_path }}
 {% endblock %}
@@ -26,6 +24,6 @@ Please select the appropriate action, note that if you click resign you will loo
 {% block body %}
 {{ block.super }}
 
-{% manage %}
+{% include "soc/models/manage.html" %}
 
 {% endblock %}

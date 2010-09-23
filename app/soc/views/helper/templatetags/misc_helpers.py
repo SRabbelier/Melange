@@ -30,7 +30,7 @@ register = template.Library()
 
 @register.inclusion_tag('soc/templatetags/_manage.html', takes_context=True)
 def manage(context):
-  """Returns a HTML representation of a work's comments.
+  """Returns a manage form for roles.
   """
 
   return context

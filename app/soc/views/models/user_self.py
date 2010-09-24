@@ -281,8 +281,7 @@ class View(base.View):
       list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
       field_props = list_params.setdefault('public_field_props', {})
       field_props["status"] = {
-          # TODO(srabbelier): enable when list code is updated
-          #"searchoptions": {"defaultValue": "Active"},
+          "searchoptions": {"defaultValue": "Active"},
           "stype": "select",
           "editoptions": {"value": ":All;^active$:Active;^inactive$:Inactive"},
       }

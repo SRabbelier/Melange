@@ -956,7 +956,15 @@
               if (_self.operations === null) {
                 _self.operations = source.operations;
               }
+
               var my_data = source.data[start];
+
+              // Don't trigger jqGrid if there's no data
+              if (my_data.length === 0 && !first_batch_received) {
+                jQuery("#temporary_list_placeholder_" + idx)
+                  .html("<p>No records to view</p>");
+                return;
+              }
 
               jQuery.each(my_data, function () {
                 _self.data.data.push(this.columns);

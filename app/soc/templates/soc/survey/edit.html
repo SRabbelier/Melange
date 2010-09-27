@@ -56,7 +56,9 @@ Please use this form to edit the {{ entity_type }}.
     <table>
       {% block survey_content %}
         {% if survey_form %}
-          {% as_twoline_table survey_form %}
+          <tbody>
+            {% as_twoline_table survey_form %}
+          </tbody>
         {% else %}
           <tbody></tbody>
         {% endif %}

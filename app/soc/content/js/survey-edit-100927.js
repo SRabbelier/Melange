@@ -640,7 +640,7 @@
             if (new_field) {
               var question_for = [
                 '\n  <input type="hidden" name="NEW_', field_name,
-                '" id="NEW_', field_name, '" value="', question_content,
+                '" id="NEW_', field_name, '" value="', question_content.replace(/\"/g,'&quot;'),
                 '"/>'
               ].join("");
 

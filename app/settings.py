@@ -126,7 +126,4 @@ INSTALLED_APPS = (
 )
 
 MODULE_FMT = 'soc.modules.%s.callback'
-MODULES = ['gsoc', 'statistic']
-# TODO: to enable GCI uncomment the following line (and of course
-# comment the previous line):
-#MODULES = ['gsoc', 'statistic', 'gci']
+MODULES = ['gsoc', 'statistic', 'gci']

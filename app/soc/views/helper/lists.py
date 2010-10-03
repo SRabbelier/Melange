@@ -35,6 +35,14 @@ import soc.views.helper.forms
 
 URL_PATTERN = '<a href="%(url)s"%(target)s%(nofollow)s>%(name)s</a>'
 
+class IsNonEmptyRequest(object):
+  """Request to check whether the list is non-empty."""
+
+  def __init__(self, idx):
+    self.idx = idx
+    self.GET = {}
+    self.POST = {}
+
 
 def urlize(url, name=None, target="_blank", nofollow=True):
   """Make an url clickable.
@@ -158,11 +166,20 @@ def isDataRequest(request):
   return False
 
 
+def isNonEmptyRequest(request):
+  """Returns true iff the request is a non-empty request.
+  """
+
+  return isinstance(request, IsNonEmptyRequest)
+
+
 def getListIndex(request):
   """Returns the index of the requested list.
   """
 
-  # get index
+  if isNonEmptyRequest(request):
+    return request.idx
+
   idx = request.GET.get('idx', '')
   idx = int(idx) if idx.isdigit() else -1
 
@@ -191,6 +208,9 @@ def getResponse(request, contents):
   if isJsonRequest(request):
     json = simplejson.dumps(contents)
     return responses.jsonResponse(request, json)
+
+  if isNonEmptyRequest(request):
+    return contents
 
   # TODO(SRabbelier): this is probably the best way to handle this
   return contents
@@ -263,19 +283,22 @@ def getListData(request, params, fields, visibility=None, args=[]):
     args: list of arguments to be passed to extract funcs
   """
 
-  get_args = request.GET
-
   if not visibility:
     visibility = 'public'
 
   if not fields:
     fields = {}
 
+  logic = params['logic']
+
+  if isNonEmptyRequest(request):
+    query = logic.getQueryForFields(filter=fields)
+    return query.count(1) > 0
+
+  get_args = request.GET
   start = get_args.get('start', '')
   limit = get_args.get('limit', 50)
   limit = int(limit)
-
-  logic = params['logic']
 
   if start:
     start_entity = logic.getFromKeyNameOrID(start)

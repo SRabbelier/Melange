@@ -163,8 +163,7 @@ class View(base.View):
     For params see base.View.editGet().
     """
 
-    s_logic = model_logic.site.logic
-    site_tos = s_logic.getToS(s_logic.getSingleton())
+    site_tos = site_logic.getToS(site_logic.getSingleton())
     if site_tos:
       context['tos_contents'] = site_tos.content
 
@@ -190,8 +189,7 @@ class View(base.View):
     For params see base.View.editPost().
     """
 
-    s_logic = model_logic.site.logic
-    site_tos = s_logic.getToS(s_logic.getSingleton())
+    site_tos = site_logic.getToS(site_logic.getSingleton())
     if site_tos:
       context['tos_contents'] = site_tos.content
 
@@ -205,8 +203,7 @@ class View(base.View):
     fields['account'] = users.User()
 
     # special actions if there is no ToS present
-    s_logic = model_logic.site.logic
-    site_tos = s_logic.getToS(s_logic.getSingleton())
+    site_tos = site_logic.getToS(site_logic.getSingleton())
     if not site_tos:
       # there is no Terms of Service set
       if not entity:

@@ -138,6 +138,64 @@ def getKeyOrderAndColNames(params, visibility):
   return key_order, col_names
 
 
+def isJsonRequest(request):
+  """Returns true iff the request is a JSON request.
+  """
+
+  if request.GET.get('fmt') == 'json':
+    return True
+
+  return False
+
+
+def isDataRequest(request):
+  """Returns true iff the request is a data request.
+  """
+
+  if isJsonRequest(request):
+    return True
+
+  return False
+
+
+def getListIndex(request):
+  """Returns the index of the requested list.
+  """
+
+  # get index
+  idx = request.GET.get('idx', '')
+  idx = int(idx) if idx.isdigit() else -1
+
+  return idx
+
+
+def getErrorResponse(request, msg):
+  """Returns an error appropriate for the request type.
+  """
+
+  from soc.views.helper import responses
+
+  if isJsonRequest(request):
+    return responses.jsonErrorResponse(request, msg)
+
+  raise Exception(msg)
+
+
+def getResponse(request, contents):
+  """Returns a response appropriate for the request type.
+  """
+
+  from soc.views.helper import responses
+  from django.utils import simplejson
+
+  if isJsonRequest(request):
+    json = simplejson.dumps(contents)
+    return responses.jsonResponse(request, json)
+
+  # TODO(SRabbelier): this is probably the best way to handle this
+  return contents
+
+
 def getListConfiguration(request, params, visibility, order):
   """Returns the list data for the specified params.
 

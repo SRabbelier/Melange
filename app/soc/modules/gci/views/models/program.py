@@ -774,7 +774,7 @@ class View(program.View):
                                    visibility=visibility,
                                    order=order, args=args)
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     json = simplejson.dumps(contents)
 

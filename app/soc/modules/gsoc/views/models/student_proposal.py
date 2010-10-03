@@ -601,7 +601,7 @@ class View(base.View):
       fields['status'] = 'invalid'
       params = ip_params
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields)
     json = simplejson.dumps(contents)

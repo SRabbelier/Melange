@@ -435,7 +435,7 @@ class View(program.View):
           'status': 'accepted',
       }
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields)
 

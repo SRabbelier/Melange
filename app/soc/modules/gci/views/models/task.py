@@ -904,7 +904,7 @@ class View(base.View):
     elif idx == 3:
       filter['status'] = ['Closed', 'AwaitingRegistration']
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     params = params_collection[idx]
     contents = lists.getListData(request, params, filter,

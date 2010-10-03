@@ -291,7 +291,7 @@ class View(survey_view.View):
                 'backup_admin': user_entity}
       params = ba_params
     else:
-        return responses.jsonErrorResponse(request, "idx not valid")
+        return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields, visibility='self')
 

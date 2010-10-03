@@ -205,7 +205,7 @@ class View(presence.View):
     participants_logic = params['participants_logic']
 
     if idx == -1 or idx > len(participants_logic):
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     # get role params that belong to the given index
     (role_logic, query_field) = participants_logic[idx]

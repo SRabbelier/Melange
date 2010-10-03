@@ -392,7 +392,7 @@ class View(organization.View):
       filter = {'org': org_entity,
                 'status': 'invalid'}
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     params = params_collection[idx]
     contents = helper.lists.getListData(request, params, filter,
@@ -655,7 +655,7 @@ class View(organization.View):
       fields= {'scope': entity,
                'status': ['accepted', 'completed']}
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields,
                                  'org_home', order=order)

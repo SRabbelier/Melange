@@ -518,7 +518,7 @@ class View(object):
     idx = int(idx) if idx.isdigit() else -1
 
     if idx != 0:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = helper.lists.getListData(request, params, filter,
                                         visibility=visibility)
@@ -621,7 +621,7 @@ class View(object):
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
-      return helper.responses.jsonErrorResponse(
+      return helper.lists.getErrorResponse(
           request, "No such %s" % params['name'])
 
     if not logic.isDeletable(entity):
@@ -631,7 +631,7 @@ class View(object):
 
       # redirect to the edit page
       # display notice that entity could not be deleted
-      return helper.responses.jsonErrorResponse(
+      return helper.lists.getErrorResponse(
           request, "That %s cannot be deleted" % params['name'])
 
     logic.delete(entity)

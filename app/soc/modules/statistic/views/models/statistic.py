@@ -283,7 +283,7 @@ class View(base.View):
           'access_for_other_programs' : 'invisible'
           }
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     params = params_collection[idx]
     contents = helper.lists.getListData(request, params, fields)

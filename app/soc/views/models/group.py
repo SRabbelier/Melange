@@ -182,7 +182,7 @@ class View(presence.View):
     idx = int(idx) if idx.isdigit() else -1
 
     if not 0 <= idx < len(list_params):
-        return responses.jsonErrorResponse(request, "idx not valid")
+        return lists.getErrorResponse(request, "idx not valid")
 
     # create the filter
     fields= {

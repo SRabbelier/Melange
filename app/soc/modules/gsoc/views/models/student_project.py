@@ -326,7 +326,7 @@ class View(base.View):
     idx = int(idx) if idx.isdigit() else -1
 
     if idx != 0:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields, visibility='admin')
     json = simplejson.dumps(contents)
@@ -446,7 +446,7 @@ class View(base.View):
     elif idx == 1:
       params = ps_params
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     fields = {'project': entity}
     record_logic = params['logic'].getRecordLogic()
@@ -824,7 +824,7 @@ class View(base.View):
       args = [project_surveys, project_survey_count,
               grading_surveys, grading_survey_count]
     else:
-      return responses.jsonErrorResponse(request, 'idx not valid')
+      return lists.getErrorResponse(request, 'idx not valid')
 
     contents = lists.getListData(request, params, fields, args=args)
     json = simplejson.dumps(contents)

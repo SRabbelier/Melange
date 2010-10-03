@@ -238,12 +238,12 @@ class View(base.View):
     idx = int(idx) if idx.isdigit() else -1
 
     if not 0 <= idx < len(lists_params):
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     list_params = lists_params[idx]
 
     if list_params is None:
-      return responses.jsonErrorResponse(
+      return lists.getErrorResponse(
           request, "idx not valid (list not in roles overview)")
 
     contents = helper.lists.getListData(request, list_params, fields)
@@ -325,7 +325,7 @@ class View(base.View):
       filter['status'] = 'new'
       params = ar_params
     else:
-      return responses.jsonErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, "idx not valid")
 
     contents = helper.lists.getListData(request, params, filter,
                                         visibility='public')

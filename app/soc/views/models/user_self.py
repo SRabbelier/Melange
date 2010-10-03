@@ -288,7 +288,7 @@ class View(base.View):
 
       lists_params.append(list_params)
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getRolesListData(request, lists_params)
 
     contents = []
@@ -367,7 +367,7 @@ class View(base.View):
     ar_params['list_description'] = ugettext(
         "List of your pending requests.")
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getRequestsListData(request, uh_params, ar_params)
 
     uh_list = helper.lists.getListGenerator(request, uh_params,

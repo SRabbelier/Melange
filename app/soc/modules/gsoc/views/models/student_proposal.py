@@ -637,7 +637,7 @@ class View(base.View):
         'link': redirects.getPublicRedirect(entity, ip_params)
     }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       scope_path = kwargs['scope_path']
       return self.getListSelfData(request, list_params, ip_params, scope_path)
 

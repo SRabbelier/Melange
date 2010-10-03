@@ -259,7 +259,7 @@ class View(survey_view.View):
     ba_params['list_description'] = \
         'List of Applications for which your are Backup Admin.'
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self._getListSelfData(request, entity, ma_params, ba_params)
 
     ma_list = lists.getListGenerator(request, ma_params, visibility='self', idx=0)
@@ -358,7 +358,7 @@ class View(survey_view.View):
 
     self._extendListWithSurveyAnswers(list_params, entity, 'overview')
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       # get all records for the entity specified in the URL
       fields = {'survey': entity}
       # use the overview visibility to show the correct columns to the Host

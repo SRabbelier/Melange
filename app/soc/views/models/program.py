@@ -237,7 +237,7 @@ class View(presence.View):
     program_logic = params['logic']
     program_entity = program_logic.getFromKeyFieldsOr404(kwargs)
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getListParticipantsData(request, params, program_entity)
 
     # we need to generate the lists to be shown on this page

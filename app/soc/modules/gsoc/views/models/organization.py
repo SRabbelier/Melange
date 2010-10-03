@@ -510,7 +510,7 @@ class View(organization.View):
         'link': redirect_fun(entity, ip_params)
     }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       # retrieving data for a list
       return self.getListProposalsData(
           request, [np_params, rp_params, mp_params, ip_params], org_entity)
@@ -685,7 +685,7 @@ class View(organization.View):
       ap_params['list_description'] = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % (
           entity.name)
 
-      if request.GET.get('fmt') == 'json':
+      if lists.isDataRequest(request):
         return self.getHomeData(request, ap_params, entity)
 
       ap_list = lists.getListGenerator(request, ap_params, idx=0)

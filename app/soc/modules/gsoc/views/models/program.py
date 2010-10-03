@@ -493,7 +493,7 @@ class View(program.View):
         "rowList": [],
     }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getAcceptedOrgsData(request, aa_params,
                                       ap_params, program_entity)
 

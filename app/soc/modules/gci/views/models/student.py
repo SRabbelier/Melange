@@ -164,7 +164,7 @@ class View(student.View):
                    'Closed', 'AwaitingRegistration', 'NeedsWork',
                    'NeedsReview']
         }
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
         return self.getListStudentTasksData(request, list_params,
                                              filter)
 

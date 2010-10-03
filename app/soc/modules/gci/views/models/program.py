@@ -828,7 +828,7 @@ class View(program.View):
         "rowList": [],
         }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
         return self.getListTasksData(request, list_params, tasks_filter)
 
     tasks = gci_task_logic.logic.getForFields(filter=tasks_filter, unique=True)

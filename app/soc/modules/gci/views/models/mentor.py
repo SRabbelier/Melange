@@ -179,7 +179,7 @@ class View(mentor.View):
                    'AwaitingRegistration', 'NeedsWork', 'NeedsReview']
         }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
         return self.getListMentorTasksData(request, list_params,
                                            filter)
 

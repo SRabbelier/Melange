@@ -1007,7 +1007,7 @@ class View(base.View):
     tclose_params = list_params.copy()
     tclose_params['list_description'] = self.DEF_TASKS_LIST_CLOSE_MSG
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getListTasksData(
           request, [tuapp_params, topen_params,
           tclaim_params, tclose_params], org_entity)

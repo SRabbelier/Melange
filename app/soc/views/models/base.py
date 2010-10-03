@@ -547,7 +547,7 @@ class View(object):
       the _list method. See the docstring for _list on how it uses it.
     """
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getListData(request, params, visibility, filter)
 
     content = helper.lists.getListGenerator(request, params, order=order,

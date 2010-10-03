@@ -234,7 +234,7 @@ class View(presence.View):
 
       lists_params.append(list_params)
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       group_logic = params['logic']
       group_entity = group_logic.getFromKeyFields(kwargs)
       return self.getListRolesData(request, lists_params, group_entity)

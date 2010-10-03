@@ -241,7 +241,7 @@ class View(base.View):
         'link': redirects.getVisualizeRedirect(entity, op_params),
     }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       # retrieving data for a list
       return self.getManageStatisticsData(request, [ep_params, op_params], program)
 

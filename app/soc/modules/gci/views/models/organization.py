@@ -222,7 +222,7 @@ class View(organization.View):
       tcl_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
           entity.name)
 
-      if request.GET.get('fmt') == 'json':
+      if lists.isDataRequest(request):
         return self.getListTasksData(
             request, [to_params, tc_params, tcl_params], entity)
 

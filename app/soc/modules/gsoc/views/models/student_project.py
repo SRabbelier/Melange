@@ -417,7 +417,7 @@ class View(base.View):
         'the project, use the buttons on the list for withdrawing a project.'%
         (program_entity.name))
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getOverviewData(request, list_params, program_entity)
 
     project_list = lists.getListGenerator(request, list_params, idx=0)
@@ -534,7 +534,7 @@ class View(base.View):
     ps_params['public_field_ignore'] = ["take_url"]
     ps_params['public_field_extra'] = getExtra(ps_params)
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self._getManageData(request, gps_params, ps_params, entity)
 
     gps_list = lists.getListGenerator(request, gps_params, idx=0)
@@ -892,7 +892,7 @@ class View(base.View):
                 psc),
     }
 
-    if request.GET.get('fmt') == 'json':
+    if lists.isDataRequest(request):
       return self.getManageOverviewData(request, mo_params, org_entity)
 
     mo_list = lists.getListGenerator(request, mo_params, idx=0)

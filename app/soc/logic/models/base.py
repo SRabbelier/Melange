@@ -445,13 +445,15 @@ class Logic(object):
 
     return result
 
-  def getQueryForFields(self, filter=None, ancestors=None, order=None):
+  def getQueryForFields(self, filter=None, ancestors=None,
+                        order=None, keys_only=False):
     """Returns a query with the specified properties.
 
     Args:
       filter: a dict for the properties that the entities should have
       ancestors: list with ancestor properties to set for this query
       order: a list with the sort order
+      keys_only: returns a query that returns only keys
 
     Returns:
       - Query object instantiated with the given properties
@@ -473,7 +475,7 @@ class Logic(object):
     if len(orderset) != len(order):
       raise InvalidArgumentError
 
-    query = db.Query(self._model)
+    query = db.Query(self._model, keys_only=keys_only)
 
     for key, value in filter.iteritems():
       if isinstance(value, list) and len(value) == 1:

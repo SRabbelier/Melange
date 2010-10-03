@@ -328,9 +328,8 @@ class View(base.View):
       return lists.getErrorResponse(request, "idx not valid")
 
     contents = lists.getListData(request, params, fields, visibility='admin')
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -457,8 +456,7 @@ class View(base.View):
               'prefix': 'gsoc_program'}
     contents = lists.getListData(request, params, fields, args=args)
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -824,9 +822,8 @@ class View(base.View):
       return lists.getErrorResponse(request, 'idx not valid')
 
     contents = lists.getListData(request, params, fields, args=args)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

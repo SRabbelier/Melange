@@ -521,9 +521,8 @@ class View(object):
 
     contents = helper.lists.getListData(request, params, filter,
                                         visibility=visibility)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -737,7 +736,7 @@ class View(object):
     else:
       json = data
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   def csv(self, request, data, filename, params, key_order=None):
     """Returns data as a csv file.

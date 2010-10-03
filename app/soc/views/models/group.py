@@ -192,8 +192,7 @@ class View(presence.View):
     params = list_params[idx]
     contents = list_helper.getListData(request, params, fields)
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

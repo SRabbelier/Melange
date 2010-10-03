@@ -175,9 +175,8 @@ class View(organization.View):
     contents = lists.getListData(request, params, filter,
                                  visibility=visibility,
                                  order=order, args=args)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.check_access
   def home(self, request, access_type,

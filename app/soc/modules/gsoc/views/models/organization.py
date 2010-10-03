@@ -396,9 +396,8 @@ class View(organization.View):
     params = params_collection[idx]
     contents = helper.lists.getListData(request, params, filter,
                                         visibility=visibility, args=args)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -657,9 +656,8 @@ class View(organization.View):
 
     contents = lists.getListData(request, params, fields,
                                  'org_home', order=order)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.check_access
   def home(self, request, access_type,

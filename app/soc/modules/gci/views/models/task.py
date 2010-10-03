@@ -909,9 +909,8 @@ class View(base.View):
     contents = lists.getListData(request, params, filter,
                                  visibility=visibility,
                                  order=order, args=args)
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   def listOrgTasksGet(self, request, page_name, params, **kwargs):
     """Handles the GET request for the list tasks view.

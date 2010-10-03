@@ -294,8 +294,7 @@ class View(survey_view.View):
 
     contents = lists.getListData(request, params, fields, visibility='self')
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -364,8 +363,7 @@ class View(survey_view.View):
       contents = lists.getListData(request, list_params, fields,
                                    visibility='overview')
 
-      json = simplejson.dumps(contents)
-      return responses.jsonResponse(request, json)
+      return lists.getResponse(request, contents)
 
     overview_list = lists.getListGenerator(request, list_params,
                                            visibility='overview', idx=0)

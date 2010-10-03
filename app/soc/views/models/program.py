@@ -218,8 +218,7 @@ class View(presence.View):
     contents = lists.getListData(request, role_params, fields,
                                  visibility='admin')
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

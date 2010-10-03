@@ -247,8 +247,7 @@ class View(base.View):
 
     contents = helper.lists.getListData(request, list_params, fields)
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access
@@ -327,9 +326,8 @@ class View(base.View):
 
     contents = helper.lists.getListData(request, params, filter,
                                         visibility='public')
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

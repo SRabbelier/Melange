@@ -287,9 +287,8 @@ class View(base.View):
     params = params_collection[idx]
     contents = helper.lists.getListData(request, params, fields)
 
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   def _manageStatisticsPost(self, request, access_type, page_name=None,
                            params=None, **kwargs):

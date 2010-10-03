@@ -438,8 +438,7 @@ class View(program.View):
 
     contents = lists.getListData(request, params, fields)
 
-    json = simplejson.dumps(contents)
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

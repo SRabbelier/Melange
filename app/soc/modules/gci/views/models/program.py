@@ -775,9 +775,8 @@ class View(program.View):
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
-    json = simplejson.dumps(contents)
 
-    return responses.jsonResponse(request, json)
+    return lists.getResponse(request, contents)
 
   @decorators.merge_params
   @decorators.check_access

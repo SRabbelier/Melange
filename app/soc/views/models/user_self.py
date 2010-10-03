@@ -56,6 +56,7 @@ class View(base.View):
   """
 
   DEF_ROLE_LIST_MSG_FMT = ugettext("Your roles as %(name)s.")
+  DEF_NO_ROLES_MSG_FMT = ugettext("You don't have any roles in %s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -293,10 +294,17 @@ class View(base.View):
       if list_params is None:
         continue
 
-      list = helper.lists.getListGenerator(request, list_params, idx=i)
+      if not self.getRolesListData(lists.IsNonEmptyRequest(i), lists_params):
+        continue
+
+      list = lists.getListGenerator(request, list_params, idx=i)
       contents.append(list)
 
     params = params.copy()
+
+    if not contents:
+      site_name = site_logic.getSingleton().site_name
+      params['list_msg'] = self.DEF_NO_ROLES_MSG_FMT % site_name
 
     return self._list(request, params, contents, page_name)
 

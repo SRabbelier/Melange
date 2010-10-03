@@ -514,8 +514,7 @@ class View(object):
     """Returns the list data.
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx != 0:
       return lists.getErrorResponse(request, "idx not valid")

@@ -279,8 +279,7 @@ class View(survey_view.View):
 
     user_entity = user_logic.getForCurrentAccount()
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx == 0:
       fields = {'survey': entity,

@@ -882,8 +882,7 @@ class View(base.View):
       org_entity: GCIOrganization entity for which the lists are generated
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     # default list settings
     args = []

@@ -234,8 +234,7 @@ class View(base.View):
         'status': ['active', 'inactive']
         }
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if not 0 <= idx < len(lists_params):
       return lists.getErrorResponse(request, "idx not valid")
@@ -308,8 +307,7 @@ class View(base.View):
     """Returns the list data for getRequestsList.
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     # get the current user
     user_entity = user_logic.getForCurrentAccount()

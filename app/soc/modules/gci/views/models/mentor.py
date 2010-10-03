@@ -125,8 +125,7 @@ class View(mentor.View):
       filter: properties on which the tasks must be listed
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     # default list settings
     args = []

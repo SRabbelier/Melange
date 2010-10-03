@@ -591,8 +591,7 @@ class View(base.View):
     student_entity = student_logic.logic.getFromKeyName(scope_path)
     fields = {'scope' : student_entity}
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx == 0:
       fields['status'] = ['new', 'pending', 'accepted', 'rejected']

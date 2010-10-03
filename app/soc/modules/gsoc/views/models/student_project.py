@@ -322,8 +322,7 @@ class View(base.View):
         'program': program,
         }
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx != 0:
       return lists.getErrorResponse(request, "idx not valid")
@@ -438,8 +437,7 @@ class View(base.View):
       entity: StudentProject entity
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx == 0:
       params = gps_params
@@ -788,8 +786,7 @@ class View(base.View):
     args = []
     fields = {}
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if idx == 0:
       from soc.modules.gsoc.logic.models.survey import grading_logic as \

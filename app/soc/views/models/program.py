@@ -198,9 +198,7 @@ class View(presence.View):
 
     from soc.views.models.role import ROLE_VIEWS
 
-    # get index
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     participants_logic = params['participants_logic']
 

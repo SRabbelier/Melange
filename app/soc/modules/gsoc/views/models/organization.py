@@ -319,8 +319,7 @@ class View(organization.View):
     from soc.modules.gsoc.logic.models.ranker_root import logic \
         as ranker_root_logic
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     # default list settings
     args = []
@@ -644,8 +643,7 @@ class View(organization.View):
     """Returns the home data.
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     order = ['name']
 

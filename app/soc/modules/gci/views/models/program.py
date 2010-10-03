@@ -761,8 +761,7 @@ class View(program.View):
       tasks_filter: dictionary that must be passed to obtain the tasks data
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     # default list settings
     args = []

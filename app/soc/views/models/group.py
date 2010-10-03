@@ -178,8 +178,7 @@ class View(presence.View):
     """Returns the list data for listRoles.
     """
 
-    idx = request.GET.get('idx', '')
-    idx = int(idx) if idx.isdigit() else -1
+    idx = lists.getListIndex(request)
 
     if not 0 <= idx < len(list_params):
         return lists.getErrorResponse(request, "idx not valid")

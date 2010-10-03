@@ -43,6 +43,7 @@ from soc.logic.models.site import logic as site_logic
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets

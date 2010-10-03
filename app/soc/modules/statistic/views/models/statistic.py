@@ -53,6 +53,7 @@ from soc.views.models import base
 from soc.views.models import program as program_view
 from soc.views.helper import access
 from soc.views.helper import decorators as view_decorators
+from soc.views.helper import lists
 from soc.views.helper import responses
 
 from soc.modules.gsoc.logic.models.program import logic as program_logic

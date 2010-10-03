@@ -32,7 +32,7 @@ from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.views.helper import decorators
-from soc.views.helper import lists as list_helper
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
@@ -190,7 +190,7 @@ class View(presence.View):
         }
 
     params = list_params[idx]
-    contents = list_helper.getListData(request, params, fields)
+    contents = lists.getListData(request, params, fields)
 
     return lists.getResponse(request, contents)
 
@@ -241,7 +241,7 @@ class View(presence.View):
 
     index = 0
     for list_params in lists_params:
-      list = list_helper.getListGenerator(request, list_params, idx=index)
+      list = lists.getListGenerator(request, list_params, idx=index)
       contents.append(list)
       index += 1
 

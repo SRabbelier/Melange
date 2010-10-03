@@ -39,6 +39,7 @@ from soc.views import helper
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import forms
+from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import requests
 from soc.views.helper import responses
@@ -48,7 +49,6 @@ from soc.views.sitemap import sitemap
 import soc.cache.logic
 import soc.logic
 import soc.logic.lists
-import soc.views.helper.lists
 import soc.views.helper.params
 
 
@@ -519,7 +519,7 @@ class View(object):
     if idx != 0:
       return lists.getErrorResponse(request, "idx not valid")
 
-    contents = helper.lists.getListData(request, params, filter,
+    contents = lists.getListData(request, params, filter,
                                         visibility=visibility)
 
     return lists.getResponse(request, contents)
@@ -548,7 +548,7 @@ class View(object):
     if lists.isDataRequest(request):
       return self.getListData(request, params, visibility, filter)
 
-    content = helper.lists.getListGenerator(request, params, order=order,
+    content = lists.getListGenerator(request, params, order=order,
                                             visibility=visibility, idx=0)
     contents = [content]
 
@@ -619,7 +619,7 @@ class View(object):
           'entity_type_lower' : params['name'].lower(),
           'entity_type' : params['name'],
           'create' : params['missing_redirect']})
-      return helper.lists.getErrorResponse(
+      return responses.jsonErrorResponse(
           request, "No such %s" % params['name'])
 
     if not logic.isDeletable(entity):
@@ -629,7 +629,7 @@ class View(object):
 
       # redirect to the edit page
       # display notice that entity could not be deleted
-      return helper.lists.getErrorResponse(
+      return responses.jsonErrorResponse(
           request, "That %s cannot be deleted" % params['name'])
 
     logic.delete(entity)
@@ -736,7 +736,7 @@ class View(object):
     else:
       json = data
 
-    return lists.getResponse(request, contents)
+    return responses.jsonResponse(request, json)
 
   def csv(self, request, data, filename, params, key_order=None):
     """Returns data as a csv file.

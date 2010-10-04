@@ -681,7 +681,8 @@ class View(organization.View):
       if lists.isDataRequest(request):
         return self.getHomeData(request, ap_params, entity)
 
-      ap_list = lists.getListGenerator(request, ap_params, idx=0, order=['name'])
+      ap_list = lists.getListGenerator(request, ap_params, idx=0,
+                                       visibility='org_home', order=['name'])
 
       contents = [ap_list]
 

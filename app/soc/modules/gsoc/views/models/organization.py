@@ -644,8 +644,6 @@ class View(organization.View):
 
     idx = lists.getListIndex(request)
 
-    order = ['name']
-
     if idx == 0:
       params = ap_params
       # only show projects that have not failed
@@ -654,8 +652,7 @@ class View(organization.View):
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
-    contents = lists.getListData(request, params, fields,
-                                 'org_home', order=order)
+    contents = lists.getListData(request, params, fields, 'org_home')
 
     return lists.getResponse(request, contents)
 
@@ -684,7 +681,7 @@ class View(organization.View):
       if lists.isDataRequest(request):
         return self.getHomeData(request, ap_params, entity)
 
-      ap_list = lists.getListGenerator(request, ap_params, idx=0)
+      ap_list = lists.getListGenerator(request, ap_params, idx=0, order=['name'])
 
       contents = [ap_list]
 

@@ -886,7 +886,6 @@ class View(base.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
     visibility = 'public'
 
     filter = {
@@ -907,8 +906,7 @@ class View(base.View):
 
     params = params_collection[idx]
     contents = lists.getListData(request, params, filter,
-                                 visibility=visibility,
-                                 order=order, args=args)
+                                 visibility=visibility, args=args)
 
     return lists.getResponse(request, contents)
 
@@ -1011,6 +1009,7 @@ class View(base.View):
           tclaim_params, tclose_params], org_entity)
 
     contents = []
+    order = ['modified_on']
 
     # add all non-public tasks to the list
     fields = {'scope': org_entity,
@@ -1019,7 +1018,8 @@ class View(base.View):
 
     if tasks_unapp:
       # we should add this list because there is a new task
-      tuapp_list = lists.getListGenerator(request, tuapp_params, idx=0)
+      tuapp_list = lists.getListGenerator(request, tuapp_params,
+                                          order=order, idx=0)
       contents.append(tuapp_list)
 
     # add all open tasks to the list
@@ -1028,7 +1028,8 @@ class View(base.View):
 
     if tasks_open:
       # we should add this list because there is an open task
-      topen_list = lists.getListGenerator(request, topen_params, idx=1)
+      topen_list = lists.getListGenerator(request, topen_params,
+                                          order=order, idx=1)
       contents.append(topen_list)
 
     # add all claimed tasks to the list
@@ -1038,7 +1039,8 @@ class View(base.View):
 
     if tasks_claimed:
       # we should add this list because there is an open task
-      tclaim_list = lists.getListGenerator(request, tclaim_params, idx=2)
+      tclaim_list = lists.getListGenerator(request, tclaim_params,
+                                           order=order, idx=2)
       contents.append(tclaim_list)
 
     # add all closed tasks to the list
@@ -1047,7 +1049,8 @@ class View(base.View):
 
     if tasks_closed:
       # we should add this list because there is an open task
-      tclose_list = lists.getListGenerator(request, tclose_params, idx=3)
+      tclose_list = lists.getListGenerator(request, tclose_params,
+                                           order=order, idx=3)
       contents.append(tclose_list)
 
     if contents:

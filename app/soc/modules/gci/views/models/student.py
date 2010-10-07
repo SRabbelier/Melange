@@ -122,13 +122,11 @@ class View(student.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
     visibility = 'public'
 
     if idx == 0:
       contents = lists.getListData(request, params, filter,
-                                   visibility=visibility,
-                                   order=order, args=args)
+                                   visibility=visibility, args=args)
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
@@ -169,9 +167,11 @@ class View(student.View):
     tasks = gci_task_logic.logic.getForFields(filter=filter, unique=True)
 
     contents = []
+    order = ['modified_on']
 
     if tasks:
-      tasks_list = lists.getListGenerator(request, list_params, idx=0)
+      tasks_list = lists.getListGenerator(request, list_params,
+                                          order=order, idx=0)
       contents.append(tasks_list)
 
     if contents:

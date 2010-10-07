@@ -155,7 +155,6 @@ class View(organization.View):
 
     # default list settings
     args = []
-    order = ['modified_on']
     visibility = 'home'
 
     if idx == 0:
@@ -173,8 +172,7 @@ class View(organization.View):
 
     params = params_collection[idx]
     contents = lists.getListData(request, params, filter,
-                                 visibility=visibility,
-                                 order=order, args=args)
+                                 visibility=visibility, args=args)
 
     return lists.getResponse(request, contents)
 
@@ -230,10 +228,11 @@ class View(organization.View):
       tasks_open = gci_task_logic.logic.getForFields(fields, unique=True)
 
       contents = []
+      order = ['modified_on']
 
       if tasks_open:
         # we should add this list because there is a new task
-        to_list = lists.getListGenerator(request, to_params, idx=0)
+        to_list = lists.getListGenerator(request, to_params, order=order, idx=0)
         contents.append(to_list)
 
       # check if there are claimed if so show them in a separate list
@@ -244,7 +243,8 @@ class View(organization.View):
 
       if tasks_claimed:
         # we should add this list because there is a new task
-        tc_list = lists.getListGenerator(request, tc_params, idx=1)
+        tc_list = lists.getListGenerator(request, tc_params,
+                                         order=order, idx=1)
         contents.append(tc_list)
 
       # check if there are claimed if so show them in a separate list
@@ -254,7 +254,8 @@ class View(organization.View):
 
       if tasks_closed:
         # we should add this list because there is a new task
-        tcl_list = lists.getListGenerator(request, tcl_params, idx=2)
+        tcl_list = lists.getListGenerator(request, tcl_params,
+                                          order=order, idx=2)
         contents.append(tcl_list)
 
       context['list'] = soc.logic.lists.Lists(contents)

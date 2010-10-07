@@ -17,7 +17,7 @@ limitations under the License.
 <script type="text/javascript">
   jQuery(
     function () {
-      melange.list.loadList("melangeList{{ list.idx }}", '{{ list.configuration|safe }}', {{ list.idx }});
+      melange.list.loadList("melangeList{{ list.idx }}", '{{ list.configuration|safe|escapejs }}', {{ list.idx }});
     }
   );
 </script>

@@ -452,3 +452,65 @@ class CleaningTest(unittest.TestCase):
     field_value = 'exampleabc'
     self.form.cleaned_data = {field_name: field_value}
     self.assertRaises(forms.ValidationError, clean_field, self.form)
+
+  def testCleanRefs(self):
+    """Tests that references can be cleaned.
+    """
+    document_prefix = 'site'
+    params = {'logic': site_logic, 'document_prefix': document_prefix}
+    fields = ['ref']
+    clean_field = cleaning.clean_refs(params, fields)
+    # Test that the format of the value of field is not validated, i.e. 
+    # no exception is raised even if the filled document link_id 
+    # is not a valid link_id
+    document_link_id = 'v1_@?'
+    site = site_logic.getSingleton()
+    self.form.cleaned_data = {
+        'link_id': site.link_id,
+        'scope_path': site.scope_path,
+        'ref': document_link_id,
+        }
+    self.form._errors = {fields[0]: None}
+    clean_field(self.form)
+    # Test that the value of field will be removed and error information 
+    # will be added to _errors field if it is a valid but nonexistent 
+    # document link_id
+    document_link_id = 'a_document'
+    site = site_logic.getSingleton()
+    self.form.cleaned_data = {
+        'link_id': site.link_id,
+        'scope_path': site.scope_path,
+        'ref': document_link_id,
+        }
+    self.form._errors = {fields[0]: None}
+    after_cleaned_data = clean_field(self.form)
+    self.assertEqual(after_cleaned_data.get('ref', None), None)
+    self.assertNotEqual(self.form._errors[fields[0]], None)
+    # Test that the value of field will be returned, a field named resolved_ref
+    # containing the document will be added and no error messges will be added 
+    # if it is a valid and exisiting document link_id
+    document_link_id = 'a_document'
+    site = site_logic.getSingleton()
+    self.form.cleaned_data = {
+        'link_id': site.link_id,
+        'scope_path': site.scope_path,
+        'ref': document_link_id,
+        }
+    self.form._errors = {fields[0]: None}
+    document_properties = {
+        'link_id': document_link_id,
+        'scope_path': site.link_id,
+        'scope': site,
+        'prefix': document_prefix,
+        'author': self.user,
+        'title': 'Home Page',
+        'short_name': 'Home',
+        'content': 'This is the Home Page',
+        'modified_by': self.user,
+        }
+    document = document_logic.updateOrCreateFromFields(document_properties)
+    after_cleaned_data = clean_field(self.form)
+    self.assertEqual(after_cleaned_data['ref'], document_link_id)
+    self.assertEqual(after_cleaned_data['resolved_ref'].link_id, 
+                     document_link_id)
+    self.assertEqual(self.form._errors[fields[0]], None)

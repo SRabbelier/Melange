@@ -424,3 +424,31 @@ class CleaningTest(unittest.TestCase):
     expected = html = '<script></script>'
     self.form.cleaned_data = {field_name: html}
     self.assertEqual(clean_field(self.form), expected)
+
+  def testCleanUrl(self):
+    """Tests that url can be cleaned.
+    """
+    field_name = 'url'
+    clean_field = cleaning.clean_url(field_name)
+    # Test that the value of the url field will be returned 
+    # if it is a valid url
+    field_value = 'http://exampleabc.com/'
+    self.form.cleaned_data = {field_name: field_value}
+    self.form.fields = {field_name: forms.URLField()}
+    self.assertEqual(clean_field(self.form), field_value) 
+    # Test that the value of the url field will be normalized and returned 
+    # if it is a valid but not a normalized url
+    field_value = 'exampleabc.com'
+    self.form.cleaned_data = {field_name: field_value}
+    self.form.fields = {field_name: forms.URLField()}
+    self.assertEqual(clean_field(self.form), 'http://'+field_value+'/') 
+    # Test that None will be returned if the value of the url field 
+    # is an empty string
+    field_value = ''
+    self.form.cleaned_data = {field_name: field_value}
+    self.assertEqual(clean_field(self.form), None) 
+    # Test that forms.ValidationError error will be raised 
+    # if the value of the url field is not a valid url
+    field_value = 'exampleabc'
+    self.form.cleaned_data = {field_name: field_value}
+    self.assertRaises(forms.ValidationError, clean_field, self.form)

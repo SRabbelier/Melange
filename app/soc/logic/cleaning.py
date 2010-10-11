@@ -815,11 +815,14 @@ def validate_document_acl(view, creating=False):
     """Decorator wrapper method.
     """
     cleaned_data = self.cleaned_data
-    read_access = cleaned_data.get('read_access')
-    write_access = cleaned_data.get('write_access')
 
-    if not (read_access and write_access and ('prefix' in cleaned_data)):
+    fields = ['read_access', 'write_access', 'prefix', 'link_id', 'scope_path']
+
+    if not all((i in cleaned_data) for i in fields):
       return cleaned_data
+
+    read_access = cleaned_data['read_access']
+    write_access = cleaned_data['write_access']
 
     if read_access != 'public':
       ordening = document_model.Document.DOCUMENT_ACCESS

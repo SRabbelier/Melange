@@ -579,19 +579,41 @@ class CleaningTest(unittest.TestCase):
     self.form.cleaned_data = cleaned_data_before.copy()
     cleaned_data_after = clean_field(self.form)
     self.assertEqual(cleaned_data_after, cleaned_data_before)
-    # Test that KeyError will be raised if some fields are not present; 
-    # it may cause http 500
+    # Test that the values of fields will be returned 
+    # if some fields are not present (no KeyError)
     cleaned_data_before = {'read_access': 'public', 
                            'write_access': 'user', 
                            'prefix': 'sponsor', 
                            'scope_path': 'non_existent_scope_path'}
     self.form.cleaned_data = cleaned_data_before.copy()
-    self.assertRaises(KeyError, clean_field, self.form)
-    # Test that forms.ValidationError will be raised if read_access is 
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after, cleaned_data_before)
+    # Test that the values of fields will be returned 
+    # if some fields are not present (no KeyError)
+    # No forms.ValidationError will be raised even if read_access is 
     # more restricted than write_access
     cleaned_data_before = {'read_access': 'admin', 
                            'write_access': 'user', 
                            'prefix': 'sponsor', 
                            'scope_path': 'non_existent_scope_path'}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after, cleaned_data_before)
+    # Test that forms.ValidationError will be raised if all fields are completed
+    # and read_access is more restricted than write_access
+    cleaned_data_before = {'read_access': 'admin', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': 'non_existent_scope_path',
+                           'link_id': 'non_existent_link_id'}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    self.assertRaises(forms.ValidationError, clean_field, self.form)
+    # Test that forms.ValidationError will be raised if all fields are present
+    # (some may be empty) and read_access is more restricted than write_access
+    cleaned_data_before = {'read_access': 'admin', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': 'non_existent_scope_path',
+                           'link_id': ''}
     self.form.cleaned_data = cleaned_data_before.copy()
     self.assertRaises(forms.ValidationError, clean_field, self.form)

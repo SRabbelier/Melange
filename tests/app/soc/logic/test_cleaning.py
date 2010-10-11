@@ -514,3 +514,42 @@ class CleaningTest(unittest.TestCase):
     self.assertEqual(after_cleaned_data['resolved_ref'].link_id, 
                      document_link_id)
     self.assertEqual(self.form._errors[fields[0]], None)
+
+  def testValidateUserEdit(self):
+    """Tests that existent user field can be cleaned.
+    """
+    link_id_field = 'link_id'
+    account_field = 'account'
+    clean_field = cleaning.validate_user_edit(link_id_field, account_field)
+    # Test that the values will be returned if the filled user account 
+    # is that of the user with the specified link_id
+    self.form.cleaned_data = {link_id_field: self.user.link_id, 
+                              account_field: self.user.account}
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after[account_field], self.user.account)
+    self.assertEqual(cleaned_data_after[link_id_field], self.user.link_id)
+    # Test that forms.ValidationError will be raised if the user account 
+    # is an existing one but not that of the user with the specified link_id
+    self.form.cleaned_data = {link_id_field: self.user.link_id, 
+                              account_field: self.another_user.account}
+    self.assertRaises(forms.ValidationError, clean_field, self.form)
+    # Test that the values will be returned if the filled user account 
+    # is not an existing one but the filled link_id is an existing one
+    account = users.User(email='non_existent_account@email.com')
+    self.form.cleaned_data = {link_id_field: self.user.link_id, 
+                              account_field: account}
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after[account_field], account)
+    self.assertEqual(cleaned_data_after[link_id_field], self.user.link_id)
+    # Test that AttributeError will be raised if the filled user link_id 
+    # does not exist but the filled user account exisits (Probably 
+    # forms.ValidationError should be raised instead or it may cause http 500)
+    self.form.cleaned_data = {link_id_field: 'non_existent_link_id',
+                              account_field: self.another_user.account}
+    self.assertRaises(AttributeError, clean_field, self.form)
+    # Test that AttributeError will be raised if neither the filled user link_id
+    # nor the filled user account exists (Probably forms.ValidationError
+    # should be raised instead or it may cause http 500)
+    self.form.cleaned_data = {link_id_field: 'non_existent_link_id', 
+        account_field: users.User(email='non_existent_account@email.com')}
+    self.assertRaises(AttributeError, clean_field, self.form)

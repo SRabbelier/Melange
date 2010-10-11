@@ -32,6 +32,7 @@ from soc.logic.models.document import logic as document_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.models import user
+from soc.views.models.document import view as document_view
 
 from soc.logic import cleaning
 
@@ -553,3 +554,44 @@ class CleaningTest(unittest.TestCase):
     self.form.cleaned_data = {link_id_field: 'non_existent_link_id', 
         account_field: users.User(email='non_existent_account@email.com')}
     self.assertRaises(AttributeError, clean_field, self.form)
+
+  def testValidateDocumentAcl(self):
+    """Test that document ACL settings can be cleaned.
+    """
+    clean_field = cleaning.validate_document_acl(document_view)
+    # Test that the values of fields will be returned 
+    # if all fields are completed
+    cleaned_data_before = {'read_access': 'public', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': 'non_existent_scope_path', 
+                           'link_id': 'non_existent_link_id'}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after, cleaned_data_before)
+    # Test that the values of fields will be returned 
+    # even if some fields are left uncompleted
+    cleaned_data_before = {'read_access': 'public', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': '', 
+                           'link_id': ''}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    cleaned_data_after = clean_field(self.form)
+    self.assertEqual(cleaned_data_after, cleaned_data_before)
+    # Test that KeyError will be raised if some fields are not present; 
+    # it may cause http 500
+    cleaned_data_before = {'read_access': 'public', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': 'non_existent_scope_path'}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    self.assertRaises(KeyError, clean_field, self.form)
+    # Test that forms.ValidationError will be raised if read_access is 
+    # more restricted than write_access
+    cleaned_data_before = {'read_access': 'admin', 
+                           'write_access': 'user', 
+                           'prefix': 'sponsor', 
+                           'scope_path': 'non_existent_scope_path'}
+    self.form.cleaned_data = cleaned_data_before.copy()
+    self.assertRaises(forms.ValidationError, clean_field, self.form)

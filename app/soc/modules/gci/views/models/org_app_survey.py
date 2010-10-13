@@ -49,7 +49,7 @@ class View(org_app_survey.View):
 
     rights = access.GCIChecker(params)
     rights['any_access'] = ['allow']
-    rights['show'] = ['checkIsDeveloper']
+    rights['show'] = [('checkIsSurveyReadable', org_app_logic)]
     rights['create'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['edit'] = [('checkIsHostForProgramInScope', program_logic)]
     rights['delete'] = ['checkIsDeveloper']

@@ -241,7 +241,7 @@ class View(program.View):
     if not entity:
       fields['ranking'] = self._params['logic'].createRankingForType(fields)
     else:
-      fields['ranking'] = program.ranking
+      fields['ranking'] = entity.ranking
 
   @decorators.merge_params
   @decorators.check_access

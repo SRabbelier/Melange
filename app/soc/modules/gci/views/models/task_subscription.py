@@ -98,6 +98,9 @@ class View(base.View):
     if not get_params.get('no_toggle'):
       data = params['logic'].subscribeUser(
           task_entity, user_entity, toggle=True)
+    else:
+      data = params['logic'].subscribeUser(
+          task_entity, user_entity, toggle=False)
 
     return http.HttpResponse(data if data else '')
 

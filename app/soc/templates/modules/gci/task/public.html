@@ -78,12 +78,12 @@ limitations under the License.
             { key_name: '{{ entity_key_name }}',
               no_toggle: true },
             function(data){
-             if (data == 'remove') { 
-                $("img#subscribe").attr('src', subscribe);
-                $("img#subscribe").attr('title', 'Unsubscribe from this task');
-              } else {
+              if (data == 'add') {
                 $("img#subscribe").attr('src', nosubscribe);
                 $("img#subscribe").attr('title', 'Subscribe to this task');
+              } else {
+                $("img#subscribe").attr('src', subscribe);
+                $("img#subscribe").attr('title', 'Unsubscribe from this task');
               }
             }
     );

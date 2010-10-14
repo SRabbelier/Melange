@@ -63,7 +63,7 @@ class Logic(base.Logic):
 
     return task_subscription
 
-  def subscribeUser(self, task_entity, user_entity, toggle=False):
+  def subscribeUser(self, task_entity, user_entity, toggle=None):
     """Adds a new subscriber to the subscription depending upon
     the previous subscription
 
@@ -71,7 +71,10 @@ class Logic(base.Logic):
       task_entity: GCITask entity
       user_entity: User entity
       toggle: If True and if the user already exists, removes the user
-              from subscription, if false only adds the user for subscription
+              from subscription, if the user doesn't exist adds the user,
+              if False just returns the current status
+              if None adds the user for subscription irrespective of current
+              subscription status
 
     Returns:
       'add' if the user was added, 'remove' if the user was removed and
@@ -81,12 +84,19 @@ class Logic(base.Logic):
     data = None
     entity = self.getOrCreateTaskSubscriptionForTask(task_entity)
 
-    if user_entity.key() not in entity.subscribers:
+    if toggle == True:
+      if user_entity.key() not in entity.subscribers:
+        entity.subscribers.append(user_entity.key())
+        data = 'add'
+      else:
+        entity.subscribers.remove(user_entity.key())
+        data = 'remove'
+    elif toggle == False:
+      if user_entity.key() not in entity.subscribers:
+        data = 'add'
+    elif toggle == None:
       entity.subscribers.append(user_entity.key())
       data = 'add'
-    elif toggle:
-      entity.subscribers.remove(user_entity.key())
-      data = 'remove'
 
     if entity.put():
       return data

@@ -1,3 +1,9 @@
         <li class="leaf">
-          <span><a href="{{ item.url }}">{{ item.title }}</a></span>
+          <span>
+{% ifequal item.url "login" %}
+<a href="{{ sign_in }}">
+{% else %}
+<a href="{{ item.url }}">
+{% endifequal %}
+{{ item.title }}</a></span>
         </li>

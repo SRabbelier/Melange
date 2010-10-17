@@ -173,6 +173,47 @@ class View(group.View):
             entity, params['mentor_url_name'])
     }
 
+  def _postCreate(self, request, entity):
+    """See base.View._postCreate.
+    """
+
+    from soc.logic.models.document import logic as document_logic
+
+    bold = lambda x: "<b>%s</b>: " % x
+
+    parts = [
+        bold("Name") + entity.name,
+        bold("Registered by") + entity.founder.name,
+        bold("Home page url") + str(entity.home_page),
+        bold("Email") + entity.email,
+        bold("Public mailing list") + entity.pub_mailing_list,
+        bold("Public irc channel") + entity.irc_channel ,
+        bold("Description") + entity.description ,
+        bold("Development mailing list") + entity.dev_mailing_list,
+        bold("Ideas list") + str(entity.ideas),
+        bold("Application template") + entity.contrib_template,
+        ]
+    content = '<br/>'.join(parts)
+
+    home_document = document_logic.updateOrCreateFromFields({
+        'link_id': 'home',
+        'scope_path': entity.key().id_or_name(),
+        'scope': entity,
+        'author': entity.founder,
+        'title': 'Home Page for %s' % entity.name,
+        'short_name': 'Home',
+        'content': content,
+        'prefix': self._params['document_prefix'],
+        'read_access': 'public',
+        'write_access': 'admin',
+        'home_for': entity,
+        'modified_by': entity.founder,
+        })
+
+    self._logic.updateEntityProperties(entity, {'home': home_document})
+
+    super(View, self)._postCreate(request, entity)
+
   @decorators.merge_params
   @decorators.check_access
   def applicant(self, request, access_type,

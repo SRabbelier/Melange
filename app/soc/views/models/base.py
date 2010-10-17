@@ -337,6 +337,8 @@ class View(object):
     logic = params['logic']
     entity = logic.updateOrCreateFromFields(fields)
 
+    self._postCreate(request, entity)
+
     page_params = params['edit_params']
     params['suffix'] = entity.key().id_or_name()
 
@@ -809,6 +811,15 @@ class View(object):
       scope = self._params['scope_logic'].logic.getFromKeyName(
           fields['scope_path'])
       fields['scope'] = scope
+
+  def _postCreate(self, request, entity):
+    """Perform any required processing after creating a new entity.
+
+    Args:
+      request: the django request object
+      entity: the entity to make public
+    """
+    pass
 
   def _public(self, request, entity, context):
     """Performs any required processing to get an entity's public page.

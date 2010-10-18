@@ -1755,10 +1755,10 @@ class Checker(object):
       program_logic: Program Logic instance
     """
 
+    # check if the timeline exists
     time_line_keyname = program_logic.timeline_logic.getKeyNameFromFields(
         django_args)
-    timeline_entity = program_logic.timeline_logic.getFromKeyNameOr404(
-        time_line_keyname)
+    program_logic.timeline_logic.getFromKeyNameOr404(time_line_keyname)
 
     fields = program_logic.getKeyFieldsFromFields(django_args)
     self.checkIsHostForProgram(fields, logic=program_logic)

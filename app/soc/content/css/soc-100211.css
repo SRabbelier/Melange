@@ -354,11 +354,8 @@ table#queues td {
   padding: 3px;
 }
 
-#logo {
-  padding-right: 18px;
-  position: absolute;
-  left: 0;
-  top: -5px;
+#logo img {
+  width: 195px;
 }
 
 #login {
@@ -454,6 +451,8 @@ table#queues td {
 
 /* SIDEBAR MENU */
 #side {
+  position:relative;
+  top: -61px;
   width: 200px;
   margin-bottom: 3em;
   float: left;

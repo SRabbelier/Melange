@@ -194,19 +194,6 @@ limitations under the License.
   </div>
 
   <div id="header">
-   <div id="logo">
-	{% block logo %}
-<a href="/">
-<img
-{% if logo_url %}
-  src="{{ logo_url }}"
-{% else %}
-  src="/soc/content/images/gospo-logo.png"
-{% endif %}
-  alt="{{ site_name }}"/>
-</a>
-	{% endblock %}
-   </div>
 
    <div id="title">
 	{% block header_title %}
@@ -245,6 +232,19 @@ TODO(tlarsen): replace this with breadcrumbs
   </div>
 
   <div id="side" dir="ltr">
+   <div id="logo">
+	{% block logo %}
+<a href="/">
+<img
+{% if logo_url %}
+  src="{{ logo_url }}"
+{% else %}
+  src="/soc/content/images/gospo-logo.png"
+{% endif %}
+  alt="{{ site_name }}"/>
+</a>
+	{% endblock %}
+   </div>
    <div id="menu">
 {% block sidebar_menu %}
     <ul>

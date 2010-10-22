@@ -34,7 +34,7 @@ If you wish to reject this invitation please click the Reject button, this invit
 <tr>
   <td>
     <input type="button" onclick="location.href='{{ invite_accepted_redirect }}'" value="Accept"/>
-    <input type="button" onclick="location.href='/{{ module_name }}/process_invite/{{ entity.key.id_or_name }}?status=rejected'" value="Reject"/>
+    <input type="button" onclick="location.href='/{{ module_name }}/process_invite/{{ entity.key.id_or_name }}?status=canceled'" value="Reject"/>
   </td>
 </tr>
 </table>

@@ -950,7 +950,7 @@ class Checker(object):
 
     request_entity = request_logic.getFromIDOr404(id)
 
-    if request_entity.status in ['completed', 'rejected']:
+    if request_entity.status in ['completed', 'rejected', 'withdrawn']:
       raise out_of_band.AccessViolation(message_fmt=DEF_REQUEST_COMPLETED_MSG)
 
     if request_entity.group.status != 'active':

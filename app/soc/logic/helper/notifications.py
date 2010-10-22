@@ -39,22 +39,28 @@ from soc.views.helper import redirects
 
 
 DEF_NEW_NOTIFICATION_MSG_SUBJECT_FMT = ugettext(
-    "New Notification: %s")
+    'New Notification: %s')
 
 DEF_INVITATION_MSG_FMT = ugettext(
-    "Invitation to become a %(role_verbose)s for %(group)s.")
+    'Invitation to become a %(role_verbose)s for %(group)s.')
 
 DEF_NEW_REQUEST_MSG_FMT = ugettext(
-    "New Request Received from %(requester)s to become a %(role_verbose)s "
-    "for %(group)s")
+    'New Request Received from %(requester)s to become a %(role_verbose)s '
+    'for %(group)s')
 
 DEF_NEW_ORG_MSG_FMT = ugettext(
-    "Your Organization Application for %(group_name)s has been accepted.")
+    'Your Organization Application for %(group_name)s has been accepted.')
 
 DEF_NEW_REVIEW_SUBJECT_FMT = ugettext(
-    "New %s Review on %s")
+    'New %s Review on %s')
 
-DEF_WELCOME_MSG_FMT = ugettext("Welcome to %(site_name)s, %(name)s,")
+DEF_REJECTED_REQUEST_SUBJECT_FMT = ugettext(
+    'Request to become a %(role_verbose)s for %(group)s has been rejected')
+
+DEF_WITHDRAWN_INVITE_SUBJECT_FMT = ugettext(
+    'Invite to become a %(role_verbose)s for %(group)s has been withdrawn')
+
+DEF_WELCOME_MSG_FMT = ugettext('Welcome to %(site_name)s, %(name)s,')
 
 DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
     'invitation.html'
@@ -67,6 +73,12 @@ DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
 
 DEF_NEW_ORG_TEMPLATE = 'soc/organization/messages/accepted.html'
 
+DEF_REJECTED_REQUEST_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
+    'rejected_request.html'
+
+DEF_WITHDRAWN_INVITE_NOTIFICATION_TEMPLATE = 'soc/notification/messages/' \
+    'withdrawn_invite.html'
+
 
 def sendInviteNotification(entity):
   """Sends out an invite notification to the user the request is for.
@@ -78,7 +90,7 @@ def sendInviteNotification(entity):
   from soc.logic.models.user import logic as user_logic
   from soc.views.models.role import ROLE_VIEWS
 
-  invitation_url = "http://%(host)s%(index)s" % {
+  invitation_url = 'http://%(host)s%(index)s' % {
       'host' : system.getHostname(),
       'index': redirects.getInviteProcessRedirect(entity, None),
       }
@@ -112,7 +124,6 @@ def sendNewRequestNotification(request_entity):
 
   from soc.logic.helper import notifications
   from soc.logic.models.role import ROLE_LOGICS
-  from soc.logic.models.user import logic as user_logic
   from soc.views.models.role import ROLE_VIEWS
 
   # get the users who should get the notification
@@ -157,6 +168,57 @@ def sendNewRequestNotification(request_entity):
                                    subject, template)
 
 
+def sendRejectedRequestNotification(entity):
+  """Sends a message that the request to get a role has been rejected.
+
+  Args:
+    entity : A request containing the information needed to create the message
+  """
+  from soc.views.models.role import ROLE_VIEWS
+
+  role_params = ROLE_VIEWS[entity.role].getParams()
+
+  message_properties = {
+      'role_verbose' : role_params['name'],
+      'group': entity.group.name,
+      }
+
+  subject = DEF_REJECTED_REQUEST_SUBJECT_FMT % {
+      'role_verbose' : role_params['name'],
+      'group' : entity.group.name
+      }
+
+  template = DEF_REJECTED_REQUEST_NOTIFICATION_TEMPLATE
+
+  # from user set to None to not leak who rejected it.
+  sendNotification(entity.user, None, message_properties, subject, template)
+
+
+def sendWithdrawnInviteNotification(entity):
+  """Sends a message that the invite to obtain a role has been withdrawn.
+
+  Args:
+    entity : A request containing the information needed to create the message
+  """
+  from soc.views.models.role import ROLE_VIEWS
+
+  role_params = ROLE_VIEWS[entity.role].getParams()
+
+  message_properties = {
+      'role_verbose' : role_params['name'],
+      'group': entity.group.name,
+      }
+
+  subject = DEF_WITHDRAWN_INVITE_SUBJECT_FMT % {
+      'role_verbose' : role_params['name'],
+      'group' : entity.group.name
+      }
+
+  template = DEF_WITHDRAWN_INVITE_NOTIFICATION_TEMPLATE
+
+  # from user set to None to not leak who rejected it.
+  sendNotification(entity.user, None, message_properties, subject, template)
+
 def sendNewOrganizationNotification(entity, module_name):
   """Sends out an invite notification to the applicant of the Organization.
 
@@ -166,7 +228,7 @@ def sendNewOrganizationNotification(entity, module_name):
 
   program_entity = entity.survey.scope
 
-  url = "http://%(host)s%(redirect)s" % {
+  url = 'http://%(host)s%(redirect)s' % {
       'redirect': redirects.getApplicantRedirect(entity,
       {'url_name': '%s/org' % module_name,
        'program': program_entity}),
@@ -201,7 +263,7 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
     reviewed_name: Name of the entity reviewed
     redirect_url: URL to which the follower should be sent for more information
   """
-  review_notification_url = "http://%(host)s%(redirect_url)s" % {
+  review_notification_url = 'http://%(host)s%(redirect_url)s' % {
       'host' : system.getHostname(),
       'redirect_url': redirect_url}
   
@@ -209,12 +271,12 @@ def sendNewReviewNotification(to_user, review, reviewed_name, redirect_url):
       'reviewer_name': review.author_name(),
       'reviewed_name': reviewed_name,
       'review_content': review.content,
-      'review_visibility': "public" if review.is_public else "private",
+      'review_visibility': 'public' if review.is_public else 'private',
       }
 
   # determine the subject
   review_type = 'public' if review.is_public else 'private'
-  subject =  DEF_NEW_REVIEW_SUBJECT_FMT % (review_type, reviewed_name)
+  subject = DEF_NEW_REVIEW_SUBJECT_FMT % (review_type, reviewed_name)
 
   template = DEF_NEW_REVIEW_NOTIFICATION_TEMPLATE
 
@@ -278,7 +340,7 @@ def sendNewNotificationMessage(notification_entity):
   from soc.views.models.notification import view as notification_view
 
   # create the url to show this notification
-  notification_url = "http://%(host)s%(index)s" % {
+  notification_url = 'http://%(host)s%(index)s' % {
       'host' : system.getHostname(),
       'index': redirects.getPublicRedirect(notification_entity,
           notification_view.getParams())}
@@ -292,7 +354,7 @@ def sendNewNotificationMessage(notification_entity):
 
   if not default_sender:
     # no valid sender found, abort
-    logging.error("No default sender")
+    logging.error('No default sender')
     return
   else:
     (sender_name, sender) = default_sender
@@ -335,7 +397,7 @@ def sendWelcomeMessage(user_entity):
 
   if not default_sender:
     # no valid sender found, should not happen but abort anyway
-    logging.error("No default sender")
+    logging.error('No default sender')
     return
   else:
     sender_name, sender = default_sender

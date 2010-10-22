@@ -25,8 +25,6 @@ __authors__ = [
 
 
 from django import http
-from django.utils import simplejson
-from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic import dicts
@@ -66,7 +64,7 @@ class View(base.View):
     new_params['rights'] = rights
     new_params['logic'] = request_logic
 
-    new_params['name'] = "Request"
+    new_params['name'] = 'Request'
 
     new_params['sidebar_developer'] = [('/%s/list', 'List %(name_plural)s',
         'list')]
@@ -88,10 +86,10 @@ class View(base.View):
 
     new_params['public_field_prefetch'] = ['user', 'group']
     new_params['public_field_extra'] = publicFieldExtra
-    new_params['public_field_keys'] = ["role_name", "user", "for",
-                                       "status", "created_on"]
-    new_params['public_field_names'] = ["Role", "User", "For",
-                                        "Status", "Created On"]
+    new_params['public_field_keys'] = ['role_name', 'user', 'for',
+                                       'status', 'created_on']
+    new_params['public_field_names'] = ['Role', 'User', 'For',
+                                        'Status', 'Created On']
 
     params = dicts.merge(params, new_params)
 
@@ -157,11 +155,12 @@ class View(base.View):
 
     get_dict = request.GET
 
+    # TODO(ljvderijk): Should be made a POST request.
     if 'status' in get_dict.keys():
-      if get_dict['status'] == 'rejected':
-        # this invite has been rejected mark as rejected
+      if get_dict['status'] == 'canceled':
+        # this invite has been canceled mark as such
         request_logic.updateEntityProperties(request_entity, {
-            'status': 'rejected'})
+            'status': 'canceled'})
 
         # redirect to user request overview
         return http.HttpResponseRedirect('/user/requests')
@@ -189,10 +188,10 @@ def publicFieldExtra(entity):
   from soc.views.models.role import ROLE_VIEWS
 
   field_extra = {
-        "user": "%s (%s)" % (entity.user.name, entity.user.link_id),
-        "for": entity.group.name,
-        "status": entity.statusMessage(),
-        "role_name": ROLE_VIEWS[entity.role].getParams()['name'],
+        'user': '%s (%s)' % (entity.user.name, entity.user.link_id),
+        'for': entity.group.name,
+        'status': entity.statusMessage(),
+        'role_name': ROLE_VIEWS[entity.role].getParams()['name'],
         }
 
   return field_extra

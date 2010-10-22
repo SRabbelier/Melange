@@ -31,6 +31,19 @@ from soc.models.group import Group
 from soc.models.user import User
 
 
+STATUS_MESSAGES =  {
+    'new': 'This request has had no reply yet.',
+    'group_accepted': 'The profile can now be filled out',
+    'completed': 'You are done, no further action needed',
+    'canceled':
+        'You have canceled the request, please make a new one if needed',
+    'rejected':
+        'You cannot do anything with this request since it was rejected',
+    'withdrawn': 'You cannot do anything with this request since it was ' \
+        'withdrawn',
+    'ignored': 'This request was marked as spam, and has been ignored',
+}
+
 class Request(ModelWithFieldAttributes):
   """A request is made to allow a person to create a new Role entity.
   """
@@ -52,21 +65,25 @@ class Request(ModelWithFieldAttributes):
 
   #: An optional message shown to the receiving end of this request
   message = db.TextProperty(required=False, default='',
-                            verbose_name=ugettext("Message"))
+                            verbose_name=ugettext('Message'))
   message.help_text = ugettext(
       'This is an optional message shown to the receiver of this request.')
 
   # property that determines the status of the request
-  # new : new Request
-  # group_accepted : The group has accepted this request
+  # new : new request.
+  # group_accepted : The group has accepted this request.
   # completed : This request has been handled either following a creation of
-  #             the role entity
-  # rejected : This request has been rejected by either the user or the group
+  #             the role entity,
+  # canceled : This request has been canceled by the user.
+  # rejected : This request has been rejected by the group.
+  # withdrawn : This request has been withdrawn after being previously
+  #             accepted.
   # ignored : The request has been ignored by the group and will not give
-  #           the user access to create the role
+  #           the user access to create the role.
   status = db.StringProperty(required=True, default='new',
-      choices=['new', 'group_accepted', 'completed', 'rejected','ignored'])
-  status.help_text = ugettext('Shows the status of the request.')
+      choices=['new', 'group_accepted', 'completed', 'canceled', 'rejected',
+               'withdrawn', 'ignored'])
+  status.help_text = ugettext('The status of the request.')
 
   #: DateTime when the request was created
   created_on = db.DateTimeProperty(auto_now_add=True)
@@ -77,13 +94,4 @@ class Request(ModelWithFieldAttributes):
   def statusMessage(self):
     """Returns a status message for the current request status.
     """
-
-    statuses =  {
-        'new': 'You requested has had no reply yet.',
-        'group_accepted': 'You can now fill out your profile',
-        'completed': 'You are done, no further action needed',
-        'rejected': 'You cannot do anything with this request since it was denied',
-        'ignored': 'This request was marked as spam, and has been ignored',
-    }
-
-    return statuses.get(self.status, "Unknown request status.")
+    return STATUS_MESSAGES.get(self.status)

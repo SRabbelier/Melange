@@ -601,10 +601,12 @@ class View(base.View):
     context['page_name'] = '%s from %s to become a %s' % (
         page_name, request_entity.user.name, params['name'])
 
+    # TODO(ljvderijk): Should be a POST request
     get_dict = request.GET
 
     if 'status' in get_dict.keys():
-      if get_dict['status'] in ['group_accepted', 'rejected', 'ignored']:
+      if get_dict['status'] in ['group_accepted', 'rejected', 'withdrawn',
+                                'ignored']:
         # update the request_entity and redirect away from this page
         request_status = get_dict['status']
 

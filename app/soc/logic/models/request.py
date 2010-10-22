@@ -26,7 +26,6 @@ import soc.models.request
 
 from soc.logic.helper import notifications
 from soc.logic.models import base
-from soc.logic.models import linkable as linkable_logic
 
 
 class Logic(base.Logic):
@@ -37,7 +36,6 @@ class Logic(base.Logic):
                base_model=None, id_based=True):
     """Defines the name, key_name and model for this entity.
     """
-
     super(Logic, self).__init__(model, base_model=base_model,
                                 id_based=id_based)
 
@@ -48,7 +46,6 @@ class Logic(base.Logic):
       fields: fields for the new Request
       logic: the Logic for the Role that is being requested
     """
-
     # check for already outstanding or ignored requests
     request_fields = {
         'role': role_logic.role_name,
@@ -80,7 +77,6 @@ class Logic(base.Logic):
   def _onCreate(self, entity):
     """Sends out a message notifying users about the new invite/request.
     """
-
     if entity.status == 'group_accepted':
       # this is an invite
       notifications.sendInviteNotification(entity)
@@ -95,16 +91,19 @@ class Logic(base.Logic):
 
       Sends out a message depending on the change of status.
     """
-
     value = entity_properties[name]
 
     if name == 'status' and entity.status != value:
       if value == 'group_accepted':
-       # this is an invite
+        # this is an invite
         notifications.sendInviteNotification(entity)
       elif value == 'new':
         # this is a request
         notifications.sendNewRequestNotification(entity)
+      elif value == 'rejected':
+        notifications.sendRejectedRequestNotification(entity)
+      elif value == 'withdrawn':
+        notifications.sendWithdrawnInviteNotification(entity)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 

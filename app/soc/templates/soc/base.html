@@ -196,10 +196,15 @@ limitations under the License.
   <div id="header">
    <div id="logo">
 	{% block logo %}
-	{% comment %}
-	TODO: logo updated in site sponsor interface
-	{% endcomment %}
-<a href="/"><img src="/soc/content/images/gospo-logo.png" alt="{{ site_name }}"/></a>
+<a href="/">
+<img
+{% if logo_url %}
+  src="{{ logo_url }}"
+{% else %}
+  src="/soc/content/images/gospo-logo.png"
+{% endif %}
+  alt="{{ site_name }}"/>
+</a>
 	{% endblock %}
    </div>
 

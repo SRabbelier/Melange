@@ -84,6 +84,12 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       'Email address provided in this field needs to be added as Developer '
       'in GAE admin console.')
 
+  #: Optional field storing the url of the site logo.
+  logo_url = db.LinkProperty(
+      verbose_name=ugettext('Site logo'))
+  logo_url.help_text = ugettext(
+      'URL of the site logo.')
+
   #: XSRF tokens are generated using a secret key.  This field is not visible in
   #: /site/edit because it is hidden in soc.views.models.site, and is populated
   #: automatically by soc.logic.models.site.

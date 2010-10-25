@@ -25,7 +25,6 @@ __authors__ = [
 from soc.tasks import responses
 from soc.tasks.helper import decorators
 
-from soc.modules.gci.logic.models.ranking import logic as gci_ranking_logic
 
 def getDjangoURLPatterns():
   """Returns the URL patterns for the tasks in this module.

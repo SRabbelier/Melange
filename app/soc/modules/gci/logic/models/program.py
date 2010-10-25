@@ -29,7 +29,6 @@ from soc.logic.models import sponsor as sponsor_logic
 
 import soc.models.program
 
-from soc.modules.gci.logic.models import ranking as gci_ranking_logic
 from soc.modules.gci.logic.models import timeline as gci_timeline_logic
 
 import soc.modules.gci.models.program

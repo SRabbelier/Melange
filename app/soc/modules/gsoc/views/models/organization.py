@@ -194,8 +194,9 @@ class View(organization.View):
         data = simplejson.dumps({
             'data': [{'link_id': item['tag']} for item in [dicts.toDict(tag, ['tag']) for tag in suggested_tags]],
             'autocomplete_options': {
-               'multiple': True
-            }            
+               'multiple': True,
+               'selectFirst': False
+            }
         })
 
     return self.json(request, data, False)

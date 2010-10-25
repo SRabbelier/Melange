@@ -910,7 +910,7 @@ class View(program.View):
   @decorators.check_access
   def showRanking(self, request, access_type,
                   page_name=None, params=None, **kwargs):
-    """Shows the delete page for the entity specified by **kwargs.
+    """Shows the ranking for the program specified by **kwargs.
 
     Args:
       request: the standard Django HTTP request object

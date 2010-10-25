@@ -46,13 +46,13 @@ An app's queues are also subject to storage quota limits for their stored tasks,
 i.e. those tasks that have been added to queues but not yet executed. This quota
 is part of their total storage quota (including datastore and blobstore quota).
 We allow an app to override the default portion of this quota available for
-taskqueue storage (100M) with a top level field "total_storage_quota".
+taskqueue storage (100M) with a top level field "total_storage_limit".
 
-taskqueue_storage_limit: 1.2G
+total_storage_limit: 1.2G
 
 If no suffix is specified, the number is interpreted as bytes. Supported
 suffices are B (bytes), K (kilobytes), M (megabytes), G (gigabytes) and
-T (terabytes). If taskqueue_storage_quota exceeds the total storage quota
+T (terabytes). If total_storage_limit exceeds the total disk storage
 available to an app, it is clamped.
 """
 
@@ -66,6 +66,7 @@ from google.appengine.api import yaml_object
 _NAME_REGEX = r'^[A-Za-z0-9-]{0,499}$'
 _RATE_REGEX = r'^(0|[0-9]+(\.[0-9]*)?/[smhd])'
 _TOTAL_STORAGE_LIMIT_REGEX = r'^([0-9]+(\.[0-9]*)?[BKMGT]?)'
+_TASK_AGE_LIMIT_REGEX = r'^([0-9]+(\.[0-9]*(e-?[0-9]+))?[smhd])'
 
 QUEUE = 'queue'
 
@@ -76,9 +77,26 @@ TOTAL_STORAGE_LIMIT = 'total_storage_limit'
 
 BYTE_SUFFIXES = 'BKMGT'
 
+RETRY_PARAMETERS = 'retry_parameters'
+TASK_RETRY_LIMIT = 'task_retry_limit'
+TASK_AGE_LIMIT = 'task_age_limit'
+MIN_BACKOFF_SEC = 'min_backoff_sec'
+MAX_BACKOFF_SEC = 'max_backoff_sec'
+MAX_DOUBLINGS = 'max_doublings'
 
 class MalformedQueueConfiguration(Exception):
   """Configuration file for Task Queue is malformed."""
+
+class RetryParameters(validation.Validated):
+  """Retry parameters for a single task queue."""
+  ATTRIBUTES = {
+      TASK_RETRY_LIMIT: validation.Optional(validation.TYPE_INT),
+      TASK_AGE_LIMIT: validation.Optional(_TASK_AGE_LIMIT_REGEX),
+      MIN_BACKOFF_SEC: validation.Optional(validation.TYPE_INT),
+      MAX_BACKOFF_SEC: validation.Optional(validation.TYPE_INT),
+      MAX_DOUBLINGS: validation.Optional(validation.TYPE_INT),
+  }
+
 
 
 class QueueEntry(validation.Validated):
@@ -87,6 +105,7 @@ class QueueEntry(validation.Validated):
       NAME: _NAME_REGEX,
       RATE: _RATE_REGEX,
       BUCKET_SIZE: validation.Optional(validation.TYPE_INT),
+      RETRY_PARAMETERS: validation.Optional(RetryParameters),
   }
 
 
@@ -176,6 +195,9 @@ def ParseTotalStorageLimit(limit):
     MalformedQueueConfiguration: if the limit argument isn't a valid python
     double followed by an optional suffix.
   """
+  limit = limit.strip()
+  if not limit:
+    raise MalformedQueueConfiguration('Total Storage Limit must not be empty.')
   try:
     if limit[-1] in BYTE_SUFFIXES:
       number = float(limit[0:-1])
@@ -190,3 +212,40 @@ def ParseTotalStorageLimit(limit):
     raise MalformedQueueConfiguration('Total Storage Limit "%s" is invalid.' %
                                       limit)
 
+def ParseTaskAgeLimit(age_limit):
+  """Parses a string representing the task's age limit (maximum allowed age).
+
+  The string must be a non-negative integer or floating point number followed by
+  one of s, m, h, or d (seconds, minutes, hours or days respectively).
+
+  Args:
+    age_limit: The task age limit string.
+
+  Returns:
+    An int representing the age limit in seconds.
+
+  Raises:
+    MalformedQueueConfiguration: if the limit argument isn't a valid python
+    double followed by a required suffix.
+ """
+  age_limit = age_limit.strip()
+  if not age_limit:
+    raise MalformedQueueConfiguration('Task Age Limit must not be empty.')
+  unit = age_limit[-1]
+  if unit not in "smhd":
+    raise MalformedQueueConfiguration('Task Age_Limit must be in s (seconds), '
+                                      'm (minutes), h (hours) or d (days)')
+  try:
+    number = float(age_limit[0:-1])
+    if unit == 's':
+      return int(number)
+    if unit == 'm':
+      return int(number * 60)
+    if unit == 'h':
+      return int(number * 3600)
+    if unit == 'd':
+      return int(number * 86400)
+
+  except ValueError:
+    raise MalformedQueueConfiguration('Task Age_Limit "%s" is invalid.' %
+                                      age_limit)

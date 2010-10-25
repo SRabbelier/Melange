@@ -57,6 +57,8 @@ from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.helper import redirects as gci_redirects
 
+from soc.modules.gci.models.task import TaskDifficultyTag
+
 import soc.modules.gci.logic.models.program
 
 
@@ -85,6 +87,9 @@ class View(program.View):
   DEF_TASK_QUOTA_ERROR_MSG_FMT = ugettext(
       "Task Quota limit for the organizations %s do not contain"
       " a valid number(>0) and has not been updated.")
+
+  DEF_LIST_RANKING_MSG_FMT = ugettext(
+      "Shows current ranking of %s.")
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
@@ -118,6 +123,9 @@ class View(program.View):
     rights['list_tasks'] = [('checkIsAfterEvent',
         ['tasks_publicly_visible',
          '__all__', gci_program_logic.logic])]
+    rights['ranking_schema'] = [('checkIsHostForProgram',
+        [gci_program_logic.logic])]
+    rights['list_ranking'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.program.logic
@@ -132,7 +140,7 @@ class View(program.View):
     new_params['url_name'] = 'gci/program'
 
     new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types',
-        'ranking']
+        'ranking_schema']
 
     patterns = []
     patterns += [
@@ -154,6 +162,12 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>list_tasks)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.list_tasks',
          'List of all Tasks in'),
+        (r'^%(url_name)s/(?P<access_type>ranking_schema)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.ranking_schema',
+         'Edit ranking schema'),
+        (r'^%(url_name)s/(?P<access_type>list_ranking)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.list_ranking',
+         'Show ranking'),
         ]
 
     new_params['public_field_keys'] = ["name", "scope_path"]
@@ -230,18 +244,6 @@ class View(program.View):
       form.fields['overview_task_types'].initial = tt_str
 
     return super(View, self)._editGet(request, entity, form)
-
-  def _editPost(self, request, entity, fields):
-    """See base._editPost().
-    """
-
-    super(View, self)._editPost(request, entity, fields)
-
-    # if there is no entity, create a new ranking
-    if not entity:
-      fields['ranking'] = self._params['logic'].createRankingForType(fields)
-    else:
-      fields['ranking'] = entity.ranking
 
   @decorators.merge_params
   @decorators.check_access
@@ -494,29 +496,6 @@ class View(program.View):
           gci_program_entity, params)
       # add a link to list all the organizations
       items += [(url, "List all tasks", 'any_access')]
-
-    return items
-
-  def _getHostEntries(self, entity, params, prefix):
-    """Returns a list with menu items for program host.
-
-    Args:
-      entity: program entity to get the entries for
-      params: view specific params
-      prefix: module prefix for the program entity
-    """
-
-    items = super(View, self)._getHostEntries(entity, params, prefix)
-
-    # add link to edit Program Ranking
-    if entity.ranking:
-      items += [(redirects.getEditRedirect(entity,
-          {'url_name': prefix + '/ranking'}),
-          "Edit Program Ranking", 'any_access')]
-    else:
-      items += [(redirects.getCreateRedirect(entity,
-          {'url_name': prefix + '/ranking'}),
-          "Edit Program Ranking", 'any_access')]      
 
     return items
 
@@ -842,6 +821,132 @@ class View(program.View):
     else:
       raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def rankingSchema(self, request, access_type, page_name=None, params=None, 
+                    **kwargs):
+    """Edit ranking schema for the specified program.
+    """
+
+    logic = params['logic']
+    program = logic.getFromKeyFieldsOr404(kwargs)
+
+    dynafields = []
+    difficulties = TaskDifficultyTag.get_by_scope(program)
+
+    ranking_schema = program.getRankingSchema()
+
+    for difficulty in difficulties:
+      dynafields.append({
+          'name': difficulty.tag,
+          'base': forms.IntegerField,
+          'min_value': 0,
+          'initial': int(ranking_schema.get(difficulty.tag, 0)),
+          'required': False,
+          'group': ugettext('Difficulty'),
+          'help_text': ugettext('Number of points for this difficulty level.'),
+          })
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+    
+    form = dynaform.newDynaForm(dynamodel=None, 
+        dynabase=helper.forms.BaseForm, dynainclude=None, 
+        dynaexclude=None, dynaproperties=dynaproperties)
+
+    context = responses.getUniversalContext(request)
+
+    if request.method == 'GET':
+      return self.rankingSchemaGet(request, context, form, params)
+    else:
+      # request.method == 'POST'
+      return self.rankingSchemaPost(request, context, params, program,
+          form, **kwargs)
+
+  def rankingSchemaGet(self, request, context, form, params):
+    """Handles the GET request for the ranking schema view.
+    """
+
+    context['form'] = form()
+    context['page_name'] = 'Edit ranking schema'
+    
+    template = params['edit_template']
+    
+    return responses.respond(request, template, context=context)
+
+  def rankingSchemaPost(self, request, context, params, program, form,
+                        **kwargs):
+    """Handles the POST request for the ranking schema view.
+    """
+
+    post_dict = request.POST
+
+    # populate the form using the POST data
+    form = form(post_dict)
+    
+    if not form.is_valid():
+      return self._constructResponse(request, entity=program, context=context,
+          form=form, params=params, template=params['edit_template'])
+
+    # update ranking_schema with new values
+    ranking_schema = program.getRankingSchema()
+
+    fields = form.cleaned_data
+    for key, value in fields.iteritems():
+      ranking_schema[key] = value
+
+    program.setRankingSchema(ranking_schema)
+    program.put()
+
+    # redirect to the same page
+    return http.HttpResponseRedirect('')
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listRanking(self, request, access_type,
+                  page_name=None, params=None, **kwargs):
+    """Shows the delete page for the entity specified by **kwargs.
+
+    Args:
+      request: the standard Django HTTP request object
+      access_type : the name of the access type which should be checked
+      page_name: the page name displayed in templates as page and header title
+      params: a dict with params for this View
+      kwargs: the Key Fields for the specified entity
+    """
+
+    from soc.modules.gci.views.models.student_ranking import view as ranking_view
+
+    logic = params['logic']
+    program = logic.getFromKeyFieldsOr404(kwargs)
+
+    list_params = ranking_view.getParams().copy()
+
+    list_params['list_description'] = self.DEF_LIST_RANKING_MSG_FMT % (
+        program.name)
+
+    list_params['public_field_keys'] = ["points"]
+    list_params['public_field_names'] = ["Points"]
+    list_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+        }
+
+    ranking_filter = {
+        'program': program
+        }
+
+    if lists.isDataRequest(request):
+      visibility = 'public'
+      order = ['-points']
+      args = []
+      contents = lists.getListData(request, params, ranking_filter,
+          visibility=visibility, order=order, args=args)
+      return lists.getResponse(request, contents)
+
+    contents = [lists.getListGenerator(request, list_params, idx=0)]
+
+    return self._list(request, list_params, contents=contents,
+        page_name=page_name)
 
 view = View()
 
@@ -854,7 +959,9 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
 list_tasks = decorators.view(view.listTasks)
+list_ranking = decorators.view(view.listRanking)
 public = decorators.view(view.public)
+ranking_schema = decorators.view(view.rankingSchema)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
 difficulty_tag_edit = decorators.view(view.difficultyTagEdit)

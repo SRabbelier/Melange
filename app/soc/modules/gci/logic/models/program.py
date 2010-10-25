@@ -50,21 +50,4 @@ class Logic(program.Logic):
                                 scope_logic=scope_logic,
                                 timeline_logic=timeline_logic)
 
-  def createRankingForType(self, fields):
-    """Creates a default ranking entity for a GCI program.
-    """
-
-    key_name = gci_ranking_logic.logic.getKeyNameFromFields(fields)
-
-    properties = {
-        'link_id': fields['link_id'],
-        'scope_path': fields['scope_path'],
-        'scope': fields['scope'],
-        }
-
-    ranking = gci_ranking_logic.logic.updateOrCreateFromKeyName(properties,
-        key_name)
-
-    return ranking
-
 logic = Logic()

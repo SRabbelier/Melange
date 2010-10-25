@@ -24,6 +24,7 @@ __authors__ = [
 
 from google.appengine.ext import db
 
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 import soc.models.program
@@ -74,8 +75,20 @@ class GCIProgram(soc.models.program.Program):
   task_types.help_text = ugettext(
       'List all the types a task can be in.')
 
-  #: A Ranking entity which describes how to rank student participants
-  ranking = db.ReferenceProperty(
-      reference_class=soc.modules.gci.models.ranking.GCIRanking,
-      required=False, collection_name="program",
-      verbose_name=ugettext('Ranking'))
+  #: JSON representation of how the ranking should be calculated
+  ranking_schema = db.StringProperty(default='{}')
+
+  def getRankingSchema(self):
+    """Returns decoded ranking_schema for the program.
+    """
+
+    if not self.ranking_schema:
+      return {}
+
+    return simplejson.loads(self.ranking_schema)
+
+  def setRankingSchema(self, ranking_schema):
+    """Sets ranking_schema for the program.
+    """
+
+    self.ranking_schema = simplejson.dumps(ranking_schema)

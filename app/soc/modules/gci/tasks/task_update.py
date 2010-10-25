@@ -35,6 +35,8 @@ from soc.logic import system
 from soc.tasks.helper import error_handler
 from soc.views.helper import redirects
 
+from soc.modules.gci.logic.models import student_ranking \
+    as gci_student_ranking_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 
 
@@ -275,6 +277,8 @@ def updateTasksPostStudentSignUp(request, *args, **kwargs):
               '(The Melange Automated System has detected that the student '
               'has signed up for the program and hence has closed this task.'),
           }
+
+      gci_student_ranking_logic.logic.updateRanking(task)
 
       gci_task_logic.logic.updateEntityPropertiesWithCWS(
           task_entity, properties, comment_properties)

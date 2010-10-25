@@ -53,6 +53,8 @@ from soc.modules.gci.logic import cleaning as gci_cleaning
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
+from soc.modules.gci.logic.models import student_ranking \
+    as gci_student_ranking_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access
@@ -1269,6 +1271,7 @@ class View(base.View):
         if entity.student:
           properties['status'] = 'Closed'
           properties['closed_on'] = datetime.datetime.utcnow()
+          gci_student_ranking_logic.logic.updateRanking(entity)
         else:
           properties['status'] = 'AwaitingRegistration'
 

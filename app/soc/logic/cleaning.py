@@ -797,11 +797,11 @@ def validate_student(program_logic):
 
       if birth_date > min_date:
         # this Student is not old enough
-        self._errors[birth_date_field] = ErrorList(
+        self._errors['birth_date'] = ErrorList(
             [DEF_MUST_BE_ABOVE_AGE_LIMIT_FMT %(
             entity.student_min_age,
             entity.student_min_age_as_of.strftime('%A, %B %d, %Y'))])
-        del cleaned_data[birth_date_field]
+        del cleaned_data['birth_date']
 
     return cleaned_data
   return wrapper

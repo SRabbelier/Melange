@@ -924,8 +924,8 @@ class View(program.View):
     list_params['list_description'] = self.DEF_LIST_RANKING_MSG_FMT % (
         program.name)
 
-    list_params['public_field_keys'] = ["points"]
-    list_params['public_field_names'] = ["Points"]
+    list_params['public_field_keys'] = ["student", "points"]
+    list_params['public_field_names'] = ["Student", "Points"]
     list_params['public_conf_extra'] = {
         "rowNum": -1,
         "rowList": [],
@@ -936,11 +936,7 @@ class View(program.View):
         }
 
     if lists.isDataRequest(request):
-      visibility = 'public'
-      order = ['-points']
-      args = []
-      contents = lists.getListData(request, params, ranking_filter,
-          visibility=visibility, order=order, args=args)
+      contents = lists.getListData(request, list_params, ranking_filter)
       return lists.getResponse(request, contents)
 
     contents = [lists.getListGenerator(request, list_params, idx=0)]

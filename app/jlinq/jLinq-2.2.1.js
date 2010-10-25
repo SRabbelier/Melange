@@ -348,7 +348,7 @@ var jLinq;
 				    records.sort(function(a,b) {
 			            a = a[field];
 			            b = b[field];
-				if (_s.state.ignoreCase) {
+				if (_s.state.ignoreCase && (_s.helper.type(a) == "string" && _s.helper.type(b) == "string")) {
                                   a = a.toLowerCase();
                                   b = b.toLowerCase();
                                 }

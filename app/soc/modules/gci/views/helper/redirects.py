@@ -107,3 +107,10 @@ def getRankingSchemaEditRedirect(entity, params):
 
   return '/%s/ranking_schema/%s' % (
       params['url_name'], entity.key().id_or_name())
+
+def getShowRankingRedirect(entity, params):
+  """Returns show ranking redirect for the given program.
+  """
+
+  return '/%s/show_ranking/%s' % (
+      params['url_name'], entity.key().id_or_name())

@@ -125,7 +125,7 @@ class View(program.View):
          '__all__', gci_program_logic.logic])]
     rights['ranking_schema'] = [('checkIsHostForProgram',
         [gci_program_logic.logic])]
-    rights['list_ranking'] = ['allow']
+    rights['show_ranking'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.program.logic
@@ -165,8 +165,8 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>ranking_schema)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.ranking_schema',
          'Edit ranking schema'),
-        (r'^%(url_name)s/(?P<access_type>list_ranking)/%(key_fields)s$',
-         '%(module_package)s.%(module_name)s.list_ranking',
+        (r'^%(url_name)s/(?P<access_type>show_ranking)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.show_ranking',
          'Show ranking'),
         ]
 
@@ -392,6 +392,12 @@ class View(program.View):
     items = []
 
     timeline_entity = gci_program_entity.timeline
+
+    # add show ranking item
+    if timeline_helper.isAfterEvent(timeline_entity, 'tasks_publicly_visible'):
+      items += [(gci_redirects.getShowRankingRedirect(
+           gci_program_entity, {'url_name': 'gci/program'}),
+           'Show Ranking', 'any_access')]
 
     mentor_entity = None
     org_admin_entity = None
@@ -902,7 +908,7 @@ class View(program.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def listRanking(self, request, access_type,
+  def showRanking(self, request, access_type,
                   page_name=None, params=None, **kwargs):
     """Shows the delete page for the entity specified by **kwargs.
 
@@ -955,9 +961,9 @@ edit = decorators.view(view.edit)
 list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
 list_tasks = decorators.view(view.listTasks)
-list_ranking = decorators.view(view.listRanking)
 public = decorators.view(view.public)
 ranking_schema = decorators.view(view.rankingSchema)
+show_ranking = decorators.view(view.showRanking)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
 difficulty_tag_edit = decorators.view(view.difficultyTagEdit)

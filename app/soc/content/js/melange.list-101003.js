@@ -512,7 +512,7 @@
     }
 
     if (temp_data.length > 0) {
-      temp_data = jLinq.from(temp_data).orderBy(order_type + sort_column).select();
+      temp_data = jLinq.from(temp_data).ignoreCase().orderBy(order_type + sort_column).select();
     }
     list_objects.get(my_index).data.filtered_data = temp_data;
 

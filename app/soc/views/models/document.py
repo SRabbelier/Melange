@@ -52,7 +52,7 @@ class View(base.View):
     rights = access.Checker(params)
     rights['any_access'] = ['allow']
     rights['show'] = ['checkIsDocumentReadable']
-    rights['create'] = ['checkIsUser']
+    rights['create'] = [('checkIsUserSelf', 'scope_path')]
     rights['edit'] = ['checkIsDocumentWritable']
     rights['delete'] = ['checkIsDocumentWritable']
     rights['list'] = ['checkDocumentList']

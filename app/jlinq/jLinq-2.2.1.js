@@ -348,6 +348,10 @@ var jLinq;
 				    records.sort(function(a,b) {
 			            a = a[field];
 			            b = b[field];
+				if (_s.state.ignoreCase) {
+                                  a = a.toLowerCase();
+                                  b = b.toLowerCase();
+                                }
                         return (a < b) ? -1 : (a > b) ? 1 : 0;
                     });
                     if (desc) { records.reverse(); }

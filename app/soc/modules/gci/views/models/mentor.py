@@ -22,7 +22,6 @@ __authors__ = [
   ]
 
 
-from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -30,7 +29,6 @@ from soc.logic.models import user as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
-from soc.views.helper import responses
 from soc.views.models import mentor
 
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic

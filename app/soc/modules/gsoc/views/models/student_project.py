@@ -469,7 +469,6 @@ class View(base.View):
 
     import soc.logic.lists
 
-    from soc.modules.gsoc.views.helper import list_info
     from soc.modules.gsoc.views.models.grading_project_survey import view as \
         grading_survey_view
     from soc.modules.gsoc.views.models.project_survey import view as \

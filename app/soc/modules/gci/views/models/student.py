@@ -24,7 +24,6 @@ __authors__ = [
   ]
 
 
-from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -32,7 +31,6 @@ from soc.logic.models import user as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
-from soc.views.helper import responses
 from soc.views.models import student
 
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
@@ -85,7 +83,6 @@ class View(student.View):
         ('checkCanOpenTaskList', [gci_student_logic.logic, 'gci/student']),
         ('checkIsAfterEvent', ['student_signup_start',
                                'scope_path', gci_program_logic.logic])]
-
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.student.logic

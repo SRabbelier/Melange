@@ -42,6 +42,10 @@ from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 
 
+DEF_ALREADY_CLAIMED_A_TASK = ugettext(
+    'You have already claimed a task and can therefore not become a mentor '
+    'or org admin.')
+
 DEF_CANT_EDIT_MSG = ugettext(
     'This task cannot be edited since it has been claimed at least '
     'once before.')
@@ -72,8 +76,8 @@ DEF_NO_TASKS_AFFILIATED = ugettext(
     'There are no tasks affiliated to you.')
 
 DEF_UNEXPECTED_ERROR = ugettext(
-  'An unexpected error occurred please file an issue report, make sure you '
-  'note the URL.')
+    'An unexpected error occurred please file an issue report, make sure you '
+    'note the URL.')
 
 class GCIChecker(access.Checker):
   """See soc.views.helper.access.Checker.
@@ -364,3 +368,24 @@ class GCIChecker(access.Checker):
                                     'scope_path', gci_program_logic.logic)
     # no right status set, but we can't give the user access
     raise out_of_band.AccessViolation(message_fmt=DEF_UNEXPECTED_ERROR)
+
+
+  def checkIsNotStudentForProgramOfOrg(self, django_args, org_logic,
+                                       student_logic):
+    """Extends the basic with one that checks whether the current user has
+    claimed a task in the program.
+
+    Args:
+        See Checker.checkIsNotStudentForProgramOfOrg().
+    """
+    org_entity = super(GCIChecker, self).checkIsNotStudentForProgramOfOrg(
+        django_args, org_logic, student_logic)
+
+    fields = {
+        'user': self.user,
+        'program': org_entity.scope
+        }
+    if gci_task_logic.logic.getForFields(fields, unique=True):
+      raise out_of_band.AccessViolation(message_fmt=DEF_ALREADY_CLAIMED_A_TASK)
+
+    return org_entity

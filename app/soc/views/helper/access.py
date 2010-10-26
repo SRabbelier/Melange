@@ -1332,6 +1332,9 @@ class Checker(object):
       org_logic: Organization logic instance
       student_logic: Student logic instance
 
+    Returns:
+      Organization entity present in the scope_path.
+
      Raises:
        AccessViolationResponse: if the current user is a student for the
                                 program the organization is in.
@@ -1355,7 +1358,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(
           message_fmt=DEF_ALREADY_STUDENT_ROLE_MSG)
 
-    return
+    return org_entity
 
   def checkIsNotStudentForProgramOfOrgInRequest(self, django_args, org_logic,
                                                 student_logic):

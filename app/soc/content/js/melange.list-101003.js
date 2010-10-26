@@ -1097,9 +1097,9 @@
               jQuery.each(_self.data.all_data, function (item_index, item) {
                 if (item.operations !== undefined && item.operations.row !== undefined && item.operations.row.link !== undefined) {
                   jQuery.each(item.columns, function (column_name, column_content) {
-                    // If there are no links in the text then insert a noul link
+                    // If there are no links in the text then insert a listsnoul link
                     if (column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
-                      var new_column_content = '<a style="display:block;" href="' + item.operations.row.link + '" class="noul">' + column_content + '</a>';
+                      var new_column_content = '<a style="display:block;" href="' + item.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
                       _self.data.all_data[item_index].columns[column_name] = new_column_content;
                     }
                   });
@@ -1152,8 +1152,8 @@
                       }
                       var field_text = cell_value.toString();
 
-                      // If there was a surrounding link (with class noul, so just link for rows)
-                      if (jQuery(field_text).parent().find("a.noul").length) {
+                      // If there was a surrounding link (with class listsnoul, so just link for rows)
+                      if (jQuery(field_text).parent().find("a.listsnoul").length) {
                         // strip the surrounding link from the text
                         var extracted_text = /<a\b[^>]*>(.*?)<\/a>/.exec(field_text);
                         field_text = extracted_text[1];

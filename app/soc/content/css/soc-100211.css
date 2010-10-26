@@ -117,6 +117,19 @@ a:visited.noul {
   color: #a32a91; /* #2a55a3; */
 }
 
+a.listsnoul {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover.listsnoul {
+  text-decoration: underline;
+}
+
+a:visited.listsnoul {
+  color: black;
+  text-decoration: none;
+}
 
 /* Styles used by Django Forms */
 ul.errorlist {

@@ -59,6 +59,15 @@ def startUpdatingTask(task):
       }
   responses.startTask(url, queue_name, context)
 
+def startClearingTask(key_name):
+  """Starts a new task which clears all ranking entities for the program
+  specified by the given key_name.
+  """
+
+  url = '/tasks/gci/ranking/clear/%s' % key_name
+  queue_name = 'gci-update'
+  responses.startTask(url, queue_name)
+  
 def updateGCIRanking(request, *args, **kwargs):
   """Updates student ranking based on the task passed as post argument.
   """

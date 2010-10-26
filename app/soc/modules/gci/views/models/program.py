@@ -54,6 +54,7 @@ from soc.modules.gci.logic.models import student as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gci.models import task as gci_task_model
+from soc.modules.gci.tasks import ranking_update
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.helper import redirects as gci_redirects
 
@@ -901,12 +902,20 @@ class View(program.View):
     # update ranking_schema with new values
     ranking_schema = program.getRankingSchema()
 
+    # for now, the code below assumes that difficulties are not modified
     fields = form.cleaned_data
+    has_changed = False
     for key, value in fields.iteritems():
-      ranking_schema[key] = value
+      if ranking_schema[key] != value:
+        ranking_schema[key] = value
+        has_changed = True
 
-    program.setRankingSchema(ranking_schema)
-    program.put()
+    if has_changed:
+      program.setRankingSchema(ranking_schema)
+      program.put()
+
+      # ranking is modified, hence all data should be cleared
+      ranking_update.startClearingTask(program.key().id_or_name())
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

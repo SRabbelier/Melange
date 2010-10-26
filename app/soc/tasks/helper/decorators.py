@@ -54,11 +54,12 @@ def task(func):
   return wrapper
 
 
-def iterative_task(logic, **task_default):
+def iterative_task(logic, repeat_in=None, **task_default):
   """Iterative wrapper method
 
   Args:
     logic: the Logic instance to get entities for
+    repeat_in: the task will be executed again t seconds after completion
     task_default: keyword arguments which can contain the following options:
       fields: dictionary to filter the entities on
       start_key: the default key where to start this iterative task
@@ -116,6 +117,12 @@ def iterative_task(logic, **task_default):
         context.update({'start_key': next_start_key})
 
         task_responses.startTask(url=request.path, context=context)
+      elif repeat_in is not None:
+        # the task will be executed again after repeat_in seconds
+        context.update({'start_key': 0})
+
+        task_responses.startTask(url=request.path, countdown=repeat_in,
+            context=context)
 
       return task_responses.terminateTask()
 

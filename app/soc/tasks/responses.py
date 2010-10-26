@@ -41,12 +41,13 @@ class FatalTaskError(Error):
   pass
 
 
-def startTask(url, queue_name='default', context=None, **kwargs):
-  """Adds a new task to one of the queues.
+def startTask(url, queue_name='default', context=None, countdown=0, **kwargs):
+  """Adds a new task to the specified task queue.
   """
 
   queue = taskqueue.Queue(name=queue_name)
-  return queue.add(taskqueue.Task(url=url, params=context))
+  return queue.add(taskqueue.Task(url=url, countdown=countdown,
+      params=context))
 
 
 def terminateTask():

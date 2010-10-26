@@ -35,6 +35,6 @@ class GCIStudentRanking(soc.models.linkable.Linkable):
   points = db.IntegerProperty(required=True,
      verbose_name=('Points'), default=0)
 
-  #: program entity that the ranking refers to
-  program = db.ReferenceProperty(reference_class=soc.models.program.Program,
+  #: student entity that the ranking refers to
+  student = db.ReferenceProperty(reference_class=soc.models.student.Student,
                                  required=True)

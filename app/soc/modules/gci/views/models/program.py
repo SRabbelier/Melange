@@ -936,9 +936,12 @@ class View(program.View):
         "rowNum": -1,
         "rowList": [],
         }
+    list_params['public_row_extra'] = lambda entity, *args: {
+        'link': gci_redirects.getShowRankingDetails(entity, list_params)
+        }
 
     ranking_filter = {
-        'program': program
+        'scope': program
         }
 
     if lists.isDataRequest(request):

@@ -37,7 +37,7 @@ class Logic(base.Logic):
   def __init__(self, 
                model=soc.modules.gci.models.student_ranking.GCIStudentRanking,
                base_model=soc.models.linkable.Linkable,
-               scope_logic=soc.modules.gci.logic.models.student):
+               scope_logic=soc.modules.gci.logic.models.program):
     """Defines the name, key_name and model for this entity.
     """
 
@@ -52,9 +52,9 @@ class Logic(base.Logic):
     # all important fields are the same as for the student
     properties = {
         'link_id': student.link_id,
-        'scope': student,
+        'scope': student.scope,
         'scope_path': student.scope_path,
-        'program': student.scope,
+        'student': student,
         }
 
     return self.updateOrCreateFromFields(properties)
@@ -82,6 +82,5 @@ class Logic(base.Logic):
         }
 
     self.updateEntityProperties(entity, properties)
-
 
 logic = Logic()

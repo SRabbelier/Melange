@@ -32,6 +32,7 @@ from soc.modules.gci.views.models import org_admin
 from soc.modules.gci.views.models import org_app_survey
 from soc.modules.gci.views.models import program
 from soc.modules.gci.views.models import student
+from soc.modules.gci.views.models import student_ranking
 from soc.modules.gci.views.models import task
 from soc.modules.gci.views.models import task_subscription
 from soc.modules.gci.views.models import timeline
@@ -62,6 +63,7 @@ class Callback(object):
     self.core.registerSitemapEntry(org_app_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(student_ranking.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(task.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(
         task_subscription.view.getDjangoURLPatterns())

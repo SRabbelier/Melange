@@ -1,0 +1,43 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block body %}
+{% block instructions %}
+Ranking details for student.
+{% endblock %}
+
+<table>
+	<tr>
+        <th>Task</th>
+        <th>Organization</th>
+        <th>Date completed</th>
+    </tr>
+	{% for task in tasks %}
+	<tr>
+		<td>{{ task.title }}</td>
+		<td>{{ task.scope.name }}</td>
+		<td>{{ task.closed_on }}</td>
+		<td>{{ task.points }}
+	</tr>
+	{% endfor %}
+	<tr>
+	    <td>Total</td>
+	    <td>&nbsp</td>
+	    <td>&nbsp</td>
+	    <td>{{ total }}</td>
+	</tr>
+</table>
+
+{% endblock %}

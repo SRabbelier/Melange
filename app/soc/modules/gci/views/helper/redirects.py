@@ -114,3 +114,10 @@ def getShowRankingRedirect(entity, params):
 
   return '/%s/show_ranking/%s' % (
       params['url_name'], entity.key().id_or_name())
+
+def getShowRankingDetails(entity, params):
+  """Returns show ranking details redirect for the given entity.
+  """
+
+  return '/%s/show_details/%s' % (
+      params['url_name'], entity.key().id_or_name())

@@ -278,7 +278,7 @@ def updateTasksPostStudentSignUp(request, *args, **kwargs):
               'has signed up for the program and hence has closed this task.'),
           }
 
-      gci_student_ranking_logic.logic.updateRanking(task)
+      gci_student_ranking_logic.logic.updateRanking(task_entity)
 
       gci_task_logic.logic.updateEntityPropertiesWithCWS(
           task_entity, properties, comment_properties)

@@ -1098,7 +1098,7 @@
                 if (item.operations !== undefined && item.operations.row !== undefined && item.operations.row.link !== undefined) {
                   jQuery.each(item.columns, function (column_name, column_content) {
                     // If there are no links in the text then insert a listsnoul link
-                    if (column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
+                    if (column_content !== null && column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
                       var new_column_content = '<a style="display:block;" href="' + item.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
                       _self.data.all_data[item_index].columns[column_name] = new_column_content;
                     }

@@ -167,7 +167,7 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
   #: to assign a Mentor upon task creation.
   mentors = db.ListProperty(item_type=db.Key, default=[])
 
-  #: User profile to whom this task has been claimed by. This field
+  #: User profile by whom this task has been claimed by. This field
   #: is mandatory for claimed tasks
   user = db.ReferenceProperty(reference_class=soc.models.user.User,
                               required=False,

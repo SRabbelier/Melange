@@ -1048,7 +1048,7 @@
               }
 
               //Add row action if present
-              var multiselect = _self.jqgrid.object.jqGrid('getGridParam','multiselect');
+              /*var multiselect = _self.jqgrid.object.jqGrid('getGridParam','multiselect');
               if (_self.operations !== undefined && _self.operations.row !== undefined && !isEmptyObject(_self.operations.row)) {
 
                 // if row action is present, than change cursor
@@ -1077,11 +1077,11 @@
                 }
                 // associate action to row
                 _self.jqgrid.object.jqGrid('setGridParam',{
-                  onCellSelect: function (row_number, cell_index, cell_content, event) {
+                  onCellSelect: function (row_number, cell_index, cell_content, event) {*/
                     /* If this is a multiselect table, do not trigger row action
                        if user clicks on a checkbox in the first column
                     */
-                    if (multiselect && cell_index == 0) {
+                    /*if (multiselect && cell_index == 0) {
                       return;
                     }
                     // get current selection
@@ -1091,7 +1091,21 @@
                     partial_row_method(object.operations.row.link, event)();
                   }
                 });
-              }
+              }*/
+
+              //Add hidden links for each cell content to preserve browser behavior
+              jQuery.each(_self.data.all_data, function (item_index, item) {
+                if (item.operations !== undefined && item.operations.row !== undefined && item.operations.row.link !== undefined) {
+                  jQuery.each(item.columns, function (column_name, column_content) {
+                    // If there are no links in the text then insert a listsnoul link
+                    if (column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
+                      var new_column_content = '<a style="display:block;" href="' + item.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
+                      _self.data.all_data[item_index].columns[column_name] = new_column_content;
+                    }
+                  });
+                }
+              });
+              _self.jqgrid.object.trigger("reloadGrid");
 
               //Add CSV Export button and RegEx switch only once all data is loaded
 
@@ -1137,6 +1151,14 @@
                         cell_value = "";
                       }
                       var field_text = cell_value.toString();
+
+                      // If there was a surrounding link (with class listsnoul, so just link for rows)
+                      if (jQuery(field_text).parent().find("a.listsnoul").length) {
+                        // strip the surrounding link from the text
+                        var extracted_text = /<a\b[^>]*>(.*?)<\/a>/.exec(field_text);
+                        field_text = extracted_text[1];
+                      }
+
                       // Check for &quot;, which is translated to " when output to textarea
                       field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");
 

@@ -369,6 +369,11 @@ class View(program.View):
         items += [(gci_redirects.getTaskTypeEditRedirect(
             entity, {'url_name': 'gci/program'}),
             "Edit Task Type Tags", 'any_access')]
+        # add link to edit Ranking Schema
+        items += [(gci_redirects.getRankingSchemaEditRedirect(
+            entity, {'url_name': 'gci/program'}),
+            "Edit Ranking Schema", 'any_access')]
+        
 
       except out_of_band.Error:
         pass

@@ -24,8 +24,6 @@ __authors__ = [
 
 
 from django import forms
-from django import http
-from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -34,7 +32,6 @@ from soc.logic.models import user as user_logic
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import presence
 from soc.views.models import document as document_view
@@ -83,22 +80,28 @@ class View(presence.View):
     new_params['public_template'] = 'soc/group/public.html'
 
     new_params['create_extra_dynaproperties'] = {
-       'email': forms.fields.EmailField(required=True),
-       'clean_phone': cleaning.clean_phone_number('phone'),
-       'clean_contact_street': cleaning.clean_ascii_only('contact_street'),
-       'clean_contact_street_extra': cleaning.clean_ascii_only(
-                                         'contact_street_extra'),
-       'clean_contact_city': cleaning.clean_ascii_only('contact_city'),
-       'clean_contact_state': cleaning.clean_ascii_only('contact_state'),
-       'clean_contact_postalcode': cleaning.clean_ascii_only(
-          'contact_postalcode'),
-       'clean_shipping_street': cleaning.clean_ascii_only('shipping_street'),
-       'clean_shipping_street_extra': cleaning.clean_ascii_only(
-                                          'shipping_street_extra'),
-       'clean_shipping_city': cleaning.clean_ascii_only('shipping_city'),
-       'clean_shipping_state': cleaning.clean_ascii_only('shipping_state'),
-       'clean_shipping_postalcode': cleaning.clean_ascii_only(
-          'shipping_postalcode'),
+        'email': forms.fields.EmailField(required=True),
+        'clean_phone': cleaning.clean_phone_number('phone'),
+        'clean_contact_street':
+            cleaning.clean_valid_shipping_chars('contact_street'),
+        'clean_contact_street_extra':
+            cleaning.clean_valid_shipping_chars('contact_street_extra'),
+        'clean_contact_city':
+            cleaning.clean_valid_shipping_chars('contact_city'),
+        'clean_contact_state':
+            cleaning.clean_valid_shipping_chars('contact_state'),
+        'clean_contact_postalcode':
+            cleaning.clean_valid_shipping_chars('contact_postalcode'),
+        'clean_shipping_street':
+            cleaning.clean_valid_shipping_chars('shipping_street'),
+        'clean_shipping_street_extra':
+            cleaning.clean_valid_shipping_chars('shipping_street_extra'),
+        'clean_shipping_city':
+            cleaning.clean_valid_shipping_chars('shipping_city'),
+        'clean_shipping_state':
+            cleaning.clean_valid_shipping_chars('shipping_state'),
+        'clean_shipping_postalcode':
+            cleaning.clean_valid_shipping_chars('shipping_postalcode'),
        }
 
     new_params['role_views'] = {}

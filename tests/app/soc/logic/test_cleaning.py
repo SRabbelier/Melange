@@ -306,13 +306,13 @@ class CleaningTest(unittest.TestCase):
     cleaned_data_after = clean_field(self.form)
     self.assertEqual(cleaned_data_after.email(), field_value)
 
-  def testCleanAsciiOnly(self):
-    """Tests that the ascii field can be cleaned.
+  def testCleanValidShippingChars(self):
+    """Tests that the shipping fields can be cleaned.
     """
     field_name = 'ascii'
-    clean_field = cleaning.clean_ascii_only(field_name)
-    # Test that the value will be returned if the value of field is valid ascii
-    field_value = 'ab12&*'
+    clean_field = cleaning.clean_valid_shipping_chars(field_name)
+    # Test that the value will be returned if the value of field is valid
+    field_value = 'ab12'
     self.form.cleaned_data = {field_name: field_value}
     self.assertEqual(clean_field(self.form), field_value)
     # Test that forms.ValidationError will be raised if the value of field

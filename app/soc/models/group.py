@@ -102,7 +102,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Street Address 1'))
   contact_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   contact_street.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing the 2nd group street address.
@@ -112,7 +112,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Street Address 2'))
   contact_street_extra.help_text = ugettext(
       '2nd address line usually used for apartment numbers, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   contact_street_extra.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing group address city.
@@ -121,7 +121,7 @@ class Group(soc.models.presence.Presence):
   contact_city = db.StringProperty(required=True,
       verbose_name=ugettext('City'))
   contact_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   contact_city.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing group address state or province.
@@ -131,7 +131,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('State/Province'))
   contact_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   contact_state.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing address country or territory of the group.
@@ -146,7 +146,7 @@ class Group(soc.models.presence.Presence):
   contact_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext('ZIP/Postal Code'))
   contact_postalcode.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'Only A-z, 0-9 and whitespace characters')
   contact_postalcode.group = ugettext("2. Contact Info (Private)")
 
   #: Required contact phone number that will be, amongst other uses,
@@ -171,7 +171,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Shipping Street Address 1'))
   shipping_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'only A-z, 0-9 and whitespace characters.'
       'Fill in only if you want the shipping address to differ from the '
       'contact address.')
   shipping_street.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -185,7 +185,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Shipping Street Address 2'))
   shipping_street_extra.help_text = ugettext(
       '2nd address line usually used for apartment numbers, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'only A-z, 0-9 and whitespace characters. '
       'Fill in only if you want the shipping address to differ from the '
       'contact address.')
   shipping_street_extra.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -196,7 +196,7 @@ class Group(soc.models.presence.Presence):
   shipping_city = db.StringProperty(required=False,
       verbose_name=ugettext('Shipping City'))
   shipping_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Only A-z, 0-9 and whitespace characters '
       'Fill in only if you want the shipping address to differ from the '
       'contact address.')
   shipping_city.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -208,7 +208,7 @@ class Group(soc.models.presence.Presence):
       verbose_name=ugettext('Shipping State/Province'))
   shipping_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'only A-z, 0-9 and whitespace characters '
       'Fill in only if you want the shipping address to differ from the '
       'contact address.')
   shipping_state.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -219,7 +219,7 @@ class Group(soc.models.presence.Presence):
   shipping_postalcode = db.StringProperty(required=False,
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
   shipping_postalcode.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'Only A-z, 0-9 and whitespace characters. '
       'Fill in only if you want the shipping address to differ from the '
       'contact address.')
   shipping_postalcode.group = ugettext("3. Shipping Info (Private and Optional)")

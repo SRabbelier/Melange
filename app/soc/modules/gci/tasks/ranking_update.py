@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from soc.logic.helper import timeline as timeline_helper
+
 from soc.tasks import responses
 from soc.tasks.helper import decorators
 
@@ -105,6 +107,11 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
     for task in tasks:
       if not ranking or task.key() not in ranking.tasks:
         gci_student_ranking_logic.updateRanking(task)
+
+    # this task should not be repeated after the program is over
+    timeline = program.timeline
+    if timeline_helper.isAfterEvent(timeline, 'program_end'):
+      raise DoNotRepeatException()
 
 @decorators.iterative_task(gci_student_ranking_logic)
 def clearGCIRanking(request, entities, context, *args, **kwargs):

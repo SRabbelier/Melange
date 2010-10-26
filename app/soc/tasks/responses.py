@@ -40,6 +40,11 @@ class FatalTaskError(Error):
   """
   pass
 
+class DoNotRepeatException(Exception):
+  """The exception that should be raised if the task should not be repeated
+  anymore. This type does not have to indicate that something wrong happened.
+  """
+  pass
 
 def startTask(url, queue_name='default', context=None, countdown=0, **kwargs):
   """Adds a new task to the specified task queue.

@@ -101,8 +101,13 @@ def iterative_task(logic, repeat_in=None, **task_default):
       # copy the post_dict so that the wrapped function can edit what it needs
       context = post_dict.copy()
 
+      # when true, the iterative task will not be repeated when completed
+      do_not_repeat = False
+
       try:
         func(request, entities=entities, context=context, *args, **kwargs)
+      except task_responses.DoNotRepeatException, exception:
+        do_not_repeat = True
       except task_responses.FatalTaskError, error:
         logging.debug(post_dict)
         logging.error(error)
@@ -117,7 +122,7 @@ def iterative_task(logic, repeat_in=None, **task_default):
         context.update({'start_key': next_start_key})
 
         task_responses.startTask(url=request.path, context=context)
-      elif repeat_in is not None:
+      elif not do_not_repeat and repeat_in is not None:
         # the task will be executed again after repeat_in seconds
         context.update({'start_key': 0})
 

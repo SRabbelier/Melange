@@ -80,8 +80,13 @@ class Logic(base.Logic):
     #: update total number of points with new points for the task
     points += ranking_schema[difficulty]
 
+    #: append a new task to the list of the tasks that have been
+    tasks = entity.tasks
+    tasks.append(task.key())
+
     properties = {
-        'points': points
+        'points': points,
+        'tasks': tasks
         }
 
     self.updateEntityProperties(entity, properties)

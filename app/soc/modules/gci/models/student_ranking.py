@@ -38,3 +38,6 @@ class GCIStudentRanking(soc.models.linkable.Linkable):
   #: student entity that the ranking refers to
   student = db.ReferenceProperty(reference_class=soc.models.student.Student,
                                  required=True)
+
+  #: tasks that have been taken account into this ranking
+  tasks = db.ListProperty(item_type=db.Key, default=[])

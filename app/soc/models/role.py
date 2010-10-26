@@ -86,8 +86,7 @@ class Role(soc.models.linkable.Linkable):
   #: used, for example, as part of the shipping (mailing) address.
   given_name = db.StringProperty(required=True,
       verbose_name=ugettext('First (given) name'))
-  given_name.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+  given_name.help_text = ugettext('only A-z, 0-9 and whitespace characters')
   given_name.group = ugettext("1. Public Info")
 
   #: Required field storing the parts of the Role's name
@@ -97,8 +96,7 @@ class Role(soc.models.linkable.Linkable):
   surname = db.StringProperty(
       required=True,
       verbose_name=ugettext('Last (family) name'))
-  surname.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+  surname.help_text = ugettext('only A-z, 0-9 and whitespace characters')
   surname.group = ugettext("1. Public Info")
 
   #: Optional field used as a display name, such as for awards
@@ -186,7 +184,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Street Address 1'))
   res_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   res_street.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing the 2nd line for the residence street address;
@@ -197,7 +195,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Street Address 2'))
   res_street_extra.help_text = ugettext(
       '2nd address line usually for apartment numbers. '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   res_street_extra.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address city; kept private.
@@ -206,7 +204,7 @@ class Role(soc.models.linkable.Linkable):
   res_city = db.StringProperty(required=True,
       verbose_name=ugettext('City'))
   res_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   res_city.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing residence address state or province; kept
@@ -216,7 +214,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('State/Province'))
   res_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   res_state.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing residence address country or territory; kept
@@ -232,7 +230,7 @@ class Role(soc.models.linkable.Linkable):
   res_postalcode = db.StringProperty(required=True,
       verbose_name=ugettext('ZIP/Postal Code'))
   res_postalcode.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only')
+      'only A-z, 0-9 and whitespace characters')
   res_postalcode.group = ugettext("2. Contact Info (Private)")
 
   #: Required field containing a phone number that will be used to
@@ -279,7 +277,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping Street Address 1'))
   ship_street.help_text = ugettext(
       'street number and name, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'only A-z, 0-9 and whitespace characters. '
       'Fill in only if you want your shipping address to differ from your '
       'contact address.')
   ship_street.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -293,7 +291,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping Street Address 2'))
   ship_street_extra.help_text = ugettext(
       '2nd address line usually used for apartment numbers, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only. '
+      'only A-z, 0-9 and whitespace characters. '
       'Fill in only if you want your shipping address to differ from your '
       'contact address.')
   ship_street_extra.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -304,8 +302,8 @@ class Role(soc.models.linkable.Linkable):
   ship_city = db.StringProperty(
       verbose_name=ugettext('Shipping City'))
   ship_city.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
-      'fill in only if you want your shipping address to differ from your '
+      'Only A-z, 0-9 and whitespace characters. '
+      'Fill in only if you want your shipping address to differ from your '
       'contact address.')
   ship_city.group = ugettext("3. Shipping Info (Private and Optional)")
 
@@ -316,7 +314,7 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Shipping State/Province'))
   ship_state.help_text = ugettext(
       'optional if country/territory does not have states or provinces, '
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only '
+      'only A-z, 0-9 and whitespace characters. '
       'fill in only if you want your shipping address to differ from your '
       'contact address.')
   ship_state.group = ugettext("3. Shipping Info (Private and Optional)")
@@ -338,7 +336,7 @@ class Role(soc.models.linkable.Linkable):
   ship_postalcode = db.StringProperty(
       verbose_name=ugettext('Shipping ZIP/Postal Code'))
   ship_postalcode.help_text = ugettext(
-      '<a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> characters only'
+      'only A-z, 0-9 and whitespace characters,'
       'fill in only if not same as above')
   ship_postalcode.group = ugettext("3. Shipping Info (Private and Optional)")
 

@@ -40,7 +40,9 @@ def getDjangoURLPatterns():
       (r'^tasks/gci/ranking/update$',
         'soc.modules.gci.tasks.ranking_update.update'),
       (r'^tasks/gci/ranking/recalculate/(?P<key_name>.+)$',
-        'soc.modules.gci.tasks.ranking_update.recalculate')]
+        'soc.modules.gci.tasks.ranking_update.recalculate'),
+      (r'^tasks/gci/ranking/clear/(?P<key_name>.+)$',
+        'soc.modules.gci.tasks.ranking_update.clear')]
 
   return patterns
 
@@ -104,6 +106,26 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
       if not ranking or task.key() not in ranking.tasks:
         gci_student_ranking_logic.updateRanking(task)
 
+@decorators.iterative_task(gci_student_ranking_logic)
+def clearGCIRanking(request, entities, context, *args, **kwargs):
+  """Clears student ranking for a program with the specified key_name.
+  """
 
+  program = gci_program_logic.getFromKeyName(kwargs['key_name'])
+  if not program:
+    return responses.terminateTask()
+
+  for entity in entities:
+
+    # check if the entity refers to the program in scope
+    if entity.scope.key() != program.key():
+      continue
+
+    entity.points = 0
+    entity.tasks = []
+
+    entity.put()
+
+clear = clearGCIRanking
 recalculate = recalculateGCIRanking
 update = decorators.task(updateGCIRanking)

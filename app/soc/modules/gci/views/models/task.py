@@ -61,6 +61,7 @@ from soc.modules.gci.views.helper import access
 from soc.modules.gci.views.helper import redirects as gci_redirects
 from soc.modules.gci.views.models import organization as gci_org_view
 from soc.modules.gci.tasks import bulk_create as bulk_create_tasks
+from soc.modules.gci.tasks import ranking_update
 from soc.modules.gci.tasks import task_update
 import soc.modules.gci.logic.models.task
 
@@ -1139,6 +1140,7 @@ class View(base.View):
     properties = None
     ws_properties = None
     update_gae_task = False
+    update_student_ranking = False
 
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
@@ -1271,7 +1273,7 @@ class View(base.View):
         if entity.student:
           properties['status'] = 'Closed'
           properties['closed_on'] = datetime.datetime.utcnow()
-          gci_student_ranking_logic.logic.updateRanking(entity)
+          update_student_ranking = True
         else:
           properties['status'] = 'AwaitingRegistration'
 
@@ -1298,6 +1300,9 @@ class View(base.View):
 
     if update_gae_task:
       task_update.spawnUpdateTask(entity)
+
+    if update_student_ranking:
+      ranking_update.startUpdatingTask(entity)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

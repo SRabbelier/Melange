@@ -63,6 +63,9 @@ class Logic(base.Logic):
     """Updates ranking with the specified task.
     """
 
+    if not task:
+      return
+
     # get ranking schema for the program
     program = task.program
     ranking_schema = program.getRankingSchema()

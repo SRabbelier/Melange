@@ -25,6 +25,10 @@ __authors__ = [
 from soc.tasks import responses
 from soc.tasks.helper import decorators
 
+from soc.modules.gci.logic.models.student_ranking import logic \
+    as gci_student_ranking_logic
+from soc.modules.gci.logic.models.task import logic as gci_task_logic
+
 
 def getDjangoURLPatterns():
   """Returns the URL patterns for the tasks in this module.
@@ -36,16 +40,29 @@ def getDjangoURLPatterns():
 
   return patterns
 
-def updateGCIRanking(request, *args, **kwargs):
+def startUpdatingTask(task):
+  """Starts a new task which updates ranking entity for the specified task.
   """
+
+  url = '/tasks/gci/ranking/update'
+  queue_name = 'gci-update'
+  context = {
+      'task_keyname': task.key().id_or_name() 
+      }
+  responses.startTask(url, queue_name, context)
+
+def updateGCIRanking(request, *args, **kwargs):
+  """Updates student ranking based on the task passed as post argument.
   """
   
   post_dict = request.POST
-  
-  ranking = gci_ranking_logic.getFromKeyFields(post_dict)
 
-  gci_ranking_logic.updateRanking(ranking)
-  
+  task_keyname = post_dict.get('task_keyname')
+  if not task_keyname:
+    responses.terminateTask()
+
+  task = gci_task_logic.getFromKeyName(str(task_keyname))
+  gci_student_ranking_logic.updateRanking(task)
   
   return responses.terminateTask()
 

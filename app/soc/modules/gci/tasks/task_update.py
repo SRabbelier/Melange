@@ -32,12 +32,12 @@ from django import http
 from django.utils.translation import ugettext
 
 from soc.logic import system
+from soc.tasks import responses as task_reponses
 from soc.tasks.helper import error_handler
 from soc.views.helper import redirects
 
-from soc.modules.gci.logic.models import student_ranking \
-    as gci_student_ranking_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
+from soc.modules.gci.tasks import ranking_update
 
 
 DEF_TASK_UPDATE_SUBJECT_FMT = ugettext('[GCI Task Update] %(title)s')
@@ -278,10 +278,10 @@ def updateTasksPostStudentSignUp(request, *args, **kwargs):
               'has signed up for the program and hence has closed this task.'),
           }
 
-      gci_student_ranking_logic.logic.updateRanking(task_entity)
-
       gci_task_logic.logic.updateEntityPropertiesWithCWS(
           task_entity, properties, comment_properties)
+
+      ranking_update.startUpdatingTask(task_entity)
 
   db.put(task_entities)
 

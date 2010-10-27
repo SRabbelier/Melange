@@ -880,6 +880,7 @@ class View(program.View):
 
     context['form'] = form()
     context['page_name'] = 'Edit ranking schema'
+    context['entity_type'] = 'Ranking Schema'
 
     template = params['edit_template']
 

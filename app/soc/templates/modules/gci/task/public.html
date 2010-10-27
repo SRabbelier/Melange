@@ -21,9 +21,27 @@ limitations under the License.
 <script type="text/javascript">
 
   var showWorkSubmissionInput = function () {
-    $('[for^=id_work_submission]').show("normal");
-    $('#id_work_submission').show("normal");
-    $('td.formfielderror').show("normal");    
+    // Show work submission URL field
+    $('[for^=id_work_submission_external]').show("normal");
+    $('#id_work_submission_external').show("normal");
+
+    // Show work submission file upload field
+    $('[for^=id_work_submission_upload]').show("normal");
+    $('#id_work_submission_upload').show("normal");
+
+    $('td.formfielderror').show("normal");
+  };
+
+  var hideWorkSubmissionInput = function () {
+    // Hide work submission URL field
+    $('[for^=id_work_submission_external]').hide("normal");
+    $('#id_work_submission_external').hide("normal");
+
+    // Hide work submission file upload field
+    $('[for^=id_work_submission_upload]').hide("normal");
+    $('#id_work_submission_upload').hide("normal");
+
+    $('td.formfielderror').hide("normal");
   };
 
   var confirmation = function() {
@@ -36,21 +54,23 @@ limitations under the License.
   };
 
   $(document).ready(function(){
-	  if (!$('#id_work_submission').val()) {
-		  $('[for^=id_work_submission]').hide();
-		  $('#id_work_submission').hide();
-		}
-	$("#id_action > *[value='needs_review'][selected='true']").each(function () {
-	  showWorkSubmissionInput(); 
-	});
+    if (!$('#id_work_submission_external').val()) {
+      $('[for^=id_work_submission_external]').hide();
+      $('#id_work_submission_external').hide();
+      $('[for^=id_work_submission_upload]').hide();
+      $('#id_work_submission_upload').hide();
+  }
+
+  $("#id_action > *[value='needs_review'][selected='true']").each(function () {
+    showWorkSubmissionInput();
+  });
+
     $('#id_action').change(function() {
       if ($(this).val() == 'needs_review') {
         showWorkSubmissionInput();
       }
       else if ($(this).val() != 'needs_work'){
-        $('[for^=id_work_submission]').hide("normal");
-        $('#id_work_submission').hide("normal");
-        $('td.formfielderror').hide("normal");
+        hideWorkSubmissionInput();
       }
     });
 
@@ -174,7 +194,11 @@ Title: {{ entity.title }}
 {% if signin_comment_msg %}
   <h4>{{ signin_comment_msg|safe }}</h4>
 {% else %}
-<form method="POST">
+<form method="POST"
+    {% if blob_manage_url %}
+    action={{ blob_manage_url }}
+    enctype="multipart/form-data"
+    {% endif %}>
  <table>
    {% block form_table %}
      {% as_table comment_form %}

@@ -27,6 +27,7 @@ __authors__ = [
 import datetime
 import time
 
+from google.appengine.ext import blobstore
 from google.appengine.ext import db
 
 from django import forms
@@ -373,7 +374,8 @@ class View(base.View):
     dynaproperties = params_helper.getDynaFields(dynafields)
     dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
     dynaproperties['clean'] = gci_cleaning.cleanTaskComment(
-        'comment', 'action', 'work_submission')
+        'comment', 'action', 'work_submission_external',
+        'work_submission_upload')
 
     comment_form = dynaform.newDynaForm(dynamodel=None,
         dynabase=helper.forms.BaseForm, dynainclude=None,
@@ -1134,6 +1136,12 @@ class View(base.View):
 
     form = params['comment_form'](request.POST)
 
+    # we request to upload only one file as of now
+    # request.file_uploads is coming from the blobstore middleware
+    # TODO: Fix this once the appengine blobstore problem mentioned
+    # in issue in blobstore middleware is fixed.
+    form.data['work_submission_upload'] = request.file_uploads[0]
+
     if not form.is_valid():
       template = params['public_template']
       context['comment_form'] = form
@@ -1207,7 +1215,10 @@ class View(base.View):
           'org': entity.scope,
           'user': user_account,
           'information': fields['comment'],
-          'url_to_work': fields['work_submission'],
+          'url_to_work': fields['work_submission_external'],
+
+          # TODO (madhu): Fix it with BlobInfo
+          'upload_of_work': fields['work_submission_upload'],
           'submitted_on': datetime.datetime.now(),
           }
     elif validation == 'accept_claim':
@@ -1459,15 +1470,25 @@ class View(base.View):
          ]
 
       if validation == 'needs_review':
-        dynafields.append(
-            {'name': 'work_submission',
+        context['blob_manage_url'] = blobstore.create_upload_url(
+            redirects.getPublicRedirect(entity, params))
+        dynafields.extend([
+            {'name': 'work_submission_external',
              'base': forms.URLField,
-             'label': 'Submit Work',
+             'label': 'Submit URL',
              'required': False,
              'help_text': 'Provide a link to your work in this box. '
                  'Please use the comment box if you need to explain '
                  'of your work.',
-             })
+             },
+            {'name': 'work_submission_upload',
+             'base': forms.FileField,
+             'label': 'Submit Work',
+             'required': False,
+             'help_text': 'Directly upload your work. It should be a single '
+                 'file. In case you have multiple files create an archive '
+                 'containing those files upload them.',
+              }])
 
       if validation == 'close':
         dynafields.append(
@@ -1484,8 +1505,8 @@ class View(base.View):
 
       dynaproperties = params_helper.getDynaFields(dynafields)
       if validation == 'needs_review':
-        dynaproperties['clean_work_submission'] = cleaning.clean_url(
-            'work_submission')
+        dynaproperties['clean_work_submission_external'] = cleaning.clean_url(
+            'work_submission_external')
 
       extended_comment_form = dynaform.extendDynaForm(
           dynaform=params['comment_form'],

@@ -23,6 +23,7 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import blobstore
 from google.appengine.ext import db
 
 from django.utils.translation import ugettext
@@ -68,6 +69,12 @@ class GCIWorkSubmission(soc.models.base.ModelWithFieldAttributes):
       required=False, verbose_name=ugettext('URL to your Work'))
   url_to_work.help_text = ugettext(
       'URL to a resource containing your work or more information about it')
+
+  #: Property pointing to the work uploaded as a file or archive
+  upload_of_work = blobstore.BlobReferenceProperty(
+      required=False, verbose_name=ugettext('Upload of Work'))
+  upload_of_work.help_text = ugettext(
+      'Your work uploaded as a single file or as archive')
 
   #: Property containing the date when the work was submitted
   submitted_on = db.DateTimeProperty(required=True, auto_now_add=True,

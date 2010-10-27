@@ -124,7 +124,8 @@ def iterative_task(logic, repeat_in=None, **task_default):
         task_responses.startTask(url=request.path, context=context)
       elif not do_not_repeat and repeat_in is not None:
         # the task will be executed again after repeat_in seconds
-        context.update({'start_key': 0})
+        if 'start_key' in context:
+          del context['start_key']
 
         task_responses.startTask(url=request.path, countdown=repeat_in,
             context=context)

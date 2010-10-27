@@ -29,6 +29,7 @@ import time
 
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
+from google.appengine.runtime import apiproxy_errors
 
 from django import forms
 from django import http
@@ -1446,8 +1447,12 @@ class View(base.View):
          ]
 
       if validation == 'needs_review':
-        context['blob_manage_url'] = blobstore.create_upload_url(
-            redirects.getPublicRedirect(entity, params))
+        try:
+          context['blob_manage_url'] = blobstore.create_upload_url(
+              redirects.getPublicRedirect(entity, params))
+        except apiproxy_errors.FeatureNotEnabledError:
+          pass
+
         dynafields.extend([
             {'name': 'work_submission_external',
              'base': forms.URLField,

@@ -194,6 +194,10 @@ Title: {{ entity.title }}
 {% if signin_comment_msg %}
   <h4>{{ signin_comment_msg|safe }}</h4>
 {% else %}
+{% if not blob_manage_url %}
+  <h4>File upload is disabled because billing is not enabled.</h4>
+{% endif %}
+
 <form method="POST"
     {% if blob_manage_url %}
     action={{ blob_manage_url }}

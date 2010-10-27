@@ -276,16 +276,18 @@ class View(base.View):
     new_params['public_field_extra'] = lambda entity: {
         "org": entity.scope.name,
         "difficulty": entity.difficulty[0].tag,
+        "points": entity.program.getRankingSchema()[entity.difficulty[0].tag],
+        #"points": .ranking_schema['Easy'],
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
     }
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
-        "title", "org", "difficulty", "task_type",
+        "title", "org", "difficulty", "points", "task_type",
         "time_to_complete", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Organization", "Difficulty", "Type",
+        "Title", "Organization", "Difficulty", "Points", "Type",
         "Time To Complete (hours)", "Status", "Mentors",
     ]
 

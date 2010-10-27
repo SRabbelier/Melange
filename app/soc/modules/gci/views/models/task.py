@@ -1117,7 +1117,7 @@ class View(base.View):
     # request.file_uploads is coming from the blobstore middleware
     # TODO: Fix this once the appengine blobstore problem mentioned
     # in issue in blobstore middleware is fixed.
-    if hasattr(request, 'file_uploads'):
+    if hasattr(request, 'file_uploads') and request.file_uploads:
       form.data['work_submission_upload'] = request.file_uploads[0]
 
     if not form.is_valid():

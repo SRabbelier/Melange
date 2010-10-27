@@ -1532,7 +1532,7 @@ class View(base.View):
       context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
       actions.extend([('needs_work', 'Needs More Work'),
                       ('reopened', 'Reopen the task'),
-                      ('closed', 'Close the task')])
+                      ('closed', 'Mark the task as complete')])
       validation = 'close'
     elif entity.status in ['AwaitingRegistration', 'Closed']:
       context['header_msg'] = self.DEF_TASK_CLOSED_MSG

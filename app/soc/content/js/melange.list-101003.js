@@ -536,7 +536,7 @@
       var my_cell = [];
       if (original_data[0] !== undefined) {
           jQuery.each(list_objects.get(my_index).configuration.colModel, function (element_key, element_value) {
-            var current_row = list_objects.get(my_index).data.all_data[i];
+            var current_row = jLinq.from(list_objects.get(my_index).data.all_data).equals("columns.key",temp_data[i]["key"]).select()[0];
             var column_content = temp_data[i][element_value.name];
             if (current_row.operations !== undefined && current_row.operations.row !== undefined && current_row.operations.row.link !== undefined) {
               // If there are no links in the text then insert a listsnoul link

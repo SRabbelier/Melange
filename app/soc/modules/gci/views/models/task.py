@@ -56,8 +56,6 @@ from soc.modules.gci.logic import cleaning as gci_cleaning
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
-from soc.modules.gci.logic.models import student_ranking \
-    as gci_student_ranking_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access
@@ -103,6 +101,9 @@ class View(base.View):
   DEF_TASK_CLAIMED_BY_STUDENT_MSG = ugettext(
       'This task has been claimed by a student!')
 
+  DEF_TASK_CLAIMED_REQUESTED_MSG = ugettext(
+      'A student has requested to claim this task and the request is pending.')
+
   DEF_TASK_CLAIMED_MSG = ugettext(
       'The task is already claimed and the work is in progress.')
 
@@ -146,7 +147,8 @@ class View(base.View):
       'you can claim it!')
 
   DEF_TASK_REQ_CLAIMED_BY_YOU_MSG = ugettext(
-      'You have requested to claim this task!')
+      "You have requested to claim this task and the request is pending. "
+      "Please don't submit any work until the request is approved.")
 
   DEF_TASK_UNPUBLISHED_MSG = ugettext(
       'The task is not yet published. It can be edited by clicking on '
@@ -162,7 +164,6 @@ class View(base.View):
     Params:
       params: a dict with params for this View
     """
-
     rights = access.GCIChecker(params)
     # TODO: create and suggest_task don't need access checks which use state
     # also feels like roles are being checked twice?
@@ -318,6 +319,11 @@ class View(base.View):
 
     super(View, self).__init__(params=params)
 
+    self._params['save_message'].append(ugettext(
+        'Successfully started processing your tasks, they should show up '
+        'shortly. Feel free to submit more.'))
+    self._params['bulk_create_message_idx'] = len(self._params['save_message']) - 1
+
     # holds the base form for the task creation and editing
     self._params['base_create_form'] = self._params['create_form']
     self._params['base_edit_form'] = self._params['edit_form']
@@ -406,7 +412,6 @@ class View(base.View):
      form_name: the Form entry in params to extend
      params: the params for the view
     """
-
     # obtain program_entity using scope_path which holds
     # the org_entity key_name
     org_entity = gci_org_logic.logic.getFromKeyName(kwargs['scope_path'])
@@ -466,7 +471,6 @@ class View(base.View):
 
     For args see base.View.create().
     """
-
     params = dicts.merge(params, self._params)
 
     # redirect to scope selection view
@@ -495,7 +499,6 @@ class View(base.View):
            page_name=None, params=None, seed=None, **kwargs):
     """See base.View.edit().
     """
-
     logic = params['logic']
 
     context = helper.responses.getUniversalContext(request)
@@ -546,7 +549,6 @@ class View(base.View):
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
     """
-
     if entity.task_type:
       form.fields['type_tags'].initial = entity.tags_string(
           entity.task_type, ret_list=True)
@@ -588,7 +590,6 @@ class View(base.View):
   def _editPost(self, request, entity, fields):
     """See base._editPost().
     """
-
     # set the scope field
     super(View, self)._editPost(request, entity, fields)
 
@@ -675,7 +676,6 @@ class View(base.View):
 
     For args see base.View.create().
     """
-
     template = params['bulk_create_template']
 
     # get the context for this webpage
@@ -702,13 +702,17 @@ class View(base.View):
     """Handles GET requests for the bulk create page.
     """
     context['bulk_create_form'] = params['bulk_create_form']()
+
+    context['notice'] = requests.getSingleIndexedParamValue(
+        request, params['submit_msg_param_name'],
+        values=params['save_message'])
+
     return responses.respond(request, template, context)
 
 
   def _bulkCreatePost(self, request, params, template, context, **kwargs):
     """Handles POST requests for the bulk create page.
     """
-
     form = params['bulk_create_form'](request.POST)
 
     if not form.is_valid():
@@ -731,11 +735,9 @@ class View(base.View):
     bulk_create_tasks.spawnBulkCreateTasks(properties['data'],
                                            org_admin_entity.key().id_or_name())
 
-    context['message'] = ugettext(
-      'Successfully started processing your tasks, they should show up '
-      'shortly. Feel free to submit more.')
-
-    return self._bulkCreateGet(request, params, template, context)
+    return http.HttpResponseRedirect(
+        request.path + '?%s=%s' % (params['submit_msg_param_name'],
+                                   params['bulk_create_message_idx']))
 
   @decorators.merge_params
   @decorators.check_access
@@ -746,7 +748,6 @@ class View(base.View):
     Tasks created by mentors must be approved by org admins
     before they are published.
     """
-
     params = dicts.merge(params, self._params)
 
     if 'link_id' in kwargs:
@@ -778,7 +779,6 @@ class View(base.View):
   def suggestTaskPost(self, request, context, params, entity):
     """Handles the POST request for the suggest task view.
     """
-
     form = params['mentor_form'](request.POST)
 
     if not form.is_valid():
@@ -819,7 +819,6 @@ class View(base.View):
   def suggestTaskGet(self, request, context, params, entity, seed):
     """Handles the GET request for the suggest task view.
     """
-
     if entity:
       # populate form with the existing entity
       form = params['mentor_form'](instance=entity)
@@ -1583,6 +1582,7 @@ class View(base.View):
     if entity.user and user_account.key() == entity.user.key():
       if entity.status  == 'ClaimRequested':
         context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
+        context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
         validation = 'claim_withdraw'
       elif entity.status in ['Claimed', 'NeedsWork',
@@ -1604,8 +1604,9 @@ class View(base.View):
       elif entity.status == 'Closed':
         context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
     else:
-      if entity.status in ['ClaimRequested', 'Claimed',
-                           'ActionNeeded', 'NeedsWork',
+      if entity.status == 'ClaimRequested':
+        context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
+      if entity.status in ['Claimed', 'ActionNeeded', 'NeedsWork',
                            'NeedsReview']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_MSG
       if entity.status in ['AwaitingRegistration', 'Closed']:

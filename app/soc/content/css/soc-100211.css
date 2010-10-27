@@ -167,6 +167,16 @@ th, td {
   background: #c3d9ff;
 }
 
+#body #pageheaderalert {
+  margin: 0.5em 0 0em 0;
+  border: 3px solid #ff0000;
+  background: #ff0000;
+}
+
+#body #pageheaderalert td {
+  background: #ff0000;
+}
+
 .gcitaskcomment {
   margin: 1em .7em 0 .7em;
 }

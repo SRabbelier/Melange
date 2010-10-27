@@ -487,7 +487,6 @@
         }
       });
     }
-
     // Process index/sorting filters
     var sort_column = postdata.sidx;
     var order_type = postdata.sord;
@@ -537,7 +536,15 @@
       var my_cell = [];
       if (original_data[0] !== undefined) {
           jQuery.each(list_objects.get(my_index).configuration.colModel, function (element_key, element_value) {
-            my_cell.push(temp_data[i][element_value.name]);
+            var current_row = jLinq.from(list_objects.get(my_index).data.all_data).equals("columns.key",temp_data[i]["key"]).select()[0];
+            var column_content = temp_data[i][element_value.name];
+            if (current_row.operations !== undefined && current_row.operations.row !== undefined && current_row.operations.row.link !== undefined) {
+              // If there are no links in the text then insert a listsnoul link
+              if (column_content !== null && column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
+                column_content = '<a style="display:block;" href="' + current_row.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
+              }
+            }
+            my_cell.push(column_content);
           });
       }
 
@@ -773,7 +780,14 @@
               var object = jLinq.from(list_objects.get(parameters.idx).all_data).equals("columns.key",row.key).select()[0];
               var single_object = {};
               jQuery.each(parameters.keys, function (key_index, column_name) {
-                single_object[column_name] = row[column_name];
+                // If there was a surrounding link (with class listsnoul, so just link for rows)
+                var field_text = row[column_name];
+                if (jQuery(field_text).parent().find("a.listsnoul").length) {
+                  // strip the surrounding link from the text
+                  var extracted_text = /^<a\b[^>]*>(.*?)<\/a>$/.exec(field_text);
+                  field_text = extracted_text[1];
+                }
+                single_object[column_name] = field_text;
               });
               objects_to_send.push(single_object);
             });
@@ -1093,20 +1107,6 @@
                 });
               }*/
 
-              //Add hidden links for each cell content to preserve browser behavior
-              jQuery.each(_self.data.all_data, function (item_index, item) {
-                if (item.operations !== undefined && item.operations.row !== undefined && item.operations.row.link !== undefined) {
-                  jQuery.each(item.columns, function (column_name, column_content) {
-                    // If there are no links in the text then insert a listsnoul link
-                    if (column_content !== null && column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
-                      var new_column_content = '<a style="display:block;" href="' + item.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
-                      _self.data.all_data[item_index].columns[column_name] = new_column_content;
-                    }
-                  });
-                }
-              });
-              _self.jqgrid.object.trigger("reloadGrid");
-
               //Add CSV Export button and RegEx switch only once all data is loaded
 
               //Add some padding at the bottom of the toolbar to display buttons correctly
@@ -1151,13 +1151,6 @@
                         cell_value = "";
                       }
                       var field_text = cell_value.toString();
-
-                      // If there was a surrounding link (with class listsnoul, so just link for rows)
-                      if (jQuery(field_text).parent().find("a.listsnoul").length) {
-                        // strip the surrounding link from the text
-                        var extracted_text = /<a\b[^>]*>(.*?)<\/a>/.exec(field_text);
-                        field_text = extracted_text[1];
-                      }
 
                       // Check for &quot;, which is translated to " when output to textarea
                       field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");

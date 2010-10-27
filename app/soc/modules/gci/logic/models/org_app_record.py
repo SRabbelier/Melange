@@ -28,7 +28,8 @@ from soc.models.org_app_record import OrgAppRecord as \
 from soc.models.survey_record import SurveyRecord
 
 
-DEF_ACCEPTED_TEMPLATE = 'soc/org_app_survey/mail/accepted.html'
+DEF_ACCEPTED_TEMPLATE = \
+    'modules/gci/org_app_survey/mail/accepted_gci2010.html'
 DEF_REJECTED_TEMPLATE = 'soc/org_app_survey/mail/rejected.html'
 
 

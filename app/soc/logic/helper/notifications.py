@@ -149,11 +149,17 @@ def sendNewRequestNotification(request_entity):
 
   role_params = ROLE_VIEWS[request_entity.role].getParams()
 
+  request_url = 'http://%(host)s%(redirect)s' % {
+      'host': system.getHostname(),
+      'redirect': redirects.getProcessRequestRedirect(request_entity, None),
+      }
+
   message_properties = {
       'requester': user_entity.name,
       'role_verbose': role_params['name'],
       'group': request_entity.group.name,
-      'request_url': redirects.getProcessRequestRedirect(request_entity, None)}
+      'request_url': request_url
+      }
 
   subject = DEF_NEW_REQUEST_MSG_FMT % {
       'requester': user_entity.name,

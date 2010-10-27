@@ -101,6 +101,9 @@ class View(base.View):
   DEF_TASK_CLAIMED_BY_STUDENT_MSG = ugettext(
       'This task has been claimed by a student!')
 
+  DEF_TASK_CLAIMED_REQUESTED_MSG = ugettext(
+      'A student has requested to claim this task and the request is pending.')
+
   DEF_TASK_CLAIMED_MSG = ugettext(
       'The task is already claimed and the work is in progress.')
 
@@ -144,7 +147,8 @@ class View(base.View):
       'you can claim it!')
 
   DEF_TASK_REQ_CLAIMED_BY_YOU_MSG = ugettext(
-      'You have requested to claim this task!')
+      "You have requested to claim this task and the request is pending. "
+      "Please don't submit any work until the request is approved.")
 
   DEF_TASK_UNPUBLISHED_MSG = ugettext(
       'The task is not yet published. It can be edited by clicking on '
@@ -1578,6 +1582,7 @@ class View(base.View):
     if entity.user and user_account.key() == entity.user.key():
       if entity.status  == 'ClaimRequested':
         context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
+        context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
         validation = 'claim_withdraw'
       elif entity.status in ['Claimed', 'NeedsWork',
@@ -1599,8 +1604,9 @@ class View(base.View):
       elif entity.status == 'Closed':
         context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
     else:
-      if entity.status in ['ClaimRequested', 'Claimed',
-                           'ActionNeeded', 'NeedsWork',
+      if entity.status == 'ClaimRequested':
+        context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
+      if entity.status in ['Claimed', 'ActionNeeded', 'NeedsWork',
                            'NeedsReview']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_MSG
       if entity.status in ['AwaitingRegistration', 'Closed']:

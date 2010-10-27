@@ -115,6 +115,7 @@ class View(role.View):
             coerce=lambda val: int(val)
             ),
         'clean': cleaning.validate_student(view_logic.getScopeLogic().logic),
+        'clean_school_home_page': cleaning.clean_url('school_home_page'),
         }
 
     new_params['create_dynafields'] = [

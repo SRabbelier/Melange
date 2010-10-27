@@ -57,7 +57,7 @@ class Student(soc.models.role.Role):
 
   #: School home page URL, not required here but enforced in the form for
   #: backwards compatibility.
-  school_home_page = db.URLProperty(
+  school_home_page = db.LinkProperty(
       required=False, verbose_name=ugettext("School Home Page URL"))
   school_home_page.group = ugettext("5. Education")
 

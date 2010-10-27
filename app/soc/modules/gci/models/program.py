@@ -43,22 +43,6 @@ class GCIProgram(soc.models.program.Program):
   nr_simultaneous_tasks.help_text = ugettext(
       'Number of tasks students can work on simultaneously in the program.')
 
-  #: Property containing the number of winners per Organization
-  nr_winners = db.IntegerProperty(
-      required=True, default=0,
-      verbose_name=ugettext('Winners per organization'))
-  nr_winners.group = ugettext('Prize Information')
-  nr_winners.help_text = ugettext(
-      'Number of winners an organization can announce.')
-
-  #: Property containing the number of runner ups per Organization
-  nr_runnerups = db.IntegerProperty(
-      required=True, default=0,
-      verbose_name=ugettext('Runner-ups per organization'))
-  nr_runnerups.group = ugettext('Prize Information')
-  nr_runnerups.help_text = ugettext(
-      'Number of runner-ups an organization can announce.')
-
   #: A list of difficulty levels that can be assigned for each Task created
   task_difficulties = db.StringListProperty(
       required=True, default=[''],

@@ -51,19 +51,3 @@ class GCITimeline(soc.models.timeline.Timeline):
       verbose_name=ugettext('Work Submission Deadline date'))
   stop_all_work_deadline.help_text = ugettext(
       'All work must stop by this date.')
-
-  winner_selection_start = db.DateTimeProperty(
-      verbose_name=ugettext('Winner Selection Start date'))
-  winner_selection_start.help_text = ugettext(
-      'Organizations start choosing their winners.')
-
-  winner_selection_end = db.DateTimeProperty(
-      verbose_name=ugettext('Winner Selection End date'))
-  winner_selection_end.help_text = ugettext(
-      'Organizations must have completed choosing their winners.')
-
-  winner_announcement = db.DateTimeProperty(
-      verbose_name=ugettext('Winner Announcement date'))
-  winner_announcement.help_text = ugettext(
-      'All winners are announced.')
-

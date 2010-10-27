@@ -324,7 +324,7 @@ class View(presence.View):
     if org_app_survey:
       # add link to Review Org Applications
         items += [(redirects.getReviewOverviewRedirect(
-            org_app_survey, params),
+            org_app_survey, params['org_app_view'].getParams()),
             "Review Organization Applications", 'any_access')]
 
     return items

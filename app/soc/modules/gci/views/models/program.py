@@ -177,7 +177,6 @@ class View(program.View):
     new_params['extra_django_patterns'] = patterns
 
     new_params['org_app_logic'] = org_app_logic
-    new_params['org_app_prefix'] = 'gci'
 
     # used to list the participants in this program
     new_params['participants_logic'] = [
@@ -325,6 +324,9 @@ class View(program.View):
   def getExtraMenus(self, id, user, params=None):
     """See soc.views.models.program.View.getExtraMenus().
     """
+    from soc.modules.gci.views.models.org_app_survey import view as org_app_view
+
+    params['org_app_view'] = org_app_view
 
     # TODO: the largest part of this method can be moved to the core Program
 

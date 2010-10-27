@@ -32,7 +32,6 @@ from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.models import licenses
 from soc.views import out_of_band
-from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
@@ -272,9 +271,6 @@ class View(survey_view.View):
   def _getListSelfData(self, request, entity, ma_params, ba_params):
     """Returns the listSelf data.
     """
-
-    from django.utils import simplejson
-
     from soc.logic.models.user import logic as user_logic
 
     user_entity = user_logic.getForCurrentAccount()
@@ -303,9 +299,6 @@ class View(survey_view.View):
     """Displays a list of applications that are in a different
     status of the application process.
     """
-
-    from django.utils import simplejson
-
     survey_logic = params['logic']
 
     entity = survey_logic.getFromKeyFieldsOr404(kwargs)
@@ -472,8 +465,8 @@ class View(survey_view.View):
       fields = {'status' : new_status}
       record_logic.updateEntityProperties(record, fields)
 
-    # TODO(ljvderijk) fix redirect
-    return http.HttpResponseRedirect('')
+    return http.HttpResponseRedirect(
+        redirects.getReviewOverviewRedirect(record.survey, params))
 
 class OrgAppSurveyForm(surveys.SurveyTakeForm):
   """Extends SurveyTakeForm by adding fields required for OrgAppSurvey.

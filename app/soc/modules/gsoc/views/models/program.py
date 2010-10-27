@@ -26,7 +26,6 @@ __authors__ = [
 
 
 from django import forms
-from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
@@ -38,7 +37,6 @@ from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.models import program
 from soc.views.sitemap import sidebar
 
@@ -137,7 +135,6 @@ class View(program.View):
         }
 
     new_params['org_app_logic'] = org_app_logic
-    new_params['org_app_prefix'] = 'gsoc'
 
     # used to list the participants in this program
     new_params['participants_logic'] = [
@@ -171,6 +168,9 @@ class View(program.View):
     Args:
       params: a dict with params for this View.
     """
+    from soc.modules.gsoc.views.models.org_app_survey import view as org_app_view
+
+    params['org_app_view'] = org_app_view
 
     # TODO: the largest part of this method can be moved to the core Program
 
@@ -447,8 +447,8 @@ class View(program.View):
     """See base.View.list.
     """
 
-    from soc.modules.gsoc.views.models.org_app_survey import view as org_app_view
     from soc.modules.gsoc.views.models.organization import view as org_view
+    from soc.modules.gsoc.views.models.org_app_survey import view as org_app_view
 
     logic = params['logic']
 
@@ -615,8 +615,6 @@ class View(program.View):
     query = org_logic.getQueryForFields(filter=filter)
     organizations = org_logic.getAll(query)
 
-    locked_slots = {}
-
     if request.method == 'POST' and 'result' in request.POST:
       result = request.POST['result']
       submit = request.GET.get('submit')
@@ -698,8 +696,6 @@ class View(program.View):
         "Locked?", "Slots Assigned", "Slots Visible to Org", "Link ID",
     ]
 
-    order = ['name']
-
     fields = {
         'scope': program_entity,
         'status': ['new', 'active', 'inactive']
@@ -780,7 +776,8 @@ class View(program.View):
                        page_name=None, params=None, filter=None, **kwargs):
     """See base.View.list.
     """
-    contents = []
+    from soc.modules.gsoc.views.models import student_project as sp_view
+
     logic = params['logic']
 
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
@@ -791,8 +788,6 @@ class View(program.View):
 
     fmt = {'name': program_entity.name}
     description = self.DEF_ACCEPTED_PROJECTS_MSG_FMT % fmt
-
-    from soc.modules.gsoc.views.models import student_project as sp_view
 
     ap_params = sp_view.view.getParams().copy() # accepted projects
 

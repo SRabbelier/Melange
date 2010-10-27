@@ -982,7 +982,7 @@ class View(base.View):
           'parameters': {
               'url': '',
               'keys': ['key'],
-              'refresh': 'table',
+              'refresh': 'current',
               }
           },
           {
@@ -993,7 +993,7 @@ class View(base.View):
           'parameters': {
               'url': '',
               'keys': ['key'],
-              'refresh': 'table',
+              'refresh': 'current',
               }
           },
           {
@@ -1004,7 +1004,7 @@ class View(base.View):
           'parameters': {
               'url': '',
               'keys': ['key'],
-              'refresh': 'table',
+              'refresh': 'current',
               }
           }]
 

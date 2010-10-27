@@ -108,7 +108,7 @@
           "parameters": {
             "url": "/user/roles",
             "keys": ["key","link_id"],
-            "refresh": "table"
+            "refresh": "current"
           }
         },
         {
@@ -119,7 +119,7 @@
           "parameters": {
             "url": "/user/roles",
             "keys": ["key","link_id"],
-            "refresh": "table"
+            "refresh": "current"
           }
         },
         {
@@ -819,7 +819,7 @@
                   list_objects.get(refresh_int).refreshData();
                   jQuery("#" + list_objects.get(refresh_int).jqgrid.id).trigger("reloadGrid");
                 }
-                if (parameters.refresh == "table") {
+                if (parameters.refresh == "current") {
                   list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
                 }
@@ -881,7 +881,7 @@
                   list_objects.get(refresh_int).refreshData();
                   jQuery("#" + list_objects.get(refresh_int).jqgrid.id).trigger("reloadGrid");
                 }
-                if (parameters.refresh == "table") {
+                if (parameters.refresh == "current") {
                   list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
                 }

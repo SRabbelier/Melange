@@ -944,17 +944,24 @@ class View(program.View):
     list_params['list_description'] = self.DEF_LIST_RANKING_MSG_FMT % (
         program.name)
 
-    list_params['public_field_keys'] = ["student", "points"]
-    list_params['public_field_names'] = ["Student", "Points"]
+    list_params['public_field_keys'] = ["student", "points", "number"]
+    list_params['public_field_names'] = ["Student", "Points", "Number of tasks"]
     list_params['public_conf_extra'] = {
         "rowNum": -1,
         "rowList": [],
+        }
+    list_params['public_field_extra'] = lambda entity, *args: {
+        'student': entity.student.name(),
+        'number': len(entity.tasks)
         }
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': gci_redirects.getShowRankingDetails(entity, list_params)
         }
     list_params['public_field_props'] = {
         'points': {
+            'sorttype': 'integer',
+        },
+        'number': {
             'sorttype': 'integer',
         },
     }

@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.ext import db
-
 from soc.cache import sidebar
 from soc.logic.helper import notifications
 from soc.logic.models import base

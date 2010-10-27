@@ -1026,51 +1026,26 @@ class View(base.View):
     order = ['modified_on']
 
     # add all non-public tasks to the list
-    fields = {'scope': org_entity,
-              'status': ['Unapproved', 'Unpublished']}
-    tasks_unapp = gci_task_logic.logic.getForFields(fields, unique=True)
-
-    if tasks_unapp:
-      # we should add this list because there is a new task
-      tuapp_list = lists.getListGenerator(request, tuapp_params,
-                                          order=order, idx=0)
-      contents.append(tuapp_list)
+    tuapp_list = lists.getListGenerator(request, tuapp_params,
+                                        order=order, idx=0)
+    contents.append(tuapp_list)
 
     # add all open tasks to the list
-    fields['status'] = ['Open', 'Reopened']
-    tasks_open = gci_task_logic.logic.getForFields(fields, unique=True)
-
-    if tasks_open:
-      # we should add this list because there is an open task
-      topen_list = lists.getListGenerator(request, topen_params,
-                                          order=order, idx=1)
-      contents.append(topen_list)
+    topen_list = lists.getListGenerator(request, topen_params,
+                                        order=order, idx=1)
+    contents.append(topen_list)
 
     # add all claimed tasks to the list
-    fields['status'] = ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                        'NeedsWork', 'NeedsReview']
-    tasks_claimed = gci_task_logic.logic.getForFields(fields, unique=True)
-
-    if tasks_claimed:
-      # we should add this list because there is an open task
-      tclaim_list = lists.getListGenerator(request, tclaim_params,
-                                           order=order, idx=2)
-      contents.append(tclaim_list)
+    tclaim_list = lists.getListGenerator(request, tclaim_params,
+                                         order=order, idx=2)
+    contents.append(tclaim_list)
 
     # add all closed tasks to the list
-    fields['status'] = ['Closed', 'AwaitingRegistration']
-    tasks_closed = gci_task_logic.logic.getForFields(fields, unique=True)
+    tclose_list = lists.getListGenerator(request, tclose_params,
+                                         order=order, idx=3)
+    contents.append(tclose_list)
 
-    if tasks_closed:
-      # we should add this list because there is an open task
-      tclose_list = lists.getListGenerator(request, tclose_params,
-                                           order=order, idx=3)
-      contents.append(tclose_list)
-
-    if contents:
-      return self._list(request, list_params, contents, page_name)
-    else:
-      raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
+    return self._list(request, list_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

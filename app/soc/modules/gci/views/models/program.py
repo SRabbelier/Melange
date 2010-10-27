@@ -909,7 +909,7 @@ class View(program.View):
     fields = form.cleaned_data
     has_changed = False
     for key, value in fields.iteritems():
-      if ranking_schema[key] != value:
+      if key not in ranking_schema or ranking_schema[key] != value:
         ranking_schema[key] = value
         has_changed = True
 

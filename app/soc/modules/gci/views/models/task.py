@@ -993,7 +993,7 @@ class View(base.View):
           'parameters': {
               'url': '',
               'keys': ['key'],
-              'refresh': 'current',
+              'refresh': 'all',
               }
           },
           {

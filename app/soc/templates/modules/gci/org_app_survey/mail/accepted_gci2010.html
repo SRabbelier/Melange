@@ -1,0 +1,44 @@
+{% extends "soc/mail/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block content %}
+<p>
+Congratulations, your application for {{ org_app_name }} as a mentoring organization for {{ program_name }} has been accepted!
+Over the next few days, you should plan to register your mentors and complete some housekeeping tasks to make sure your pages on the GCI 2010 site are up to date.
+Please read this email very carefully, as it contains important instructions for you and your organization.
+</p>
+
+<p>
+The most important thing to do right now is to check your email for an invitation to become an organization administrator. If you do not do this, it will *not* be possible for anyone to apply to become a mentor (as there is no adminstrator to approve them)! You should have received a <a href="http://www.google-melange.com/notification/list">notification</a> (the same as an email too) about this. If you cannot find the notification, you can find the invitation under your <a href="http://www.google-melange.com/user/requests">requests</a>. Again, please do this *now*.
+</p>
+
+<p>
+For more information on registering your mentors and other/alternate administrators, please see the site 
+<a href="http://www.google-melange.com/document/show/gsoc_program/google/gsoc2010/userguide">User Guide</a>.
+</p>
+
+<p>
+You should immediately plan to update your accepted organization profile and to create your organization's home page
+at www.google-melange.com. You can find instructions for this in the <a href="http://www.google-melange.com/document/show/gsoc_program/google/gsoc2010/userguide#depth_orgadmins">User Guide:
+Organization Administrators</a> section. Please do this *now*, as it ensure that would-be student applicants have the best access to your organization's information.
+</p>
+
+<p>Once again, congratulations for your acceptance into {{ program_name }}!</p>
+{% endblock %}
+
+{% block signature %}
+  Kind regards, <br />
+  The Google Summer of Code Program Administration Team
+{% endblock %}

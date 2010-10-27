@@ -284,7 +284,7 @@ class View(base.View):
     ]
     new_params['public_field_names'] = [
         "Title", "Organization", "Difficulty", "Type",
-        "Time To Complete", "Status", "Mentors",
+        "Time To Complete (hours)", "Status", "Mentors",
     ]
 
     # parameters to list the task on the organization home page
@@ -300,7 +300,7 @@ class View(base.View):
                                      "mentors", "modified_on"]
     new_params['home_field_hidden'] = ["modified_on"]
     new_params['home_field_names'] = ["Title", "Difficulty", "Type",
-                                     "Tags", "Time To Complete",
+                                     "Tags", "Time To Complete (hours)",
                                      "Mentors", "Modified On"]
 
     new_params['public_row_action'] = new_params['home_row_action'] = {
@@ -958,7 +958,7 @@ class View(base.View):
       ]
       tuapp_params['public_field_names'] = [
           'Status', 'Title', 'Organization', 'Difficulty', 'Type',
-          'Time To Complete', 'Mentors',
+          'Time To Complete (hours)', 'Mentors',
       ]
 
       tuapp_params['public_field_props'] = {

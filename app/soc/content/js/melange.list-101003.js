@@ -814,9 +814,21 @@
                     //TODO (Mario): display an error message
                   }
                 }
+                var refresh_int = parseInt(parameters.refresh, 10);
+                if (!isNaN(refresh_int)) {
+                  list_objects.get(refresh_int).refreshData();
+                  jQuery("#" + list_objects.get(refresh_int).jqgrid.id).trigger("reloadGrid");
+                }
                 if (parameters.refresh == "table") {
                   list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
+                }
+                else if (parameters.refresh == "all") {
+                  var lists = list_objects.getAll();
+                  jQuery.each(lists, function (list_index, list_object) {
+                    list_object.refreshData();
+                    jQuery("#" + list_objects.get(list_index).jqgrid.id).trigger("reloadGrid");
+                  });
                 }
               }
             )
@@ -864,9 +876,21 @@
                     //TODO (Mario): display an error message
                   }
                 }
+                var refresh_int = parseInt(parameters.refresh, 10);
+                if (!isNaN(refresh_int)) {
+                  list_objects.get(refresh_int).refreshData();
+                  jQuery("#" + list_objects.get(refresh_int).jqgrid.id).trigger("reloadGrid");
+                }
                 if (parameters.refresh == "table") {
                   list_objects.get(parameters.idx).refreshData();
                   jQuery("#" + list_objects.get(parameters.idx).jqgrid.id).trigger("reloadGrid");
+                }
+                else if (parameters.refresh == "all") {
+                  var lists = list_objects.getAll();
+                  jQuery.each(lists, function (list_index, list_object) {
+                    list_object.refreshData();
+                    jQuery("#" + list_objects.get(list_index).jqgrid.id).trigger("reloadGrid");
+                  });
                 }
               }
             )

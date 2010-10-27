@@ -25,10 +25,17 @@ __authors__ = [
 import os
 import settings
 
+from soc.logic.models import site
+
 
 def getHostname():
   """Returns the hostname
   """
+
+  site_settings = site.logic.getSingleton()
+
+  if site_settings.hostname:
+    return site_settings.hostname
 
   return os.environ.get('HTTP_HOST')
 

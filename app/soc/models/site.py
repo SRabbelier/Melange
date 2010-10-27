@@ -96,3 +96,9 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
   xsrf_secret_key = db.StringProperty(multiline=False)
   xsrf_secret_key.help_text = ugettext('An automatically generated random '
       'value used to prevent cross-site request forgery attacks.')
+
+  #: Optional field storing the hostname
+  hostname = db.LinkProperty(
+      verbose_name=ugettext('Hostname'))
+  hostname.help_text = ugettext(
+      'URL of the hostname.')

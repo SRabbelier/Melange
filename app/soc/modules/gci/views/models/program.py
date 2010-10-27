@@ -374,7 +374,7 @@ class View(program.View):
         items += [(gci_redirects.getRankingSchemaEditRedirect(
             entity, {'url_name': 'gci/program'}),
             "Edit Ranking Schema", 'any_access')]
-        
+
 
       except out_of_band.Error:
         pass
@@ -835,7 +835,7 @@ class View(program.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def rankingSchema(self, request, access_type, page_name=None, params=None, 
+  def rankingSchema(self, request, access_type, page_name=None, params=None,
                     **kwargs):
     """Edit ranking schema for the specified program.
     """
@@ -860,9 +860,9 @@ class View(program.View):
           })
 
     dynaproperties = params_helper.getDynaFields(dynafields)
-    
-    form = dynaform.newDynaForm(dynamodel=None, 
-        dynabase=helper.forms.BaseForm, dynainclude=None, 
+
+    form = dynaform.newDynaForm(dynamodel=None,
+        dynabase=helper.forms.BaseForm, dynainclude=None,
         dynaexclude=None, dynaproperties=dynaproperties)
 
     context = responses.getUniversalContext(request)
@@ -880,9 +880,9 @@ class View(program.View):
 
     context['form'] = form()
     context['page_name'] = 'Edit ranking schema'
-    
+
     template = params['edit_template']
-    
+
     return responses.respond(request, template, context=context)
 
   def rankingSchemaPost(self, request, context, params, program, form,
@@ -894,7 +894,7 @@ class View(program.View):
 
     # populate the form using the POST data
     form = form(post_dict)
-    
+
     if not form.is_valid():
       return self._constructResponse(request, entity=program, context=context,
           form=form, params=params, template=params['edit_template'])
@@ -953,16 +953,24 @@ class View(program.View):
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': gci_redirects.getShowRankingDetails(entity, list_params)
         }
+    list_params['public_field_props'] = {
+        'points': {
+            'sorttype': 'integer',
+        },
+    }
 
     ranking_filter = {
         'scope': program
         }
 
+    order = ['-points']
+
     if lists.isDataRequest(request):
       contents = lists.getListData(request, list_params, ranking_filter)
       return lists.getResponse(request, contents)
 
-    contents = [lists.getListGenerator(request, list_params, idx=0)]
+    contents = [lists.getListGenerator(
+        request, list_params, order=order, idx=0)]
 
     return self._list(request, list_params, contents=contents,
         page_name=page_name)

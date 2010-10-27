@@ -45,6 +45,7 @@ from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
+from soc.views.helper import requests
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
@@ -807,7 +808,10 @@ class View(base.View):
     redirect = gci_redirects.getSuggestTaskRedirect(
         entity, params)
 
-    return http.HttpResponseRedirect(redirect)
+    page_params = params['edit_params']
+
+    return helper.responses.redirectToChangedSuffix(
+        request, None, params=page_params)
 
   def suggestTaskGet(self, request, context, params, entity, seed):
     """Handles the GET request for the suggest task view.
@@ -822,6 +826,11 @@ class View(base.View):
       form = params['mentor_form'](initial=seed)
     else:
       form = params['mentor_form']()
+
+    # message will be displayed when the task was saved
+    context['notice'] = requests.getSingleIndexedParamValue(
+        request, params['submit_msg_param_name'],
+        values=params['save_message'])
 
     return self._constructResponse(request, entity, context, form, params)
 

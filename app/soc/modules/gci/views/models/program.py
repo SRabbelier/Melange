@@ -825,15 +825,11 @@ class View(program.View):
     contents = []
     order = ['-modified_on']
 
-    if tasks:
-      tasks_list = lists.getListGenerator(request, list_params,
-                                          order=order, idx=0)
-      contents.append(tasks_list)
+    tasks_list = lists.getListGenerator(request, list_params,
+                                        order=order, idx=0)
+    contents.append(tasks_list)
 
-    if contents:
-      return self._list(request, list_params, contents, page_name)
-    else:
-      raise out_of_band.Error(self.DEF_NO_TASKS_MSG)
+    return self._list(request, list_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access

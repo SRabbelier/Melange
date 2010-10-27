@@ -780,7 +780,14 @@
               var object = jLinq.from(list_objects.get(parameters.idx).all_data).equals("columns.key",row.key).select()[0];
               var single_object = {};
               jQuery.each(parameters.keys, function (key_index, column_name) {
-                single_object[column_name] = row[column_name];
+                // If there was a surrounding link (with class listsnoul, so just link for rows)
+                var field_text = row[column_name];
+                if (jQuery(field_text).parent().find("a.listsnoul").length) {
+                  // strip the surrounding link from the text
+                  var extracted_text = /^<a\b[^>]*>(.*?)<\/a>$/.exec(field_text);
+                  field_text = extracted_text[1];
+                }
+                single_object[column_name] = field_text;
               });
               objects_to_send.push(single_object);
             });

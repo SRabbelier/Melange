@@ -29,7 +29,7 @@ from soc.logic import cleaning
 from soc.logic import validate
 
 
-def cleanTaskComment(comment_field, action_field, ws_field):
+def cleanTaskComment(comment_field, action_field, ws_ext_field, ws_upld_field):
   """Cleans the comment form and checks to see if there is either
   action or comment content.
 
@@ -43,18 +43,24 @@ def cleanTaskComment(comment_field, action_field, ws_field):
     """Decorator wrapper method.
     """
     cleaned_data = self.cleaned_data
-
     content = cleaned_data.get(comment_field)
     action = cleaned_data.get(action_field)
-    work_submission = cleaned_data.get(ws_field)
+    ws_ext = cleaned_data.get(ws_ext_field)
+
+    # not using cleaned data because this is separately handled by
+    # Appengine's blobstore APIs
+    ws_upld = self.data.get(ws_upld_field)
 
     if action == 'noaction' and not content:
       raise forms.ValidationError(
           ugettext('You cannot have comment field empty with no action.'))
-    if action == 'needs_review' and not content and not work_submission:
+
+    if action == 'needs_review' and not (content or ws_ext or ws_upld):
       raise forms.ValidationError(
-          ugettext('You cannot have both comment field and work '
-                   'submission fields empty.'))
+          ugettext('You cannot have all the three fields: comment, '
+                   'and two work submission fields empty'))
+
+    cleaned_data[ws_upld_field] = ws_upld
 
     return cleaned_data
 

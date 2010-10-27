@@ -44,8 +44,17 @@ $(document).ready(function(){
  {% if ws.url_to_work %}
   <div class="changes">
    <div class="box-inner">
+    {% if ws.url_to_work %}
     <b>Link to Work Submitted:</b>
-    <a href='{{ ws.url_to_work|safe }}'>{{ ws.url_to_work|safe }}</a> 
+    <a href='{{ ws.url_to_work|safe }}'>{{ ws.url_to_work|safe }}</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    {% endif %}
+    {% if ws_file_blob_key %}
+    <b>File submitted as work:</b>
+    <a href='/gci/work_submission/download_blob?key={{ ws_file_blob_key }}'>
+      <b>{{ ws_file_name }}</b>
+    </a> ({{ ws_file_size }})
+    {% endif %}
    </div>
   </div>
  {% endif %}

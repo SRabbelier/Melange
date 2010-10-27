@@ -16,6 +16,7 @@
 """
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Augie Fackler" <durin42@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -99,6 +100,7 @@ MIDDLEWARE_CLASSES = (
     'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
 #    'soc.middleware.profiler.ProfileMiddleware',
     'soc.middleware.maintenance.MaintenanceMiddleware',
+    'soc.middleware.blobstore.BlobStoreMiddleware',
     'soc.middleware.xsrf.XsrfMiddleware',
 #    'django.middleware.common.CommonMiddleware',
 #    'django.contrib.sessions.middleware.SessionMiddleware',

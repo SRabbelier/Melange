@@ -36,6 +36,7 @@ from soc.modules.gci.views.models import student_ranking
 from soc.modules.gci.views.models import task
 from soc.modules.gci.views.models import task_subscription
 from soc.modules.gci.views.models import timeline
+from soc.modules.gci.views.models import work_submission
 
 
 class Callback(object):
@@ -68,6 +69,7 @@ class Callback(object):
     self.core.registerSitemapEntry(
         task_subscription.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(timeline.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(work_submission.view.getDjangoURLPatterns())
 
     # register GCI GAE Tasks URL's
     self.core.registerSitemapEntry(bulk_create.getDjangoURLPatterns())

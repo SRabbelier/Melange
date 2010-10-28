@@ -1184,7 +1184,7 @@ class View(base.View):
 
       changes.extend([
           ugettext('User-Student'),
-          ugettext('Action-Submitted work and Requested for review'),
+          ugettext('Action-Submitted work'),
           ugettext('Status-%s' % (properties['status']))])
 
       ws_properties = {

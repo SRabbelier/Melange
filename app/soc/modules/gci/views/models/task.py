@@ -1589,7 +1589,7 @@ class View(base.View):
         context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
         validation = 'claim_withdraw'
-      elif entity.deadline in entity.status in [
+      elif entity.deadline and entity.status in [
           'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
         actions.extend([

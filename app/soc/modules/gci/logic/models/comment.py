@@ -42,5 +42,15 @@ class Logic(base.Logic):
     super(Logic, self).__init__(model, base_model=base_model,
                                 id_based=id_based)
 
+  def _onCreate(self, entity):
+    """See base._onCreate().
+    """
+
+    from soc.modules.gci.tasks import task_update
+
+    task_update.spawnCreateNotificationMail(entity)
+
+    super(Logic, self)._onCreate(entity)
+
 
 logic = Logic()

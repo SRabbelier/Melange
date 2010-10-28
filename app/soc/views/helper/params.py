@@ -56,6 +56,7 @@ DEF_JS_USES_LIST = [
     'jq_ajaqQueue',
     'jq_autocomplete',
     'jq_bgiframe',
+    'jq_cookie',
     'jq_grid',
     'jq_purr',
     'jq_spin',

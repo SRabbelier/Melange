@@ -67,10 +67,10 @@ limitations under the License.
 
   $('#id_action').change(function() {
     if ($(this).val() == 'needs_review') {
-    	alert("{{ blob_manage_url }}");
-      $('#id_task_action_form').get(0).setAttribute('action','{{ blob_manage_url }}');
-      $('#id_task_action_form').get(0).setAttribute('enctype', 'multipart/form-data');
-      alert("{{ blob_manage_url }}");
+      $('#id_task_action_form').get(0).setAttribute(
+          'action','{{ blob_manage_url }}');
+      $('#id_task_action_form').get(0).setAttribute(
+          'enctype', 'multipart/form-data');
       showWorkSubmissionInput();
     }
     else if ($(this).val() != 'needs_work'){

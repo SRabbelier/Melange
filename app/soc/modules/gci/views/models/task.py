@@ -1597,7 +1597,7 @@ class View(base.View):
       elif entity.status == 'NeedsReview':
         context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
         actions.append(('withdraw', 'Withdraw from the task'))
-        if datetime.datetime.now < entity.deadline:
+        if entity.deadline and datetime.datetime.now < entity.deadline:
           actions.append(
               ('needs_review', 'Submit work and Request for review'))
         validation = 'needs_review'

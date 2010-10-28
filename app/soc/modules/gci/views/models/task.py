@@ -1498,7 +1498,9 @@ class View(base.View):
     else:
       # list of statuses a task can be in after it is requested to be
       # claimed before closing or re-opening
-      claim_status = ['ClaimRequested', 'Claimed', 'ActionNeeded',
+      if entity.status == 'ClaimRequested':
+        context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
+      claim_status = [ 'Claimed', 'ActionNeeded',
                       'NeedsWork', 'NeedsReview']
       if entity.status in claim_status:
         context['header_msg'] = self.DEF_TASK_CLAIMED_MSG

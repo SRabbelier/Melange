@@ -29,10 +29,7 @@ __authors__ = [
   ]
 
 
-import os
 import re
-
-from django import http
 
 from soc.views.helper import blobstore as bs_helper
 
@@ -51,7 +48,7 @@ class BlobStoreMiddleware(object):
 
     # we only care about POST and which has form data with file.
     if request.method != 'POST' or (
-        'multipart/form-data' not in request.META['CONTENT_TYPE']):
+        'multipart/form-data' not in request.META.get('CONTENT_TYPE', '')):
       return None
 
     # rewrite request.POST with the form data with file_uploads

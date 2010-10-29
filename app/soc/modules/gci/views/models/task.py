@@ -172,12 +172,14 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin'], ['active'],
-            []])]
+            []]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['edit'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']])]
+            ['Unapproved', 'Unpublished', 'Open']]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['delete'] = [
         ('checkRoleAndStatusForTask', 
             [['gci/org_admin'], ['active'],
@@ -189,7 +191,8 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin', 'gci/mentor'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']])]
+            ['Unapproved', 'Unpublished', 'Open']]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.task.logic

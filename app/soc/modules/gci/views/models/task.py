@@ -36,6 +36,7 @@ from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
+from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
@@ -87,10 +88,6 @@ class View(base.View):
   DEF_NO_TASKS_MSG = ugettext(
       'There are no tasks under your organization. Please create tasks.')
 
-  DEF_SIGNIN_TO_COMMENT_MSG = ugettext(
-      '<a href=%s>Sign in</a> to perform any action or comment on '
-      'this task.')
-
   DEF_STUDENT_SIGNUP_MSG = ugettext(
       'You have successfully completed this task. Sign up as a student '
       'before you proceed further.')
@@ -129,7 +126,7 @@ class View(base.View):
        'List of non-public tasks.')
 
   DEF_TASK_NO_MORE_SUBMIT_MSG = ugettext(
-      'You have submitted the work to this task, but deadline has passed '
+      'You have submitted the work to this task, but the deadline has passed. '
       'You cannot submit any more work until your mentor extends the '
       'deadline.')
 
@@ -939,10 +936,28 @@ class View(base.View):
 
     tuapp_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
 
-    tuapp_params['public_row_extra'] = lambda entity: {
-            'link': redirects.getEditRedirect(
-                entity, {'url_name': tuapp_params['url_name']})
+    user_account = user_logic.logic.getForCurrentAccount()
+
+    # give a suggest page redirect if the user is a mentor
+    filter = {
+      'user': user_account,
+      'program': org_entity.scope
     }
+    org_admin_entity = gci_org_admin_logic.logic.getForFields(
+        filter, unique=True)
+    mentor_entity = gci_mentor_logic.logic.getForFields(
+        filter, unique=True)
+
+    if org_admin_entity:
+      tuapp_params['public_row_extra'] = lambda entity: {
+              'link': redirects.getEditRedirect(
+                  entity, {'url_name': tuapp_params['url_name']})
+      }
+    elif mentor_entity:
+      tuapp_params['public_row_extra'] = lambda entity: {
+              'link': gci_redirects.getSuggestTaskRedirect(
+                  entity, {'url_name': tuapp_params['url_name']})
+      }
 
     user_account = user_logic.logic.getForCurrentAccount()
 
@@ -1184,7 +1199,7 @@ class View(base.View):
 
       changes.extend([
           ugettext('User-Student'),
-          ugettext('Action-Submitted work and Requested for review'),
+          ugettext('Action-Submitted work'),
           ugettext('Status-%s' % (properties['status']))])
 
       ws_properties = {
@@ -1498,15 +1513,18 @@ class View(base.View):
     else:
       # list of statuses a task can be in after it is requested to be
       # claimed before closing or re-opening
-      claim_status = ['ClaimRequested', 'Claimed', 'ActionNeeded',
+      if entity.status == 'ClaimRequested':
+        context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
+      claim_status = [ 'Claimed', 'ActionNeeded',
                       'NeedsWork', 'NeedsReview']
       if entity.status in claim_status:
         context['header_msg'] = self.DEF_TASK_CLAIMED_MSG
       elif entity.status in ['AwaitingRegistration', 'Closed']:
         context['header_msg'] = self.DEF_TASK_CLOSED_MSG
 
-      context['signin_comment_msg'] = self.DEF_SIGNIN_TO_COMMENT_MSG % (
-          context['sign_in'])
+      if accounts.getCurrentAccount():
+        context['create_profile_url'] = redirects.getCreateProfileRedirect(
+            {'url_name': 'user'})
 
     return validation
 
@@ -1587,8 +1605,8 @@ class View(base.View):
         context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
         validation = 'claim_withdraw'
-      elif entity.status in ['Claimed', 'NeedsWork',
-                             'NeedsReview', 'ActionNeeded']:
+      elif entity.deadline and entity.status in [
+          'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
         context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
         actions.extend([
             ('withdraw', 'Withdraw from the task'),
@@ -1596,8 +1614,9 @@ class View(base.View):
         validation = 'needs_review'
       elif entity.status == 'NeedsReview':
         context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
+        context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
-        if datetime.datetime.now < entity.deadline:
+        if entity.deadline and datetime.datetime.now < entity.deadline:
           actions.append(
               ('needs_review', 'Submit work and Request for review'))
         validation = 'needs_review'

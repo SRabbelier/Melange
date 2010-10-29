@@ -65,72 +65,78 @@ limitations under the License.
     showWorkSubmissionInput();
   });
 
-    $('#id_action').change(function() {
-      if ($(this).val() == 'needs_review') {
-        showWorkSubmissionInput();
-      }
-      else if ($(this).val() != 'needs_work'){
-        hideWorkSubmissionInput();
-      }
-    });
-
-    if (!$('#id_extended_deadline').val()) {
-	    $('[for^=id_extended_deadline]').hide();
-	    $('#id_extended_deadline').hide();
+  $('#id_action').change(function() {
+    if ($(this).val() == 'needs_review') {
+      $('#id_task_action_form').get(0).setAttribute(
+          'action','{{ blob_manage_url }}');
+      $('#id_task_action_form').get(0).setAttribute(
+          'enctype', 'multipart/form-data');
+      showWorkSubmissionInput();
     }
-    $('#id_action').change(function() {
-      if ($(this).val() == 'needs_work') {
-        $('[for^=id_extended_deadline]').show("normal");
-        $('#id_extended_deadline').show("normal");
-        $('td.formfielderror').show("normal");
-      }
-      else if ($(this).val() != 'needs_review'){
-        $('[for^=id_extended_deadline]').hide("normal");
-        $('#id_extended_deadline').hide("normal");
-        $('td.formfielderror').hide("normal");
-      }
-    });
+    else if ($(this).val() != 'needs_work'){
+      $('#id_task_action_form').get(0).setAttribute('action','');
+      $('#id_task_action_form').get(0).setAttribute('enctype', '');
+      hideWorkSubmissionInput();
+    }
+  });
 
-    nosubscribe = '/soc/content/images/star-white.png'
-    subscribe = '/soc/content/images/star-gold.png';
+  if (!$('#id_extended_deadline').val()) {
+    $('[for^=id_extended_deadline]').hide();
+    $('#id_extended_deadline').hide();
+  }
+  $('#id_action').change(function() {
+    if ($(this).val() == 'needs_work') {
+      $('[for^=id_extended_deadline]').show("normal");
+      $('#id_extended_deadline').show("normal");
+      $('td.formfielderror').show("normal");
+    }
+    else if ($(this).val() != 'needs_review'){
+      $('[for^=id_extended_deadline]').hide("normal");
+      $('#id_extended_deadline').hide("normal");
+      $('td.formfielderror').hide("normal");
+    }
+  });
 
-    $.get('/gci/task_subscription/subscribe', 
-            { key_name: '{{ entity_key_name }}',
-              no_toggle: true },
-            function(data){
-              if (data == 'add') {
-                $("img#subscribe").attr('src', nosubscribe);
-                $("img#subscribe").attr('title', 'Subscribe to this task');
-              } else {
-                $("img#subscribe").attr('src', subscribe);
-                $("img#subscribe").attr('title', 'Unsubscribe from this task');
-              }
-            }
-    );
+  nosubscribe = '/soc/content/images/star-white.png'
+  subscribe = '/soc/content/images/star-gold.png';
 
-    $("img#subscribe").click(
-      function () {
-        if ($("img#subscribe").attr('src') == subscribe) {
+  $.get('/gci/task_subscription/subscribe', 
+      { key_name: '{{ entity_key_name }}',
+      no_toggle: true },
+      function(data){
+        if (data == 'add') {
           $("img#subscribe").attr('src', nosubscribe);
           $("img#subscribe").attr('title', 'Subscribe to this task');
-        } else if ($("img#subscribe").attr('src') == nosubscribe) {
+        } else {
           $("img#subscribe").attr('src', subscribe);
-          $("img#subscribe").attr('title', 
-                                  'Unsubscribe from this task');
+          $("img#subscribe").attr('title', 'Unsubscribe from this task');
         }
-        $.get('/gci/task_subscription/subscribe', 
-             { key_name: '{{ entity_key_name }}' },
-              function(data){
-                if (data == 'add') { 
-                  $("img#subscribe").attr('src', subscribe);
-                  $("img#subscribe").attr('title', 
-                                          'Unsubscribe from this task');
-                } else if (data == 'remove') {
-                 $("img#subscribe").attr('src', nosubscribe);
-                 $("img#subscribe").attr('title', 'Subscribe to this task');
-                }
-              });
-     }
+      }
+  );
+
+  $("img#subscribe").click(
+    function () {
+      if ($("img#subscribe").attr('src') == subscribe) {
+        $("img#subscribe").attr('src', nosubscribe);
+        $("img#subscribe").attr('title', 'Subscribe to this task');
+      } else if ($("img#subscribe").attr('src') == nosubscribe) {
+        $("img#subscribe").attr('src', subscribe);
+        $("img#subscribe").attr('title', 
+                                'Unsubscribe from this task');
+      }
+      $.get('/gci/task_subscription/subscribe', 
+           { key_name: '{{ entity_key_name }}' },
+            function(data){
+              if (data == 'add') { 
+                $("img#subscribe").attr('src', subscribe);
+                $("img#subscribe").attr('title', 
+                                        'Unsubscribe from this task');
+              } else if (data == 'remove') {
+                $("img#subscribe").attr('src', nosubscribe);
+                $("img#subscribe").attr('title', 'Subscribe to this task');
+              }
+            });
+      }
     );
   });
 
@@ -193,41 +199,45 @@ Title: {{ entity.title }}
 {% if comment_disabled %}
   <h4>Comments are disabled</h4>
 {% else %}
-{% block comment-form %}
-<p>
-{% if signin_comment_msg %}
-  <h4>{{ signin_comment_msg|safe }}</h4>
-{% else %}
-{% if not blob_manage_url %}
-  <h4>File upload is disabled because billing is not enabled.</h4>
-{% endif %}
-
-<form method="POST"
-    {% if blob_manage_url %}
-    action={{ blob_manage_url }}
-    enctype="multipart/form-data"
-    {% endif %}>
- <table>
-   {% block form_table %}
-     {% as_table comment_form %}
-   {% endblock %}
- </table>
- <table>
-  <tr><td colspan="4">&nbsp;</td></tr>
-  <tr>
-   <td>
-    <input style="font-weight: bold; float: right" type="submit"
-        name="submit" onclick="return confirmation();"
-        value="Save Changes"/></span>
-   </td>
-  </tr>
- </table>
-</form>
-{% endif %}
-</p>
-<br /><br />
-<hr />
-{% endblock comment-form %}
+  {% block comment-form %}
+  <p>
+  {% if not account %}
+  <h4>
+   <a href='{{ sign_in|safe }}'>
+    Sign in
+   </a> to perform any action or comment on this task.
+  </h4>
+  {% else %}
+    {% if not user %}
+    <h4>
+     <a href='{{ create_profile_url|safe }}'>
+      Create a profile
+     </a> to perform any action or comment on this task.
+    </h4>
+    {% else %}
+    <form id="id_task_action_form" method="POST">
+     <table>
+       {% block form_table %}
+         {% as_table comment_form %}
+       {% endblock %}
+     </table>
+     <table>
+      <tr><td colspan="4">&nbsp;</td></tr>
+      <tr>
+       <td>
+        <input style="font-weight: bold; float: right" type="submit"
+            name="submit" onclick="return confirmation();"
+            value="Save Changes"/></span>
+       </td>
+      </tr>
+     </table>
+    </form>
+    {% endif %}
+  </p>
+  <br /><br />
+  <hr />
+  {% endif %}
+  {% endblock comment-form %}
 {% endif %}
 
 {% block list-work-submissions %}

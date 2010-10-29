@@ -544,3 +544,39 @@ def getManageStatisticsRedirect(entity, params):
       params['url_name'], entity.key().id_or_name())
 
   return result
+
+def getCreateProfileRedirect(params):
+  """Returns the create profile redirect for creating link id for the user.
+  """
+
+  result ='/%s/create_profile' % (
+      params['url_name'])
+
+  return result
+
+def getEditProfileRedirect(params):
+  """Returns the edit profile redirect for editing the profile details.
+  """
+
+  result ='/%s/edit_profile' % (
+      params['url_name'])
+
+  return result
+
+def getRolesRedirect(params):
+  """Returns the edit profile redirect for editing the profile details.
+  """
+
+  result ='/%s/roles' % (
+      params['url_name'])
+
+  return result
+
+def getRequestsRedirect(params):
+  """Returns the edit profile redirect for editing the profile details.
+  """
+
+  result ='/%s/requests' % (
+      params['url_name'])
+
+  return result

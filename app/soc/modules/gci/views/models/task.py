@@ -810,10 +810,9 @@ class View(base.View):
 
       entity = logic.updateOrCreateFromFields(fields)
 
-    redirect = gci_redirects.getSuggestTaskRedirect(
-        entity, params)
-
     page_params = params['edit_params']
+
+    request.path = gci_redirects.getSuggestTaskRedirect(entity, params)
 
     return helper.responses.redirectToChangedSuffix(
         request, None, params=page_params)

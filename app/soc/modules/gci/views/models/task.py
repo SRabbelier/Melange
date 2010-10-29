@@ -936,10 +936,28 @@ class View(base.View):
 
     tuapp_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
 
-    tuapp_params['public_row_extra'] = lambda entity: {
-            'link': redirects.getEditRedirect(
-                entity, {'url_name': tuapp_params['url_name']})
+    user_account = user_logic.logic.getForCurrentAccount()
+
+    # give a suggest page redirect if the user is a mentor
+    filter = {
+      'user': user_account,
+      'program': org_entity.scope
     }
+    org_admin_entity = gci_org_admin_logic.logic.getForFields(
+        filter, unique=True)
+    mentor_entity = gci_mentor_logic.logic.getForFields(
+        filter, unique=True)
+
+    if org_admin_entity:
+      tuapp_params['public_row_extra'] = lambda entity: {
+              'link': redirects.getEditRedirect(
+                  entity, {'url_name': tuapp_params['url_name']})
+      }
+    elif mentor_entity:
+      tuapp_params['public_row_extra'] = lambda entity: {
+              'link': gci_redirects.getSuggestTaskRedirect(
+                  entity, {'url_name': tuapp_params['url_name']})
+      }
 
     user_account = user_logic.logic.getForCurrentAccount()
 

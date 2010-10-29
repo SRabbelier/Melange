@@ -120,7 +120,7 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
     # this task should not be repeated after the program is over
     timeline = program.timeline
     if timeline_helper.isAfterEvent(timeline, 'program_end'):
-      raise DoNotRepeatException()
+      raise responses.DoNotRepeatException()
 
 @decorators.iterative_task(gci_student_ranking_logic)
 def clearGCIRanking(request, entities, context, *args, **kwargs):

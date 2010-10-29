@@ -18,10 +18,12 @@
 
 
 __authors__ = [
+  '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Augie Fackler" <durin42@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+import StringIO
 import unittest
 
 import gaetestbed
@@ -132,6 +134,28 @@ class StuboutHelper(object):
 
     self.stubout.Set(parent, child_name, get_general_raw(args_names))
 
+class NonFailingFakePayload(object):
+  """Extension of Django FakePayload class that includes seek and readline
+  methods.
+  """
+
+  def __init__(self, content):
+    self.__content = StringIO.StringIO(content)
+    self.__len = len(content)
+
+  def read(self, num_bytes=None):
+    if num_bytes is None:
+        num_bytes = self.__len or 1
+    assert self.__len >= num_bytes, "Cannot read more than the available bytes from the HTTP incoming data."
+    content = self.__content.read(num_bytes)
+    self.__len -= num_bytes
+    return content
+
+  def seek(self, pos, mode=0):
+    return self.__content.seek(pos, mode)
+  
+  def readline(self, length=None):
+    return self.__content.readline(length)
 
 class DjangoTestCase(TestCase):
   """Class extending Django TestCase in order to extend its functions.
@@ -145,7 +169,8 @@ class DjangoTestCase(TestCase):
     """Performs any pre-test setup.
     """
 
-    pass
+    from django.test import client
+    client.FakePayload = NonFailingFakePayload
 
   def _post_teardown(self):
     """ Performs any post-test cleanup.

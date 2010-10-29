@@ -389,10 +389,3 @@ class GCIChecker(access.Checker):
       raise out_of_band.AccessViolation(message_fmt=DEF_ALREADY_CLAIMED_A_TASK)
 
     return org_entity
-
-def getSuggestTaskRedirect(entity, params):
-  """Returns the edit redirect for the specified entity.
-  """
-
-  return '/%s/suggest_task/%s' % (
-      params['url_name'], entity.key().id_or_name())

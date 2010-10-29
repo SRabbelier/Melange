@@ -106,12 +106,12 @@ class View(base.View):
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
         ("login", 'Sign In', 'signIn'),
-        ('/' + new_params['url_name'] + '/create_profile',
+        (redirects.getCreateProfileRedirect(new_params),
             'Create Profile', 'create_profile'),
-        ('/' + new_params['url_name'] + '/edit_profile',
+        (redirects.getEditProfileRedirect(new_params),
             'Edit Profile', 'edit_profile'),
-        ('/' + new_params['url_name'] + '/roles', 'Roles', 'roles'),
-        ('/' + new_params['url_name'] + '/requests', 'Requests', 'requests'),
+        (redirects.getRolesRedirect(new_params), 'Roles', 'roles'),
+        (redirects.getRequestsRedirect(new_params), 'Requests', 'requests'),
         ]
 
     patterns = []

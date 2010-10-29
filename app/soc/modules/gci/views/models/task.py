@@ -129,7 +129,7 @@ class View(base.View):
        'List of non-public tasks.')
 
   DEF_TASK_NO_MORE_SUBMIT_MSG = ugettext(
-      'You have submitted the work to this task, but deadline has passed '
+      'You have submitted the work to this task, but deadline has passed. '
       'You cannot submit any more work until your mentor extends the '
       'deadline.')
 
@@ -1598,6 +1598,7 @@ class View(base.View):
         validation = 'needs_review'
       elif entity.status == 'NeedsReview':
         context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
+        context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
         if entity.deadline and datetime.datetime.now < entity.deadline:
           actions.append(

@@ -71,3 +71,8 @@ def sendTaskUpdateMail(subscriber, subject, message_properties=None):
 
   # send out the message using the default new notification template
   mail_dispatcher.sendMailFromTemplate(template, messageProperties)
+
+def sendRequestForTaskNotofication():
+  """Sends a notification to organization admin that a student has requested
+  a new task, while there are currently no open tasks.
+  """

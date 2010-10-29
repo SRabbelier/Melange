@@ -24,11 +24,15 @@ __authors__ = [
   ]
 
 
+from django import http
+
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
+
+from soc.views import helper
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
@@ -37,6 +41,7 @@ from soc.views.models import organization
 
 import soc.logic.lists
 
+from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
@@ -83,6 +88,13 @@ class View(organization.View):
                                 gci_org_admin_logic.logic)]
     rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              gci_org_admin_logic.logic)]
+    rights['request_task'] = [
+        'checkIsUser',
+        ('checkIsAfterEvent',
+            ['tasks_publicly_visible', 'scope_path', gci_program_logic.logic]),
+        ('checkIsBeforeEvent',
+            ['task_claim_deadline', 'scope_path', gci_program_logic.logic]),
+        ]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.organization.logic
@@ -137,6 +149,15 @@ class View(organization.View):
     ]
 
     new_params['org_app_logic'] = org_app_logic
+
+    patterns = []
+    patterns += [
+        (r'^%(url_name)s/(?P<access_type>request_task)/%(key_fields)s$',
+          '%(module_package)s.%(module_name)s.request_task',
+          'Request more tasks'),
+        ]
+
+    new_params['extra_django_patterns'] = patterns
 
     params = dicts.merge(params, new_params, sub_merge=True)
 
@@ -373,6 +394,50 @@ class View(organization.View):
 
     return submenus
 
+  @decorators.check_access
+  def requestTask(self, request, access_type, page_name=None,
+                params=None, **kwargs):
+    """Students may request a new task if there are no open tasks for the
+    organization. 
+    """
+
+    # retrieve the organization
+    org_entity = gci_org_logic.logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.method == 'GET':
+      return self.requestTaskGet(request, page_name, org_entity, **kwargs)
+    else: # POST
+      return self.requestTaskPost(request, page_name, org_entity, **kwargs)
+
+  def requestTaskGet(self, request, page_name, org_entity, **kwargs):
+    """GET request for requestTask.
+    """
+
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
+    context['org_name'] = org_entity.name
+
+    template = 'modules/gci/task/request.html'
+    return responses.respond(request, template, context=context)
+
+  def requestTaskPost(self, request, page_name, org_entity, **kwargs):
+    """POST request for requestTask.
+    """  
+
+    # find all administrators for the organization
+    fields = {
+        'scope': org_entity
+        }
+    org_admins = gci_org_admin_logic.logic.getForFields(fields)
+    
+    # notification should be sent to all of the org admins
+
+    # return to the list of all accepted organizations
+    program = org_entity.scope
+    url = redirects.getAcceptedOrgsRedirect(
+          program, {'url_name': 'gci/program'})
+
+    return http.HttpResponseRedirect(url)
 
 view = View()
 
@@ -388,4 +453,4 @@ list_roles = decorators.view(view.listRoles)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
-
+request_task = decorators.view(view.requestTask)

@@ -24,6 +24,7 @@ __authors__ = [
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+
 from google.appengine.ext import db
 
 from django import forms
@@ -34,6 +35,7 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
+from soc.logic.models import user as user_logic
 from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
@@ -729,13 +731,57 @@ class View(program.View):
         'open_tasks': len(gci_task_logic.logic.getForFields({
             'scope': entity, 'status': ['Open', 'Reopened']}))
     }
-    aa_params['participating_row_action'] = {
-        "type": "redirect_custom",
-        "parameters": dict(new_window=True),
-    }
-    aa_params['participating_row_extra'] = lambda entity: {
-        'link': redirects.getHomeRedirect(entity, aa_params),
-    }
+
+    # request task button should be available only for students
+    user = user_logic.logic.getForCurrentAccount()
+    fields = {
+        'scope': program_entity,
+        'user': user,
+        'status': 'active'
+        }
+    student = gci_student_logic.logic.getForFields(fields, unique=True)
+    import logging
+    # student must not work on any tasks at the moment
+    if student and not gci_student_logic.logic.isWorkingOnTask(student):
+
+      def canRequestTask(entity):
+        """Checks if a task may be requested from particular organization.
+        """
+
+        fields = {
+            'scope': entity,
+            'status': ['Open', 'Reopened']
+            }
+        task = gci_task_logic.logic.getForFields(fields, unique=True)
+
+        return False if task else True
+
+      aa_params['participating_row_action'] = {
+          "type": "redirect_custom",
+          "parameters": dict(new_window=True),
+      }
+
+      aa_params['participating_button_extra'] = lambda entity: {} \
+          if not canRequestTask(entity) else {
+          'slots': {
+              'caption': 'Request additional tasks for %s' % entity.name,
+              'link': gci_redirects.getRequestTaskRedirect(entity, aa_params),
+              }
+      }
+
+      aa_params['participating_conf_extra'] = {
+          "multiselect": False,
+      }
+
+      aa_params['participating_button_global'] = [{
+          'bounds': [1, 1],
+          'id': 'slots',
+          'caption': 'Request additional tasks',
+          'type': "redirect_custom",
+          'parameters': {
+             'new_window': False,
+             }
+          }]
 
     filter = {'scope': program_entity,
                  'status': 'active'}

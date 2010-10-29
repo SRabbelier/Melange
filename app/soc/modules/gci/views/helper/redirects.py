@@ -121,3 +121,10 @@ def getShowRankingDetails(entity, params):
 
   return '/%s/show_details/%s' % (
       params['url_name'], entity.key().id_or_name())
+
+def getRequestTaskRedirect(entity, params):
+  """Returns request task redirect for the given organization.
+  """
+
+  return '/%s/request_task/%s' % (
+      params['url_name'], entity.key().id_or_name())

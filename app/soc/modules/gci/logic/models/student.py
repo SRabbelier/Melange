@@ -62,5 +62,18 @@ class Logic(student.Logic):
 
     super(Logic, self)._onCreate(entity)
 
+  def isWorkingOnTask(self, student):
+    """Returns true if the specified student is currently working on a task.
+    """
+
+    fields = {
+        'student': student,
+        'status': [
+            'ClaimRequested', 'Claimed', 'ActionNeeded',
+            'Closed', 'AwaitingRegistration', 'NeedsWork',
+            'NeedsReview'
+            ]
+        }
+    return True if self.getForFields(filter=fields, unique=True) else False
 
 logic = Logic()

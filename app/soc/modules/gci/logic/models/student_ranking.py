@@ -62,7 +62,7 @@ class Logic(base.Logic):
   def updateRanking(self, task):
     """Updates ranking with the specified task.
     """
-
+    
     if not task:
       return
 
@@ -76,7 +76,7 @@ class Logic(base.Logic):
     points = entity.points
 
     difficulty = task.difficulty[0].tag
-    
+
     #: update total number of points with new points for the task
     points += ranking_schema[difficulty]
 

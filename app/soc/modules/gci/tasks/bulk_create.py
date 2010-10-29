@@ -98,6 +98,8 @@ def bulkCreateTasks(request, *args, **kwargs):
       task_data: The tasks in the CSV format to process.
   """
 
+  import settings
+
   # keep track of our own timelimit (20 seconds)
   timelimit = 20000
   timekeeper = Timekeeper(timelimit)
@@ -134,7 +136,7 @@ def bulkCreateTasks(request, *args, **kwargs):
       # check if we have time
       timekeeper.ping()
 
-      if task_quota <= 0:
+      if settings.GCI_TASK_QUOTA_LIMIT_ENABLED and task_quota <= 0:
         return error_handler.logErrorAndReturnOK(
             'Task quota reached for %s' %(org_admin.scope.name))
 

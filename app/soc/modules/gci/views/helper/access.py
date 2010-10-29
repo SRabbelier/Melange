@@ -99,6 +99,8 @@ class GCIChecker(access.Checker):
                    task quota limit for the given program.
     """
 
+    import settings
+
     self.checkIsUser(django_args)
 
     user_account = user_logic.logic.getForCurrentAccount()
@@ -130,7 +132,7 @@ class GCIChecker(access.Checker):
     # pylint: disable-msg=E1103
     org_entity = role_entity.scope
 
-    if check_limit:
+    if settings.GCI_TASK_QUOTA_LIMIT_ENABLED and check_limit:
       # count all tasks from this organization
       fields = {'scope': org_entity}
       task_query = gci_task_logic.logic.getQueryForFields(fields)

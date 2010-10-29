@@ -36,6 +36,7 @@ from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
+from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.models import host as host_logic
@@ -86,10 +87,6 @@ class View(base.View):
 
   DEF_NO_TASKS_MSG = ugettext(
       'There are no tasks under your organization. Please create tasks.')
-
-  DEF_SIGNIN_TO_COMMENT_MSG = ugettext(
-      '<a href=%s>Sign in</a> to perform any action or comment on '
-      'this task.')
 
   DEF_STUDENT_SIGNUP_MSG = ugettext(
       'You have successfully completed this task. Sign up as a student '
@@ -1507,8 +1504,9 @@ class View(base.View):
       elif entity.status in ['AwaitingRegistration', 'Closed']:
         context['header_msg'] = self.DEF_TASK_CLOSED_MSG
 
-      context['signin_comment_msg'] = self.DEF_SIGNIN_TO_COMMENT_MSG % (
-          context['sign_in'])
+      if accounts.getCurrentAccount():
+        context['create_profile_url'] = redirects.getCreateProfileRedirect(
+            {'url_name': 'user'})
 
     return validation
 

@@ -199,37 +199,45 @@ Title: {{ entity.title }}
 {% if comment_disabled %}
   <h4>Comments are disabled</h4>
 {% else %}
-{% block comment-form %}
-<p>
-{% if signin_comment_msg %}
-  <h4>{{ signin_comment_msg|safe }}</h4>
-{% else %}
-{% if not blob_manage_url %}
-  <h4>File upload is disabled because billing is not enabled.</h4>
-{% endif %}
-
-<form id="id_task_action_form" method="POST">
- <table>
-   {% block form_table %}
-     {% as_table comment_form %}
-   {% endblock %}
- </table>
- <table>
-  <tr><td colspan="4">&nbsp;</td></tr>
-  <tr>
-   <td>
-    <input style="font-weight: bold; float: right" type="submit"
-        name="submit" onclick="return confirmation();"
-        value="Save Changes"/></span>
-   </td>
-  </tr>
- </table>
-</form>
-{% endif %}
-</p>
-<br /><br />
-<hr />
-{% endblock comment-form %}
+  {% block comment-form %}
+  <p>
+  {% if not account %}
+  <h4>
+   <a href='{{ sign_in|safe }}'>
+    Sign in
+   </a> to perform any action or comment on this task.
+  </h4>
+  {% else %}
+    {% if not user %}
+    <h4>
+     <a href='{{ create_profile_url|safe }}'>
+      Create a profile
+     </a> to perform any action or comment on this task.
+    </h4>
+    {% else %}
+    <form id="id_task_action_form" method="POST">
+     <table>
+       {% block form_table %}
+         {% as_table comment_form %}
+       {% endblock %}
+     </table>
+     <table>
+      <tr><td colspan="4">&nbsp;</td></tr>
+      <tr>
+       <td>
+        <input style="font-weight: bold; float: right" type="submit"
+            name="submit" onclick="return confirmation();"
+            value="Save Changes"/></span>
+       </td>
+      </tr>
+     </table>
+    </form>
+    {% endif %}
+  </p>
+  <br /><br />
+  <hr />
+  {% endif %}
+  {% endblock comment-form %}
 {% endif %}
 
 {% block list-work-submissions %}

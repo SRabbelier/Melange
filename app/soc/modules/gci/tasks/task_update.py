@@ -40,7 +40,8 @@ from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.tasks import ranking_update
 
 
-DEF_TASK_UPDATE_SUBJECT_FMT = ugettext('[GCI Task Update] %(title)s')
+DEF_TASK_UPDATE_SUBJECT_FMT = ugettext(
+    '[%(program_name)s Task Update] %(title)s')
 
 
 def getDjangoURLPatterns():
@@ -199,7 +200,8 @@ def createNotificationMail(request, *args, **kwargs):
   }
 
   subject = DEF_TASK_UPDATE_SUBJECT_FMT % {
-      'title': task_entity.title, 
+      'program_name': task_entity.program.short_name,
+      'title': task_entity.title,
       }
 
   for subscriber in subscribers:

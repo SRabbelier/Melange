@@ -102,9 +102,8 @@ class View(base.View):
     tasks = task_logic.getForFields(filter)
 
     total = 0
-    ranking_schema = program.getRankingSchema()
     for task in tasks:
-      points = ranking_schema[str(task.difficulty[0])]
+      points = task.difficulty.value
       total += points
       task.points = points
 
@@ -112,7 +111,7 @@ class View(base.View):
     context['page_name'] = 'Ranking details for %s.' % student.name()
     context['tasks'] = tasks
     context['total'] = total
-    
+
     template = 'modules/gci/student_ranking/details.html'
 
     return helper.responses.respond(request, template, context=context)

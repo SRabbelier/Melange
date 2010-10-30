@@ -276,8 +276,7 @@ class View(base.View):
     new_params['public_field_extra'] = lambda entity: {
         "org": entity.scope.name,
         "difficulty": entity.difficulty[0].tag,
-        "points": entity.program.getRankingSchema()[entity.difficulty[0].tag],
-        #"points": .ranking_schema['Easy'],
+        "points": entity.difficulty[0].value,
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
     }

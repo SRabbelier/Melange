@@ -75,7 +75,6 @@ class TaskTag(Tag):
     if tag:
       tag.order = order
       tag.put()
-
     return tag
 
   @classmethod
@@ -101,15 +100,13 @@ class TaskTag(Tag):
 class TaskTypeTag(TaskTag):
   """Model for storing of task type tags.
   """
-
   pass
 
 
 class TaskDifficultyTag(TaskTag):
   """Model for storing of task difficulty level tags.
   """
-
-  pass
+  value = db.IntegerProperty(default=0, verbose_name=ugettext('value'))
 
 
 class TaskArbitraryTag(TaskTag):

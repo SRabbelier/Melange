@@ -93,7 +93,6 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
     return responses.terminateTask()
 
   for entity in entities:
-
     # check if the entity refers to the program in scope
     if entity.scope.key() != program.key():
       continue

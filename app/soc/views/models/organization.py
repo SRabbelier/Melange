@@ -133,15 +133,10 @@ class View(group.View):
         'description': forms.fields.CharField(
             widget=helper.widgets.FullTinyMCE(
                 attrs={'rows': 25, 'cols': 100})),
-        'contrib_template': forms.fields.CharField(
-            widget=helper.widgets.FullTinyMCE(
-                attrs={'rows': 25, 'cols': 100})),
         'clean_description': cleaning.clean_html_content('description'),
-        'clean_contrib_template': cleaning.clean_html_content(
-            'contrib_template'),
         'clean_ideas': cleaning.clean_url('ideas'),
         'clean': cleaning.validate_new_group('link_id', 'scope_path',
-            soc.logic.models.organization)
+            soc.logic.models.organization),
         }
 
     new_params['edit_extra_dynaproperties'] = {

@@ -120,7 +120,7 @@ class Callback(object):
     site_membership = {
         'admin': [],
         'restricted': ['host'],
-        'member': ['user'],
+        'member': ['host'],
         'list': ['host'],
         }
 

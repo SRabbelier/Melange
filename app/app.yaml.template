@@ -23,6 +23,7 @@ builtins:
 - admin_redirect: on
 - datastore_admin: on
 - remote_api: on
+- appstats: on
 
 handlers:
 - url: /(robots.txt|favicon.ico)

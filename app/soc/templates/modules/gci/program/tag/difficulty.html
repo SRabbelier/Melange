@@ -23,89 +23,27 @@ type='text/css' media='all' />
   {{ block.super }}
   <script type="text/javascript" src="/jquery/jquery-in-place-edit.js"></script>
   <script type="text/javascript" src="/jquery/jquery-ui.sortable.js"></script>
-  <script type="text/javascript">
-   var submit_handler = function(element, id, value) {
-	   $.get("/gci/program/difficulty_tag_edit/{{ program_key_name }}", 
-	         { 'tag_data': [$("#"+id).attr("name"), value] },
-           function(data) {
-    	       if (!data) {
-    	    	   $("#"+id).remove();
-    	       } else {
-    	         $("#"+id).attr('name', data);
-    	       }
-    	     }
-     );
-	  return true;
-	};
-
-	var cancel_handler = function(element) {
-	  // Nothing
-	  return true;
-	};
-
-	// Enable in-place-edit
-	$(document).ready(function(){
-	      
-	  // paragraph, list examples
-	  $(".in-place-edit").children().inPlaceEdit({
-	    submit : submit_handler,
-	    cancel : cancel_handler
-	  }); 
-
-	  $("#dynamic-add").sortable({
-		  update : function () {
-		    var order = $('#dynamic-add').sortable('toArray');
-		    var new_order = new Array();
-	      for (i in order) {
-		      if (order[i])
-			      new_order[i] = $("#"+order[i]).attr("name");
-	      }
-		    $.get("/gci/program/difficulty_tag_edit/{{ program_key_name }}",
-		          { 'order': new_order }
-        );
-		  }
-		});
-	});
-  </script>
+  <script type="text/javascript" src="/soc/content/js/templates/modules/gci/program/tag/difficulty-101029.js" melangeContext='{difficulties: {{ difficulties|safe }}}'></script>
 {% endblock %}
 
 {% block body %}
 To add new tags click on Add button. To edit a tag click on the tag. To
 delete a tag click on it and make its content empty. To order them drag and
 drop the tags.
-<ul class="in-place-edit" id="dynamic-add">
- {% for difficulty in difficulties %}
- <li id="existing-{{ forloop.counter }}"
- name="{{ difficulty.tag }}" class="handle">{{ difficulty.tag }}</li>
- {% endfor %}
-</ul>
 <p>
- <input style="font-weight: bold" type="button"
- value="Add" onclick="return add()"/>
+ <input style="font-weight: bold" type="button" value="Add" class="add-button" />
 </p>
+<ul class="in-place-edit" id="dynamic-add"></ul>
+<p>
+ <input style="font-weight: bold" type="button" value="Add" class="add-button" />
+</p>
+<div id="add_dialog" title="Add a new tag">
+  <p>Please add a new tag</p>
+  <form>
+    <label for="new_name">Difficulty</label><input type="text" id="new_name" />
+    <label for="new_value">Value</label><input type="text" id="new_value" />
+  </form>
+</div>
 
-<script type="text/javascript">
- var index = 0;
-
- function add() {
-   $('#dynamic-add').append(
-	     '<li id="category-new-' + index + '" name="" class="handle">Type name here...</li>');
-
-   var new_element = $("#category-new-" + index);
-   new_element.inPlaceEdit({
-     submit : submit_handler,
-     cancel : cancel_handler
-   });
-
-   new_element.click();
-
-   new_element.find('.field').focus();
-   new_element.find('.field').select();
-
-   index = index + 1;
-
-   return false;
- }
-</script>
 {% endblock %}
 

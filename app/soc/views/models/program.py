@@ -401,22 +401,19 @@ class View(presence.View):
     items += [(redirects.getListParticipantsRedirect(entity, params),
                "List Participants", 'any_access')]
 
-    timeline_entity = entity.timeline
-
     org_app_logic = params['org_app_logic']
     org_app_survey = org_app_logic.getForProgram(entity)
 
-    if not timeline_helper.isAfterEvent(timeline_entity, 'org_signup'):
-      # add link to create/edit OrgAppSurvey
-      items += [(redirects.getCreateSurveyRedirect(
-                    entity, params['document_prefix'], prefix + '/org_app'),
-                'Edit Org Application Survey','any_access')]
+    # add link to create/edit OrgAppSurvey
+    items += [(redirects.getCreateSurveyRedirect(
+                  entity, params['document_prefix'], prefix + '/org_app'),
+              'Edit Org Application Survey','any_access')]
 
     if org_app_survey:
       # add link to Review Org Applications
-        items += [(redirects.getReviewOverviewRedirect(
-            org_app_survey, params['org_app_view'].getParams()),
-            "Review Organization Applications", 'any_access')]
+      items += [(redirects.getReviewOverviewRedirect(
+          org_app_survey, params['org_app_view'].getParams()),
+          'Review Organization Applications', 'any_access')]
 
     return items
 

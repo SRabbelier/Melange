@@ -39,12 +39,6 @@ class Timeline(linkable.Linkable):
   program_end = db.DateTimeProperty(
       verbose_name=ugettext('Program End date'))
 
-  org_signup_start = db.DateTimeProperty(
-      verbose_name=ugettext('Organization Signup Start date'))
-
-  org_signup_end  = db.DateTimeProperty(
-      verbose_name=ugettext('Organization Signup End date'))
-
   accepted_organization_announced_deadline = db.DateTimeProperty(
       verbose_name=ugettext('Accepted Organizations Announced Deadline'))
 

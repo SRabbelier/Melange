@@ -396,7 +396,7 @@ class View(program.View):
     org_app_survey = org_app_logic.getForProgram(gci_program_entity)
 
     if org_app_survey and \
-        timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+        timeline_helper.isActivePeriod(org_app_survey, 'survey'):
       # add the organization signup link
       items += [
           (redirects.getTakeSurveyRedirect(
@@ -404,7 +404,7 @@ class View(program.View):
           "Apply to become an Organization", 'any_access')]
 
     if user and org_app_survey and timeline_helper.isAfterEvent(
-        timeline_entity, 'org_signup_start'):
+        org_app_survey, 'survey_start'):
 
       main_admin_fields = {
           'main_admin': user,

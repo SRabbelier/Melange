@@ -36,6 +36,7 @@ RIGHTS = [
     'checkIsAllowedToManageRole',
     'checkIsDeveloper',
     'checkIsDocumentReadable',
+    'checkIsDocumentCreatable',
     'checkIsDocumentWritable',
     'checkIsHostForProgram',
     'checkIsLoggedIn',

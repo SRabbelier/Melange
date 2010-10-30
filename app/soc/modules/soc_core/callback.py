@@ -154,8 +154,8 @@ class Callback(object):
 
     user_membership = {
         'admin': ['user_self'],
-        'restricted': ['user_self'], # ,'friends'
-        'member': ['user'],
+        'restricted': ['user_self'], # ,'friends'?
+        'member': ['user_self'], # ,'friends'
         'list': ['user_self'],
         }
 

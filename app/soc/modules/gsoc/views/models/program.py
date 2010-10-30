@@ -61,16 +61,6 @@ class View(program.View):
   """View methods for the Program model.
   """
 
-  DEF_ACCEPTED_ORGS_MSG_FMT = ugettext("These organizations have"
-      " been accepted into %(name)s, but they have not yet completed"
-      " their organization profile. You can still learn more about"
-      " each organization by visiting the links below.")
-
-  DEF_CREATED_ORGS_MSG_FMT = ugettext("These organizations have been"
-      " accepted into %(name)s and have completed their organization"
-      " profiles. You can learn more about each organization by"
-      " visiting the links below.")
-
   DEF_ACCEPTED_PROJECTS_MSG_FMT = ugettext("These projects have been"
       " accepted into %(name)s. You can learn more about each project"
       " by visiting the links below.")
@@ -412,101 +402,19 @@ class View(program.View):
 
     return items
 
-  def getAcceptedOrgsData(self, request, aa_params, ap_params, program_entity):
-    """Get acceptedOrgs data.
-    """
-
-    idx = lists.getListIndex(request)
-
-    if idx == 0:
-      params = ap_params
-
-      fields = {
-          'scope': program_entity,
-          'status': ['new', 'active', 'inactive']
-      }
-    elif idx == 1:
-      params = aa_params
-
-      org_app = org_app_logic.getForProgram(program_entity)
-      fields = {
-          'survey': org_app,
-          'status': 'accepted',
-      }
-    else:
-      return lists.getErrorResponse(request, "idx not valid")
-
-    contents = lists.getListData(request, params, fields)
-
-    return lists.getResponse(request, contents)
-
   @decorators.merge_params
   @decorators.check_access
   def acceptedOrgs(self, request, access_type,
-                   page_name=None, params=None, filter=None, **kwargs):
-    """See base.View.list.
-    """
+                   page_name=None, params=None, **kwargs):
 
     from soc.modules.gsoc.views.models.organization import view as org_view
     from soc.modules.gsoc.views.models.org_app_survey import view as org_app_view
 
     logic = params['logic']
-
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
-    list_params = org_view.getParams().copy()
-    list_params['list_msg'] = program_entity.accepted_orgs_msg
-
-    fmt = {'name': program_entity.name}
-
-    org_app_params = org_app_view.getParams()
-
-    # try to retrieve an accepted record
-    org_app_logic = org_app_params['logic']
-    org_app = org_app_logic.getForProgram(program_entity)
-    fields = {
-        'survey': org_app,
-        'status': 'accepted',
-    }
-    org_app_record_logic = org_app_logic.getRecordLogic()
-    record = org_app_record_logic.getForFields(fields, unique=True)
-
-    aa_params = org_app_params['record_list_params'].copy() # accepted applications
-    aa_params['public_row_extra'] = lambda entity: {}
-    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
-    aa_params['list_description'] = description
-    aa_params['public_conf_extra'] = {
-        "rowNum": -1,
-        "rowList": [],
-    }
-
-    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
-    ap_params = org_view.getParams().copy()
-    ap_params['list_description'] = description
-    ap_params['public_row_extra'] = lambda entity: {
-        'link': redirects.getHomeRedirect(entity, ap_params),
-    }
-    ap_params['public_conf_extra'] = {
-        "rowNum": -1,
-        "rowList": [],
-    }
-
-    if lists.isDataRequest(request):
-      return self.getAcceptedOrgsData(request, aa_params,
-                                      ap_params, program_entity)
-
-    contents = []
-    order = ['name']
-
-    ap_list = lists.getListGenerator(request, ap_params, order=order, idx=0)
-    contents.append(ap_list)
-
-    if record:
-      # only if there is a record we should show this list
-      aa_list = lists.getListGenerator(request, aa_params, order=order, idx=1)
-      contents.append(aa_list)
-
-    return self._list(request, list_params, contents, page_name)
+    return super(View, self).acceptedOrgs(
+        request, page_name, params, program_entity, org_view, org_app_view)
 
   @decorators.merge_params
   @decorators.check_access

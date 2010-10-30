@@ -711,10 +711,20 @@ class View(program.View):
     """
 
     from soc.modules.gci.views.models.organization import view as org_view
+    from soc.modules.gci.views.models.org_app_survey import view as org_app_view
 
     logic = params['logic']
-
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    return super(View, self).acceptedOrgs(
+        request, page_name, params, program_entity, org_view, org_app_view)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def requestMoreSlots(self, request, access_type,
+                       page_name=None, params=None, **kwargs):
+    """TODO(dhans): Finish this
+    """
 
     fmt = {'name': program_entity.name}
 

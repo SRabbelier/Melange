@@ -96,6 +96,7 @@ TEMPLATE_LOADERS = (
 # - The MaintenanceMiddleware should be after the Profiler, since we
 #   do want it's actions profiled.
 MIDDLEWARE_CLASSES = (
+    'google.appengine.ext.appstats.recording.AppStatsDjangoMiddleware',
     'soc.middleware.value_store.ValueStoreMiddleware',
     'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
 #    'soc.middleware.profiler.ProfileMiddleware',

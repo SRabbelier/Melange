@@ -1176,6 +1176,12 @@
                       }
                       var field_text = cell_value.toString();
 
+                      // strip the surrounding link (if any) from the text
+                      var extracted_text = /^<a\b[^>]*>(.*?)<\/a>$/.exec(field_text);
+                      if (extracted_text !== null) {
+                        field_text = extracted_text[1];
+                      }
+
                       // Check for &quot;, which is translated to " when output to textarea
                       field_text = field_text.replace(/\"|&quot;|&#34;/g,"\"\"");
 

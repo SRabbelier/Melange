@@ -143,6 +143,7 @@ def setup():
                  os.path.join(appengine_location, 'lib', 'django'),
                  os.path.join(appengine_location, 'lib', 'webob'),
                  os.path.join(appengine_location, 'lib', 'yaml', 'lib'),
+                 os.path.join(appengine_location, 'lib', 'fancy_urllib'),
                  appengine_location,
                  os.path.join(here, 'app'),
                 ]

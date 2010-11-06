@@ -127,8 +127,8 @@ def bulkCreateTasks(request, *args, **kwargs):
   tasks = csv.DictReader(task_file, fieldnames=DATA_HEADERS)
 
   completed = True
-  for task in tasks:
-    try :
+  try :
+    for task in tasks:
       # check if we have time
       timekeeper.ping()
 
@@ -158,12 +158,13 @@ def bulkCreateTasks(request, *args, **kwargs):
         logging.info('Creating new task with fields: %s' %task)
         task_logic.updateOrCreateFromFields(task)
         task_quota = task_quota - 1
-
       else:
         logging.warning('Invalid Task data: %s' %task)
-    except DeadlineExceededError:
-      # time to bail out
-      completed = False
+  except DeadlineExceededError:
+    # time to bail out
+    completed = False
+  except BaseException, e:
+    logging.warn('Exception occurred %s', e)
 
   if not completed:
     new_data = StringIO.StringIO()

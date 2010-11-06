@@ -57,14 +57,8 @@ class View(organization.View):
   """View methods for the GCI Organization model.
   """
 
-  DEF_OPEN_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are open.')
-
-  DEF_CLAIMED_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are claimed.')
-
-  DEF_CLOSED_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are closed.')
+  DEF_PROJECTS_MSG_FMT = ugettext(
+      'List of tasks published by %s.')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
@@ -154,7 +148,7 @@ class View(organization.View):
       self._params['public_field_keys'].append("task_quota_limit")
       self._params['public_field_names'].append("Tasks Quota")
 
-  def getListTasksData(self, request, params_collection, org_entity):
+  def getListTasksData(self, request, params, org_entity):
     """Returns the list data for Organization Tasks list.
 
     Args:
@@ -170,19 +164,10 @@ class View(organization.View):
     visibility = 'home'
 
     if idx == 0:
-      filter = {'scope': org_entity,
-                'status': ['Open', 'Reopened']}
-    elif idx == 1:
-      filter = {'scope': org_entity,
-                'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                           'NeedsReview', 'NeedsWork']}
-    elif idx == 2:
-      filter = {'scope': org_entity,
-                'status': ['Closed', 'AwaitingRegistration']}
+      filter = {'scope': org_entity}
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
-    params = params_collection[idx]
     contents = lists.getListData(request, params, filter,
                                  visibility=visibility, args=args)
 
@@ -212,64 +197,16 @@ class View(organization.View):
     if is_after_student_signup and is_after_tasks_become_public:
       list_params = gci_task_view.view.getParams().copy()
 
-      # open tasks
-      to_params = list_params.copy()
-
-      to_params['list_description'] = self.DEF_OPEN_PROJECTS_MSG_FMT % (
-          entity.name)
-
-      # claimed tasks
-      tc_params = to_params.copy()
-
-      tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT % (
-          entity.name)
-
-      # closed tasks
-      tcl_params = to_params.copy()
-
-      tcl_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
+      list_params['list_description'] = self.DEF_PROJECTS_MSG_FMT % (
           entity.name)
 
       if lists.isDataRequest(request):
         return self.getListTasksData(
-            request, [to_params, tc_params, tcl_params], entity)
+            request, list_params, entity)
 
-      # check if there are opened if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['Open', 'Reopened']}
-      tasks_open = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      contents = []
-      order = ['modified_on']
-
-      if tasks_open:
-        # we should add this list because there is a new task
-        to_list = lists.getListGenerator(request, to_params, order=order, idx=0)
-        contents.append(to_list)
-
-      # check if there are claimed if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['ClaimRequested', 'Claimed',
-                           'ActionNeeded', 'NeedsWork', 'NeedsReview']}
-      tasks_claimed = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      if tasks_claimed:
-        # we should add this list because there is a new task
-        tc_list = lists.getListGenerator(request, tc_params,
-                                         order=order, idx=1)
-        contents.append(tc_list)
-
-      # check if there are claimed if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['Closed', 'AwaitingRegistration']}
-      tasks_closed = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      if tasks_closed:
-        # we should add this list because there is a new task
-        tcl_list = lists.getListGenerator(request, tcl_params,
-                                          order=order, idx=2)
-        contents.append(tcl_list)
-
+      content = lists.getListGenerator(request, list_params,
+                                        visibility='home', idx=0)
+      contents = [content]
       context['list'] = soc.logic.lists.Lists(contents)
 
     params['context'] = context

@@ -121,33 +121,6 @@ class View(organization.View):
     new_params['mentor_role_name'] = 'gci_mentor'
     new_params['mentor_url_name'] = 'gci/mentor'
     new_params['org_admin_role_name'] = 'gci_org_admin'
-
-    # TODO(ljvderijk): prefetch these entities and pass as args
-    new_params['public_field_extra'] = lambda entity: {
-        "open_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['Open', 'Reopened']
-        }))),
-        "claimed_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                       'NeedsReview', 'NeedsWork'],
-        }))),
-        "closed_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['AwaitingRegistration', 'Closed'],
-        }))),
-        "home_page": lists.urlize(entity.home_page),
-    }
-    new_params['public_field_keys'] = [
-        "name", "task_quota_limit", "open_tasks",
-        "claimed_tasks", "closed_tasks", "home_page",
-    ]
-    new_params['public_field_names'] = [
-        "Name", "Tasks Quota", "Open Tasks",
-        "Claimed Tasks", "Closed Tasks", "Home Page",
-    ]
-
     new_params['org_app_logic'] = org_app_logic
 
     patterns = []
@@ -162,6 +135,24 @@ class View(organization.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
+
+    # The organization view manually overwrites public_field_extra,
+    # so we must do the same (or be overwritten by them).
+
+    self._params['public_field_extra'] = lambda entity: {
+        "home_page": lists.urlize(entity.home_page),
+    }
+    import settings
+    self._params['public_field_keys'] = [
+        "name", "short_name", "home_page",
+    ]
+    self._params['public_field_names'] = [
+        "Name", "Short Name", "Home Page",
+    ]
+
+    if settings.GCI_TASK_QUOTA_LIMIT_ENABLED:
+      self._params['public_field_keys'].append("task_quota_limit")
+      self._params['public_field_names'].append("Tasks Quota")
 
   def getListTasksData(self, request, params_collection, org_entity):
     """Returns the list data for Organization Tasks list.

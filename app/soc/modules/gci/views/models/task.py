@@ -624,12 +624,12 @@ class View(base.View):
         filter, unique=True)
 
     role_entity = host_entity or org_admin_entity
-
     if role_entity:
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      elif fields.get('approved'):
+      elif fields.get('approved') or entity.status == 'Open':
+        # Set it to be unpublished
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])

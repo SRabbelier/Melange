@@ -972,15 +972,6 @@ class View(base.View):
 
     # give the capability to approve tasks for the org_admins
     if gci_org_admin_logic.logic.getForFields(fields, unique=True):
-      tuapp_params['public_field_keys'] = [
-          'status', 'title', 'org', 'difficulty', 'task_type',
-          'time_to_complete', 'mentors'
-      ]
-      tuapp_params['public_field_names'] = [
-          'Status', 'Title', 'Organization', 'Difficulty', 'Type',
-          'Time To Complete (hours)', 'Mentors',
-      ]
-
       tuapp_params['public_field_props'] = {
           'status': {
               'stype': 'select',

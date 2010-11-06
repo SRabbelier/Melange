@@ -275,34 +275,36 @@ class View(base.View):
     # once prefetch for list of references is fixed
     new_params['public_field_extra'] = lambda entity: {
         "org": entity.scope.name,
-        "difficulty": entity.difficulty[0].tag,
-        "points": entity.difficulty[0].value,
+        "points_difficulty": "%s (%s)" % (
+            entity.difficulty[0].value, entity.difficulty[0].tag),
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
+        "arbit_tag": entity.tags_string(entity.arbit_tag),
     }
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
-        "title", "org", "difficulty", "points", "task_type",
-        "time_to_complete", "status", "mentors",
+        "title", "org", "points_difficulty", "task_type",
+        "arbit_tag", "time_to_complete", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Organization", "Difficulty", "Points", "Type",
-        "Time To Complete (hours)", "Status", "Mentors",
+        "Title", "Organization", "Points (Difficulty)", "Type",
+        "Tags", "Time To Complete (hours)", "Status", "Mentors",
     ]
 
     # parameters to list the task on the organization home page
     new_params['home_field_extra'] = lambda entity: {
-        "difficulty": entity.tags_string(entity.difficulty),
+        "points_difficulty": "%s (%s)" % (
+            entity.difficulty[0].value, entity.difficulty[0].tag),
         "task_type": entity.tags_string(entity.task_type),
         "arbit_tag": entity.tags_string(entity.arbit_tag),
         "mentors": render(db.get(entity.mentors)),
     }
 
-    new_params['home_field_keys'] = ["title", "difficulty", "task_type",
+    new_params['home_field_keys'] = ["title", "points_difficulty", "task_type",
                                      "arbit_tag", "time_to_complete",
                                      "mentors", "modified_on"]
     new_params['home_field_hidden'] = ["modified_on"]
-    new_params['home_field_names'] = ["Title", "Difficulty", "Type",
+    new_params['home_field_names'] = ["Title", "Points (Difficulty)", "Type",
                                      "Tags", "Time To Complete (hours)",
                                      "Mentors", "Modified On"]
 

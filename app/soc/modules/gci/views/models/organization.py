@@ -137,12 +137,13 @@ class View(organization.View):
         "home_page": lists.urlize(entity.home_page),
     }
     import settings
-    self._params['public_field_keys'] = [
+    self._params['public_field_keys'] = self._params['select_field_keys'] = [
         "name", "short_name", "home_page",
     ]
-    self._params['public_field_names'] = [
+    self._params['public_field_names'] = self._params['select_field_names'] = [
         "Name", "Short Name", "Home Page",
     ]
+    self._params['select_field_extra'] = self._params['public_field_extra']
 
     if settings.GCI_TASK_QUOTA_LIMIT_ENABLED:
       self._params['public_field_keys'].append("task_quota_limit")

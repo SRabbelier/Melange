@@ -1678,6 +1678,23 @@ class Checker(object):
 
   @denySidebar
   @allowDeveloper
+  def checkIsDocumentCreatable(self, django_args, key_name_field=None):
+    """Checks whether a document is creatable by the current user.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      key_name_field: key name field
+    """
+
+    if 'prefix' not in django_args:
+      self.deny()
+
+    prefix = django_args['prefix']
+
+    self.checkMembership('create', prefix, 'member', django_args)
+
+  @denySidebar
+  @allowDeveloper
   def checkIsDocumentWritable(self, django_args, key_name_field=None):
     """Checks whether a document is writable by the current user.
 

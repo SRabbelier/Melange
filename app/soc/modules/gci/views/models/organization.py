@@ -57,14 +57,8 @@ class View(organization.View):
   """View methods for the GCI Organization model.
   """
 
-  DEF_OPEN_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are open.')
-
-  DEF_CLAIMED_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are claimed.')
-
-  DEF_CLOSED_PROJECTS_MSG_FMT = ugettext(
-      'List of tasks published by %s that are closed.')
+  DEF_PROJECTS_MSG_FMT = ugettext(
+      'List of tasks published by %s.')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
@@ -121,33 +115,6 @@ class View(organization.View):
     new_params['mentor_role_name'] = 'gci_mentor'
     new_params['mentor_url_name'] = 'gci/mentor'
     new_params['org_admin_role_name'] = 'gci_org_admin'
-
-    # TODO(ljvderijk): prefetch these entities and pass as args
-    new_params['public_field_extra'] = lambda entity: {
-        "open_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['Open', 'Reopened']
-        }))),
-        "claimed_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                       'NeedsReview', 'NeedsWork'],
-        }))),
-        "closed_tasks": str(len(gci_task_logic.logic.getForFields({
-            'scope': entity,
-            'status': ['AwaitingRegistration', 'Closed'],
-        }))),
-        "home_page": lists.urlize(entity.home_page),
-    }
-    new_params['public_field_keys'] = [
-        "name", "task_quota_limit", "open_tasks",
-        "claimed_tasks", "closed_tasks", "home_page",
-    ]
-    new_params['public_field_names'] = [
-        "Name", "Tasks Quota", "Open Tasks",
-        "Claimed Tasks", "Closed Tasks", "Home Page",
-    ]
-
     new_params['org_app_logic'] = org_app_logic
 
     patterns = []
@@ -163,7 +130,25 @@ class View(organization.View):
 
     super(View, self).__init__(params=params)
 
-  def getListTasksData(self, request, params_collection, org_entity):
+    # The organization view manually overwrites public_field_extra,
+    # so we must do the same (or be overwritten by them).
+
+    self._params['public_field_extra'] = lambda entity: {
+        "home_page": lists.urlize(entity.home_page),
+    }
+    import settings
+    self._params['public_field_keys'] = [
+        "name", "short_name", "home_page",
+    ]
+    self._params['public_field_names'] = [
+        "Name", "Short Name", "Home Page",
+    ]
+
+    if settings.GCI_TASK_QUOTA_LIMIT_ENABLED:
+      self._params['public_field_keys'].append("task_quota_limit")
+      self._params['public_field_names'].append("Tasks Quota")
+
+  def getListTasksData(self, request, params, org_entity):
     """Returns the list data for Organization Tasks list.
 
     Args:
@@ -179,19 +164,10 @@ class View(organization.View):
     visibility = 'home'
 
     if idx == 0:
-      filter = {'scope': org_entity,
-                'status': ['Open', 'Reopened']}
-    elif idx == 1:
-      filter = {'scope': org_entity,
-                'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                           'NeedsReview', 'NeedsWork']}
-    elif idx == 2:
-      filter = {'scope': org_entity,
-                'status': ['Closed', 'AwaitingRegistration']}
+      filter = {'scope': org_entity}
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
-    params = params_collection[idx]
     contents = lists.getListData(request, params, filter,
                                  visibility=visibility, args=args)
 
@@ -221,64 +197,16 @@ class View(organization.View):
     if is_after_student_signup and is_after_tasks_become_public:
       list_params = gci_task_view.view.getParams().copy()
 
-      # open tasks
-      to_params = list_params.copy()
-
-      to_params['list_description'] = self.DEF_OPEN_PROJECTS_MSG_FMT % (
-          entity.name)
-
-      # claimed tasks
-      tc_params = to_params.copy()
-
-      tc_params['list_description'] = self.DEF_CLAIMED_PROJECTS_MSG_FMT % (
-          entity.name)
-
-      # closed tasks
-      tcl_params = to_params.copy()
-
-      tcl_params['list_description'] = self.DEF_CLOSED_PROJECTS_MSG_FMT % (
+      list_params['list_description'] = self.DEF_PROJECTS_MSG_FMT % (
           entity.name)
 
       if lists.isDataRequest(request):
         return self.getListTasksData(
-            request, [to_params, tc_params, tcl_params], entity)
+            request, list_params, entity)
 
-      # check if there are opened if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['Open', 'Reopened']}
-      tasks_open = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      contents = []
-      order = ['modified_on']
-
-      if tasks_open:
-        # we should add this list because there is a new task
-        to_list = lists.getListGenerator(request, to_params, order=order, idx=0)
-        contents.append(to_list)
-
-      # check if there are claimed if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['ClaimRequested', 'Claimed',
-                           'ActionNeeded', 'NeedsWork', 'NeedsReview']}
-      tasks_claimed = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      if tasks_claimed:
-        # we should add this list because there is a new task
-        tc_list = lists.getListGenerator(request, tc_params,
-                                         order=order, idx=1)
-        contents.append(tc_list)
-
-      # check if there are claimed if so show them in a separate list
-      fields = {'scope': entity,
-                'status': ['Closed', 'AwaitingRegistration']}
-      tasks_closed = gci_task_logic.logic.getForFields(fields, unique=True)
-
-      if tasks_closed:
-        # we should add this list because there is a new task
-        tcl_list = lists.getListGenerator(request, tcl_params,
-                                          order=order, idx=2)
-        contents.append(tcl_list)
-
+      content = lists.getListGenerator(request, list_params,
+                                        visibility='home', idx=0)
+      contents = [content]
       context['list'] = soc.logic.lists.Lists(contents)
 
     params['context'] = context

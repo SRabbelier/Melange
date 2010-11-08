@@ -45,7 +45,7 @@ from soc.models import document as document_model
 from soc.modules import callback
 
 
-DEF_VALID_SHIPPING_CHARS = re.compile('^[A-Za-z0-9\s]+$')
+DEF_VALID_SHIPPING_CHARS = re.compile('^[A-Za-z0-9\s-]+$')
 
 DEF_LINK_ID_IN_USE_MSG = ugettext(
     'This link ID is already in use, please specify another one')
@@ -314,7 +314,7 @@ def clean_valid_shipping_chars(field_name):
 
     if value and not DEF_VALID_SHIPPING_CHARS.match(value):
       raise forms.ValidationError(
-          'Invalid characters, only A-z, 0-9 and whitespace are allowed.')
+          'Invalid characters, only A-z, 0-9, - and whitespace are allowed.')
 
     return value
   return wrapper

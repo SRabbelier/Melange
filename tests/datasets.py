@@ -167,8 +167,6 @@ class GCITimelineData(DataSet):
     scope = SponsorData.google
     program_start =  datetime.today() - timedelta(days=30)
     program_end = datetime.today() + timedelta(days=30)
-    org_signup_start = datetime.today() + timedelta(days=25)
-    org_signup_end = datetime.today() + timedelta(days=25)
 
 
 class ProgramData(DataSet):

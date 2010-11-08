@@ -172,12 +172,14 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin'], ['active'],
-            []])]
+            []]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['edit'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']])]
+            ['Unapproved', 'Unpublished', 'Open']]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['delete'] = [
         ('checkRoleAndStatusForTask', 
             [['gci/org_admin'], ['active'],
@@ -189,7 +191,8 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin', 'gci/mentor'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']])]
+            ['Unapproved', 'Unpublished', 'Open']]),
+        ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.task.logic
@@ -272,35 +275,36 @@ class View(base.View):
     # once prefetch for list of references is fixed
     new_params['public_field_extra'] = lambda entity: {
         "org": entity.scope.name,
-        "difficulty": entity.difficulty[0].tag,
-        "points": entity.program.getRankingSchema()[entity.difficulty[0].tag],
-        #"points": .ranking_schema['Easy'],
+        "points_difficulty": "%s (%s)" % (
+            entity.difficulty[0].value, entity.difficulty[0].tag),
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
+        "arbit_tag": entity.tags_string(entity.arbit_tag),
     }
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
-        "title", "org", "difficulty", "points", "task_type",
-        "time_to_complete", "status", "mentors",
+        "title", "org", "points_difficulty", "task_type",
+        "arbit_tag", "time_to_complete", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Organization", "Difficulty", "Points", "Type",
-        "Time To Complete (hours)", "Status", "Mentors",
+        "Title", "Organization", "Points (Difficulty)", "Type",
+        "Tags", "Time To Complete (hours)", "Status", "Mentors",
     ]
 
     # parameters to list the task on the organization home page
     new_params['home_field_extra'] = lambda entity: {
-        "difficulty": entity.tags_string(entity.difficulty),
+        "points_difficulty": "%s (%s)" % (
+            entity.difficulty[0].value, entity.difficulty[0].tag),
         "task_type": entity.tags_string(entity.task_type),
         "arbit_tag": entity.tags_string(entity.arbit_tag),
         "mentors": render(db.get(entity.mentors)),
     }
 
-    new_params['home_field_keys'] = ["title", "difficulty", "task_type",
+    new_params['home_field_keys'] = ["title", "points_difficulty", "task_type",
                                      "arbit_tag", "time_to_complete",
                                      "mentors", "modified_on"]
     new_params['home_field_hidden'] = ["modified_on"]
-    new_params['home_field_names'] = ["Title", "Difficulty", "Type",
+    new_params['home_field_names'] = ["Title", "Points (Difficulty)", "Type",
                                      "Tags", "Time To Complete (hours)",
                                      "Mentors", "Modified On"]
 
@@ -620,12 +624,12 @@ class View(base.View):
         filter, unique=True)
 
     role_entity = host_entity or org_admin_entity
-
     if role_entity:
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      elif fields.get('approved'):
+      elif fields.get('approved') or entity.status == 'Open':
+        # Set it to be unpublished
         fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])
@@ -807,10 +811,9 @@ class View(base.View):
 
       entity = logic.updateOrCreateFromFields(fields)
 
-    redirect = gci_redirects.getSuggestTaskRedirect(
-        entity, params)
-
     page_params = params['edit_params']
+
+    request.path = gci_redirects.getSuggestTaskRedirect(entity, params)
 
     return helper.responses.redirectToChangedSuffix(
         request, None, params=page_params)
@@ -969,15 +972,6 @@ class View(base.View):
 
     # give the capability to approve tasks for the org_admins
     if gci_org_admin_logic.logic.getForFields(fields, unique=True):
-      tuapp_params['public_field_keys'] = [
-          'status', 'title', 'org', 'difficulty', 'task_type',
-          'time_to_complete', 'mentors'
-      ]
-      tuapp_params['public_field_names'] = [
-          'Status', 'Title', 'Organization', 'Difficulty', 'Type',
-          'Time To Complete (hours)', 'Mentors',
-      ]
-
       tuapp_params['public_field_props'] = {
           'status': {
               'stype': 'select',

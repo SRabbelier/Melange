@@ -43,7 +43,6 @@ from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import params as params_helper
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import document as document_view
 from soc.views.models import program
@@ -56,11 +55,8 @@ from soc.modules.gci.logic.models import student as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gci.models import task as gci_task_model
-from soc.modules.gci.tasks import ranking_update
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.helper import redirects as gci_redirects
-
-from soc.modules.gci.models.task import TaskDifficultyTag
 
 import soc.modules.gci.logic.models.program
 
@@ -119,15 +115,11 @@ class View(program.View):
         [gci_program_logic.logic])]
     rights['task_type'] = [('checkIsHostForProgram',
         [gci_program_logic.logic])]
-    rights['difficulty_tag_edit'] = [('checkIsHostForProgram',
-        [gci_program_logic.logic])]
     rights['type_tag_edit'] = [('checkIsHostForProgram',
         [gci_program_logic.logic])]
     rights['list_tasks'] = [('checkIsAfterEvent',
         ['tasks_publicly_visible',
          '__all__', gci_program_logic.logic])]
-    rights['ranking_schema'] = [('checkIsHostForProgram',
-        [gci_program_logic.logic])]
     rights['show_ranking'] = ['allow']
 
     new_params = {}
@@ -156,18 +148,12 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>task_type)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_edit',
          'Edit Task Type Tags'),
-        (r'^%(url_name)s/(?P<access_type>difficulty_tag_edit)/%(key_fields)s$',
-         '%(module_package)s.%(module_name)s.difficulty_tag_edit',
-         'Edit a Difficulty Tag'),
         (r'^%(url_name)s/(?P<access_type>type_tag_edit)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_tag_edit',
          'Edit a Task Type Tag'),
         (r'^%(url_name)s/(?P<access_type>list_tasks)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.list_tasks',
          'List of all Tasks in'),
-        (r'^%(url_name)s/(?P<access_type>ranking_schema)/%(key_fields)s$',
-         '%(module_package)s.%(module_name)s.ranking_schema',
-         'Edit ranking schema'),
         (r'^%(url_name)s/(?P<access_type>show_ranking)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.show_ranking',
          'Show ranking'),
@@ -374,11 +360,6 @@ class View(program.View):
         items += [(gci_redirects.getTaskTypeEditRedirect(
             entity, {'url_name': 'gci/program'}),
             "Edit Task Type Tags", 'any_access')]
-        # add link to edit Ranking Schema
-        items += [(gci_redirects.getRankingSchemaEditRedirect(
-            entity, {'url_name': 'gci/program'}),
-            "Edit Ranking Schema", 'any_access')]
-
 
       except out_of_band.Error:
         pass
@@ -415,7 +396,7 @@ class View(program.View):
     org_app_survey = org_app_logic.getForProgram(gci_program_entity)
 
     if org_app_survey and \
-        timeline_helper.isActivePeriod(timeline_entity, 'org_signup'):
+        timeline_helper.isActivePeriod(org_app_survey, 'survey'):
       # add the organization signup link
       items += [
           (redirects.getTakeSurveyRedirect(
@@ -423,7 +404,7 @@ class View(program.View):
           "Apply to become an Organization", 'any_access')]
 
     if user and org_app_survey and timeline_helper.isAfterEvent(
-        timeline_entity, 'org_signup_start'):
+        org_app_survey, 'survey_start'):
 
       main_admin_fields = {
           'main_admin': user,
@@ -580,64 +561,110 @@ class View(program.View):
                          params=None, **kwargs):
     """View method used to edit Difficulty Level tags.
     """
-
     params = dicts.merge(params, self._params)
 
     try:
-      entity = self._logic.getFromKeyFieldsOr404(kwargs)
+      program_entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
       return helper.responses.errorResponse(
           error, request, template=params['error_public'])
 
+    if request.POST:
+      return self.taskDifficultyEditPost(request, program_entity, params)
+    else: #request.GET
+      return self.taskDifficultyEditGet(request, program_entity, page_name, params)
+
+  def taskDifficultyEditGet(self, request, program_entity, page_name, params):
+    """View method for edit task difficulty tags GET requests.
+    """
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
     context['page_name'] = page_name
 
-    context['program_key_name'] = entity.key().name()
+    context['program_key_name'] = program_entity.key().name()
 
-    context['difficulties'] = gci_task_model.TaskDifficultyTag.get_by_scope(
-        entity)
+    difficulty_tags = gci_task_model.TaskDifficultyTag.get_by_scope(
+        program_entity)
 
-    params['edit_template'] = 'modules/gci/program/tag/difficulty.html'
+    difficulties = []
+    for difficulty in difficulty_tags:
+      difficulties.append({
+        'name': difficulty.tag,
+        'value': difficulty.value })
+    context['difficulties'] = simplejson.dumps(difficulties)
 
-    return self._constructResponse(request, entity, context, None, params)
+    template = 'modules/gci/program/tag/difficulty.html'
 
-  @decorators.merge_params
-  @decorators.check_access
-  def difficultyTagEdit(self, request, access_type, page_name=None,
-                        params=None, **kwargs):
-    """View method used to edit a supplied Difficulty level tag.
+    return self._constructResponse(request, program_entity, context, None,
+                                   params, template=template)
+
+  def taskDifficultyEditPost(self, request, program_entity, params):
+    """View method for edit task difficulty tags POST requests.
     """
+    post_dict = request.POST
 
-    get_params = request.GET
+    operation = simplejson.loads(post_dict.get('operation'))
 
-    order = get_params.getlist('order')
+    # invalid request
+    INVALID_REQUEST_RESPONSE = http.HttpResponse()
+    INVALID_REQUEST_RESPONSE.status_code = 400
+    if not operation:
+      return INVALID_REQUEST_RESPONSE
 
-    program_entity = gci_program_logic.logic.getFromKeyFields(kwargs)
+    op = operation.get('op')
 
-    if order:
-      for index, elem in enumerate(order):
-        gci_task_model.TaskDifficultyTag.update_order(
-              program_entity, elem, index)
-      return http.HttpResponse()
-    else:
-      tag_data = get_params.getlist('tag_data')
+    # TODO(ljvderijk): How do we want to deal with the setting of the value
+    # property in the tag since it now requires an extra put.
 
-      tag_name = tag_data[0].strip()
-      tag_value = tag_data[1].strip()
+    data = operation['data']
+    if op == 'add':
+      for tag_data in data:
+        tag = gci_task_model.TaskDifficultyTag.get_or_create(
+            program_entity, tag_data['name'])
+        tag.value = int(tag_data['value'])
+        tag.put()
+    elif op == 'change':
+        current_tag_data = data[0]
+        new_tag_data = data[1]
 
-      if tag_name:
-        if not tag_value:
-          gci_task_model.TaskDifficultyTag.delete_tag(
-              program_entity, tag_name)
-        elif tag_name != tag_value:
-          gci_task_model.TaskDifficultyTag.copy_tag(
-              program_entity, tag_name, tag_value)
-      else:
-        gci_task_model.TaskDifficultyTag.get_or_create(
-            program_entity, tag_value)
+        current_tag_name = current_tag_data['name']
+        new_tag_name = new_tag_data['name']
 
-      return http.HttpResponse(tag_value)
+        current_tag = gci_task_model.TaskDifficultyTag.get_by_scope_and_name(
+            program_entity, current_tag_name)
+
+        if not current_tag:
+          return INVALID_REQUEST_RESPONSE
+
+        if current_tag_name != new_tag_name:
+          # rename tag
+          new_tag = gci_task_model.TaskDifficultyTag.copy_tag(
+              program_entity, current_tag_name, new_tag_name)
+          # TODO(ljvderijk): The tag copy method should work with new fields
+          new_tag.order = current_tag.order
+          new_tag.value = int(new_tag_data['value'])
+          new_tag.put()
+        else:
+          # change value of the tag
+          current_tag.value = int(new_tag_data['value'])
+          current_tag.put()
+    elif op == 'delete':
+      for tag_data in data:
+        gci_task_model.TaskDifficultyTag.delete_tag(
+            program_entity, tag_data['name'])
+    elif op == 'reorder':
+      tags = []
+      for i in range(0, len(data)):
+        tag_data = data[i]
+        tag = gci_task_model.TaskDifficultyTag.get_by_scope_and_name(
+            program_entity, tag_data['name'])
+
+        tag.order = i
+        tags.append(tag)
+
+      db.put(tags)
+
+    return http.HttpResponse()
 
   @decorators.merge_params
   @decorators.check_access
@@ -645,7 +672,6 @@ class View(program.View):
                    params=None, **kwargs):
     """View method used to edit Task Type tags.
     """
-
     params = dicts.merge(params, self._params)
 
     try:
@@ -711,10 +737,20 @@ class View(program.View):
     """
 
     from soc.modules.gci.views.models.organization import view as org_view
+    from soc.modules.gci.views.models.org_app_survey import view as org_app_view
 
     logic = params['logic']
-
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
+
+    return super(View, self).acceptedOrgs(
+        request, page_name, params, program_entity, org_view, org_app_view)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def requestMoreSlots(self, request, access_type,
+                       page_name=None, params=None, **kwargs):
+    """TODO(dhans): Finish this
+    """
 
     fmt = {'name': program_entity.name}
 
@@ -822,7 +858,6 @@ class View(program.View):
     """View where all the tasks can be searched from.
     """
 
-    from soc.logic.models import user as user_logic
     from soc.modules.gci.views.models.task import view as task_view
 
     logic = params['logic']
@@ -866,8 +901,6 @@ class View(program.View):
     if lists.isDataRequest(request):
         return self.getListTasksData(request, list_params, tasks_filter)
 
-    tasks = gci_task_logic.logic.getForFields(filter=tasks_filter, unique=True)
-
     contents = []
     order = ['-modified_on']
 
@@ -876,94 +909,6 @@ class View(program.View):
     contents.append(tasks_list)
 
     return self._list(request, list_params, contents, page_name)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def rankingSchema(self, request, access_type, page_name=None, params=None,
-                    **kwargs):
-    """Edit ranking schema for the specified program.
-    """
-
-    logic = params['logic']
-    program = logic.getFromKeyFieldsOr404(kwargs)
-
-    dynafields = []
-    difficulties = TaskDifficultyTag.get_by_scope(program)
-
-    ranking_schema = program.getRankingSchema()
-
-    for difficulty in difficulties:
-      dynafields.append({
-          'name': difficulty.tag,
-          'base': forms.IntegerField,
-          'min_value': 0,
-          'initial': int(ranking_schema.get(difficulty.tag, 0)),
-          'required': False,
-          'group': ugettext('Difficulty'),
-          'help_text': ugettext('Number of points for this difficulty level.'),
-          })
-
-    dynaproperties = params_helper.getDynaFields(dynafields)
-
-    form = dynaform.newDynaForm(dynamodel=None,
-        dynabase=helper.forms.BaseForm, dynainclude=None,
-        dynaexclude=None, dynaproperties=dynaproperties)
-
-    context = responses.getUniversalContext(request)
-
-    if request.method == 'GET':
-      return self.rankingSchemaGet(request, context, form, params)
-    else:
-      # request.method == 'POST'
-      return self.rankingSchemaPost(request, context, params, program,
-          form, **kwargs)
-
-  def rankingSchemaGet(self, request, context, form, params):
-    """Handles the GET request for the ranking schema view.
-    """
-
-    context['form'] = form()
-    context['page_name'] = 'Edit ranking schema'
-    context['entity_type'] = 'Ranking Schema'
-
-    template = params['edit_template']
-
-    return responses.respond(request, template, context=context)
-
-  def rankingSchemaPost(self, request, context, params, program, form,
-                        **kwargs):
-    """Handles the POST request for the ranking schema view.
-    """
-
-    post_dict = request.POST
-
-    # populate the form using the POST data
-    form = form(post_dict)
-
-    if not form.is_valid():
-      return self._constructResponse(request, entity=program, context=context,
-          form=form, params=params, template=params['edit_template'])
-
-    # update ranking_schema with new values
-    ranking_schema = program.getRankingSchema()
-
-    # for now, the code below assumes that difficulties are not modified
-    fields = form.cleaned_data
-    has_changed = False
-    for key, value in fields.iteritems():
-      if key not in ranking_schema or ranking_schema[key] != value:
-        ranking_schema[key] = value
-        has_changed = True
-
-    if has_changed:
-      program.setRankingSchema(ranking_schema)
-      program.put()
-
-      # ranking is modified, hence all data should be cleared
-      ranking_update.startClearingTask(program.key().id_or_name())
-
-    # redirect to the same page
-    return http.HttpResponseRedirect('')
 
   @decorators.merge_params
   @decorators.check_access
@@ -1039,11 +984,9 @@ list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
 list_tasks = decorators.view(view.listTasks)
 public = decorators.view(view.public)
-ranking_schema = decorators.view(view.rankingSchema)
 show_ranking = decorators.view(view.showRanking)
 export = decorators.view(view.export)
 home = decorators.view(view.home)
-difficulty_tag_edit = decorators.view(view.difficultyTagEdit)
 task_type_tag_edit = decorators.view(view.taskTypeTagEdit)
 task_difficulty_edit = decorators.view(view.taskDifficultyEdit)
 task_type_edit = decorators.view(view.taskTypeEdit)

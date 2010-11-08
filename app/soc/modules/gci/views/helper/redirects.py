@@ -101,13 +101,6 @@ def getBulkCreateRedirect(entity, params):
   return '/%s/bulk_create/%s' % (
       params['url_name'], entity.key().id_or_name())
 
-def getRankingSchemaEditRedirect(entity, params):
-  """Returns the ranking entity edit redirect for the specified program entity.
-  """
-
-  return '/%s/ranking_schema/%s' % (
-      params['url_name'], entity.key().id_or_name())
-
 def getShowRankingRedirect(entity, params):
   """Returns show ranking redirect for the given program.
   """

@@ -99,6 +99,8 @@ class GCIChecker(access.Checker):
                    task quota limit for the given program.
     """
 
+    import settings
+
     self.checkIsUser(django_args)
 
     user_account = user_logic.logic.getForCurrentAccount()
@@ -130,7 +132,7 @@ class GCIChecker(access.Checker):
     # pylint: disable-msg=E1103
     org_entity = role_entity.scope
 
-    if check_limit:
+    if settings.GCI_TASK_QUOTA_LIMIT_ENABLED and check_limit:
       # count all tasks from this organization
       fields = {'scope': org_entity}
       task_query = gci_task_logic.logic.getQueryForFields(fields)
@@ -389,10 +391,3 @@ class GCIChecker(access.Checker):
       raise out_of_band.AccessViolation(message_fmt=DEF_ALREADY_CLAIMED_A_TASK)
 
     return org_entity
-
-def getSuggestTaskRedirect(entity, params):
-  """Returns the edit redirect for the specified entity.
-  """
-
-  return '/%s/suggest_task/%s' % (
-      params['url_name'], entity.key().id_or_name())

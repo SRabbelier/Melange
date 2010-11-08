@@ -26,9 +26,8 @@ from soc.logic.models import base
 
 import soc.models.linkable
 
-import soc.modules.gci.logic.models.student
+import soc.modules.gci.logic.models
 import soc.modules.gci.models.student_ranking
-
 
 class Logic(base.Logic):
   """Logic methods for the GCIStudentRanking model.
@@ -62,25 +61,17 @@ class Logic(base.Logic):
   def updateRanking(self, task):
     """Updates ranking with the specified task.
     """
-    
-    if not task:
-      return
-
-    # get ranking schema for the program
-    program = task.program
-    ranking_schema = program.getRankingSchema()
-    
     # get current ranking for the student
     entity = self.getOrCreateForStudent(task.student)
-    
-    points = entity.points
 
-    difficulty = task.difficulty[0].tag
+    if task.key() in entity.tasks:
+      # already counted
+      return
 
     #: update total number of points with new points for the task
-    points += ranking_schema[difficulty]
+    points = entity.points + task.difficulty[0].value
 
-    #: append a new task to the list of the tasks that have been
+    #: append a new task to the list of the tasks that have been counted
     tasks = entity.tasks
     tasks.append(task.key())
 
@@ -88,7 +79,6 @@ class Logic(base.Logic):
         'points': points,
         'tasks': tasks
         }
-
     self.updateEntityProperties(entity, properties)
 
 logic = Logic()

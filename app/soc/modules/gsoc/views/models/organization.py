@@ -25,10 +25,12 @@ __authors__ = [
   ]
 
 
+from django import forms
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.logic import cleaning
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.user import logic as user_logic
 
@@ -41,7 +43,7 @@ from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import organization
 
-from soc.modules.gsoc.logic import cleaning
+from soc.modules.gsoc.logic import cleaning as gsoc_cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
@@ -136,7 +138,13 @@ class View(organization.View):
               example_text="e.g. python, django, appengine",
               filter=['scope_path'],
               group="1. Public Info"),
-        'clean_tags': cleaning.cleanTagsList('tags', cleaning.COMMA_SEPARATOR)
+        'clean_tags': gsoc_cleaning.cleanTagsList(
+            'tags', gsoc_cleaning.COMMA_SEPARATOR),
+        'contrib_template': forms.fields.CharField(
+            widget=helper.widgets.FullTinyMCE(
+                attrs={'rows': 25, 'cols': 100})),
+        'clean_contrib_template': cleaning.clean_html_content(
+            'contrib_template'),
         }
 
     new_params['org_app_logic'] = org_app_logic

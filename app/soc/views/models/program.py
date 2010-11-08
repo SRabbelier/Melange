@@ -55,6 +55,16 @@ class View(presence.View):
 
   DEF_SLOTS_ALLOCATION_MSG = ugettext("Use this view to assign slots.")
 
+  DEF_ACCEPTED_ORGS_MSG_FMT = ugettext("These organizations have"
+      " been accepted into %(name)s, but they have not yet completed"
+      " their organization profile. You can still learn more about"
+      " each organization by visiting the links below.")
+
+  DEF_CREATED_ORGS_MSG_FMT = ugettext("These organizations have been"
+      " accepted into %(name)s and have completed their organization"
+      " profiles. You can learn more about each organization by"
+      " visiting the links below.")
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
@@ -258,6 +268,87 @@ class View(presence.View):
     return self._list(request, params, contents=participants,
                       page_name=page_name)
 
+  def getAcceptedOrgsData(self, request, aa_params, ap_params, org_app_logic, program_entity):
+    """Get acceptedOrgs data.
+    """
+
+    idx = lists.getListIndex(request)
+
+    if idx == 0:
+      params = ap_params
+
+      fields = {
+          'scope': program_entity,
+          'status': ['new', 'active', 'inactive']
+      }
+    elif idx == 1:
+      params = aa_params
+
+      org_app = org_app_logic.getForProgram(program_entity)
+      fields = {
+          'survey': org_app,
+          'status': 'accepted',
+      }
+    else:
+      return lists.getErrorResponse(request, "idx not valid")
+
+    contents = lists.getListData(request, params, fields)
+
+    return lists.getResponse(request, contents)
+
+  def acceptedOrgs(self, request, page_name, params, program_entity,
+                   org_view, org_app_view):
+    """See base.View.list.
+    """
+
+    logic = params['logic']
+
+    list_params = org_view.getParams().copy()
+    list_params['list_msg'] = program_entity.accepted_orgs_msg
+
+    fmt = {'name': program_entity.name}
+
+    org_app_params = org_app_view.getParams()
+
+    # try to retrieve an accepted record
+    org_app_logic = org_app_params['logic']
+    org_app = org_app_logic.getForProgram(program_entity)
+
+    aa_params = org_app_params['record_list_params'].copy() # accepted applications
+    aa_params['public_row_extra'] = lambda entity: {}
+    description = self.DEF_ACCEPTED_ORGS_MSG_FMT % fmt
+    aa_params['list_description'] = description
+    aa_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+    }
+
+    description = self.DEF_CREATED_ORGS_MSG_FMT % fmt
+    ap_params = org_view.getParams().copy()
+    ap_params['list_description'] = description
+    ap_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getHomeRedirect(entity, ap_params),
+    }
+    ap_params['public_conf_extra'] = {
+        "rowNum": -1,
+        "rowList": [],
+    }
+
+    if lists.isDataRequest(request):
+      return self.getAcceptedOrgsData(
+          request, aa_params, ap_params, org_app_logic, program_entity)
+
+    contents = []
+    order = ['name']
+
+    ap_list = lists.getListGenerator(request, ap_params, order=order, idx=0)
+    contents.append(ap_list)
+
+    aa_list = lists.getListGenerator(request, aa_params, order=order, idx=1)
+    contents.append(aa_list)
+
+    return self._list(request, list_params, contents, page_name)
+
   def _getStandardProgramEntries(self, entity, id, user, params):
     """Returns those entries for a program which are available to regular users,
     not only to hosts or developers. 
@@ -310,22 +401,19 @@ class View(presence.View):
     items += [(redirects.getListParticipantsRedirect(entity, params),
                "List Participants", 'any_access')]
 
-    timeline_entity = entity.timeline
-
     org_app_logic = params['org_app_logic']
     org_app_survey = org_app_logic.getForProgram(entity)
 
-    if not timeline_helper.isAfterEvent(timeline_entity, 'org_signup'):
-      # add link to create/edit OrgAppSurvey
-      items += [(redirects.getCreateSurveyRedirect(
-                    entity, params['document_prefix'], prefix + '/org_app'),
-                'Edit Org Application Survey','any_access')]
+    # add link to create/edit OrgAppSurvey
+    items += [(redirects.getCreateSurveyRedirect(
+                  entity, params['document_prefix'], prefix + '/org_app'),
+              'Edit Org Application Survey','any_access')]
 
     if org_app_survey:
       # add link to Review Org Applications
-        items += [(redirects.getReviewOverviewRedirect(
-            org_app_survey, params['org_app_view'].getParams()),
-            "Review Organization Applications", 'any_access')]
+      items += [(redirects.getReviewOverviewRedirect(
+          org_app_survey, params['org_app_view'].getParams()),
+          'Review Organization Applications', 'any_access')]
 
     return items
 

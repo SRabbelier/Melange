@@ -66,8 +66,6 @@ class View(org_app_survey.View):
                                   program_logic)]
     rights['take'] = [
         ('checkOrgAppRecordIfPresent', org_app_logic),
-        ('checkIsActivePeriod',
-            ['org_signup', 'scope_path', program_logic]),
         ('checkIsSurveyTakeable', org_app_logic),
         ('checkIsNotStudentForProgramInScope', [program_logic, student_logic])]
 

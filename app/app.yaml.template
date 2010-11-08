@@ -15,15 +15,17 @@
 # TODO(proto): uncomment and supply a Google App Engine application instance
 # application: FIXME
 # TODO(release): see the instructions in README about the "version:" field
-version: 0-8-20101017
+version: 0-8-20101106
 runtime: python
 api_version: 1
 
-handlers:
-- url: /remote_api
-  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
+builtins:
+- admin_redirect: on
+#- datastore_admin: on
+- remote_api: on
+- appstats: on
 
+handlers:
 - url: /(robots.txt|favicon.ico)
   static_files: soc/content/\1
   upload: soc/content/(robots.txt|favicon.ico)  

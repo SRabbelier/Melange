@@ -98,6 +98,8 @@ def bulkCreateTasks(request, *args, **kwargs):
       task_data: The tasks in the CSV format to process.
   """
 
+  import settings
+
   # keep track of our own timelimit (20 seconds)
   timelimit = 20000
   timekeeper = Timekeeper(timelimit)
@@ -117,26 +119,28 @@ def bulkCreateTasks(request, *args, **kwargs):
     error_handler.logErrorAndReturnOK(
         'No valid GCIOrgAdmin found for key: %s' % admin_key)
 
-  if not task_data:
-    error_handler.logErrorAndReturnOK(
-        'Empty or no task data defined in: %s' % post_dict)
-
   # note that we only query for the quota once
   task_quota = org_logic.getRemainingTaskQuota(org_admin.scope)
 
   # convert post data on tasks to something that behaves like a file
-  task_file = StringIO.StringIO(task_data)
+  task_file = StringIO.StringIO(task_data.encode('UTF-8'))
   tasks = csv.DictReader(task_file, fieldnames=DATA_HEADERS)
 
   completed = True
-  for task in tasks:
-    try :
+  try :
+    for task in tasks:
       # check if we have time
       timekeeper.ping()
 
-      if task_quota <= 0:
+      if settings.GCI_TASK_QUOTA_LIMIT_ENABLED and task_quota <= 0:
         return error_handler.logErrorAndReturnOK(
             'Task quota reached for %s' %(org_admin.scope.name))
+
+      # pop any extra columns added by DictReader.next()
+      task.pop(None,None)
+
+      for key, value in task.iteritems():
+        task[key] = value.decode('UTF-8')
 
       logging.info('Uncleaned task: %s' %task)
       # clean the data
@@ -153,18 +157,21 @@ def bulkCreateTasks(request, *args, **kwargs):
         # create a new task
         logging.info('Creating new task with fields: %s' %task)
         task_logic.updateOrCreateFromFields(task)
-        task_quota = task_quota -1
+        task_quota = task_quota - 1
       else:
         logging.warning('Invalid Task data: %s' %task)
-    except DeadlineExceededError:
-      # time to bail out
-      completed = False
+  except DeadlineExceededError:
+    # time to bail out
+    completed = False
+  except BaseException, e:
+    logging.warn('Exception occurred %s', e)
 
   if not completed:
-    new_task_data = csv.dictWriter(StringIO.StringIO(), DATA_HEADERS)
+    new_data = StringIO.StringIO()
+    new_data_writer = csv.DictWriter(new_data, fieldnames=DATA_HEADERS)
     for task in tasks:
-      new_task_data.write(task)
-    spawnBulkCreateTasks(new_task_data.getValue(), admin_key)
+      new_data_writer.writeRow(task)
+    spawnBulkCreateTasks(new_data.getvalue().decode('UTF-8'), admin_key)
 
   # we're done here
   return http.HttpResponse('OK')
@@ -180,9 +187,6 @@ def _cleanTask(task, org_admin):
     Returns:
         True iff the task dictionary has been successfully cleaned.
   """
-
-  # pop any extra columns added by DictReader.next()
-  task.pop(None,None)
 
   # check title
   if not task['title']:

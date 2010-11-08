@@ -122,7 +122,7 @@ def remote(args, context=None):
   else:
     host = '%s.appspot.com' % app_id
 
-  remote_api_stub.ConfigureRemoteDatastore(app_id, '/remote_api', auth_func, host)
+  remote_api_stub.ConfigureRemoteDatastore(app_id, '/_ah/remote_api', auth_func, host)
 
   context['deepFetch'] = deepFetch
 

@@ -628,7 +628,7 @@ class View(base.View):
       # this user can publish/approve the task
       if fields.get('published'):
         fields['status'] = 'Open'
-      elif fields.get('approved') or entity.status == 'Open':
+      elif fields.get('approved') or (entity and entity.status == 'Open'):
         # Set it to be unpublished
         fields['status'] = 'Unpublished'
 

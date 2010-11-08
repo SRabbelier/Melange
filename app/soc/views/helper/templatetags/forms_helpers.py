@@ -176,6 +176,13 @@ def readonly_url_field_as_twoline_table_row(field_label, field_value):
   return {'field_label': field_label,
           'field_value': field_value}
 
+@register.inclusion_tag(
+    'soc/templatetags/_readonly_email_field_as_table_row.html')
+def readonly_email_field_as_table_row(field_label, field_value):
+  """See readonly_field_as_table_row().
+  """
+  return {'field_label': field_label,
+          'field_value': field_value}
 
 @register.inclusion_tag(
     'soc/templatetags/_readonly_safe_field_as_table_row.html')

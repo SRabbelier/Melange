@@ -740,7 +740,7 @@ class View(program.View):
         'status': 'active'
         }
     student = gci_student_logic.logic.getForFields(fields, unique=True)
-    import logging
+
     # student must not work on any tasks at the moment
     if student and not gci_student_logic.logic.isWorkingOnTask(student):
 

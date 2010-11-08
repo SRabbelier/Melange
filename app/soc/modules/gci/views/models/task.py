@@ -228,7 +228,7 @@ class View(base.View):
         'Mentors edit a %(name)s'),
         (r'^%(url_name)s/(?P<access_type>list_org_tasks)/%(scope)s$',
         '%(module_package)s.%(module_name)s.list_org_tasks',
-        'List Organization %(name)s'),
+        'Organization %(name)s List'),
         ]
 
     new_params['extra_django_patterns'] = patterns

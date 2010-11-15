@@ -24,11 +24,16 @@ __authors__ = [
 
 from soc.logic.models import host as host_logic
 
+from soc.modules.gci.logic.models import mentor as gci_mentor_logic
+from soc.modules.gci.logic.models import organization as gci_org_logic
+from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
+from soc.modules.gci.logic.models import program as gci_program_logic
+from soc.modules.gci.logic.models import task as gci_task_logic
+
 from soc.modules.gsoc.logic.models import mentor as gsoc_mentor_logic
 from soc.modules.gsoc.logic.models import program as gsoc_program_logic
 from soc.modules.gsoc.logic.models import org_admin as gsoc_org_admin_logic
-from soc.modules.gsoc.logic.models import organization as \
-    gsoc_org_logic
+from soc.modules.gsoc.logic.models import organization as gsoc_org_logic
 from soc.modules.gsoc.logic.models import student as gsoc_student_logic
 from soc.modules.gsoc.logic.models import student_proposal as \
     gsoc_proposal_logic
@@ -47,6 +52,11 @@ class Mapper(object):
 
   LOGICS_DICT = {
       'host': host_logic,
+      'gci_mentor': gci_mentor_logic,
+      'gci_organization': gci_org_logic,
+      'gci_org_admin': gci_org_admin_logic,
+      'gci_program': gci_program_logic,
+      'gci_task': gci_task_logic,
       'gsoc_mentor': gsoc_mentor_logic,
       'gsoc_organization': gsoc_org_logic,
       'gsoc_org_admin': gsoc_org_admin_logic,

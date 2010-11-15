@@ -403,7 +403,7 @@ class View(presence.View):
     items += [(redirects.getListParticipantsRedirect(entity, params),
                "List Participants", 'any_access')]
     # add link to Manage Statistics
-    items += [(statistic_redirects.getManageRedirect(entity),
+    items += [(statistic_redirects.getManageRedirect(entity, params),
             'Manage Statistics', 'any_access')]
 
     org_app_logic = params['org_app_logic']

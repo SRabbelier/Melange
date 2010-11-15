@@ -132,6 +132,7 @@ class View(program.View):
     new_params['document_prefix'] = 'gci_program'
 
     new_params['module_package'] = 'soc.modules.gci.views.models'
+    new_params['url_prefix'] = 'gci'
     new_params['url_name'] = 'gci/program'
 
     new_params['extra_dynaexclude'] = ['task_difficulties', 'task_types',

@@ -425,12 +425,6 @@ class View(base.View):
 
       template = 'soc/statistic/show.html'
 
-      fields = {
-          'url_name': params['url_name'],
-          'scope_path': kwargs['scope_path'],
-          'link_id': 'students_per_degree'
-          }
-
     return responses.respond(request, template, context)
 
   @view_decorators.merge_params
@@ -543,7 +537,7 @@ class View(base.View):
     logic = params['logic']
     data = []
 
-    statistic = self._getStatisticEntity(link_id, scope_path, logic)    
+    statistic = self._getStatisticEntity(link_id, scope_path, logic)
     if statistic:
       data = logic.getCSV(statistic)
 

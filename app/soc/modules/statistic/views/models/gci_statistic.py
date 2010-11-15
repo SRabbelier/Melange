@@ -24,6 +24,8 @@ __authors__ = [
 
 from soc.logic import dicts
 
+from soc.tasks.helper import decorators as task_decorators
+
 from soc.views.helper import decorators as view_decorators
 
 from soc.modules.gci.logic.models.program import logic as gci_program_logic
@@ -56,4 +58,17 @@ class View(statistic.View):
 
 view = View()
 
+csv_export = view_decorators.view(view.csvExport)
 manage_statistics = view_decorators.view(view.manageStatistics)
+update_stats = view_decorators.view(view.updateOrClearStats)
+visualize = view_decorators.view(view.visualize)
+get_json_response = view_decorators.view(view.getJsonResponse)
+get_virtual_statistics = view_decorators.view(view.getVirtualStatistics)
+get_available_statistics = view_decorators.view(view.getAvailableStatistics)
+set_collect_task = view_decorators.view(view.setCollectTask)
+public = view_decorators.view(view.public)
+create = view_decorators.view(view.create)
+delete = view_decorators.view(view.delete)
+edit = view_decorators.view(view.edit)
+list = view_decorators.view(view.list)
+collect_task = task_decorators.task(view.collectTask)

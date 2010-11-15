@@ -28,8 +28,9 @@ from soc.logic import dicts
 from soc.views import helper
 
 from soc.views.helper import decorators
+from soc.views.helper import lists
 
-from soc.modules.gci.logic.models.task import logic as task_logic
+from soc.modules.gci.logic.models.task import logic as gci_task_logic
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.models import program as gci_program_view
 
@@ -38,6 +39,8 @@ import soc.modules.gci.logic.models.student_ranking
 class View(base.View):
   """View methods for the Tasks.
   """
+
+  DETAILS_MSG_FMT = 'Ranking details for %s.'
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the task View class
@@ -92,30 +95,53 @@ class View(base.View):
     logic = params['logic']
     ranking = logic.getFromKeyFields(kwargs)
     student = ranking.student
-    program = ranking.scope
+
+    list_params = params.copy()
+    list_params['list_description'] = self.DETAILS_MSG_FMT % student.name()
+    list_params['public_field_extra'] = lambda entity: {
+        'task': entity.title,
+        'org': entity.scope.name,
+        'points_difficulty': entity.difficulty.value
+        }
+    list_params['public_field_keys'] = [
+        'task', 'org', 'points_difficulty', 'closed_on']
+    list_params['public_field_names'] = [
+        'Task', 'Organization', 'Points (Difficulty)', 'Completed on']
+
+    if lists.isDataRequest(request):
+      return self.getListRankingDetailsData(request, list_params, student)
+
+    contents = []
+    order = ['closed_on']
+    list = lists.getListGenerator(request, list_params, order=order, idx=0)
+    contents.append(list)
+
+    return self._list(request, list_params, contents, page_name)
+
+
+  def getListRankingDetailsData(self, request, params, student):
+    """Returns the list data for Ranking Details list.
+
+    Args:
+      request: HTTPRequest object
+      params_collection: List of list Params indexed with the idx of the list
+      org_entity: GCIOrganization entity for which the lists are generated
+    """
 
     filter = {
         'student': student,
-        'program': program,
-        'status': 'Closed'
+        'status': 'Closed',
         }
-    tasks = task_logic.getForFields(filter)
 
-    total = 0
-    for task in tasks:
-      points = task.difficulty.value
-      total += points
-      task.points = points
+    visibility = 'public'
+    args = []
 
-    context = helper.responses.getUniversalContext(request)
-    context['page_name'] = 'Ranking details for %s.' % student.name()
-    context['tasks'] = tasks
-    context['total'] = total
+    params['logic'] = gci_task_logic
 
-    template = 'modules/gci/student_ranking/details.html'
+    contents = lists.getListData(request, params, filter,
+        visibility=visibility, args=args)
+    return lists.getResponse(request, contents)
 
-    return helper.responses.respond(request, template, context=context)
-    
 view = View()
 
 show_details = decorators.view(view.showDetails)

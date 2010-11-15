@@ -56,7 +56,6 @@ from soc.views.helper import decorators as view_decorators
 from soc.views.helper import lists
 from soc.views.helper import responses
 
-from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.statistic.logic.models.statistic import logic as \
     statistic_logic
 
@@ -73,10 +72,10 @@ class View(base.View):
   """
 
   DEF_EACH_GSOC_STAT_MSG = ugettext("These statistics have been"
-      " defined for all Google Summer of Code programs.")
+      " defined for all programs.")
 
   DEF_ONE_GSOC_STAT_MSG = ugettext("These statistics have been"
-      " defined for this particular Google Summer of Code program.")
+      " defined for %s program.")
 
   DEF_EACH_GSOC_LIST_IDX = 0
   DEF_ONE_GSOC_LIST_IDX = 1
@@ -84,7 +83,7 @@ class View(base.View):
   DEF_NO_VISUALIZATION_MSG_FMT = ugettext("There is no available"
       " visualization for %s statistic. Please try again later.")
 
-  def __init__(self, params=None):
+  def __init__(self, params={}):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
@@ -92,6 +91,8 @@ class View(base.View):
       params: a dict with params for this View
 
     """
+
+    program_logic = params.get('program_logic')
 
     rights = access.StatisticChecker(params)
 
@@ -237,7 +238,7 @@ class View(base.View):
     # statistic entities which are defined for the specific GSoC program
     op_params = list_params.copy()
 
-    op_params['list_description'] = self.DEF_ONE_GSOC_STAT_MSG
+    op_params['list_description'] = self.DEF_ONE_GSOC_STAT_MSG % program.name
     op_params['public_row_extra'] = lambda entity: {
         'link': redirects.getVisualizeRedirect(entity, op_params),
     }
@@ -594,12 +595,15 @@ class View(base.View):
 
     return json_response
 
-  def _getProgramInScopeEntity(self, scope_path):
+  @view_decorators.merge_params
+  def _getProgramInScopeEntity(self, scope_path, params=None):
     """Extracts program link_id from scope_path for a statistic.
     """
 
     path_link_name_match = linkable.PATH_LINK_ID_REGEX.match(scope_path)
     fields = path_link_name_match.groupdict()
+
+    program_logic = params['program_logic']
     return program_logic.getFromKeyFields(fields)
 
   def _getStatisticEntity(self, link_id, scope_path, logic):

@@ -44,6 +44,8 @@ from soc.views.models import presence
 from soc.views.models import document as document_view
 from soc.views.models import sponsor as sponsor_view
 
+from soc.modules.statistic.views.helper import redirects as statistic_redirects
+
 import soc.cache.logic
 import soc.logic.models.program
 import soc.models.work
@@ -400,6 +402,9 @@ class View(presence.View):
     # add link to list all participants
     items += [(redirects.getListParticipantsRedirect(entity, params),
                "List Participants", 'any_access')]
+    # add link to Manage Statistics
+    items += [(statistic_redirects.getManageRedirect(entity),
+            'Manage Statistics', 'any_access')]
 
     org_app_logic = params['org_app_logic']
     org_app_survey = org_app_logic.getForProgram(entity)

@@ -21,7 +21,8 @@ __authors__ = [
   ]
 
 
-from soc.modules.statistic.views.models import statistic
+from soc.modules.statistic.views.models import gci_statistic
+from soc.modules.statistic.views.models import gsoc_statistic
 
 
 class Callback(object):
@@ -43,4 +44,5 @@ class Callback(object):
     self.core.requireUniqueService('registerWithSitemap')
 
     # register the Statistic Views
-    self.core.registerSitemapEntry(statistic.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(gci_statistic.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(gsoc_statistic.view.getDjangoURLPatterns())

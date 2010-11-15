@@ -54,8 +54,6 @@ from soc.modules.gsoc.logic.models.student_proposal import logic \
     as student_proposal_logic
 from soc.modules.gsoc.views.helper import access
 
-from soc.modules.statistic.views.helper import redirects as statistic_redirects
-
 
 class View(program.View):
   """View methods for the Program model.
@@ -201,9 +199,6 @@ class View(program.View):
         # add link to Show Duplicate project assignments
         items += [(redirects.getShowDuplicatesRedirect(entity, params),
             'Show Duplicate Project Assignments', 'any_access')]
-        # add link to Manage Statistics
-        items += [(statistic_redirects.getManageRedirect(entity),
-            'Manage Statistics', 'any_access')]
         # add link to create a new Program Survey
         items += [(redirects.getCreateSurveyRedirect(
             entity, params['document_prefix'], 'survey'),

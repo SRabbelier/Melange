@@ -32,7 +32,7 @@ from gviz import gviz_api
 
 from soc.logic.models import base
 
-from soc.modules.gsoc.logic.models import program as program_logic
+from soc.logic.models import program as program_logic
 from soc.modules.gsoc.logic.models import student_proposal as \
     gsoc_proposal_logic
 from soc.modules.gsoc.logic.models import student_project as \

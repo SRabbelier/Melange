@@ -103,12 +103,11 @@ class View(base.View):
 
     new_params['edit_redirect'] = '/%(url_name)s/list'
 
-    site_name = site_logic.getSingleton().site_name
-
     new_params['public_configuration'] = {"multiselect": True}
     new_params['public_field_prefetch'] = ['from_user']
     new_params['public_field_extra'] = lambda entity: {
-        "from": entity.from_user.name if entity.from_user else site_name,
+        "from": entity.from_user.name if entity.from_user else
+            site_logic.getSingleton().site_name,
         "unread": "Not Read" if entity.unread else "Read",
     }
     new_params['public_field_props'] = {

@@ -102,18 +102,18 @@ class Logic(base.Logic):
               'difficulty': entity.difficulty[0].tag,
               'task_type': [type.tag for type in entity.task_type],
               'time_to_complete': entity.time_to_complete,
-              'mentors': [m_key.name() for m_key in entity.mentors],
+              'mentors': [m_key.id_or_name() for m_key in entity.mentors],
               'user': '',
               'student': '',
               'status': entity.status,
               'deadline': '',
-              'created_by': entity.created_by.key().name(),
+              'created_by': entity.created_by.key().id_or_name(),
               'created_on': str(entity.created_on),
               'modified_on': str(entity.modified_on),
               }
 
           if entity.modified_by:
-            history['modified_by'] = entity.modified_by.key().name()
+            history['modified_by'] = entity.modified_by.key().id_or_name()
 
           # initialize history
           task_history = {}
@@ -227,7 +227,7 @@ class Logic(base.Logic):
           'difficulty': properties['difficulty']['tags'],
           'task_type': properties['type_tags'],
           'time_to_complete': properties['time_to_complete'],
-          'mentors': [m_key.name() for m_key in properties['mentors']],
+          'mentors': [m_key.id_or_name() for m_key in properties['mentors']],
           'user': '',
           'student': '',
           'status': properties['status'],
@@ -237,8 +237,8 @@ class Logic(base.Logic):
           }
 
       if 'created_by' in properties and properties['created_by']:
-        history['created_by'] = properties['created_by'].key().name()
-        history['modified_by'] = properties['modified_by'].key().name()
+        history['created_by'] = properties['created_by'].key().id_or_name()
+        history['modified_by'] = properties['modified_by'].key().id_or_name()
 
       # Constructs new history from the _constructNewHistory method, assigns
       # it as a value to the dictionary key with current timestamp and dumps
@@ -312,7 +312,7 @@ class Logic(base.Logic):
 
       comment_properties = {
           'parent': entity,
-          'scope_path': entity.key().name(),
+          'scope_path': entity.key().id_or_name(),
           'created_by': None,
           'content': update_dict['content'],
           'changes': update_dict['changes'],

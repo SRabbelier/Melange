@@ -285,8 +285,7 @@ class View(base.View):
     # once prefetch for list of references is fixed
     new_params['public_field_extra'] = lambda entity: {
         "org": entity.scope.name,
-        "points_difficulty": "%s (%s)" % (
-            entity.difficulty[0].value, entity.difficulty[0].tag),
+        "points_difficulty": entity.taskDifficultyValue(),
         "task_type": entity.tags_string(entity.task_type),
         "mentors": render(db.get(entity.mentors)),
         "arbit_tag": entity.tags_string(entity.arbit_tag),
@@ -303,8 +302,7 @@ class View(base.View):
 
     # parameters to list the task on the organization home page
     new_params['home_field_extra'] = lambda entity: {
-        "points_difficulty": "%s (%s)" % (
-            entity.difficulty[0].value, entity.difficulty[0].tag),
+        "points_difficulty": entity.taskDifficultyValue(),
         "task_type": entity.tags_string(entity.task_type),
         "arbit_tag": entity.tags_string(entity.arbit_tag),
         "mentors": render(db.get(entity.mentors)),

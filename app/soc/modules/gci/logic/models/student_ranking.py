@@ -69,7 +69,7 @@ class Logic(base.Logic):
       return
 
     #: update total number of points with new points for the task
-    points = entity.points + task.difficulty[0].value
+    points = entity.points + task.taskDifficulty().value
 
     #: append a new task to the list of the tasks that have been counted
     tasks = entity.tasks

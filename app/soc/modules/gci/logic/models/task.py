@@ -99,7 +99,7 @@ class Logic(base.Logic):
           history = {
               'title': entity.title,
               'description': entity.description,
-              'difficulty': entity.difficulty[0].tag,
+              'difficulty': entity.taskDifficulty().tag,
               'task_type': [type.tag for type in entity.task_type],
               'time_to_complete': entity.time_to_complete,
               'mentors': [m_key.id_or_name() for m_key in entity.mentors],

@@ -285,3 +285,15 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
     Taggable.__init__(self, task_type=TaskTypeTag,
                       difficulty=TaskDifficultyTag,
                       arbit_tag=TaskArbitraryTag)
+
+  def taskDifficulty(self):
+    difficulties = self.difficulty
+    if len(difficulties) == 1:
+      return difficulties[0]
+
+    self.difficulty = {'tags': ['Unknown'], 'scope': self.program}
+    return self.difficulty[0]
+
+  def taskDifficultyValue(self):
+    difficulty = self.taskDifficulty()
+    return "%s (%s)" % (difficulty.value, difficulty.tag)

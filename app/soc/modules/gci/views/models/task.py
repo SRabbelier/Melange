@@ -208,12 +208,13 @@ class View(base.View):
     new_params['scope_view'] = gci_org_view
     new_params['scope_redirect'] = redirects.getCreateRedirect
 
-    new_params['extra_dynaexclude'] = ['task_type', 'mentors', 'user',
-                                       'student', 'program', 'status',
-                                       'deadline', 'created_by',
-                                       'created_on', 'modified_by',
-                                       'modified_on', 'history',
-                                       'link_id', 'difficulty', 'closed_on']
+    new_params['extra_dynaexclude'] = ['task_type', 'time_to_complete',
+                                       'mentors', 'user', 'student',
+                                       'program', 'status', 'deadline',
+                                       'created_by', 'created_on',
+                                       'modified_by', 'modified_on',
+                                       'history', 'link_id', 'difficulty',
+                                       'closed_on']
 
     patterns = []
     patterns += [
@@ -252,8 +253,17 @@ class View(base.View):
             widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
             required=True),
-        'time_to_complete': forms.IntegerField(min_value=1,
-                                               required=True),
+        'time_to_complete_days': forms.IntegerField(
+            min_value=0, required=True, initial=0,
+            label='Time to complete (in days)',
+            help_text=ugettext('If the task requires, say 84 hours in '
+            'total to complete, enter 3 in days field and 12 in hours '
+            'field.')),
+        'time_to_complete_hours': forms.IntegerField(
+            min_value=1, required=True, initial=1,
+            label='Time to complete (in hours)',
+            help_text=ugettext('If you enter the total amount of time in '
+            'hours, say 84, it will be converted to days and hours format.')),
         'clean_description': cleaning.clean_html_content('description'),
         'clean_arbit_tags': cleaning.str2set('arbit_tags'),
         }
@@ -570,6 +580,14 @@ class View(base.View):
         mentors_list.append(mentor.link_id)
       form.fields['mentors_list'].initial = ', '.join(mentors_list)
 
+    # time_to_complete is normalized to hours in datastore, so
+    # while presenting it on the form we are converting it to
+    # days and hours format
+    form.fields['time_to_complete_days'].initial = \
+        entity.time_to_complete / 24
+    form.fields['time_to_complete_hours'].initial = \
+        entity.time_to_complete % 24
+
     form.fields['link_id'].initial = entity.link_id
 
     # checks if the task is already approved or not and sets
@@ -642,6 +660,11 @@ class View(base.View):
 
     # explicitly change the last_modified_on since the content has been edited
     fields['modified_on'] = datetime.datetime.now()
+
+    # normalize days and hours for time to complete to hours
+    ttc_days = fields['time_to_complete_days']
+    ttc_hours = fields['time_to_complete_hours']
+    fields['time_to_complete'] =  (ttc_days * 24) + ttc_hours
 
     if not entity:
       fields['link_id'] = 't%i' % (int(time.time()*100))

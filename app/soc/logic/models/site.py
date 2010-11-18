@@ -25,7 +25,6 @@ __authors__ = [
 
 from google.appengine.api import memcache
 
-from soc.cache import singleton
 from soc.logic.helper import xsrfutil
 from soc.logic.models import presence_with_tos
 
@@ -79,7 +78,6 @@ class Logic(presence_with_tos.Logic):
 
     return ['link_id']
 
-  @singleton.cache
   def getSingleton(self):
     """Return singleton Site settings entity, since there is always only one.
     """

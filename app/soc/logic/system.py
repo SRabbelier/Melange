@@ -39,6 +39,17 @@ def getHostname():
 
   return os.environ.get('HTTP_HOST')
 
+def isSecondaryHostname(request):
+  """Returns if the current request is from the secondary hostname.
+  """
+
+  site_settings = site.logic.getSingleton()
+
+  if not site_settings.hostname:
+    return False
+
+  return request.path.find(site_settings.hostname) >= 0
+
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.
   """

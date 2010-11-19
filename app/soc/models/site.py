@@ -77,6 +77,13 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       'Valid Google API Key. This key is used for '
       'embedding Google services into the website.')
 
+  #: Valid Google API Key. Used to embed Google services.
+  secondary_google_api_key = db.StringProperty(verbose_name=ugettext('Secondary Google API'))
+  secondary_google_api_key.help_text = ugettext(
+      'Valid Google API Key. This secondary key is used for '
+      'embedding Google services into the website when '
+      'accessed through the "hostname" url.')
+
   #: No Reply Email address used for sending notification emails to site users
   noreply_email = db.EmailProperty(verbose_name=ugettext('No reply email'))
   noreply_email.help_text = ugettext(

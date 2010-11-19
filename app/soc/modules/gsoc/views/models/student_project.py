@@ -418,7 +418,7 @@ class View(base.View):
     if lists.isDataRequest(request):
       return self.getOverviewData(request, list_params, program_entity)
 
-    project_list = lists.getListGenerator(request, list_params, idx=0)
+    project_list = lists.getListGenerator(request, list_params, idx=0, visibility='admin')
 
     # fill contents with the list
     contents = [project_list]

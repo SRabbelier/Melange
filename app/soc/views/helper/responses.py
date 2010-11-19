@@ -142,7 +142,7 @@ def getUniversalContext(request):
   settings = site.logic.getSingleton()
 
   context['ga_tracking_num'] = settings.ga_tracking_num
-  context['gmaps_api_key'] = settings.gmaps_api_key
+  context['google_api_key'] = settings.google_api_key
   context['logo_url'] = settings.logo_url
   context['site_name'] = settings.site_name
   context['site_notice'] = settings.site_notice

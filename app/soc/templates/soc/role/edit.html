@@ -16,8 +16,8 @@ limitations under the License.
 
 {% block scripts %}
 {{ block.super }}
-{% if gmaps_api_key %}
-	<script src="http://www.google.com/jsapi?key={{ gmaps_api_key }}" type="text/javascript"></script>
+{% if google_api_key %}
+	<script src="http://www.google.com/jsapi?key={{ google_api_key }}" type="text/javascript"></script>
 	<script type="text/javascript" src="/soc/content/js/templates/soc/role/edit-091027.js"></script>
 {% endif %}
 {% endblock %}
@@ -28,7 +28,7 @@ limitations under the License.
 
 {% block instructions %}
 {{ block.super }}
-{% if not gmaps_api_key %}
+{% if not google_api_key %}
 <br /><span class="error">Google Maps API key not present.
 Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps field.
 </span>
@@ -37,7 +37,7 @@ Please insert your key in <a href="/site/edit">Site Settings</a>, Google Maps fi
 
 {% block form_table %}
 {{ block.super }}
-    {% if gmaps_api_key %}
+    {% if google_api_key %}
     <tr title="My Location">
       <td class="formfieldlabel">
         <label for="id_location">Public Location:</label>

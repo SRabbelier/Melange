@@ -71,11 +71,11 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       'entered every page is going to have Google Analytics '
       'initialization code in footer.')
 
-  #: Valid Google Maps API Key. Used to embed Google Maps.
-  gmaps_api_key = db.StringProperty(verbose_name=ugettext('Google Maps'))
-  gmaps_api_key.help_text = ugettext(
-      'Valid Google Maps API Key. This key is used for '
-      'embedding Google Maps into the website.')
+  #: Valid Google API Key. Used to embed Google services.
+  google_api_key = db.StringProperty(verbose_name=ugettext('Google API'))
+  google_api_key.help_text = ugettext(
+      'Valid Google API Key. This key is used for '
+      'embedding Google services into the website.')
 
   #: No Reply Email address used for sending notification emails to site users
   noreply_email = db.EmailProperty(verbose_name=ugettext('No reply email'))

@@ -41,7 +41,7 @@ $(document).ready(function(){
    (No additional information was entered with this work submission.)
    {% endif %}
  </div>
- {% if ws.url_to_work %}
+ {% if ws.url_to_work or ws_file_blob_key %}
   <div class="changes">
    <div class="box-inner">
     {% if ws.url_to_work %}

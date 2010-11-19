@@ -218,6 +218,19 @@ Title: {{ entity.title }}
     <form id="id_task_action_form" method="POST">
      <table>
        {% block form_table %}
+         {% if file_upload_errors %}
+         <span class="formfielderrorlabel">
+           Your changes have <i>not</i> been saved because there are errors
+           on this form which may be because of one of the following:
+         </span>
+         <ul class="errorlist">
+           <li>All the three fields: Comment, Submit URL and Submit Work
+           are empty. You must fill in at least one of them to correct this
+           error.</li>
+           <li>The URL you submitted is not a valid URL.</li>
+         </ul>
+         <br />
+         {% endif %}
          {% as_table comment_form %}
        {% endblock %}
      </table>

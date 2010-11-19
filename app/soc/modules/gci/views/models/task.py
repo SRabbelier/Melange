@@ -1153,10 +1153,24 @@ class View(base.View):
       form.data['work_submission_upload'] = request.file_uploads[0]
 
     if not form.is_valid():
-      template = params['public_template']
-      context['comment_form'] = form
-      return self._constructResponse(request, entity, context,
-                                     form, params, template=template)
+      if hasattr(request, 'file_uploads'):
+        # delete the blob
+        for file_blob in request.file_uploads:
+          file_blob.delete()
+
+        # form_error variable is set as a get variable in the URL
+        # because the blobstore API always expects a HttpResponseRedirect
+        # and if we send a redirect we have no way of transmitting
+        # what errors occured on the form.
+        # TODO: Javascript validations.
+        redirect_to = '%s?form_error=1' % (redirects.getPublicRedirect(
+            entity, params))
+        return http.HttpResponseRedirect(redirect_to)
+      else:
+        template = params['public_template']
+        context['comment_form'] = form
+        return self._constructResponse(request, entity, context,
+                                       form, params, template=template)
 
     _, fields = helper.forms.collectCleanedFields(form)
 
@@ -1346,7 +1360,12 @@ class View(base.View):
         rest see base.View.public()
     """
 
+    form_error = request.GET.get('form_error')
+
     context['comment_form'] = params['comment_form']()
+
+    if form_error:
+      context['file_upload_errors'] = True
 
     template = params['public_template']
 

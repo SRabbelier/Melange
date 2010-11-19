@@ -105,6 +105,14 @@ class User(soc.models.linkable.Linkable):
   disable_tinymce.example_text = ugettext(
       'If ticked, this will disable the TinyMCE editor')
 
+  #: field storing the user preference as to how many rows to show
+  nr_list_rows = db.IntegerProperty(
+      required=False, verbose_name=ugettext('Number of list rows'))
+  nr_list_rows.help_text = ugettext(
+      'Controls how many rows will be shown per list by default.')
+  nr_list_rows.example_text = ugettext(
+      'Defaults to 5 if not set.')
+
   #: field storing wheter the User has agreed to the site-wide Terms of Service.
   #: (Not a required field because the Terms of Service might not be present
   #: when the first User profile is created when bootstrapping the site.)

@@ -84,7 +84,6 @@ class View(presence_with_tos.View):
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'noreply_email': forms.EmailField(required=False),
         'clean_logo_url': cleaning.clean_url('logo_url'),
-        'clean_hostname': cleaning.clean_url('hostname'),
         }
     new_params['edit_extra_dynaproperties'] = {
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),

@@ -105,7 +105,7 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       'value used to prevent cross-site request forgery attacks.')
 
   #: Optional field storing the hostname
-  hostname = db.LinkProperty(
+  hostname = db.StringProperty(
       verbose_name=ugettext('Hostname'))
   hostname.help_text = ugettext(
       'URL of the hostname.')

@@ -81,7 +81,7 @@ def spawnBulkCreateTasks(data, org_admin):
     org_admin: GCIOrgAdmin uploading these tasks
   """
   data = StringIO.StringIO(data.encode('UTF-8'))
-  tasks = csv.DictReader(data, fieldnames=DATA_HEADERS)
+  tasks = csv.DictReader(data, fieldnames=DATA_HEADERS, restval="")
 
   task_list = []
   for task in tasks:

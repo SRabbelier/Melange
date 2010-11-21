@@ -158,6 +158,9 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>show_ranking)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.show_ranking',
          'Show ranking'),
+        (r'^%(url_name)s/(?P<access_type>request_tasks)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.request_tasks',
+         'Request more tasks'),
         ]
 
     new_params['public_field_keys'] = ["name", "scope_path"]
@@ -985,6 +988,7 @@ list = decorators.view(view.list)
 list_participants = decorators.view(view.listParticipants)
 list_tasks = decorators.view(view.listTasks)
 public = decorators.view(view.public)
+request_tasks = decorators.view(view.requestMoreTasks)
 show_ranking = decorators.view(view.showRanking)
 export = decorators.view(view.export)
 home = decorators.view(view.home)

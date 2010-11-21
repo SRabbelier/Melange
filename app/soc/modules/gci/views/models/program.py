@@ -90,6 +90,12 @@ class View(program.View):
   DEF_LIST_RANKING_MSG_FMT = ugettext(
       "Shows current ranking of %s.")
 
+  DEF_REQUEST_TASKS_MSG = ugettext(
+      'You can request more tasks from organizations which do not have '
+      'any open tasks at the moment. Just click on the organization that '
+      'is currently blocking your work and you will be able to send a message '
+      'to their admins.')
+
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
     to provide the user with list, public, create, edit and delete views.
@@ -759,82 +765,54 @@ class View(program.View):
   @decorators.check_access
   def requestMoreTasks(self, request, access_type,
                        page_name=None, params=None, **kwargs):
-    """TODO(dhans): Finish this
+    """List of all organization which allows students to request new tasks
+    from organizations which do not have any open tasks.
     """
+
+    from soc.modules.gci.views.models.organization import view as org_view
+
+    logic = params['logic']
+
+    program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
     fmt = {'name': program_entity.name}
 
-    aa_params = org_view.getParams().copy()
-    aa_params['list_msg'] = program_entity.accepted_orgs_msg
-    aa_params['list_description'] = self.DEF_PARTICIPATING_ORGS_MSG_FMT % fmt
+    rt_params = org_view.getParams().copy()
+    rt_params['list_msg'] = self.DEF_REQUEST_TASKS_MSG
 
-    aa_params['participating_field_keys'] = [
-        'name', 'short_name', 'home_page', 'pub_mailing_list', 'open_tasks']
-    aa_params['participating_field_names'] = [
-        'Organization', 'Short Name', 'Home Page', 'Public Mailing List',
-        'Open Tasks']
-    aa_params['participating_field_extra'] = lambda entity: {
+    rt_params['participating_field_keys'] = [
+        'name', 'home_page', 'pub_mailing_list', 'open_tasks']
+    rt_params['participating_field_names'] = [
+        'Organization', 'Home Page', 'Public Mailing List', 'Open Tasks']
+    rt_params['participating_field_extra'] = lambda entity: {
         'open_tasks': len(gci_task_logic.logic.getForFields({
             'scope': entity, 'status': ['Open', 'Reopened']}))
     }
+    rt_params['participating_row_extra'] = lambda entity: {
+        'link': gci_redirects.getRequestTaskRedirect(
+            entity, {'url_name': rt_params['url_name']})
+    } if canRequestTask(entity) else {}
 
-    # request task button should be available only for students
-    user = user_logic.logic.getForCurrentAccount()
-    fields = {
+    def canRequestTask(entity):
+      """Checks if a task may be requested from particular organization.
+      """
+
+      fields = {
+          'scope': entity,
+          'status': ['Open', 'Reopened']
+          }
+
+      task = gci_task_logic.logic.getForFields(fields, unique=True)
+
+      return False if task else True
+
+    filter = {
         'scope': program_entity,
-        'user': user,
         'status': 'active'
         }
-    student = gci_student_logic.logic.getForFields(fields, unique=True)
-
-    # student must not work on any tasks at the moment
-    if student and not gci_student_logic.logic.isWorkingOnTask(student):
-
-      def canRequestTask(entity):
-        """Checks if a task may be requested from particular organization.
-        """
-
-        fields = {
-            'scope': entity,
-            'status': ['Open', 'Reopened']
-            }
-        task = gci_task_logic.logic.getForFields(fields, unique=True)
-
-        return False if task else True
-
-      aa_params['participating_row_action'] = {
-          "type": "redirect_custom",
-          "parameters": dict(new_window=True),
-      }
-
-      aa_params['participating_button_extra'] = lambda entity: {} \
-          if not canRequestTask(entity) else {
-          'slots': {
-              'caption': 'Request additional tasks for %s' % entity.name,
-              'link': gci_redirects.getRequestTaskRedirect(entity, aa_params),
-              }
-      }
-
-      aa_params['participating_conf_extra'] = {
-          "multiselect": False,
-      }
-
-      aa_params['participating_button_global'] = [{
-          'bounds': [1, 1],
-          'id': 'slots',
-          'caption': 'Request additional tasks',
-          'type': "redirect_custom",
-          'parameters': {
-             'new_window': False,
-             }
-          }]
-
-    filter = {'scope': program_entity,
-                 'status': 'active'}
 
     return self.list(request, 'allow', page_name=page_name,
-                     params=aa_params, filter=filter,
-                     visibility='participating')
+        params=rt_params, filter=filter, visibility='participating')
 
   def getListTasksData(self, request, params, tasks_filter):
     """Returns the list data for all tasks list for program host and

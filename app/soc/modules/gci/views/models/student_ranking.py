@@ -97,7 +97,7 @@ class View(base.View):
     student = ranking.student
 
     list_params = params.copy()
-    list_params['list_description'] = self.DETAILS_MSG_FMT % student.name()
+    list_params['list_description'] = self.DETAILS_MSG_FMT % student.user.name
     list_params['public_field_extra'] = lambda entity: {
         'task': entity.title,
         'org': entity.scope.name,

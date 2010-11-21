@@ -30,6 +30,7 @@ import time
 from django import http
 from django.utils import simplejson
 
+from google.appengine.ext import db
 from google.appengine.api.labs import taskqueue
 from google.appengine.runtime import DeadlineExceededError
 
@@ -87,7 +88,7 @@ def spawnBulkCreateTasks(data, org_admin):
   for task in tasks:
     # pop any extra columns
     task.pop(None,None)
-    task_list.append(simplejson.dumps(task))
+    task_list.append(db.Text(simplejson.dumps(task)))
 
   bulk_data = bulk_create_model.GCIBulkCreateData(
       tasks=task_list, created_by=org_admin, total_tasks=len(task_list))
@@ -160,9 +161,9 @@ def bulkCreateTasks(request, *args, **kwargs):
         logging.warning(
             'Invalid task data uploaded, the following errors occurred: %s'
             %errors)
-        bulk_data.errors.append(
+        bulk_data.errors.append(db.Text(
             'The task in row %i contains the following errors.\n %s' \
-            %(bulk_data.tasksRemoved(), '\n'.join(errors)))
+            %(bulk_data.tasksRemoved(), '\n'.join(errors))))
 
       # at-most-once semantics for creating tasks
       bulk_data.put()

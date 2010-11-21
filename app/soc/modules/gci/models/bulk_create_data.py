@@ -30,10 +30,10 @@ class GCIBulkCreateData(db.Model):
   """
 
   #: The tasks to be created in json format.
-  tasks = db.StringListProperty()
+  tasks = db.ListProperty(item_type=db.Text)
 
   #: The accumulated error messages
-  errors = db.StringListProperty()
+  errors = db.ListProperty(item_type=db.Text)
 
   #: The number of tasks that are present when this entity is created, this
   #: allows us to give the user more concrete information about which line of

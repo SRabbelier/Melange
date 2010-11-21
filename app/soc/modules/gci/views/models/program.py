@@ -748,7 +748,7 @@ class View(program.View):
 
   @decorators.merge_params
   @decorators.check_access
-  def requestMoreSlots(self, request, access_type,
+  def requestMoreTasks(self, request, access_type,
                        page_name=None, params=None, **kwargs):
     """TODO(dhans): Finish this
     """

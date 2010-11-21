@@ -28,6 +28,7 @@ import StringIO
 import time
 
 from django import http
+from django.utils import simplejson
 
 from google.appengine.api.labs import taskqueue
 from google.appengine.runtime import DeadlineExceededError
@@ -40,11 +41,14 @@ from htmlsanitizer import safe_html
 from soc.tasks.helper import error_handler
 from soc.tasks.helper.timekeeper import Timekeeper
 
+from soc.modules.gci.logic.helper import notifications
 from soc.modules.gci.logic.models.mentor import logic as mentor_logic
 from soc.modules.gci.logic.models.organization import logic as org_logic
-from soc.modules.gci.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gci.logic.models.task import logic as task_logic
 from soc.modules.gci.models import task as task_model
+from soc.modules.gci.models import bulk_create_data as bulk_create_model
+
+BULK_CREATE_URL = '/tasks/gci/task/bulk_create_tasks'
 
 DATA_HEADERS = ['title', 'description', 'time_to_complete', 'mentors',
                 'difficulty', 'task_type', 'arbit_tag']
@@ -60,7 +64,7 @@ def getDjangoURLPatterns():
   return patterns
 
 
-def spawnBulkCreateTasks(data, admin_key):
+def spawnBulkCreateTasks(data, org_admin):
   """Spawns a task to bulk post the given data.
 
   The data given to this method should be in CSV format with the following
@@ -74,18 +78,28 @@ def spawnBulkCreateTasks(data, admin_key):
 
   Args:
     data: string with data in csv format
-    admin_key: keyname for the GCIOrgAdmin that is uploading these tasks
+    org_admin: GCIOrgAdmin uploading these tasks
   """
+  data = StringIO.StringIO(data.encode('UTF-8'))
+  tasks = csv.DictReader(data, fieldnames=DATA_HEADERS)
+
+  task_list = []
+  for task in tasks:
+    # pop any extra columns
+    task.pop(None,None)
+    task_list.append(simplejson.dumps(task))
+
+  bulk_data = bulk_create_model.GCIBulkCreateData(
+      tasks=task_list, created_by=org_admin, total_tasks=len(task_list))
+  bulk_data.put()
 
   task_params = {
-      'task_data': data,
-      'admin_key': admin_key,
+      'bulk_create_key': bulk_data.key()
       }
-  task_url = '/tasks/gci/task/bulk_create_tasks'
 
   logging.info('Enqueued bulk_create with: %s' %task_params)
   new_task = taskqueue.Task(params=task_params,
-                            url=task_url)
+                            url=BULK_CREATE_URL)
   # add to the gci queue
   new_task.add(queue_name='gci-update')
 
@@ -94,10 +108,8 @@ def bulkCreateTasks(request, *args, **kwargs):
   """Task that creates GCI Tasks from bulk data specified in the POST dict.
 
   The POST dict should have the following information present:
-      admin_key: The keyname for the Org Admin who has uploaded these tasks.
-      task_data: The tasks in the CSV format to process.
+      bulk_create_key: the key of the bulk_create entity
   """
-
   import settings
 
   # keep track of our own timelimit (20 seconds)
@@ -106,29 +118,23 @@ def bulkCreateTasks(request, *args, **kwargs):
 
   post_dict = request.POST
 
-  admin_key = post_dict.get('admin_key')
-  task_data = post_dict.get('task_data')
-
-  if not admin_key or not task_data:
+  bulk_create_key = post_dict.get('bulk_create_key')
+  if not bulk_create_key:
     error_handler.logErrorAndReturnOK(
         'Not all POST data specified in: %s' % post_dict)
 
-  org_admin = org_admin_logic.getFromKeyName(admin_key)
-
-  if not org_admin or org_admin.status != 'active':
+  bulk_data = bulk_create_model.GCIBulkCreateData.get(bulk_create_key)
+  if not bulk_data:
     error_handler.logErrorAndReturnOK(
-        'No valid GCIOrgAdmin found for key: %s' % admin_key)
+        'No valid data found for key: %s' % bulk_create_key)
 
   # note that we only query for the quota once
+  org_admin = bulk_data.created_by
   task_quota = org_logic.getRemainingTaskQuota(org_admin.scope)
 
-  # convert post data on tasks to something that behaves like a file
-  task_file = StringIO.StringIO(task_data.encode('UTF-8'))
-  tasks = csv.DictReader(task_file, fieldnames=DATA_HEADERS)
-
-  completed = True
-  try :
-    for task in tasks:
+  tasks = bulk_data.tasks
+  while len(tasks) > 0:
+    try:
       # check if we have time
       timekeeper.ping()
 
@@ -136,42 +142,65 @@ def bulkCreateTasks(request, *args, **kwargs):
         return error_handler.logErrorAndReturnOK(
             'Task quota reached for %s' %(org_admin.scope.name))
 
-      # pop any extra columns added by DictReader.next()
-      task.pop(None,None)
+      # remove the first task
+      task_as_string = tasks.pop(0)
 
-      for key, value in task.iteritems():
-        task[key] = value.decode('UTF-8')
+      loaded_task = simplejson.loads(task_as_string)
+      task = {}
+      for key, value in loaded_task.iteritems():
+        # If we don't do this python will complain about kwargs not being
+        # strings when we try to save the new task.
+        task[key.encode('UTF-8')] = value
 
       logging.info('Uncleaned task: %s' %task)
       # clean the data
-      if _cleanTask(task, org_admin):
-        # set other properties
-        task['link_id'] = 't%i' % (int(time.time()*100))
-        task['scope'] = org_admin.scope
-        task['scope_path'] = org_admin.scope_path
-        task['program'] = org_admin.program
-        task['status'] = 'Unpublished'
-        task['created_by'] = org_admin
-        task['modified_by'] = org_admin
+      errors = _cleanTask(task, org_admin)
 
-        # create a new task
-        logging.info('Creating new task with fields: %s' %task)
-        task_logic.updateOrCreateFromFields(task)
-        task_quota = task_quota - 1
-      else:
-        logging.warning('Invalid Task data: %s' %task)
-  except DeadlineExceededError:
-    # time to bail out
-    completed = False
-  except BaseException, e:
-    logging.warn('Exception occurred %s', e)
+      if errors:
+        logging.warning(
+            'Invalid task data uploaded, the following errors occurred: %s'
+            %errors)
+        bulk_data.errors.append(
+            'The task in row %i contains the following errors.\n %s' \
+            %(bulk_data.tasksRemoved(), '\n'.join(errors)))
 
-  if not completed:
-    new_data = StringIO.StringIO()
-    new_data_writer = csv.DictWriter(new_data, fieldnames=DATA_HEADERS)
-    for task in tasks:
-      new_data_writer.writeRow(task)
-    spawnBulkCreateTasks(new_data.getvalue().decode('UTF-8'), admin_key)
+      # at-most-once semantics for creating tasks
+      bulk_data.put()
+
+      if errors:
+        # do the next task
+        continue
+
+      # set other properties
+      task['link_id'] = 't%i' % (int(time.time()*100))
+      task['scope'] = org_admin.scope
+      task['scope_path'] = org_admin.scope_path
+      task['program'] = org_admin.program
+      task['status'] = 'Unpublished'
+      task['created_by'] = org_admin
+      task['modified_by'] = org_admin
+
+      # create the new task
+      logging.info('Creating new task with fields: %s' %task)
+      task_logic.updateOrCreateFromFields(task)
+      task_quota = task_quota - 1
+    except DeadlineExceededError:
+      # time to bail out
+      pass
+
+  if len(tasks) == 0:
+    # send out a message
+    notifications.sendBulkCreationCompleted(bulk_data)
+    bulk_data.delete()
+  else:
+    # there is still work to be done, do a non 500 response and requeue
+    task_params = {
+        'bulk_create_key': bulk_data.key().id_or_name()
+        }
+    new_task = taskqueue.Task(params=task_params,
+                              url=BULK_CREATE_URL)
+    # add to the gci queue
+    new_task.add(queue_name='gci-update')
 
   # we're done here
   return http.HttpResponse('OK')
@@ -185,30 +214,33 @@ def _cleanTask(task, org_admin):
       org_admin: the Org Admin who is creating these tasks.
 
     Returns:
-        True iff the task dictionary has been successfully cleaned.
+        A list of error messages if any have occurred.
   """
+
+  errors = []
 
   # check title
   if not task['title']:
-    logging.warning('No valid title found')
-    return False
+    errors.append('No valid title present.')
 
   # clean description
   try:
     cleaner = HtmlSanitizer.Cleaner()
     cleaner.string = task['description']
     cleaner.clean()
+    task['description'] = cleaner.string.strip().replace('\r\n', '\n')  
   except (HTMLParseError, safe_html.IllegalHTML, TypeError), e:
     logging.warning('Cleaning of description failed with: %s' %e)
-    return False
-  task['description'] = cleaner.string.strip().replace('\r\n', '\n')
+    errors.append(
+        'Failed to clean the description, do not use naughty HTML such as '
+        '<script>.')
 
   # clean time to complete
   try:
     task['time_to_complete'] = int(task['time_to_complete'])
   except (ValueError, TypeError), e:
-    logging.warning('No valid time to completion found, failed with: %s' %e)
-    return False
+    errors.append('No valid time to completion found, given was: %s.' 
+                  %task['time_to_complete'])
 
   # clean mentors
   mentor_ids = set(task['mentors'].split(','))
@@ -223,10 +255,10 @@ def _cleanTask(task, org_admin):
       mentors.append(mentor.key())
 
   if not mentors:
-    # no valid mentors found
-    logging.warning('No valid mentors found')
-    return False
-  task['mentors'] = mentors
+    errors.append('No valid mentors found the given ids were: %s.' 
+                  %task['mentors'])
+  else:
+    task['mentors'] = mentors
 
   program_entity = org_admin.program
 
@@ -237,12 +269,12 @@ def _cleanTask(task, org_admin):
           task_model.TaskDifficultyTag.get_by_scope(program_entity)]
   if not difficulty or difficulty not in allowed_difficulties:
     # no valid difficulty found
-    logging.warning('No valid task difficulty found')
-    return False
-  task['difficulty'] = {
-      'tags': task['difficulty'],
-      'scope': program_entity
-      }
+    errors.append('No valid task difficulty found, given %s.' %difficulty)
+  else:
+    task['difficulty'] = {
+        'tags': task['difficulty'],
+        'scope': program_entity
+        }
 
   # clean task types
   task_types = []
@@ -255,12 +287,12 @@ def _cleanTask(task, org_admin):
 
   if not task_types:
     # no valid task types found
-    logging.warning('No valid task type found')
-    return False
-  task['task_type'] = {
-      'tags': task_types,
-      'scope': program_entity
-      }
+    errors.append('No valid task type found, given %s.' %task['task_type'])
+  else:
+    task['task_type'] = {
+        'tags': task_types,
+        'scope': program_entity
+        }
 
   # clean task tags
   arbit_tags = []
@@ -271,4 +303,4 @@ def _cleanTask(task, org_admin):
       'scope': program_entity
       }
 
-  return True
+  return errors

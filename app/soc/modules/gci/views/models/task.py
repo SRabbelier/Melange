@@ -759,7 +759,7 @@ class View(base.View):
         fields, unique=True)
 
     bulk_create_tasks.spawnBulkCreateTasks(properties['data'],
-                                           org_admin_entity.key().id_or_name())
+                                           org_admin_entity)
 
     return http.HttpResponseRedirect(
         request.path + '?%s=%s' % (params['submit_msg_param_name'],

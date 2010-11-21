@@ -14,20 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Appengine Tasks related to GCITask.
+"""Notifications for the GCI module.
 """
 
 __authors__ = [
-    '"Madhusudan.C.S" <madhusudancs@gmail.com>'
+    '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+    '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
 from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext
 
 from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic import mail_dispatcher
+from soc.logic.helper import notifications
 
+DEF_BULK_CREATE_COMPLETE_SUBJECT_MSG = ugettext(
+    'Bulk creation of tasks completed')
+
+DEF_BULK_CREATE_COMPLETE_TEMPLATE = \
+    'modules/gci/notification/messages/bulk_create_complete.html'
 
 def sendTaskUpdateMail(subscriber, subject, message_properties=None):
   """Sends an email to a user about an update to a Task.
@@ -72,7 +80,22 @@ def sendTaskUpdateMail(subscriber, subject, message_properties=None):
   # send out the message using the default new notification template
   mail_dispatcher.sendMailFromTemplate(template, messageProperties)
 
-def sendRequestForTaskNotofication():
-  """Sends a notification to organization admin that a student has requested
-  a new task, while there are currently no open tasks.
+def sendBulkCreationCompleted(bulk_data):
+  """Sends out a notification that the bulk creation of tasks has been
+  completed.
+
+  Any error messages that have been generated are also added to the notification.
+
+  Args:
+    bulk_data: GCIBulkCreateData entity containing information needed to
+               populate the notification.
   """
+  message_properties = {
+      'bulk_data' : bulk_data
+      }
+
+  subject = DEF_BULK_CREATE_COMPLETE_SUBJECT_MSG
+  template = DEF_BULK_CREATE_COMPLETE_TEMPLATE
+
+  notifications.sendNotification(
+      bulk_data.created_by.user, None, message_properties, subject, template)

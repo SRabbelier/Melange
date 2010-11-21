@@ -121,6 +121,12 @@ class View(program.View):
         ['tasks_publicly_visible',
          '__all__', gci_program_logic.logic])]
     rights['show_ranking'] = ['allow']
+    rights['request_tasks'] = [
+        ('checkHasRoleForKeyFieldsAsScope', [gci_student_logic.logic]),
+        ('checkIsAfterEvent', ['tasks_publicly_visible', '__all__',
+            gci_program_logic.logic]),
+        ('checkIsBeforeEvent', ['task_claim_deadline', '__all__',
+            gci_program_logic.logic])]
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.program.logic

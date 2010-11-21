@@ -783,8 +783,8 @@
                 // If there was a surrounding link (with class listsnoul, so just link for rows)
                 var field_text = row[column_name];
                 if (jQuery(field_text).parent().find("a.listsnoul").length) {
-                  // extract link href from the text
-                  var extracted_text = /^<a\b[^>]*href="(.*?)" \b[^>]*>(.*?)<\/a>$/.exec(field_text);
+                  // strip the surrounding link from the text
+                  var extracted_text = /^<a\b[^>]*>(.*?)<\/a>$/.exec(field_text);
                   field_text = extracted_text[1];
                 }
                 single_object[column_name] = field_text;

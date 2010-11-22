@@ -884,10 +884,11 @@ class View(program.View):
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': redirects.getPublicRedirect(entity, list_params)
         }
-    list_params['public_conf_extra'] = {
-        "rowNum": -1,
-        "rowList": [],
-        }
+    #list_params['public_conf_extra'] = {
+    #    "rowNum": -1,
+    #    "rowList": [],
+    #    }
+    list_params['public_conf_min_num'] = 100
 
     if lists.isDataRequest(request):
         return self.getListTasksData(request, list_params, tasks_filter)

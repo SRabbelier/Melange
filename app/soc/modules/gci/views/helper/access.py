@@ -145,7 +145,8 @@ class GCIChecker(access.Checker):
     if 'link_id' in django_args:
       task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
-      if task_entity.status not in ['Unapproved', 'Unpublished', 'Open']:
+      if task_entity.status not in ['Unapproved', 'Unpublished', 'Open',
+                                    'ClaimRequested', 'Reopened']:
         # task is claimed at least once
         raise out_of_band.AccessViolation(message_fmt=DEF_CANT_EDIT_MSG)
 

@@ -178,12 +178,14 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']]),
+            ['Unapproved', 'Unpublished', 'Open',
+             'ClaimRequested', 'Reopened']]),
         ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
     rights['delete'] = [
         ('checkRoleAndStatusForTask', 
             [['gci/org_admin'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']])]
+            ['Unapproved', 'Unpublished', 'Open',
+             'ClaimRequested', 'Reopened']])]
     rights['show'] = ['checkStatusForTask']
     rights['list_org_tasks'] = [
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', False])]
@@ -191,7 +193,8 @@ class View(base.View):
         ('checkCanOrgAdminOrMentorEdit', ['scope_path', True]),
         ('checkRoleAndStatusForTask',
             [['gci/org_admin', 'gci/mentor'], ['active'],
-            ['Unapproved', 'Unpublished', 'Open']]),
+            ['Unapproved', 'Unpublished', 'Open',
+             'ClaimRequested', 'Reopened']]),
         ('checkTimelineFromTaskScope', ['before', 'task_claim_deadline'])]
 
     new_params = {}
@@ -1481,7 +1484,8 @@ class View(base.View):
         validation, mentor_actions = self._constructMentorActions(
             context, entity)
         actions += mentor_actions
-        if entity.status in ['Unapproved', 'Unpublished', 'Open']:
+        if entity.status in ['Unapproved', 'Unpublished',
+            'Open', 'ClaimRequested', 'Reopened']:
           if host_entity or org_admin_entity:
             context['edit_link'] = redirects.getEditRedirect(entity, params)
           elif mentor_entity:

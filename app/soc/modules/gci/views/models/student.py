@@ -38,6 +38,7 @@ from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import student as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
+from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.models import program as gci_program_view
 from soc.modules.gci.views.models import task as gci_task_view
@@ -118,10 +119,13 @@ class View(student.View):
     idx = lists.getListIndex(request)
 
     # default list settings
-    args = []
     visibility = 'public'
 
     if idx == 0:
+      all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+      all_t = gci_task_model.TaskTypeTag.all().fetch(100)
+      args = [all_d, all_t]
+
       contents = lists.getListData(request, params, filter,
                                    visibility=visibility, args=args)
     else:

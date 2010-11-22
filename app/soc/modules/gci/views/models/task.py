@@ -294,12 +294,17 @@ class View(base.View):
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
         "title", "org", "points_difficulty", "task_type",
-        "arbit_tag", "days_hours", "status", "mentors",
+        "arbit_tag", "time_to_complete", "days_hours", "status", "mentors",
     ]
     new_params['public_field_names'] = [
-        "Title", "Organization", "Points (Difficulty)", "Type",
-        "Tags", "Time To Complete", "Status", "Mentors",
+        "Title", "Organization", "Points (Difficulty)", "Type", "Tags",
+        "Total Hours To Complete", "Time To Complete", "Status", "Mentors",
     ]
+    new_params['public_field_props'] = new_params['home_field_props'] = {
+        'time_to_complete': {
+            'sorttype': 'integer',
+        },
+    }
 
     # parameters to list the task on the organization home page
     new_params['home_field_extra'] = lambda entity, all_d, all_t: {
@@ -311,12 +316,13 @@ class View(base.View):
     }
 
     new_params['home_field_keys'] = ["title", "points_difficulty", "task_type",
-                                     "arbit_tag", "days_hours",
+                                     "arbit_tag", "time_to_complete", "days_hours",
                                      "mentors", "modified_on"]
     new_params['home_field_hidden'] = ["modified_on"]
     new_params['home_field_names'] = ["Title", "Points (Difficulty)", "Type",
-                                     "Tags", "Time To Complete",
-                                     "Mentors", "Modified On"]
+                                     "Tags", "Total Hours To Complete",
+                                     "Time To Complete", "Mentors",
+                                     "Modified On"]
 
     new_params['public_row_action'] = new_params['home_row_action'] = {
           "type": "redirect_custom",

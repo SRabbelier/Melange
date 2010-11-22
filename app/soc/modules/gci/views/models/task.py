@@ -289,15 +289,16 @@ class View(base.View):
         "task_type": entity.taskType(all_t),
         "mentors": render(db.get(entity.mentors)),
         "arbit_tag": entity.taskArbitTag(),
+        "days_hours": entity.taskTimeToComplete(),
     }
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
         "title", "org", "points_difficulty", "task_type",
-        "arbit_tag", "time_to_complete", "status", "mentors",
+        "arbit_tag", "days_hours", "status", "mentors",
     ]
     new_params['public_field_names'] = [
         "Title", "Organization", "Points (Difficulty)", "Type",
-        "Tags", "Time To Complete (hours)", "Status", "Mentors",
+        "Tags", "Time To Complete", "Status", "Mentors",
     ]
 
     # parameters to list the task on the organization home page
@@ -306,14 +307,15 @@ class View(base.View):
         "task_type": entity.taskType(all_t),
         "arbit_tag": entity.taskArbitTag(),
         "mentors": render(db.get(entity.mentors)),
+        "days_hours": entity.taskTimeToComplete(),
     }
 
     new_params['home_field_keys'] = ["title", "points_difficulty", "task_type",
-                                     "arbit_tag", "time_to_complete",
+                                     "arbit_tag", "days_hours",
                                      "mentors", "modified_on"]
     new_params['home_field_hidden'] = ["modified_on"]
     new_params['home_field_names'] = ["Title", "Points (Difficulty)", "Type",
-                                     "Tags", "Time To Complete (hours)",
+                                     "Tags", "Time To Complete",
                                      "Mentors", "Modified On"]
 
     new_params['public_row_action'] = new_params['home_row_action'] = {

@@ -314,3 +314,23 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
   def taskDifficultyValue(self, all_difficulties=None):
     difficulty = self.taskDifficulty(all_difficulties)
     return "%s (%s)" % (difficulty.value, difficulty.tag)
+
+  def taskTimeToComplete(self):
+    days = self.time_to_complete / 24
+    hours = self.time_to_complete % 24
+    result = []
+
+    if days == 1:
+      result.append("1 day")
+    if days > 1:
+      result.append("%d days" % days)
+
+    if days and hours:
+      result.append(" and ")
+
+    if hours == 1:
+      result.append("1 hour")
+    if hours > 1:
+      result.append("%d hours" % hours)
+
+    return "".join(result)

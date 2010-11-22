@@ -101,7 +101,7 @@ class View(base.View):
     list_params['public_field_extra'] = lambda entity: {
         'task': entity.title,
         'org': entity.scope.name,
-        'points_difficulty': entity.difficulty.value
+        'points_difficulty': entity.taskDifficulty().value
         }
     list_params['public_field_keys'] = [
         'task', 'org', 'points_difficulty', 'closed_on']

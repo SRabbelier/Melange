@@ -286,14 +286,31 @@ class GCITask(Taggable, soc.models.linkable.Linkable):
                       difficulty=TaskDifficultyTag,
                       arbit_tag=TaskArbitraryTag)
 
-  def taskDifficulty(self):
-    difficulties = self.difficulty
+  def taskDifficulty(self, all_difficulties=None):
+    if all_difficulties:
+      key = self.key()
+      difficulties = [i for i in all_difficulties if key in i.tagged]
+    else:
+      difficulties = self.difficulty
+
     if len(difficulties) == 1:
       return difficulties[0]
 
     self.difficulty = {'tags': ['Unknown'], 'scope': self.program}
     return self.difficulty[0]
 
-  def taskDifficultyValue(self):
-    difficulty = self.taskDifficulty()
+  def taskType(self, all_types=None, ret_list=False):
+    if all_types:
+      key = self.key()
+      types = [i for i in all_types if key in i.tagged]
+    else:
+      types = self.task_type
+
+    return self.tags_string(types, ret_list=ret_list)
+
+  def taskArbitTag(self, ret_list=False):
+    return self.tags_string(self.arbit_tag, ret_list=ret_list)
+
+  def taskDifficultyValue(self, all_difficulties=None):
+    difficulty = self.taskDifficulty(all_difficulties)
     return "%s (%s)" % (difficulty.value, difficulty.tag)

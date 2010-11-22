@@ -827,10 +827,13 @@ class View(program.View):
     idx = lists.getListIndex(request)
 
     # default list settings
-    args = []
     visibility = 'public'
 
     if idx == 0:
+      all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+      all_t = gci_task_model.TaskTypeTag.all().fetch(100)
+      args = [all_d, all_t]
+
       contents = lists.getListData(request, params, tasks_filter,
                                    visibility=visibility, args=args)
     else:

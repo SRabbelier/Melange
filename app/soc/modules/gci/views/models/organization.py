@@ -46,6 +46,7 @@ from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.logic.models.org_app_survey import logic as org_app_logic
+from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.models import program as gci_program_view
 from soc.modules.gci.views.helper import redirects as gci_redirects
@@ -161,13 +162,16 @@ class View(organization.View):
     idx = lists.getListIndex(request)
 
     # default list settings
-    args = []
     visibility = 'home'
 
     if idx == 0:
       filter = {'scope': org_entity}
     else:
       return lists.getErrorResponse(request, "idx not valid")
+
+    all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+    all_t = gci_task_model.TaskTypeTag.all().fetch(100)
+    args = [all_d, all_t]
 
     contents = lists.getListData(request, params, filter,
                                  visibility=visibility, args=args)

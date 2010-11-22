@@ -283,12 +283,12 @@ class View(base.View):
 
     # TODO (Madhu) Add mentors to prefetch of both public and home
     # once prefetch for list of references is fixed
-    new_params['public_field_extra'] = lambda entity: {
+    new_params['public_field_extra'] = lambda entity, all_d, all_t: {
         "org": entity.scope.name,
-        "points_difficulty": entity.taskDifficultyValue(),
-        "task_type": entity.tags_string(entity.task_type),
+        "points_difficulty": entity.taskDifficultyValue(all_d),
+        "task_type": entity.taskType(all_t),
         "mentors": render(db.get(entity.mentors)),
-        "arbit_tag": entity.tags_string(entity.arbit_tag),
+        "arbit_tag": entity.taskArbitTag(),
     }
     new_params['public_field_prefetch'] = ["scope"]
     new_params['public_field_keys'] = [
@@ -301,10 +301,10 @@ class View(base.View):
     ]
 
     # parameters to list the task on the organization home page
-    new_params['home_field_extra'] = lambda entity: {
-        "points_difficulty": entity.taskDifficultyValue(),
-        "task_type": entity.tags_string(entity.task_type),
-        "arbit_tag": entity.tags_string(entity.arbit_tag),
+    new_params['home_field_extra'] = lambda entity, all_d, all_t: {
+        "points_difficulty": entity.taskDifficultyValue(all_d),
+        "task_type": entity.taskType(all_t),
+        "arbit_tag": entity.taskArbitTag(),
         "mentors": render(db.get(entity.mentors)),
     }
 
@@ -321,7 +321,7 @@ class View(base.View):
           "parameters": dict(new_window=True),
     }
     new_params['public_row_extra'] = new_params['home_row_extra'] = \
-        lambda entity: {
+        lambda entity, *args: {
             'link': redirects.getPublicRedirect(
                 entity, {'url_name': new_params['url_name']})
     }
@@ -561,15 +561,12 @@ class View(base.View):
     """See base.View._editGet().
     """
     if entity.task_type:
-      form.fields['type_tags'].initial = entity.tags_string(
-          entity.task_type, ret_list=True)
+      form.fields['type_tags'].initial = entity.taskType(ret_list=True)
     if entity.arbit_tag:
-      form.fields['arbit_tags'].initial = entity.tags_string(
-          entity.arbit_tag)
+      form.fields['arbit_tags'].initial = entity.taskArbitTag()
 
     if entity.difficulty:
-      form.fields['difficulty'].initial = entity.tags_string(
-          entity.difficulty)
+      form.fields['difficulty'].initial = entity.taskDifficulty()
 
     if entity.mentors and 'mentors_list' in form.fields:
       mentor_entities = db.get(entity.mentors)
@@ -922,7 +919,6 @@ class View(base.View):
     idx = lists.getListIndex(request)
 
     # default list settings
-    args = []
     visibility = 'public'
 
     filter = {
@@ -940,6 +936,10 @@ class View(base.View):
       filter['status'] = ['Closed', 'AwaitingRegistration']
     else:
       return lists.getErrorResponse(request, "idx not valid")
+
+    all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+    all_t = gci_task_model.TaskTypeTag.all().fetch(100)
+    args = [all_d, all_t]
 
     params = params_collection[idx]
     contents = lists.getListData(request, params, filter,
@@ -973,12 +973,12 @@ class View(base.View):
         filter, unique=True)
 
     if org_admin_entity:
-      tuapp_params['public_row_extra'] = lambda entity: {
+      tuapp_params['public_row_extra'] = lambda entity, *args: {
               'link': redirects.getEditRedirect(
                   entity, {'url_name': tuapp_params['url_name']})
       }
     elif mentor_entity:
-      tuapp_params['public_row_extra'] = lambda entity: {
+      tuapp_params['public_row_extra'] = lambda entity, *args: {
               'link': gci_redirects.getSuggestTaskRedirect(
                   entity, {'url_name': tuapp_params['url_name']})
       }
@@ -1390,9 +1390,9 @@ class View(base.View):
     else:
       context['mentors_str'] = "Not Assigned"
 
-    context['difficulty_str'] = entity.tags_string(entity.difficulty)
+    context['difficulty_str'] = entity.taskDifficulty()
 
-    context['task_type_str'] = entity.tags_string(entity.task_type)
+    context['task_type_str'] = entity.taskType()
 
     if entity.deadline:
       # TODO: it should be able to abuse Django functionality for this

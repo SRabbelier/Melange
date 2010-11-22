@@ -48,7 +48,7 @@ def isSecondaryHostname(request):
   if not site_settings.hostname:
     return False
 
-  return request.path.find(site_settings.hostname) >= 0
+  return os.environ.get('HTTP_HOST', '').find(site_settings.hostname) >= 0
 
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.

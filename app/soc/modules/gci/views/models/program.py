@@ -888,7 +888,7 @@ class View(program.View):
     #    "rowNum": -1,
     #    "rowList": [],
     #    }
-    list_params['public_conf_min_num'] = 100
+    list_params['public_conf_min_num'] = list_params['public_conf_limit'] = 100
 
     if lists.isDataRequest(request):
         return self.getListTasksData(request, list_params, tasks_filter)

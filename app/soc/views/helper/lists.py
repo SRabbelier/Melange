@@ -297,8 +297,11 @@ def getListData(request, params, fields, visibility=None, args=[]):
 
   get_args = request.GET
   start = get_args.get('start', '')
-  limit = get_args.get('limit', 50)
-  limit = int(limit)
+
+  limit = params.get('%s_conf_limit' % visibility)
+  if not limit:
+    limit = get_args.get('limit', 50)
+    limit = int(limit)
 
   if start:
     start_entity = logic.getFromKeyNameOrID(start)

@@ -879,6 +879,7 @@ class View(program.View):
           'Claimed', 'ActionNeeded', 'Closed', 'AwaitingRegistration',
           'NeedsWork', 'NeedsReview','Unapproved', 'Unpublished'])
     else:
+      list_params.setdefault('public_field_ignore', []).append('mentors')
       list_params['list_description'] = self.DEF_LIST_PUBLIC_TASKS_MSG_FMT % (
           program_entity.name)
 

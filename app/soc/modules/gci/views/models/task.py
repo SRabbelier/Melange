@@ -260,7 +260,7 @@ class View(base.View):
             'total to complete, enter 3 in days field and 12 in hours '
             'field.')),
         'time_to_complete_hours': forms.IntegerField(
-            min_value=1, required=True, initial=1,
+            min_value=0, required=True, initial=1,
             label='Time to complete (in hours)',
             help_text=ugettext('If you enter the total amount of time in '
             'hours, say 84, it will be converted to days and hours format.')),

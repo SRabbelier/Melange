@@ -60,7 +60,8 @@ def cleanTaskComment(comment_field, action_field, ws_ext_field, ws_upld_field):
           ugettext('You cannot have all the three fields: comment, '
                    'and two work submission fields empty'))
 
-    cleaned_data[ws_upld_field] = ws_upld
+    if ws_upld:
+      cleaned_data[ws_upld_field] = ws_upld
 
     return cleaned_data
 

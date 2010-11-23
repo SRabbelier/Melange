@@ -165,7 +165,12 @@ class View(organization.View):
     visibility = 'home'
 
     if idx == 0:
-      filter = {'scope': org_entity}
+      filter = {
+          'scope': org_entity,
+          'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
+                     'ActionNeeded', 'Closed', 'AwaitingRegistration',
+                     'NeedsWork', 'NeedsReview']
+          }
     else:
       return lists.getErrorResponse(request, "idx not valid")
 

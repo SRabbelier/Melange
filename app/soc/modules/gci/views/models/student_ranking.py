@@ -29,6 +29,7 @@ from soc.views import helper
 
 from soc.views.helper import decorators
 from soc.views.helper import lists
+from soc.views.helper import redirects
 
 from soc.modules.gci.logic.models.task import logic as gci_task_logic
 from soc.modules.gci.views.helper import access as gci_access
@@ -107,6 +108,9 @@ class View(base.View):
         'task', 'org', 'points_difficulty', 'closed_on']
     list_params['public_field_names'] = [
         'Task', 'Organization', 'Points (Difficulty)', 'Completed on']
+    list_params['public_row_extra'] = lambda entity: {
+        'link': redirects.getPublicRedirect(entity, {'url_name': 'gci/task'}),
+    }
 
     if lists.isDataRequest(request):
       return self.getListRankingDetailsData(request, list_params, student)

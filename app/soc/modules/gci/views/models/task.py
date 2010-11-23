@@ -1294,7 +1294,9 @@ class View(base.View):
                         ])
 
         if fields['extended_deadline'] > 0:
-          deadline = entity.deadline + datetime.timedelta(
+          current_deadline = entity.deadline if entity.deadline \
+              else datetime.datetime.now()
+          deadline = current_deadline + datetime.timedelta(
               hours=fields['extended_deadline'])
 
           properties['deadline'] = deadline

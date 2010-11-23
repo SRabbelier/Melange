@@ -869,14 +869,15 @@ class View(program.View):
 
     tasks_filter = {
         'program': program_entity,
-        'status': ['Open', 'Reopened', 'ClaimRequested', 'Claimed',
-                   'ActionNeeded', 'Closed', 'AwaitingRegistration',
-                   'NeedsWork', 'NeedsReview'],
-        }
+        'status': ['Open', 'Reopened', 'ClaimRequested']
+    }
+
     if host_entity:
       list_params['list_description'] = self.DEF_LIST_VALID_TASKS_MSG_FMT % (
           program_entity.name)
-      tasks_filter['status'].extend(['Unapproved', 'Unpublished'])
+      tasks_filter['status'].extend([
+          'Claimed', 'ActionNeeded', 'Closed', 'AwaitingRegistration',
+          'NeedsWork', 'NeedsReview','Unapproved', 'Unpublished'])
     else:
       list_params['list_description'] = self.DEF_LIST_PUBLIC_TASKS_MSG_FMT % (
           program_entity.name)

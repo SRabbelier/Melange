@@ -536,7 +536,14 @@
       var my_cell = [];
       if (original_data[0] !== undefined) {
           jQuery.each(list_objects.get(my_index).configuration.colModel, function (element_key, element_value) {
-            var current_row = jLinq.from(list_objects.get(my_index).data.all_data).equals("columns.key",temp_data[i]["key"]).select()[0];
+              var current_row;
+              var search_into = list_objects.get(my_index).data.all_data;
+              for (var row_index = 0; row_index < search_into.length; row_index++) {
+                if (search_into[row_index].columns.key === temp_data[i]["key"]) {
+                  current_row = search_into[row_index];
+                  break;
+                }
+              }
             var column_content = temp_data[i][element_value.name];
             if (current_row.operations !== undefined && current_row.operations.row !== undefined && current_row.operations.row.link !== undefined) {
               // If there are no links in the text then insert a listsnoul link

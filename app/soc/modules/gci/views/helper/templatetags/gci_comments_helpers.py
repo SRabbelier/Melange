@@ -57,8 +57,9 @@ def as_gci_task_ws(context, comment):
     blob_key = comment.upload_of_work.key()
 
     blob = blobstore.BlobInfo.get(blob_key)
-    context['ws_file_blob_key'] = blob_key
-    context['ws_file_name'] = blob.filename
+    if blob:
+      context['ws_file_blob_key'] = blob_key
+      context['ws_file_name'] = blob.filename
 
     suffixes = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
     file_size_int = blob.size

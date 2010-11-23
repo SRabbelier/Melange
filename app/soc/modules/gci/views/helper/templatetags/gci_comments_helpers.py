@@ -61,15 +61,15 @@ def as_gci_task_ws(context, comment):
       context['ws_file_blob_key'] = blob_key
       context['ws_file_name'] = blob.filename
 
-    suffixes = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-    file_size_int = blob.size
+      suffixes = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+      file_size_int = blob.size
 
-    for s in suffixes:
-      file_size_int /= 1024
-      if file_size_int < 1024:
-        file_size = '%d %s' % (file_size_int, s)
-        break
+      for s in suffixes:
+        file_size_int /= 1024
+        if file_size_int < 1024:
+          file_size = '%d %s' % (file_size_int, s)
+          break
 
-    context['ws_file_size'] = file_size
+      context['ws_file_size'] = file_size
 
   return context

@@ -34,6 +34,7 @@ from google.appengine.runtime import apiproxy_errors
 from django import forms
 from django import http
 from django.utils import simplejson
+from django.utils.timesince import timeuntil
 from django.utils.translation import ugettext
 
 from soc.logic import accounts
@@ -1408,23 +1409,7 @@ class View(base.View):
     context['task_type_str'] = entity.taskType()
 
     if entity.deadline:
-      # TODO: it should be able to abuse Django functionality for this
-      ttc = entity.deadline - datetime.datetime.now()
-      (ttc_min, ttc_hour) = ((ttc.seconds / 60), (ttc.seconds / 3600))
-      if ttc_min >= 60:
-        ttc_min = ttc_min % 60
-      if ttc_hour > 1:
-        if ttc_min == 0:
-          ttc_str = '%d hours' % (ttc_hour)
-        else:
-          ttc_str = '%d:%02d hours' % (ttc_hour, ttc_min)
-        if ttc.days == 1:
-          ttc_str = '%d day, %s' % (ttc.days, ttc_str)
-        elif ttc.days > 1:
-          ttc_str = '%d days, %s' % (ttc.days, ttc_str)
-      else:
-        ttc_str = '%d mins' % (ttc_min)
-      context['time_to_complete'] = ttc_str
+      context['time_to_complete'] = timeuntil(entity.deadline)
     else:
       if entity.status == 'NeedsReview':
         context['time_to_complete'] = 'No Time Left'

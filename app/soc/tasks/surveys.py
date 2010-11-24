@@ -59,8 +59,6 @@ def spawnRemindersForProjectSurvey(request, *args, **kwargs):
   Args:
     request: Django Request object
   """
-  
-  from google.appengine.ext import db
 
   from soc.modules.gsoc.logic.models.program import logic as program_logic
   from soc.modules.gsoc.logic.models.student_project import logic as \
@@ -239,7 +237,7 @@ def sendSurveyReminderForProject(request, *args, **kwargs):
     }
 
     # set the sender
-    (sender, sender_address) = mail_dispatcher.getDefaultMailSender()
+    (_, sender_address) = mail_dispatcher.getDefaultMailSender()
     mail_context['sender'] = sender_address
     # set the receiver and subject
     mail_context['to'] = to_role.email

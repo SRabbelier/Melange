@@ -254,12 +254,10 @@ def _cleanTask(task, org_admin):
     mentor = mentor_logic.getForFields(mentor_fields, unique=True)
     if mentor:
       mentors.append(mentor.key())
+    else:
+      errors.append('%s is not a mentor.' %mentor_id)
 
-  if not mentors:
-    errors.append('No valid mentors found the given ids were: %s.' 
-                  %task['mentors'])
-  else:
-    task['mentors'] = mentors
+  task['mentors'] = mentors
 
   program_entity = org_admin.program
 
@@ -285,15 +283,13 @@ def _cleanTask(task, org_admin):
     task_type = task_type.strip()
     if task_type in allowed_types:
       task_types.append(task_type)
+    else:
+      errors.append('%s is not a valid task type.' %task_type)
 
-  if not task_types:
-    # no valid task types found
-    errors.append('No valid task type found, given %s.' %task['task_type'])
-  else:
-    task['task_type'] = {
-        'tags': task_types,
-        'scope': program_entity
-        }
+  task['task_type'] = {
+      'tags': task_types,
+      'scope': program_entity
+      }
 
   # clean task tags
   arbit_tags = []

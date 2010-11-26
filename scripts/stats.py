@@ -818,6 +818,18 @@ def surveyRecordCSVExport(csv_filename, survey_record_model,
   print "Survey Records exported to %s file." % csv_filename
 
 
+class Request(object):
+  def __init__(self, **kwargs):
+    self.method = kwargs.get('method', "GET")
+    self.path = kwargs.get('path', None)
+    self.GET = kwargs.get('get', {})
+    self.POST = kwargs.get('post', {})
+
+class StudentKeyRequest(Request):
+  def __init__(self, key):
+    super(StudentKeyRequest, self).__init__(post=dict(student_key=key))
+
+
 def main(args):
   """Main routine.
   """
@@ -832,6 +844,11 @@ def main(args):
   from soc.modules.gsoc.models import org_admin
   from soc.modules.gsoc.models.student_proposal import StudentProposal
   from soc.modules.gsoc.models.student_project import StudentProject
+
+  from soc.modules.gci.models.task import GCITask
+  from soc.modules.gci.models.student import GCIStudent
+  from soc.modules.gci.models.organization import GCIOrganization
+  from soc.modules.gci import tasks as gci_tasks
 
   def slotSaver(org, value):
     org.slots = value
@@ -866,6 +883,12 @@ def main(args):
       'GSoCMentor': GSoCMentor,
       'GSoCOrgAdmin': org_admin.GSoCOrgAdmin,
       'GSoCProgram': GSoCProgram,
+      'GCITask': GCITask,
+      'Request': Request,
+      'SRequest': StudentKeyRequest,
+      'GCIStudent': GCIStudent,
+      'GCIOrganization': GCIOrganization,
+      'gci_tasks': gci_tasks,
       'StudentProject': StudentProject,
       'StudentProposal': StudentProposal,
       'slotSaver': slotSaver,

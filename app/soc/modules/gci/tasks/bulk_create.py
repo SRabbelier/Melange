@@ -121,13 +121,13 @@ def bulkCreateTasks(request, *args, **kwargs):
 
   bulk_create_key = post_dict.get('bulk_create_key')
   if not bulk_create_key:
-    error_handler.logErrorAndReturnOK(
-        'Not all POST data specified in: %s' % post_dict)
+    return error_handler.logErrorAndReturnOK(
+               'Not all POST data specified in: %s' % post_dict)
 
   bulk_data = bulk_create_model.GCIBulkCreateData.get(bulk_create_key)
   if not bulk_data:
-    error_handler.logErrorAndReturnOK(
-        'No valid data found for key: %s' % bulk_create_key)
+    return error_handler.logErrorAndReturnOK(
+               'No valid data found for key: %s' % bulk_create_key)
 
   # note that we only query for the quota once
   org_admin = bulk_data.created_by

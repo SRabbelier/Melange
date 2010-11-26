@@ -393,6 +393,12 @@ class View(program.View):
           {'url_name': prefix + '/student'}),
           "List my Student Projects", 'any_access')]
 
+    if timeline_helper.isBeforeEvent(program_entity.timeline, 'program_end') \
+        and student_entity.status == 'active':
+      items += [(redirects.getManageRedirect(student_entity,
+          {'url_name': prefix + '/student'}),
+          "Resign as a Student", 'any_access')]
+
     items += super(View, self)._getStudentEntries(program_entity,
         student_entity, params, id, user, prefix)
 

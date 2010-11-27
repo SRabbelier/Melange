@@ -26,7 +26,6 @@ from soc.logic import dicts
 from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
 from soc.views.helper import decorators
-from soc.views.helper import lists
 from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.models import survey
@@ -89,18 +88,19 @@ class View(survey.View):
     new_params['reminder_template'] = 'soc/project_survey/reminder.html'
 
     new_params['records_field_keys'] = [
-        'mentor_id', 'student_id'
+        'mentor_id', 'student_id', 'organization'
     ]
     new_params['records_field_names'] = [
-        'Mentor Link ID', 'Student Link ID',
+        'Mentor Link ID', 'Student Link ID', 'Organization'
     ]
-    new_params['records_field_prefetch'] = ['project']
+    new_params['records_field_prefetch'] = ['project', 'org']
 
     # TODO(ljvderijk): If we ever fix the merging of field_extra remove the
     # taken_by.
     new_params['records_field_extra'] = lambda entity: { 
         'mentor_id': entity.project.mentor.link_id,
         'student_id': entity.project.student.link_id,
+        'organization': entity.org.name,
         'taken_by': '%s (%s)' %(entity.user.name, entity.user.link_id),
     }
 

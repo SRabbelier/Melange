@@ -396,6 +396,7 @@ class GCIChecker(access.Checker):
 
     return org_entity
 
+  @access.allowDeveloper
   def checkOrgHasNoOpenTasks(self, django_args):
     """Checks if the organization does not have any tasks which might be 
     claimed by students.

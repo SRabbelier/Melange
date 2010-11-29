@@ -41,6 +41,7 @@ from soc.views.models import organization
 
 import soc.logic.lists
 
+from soc.modules.gci.logic.helper import notifications as gci_notifications
 from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
@@ -60,6 +61,10 @@ class View(organization.View):
 
   DEF_PROJECTS_MSG_FMT = ugettext(
       'List of tasks published by %s.')
+
+  DEFAULT_REQUEST_MSG = ugettext(
+      'Your organization does not currently have any open tasks.\n '
+      'Could you please add a new task so that I can claim it?')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the program View class
@@ -336,7 +341,7 @@ class View(organization.View):
   def requestTask(self, request, access_type, page_name=None,
                 params=None, **kwargs):
     """Students may request a new task if there are no open tasks for the
-    organization. 
+    organization.
     """
 
     # retrieve the organization
@@ -360,15 +365,22 @@ class View(organization.View):
 
   def requestTaskPost(self, request, page_name, org_entity, **kwargs):
     """POST request for requestTask.
-    """  
+    """
 
     # find all administrators for the organization
     fields = {
         'scope': org_entity
         }
     org_admins = gci_org_admin_logic.logic.getForFields(fields)
-    
+
+    # include student's message or use a default one
+    post_dict = request.POST
+    message = post_dict.get('message')
+    if not message:
+      message = self.DEFAULT_REQUEST_MSG
+
     # notification should be sent to all of the org admins
+    gci_notifications.sendRequestTaskNotification(org_admins, message)
 
     # return to the list of all accepted organizations
     program = org_entity.scope

@@ -37,6 +37,12 @@ DEF_BULK_CREATE_COMPLETE_SUBJECT_MSG = ugettext(
 DEF_BULK_CREATE_COMPLETE_TEMPLATE = \
     'modules/gci/notification/messages/bulk_create_complete.html'
 
+DEF_TASK_REQUEST_SUBJECT_MSG = ugettext(
+    'A new task has been requested from your organization')
+
+DEF_TASK_REQUEST_TEMPLATE = \
+    'modules/gci/notification/messages/task_request.html'
+
 def sendTaskUpdateMail(subscriber, subject, message_properties=None):
   """Sends an email to a user about an update to a Task.
 
@@ -99,3 +105,44 @@ def sendBulkCreationCompleted(bulk_data):
 
   notifications.sendNotification(
       bulk_data.created_by.user, None, message_properties, subject, template)
+
+def sendRequestTaskNotification(org_admins, message):
+  """Sends notifications to org admins that there is a student who requested
+  more tasks from them.
+
+  Args:
+    org_admins: a list of org admins who the notification should be sent to
+    message: a short message that will be included to the notification
+  """
+
+  from soc.logic.models.site import logic as site_logic
+
+  # get the default mail sender
+  default_sender = mail_dispatcher.getDefaultMailSender()
+
+  if not default_sender:
+    # no valid sender found, abort
+    return
+  else:
+    (sender_name, sender) = default_sender
+
+  # get site name
+  site_entity = site_logic.getSingleton()
+  site_name = site_entity.site_name
+  subject = DEF_TASK_REQUEST_SUBJECT_MSG
+  template = DEF_TASK_REQUEST_TEMPLATE
+
+  properties = {
+      'message': message,
+      'sender': sender,
+      'sender_name': sender_name,
+      'site_name': site_name,
+      'subject': subject,
+      }
+
+  for org_admin in org_admins:
+    to = org_admin.user
+    properties['to'] = to
+    properties['to_name'] = to.name
+
+    notifications.sendNotification(to, None, properties, subject, template)

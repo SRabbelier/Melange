@@ -79,6 +79,9 @@ DEF_UNEXPECTED_ERROR = ugettext(
     'An unexpected error occurred please file an issue report, make sure you '
     'note the URL.')
 
+DEF_ORG_HAS_TASKS = ugettext(
+    'The organization has at least one task which may be claimed.')
+
 class GCIChecker(access.Checker):
   """See soc.views.helper.access.Checker.
   """
@@ -392,3 +395,17 @@ class GCIChecker(access.Checker):
       raise out_of_band.AccessViolation(message_fmt=DEF_ALREADY_CLAIMED_A_TASK)
 
     return org_entity
+
+  def checkOrgHasNoOpenTasks(self, django_args):
+    """Checks if the organization does not have any tasks which might be 
+    claimed by students.
+    """
+
+    org_entity = gci_org_logic.logic.getFromKeyFieldsOr404(django_args)
+
+    fields = {
+        'status': ['Open', 'Reopened'],
+        'scope': org_entity
+        }
+    if gci_task_logic.logic.getForFields(fields, unique=True):
+      raise out_of_band.AccessViolation(message_fmt=DEF_ORG_HAS_TASKS)

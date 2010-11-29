@@ -45,6 +45,7 @@ from soc.modules.gci.logic.helper import notifications as gci_notifications
 from soc.modules.gci.logic.models import program as gci_program_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
+from soc.modules.gci.logic.models import student as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gci.models import task as gci_task_model
@@ -89,7 +90,8 @@ class View(organization.View):
     rights['list_roles'] = [('checkHasRoleForKeyFieldsAsScope',
                              gci_org_admin_logic.logic)]
     rights['request_task'] = [
-        'checkIsUser',
+        ('checkHasRoleForScope', gci_student_logic.logic),
+        'checkOrgHasNoOpenTasks',
         ('checkIsAfterEvent',
             ['tasks_publicly_visible', 'scope_path', gci_program_logic.logic]),
         ('checkIsBeforeEvent',

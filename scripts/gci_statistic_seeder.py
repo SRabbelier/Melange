@@ -95,7 +95,7 @@ STATISTIC_PROPERTIES = {
         "filter": "property_filter",
         "params": {
             "ref_logic": "gci_task",
-            "ref_field": "mentor",
+            "ref_field": "mentors",
             "program_field": "program",
             "property_conditions": {
                 "status": ["active", "inactive"]
@@ -127,6 +127,31 @@ STATISTIC_PROPERTIES = {
             }
         },
         "org_admin"),
+    "students_per_age": (
+        "Students Per Age",
+        {
+        "type": "per_field",
+        "field": "age",
+        "model": "gci_student",
+        "transformer": "remove-out-of-range",
+        "filter": "property_filter",
+        "params": {
+            "program_field": "scope",
+            "property_conditions": {
+                "status": ['active', 'inactive']
+                 },
+            }
+        },
+        {
+        "description": [("age", "number", "Age"),
+                        ("number", "number", "Number")],
+        "options": {
+            'Organization Admins Per Age': {
+                "visualizations": VISUALIZATION_SETS['single_standard']
+                }
+            }
+        },
+        "host"),
 }
 
 STATISTICS_LIST = [k for k in STATISTIC_PROPERTIES]
@@ -138,8 +163,6 @@ CHARTS_DICT = dict((k, v) for k, (_, _, v, _)
     in STATISTIC_PROPERTIES.iteritems())
 ACCESS_DICT = dict((k, v) for k, (_, _, _, v)
     in STATISTIC_PROPERTIES.iteritems())
-
-program_keyname = 'melange/gcirunthrough'
 
 
 def _getCommonProperties():
@@ -238,6 +261,8 @@ def main(args):
       }
 
   interactive.remote(args, context)
+
+program_keyname = 'melange/gcirunthrough'
 
 if __name__ == '__main__':
   if len(sys.argv) < 2:

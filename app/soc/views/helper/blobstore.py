@@ -49,6 +49,10 @@ def get_uploads(request, field_name=None, populate_post=False):
 
   results = []
 
+  # the __uploads attribute in the request object is used
+  # only to cache the file uploads so that we need not
+  # have to go through the process of reading HTTP request
+  # original file if it has already been read in the same request.
   if hasattr(request,'__uploads') == False:
       request.META['wsgi.input'].seek(0)
       fields = cgi.FieldStorage(request.META['wsgi.input'],

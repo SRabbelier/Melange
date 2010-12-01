@@ -223,8 +223,7 @@ class View(presence.View):
     role_params = role_view.getParams().copy()
 
     # construct the query for the specific list
-    fields = {query_field: program_entity,
-              'status': ['active','inactive']}
+    fields = {query_field: program_entity}
 
     # return getListData
     contents = lists.getListData(request, role_params, fields,

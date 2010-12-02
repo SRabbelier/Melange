@@ -93,7 +93,12 @@ def updateGCITask(request, *args, **kwargs):
     return error_handler.logErrorAndReturnOK(
         'Invalid updateGCITask data: %s' % post_dict)
 
-  entity = gci_task_logic.logic.getFromKeyNameOr404(key_name)
+  entity = gci_task_logic.logic.getFromKeyName(key_name)
+
+  if not entity:
+    # invalid task data, log and return OK
+    return error_handler.logErrorAndReturnOK(
+        'Invalid updateGCITask gci_task_key: %s' % post_dict)
 
   entity, comment_entity = gci_task_logic.logic.updateTaskStatus(entity)
 

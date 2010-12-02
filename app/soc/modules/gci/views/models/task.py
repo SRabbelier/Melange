@@ -134,6 +134,10 @@ class View(base.View):
   DEF_TASK_MENTOR_REOPENED_MSG = ugettext(
       'The task has been reopened.')
 
+  DEF_TASK_MENTOR_FIX_MSG = ugettext(
+      'Through no fault of your own, the current difficulty of this task is '
+      'set to a value which is worth 0 points. Please fix this.')
+
   DEF_TASK_NEEDS_REVIEW_MSG = ugettext(
       'Student has submitted his work for this task! It needs review.')
 
@@ -651,11 +655,12 @@ class View(base.View):
     role_entity = host_entity or org_admin_entity
     if role_entity:
       # this user can publish/approve the task
-      if fields.get('published'):
-        fields['status'] = 'Open'
-      elif fields.get('approved') or (entity and entity.status == 'Open'):
-        # Set it to be unpublished
-        fields['status'] = 'Unpublished'
+      if not entity:
+        if fields.get('published'):
+          fields['status'] = 'Open'
+        elif fields.get('approved') or (entity and entity.status == 'Open'):
+          # Set it to be unpublished
+          fields['status'] = 'Unpublished'
 
       fields['mentors'] = fields.get('mentors_list', [])
     else:
@@ -1572,7 +1577,20 @@ class View(base.View):
 
     actions = []
 
-    if entity.status in ['Unapproved', 'Unpublished']:
+    if entity.status == 'NeedsReview':
+      context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
+      actions.extend([('needs_work', 'Needs More Work'),
+                      ('reopened', 'Reopen the task'),
+                      ('closed', 'Mark the task as complete')])
+      validation = 'close'
+    elif entity.status == 'Claimed':
+      context['header_msg'] = self.DEF_TASK_CLAIMED_BY_STUDENT_MSG
+    elif entity.taskDifficulty().value == 0:
+      # Prevent any action from being taken if the task difficulty is
+      # not set properly, with the exception of 'NeedsReview' and the
+      # 'Claimed' state, since the task cannot be edited then anyway.
+      context['header_msg'] = self.DEF_TASK_MENTOR_FIX_MSG
+    elif entity.status in ['Unapproved', 'Unpublished']:
       context['header_msg'] = self.DEF_TASK_UNPUBLISHED_MSG
       context['comment_disabled'] = True
     elif entity.status == 'Open':
@@ -1584,14 +1602,6 @@ class View(base.View):
                       ('reject', 'Reject claim request')])
       context['header_msg'] = self.DEF_TASK_CLAIM_REQUESTED_MSG
       validation = 'accept_claim'
-    elif entity.status == 'Claimed':
-      context['header_msg'] = self.DEF_TASK_CLAIMED_BY_STUDENT_MSG
-    elif entity.status == 'NeedsReview':
-      context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
-      actions.extend([('needs_work', 'Needs More Work'),
-                      ('reopened', 'Reopen the task'),
-                      ('closed', 'Mark the task as complete')])
-      validation = 'close'
     elif entity.status in ['AwaitingRegistration', 'Closed']:
       context['header_msg'] = self.DEF_TASK_CLOSED_MSG
 

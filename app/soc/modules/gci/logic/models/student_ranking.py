@@ -28,6 +28,8 @@ import soc.models.linkable
 
 import soc.modules.gci.logic.models
 import soc.modules.gci.models.student_ranking
+import soc.modules.gci.logic.models.program
+
 
 class Logic(base.Logic):
   """Logic methods for the GCIStudentRanking model.

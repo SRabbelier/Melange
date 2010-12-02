@@ -93,6 +93,10 @@ class View(base.View):
       'You have successfully completed this task. Sign up as a student '
       'before you proceed further.')
 
+  DEF_TASK_ACTION_NEEDED_MSG = ugettext(
+      'The initial deadline for this task has passed. You have been granted '
+      'an additional 24 hours to complete this task.')
+
   DEF_TASK_CLAIMED_BY_YOU_MSG = ugettext(
       'You have claimed this task!')
 
@@ -137,6 +141,11 @@ class View(base.View):
   DEF_TASK_MENTOR_FIX_MSG = ugettext(
       'Through no fault of your own, the current difficulty of this task is '
       'set to a value which is worth 0 points. Please fix this.')
+
+  DEF_TASK_MENTOR_ACTION_NEEDED_MSG = ugettext(
+      'The initial deadline for the task has passed. The student has been '
+      'notified and the deadline has been extended by 24 hours. No action is '
+      'required from you.')
 
   DEF_TASK_NEEDS_REVIEW_MSG = ugettext(
       'Student has submitted his work for this task! It needs review.')
@@ -1604,6 +1613,8 @@ class View(base.View):
       validation = 'accept_claim'
     elif entity.status in ['AwaitingRegistration', 'Closed']:
       context['header_msg'] = self.DEF_TASK_CLOSED_MSG
+    elif entity.status == 'ActionNeeded':
+      context['header_msg'] = self.DEF_TASK_MENTOR_ACTION_NEEDED_MSG
 
     return validation, actions
 
@@ -1650,7 +1661,10 @@ class View(base.View):
         validation = 'claim_withdraw'
       elif entity.deadline and entity.status in [
           'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
-        context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
+        if entity.status == 'ActionNeeded':
+          context['header_msg'] = self.DEF_TASK_ACTION_NEEDED_MSG
+        else:
+          context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
         actions.extend([
             ('withdraw', 'Withdraw from the task'),
             ('needs_review', 'Submit work and Request for review')])

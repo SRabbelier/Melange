@@ -1,34 +1,33 @@
-# Copyright 2009 the Melange authors.
+#!/usr/bin/env python2.5
+#
+# Copyright 2010 the Melange authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-queue:
+"""Model storing mail that needs to be sent.
+"""
 
-- name: profiler
-  rate: 20/s
-  bucket_size: 20
+__authors__ = [
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+  ]
 
-# queue used for tasks that send out mail
-- name: mail
-  rate: 5/s
-  bucket_size: 5
 
-# queue used by the GCI module to do GCI task related work
-- name: gci-update
-  rate: 5/s
-  bucket_size: 5
+from google.appengine.ext import db
 
-# queue used by statistic module to collect data
-- name: statistic
-  rate: 5/s
-  bucket_size: 5
+
+class Email(db.Model):
+  """Data model for storing an email.
+  """
+
+  #: JSON content to be passed along the the Mail constructor
+  context = db.TextProperty(required=True)

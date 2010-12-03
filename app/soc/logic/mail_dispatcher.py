@@ -64,13 +64,15 @@ __authors__ = [
   ]
 
 
+import logging
+
 from django.template import loader
 
 from google.appengine.api import mail
-from google.appengine.runtime.apiproxy_errors import OverQuotaError
 
 from soc.logic import dicts
 from soc.logic import system
+from soc.tasks import mailer
 
 
 def sendMailFromTemplate(template, context):
@@ -111,7 +113,6 @@ def sendMail(context):
     List of all possible errors:
       http://code.google.com/appengine/docs/mail/exceptions.html
   """
-
   # construct the EmailMessage from the given context
   message = mail.EmailMessage(**context)
   message.check_initialized()
@@ -120,13 +121,7 @@ def sendMail(context):
   if not system.isLocal() and system.isDebug():
     return
 
-  try:
-    # send the message
-    message.send()
-  except (mail.Error, OverQuotaError), exception:
-    import logging
-    logging.info(context)
-    logging.exception(exception)
+  mailer.spawnMailTask(context)
 
 def getDefaultMailSender():
   """Returns the sender that currently can be used to send emails.
@@ -138,9 +133,6 @@ def getDefaultMailSender():
     - Or the (public) name and email address of the current logged in User
     - None if there is no address to return
   """
-
-  import logging
-
   from soc.logic import accounts
   from soc.logic.models import user as user_logic
   from soc.logic.models import site as site_logic

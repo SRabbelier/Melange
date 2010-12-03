@@ -56,7 +56,7 @@ def spawnMailTask(context):
     mail_entity.put()
 
     task_params = {'mail_key': mail_entity.key()}
-    new_task = taskqueue.Task(params=task_params, url='/tasks/mail/send_mail')
+    new_task = taskqueue.Task(params=task_params, url=SEND_MAIL_URL)
     new_task.add(queue_name='mail')
 
   db.RunInTransaction(txn)
@@ -110,6 +110,8 @@ def sendMail(request):
   try:
     db.RunInTransaction(txn)
   except mail.Error, exception:
+    # shouldn't happen because validate has been called, keeping the Email
+    # entity for study purposes.
     return error_handler.logErrorAndReturnOK(exception)
   except OverQuotaError:
     return responses.repeatTask()

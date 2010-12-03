@@ -1539,9 +1539,10 @@ class View(base.View):
             {'name': 'extended_deadline',
              'base': forms.IntegerField,
              'min_value': 1,
+             'max_value': 7*24,
              'label': 'Extend deadline by',
              'required': False,
-             'passthrough': ['min_value', 'required', 'help_text'],
+             'passthrough': ['min_value', 'max_value', 'required', 'help_text'],
              'help_text': 'Optional: Specify the number of hours by '
                  'which you want to extend the deadline for the task '
                  'for this student. ',

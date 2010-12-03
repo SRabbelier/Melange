@@ -373,14 +373,6 @@ class View(base.View):
          'help_text': 'Assign mentors to this task by '
              'giving their link_ids separated by comma.',
          },
-        {'name': 'published',
-         'required': False,
-         'initial': False,
-         'base': forms.fields.BooleanField,
-         'label': 'Publish the task',
-         'help_text': ugettext('By ticking this box, the task will be'
-                               'made public and can be claimed by students.'),
-         }
         ]
 
     dynaproperties = params_helper.getDynaFields(dynafields)
@@ -557,26 +549,6 @@ class View(base.View):
     params['edit_form'] = self._getTagsForProgram(
         'edit_form', params, **kwargs)
 
-    if entity.status == 'Unapproved':
-      dynafields = [
-          {'name': 'approved',
-           'required': False,
-           'initial': False,
-           'base': forms.fields.BooleanField,
-           'label': 'Approve the task',
-           'help_text': 'By ticking this box, the task will be'
-               'will be approved for publishing.',
-          }
-          ]
-
-      dynaproperties = params_helper.getDynaFields(dynafields)
-
-      edit_form = dynaform.extendDynaForm(
-          dynaform=params['edit_form'],
-          dynaproperties=dynaproperties)
-
-      params['edit_form'] = edit_form
-
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
     else:
@@ -610,22 +582,6 @@ class View(base.View):
 
     form.fields['link_id'].initial = entity.link_id
 
-    # checks if the task is already approved or not and sets
-    # the form approved field
-    if 'approved' in form.fields:
-      if entity.status == 'Unapproved':
-        form.fields['approved'].initial = False
-      else:
-        form.fields['approved'].initial = True
-
-    # checks if the task is already published or not and sets
-    # the form published field
-    if 'published' in form.fields:
-      if entity.status == 'Unapproved' or entity.status == 'Unpublished':
-        form.fields['published'].initial = False
-      else:
-        form.fields['published'].initial = True
-
     return super(View, self)._editGet(request, entity, form)
 
   def _editPost(self, request, entity, fields):
@@ -650,34 +606,26 @@ class View(base.View):
         }
 
     # get the host entity if the current user is host
-    host_entity = host_logic.logic.getForFields(filter, unique=True)
+    role_entity = host_logic.logic.getForFields(filter, unique=True)
 
     if not entity:
       filter['scope'] = fields['scope']
     else:
       filter['scope'] = entity.scope
 
-    # get the entity if the current user is org admin
-    org_admin_entity = gci_org_admin_logic.logic.getForFields(
-        filter, unique=True)
+    if not role_entity:
+      # get the entity if the current user is org admin
+      role_entity = gci_org_admin_logic.logic.getForFields(
+          filter, unique=True)
 
-    role_entity = host_entity or org_admin_entity
     if role_entity:
-      # this user can publish/approve the task
-      if not entity:
-        if fields.get('published'):
-          fields['status'] = 'Open'
-        elif fields.get('approved') or (entity and entity.status == 'Open'):
-          # Set it to be unpublished
-          fields['status'] = 'Unpublished'
-
       fields['mentors'] = fields.get('mentors_list', [])
     else:
-      role_entity = gci_mentor_logic.logic.getForFields(
-          filter, unique=True)
-      if not entity:
-        # creating a new task
-        fields['status'] = 'Unapproved'
+      role_entity = gci_mentor_logic.logic.getForFields(filter, unique=True)
+
+    if not entity:
+      # creating a new task
+      fields['status'] = 'Unapproved'
 
     # explicitly change the last_modified_on since the content has been edited
     fields['modified_on'] = datetime.datetime.now()

@@ -23,6 +23,9 @@ __authors__ = [
 
 
 from google.appengine.ext import db
+from google.appengine.ext import blobstore
+
+from django.utils.translation import ugettext
 
 import soc.models.student
 
@@ -34,3 +37,15 @@ class GCIStudent(soc.models.student.Student):
   #: Set to True if the reminder mail to upload parental consent
   #: form is sent to students
   parental_form_mail = db.BooleanProperty(default=False)
+
+  #: Property pointing to the work uploaded as a file or archive
+  consent_form = blobstore.BlobReferenceProperty(
+      required=False, verbose_name=ugettext('Parental Consent Form'))
+  consent_form.help_text = ugettext(
+      'A signed Parental Consent Form from your legal parent or guardian')
+
+  #: Property pointing to the work uploaded as a file or archive
+  student_id_form = blobstore.BlobReferenceProperty(
+      required=False, verbose_name=ugettext('Student ID form'))
+  student_id_form.help_text = ugettext(
+      'A scan of your student ID to verify your student status and birthday.')

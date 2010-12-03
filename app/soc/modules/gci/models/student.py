@@ -22,10 +22,15 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import db
+
 import soc.models.student
 
 
 class GCIStudent(soc.models.student.Student):
   """GCI Student model extends the basic student model.
   """
-  pass
+
+  #: Set to True if the reminder mail to upload parental consent
+  #: form is sent to students
+  parental_form_mail = db.BooleanProperty(default=False)

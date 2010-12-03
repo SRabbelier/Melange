@@ -101,6 +101,9 @@ class View(student.View):
     new_params['module_package'] = 'soc.modules.gci.views.models'
     new_params['url_name'] = 'gci/student'
 
+    new_params['extra_dynaexclude'] = ['agreed_to_tos', 'school',
+                                       'parental_form_mail']
+
     new_params['extra_django_patterns'] = patterns
 
     params = dicts.merge(params, new_params, sub_merge=True)

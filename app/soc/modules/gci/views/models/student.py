@@ -36,7 +36,7 @@ from soc.views.models import student
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
 from soc.modules.gci.logic.models import program as gci_program_logic
-from soc.modules.gci.logic.models import student as gci_student_logic
+from soc.modules.gci.logic.models.student  import logic as gci_student_logic
 from soc.modules.gci.logic.models import task as gci_task_logic
 from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access as gci_access
@@ -70,23 +70,23 @@ class View(student.View):
         'List Student tasks')]
 
     rights = gci_access.GCIChecker(params)
-    rights['edit'] = [('checkIsMyActiveRole', gci_student_logic.logic)]
+    rights['edit'] = [('checkIsMyActiveRole', gci_student_logic)]
     rights['apply'] = [
         'checkIsUser',
         ('checkIsActivePeriod', ['student_signup', 'scope_path',
             gci_program_logic.logic]),
         ('checkIsNotParticipatingInProgramInScope',
-            [gci_program_logic.logic, gci_student_logic.logic,
+            [gci_program_logic.logic, gci_student_logic,
             gci_org_admin_logic.logic, gci_mentor_logic.logic]),
         'checkCanApply']
-    rights['manage'] = [('checkIsMyActiveRole', gci_student_logic.logic)]
+    rights['manage'] = [('checkIsMyActiveRole', gci_student_logic)]
     rights['list_student_tasks'] = [
-        ('checkCanOpenTaskList', [gci_student_logic.logic, 'gci/student']),
+        ('checkCanOpenTaskList', [gci_student_logic, 'gci/student']),
         ('checkIsAfterEvent', ['student_signup_start',
                                'scope_path', gci_program_logic.logic])]
 
     new_params = {}
-    new_params['logic'] = soc.modules.gci.logic.models.student.logic
+    new_params['logic'] = gci_student_logic
     new_params['rights'] = rights
 
     new_params['group_logic'] = gci_program_logic.logic

@@ -60,6 +60,20 @@ def as_email(account):
   return {'email': denormalized.email()}
 
 
+@register.inclusion_tag('soc/templatetags/_as_upload_form.html')
+def as_upload_form(form, form_url, form_name, submit_button_text):
+  """Prints an upload form.
+  """
+
+  return {
+      'form': form,
+      'form_url': form_url,
+      'form_name': form_name,
+      'submit_button_text': submit_button_text,
+  }
+
+
+
 @register.inclusion_tag('soc/templatetags/_field_as_table_row.html')
 def field_as_table_row(field):
   """Prints a newforms field as a table row.

@@ -68,6 +68,15 @@ def getListStudentTasksRedirect(entity, params):
 
   return result
 
+def getSubmitFormsRedirect(entity, params):
+  """Returns the redirect for the Submit Forms page for the given entity.
+  """
+
+  result = '/%s/submit_forms/%s' % (
+      params['url_name'], entity.key().id_or_name())
+
+  return result
+
 def getListMentorTasksRedirect(entity, params):
   """Returns the redirect for the List Mentor Tasks page for the given entity.
   """

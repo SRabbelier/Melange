@@ -56,6 +56,8 @@ def spawnMailTask(context):
     mail_entity.put()
 
     task_params = {'mail_key': mail_entity.key()}
+    # Setting a countdown because the mail_entity might not be stored to
+    # all the replicas yet.
     new_task = taskqueue.Task(params=task_params, url=SEND_MAIL_URL,
                               countdown=5)
     new_task.add(queue_name='mail', transactional=True)

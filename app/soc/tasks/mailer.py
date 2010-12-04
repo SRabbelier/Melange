@@ -56,8 +56,9 @@ def spawnMailTask(context):
     mail_entity.put()
 
     task_params = {'mail_key': mail_entity.key()}
-    new_task = taskqueue.Task(params=task_params, url=SEND_MAIL_URL)
-    new_task.add(queue_name='mail')
+    new_task = taskqueue.Task(params=task_params, url=SEND_MAIL_URL,
+                              countdown=5)
+    new_task.add(queue_name='mail', transactional=True)
 
   db.RunInTransaction(txn)
 

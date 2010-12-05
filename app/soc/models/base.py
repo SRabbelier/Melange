@@ -80,6 +80,8 @@ class ModelWithFieldAttributes(db.Model):
           """
           #: db.Model subclass for which to access model properties attributes
           model = cls
+          fields = None
+          exclude = None
 
       cls._fields_cache = FieldsProxy()
     return cls._fields_cache

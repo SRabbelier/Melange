@@ -265,6 +265,7 @@ def as_table_helper(context, form):
   # entity = context['entity']
 
   # support defining output order like in Django
+  a = form.Meta
   if hasattr(form, 'Meta') and form.Meta.fields:
     items = [(i, form.fields[i]) for i in form.Meta.fields]
   else:

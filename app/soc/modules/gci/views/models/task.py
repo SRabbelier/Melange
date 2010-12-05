@@ -57,6 +57,7 @@ from soc.views.helper import widgets
 from soc.views.models import base
 
 from soc.modules.gci.logic import cleaning as gci_cleaning
+from soc.modules.gci.logic.helper import notifications as gci_notifications
 from soc.modules.gci.logic.models import mentor as gci_mentor_logic
 from soc.modules.gci.logic.models import organization as gci_org_logic
 from soc.modules.gci.logic.models import org_admin as gci_org_admin_logic
@@ -1201,6 +1202,10 @@ class View(base.View):
     update_gae_task = False
     update_student_ranking = False
 
+    # saving the current task status to check if it changed to
+    # AwaitingRegistration after the update to shoot a mail if it updated
+    cur_task_status = entity.status
+
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
       st_filter = {
@@ -1365,6 +1370,14 @@ class View(base.View):
 
     if update_student_ranking:
       ranking_update.startUpdatingTask(entity)
+
+    # send a notification to the student if he completed his first task
+    # and the status of the task changed from some non completed state
+    # to AwaitingRegistration
+    if (cur_task_status != 'AwaitingRegistration' and
+        entity.status == 'AwaitingRegistration'):
+      gci_notifications.sendParentalConsentFormRequired(
+          entity.user, entity.program)
 
     # redirect to the same page
     return http.HttpResponseRedirect('')

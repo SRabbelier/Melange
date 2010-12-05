@@ -43,14 +43,18 @@ DEF_TASK_REQUEST_SUBJECT_MSG = ugettext(
 DEF_TASK_REQUEST_TEMPLATE = \
     'modules/gci/notification/messages/task_request.html'
 
-def sendTaskUpdateMail(subscriber, subject, message_properties=None):
-  """Sends an email to a user about an update to a Task.
+DEF_PARENTAL_FORM_SUBJECT_MSG = ugettext(
+    '[%(program_name)s]: Parental Consent Form - Please Respond')
 
-    Args:
-      subscriber: The user entity to whom the message must be sent
-      subject: Subject of the mail
-      message_properties: The mail message properties
-      template: Optional django template that is used to build the message body
+def sendMail(to_user, subject, message_properties, template):
+  """Sends an email with the specified properties and mail content
+
+  Args:
+    to_user: user entity to whom the mail should be sent
+    subject: subject of the mail
+    message_properties: contains those properties that need to be
+                        customized
+    template: template that holds the content of the mail
   """
 
   from soc.logic.models.site import logic as site_logic
@@ -67,24 +71,37 @@ def sendTaskUpdateMail(subscriber, subject, message_properties=None):
   else:
     (sender_name, sender) = default_sender
 
-  to = accounts.denormalizeAccount(subscriber.account).email()
+  to = accounts.denormalizeAccount(to_user.account).email()
 
   # create the message contents
   new_message_properties = {
-      'to_name': subscriber.name,
+      'to_name': to_user.name,
       'sender_name': sender_name,
       'to': to,
       'sender': sender,
       'site_name': site_name,
-      'subject': force_unicode(subject),
+      'subject': force_unicode(subject)
       }
 
   messageProperties = dicts.merge(message_properties, new_message_properties)
 
-  template = 'modules/gci/task/update_notification.html'
-
   # send out the message using the default new notification template
   mail_dispatcher.sendMailFromTemplate(template, messageProperties)
+
+def sendTaskUpdateMail(subscriber, subject, message_properties=None):
+  """Sends an email to a user about an update to a Task.
+
+    Args:
+      subscriber: The user entity to whom the message must be sent
+      subject: Subject of the mail
+      message_properties: The mail message properties
+      template: Optional django template that is used to build the message body
+  """
+
+  template = 'modules/gci/task/update_notification.html'
+
+  # delegate sending mail to the helper function
+  sendMail(subscriber, subject, message_properties, template)
 
 def sendBulkCreationCompleted(bulk_data):
   """Sends out a notification that the bulk creation of tasks has been
@@ -105,6 +122,24 @@ def sendBulkCreationCompleted(bulk_data):
 
   notifications.sendNotification(
       bulk_data.created_by.user, None, message_properties, subject, template)
+
+def sendParentalConsentFormRequired(user_entity, program_entity):
+  """Sends out a notification to the student who completed first task that
+  a parent consental form is necessary to receive prizes.
+
+  Args:
+    user_entity: User entity who completed his/her first task
+    program_entity: The entity for the program for which the task
+                    was completed.
+  """
+
+  subject = DEF_PARENTAL_FORM_SUBJECT_MSG % {
+      'program_name': program_entity.name
+      }
+  template = 'modules/gci/notification/messages/parental_form_required.html'
+
+  # delegate sending mail to the helper function
+  sendMail(user_entity, subject, {}, template)
 
 def sendRequestTaskNotification(org_admins, message):
   """Sends notifications to org admins that there is a student who requested

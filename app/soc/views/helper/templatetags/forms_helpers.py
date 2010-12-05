@@ -251,8 +251,14 @@ def as_table_helper(context, form):
   
   # entity = context['entity']
 
+  # support defining output order like in Django
+  if hasattr(form, 'Meta') and form.Meta.fields:
+    items = [(i, form.fields[i]) for i in form.Meta.fields]
+  else:
+    items = form.fields.items()
+
   # Iterate over all fields and prepare it for adding 
-  for name, field in form.fields.items():
+  for name, field in items:
     if not field:
       continue
 

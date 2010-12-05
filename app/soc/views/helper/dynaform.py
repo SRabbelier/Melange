@@ -91,7 +91,7 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
       """
 
       model = dynamodel
-      include = dynainclude
+      fields = dynainclude
       exclude = dynaexclude
       dynaconf = dynaproperties
 

@@ -61,13 +61,12 @@ def as_email(account):
 
 
 @register.inclusion_tag('soc/templatetags/_as_upload_form.html')
-def as_upload_form(form, form_url, form_name, submit_button_text):
+def as_upload_form(form, form_name, submit_button_text):
   """Prints an upload form.
   """
 
   return {
       'form': form,
-      'form_url': form_url,
       'form_name': form_name,
       'submit_button_text': submit_button_text,
   }

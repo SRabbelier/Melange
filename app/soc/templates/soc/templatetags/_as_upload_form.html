@@ -14,7 +14,21 @@ limitations under the License.
 
 {% load forms_helpers %}
 
-<form method="POST" enctype="multipart/form-data" action={{ form_url }}>
+<script>
+
+(function ($) {
+  $(function() {
+    var form_name = '#{{ form_name }}_submit_form';
+    jQuery(form_name).submit(function() {
+      var url = melange.getUploadUrl();
+      $(form_name).get(0).setAttribute('action', url);
+      return true;
+    });
+  });
+}(jQuery));
+</script>
+
+<form method="POST" enctype="multipart/form-data" id="{{ form_name }}_submit_form">
   <table>
     <div style="display:none;"><input type="hidden" name="form" value={{ form_name }}></div>
     {% as_table form %}

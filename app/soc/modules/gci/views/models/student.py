@@ -272,6 +272,11 @@ class View(student.View):
       return self.submitFormsGet(request, params, template, context, entity)
 
   def submitFormsGet(self, request, params, template, context, entity):
+    if lists.isJsonRequest(request):
+      url = blobstore.create_upload_url(
+          gci_redirects.getSubmitFormsRedirect(entity, params))
+      return responses.jsonResponse(request, url)
+
     def setForm(param_name, blob_info):
       add_form, edit_form = params[param_name]
 
@@ -288,10 +293,6 @@ class View(student.View):
 
     setForm('consent_form_upload_form', entity.consent_form)
     setForm('student_id_form_upload_form', entity.student_id_form)
-
-    url = blobstore.create_upload_url(
-        gci_redirects.getSubmitFormsRedirect(entity, params))
-    context['consent_form_url'] = context['student_id_form_url'] = url
 
     return responses.respond(request, template, context)
 

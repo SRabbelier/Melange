@@ -1,0 +1,74 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% block greeting %}
+Hi {{ to_name }},
+{% endblock %}
+{% block content %}
+
+<p>Thank you for submitting a task for Google Code-in.  Assuming your task
+ is accepted by the related organization, you will need to supply the
+  following to be eligible [0] to receive prizes.  Please have the
+following info ready to send in: </p>
+
+<p>
+- a signed Parental Consent Form from your legal parent or guardian.
+ Please visit the link below to download the Parental Consent form
+ in your preferred language [1].<br/>
+- a copy of a pre-university, high school, or secondary school
+ student ID or proof of enrollment*<br/>
+</p>
+
+<p>
+Once your task has been accepted:<br/>
+- visit http://www.google-melange.com<br/>
+- go to the submit forms page, and<br/>
+- upload the files (one at a time) in the appropriate section
+ before 11:59 P.M. Pacific Time on February 7, 2011.<br/>
+</p>
+
+<p>
+Remember, you only have to do this once, but PARTICIPANTS WHO FAIL
+ TO RETURN A SIGNED PARENTAL CONSENT AND STUDENT ID BY THIS DATE
+ WILL BE INELIGIBLE TO RECEIVE ANY PRIZES.  And we want to send you
+prizes, so please get this done soon.
+</p>
+
+<p>
+[0] - http://code.google.com/opensource/gci/2010-11/rules.html<br/>
+[1] - http://code.google.com/p/google-code-in/downloads/list<br/>
+</p>
+
+{% endblock %}
+{% block signature %}
+<p>
+Thanks,<br/>
+The Google OSPO Team
+<p>
+
+<p>
+*Any one of following documents is considered acceptable proof
+ of enrollment:<br/>
+-a scanned copy of your student identification card that shows
+ you were enrolled as of 22 November 2010.  This means the card
+ must show the date (a 2010 or later expiration date or some kind
+ of indication of enrollment in the 2009/2010 is fine, but the
+ date you started is alone not enough)<br/>
+-a transcript or course list (official or unofficial is fine)
+ showing the courses you were enrolled in as of 22 November 2010.
+ Transcript in .txt format is NOT acceptable.<br/>
+-a letter from your student affairs or admissions office stating
+ that you were enrolled as of 22 November 2010.<br/>
+</p>
+
+{% endblock %}

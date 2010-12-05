@@ -50,7 +50,8 @@ class View(base.View):
     """
 
     rights = gci_access.GCIChecker(params)
-    rights['download_blob'] = ['checkIsUser']
+    rights['any_access'] = ['allow']
+    rights['download_blob'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.work_submission.logic
@@ -88,7 +89,7 @@ class View(base.View):
     blob_get_key = request.GET.get('key')
 
     if not blob_get_key:
-      return http.Http404()
+      return http.HttpResponse('No blob key present')
 
     blob_key = str(urllib.unquote(blob_get_key))
     blob = blobstore.BlobInfo.get(blob_key)

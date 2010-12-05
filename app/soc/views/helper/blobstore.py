@@ -99,7 +99,7 @@ def send_blob(request, blob_key_or_info, content_type=None, save_as=None):
       If None or False, do not send as attachment.
 
     Raises:
-      ValueError on invalid save_as parameter.
+      ValueError on invalid save_as parameter or blob key.
   """
 
   CONTENT_DISPOSITION_FORMAT = 'attachment; filename="%s"'

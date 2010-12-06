@@ -57,7 +57,7 @@ class Logic(student.Logic):
         }
     task_url = '/tasks/gci/task/update/student_status'
 
-    new_task = taskqueue.Task(params=task_params, url=task_url)
+    new_task = taskqueue.Task(params=task_params, url=task_url, countdown=5)
     new_task.add('gci-update')
 
     super(Logic, self)._onCreate(entity)

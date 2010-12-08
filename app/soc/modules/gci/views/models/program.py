@@ -939,8 +939,9 @@ class View(program.View):
         "rowNum": -1,
         "rowList": [],
         }
+    list_params['public_field_prefetch'] = ['student']
     list_params['public_field_extra'] = lambda entity, *args: {
-        'student': entity.student.name(),
+        'student': entity.student.user.name,
         'number': len(entity.tasks)
         }
     list_params['public_row_extra'] = lambda entity, *args: {

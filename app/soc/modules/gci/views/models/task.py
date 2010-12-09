@@ -558,7 +558,7 @@ class View(base.View):
     buttons = [
         ('Publish Task', 'publish', 'Open', ['Unapproved', 'Unpublished']),
         ('Approve Task', 'approve', 'Unpublished', ['Unapproved']),
-        ('Unpublish Task', 'unpublish', 'Unpublished', ['Open', 'ReOpened']),
+        ('Unpublish Task', 'unpublish', 'Unpublished', ['Open', 'Reopened']),
         ('Unapprove Task', 'unapprove', 'Unapproved', ['Unpublished']),
     ]
 

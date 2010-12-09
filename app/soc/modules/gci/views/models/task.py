@@ -270,6 +270,8 @@ class View(base.View):
             widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
             required=True),
+        'task_status': forms.CharField(widget=widgets.PlainTextWidget(),
+                                       required=False),
         'time_to_complete_days': forms.IntegerField(
             min_value=0, required=True, initial=0,
             label='Time to complete (in days)',
@@ -545,9 +547,39 @@ class View(base.View):
       return helper.responses.errorResponse(
           error, request, context=context)
 
+    params = params.copy()
+
     # extend edit_form to include difficulty levels
     params['edit_form'] = self._getTagsForProgram(
         'edit_form', params, **kwargs)
+
+    params['edit_template'] = 'modules/gci/task/edit.html'
+
+    buttons = [
+        ('Publish Task', 'publish', 'Open', ['Unapproved', 'Unpublished']),
+        ('Approve Task', 'approve', 'Unpublished', ['Unapproved']),
+        ('Unpublish Task', 'unpublish', 'Unpublished', ['Open', 'ReOpened']),
+        ('Unapprove Task', 'unapprove', 'Unapproved', ['Unpublished']),
+    ]
+
+    context['buttons'] = []
+
+    for (text, action, next_state, states) in buttons:
+      if entity.status not in states:
+        if request.method != 'POST':
+          continue
+
+      if request.POST.get(action):
+        if entity.status not in states:
+          # request is no longer valid, redirect to current page
+          return http.HttpResponseRedirect('')
+
+        entity.status = next_state
+        entity.put()
+        return http.HttpResponseRedirect(request.path + '?s=0')
+
+      item = (text, action)
+      context['buttons'].append(item)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
@@ -580,6 +612,7 @@ class View(base.View):
     form.fields['time_to_complete_hours'].initial = \
         entity.time_to_complete % 24
 
+    form.fields['task_status'].initial = entity.status
     form.fields['link_id'].initial = entity.link_id
 
     return super(View, self)._editGet(request, entity, form)

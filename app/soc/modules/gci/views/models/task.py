@@ -1494,8 +1494,10 @@ class View(base.View):
         try:
           context['blob_manage_url'] = blobstore.create_upload_url(
               redirects.getPublicRedirect(entity, params))
-        except apiproxy_errors.FeatureNotEnabledError:
-          pass
+        except apiproxy_errors.FeatureNotEnabledError, message:
+          logging.error(message)
+        except apiproxy_errors.OverQuotaError, message:
+          logging.error(message)
 
         dynafields.extend([
             {'name': 'work_submission_external',

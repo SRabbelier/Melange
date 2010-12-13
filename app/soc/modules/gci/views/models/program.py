@@ -123,6 +123,10 @@ class View(program.View):
         [gci_program_logic.logic])]
     rights['type_tag_edit'] = [('checkIsHostForProgram',
         [gci_program_logic.logic])]
+    rights['list_self'] = [('checkIsAfterEvent',
+        ['tasks_publicly_visible',
+         '__all__', gci_program_logic.logic]),
+         'checkIsUser']
     rights['list_tasks'] = [('checkIsAfterEvent',
         ['tasks_publicly_visible',
          '__all__', gci_program_logic.logic])]
@@ -164,6 +168,9 @@ class View(program.View):
         (r'^%(url_name)s/(?P<access_type>type_tag_edit)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.task_type_tag_edit',
          'Edit a Task Type Tag'),
+        (r'^%(url_name)s/(?P<access_type>list_self)/%(key_fields)s$',
+         '%(module_package)s.%(module_name)s.list_my_tasks',
+         'List of my starred tasks'),
         (r'^%(url_name)s/(?P<access_type>list_tasks)/%(key_fields)s$',
          '%(module_package)s.%(module_name)s.list_tasks',
          'List of all Tasks in'),
@@ -510,6 +517,12 @@ class View(program.View):
       # add a link to list all the organizations
       items += [(url, "List all tasks", 'any_access')]
 
+      if user:
+        # add a link to show all tasks of interest
+        items += [(gci_redirects.getListMyTasksRedirect(
+            gci_program_entity, params),
+            'List my Tasks', 'any_access')]
+
     return items
 
   def _getStudentEntries(self, gci_program_entity, student_entity,
@@ -520,13 +533,6 @@ class View(program.View):
     items = []
 
     timeline_entity = gci_program_entity.timeline
-
-    if timeline_helper.isAfterEvent(timeline_entity,
-                                    'student_signup_start'):
-      # add a link to show all projects
-      items += [(gci_redirects.getListStudentTasksRedirect(
-          gci_program_entity, {'url_name':'gci/student'}),
-          "List my Tasks", 'any_access')]
 
     # this check is done because of the GCI student registration
     # specification mentioned in previous method, a user can have
@@ -780,8 +786,6 @@ class View(program.View):
 
     program_entity = logic.getFromKeyFieldsOr404(kwargs)
 
-    fmt = {'name': program_entity.name}
-
     rt_params = org_view.getParams().copy()
     rt_params['list_msg'] = self.DEF_REQUEST_TASKS_MSG
 
@@ -844,7 +848,6 @@ class View(program.View):
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
-
     return lists.getResponse(request, contents)
 
   @decorators.merge_params
@@ -891,10 +894,7 @@ class View(program.View):
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': redirects.getPublicRedirect(entity, list_params)
         }
-    #list_params['public_conf_extra'] = {
-    #    "rowNum": -1,
-    #    "rowList": [],
-    #    }
+
     list_params['public_conf_min_num'] = list_params['public_conf_limit'] = 100
 
     if lists.isDataRequest(request):
@@ -908,6 +908,88 @@ class View(program.View):
     contents.append(tasks_list)
 
     return self._list(request, list_params, contents, page_name)
+
+  def getListMyTasksData(self, request, task_params, subscription_params,
+                         program, user):
+    """Returns the list data for the starred tasks of the current user.
+
+    Args:
+      request: HTTPRequest object
+      task_params: params of the task entity for the list
+      subscription_params: params for the task subscription entity for the list
+      program: the GCIProgram to show the tasks for
+      user: The user entity to show the tasks for
+    """
+
+    idx = lists.getListIndex(request)
+
+    all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+    all_t = gci_task_model.TaskTypeTag.all().fetch(100)
+    args = [all_d, all_t]
+
+    if idx == 0:
+      filter = {
+          'program': program,
+          'user': user,
+          'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                     'Closed', 'AwaitingRegistration', 'NeedsWork',
+                     'NeedsReview']
+          }
+      contents = lists.getListData(request, task_params, filter, args=args)
+    elif idx == 1:
+      filter = {'subscribers': user}
+      contents = lists.getListData(request, subscription_params, filter,
+                                   args=args)
+    else:
+      return lists.getErrorResponse(request, 'idx not valid')
+
+    return lists.getResponse(request, contents)
+
+  @decorators.merge_params
+  @decorators.check_access
+  def listMyTasks(self, request, access_type, page_name=None,
+                       params=None, **kwargs):
+    """Displays a list of all starred tasks for the current user.
+
+    If the current user is a student it also lists all tasks claimed by them.
+
+    See base.View.list() for more details.
+    """
+    from soc.modules.gci.views.models import task as gci_task_view
+    from soc.modules.gci.views.models import task_subscription as \
+        gci_subscription_view
+
+    program = gci_program_logic.logic.getFromKeyFieldsOr404(kwargs)
+    user = user_logic.logic.getForCurrentAccount()
+
+    task_params = gci_task_view.view.getParams().copy()
+    task_params['list_description'] = ugettext(
+        'Tasks that you have claimed.')
+
+    subscription_params = gci_subscription_view.view.getParams().copy()
+    subscription_params['list_description'] = ugettext(
+        'Tasks that you have starred.')
+
+    if lists.isDataRequest(request):
+        return self.getListMyTasksData(request, task_params,
+                                       subscription_params, program, user)
+
+    contents = []
+
+    fields = {'user': user,
+              'status': ['active', 'inactive'],
+              }
+    if gci_student_logic.logic.getForFields(fields, unique=True):
+      order = ['modified_on']
+      tasks_list = lists.getListGenerator(request, task_params,
+                                          order=order, idx=0)
+      contents.append(tasks_list)
+
+    starred_tasks_list = lists.getListGenerator(request, subscription_params,
+                                                idx=1)
+    contents.append(starred_tasks_list)
+
+    return self._list(request, task_params, contents, page_name)
 
   @decorators.merge_params
   @decorators.check_access
@@ -981,6 +1063,7 @@ create = decorators.view(view.create)
 delete = decorators.view(view.delete)
 edit = decorators.view(view.edit)
 list = decorators.view(view.list)
+list_my_tasks = decorators.view(view.listMyTasks)
 list_participants = decorators.view(view.listParticipants)
 list_tasks = decorators.view(view.listTasks)
 public = decorators.view(view.public)

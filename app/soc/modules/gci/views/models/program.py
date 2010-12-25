@@ -556,8 +556,8 @@ class View(program.View):
       if gci_task_logic.logic.getForFields(filter, unique=True):
         if timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
           # this user does not have a role yet for this program
-          items += [('/gci/student/apply/%s' % (
-              gci_program_entity.key().id_or_name()),
+          items += [(redirects.getStudentApplyRedirect(
+              gci_program_entity, {'url_name': 'gci/student'}),
               "Register as a Student", 'any_access')]
 
     return items

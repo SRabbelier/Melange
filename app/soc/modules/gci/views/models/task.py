@@ -91,8 +91,9 @@ class View(base.View):
       'There are no tasks under your organization. Please create tasks.')
 
   DEF_STUDENT_SIGNUP_MSG = ugettext(
-      'You have successfully completed this task. Sign up as a student '
-      'before you proceed further.')
+      'You have successfully completed this task. <a href=" '
+      '%(student_signup_redirect)s">Click here</a> to sign up as a '
+      'student before you proceed further.')
 
   DEF_TASK_ACTION_NEEDED_MSG = ugettext(
       'The initial deadline for this task has passed. You have been granted '
@@ -1663,7 +1664,9 @@ class View(base.View):
               ('needs_review', 'Submit work and Request for review'))
         validation = 'needs_review'
       elif entity.status == 'AwaitingRegistration':
-        context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG
+        context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG % {
+            'student_signup_redirect': redirects.getStudentApplyRedirect(
+                entity.program, {'url_name': 'gci/student'})}
       elif entity.status == 'Closed':
         context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
     else:

@@ -1119,23 +1119,23 @@ class View(base.View):
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getForCurrentAccount()
 
     # get some entity specific context
     self.updatePublicContext(context, entity, comment_entities,
-                             ws_entities, user_account, params)
+                             ws_entities, params)
 
     validation = self._constructActionsList(context, entity,
-                                            user_account, params)
+                                            user_entity, params)
 
     context = dicts.merge(params['context'], context)
 
     if request.method == 'POST':
       return self.publicPost(request, context, params, entity,
-                             user_account, validation, **kwargs)
+                             user_entity, validation, **kwargs)
     else: # request.method == 'GET'
       return self.publicGet(request, context, params, entity,
-                            user_account, **kwargs)
+                            user_entity, **kwargs)
 
   def publicPost(self, request, context, params, entity,
                  user_account=None, validation=None, **kwargs):
@@ -1143,6 +1143,7 @@ class View(base.View):
 
     Args:
         entity: the task entity
+        user_account: The currently logged in user.
         rest: see base.View.public()
     """
 
@@ -1192,26 +1193,25 @@ class View(base.View):
 
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
+      st_filter = {
+        'user': user_account,
+        'scope': entity.program,
+        'status': 'active'
+        }
+      # Can be None
+      student_entity = gci_student_logic.logic.getForFields(
+          st_filter, unique=True)
+
       properties = {
           'status': 'ClaimRequested',
           'user': user_account,
+          'student': student_entity
           }
-
-      st_filter = {
-          'user': user_account,
-          'scope': entity.program,
-          'status': 'active'
-          }
-      student_entity = gci_student_logic.logic.getForFields(
-          st_filter, unique=True)
 
       # automatically subscribing the student to the task once he requests
       # his claim for the task
       user_entity = user_logic.logic.getForCurrentAccount()
       gci_ts_logic.logic.subscribeUser(entity, user_entity)
-
-      if student_entity:
-        properties['student'] = student_entity
 
       changes.extend([ugettext('User-Student'),
                       ugettext('Action-Claim Requested'),
@@ -1244,7 +1244,7 @@ class View(base.View):
           'parent': entity,
           'program': entity.program,
           'org': entity.scope,
-          'user': user_account,
+          'user': user_entity,
           'information': fields['comment'],
           'url_to_work': fields['work_submission_external'],
 
@@ -1338,7 +1338,7 @@ class View(base.View):
     comment_properties = {
         'parent': entity,
         'scope_path': entity.key().name(),
-        'created_by': user_account,
+        'created_by': user_entity,
         'changes': changes,
         }
 
@@ -1381,13 +1381,12 @@ class View(base.View):
     return responses.respond(request, template, context=context)
 
   def updatePublicContext(self, context, entity, comment_entities,
-                          ws_entities, user_account, params):
+                          ws_entities, params):
     """Updates the context for the public page with information.
 
     Args:
       context: the context that should be updated
       entity: a task used to set context
-      user_account: user entity of the logged in user
       params: dict with params for the view using this context
     """
 
@@ -1418,7 +1417,7 @@ class View(base.View):
     context['work_submissions'] = ws_entities
 
   def _constructActionsList(self, context, entity,
-                            user_account, params):
+                            user_entity, params):
     """Constructs a list of actions for the task page and extends
     the comment form with this list.
 
@@ -1428,7 +1427,7 @@ class View(base.View):
     Args:
       context: the context that should be updated
       entity: a task used to set context
-      user_account: user entity of the logged in user
+      user_entity: user entity of the logged in user
       params: dict with params for the view using this context
     """
 
@@ -1447,13 +1446,13 @@ class View(base.View):
     elif entity.status == 'Reopened':
       context['header_msg'] = self.DEF_TASK_REOPENED_MSG
 
-    if user_account:
+    if user_entity:
       actions = [('noaction', 'Comment without action')]
 
       # if the user is logged give him the permission to claim
       # the task only if he none of program host, org admin or mentor
       filter = {
-          'user': user_account,
+          'user': user_entity,
           }
 
       host_entity = host_logic.logic.getForFields(filter, unique=True)
@@ -1477,7 +1476,7 @@ class View(base.View):
                 entity, params)
       else:
         validation, student_actions = self._constructStudentActions(
-            context, entity, user_account)
+            context, entity, user_entity)
         actions += student_actions
 
       # create the difficultly level field containing the choices

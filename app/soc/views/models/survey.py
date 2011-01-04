@@ -638,6 +638,7 @@ class View(base.View):
     # add the required SurveyRecord properties
     properties['user'] = user_logic.getForCurrentAccount()
     properties['survey'] = entity
+    properties['modified'] = db.DateTimeProperty.now()
 
     # call the hook method before updating the SurveyRecord
     self._takePost(request, params, entity, record, properties)

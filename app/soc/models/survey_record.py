@@ -48,8 +48,9 @@ class BaseSurveyRecord(ExpandoBase):
   #: Date when this record was created.
   created = db.DateTimeProperty(auto_now_add=True)
 
-  #: Date when this record was last modified.
-  modified = db.DateTimeProperty(auto_now=True)
+  #: Date when this record was last modified, only changes when the answers
+  #: change.
+  modified = db.DateTimeProperty(auto_now=False)
 
   def getValues(self):
     """Method to get dynamic property values for a survey record.

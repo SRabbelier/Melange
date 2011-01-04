@@ -91,7 +91,7 @@ def newDynaForm(dynamodel=None, dynabase=None, dynainclude=None,
       """
 
       model = dynamodel
-      include = dynainclude
+      fields = dynainclude
       exclude = dynaexclude
       dynaconf = dynaproperties
 
@@ -114,30 +114,28 @@ def extendDynaForm(dynaform, dynainclude=None, dynaexclude=None,
   dynaexclude, which both are still allowed to be None.
   """
 
-  # Try to retrieve the Meta class from the existing dynaform
-  meta = getattr(dynaform, 'Meta', None)
+  # Retrieve the Meta class from the existing dynaform
+  meta = getattr(dynaform, 'Meta')
 
-  # If we find one, we can use it to 'extend' from
-  if meta:
-    dynamodel = getattr(meta, 'model', None)
+  dynamodel = getattr(meta, 'model', None)
 
-    originclude = getattr(meta, 'include', [])
-    origexclude = getattr(meta, 'exclude', [])
+  originclude = getattr(meta, 'include', [])
+  origexclude = getattr(meta, 'exclude', [])
 
-    if not dynainclude:
-      dynainclude = originclude
-      originclude = []
-    if not dynaexclude:
-      dynaexclude = origexclude
-      origexclude = []
+  if not dynainclude:
+    dynainclude = originclude
+    originclude = []
+  if not dynaexclude:
+    dynaexclude = origexclude
+    origexclude = []
 
-    if append:
-      dynainclude += originclude
-      dynaexclude += origexclude
+  if append:
+    dynainclude += originclude
+    dynaexclude += origexclude
 
-    # The most interesting parameter, the 'extra fields' dictionary
-    dynaconf = getattr(meta, 'dynaconf', {})
-    dynaproperties = dicts.merge(dynaproperties, dynaconf)
+  # The most interesting parameter, the 'extra fields' dictionary
+  dynaconf = getattr(meta, 'dynaconf', {})
+  dynaproperties = dicts.merge(dynaproperties, dynaconf)
 
   # Create a new DynaForm, using the properties we extracted
   return newDynaForm(

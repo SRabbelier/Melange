@@ -27,10 +27,8 @@ __authors__ = [
 import datetime
 
 from google.appengine.api import users
-from google.appengine.ext import db
 
 from django import forms
-from django.utils import simplejson
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
@@ -45,7 +43,6 @@ from soc.views.helper import access
 from soc.views.helper import decorators
 from soc.views.helper import lists
 from soc.views.helper import redirects
-from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import base
 from soc.views.models import role as role_view
@@ -79,9 +76,9 @@ class View(base.View):
     new_params['rights'] = rights
     new_params['logic'] = user_logic
 
-    new_params['name'] = "User"
-    new_params['module_name'] = "user_self"
-    new_params['url_name'] = "user"
+    new_params['name'] = 'User'
+    new_params['module_name'] = 'user_self'
+    new_params['url_name'] = 'user'
 
     new_params['create_template'] = 'soc/user/edit_profile.html'
     new_params['edit_template'] = 'soc/user/edit_profile.html'
@@ -105,7 +102,7 @@ class View(base.View):
 
     new_params['sidebar_heading'] = 'User (self)'
     new_params['sidebar'] = [
-        ("login", 'Sign In', 'signIn'),
+        ('login', 'Sign In', 'signIn'),
         (redirects.getCreateProfileRedirect(new_params),
             'Create Profile', 'create_profile'),
         (redirects.getEditProfileRedirect(new_params),
@@ -116,19 +113,19 @@ class View(base.View):
 
     patterns = []
 
-    page_name = ugettext("Create your profile")
+    page_name = ugettext('Create your profile')
     patterns += [(r'^%(url_name)s/(?P<access_type>create_profile)$',
                   'soc.views.models.%(module_name)s.create', page_name)]
 
-    page_name = ugettext("Edit your profile")
+    page_name = ugettext('Edit your profile')
     patterns += [(r'^%(url_name)s/(?P<access_type>edit_profile)$',
                   'soc.views.models.%(module_name)s.edit', page_name)]
 
-    page_name = ugettext("List of your roles")
+    page_name = ugettext('List of your roles')
     patterns += [(r'^%(url_name)s/(?P<access_type>roles)$',
                    'soc.views.models.user_self.roles', page_name)]
 
-    page_name = ugettext("List of your requests")
+    page_name = ugettext('List of your requests')
     patterns += [(r'^%(url_name)s/(?P<access_type>requests)$',
                    'soc.views.models.user_self.requests', page_name)]
 
@@ -200,8 +197,14 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    # fill in the account field with the current User
-    fields['account'] = users.User()
+    if not entity:
+      # fill in the account field with the current User
+      account = users.User()
+      fields['account'] = account
+      fields['user_id'] = account.user_id()
+    else:
+      fields['account'] = entity.account
+      fields['user_id'] = entity.user_id
 
     # special actions if there is no ToS present
     site_tos = site_logic.getToS(site_logic.getSingleton())
@@ -236,13 +239,13 @@ class View(base.View):
     idx = lists.getListIndex(request)
 
     if not 0 <= idx < len(lists_params):
-      return lists.getErrorResponse(request, "idx not valid")
+      return lists.getErrorResponse(request, 'idx not valid')
 
     list_params = lists_params[idx]
 
     if list_params is None:
       return lists.getErrorResponse(
-          request, "idx not valid (list not in roles overview)")
+          request, 'idx not valid (list not in roles overview)')
 
     contents = helper.lists.getListData(request, list_params, fields)
 
@@ -273,14 +276,14 @@ class View(base.View):
         continue
 
       list_params = list_params.copy()
-      list_params['public_field_keys'] = list_params['public_field_keys'] + ["status"]
-      list_params['public_field_names'] = list_params['public_field_names'] + ["Status"]
+      list_params['public_field_keys'] = list_params['public_field_keys'] + ['status']
+      list_params['public_field_names'] = list_params['public_field_names'] + ['Status']
       list_params['list_description'] = self.DEF_ROLE_LIST_MSG_FMT % list_params
       field_props = list_params.setdefault('public_field_props', {})
-      field_props["status"] = {
-          "searchoptions": {"defaultValue": "Active"},
-          "stype": "select",
-          "editoptions": {"value": ":All;^active$:Active;^inactive$:Inactive"},
+      field_props['status'] = {
+          'searchoptions': {'defaultValue': 'Active'},
+          'stype': 'select',
+          'editoptions': {'value': ':All;^active$:Active;^inactive$:Inactive'},
       }
 
       lists_params.append(list_params)

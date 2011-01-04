@@ -59,8 +59,8 @@ class PlainTextWidget(forms.widgets.Widget):
     """Render ReadOnlyInput widget as HTML.
     """
 
-    return html.linebreaks(html.escape(encoding.force_unicode(value))) if value \
-        else ""
+    escaped = html.escape(encoding.force_unicode(value))
+    return html.linebreaks(escaped) if escaped.find("\n") >= 0 else escaped
 
 
 class FullTinyMCE(forms.widgets.Textarea):

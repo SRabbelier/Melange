@@ -27,6 +27,7 @@ from django import http
 from soc.logic import dicts
 from soc.logic.models import user as user_logic
 from soc.views.helper import decorators
+from soc.views.helper import redirects
 from soc.views.models import base
 
 from soc.modules.gci.logic.models import task as gci_task_logic
@@ -67,6 +68,42 @@ class View(base.View):
         ]
 
     new_params['extra_django_patterns'] = patterns
+
+    new_params['public_field_extra'] = lambda entity, all_d, all_t: {
+        'title': entity.task.title,
+        'org': entity.task.scope.name,
+        'points_difficulty': entity.task.taskDifficultyValue(all_d),
+        'task_type': entity.task.taskType(all_t),
+        'arbit_tag': entity.task.taskArbitTag(),
+        'time_to_complete': entity.task.time_to_complete,
+        'days_hours': entity.task.taskTimeToComplete(),
+        'status': entity.task.status,
+    }
+    # TODO(ljvderijk): With multi-level prefetch we should be able to fetch
+    # the org as well.
+    new_params['public_field_prefetch'] = ['task']
+    new_params['public_field_keys'] = [
+        'title', 'org', 'points_difficulty', 'task_type',
+        'arbit_tag', 'time_to_complete', 'days_hours', 'status',
+    ]
+    new_params['public_field_names'] = [
+        'Title', 'Organization', 'Points (Difficulty)', 'Type', 'Tags',
+        'Total Hours To Complete', 'Time To Complete', 'Status',
+    ]
+    new_params['public_field_props'] = {
+        'time_to_complete': {
+            'sorttype': 'integer',
+        },
+    }
+    new_params['public_row_action'] = {
+          "type": "redirect_custom",
+          "parameters": dict(new_window=True),
+    }
+    new_params['public_row_extra'] = \
+        lambda entity, *args: {
+            'link': redirects.getPublicRedirect(
+                entity.task, {'url_name': 'gci/task'})
+    }
 
     params = dicts.merge(params, new_params, sub_merge=True)
 

@@ -461,6 +461,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
   class Meta(object):
     model = SurveyContent
+    fields = None
     exclude = ['schema']
 
 
@@ -591,6 +592,7 @@ class SurveyEditForm(djangoforms.ModelForm):
 
   class Meta(object):
     model = SurveyContent
+    fields = None
     exclude = ['schema']
 
 

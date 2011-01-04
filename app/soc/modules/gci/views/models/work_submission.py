@@ -26,6 +26,8 @@ import urllib
 
 from google.appengine.ext import blobstore
 
+from django import http
+
 from soc.logic import dicts
 from soc.views.helper import decorators
 from soc.views.models import base
@@ -48,7 +50,8 @@ class View(base.View):
     """
 
     rights = gci_access.GCIChecker(params)
-    rights['download_blob'] = ['checkIsUser']
+    rights['any_access'] = ['allow']
+    rights['download_blob'] = ['allow']
 
     new_params = {}
     new_params['logic'] = soc.modules.gci.logic.models.work_submission.logic
@@ -84,10 +87,17 @@ class View(base.View):
     """
 
     blob_get_key = request.GET.get('key')
+
+    if not blob_get_key:
+      return http.HttpResponse('No blob key present')
+
     blob_key = str(urllib.unquote(blob_get_key))
     blob = blobstore.BlobInfo.get(blob_key)
 
-    return bs_helper.send_blob(request, blob, save_as=True)
+    try:
+      return bs_helper.send_blob(request, blob, save_as=True)
+    except ValueError, error:
+      return http.HttpResponse(str(error))
 
 
 view = View()

@@ -93,7 +93,12 @@ def updateGCITask(request, *args, **kwargs):
     return error_handler.logErrorAndReturnOK(
         'Invalid updateGCITask data: %s' % post_dict)
 
-  entity = gci_task_logic.logic.getFromKeyNameOr404(key_name)
+  entity = gci_task_logic.logic.getFromKeyName(key_name)
+
+  if not entity:
+    # invalid task data, log and return OK
+    return error_handler.logErrorAndReturnOK(
+        'Invalid updateGCITask gci_task_key: %s' % post_dict)
 
   entity, comment_entity = gci_task_logic.logic.updateTaskStatus(entity)
 
@@ -166,10 +171,8 @@ def createNotificationMail(request, *args, **kwargs):
         'Invalid comment specified: %s/%s' % (comment_key, task_key))
 
   # check and retrieve the subscriber_start_key that has been done last
-  if 'subscriber_start_index' in post_dict:
-    subscriber_start_index = post_dict['subscriber_start_index']
-  else:
-    subscriber_start_index = 0
+  idx = post_dict.get('subscriber_start_index', '')
+  subscriber_start_index = int(idx) if idx.isdigit() else 0
 
   # get all subscribers to GCI task
   fields = {

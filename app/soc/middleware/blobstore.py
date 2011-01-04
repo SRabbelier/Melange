@@ -46,6 +46,8 @@ class BlobStoreMiddleware(object):
     """Process wsgi.input on POST requests.
     """
 
+    request.file_uploads = []
+
     # we only care about POST and which has form data with file.
     if request.method != 'POST' or (
         'multipart/form-data' not in request.META.get('CONTENT_TYPE', '')):

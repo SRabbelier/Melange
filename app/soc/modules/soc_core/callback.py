@@ -22,6 +22,7 @@ __authors__ = [
 
 
 from soc.tasks import grading_survey_group as grading_group_tasks
+from soc.tasks import mailer as mailer_tasks
 from soc.tasks import surveys as survey_tasks
 from soc.tasks.updates import start_update
 from soc.views.models import club
@@ -90,6 +91,7 @@ class Callback(object):
 
     # register task URL's
     self.core.registerSitemapEntry(grading_group_tasks.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(mailer_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(start_update.getDjangoURLPatterns())
     self.core.registerSitemapEntry(survey_tasks.getDjangoURLPatterns())
 

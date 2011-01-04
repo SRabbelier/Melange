@@ -65,6 +65,7 @@ class CreateForm(helper.forms.BaseForm):
     """Inner Meta class that defines some behavior for the form.
     """
     model = notification_model.Notification
+    fields = None
 
     # exclude the necessary fields from the form
     exclude = ['link_id', 'scope', 'scope_path', 'from_user', 'unread']

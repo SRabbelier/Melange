@@ -25,6 +25,7 @@ __authors__ = [
 
 
 import datetime
+import logging
 import time
 
 from google.appengine.ext import blobstore
@@ -90,8 +91,13 @@ class View(base.View):
       'There are no tasks under your organization. Please create tasks.')
 
   DEF_STUDENT_SIGNUP_MSG = ugettext(
-      'You have successfully completed this task. Sign up as a student '
-      'before you proceed further.')
+      'You have successfully completed this task. <a href=" '
+      '%(student_signup_redirect)s">Click here</a> to sign up as a '
+      'student before you proceed further.')
+
+  DEF_TASK_ACTION_NEEDED_MSG = ugettext(
+      'The initial deadline for this task has passed. You have been granted '
+      'an additional 24 hours to complete this task.')
 
   DEF_TASK_CLAIMED_BY_YOU_MSG = ugettext(
       'You have claimed this task!')
@@ -133,6 +139,15 @@ class View(base.View):
 
   DEF_TASK_MENTOR_REOPENED_MSG = ugettext(
       'The task has been reopened.')
+
+  DEF_TASK_MENTOR_FIX_MSG = ugettext(
+      'Through no fault of your own, the current difficulty of this task is '
+      'set to a value which is worth 0 points. Please fix this.')
+
+  DEF_TASK_MENTOR_ACTION_NEEDED_MSG = ugettext(
+      'The initial deadline for the task has passed. The student has been '
+      'notified and the deadline has been extended by 24 hours. No action is '
+      'required from you.')
 
   DEF_TASK_NEEDS_REVIEW_MSG = ugettext(
       'Student has submitted his work for this task! It needs review.')
@@ -257,6 +272,8 @@ class View(base.View):
             widget=widgets.FullTinyMCE(attrs={'rows': 25, 'cols': 100})),
         'scope_path': forms.CharField(widget=forms.HiddenInput,
             required=True),
+        'task_status': forms.CharField(widget=widgets.PlainTextWidget(),
+                                       required=False),
         'time_to_complete_days': forms.IntegerField(
             min_value=0, required=True, initial=0,
             label='Time to complete (in days)',
@@ -360,14 +377,6 @@ class View(base.View):
          'help_text': 'Assign mentors to this task by '
              'giving their link_ids separated by comma.',
          },
-        {'name': 'published',
-         'required': False,
-         'initial': False,
-         'base': forms.fields.BooleanField,
-         'label': 'Publish the task',
-         'help_text': ugettext('By ticking this box, the task will be'
-                               'made public and can be claimed by students.'),
-         }
         ]
 
     dynaproperties = params_helper.getDynaFields(dynafields)
@@ -540,29 +549,39 @@ class View(base.View):
       return helper.responses.errorResponse(
           error, request, context=context)
 
+    params = params.copy()
+
     # extend edit_form to include difficulty levels
     params['edit_form'] = self._getTagsForProgram(
         'edit_form', params, **kwargs)
 
-    if entity.status == 'Unapproved':
-      dynafields = [
-          {'name': 'approved',
-           'required': False,
-           'initial': False,
-           'base': forms.fields.BooleanField,
-           'label': 'Approve the task',
-           'help_text': 'By ticking this box, the task will be'
-               'will be approved for publishing.',
-          }
-          ]
+    params['edit_template'] = 'modules/gci/task/edit.html'
 
-      dynaproperties = params_helper.getDynaFields(dynafields)
+    buttons = [
+        ('Publish Task', 'publish', 'Open', ['Unapproved', 'Unpublished']),
+        ('Approve Task', 'approve', 'Unpublished', ['Unapproved']),
+        ('Unpublish Task', 'unpublish', 'Unpublished', ['Open', 'Reopened']),
+        ('Unapprove Task', 'unapprove', 'Unapproved', ['Unpublished']),
+    ]
 
-      edit_form = dynaform.extendDynaForm(
-          dynaform=params['edit_form'],
-          dynaproperties=dynaproperties)
+    context['buttons'] = []
 
-      params['edit_form'] = edit_form
+    for (text, action, next_state, states) in buttons:
+      if entity.status not in states:
+        if request.method != 'POST':
+          continue
+
+      if request.POST.get(action):
+        if entity.status not in states:
+          # request is no longer valid, redirect to current page
+          return http.HttpResponseRedirect('')
+
+        entity.status = next_state
+        entity.put()
+        return http.HttpResponseRedirect(request.path + '?s=0')
+
+      item = (text, action)
+      context['buttons'].append(item)
 
     if request.method == 'POST':
       return self.editPost(request, entity, context, params=params)
@@ -595,23 +614,8 @@ class View(base.View):
     form.fields['time_to_complete_hours'].initial = \
         entity.time_to_complete % 24
 
+    form.fields['task_status'].initial = entity.status
     form.fields['link_id'].initial = entity.link_id
-
-    # checks if the task is already approved or not and sets
-    # the form approved field
-    if 'approved' in form.fields:
-      if entity.status == 'Unapproved':
-        form.fields['approved'].initial = False
-      else:
-        form.fields['approved'].initial = True
-
-    # checks if the task is already published or not and sets
-    # the form published field
-    if 'published' in form.fields:
-      if entity.status == 'Unapproved' or entity.status == 'Unpublished':
-        form.fields['published'].initial = False
-      else:
-        form.fields['published'].initial = True
 
     return super(View, self)._editGet(request, entity, form)
 
@@ -637,33 +641,26 @@ class View(base.View):
         }
 
     # get the host entity if the current user is host
-    host_entity = host_logic.logic.getForFields(filter, unique=True)
+    role_entity = host_logic.logic.getForFields(filter, unique=True)
 
     if not entity:
       filter['scope'] = fields['scope']
     else:
       filter['scope'] = entity.scope
 
-    # get the entity if the current user is org admin
-    org_admin_entity = gci_org_admin_logic.logic.getForFields(
-        filter, unique=True)
+    if not role_entity:
+      # get the entity if the current user is org admin
+      role_entity = gci_org_admin_logic.logic.getForFields(
+          filter, unique=True)
 
-    role_entity = host_entity or org_admin_entity
     if role_entity:
-      # this user can publish/approve the task
-      if fields.get('published'):
-        fields['status'] = 'Open'
-      elif fields.get('approved') or (entity and entity.status == 'Open'):
-        # Set it to be unpublished
-        fields['status'] = 'Unpublished'
-
       fields['mentors'] = fields.get('mentors_list', [])
     else:
-      role_entity = gci_mentor_logic.logic.getForFields(
-          filter, unique=True)
-      if not entity:
-        # creating a new task
-        fields['status'] = 'Unapproved'
+      role_entity = gci_mentor_logic.logic.getForFields(filter, unique=True)
+
+    if not entity:
+      # creating a new task
+      fields['status'] = 'Unapproved'
 
     # explicitly change the last_modified_on since the content has been edited
     fields['modified_on'] = datetime.datetime.now()
@@ -1122,23 +1119,23 @@ class View(base.View):
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getForCurrentAccount()
 
     # get some entity specific context
     self.updatePublicContext(context, entity, comment_entities,
-                             ws_entities, user_account, params)
+                             ws_entities, params)
 
     validation = self._constructActionsList(context, entity,
-                                            user_account, params)
+                                            user_entity, params)
 
     context = dicts.merge(params['context'], context)
 
     if request.method == 'POST':
       return self.publicPost(request, context, params, entity,
-                             user_account, validation, **kwargs)
+                             user_entity, validation, **kwargs)
     else: # request.method == 'GET'
       return self.publicGet(request, context, params, entity,
-                            user_account, **kwargs)
+                            user_entity, **kwargs)
 
   def publicPost(self, request, context, params, entity,
                  user_account=None, validation=None, **kwargs):
@@ -1146,6 +1143,7 @@ class View(base.View):
 
     Args:
         entity: the task entity
+        user_account: The currently logged in user.
         rest: see base.View.public()
     """
 
@@ -1159,11 +1157,11 @@ class View(base.View):
     # request.file_uploads is coming from the blobstore middleware
     # TODO: Fix this once the appengine blobstore problem mentioned
     # in issue in blobstore middleware is fixed.
-    if hasattr(request, 'file_uploads') and request.file_uploads:
+    if request.file_uploads:
       form.data['work_submission_upload'] = request.file_uploads[0]
 
     if not form.is_valid():
-      if hasattr(request, 'file_uploads'):
+      if request.file_uploads:
         # delete the blob
         for file_blob in request.file_uploads:
           file_blob.delete()
@@ -1195,26 +1193,25 @@ class View(base.View):
 
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
+      st_filter = {
+        'user': user_account,
+        'scope': entity.program,
+        'status': 'active'
+        }
+      # Can be None
+      student_entity = gci_student_logic.logic.getForFields(
+          st_filter, unique=True)
+
       properties = {
           'status': 'ClaimRequested',
           'user': user_account,
+          'student': student_entity
           }
-
-      st_filter = {
-          'user': user_account,
-          'scope': entity.program,
-          'status': 'active'
-          }
-      student_entity = gci_student_logic.logic.getForFields(
-          st_filter, unique=True)
 
       # automatically subscribing the student to the task once he requests
       # his claim for the task
       user_entity = user_logic.logic.getForCurrentAccount()
       gci_ts_logic.logic.subscribeUser(entity, user_entity)
-
-      if student_entity:
-        properties['student'] = student_entity
 
       changes.extend([ugettext('User-Student'),
                       ugettext('Action-Claim Requested'),
@@ -1247,7 +1244,7 @@ class View(base.View):
           'parent': entity,
           'program': entity.program,
           'org': entity.scope,
-          'user': user_account,
+          'user': user_entity,
           'information': fields['comment'],
           'url_to_work': fields['work_submission_external'],
 
@@ -1341,7 +1338,7 @@ class View(base.View):
     comment_properties = {
         'parent': entity,
         'scope_path': entity.key().name(),
-        'created_by': user_account,
+        'created_by': user_entity,
         'changes': changes,
         }
 
@@ -1384,13 +1381,12 @@ class View(base.View):
     return responses.respond(request, template, context=context)
 
   def updatePublicContext(self, context, entity, comment_entities,
-                          ws_entities, user_account, params):
+                          ws_entities, params):
     """Updates the context for the public page with information.
 
     Args:
       context: the context that should be updated
       entity: a task used to set context
-      user_account: user entity of the logged in user
       params: dict with params for the view using this context
     """
 
@@ -1421,7 +1417,7 @@ class View(base.View):
     context['work_submissions'] = ws_entities
 
   def _constructActionsList(self, context, entity,
-                            user_account, params):
+                            user_entity, params):
     """Constructs a list of actions for the task page and extends
     the comment form with this list.
 
@@ -1431,7 +1427,7 @@ class View(base.View):
     Args:
       context: the context that should be updated
       entity: a task used to set context
-      user_account: user entity of the logged in user
+      user_entity: user entity of the logged in user
       params: dict with params for the view using this context
     """
 
@@ -1450,13 +1446,13 @@ class View(base.View):
     elif entity.status == 'Reopened':
       context['header_msg'] = self.DEF_TASK_REOPENED_MSG
 
-    if user_account:
+    if user_entity:
       actions = [('noaction', 'Comment without action')]
 
       # if the user is logged give him the permission to claim
       # the task only if he none of program host, org admin or mentor
       filter = {
-          'user': user_account,
+          'user': user_entity,
           }
 
       host_entity = host_logic.logic.getForFields(filter, unique=True)
@@ -1480,7 +1476,7 @@ class View(base.View):
                 entity, params)
       else:
         validation, student_actions = self._constructStudentActions(
-            context, entity, user_account)
+            context, entity, user_entity)
         actions += student_actions
 
       # create the difficultly level field containing the choices
@@ -1499,8 +1495,10 @@ class View(base.View):
         try:
           context['blob_manage_url'] = blobstore.create_upload_url(
               redirects.getPublicRedirect(entity, params))
-        except apiproxy_errors.FeatureNotEnabledError:
-          pass
+        except apiproxy_errors.FeatureNotEnabledError, message:
+          logging.error(message)
+        except apiproxy_errors.OverQuotaError, message:
+          logging.error(message)
 
         dynafields.extend([
             {'name': 'work_submission_external',
@@ -1525,9 +1523,10 @@ class View(base.View):
             {'name': 'extended_deadline',
              'base': forms.IntegerField,
              'min_value': 1,
+             'max_value': 7*24,
              'label': 'Extend deadline by',
              'required': False,
-             'passthrough': ['min_value', 'required', 'help_text'],
+             'passthrough': ['min_value', 'max_value', 'required', 'help_text'],
              'help_text': 'Optional: Specify the number of hours by '
                  'which you want to extend the deadline for the task '
                  'for this student. ',
@@ -1572,7 +1571,20 @@ class View(base.View):
 
     actions = []
 
-    if entity.status in ['Unapproved', 'Unpublished']:
+    if entity.status == 'NeedsReview':
+      context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
+      actions.extend([('needs_work', 'Needs More Work'),
+                      ('reopened', 'Reopen the task'),
+                      ('closed', 'Mark the task as complete')])
+      validation = 'close'
+    elif entity.status == 'Claimed':
+      context['header_msg'] = self.DEF_TASK_CLAIMED_BY_STUDENT_MSG
+    elif entity.taskDifficulty().value == 0:
+      # Prevent any action from being taken if the task difficulty is
+      # not set properly, with the exception of 'NeedsReview' and the
+      # 'Claimed' state, since the task cannot be edited then anyway.
+      context['header_msg'] = self.DEF_TASK_MENTOR_FIX_MSG
+    elif entity.status in ['Unapproved', 'Unpublished']:
       context['header_msg'] = self.DEF_TASK_UNPUBLISHED_MSG
       context['comment_disabled'] = True
     elif entity.status == 'Open':
@@ -1584,16 +1596,10 @@ class View(base.View):
                       ('reject', 'Reject claim request')])
       context['header_msg'] = self.DEF_TASK_CLAIM_REQUESTED_MSG
       validation = 'accept_claim'
-    elif entity.status == 'Claimed':
-      context['header_msg'] = self.DEF_TASK_CLAIMED_BY_STUDENT_MSG
-    elif entity.status == 'NeedsReview':
-      context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
-      actions.extend([('needs_work', 'Needs More Work'),
-                      ('reopened', 'Reopen the task'),
-                      ('closed', 'Mark the task as complete')])
-      validation = 'close'
     elif entity.status in ['AwaitingRegistration', 'Closed']:
       context['header_msg'] = self.DEF_TASK_CLOSED_MSG
+    elif entity.status == 'ActionNeeded':
+      context['header_msg'] = self.DEF_TASK_MENTOR_ACTION_NEEDED_MSG
 
     return validation, actions
 
@@ -1640,7 +1646,10 @@ class View(base.View):
         validation = 'claim_withdraw'
       elif entity.deadline and entity.status in [
           'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
-        context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
+        if entity.status == 'ActionNeeded':
+          context['header_msg'] = self.DEF_TASK_ACTION_NEEDED_MSG
+        else:
+          context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
         actions.extend([
             ('withdraw', 'Withdraw from the task'),
             ('needs_review', 'Submit work and Request for review')])
@@ -1654,7 +1663,9 @@ class View(base.View):
               ('needs_review', 'Submit work and Request for review'))
         validation = 'needs_review'
       elif entity.status == 'AwaitingRegistration':
-        context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG
+        context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG % {
+            'student_signup_redirect': redirects.getStudentApplyRedirect(
+                entity.program, {'url_name': 'gci/student'})}
       elif entity.status == 'Closed':
         context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
     else:

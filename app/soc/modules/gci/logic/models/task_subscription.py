@@ -95,8 +95,9 @@ class Logic(base.Logic):
       if user_entity.key() not in entity.subscribers:
         data = 'add'
     elif toggle == None:
-      entity.subscribers.append(user_entity.key())
-      data = 'add'
+      if user_entity.key() not in entity.subscribers:
+        entity.subscribers.append(user_entity.key())
+        data = 'add'
 
     if entity.put():
       return data

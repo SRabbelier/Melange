@@ -580,3 +580,10 @@ def getRequestsRedirect(params):
       params['url_name'])
 
   return result
+
+def getStudentApplyRedirect(entity, params):
+  """Returns the student application for redirect for students to create
+  their new profiles.
+  """
+
+  return '/%s/apply/%s' % (params['url_name'], entity.key().id_or_name())

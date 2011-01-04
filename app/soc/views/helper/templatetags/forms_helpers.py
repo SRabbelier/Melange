@@ -60,6 +60,19 @@ def as_email(account):
   return {'email': denormalized.email()}
 
 
+@register.inclusion_tag('soc/templatetags/_as_upload_form.html')
+def as_upload_form(form, form_name, submit_button_text):
+  """Prints an upload form.
+  """
+
+  return {
+      'form': form,
+      'form_name': form_name,
+      'submit_button_text': submit_button_text,
+  }
+
+
+
 @register.inclusion_tag('soc/templatetags/_field_as_table_row.html')
 def field_as_table_row(field):
   """Prints a newforms field as a table row.
@@ -251,8 +264,15 @@ def as_table_helper(context, form):
   
   # entity = context['entity']
 
+  # support defining output order like in Django
+  a = form.Meta
+  if hasattr(form, 'Meta') and form.Meta.fields:
+    items = [(i, form.fields[i]) for i in form.Meta.fields]
+  else:
+    items = form.fields.items()
+
   # Iterate over all fields and prepare it for adding 
-  for name, field in form.fields.items():
+  for name, field in items:
     if not field:
       continue
 

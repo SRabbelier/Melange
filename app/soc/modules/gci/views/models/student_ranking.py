@@ -94,7 +94,7 @@ class View(base.View):
     """
 
     logic = params['logic']
-    ranking = logic.getFromKeyFields(kwargs)
+    ranking = logic.getFromKeyFieldsOr404(kwargs)
     student = ranking.student
 
     list_params = params.copy()

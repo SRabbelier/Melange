@@ -20,6 +20,7 @@
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Augie Fackler" <durin42@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
@@ -29,6 +30,7 @@ import unittest
 import gaetestbed
 from mox import stubout
 
+from django.test import client
 from django.test import TestCase
 
 from soc.logic.helper import xsrfutil
@@ -146,7 +148,8 @@ class NonFailingFakePayload(object):
   def read(self, num_bytes=None):
     if num_bytes is None:
         num_bytes = self.__len or 1
-    assert self.__len >= num_bytes, "Cannot read more than the available bytes from the HTTP incoming data."
+    assert self.__len >= num_bytes, \
+      "Cannot read more than the available bytes from the HTTP incoming data."
     content = self.__content.read(num_bytes)
     self.__len -= num_bytes
     return content
@@ -169,7 +172,6 @@ class DjangoTestCase(TestCase):
     """Performs any pre-test setup.
     """
 
-    from django.test import client
     client.FakePayload = NonFailingFakePayload
 
   def _post_teardown(self):
@@ -178,7 +180,8 @@ class DjangoTestCase(TestCase):
 
     pass
 
-  def getXsrfToken(self, path=None, method='POST', data={}, **extra):
+  @classmethod
+  def getXsrfToken(cls, path=None, method='POST', data={}, **extra):
     """Returns an XSRF token for request context.
 
     It is signed by Melange XSRF middleware.
@@ -198,6 +201,24 @@ class DjangoTestCase(TestCase):
     user_id = xsrfutil._getCurrentUserId()
     xsrf_token = xsrfutil._generateToken(key, user_id)
     return xsrf_token
+
+
+def runTasks(url = None, name=None, queue_names = None):
+  """Run tasks with specified url and name in specified task queues.
+  """
+
+  task_queue_test_case = gaetestbed.taskqueue.TaskQueueTestCase()
+  # Get all tasks with specified url and name in specified task queues
+  tasks = task_queue_test_case.get_tasks(url=url, name=name, 
+                                         queue_names=queue_names)
+  for task in tasks:
+    postdata = task['params']
+    xsrf_token = DjangoTestCase.getXsrfToken(url, data=postdata)
+    postdata.update(xsrf_token=xsrf_token)
+    client.FakePayload = NonFailingFakePayload
+    c = client.Client()
+    # Run the task with Django test client
+    c.post(url, postdata)
 
 
 class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
@@ -225,6 +246,8 @@ class MailTestCase(gaetestbed.mail.MailTestCase, unittest.TestCase):
     messages satisfying the criteria are sent out.
     """
 
+    # Run all mail tasks first so that all mails will be sent out
+    runTasks(url = '/tasks/mail/send_mail', queue_names = ['mail'])
     messages = self.get_sent_messages(
         to = to,
         sender = sender,

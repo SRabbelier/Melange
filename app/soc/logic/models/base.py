@@ -459,9 +459,6 @@ class Logic(object):
       - Query object instantiated with the given properties
     """
 
-    from google.appengine.api import memcache
-    from soc.logic import system
-
     if not filter:
       filter = {}
 
@@ -678,7 +675,7 @@ class Logic(object):
     Retrieved from http://tinyurl.com/d887ll (AppEngine cookbook).
     """
 
-     # AppEngine will not fetch more than 1000 results
+    # AppEngine will not fetch more than 1000 results
     batch_size = min(batch_size, 1000)
 
     done = False

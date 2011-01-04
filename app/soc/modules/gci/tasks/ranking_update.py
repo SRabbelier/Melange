@@ -159,10 +159,11 @@ def recalculateGCIStudentRanking(request, *args, **kwargs):
       unique=True)
   ranking.points = 0
   ranking.tasks = []
+  ranking.put()
 
   # get all the tasks that the student has completed
   filter = {
-      'student': entity,
+      'student': student,
       'status': 'Closed',
       }
   tasks = gci_task_logic.getForFields(filter=filter)
@@ -170,7 +171,7 @@ def recalculateGCIStudentRanking(request, *args, **kwargs):
   for task in tasks:
     gci_student_ranking_logic.updateRanking(task)
 
-
+  responses.terminateTask()
 
 
 clear = clearGCIRanking

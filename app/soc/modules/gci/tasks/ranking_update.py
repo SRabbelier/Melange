@@ -43,6 +43,8 @@ def getDjangoURLPatterns():
         'soc.modules.gci.tasks.ranking_update.update'),
       (r'^tasks/gci/ranking/recalculate/(?P<key_name>.+)$',
         'soc.modules.gci.tasks.ranking_update.recalculate'),
+      (r'^tasks/gci/ranking/recalculate_student/(?P<key_name>.+)$',
+        'soc.modules.gci.tasks.ranking_update.recalculate_student'),
       (r'^tasks/gci/ranking/clear/(?P<key_name>.+)$',
         'soc.modules.gci.tasks.ranking_update.clear')]
 
@@ -141,6 +143,37 @@ def clearGCIRanking(request, entities, context, *args, **kwargs):
 
     entity.put()
 
+def recalculateGCIStudentRanking(request, *args, **kwargs):
+  """Recalculates GCI Student Ranking for the specified student.
+  """
+
+  student = gci_student_logic.getFromKeyName(kwargs['key_name'])
+  if not student:
+    return responses.terminateTask()
+
+  # find ranking entity for the student and clear it
+  filter = {
+      'student': student
+      }
+  ranking = gci_student_ranking_logic.getForFields(filter=filter,
+      unique=True)
+  ranking.points = 0
+  ranking.tasks = []
+
+  # get all the tasks that the student has completed
+  filter = {
+      'student': entity,
+      'status': 'Closed',
+      }
+  tasks = gci_task_logic.getForFields(filter=filter)
+
+  for task in tasks:
+    gci_student_ranking_logic.updateRanking(task)
+
+
+
+
 clear = clearGCIRanking
 recalculate = recalculateGCIRanking
+recalculate_student = recalculateGCIStudentRanking
 update = decorators.task(updateGCIRanking)

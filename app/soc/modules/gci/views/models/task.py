@@ -1138,12 +1138,12 @@ class View(base.View):
                             user_entity, **kwargs)
 
   def publicPost(self, request, context, params, entity,
-                 user_account=None, validation=None, **kwargs):
+                 user_entity=None, validation=None, **kwargs):
     """Handles the POST request for the entity's public page.
 
     Args:
         entity: the task entity
-        user_account: The currently logged in user.
+        user_entity: The currently logged in user.
         rest: see base.View.public()
     """
 
@@ -1194,7 +1194,7 @@ class View(base.View):
     # TODO: this can be separated into several methods that handle the changes
     if validation == 'claim_request' and action == 'request':
       st_filter = {
-        'user': user_account,
+        'user': user_entity,
         'scope': entity.program,
         'status': 'active'
         }
@@ -1204,13 +1204,12 @@ class View(base.View):
 
       properties = {
           'status': 'ClaimRequested',
-          'user': user_account,
+          'user': user_entity,
           'student': student_entity
           }
 
       # automatically subscribing the student to the task once he requests
       # his claim for the task
-      user_entity = user_logic.logic.getForCurrentAccount()
       gci_ts_logic.logic.subscribeUser(entity, user_entity)
 
       changes.extend([ugettext('User-Student'),

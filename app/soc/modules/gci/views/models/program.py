@@ -1006,6 +1006,17 @@ class View(program.View):
     """
 
     from soc.modules.gci.views.models.student_ranking import view as ranking_view
+    from soc.modules.gci.views.models.student import view as student_view
+
+    sparams = student_view.getParams()
+
+    user_account = user_logic.getForCurrentAccount()
+    user_fields = {
+        'user': user_account,
+        'status': 'active'
+        }
+    host_entity = host_logic.getForFields(user_fields, unique=True)
+    is_host = bool(host_entity)
 
     logic = params['logic']
     program = logic.getFromKeyFieldsOr404(kwargs)
@@ -1022,13 +1033,18 @@ class View(program.View):
         "rowList": [],
         }
     list_params['public_field_prefetch'] = ['student']
-    list_params['public_field_extra'] = lambda entity, *args: {
+    def getExtraFields(entity, *args):
+      res = {
         'student': entity.student.user.name,
         'number': len(entity.tasks)
-        }
+      }
+      for f in sparams['admin_field_keys'] if is_host else []:
+        res[f] = getattr(entity.student, f)
+      return res
+    list_params['public_field_extra'] = getExtraFields
     list_params['public_row_extra'] = lambda entity, *args: {
         'link': gci_redirects.getShowRankingDetails(entity, list_params)
-        }
+    }
     list_params['public_field_props'] = {
         'points': {
             'sorttype': 'integer',
@@ -1037,6 +1053,10 @@ class View(program.View):
             'sorttype': 'integer',
         },
     }
+    if is_host:
+      list_params['public_field_hidden'] = sparams['admin_field_hidden'] + sparams['admin_field_keys']
+      list_params['public_field_keys'].extend(sparams['admin_field_keys'])
+      list_params['public_field_names'].extend(sparams['admin_field_names'])
 
     ranking_filter = {
         'scope': program

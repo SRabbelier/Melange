@@ -34,8 +34,8 @@ from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.models import host as host_logic
-from soc.logic.models import user as user_logic
+from soc.logic.models.host import logic as host_logic
+from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
 from soc.views import helper
 from soc.views.helper import decorators
@@ -107,7 +107,7 @@ class View(program.View):
     rights = gci_access.GCIChecker(params)
     rights['show'] = ['allow']
     rights['create'] = [('checkSeeded', ['checkHasRoleForScope',
-                                         host_logic.logic])]
+                                         host_logic])]
     rights['edit'] = [('checkIsHostForProgram', [gci_program_logic.logic])]
     rights['delete'] = ['checkIsDeveloper']
     rights['assign_task_quotas'] = [
@@ -502,7 +502,7 @@ class View(program.View):
         'user': user,
         'status': 'active'
         }
-    host_entity = host_logic.logic.getForFields(user_fields, unique=True)
+    host_entity = host_logic.getForFields(user_fields, unique=True)
 
     # for org admins this link should be visible only after accepted
     # organizations are announced and for other public after the tasks
@@ -867,13 +867,13 @@ class View(program.View):
 
     list_params = task_view.getParams().copy()
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.getForCurrentAccount()
     user_fields = {
         'user': user_account,
         'status': 'active'
         }
 
-    host_entity = host_logic.logic.getForFields(user_fields, unique=True)
+    host_entity = host_logic.getForFields(user_fields, unique=True)
 
     tasks_filter = {
         'program': program_entity,
@@ -960,7 +960,7 @@ class View(program.View):
         gci_subscription_view
 
     program = gci_program_logic.logic.getFromKeyFieldsOr404(kwargs)
-    user = user_logic.logic.getForCurrentAccount()
+    user = user_logic.getForCurrentAccount()
 
     task_params = gci_task_view.view.getParams().copy()
     task_params['list_description'] = ugettext(

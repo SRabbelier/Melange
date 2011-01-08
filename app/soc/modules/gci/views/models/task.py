@@ -1404,7 +1404,9 @@ class View(base.View):
     context['task_type_str'] = entity.taskType()
 
     if entity.deadline:
-      context['time_to_complete'] = timeuntil(entity.deadline)
+      stop_dl = entity.program.timeline.stop_all_work_deadline
+      end_time = entity.deadline if entity.deadline < stop_dl else stop_dl
+      context['time_to_complete'] = timeuntil(end_time)
     else:
       if entity.status == 'NeedsReview':
         context['time_to_complete'] = 'No Time Left'

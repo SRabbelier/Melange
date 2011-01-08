@@ -28,8 +28,11 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic import validate
 
+from soc.modules.gci.logic.models.task import logic as gci_task_logic
 
-def cleanTaskComment(comment_field, action_field, ws_ext_field, ws_upld_field):
+
+def cleanTaskComment(comment_field, action_field, ws_ext_field,
+                     ws_upld_field, extended_deadline_field):
   """Cleans the comment form and checks to see if there is either
   action or comment content.
 
@@ -42,10 +45,12 @@ def cleanTaskComment(comment_field, action_field, ws_ext_field, ws_upld_field):
   def wrapper(self):
     """Decorator wrapper method.
     """
+
     cleaned_data = self.cleaned_data
     content = cleaned_data.get(comment_field)
     action = cleaned_data.get(action_field)
     ws_ext = cleaned_data.get(ws_ext_field)
+    extended_deadline = cleaned_data.get(extended_deadline_field)
 
     # not using cleaned data because this is separately handled by
     # Appengine's blobstore APIs
@@ -59,6 +64,11 @@ def cleanTaskComment(comment_field, action_field, ws_ext_field, ws_upld_field):
       raise forms.ValidationError(
           ugettext('You cannot have all the three fields: comment, '
                    'and two work submission fields empty'))
+
+    if action == 'needs_work' and extended_deadline <= 0:
+      raise forms.ValidationError(
+          ugettext('Some time extension must be given to the student '
+                   'when more work on the task is expected.'))
 
     if ws_upld:
       cleaned_data[ws_upld_field] = ws_upld

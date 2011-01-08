@@ -414,7 +414,7 @@ class View(base.View):
     dynaproperties['clean_comment'] = cleaning.clean_html_content('comment')
     dynaproperties['clean'] = gci_cleaning.cleanTaskComment(
         'comment', 'action', 'work_submission_external',
-        'work_submission_upload')
+        'work_submission_upload', 'extended_deadline')
 
     comment_form = dynaform.newDynaForm(dynamodel=None,
         dynabase=helper.forms.BaseForm, dynainclude=None,

@@ -1098,7 +1098,6 @@ class View(base.View):
     # create default template context for use with any templates
     context = helper.responses.getUniversalContext(request)
     helper.responses.useJavaScript(context, params['js_uses_all'])
-    context['page_name'] = page_name
     entity = None
     logic = params['logic']
 
@@ -1118,6 +1117,7 @@ class View(base.View):
     context['entity_key_name'] = entity.key().id_or_name()
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
+    context['page_name'] = ugettext('GCI Task: %s' % (entity.title))
 
     user_entity = user_logic.logic.getForCurrentAccount()
 

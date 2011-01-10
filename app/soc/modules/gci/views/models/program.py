@@ -32,6 +32,7 @@ from django import http
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
+from soc.logic import accounts
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.host import logic as host_logic
@@ -1016,7 +1017,7 @@ class View(program.View):
         'status': 'active'
         }
     host_entity = host_logic.getForFields(user_fields, unique=True)
-    is_host = bool(host_entity)
+    is_host = host_entity or user_logic.isDeveloper(user=user_account)
 
     logic = params['logic']
     program = logic.getFromKeyFieldsOr404(kwargs)
@@ -1035,16 +1036,26 @@ class View(program.View):
     list_params['public_field_prefetch'] = ['student']
     def getExtraFields(entity, *args):
       res = {
-        'student': entity.student.user.name,
-        'number': len(entity.tasks)
+          'student': entity.student.user.name,
+          'number': len(entity.tasks)
       }
-      for f in sparams['admin_field_keys'] if is_host else []:
-        res[f] = getattr(entity.student, f)
+      if is_host:
+        fields = sparams['admin_field_keys']
+        extra = dicts.toDict(entity.student, fields)
+        res.update(extra)
       return res
     list_params['public_field_extra'] = getExtraFields
-    list_params['public_row_extra'] = lambda entity, *args: {
-        'link': gci_redirects.getShowRankingDetails(entity, list_params)
-    }
+    def getExtraRow(entity, *args):
+      res = {
+          'link': gci_redirects.getShowRankingDetails(entity, list_params)
+      }
+      if is_host:
+        res['group_name'] = entity.student.scope.name
+        res['birth_date'] = entity.student.birth_date.isoformat()
+        res['account_name'] = accounts.normalizeAccount(entity.student.user.account).email()
+      return res
+
+    list_params['public_row_extra'] = getExtraRow
     list_params['public_field_props'] = {
         'points': {
             'sorttype': 'integer',

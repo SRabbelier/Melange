@@ -547,7 +547,7 @@
             var column_content = temp_data[i][element_value.name];
             if (current_row.operations !== undefined && current_row.operations.row !== undefined && current_row.operations.row.link !== undefined) {
               // If there are no links in the text then insert a listsnoul link
-              if (column_content !== null && column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
+              if (column_content !== null && column_content !== undefined && column_content.toString().match(/<a\b[^>]*>.*<\/a>/) === null) {
                 column_content = '<a style="display:block;" href="' + current_row.operations.row.link + '" class="listsnoul">' + column_content + '</a>';
               }
             }

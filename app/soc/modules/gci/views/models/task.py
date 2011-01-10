@@ -84,12 +84,21 @@ class View(base.View):
       'The task can be edited by clicking on the edit link '
       'next to the title above.')
 
+  DEF_CLAIM_DEADLINE_PASSED_MSG = ugettext(
+      'The task claim deadline has passed. You cannot claim any more '
+      'tasks now.'
+      )
+
   DEF_MAX_TASK_LIMIT_MSG_FMT = ugettext(
       'The task is open but you cannot claim this task since you '
       'have already claimed %d task(s).')
 
   DEF_NO_TASKS_MSG = ugettext(
       'There are no tasks under your organization. Please create tasks.')
+
+  DEF_STOP_WORK_DEADLINE_MSG = ugettext(
+      'The %(program_name)s has ended and no more actions can be performed '
+      'on this task.')
 
   DEF_STUDENT_SIGNUP_MSG = ugettext(
       'You have successfully completed this task. <a href=" '
@@ -1616,72 +1625,77 @@ class View(base.View):
 
     program_timeline = entity.program.timeline
 
-    if entity.status in ['Open', 'Reopened']:
-      task_filter = {
-          'user': user_account,
-          'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                     'NeedsWork', 'NeedsReview']
-          }
-      task_entities = gci_task_logic.logic.getForFields(task_filter)
+    if timeline_helper.isBeforeEvent(program_timeline, 'task_claim_deadline'):
+      if entity.status in ['Open', 'Reopened']:
+        task_filter = {
+            'user': user_account,
+            'status': ['ClaimRequested', 'Claimed', 'ActionNeeded',
+                       'NeedsWork', 'NeedsReview']
+            }
+        task_entities = gci_task_logic.logic.getForFields(task_filter)
 
-      if len(task_entities) >= entity.program.nr_simultaneous_tasks:
-        context['header_msg'] = self.DEF_MAX_TASK_LIMIT_MSG_FMT % (
-            entity.program.nr_simultaneous_tasks)
-        validation = 'claim_ineligible'
-        return validation, actions
+        if len(task_entities) >= entity.program.nr_simultaneous_tasks:
+          context['header_msg'] = self.DEF_MAX_TASK_LIMIT_MSG_FMT % (
+              entity.program.nr_simultaneous_tasks)
+          validation = 'claim_ineligible'
+          return validation, actions
 
-      task_filter['status'] = 'AwaitingRegistration'
-      task_entities = gci_task_logic.logic.getForFields(task_filter)
+        task_filter['status'] = 'AwaitingRegistration'
+        task_entities = gci_task_logic.logic.getForFields(task_filter)
 
-      if task_entities:
-        context['header_msg'] = self.DEF_AWAITING_REG_MSG
-        validation = 'claim_ineligible'
-      elif timeline_helper.isBeforeEvent(program_timeline,
-                                         'task_claim_deadline'):
-        actions.append(('request', 'Request to claim the task'))
-        validation = 'claim_request'
+        if task_entities:
+          context['header_msg'] = self.DEF_AWAITING_REG_MSG
+          validation = 'claim_ineligible'
+        else:
+          actions.append(('request', 'Request to claim the task'))
+          validation = 'claim_request'
+    else:
+      context['header_msg'] = self.DEF_CLAIM_DEADLINE_PASSED_MSG
 
     # TODO: lot of double information here that can be simplified
-    if (entity.user and user_account.key() == entity.user.key() and
-        timeline_helper.isBeforeEvent(program_timeline,
-                                      'stop_all_work_deadline')):
-      if entity.status  == 'ClaimRequested':
-        context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
-        context['pageheaderalert'] = True
-        actions.append(('withdraw', 'Withdraw from the task'))
-        validation = 'claim_withdraw'
-      elif entity.deadline and entity.status in [
-          'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
-        if entity.status == 'ActionNeeded':
-          context['header_msg'] = self.DEF_TASK_ACTION_NEEDED_MSG
-        else:
-          context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
-        actions.extend([
-            ('withdraw', 'Withdraw from the task'),
-            ('needs_review', 'Submit work and Request for review')])
-        validation = 'needs_review'
-      elif entity.status == 'NeedsReview':
-        context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
-        context['pageheaderalert'] = True
-        actions.append(('withdraw', 'Withdraw from the task'))
-        if entity.deadline and datetime.datetime.now() < entity.deadline:
-          actions.append(
-              ('needs_review', 'Submit work and Request for review'))
-        validation = 'needs_review'
-      elif entity.status == 'AwaitingRegistration':
-        context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG % {
-            'student_signup_redirect': redirects.getStudentApplyRedirect(
-                entity.program, {'url_name': 'gci/student'})}
-      elif entity.status == 'Closed':
-        context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
+    if timeline_helper.isBeforeEvent(program_timeline,
+                                     'stop_all_work_deadline'):
+      if entity.user and user_account.key() == entity.user.key():
+        if entity.status  == 'ClaimRequested':
+          context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
+          context['pageheaderalert'] = True
+          actions.append(('withdraw', 'Withdraw from the task'))
+          validation = 'claim_withdraw'
+        elif entity.deadline and entity.status in [
+            'Claimed', 'NeedsWork', 'NeedsReview', 'ActionNeeded']:
+          if entity.status == 'ActionNeeded':
+            context['header_msg'] = self.DEF_TASK_ACTION_NEEDED_MSG
+          else:
+            context['header_msg'] = self.DEF_TASK_CLAIMED_BY_YOU_MSG
+          actions.extend([
+              ('withdraw', 'Withdraw from the task'),
+              ('needs_review', 'Submit work and Request for review')])
+          validation = 'needs_review'
+        elif entity.status == 'NeedsReview':
+          context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
+          context['pageheaderalert'] = True
+          actions.append(('withdraw', 'Withdraw from the task'))
+          if entity.deadline and datetime.datetime.now() < entity.deadline:
+            actions.append(
+                ('needs_review', 'Submit work and Request for review'))
+          validation = 'needs_review'
+        elif entity.status == 'AwaitingRegistration':
+          context['header_msg'] = self.DEF_STUDENT_SIGNUP_MSG % {
+              'student_signup_redirect': redirects.getStudentApplyRedirect(
+                  entity.program, {'url_name': 'gci/student'})}
+        elif entity.status == 'Closed':
+          context['header_msg'] = self.DEF_TASK_CMPLTD_BY_YOU_MSG
+      else:
+        if entity.status == 'ClaimRequested':
+          context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
+        if entity.status in ['Claimed', 'ActionNeeded', 'NeedsWork',
+                             'NeedsReview']:
+          context['header_msg'] = self.DEF_TASK_CLAIMED_MSG
+        if entity.status in ['AwaitingRegistration', 'Closed']:
+          context['header_msg'] = self.DEF_TASK_CLOSED_MSG
     else:
-      if entity.status == 'ClaimRequested':
-        context['header_msg'] = self.DEF_TASK_CLAIMED_REQUESTED_MSG
-      if entity.status in ['Claimed', 'ActionNeeded', 'NeedsWork',
-                           'NeedsReview']:
-        context['header_msg'] = self.DEF_TASK_CLAIMED_MSG
-      if entity.status in ['AwaitingRegistration', 'Closed']:
-        context['header_msg'] = self.DEF_TASK_CLOSED_MSG
+      context['header_msg'] = self.DEF_STOP_WORK_DEADLINE_MSG % {
+          'program_name': entity.program.name}
 
     return validation, actions
 

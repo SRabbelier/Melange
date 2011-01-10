@@ -41,6 +41,7 @@ from django.utils.translation import ugettext
 from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
+from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import user as user_logic
 from soc.views import helper
@@ -1613,6 +1614,8 @@ class View(base.View):
 
     actions = []
 
+    program_timeline = entity.program.timeline
+
     if entity.status in ['Open', 'Reopened']:
       task_filter = {
           'user': user_account,
@@ -1633,12 +1636,15 @@ class View(base.View):
       if task_entities:
         context['header_msg'] = self.DEF_AWAITING_REG_MSG
         validation = 'claim_ineligible'
-      else:
+      elif timeline_helper.isBeforeEvent(program_timeline,
+                                         'task_claim_deadline'):
         actions.append(('request', 'Request to claim the task'))
         validation = 'claim_request'
 
     # TODO: lot of double information here that can be simplified
-    if entity.user and user_account.key() == entity.user.key():
+    if (entity.user and user_account.key() == entity.user.key() and
+        timeline_helper.isBeforeEvent(program_timeline,
+                                      'stop_all_work_deadline')):
       if entity.status  == 'ClaimRequested':
         context['header_msg'] = self.DEF_TASK_REQ_CLAIMED_BY_YOU_MSG
         context['pageheaderalert'] = True
@@ -1658,7 +1664,7 @@ class View(base.View):
         context['header_msg'] = self.DEF_TASK_NO_MORE_SUBMIT_MSG
         context['pageheaderalert'] = True
         actions.append(('withdraw', 'Withdraw from the task'))
-        if entity.deadline and datetime.datetime.now < entity.deadline:
+        if entity.deadline and datetime.datetime.now() < entity.deadline:
           actions.append(
               ('needs_review', 'Submit work and Request for review'))
         validation = 'needs_review'

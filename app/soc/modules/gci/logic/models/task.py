@@ -31,8 +31,9 @@ from google.appengine.ext import db
 from django.utils import simplejson
 from django.utils.translation import ugettext
 
-from soc.logic.models import base
 from soc.logic import tags
+from soc.logic.models import base
+from soc.logic.models import site as site_logic
 
 from soc.modules.gci.logic.models.comment import logic as gci_comment_logic
 
@@ -47,6 +48,7 @@ STATE_TRANSITIONS = {
     'NeedsReview': 'transitFromNeedsReview',
     'ActionNeeded': 'transitFromActionNeeded',
     'NeedsWork': 'transitFromNeedsWork',
+    'Invalid': 'transitFromInvalid',
     }
 
 TAG_NAMES = ['arbit_tag', 'difficulty', 'task_type']
@@ -59,6 +61,11 @@ class Logic(base.Logic):
       '(The Melange Automated System has detected that the intial '
       'deadline has been passed and it has set the task status to '
       'ActionNeeded.)')
+
+  DEF_INVALID_MSG = ugettext(
+      '(This task was marked invalid by an administrator. Please '
+      'contact the %(site_name)s team if you have any questions '
+      'regarding the same.)')
 
   DEF_NO_MORE_WORK_MSG = ugettext(
       '(The Melange Automated System has detected that the deadline '
@@ -438,6 +445,37 @@ class Logic(base.Logic):
         'properties': properties,
         'changes': changes,
         'content': None,
+        }
+
+    return update_dict
+
+  def transitFromInvalid(self, entity):
+    """The task was invalidated manually. So post a comment about it
+    and unset the deadline.
+
+    Args:
+      entity: The GCITask entity
+    """
+
+    # do not unset the user and student properties since if student
+    # challenges the manual invalidation of the task we should still
+    # be able to retrieve the task. So just unset the deadline.
+    properties = {
+        'deadline': None,
+        }
+
+    changes = [ugettext('User-MelangeAutomatic'),
+               ugettext('Action-None'),
+               ugettext('Status-Invalid')]
+
+    content = self.DEF_INVALID_MSG % {
+        'site_name': site_logic.getSingleton().site_name,
+        }
+
+    update_dict = {
+        'properties': properties,
+        'changes': changes,
+        'content': content,
         }
 
     return update_dict

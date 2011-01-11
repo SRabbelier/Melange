@@ -1043,19 +1043,18 @@ class View(program.View):
         fields = sparams['admin_field_keys']
         extra = dicts.toDict(entity.student, fields)
         res.update(extra)
-      return res
-    list_params['public_field_extra'] = getExtraFields
-    def getExtraRow(entity, *args):
-      res = {
-          'link': gci_redirects.getShowRankingDetails(entity, list_params)
-      }
-      if is_host:
         res['group_name'] = entity.student.scope.name
         res['birth_date'] = entity.student.birth_date.isoformat()
         res['account_name'] = accounts.normalizeAccount(entity.student.user.account).email()
+        res['consent_form_submitted'] = "Yes" if entity.student.consent_form else "No"
+        res['student_id_form_submitted'] = "Yes" if entity.student.student_id_form else "No"
       return res
 
-    list_params['public_row_extra'] = getExtraRow
+    list_params['public_field_extra'] = getExtraFields
+    list_params['public_row_extra'] = lambda entity, *args: {
+        'link': gci_redirects.getShowRankingDetails(entity, list_params)
+    }
+
     list_params['public_field_props'] = {
         'points': {
             'sorttype': 'integer',
@@ -1065,6 +1064,10 @@ class View(program.View):
         },
     }
     if is_host:
+      list_params['public_field_keys'] += ["consent_form_submitted",
+                                           "student_id_form_submitted"]
+      list_params['public_field_names'] += ["Consent form submitted",
+                                            "Student ID form submitted"]
       list_params['public_field_hidden'] = sparams['admin_field_hidden'] + sparams['admin_field_keys']
       list_params['public_field_keys'].extend(sparams['admin_field_keys'])
       list_params['public_field_names'].extend(sparams['admin_field_names'])

@@ -1479,6 +1479,7 @@ class View(base.View):
           }
 
       host_entity = host_logic.logic.getForFields(filter, unique=True)
+      is_host = host_entity or user_logic.logic.isDeveloper(user=user_entity)
 
       filter['program'] = entity.program
       org_admin_entity = gci_org_admin_logic.logic.getForFields(
@@ -1488,11 +1489,11 @@ class View(base.View):
 
       if host_entity or org_admin_entity or mentor_entity:
         validation, mentor_actions = self._constructMentorActions(
-            context, entity)
+            context, entity, is_host)
         actions += mentor_actions
         if entity.status in ['Unapproved', 'Unpublished',
             'Open', 'ClaimRequested', 'Reopened']:
-          if host_entity or org_admin_entity:
+          if is_host or org_admin_entity:
             context['edit_link'] = redirects.getEditRedirect(entity, params)
           elif mentor_entity:
             context['suggest_link'] = gci_redirects.getSuggestTaskRedirect(
@@ -1583,7 +1584,7 @@ class View(base.View):
 
     return validation
 
-  def _constructMentorActions(self, context, entity):
+  def _constructMentorActions(self, context, entity, is_host=False):
     """Constructs the list of actions for mentors, org admins and
     hosts.
     """
@@ -1594,7 +1595,7 @@ class View(base.View):
 
     actions = []
 
-    if entity.status == 'NeedsReview':
+    if entity.status == 'NeedsReview' or is_host:
       context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
       actions.extend([('needs_work', 'Needs More Work'),
                       ('reopened', 'Reopen the task'),

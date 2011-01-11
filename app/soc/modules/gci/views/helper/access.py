@@ -246,9 +246,6 @@ class GCIChecker(access.Checker):
       if user_entity and task_entity.user.key() == user_entity.key():
         return
 
-      # The following four if statements can be combined using the
-      # short circuit logic, but due to the length of the function
-      # calls and their arguments, they are kept separate for readability.
       filter = {
           'user': user_entity,
           'status': 'active',

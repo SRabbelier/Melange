@@ -33,7 +33,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import tags
 from soc.logic.models import base
-from soc.logic.models import site as site_logic
+from soc.logic.models.site import logic as site_logic
 
 from soc.modules.gci.logic.models.comment import logic as gci_comment_logic
 

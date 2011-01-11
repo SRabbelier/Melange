@@ -240,23 +240,24 @@ class GCIChecker(access.Checker):
     try:
       user_entity = self.user
 
-      filter = {
-          'user': user_entity,
-          'status': 'active',
-          'scope_path': django_args['scope_path'],
-          }
-
       # bail out with 404 if no task is found
       task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
+
+      if user_entity and task_entity.user.key() == user_entity.key():
+        return
 
       # The following four if statements can be combined using the
       # short circuit logic, but due to the length of the function
       # calls and their arguments, they are kept separate for readability.
-      if user_entity and task_entity.user.key() == user_entity.key():
-        return
+      filter = {
+          'user': user_entity,
+          'status': 'active',
+          }
 
       if host_logic.logic.getForFields(filter, unique=True):
         return
+
+      filter['scope_path'] = django_args['scope_path']
 
       if gci_org_admin_logic.logic.getForFields(filter, unique=True):
         return

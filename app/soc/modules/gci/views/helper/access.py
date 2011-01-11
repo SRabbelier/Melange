@@ -217,6 +217,8 @@ class GCIChecker(access.Checker):
     # no roles found, access denied
     raise out_of_band.AccessViolation(message_fmt=DEF_NEED_ROLE_MSG)
 
+  @access.allowDeveloper
+  @access.denySidebar
   def checkStatusForTask(self, django_args):
     """Checks if the current user has access to the given task.
 
@@ -244,6 +246,18 @@ class GCIChecker(access.Checker):
           'scope_path': django_args['scope_path'],
           }
 
+      # bail out with 404 if no task is found
+      task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
+
+      # The following four if statements can be combined using the
+      # short circuit logic, but due to the length of the function
+      # calls and their arguments, they are kept separate for readability.
+      if user_entity and task_entity.user.key() == user_entity.key():
+        return
+
+      if host_logic.logic.getForFields(filter, unique=True):
+        return
+
       if gci_org_admin_logic.logic.getForFields(filter, unique=True):
         return
 
@@ -259,9 +273,6 @@ class GCIChecker(access.Checker):
     if not timeline_helper.isAfterEvent(org_entity.scope.timeline,
         'tasks_publicly_visible'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
-
-    # bail out with 404 if no task is found
-    task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
     if task_entity.status in ['Unapproved', 'Unpublished', 'Invalid']:
       # this proposal can not be task at the moment

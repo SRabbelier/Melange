@@ -51,7 +51,7 @@ $(document).ready(function(){
     {% endif %}
     {% if ws_file_blob_key %}
     <b>File submitted as work:</b>
-    <a href='/gci/work_submission/download_blob?key={{ ws_file_blob_key }}'>
+    <a href='{{ ws_file_download_url }}'>
       <b>{{ ws_file_name }}</b>
     </a> ({{ ws_file_size|filesizeformat }})
     {% endif %}

@@ -27,6 +27,8 @@ from google.appengine.ext import blobstore
 
 from django import template
 
+from soc.views.helper import redirects
+
 
 register = template.Library()
 
@@ -61,5 +63,8 @@ def as_gci_task_ws(context, comment):
       context['ws_file_blob_key'] = blob_key
       context['ws_file_name'] = blob.filename
       context['ws_file_size'] = blob.size
+      context['ws_file_download_url'] = \
+          redirects.getDownloadBlobRedirectWithGet(
+              blob, {'url_name': 'gci/work_submission'})
 
   return context

@@ -1012,7 +1012,7 @@ class Checker(object):
       raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_PROGRAM_MSG)
 
     django_args = {'scope_path': program.scope_path}
-    self.checkHasRoleForScope(django_args, host_logic)
+    return self.checkHasRoleForScope(django_args, host_logic)
 
   @allowDeveloper
   @denySidebar

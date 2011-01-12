@@ -39,6 +39,7 @@ from soc.views.helper import decorators
 from soc.views.helper import dynaform
 from soc.views.helper import lists
 from soc.views.helper import params as params_helper
+from soc.views.helper import redirects
 from soc.views.helper import responses
 from soc.views.helper import widgets
 from soc.views.models import student
@@ -76,6 +77,9 @@ class View(student.View):
         (r'^%(url_name)s/(?P<access_type>submit_forms)/%(key_fields)s$',
         '%(module_package)s.%(module_name)s.submit_forms',
         'Submit forms'),
+        (r'^%(url_name)s/(?P<access_type>download_blob)/%(key_fields)s$',
+        '%(module_package)s.%(module_name)s.download_blob',
+        'Download the blob'),
     ]
 
     rights = gci_access.GCIChecker(params)
@@ -90,6 +94,9 @@ class View(student.View):
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', gci_student_logic)]
     rights['submit_forms'] = [('checkIsMyActiveRole', gci_student_logic)]
+    rights['download_blob'] = [
+        ('checkCanDownloadConsentForms', gci_student_logic)]
+
 
     new_params = {}
     new_params['logic'] = gci_student_logic
@@ -194,7 +201,10 @@ class View(student.View):
 
       if blob_info:
         form = edit_form(initial={
-            'name': blob_info.filename,
+            'name': '<a href="%(url)s">%(name)s</a>' % {
+                'name': blob_info.filename,
+                'url': redirects.getDownloadBlobRedirectWithGet(
+                    blob_info, params, scope_path=entity.key().id_or_name(), type=param_name)},
             'size': blob_info.size,
             'uploaded': blob_info.creation.strftime(self.DATETIME_FORMAT),
             })
@@ -232,6 +242,7 @@ class View(student.View):
     return http.HttpResponseRedirect(
         gci_redirects.getSubmitFormsRedirect(entity, params))
 
+
 view = View()
 
 apply = decorators.view(view.apply)
@@ -242,3 +253,4 @@ list = decorators.view(view.list)
 public = decorators.view(view.public)
 export = decorators.view(view.export)
 submit_forms = decorators.view(view.submitForms)
+download_blob = decorators.view(view.downloadBlob)

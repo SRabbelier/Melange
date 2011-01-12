@@ -243,7 +243,8 @@ class GCIChecker(access.Checker):
       # bail out with 404 if no task is found
       task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
-      if user_entity and task_entity.user.key() == user_entity.key():
+      if (user_entity and task_entity.user and
+          task_entity.user.key() == user_entity.key()):
         return
 
       filter = {

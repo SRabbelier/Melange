@@ -63,6 +63,12 @@ DEF_NEED_ROLE_MSG = ugettext(
 DEF_NO_ACTIVE_ENTITY_MSG = ugettext(
     'There is no such active entity.')
 
+DEF_NO_FILE_ACCESS_MSG = ugettext(
+    'You do not have the necessary privileges to access this file.')
+
+DEF_NO_FILE_SPECIFIED_MSG = ugettext(
+    'File to download is not specified')
+
 DEF_NO_PUB_TASK_MSG = ugettext(
     'There is no such published task.')
 
@@ -231,10 +237,10 @@ class GCIChecker(access.Checker):
     Args:
       django_args: a dictionary with django's arguments
 
-     Raises:
-       AccessViolationResponse:
-         - If there is no task found
-         - If the task is not in one of the required states.
+    Raises:
+      AccessViolationResponse:
+        - If there is no task found
+        - If the task is not in one of the required states.
     """
 
     try:
@@ -420,3 +426,64 @@ class GCIChecker(access.Checker):
         }
     if gci_task_logic.logic.getForFields(fields, unique=True):
       raise out_of_band.AccessViolation(message_fmt=DEF_ORG_HAS_TASKS)
+
+  @access.allowDeveloper
+  @access.denySidebar
+  def checkCanDownloadConsentForms(self, django_args, student_logic):
+    """Checks if the user is a student who can download the forms i.e.
+    the blobs he has requested.
+
+    Args:
+      django_args: a dictionary with django's arguments
+      student_logic: student logic used to look up student entity
+
+    Raises:
+      AccessViolationResponse:
+        - If there are no forms uploaded for the student.
+        - If the logged in user is not the one to whom the form belongs to.
+    """
+
+    self.checkIsUser(django_args)
+
+    user_entity = self.user
+
+    try:
+      # if the current user is the program host no more access is required
+      if self.checkIsHostForProgramInScope(
+          django_args, gci_program_logic.logic):
+        return
+    except out_of_band.AccessViolation:
+      # if the user is not the host proceed for other checks
+      # NOTE: This is not combined with the following exception because
+      # if we catch AccessViolation there the access check for blob key
+      # being null which raises the same exception will also be caught
+      pass
+
+    filter = {
+          'user': user_entity,
+          'status': 'active',
+          'scope_path': django_args['scope_path'],
+          'link_id': django_args['link_id'],
+          }
+
+    student_entity = student_logic.getForFields(filter, unique=True)
+
+    try:
+      form_type = django_args['GET'].get('type', '')
+      blob_key = django_args['GET'].get('key', '')
+
+      if not blob_key:
+        raise out_of_band.AccessViolation(
+            message_fmt=DEF_NO_FILE_SPECIFIED_MSG)
+      if (form_type == 'consent_form_upload_form' and
+          blob_key == str(student_entity.consent_form.key())):
+        return
+
+      if (form_type == 'student_id_form_upload_form' and
+          blob_key == str(student_entity.student_id_form.key())):
+        return
+
+    except AttributeError:
+      pass
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_FILE_ACCESS_MSG)

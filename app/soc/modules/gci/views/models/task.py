@@ -137,6 +137,9 @@ class View(base.View):
   DEF_TASKS_LIST_CLOSE_MSG = ugettext(
        'List of closed tasks.')
 
+  DEF_TASKS_LIST_INVALID_MSG = ugettext(
+       'List of Invalid/deleted tasks.')
+
   DEF_TASKS_LIST_OPEN_MSG = ugettext(
        'List of open tasks.')
 
@@ -954,6 +957,8 @@ class View(base.View):
                           'NeedsWork', 'NeedsReview']
     elif idx == 3:
       filter['status'] = ['Closed', 'AwaitingRegistration']
+    elif idx == 4:
+      filter['status'] = ['Invalid']
     else:
       return lists.getErrorResponse(request, "idx not valid")
 
@@ -1069,10 +1074,13 @@ class View(base.View):
     tclose_params = list_params.copy()
     tclose_params['list_description'] = self.DEF_TASKS_LIST_CLOSE_MSG
 
+    tinvalid_params = list_params.copy()
+    tinvalid_params['list_description'] = self.DEF_TASKS_LIST_INVALID_MSG
+
     if lists.isDataRequest(request):
       return self.getListTasksData(
           request, [tuapp_params, topen_params,
-          tclaim_params, tclose_params], org_entity)
+          tclaim_params, tclose_params, tinvalid_params], org_entity)
 
     contents = []
     order = ['modified_on']
@@ -1096,6 +1104,11 @@ class View(base.View):
     tclose_list = lists.getListGenerator(request, tclose_params,
                                          order=order, idx=3)
     contents.append(tclose_list)
+
+    # add all invalid tasks to the list
+    tinvalid_list = lists.getListGenerator(request, tinvalid_params,
+                                           order=order, idx=4)
+    contents.append(tinvalid_list)
 
     return self._list(request, list_params, contents, page_name)
 

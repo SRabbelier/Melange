@@ -37,6 +37,7 @@ from django.utils.translation import ugettext
 from soc.logic import dicts
 from soc.views import helper
 from soc.views import out_of_band
+from soc.views.helper import blobstore as bs_helper
 from soc.views.helper import decorators
 from soc.views.helper import forms
 from soc.views.helper import lists
@@ -981,3 +982,16 @@ class View(object):
 
     return sitemap.getDjangoURLPatterns(params)
 
+  @decorators.merge_params
+  @decorators.check_access
+  def downloadBlob(self, request, access_type, page_name=None,
+                   params=None, **kwargs):
+    """View that helps to download the blob.
+
+    Args:
+      request: the standard Django HTTP request object
+    """
+
+    blob_get_key = request.GET.get('key')
+
+    return bs_helper.download_blob(blob_get_key)

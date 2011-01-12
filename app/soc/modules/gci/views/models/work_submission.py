@@ -27,7 +27,6 @@ from soc.views.helper import decorators
 from soc.views.models import base
 
 from soc.modules.gci.views.helper import access as gci_access
-from soc.views.helper import blobstore as bs_helper
 
 import soc.modules.gci.logic.models.work_submission
 
@@ -69,20 +68,6 @@ class View(base.View):
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)
-
-  @decorators.merge_params
-  @decorators.check_access
-  def downloadBlob(self, request, access_type, page_name=None,
-                   params=None, **kwargs):
-    """View that helps to download the blob.
-
-    Args:
-      request: the standard Django HTTP request object
-    """
-
-    blob_get_key = request.GET.get('key')
-
-    return bs_helper.download_blob(blob_get_key)
 
 
 view = View()

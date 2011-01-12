@@ -62,6 +62,18 @@ class PlainTextWidget(forms.widgets.Widget):
     escaped = html.escape(encoding.force_unicode(value))
     return html.linebreaks(escaped) if escaped.find("\n") >= 0 else escaped
 
+class HTMLTextWidget(forms.widgets.Widget):
+  """Read only HTML input widget.
+  """
+
+  def render(self, name, value, attrs=None):
+    """Render HTMLText widget as HTML text.
+    """
+
+    attrs['readonly'] = 'readonly'
+    attrs['class'] = 'plaintext'
+
+    return safestring.mark_safe(value)
 
 class FullTinyMCE(forms.widgets.Textarea):
   """TinyMCE widget. 

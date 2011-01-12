@@ -139,7 +139,7 @@ class View(student.View):
       dynaproperties = {
           'name': django_fields.CharField(
               label='Name', required=False,
-              widget=widgets.PlainTextWidget),
+              widget=widgets.HTMLTextWidget),
           'uploaded': django_fields.CharField(
               label='Uploaded on', required=False,
               widget=widgets.PlainTextWidget),

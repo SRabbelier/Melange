@@ -30,10 +30,13 @@ __authors__ = [
 
 import cgi
 import logging
- 
+import urllib
+
 from google.appengine.ext import blobstore
 
 from django.http import HttpResponse
+
+from soc.views import out_of_band
 
 
 def get_uploads(request, field_name=None, populate_post=False):
@@ -84,7 +87,7 @@ def get_uploads(request, field_name=None, populate_post=False):
   return results
 
 
-def send_blob(request, blob_key_or_info, content_type=None, save_as=None):
+def send_blob(blob_key_or_info, content_type=None, save_as=None):
   """Send a blob-response based on a blob_key.
 
   Sets the correct response header for serving a blob.  If BlobInfo
@@ -133,8 +136,31 @@ def send_blob(request, blob_key_or_info, content_type=None, save_as=None):
       send_attachment(blob_info.filename)
     else:
       if not blob_info:
-        raise ValueError('Expected BlobInfo value for blob_key_or_info.')
+        raise ValueError('The specified file is not found.')
       else:
-        raise ValueError('Unexpected value for save_as')
+        raise ValueError(
+            'Unexpected value for the name in which file is '
+            'expected to be downloaded')
 
   return response
+
+def download_blob(blob_key_str):
+  """A function which provides the boiler plate required to process
+  the blob key string and calls the actual function which sends the
+  blob as the HTTP Response.
+
+  Args:
+    blob_key_str: The blob key for which the blob must be retrieved
+        in the normal string format
+  """
+
+  if not blob_key_str:
+    raise out_of_band.Error(message_fmt='No blob key present')
+
+  blob_key = str(urllib.unquote(blob_key_str))
+  blob = blobstore.BlobInfo.get(blob_key)
+
+  try:
+    return send_blob(blob, save_as=True)
+  except ValueError, error:
+    raise out_of_band.Error(message_fmt=str(error))

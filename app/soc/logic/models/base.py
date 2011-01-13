@@ -394,7 +394,7 @@ class Logic(object):
     keys = [i for i in keys if i]
 
     prefetched_entities = db.get(keys)
-    prefetched_dict = dict((i.key(), i) for i in prefetched_entities)
+    prefetched_dict = dict((i.key(), i) for i in prefetched_entities if i)
 
     for i in data:
       key = prop.get_value_for_datastore(i)

@@ -1147,6 +1147,9 @@ class View(base.View):
     context['entity_type_url'] = params['url_name']
     context['page_name'] = ugettext('GCI Task: %s' % (entity.title))
 
+    if entity.user:
+      context['entity_user'] = entity.user
+
     user_entity = user_logic.logic.getForCurrentAccount()
 
     # get some entity specific context

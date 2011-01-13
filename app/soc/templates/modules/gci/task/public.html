@@ -191,6 +191,9 @@ Title: {{ entity.title }}
   {% readonly_field_as_table_row entity.fields.time_to_complete.label time_to_complete %}
   {% readonly_field_as_table_row "Mentor(s)" mentors_str %}
   {% readonly_date_field_as_table_row entity.fields.deadline.label entity.deadline %}
+  {% if entity_user %}
+    {% readonly_field_as_table_row "Assigned student" entity_user.name %}
+  {% endif %}
  </table>
 </p>
 <hr />

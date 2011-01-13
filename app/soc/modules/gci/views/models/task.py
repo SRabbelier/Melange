@@ -322,7 +322,8 @@ class View(base.View):
         "org": entity.scope.name,
         "points_difficulty": entity.taskDifficultyValue(all_d),
         "task_type": entity.taskType(all_t),
-        "mentors": render(db.get(entity.mentors)),
+        # TODO(SRabbelier): change back to 'render(db.get(entity.mentors))'
+        "mentors": str(len(entity.mentors)),
         "arbit_tag": entity.taskArbitTag(),
         "days_hours": entity.taskTimeToComplete(),
     }

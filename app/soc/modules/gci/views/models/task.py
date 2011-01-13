@@ -1612,9 +1612,12 @@ class View(base.View):
 
     actions = []
 
-    if entity.status == 'NeedsReview' or (is_host and
-        entity.status in ['ClaimRequested', 'Claimed', 'ActionNeeded',
-                          'NeedsWork', 'NeedsReview']):
+    if is_host and entity.status in [
+        'ClaimRequested', 'Claimed', 'ActionNeeded',
+        'NeedsWork', 'Invalid']:
+      actions.extend([('closed', 'Mark the task as complete')])
+      validation = 'close'
+    if entity.status == 'NeedsReview':
       context['header_msg'] = self.DEF_TASK_NEEDS_REVIEW_MSG
       actions.extend([('needs_work', 'Needs More Work'),
                       ('reopened', 'Reopen the task'),

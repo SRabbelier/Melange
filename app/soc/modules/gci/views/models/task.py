@@ -181,6 +181,9 @@ class View(base.View):
       'The task is not yet published. It can be edited by clicking on '
       'the edit link next to the title above.')
 
+  DEF_TASK_INVALID_MSG = ugettext(
+      'This task has been marked as Invalid by an administrator.')
+
   DEF_WS_MSG_FMT = ugettext(
       '(To see the work submitted <a href=#ws%d>click here</a>.)')
 
@@ -1640,6 +1643,8 @@ class View(base.View):
       context['header_msg'] = self.DEF_TASK_CLOSED_MSG
     elif entity.status == 'ActionNeeded':
       context['header_msg'] = self.DEF_TASK_MENTOR_ACTION_NEEDED_MSG
+    elif entity.status == 'Invalid':
+      context['header_msg'] = self.DEF_TASK_INVALID_MSG
 
     return validation, actions
 

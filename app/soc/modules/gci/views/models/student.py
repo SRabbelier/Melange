@@ -32,6 +32,7 @@ from google.appengine.ext import blobstore
 from django import forms
 from django import http
 from django.forms import fields as django_fields
+from django.template import defaultfilters
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
@@ -204,8 +205,9 @@ class View(student.View):
             'name': '<a href="%(url)s">%(name)s</a>' % {
                 'name': blob_info.filename,
                 'url': redirects.getDownloadBlobRedirectWithGet(
-                    blob_info, params, scope_path=entity.key().id_or_name(), type=param_name)},
-            'size': blob_info.size,
+                    blob_info, params, scope_path=entity.key().id_or_name(),
+                    type=param_name)},
+            'size': defaultfilters.filesizeformat(blob_info.size),
             'uploaded': blob_info.creation.strftime(self.DATETIME_FORMAT),
             })
       else:

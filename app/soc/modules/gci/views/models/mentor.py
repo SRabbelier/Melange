@@ -155,7 +155,7 @@ class View(mentor.View):
     # obtain program entity based on request params
     program = entity.program
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.logic.getCurrentUser()
 
     filter = {
         'user': user_account,

@@ -194,10 +194,7 @@ class UserTest(unittest.TestCase):
     email = "a_user@example.com"
     account = users.User(email=email)
     entity = user_logic.getForAccount(account)
-    self.failUnlessEqual(self.entity.account.email(), entity.account.email())
-    self.failUnlessEqual(self.entity.account, entity.account)
-    self.failUnlessEqual(self.entity.link_id, entity.link_id)
-    self.failUnlessEqual(self.entity.name, entity.name)
+    self._compareUsers(self.entity, entity)
 
   def testGetForAccountNonMatching(self):
     """Test that non matching returns None.
@@ -212,10 +209,7 @@ class UserTest(unittest.TestCase):
     """
     user_id = self.entity.user_id
     entity = user_logic.getForUserId(user_id)
-    self.failUnlessEqual(self.entity.account.email(), entity.account.email())
-    self.failUnlessEqual(self.entity.account, entity.account)
-    self.failUnlessEqual(self.entity.link_id, entity.link_id)
-    self.failUnlessEqual(self.entity.name, entity.name)
+    self._compareUsers(self.entity, entity)
 
   def testGetForUserIdNonMatching(self):
     """Test that non matching returns None.
@@ -233,37 +227,52 @@ class UserTest(unittest.TestCase):
         'name': 'Current User',
         }
     current_user = user_logic.updateOrCreateFromFields(properties)
-    entity = user_logic.getForCurrentAccount()
+    entity = user_logic.getCurrentUser()
     return entity
 
   def testGetForCurrentAccount(self):
     """Test that the entity of current user can be retrieved through account.
     """
     current_user = self.createCurrentUser()
-    entity = user_logic.getForCurrentAccount()
-    self.failUnlessEqual(current_user.account.email(), entity.account.email())
-    self.failUnlessEqual(current_user.account, entity.account)
-    self.failUnlessEqual(current_user.link_id, entity.link_id)
-    self.failUnlessEqual(current_user.name, entity.name)
+    entity = user_logic._getForCurrentAccount()
+    self._compareUsers(current_user, entity)
 
   def testGetForCurrentAccountNonExistent(self):
-    """Test that None is returned when the current user is not regiested.
+    """Test that None is returned when the current user is not registered.
     """
-    entity = user_logic.getForCurrentAccount()
+    entity = user_logic._getForCurrentAccount()
     self.failUnlessEqual(entity, None)
 
   def testGetForCurrentUserId(self):
     """Test that entity of the current user can be retrieved through user id.
     """
     current_user = self.createCurrentUser()
-    entity = user_logic.getForCurrentAccount()
-    self.failUnlessEqual(current_user.account.email(), entity.account.email())
-    self.failUnlessEqual(current_user.account, entity.account)
-    self.failUnlessEqual(current_user.link_id, entity.link_id)
-    self.failUnlessEqual(current_user.name, entity.name)
+    entity = user_logic._getForCurrentUserId()
+    self._compareUsers(current_user, entity)
 
   def testGetForCurrentUserIdNonMatching(self):
-    """Test that None is returned when the current user is not regiested.
+    """Test that None is returned when the current user is not registered.
     """
-    entity = user_logic.getForCurrentAccount()
+    entity = user_logic._getForCurrentUserId()
     self.failUnlessEqual(entity, None)
+
+  def testGetCurrentUser(self):
+    """Test that entity of the current user can be retrieved through user id.
+    """
+    current_user = self.createCurrentUser()
+    entity = user_logic.getCurrentUser()
+    self._compareUsers(current_user, entity)
+
+  def testGetCurrentUserNonMatching(self):
+    """Test that None is returned when the current user is not registered.
+    """
+    entity = user_logic.getCurrentUser()
+    self.failUnlessEqual(entity, None)
+
+  def _compareUsers(self, user, otherUser):
+    """Checks whether two User entities are to be considered equal.
+    """
+    self.failUnlessEqual(user.account.email(), otherUser.account.email())
+    self.failUnlessEqual(user.account, otherUser.account)
+    self.failUnlessEqual(user.link_id, otherUser.link_id)
+    self.failUnlessEqual(user.name, otherUser.name)

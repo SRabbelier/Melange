@@ -176,7 +176,7 @@ class View(base.View):
     """See base.View._editPost().
     """
 
-    user = user_logic.getForCurrentAccount()
+    user = user_logic.getCurrentUser()
 
     if not entity:
       fields['author'] = user

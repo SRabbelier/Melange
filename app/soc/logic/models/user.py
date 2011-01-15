@@ -61,8 +61,11 @@ class Logic(base.Logic):
 
     return False
 
-  def getForCurrentAccount(self):
+  def _getForCurrentAccount(self):
     """Retrieves the user entity for the currently logged in account.
+
+    Also Updates the user entity's unique identifier. getCurrentUser() should
+    be favored over this method.
 
     If there is no user logged in, or they have no valid associated User
     entity, None is returned.
@@ -81,7 +84,7 @@ class Logic(base.Logic):
 
     return user
 
-  def getForCurrentUserId(self):
+  def _getForCurrentUserId(self):
     """Retrieves the user entity for the currently logged in user id.
 
     If there is no user logged in, or they have no valid associated User
@@ -94,6 +97,21 @@ class Logic(base.Logic):
       return None
 
     return self.getForUserId(user_id)
+
+  def getCurrentUser(self):
+    """Retrieves the user entity for the currently logged in user.
+
+    Returns:
+      The User entity of the logged in user or None if not available.
+    """
+    # look up with the unique id first
+    user = self._getForCurrentUserId()
+
+    if not user:
+      # look up using the account address thereby setting the unique id
+      user = self._getForCurrentAccount()
+
+    return user
 
   def getForAccount(self, account):
     """Retrieves the user entity for the specified account.

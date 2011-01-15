@@ -181,7 +181,7 @@ class View(role.View):
     """Handles student role creation for the current user.
     """
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     logic = params['logic']
     fields = logic.getSuggestedInitialProperties(user_entity)

@@ -234,7 +234,7 @@ class View(survey.View):
 
     survey_logic = params['logic']
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     # get the student entity for the current user and program
     fields = {'user': user_entity,
@@ -298,7 +298,7 @@ class View(survey.View):
     fields = {'survey': survey}
 
     program_entity = survey.scope
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     student_fields = {'scope': program_entity,
                       'user': user_entity,

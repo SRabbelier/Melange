@@ -868,7 +868,7 @@ class View(program.View):
 
     list_params = task_view.getParams().copy()
 
-    user_account = user_logic.getForCurrentAccount()
+    user_account = user_logic.getCurrentUser()
     user_fields = {
         'user': user_account,
         'status': 'active'
@@ -961,7 +961,7 @@ class View(program.View):
         gci_subscription_view
 
     program = gci_program_logic.logic.getFromKeyFieldsOr404(kwargs)
-    user = user_logic.getForCurrentAccount()
+    user = user_logic.getCurrentUser()
 
     task_params = gci_task_view.view.getParams().copy()
     task_params['list_description'] = ugettext(
@@ -1011,7 +1011,7 @@ class View(program.View):
 
     sparams = student_view.getParams()
 
-    user_account = user_logic.getForCurrentAccount()
+    user_account = user_logic.getCurrentUser()
     user_fields = {
         'user': user_account,
         'status': 'active'

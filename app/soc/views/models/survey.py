@@ -274,7 +274,7 @@ class View(base.View):
     question types, and default prompt values to SurveyContent model.
     """
 
-    user = user_logic.getForCurrentAccount()
+    user = user_logic.getCurrentUser()
     schema = {}
     survey_fields = {}
 
@@ -573,7 +573,7 @@ class View(base.View):
     survey_logic = params['logic']
     record_logic = survey_logic.getRecordLogic()
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     filter = {'survey': survey,
               'user': user_entity}
@@ -636,7 +636,7 @@ class View(base.View):
     _, properties = forms_helper.collectCleanedFields(survey_form)
 
     # add the required SurveyRecord properties
-    properties['user'] = user_logic.getForCurrentAccount()
+    properties['user'] = user_logic.getCurrentUser()
     properties['survey'] = entity
     properties['modified'] = db.DateTimeProperty.now()
 
@@ -739,7 +739,7 @@ class View(base.View):
     context['entity'] = entity
 
     # get the rights checker
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
     rights = self._params['rights']
     rights.setCurrentUser(user_entity.account, user_entity)
 
@@ -797,7 +797,7 @@ class View(base.View):
 
     if not allowed_to_read:
       # this user is not allowed to view all the Records so only show their own
-      fields['user'] = user_logic.getForCurrentAccount()
+      fields['user'] = user_logic.getCurrentUser()
 
     return fields
 

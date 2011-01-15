@@ -126,7 +126,7 @@ class View(base.View):
 
     task_entity = gci_task_logic.logic.getFromKeyNameOr404(
         get_params['key_name'])
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     # this method gets called everytime the task public page gets loaded
     # caused by jQuery. So this conditional is necessary to make sure

@@ -149,7 +149,7 @@ class View(base.View):
     """
 
     # set the link_id to the current user's link_id
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
     # pylint: disable-msg=E1103
     link_id = user_entity.link_id
 
@@ -227,7 +227,7 @@ class View(base.View):
     """Returns the list data for roles.
     """
 
-    user = user_logic.getForCurrentAccount()
+    user = user_logic.getCurrentUser()
 
     # only select the roles for the current user
     # pylint: disable-msg=E1103
@@ -318,7 +318,7 @@ class View(base.View):
     idx = lists.getListIndex(request)
 
     # get the current user
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     # only select the Invites for this user that haven't been handled yet
     # pylint: disable-msg=E1103

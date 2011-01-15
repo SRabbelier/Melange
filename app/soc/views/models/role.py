@@ -558,7 +558,7 @@ class View(base.View):
     _, fields = soc.views.helper.forms.collectCleanedFields(form)
 
     # set the fields for the new request
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     request_fields = {
         'user': user_entity,

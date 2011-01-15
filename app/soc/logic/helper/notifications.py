@@ -110,7 +110,7 @@ def sendInviteNotification(entity):
 
   template = DEF_GROUP_INVITE_NOTIFICATION_TEMPLATE
 
-  from_user = user_logic.getForCurrentAccount()
+  from_user = user_logic.getCurrentUser()
 
   sendNotification(entity.user, from_user, message_properties, subject, template)
 

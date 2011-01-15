@@ -386,7 +386,7 @@ class View(organization.View):
       visibility = 'review'
     elif idx == 2:
       # check if the current user is a mentor
-      user_entity = user_logic.getForCurrentAccount()
+      user_entity = user_logic.getCurrentUser()
 
       fields = {'user': user_entity,
                 'scope': org_entity,
@@ -542,7 +542,7 @@ class View(organization.View):
     contents.append(rp_list)
 
     # check whether the current user is a mentor for the organization
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     fields = {'user': user_entity,
               'scope': org_entity,

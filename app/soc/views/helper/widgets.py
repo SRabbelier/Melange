@@ -140,7 +140,7 @@ tinyMCE.init(%(settings_json)s)
     """
 
     from soc.logic.models.user import logic as user_logic
-    user = user_logic.getForCurrentAccount()
+    user = user_logic.getCurrentUser()
 
     if user and user.disable_tinymce:
       return super(FullTinyMCE, self).render(name, value, attrs)

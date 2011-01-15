@@ -127,7 +127,7 @@ class View(presence.View):
 
     if not entity:
       # only if we are creating a new entity we should fill in founder
-      user = user_logic.logic.getForCurrentAccount()
+      user = user_logic.logic.getCurrentUser()
       fields['founder'] = user
 
     super(View, self)._editPost(request, entity, fields)

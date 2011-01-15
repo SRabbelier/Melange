@@ -1252,7 +1252,7 @@ class Checker(object):
 
     program_entity = program_logic.getFromKeyNameOr404(
         django_args['scope_path'])
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     filter = {'user': user_entity,
               'scope': program_entity,
@@ -1308,7 +1308,7 @@ class Checker(object):
       key_name = django_args['scope_path']
 
     program_entity = program_logic.getFromKeyNameOr404(key_name)
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     filter = {'user': user_entity,
               'scope': program_entity,

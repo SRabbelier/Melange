@@ -421,7 +421,7 @@ class View(base.View):
       subscription = get_dict['subscription']
 
       # get the current user
-      user_entity = user_logic.logic.getForCurrentAccount()
+      user_entity = user_logic.logic.getCurrentUser()
 
       # create the fields that should be in the ReviewFollower entity
       # pylint: disable-msg=E1103
@@ -469,7 +469,7 @@ class View(base.View):
     context['student'] = student_entity
     context['student_name'] = student_entity.name()
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     # check if the current user is the student
     # pylint: disable-msg=E1103
@@ -676,7 +676,7 @@ class View(base.View):
 
     # get the roles important for reviewing an application
     filter = {
-        'user': user_logic.logic.getForCurrentAccount(),
+        'user': user_logic.logic.getCurrentUser(),
         'scope': entity.org,
         'status': 'active'
         }
@@ -1196,7 +1196,7 @@ class View(base.View):
           duplicate_keys.remove(entity.key())
           context['sp_duplicates'] = db.get(duplicate_keys)
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     # check if the current user is subscribed to public or private reviews
     fields = {'scope': entity,
@@ -1294,7 +1294,7 @@ class View(base.View):
     fields = {'link_id': 't%i' % (int(time.time()*100)),
         'scope': entity,
         'scope_path': entity.key().id_or_name(),
-        'author': user_logic.logic.getForCurrentAccount(),
+        'author': user_logic.logic.getCurrentUser(),
         'content': comment if comment else '',
         'is_public': is_public,
         }
@@ -1358,7 +1358,7 @@ class View(base.View):
 
     if subscribe != None:
       # get the current user
-      user_entity = user_logic.logic.getForCurrentAccount()
+      user_entity = user_logic.logic.getCurrentUser()
 
       # create the fields that should be in the ReviewFollower entity
       # pylint: disable-msg=E1103

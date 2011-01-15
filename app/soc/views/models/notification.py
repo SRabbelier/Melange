@@ -181,7 +181,7 @@ class View(base.View):
     else: # request.method == 'GET'
       if not order:
         order = ['-created_on']
-      user_entity = user_logic.getForCurrentAccount()
+      user_entity = user_logic.getCurrentUser()
       filter = {'scope': user_entity}
       return super(View, self).list(request, access_type, page_name=page_name,
                                     params=params, filter=filter, order=order,
@@ -200,7 +200,7 @@ class View(base.View):
     data = simplejson.loads(post_dict.get('data', '[]'))
     button_id = post_dict.get('button_id', '')
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     notifications = []
     for selection in data:
@@ -237,7 +237,7 @@ class View(base.View):
     """
 
     # get the current user
-    current_user = user_logic.getForCurrentAccount()
+    current_user = user_logic.getCurrentUser()
 
     fields['link_id'] = 't%i' % (int(time.time()*100))
     fields['scope'] = fields['to_user']
@@ -265,7 +265,7 @@ class View(base.View):
     # and the notification has not been read yet
     if entity.unread:
       # get the current user
-      user = user_logic.getForCurrentAccount()
+      user = user_logic.getCurrentUser()
 
       # if the message is meant for the user that is reading it
       # pylint: disable-msg=E1103

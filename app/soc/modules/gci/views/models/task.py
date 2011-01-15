@@ -651,7 +651,7 @@ class View(base.View):
     else:
       program_entity = entity.program
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.logic.getCurrentUser()
 
     filter = {
         'user': user_account,
@@ -773,7 +773,7 @@ class View(base.View):
     # retrieve the data from the form
     _, properties = helper.forms.collectCleanedFields(form)
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
     fields = {'user': user_entity,
               'scope_path': kwargs['scope_path'],
               'status': 'active'}
@@ -843,7 +843,7 @@ class View(base.View):
       # TODO: Redirect to standard edit page which already has the ability to
       # hide certain fields.
       # get the mentor entity of the current user that is suggesting the task
-      user_entity = user_logic.logic.getForCurrentAccount()
+      user_entity = user_logic.logic.getCurrentUser()
 
       filter = {'user': user_entity,
                 'scope': fields['scope'],
@@ -989,7 +989,7 @@ class View(base.View):
 
     tuapp_params['list_description'] = self.DEF_TASKS_LIST_UNAPPROVED_MSG
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.logic.getCurrentUser()
 
     # give a suggest page redirect if the user is a mentor
     filter = {
@@ -1012,7 +1012,7 @@ class View(base.View):
                   entity, {'url_name': tuapp_params['url_name']})
       }
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.logic.getCurrentUser()
 
     fields = {
         'user': user_account,
@@ -1150,7 +1150,7 @@ class View(base.View):
     if entity.user:
       context['entity_user'] = entity.user
 
-    user_entity = user_logic.logic.getForCurrentAccount()
+    user_entity = user_logic.logic.getCurrentUser()
 
     # get some entity specific context
     self.updatePublicContext(context, entity, comment_entities,

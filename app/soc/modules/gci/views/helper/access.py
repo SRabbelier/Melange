@@ -112,7 +112,7 @@ class GCIChecker(access.Checker):
 
     self.checkIsUser(django_args)
 
-    user_account = user_logic.logic.getForCurrentAccount()
+    user_account = user_logic.logic.getCurrentUser()
 
     if key_location not in django_args:
       raise out_of_band.AccessViolation(

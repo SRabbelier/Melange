@@ -117,7 +117,7 @@ class View(student.View):
 
     from soc.modules.gsoc.views.models import student_project as project_view
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     # pylint: disable-msg=E1103
     fields = {

@@ -204,7 +204,7 @@ class View(survey_view.View):
 
     if not record:
       # creating a new record
-      user_entity = user_logic.getForCurrentAccount()
+      user_entity = user_logic.getCurrentUser()
       properties['main_admin'] = user_entity
 
       if properties['agreed_to_tos']:
@@ -273,7 +273,7 @@ class View(survey_view.View):
     """
     from soc.logic.models.user import logic as user_logic
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     idx = lists.getListIndex(request)
 

@@ -102,7 +102,7 @@ class View(project_survey.View):
 
     survey_logic = params['logic']
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
 
     # get the mentor entities for the current user and program
     fields = {'user': user_entity,
@@ -138,7 +138,7 @@ class View(project_survey.View):
 
     fields = {'survey': survey}
 
-    user_entity = user_logic.getForCurrentAccount()
+    user_entity = user_logic.getCurrentUser()
     program_entity = survey.scope
 
     role_fields = {'user': user_entity,

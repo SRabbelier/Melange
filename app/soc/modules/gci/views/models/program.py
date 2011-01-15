@@ -579,7 +579,7 @@ class View(program.View):
       # add a link to show all tasks that the mentor is assigned to
       items += [(gci_redirects.getListMentorTasksRedirect(
           mentor_entity, {'url_name':'gci/mentor'}),
-          "List my Tasks", 'any_access')]
+          "List starred tasks", 'any_access')]
 
     return items
 

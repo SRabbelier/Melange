@@ -54,6 +54,9 @@ def urlize(url, name=None, target="_blank", nofollow=True):
     nofollow: whether to add the 'rel="nofollow"' attribute
   """
 
+  if not url:
+    return ''
+
   from django.utils.safestring import mark_safe
   from django.utils.html import escape
 

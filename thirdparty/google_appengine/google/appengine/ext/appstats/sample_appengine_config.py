@@ -24,6 +24,8 @@ There are four sections:
 2) Configuration constants.
 3) Configuration functions.
 
+Also a section at the end for the remote_api handler.
+
 """
 
 
@@ -130,8 +132,9 @@ appstats_LOCK_TIMEOUT = 1
 appstats_TZOFFSET = 8*3600
 
 # URL path (sans host) leading to the stats UI.  Should match app.yaml.
+# If "builtins: - appstats: on" is used, the path should be /_ah/stats.
 
-appstats_stats_url = '/stats'
+appstats_stats_url = '/_ah/stats'
 
 # Fraction of requests to record.  Set this to a float between 0.0
 # and 1.0 to record that fraction of all requests.
@@ -209,3 +212,12 @@ def appstats_extract_key(request):
   if request.http_method() != 'GET':
     key = '%s %s' % (request.http_method(), key)
   return key
+
+
+# ########################################
+# Remote_API Authentication configuration.
+# # See google/appengine/ext/remote_api/handler.py for more information.
+# In most cases, you will not want to configure this.
+# # remoteapi_CUSTOM_ENVIRONMENT_AUTHENTICATION = (
+#     'HTTP_X_APPENGINE_INBOUND_APPID', ['a trusted appid here'])
+

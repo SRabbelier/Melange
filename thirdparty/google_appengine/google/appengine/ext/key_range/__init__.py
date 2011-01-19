@@ -95,7 +95,7 @@ class KeyRange(object):
     if self.include_end:
       right_side = "]"
     else:
-      right_side = "("
+      right_side = ")"
     return "%s%s%r to %r%s" % (self.direction, left_side, self.key_start,
                                self.key_end, right_side)
 
@@ -199,6 +199,7 @@ class KeyRange(object):
     Raises:
       KeyRangeError: if self.direction is not in (KeyRange.ASC, KeyRange.DESC).
     """
+    assert self._app is None, '_app is not supported for db.Query'
     direction = self.__get_direction("", "-")
     query = db.Query(kind_class, namespace=self.namespace, keys_only=keys_only)
     query.order("%s__key__" % direction)
@@ -237,6 +238,7 @@ class KeyRange(object):
     Returns:
       A db.Query instance.
     """
+    assert self._app is None, '_app is not supported for db.Query'
     query = db.Query(kind_class, namespace=self.namespace, keys_only=keys_only)
     query.order("__key__")
 

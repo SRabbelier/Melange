@@ -39,7 +39,8 @@ def getCurrentUserId():
   """Returns a unique id of the current user.
   """
 
-  return users.get_current_user().user_id()
+  user = users.get_current_user()
+  return user.user_id() if user else None
 
 
 def normalizeAccount(account):

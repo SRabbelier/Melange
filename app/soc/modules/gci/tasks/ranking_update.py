@@ -99,12 +99,15 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
     if entity.scope.key() != program.key():
       continue
 
-    # find ranking entity for the student
+    # find and clear ranking entity for the student
     filter = {
         'student': entity
         }
     ranking = gci_student_ranking_logic.getForFields(filter=filter,
         unique=True)
+    ranking.tasks = []
+    ranking.points = 0
+    ranking.put()
 
     # get all the tasks that the student has completed
     filter = {
@@ -115,8 +118,7 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
 
     # check if all the tasks have been already taken into account
     for task in tasks:
-      if not ranking or task.key() not in ranking.tasks:
-        gci_student_ranking_logic.updateRanking(task)
+      gci_student_ranking_logic.updateRanking(task)
 
     # this task should not be repeated after the program is over
     timeline = program.timeline

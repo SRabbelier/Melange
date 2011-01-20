@@ -173,7 +173,7 @@ def recalculateGCIStudentRanking(request, *args, **kwargs):
   for task in tasks:
     gci_student_ranking_logic.updateRanking(task)
 
-  responses.terminateTask()
+  return responses.terminateTask()
 
 
 clear = clearGCIRanking

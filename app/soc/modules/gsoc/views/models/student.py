@@ -98,11 +98,6 @@ class View(student.View):
 
     new_params['extra_django_patterns'] = patterns
 
-    new_params['create_extra_dynaproperties'] = {
-       'school_home_page': forms.fields.URLField(required=True),
-       'clean_school_home_page': cleaning.clean_url('school_home_page'),
-       }
-
     params = dicts.merge(params, new_params, sub_merge=True)
 
     super(View, self).__init__(params=params)

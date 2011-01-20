@@ -87,12 +87,16 @@ class Transaction(ProtocolBuffer.ProtocolMessage):
       initialized = 0
       if debug_strs is not None:
         debug_strs.append('Required field: handle not set.')
+    if (not self.has_app_):
+      initialized = 0
+      if debug_strs is not None:
+        debug_strs.append('Required field: app not set.')
     return initialized
 
   def ByteSize(self):
     n = 0
-    if (self.has_app_): n += 1 + self.lengthString(len(self.app_))
-    return n + 9
+    n += self.lengthString(len(self.app_))
+    return n + 10
 
   def Clear(self):
     self.clear_handle()
@@ -101,9 +105,8 @@ class Transaction(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(9)
     out.put64(self.handle_)
-    if (self.has_app_):
-      out.putVarInt32(18)
-      out.putPrefixedString(self.app_)
+    out.putVarInt32(18)
+    out.putPrefixedString(self.app_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -433,6 +436,8 @@ class Query(ProtocolBuffer.ProtocolMessage):
   compile_ = 0
   has_failover_ms_ = 0
   failover_ms_ = 0
+  has_strong_ = 0
+  strong_ = 0
 
   def __init__(self, contents=None):
     self.filter_ = []
@@ -730,6 +735,19 @@ class Query(ProtocolBuffer.ProtocolMessage):
 
   def has_failover_ms(self): return self.has_failover_ms_
 
+  def strong(self): return self.strong_
+
+  def set_strong(self, x):
+    self.has_strong_ = 1
+    self.strong_ = x
+
+  def clear_strong(self):
+    if self.has_strong_:
+      self.has_strong_ = 0
+      self.strong_ = 0
+
+  def has_strong(self): return self.has_strong_
+
 
   def MergeFrom(self, x):
     assert x is not self
@@ -753,6 +771,7 @@ class Query(ProtocolBuffer.ProtocolMessage):
     if (x.has_distinct()): self.set_distinct(x.distinct())
     if (x.has_compile()): self.set_compile(x.compile())
     if (x.has_failover_ms()): self.set_failover_ms(x.failover_ms())
+    if (x.has_strong()): self.set_strong(x.strong())
 
   def Equals(self, x):
     if x is self: return 1
@@ -799,6 +818,8 @@ class Query(ProtocolBuffer.ProtocolMessage):
     if self.has_compile_ and self.compile_ != x.compile_: return 0
     if self.has_failover_ms_ != x.has_failover_ms_: return 0
     if self.has_failover_ms_ and self.failover_ms_ != x.failover_ms_: return 0
+    if self.has_strong_ != x.has_strong_: return 0
+    if self.has_strong_ and self.strong_ != x.strong_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -844,6 +865,7 @@ class Query(ProtocolBuffer.ProtocolMessage):
     if (self.has_distinct_): n += 3
     if (self.has_compile_): n += 3
     if (self.has_failover_ms_): n += 2 + self.lengthVarInt64(self.failover_ms_)
+    if (self.has_strong_): n += 3
     return n + 1
 
   def Clear(self):
@@ -867,6 +889,7 @@ class Query(ProtocolBuffer.ProtocolMessage):
     self.clear_distinct()
     self.clear_compile()
     self.clear_failover_ms()
+    self.clear_strong()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
@@ -935,6 +958,9 @@ class Query(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(250)
       out.putVarInt32(self.end_compiled_cursor_.ByteSize())
       self.end_compiled_cursor_.OutputUnchecked(out)
+    if (self.has_strong_):
+      out.putVarInt32(256)
+      out.putBoolean(self.strong_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1014,6 +1040,9 @@ class Query(ProtocolBuffer.ProtocolMessage):
         d.skip(length)
         self.mutable_end_compiled_cursor().TryMerge(tmp)
         continue
+      if tt == 256:
+        self.set_strong(d.getBoolean())
+        continue
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
       d.skipData(tt)
 
@@ -1073,6 +1102,7 @@ class Query(ProtocolBuffer.ProtocolMessage):
     if self.has_distinct_: res+=prefix+("distinct: %s\n" % self.DebugFormatBool(self.distinct_))
     if self.has_compile_: res+=prefix+("compile: %s\n" % self.DebugFormatBool(self.compile_))
     if self.has_failover_ms_: res+=prefix+("failover_ms: %s\n" % self.DebugFormatInt64(self.failover_ms_))
+    if self.has_strong_: res+=prefix+("strong: %s\n" % self.DebugFormatBool(self.strong_))
     return res
 
 
@@ -1103,6 +1133,7 @@ class Query(ProtocolBuffer.ProtocolMessage):
   kdistinct = 24
   kcompile = 25
   kfailover_ms = 26
+  kstrong = 32
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
@@ -1130,7 +1161,8 @@ class Query(ProtocolBuffer.ProtocolMessage):
     29: "name_space",
     30: "compiled_cursor",
     31: "end_compiled_cursor",
-  }, 31)
+    32: "strong",
+  }, 32)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -1158,7 +1190,8 @@ class Query(ProtocolBuffer.ProtocolMessage):
     29: ProtocolBuffer.Encoder.STRING,
     30: ProtocolBuffer.Encoder.STRING,
     31: ProtocolBuffer.Encoder.STRING,
-  }, 31, ProtocolBuffer.Encoder.MAX_TYPE)
+    32: ProtocolBuffer.Encoder.NUMERIC,
+  }, 32, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -3114,6 +3147,8 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
   transaction_ = None
   has_trusted_ = 0
   trusted_ = 0
+  has_force_ = 0
+  force_ = 0
 
   def __init__(self, contents=None):
     self.entity_ = []
@@ -3184,6 +3219,19 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
 
   def has_trusted(self): return self.has_trusted_
 
+  def force(self): return self.force_
+
+  def set_force(self, x):
+    self.has_force_ = 1
+    self.force_ = x
+
+  def clear_force(self):
+    if self.has_force_:
+      self.has_force_ = 0
+      self.force_ = 0
+
+  def has_force(self): return self.has_force_
+
 
   def MergeFrom(self, x):
     assert x is not self
@@ -3191,6 +3239,7 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     if (x.has_transaction()): self.mutable_transaction().MergeFrom(x.transaction())
     for i in xrange(x.composite_index_size()): self.add_composite_index().CopyFrom(x.composite_index(i))
     if (x.has_trusted()): self.set_trusted(x.trusted())
+    if (x.has_force()): self.set_force(x.force())
 
   def Equals(self, x):
     if x is self: return 1
@@ -3204,6 +3253,8 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
       if e1 != e2: return 0
     if self.has_trusted_ != x.has_trusted_: return 0
     if self.has_trusted_ and self.trusted_ != x.trusted_: return 0
+    if self.has_force_ != x.has_force_: return 0
+    if self.has_force_ and self.force_ != x.force_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -3223,6 +3274,7 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     n += 1 * len(self.composite_index_)
     for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSize())
     if (self.has_trusted_): n += 2
+    if (self.has_force_): n += 2
     return n + 0
 
   def Clear(self):
@@ -3230,6 +3282,7 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     self.clear_transaction()
     self.clear_composite_index()
     self.clear_trusted()
+    self.clear_force()
 
   def OutputUnchecked(self, out):
     for i in xrange(len(self.entity_)):
@@ -3247,6 +3300,9 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_trusted_):
       out.putVarInt32(32)
       out.putBoolean(self.trusted_)
+    if (self.has_force_):
+      out.putVarInt32(56)
+      out.putBoolean(self.force_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3271,6 +3327,9 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
         continue
       if tt == 32:
         self.set_trusted(d.getBoolean())
+        continue
+      if tt == 56:
+        self.set_force(d.getBoolean())
         continue
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
       d.skipData(tt)
@@ -3299,6 +3358,7 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
       res+=prefix+">\n"
       cnt+=1
     if self.has_trusted_: res+=prefix+("trusted: %s\n" % self.DebugFormatBool(self.trusted_))
+    if self.has_force_: res+=prefix+("force: %s\n" % self.DebugFormatBool(self.force_))
     return res
 
 
@@ -3309,6 +3369,7 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
   ktransaction = 2
   kcomposite_index = 3
   ktrusted = 4
+  kforce = 7
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
@@ -3316,7 +3377,8 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     2: "transaction",
     3: "composite_index",
     4: "trusted",
-  }, 4)
+    7: "force",
+  }, 7)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -3324,7 +3386,8 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     2: ProtocolBuffer.Encoder.STRING,
     3: ProtocolBuffer.Encoder.STRING,
     4: ProtocolBuffer.Encoder.NUMERIC,
-  }, 4, ProtocolBuffer.Encoder.MAX_TYPE)
+    7: ProtocolBuffer.Encoder.NUMERIC,
+  }, 7, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -3715,6 +3778,8 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
   transaction_ = None
   has_trusted_ = 0
   trusted_ = 0
+  has_force_ = 0
+  force_ = 0
 
   def __init__(self, contents=None):
     self.key_ = []
@@ -3768,12 +3833,26 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
 
   def has_trusted(self): return self.has_trusted_
 
+  def force(self): return self.force_
+
+  def set_force(self, x):
+    self.has_force_ = 1
+    self.force_ = x
+
+  def clear_force(self):
+    if self.has_force_:
+      self.has_force_ = 0
+      self.force_ = 0
+
+  def has_force(self): return self.has_force_
+
 
   def MergeFrom(self, x):
     assert x is not self
     for i in xrange(x.key_size()): self.add_key().CopyFrom(x.key(i))
     if (x.has_transaction()): self.mutable_transaction().MergeFrom(x.transaction())
     if (x.has_trusted()): self.set_trusted(x.trusted())
+    if (x.has_force()): self.set_force(x.force())
 
   def Equals(self, x):
     if x is self: return 1
@@ -3784,6 +3863,8 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
     if self.has_transaction_ and self.transaction_ != x.transaction_: return 0
     if self.has_trusted_ != x.has_trusted_: return 0
     if self.has_trusted_ and self.trusted_ != x.trusted_: return 0
+    if self.has_force_ != x.has_force_: return 0
+    if self.has_force_ and self.force_ != x.force_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -3799,12 +3880,14 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSize())
     if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSize())
     if (self.has_trusted_): n += 2
+    if (self.has_force_): n += 2
     return n + 0
 
   def Clear(self):
     self.clear_key()
     self.clear_transaction()
     self.clear_trusted()
+    self.clear_force()
 
   def OutputUnchecked(self, out):
     if (self.has_trusted_):
@@ -3818,6 +3901,9 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(50)
       out.putVarInt32(self.key_[i].ByteSize())
       self.key_[i].OutputUnchecked(out)
+    if (self.has_force_):
+      out.putVarInt32(56)
+      out.putBoolean(self.force_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3836,6 +3922,9 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
         tmp = ProtocolBuffer.Decoder(d.buffer(), d.pos(), d.pos() + length)
         d.skip(length)
         self.add_key().TryMerge(tmp)
+        continue
+      if tt == 56:
+        self.set_force(d.getBoolean())
         continue
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
       d.skipData(tt)
@@ -3856,6 +3945,7 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
       res+=self.transaction_.__str__(prefix + "  ", printElemNumber)
       res+=prefix+">\n"
     if self.has_trusted_: res+=prefix+("trusted: %s\n" % self.DebugFormatBool(self.trusted_))
+    if self.has_force_: res+=prefix+("force: %s\n" % self.DebugFormatBool(self.force_))
     return res
 
 
@@ -3865,20 +3955,23 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
   kkey = 6
   ktransaction = 5
   ktrusted = 4
+  kforce = 7
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
     4: "trusted",
     5: "transaction",
     6: "key",
-  }, 6)
+    7: "force",
+  }, 7)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
     4: ProtocolBuffer.Encoder.NUMERIC,
     5: ProtocolBuffer.Encoder.STRING,
     6: ProtocolBuffer.Encoder.STRING,
-  }, 6, ProtocolBuffer.Encoder.MAX_TYPE)
+    7: ProtocolBuffer.Encoder.NUMERIC,
+  }, 7, ProtocolBuffer.Encoder.MAX_TYPE)
 
   _STYLE = """"""
   _STYLE_CONTENT_TYPE = """"""
@@ -5652,20 +5745,23 @@ class BeginTransactionRequest(ProtocolBuffer.ProtocolMessage):
 
   def IsInitialized(self, debug_strs=None):
     initialized = 1
+    if (not self.has_app_):
+      initialized = 0
+      if debug_strs is not None:
+        debug_strs.append('Required field: app not set.')
     return initialized
 
   def ByteSize(self):
     n = 0
-    if (self.has_app_): n += 1 + self.lengthString(len(self.app_))
-    return n + 0
+    n += self.lengthString(len(self.app_))
+    return n + 1
 
   def Clear(self):
     self.clear_app()
 
   def OutputUnchecked(self, out):
-    if (self.has_app_):
-      out.putVarInt32(10)
-      out.putPrefixedString(self.app_)
+    out.putVarInt32(10)
+    out.putPrefixedString(self.app_)
 
   def TryMerge(self, d):
     while d.avail() > 0:

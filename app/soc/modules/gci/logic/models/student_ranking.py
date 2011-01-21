@@ -35,7 +35,7 @@ class Logic(base.Logic):
   """Logic methods for the GCIStudentRanking model.
   """
 
-  def __init__(self, 
+  def __init__(self,
                model=soc.modules.gci.models.student_ranking.GCIStudentRanking,
                base_model=soc.models.linkable.Linkable,
                scope_logic=soc.modules.gci.logic.models.program):
@@ -60,27 +60,50 @@ class Logic(base.Logic):
 
     return self.updateOrCreateFromFields(properties)
 
-  def updateRanking(self, task):
+  def updateRanking(self, task, ranking=None, tasks=None, difficulties=None):
     """Updates ranking with the specified task.
     """
-    # get current ranking for the student
-    entity = self.getOrCreateForStudent(task.student)
 
-    if task.key() in entity.tasks:
-      # already counted
-      return
+    # get current ranking for the student if it is not specified
+    if not ranking:
+      ranking = self.getOrCreateForStudent(task.student)
+
+    # get list of tasks that are already considered by the ranking
+    tasks = ranking.tasks
+
+    if task.key() in tasks:
+       # already considered
+       return
 
     #: update total number of points with new points for the task
-    points = entity.points + task.taskDifficulty().value
+    points = ranking.points + task.taskDifficulty(difficulties).value
 
     #: append a new task to the list of the tasks that have been counted
-    tasks = entity.tasks
     tasks.append(task.key())
 
     properties = {
         'points': points,
         'tasks': tasks
         }
-    self.updateEntityProperties(entity, properties)
+    self.updateEntityProperties(ranking, properties)
+
+  def calculateRankingForStudent(self, student, tasks, difficulties):
+    """Calculates ranking for the specified student with the specified
+    list of tasks.
+
+    It is assumed that all the tasks from the list belong to the student.
+    """
+
+    ranking = self.getOrCreateForStudent(student)
+
+    points = 0
+    for task in tasks:
+      points += task.taskDifficulty(difficulties).value
+
+    properties = {
+        'points': points,
+        'tasks': [task.key() for task in tasks]
+        }
+    self.updateEntityProperties(ranking, properties)
 
 logic = Logic()

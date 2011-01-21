@@ -32,6 +32,7 @@ from soc.modules.gci.logic.models.student import logic as gci_student_logic
 from soc.modules.gci.logic.models.student_ranking import logic \
     as gci_student_ranking_logic
 from soc.modules.gci.logic.models.task import logic as gci_task_logic
+from soc.modules.gci.models import task as gci_task_model
 
 
 def getDjangoURLPatterns():
@@ -69,7 +70,7 @@ def startClearingTask(key_name):
   url = '/tasks/gci/ranking/clear/%s' % key_name
   queue_name = 'gci-update'
   responses.startTask(url, queue_name)
-  
+
 def updateGCIRanking(request, *args, **kwargs):
   """Updates student ranking based on the task passed as post argument.
   """
@@ -94,20 +95,13 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
   if not program:
     return responses.terminateTask()
 
+  # prefetch all task difficulties
+  all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+
   for entity in entities:
     # check if the entity refers to the program in scope
     if entity.scope.key() != program.key():
       continue
-
-    # find and clear ranking entity for the student
-    filter = {
-        'student': entity
-        }
-    ranking = gci_student_ranking_logic.getForFields(filter=filter,
-        unique=True)
-    ranking.tasks = []
-    ranking.points = 0
-    ranking.put()
 
     # get all the tasks that the student has completed
     filter = {
@@ -116,9 +110,8 @@ def recalculateGCIRanking(request, entities, context, *args, **kwargs):
         }
     tasks = gci_task_logic.getForFields(filter=filter)
 
-    # check if all the tasks have been already taken into account
-    for task in tasks:
-      gci_student_ranking_logic.updateRanking(task)
+    # calculate ranking with all the tasks
+    gci_student_ranking_logic.calculateRankingForStudent(entity, tasks, all_d)
 
     # this task should not be repeated after the program is over
     timeline = program.timeline

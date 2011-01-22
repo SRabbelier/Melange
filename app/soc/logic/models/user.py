@@ -96,7 +96,15 @@ class Logic(base.Logic):
     if not user_id:
       return None
 
-    return self.getForUserId(user_id)
+    user = self.getForUserId(user_id)
+
+    current_account = accounts.getCurrentAccount()
+    if user and (str(user.account) != str(current_account)):
+      # The account of the user has changed, we use this account to send system
+      # emails to.
+      self.updateEntityProperties(user, {'account': current_account})
+
+    return user
 
   def getCurrentUser(self):
     """Retrieves the user entity for the currently logged in user.

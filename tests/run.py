@@ -119,7 +119,7 @@ def main():
   from google.appengine.api import user_service_stub
   from google.appengine.api import urlfetch_stub
   from google.appengine.api.memcache import memcache_stub
-  from google.appengine.api.labs.taskqueue import taskqueue_stub
+  from google.appengine.api.taskqueue import taskqueue_stub
   apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
   apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
                                           urlfetch_stub.URLFetchServiceStub())

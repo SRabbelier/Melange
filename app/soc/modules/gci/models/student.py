@@ -38,13 +38,19 @@ class GCIStudent(soc.models.student.Student):
   #: form is sent to students
   parental_form_mail = db.BooleanProperty(default=False)
 
-  #: Property pointing to the work uploaded as a file or archive
+  #: Property pointing to the consent form
   consent_form = blobstore.BlobReferenceProperty(
       required=False, verbose_name=ugettext('Parental Consent Form'))
   consent_form.help_text = ugettext(
       'A signed Parental Consent Form from your legal parent or guardian')
 
-  #: Property pointing to the work uploaded as a file or archive
+  #: Property pointing to the second page of the consent form
+  consent_form_two = blobstore.BlobReferenceProperty(
+      required=False, verbose_name=ugettext('Parental Consent Form (page 2)'))
+  consent_form_two.help_text = ugettext(
+      'Page two of the Parental Consent Form (if applicable)')
+
+  #: Property pointing to the student id form
   student_id_form = blobstore.BlobReferenceProperty(
       required=False, verbose_name=ugettext('Student ID form'))
   student_id_form.help_text = ugettext(

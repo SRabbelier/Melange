@@ -117,7 +117,7 @@ class View(student.View):
 
     new_params['extra_dynaexclude'] = [
         'agreed_to_tos', 'school', 'parental_form_mail',
-        'consent_form', 'student_id_form',
+        'consent_form', 'consent_form_two', 'student_id_form',
     ]
 
     new_params['extra_django_patterns'] = patterns
@@ -164,6 +164,10 @@ class View(student.View):
     self._params['consent_form_upload_form'] = getUploadForms(
         'consent_form_upload', 'Consent Form',
         gci_student_model.consent_form.help_text)
+
+    self._params['consent_form_two_upload_form'] = getUploadForms(
+        'consent_form_two_upload', 'Consent Form (page two)',
+        gci_student_model.consent_form_two.help_text)
 
     self._params['student_id_form_upload_form'] = getUploadForms(
         'student_id_form_upload', 'Student ID Form',
@@ -216,6 +220,7 @@ class View(student.View):
       context[param_name] = form
 
     setForm('consent_form_upload_form', entity.consent_form)
+    setForm('consent_form_two_upload_form', entity.consent_form_two)
     setForm('student_id_form_upload_form', entity.student_id_form)
 
     return responses.respond(request, template, context)
@@ -234,6 +239,8 @@ class View(student.View):
 
     if form == 'consent':
       entity.consent_form = upload
+    elif form == 'consent_two':
+      entity.consent_form_two = upload
     elif form=='student_id':
       entity.student_id_form = upload
     else:

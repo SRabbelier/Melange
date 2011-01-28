@@ -78,10 +78,10 @@ jQuery(function () {
       setNavbarClasses(saved_user_preferences.navbar_structure, saved_user_preferences.navbar_structure.children);
     }
     catch (e) {
-      jQuery.cookie("user_preferences", null);
+      jQuery.cookie("user_preferences", {path: '/'});
       var first_level_spans = jQuery('#side #menu > ul > li > ul > li[class^=expandable] > span');
       create_navbar_structure(user_preferences["navbar_structure"], first_level_spans);
-      jQuery.cookie("user_preferences",JSON.stringify(user_preferences),{expires: 14});
+      jQuery.cookie("user_preferences",JSON.stringify(user_preferences),{path:'/', expires: 14});
     }
     openCloseMenu();
   };
@@ -107,7 +107,7 @@ jQuery(function () {
     }
     var first_level_spans = jQuery('#side #menu > ul > li > ul > li[class^=expandable] > span');
     create_navbar_structure(user_preferences["navbar_structure"], first_level_spans);
-    jQuery.cookie("user_preferences",JSON.stringify(user_preferences),{expires: 14});
+    jQuery.cookie("user_preferences",JSON.stringify(user_preferences),{path:'/', expires: 14});
   };
 
   jQuery('#side #menu li[class^=expandable] > span').toggle(navbar_toggle, navbar_toggle);

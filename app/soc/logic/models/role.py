@@ -127,6 +127,27 @@ class Logic(base.Logic):
     # resignation is possible
     return None
 
+  def canRejectInvite(self, scope_entity):
+    """Checks if the user in the given role can reject the invitation.
+
+    Args:
+      scope_entity: the entity under which the current Role is scoped.
+    """
+
+    if self.disallow_last_resign:
+      # check if this is the last active role for it's scope
+      fields = {
+          'scope': scope_entity,
+          'status': 'active'
+          }
+      role = self.getForFields(fields, unique=True)
+
+      # if this it the last one return error message
+      if not role:
+        return False
+
+    return True
+
   def getRoleLogicsToNotifyUponNewRequest(self):
     """Returns a list with subclasses of Role Logic which should be notified
     when a new request to obtain this Role arrives.

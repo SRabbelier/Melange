@@ -147,7 +147,14 @@ class View(base.View):
     # get the request entity using the information from kwargs
     request_entity = request_logic.getFromIDOr404(int(kwargs['id']))
 
+    invite_accepted_redirect = redirects.getInviteAcceptedRedirect(
+        request_entity, self._params)
+
     role_params = ROLE_VIEWS[request_entity.role].getParams()
+
+    role_logic = role_params['logic']
+    if not role_logic.canRejectInvite(request_entity.group):
+      return http.HttpResponseRedirect(invite_accepted_redirect)
 
     # set the page name using the request_entity
     context['page_name'] = '%s %s for %s' % (page_name, 
@@ -169,8 +176,7 @@ class View(base.View):
     context['entity'] = request_entity
     context['module_name'] = params['module_name']
     context['role_name'] = role_params['name']
-    context['invite_accepted_redirect'] = (
-        redirects.getInviteAcceptedRedirect(request_entity, self._params))
+    context['invite_accepted_redirect'] = (invite_accepted_redirect)
 
     #display the invite processing page using the appropriate template
     template = params['invite_processing_template']

@@ -240,10 +240,12 @@ class View(group.View):
       record_entity =  record_logic.getFromIDOr404(int(record_id))
 
     if request.method == 'POST':
-      return self.applicantPost(request, context, params, record_entity, **kwargs)
+      return self.applicantPost(request, context, params,
+                                record_entity, **kwargs)
     else:
       # request.method == 'GET'
-      return self.applicantGet(request, context, params, record_entity, **kwargs)
+      return self.applicantGet(request, context, params,
+                               record_entity, **kwargs)
 
   def applicantGet(self, request, context, params, record_entity, **kwargs):
     """Handles the GET request concerning the creation of an Organization via

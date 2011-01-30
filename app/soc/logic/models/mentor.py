@@ -33,7 +33,7 @@ import soc.models.mentor
 import soc.models.role
 
 
-DEF_ALREADY_MENTORING_RPOJECT_MSG = ugettext(
+DEF_ALREADY_MENTORING_PROJECT_MSG = ugettext(
     "This Mentor is mentoring a Student Project and can therefore not be"
     " resigned. Please assign another Mentor.")
 
@@ -78,7 +78,7 @@ class Logic(role.Logic):
     student_project_entity = student_project_logic.getForFields(fields,
                                                                 unique=True)
     if student_project_entity:
-      return DEF_ALREADY_MENTORING_RPOJECT_MSG
+      return DEF_ALREADY_MENTORING_PROJECT_MSG
 
     student_proposal_entity = student_proposal_logic.getForFields(fields,
                                                                   unique=True)

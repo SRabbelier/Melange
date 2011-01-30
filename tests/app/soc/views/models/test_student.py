@@ -172,7 +172,6 @@ class StudentTestExistent(DjangoTestCase):
     # Create sponsor role for a_sponsor_user
     link_id = 'a_sponsor'
     name = link_id
-    founder = 'a_founder'
     phone = '01234567'
     contact_postalcode = 'A postalcode'
     description = 'A description'
@@ -189,7 +188,7 @@ class StudentTestExistent(DjangoTestCase):
         'phone': phone,
         'description': description,
         'contact_country': contact_country,
-       'contact_city': 'A City',
+       'contact_city': contact_city,
        'contact_street': 'A Street',
         'contact_postalcode': contact_postalcode,
         'home_page': home_page,
@@ -202,7 +201,8 @@ class StudentTestExistent(DjangoTestCase):
         'scope_path': 'a_sponsor',
         'scope': self.sponsor,
           }
-    self.timeline = timeline_logic.updateOrCreateFromFields(timeline_properties)
+    self.timeline = timeline_logic.updateOrCreateFromFields(
+      timeline_properties)
     # Create a program for a_sponsor
     program_properties = {
         'link_id': 'a_program',

@@ -22,12 +22,15 @@ __authors__ = [
   ]
 
 
+from django.utils.translation import ugettext
+
 from soc.logic.models import program as program_logic
 from soc.logic.models import survey
 from soc.logic.models.org_app_record import logic as \
     org_app_record_logic
 from soc.models.org_app_survey import OrgAppSurvey
 from soc.models.survey import Survey
+from soc.views import out_of_band
 
 
 class Logic(survey.Logic):
@@ -56,5 +59,22 @@ class Logic(survey.Logic):
     fields = {'scope': program}
 
     return self.getForFields(fields, unique=True)
+
+  def getForProgramOr404(self, program):
+    """Returns the OrgAppSurvery belonging to the given program but returns
+    404 if it doesn't exist.
+    """
+
+    entity = self.getForProgram(program)
+
+    if entity:
+      return entity
+
+    msg = ugettext(
+        'There is no "%(name)s" for the program %(program_name)s.') % {
+        'name': self._name, 'program_name': program.name}
+
+    raise out_of_band.Error(msg, status=404)
+
 
 logic = Logic()

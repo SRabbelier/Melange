@@ -212,8 +212,8 @@ class View(role.View):
       form.fields['admin_agreement'] = None
       return
 
-    org_entity = self._params['group_logic'].getFromKeyName(scope_path)
-    org_app = org_app_logic.getForProgram(org_entity.scope)
+    org_entity = self._params['group_logic'].getFromKeyNameOr404(scope_path)
+    org_app = org_app_logic.getForProgramOr404(org_entity.scope)
 
     if org_app:
       user_entity = context['user']

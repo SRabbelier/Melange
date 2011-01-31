@@ -283,7 +283,7 @@ class OrgAdminTestExistent(DjangoTestCase):
         }
     self.org = org_logic.updateOrCreateFromFields(org_properties)
 
-    # Create student role for a_user
+    # Create an org admin role for a_user
     org_admin_properties = {
         'link_id': 'an_org_admin',
         'scope_path': self.org.key().id_or_name(),

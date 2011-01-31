@@ -76,6 +76,7 @@ class LoginRequest(Error):
     if not message_fmt:
       message_fmt = self.DEF_LOGIN_MSG_FMT
 
+    response_args['status'] = 401
     super(LoginRequest, self).__init__(message_fmt, **response_args)
 
 

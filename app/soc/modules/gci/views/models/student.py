@@ -96,8 +96,11 @@ class View(student.View):
     rights['manage'] = [('checkIsMyActiveRole', gci_student_logic)]
     rights['submit_forms'] = [('checkIsMyActiveRole', gci_student_logic)]
     rights['download_blob'] = [
-        ('checkCanDownloadConsentForms', gci_student_logic)]
-
+        ('checkCanDownloadConsentForms', [gci_student_logic,
+        {'consent_form_upload_form': 'consent_form',
+         'consent_form_two_upload_form': 'consent_form_two',
+         'student_id_form_upload_form': 'student_id_form'
+         }])]
 
     new_params = {}
     new_params['logic'] = gci_student_logic

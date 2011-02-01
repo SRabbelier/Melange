@@ -429,13 +429,16 @@ class GCIChecker(access.Checker):
 
   @access.allowDeveloper
   @access.denySidebar
-  def checkCanDownloadConsentForms(self, django_args, student_logic):
+  def checkCanDownloadConsentForms(self, django_args, student_logic,
+                                   forms_data):
     """Checks if the user is a student who can download the forms i.e.
     the blobs he has requested.
 
     Args:
       django_args: a dictionary with django's arguments
       student_logic: student logic used to look up student entity
+      forms_data: dictionary containing the data related to the forms
+          that student should upload and entities that store the form.
 
     Raises:
       AccessViolationResponse:
@@ -475,12 +478,10 @@ class GCIChecker(access.Checker):
       if not blob_key:
         raise out_of_band.AccessViolation(
             message_fmt=DEF_NO_FILE_SPECIFIED_MSG)
-      if (form_type == 'consent_form_upload_form' and
-          blob_key == str(student_entity.consent_form.key())):
-        return
 
-      if (form_type == 'student_id_form_upload_form' and
-          blob_key == str(student_entity.student_id_form.key())):
+      form_entity_name = forms_data.get(form_type, '')
+      form_entity = getattr(student_entity, form_entity_name)
+      if blob_key == str(form_entity.key()):
         return
 
     except AttributeError:

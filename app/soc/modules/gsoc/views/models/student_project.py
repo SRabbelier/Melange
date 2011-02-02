@@ -448,7 +448,7 @@ class View(base.View):
     fields = {'project': entity}
     record_logic = params['logic'].getRecordLogic()
     record_entities = record_logic.getForFields(fields)
-    record_dict = dict((i.survey.key(), i) for i in record_entities)
+    record_dict = dict((i.survey.key(), i) for i in record_entities if i.survey)
     record_getter = lambda entity: record_dict.get(entity.key())
     args = [record_getter]
 

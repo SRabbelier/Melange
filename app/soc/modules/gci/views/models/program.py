@@ -1046,8 +1046,7 @@ class View(program.View):
         res['group_name'] = entity.student.scope.name
         res['birth_date'] = entity.student.birth_date.isoformat()
         res['account_name'] = accounts.normalizeAccount(entity.student.user.account).email()
-        res['consent_form_submitted'] = "Yes" if entity.student.consent_form else "No"
-        res['student_id_form_submitted'] = "Yes" if entity.student.student_id_form else "No"
+        res['forms_submitted'] = "Yes" if (entity.student.consent_form and entity.student.student_id_form) else "No"
       return res
 
     list_params['public_field_extra'] = getExtraFields
@@ -1064,10 +1063,8 @@ class View(program.View):
         },
     }
     if is_host:
-      list_params['public_field_keys'] += ["consent_form_submitted",
-                                           "student_id_form_submitted"]
-      list_params['public_field_names'] += ["Consent form submitted",
-                                            "Student ID form submitted"]
+      list_params['public_field_keys'] += ["forms_submitted"]
+      list_params['public_field_names'] += ["Forms submitted"]
       list_params['public_field_hidden'] = sparams['admin_field_hidden'] + sparams['admin_field_keys']
       list_params['public_field_keys'].extend(sparams['admin_field_keys'])
       list_params['public_field_names'].extend(sparams['admin_field_names'])

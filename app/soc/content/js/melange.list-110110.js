@@ -987,7 +987,7 @@
             }
           },
           success: function (data_from_server) {
-            var source = JSON.parse(data_from_server);
+            var source = data_from_server;
             var first_batch_received = (current_loop > 0);
             var data_received = source.data[start] !== undefined;
             var last_batch = !source.data[start].length;

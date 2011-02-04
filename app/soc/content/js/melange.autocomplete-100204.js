@@ -42,8 +42,9 @@
   ]);
 
   $m.makeAutoComplete = function (id, url) {
-    jQuery.getJSON(url,
-      function(data){
+    jQuery.ajax({
+      url: url,
+      success: function(data){
         var default_autocomplete_options = {
           matchContains: true,
           formatItem: function(item) {
@@ -60,6 +61,6 @@
         }
         jQuery("#" + id).autocomplete(data.data, default_autocomplete_options);
       }
-    );
+    });
   }
 }());

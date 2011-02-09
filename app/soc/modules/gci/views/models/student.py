@@ -94,7 +94,10 @@ class View(student.View):
             gci_org_admin_logic.logic, gci_mentor_logic.logic]),
         'checkCanApply']
     rights['manage'] = [('checkIsMyActiveRole', gci_student_logic)]
-    rights['submit_forms'] = [('checkIsMyActiveRole', gci_student_logic)]
+    rights['submit_forms'] = [
+        ('checkIsActivePeriod', ['program', 'scope_path',
+            gci_program_logic.logic]),
+        ('checkIsMyActiveRole', gci_student_logic)]
     rights['download_blob'] = [
         ('checkCanDownloadConsentForms', [gci_student_logic,
         {'consent_form_upload_form': 'consent_form',

@@ -541,11 +541,12 @@ class View(program.View):
     if student_entity:
       items += super(View, self)._getStudentEntries(
           gci_program_entity, student_entity, params, id, user, prefix)
-      items += [
-          (gci_redirects.getSubmitFormsRedirect(
-              student_entity, {'url_name': 'gci/student'}),
-           "Submit Forms", 'any_access')
-      ]
+      if timeline_helper.isActivePeriod(timeline_entity, 'program'):
+        items += [
+            (gci_redirects.getSubmitFormsRedirect(
+                student_entity, {'url_name': 'gci/student'}),
+             "Submit Forms", 'any_access')
+        ]
     else:
       # add a sidebar entry for the user to register as student if not
       # since he has completed one task

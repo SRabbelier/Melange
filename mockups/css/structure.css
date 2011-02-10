@@ -1,0 +1,497 @@
+/*////////////////
+
+  LessCSS
+
+////////////////*/
+.imagereplace {
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999em;
+}
+/*////////////////
+
+  Structure
+
+////////////////*/
+#bg {
+  background: url(../images/main-bg.png) top center repeat-y;
+  display: block;
+  overflow: hidden;
+}
+#page-header {
+  /*logo and globe*/
+
+  background: #ffffff url(../images/header-bg.png) bottom left repeat-x;
+  height: 156px;
+  width: 100%;
+}
+#page-header .grid_12 {
+  /*globe*/
+
+  background: url(../images/header-globe.gif) bottom right no-repeat;
+  height: 156px;
+}
+#page-header img {
+  margin: 35px 0 0 10px;
+}
+#page-header h1, #page-header p {
+  color: #238bd2;
+  font-size: 35px;
+  font-weight: bold;
+  line-height: 1em;
+  margin-left: 10px;
+}
+#page-header h1 a, #page-header p a {
+  color: #238bd2;
+  text-decoration: none;
+}
+#main {
+  /*main content container*/
+
+}
+#main .grid_9 {
+  background: #f6f6f6;
+  margin-left: 0;
+}
+#main .content {
+  overflow: hidden;
+  padding: 19px;
+}
+#main .block {
+  /*every block*/
+
+  background: #fff;
+  margin-bottom: 20px;
+}
+#main .block h4 {
+  /*block title*/
+
+  background: #6eb5e5;
+  color: #fff;
+  font-size: 15px;
+  line-height: 30px;
+  margin: 0;
+  padding: 0 0 0 7px;
+  text-transform: uppercase;
+}
+#main .block .block-content {
+  /*block content*/
+
+  overflow: hidden;
+  padding: 12px;
+}
+#main .block .block-content h5 {
+  color: #00538b;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.1em;
+  margin: 0 0 8px 0;
+}
+#main .block .block-content p {
+  color: #000;
+  font-size: 12px;
+  line-height: 1.5em;
+}
+#main .block .readmore {
+  /*read more link in block*/
+
+  background: #dedede;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 25px;
+  padding-left: 9px;
+}
+#main .block .readmore a {
+  color: #d5620e;
+  text-decoration: none;
+}
+#main .home-block-1 {
+  /*how summer of code works*/
+
+  overflow: hidden;
+  width: 100%;
+}
+#main .home-block-1 h2 {
+  color: #238bd2;
+  font-size: 27px;
+  font-weight: bold;
+  line-height: 1.7em;
+  margin: 0 0 0 12px;
+}
+#main .home-block-1 ol {
+  /*numbered list*/
+
+  background: url(../images/home-block-1-bg-center.gif) center center no-repeat;
+  float: left;
+  height: 218px;
+  list-style-type: none;
+  margin: 0 15px 0 0;
+  width: 429px;
+}
+#main .home-block-1 ol li {
+  background-position: 13px center;
+  background-repeat: no-repeat;
+  color: #238bd2;
+  height: 72px;
+  font-size: 23px;
+  font-weight: bold;
+  padding: 0 0 0 136px;
+}
+#main .home-block-1 ol li strong {
+  display: block;
+  padding: 17px 10px 0 0;
+}
+#main .home-block-1 ol li span {
+  font-size: 13px;
+}
+#main .home-block-1 ol li.first {
+  background-image: url(../images/home-block-1-list-1.png);
+}
+#main .home-block-1 ol li.second {
+  background-image: url(../images/home-block-1-list-2.png);
+}
+#main .home-block-1 ol li.second strong {
+  padding-top: 22px;
+}
+#main .home-block-1 ol li.third {
+  background-image: url(../images/home-block-1-list-3.png);
+}
+#main .home-block-1 .description p {
+  color: #d5620e;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 0 0;
+}
+#main .content_column_1 {
+  /*homepage left column*/
+
+  float: left;
+  width: 429px;
+}
+#main .content_column_1 .block-students {
+  /*students apply now block*/
+
+  background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  color: #004371;
+  padding-bottom: 15px;
+  text-align: center;
+}
+#main .content_column_1 .block-students h3 {
+  *background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  font-size: 35px;
+  font-weight: bold;
+  line-height: 1.9em;
+  margin: 0;
+  text-transform: lowercase;
+}
+#main .content_column_1 .block-students p {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.5em;
+  margin: 0;
+}
+#main .content_column_1 .block-students p a {
+  color: #004371;
+  text-decoration: none;
+}
+#main .content_column_1 .block-students p.action {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+#main .content_column_1 .block-students p.action a {
+  background: #e57e30;
+  color: #fff;
+  padding: 3px 7px;
+}
+#main .content_column_1 .block-students p.action span {
+  padding: 0 8px;
+}
+#main .content_column_1 .block-students p.small {
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  margin-bottom: 5px;
+}
+#main .content_column_1 .block-featured-project {
+  /*featured project block*/
+
+}
+#main .content_column_1 .block-featured-project .block-content {
+  padding-bottom: 0;
+}
+#main .content_column_1 .block-participants {
+  /*participating orgs block*/
+
+}
+#main .content_column_1 .block-participants img {
+  margin: 0 10px 0 0;
+  vertical-align: middle;
+}
+#main .content_column_1 .block-mentors {
+  /*mentors apply now block*/
+
+  background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  color: #004371;
+  text-align: center;
+  padding-bottom: 15px;
+}
+#main .content_column_1 .block-mentors h3 {
+  *background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  font-size: 35px;
+  font-weight: bold;
+  line-height: 1.9em;
+  margin: 0;
+  text-transform: lowercase;
+}
+#main .content_column_1 .block-mentors p {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.5em;
+  margin: 0;
+}
+#main .content_column_1 .block-mentors p a {
+  color: #004371;
+  text-decoration: none;
+}
+#main .content_column_1 .block-mentors p.action {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+#main .content_column_1 .block-mentors p.action a {
+  background: #e57e30;
+  color: #fff;
+  padding: 3px 7px;
+}
+#main .content_column_1 .block-mentors p.action span {
+  padding: 0 8px;
+}
+#main .content_column_1 .block-mentors p.small {
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  margin-bottom: 5px;
+}
+#main .content_column_1 .block-orgs {
+  /*orgs apply now block*/
+
+  background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  color: #004371;
+  text-align: center;
+  padding-bottom: 15px;
+}
+#main .content_column_1 .block-orgs h3 {
+  *background: url(../images/home-block-students-bg.gif) 0 0 no-repeat;
+  font-size: 33px;
+  font-weight: bold;
+  line-height: 1.9em;
+  margin: 0;
+  text-transform: lowercase;
+}
+#main .content_column_1 .block-orgs p {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.5em;
+  margin: 0;
+}
+#main .content_column_1 .block-orgs p a {
+  color: #004371;
+  text-decoration: none;
+}
+#main .content_column_1 .block-orgs p.action {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+#main .content_column_1 .block-orgs p.action a {
+  background: #e57e30;
+  color: #fff;
+  padding: 3px 7px;
+}
+#main .content_column_1 .block-orgs p.action span {
+  padding: 0 8px;
+}
+#main .content_column_1 .block-orgs p.small {
+  color: #000;
+  font-size: 11px;
+  font-weight: normal;
+  margin-bottom: 5px;
+}
+#main .content_column_2 {
+  /*homepage right column*/
+
+  float: right;
+  width: 213px;
+}
+#main .content_column_2 .block-project-timeline .block-content {
+  padding: 12px 0 0 0;
+}
+#main .content_column_2 .block-connect {
+  /*social network block*/
+
+}
+#main .content_column_2 .block-connect .social {
+  background-image: url(../images/social-icons.png);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  height: 31px;
+  float: left;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999em;
+}
+#main .content_column_2 .block-connect .fb {
+  margin-right: 13px;
+  width: 22px;
+}
+#main .content_column_2 .block-connect .tw {
+  background-position: -36px 0;
+  margin-right: 14px;
+  width: 27px;
+}
+#main .content_column_2 .block-connect .bl {
+  background-position: -77px 0;
+  margin-right: 11px;
+  width: 26px;
+}
+#main .content_column_2 .block-connect .em {
+  background-position: -114px 0;
+  margin-right: 11px;
+  width: 28px;
+}
+#main .content_column_2 .block-connect .irc {
+  background-position: -153px 0;
+  width: 29px;
+}
+#main .content_column_2 .block-blog-feed {
+  /*recent blog posts block*/
+
+}
+#main .content_column_2 .block-blog-feed .block-content {
+  padding-bottom: 2px;
+}
+#main .content_column_2 .block-blog-feed .blog-item {
+  margin-bottom: 10px;
+}
+#main .content_column_2 .block-blog-feed .blog-item span {
+  display: block;
+  font-weight: bold;
+}
+#main .content_column_2 .block-blog-feed .blog-item .date {
+  color: #999;
+  font-size: 10px;
+  line-height: 1.1em;
+  text-transform: uppercase;
+}
+#main .content_column_2 .block-blog-feed .blog-item .title {
+  font-size: 13px;
+  line-height: 1.2em;
+}
+#main .block-text p {
+  margin: 0;
+}
+#main .block-text p a {
+  color: #238bd2;
+  font-weight: bold;
+}
+/*////////////////
+
+  Footer
+
+////////////////*/
+#footer {
+  /*footer container*/
+
+}
+#footer .grid_3 {
+  margin-right: 0;
+}
+#footer .grid_9 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 0;
+  padding: 20px 0 25px 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+#footer .footer-meta {
+  /*powered by/empowered by*/
+
+  color: #4496ce;
+}
+#footer .footer-meta a {
+  color: #4496ce;
+  text-decoration: none;
+}
+#footer .footer-meta .powered {
+  padding-right: 15px;
+}
+#footer .footer-menu {
+  /*menu in footer*/
+
+  float: left;
+  overflow: hidden;
+  margin: 0 0 12px 0;
+  position: relative;
+  width: 100%;
+}
+#footer .footer-menu ul {
+  clear: left;
+  float: left;
+  left: 50%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  text-align: center;
+}
+#footer .footer-menu ul li {
+  display: block;
+  float: left;
+  list-style: none;
+  margin: 0;
+  padding: 0 20px 0 0;
+  position: relative;
+  right: 50%;
+}
+#footer .footer-menu ul li a {
+  display: block;
+}
+#footer .footer-menu ul li.last {
+  padding-right: 0px;
+}
+#footer .footer-menu .social {
+  /*social network links in footer*/
+
+  padding: 3px 0 0 0;
+}
+#footer .footer-menu .social a {
+  background-image: url(../images/social-icons.png);
+  background-position: 0 -34px;
+  background-repeat: no-repeat;
+  height: 14px;
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999em;
+}
+#footer .footer-menu .social .fb {
+  width: 16px;
+}
+#footer .footer-menu .social .tw {
+  background-position: -16px -34px;
+  width: 20px;
+}
+#footer .footer-menu .social .bl {
+  background-position: -36px -34px;
+  width: 20px;
+}
+#footer .footer-menu .social .em {
+  background-position: -56px -34px;
+  width: 24px;
+}
+#footer .footer-menu .social .irc {
+  background-position: -80px -34px;
+  margin-right: 20px;
+  width: 22px;
+}

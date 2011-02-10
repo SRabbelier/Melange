@@ -1,0 +1,128 @@
+/*////////////////
+
+  LessCSS
+
+////////////////*/
+
+@darkblue: #00538b;
+@lightblue: #238bd2;
+@lightbluebg: #6eb5e5;
+@grey: #f6f6f6;
+
+.imagereplace {
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    text-indent: -9999em;
+}
+
+/*////////////////
+
+    Typography
+
+////////////////*/
+
+hr {
+	border: 0 #ccc solid;
+	border-top-width: 1px;
+	clear: both;
+	height: 0;
+}
+
+a, a:link {
+    color: @darkblue;
+    text-decoration: none;
+}
+
+#main .grid_9 {
+
+    h1, h2, h3, h4, h5, h6, p, ul, ol, pre, code, dl {
+        line-height: 1.5em;
+        margin: 0 0 1.5em 0;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: @lightblue;
+        font-weight: bold;
+    }
+    h1 {
+        font-size: 27px;
+        margin: 0 0 5px 0;
+    }
+    h6 {
+        font-size: 14px;
+        margin: 0;  
+    }
+    p {
+        font-size: 12px;
+    }
+    ul, ol { margin-left: 1.1em; }
+    ol { margin-left: 1.5em; }
+    ul li, ol li { list-style-position: outside; }
+    ul { list-style: disc; }
+    ul ul { margin-left: 1em; font-size: 1em; }
+    ol ol { margin-left: 1.5em; font-size: 1em; }
+    ol { list-style-type: decimal; }
+    ol ol { list-style: upper-alpha; }
+    ol ol ol { list-style: lower-roman; }
+    ol ol ol ol { list-style: lower-alpha; }
+    ul ul, ul ul ul, ol ol, ol ol ol, ul ol, ol ul { margin-bottom:0; }
+    dt { font-weight: bold; }
+    dd { margin-bottom: 1.5em; }
+    strong { font-weight: bold; }
+    cite, em, i { font-style: italic; }
+    ins { text-decoration:none; }
+    abbr { border-bottom: 1px dotted #000; cursor: help; }
+    sup, sub { height: 0; line-height: 1; vertical-align: baseline; _vertical-align: bottom; position: relative; font-size: .8em; }
+    sup { bottom: 1ex; }
+    sub { top: .5ex; }
+    code { line-height: 1.5em; }
+    pre { background: #000; color: #fff; display: block; line-height: 1.5em; margin: 0 0 1.5em 2em; padding: 0;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap !important;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
+    pre code {
+        color: #fff;
+    	margin: 0 0 0 2em;
+    	padding: 1.2em 0;
+    	display: block;
+    }
+    blockquote {
+        border-left:  2px solid #ccc;
+        margin: 0 0 0 2em;
+        padding: 0 0 0 1em;
+        
+        cite {
+            display: block;
+            font-size: .9em;
+            margin: .4em 0 0 0;
+        }
+    }
+    q {
+        font-style: italic;
+    }
+    .pager {
+        padding: 10px 0;
+        p {
+            font-size: 14px;
+            margin: 0;
+            text-align: center;
+            text-transform: uppercase;
+            
+            span {
+                color: #188dd0;
+                font-weight: bold;
+            }
+            
+            a.prev, a.next {
+                background: #a5cadd;
+                color: #fff;
+                font-weight: bold;
+                padding: 3px 7px;
+            }
+        }
+    }
+
+}

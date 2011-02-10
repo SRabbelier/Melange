@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Google Summer of Code</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/reset.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/960.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/global.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/typography.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/structure.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/menu.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/forms.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/tables.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/user-messages.css" />
+    
+    <!-- 
+    ////////////////////////
+      FOR THIS PAGE ONLY
+    ////////////////////////
+    -->
+    <style type="text/css">
+    
+    #main .grid_12 { background: #F6F6F6; }
+    #thumbs {
+        display: block;
+        margin: 0 auto 10px auto;
+        overflow: hidden;
+        padding: 0;
+    }
+    .thumbs1 { width: 840px; }
+    .thumbs2, .thumbs3 { width: 630px; }
+    #thumbs li { display: block; float: left; margin: 0 5px; }
+    #thumbs li strong { color: #3d6b8a; display: block; text-align: center; margin: 0 0 3px 0; }
+    
+    #notes, #thumbnails {
+        background: #fff;
+        display: block;
+        margin: 0 0 20px 0;
+        padding: 10px;
+    }
+    #notes strong {
+        color: #00538B;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 1.5em;
+        margin: 0 0 5px 0;
+    }
+    #notes p {
+        margin: 10px 0 15px 4px;
+    }
+    #notes code {
+        display: block;
+        margin-left: 20px;
+    }
+    #notes a {
+        text-decoration: underline;
+    }
+    
+    #table-comparison {
+        border-collapse: collapse;
+        font-size: 12px;
+        margin: 0;
+        text-align: left;
+        width: 100%;
+    }
+    #table-comparison th {
+        background: #6EB5E5;
+        color: #fff;
+        font-size: 13px;
+        font-weight: bold;
+        padding: 8px;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    #table-comparison td {
+        background: #f6ffff;
+        color: #3d6b8a;
+        padding: 6px;
+        text-align: center;
+    }
+    #table-comparison td img {
+        vertical-align: text-top;
+    }
+    #table-comparison td.page {
+        font-weight: bold;
+        text-align: left;
+    }
+    #table-comparison tr.even td {
+        background: #eaf5fb;
+    }
+
+    #table-comparison.table-js {
+        margin: 0 0 15px 0;
+        width: 430px;
+    }
+    
+    </style>
+
+</head>
+<body>
+
+<!-- 
+////////////////////////
+   BEGIN MAIN CONTENT
+////////////////////////
+-->
+<div id="main">
+    <div class="container_12">
+
+        <!-- 
+        ////////////////////////
+           BEGIN PAGE CONTENT
+        ////////////////////////
+        -->
+        <div class="grid_12">
+            
+            <div class="content">
+            
+                <div id="notes">
+                    <strong>notes:</strong>
+                    <p>&bull; The main sections of the templates have been marked by large comments:<br />
+                    <code>
+                    &#60;&#33;&#45;&#45;&#32;<br />
+                    &#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;<br />
+                    &#32;&#32;&#66;&#69;&#71;&#73;&#78;&#32;
+                    &#68;&#69;&#70;&#65;&#85;&#76;&#84;&#32;&#72;&#69;&#65;&#68;&#69;&#82;<br />
+                    &#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;&#47;<br />
+                    &#45;&#45;&#62;
+                    </code>
+                    </p>
+                    <p>&bull; Other sections are marked at the end:<br />
+                    <code>
+                    &#60;&#33;&#45;&#45;&#32;&#46;&#103;&#114;&#105;&#100;&#95;&#51;&#32;&#45;&#45;&#62;
+                    </code>
+                    </p>
+                    <p>&bull; This site uses the <a href="http://960.gs/">960gs</a> 
+                    <a href="http://960.gs/demo.html">12-column grid</a></p>
+                    <p>&bull; jQuery plugins are <a href="http://pixelmatrixdesign.com/uniform/">Uniform</a> 
+                    (skinning form elements), <a href="http://tablesorter.com">Table Sorter</a>, and 
+                    <a href="http://www.wbotelhos.com/raty/">Raty</a> (star ratings)</p>
+                    <p>&bull; CSS was written using <a href="http://lesscss.org/">LessCSS</a> 
+                    and <a href="http://incident57.com/less/">LESS.app</a></p>
+                    <p>&bull; Container elements (DIVs, tables, forms) have unique IDs and/or classes as well as 
+                    generic classes for styling (.block, .tablesorter, #form)</p>
+                    <p>&bull; Not every element has a unique ID or class; this can be added on request</p>
+                    <p>&bull; For social bookmarking and sharing, we recommend 
+                    <a href="http://www.addthis.com/">AddThis</a></p>
+                    
+                    <strong>javascript:</strong>
+                    <table id="table-comparison" class="table-js">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">jQuery</th>
+                                <th scope="col">Uniform</th>
+                                <th scope="col">Table Sorter</th>
+                                <th scope="col">Raty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="page">Homepage</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="even">
+                                <td class="page">Dashboard</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                            </tr>
+                            <tr>
+                                <td class="page">Register</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="even">
+                                <td class="page">Search</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="page">Application</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <strong>css:</strong>
+                    <table id="table-comparison" class="table-css">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Reset</th>
+                                <th scope="col">960</th>
+                                <th scope="col">Global</th>
+                                <th scope="col">Typography</th>
+                                <th scope="col">Structure</th>
+                                <th scope="col">Menu</th>
+                                <th scope="col">Forms</th>
+                                <th scope="col">Tables</th>
+                                <th scope="col">User Messages</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="page">Homepage</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="even">
+                                <td class="page">Dashboard</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                            </tr>
+                            <tr>
+                                <td class="page">Register</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="even">
+                                <td class="page">Search</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="page">Application</td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td><img src="_thumbnails/check.png" width="13" height="13" alt="" /></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            
+                <div id="thumbnails">
+                <ul id="thumbs" class="thumbs1">
+                <li>
+                    <a href="homepage.html"><strong>Homepage</strong>
+                    <img src="_thumbnails/homepage.png" alt="Homepage" /></a>
+                </li>
+                <li>
+                    <a href="homepage-orgs.html"><strong>Homepage for Organizations</strong>
+                    <img src="_thumbnails/homepage-orgs.png" alt="Homepage for Organizations" /></a>
+                </li>
+                <li>
+                    <a href="homepage-mentor.html"><strong>Homepage for Mentors</strong>
+                    <img src="_thumbnails/homepage-mentor.png" alt="Homepage for Mentors" /></a>
+                </li>
+                <li>
+                    <a href="homepage-offseason.html"><strong>Homepage for Offseason</strong>
+                    <img src="_thumbnails/homepage-offseason.png" alt="Homepage in Offseason" /></a>
+                </li>
+                </ul>
+                <ul id="thumbs" class="thumbs2">
+                <li>
+                    <a href="dashboard.html"><strong>Dashboard</strong>
+                    <img src="_thumbnails/dashboard.png" alt="Dashboard" /></a>
+                </li>
+                <li>
+                    <a href="dashboard-admin.html"><strong>Dashboard for Admins</strong>
+                    <img src="_thumbnails/dashboard-admin.png" alt="Dashboard for Admins" /></a>
+                </li>
+                <li>
+                    <a href="dashboard-student.html"><strong>Dashboard for Students</strong>
+                    <img src="_thumbnails/dashboard-student.png" alt="Dashboard for Students" /></a>
+                </li>
+                </ul>
+                <ul id="thumbs" class="thumbs3">
+                <li>
+                    <a href="register.html"><strong>Register</strong>
+                    <img src="_thumbnails/register.png" alt="Register" /></a>
+                </li>
+                <li>
+                    <a href="search.html"><strong>Search</strong>
+                    <img src="_thumbnails/search.png" alt="Search" /></a>
+                </li>
+                <li>
+                    <a href="appform.html"><strong>Application</strong>
+                    <img src="_thumbnails/appform.png" alt="Proposal Application Form" /></a>
+                </li>
+                </ul>
+                </div>
+            	    
+            </div>
+            <!-- .content -->
+        </div>
+        <!-- .grid_9 -->
+        <!-- 
+        ////////////////////////
+           END PAGE CONTENT
+        ////////////////////////
+        -->
+
+    </div>
+    <!-- .container_12 -->
+</div>
+<!-- .main -->
+<!-- 
+////////////////////////
+   END MAIN CONTENT
+////////////////////////
+-->
+
+</body>
+</html>

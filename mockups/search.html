@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Google Summer of Code</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/reset.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/960.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/global.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/typography.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/structure.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/menu.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/forms.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/tables.css" />
+    
+    <!-- 
+    ////////////////////////
+      BEGIN CUSTOM SCRIPTS
+    ////////////////////////
+    -->
+    <!--
+        jQuery 1.4.2
+    -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    
+    <!--
+        Skinning form elements with Uniform
+        http://pixelmatrixdesign.com/uniform
+    -->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/uniform.default.css" />
+    <script src="js/jquery.uniform.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(function(){
+        $("select, input:radio").uniform();
+      });
+    </script>
+    
+    <!--
+        Table sorter
+        http://tablesorter.com
+    -->
+    <script src="js/jquery.tablesorter.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() 
+            { 
+                $(".table-projects").tablesorter( {sortList: [[1,0]], widgets: ['zebra']} );
+            } 
+        );
+    </script>
+    <!-- 
+    ////////////////////////
+      END CUSTOM SCRIPTS
+    ////////////////////////
+    -->
+
+</head>
+<body>
+
+<!-- 
+////////////////////////
+  BEGIN DEFAULT HEADER
+////////////////////////
+-->
+<div id="bg">
+<div id="page-header">
+    <div class="container_12">
+        <div class="grid_12">
+            <a href="homepage.html"><img src="images/google.png" height="40" width="114" alt="Google" /></a>
+            <p><a href="homepage.html">Summer<br />of Code // 2011</a></p>
+        </div>
+    </div>
+</div>
+<!-- .page-header -->
+<!-- 
+////////////////////////
+  END DEFAULT HEADER
+////////////////////////
+-->
+
+<!-- 
+////////////////////////
+   BEGIN MAIN CONTENT
+////////////////////////
+-->
+<div id="main">
+    <div class="container_12">
+
+        <!-- 
+        ////////////////////////
+            BEGIN SITE MENU
+        ////////////////////////
+        -->
+        <div id="main-menu" class="grid_3">
+            <ul id="main-menu-list">
+                <li id="menu-login"><a href="javascript:void(0)">Login</a></li>
+                <li id="menu-about"><a href="javascript:void(0)">About</a></li>
+                <li id="menu-apply" class="parent"><a href="javascript:void(0)">Apply</a></li>
+                <li id="menu-projects" class="active"><a href="search.html">Current &amp; Past Projects</a></li>
+                <li id="menu-events"><a href="javascript:void(0)">Events &amp; Timeline</a></li>
+                <li id="menu-connect"><a href="javascript:void(0)">Connect With Us</a></li>
+                <li id="menu-help"><a href="javascript:void(0)">Help</a></li>
+            </ul>
+        </div>
+        <!-- .grid_3 -->
+        <!-- 
+        ////////////////////////
+            END SITE MENU
+        ////////////////////////
+        -->
+
+        <!-- 
+        ////////////////////////
+           BEGIN PAGE CONTENT
+        ////////////////////////
+        -->
+        <div class="grid_9">
+            
+            <div class="content">
+            
+                <h1 id="main-page-title">Search Projects and Organizations</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod volutpat tellus, 
+                vel dapibus nibh sagittis nec. Vestibulum lectus arcu, aliquam ac elementum a, porttitor lacinia augue.</p>
+                
+                <div class="form-search">
+                    <form action="#" method="post" id="form" class="form-search">
+                        <h2 id="form-search-title">Keyword Search</h2>
+                        <fieldset id="form-search-fieldset">
+                        <div id="form-row-search-field" class="row search-field">
+                        	<input type="text" name="search" value="" class="text" />
+                        </div>
+                        <div id="form-row-search-filter" class="row search-filter">
+                        	<select>
+                        		<option selected="selected">Program Year</option>
+                        		<option>Another option</option>
+                        		<option>Option #3</option>
+                        	</select>
+                        </div>
+                        <div id="form-row-button-row" class="row button-row">
+                            <input id="form-search-submit" type="submit" value="Search" class="submit" />
+                        </div>
+                        </fieldset>
+                        <div id="form-row-search-note" class="row search-note">
+                            <span class="note">Search within project title, project description, organization name, and all tags</span>
+                        </div>
+                    </form>
+                </div>
+                <!-- .search-form -->
+                
+                <!-- begin table#projects -->
+                <table id="projects" class="tablesorter table-projects">
+                    <thead>
+                        <tr>
+                            <th><span>Title</span></th>
+                            <th><span>Organization</span></th>
+                            <th><span>Student</span></th>
+                            <th><span>Mentor</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></td>
+                            <td><a href="javascript:void(0)">Apache</a></td>
+                            <td><a href="javascript:void(0)">Ben Smith</a></td>
+                            <td><a href="javascript:void(0)">Matt McGann</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Consectetur adipiscing elit</a></td>
+                            <td><a href="javascript:void(0)">Apache</a></td>
+                            <td><a href="javascript:void(0)">Mike Yang</a></td>
+                            <td><a href="javascript:void(0)">Danielle Jones</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Praesent ut erat tellus quis rhoncus massa</a></td>
+                            <td><a href="javascript:void(0)">Apache</a></td>
+                            <td><a href="javascript:void(0)">Kim Hunter</a></td>
+                            <td><a href="javascript:void(0)">Yan Zēng</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Donec malesuada tempus laoreet</a></td>
+                            <td><a href="javascript:void(0)">Apache</a></td>
+                            <td><a href="javascript:void(0)">Natanya Kutzow</a></td>
+                            <td><a href="javascript:void(0)">Anika Sarin</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Pellentesque vestibulum sem et enim malesuada porta</a></td>
+                            <td><a href="javascript:void(0)">Mozilla</a></td>
+                            <td><a href="javascript:void(0)">Ben Smith</a></td>
+                            <td><a href="javascript:void(0)">Matt McGann</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Morbi tempor lorem in enim ullamcorper</a></td>
+                            <td><a href="javascript:void(0)">Mozilla</a></td>
+                            <td><a href="javascript:void(0)">Mike Yang</a></td>
+                            <td><a href="javascript:void(0)">Danielle Jones</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Aenean eleifend enim eget neque</a></td>
+                            <td><a href="javascript:void(0)">Mozilla</a></td>
+                            <td><a href="javascript:void(0)">Kim Hunter</a></td>
+                            <td><a href="javascript:void(0)">Yan Zēng</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Condimentum ligula lacinia</a></td>
+                            <td><a href="javascript:void(0)">Mozilla</a></td>
+                            <td><a href="javascript:void(0)">Natanya Kutzow</a></td>
+                            <td><a href="javascript:void(0)">Anika Sarin</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Venenatis sagittis</a></td>
+                            <td><a href="javascript:void(0)">WikiMedia</a></td>
+                            <td><a href="javascript:void(0)">Ben Smith</a></td>
+                            <td><a href="javascript:void(0)">Matt McGann</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Aliquam quis dolor sit amet</a></td>
+                            <td><a href="javascript:void(0)">WikiMedia</a></td>
+                            <td><a href="javascript:void(0)">Mike Yang</a></td>
+                            <td><a href="javascript:void(0)">Danielle Jones</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Magna hendrerit viverra</a></td>
+                            <td><a href="javascript:void(0)">WikiMedia</a></td>
+                            <td><a href="javascript:void(0)">Kim Hunter</a></td>
+                            <td><a href="javascript:void(0)">Yan Zēng</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Ultricies laoreet a gravida risus</a></td>
+                            <td><a href="javascript:void(0)">WikiMedia</a></td>
+                            <td><a href="javascript:void(0)">Natanya Kutzow</a></td>
+                            <td><a href="javascript:void(0)">Anika Sarin</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Praesent ac enim leo</a></td>
+                            <td><a href="javascript:void(0)">Drupal</a></td>
+                            <td><a href="javascript:void(0)">Ben Smith</a></td>
+                            <td><a href="javascript:void(0)">Matt McGann</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Nunc ut placerat orci</a></td>
+                            <td><a href="javascript:void(0)">Drupal</a></td>
+                            <td><a href="javascript:void(0)">Mike Yang</a></td>
+                            <td><a href="javascript:void(0)">Danielle Jones</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Suspendisse at lacus sem</a></td>
+                            <td><a href="javascript:void(0)">Drupal</a></td>
+                            <td><a href="javascript:void(0)">Kim Hunter</a></td>
+                            <td><a href="javascript:void(0)">Yan Zēng</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Nulla quis mollis libero</a></td>
+                            <td><a href="javascript:void(0)">Drupal</a></td>
+                            <td><a href="javascript:void(0)">Natanya Kutzow</a></td>
+                            <td><a href="javascript:void(0)">Anika Sarin</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Vestibulum aliquet dolor quis justo tempor feugiat</a></td>
+                            <td><a href="javascript:void(0)">Perl</a></td>
+                            <td><a href="javascript:void(0)">Ben Smith</a></td>
+                            <td><a href="javascript:void(0)">Matt McGann</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Etiam id quam mi, nec tempus justo</a></td>
+                            <td><a href="javascript:void(0)">Perl</a></td>
+                            <td><a href="javascript:void(0)">Mike Yang</a></td>
+                            <td><a href="javascript:void(0)">Danielle Jones</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Nam libero turpis tincidunt nec tristique</a></td>
+                            <td><a href="javascript:void(0)">Perl</a></td>
+                            <td><a href="javascript:void(0)">Kim Hunter</a></td>
+                            <td><a href="javascript:void(0)">Yan Zēng</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript:void(0)">Quisque ut odio auctor</a></td>
+                            <td><a href="javascript:void(0)">Perl</a></td>
+                            <td><a href="javascript:void(0)">Natanya Kutzow</a></td>
+                            <td><a href="javascript:void(0)">Anika Sarin</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- end table#projects -->
+                
+                <div id="table-pager" class="pager">
+                    <p><a href="javascript:void(0)" class="prev">Prev</a> Page 1 of <span>10</span> <a href="javascript:void(0)" class="next">Next</a></p>
+                </div>
+            	    
+            </div>
+            <!-- .content -->
+        </div>
+        <!-- .grid_9 -->
+        <!-- 
+        ////////////////////////
+           END PAGE CONTENT
+        ////////////////////////
+        -->
+
+    </div>
+    <!-- .container_12 -->
+</div>
+<!-- .main -->
+<!-- 
+////////////////////////
+   END MAIN CONTENT
+////////////////////////
+-->
+
+<!-- 
+////////////////////////
+  BEGIN DEFAULT FOOTER
+////////////////////////
+-->
+<div id="footer">
+    <div class="container_12">
+            <div class="grid_3">&nbsp;</div>
+            <!-- .grid_3 -->
+            <div class="grid_9">
+                <div class="footer-menu">
+                    <ul id="footer-menu-list">
+                        <li id="footer-menu-about"><a href="javascript:void(0)">About</a></li>
+                        <li id="footer-menu-contact"><a href="javascript:void(0)">Contact</a></li>
+                        <li id="footer-menu-facebook" class="social"><a href="javascript:void(0)" class="fb">Facebook</a></li>
+                        <li id="footer-menu-twitter" class="social"><a href="javascript:void(0)" class="tw">Twitter</a></li>
+                        <li id="footer-menu-blogger" class="social"><a href="javascript:void(0)" class="bl">Blogger</a></li>
+                        <li id="footer-menu-email" class="social"><a href="javascript:void(0)" class="em">Email</a></li>
+                        <li id="footer-menu-irc" class="social"><a href="javascript:void(0)" class="irc">IRC</a></li>
+                        <li id="footer-menu-privacy" class="last"><a href="javascript:void(0)">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-meta">
+                    <span class="powered">Powered by <a href="http://code.google.com/p/soc/wiki/MelangeIntro" target="_blank">Melange</a></span> Empowered by <a href="http://www.echoditto.com/" target="_blank"><img src="images/echoditto.png" height="16" width="70" alt="EchoDitto" /></a>
+                </div>
+            </div>
+            <!-- .grid_9 -->
+        </div>
+        <!-- .container_12 -->
+</div>
+<!-- .footer -->
+</div>
+<!-- #bg -->
+<!-- 
+////////////////////////
+  END DEFAULT FOOTER
+////////////////////////
+-->
+
+</body>
+</html>

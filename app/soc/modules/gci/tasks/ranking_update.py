@@ -86,7 +86,7 @@ def updateGCIRanking(request, *args, **kwargs):
 
   return responses.terminateTask()
 
-@decorators.iterative_task(gci_student_logic, repeat_in=600)
+@decorators.iterative_task(gci_student_logic)
 def recalculateGCIRanking(request, entities, context, *args, **kwargs):
   """Recalculates student ranking for a program with the specified key_name.
   """

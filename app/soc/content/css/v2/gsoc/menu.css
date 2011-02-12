@@ -1,0 +1,73 @@
+/*////////////////
+
+  Menu
+
+////////////////*/
+#main-menu {
+  background: url(../images/nav-bg.gif) 0 0 repeat;
+  margin-right: 0;
+}
+#main-menu ul {
+  margin: 13px 0;
+}
+#main-menu ul li {
+  /*top level list item*/
+
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 3px 0;
+  padding: 0;
+}
+#main-menu ul li a {
+  /*top level link*/
+
+  display: block;
+  color: #fff;
+  margin: 0;
+  padding: 4px 0 4px 20px;
+  text-decoration: none;
+}
+#main-menu ul li a:hover {
+  background: #e67a25;
+}
+#main-menu ul li ul {
+  /*submenu*/
+
+  margin: 5px 0 0 0;
+  padding: 0;
+}
+#main-menu ul li ul li {
+  /*submenu list item*/
+
+  font-size: 12px;
+  margin: 0;
+}
+#main-menu ul li ul li a {
+  /*submenu link*/
+
+  margin: 0 0 0 40px;
+}
+#main-menu ul li ul li a:hover {
+  background: none;
+  text-decoration: underline;
+}
+#main-menu ul li ul li.active {
+  /*submenu active list item*/
+
+  background: #e67a25;
+}
+#main-menu ul li.active {
+  /*top level active list item*/
+
+  background: #e67a25;
+}
+#main-menu ul li.active ul {
+  /*submenu under an active top level*/
+
+  background: url(../images/nav-bg.gif) 0 0 repeat;
+}
+#main-menu ul li.parent.active {
+  /*top level active list item w/ submenu - for use when the top level is highlighted but the submenu is not*/
+
+  padding-bottom: 0px;
+}

@@ -1,0 +1,188 @@
+/*////////////////
+
+  LessCSS
+
+////////////////*/
+.imagereplace {
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999em;
+}
+/*////////////////
+
+    Typography
+
+////////////////*/
+hr {
+  border: 0 #ccc solid;
+  border-top-width: 1px;
+  clear: both;
+  height: 0;
+}
+a, a:link {
+  color: #00538b;
+  text-decoration: none;
+}
+#main .grid_9 h1,
+#main .grid_9 h2,
+#main .grid_9 h3,
+#main .grid_9 h4,
+#main .grid_9 h5,
+#main .grid_9 h6,
+#main .grid_9 p,
+#main .grid_9 ul,
+#main .grid_9 ol,
+#main .grid_9 pre,
+#main .grid_9 code,
+#main .grid_9 dl {
+  line-height: 1.5em;
+  margin: 0 0 1.5em 0;
+}
+#main .grid_9 h1,
+#main .grid_9 h2,
+#main .grid_9 h3,
+#main .grid_9 h4,
+#main .grid_9 h5,
+#main .grid_9 h6 {
+  color: #238bd2;
+  font-weight: bold;
+}
+#main .grid_9 h1 {
+  font-size: 27px;
+  margin: 0 0 5px 0;
+}
+#main .grid_9 h6 {
+  font-size: 14px;
+  margin: 0;
+}
+#main .grid_9 p {
+  font-size: 12px;
+}
+#main .grid_9 ul, #main .grid_9 ol {
+  margin-left: 1.1em;
+}
+#main .grid_9 ol {
+  margin-left: 1.5em;
+}
+#main .grid_9 ul li, #main .grid_9 ol li {
+  list-style-position: outside;
+}
+#main .grid_9 ul {
+  list-style: disc;
+}
+#main .grid_9 ul ul {
+  margin-left: 1em;
+  font-size: 1em;
+}
+#main .grid_9 ol ol {
+  margin-left: 1.5em;
+  font-size: 1em;
+}
+#main .grid_9 ol {
+  list-style-type: decimal;
+}
+#main .grid_9 ol ol {
+  list-style: upper-alpha;
+}
+#main .grid_9 ol ol ol {
+  list-style: lower-roman;
+}
+#main .grid_9 ol ol ol ol {
+  list-style: lower-alpha;
+}
+#main .grid_9 ul ul,
+#main .grid_9 ul ul ul,
+#main .grid_9 ol ol,
+#main .grid_9 ol ol ol,
+#main .grid_9 ul ol,
+#main .grid_9 ol ul {
+  margin-bottom: 0;
+}
+#main .grid_9 dt {
+  font-weight: bold;
+}
+#main .grid_9 dd {
+  margin-bottom: 1.5em;
+}
+#main .grid_9 strong {
+  font-weight: bold;
+}
+#main .grid_9 cite, #main .grid_9 em, #main .grid_9 i {
+  font-style: italic;
+}
+#main .grid_9 ins {
+  text-decoration: none;
+}
+#main .grid_9 abbr {
+  border-bottom: 1px dotted #000;
+  cursor: help;
+}
+#main .grid_9 sup, #main .grid_9 sub {
+  height: 0;
+  line-height: 1;
+  vertical-align: baseline;
+  _vertical-align: bottom;
+  position: relative;
+  font-size: .8em;
+}
+#main .grid_9 sup {
+  bottom: 1ex;
+}
+#main .grid_9 sub {
+  top: .5ex;
+}
+#main .grid_9 code {
+  line-height: 1.5em;
+}
+#main .grid_9 pre {
+  background: #000;
+  color: #fff;
+  display: block;
+  line-height: 1.5em;
+  margin: 0 0 1.5em 2em;
+  padding: 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap !important;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+#main .grid_9 pre code {
+  color: #fff;
+  margin: 0 0 0 2em;
+  padding: 1.2em 0;
+  display: block;
+}
+#main .grid_9 blockquote {
+  border-left: 2px solid #ccc;
+  margin: 0 0 0 2em;
+  padding: 0 0 0 1em;
+}
+#main .grid_9 blockquote cite {
+  display: block;
+  font-size: .9em;
+  margin: .4em 0 0 0;
+}
+#main .grid_9 q {
+  font-style: italic;
+}
+#main .grid_9 .pager {
+  padding: 10px 0;
+}
+#main .grid_9 .pager p {
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+#main .grid_9 .pager p span {
+  color: #188dd0;
+  font-weight: bold;
+}
+#main .grid_9 .pager p a.prev, #main .grid_9 .pager p a.next {
+  background: #a5cadd;
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 7px;
+}

@@ -1,0 +1,105 @@
+/*////////////////
+
+  Tables
+
+////////////////*/
+.tablesorter {
+  /*all tables used in the dashboard*/
+
+  border: 1px solid #e7e7e7;
+  width: 100%;
+}
+.tablesorter th.header {
+  /*header cells*/
+
+  background: #e7e7e7;
+  color: #000;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: normal;
+  padding: 4px;
+  text-align: left;
+}
+.tablesorter th.header span {
+  /*padding for the arrow*/
+
+  padding-right: 20px;
+}
+.tablesorter .headerSortUp span, .tablesorter .headerSortDown span {
+  background-position: right center;
+  background-repeat: no-repeat;
+}
+.tablesorter .headerSortUp span {
+  /*asc arrow*/
+
+  background-image: url(../images/table-sort-asc.gif);
+}
+.tablesorter .headerSortDown span {
+  /*desc arrow*/
+
+  background-image: url(../images/table-sort-desc.gif);
+}
+.tablesorter tbody {
+  /*table body*/
+
+}
+.tablesorter tbody td {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.tablesorter tbody td a {
+  color: #188dd0;
+  font-weight: bold;
+}
+.tablesorter tbody td a.rank {
+  /*ranking arrows - default is down on*/
+
+  background: url(../images/ranking.png) 0 0 no-repeat;
+  display: block;
+  float: left;
+  height: 6px;
+  width: 11px;
+}
+.tablesorter tbody td a.rank.up {
+  /*upward arrow - default is on*/
+
+  background-position: -12px 0;
+  margin-right: 5px;
+}
+.tablesorter tbody td a.rank.up.off {
+  /*stack the "off" class to turn the arrow off*/
+
+  background-position: -12px -7px;
+}
+.tablesorter tbody td a.rank.down.off {
+  background-position: 0 -7px;
+}
+.tablesorter tbody td.emph {
+  /*emphasized text*/
+
+  font-weight: bold;
+}
+.tablesorter tbody td.flag {
+  /*flagged text*/
+
+  color: #f6120f;
+}
+.tablesorter tbody .stars {
+  /*rating stars*/
+
+  float: left;
+  width: 75px !important;
+}
+.tablesorter tbody tr.even {
+  /*zebra striping in table*/
+
+  background: #eee;
+}
+.table-submitted-google {
+  /*when multiple tables are stacked, add this bottom margin to the top table*/
+
+  margin: 0 0 10px 0;
+}
+.table-projects tbody tr:hover {
+  background: #E0EDF5;
+}

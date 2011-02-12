@@ -16,7 +16,7 @@ place them in the soc/templates/soc "namespace" subdirectory.
 
 Different Melange applications should also follow this pattern, to promote
 sharing of templates between applications as well.  For exmample, the GSoC
-Melange application should place its templates in gsoc/templates/gsoc.
+Melange application should place its templates in soc/templates/modules/gsoc.
 
 MODEL/VIEW TEMPLATE NAMING
 

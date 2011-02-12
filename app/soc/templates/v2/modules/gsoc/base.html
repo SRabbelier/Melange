@@ -1,0 +1,122 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <title>{{ page_name|default:"No Page Name Present!" }}</title>
+
+    {% block stylesheets %}
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/reset.css" />
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/960.css" />
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/global.css" />
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/typography.css" />
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/structure.css" />
+      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/menu.css" />
+    {% endblock stylesheets %}
+
+    {% block scripts %}
+      <!-- TODO: Talk with Mario about script loading -->
+    {% endblock scripts %}
+</head>
+<body>
+  {% block extra_header %}
+  {% endblock extra_header %}
+
+  <!-- TODO: Header should get logo, link and program name from context
+  extra (google) logo will be removed after update.-->
+  <div id="bg">
+  <div id="page-header">
+    <div class="container_12">
+        <div class="grid_12">
+        {% block header %}
+              <a href="homepage.html"><img src="images/google.png" height="40" width="114" alt="Google" /></a>
+              <p><a href="homepage.html">Summer<br />of Code // 2011</a></p>
+        {% endblock header %}
+        </div>
+    </div>
+  </div>
+  <!-- .page-header -->
+
+  {% block main_content %}
+    <div id="main">
+      <div class="container_12">
+        <!-- TODO: Site menu should be built from context -->
+        <div id="main-menu" class="grid_3">
+          {% block site_menu %}
+              <ul id="main-menu-list">
+                  <li id="menu-login"><a href="javascript:void(0)">Login</a></li>
+                  <li id="menu-about"><a href="javascript:void(0)">About</a></li>
+                  <li id="menu-apply"><a href="javascript:void(0)">Apply</a></li>
+                  <li id="menu-projects"><a href="search.html">Current &amp; Past Projects</a></li>
+                  <li id="menu-events"><a href="javascript:void(0)">Events &amp; Timeline</a></li>
+                  <li id="menu-connect"><a href="javascript:void(0)">Connect With Us</a></li>
+                  <li id="menu-help"><a href="javascript:void(0)">Help</a></li>
+              </ul>
+          {% endblock site_menu %}
+        </div>
+        <!-- .grid_3 -->
+
+        <div class="grid_9">
+          <div class="content">
+            {% block page_content %}
+            {% endblock page_content %}
+          </div>
+          <!-- .content -->
+        </div>
+        <!-- .grid_9 -->
+  {% endblock main_content %}
+
+  <!-- TODO: Footer should get links to pages and social media from context -->
+  <div id="footer">
+    <div class="container_12">
+      <div class="grid_3">&nbsp;</div>
+      <!-- .grid_3 -->
+      <div class="grid_9">
+        {% block footer %}
+          <div class="footer-menu">
+              <ul id="footer-menu-list">
+                <li id="footer-menu-about"><a href="javascript:void(0)">About</a></li>
+                <li id="footer-menu-contact"><a href="javascript:void(0)">Contact</a></li>
+                <li id="footer-menu-facebook" class="social"><a href="javascript:void(0)" class="fb">Facebook</a></li>
+                <li id="footer-menu-twitter" class="social"><a href="javascript:void(0)" class="tw">Twitter</a></li>
+                <li id="footer-menu-blogger" class="social"><a href="javascript:void(0)" class="bl">Blogger</a></li>
+                <li id="footer-menu-email" class="social"><a href="javascript:void(0)" class="em">Email</a></li>
+                <li id="footer-menu-irc" class="social"><a href="javascript:void(0)" class="irc">IRC</a></li>
+                <li id="footer-menu-privacy" class="last"><a href="javascript:void(0)">Privacy Policy</a></li>
+              </ul>
+         </div>
+         <div class="footer-meta">
+           <span class="powered">Powered by <a href="http://code.google.com/p/soc/wiki/MelangeIntro" target="_blank">Melange</a></span> Empowered by <a href="http://www.echoditto.com/" target="_blank"><img src="images/echoditto.png" height="16" width="70" alt="EchoDitto" /></a>
+          </div>
+        {% endblock footer %}
+      </div>
+      <!-- .grid_9 -->
+    </div>
+    <!-- .container_12 -->
+  </div>
+  <!-- .footer -->
+
+  </div>
+  <!-- #bg -->
+
+  {% block extra_footer %}
+    <!-- Include analytics tracking -->
+    {% if ga_tracking_num %}
+      {% include 'soc/site/ga.html' %}
+    {% endif %}
+  {% endblock extra_footer %}
+</body>
+</html>

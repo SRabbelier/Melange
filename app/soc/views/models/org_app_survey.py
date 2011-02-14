@@ -389,7 +389,11 @@ class View(survey_view.View):
           'id': 'save_status',
           'caption': 'Save status',
           'type': 'post_edit',
-          'parameters': {'url': ''},
+          'parameters': {
+              'url': '',
+              'keys': ['key'],
+              'refresh': 'current',
+          },
         },
     ]
 

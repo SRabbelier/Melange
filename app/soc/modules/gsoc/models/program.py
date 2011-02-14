@@ -26,6 +26,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+import soc.models.document
 import soc.models.program
 
 
@@ -76,3 +77,22 @@ class GSoCProgram(soc.models.program.Program):
       verbose_name=ugettext('Duplicate proposals visible'))
   duplicates_visible.help_text = ugettext(
       'Field used to indicate if the duplicate proposal should be visible.')
+
+  #: The document entity which contains "About" page for the program
+  about_page = db.ReferenceProperty(
+      reference_class=soc.models.document.Document)
+  about_page.help_text = ugettext('The document with <b>About</b>')
+
+  #: The document entity which contains "Events & Timeline" page
+  #: for the program
+  events_page = db.ReferenceProperty(
+      reference_class=soc.models.document.Document)
+  events_page.help_text = ugettext(
+      'The document with <b>Events & Timeline</b>')
+
+  #: The document entity which contains "Connect With Us" page
+  #: for the program
+  connect_with_us_page = db.ReferenceProperty(
+      reference_class=soc.models.document.Document)
+  connect_with_us_page.help_text = ugettext(
+      'The document with <b>Connect With Us</b>')

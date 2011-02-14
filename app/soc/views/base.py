@@ -25,6 +25,10 @@ __authors__ = [
 
 from django.http import HttpResponse
 
+from soc.views.out_of_band import Error
+
+from soc.modules.gsoc.views.helper.request_data import RequestData
+
 
 class Response(HttpResponse):
   """Response class that wraps the Django's HttpResponse class but
@@ -107,11 +111,8 @@ class RequestHandler(object):
   """Base class managing HTTP Requests.
   """
 
-  def __init__(self, request, response):
-    """Construct the request and response for a HTTP Request.
-    """
-    self.request= request
-    self.response = response
+  def __init__(self, template_name=None):
+    self.template_name = template_name
 
   def get(self, request, *args, **kwargs):
     """Handler for HTTP GET request.
@@ -164,25 +165,37 @@ class RequestHandler(object):
     patterns = []
     return patterns
 
+  def checkAccess(self, request, *args, **kwargs):
+    """Return True if the user has access to the requested URL or raise
+    the exception.
+    """
+
+    self.error(405)
+
   def __call__(self, request, *args, **kwargs):
     """Dispatches the relevant handler as specified in the request object.
     """
 
-    if request.method == 'GET':
-      self.get(request, *args, **kwargs)
-    elif request.method == 'POST':
-      self.post(request, *args, **kwargs)
-    elif request.method == 'HEAD':
-      self.head(request, *args, **kwargs)
-    elif request.method == 'OPTIONS':
-      self.options(request, *args, **kwargs)
-    elif request.method == 'PUT':
-      self.put(request, *args, **kwargs)
-    elif request.method == 'DELETE':
-      self.delete(request, *args, **kwargs)
-    elif request.method == 'TRACE':
-      self.trace(request, *args, **kwargs)
-    else:
-      self.error(501)
+    self.response = Response()
+
+    self.data = RequestData(request, *args, **kwargs)
+
+    if self.checkAccess(request, *args, **kwargs):
+      if request.method == 'GET':
+        self.get(request, *args, **kwargs)
+      elif request.method == 'POST':
+        self.post(request, *args, **kwargs)
+      elif request.method == 'HEAD':
+        self.head(request, *args, **kwargs)
+      elif request.method == 'OPTIONS':
+        self.options(request, *args, **kwargs)
+      elif request.method == 'PUT':
+        self.put(request, *args, **kwargs)
+      elif request.method == 'DELETE':
+        self.delete(request, *args, **kwargs)
+      elif request.method == 'TRACE':
+        self.trace(request, *args, **kwargs)
+      else:
+        self.error(501)
 
     return self.response

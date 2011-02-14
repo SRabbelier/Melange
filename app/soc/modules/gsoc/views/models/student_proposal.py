@@ -19,6 +19,7 @@
 
 __authors__ = [
     '"Daniel Hans" <daniel.m.hans@gmail.com>',
+    '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -26,9 +27,10 @@ __authors__ = [
 import datetime
 import time
 
+from google.appengine.ext import db
+
 from django import forms
 from django import http
-from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -59,6 +61,11 @@ from soc.modules.gsoc.views.helper import access
 class View(base.View):
   """View methods for the Student Proposal model.
   """
+
+  DEF_REVIEW_NOT_APPEARED_MSG = ugettext(
+      'Your review has been saved. '
+      'However, it may take some time for your review to appear. ' 
+      'Please refresh your browser or check back later to view your review.')
 
   def __init__(self, params=None):
     """Defines the fields and methods required for the base View class
@@ -275,6 +282,7 @@ class View(base.View):
         dynabase=helper.forms.BaseForm, dynainclude=None, 
         dynaexclude=None, dynaproperties=dynaproperties)
     self._params['mentor_review_form'] = mentor_review_form
+    self._show_review_not_appeared_msg = False
 
   def _editGet(self, request, entity, form):
     """See base.View._editGet().
@@ -655,8 +663,6 @@ class View(base.View):
        For Args see base.View.public().
     """
 
-    from soc.logic.helper import timeline as timeline_helper
-
     try:
       entity = self._logic.getFromKeyFieldsOr404(kwargs)
     except out_of_band.Error, error:
@@ -671,8 +677,9 @@ class View(base.View):
     context['entity'] = entity
     context['entity_type'] = params['name']
     context['entity_type_url'] = params['url_name']
-
-    program_entity = entity.program
+    if self._show_review_not_appeared_msg:
+      context['header_msg'] = self.DEF_REVIEW_NOT_APPEARED_MSG
+      self._show_review_not_appeared_msg = False
 
     # get the roles important for reviewing an application
     filter = {
@@ -770,6 +777,8 @@ class View(base.View):
         rest: see base.View.public()
     """
 
+    from soc.modules.gsoc.tasks.proposal_review import run_create_review_for
+
     post_dict = request.POST
 
     if post_dict.get('subscribe') or post_dict.get('unsubscribe'):
@@ -800,69 +809,86 @@ class View(base.View):
           form=form, params=params, template=params['review_template'])
 
     fields = form.cleaned_data
-
-    given_score = fields.get('score')
-    # Doing this instead of get('score',0) because fields.get does not use the
-    # default argument for u''.
-    given_score = int(given_score) if given_score else 0
-
-    is_public = fields['public']
-
-    comment = fields.get('comment')
-    comment = comment if comment else ''
-
+    user = user_logic.logic.getCurrentUser()
+    # Adjust mentor if necessary
+    # NOTE: it cannot be put in the same transaction with student_proposal 
+    # since they are not in the same entity group
     if org_admin and 'org_admin_action' in request.POST:
-      # admin actions are not public, so force private comment
-      is_public = False
-
       prev_mentor = entity.mentor.key() if entity.mentor else None
-
       # org admin found, try to adjust the assigned mentor
       self._adjustMentor(entity, fields['mentor'])
-
       current_mentor = entity.mentor.key() if entity.mentor else None
-
+      mentor_changed = False
       if prev_mentor != current_mentor:
         mentor_name = entity.mentor.name() if entity.mentor else 'None'
-        comment = '%s Changed mentor to %s.' %(comment, mentor_name)
+        mentor_changed = True
+    # try to see if the rank is given and adjust the given_score if needed
+    # NOTE: it cannot be put in the same transaction with student_proposal 
+    # since they are not in the same entity group
+    rank = fields['rank']
+    if rank:
+      ranker = self._logic.getRankerFor(entity)
+      # if a very high rank is filled in use the highest 
+      # one that returns a score
+      rank = min(ranker.TotalRankedScores(), rank)
+      # ranker uses zero-based ranking
+      (scores, _) = ranker.FindScore(rank-1)
+      # since we only use one score we need it out of the list with scores
+      score_at_rank = scores[0]
 
-      # try to see if the rank is given and adjust the given_score if needed
-      rank = fields['rank']
-      if rank:
-        ranker = self._logic.getRankerFor(entity)
-        # if a very high rank is filled in use the highest 
-        # one that returns a score
-        rank = min(ranker.TotalRankedScores(), rank)
-        # ranker uses zero-based ranking
-        (scores, _) = ranker.FindScore(rank-1)
-        # since we only use one score we need to it out of the list with scores
-        score_at_rank = scores[0]
-        # calculate the score that should be given to end up at the given rank
-        # give +1 to make sure that in the case of a tie they end up top
-        given_score = score_at_rank - entity.score + 1
-        comment = '%s Proposal has been set to rank %i.' %(comment, rank)
+    # Update student_proposal, rank and review within one transaction
+    def txn():
+      given_score = fields.get('score')
+      # Doing this instead of get('score',0) because fields.get does not use the
+      # default argument for u''.
+      given_score = int(given_score) if given_score else 0
 
-    # store the properties to update the proposal with
-    properties = {}
+      is_public = fields['public']
 
-    if (org_admin or mentor) and (not is_public) and (given_score is not 0):
-      # if it is not a public comment and it's made by a member of the
-      # organization we update the score of the proposal
-      new_score = given_score + entity.score
-      properties = {'score': new_score}
+      comment = fields.get('comment')
+      comment = comment if comment else ''
 
-    if comment or (given_score is not 0):
-      # if the proposal is new we change it status to pending
-      if entity.status == 'new':
-        properties['status'] = 'pending'
+      # Reload entity in case that it has changed
+      current_entity = db.get(entity.key())
 
-      # create the review entity
-      self._createReviewFor(entity, comment, given_score, is_public)
+      if org_admin and 'org_admin_action' in request.POST:
+        # admin actions are not public, so force private comment
+        is_public = False
 
-    if properties.values():
-      # there is something to update
-      self._logic.updateEntityProperties(entity, properties)
+        if mentor_changed:
+          comment = '%s Changed mentor to %s.' %(comment, mentor_name)
 
+        # try to see if the rank is given and adjust the given_score if needed
+        if rank:
+          # calculate the score that should be given to end up at the given rank
+          # give +1 to make sure that in the case of a tie they end up top
+          given_score = score_at_rank - current_entity.score + 1
+          comment = '%s Proposal has been set to rank %i.' %(comment, rank)
+
+      # store the properties to update the proposal with
+      properties = {}
+
+      if (org_admin or mentor) and (not is_public) and (given_score is not 0):
+        # if it is not a public comment and it's made by a member of the
+        # organization we update the score of the proposal
+        new_score = given_score + current_entity.score
+        properties = {'score': new_score}
+
+      if comment or (given_score is not 0):
+        # if the proposal is new we change it status to pending
+        if current_entity.status == 'new':
+          properties['status'] = 'pending'
+
+        # create a review for current_entity using taskqueue
+        run_create_review_for(current_entity, comment, given_score, 
+                              is_public, user, self._params)
+      if properties.values():
+        # there is something to update
+        self._logic.updateEntityProperties(current_entity, properties)
+
+    db.run_in_transaction(txn)
+    # Inform users that review may not appear immediately
+    self._show_review_not_appeared_msg = True
     # redirect to the same page
     return http.HttpResponseRedirect('')
 
@@ -1126,8 +1152,6 @@ class View(base.View):
       mentor: mentor entity for the current user/proposal (iff available)
     """
 
-    from google.appengine.ext import db
-
     from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
         as duplicates_logic
     from soc.modules.gsoc.logic.models.review_follower import logic as \
@@ -1157,9 +1181,6 @@ class View(base.View):
         mentor_names.append(possible_mentor.name())
 
       context['possible_mentors'] = ', '.join(mentor_names)
-
-    # order the reviews by ascending creation date
-    order = ['created']
 
     # update the reviews context
     self._updateReviewsContext(context, entity)
@@ -1285,55 +1306,9 @@ class View(base.View):
       is_public: Determines if the review is a public review
     """
 
-    from soc.logic.helper import notifications as notifications_helper
-    from soc.modules.gsoc.logic.models.review import logic as review_logic
-    from soc.modules.gsoc.logic.models.review_follower import logic as \
-        review_follower_logic
-
-    # create the fields for the review entity
-    fields = {'link_id': 't%i' % (int(time.time()*100)),
-        'scope': entity,
-        'scope_path': entity.key().id_or_name(),
-        'author': user_logic.logic.getCurrentUser(),
-        'content': comment if comment else '',
-        'is_public': is_public,
-        }
-
-    # add the given score if the review is not public
-    if not is_public:
-      fields['score'] = score
-
-    # create a new Review
-    key_name = review_logic.getKeyNameFromFields(fields)
-    review_entity = review_logic.updateOrCreateFromKeyName(fields, key_name)
-
-    # get all followers
-    fields = {'scope': entity}
-
-    if is_public:
-      fields['subscribed_public'] = True
-    else:
-      fields['subscribed_private'] = True
-
-    followers = review_follower_logic.getForFields(fields)
-
-    # retrieve the redirects for the student and one for the org members
-    private_redirect_url = redirects.getStudentPrivateRedirect(entity,
-                                                               self._params)
-    review_redirect_url = redirects.getReviewRedirect(entity, self._params)
-
-    student_id = entity.scope.link_id
-
-    for follower in followers:
-      # sent to every follower except the reviewer
-      if follower.user.key() != review_entity.author.key():
-        if follower.user.link_id == student_id:
-          redirect_url = private_redirect_url
-        else:
-          redirect_url = review_redirect_url
-
-        notifications_helper.sendNewReviewNotification(follower.user,
-            review_entity, entity.title, redirect_url)
+    user = user_logic.logic.getCurrentUser()
+    student_proposal_logic.logic.createReviewFor(self, entity, user, 
+                                                 comment, score, is_public)
 
   def _handleSubscribePost(self, request, entity):
     """Handles the POST request for subscription management.

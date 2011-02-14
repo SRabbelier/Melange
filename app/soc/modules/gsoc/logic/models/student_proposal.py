@@ -18,9 +18,12 @@
 """
 
 __authors__ = [
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+
+import time
 
 from soc.logic.models import base
 
@@ -140,28 +143,27 @@ class Logic(base.Logic):
         rejected
     """
 
-    value = entity_properties[name]
+    from soc.modules.gsoc.tasks.proposal_review import run_update_ranker
 
+    value = entity_properties[name]
+    should_update_ranker = False
     if name == 'score':
       # keep the score within bounds
       min_score, max_score = soc.modules.gsoc.models.student_proposal.DEF_SCORE
-
       value = max(min_score, min(value, max_score-1))
       entity_properties[name] = value
-
-      # update the ranker
-      ranker = self.getRankerFor(entity)
-      ranker.SetScore(entity.key().id_or_name(), [value])
-
+      should_update_ranker = True
+      transactional = True
     if name == 'status':
-
       if value in ['invalid', 'rejected'] and entity.status != value:
         # the proposal is going into invalid or rejected state
         # remove the score from the ranker
-        ranker = self.getRankerFor(entity)
-
-        # entries in the ranker can be removed by setting the score to None
-        ranker.SetScore(entity.key().id_or_name(), None)
+        should_update_ranker = True
+        value = ''
+        transactional = False
+    if should_update_ranker:
+      # Use taskqueue to update ranker
+      run_update_ranker(entity, value, transactional)
 
     return super(Logic, self)._updateField(entity, entity_properties, name)
 
@@ -172,7 +174,8 @@ class Logic(base.Logic):
       entity: an existing entity in datastore
     """
 
-    from soc.logic.models.review_follower import logic as review_follower_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
 
     # entries in the ranker can be removed by setting the score to None
     ranker = self.getRankerFor(entity)
@@ -189,6 +192,70 @@ class Logic(base.Logic):
 
     # call to super to complete the deletion
     super(Logic, self).delete(entity)
+  
+  def createReviewFor(self, view, entity, user, comment, score=0, is_public=True):
+    """Creates a review of the user for the given proposal and sends 
+       out a message to all followers.
+
+    Args:
+      view: student proposal view
+      entity: Student Proposal entity for which the review should be created
+      user: the user who is leaving the review
+      comment: The textual contents of the review
+      score: The score of the review (only used if the review is not public)
+      is_public: Determines if the review is a public review
+    """
+
+    from soc.logic.helper import notifications as notifications_helper
+    from soc.views.helper import redirects
+    from soc.modules.gsoc.logic.models.review import logic as review_logic
+    from soc.modules.gsoc.logic.models.review_follower import logic as \
+        review_follower_logic
+
+    # create the fields for the review entity
+    fields = {'link_id': 't%i' % (int(time.time()*100)),
+        'scope': entity,
+        'scope_path': entity.key().id_or_name(),
+        'author': user,
+        'content': comment if comment else '',
+        'is_public': is_public,
+        }
+
+    # add the given score if the review is not public
+    if not is_public:
+      fields['score'] = score
+
+    # create a new Review
+    key_name = review_logic.getKeyNameFromFields(fields)
+    review_entity = review_logic.updateOrCreateFromKeyName(fields, key_name)
+
+    # get all followers
+    fields = {'scope': entity}
+
+    if is_public:
+      fields['subscribed_public'] = True
+    else:
+      fields['subscribed_private'] = True
+
+    followers = review_follower_logic.getForFields(fields)
+
+    # retrieve the redirects for the student and one for the org members
+    private_redirect_url = redirects.getStudentPrivateRedirect(entity,
+                                                               view._params)
+    review_redirect_url = redirects.getReviewRedirect(entity, view._params)
+
+    student_id = entity.scope.link_id
+
+    for follower in followers:
+      # sent to every follower except the reviewer
+      if follower.user.key() != review_entity.author.key():
+        if follower.user.link_id == student_id:
+          redirect_url = private_redirect_url
+        else:
+          redirect_url = review_redirect_url
+
+        notifications_helper.sendNewReviewNotification(follower.user,
+            review_entity, entity.title, redirect_url)
 
 
 logic = Logic()

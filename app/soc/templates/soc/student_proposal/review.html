@@ -22,6 +22,20 @@ limitations under the License.
 
 {% block body %}
 
+{% if header_msg %} 
+<p>
+ <div id="pageheader">
+  <table width="100%" cellpadding="0" cellspacing="0">
+   <tr>
+    <td style="font-weight: bold; text-align:center"> 
+     {{ header_msg|safe }}
+    </td>
+   </tr>
+  </table>
+ </div>
+</p>
+{% endif %}
+
 <form method="post">
   <table>
    {% if is_subscribed %}

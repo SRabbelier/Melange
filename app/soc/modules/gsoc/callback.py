@@ -16,6 +16,7 @@
 """
 
 __authors__ = [
+    '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
     '"Sverre Rabbelier" <sverre@rabbelier.nl>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
@@ -27,6 +28,7 @@ from soc.modules.gsoc.tasks import program_freezer
 from soc.modules.gsoc.tasks import slot_assignment
 from soc.modules.gsoc.tasks import proposal_duplicates as \
     proposal_duplicates_tasks
+from soc.modules.gsoc.tasks import proposal_review
 from soc.modules.gsoc.views.models import grading_project_survey as \
     grading_survey
 from soc.modules.gsoc.views.models import grading_survey_group
@@ -81,6 +83,7 @@ class Callback(object):
     self.core.registerSitemapEntry(
         proposal_duplicates_tasks.getDjangoURLPatterns())
     self.core.registerSitemapEntry(accept_proposals.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(proposal_review.getDjangoURLPatterns())
     self.core.registerSitemapEntry(slot_assignment.getDjangoURLPatterns())
 
   def registerWithSidebar(self):

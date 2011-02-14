@@ -58,6 +58,10 @@ handlers:
   static_dir: json.min
   expiration: 1d
 
+- url: /LABjs
+  static_dir: LABjs.min
+  expiration: 1d
+
 - url: /admin/shell.*
   script: shell/shell.py
   login: admin

@@ -57,13 +57,13 @@ limitations under the License.
         <div id="main-menu" class="grid_3">
           {% block site_menu %}
             <ul id="main-menu-list">
-              <li id="menu-login"><a href="javascript:void(0)">Login</a></li>
-              <li id="menu-about"><a href="javascript:void(0)">About</a></li>
+              <li id="menu-login"><a href="{{ login_link }}">Login</a></li>
+              <li id="menu-about"><a href="{{ about_link }}">About</a></li>
               <li id="menu-apply"><a href="javascript:void(0)">Apply</a></li>
-              <li id="menu-projects"><a href="search.html">Current &amp; Past Projects</a></li>
-              <li id="menu-events"><a href="javascript:void(0)">Events &amp; Timeline</a></li>
-              <li id="menu-connect"><a href="javascript:void(0)">Connect With Us</a></li>
-              <li id="menu-help"><a href="javascript:void(0)">Help</a></li>
+              <li id="menu-projects"><a href="{{ projects_link }}">Current &amp; Past Projects</a></li>
+              <li id="menu-events"><a href="{{ events_link }}">Events &amp; Timeline</a></li>
+              <li id="menu-connect"><a href="{{ connect_link }}">Connect With Us</a></li>
+			  <li id="menu-help"><a href="{{ help_link }}">Help</a></li>
             </ul>
           {% endblock site_menu %}
         </div>

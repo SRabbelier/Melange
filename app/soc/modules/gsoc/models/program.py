@@ -81,12 +81,14 @@ class GSoCProgram(soc.models.program.Program):
   #: The document entity which contains "About" page for the program
   about_page = db.ReferenceProperty(
       reference_class=soc.models.document.Document)
+  about_page.collection_name = 'about_page'
   about_page.help_text = ugettext('The document with <b>About</b>')
 
   #: The document entity which contains "Events & Timeline" page
   #: for the program
   events_page = db.ReferenceProperty(
       reference_class=soc.models.document.Document)
+  events_page.collection_name = 'events_page'
   events_page.help_text = ugettext(
       'The document with <b>Events & Timeline</b>')
 
@@ -94,5 +96,6 @@ class GSoCProgram(soc.models.program.Program):
   #: for the program
   connect_with_us_page = db.ReferenceProperty(
       reference_class=soc.models.document.Document)
+  connect_with_us_page.collection_name = 'connect_with_us_page'
   connect_with_us_page.help_text = ugettext(
       'The document with <b>Connect With Us</b>')

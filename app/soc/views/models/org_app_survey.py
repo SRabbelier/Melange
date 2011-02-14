@@ -24,13 +24,17 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from django import forms
 from django import http
+from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.models import licenses
+from soc.models import org_app_record
 from soc.views import out_of_band
 from soc.views.helper import decorators
 from soc.views.helper import dynaform
@@ -292,6 +296,34 @@ class View(survey_view.View):
 
     return lists.getResponse(request, contents)
 
+  def processSaveReview(self, json):
+    """Processes a save request from the reviewOverview page.
+    """
+
+    data = simplejson.loads(json)
+
+    records = []
+
+    for record_id, update in data.iteritems():
+      if not record_id.isnumeric():
+        logging.error("Non-numeric record_id %s in %s", record_id, json)
+        continue
+
+      record = org_app_record.OrgAppRecord.get_by_id(int(record_id))
+      if not record:
+        logging.error("No record for id %s in %s", record_id, json)
+        continue
+
+      new_value = update.get('status', '').lower()
+      if not new_value in org_app_record.OrgAppRecord.status.choices:
+        logging.error("Invalid new value for id %s in %s", new_value, json)
+        continue
+
+      record.status = new_value
+      records.append(record)
+
+    db.put(records)
+
   @decorators.merge_params
   @decorators.check_access
   def reviewOverview(self, request, access_type,
@@ -310,6 +342,9 @@ class View(survey_view.View):
       if post_dict.get('button_id') == 'bulk_process':
         params['bulk_process_task'].start(entity.scope)
 
+      if post_dict.get('button_id') == 'save_status' and 'data' in request.POST:
+        self.processSaveReview(request.POST['data'])
+
       return http.HttpResponse()
 
     list_params = params['record_list_params'].copy()
@@ -320,9 +355,16 @@ class View(survey_view.View):
 
     info = {'url_name': params['url_name'],
             'survey':entity}
-    list_params['overview_row_extra'] = lambda entity: {
-        'link': redirects.getReviewOrgAppSurvey(entity, info)
-    }
+    choices = org_app_record.OrgAppRecord.status.choices
+    values = ";".join("%s:%s" % (i, i.capitalize()) for i in choices)
+
+    list_params['overview_field_props'] = {'status': {
+        'editable': True,
+        'edittype': "select",
+        'editoptions': {
+            'value': values
+        }
+    }}
 
     # define the basic fields for the overview list
     list_params['overview_field_keys'] = [
@@ -332,16 +374,25 @@ class View(survey_view.View):
         'Organization Name', 'Home Page', 'Application Status'
     ]
     list_params['overview_field_extra'] = lambda entity: {
-        'home_page': lists.urlize(entity.home_page)
+        'home_page': lists.urlize(entity.home_page),
+        'status': entity.status.capitalize(),
     }
-    list_params['overview_button_global'] = [{
+    list_params['overview_button_global'] = [
+        {
           'bounds': [0,'all'],
           'id': 'bulk_process',
           'caption': 'Bulk Accept/Reject Organizations',
           'type': 'post',
-          'parameters': {
-            'url': '',
-         }}]
+          'parameters': {'url': ''},
+        },
+        {
+          'id': 'save_status',
+          'caption': 'Save status',
+          'type': 'post_edit',
+          'parameters': {'url': ''},
+        },
+    ]
+
     list_params['overview_row_action'] = {
         "type": "redirect_custom",
         "parameters": dict(new_window=False),

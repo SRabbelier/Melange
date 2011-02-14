@@ -14,22 +14,22 @@ limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-    <title>{{ page_name|default:"No Page Name Present!" }}</title>
+  <title>{{ page_name|default:"No Page Name Present!" }}</title>
 
-    {% block stylesheets %}
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/reset.css" />
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/960.css" />
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/global.css" />
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/typography.css" />
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/structure.css" />
-      <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/menu.css" />
-    {% endblock stylesheets %}
+  {% block stylesheets %}
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/reset.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/960.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/global.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/typography.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/structure.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/v2/gsoc/css/menu.css" />
+  {% endblock stylesheets %}
 
-    {% block scripts %}
-      <!-- TODO: Talk with Mario about script loading -->
-    {% endblock scripts %}
+  {% block scripts %}
+    <!-- TODO: Talk with Mario about script loading -->
+  {% endblock scripts %}
 </head>
 <body>
   {% block extra_header %}
@@ -40,12 +40,12 @@ limitations under the License.
   <div id="bg">
   <div id="page-header">
     <div class="container_12">
-        <div class="grid_12">
+      <div class="grid_12">
         {% block header %}
-              <a href="homepage.html"><img src="images/google.png" height="40" width="114" alt="Google" /></a>
-              <p><a href="homepage.html">Summer<br />of Code // 2011</a></p>
+          <a href="homepage.html"><img src="images/google.png" height="40" width="114" alt="Google" /></a>
+          <p><a href="homepage.html">Summer<br />of Code // 2011</a></p>
         {% endblock header %}
-        </div>
+      </div>
     </div>
   </div>
   <!-- .page-header -->
@@ -56,15 +56,15 @@ limitations under the License.
         <!-- TODO: Site menu should be built from context -->
         <div id="main-menu" class="grid_3">
           {% block site_menu %}
-              <ul id="main-menu-list">
-                  <li id="menu-login"><a href="javascript:void(0)">Login</a></li>
-                  <li id="menu-about"><a href="javascript:void(0)">About</a></li>
-                  <li id="menu-apply"><a href="javascript:void(0)">Apply</a></li>
-                  <li id="menu-projects"><a href="search.html">Current &amp; Past Projects</a></li>
-                  <li id="menu-events"><a href="javascript:void(0)">Events &amp; Timeline</a></li>
-                  <li id="menu-connect"><a href="javascript:void(0)">Connect With Us</a></li>
-                  <li id="menu-help"><a href="javascript:void(0)">Help</a></li>
-              </ul>
+            <ul id="main-menu-list">
+              <li id="menu-login"><a href="javascript:void(0)">Login</a></li>
+              <li id="menu-about"><a href="javascript:void(0)">About</a></li>
+              <li id="menu-apply"><a href="javascript:void(0)">Apply</a></li>
+              <li id="menu-projects"><a href="search.html">Current &amp; Past Projects</a></li>
+              <li id="menu-events"><a href="javascript:void(0)">Events &amp; Timeline</a></li>
+              <li id="menu-connect"><a href="javascript:void(0)">Connect With Us</a></li>
+              <li id="menu-help"><a href="javascript:void(0)">Help</a></li>
+            </ul>
           {% endblock site_menu %}
         </div>
         <!-- .grid_3 -->
@@ -77,6 +77,10 @@ limitations under the License.
           <!-- .content -->
         </div>
         <!-- .grid_9 -->
+      </div>
+      <!-- .container_12 -->
+    </div>
+    <!-- .main -->
   {% endblock main_content %}
 
   <!-- TODO: Footer should get links to pages and social media from context -->
@@ -87,19 +91,19 @@ limitations under the License.
       <div class="grid_9">
         {% block footer %}
           <div class="footer-menu">
-              <ul id="footer-menu-list">
-                <li id="footer-menu-about"><a href="javascript:void(0)">About</a></li>
-                <li id="footer-menu-contact"><a href="javascript:void(0)">Contact</a></li>
-                <li id="footer-menu-facebook" class="social"><a href="javascript:void(0)" class="fb">Facebook</a></li>
-                <li id="footer-menu-twitter" class="social"><a href="javascript:void(0)" class="tw">Twitter</a></li>
-                <li id="footer-menu-blogger" class="social"><a href="javascript:void(0)" class="bl">Blogger</a></li>
-                <li id="footer-menu-email" class="social"><a href="javascript:void(0)" class="em">Email</a></li>
-                <li id="footer-menu-irc" class="social"><a href="javascript:void(0)" class="irc">IRC</a></li>
-                <li id="footer-menu-privacy" class="last"><a href="javascript:void(0)">Privacy Policy</a></li>
-              </ul>
-         </div>
-         <div class="footer-meta">
-           <span class="powered">Powered by <a href="http://code.google.com/p/soc/wiki/MelangeIntro" target="_blank">Melange</a></span> Empowered by <a href="http://www.echoditto.com/" target="_blank"><img src="images/echoditto.png" height="16" width="70" alt="EchoDitto" /></a>
+            <ul id="footer-menu-list">
+              <li id="footer-menu-about"><a href="javascript:void(0)">About</a></li>
+              <li id="footer-menu-contact"><a href="javascript:void(0)">Contact</a></li>
+              <li id="footer-menu-facebook" class="social"><a href="javascript:void(0)" class="fb">Facebook</a></li>
+              <li id="footer-menu-twitter" class="social"><a href="javascript:void(0)" class="tw">Twitter</a></li>
+              <li id="footer-menu-blogger" class="social"><a href="javascript:void(0)" class="bl">Blogger</a></li>
+              <li id="footer-menu-email" class="social"><a href="javascript:void(0)" class="em">Email</a></li>
+              <li id="footer-menu-irc" class="social"><a href="javascript:void(0)" class="irc">IRC</a></li>
+              <li id="footer-menu-privacy" class="last"><a href="javascript:void(0)">Privacy Policy</a></li>
+            </ul>
+          </div>
+          <div class="footer-meta">
+            <span class="powered">Powered by <a href="http://code.google.com/p/soc/wiki/MelangeIntro" target="_blank">Melange</a></span> Empowered by <a href="http://www.echoditto.com/" target="_blank"><img src="images/echoditto.png" height="16" width="70" alt="EchoDitto" /></a>
           </div>
         {% endblock footer %}
       </div>
@@ -108,7 +112,6 @@ limitations under the License.
     <!-- .container_12 -->
   </div>
   <!-- .footer -->
-
   </div>
   <!-- #bg -->
 

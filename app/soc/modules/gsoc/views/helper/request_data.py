@@ -51,22 +51,32 @@ class RequestData(object):
     out_of_band: 404 when the program does not exist
   """
 
-  def __init__(self, request, *args, **kwargs):
-    """Initializes the RequestData fields.
+  def __init__(self):
+    """Constructs an empty RequestData object.
     """
-    self.site = site_logic.getSingleton()
-    self.user = user_logic.getCurrentUser()
-
-    program_keyfields = {'link_id': kwargs.get('program'),
-                         'scope_path': kwargs.get('sponsor')}
-    self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
-    self.program_timeline = self.program.timeline
-
-    # program specific fields
+    self.site = None
+    self.user = None
+    self.program = None
+    self.program_timeline = None
     self.host = None
     self.org_admins = []
     self.mentors = []
     self.student = None
+
+  def populate(self, request, *args, **kwargs):
+    """Populates the fields in the RequestData object.
+
+    Args:
+      request: Django HTTPRequest object.
+      args & kwargs: The args and kwargs django sends along.
+    """
+    self.site = site_logic.getSingleton()
+    self.user = user_logic.getCurrentUser()
+
+    program_keyfields = {'link_id': self._kwargs.get('program'),
+                         'scope_path': self._kwargs.get('sponsor')}
+    self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
+    self.program_timeline = self.program.timeline
 
     if self.user:
       fields = {'user': self.user,
@@ -84,4 +94,3 @@ class RequestData(object):
                 'scope': self.program,
                 'status': ['active', 'inactive']}
       self.student = student_logic.getForFields(fields, unique=True)
-

@@ -27,6 +27,10 @@ __authors__ = [
 from google.appengine.ext import db
 
 
+# TODO: Maybe redirects should become a class?
+# Then the program specific redirects may inherit from this class.
+# It is easier to maintain imports, as a view does not need to
+# import both redirects and gsoc/redirects modules.
 def getApplyRedirect(entity, params):
   """Returns the apply redirect for the specified entity.
   """

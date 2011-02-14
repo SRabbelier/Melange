@@ -93,14 +93,12 @@ class FullTinyMCE(forms.widgets.Textarea):
   """ 
 
   features1 = ("bold,italic,underline,strikethrough,|,"
-               "forecolor,backcolor,blockquote,|"
-              ",justifyleft,justifycenter,justifyright,justifyfull,|,"
-              "fontselect, fontsizeselect,formatselect")
+               "fontsizeselect,forecolor,|,"
+               "bullist,numlist,outdent,indent")
 
-  features2 = ("newdocument,|,bullist,numlist,|,outdent,indent,|,undo,redo,|"
-      ",link,unlink,anchor,image,cleanup,help,code,hr,removeformat,visualaid,|,"
-      "sub,sup,|,charmap,"
-      "")
+  features2 = ("undo,redo,|,"
+               "justifyleft,justifycenter,justifyright,|,"
+               "link,unlink,anchor,code")
 
   DEF_MCE_SETTINGS = {
       'mode': "exact",

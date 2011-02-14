@@ -35,6 +35,8 @@ from soc.modules.gsoc.logic.models.student import logic as student_logic
 class RequestData(object):
   """Object containing data we query for each request in the GSoC module.
 
+  The only view that will be exempt is the one that creates the program.
+
   Fields:
     site: The Site entity
     user: The user entity (if logged in)
@@ -44,6 +46,9 @@ class RequestData(object):
     org_admins: GSoCOrgadmin entities belonging to the current user and program
     mentors: GSoCMentor entities belonging to the current user and program
     student: GSoCStudent entity belonging to the current user and program
+
+  Raises:
+    out_of_band: 404 when the program does not exist
   """
 
   def __init__(self, request, *args, **kwargs):
@@ -52,23 +57,16 @@ class RequestData(object):
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 
+    program_keyfields = {'link_id': kwargs.get('program'),
+                         'scope_path': kwargs.get('sponsor')}
+    self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
+    self.program_timeline = self.program.timeline
+
     # program specific fields
-    self.program = None
-    self.program_timeline = None
     self.host = None
     self.org_admins = []
     self.mentors = []
     self.student = None
-
-    program_keyfields = {'link_id': kwargs.get('program'),
-                         'scope_path': kwargs.get('sponsor')}
-    self.program = program_logic.getFromKeyFields(program_keyfields)
-
-    if not self.program:
-      # no (valid) program was specified
-      return
-
-    self.program_timeline = self.program.timeline
 
     if self.user:
       fields = {'user': self.user,

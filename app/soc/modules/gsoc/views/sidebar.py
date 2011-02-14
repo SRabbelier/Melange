@@ -28,7 +28,7 @@ from soc.modules.gsoc.views.helper import redirects
 
 # TODO: this is a draft version of the class. It will be changed due to
 # some further decisions on how the views should look like
-class Sidebar():
+class Sidebar(object):
   """Sidebar view.
   """
 

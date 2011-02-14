@@ -51,7 +51,7 @@ options(
                      'profiler.py'],
         app_dirs =  ["soc", "feedparser", "python25src", "reflistprop",
                      "jquery.min", "ranklist", "shell", "json.min", "jlinq",
-                     "htmlsanitizer", "taggable", "gviz", "django",
+                     "htmlsanitizer", "LABjs.min", "taggable", "gviz", "django",
                      "webmaster"],
         zip_files = ['tiny_mce.zip'],
         skip_pylint = False,
@@ -79,7 +79,7 @@ options(
     closure = Bunch(
         js_filter = None,
         js_dir = None,
-        js_dirs = ["soc/content/js", "jquery", "jlinq", "json"],
+        js_dirs = ["soc/content/js", "jquery", "jlinq", "json", "LABjs"],
         closure_bin = PROJECT_DIR / "thirdparty/closure/compiler.jar",
         no_optimize = ["jquery-spin-1.1.1.js", "jquery-jqgrid.base.js"],
         **options.build

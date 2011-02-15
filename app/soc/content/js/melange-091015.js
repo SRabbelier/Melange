@@ -31,10 +31,6 @@
     throw new Error("jQuery package must be loaded exposing jQuery namespace");
   }
 
-  if (window.JSON === undefined) {
-    throw new Error("json2 package must be loaded exposing JSON namespace");
-  }
-
   /** Shortcut to current package.
     * @private
     */
@@ -47,14 +43,11 @@
     */
   $m.config = {};
 
-  (function () {
-    var configuration =
-      jQuery("script[melangeConfig][src$='melange.js']").attr("melangeConfig");
+  $m.init = function (configuration) {
     if (configuration) {
-      var configuration_object = JSON.parse("{ " + configuration + " }");
-      jQuery.extend($m.config, configuration_object);
+      $m.config = jQuery.extend($m.config, configuration);
     }
-  }());
+  };
 
   /** Shortcut to clone objects using jQuery.
     * @function
@@ -283,6 +276,26 @@
     melange.error.createErrors([
     ]);
 
+    /** Contains a queue of all loaded templates
+      *
+      * This is needed to keep track of all loaded templates
+      * and to give them appropriate contexts using the
+      * following setContextToLast function.
+      * @private
+      */
+    var templatesQueue = [];
+
+    /** Assign a context to the template
+      *
+      * @function
+      * @public
+      * @name melange.templates.setContextToLast
+      */
+    $m.setContextToLast = function (context) {
+      var last_template = templatesQueue[(templatesQueue.length - 1)];
+      last_template.context = jQuery.extend(last_template.context, context);
+    };
+
     /** Parent prototype for all templates
       * @class
       * @constructor
@@ -290,22 +303,9 @@
       * @public
       */
     $m._baseTemplate = function () {
+      // Create internal context variable and push this template to the queue
       this.context = {};
-      var configuration = jQuery("script[melangeContext]")[0];
-      if (configuration !== undefined) {
-        configuration = jQuery(configuration).attr("melangeContext");
-        if (configuration) {
-          /* FIXME: json2 doesn't parse the object if they have k:"v" instead
-             of "k":"v", but this is not what gviz outputs, we need to change
-             gviz source or hack json2 source or use another method. eval()
-             must be not used anyway
-          */
-          /*jslint evil: true,undef: false */
-          eval("var configuration_object = " + configuration);
-          jQuery.extend(this.context, configuration_object);
-          /*jslint evil: false,undef: true */
-        }
-      }
+      templatesQueue.push(this);
     };
   }());
 }());

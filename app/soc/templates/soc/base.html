@@ -20,23 +20,6 @@ limitations under the License.
   <!--[if IE]>
   <link rel="stylesheet" href="/soc/content/css/soc-090708-ie.css" type="text/css"/>
   <![endif]-->
-
-  {% if uses_jq_autocomplete %}
-  <link rel="stylesheet" href="/soc/content/css/jquery-autocomplete-090304.css" type="text/css"/>
-  {% endif %}
-  {% if uses_jq_thickbox %}
-  <link rel="stylesheet" href="/soc/content/css/jquery-thickbox-090304.css" type="text/css"/>
-  {% endif %}
-  {% if uses_jq_purr %}
-  <link rel="stylesheet" href="/soc/content/css/jquery-purr-090308.css" type="text/css"/>
-  {% endif %}
-  {% if uses_jq_datetimepicker %}
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.datetimepicker-090304.css">
-  {% endif %}
-  {% if uses_jq_grid %}
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.all.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/ui.jqgrid-110204.css" />
-  {% endif %}
 	{% endblock %}
   <title>
     {% block page_title %}
@@ -47,103 +30,6 @@ limitations under the License.
       {% endif %}
     {% endblock %}
   </title>
-
-{% block scripts %}
-  {% if uses_jq %}
-  {% if is_local %}
-  <script type='text/javascript' src="/jquery/jquery-1.5.js"></script>
-  {% else %}
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-  {% endif %}
-  {% endif %}
-  {% if uses_json %}
-  <script type='text/javascript' src="/json/json2.js"></script>
-  {% endif %}
-  {% if uses_menu %}
-  <script type='text/javascript' src="/soc/content/js/menu-110128.js"></script>
-  {% endif %}
-  {% if uses_jq_purr %}
-    <script type='text/javascript' src="/jquery/jquery-purr.js"></script>
-  {% endif %}
-  {% if uses_jq_spin %}
-    <script type='text/javascript' src="/jquery/jquery-spin-1.1.1.js"></script>
-  {% endif %}
-  {% if uses_jq_bgiframe %}
-  <script type='text/javascript' src='/jquery/jquery-bgiframe.js'></script>
-  {% endif %}
-  {% if uses_jq_ajaqQueue %}
-  <script type='text/javascript' src='/jquery/jquery-ajaxQueue.js'></script>
-  {% endif %}
-  {% if uses_jq_autocomplete %}
-  <script type='text/javascript' src='/jquery/jquery-autocomplete.js'></script>
-  {% endif %}
-  {% if uses_jq_thickbox %}
-  <script type='text/javascript' src='/jquery/jquery-thickbox.js'></script>
-  {% endif %}
-  {% if uses_tinymce %}
-  <script type="text/javascript" src="/tiny_mce/tiny_mce.js"></script>
-  {% endif %}
-  {% if uses_jq_progressbar %}
-  <script type="text/javascript" src="/jquery/jquery-progressbar.js"></script>
-  {% endif %}
-  {% if uses_jq_ui_core %}
-  <script type="text/javascript" src="/jquery/jquery-ui.core.js"></script>
-  {% endif %}
-  {% if uses_jq_datetimepicker %}
-  <script type="text/javascript" src="/jquery/jquery-ui.datetimepicker.js"></script>
-  <script type="text/javascript" src="/soc/content/js/datetime-loader-090825.js"></script>
-  <script type="text/javascript" src="/soc/content/js/datetimepicker-090825.js"></script>
-  {% endif %}
-  {% if uses_jq_grid %}
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.locale-en.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.base.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.common.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.custom.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.formedit.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.inlinedit.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.jqDnR.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.jqModal.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.searchFilter.js"></script>
-  <script type="text/javascript" src="/jquery/jquery-jqgrid.setcolumns.js"></script>
-  {% endif %}
-  {% if uses_jq_cookie %}
-  <script type="text/javascript" src="/jquery/jquery-cookie.js"></script>
-  {% endif %}
-  {% if uses_jlinq %}
-  <script type="text/javascript" src="/jlinq/jLinq-2.2.1.js"></script>
-  {% endif %}
-  {% if uses_duplicates %}
-  <script type="text/javascript" src="/soc/content/js/duplicate-slots-090825.js"></script>
-  {% endif %}
-  {% if google_api_key %}
-  <script src="https://www.google.com/jsapi?key={{ google_api_key }}" type="text/javascript"></script>
-  {% else %}
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-  {% endif %}
-
-  {% if uses_melange %}
-  <script type="text/javascript" src="/soc/content/js/melange-091015.js"></script>
-  {% endif %}
-  <script type="text/javascript">
-    var xsrf_token = '{{xsrf_token}}';
-  </script>
-  {% if uses_melangeform %}
-  <script type="text/javascript" src="/soc/content/js/melange.form-100414.js"></script>
-  {% endif %}
-  {% if uses_melangelist %}
-  <script type="text/javascript" src="/soc/content/js/melange.list-110204.js"></script>
-  {% endif %}
-  {% if uses_melangetooltip %}
-  <script type="text/javascript" src="/soc/content/js/melange.tooltip-100204.js"></script>
-  {% endif %}
-  {% if uses_melangeautocomplete %}
-  <script type="text/javascript" src="/soc/content/js/melange.autocomplete-110204.js"></script>
-  {% endif %}
-
-    <script type="text/javascript" src="/soc/content/js/melange.graph-100501.js"></script>
-    <script type='text/javascript' src="/soc/content/js/upload-form-101205.js"></script>
-
-{% endblock %}
 </head>
 
 {% block body_tag %}
@@ -311,5 +197,51 @@ Version {{ gae_version }}
   {% if ga_tracking_num %}
     {% include 'soc/site/ga.html' %}
   {% endif %}
+
+  {% block scripts %}
+  <script type="text/javascript">
+    var xsrf_token = '{{xsrf_token}}';
+  </script>
+  <script type='text/javascript' src="/LABjs/LAB.js"></script>
+  <script type="text/javascript">
+    $LAB
+      .script("/json/json2.js")
+      .script("/jquery/jquery-1.5.js").wait()
+      .script("soc/content/js/melange-091015.js").wait(
+        function () {
+          // set global configuration
+          melange.init({
+            {% if google_api_key %}
+            google_api_key: {{ google_api_key }},
+            {% endif %}
+            {% if is_local %}
+            is_local: true
+            {% else %}
+            is_local: false
+            {% endif %}
+          });
+        }
+      )
+      .script("soc/content/js/melange.dependency-100214.js").wait(
+        function () {
+          // Shortcuts facilities for children Django templates
+          var dep = melange.dependency.s;
+          var tc = function (script, context) {
+            return new melange.dependency.templateWithContext(script, context);
+          };
+          var css = function (css_path) {
+            return new melange.dependency.cssFile(css_path);
+          };
+          melange.dependency.loadScripts([
+            {% block dependencies %}
+            [
+              dep.melange.menu
+            ]
+            {% endblock %}
+          ]);
+        }
+      );
+  </script>
+  {% endblock %}
  </body>
 </html>

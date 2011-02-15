@@ -20,11 +20,16 @@ module is largely based on appengine's webapp framework's code.
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
 
 from django.http import HttpResponse
+from django.template import loader
+
+from soc.modules.gsoc.views import site_menu
+from soc.modules.gsoc.views import header
 
 
 class Response(HttpResponse):
@@ -106,13 +111,14 @@ class RequestHandler(object):
   """Base class managing HTTP Requests.
   """
 
-  def __init__(self, template_path=None):
-    self.template_path = template_path
+  def context(self):
+    return {}
 
   def get(self):
     """Handler for HTTP GET request.
     """
-    self.error(405)
+    context = self.context()
+    self.render(context)
 
   def post(self):
     """Handler for HTTP POST request.
@@ -166,6 +172,28 @@ class RequestHandler(object):
     """
     self.error(401, "checkAccess in base RequestHandler has not been changed "
                "to grant access")
+
+  def render(self, context):
+    """Renders the page using the specified context.
+
+    The page is rendered using the template specified in self.templatePath()
+    and is written to the response object.
+
+    The context object is extended with the following values:
+      header: a rendered header.Header template for the current self.data
+      mainmenu: a rendered site_menu.MainMenu template for the current self.data
+      footer: a rendered site_menu.Footer template for the current self.data
+
+    Args:
+      context: the context that should be used
+    """
+
+    context['header'] = header.Header(self.data).render()
+    context['mainmenu'] = site_menu.MainMenu(self.data).render()
+    context['footer'] = site_menu.Footer(self.data).render()
+
+    rendered = loader.render_to_string(self.templatePath(), dictionary=context)
+    self.response.write(rendered)
 
   def _dispatch(self):
     """Dispatches the HTTP request to its respective handler method.

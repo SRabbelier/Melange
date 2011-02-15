@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from django.template import loader
-
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
@@ -33,39 +31,30 @@ class Homepage(RequestHandler):
   """Encapsulate all the methods required to generate GSoC Home page.
   """
 
-  def __init__(self, template_path=None):
-    """Construct the instance variables required for the GSoC Home page view.
-    """
-    if not template_path:
-      template_path = 'v2/modules/gsoc/homepage/base.html'
-
-    super(Homepage, self).__init__(template_path=template_path)
+  def templatePath(self):
+    return 'v2/modules/gsoc/homepage/base.html'
 
   def djangoURLPatterns(self):
     """Returns the list of tuples for containing URL to view method mapping.
     """
 
-    patterns = [
-         (r'^gsoc/homepage/%(program_key)s$' % {
-             'program_key': url_patterns.PROGRAM}, self)]
-    return patterns
+    return [
+        (r'^gsoc/homepage/%s$' % url_patterns.PROGRAM, self)
+    ]
 
   def checkAccess(self):
     """Access checks for GSoC Home page.
     """
-    return
+    pass
 
-  def get(self):
+  def context(self):
     """Handler to for GSoC Home page HTTP get request.
     """
 
     current_timeline = timeline_logic.getCurrentTimeline(
         self.data.program_timeline, self.data.org_app)
 
-    context = {
+    return {
         'page_name': 'Home page',
         'current_timeline': current_timeline,
-        }
-
-    content = loader.render_to_string(self.template_path, dictionary=context)
-    self.response.write(content)
+    }

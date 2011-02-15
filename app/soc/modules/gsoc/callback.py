@@ -86,6 +86,10 @@ class Callback(object):
     self.core.registerSitemapEntry(proposal_review.getDjangoURLPatterns())
     self.core.registerSitemapEntry(slot_assignment.getDjangoURLPatterns())
 
+    # Redesigned view registration
+    from soc.modules.gsoc.views import dashboard
+    self.core.registerSitemapEntry(dashboard.StudentDashboard().getDjangoURLPatterns())
+
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.
     """

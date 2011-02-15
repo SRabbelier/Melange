@@ -20,6 +20,7 @@ module is largely based on appengine's webapp framework's code.
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
 
@@ -98,7 +99,10 @@ class Response(HttpResponse):
     specification defined in the dictionary HTTP_STATUS_MESSAGE.
     """
     if not message:
-      self.content = self.HTTP_STATUS_MESSAGE.get(status, '')
+      message = self.HTTP_STATUS_MESSAGES.get(status, '')
+
+    self.status_code = status
+    self.content = message
 
 
 class RequestHandler(object):

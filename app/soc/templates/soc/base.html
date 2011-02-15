@@ -207,7 +207,7 @@ Version {{ gae_version }}
     $LAB
       .script("/json/json2.js")
       .script("/jquery/jquery-1.5.js").wait()
-      .script("soc/content/js/melange-091015.js").wait(
+      .script("/soc/content/js/melange-091015.js").wait(
         function () {
           // set global configuration
           melange.init({
@@ -222,7 +222,7 @@ Version {{ gae_version }}
           });
         }
       )
-      .script("soc/content/js/melange.dependency-100214.js").wait(
+      .script("/soc/content/js/melange.dependency-100214.js").wait(
         function () {
           // Shortcuts facilities for children Django templates
           var dep = melange.dependency.s;

@@ -163,16 +163,11 @@ def sendRequestTaskNotification(org_admins, message):
 
   # get site name
   site_entity = site_logic.getSingleton()
-  site_name = site_entity.site_name
-  subject = DEF_TASK_REQUEST_SUBJECT_MSG
   template = DEF_TASK_REQUEST_TEMPLATE
 
   properties = {
       'message': message,
-      'sender': sender,
       'sender_name': sender_name,
-      'site_name': site_name,
-      'subject': subject,
       }
 
   for org_admin in org_admins:

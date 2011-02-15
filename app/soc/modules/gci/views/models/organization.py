@@ -191,6 +191,58 @@ class View(organization.View):
     return lists.getResponse(request, contents)
 
   @decorators.check_access
+  def requestTask(self, request, access_type, page_name=None,
+                params=None, **kwargs):
+    """Students may request a new task if there are no open tasks for the
+    organization.
+    """
+
+    # retrieve the organization
+    org_entity = gci_org_logic.logic.getFromKeyFieldsOr404(kwargs)
+
+    if request.method == 'GET':
+      return self.requestTaskGet(request, page_name, org_entity, **kwargs)
+    else: # POST
+      return self.requestTaskPost(request, page_name, org_entity, **kwargs)
+
+  def requestTaskGet(self, request, page_name, org_entity, **kwargs):
+    """GET request for requestTask.
+    """
+
+    context = helper.responses.getUniversalContext(request)
+    context['page_name'] = page_name
+    context['org_name'] = org_entity.name
+
+    template = 'modules/gci/task/request.html'
+    return responses.respond(request, template, context=context)
+
+  def requestTaskPost(self, request, page_name, org_entity, **kwargs):
+    """POST request for requestTask.
+    """
+
+    # find all administrators for the organization
+    fields = {
+        'scope': org_entity
+        }
+    org_admins = gci_org_admin_logic.logic.getForFields(fields)
+
+    # include student's message or use a default one
+    post_dict = request.POST
+    message = post_dict.get('message')
+    if not message:
+      message = self.DEFAULT_REQUEST_MSG
+
+    # notification should be sent to all of the org admins
+    gci_notifications.sendRequestTaskNotification(org_admins, message)
+
+    # return to the list of all accepted organizations
+    program = org_entity.scope
+    url = redirects.getAcceptedOrgsRedirect(
+        program, {'url_name': 'gci/program'})
+
+    return http.HttpResponseRedirect(url)
+
+  @decorators.check_access
   def home(self, request, access_type,
            page_name=None, params=None, **kwargs):
     """See base.View._public().
@@ -338,58 +390,6 @@ class View(organization.View):
       submenus.append(submenu)
 
     return submenus
-
-  @decorators.check_access
-  def requestTask(self, request, access_type, page_name=None,
-                params=None, **kwargs):
-    """Students may request a new task if there are no open tasks for the
-    organization.
-    """
-
-    # retrieve the organization
-    org_entity = gci_org_logic.logic.getFromKeyFieldsOr404(kwargs)
-
-    if request.method == 'GET':
-      return self.requestTaskGet(request, page_name, org_entity, **kwargs)
-    else: # POST
-      return self.requestTaskPost(request, page_name, org_entity, **kwargs)
-
-  def requestTaskGet(self, request, page_name, org_entity, **kwargs):
-    """GET request for requestTask.
-    """
-
-    context = helper.responses.getUniversalContext(request)
-    context['page_name'] = page_name
-    context['org_name'] = org_entity.name
-
-    template = 'modules/gci/task/request.html'
-    return responses.respond(request, template, context=context)
-
-  def requestTaskPost(self, request, page_name, org_entity, **kwargs):
-    """POST request for requestTask.
-    """
-
-    # find all administrators for the organization
-    fields = {
-        'scope': org_entity
-        }
-    org_admins = gci_org_admin_logic.logic.getForFields(fields)
-
-    # include student's message or use a default one
-    post_dict = request.POST
-    message = post_dict.get('message')
-    if not message:
-      message = self.DEFAULT_REQUEST_MSG
-
-    # notification should be sent to all of the org admins
-    gci_notifications.sendRequestTaskNotification(org_admins, message)
-
-    # return to the list of all accepted organizations
-    program = org_entity.scope
-    url = redirects.getAcceptedOrgsRedirect(
-          program, {'url_name': 'gci/program'})
-
-    return http.HttpResponseRedirect(url)
 
 view = View()
 

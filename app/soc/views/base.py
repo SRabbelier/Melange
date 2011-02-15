@@ -108,37 +108,37 @@ class RequestHandler(object):
   def __init__(self, template_path=None):
     self.template_path = template_path
 
-  def get(self, request, *args, **kwargs):
+  def get(self):
     """Handler for HTTP GET request.
     """
     self.error(405)
 
-  def post(self, request, *args, **kwargs):
+  def post(self):
     """Handler for HTTP POST request.
     """
     self.error(405)
 
-  def head(self, request, *args, **kwargs):
+  def head(self):
     """Handler for HTTP HEAD request.
     """
     self.error(405)
 
-  def options(self, request, *args, **kwargs):
+  def options(self):
     """Handler for HTTP OPTIONS request.
     """
     self.error(405)
 
-  def put(self, request, *args, **kwargs):
+  def put(self):
     """Handler for HTTP PUT request.
     """
     self.error(405)
 
-  def delete(self, request, *args, **kwargs):
+  def delete(self):
     """Handler for HTTP DELETE request.
     """
     self.error(405)
 
-  def trace(self, request, *args, **kwargs):
+  def trace(self):
     """Handler for HTTP TRACE request.
     """
     self.error(405)
@@ -159,30 +159,30 @@ class RequestHandler(object):
     patterns = []
     return patterns
 
-  def checkAccess(self, request, *args, **kwargs):
+  def checkAccess(self):
     """Raise an exception if the user doesn't have access to the
     requested URL.
     """
     self.error(401, "checkAccess in base RequestHandler has not been changed"
                "to grant access")
 
-  def _dispatch(self, request, *args, **kwargs):
+  def _dispatch(self):
     """Dispatches the HTTP request to its respective handler method.
     """
-    if request.method == 'GET':
-      self.get(request, *args, **kwargs)
-    elif request.method == 'POST':
-      self.post(request, *args, **kwargs)
-    elif request.method == 'HEAD':
-      self.head(request, *args, **kwargs)
-    elif request.method == 'OPTIONS':
-      self.options(request, *args, **kwargs)
-    elif request.method == 'PUT':
-      self.put(request, *args, **kwargs)
-    elif request.method == 'DELETE':
-      self.delete(request, *args, **kwargs)
-    elif request.method == 'TRACE':
-      self.trace(request, *args, **kwargs)
+    if self.request.method == 'GET':
+      self.get()
+    elif self.request.method == 'POST':
+      self.post()
+    elif self.request.method == 'HEAD':
+      self.head()
+    elif self.request.method == 'OPTIONS':
+      self.options()
+    elif self.request.method == 'PUT':
+      self.put()
+    elif self.request.method == 'DELETE':
+      self.delete()
+    elif self.request.method == 'TRACE':
+      self.trace()
     else:
       self.error(501)
 
@@ -190,11 +190,17 @@ class RequestHandler(object):
     """Returns the response object for the requested URL.
 
     In detail, this method does the following:
-    1. Construct the response object.
-    2. Calls the access check.
-    3. Delegates dispatching to the handler to the _dispatch method.
-    4. Returns the response.
+    1. Initialize request, arguments and keyword arguments as instance variables
+    2. Construct the response object.
+    3. Calls the access check.
+    4. Delegates dispatching to the handler to the _dispatch method.
+    5. Returns the response.
     """
+
+    self.request = request
+    self.args = args
+    self.kwargs = kwargs
+
     self.response = Response()
 
     self.checkAccess(request, *args, **kwargs)

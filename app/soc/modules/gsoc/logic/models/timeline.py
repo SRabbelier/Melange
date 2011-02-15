@@ -41,20 +41,14 @@ class Logic(timeline.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model)
 
-  def getCurrentTimeline(self, program_entity):
+  def getCurrentTimeline(self, timeline, org_app):
     """Return where we are currently on the timeline.
     """
-    from soc.modules.gsoc.logic.models.org_app_survey import logic as oas_logic
-
-    oas_entity = oas_logic.getForFields({'scope': program_entity},
-                                        unique=True)
-    timeline_entity = program_entity.timeline
-
-    if timeline_helper.isActivePeriod(oas_entity, 'survey'):
+    if timeline_helper.isActivePeriod(org_app, 'survey'):
       return 'org_signup_period'
-    elif timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+    elif timeline_helper.isActivePeriod(timeline, 'student_signup'):
       return 'student_signup_period'
-    elif timeline_helper.isActivePeriod(timeline_entity, 'program'):
+    elif timeline_helper.isActivePeriod(timeline, 'program'):
       return 'program_period'
 
     return ''

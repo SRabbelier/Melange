@@ -59,11 +59,12 @@ class Homepage(RequestHandler):
     """Handler to for GSoC Home page HTTP get request.
     """
 
-    program = self.data.program
+    current_timeline = timeline_logic.getCurrentTimeline(
+        self.data.program_timeline, self.data.org_app)
 
     context = {
         'page_name': 'Home page',
-        'current_timeline': timeline_logic.getCurrentTimeline(program),
+        'current_timeline': current_timeline,
         }
 
     content = loader.render_to_string(self.template_path, dictionary=context)

@@ -29,6 +29,7 @@ from soc.logic.models.user import logic as user_logic
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
+from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 
@@ -58,6 +59,7 @@ class RequestData(object):
     self.user = None
     self.program = None
     self.program_timeline = None
+    self.org_app = None
     self.host = None
     self.org_admins = []
     self.mentors = []
@@ -78,6 +80,9 @@ class RequestData(object):
                          'scope_path': kwargs.get('sponsor')}
     self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
     self.program_timeline = self.program.timeline
+
+    org_app_fields = {'scope': self.program}
+    self.org_app = org_app_logic.getOneForFields(org_app_fields)
 
     if self.user:
       fields = {'user': self.user,

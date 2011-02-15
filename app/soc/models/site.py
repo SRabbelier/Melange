@@ -17,6 +17,7 @@
 """This module contains the Site Model."""
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Doug Coker" <dcoker@google.com>',
   '"Leon Palm" <lpalm@google.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
@@ -29,6 +30,7 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.presence_with_tos
+import soc.models.program
 
 
 class Site(soc.models.presence_with_tos.PresenceWithToS):
@@ -109,3 +111,9 @@ class Site(soc.models.presence_with_tos.PresenceWithToS):
       verbose_name=ugettext('Hostname'))
   hostname.help_text = ugettext(
       'URL of the hostname.')
+
+  #: Reference to Program which is currently active
+  active_program = db.ReferenceProperty(
+    reference_class=soc.models.program.Program)
+  active_program.help_text = ugettext(
+      'The Program which is currently active.')

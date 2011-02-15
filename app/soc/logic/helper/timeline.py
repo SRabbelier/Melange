@@ -106,7 +106,4 @@ def getDateTimeByName(entity, name):
     The requested DateTime property, or None if there is no such property set.
   """
 
-  if hasattr(entity, name):
-    return getattr(entity, name)
-  else:
-    return None
+  return getattr(entity, name, None)

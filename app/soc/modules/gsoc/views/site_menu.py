@@ -18,47 +18,71 @@
 
 __authors__ = [
   '"Daniel Hans" <daniel.m.hans@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
 
 
 from google.appengine.api import users
 
+from soc.views.template import Template
 from soc.modules.gsoc.views.helper import redirects
 
 
-# TODO: this is a draft version of the class. It will be changed due to
-# some further decisions on how the views should look like
-class SiteMenu(object):
-  """SiteMenu view.
+def siteMenuContext(data):
+  """Generates URL links for the hard-coded GSoC site menu items.
+  """
+  context = {}
+
+  # get login link
+  context['login_link'] = users.create_login_url(
+      data.request.path.encode('utf-8'))
+
+  # get logout link
+  context['logout_link'] = users.create_logout_url(
+      data.request.path.encode('utf-8'))
+
+  # get about link
+  context['about_link'] = redirects.getAboutPageRedirect()
+
+  # get projects link
+  context['projects_link'] = redirects.getAllProjectsRedirect()
+
+  # get events link
+  context['events_link'] = redirects.getEventsRedirect()
+
+  # get connect link
+  context['connect_link'] = redirects.getConnectRedirect()
+
+  # get help link
+  context['help_link'] = redirects.getHelpRedirect()
+
+  return context
+
+
+class MainMenu(Template):
+  """MainMenu template.
   """
 
-  def getContext(self, request):
-    """Generates URL links for the hard-coded GSoC site menu items.
-    """
-    context = {}
+  def __init__(self, data):
+    self.data = data
 
-    # get login link
-    context['login_link'] = users.create_login_url(
-        request.path.encode('utf-8'))
+  def context(self):
+    return siteMenuContext(self.data)
 
-    # get logout link
-    context['logout_link'] = users.create_logout_url(
-        request.path.encode('utf-8'))
+  def templatePath(self):
+    return "v2/modules/gsoc/mainmenu.html"
 
-    # get about link
-    context['about'] = redirects.getAboutPageRedirect()
 
-    # get projects link
-    context['projects'] = redirects.getAllProjectsRedirect()
+class Footer(Template):
+  """Footer template.
+  """
 
-    # get events link
-    context['events'] = redirects.getEventsRedirect()
+  def __init__(self, data):
+    self.data = data
 
-    # get connect link
-    context['connect'] = redirects.getConnectRedirect()
+  def context(self):
+    return siteMenuContext(self.data)
 
-    # get help link
-    context['help'] = redirects.getHelpRedirect()
-
-    return {'site_menu': context}
+  def templatePath(self):
+    return "v2/modules/gsoc/footer.html"

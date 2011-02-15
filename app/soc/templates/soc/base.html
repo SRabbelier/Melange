@@ -206,7 +206,11 @@ Version {{ gae_version }}
   <script type="text/javascript">
     $LAB
       .script("/json/json2.js")
+      {% if is_local %}
       .script("/jquery/jquery-1.5.js").wait()
+      {% else %}
+      .script("http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js").wait()
+      {% endif %}
       .script("/soc/content/js/melange-091015.js").wait(
         function () {
           // set global configuration

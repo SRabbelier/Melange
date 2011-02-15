@@ -88,7 +88,7 @@ class RequestData(object):
       fields = {'user': self.user,
                 'scope': self.program.scope,
                 'status': 'active'}
-      self.host = host_logic.getForFields(fields, unique=True)
+      self.host = host_logic.getOneForFields(fields)
 
       fields = {'user': self.user,
                 'program': self.program,
@@ -99,4 +99,4 @@ class RequestData(object):
       fields = {'user': self.user,
                 'scope': self.program,
                 'status': ['active', 'inactive']}
-      self.student = student_logic.getForFields(fields, unique=True)
+      self.student = student_logic.getOneForFields(fields)

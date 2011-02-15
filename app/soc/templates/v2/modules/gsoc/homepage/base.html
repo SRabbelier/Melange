@@ -29,22 +29,16 @@ limitations under the License.
       </li>
     </ol>
   <div id="block-how-it-works-description" class="description">
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec lectus lacus, a blandit ante. Sed lorem ipsum, 
-    aliquam ac tincidunt ac, luctus ut felis. Sed lobortis dapibus semper. Sed lorem ipsum, aliquam ac tincidunt ac, 
-    luctus ut felis.</p>
+    <p>{{ program.description }}</p>
   </div>
 </div>
 <!-- .home-block-1 -->
 
 <div id="apply-students" class="content_column_1">
   <!-- begin block -->
-  <div id="apply-students" class="block block-students">
-    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-students-image" />
-    <h3 id="title-section-apply-students">Students: Apply now!</h3>
-    <p id="block-apply-students-text-action" class="action"><a href="javascript:void(0)">Login</a> <span>or</span> <a href="javascript:void(0)">Register</a></p>
-    <p id="block-apply-students-text-small" class="small">with a Google Account to get started.</p>
-    <p id="block-apply-students-text-link"><a href="javascript:void(0)">Looking for ideas? See what others are proposing! &rsaquo;</a></p>
-  </div>
+
+  {% include "v2/modules/gsoc/homepage/_apply.html" %}
+
   <!-- end block -->
   <!-- begin block -->
   <div id="featured-projects" class="block block-featured-project">
@@ -71,7 +65,7 @@ limitations under the License.
 <div class="content_column_2">
   <!-- begin block -->
   <div id="program-map" class="block block-project-timeline">
-    {% include "v2/modules/gsoc/_timeline.html" %}
+    {% include "v2/modules/gsoc/homepage/_timeline.html" %}
   </div>
   <!-- end block -->
   <!-- begin block -->

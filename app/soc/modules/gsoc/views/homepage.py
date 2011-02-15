@@ -24,10 +24,9 @@ __authors__ = [
 
 from django.template import loader
 
-from soc.models import linkable
-
-from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
+from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.helper import url_patterns
 
 
 class Homepage(RequestHandler):
@@ -38,7 +37,7 @@ class Homepage(RequestHandler):
     """Construct the instance variables required for the GSoC Home page view.
     """
     if not template_path:
-      template_path = 'v2/modules/gsoc/homepage.html'
+      template_path = 'v2/modules/gsoc/homepage/base.html'
 
     super(Homepage, self).__init__(template_path=template_path)
 
@@ -47,9 +46,8 @@ class Homepage(RequestHandler):
     """
 
     patterns = [
-         (r'^gsoc/homepage/(?P<sponsor>%s)/(?P<program>%s)$'
-          % (linkable.LINK_ID_PATTERN_CORE, linkable.LINK_ID_PATTERN_CORE),
-          self)]
+         (r'^gsoc/homepage/%(program_key)s$' % {
+             'program_key': url_patterns.PROGRAM}, self)]
     return patterns
 
   def checkAccess(self):

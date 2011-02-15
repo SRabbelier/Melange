@@ -73,8 +73,8 @@ class RequestData(object):
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 
-    program_keyfields = {'link_id': self._kwargs.get('program'),
-                         'scope_path': self._kwargs.get('sponsor')}
+    program_keyfields = {'link_id': kwargs.get('program'),
+                         'scope_path': kwargs.get('sponsor')}
     self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
     self.program_timeline = self.program.timeline
 

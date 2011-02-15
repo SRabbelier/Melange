@@ -82,7 +82,7 @@ class Response(HttpResponse):
     """Constructor to convert the status code to the relevant message.
     """
     if not content:
-      content = self.HTTP_STATUS_MESSAGE.get(status, '')
+      content = self.HTTP_STATUS_MESSAGES.get(status, '')
 
     super(Response, self).__init__(content, mimetype,
                                    status, content_type)

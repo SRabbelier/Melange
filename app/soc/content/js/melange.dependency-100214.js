@@ -267,6 +267,14 @@
             }(_queue[i].context)
           ).wait();
       }
+      else if (typeof _queue[i] == "object" && _queue[i] instanceof $m.cssFile) {
+        jQuery("<link>", {
+          href: _queue[i].css,
+          media: "screen",
+          rel: "stylesheet",
+          type: "text/css",
+        }).appendTo("head");
+      }
       else if (typeof _queue[i] == "function") { // inline function found
           $LAB = $LAB.wait(_queue[i]);
       }
@@ -277,4 +285,9 @@
     this.script_template = script_template;
     this.context = context;
   };
+
+  $m.cssFile = function (css) {
+    this.css = css;
+  };
+
 }());

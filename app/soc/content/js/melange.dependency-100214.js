@@ -259,7 +259,7 @@
                 melange.templates.setContextToLast(context_to_send);
               }
             }(_queue[i].context)
-          );
+          ).wait();
       }
       else if (typeof _queue[i] == "function") { // inline function found
           $LAB = $LAB.wait(_queue[i]);

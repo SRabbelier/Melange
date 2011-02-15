@@ -27,21 +27,21 @@ def getAboutPageRedirect():
   """Returns the redirect for the About page for the current GSoC program.
   """
 
-  return 'gsoc/about'
+  return '/gsoc/about'
 
 
 def getAllProjectsRedirect():
   """Returns the redirect for list all GSoC projects.
   """
 
-  return 'gsoc/list_projects'
+  return '/gsoc/list_projects'
 
 
 def getConnectRedirect():
   """Returns the redirect for the Connect page for the current GSoC program.
   """
 
-  return 'gsoc/connect'
+  return '/gsoc/connect'
 
 
 def getEventsRedirect():
@@ -49,11 +49,11 @@ def getEventsRedirect():
   GSoC program.
   """
 
-  return 'gsoc/events'
+  return '/gsoc/events'
 
 
 def getHelpRedirect():
   """Returns the redirect for the Help page for the current GSoC program.
   """
 
-  return 'gsoc/help'
+  return '/gsoc/help'

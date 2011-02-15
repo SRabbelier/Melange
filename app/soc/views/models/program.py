@@ -33,6 +33,7 @@ from soc.logic import dicts
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models import host as host_logic
 from soc.logic.models import program as program_logic
+from soc.logic.models import site as site_logic 
 from soc.views import helper
 from soc.views.helper import access
 from soc.views.helper import decorators
@@ -142,6 +143,7 @@ class View(presence.View):
         'accepted_orgs_msg': forms.fields.CharField(required=False,
             widget=helper.widgets.TinyMCE(attrs={'rows':10, 'cols':40})),
         'scope_path': forms.CharField(widget=forms.HiddenInput, required=True),
+        'is_active': forms.BooleanField(required=False),
         }
 
     params = dicts.merge(params, new_params, sub_merge=True)
@@ -202,6 +204,20 @@ class View(presence.View):
 
     super(View, self).__init__(params=params)
 
+  def _editGet(self, request, entity, form):
+    """See base._editGet().
+    """
+
+    initial = False
+    # check if the program is currently the active one
+    site_entity = site_logic.logic.getSingleton()
+    active_program = site_entity.active_program
+    if active_program and \
+       active_program.key().id_or_name() == entity.key().id_or_name():
+      form.fields['is_active'].initial = True
+
+    super(View, self)._editGet(request, entity, form)
+
   def _editPost(self, request, entity, fields):
     """See base._editPost().
     """
@@ -214,6 +230,13 @@ class View(presence.View):
     else:
       # use the timeline from the entity
       fields['timeline'] = entity.timeline
+
+    # check if the program is currently the active one
+    is_active = fields['is_active']
+    if is_active:
+      site_entity = site_logic.logic.getSingleton()
+      site_entity.active_program = entity
+      site_entity.put()
 
   def getListParticipantsData(self, request, params, program_entity):
     """Returns the list data.

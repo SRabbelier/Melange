@@ -405,6 +405,26 @@ class Logic(object):
       value = prefetched_dict[key]
       setattr(i, field, value)
 
+  def getOneForFields(self, fields=None, ancestors=None, order=None):
+    """Returns the first entity to have the specified properties.
+
+    Args:
+      fields: a dict for the properties that the entities should have
+      ancestors: list of ancestors properties to set for this query
+      order: a list with the sort order
+    """
+
+    query = self.getQueryForFields(filter=fields,
+                                   ancestors=ancestors, order=order)
+    try:
+      result = query.get()
+    except db.NeedIndexError, exception:
+      result = None
+      logging.exception("%s, model: %s filter: %s, ancestors: %s, order: %s" %
+                        (exception, self._model, filter, ancestors, order))
+    return result
+
+      # TODO: send email
   def getForFields(self, filter=None, unique=False, limit=1000, offset=0,
                    ancestors=None, order=None, prefetch=None):
     """Returns all entities that have the specified properties.

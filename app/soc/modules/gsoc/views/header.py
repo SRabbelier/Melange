@@ -29,8 +29,6 @@ class Header(Template):
   """
 
   def __init__(self, data):
-    """Constructs a SiteMenu view.
-    """
     pass
 
   def templatePath(self):

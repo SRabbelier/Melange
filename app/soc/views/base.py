@@ -116,6 +116,9 @@ class RequestHandler(object):
 
   def get(self):
     """Handler for HTTP GET request.
+
+    Default implementation calls context and passes it to render to
+    construct the page.
     """
     context = self.context()
     self.render(context)

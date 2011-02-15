@@ -86,6 +86,8 @@ class View(presence_with_tos.View):
         'clean_logo_url': cleaning.clean_url('logo_url'),
         }
     new_params['edit_extra_dynaproperties'] = {
+        'currently_active_program': forms.CharField(required = False,
+            widget=helper.widgets.ReadOnlyInput()),
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'home_link_id': widgets.ReferenceField(
             reference_url='document', required=False,
@@ -101,8 +103,8 @@ class View(presence_with_tos.View):
         }
 
     # XSRF secret key is not editable by mere mortals.
-    new_params['extra_dynaexclude'] = ['xsrf_secret_key']
-
+    new_params['extra_dynaexclude'] = ['xsrf_secret_key', 'active_program']
+    
     patterns = []
 
     page_name = "Home Page"
@@ -133,6 +135,17 @@ class View(presence_with_tos.View):
     params = dicts.merge(params, new_params)
 
     super(View, self).__init__(params=params)
+
+  def _editGet(self, request, entity, form):
+    """See base._editGet().
+    """
+
+    initial = ''
+    active_program = entity.active_program
+    if active_program:
+      form.fields['currently_active_program'].initial = active_program.name 
+
+    super(View, self)._editGet(request, entity, form)
 
   def getSidebarMenus(self, id, user, params=None):
     """See base.View.getSidebarMenus.

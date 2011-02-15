@@ -1,0 +1,120 @@
+{% extends "v2/modules/gsoc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+
+{% block page_content %}
+<div id="how-it-works" class="block full home-block-1">
+  <h2 id="title-section-how-it-works">How Google Summer of Code Works</h2>
+    <ol id="list-how-it-works">
+      <li id="how-it-works-item1" class="first">
+        <strong>Propose a project <span>for approval by a participating open source organization</span></strong>
+      </li>
+      <li id="how-it-works-item2" class="second">
+        <strong>Code the summer away</strong>
+      </li>
+      <li id="how-it-works-item3" class="third">
+        <strong>Achieve Ultimate Glory <span>(and get a nice paycheck)</span></strong>
+      </li>
+    </ol>
+  <div id="block-how-it-works-description" class="description">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec lectus lacus, a blandit ante. Sed lorem ipsum, 
+    aliquam ac tincidunt ac, luctus ut felis. Sed lobortis dapibus semper. Sed lorem ipsum, aliquam ac tincidunt ac, 
+    luctus ut felis.</p>
+  </div>
+</div>
+<!-- .home-block-1 -->
+
+<div id="apply-students" class="content_column_1">
+  <!-- begin block -->
+  <div id="apply-students" class="block block-students">
+    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-students-image" />
+    <h3 id="title-section-apply-students">Students: Apply now!</h3>
+    <p id="block-apply-students-text-action" class="action"><a href="javascript:void(0)">Login</a> <span>or</span> <a href="javascript:void(0)">Register</a></p>
+    <p id="block-apply-students-text-small" class="small">with a Google Account to get started.</p>
+    <p id="block-apply-students-text-link"><a href="javascript:void(0)">Looking for ideas? See what others are proposing! &rsaquo;</a></p>
+  </div>
+  <!-- end block -->
+  <!-- begin block -->
+  <div id="featured-projects" class="block block-featured-project">
+    <h4 title="title-section-featured-project">Featured Project</h4>
+    <div id="block-featured-project-content" class="block-content">
+      <h5 id="block-featured-project-content-title">Revive and Restructure the Escher project</h5>
+      <img src="/soc/content/images/v2/gsoc/featured-project-stock-image.jpg" height="99" width="121" alt="" id="block-featured-project-image" class="alignright" />
+      <p>My name is <a href="javascript:void(0)">Marcos Paulino Roriz Junior</a>, and I’m participating in <a href="javascript:void(0)">Google Summer of Code&trade;</a> 
+      for the first time this year. I’m really excited because I’ve been developing in Java for 
+      some time and this is my first step into FOSS. My project is hacking on GNU Classpath on 
+      Escher which is an X11 client written in Java, used by the XPeer code to request and handle 
+      drawings. I’m learning the X11 protocol which is amazingly cool and surely ahead of it’s time. 
+      This is not only helping me with Google Summer of Code but is also the main protocol behind 
+      the idea that I’m using in my...</p>
+    </div>
+    <div id="block-featured-project-readmore" class="readmore">
+      <a href="javascript:void(0)">read more</a>
+    </div>
+  </div>
+  <!-- end block -->
+</div>
+<!-- .content_column_1 -->
+
+<div class="content_column_2">
+  <!-- begin block -->
+  <div id="program-map" class="block block-project-timeline">
+    {% include "v2/modules/gsoc/_timeline.html" %}
+  </div>
+  <!-- end block -->
+  <!-- begin block -->
+  <div id="connect-with-us" class="block block-connect">
+    <h4 id="title-section-connect-with-us">Connect With Us</h4>
+    <div id="block-connect-with-us-content" class="block-content">
+      <a href="javascript:void(0)" id="connect-block-facebook" class="social fb">Facebook</a>
+      <a href="javascript:void(0)" id="connect-block-twitter" class="social tw">Twitter</a>
+      <a href="javascript:void(0)" id="connect-block-blogger" class="social bl">Blogger</a>
+      <a href="javascript:void(0)" id="connect-block-email" class="social em">Email</a>
+      <a href="javascript:void(0)" id="connect-block-irc" class="social irc">IRC</a>
+    </div>
+  </div>
+  <!-- end block -->
+  <!-- begin block -->
+  <div id="blog-feed" class="block block-blog-feed">
+    <h4 id="title-section-blog-feed">Blog Feed</h4>
+    <div id="block-blog-feed-content" class="block-content">
+      <div id="blog-feed-item1" class="blog-item">
+        <span class="date">Nov 2, 2010</span>
+        <span class="title"><a href="javascript:void(0)">2010 Google Summer of Code Mentor Summit</a></span>
+      </div>
+      <div id="blog-feed-item2" class="blog-item">
+        <span class="date">Oct 27, 2010</span>
+        <span class="title"><a href="javascript:void(0)">Facebook Likes Google Summer of Code</a></span>
+      </div>
+      <div id="blog-feed-item3" class="blog-item">
+        <span class="date">Oct 23, 2010</span>
+        <span class="title"><a href="javascript:void(0)">Perl and Parrot Spread Open Source Love</a></span>
+      </div>
+      <div id="blog-feed-item4" class="blog-item">
+        <span class="date">Oct 13, 2010</span>
+        <span class="title"><a href="javascript:void(0)">Another Successful Summer for Haiku</a></span>
+      </div>
+      <div id="blog-feed-item5" class="blog-item">
+        <span class="date">Oct 6, 2010</span>
+        <span class="title"><a href="javascript:void(0)">Google Summer of Code report: WorldForge</a></span>
+      </div>
+    </div>
+    <div id="block-blog-feed-readmore" class="readmore">
+      <a href="javascript:void(0)">read more</a>
+    </div>
+  </div>
+  <!-- end block -->
+</div>
+{% endblock page_content %}

@@ -40,9 +40,10 @@ def namedLinkIdPattern(names):
 
   return r'/'.join(named_patterns)
 
-PROGRAM_PATTERN = namedLinkIdPattern(['sponsor', 'program'])
-STUDENT_PATTERN = namedLinkIdPattern(['sponsor', 'program', 'student'])
-MENTOR_PATTERN = namedLinkIdPattern(['sponsor', 'program', 'organization', 'mentor'])
-ORG_ADMIN_PATTERN = namedLinkIdPattern(['sponsor', 'program', 'organization', 'org_admin'])
-PROPOSAL_PATTERN = namedLinkIdPattern(['sponsor', 'program', 'student', 'proposal'])
-PROJECT_PATTERN = namedLinkIdPattern(['sponsor', 'program', 'organization', 'project'])
+SPONSOR   = namedLinkIdPattern(['sponsor'])
+PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
+STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
+PROPOSAL  = namedLinkIdPattern(['sponsor', 'program', 'student', 'proposal'])
+MENTOR    = namedLinkIdPattern(['sponsor', 'program', 'organization', 'mentor'])
+ORG_ADMIN = namedLinkIdPattern(['sponsor', 'program', 'organization', 'org_admin'])
+PROJECT   = namedLinkIdPattern(['sponsor', 'program', 'organization', 'project'])

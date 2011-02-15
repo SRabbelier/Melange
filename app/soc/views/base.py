@@ -164,7 +164,7 @@ class RequestHandler(object):
     """Raise an exception if the user doesn't have access to the
     requested URL.
     """
-    self.error(401, "checkAccess in base RequestHandler has not been changed"
+    self.error(401, "checkAccess in base RequestHandler has not been changed "
                "to grant access")
 
   def _dispatch(self):

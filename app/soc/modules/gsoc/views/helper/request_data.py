@@ -70,6 +70,7 @@ class RequestData(object):
       request: Django HTTPRequest object.
       args & kwargs: The args and kwargs django sends along.
     """
+    self.request = request
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 

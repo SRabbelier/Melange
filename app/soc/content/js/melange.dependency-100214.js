@@ -252,18 +252,23 @@
       else if (!_queue[i]) { // null/false found
           $LAB = $LAB.wait();
       }
-      else if (typeof _queue[i] == "object") {
-          $LAB = $LAB.wait(
+      else if (typeof _queue[i] == "object" && _queue[i] instanceof $m.templateWithContext) {
+          $LAB = $LAB.script(_queue[i].script_template).wait(
             function (context_to_send) {
               return function () {
                 melange.templates.setContextToLast(context_to_send);
               }
-            }(_queue[i])
+            }(_queue[i].context)
           );
       }
       else if (typeof _queue[i] == "function") { // inline function found
           $LAB = $LAB.wait(_queue[i]);
       }
     }
+  };
+
+  $m.templateWithContext = function (script_template, context) {
+    this.script_template = script_template;
+    this.context = context;
   };
 }());

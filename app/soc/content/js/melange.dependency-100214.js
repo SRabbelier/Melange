@@ -202,7 +202,7 @@
   s.melange.tooltip = [
     s.melange,
     s.purr,
-    null,
+    null
   ];
 
   s.melange.autocomplete = [

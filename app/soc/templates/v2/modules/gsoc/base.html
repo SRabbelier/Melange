@@ -27,10 +27,6 @@ limitations under the License.
     <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/menu.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/user-messages.css" />
   {% endblock stylesheets %}
-
-  {% block scripts %}
-    <!-- TODO: Talk with Mario about script loading -->
-  {% endblock scripts %}
 </head>
 <body>
   {% block extra_header %}
@@ -122,5 +118,50 @@ limitations under the License.
       {% include 'soc/site/ga.html' %}
     {% endif %}
   {% endblock extra_footer %}
+  {% block scripts %}
+  <script type="text/javascript">
+    var xsrf_token = '{{xsrf_token}}';
+  </script>
+  <script type='text/javascript' src="/LABjs/LAB.js"></script>
+  <script type="text/javascript">
+    $LAB
+      .script("/json/json2.js")
+      .script("/jquery/jquery-1.5.js").wait()
+      .script("soc/content/js/melange-091015.js").wait(
+        function () {
+          // set global configuration
+          melange.init({
+            {% if google_api_key %}
+            google_api_key: {{ google_api_key }},
+            {% endif %}
+            {% if is_local %}
+            is_local: true
+            {% else %}
+            is_local: false
+            {% endif %}
+          });
+        }
+      )
+      .script("soc/content/js/melange.dependency-100214.js").wait(
+        function () {
+          // Shortcuts facilities for children Django templates
+          var dep = melange.dependency.s;
+          var tc = function (script, context) {
+            return new melange.dependency.templateWithContext(script, context);
+          };
+          var css = function (css_path) {
+            return new melange.dependency.cssFile(css_path);
+          };
+          melange.dependency.loadScripts([
+            {% block dependencies %}
+            [
+              dep.melange.menu
+            ]
+            {% endblock %}
+          ]);
+        }
+      );
+  </script>
+  {% endblock scripts %}
 </body>
 </html>

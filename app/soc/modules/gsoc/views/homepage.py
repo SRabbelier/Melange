@@ -22,9 +22,44 @@ __authors__ = [
   ]
 
 
+from soc.views.template import Template
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
+
+
+class Timeline(Template):
+  """Timeline template.
+  """
+
+  def __init__(self, data, current_timeline):
+    self.data = data
+    self.current_timeline = current_timeline
+
+  def context(self):
+    return {
+        'current_timeline': self.current_timeline,
+    }
+
+  def templatePath(self):
+    return "v2/modules/gsoc/homepage/_timeline.html"
+
+
+class Apply(Template):
+  """Apply template.
+  """
+
+  def __init__(self, data, current_timeline):
+    self.data = data
+    self.current_timeline = current_timeline
+
+  def context(self):
+    return {
+        'current_timeline': self.current_timeline,
+    }
+
+  def templatePath(self):
+    return "v2/modules/gsoc/homepage/_apply.html"
 
 
 class Homepage(RequestHandler):
@@ -55,6 +90,8 @@ class Homepage(RequestHandler):
         self.data.program_timeline, self.data.org_app)
 
     return {
+        'timeline': Timeline(self.data, current_timeline).render(),
+        'apply': Apply(self.data, current_timeline).render(),
         'page_name': 'Home page',
-        'current_timeline': current_timeline,
+        'program': self.data.program,
     }

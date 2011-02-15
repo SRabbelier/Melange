@@ -41,7 +41,7 @@ class Homepage(RequestHandler):
 
     super(Homepage, self).__init__(template_path=template_path)
 
-  def getDjangoURLPatterns(self):
+  def djangoURLPatterns(self):
     """Returns the list of tuples for containing URL to view method mapping.
     """
 

@@ -95,7 +95,7 @@ class Callback(object):
 
     # Redesigned view registration
     for view in self.views:
-      self.core.registerSitemapEntry(view.getDjangoURLPatterns())
+      self.core.registerSitemapEntry(view.djangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

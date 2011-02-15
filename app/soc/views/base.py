@@ -154,7 +154,7 @@ class RequestHandler(object):
     """
     self.response.set_status(status, message=message)
 
-  def getDjangoURLPatterns(self):
+  def djangoURLPatterns(self):
     """Returns a list of Django URL pattern tuples.
     """
     patterns = []

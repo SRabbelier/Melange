@@ -1,0 +1,14 @@
+.trigger {
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left: 12px;
+	background-image: url('/soc/content/images/plus.gif');
+}
+
+.toggle_container {
+	padding-left: 12px;
+}
+
+.active {
+	background-image: url('/soc/content/images/minus.gif');
+}

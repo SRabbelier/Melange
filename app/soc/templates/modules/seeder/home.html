@@ -1,0 +1,184 @@
+{% extends "soc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="/soc/content/js/templates/modules/seeder/home-100623.js" melangeContext="{configuration_sheet: {{ configuration_sheet }} }"></script>
+{% endblock %}
+
+{% block stylesheet %}
+{{ block.super }}
+<link rel="stylesheet" href="/soc/content/modules/seeder/css/home-100623.css" type="text/css"/>
+{% endblock %}
+
+{% block page_title %}
+Data seeder
+{% endblock %}
+
+{% block header_title %}
+Data seeder
+{% endblock %}
+
+{% block body %}
+<h2>Models</h2>
+<div id="models_list">
+
+	{% comment %}
+	This div serves as a pure template for displaying a list of models. It is
+	populated by MODEL_SELECTOR_DIRECTIVE in the JavaScript template file.
+	{% endcomment %}
+	<div id="models_selector">
+		<select class="model_select">
+			<option class="model_select_option"></option>
+		</select>
+	</div>
+	<button id="add_model_button" type="button">Add model</button>
+</div>
+<div id="selected_models">
+
+	{% comment %}
+	This div serves as a pure template for displaying a model and its
+	properties. It's populated by MODEL_SELECTOR_DIRECTIVE in the JavaScript
+	template file.
+	{% endcomment %}
+	<div class="model_container">
+		<h2 class="trigger"><span class="model_name"></span>(<a href="#" class="model_remove_link">Delete</a>)</h2>
+		<div class="toggle_container">
+			<h3>Number of models to seed:</h3>
+			<input id="number" />
+			<h3>Properties</h3>
+			<div class="property_set_container">
+				<h4 class="property_set_name trigger"></h4>
+				<div class="toggle_container">
+					<div class="property_container">
+						<h5 class="property_name trigger"></h5>
+						<div class="toggle_container">Please choose a provider:
+							<select class="provider_select">
+								<option value="none">None</option>
+								<option class="provider_select_option" value=""></option>
+							</select>
+							<div class="provider_parameters"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% comment %}
+	This div serves as a pure template for displaying a nested model
+	(a reference or a back-reference) and its properties. It's populated
+	by NESTED_MODEL_SELECTOR_DIRECTIVE in the JavaScript template file.
+	{% endcomment %}
+	<div class="nested_model_container">
+		<h2 class="trigger"><span class="model_name"></span>(<a class="model_remove_link">Delete</a>)</h2>
+		<div class="toggle_container">
+			<h3>Properties</h3>
+			<div class="property_set_container">
+				<h4 class="property_set_name trigger"></h4>
+				<div class="toggle_container">
+					<div class="property_container">
+						<h5 class="property_name trigger"></h5>
+						<div class="toggle_container">Please choose a provider:
+							<select class="provider_select">
+								<option value="none">None</option>
+								<option class="provider_select_option" value=""></option>
+							</select>
+							<div class="provider_parameters"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% comment %}
+	This div serves as a pure template for displaying information and
+	configuration for a data provider. It's populated by
+	PROVIDER_CONTAINER_DIRECTIVE in the JavaScript template file.
+	{% endcomment %}
+	<div class="provider_container">
+		<p class="fieldhelptext provider_description">
+		</p>
+		<h4>Parameters</h4>
+		<table>
+			<tbody class="provider_parameter_container">
+				<tr>
+					<td class="formfieldlabel">
+						<label class="parameter_name"></label>
+					</td>
+					<td class="formfieldvalue">
+						<input class="provider_parameter_input" />
+					</td>
+					<td class="formfieldrequired parameter_required"></td>
+				</tr>
+				<tr>
+					<td class="fieldhelptext parameter_description" colspan="4">
+					</td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+			</tbody>
+		</table>
+		<table>
+			<tr>
+				<td>
+					<button class="test_provider" type="button">Test</button>
+				</td>
+				<td>
+					<div class="test_provider_response"></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	{% comment %}
+	This div serves as a pure template for displaying a list of models for a
+	reference property. It is populated by REFERENCE_MODEL_SELECTOR_DIRECTIVE
+	in the JavaScript template file.
+	{% endcomment %}
+	<div class="reference_model_selector">Please choose a model class:
+		<select class="model_select">
+			<option class="model_select_option"></option>
+		</select>
+		<div class="reference_model_parameters"></div>
+	</div>
+</div>
+
+<button id="validate_configuration_sheet_button" type="button">Validate configuration sheet</button>
+<button id="send_configuration_sheet_button" type="button">Send configuration sheet</button>
+
+<div id="download_configuration">
+	<h2>Download configuration sheet</h2>
+	<form action="/seeder/echo" method="post">
+		<input id="download_configuration_sheet_data" name="data" type="hidden" />
+		<input id="download_configuration_sheet_button" type="submit" value="Download configuration sheet" />
+	</form>
+</div>
+
+<div id="load_configuration">
+	<h2>Load configuration sheet</h2>
+	<form action="/seeder/home"
+			enctype="multipart/form-data" method="post">
+		<p>
+		Please specify a file, or a set of files:<br>
+		<input type="file" name="configuration_sheet">
+		</p>
+		<div>
+		<input id="load_configuration_sheet_button"
+				type="submit" value="Load configuration sheet">
+		</div>
+	</form>
+</div>
+{% endblock %}

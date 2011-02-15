@@ -27,6 +27,7 @@ from django.template import loader
 from soc.models import linkable
 
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 
 
 class Homepage(RequestHandler):
@@ -59,8 +60,13 @@ class Homepage(RequestHandler):
   def get(self):
     """Handler to for GSoC Home page HTTP get request.
     """
+
+    program = self.data.program
+
     context = {
-        'page_name': "Home page"
+        'page_name': 'Home page',
+        'current_timeline': timeline_logic.getCurrentTimeline(program),
         }
+
     content = loader.render_to_string(self.template_path, dictionary=context)
     self.response.write(content)

@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.logic.models import timeline
+from soc.logic.helper import timeline as timeline_helper
 
 import soc.models.timeline
 
@@ -40,5 +41,22 @@ class Logic(timeline.Logic):
 
     super(Logic, self).__init__(model, base_model=base_model)
 
+  def getCurrentTimeline(self, program_entity):
+    """Return where we are currently on the timeline.
+    """
+    from soc.modules.gsoc.logic.models.org_app_survey import logic as oas_logic
+
+    oas_entity = oas_logic.getForFields({'scope': program_entity},
+                                        unique=True)
+    timeline_entity = program_entity.timeline
+
+    if timeline_helper.isActivePeriod(oas_entity, 'survey'):
+      return 'org_signup_period'
+    elif timeline_helper.isActivePeriod(timeline_entity, 'student_signup'):
+      return 'student_signup_period'
+    elif timeline_helper.isActivePeriod(timeline_entity, 'program'):
+      return 'program_period'
+
+    return ''
 
 logic = Logic()

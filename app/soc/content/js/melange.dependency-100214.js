@@ -45,21 +45,27 @@
 
   var s = script_dependencies_chains;
 
-  s.google = [
-//     {% if google_api_key %}
-//     "http://www.google.com/jsapi?key={{ google_api_key }}"
-//     {% else %}
-    "http://www.google.com/jsapi"
-//     {% endif %}
-  ];
+  if (melange.config.google_api_key !== undefined) {
+    s.google = [
+      "http://www.google.com/jsapi?key=" + melange.config.google_api_key
+    ];
+  }
+  else {
+    s.google = [
+      "http://www.google.com/jsapi"
+    ];
+  }
 
-  s.jquery = [
-//     {% if is_local %}
-    "/jquery/jquery-1.5.js"
-//     {% else %}
-//     "http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"
-//     {% endif %}
-  ];
+  if (melange.config.is_local !== undefined && melange.config.is_local === true) {
+    s.jquery = [
+      "/jquery/jquery-1.5.js"
+    ];
+  }
+  else {
+    s.jquery = [
+      "http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"
+    ];
+  }
 
   s.json = [
     "/json/json2.js"

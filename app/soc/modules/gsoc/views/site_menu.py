@@ -32,32 +32,18 @@ from soc.modules.gsoc.views.helper import redirects
 def siteMenuContext(data):
   """Generates URL links for the hard-coded GSoC site menu items.
   """
-  context = {}
 
-  # get login link
-  context['login_link'] = users.create_login_url(
-      data.request.path.encode('utf-8'))
+  encoded_path = data.request.path.encode('utf-8')
 
-  # get logout link
-  context['logout_link'] = users.create_logout_url(
-      data.request.path.encode('utf-8'))
-
-  # get about link
-  context['about_link'] = redirects.getAboutPageRedirect()
-
-  # get projects link
-  context['projects_link'] = redirects.getAllProjectsRedirect()
-
-  # get events link
-  context['events_link'] = redirects.getEventsRedirect()
-
-  # get connect link
-  context['connect_link'] = redirects.getConnectRedirect()
-
-  # get help link
-  context['help_link'] = redirects.getHelpRedirect()
-
-  return context
+  return {
+      'login_link': users.create_login_url(encoded_path),
+      'logout_link': users.create_logout_url(encoded_path),
+      'about_link': redirects.getAboutPageRedirect(),
+      'projects_link': redirects.getAllProjectsRedirect(),
+      'events_link': redirects.getEventsRedirect(),
+      'connect_link': redirects.getConnectRedirect(),
+      'help_link': redirects.getHelpRedirect(),
+  }
 
 
 class MainMenu(Template):

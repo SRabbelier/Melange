@@ -95,6 +95,7 @@ def real_main():
   callback.registerCore(core.Core())
   callback.getCore().registerModuleCallbacks(settings.MODULES,
                                              settings.MODULE_FMT)
+  callback.getCore().initialize()
 
   # Run the WSGI CGI handler with that application.
   util.run_wsgi_app(application)

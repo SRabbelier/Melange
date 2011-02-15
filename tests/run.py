@@ -78,6 +78,7 @@ def load_melange():
   current_core.registerModuleCallbacks(modules, fmt)
 
   # Make sure all services are called
+  current_core.callService('registerViews', True)
   current_core.callService('registerWithSitemap', True)
   current_core.callService('registerWithSidebar', True)
   current_core.callService('registerRights', True)

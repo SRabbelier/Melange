@@ -195,6 +195,12 @@ class Core(object):
     assert self.in_request
     self.per_request_value[key] = value
 
+  def initialize(self):
+    """Performs the required initialization for all modules.
+    """
+
+    self.callService('registerViews', True)
+
   def getPatterns(self):
     """Returns the Django patterns for this site.
     """

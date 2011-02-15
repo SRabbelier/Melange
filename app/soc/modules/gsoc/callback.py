@@ -55,6 +55,14 @@ class Callback(object):
     """
 
     self.core = core
+    self.views = []
+
+  def registerViews(self):
+    """Instantiates all view objects.
+    """
+
+    from soc.modules.gsoc.views import dashboard
+    self.views.append(dashboard.StudentDashboard())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.
@@ -87,8 +95,8 @@ class Callback(object):
     self.core.registerSitemapEntry(slot_assignment.getDjangoURLPatterns())
 
     # Redesigned view registration
-    from soc.modules.gsoc.views import dashboard
-    self.core.registerSitemapEntry(dashboard.StudentDashboard().getDjangoURLPatterns())
+    for view in self.views:
+      self.core.registerSitemapEntry(view.getDjangoURLPatterns())
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

@@ -81,7 +81,6 @@ class Response(HttpResponse):
                content_type=DEFAULT_CONTENT_TYPE):
     """Constructor to convert the status code to the relevant message.
     """
-
     if not content:
       content = self.HTTP_STATUS_MESSAGE.get(status, '')
 
@@ -98,7 +97,6 @@ class Response(HttpResponse):
     If no status string is given, we use the default from the HTTP/1.1
     specification defined in the dictionary HTTP_STATUS_MESSAGE.
     """
-
     if not message:
       self.content = self.HTTP_STATUS_MESSAGE.get(status, '')
 
@@ -145,14 +143,15 @@ class RequestHandler(object):
     """
     self.error(405)
 
-  def error(self, status):
+  def error(self, status, message=None):
     """Sets the error response code and the message when the HTTP
     Request should get an error response.
 
     Args:
       status: the HTTP status error code
+      message: the message to set, uses default if None
     """
-    self.response.set_status(status)
+    self.response.set_status(status, message=message)
 
   def getDjangoURLPatterns(self):
     """Returns a list of Django URL pattern tuples.
@@ -165,13 +164,12 @@ class RequestHandler(object):
     """Raise an exception if the user doesn't have access to the
     requested URL.
     """
-
-    self.error(405)
+    self.error(401, "checkAccess in base RequestHandler has not been changed"
+               "to grant access")
 
   def _dispatch(self, request, *args, **kwargs):
     """Dispatches the HTTP request to its respective handler method.
     """
-
     if request.method == 'GET':
       self.get(request, *args, **kwargs)
     elif request.method == 'POST':
@@ -198,7 +196,6 @@ class RequestHandler(object):
     3. Delegates dispatching to the handler to the _dispatch method.
     4. Returns the response.
     """
-
     self.response = Response()
 
     self.checkAccess(request, *args, **kwargs)

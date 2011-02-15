@@ -19,6 +19,7 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 
@@ -35,6 +36,7 @@ class RequestHandler(RequestHandler):
     """See soc.views.base.RequestHandler.__call__()
     """
 
-    self.data = RequestData(request, *args, **kwargs)
+    self.data = RequestData()
+    self.data.populate(request, *args, **kwargs)
 
     return super(RequestHandler, self).__call__(request, *args, **kwargs)

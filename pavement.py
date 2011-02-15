@@ -24,6 +24,7 @@ files would be added to the ``tinymce.zip`` file, etc.
 """
 
 from cStringIO import StringIO
+import shutil
 import sys
 import zipfile
 
@@ -53,6 +54,25 @@ options(
                      "jquery.min", "ranklist", "shell", "json.min", "jlinq",
                      "htmlsanitizer", "LABjs.min", "taggable", "gviz", "django",
                      "webmaster"],
+        css_dir = "soc/content/css",
+        css_files = {
+            "ui.all.css": [
+                "ui.theme.css",
+                "ui.base.css",
+                "ui.theme.css",
+                "ui.core.css",
+                "ui.resizable.css",
+                "ui.selectable.css",
+                "ui.accordion.css",
+                "ui.autocomplete.css",
+                "ui.button.css",
+                "ui.dialog.css",
+                "ui.slider.css",
+                "ui.tabs.css",
+                "ui.datepicker.css",
+                "ui.progressbar.css"
+            ],
+        },
         zip_files = ['tiny_mce.zip'],
         skip_pylint = False,
         skip_closure = False,
@@ -195,6 +215,9 @@ def build(options):
         if options.get('quiet_pylint', False):
             options.pylint.quiet = True
         pylint(options)
+
+    # Compile the css files into one
+    build_css(options)
     
     # Clean old generated zip files from the app folder.
     clean_zip(options)
@@ -224,6 +247,21 @@ def build_symlinks(options):
         dry(
             '%-4s%-20s <- %s' % ('', target, link),
             lambda: symlink(target, link.abspath()))
+
+
+@task
+def build_css(options):
+    """Compiles the css files into one."""
+
+    for target, components in options.css_files.iteritems():
+      target = options.app_folder / options.css_dir / target
+      f = target.open('w')
+
+      for component in components:
+        source = options.app_folder / options.css_dir / component
+        dry("cat %s >> %s" % (source, target),
+            lambda: shutil.copyfileobj(source.open('r'), f))
+      f.close()
 
 
 @task

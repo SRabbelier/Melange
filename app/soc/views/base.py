@@ -196,14 +196,13 @@ class RequestHandler(object):
     4. Delegates dispatching to the handler to the _dispatch method.
     5. Returns the response.
     """
-
     self.request = request
     self.args = args
     self.kwargs = kwargs
 
     self.response = Response()
 
-    self.checkAccess(request, *args, **kwargs)
-    self._dispatch(request, *args, **kwargs)
+    self.checkAccess()
+    self._dispatch()
 
     return self.response

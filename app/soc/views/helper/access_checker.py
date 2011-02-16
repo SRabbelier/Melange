@@ -219,23 +219,17 @@ class AccessChecker(object):
       raise out_of_band.AccessViolation(
           message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
-  def checkIsOrgAdminForOrg(self, org):
-    """Checks if the current user is an organization admin for the specified
-    organization.
-    
-    Raises:
-      AccessViolationResponse: if the current user is not an admin for
-                               the specified organization
+  def checkIsParticipatingInProgram(self):
+    """Checks if the user has a role for the program specified in data.
+
+     Raises:
+       AccessViolationResponse: if the current user has no student, mentor or
+                                org admin role for the given program.
     """
-
-    key_name = org.key().id_or_name()
-
-    for org_admin in self.data.org_admins:
-      if org_admin.scope.key().id_or_name() == key_name:
-        return
-
-    raise out_of_band.AccessViolation(
-          message_fmt=DEF_NEED_ROLE_MSG)
+    data = self.data
+    if not (data.student or data.mentors or data.org_admins or data.host):
+      raise out_of_band.AccessViolation(
+          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
   def checkIsActive(self, entity):
     """Checks if the specified entity is active.

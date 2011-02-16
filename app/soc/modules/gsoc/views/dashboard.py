@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from soc.modules.gsoc.views.helper.access_checker import AccessChecker
 
 """Module for the GSoC participant dashboard.
 """
@@ -48,8 +49,7 @@ class Dashboard(RequestHandler):
   def checkAccess(self):
     """Denies access if you don't have a role in the current program.
     """
-    # TODO: Should raise exception when you are not a participant in the program
-    return
+    AccessChecker(self.data).checkIsParticipatingInProgram()
 
   def templatePath(self):
     """Returns the path to the template.

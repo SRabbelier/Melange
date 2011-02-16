@@ -145,7 +145,7 @@ tinyMCE.init(%(settings_json)s)
 
     if value is None:
       value = ''
-    value = util.smart_unicode(value)
+    value = encoding.smart_unicode(value)
     final_attrs = self.build_attrs(attrs, name=name)
     
     self.mce_settings['elements'] = "id_%s" % name

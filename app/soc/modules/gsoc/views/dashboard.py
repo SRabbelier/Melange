@@ -94,14 +94,14 @@ class Dashboard(RequestHandler):
     pass
 
 
-class MyProposalsComponent(Component):
+class MyProposalsComponent(Template):
   """Component for listing all the proposals of the current Student.
   """
 
   def __init__(self, handler):
     """Initializes the template location, name and title of this component.
     """
-    self.handler = handle
+    self._handler = handler
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
@@ -117,6 +117,6 @@ class MyProposalsComponent(Component):
                                          view.getParams())
     return {
         'name': "proposals",
-        'title': "PROPOSALS"
-        'lists' = Lists([list_config])
+        'title': "PROPOSALS",
+        'lists': Lists([list_config]),
     }

@@ -8,12 +8,24 @@
       {% if dashboard_link %}
       <li id="menu-login"><a href="{{ dashboard_link }}">My Dashboard</a></li>
       {% endif %}
+      {% if about_link %}
       <li id="menu-about"><a href="{{ about_link }}">About</a></li>
-      <li id="menu-apply"><a href="javascript:void(0)">Apply</a></li>
+      {% endif %}
+      {% if apply_link %}
+      <li id="menu-apply"><a href="{{ apply_link }}">Apply</a></li>
+      {% endif %}
+      {% if projects_link %}
       <li id="menu-projects"><a href="{{ projects_link }}">Current &amp; Past Projects</a></li>
+      {% endif %}
+      {% if events_link %}
       <li id="menu-events"><a href="{{ events_link }}">Events &amp; Timeline</a></li>
+      {% endif %}
+      {% if connect_link %}
       <li id="menu-connect"><a href="{{ connect_link }}">Connect With Us</a></li>
+      {% endif %}
+      {% if help_link %}
       <li id="menu-help"><a href="{{ help_link }}">Help</a></li>
+      {% endif %}
     </ul>
   {% endblock site_menu %}
 </div>

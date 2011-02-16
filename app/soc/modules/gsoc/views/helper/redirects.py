@@ -27,7 +27,8 @@ def getAboutPageRedirect(data):
   """Returns the redirect for the About page for the current GSoC program.
   """
 
-  return '/gsoc/about/%s' % data.program.key().name()
+  if data.program.about_page:
+    return '/gsoc/document/%s' % data.program.about_page.key().name()
 
 
 def getAllProjectsRedirect(data):
@@ -41,7 +42,8 @@ def getConnectRedirect(data):
   """Returns the redirect for the Connect page for the current GSoC program.
   """
 
-  return '/gsoc/connect/%s' % data.program.key().name()
+  if data.program.connect_with_us_page:
+    return '/gsoc/document/%s' % data.program.connect_with_us_page.key().name()
 
 
 def getEventsRedirect(data):
@@ -49,19 +51,23 @@ def getEventsRedirect(data):
   GSoC program.
   """
 
-  return '/gsoc/events/%s' % data.program.key().name()
+  if data.program.events_page:
+    return '/gsoc/document/%s' % data.program.events_page.key().name()
 
 
 def getHelpRedirect(data):
   """Returns the redirect for the Help page for the current GSoC program.
   """
 
-  return '/gsoc/help/%s' % data.program.key().name()
+  if data.program.events_page:
+    return '/gsoc/document/%s' % data.program.events_page.key().name()
+
 
 def getHomepageRedirect(data):
   """Returns the redirect for the homepage for the current GSOC program.
   """
   return '/gsoc/homepage/%s' % data.program.key().name()
+
 
 def getDashboardRedirect(data):
   """Returns the redirect for the dashboard page for the current GSOC program.

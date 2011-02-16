@@ -60,7 +60,10 @@ class Callback(object):
   def registerViews(self):
     """Instantiates all view objects.
     """
+    from soc.modules.gsoc.views import dashboard
     from soc.modules.gsoc.views import homepage
+
+    self.views.append(dashboard.Dashboard())
     self.views.append(homepage.Homepage())
 
   def registerWithSitemap(self):

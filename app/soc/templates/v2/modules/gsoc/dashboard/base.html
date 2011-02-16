@@ -16,7 +16,7 @@ limitations under the License.
 {% block page_content %}
   {% if alert_msg %}
     <div id="user-message" class="error">
-      {{ alert_msg }}
+      {{ alert_msg|safe }}
     </div>
   {% endif %}
   <h1 id="main-page-title">{{ user.name }}'s Dashboard</h1>

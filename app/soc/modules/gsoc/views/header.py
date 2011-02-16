@@ -23,13 +23,20 @@ __authors__ = [
 
 from soc.views.template import Template
 
+from soc.modules.gsoc.views.helper import redirects
+
 
 class Header(Template):
   """MainMenu template.
   """
 
   def __init__(self, data):
-    pass
+    self.data = data
 
   def templatePath(self):
     return "v2/modules/gsoc/header.html"
+
+  def context(self):
+    return {
+        'home_link': redirects.getHomepageRedirect(self.data)
+    }

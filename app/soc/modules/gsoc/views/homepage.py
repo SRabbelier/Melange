@@ -37,8 +37,17 @@ class Timeline(Template):
     self.current_timeline = current_timeline
 
   def context(self):
+    if self.current_timeline == 'program-timeline':
+      img_url = "/soc/content/images/v2/gsoc/image-map-org-apps.png"
+    elif self.current_timeline == 'student_signup_period':
+      img_url = "/soc/content/images/v2/gsoc/image-map-student-apps.png"
+    elif self.current_timeline == 'program_period':
+      img_url = "/soc/content/images/v2/gsoc/image-map-off-season.png"
+    else:
+      img_url = ""
+
     return {
-        'current_timeline': self.current_timeline,
+        'img_url': img_url
     }
 
   def templatePath(self):

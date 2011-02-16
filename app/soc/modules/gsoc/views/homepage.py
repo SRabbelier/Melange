@@ -29,6 +29,7 @@ from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
+from soc.modules.gsoc.views.helper import redirects
 
 
 class Timeline(Template):
@@ -74,17 +75,29 @@ class Apply(Template):
     return "v2/modules/gsoc/homepage/_apply.html"
 
 
+class FeaturedProject(Template):
+  """Featured project template
+  """
+
+  def __init__(self, data, featured_project):
+    self.data = data
+    self.featured_project = featured_project
+
+  def context(self):
+    featured_project_url = redirects.getProjectDetailsRedirect(self.featured_project)
+
+    return {
+      'featured_project': self.featured_project,
+      'featured_project_url': featured_project_url,
+    }
+
+  def templatePath(self):
+    return "v2/modules/gsoc/homepage/_featured_project.html"
+
+
 class Homepage(RequestHandler):
   """Encapsulate all the methods required to generate GSoC Home page.
   """
-
-  def getProjectDetailsRedirect(self, student_project):
-    """Returns the URL to the Student Project.
-
-    Args:
-      student_project: entity which represents the Student Project
-    """
-    return '/gsoc/student_project/show/%s' % student_project.key().id_or_name()
 
   def templatePath(self):
     return 'v2/modules/gsoc/homepage/base.html'
@@ -109,17 +122,17 @@ class Homepage(RequestHandler):
     current_timeline = timeline_logic.getCurrentTimeline(
         self.data.program_timeline, self.data.org_app)
 
-    program = self.data.program
+    featured_project = sp_logic.getFeaturedProject(
+        current_timeline, self.data.program)
 
-    featured_project = sp_logic.getFeaturedProject(current_timeline, program)
-    if featured_project:
-      featured_project_url = self.getProjectDetailsRedirect(featured_project)
-
-    return {
+    context = {
         'timeline': Timeline(self.data, current_timeline).render(),
         'apply': Apply(self.data, current_timeline).render(),
-        'featured_project':featured_project,
-        'featured_project_url': featured_project_url,
         'page_name': 'Home page',
-        'program': program,
+        'program': self.data.program,
     }
+
+    if featured_project:
+      context['featured_project'] = FeaturedProject(self.data, featured_project).render()
+
+    return context

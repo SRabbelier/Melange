@@ -39,21 +39,8 @@ limitations under the License.
   {{ apply }}
   <!-- end block -->
 
-
   <!-- begin block -->
-  <div id="featured-projects" class="block block-featured-project">
-    <h4 title="title-section-featured-project">Featured Project</h4>
-    <div id="block-featured-project-content" class="block-content">
-      <h5 id="block-featured-project-content-title">{{ featured_project.title }}</h5>
-      {% if featured_project.image %}
-        <img src="{{ featured_project.image }}" height="99" width="121" alt="" id="block-featured-project-image" class="alignright" />
-      {% endif %}
-      <p>{{ featured_project.abstract }}</p>
-    </div>
-    <div id="block-featured-project-readmore" class="readmore">
-      <a href="{{ featured_project_url }}">read more</a>
-    </div>
-  </div>
+  {{ featured_project }}
   <!-- end block -->
 </div>
 <!-- .content_column_1 -->

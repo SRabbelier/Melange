@@ -74,3 +74,12 @@ def getDashboardRedirect(data):
   """
 
   return '/gsoc/dashboard/%s' % data.program.key().name()
+
+
+def getProjectDetailsRedirect(student_project):
+  """Returns the URL to the Student Project.
+
+  Args:
+    student_project: entity which represents the Student Project
+  """
+  return '/gsoc/student_project/show/%s' % student_project.key().id_or_name()

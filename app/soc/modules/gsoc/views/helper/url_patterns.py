@@ -42,6 +42,7 @@ def namedLinkIdPattern(names):
 
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
+DOCUMENT  = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'document'])
 STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
 PROPOSAL  = namedLinkIdPattern(['sponsor', 'program', 'student', 'proposal'])
 MENTOR    = namedLinkIdPattern(['sponsor', 'program', 'organization', 'mentor'])

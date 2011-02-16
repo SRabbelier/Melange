@@ -186,3 +186,11 @@ a, a:link {
   font-weight: bold;
   padding: 3px 7px;
 }
+
+/* Override color for embedded document */
+#document_content span {
+  color: black;
+}
+#document_content {
+  padding-top: 0.5em;
+}

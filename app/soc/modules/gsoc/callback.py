@@ -62,9 +62,11 @@ class Callback(object):
     """
     from soc.modules.gsoc.views import dashboard
     from soc.modules.gsoc.views import homepage
+    from soc.modules.gsoc.views import document
 
     self.views.append(dashboard.Dashboard())
     self.views.append(homepage.Homepage())
+    self.views.append(document.Document())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

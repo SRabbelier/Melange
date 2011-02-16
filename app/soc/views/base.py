@@ -198,6 +198,13 @@ class RequestHandler(object):
     rendered = loader.render_to_string(self.templatePath(), dictionary=context)
     self.response.write(rendered)
 
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
+
+    Subclasses should override this method.
+    """
+    raise NotImplementedError()
+
   def _dispatch(self):
     """Dispatches the HTTP request to its respective handler method.
     """

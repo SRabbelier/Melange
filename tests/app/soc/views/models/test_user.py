@@ -70,18 +70,17 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/edit_profile'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit_profile.html')
     self.assertTrue('message' in response.context[0])
-    self.assertContains(response, 'Sign In Required')
 
   def testListUserRoles(self):
     """Test that an unregistered user cannot list his/her non existed roles.
     """
     url = '/user/roles'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -91,7 +90,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/requests'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -101,7 +100,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/create'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -111,7 +110,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/create/'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -121,7 +120,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/create/abc'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -131,7 +130,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/edit/a_user'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -141,7 +140,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/delete/a_user'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -161,7 +160,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/list'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -171,7 +170,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/pick'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/json.html')
     self.assertTrue('message' in response.context[0])
@@ -181,7 +180,7 @@ class UserTestUnregistered(DjangoTestCase):
     """
     url = '/user/list_developers'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -242,7 +241,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/create_profile'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit_profile.html')
     self.assertTrue('message' in response.context[0])
@@ -288,7 +287,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/create'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -298,7 +297,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/create/'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -308,7 +307,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/create/abc'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -318,7 +317,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/edit/current_user'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -328,7 +327,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/delete/another_user'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -338,7 +337,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/delete/current_user'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit.html')
     self.assertTrue('message' in response.context[0])
@@ -358,7 +357,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/list'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -378,7 +377,7 @@ class UserTestRegistered(DjangoTestCase):
     """
     url = '/user/list_developers'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/models/list.html')
     self.assertTrue('message' in response.context[0])
@@ -452,7 +451,7 @@ class UserTestDeveloper(DjangoTestCase):
     """
     url = '/user/create_profile'
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual(response.status_code, httplib.UNAUTHORIZED)
     self.assertTemplateUsed(response, 'soc/login.html')
     self.assertTemplateNotUsed(response, 'soc/user/edit_profile.html')
     self.assertTrue('message' in response.context[0])

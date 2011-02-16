@@ -40,6 +40,8 @@ import nose
 from nose import plugins
 
 import logging
+# Disable the messy logging information
+logging.disable(90)
 log =  logging.getLogger('nose.plugins.cover')
 logging.disable(90)
 
@@ -112,6 +114,7 @@ def main():
   os.environ['SERVER_PORT'] = '8080'
   os.environ['APPLICATION_ID'] = 'test-app-run'
   os.environ['USER_EMAIL'] = 'test@example.com'
+  os.environ['USER_ID'] = '42'
   os.environ['CURRENT_VERSION_ID'] = 'testing-version'
   os.environ['HTTP_HOST'] = 'some.testing.host.tld'
   import main as app_main

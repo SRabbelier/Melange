@@ -50,7 +50,7 @@ class SidebarCacheTest(unittest.TestCase):
     """Test that the key method returns a unique key.
     """
 
-    self.assertEqual("sidebar_for_users.User(email='test@example.com')",
+    self.assertEqual("sidebar_for_users.User(email='test@example.com',_user_id='42')",
                      sidebar.key(self.user))
 
   def testGet(self):

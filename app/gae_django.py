@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module containing Melange Django 1.0+ configuration for Google App Engine.
+"""Module containing Melange Django 1.2 configuration for Google App Engine.
 """
 
 import logging
@@ -24,32 +24,15 @@ import sys
 __authors__ = [
   # alphabetical order by last name, please
   '"Pawel Solyga" <pawel.solyga@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
-
-
-if os.environ['SERVER_SOFTWARE'].startswith('Dev'):
-  
-  # Remove the standard version of Django.
-  for k in [k for k in sys.modules if k.startswith('django')]:
-    del sys.modules[k]
-
-  # Force sys.path to have our own directory first, in case we want to import
-  # from it. This lets us replace the built-in Django
-  sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-  sys.path.insert(0, os.path.abspath('django'))
-  sys.path.insert(0, os.path.abspath('django.zip'))
-
-else:
-  # Declare the Django version we need.
-  from google.appengine.dist import use_library
-  use_library('django', '1.0')
-
-# Force Django to reload its settings.
-from django.conf import settings
-settings._target = None
 
 # Must set this env var before importing any part of Django
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+# Declare the Django version we need.
+from google.appengine.dist import use_library
+use_library('django', '1.2')
 
 import django.core.signals
 import django.db

@@ -48,6 +48,7 @@ except ImportError:
 
 import dummy_thread
 import email.Utils
+import fancy_urllib
 import errno
 import heapq
 import httplib
@@ -80,8 +81,6 @@ import urlparse
 import urllib
 
 import google
-google._DEV_APPSERVER = True
-
 from google.pyglib import gexcept
 
 from google.appengine.api import apiproxy_stub_map
@@ -100,8 +99,9 @@ from google.appengine.api.blobstore import blobstore_stub
 from google.appengine.api.blobstore import file_blob_storage
 from google.appengine.api.capabilities import capability_stub
 from google.appengine.api.channel import channel_service_stub
+from google.appengine.api.files import file_service_stub
 from google.appengine.api.taskqueue import taskqueue_stub
-from google.appengine.api.matcher import matcher_stub
+from google.appengine.api.prospective_search import prospective_search_stub
 from google.appengine.api.memcache import memcache_stub
 from google.appengine.api.xmpp import xmpp_service_stub
 from google.appengine.datastore import datastore_sqlite_stub
@@ -3555,7 +3555,7 @@ def SetupStubs(app_id, **config):
     login_url: Relative URL which should be used for handling user login/logout.
     blobstore_path: Path to the directory to store Blobstore blobs in.
     datastore_path: Path to the file to store Datastore file stub data in.
-    matcher_path: Path to the file to store Matcher stub data in.
+    prospective_search_path: Path to the file to store Prospective Search stub data in.
     use_sqlite: Use the SQLite stub for the datastore.
     history_path: DEPRECATED, No-op.
     clear_datastore: If the datastore should be cleared on startup.
@@ -3582,8 +3582,8 @@ def SetupStubs(app_id, **config):
   blobstore_path = config['blobstore_path']
   datastore_path = config['datastore_path']
   clear_datastore = config['clear_datastore']
-  matcher_path = config.get('matcher_path', '')
-  clear_matcher = config.get('clear_matcher', False)
+  prospective_search_path = config.get('prospective_search_path', '')
+  clear_prospective_search = config.get('clear_prospective_search', False)
   use_sqlite = config.get('use_sqlite', False)
   require_indexes = config.get('require_indexes', False)
   smtp_host = config.get('smtp_host', None)
@@ -3601,11 +3601,11 @@ def SetupStubs(app_id, **config):
 
   os.environ['APPLICATION_ID'] = app_id
 
-  if clear_matcher and matcher_path:
-    if os.path.lexists(matcher_path):
-      logging.info('Attempting to remove file at %s', matcher_path)
+  if clear_prospective_search and prospective_search_path:
+    if os.path.lexists(prospective_search_path):
+      logging.info('Attempting to remove file at %s', prospective_search_path)
       try:
-        remove(matcher_path)
+        remove(prospective_search_path)
       except OSError, e:
         logging.warning('Removing file failed: %s', e)
 
@@ -3645,6 +3645,8 @@ def SetupStubs(app_id, **config):
       urlfetch_stub.URLFetchServiceStub())
 
 
+
+
   apiproxy_stub_map.apiproxy.RegisterStub(
       'mail',
       mail_stub.MailServiceStub(smtp_host,
@@ -3679,8 +3681,8 @@ def SetupStubs(app_id, **config):
 
   apiproxy_stub_map.apiproxy.RegisterStub(
       'matcher',
-      matcher_stub.MatcherStub(
-          matcher_path,
+      prospective_search_stub.ProspectiveSearchStub(
+          prospective_search_path,
           apiproxy_stub_map.apiproxy.GetStub('taskqueue')))
 
 
@@ -3705,6 +3707,10 @@ def SetupStubs(app_id, **config):
   apiproxy_stub_map.apiproxy.RegisterStub(
       'blobstore',
       blobstore_stub.BlobstoreServiceStub(blob_storage))
+
+  apiproxy_stub_map.apiproxy.RegisterStub(
+      'file',
+      file_service_stub.FileServiceStub(blob_storage))
 
 
 def CreateImplicitMatcher(

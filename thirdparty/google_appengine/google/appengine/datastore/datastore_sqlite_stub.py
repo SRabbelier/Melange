@@ -321,7 +321,7 @@ class QueryCursor(datastore_stub_util.BaseCursor):
 
     result.set_keys_only(self.__query.keys_only())
     result.set_more_results(self._HasNext())
-    self.PopulateCursor(result.mutable_cursor())
+    self.PopulateCursor(result)
     self._EncodeCompiledCursor(result.mutable_compiled_cursor())
 
 
@@ -1549,7 +1549,8 @@ class DatastoreSqliteStub(apiproxy_stub.APIProxyStub):
         count = _BATCH_SIZE
 
       cursor.PopulateQueryResult(query_result, count, query.offset())
-      self.__cursors[query_result.cursor().cursor()] = cursor
+      if query_result.has_cursor():
+        self.__cursors[query_result.cursor().cursor()] = cursor
     finally:
       self._ReleaseConnection(conn, query.transaction())
 
@@ -1569,6 +1570,8 @@ class DatastoreSqliteStub(apiproxy_stub.APIProxyStub):
     if next_request.has_count():
       count = next_request.count()
     cursor.PopulateQueryResult(query_result, count, next_request.offset())
+    if not query_result.has_cursor():
+      del self.__cursors[next_request.cursor().cursor()]
 
   def _Dynamic_Count(self, query, integer64proto):
     if query.has_limit():

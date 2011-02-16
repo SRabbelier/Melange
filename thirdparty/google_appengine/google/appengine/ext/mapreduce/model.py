@@ -405,7 +405,7 @@ class MapreduceSpec(JsonMixin):
                name,
                mapreduce_id,
                mapper_spec,
-               params = {},
+               params={},
                hooks_class_name=None):
     """Create new MapreduceSpec.
 
@@ -441,7 +441,7 @@ class MapreduceSpec(JsonMixin):
       if not issubclass(hooks_class, hooks.Hooks):
         raise ValueError(
             "hooks_class_name must refer to a hooks.Hooks subclass")
-      self.__hooks = hooks_class()
+      self.__hooks = hooks_class(self.mapper)
 
     return self.__hooks
 

@@ -301,6 +301,10 @@ class APIProxyStubMap(object):
                                    returned_response or response)
         return returned_response
 
+  def CancelApiCalls(self):
+    if self.__default_stub:
+      self.__default_stub.CancelApiCalls()
+
 
 class UserRPC(object):
   """Wrapper class for asynchronous RPC.

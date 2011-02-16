@@ -92,7 +92,14 @@ class CapabilityConfigList(ProtocolBuffer.ProtocolMessage):
     n += 1 * len(self.config_)
     for i in xrange(len(self.config_)): n += self.lengthString(self.config_[i].ByteSize())
     if (self.has_default_config_): n += 1 + self.lengthString(self.default_config_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.config_)
+    for i in xrange(len(self.config_)): n += self.lengthString(self.config_[i].ByteSizePartial())
+    if (self.has_default_config_): n += 1 + self.lengthString(self.default_config_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_config()
@@ -107,6 +114,16 @@ class CapabilityConfigList(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.default_config_.ByteSize())
       self.default_config_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.config_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.config_[i].ByteSizePartial())
+      self.config_[i].OutputPartial(out)
+    if (self.has_default_config_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.default_config_.ByteSizePartial())
+      self.default_config_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -342,6 +359,21 @@ class CapabilityConfig(ProtocolBuffer.ProtocolMessage):
     if (self.has_error_message_): n += 1 + self.lengthString(len(self.error_message_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_package_):
+      n += 1
+      n += self.lengthString(len(self.package_))
+    if (self.has_capability_):
+      n += 1
+      n += self.lengthString(len(self.capability_))
+    if (self.has_status_): n += 1 + self.lengthVarInt64(self.status_)
+    if (self.has_scheduled_time_): n += 1 + self.lengthString(len(self.scheduled_time_))
+    if (self.has_internal_message_): n += 1 + self.lengthString(len(self.internal_message_))
+    if (self.has_admin_message_): n += 1 + self.lengthString(len(self.admin_message_))
+    if (self.has_error_message_): n += 1 + self.lengthString(len(self.error_message_))
+    return n
+
   def Clear(self):
     self.clear_package()
     self.clear_capability()
@@ -356,6 +388,29 @@ class CapabilityConfig(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.package_)
     out.putVarInt32(18)
     out.putPrefixedString(self.capability_)
+    if (self.has_status_):
+      out.putVarInt32(24)
+      out.putVarInt32(self.status_)
+    if (self.has_internal_message_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.internal_message_)
+    if (self.has_admin_message_):
+      out.putVarInt32(42)
+      out.putPrefixedString(self.admin_message_)
+    if (self.has_error_message_):
+      out.putVarInt32(50)
+      out.putPrefixedString(self.error_message_)
+    if (self.has_scheduled_time_):
+      out.putVarInt32(58)
+      out.putPrefixedString(self.scheduled_time_)
+
+  def OutputPartial(self, out):
+    if (self.has_package_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.package_)
+    if (self.has_capability_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.capability_)
     if (self.has_status_):
       out.putVarInt32(24)
       out.putVarInt32(self.status_)

@@ -100,6 +100,25 @@ class XmppServiceStub(apiproxy_stub.APIProxyStub):
     self.log('       ' + from_jid)
     self.log('    To: ' + request.jid())
 
+  def _Dynamic_SendPresence(self, request, response):
+    """Implementation of XmppService::SendPresence.
+
+    Args:
+      request: An XmppSendPresenceRequest.
+      response: An XmppSendPresenceResponse .
+    """
+    from_jid = self._GetFrom(request.from_jid())
+    self.log('Sending an XMPP Presence:')
+    self.log('    From:')
+    self.log('       ' + from_jid)
+    self.log('    To: ' + request.jid())
+    if request.type():
+      self.log('    Type: ' + request.type())
+    if request.show():
+      self.log('    Show: ' + request.show())
+    if request.status():
+      self.log('    Status: ' + request.status())
+
   def _GetFrom(self, requested):
     """Validates that the from JID is valid.
 

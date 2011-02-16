@@ -56,12 +56,19 @@ class MemcacheServiceError(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -169,7 +176,15 @@ class MemcacheGetRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.key_)): n += self.lengthString(len(self.key_[i]))
     if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
     if (self.has_for_cas_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.key_)
+    for i in xrange(len(self.key_)): n += self.lengthString(len(self.key_[i]))
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    if (self.has_for_cas_): n += 2
+    return n
 
   def Clear(self):
     self.clear_key()
@@ -177,6 +192,17 @@ class MemcacheGetRequest(ProtocolBuffer.ProtocolMessage):
     self.clear_for_cas()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.key_)):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.key_[i])
+    if (self.has_name_space_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.name_space_)
+    if (self.has_for_cas_):
+      out.putVarInt32(32)
+      out.putBoolean(self.for_cas_)
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.key_)):
       out.putVarInt32(10)
       out.putPrefixedString(self.key_[i])
@@ -363,6 +389,19 @@ class MemcacheGetResponse_Item(ProtocolBuffer.ProtocolMessage):
     if (self.has_expires_in_seconds_): n += 1 + self.lengthVarInt64(self.expires_in_seconds_)
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(len(self.key_))
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    if (self.has_flags_): n += 5
+    if (self.has_cas_id_): n += 9
+    if (self.has_expires_in_seconds_): n += 1 + self.lengthVarInt64(self.expires_in_seconds_)
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_value()
@@ -375,6 +414,23 @@ class MemcacheGetResponse_Item(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.key_)
     out.putVarInt32(26)
     out.putPrefixedString(self.value_)
+    if (self.has_flags_):
+      out.putVarInt32(37)
+      out.put32(self.flags_)
+    if (self.has_cas_id_):
+      out.putVarInt32(41)
+      out.put64(self.cas_id_)
+    if (self.has_expires_in_seconds_):
+      out.putVarInt32(48)
+      out.putVarInt32(self.expires_in_seconds_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.key_)
+    if (self.has_value_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.value_)
     if (self.has_flags_):
       out.putVarInt32(37)
       out.put32(self.flags_)
@@ -461,7 +517,13 @@ class MemcacheGetResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 2 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.item_[i].ByteSize()
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.item_[i].ByteSizePartial()
+    return n
 
   def Clear(self):
     self.clear_item()
@@ -470,6 +532,12 @@ class MemcacheGetResponse(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.item_)):
       out.putVarInt32(11)
       self.item_[i].OutputUnchecked(out)
+      out.putVarInt32(12)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(11)
+      self.item_[i].OutputPartial(out)
       out.putVarInt32(12)
 
   def TryMerge(self, d):
@@ -689,6 +757,21 @@ class MemcacheSetRequest_Item(ProtocolBuffer.ProtocolMessage):
     if (self.has_for_cas_): n += 2
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(len(self.key_))
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    if (self.has_flags_): n += 5
+    if (self.has_set_policy_): n += 1 + self.lengthVarInt64(self.set_policy_)
+    if (self.has_expiration_time_): n += 5
+    if (self.has_cas_id_): n += 9
+    if (self.has_for_cas_): n += 2
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_value()
@@ -703,6 +786,29 @@ class MemcacheSetRequest_Item(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.key_)
     out.putVarInt32(26)
     out.putPrefixedString(self.value_)
+    if (self.has_flags_):
+      out.putVarInt32(37)
+      out.put32(self.flags_)
+    if (self.has_set_policy_):
+      out.putVarInt32(40)
+      out.putVarInt32(self.set_policy_)
+    if (self.has_expiration_time_):
+      out.putVarInt32(53)
+      out.put32(self.expiration_time_)
+    if (self.has_cas_id_):
+      out.putVarInt32(65)
+      out.put64(self.cas_id_)
+    if (self.has_for_cas_):
+      out.putVarInt32(72)
+      out.putBoolean(self.for_cas_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.key_)
+    if (self.has_value_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.value_)
     if (self.has_flags_):
       out.putVarInt32(37)
       out.put32(self.flags_)
@@ -838,7 +944,14 @@ class MemcacheSetRequest(ProtocolBuffer.ProtocolMessage):
     n += 2 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.item_[i].ByteSize()
     if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.item_[i].ByteSizePartial()
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    return n
 
   def Clear(self):
     self.clear_item()
@@ -848,6 +961,15 @@ class MemcacheSetRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.item_)):
       out.putVarInt32(11)
       self.item_[i].OutputUnchecked(out)
+      out.putVarInt32(12)
+    if (self.has_name_space_):
+      out.putVarInt32(58)
+      out.putPrefixedString(self.name_space_)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(11)
+      self.item_[i].OutputPartial(out)
       out.putVarInt32(12)
     if (self.has_name_space_):
       out.putVarInt32(58)
@@ -978,12 +1100,23 @@ class MemcacheSetResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.set_status_)
     for i in xrange(len(self.set_status_)): n += self.lengthVarInt64(self.set_status_[i])
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.set_status_)
+    for i in xrange(len(self.set_status_)): n += self.lengthVarInt64(self.set_status_[i])
+    return n
 
   def Clear(self):
     self.clear_set_status()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.set_status_)):
+      out.putVarInt32(8)
+      out.putVarInt32(self.set_status_[i])
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.set_status_)):
       out.putVarInt32(8)
       out.putVarInt32(self.set_status_[i])
@@ -1089,6 +1222,14 @@ class MemcacheDeleteRequest_Item(ProtocolBuffer.ProtocolMessage):
     if (self.has_delete_time_): n += 5
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(len(self.key_))
+    if (self.has_delete_time_): n += 5
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_delete_time()
@@ -1096,6 +1237,14 @@ class MemcacheDeleteRequest_Item(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(18)
     out.putPrefixedString(self.key_)
+    if (self.has_delete_time_):
+      out.putVarInt32(29)
+      out.put32(self.delete_time_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.key_)
     if (self.has_delete_time_):
       out.putVarInt32(29)
       out.put32(self.delete_time_)
@@ -1183,7 +1332,14 @@ class MemcacheDeleteRequest(ProtocolBuffer.ProtocolMessage):
     n += 2 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.item_[i].ByteSize()
     if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.item_[i].ByteSizePartial()
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    return n
 
   def Clear(self):
     self.clear_item()
@@ -1193,6 +1349,15 @@ class MemcacheDeleteRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.item_)):
       out.putVarInt32(11)
       self.item_[i].OutputUnchecked(out)
+      out.putVarInt32(12)
+    if (self.has_name_space_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.name_space_)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(11)
+      self.item_[i].OutputPartial(out)
       out.putVarInt32(12)
     if (self.has_name_space_):
       out.putVarInt32(34)
@@ -1304,12 +1469,23 @@ class MemcacheDeleteResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.delete_status_)
     for i in xrange(len(self.delete_status_)): n += self.lengthVarInt64(self.delete_status_[i])
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.delete_status_)
+    for i in xrange(len(self.delete_status_)): n += self.lengthVarInt64(self.delete_status_[i])
+    return n
 
   def Clear(self):
     self.clear_delete_status()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.delete_status_)):
+      out.putVarInt32(8)
+      out.putVarInt32(self.delete_status_[i])
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.delete_status_)):
       out.putVarInt32(8)
       out.putVarInt32(self.delete_status_[i])
@@ -1503,6 +1679,18 @@ class MemcacheIncrementRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_initial_flags_): n += 5
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(len(self.key_))
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    if (self.has_delta_): n += 1 + self.lengthVarInt64(self.delta_)
+    if (self.has_direction_): n += 1 + self.lengthVarInt64(self.direction_)
+    if (self.has_initial_value_): n += 1 + self.lengthVarInt64(self.initial_value_)
+    if (self.has_initial_flags_): n += 5
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_name_space()
@@ -1514,6 +1702,26 @@ class MemcacheIncrementRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.key_)
+    if (self.has_delta_):
+      out.putVarInt32(16)
+      out.putVarUint64(self.delta_)
+    if (self.has_direction_):
+      out.putVarInt32(24)
+      out.putVarInt32(self.direction_)
+    if (self.has_name_space_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.name_space_)
+    if (self.has_initial_value_):
+      out.putVarInt32(40)
+      out.putVarUint64(self.initial_value_)
+    if (self.has_initial_flags_):
+      out.putVarInt32(53)
+      out.put32(self.initial_flags_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.key_)
     if (self.has_delta_):
       out.putVarInt32(16)
       out.putVarUint64(self.delta_)
@@ -1669,13 +1877,27 @@ class MemcacheIncrementResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     if (self.has_new_value_): n += 1 + self.lengthVarInt64(self.new_value_)
     if (self.has_increment_status_): n += 1 + self.lengthVarInt64(self.increment_status_)
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_new_value_): n += 1 + self.lengthVarInt64(self.new_value_)
+    if (self.has_increment_status_): n += 1 + self.lengthVarInt64(self.increment_status_)
+    return n
 
   def Clear(self):
     self.clear_new_value()
     self.clear_increment_status()
 
   def OutputUnchecked(self, out):
+    if (self.has_new_value_):
+      out.putVarInt32(8)
+      out.putVarUint64(self.new_value_)
+    if (self.has_increment_status_):
+      out.putVarInt32(16)
+      out.putVarInt32(self.increment_status_)
+
+  def OutputPartial(self, out):
     if (self.has_new_value_):
       out.putVarInt32(8)
       out.putVarUint64(self.new_value_)
@@ -1786,7 +2008,14 @@ class MemcacheBatchIncrementRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
     n += 1 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.lengthString(self.item_[i].ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    n += 1 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.lengthString(self.item_[i].ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_name_space()
@@ -1800,6 +2029,15 @@ class MemcacheBatchIncrementRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.item_[i].ByteSize())
       self.item_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_name_space_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.name_space_)
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(18)
+      out.putVarInt32(self.item_[i].ByteSizePartial())
+      self.item_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1895,7 +2133,13 @@ class MemcacheBatchIncrementResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.lengthString(self.item_[i].ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.lengthString(self.item_[i].ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_item()
@@ -1905,6 +2149,12 @@ class MemcacheBatchIncrementResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.item_[i].ByteSize())
       self.item_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.item_[i].ByteSizePartial())
+      self.item_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1969,12 +2219,19 @@ class MemcacheFlushRequest(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -2023,12 +2280,19 @@ class MemcacheFlushResponse(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -2077,12 +2341,19 @@ class MemcacheStatsRequest(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -2269,6 +2540,27 @@ class MergedNamespaceStats(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.bytes_)
     return n + 10
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_hits_):
+      n += 1
+      n += self.lengthVarInt64(self.hits_)
+    if (self.has_misses_):
+      n += 1
+      n += self.lengthVarInt64(self.misses_)
+    if (self.has_byte_hits_):
+      n += 1
+      n += self.lengthVarInt64(self.byte_hits_)
+    if (self.has_items_):
+      n += 1
+      n += self.lengthVarInt64(self.items_)
+    if (self.has_bytes_):
+      n += 1
+      n += self.lengthVarInt64(self.bytes_)
+    if (self.has_oldest_item_age_):
+      n += 5
+    return n
+
   def Clear(self):
     self.clear_hits()
     self.clear_misses()
@@ -2290,6 +2582,26 @@ class MergedNamespaceStats(ProtocolBuffer.ProtocolMessage):
     out.putVarUint64(self.bytes_)
     out.putVarInt32(53)
     out.put32(self.oldest_item_age_)
+
+  def OutputPartial(self, out):
+    if (self.has_hits_):
+      out.putVarInt32(8)
+      out.putVarUint64(self.hits_)
+    if (self.has_misses_):
+      out.putVarInt32(16)
+      out.putVarUint64(self.misses_)
+    if (self.has_byte_hits_):
+      out.putVarInt32(24)
+      out.putVarUint64(self.byte_hits_)
+    if (self.has_items_):
+      out.putVarInt32(32)
+      out.putVarUint64(self.items_)
+    if (self.has_bytes_):
+      out.putVarInt32(40)
+      out.putVarUint64(self.bytes_)
+    if (self.has_oldest_item_age_):
+      out.putVarInt32(53)
+      out.put32(self.oldest_item_age_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -2404,7 +2716,12 @@ class MemcacheStatsResponse(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_stats_): n += 1 + self.lengthString(self.stats_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_stats_): n += 1 + self.lengthString(self.stats_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_stats()
@@ -2414,6 +2731,12 @@ class MemcacheStatsResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.stats_.ByteSize())
       self.stats_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_stats_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.stats_.ByteSizePartial())
+      self.stats_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -2517,6 +2840,14 @@ class MemcacheGrabTailRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_item_count_):
+      n += 1
+      n += self.lengthVarInt64(self.item_count_)
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    return n
+
   def Clear(self):
     self.clear_item_count()
     self.clear_name_space()
@@ -2524,6 +2855,14 @@ class MemcacheGrabTailRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(8)
     out.putVarInt32(self.item_count_)
+    if (self.has_name_space_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.name_space_)
+
+  def OutputPartial(self, out):
+    if (self.has_item_count_):
+      out.putVarInt32(8)
+      out.putVarInt32(self.item_count_)
     if (self.has_name_space_):
       out.putVarInt32(18)
       out.putPrefixedString(self.name_space_)
@@ -2631,6 +2970,14 @@ class MemcacheGrabTailResponse_Item(ProtocolBuffer.ProtocolMessage):
     if (self.has_flags_): n += 5
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    if (self.has_flags_): n += 5
+    return n
+
   def Clear(self):
     self.clear_value()
     self.clear_flags()
@@ -2638,6 +2985,14 @@ class MemcacheGrabTailResponse_Item(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(18)
     out.putPrefixedString(self.value_)
+    if (self.has_flags_):
+      out.putVarInt32(29)
+      out.put32(self.flags_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.value_)
     if (self.has_flags_):
       out.putVarInt32(29)
       out.put32(self.flags_)
@@ -2706,7 +3061,13 @@ class MemcacheGrabTailResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 2 * len(self.item_)
     for i in xrange(len(self.item_)): n += self.item_[i].ByteSize()
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.item_)
+    for i in xrange(len(self.item_)): n += self.item_[i].ByteSizePartial()
+    return n
 
   def Clear(self):
     self.clear_item()
@@ -2715,6 +3076,12 @@ class MemcacheGrabTailResponse(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.item_)):
       out.putVarInt32(11)
       self.item_[i].OutputUnchecked(out)
+      out.putVarInt32(12)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.item_)):
+      out.putVarInt32(11)
+      self.item_[i].OutputPartial(out)
       out.putVarInt32(12)
 
   def TryMerge(self, d):

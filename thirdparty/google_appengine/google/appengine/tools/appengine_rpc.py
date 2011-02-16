@@ -211,6 +211,9 @@ class AbstractRpcServer(object):
       response_body = response.read()
       response_dict = dict(x.split("=")
                            for x in response_body.split("\n") if x)
+      if os.getenv("APPENGINE_RPC_USE_SID", "0") == "1":
+        self.extra_headers["Cookie"] = (
+            'SID=%s; Path=/;' % response_dict["SID"])
       return response_dict["Auth"]
     except urllib2.HTTPError, e:
       if e.code == 403:
@@ -265,6 +268,8 @@ class AbstractRpcServer(object):
       credentials = self.auth_function()
       try:
         auth_token = self._GetAuthToken(credentials[0], credentials[1])
+        if os.getenv("APPENGINE_RPC_USE_SID", "0") == "1":
+          return
       except ClientLoginError, e:
         if e.reason == "BadAuthentication":
           print >>sys.stderr, "Invalid username or password."

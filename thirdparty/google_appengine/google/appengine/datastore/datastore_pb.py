@@ -98,6 +98,15 @@ class Transaction(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.app_))
     return n + 10
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_handle_):
+      n += 9
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    return n
+
   def Clear(self):
     self.clear_handle()
     self.clear_app()
@@ -107,6 +116,14 @@ class Transaction(ProtocolBuffer.ProtocolMessage):
     out.put64(self.handle_)
     out.putVarInt32(18)
     out.putPrefixedString(self.app_)
+
+  def OutputPartial(self, out):
+    if (self.has_handle_):
+      out.putVarInt32(9)
+      out.put64(self.handle_)
+    if (self.has_app_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.app_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -239,6 +256,15 @@ class Query_Filter(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.property_)): n += self.lengthString(self.property_[i].ByteSize())
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_op_):
+      n += 1
+      n += self.lengthVarInt64(self.op_)
+    n += 1 * len(self.property_)
+    for i in xrange(len(self.property_)): n += self.lengthString(self.property_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_op()
     self.clear_property()
@@ -250,6 +276,15 @@ class Query_Filter(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(114)
       out.putVarInt32(self.property_[i].ByteSize())
       self.property_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_op_):
+      out.putVarInt32(48)
+      out.putVarInt32(self.op_)
+    for i in xrange(len(self.property_)):
+      out.putVarInt32(114)
+      out.putVarInt32(self.property_[i].ByteSizePartial())
+      self.property_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while 1:
@@ -356,6 +391,14 @@ class Query_Order(ProtocolBuffer.ProtocolMessage):
     if (self.has_direction_): n += 1 + self.lengthVarInt64(self.direction_)
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_property_):
+      n += 1
+      n += self.lengthString(len(self.property_))
+    if (self.has_direction_): n += 1 + self.lengthVarInt64(self.direction_)
+    return n
+
   def Clear(self):
     self.clear_property()
     self.clear_direction()
@@ -363,6 +406,14 @@ class Query_Order(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(82)
     out.putPrefixedString(self.property_)
+    if (self.has_direction_):
+      out.putVarInt32(88)
+      out.putVarInt32(self.direction_)
+
+  def OutputPartial(self, out):
+    if (self.has_property_):
+      out.putVarInt32(82)
+      out.putPrefixedString(self.property_)
     if (self.has_direction_):
       out.putVarInt32(88)
       out.putVarInt32(self.direction_)
@@ -868,6 +919,36 @@ class Query(ProtocolBuffer.ProtocolMessage):
     if (self.has_strong_): n += 3
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    if (self.has_name_space_): n += 2 + self.lengthString(len(self.name_space_))
+    if (self.has_kind_): n += 1 + self.lengthString(len(self.kind_))
+    if (self.has_ancestor_): n += 2 + self.lengthString(self.ancestor_.ByteSizePartial())
+    n += 2 * len(self.filter_)
+    for i in xrange(len(self.filter_)): n += self.filter_[i].ByteSizePartial()
+    if (self.has_search_query_): n += 1 + self.lengthString(len(self.search_query_))
+    n += 2 * len(self.order_)
+    for i in xrange(len(self.order_)): n += self.order_[i].ByteSizePartial()
+    if (self.has_hint_): n += 2 + self.lengthVarInt64(self.hint_)
+    if (self.has_count_): n += 2 + self.lengthVarInt64(self.count_)
+    if (self.has_offset_): n += 1 + self.lengthVarInt64(self.offset_)
+    if (self.has_limit_): n += 2 + self.lengthVarInt64(self.limit_)
+    if (self.has_compiled_cursor_): n += 2 + self.lengthString(self.compiled_cursor_.ByteSizePartial())
+    if (self.has_end_compiled_cursor_): n += 2 + self.lengthString(self.end_compiled_cursor_.ByteSizePartial())
+    n += 2 * len(self.composite_index_)
+    for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSizePartial())
+    if (self.has_require_perfect_plan_): n += 3
+    if (self.has_keys_only_): n += 3
+    if (self.has_transaction_): n += 2 + self.lengthString(self.transaction_.ByteSizePartial())
+    if (self.has_distinct_): n += 3
+    if (self.has_compile_): n += 3
+    if (self.has_failover_ms_): n += 2 + self.lengthVarInt64(self.failover_ms_)
+    if (self.has_strong_): n += 3
+    return n
+
   def Clear(self):
     self.clear_app()
     self.clear_name_space()
@@ -958,6 +1039,78 @@ class Query(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(250)
       out.putVarInt32(self.end_compiled_cursor_.ByteSize())
       self.end_compiled_cursor_.OutputUnchecked(out)
+    if (self.has_strong_):
+      out.putVarInt32(256)
+      out.putBoolean(self.strong_)
+
+  def OutputPartial(self, out):
+    if (self.has_app_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.app_)
+    if (self.has_kind_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.kind_)
+    for i in xrange(len(self.filter_)):
+      out.putVarInt32(35)
+      self.filter_[i].OutputPartial(out)
+      out.putVarInt32(36)
+    if (self.has_search_query_):
+      out.putVarInt32(66)
+      out.putPrefixedString(self.search_query_)
+    for i in xrange(len(self.order_)):
+      out.putVarInt32(75)
+      self.order_[i].OutputPartial(out)
+      out.putVarInt32(76)
+    if (self.has_offset_):
+      out.putVarInt32(96)
+      out.putVarInt32(self.offset_)
+    if (self.has_limit_):
+      out.putVarInt32(128)
+      out.putVarInt32(self.limit_)
+    if (self.has_ancestor_):
+      out.putVarInt32(138)
+      out.putVarInt32(self.ancestor_.ByteSizePartial())
+      self.ancestor_.OutputPartial(out)
+    if (self.has_hint_):
+      out.putVarInt32(144)
+      out.putVarInt32(self.hint_)
+    for i in xrange(len(self.composite_index_)):
+      out.putVarInt32(154)
+      out.putVarInt32(self.composite_index_[i].ByteSizePartial())
+      self.composite_index_[i].OutputPartial(out)
+    if (self.has_require_perfect_plan_):
+      out.putVarInt32(160)
+      out.putBoolean(self.require_perfect_plan_)
+    if (self.has_keys_only_):
+      out.putVarInt32(168)
+      out.putBoolean(self.keys_only_)
+    if (self.has_transaction_):
+      out.putVarInt32(178)
+      out.putVarInt32(self.transaction_.ByteSizePartial())
+      self.transaction_.OutputPartial(out)
+    if (self.has_count_):
+      out.putVarInt32(184)
+      out.putVarInt32(self.count_)
+    if (self.has_distinct_):
+      out.putVarInt32(192)
+      out.putBoolean(self.distinct_)
+    if (self.has_compile_):
+      out.putVarInt32(200)
+      out.putBoolean(self.compile_)
+    if (self.has_failover_ms_):
+      out.putVarInt32(208)
+      out.putVarInt64(self.failover_ms_)
+    if (self.has_name_space_):
+      out.putVarInt32(234)
+      out.putPrefixedString(self.name_space_)
+    if (self.has_compiled_cursor_):
+      out.putVarInt32(242)
+      out.putVarInt32(self.compiled_cursor_.ByteSizePartial())
+      self.compiled_cursor_.OutputPartial(out)
+    if (self.has_end_compiled_cursor_):
+      out.putVarInt32(250)
+      out.putVarInt32(self.end_compiled_cursor_.ByteSizePartial())
+      self.end_compiled_cursor_.OutputPartial(out)
     if (self.has_strong_):
       out.putVarInt32(256)
       out.putBoolean(self.strong_)
@@ -1328,7 +1481,17 @@ class CompiledQuery_PrimaryScan(ProtocolBuffer.ProtocolMessage):
     if (self.has_end_key_): n += 1 + self.lengthString(len(self.end_key_))
     if (self.has_end_inclusive_): n += 2
     if (self.has_end_unapplied_log_timestamp_us_): n += 2 + self.lengthVarInt64(self.end_unapplied_log_timestamp_us_)
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_index_name_): n += 1 + self.lengthString(len(self.index_name_))
+    if (self.has_start_key_): n += 1 + self.lengthString(len(self.start_key_))
+    if (self.has_start_inclusive_): n += 2
+    if (self.has_end_key_): n += 1 + self.lengthString(len(self.end_key_))
+    if (self.has_end_inclusive_): n += 2
+    if (self.has_end_unapplied_log_timestamp_us_): n += 2 + self.lengthVarInt64(self.end_unapplied_log_timestamp_us_)
+    return n
 
   def Clear(self):
     self.clear_index_name()
@@ -1339,6 +1502,26 @@ class CompiledQuery_PrimaryScan(ProtocolBuffer.ProtocolMessage):
     self.clear_end_unapplied_log_timestamp_us()
 
   def OutputUnchecked(self, out):
+    if (self.has_index_name_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.index_name_)
+    if (self.has_start_key_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.start_key_)
+    if (self.has_start_inclusive_):
+      out.putVarInt32(32)
+      out.putBoolean(self.start_inclusive_)
+    if (self.has_end_key_):
+      out.putVarInt32(42)
+      out.putPrefixedString(self.end_key_)
+    if (self.has_end_inclusive_):
+      out.putVarInt32(48)
+      out.putBoolean(self.end_inclusive_)
+    if (self.has_end_unapplied_log_timestamp_us_):
+      out.putVarInt32(152)
+      out.putVarInt64(self.end_unapplied_log_timestamp_us_)
+
+  def OutputPartial(self, out):
     if (self.has_index_name_):
       out.putVarInt32(18)
       out.putPrefixedString(self.index_name_)
@@ -1460,6 +1643,15 @@ class CompiledQuery_MergeJoinScan(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.prefix_value_)): n += self.lengthString(len(self.prefix_value_[i]))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_index_name_):
+      n += 1
+      n += self.lengthString(len(self.index_name_))
+    n += 1 * len(self.prefix_value_)
+    for i in xrange(len(self.prefix_value_)): n += self.lengthString(len(self.prefix_value_[i]))
+    return n
+
   def Clear(self):
     self.clear_index_name()
     self.clear_prefix_value()
@@ -1467,6 +1659,14 @@ class CompiledQuery_MergeJoinScan(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(66)
     out.putPrefixedString(self.index_name_)
+    for i in xrange(len(self.prefix_value_)):
+      out.putVarInt32(74)
+      out.putPrefixedString(self.prefix_value_[i])
+
+  def OutputPartial(self, out):
+    if (self.has_index_name_):
+      out.putVarInt32(66)
+      out.putPrefixedString(self.index_name_)
     for i in xrange(len(self.prefix_value_)):
       out.putVarInt32(74)
       out.putPrefixedString(self.prefix_value_[i])
@@ -1579,7 +1779,14 @@ class CompiledQuery_EntityFilter(ProtocolBuffer.ProtocolMessage):
     if (self.has_distinct_): n += 2
     if (self.has_kind_): n += 2 + self.lengthString(len(self.kind_))
     if (self.has_ancestor_): n += 2 + self.lengthString(self.ancestor_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_distinct_): n += 2
+    if (self.has_kind_): n += 2 + self.lengthString(len(self.kind_))
+    if (self.has_ancestor_): n += 2 + self.lengthString(self.ancestor_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_distinct()
@@ -1597,6 +1804,18 @@ class CompiledQuery_EntityFilter(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(146)
       out.putVarInt32(self.ancestor_.ByteSize())
       self.ancestor_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_distinct_):
+      out.putVarInt32(112)
+      out.putBoolean(self.distinct_)
+    if (self.has_kind_):
+      out.putVarInt32(138)
+      out.putPrefixedString(self.kind_)
+    if (self.has_ancestor_):
+      out.putVarInt32(146)
+      out.putVarInt32(self.ancestor_.ByteSizePartial())
+      self.ancestor_.OutputPartial(out)
 
   def TryMerge(self, d):
     while 1:
@@ -1779,6 +1998,20 @@ class CompiledQuery(ProtocolBuffer.ProtocolMessage):
     if (self.has_entityfilter_): n += 2 + self.entityfilter_.ByteSize()
     return n + 4
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_primaryscan_):
+      n += 2
+      n += self.primaryscan_.ByteSizePartial()
+    n += 2 * len(self.mergejoinscan_)
+    for i in xrange(len(self.mergejoinscan_)): n += self.mergejoinscan_[i].ByteSizePartial()
+    if (self.has_offset_): n += 1 + self.lengthVarInt64(self.offset_)
+    if (self.has_limit_): n += 1 + self.lengthVarInt64(self.limit_)
+    if (self.has_keys_only_):
+      n += 2
+    if (self.has_entityfilter_): n += 2 + self.entityfilter_.ByteSizePartial()
+    return n
+
   def Clear(self):
     self.clear_primaryscan()
     self.clear_mergejoinscan()
@@ -1806,6 +2039,29 @@ class CompiledQuery(ProtocolBuffer.ProtocolMessage):
     if (self.has_entityfilter_):
       out.putVarInt32(107)
       self.entityfilter_.OutputUnchecked(out)
+      out.putVarInt32(108)
+
+  def OutputPartial(self, out):
+    if (self.has_primaryscan_):
+      out.putVarInt32(11)
+      self.primaryscan_.OutputPartial(out)
+      out.putVarInt32(12)
+    for i in xrange(len(self.mergejoinscan_)):
+      out.putVarInt32(59)
+      self.mergejoinscan_[i].OutputPartial(out)
+      out.putVarInt32(60)
+    if (self.has_offset_):
+      out.putVarInt32(80)
+      out.putVarInt32(self.offset_)
+    if (self.has_limit_):
+      out.putVarInt32(88)
+      out.putVarInt32(self.limit_)
+    if (self.has_keys_only_):
+      out.putVarInt32(96)
+      out.putBoolean(self.keys_only_)
+    if (self.has_entityfilter_):
+      out.putVarInt32(107)
+      self.entityfilter_.OutputPartial(out)
       out.putVarInt32(108)
 
   def TryMerge(self, d):
@@ -1979,13 +2235,27 @@ class CompiledCursor_Position(ProtocolBuffer.ProtocolMessage):
     n = 0
     if (self.has_start_key_): n += 2 + self.lengthString(len(self.start_key_))
     if (self.has_start_inclusive_): n += 3
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_start_key_): n += 2 + self.lengthString(len(self.start_key_))
+    if (self.has_start_inclusive_): n += 3
+    return n
 
   def Clear(self):
     self.clear_start_key()
     self.clear_start_inclusive()
 
   def OutputUnchecked(self, out):
+    if (self.has_start_key_):
+      out.putVarInt32(218)
+      out.putPrefixedString(self.start_key_)
+    if (self.has_start_inclusive_):
+      out.putVarInt32(224)
+      out.putBoolean(self.start_inclusive_)
+
+  def OutputPartial(self, out):
     if (self.has_start_key_):
       out.putVarInt32(218)
       out.putPrefixedString(self.start_key_)
@@ -2076,7 +2346,14 @@ class CompiledCursor(ProtocolBuffer.ProtocolMessage):
     if (self.has_multiquery_index_): n += 1 + self.lengthVarInt64(self.multiquery_index_)
     n += 2 * len(self.position_)
     for i in xrange(len(self.position_)): n += self.position_[i].ByteSize()
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_multiquery_index_): n += 1 + self.lengthVarInt64(self.multiquery_index_)
+    n += 2 * len(self.position_)
+    for i in xrange(len(self.position_)): n += self.position_[i].ByteSizePartial()
+    return n
 
   def Clear(self):
     self.clear_multiquery_index()
@@ -2089,6 +2366,15 @@ class CompiledCursor(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.position_)):
       out.putVarInt32(19)
       self.position_[i].OutputUnchecked(out)
+      out.putVarInt32(20)
+
+  def OutputPartial(self, out):
+    if (self.has_multiquery_index_):
+      out.putVarInt32(8)
+      out.putVarInt32(self.multiquery_index_)
+    for i in xrange(len(self.position_)):
+      out.putVarInt32(19)
+      self.position_[i].OutputPartial(out)
       out.putVarInt32(20)
 
   def TryMerge(self, d):
@@ -2290,6 +2576,20 @@ class RunCompiledQueryRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_failover_ms_): n += 1 + self.lengthVarInt64(self.failover_ms_)
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    if (self.has_compiled_query_):
+      n += 1
+      n += self.lengthString(self.compiled_query_.ByteSizePartial())
+    if (self.has_original_query_): n += 1 + self.lengthString(self.original_query_.ByteSizePartial())
+    if (self.has_count_): n += 1 + self.lengthVarInt64(self.count_)
+    if (self.has_failover_ms_): n += 1 + self.lengthVarInt64(self.failover_ms_)
+    return n
+
   def Clear(self):
     self.clear_app()
     self.clear_name_space()
@@ -2314,6 +2614,28 @@ class RunCompiledQueryRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt64(self.failover_ms_)
     out.putVarInt32(42)
     out.putPrefixedString(self.app_)
+    if (self.has_name_space_):
+      out.putVarInt32(50)
+      out.putPrefixedString(self.name_space_)
+
+  def OutputPartial(self, out):
+    if (self.has_compiled_query_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.compiled_query_.ByteSizePartial())
+      self.compiled_query_.OutputPartial(out)
+    if (self.has_original_query_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.original_query_.ByteSizePartial())
+      self.original_query_.OutputPartial(out)
+    if (self.has_count_):
+      out.putVarInt32(24)
+      out.putVarInt32(self.count_)
+    if (self.has_failover_ms_):
+      out.putVarInt32(32)
+      out.putVarInt64(self.failover_ms_)
+    if (self.has_app_):
+      out.putVarInt32(42)
+      out.putPrefixedString(self.app_)
     if (self.has_name_space_):
       out.putVarInt32(50)
       out.putPrefixedString(self.name_space_)
@@ -2460,6 +2782,13 @@ class Cursor(ProtocolBuffer.ProtocolMessage):
     if (self.has_app_): n += 1 + self.lengthString(len(self.app_))
     return n + 9
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cursor_):
+      n += 9
+    if (self.has_app_): n += 1 + self.lengthString(len(self.app_))
+    return n
+
   def Clear(self):
     self.clear_cursor()
     self.clear_app()
@@ -2467,6 +2796,14 @@ class Cursor(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(9)
     out.put64(self.cursor_)
+    if (self.has_app_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.app_)
+
+  def OutputPartial(self, out):
+    if (self.has_cursor_):
+      out.putVarInt32(9)
+      out.put64(self.cursor_)
     if (self.has_app_):
       out.putVarInt32(18)
       out.putPrefixedString(self.app_)
@@ -2559,12 +2896,19 @@ class Error(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -2688,7 +3032,15 @@ class Cost(ProtocolBuffer.ProtocolMessage):
     if (self.has_index_write_bytes_): n += 1 + self.lengthVarInt64(self.index_write_bytes_)
     if (self.has_entity_writes_): n += 1 + self.lengthVarInt64(self.entity_writes_)
     if (self.has_entity_write_bytes_): n += 1 + self.lengthVarInt64(self.entity_write_bytes_)
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_index_writes_): n += 1 + self.lengthVarInt64(self.index_writes_)
+    if (self.has_index_write_bytes_): n += 1 + self.lengthVarInt64(self.index_write_bytes_)
+    if (self.has_entity_writes_): n += 1 + self.lengthVarInt64(self.entity_writes_)
+    if (self.has_entity_write_bytes_): n += 1 + self.lengthVarInt64(self.entity_write_bytes_)
+    return n
 
   def Clear(self):
     self.clear_index_writes()
@@ -2697,6 +3049,20 @@ class Cost(ProtocolBuffer.ProtocolMessage):
     self.clear_entity_write_bytes()
 
   def OutputUnchecked(self, out):
+    if (self.has_index_writes_):
+      out.putVarInt32(8)
+      out.putVarInt32(self.index_writes_)
+    if (self.has_index_write_bytes_):
+      out.putVarInt32(16)
+      out.putVarInt32(self.index_write_bytes_)
+    if (self.has_entity_writes_):
+      out.putVarInt32(24)
+      out.putVarInt32(self.entity_writes_)
+    if (self.has_entity_write_bytes_):
+      out.putVarInt32(32)
+      out.putVarInt32(self.entity_write_bytes_)
+
+  def OutputPartial(self, out):
     if (self.has_index_writes_):
       out.putVarInt32(8)
       out.putVarInt32(self.index_writes_)
@@ -2872,7 +3238,16 @@ class GetRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSize())
     if (self.has_failover_ms_): n += 1 + self.lengthVarInt64(self.failover_ms_)
     if (self.has_strong_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.key_)
+    for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSizePartial())
+    if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSizePartial())
+    if (self.has_failover_ms_): n += 1 + self.lengthVarInt64(self.failover_ms_)
+    if (self.has_strong_): n += 2
+    return n
 
   def Clear(self):
     self.clear_key()
@@ -2889,6 +3264,22 @@ class GetRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.transaction_.ByteSize())
       self.transaction_.OutputUnchecked(out)
+    if (self.has_failover_ms_):
+      out.putVarInt32(24)
+      out.putVarInt64(self.failover_ms_)
+    if (self.has_strong_):
+      out.putVarInt32(32)
+      out.putBoolean(self.strong_)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.key_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.key_[i].ByteSizePartial())
+      self.key_[i].OutputPartial(out)
+    if (self.has_transaction_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.transaction_.ByteSizePartial())
+      self.transaction_.OutputPartial(out)
     if (self.has_failover_ms_):
       out.putVarInt32(24)
       out.putVarInt64(self.failover_ms_)
@@ -3011,7 +3402,12 @@ class GetResponse_Entity(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_entity_): n += 1 + self.lengthString(self.entity_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_entity_): n += 1 + self.lengthString(self.entity_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_entity()
@@ -3021,6 +3417,12 @@ class GetResponse_Entity(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.entity_.ByteSize())
       self.entity_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_entity_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.entity_.ByteSizePartial())
+      self.entity_.OutputPartial(out)
 
   def TryMerge(self, d):
     while 1:
@@ -3088,7 +3490,13 @@ class GetResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 2 * len(self.entity_)
     for i in xrange(len(self.entity_)): n += self.entity_[i].ByteSize()
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.entity_)
+    for i in xrange(len(self.entity_)): n += self.entity_[i].ByteSizePartial()
+    return n
 
   def Clear(self):
     self.clear_entity()
@@ -3097,6 +3505,12 @@ class GetResponse(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.entity_)):
       out.putVarInt32(11)
       self.entity_[i].OutputUnchecked(out)
+      out.putVarInt32(12)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.entity_)):
+      out.putVarInt32(11)
+      self.entity_[i].OutputPartial(out)
       out.putVarInt32(12)
 
   def TryMerge(self, d):
@@ -3275,7 +3689,18 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSize())
     if (self.has_trusted_): n += 2
     if (self.has_force_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.entity_)
+    for i in xrange(len(self.entity_)): n += self.lengthString(self.entity_[i].ByteSizePartial())
+    if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSizePartial())
+    n += 1 * len(self.composite_index_)
+    for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSizePartial())
+    if (self.has_trusted_): n += 2
+    if (self.has_force_): n += 2
+    return n
 
   def Clear(self):
     self.clear_entity()
@@ -3297,6 +3722,26 @@ class PutRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(26)
       out.putVarInt32(self.composite_index_[i].ByteSize())
       self.composite_index_[i].OutputUnchecked(out)
+    if (self.has_trusted_):
+      out.putVarInt32(32)
+      out.putBoolean(self.trusted_)
+    if (self.has_force_):
+      out.putVarInt32(56)
+      out.putBoolean(self.force_)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.entity_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.entity_[i].ByteSizePartial())
+      self.entity_[i].OutputPartial(out)
+    if (self.has_transaction_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.transaction_.ByteSizePartial())
+      self.transaction_.OutputPartial(out)
+    for i in xrange(len(self.composite_index_)):
+      out.putVarInt32(26)
+      out.putVarInt32(self.composite_index_[i].ByteSizePartial())
+      self.composite_index_[i].OutputPartial(out)
     if (self.has_trusted_):
       out.putVarInt32(32)
       out.putBoolean(self.trusted_)
@@ -3461,7 +3906,14 @@ class PutResponse(ProtocolBuffer.ProtocolMessage):
     n += 1 * len(self.key_)
     for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSize())
     if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.key_)
+    for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSizePartial())
+    if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_key()
@@ -3476,6 +3928,16 @@ class PutResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.cost_.ByteSize())
       self.cost_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.key_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.key_[i].ByteSizePartial())
+      self.key_[i].OutputPartial(out)
+    if (self.has_cost_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.cost_.ByteSizePartial())
+      self.cost_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3602,7 +4064,15 @@ class TouchRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSize())
     n += 1 * len(self.composite_index_)
     for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.key_)
+    for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSizePartial())
+    n += 1 * len(self.composite_index_)
+    for i in xrange(len(self.composite_index_)): n += self.lengthString(self.composite_index_[i].ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_key()
@@ -3617,6 +4087,16 @@ class TouchRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.composite_index_[i].ByteSize())
       self.composite_index_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.key_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.key_[i].ByteSizePartial())
+      self.key_[i].OutputPartial(out)
+    for i in xrange(len(self.composite_index_)):
+      out.putVarInt32(18)
+      out.putVarInt32(self.composite_index_[i].ByteSizePartial())
+      self.composite_index_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3723,7 +4203,12 @@ class TouchResponse(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_cost()
@@ -3733,6 +4218,12 @@ class TouchResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.cost_.ByteSize())
       self.cost_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_cost_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.cost_.ByteSizePartial())
+      self.cost_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3881,7 +4372,16 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSize())
     if (self.has_trusted_): n += 2
     if (self.has_force_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.key_)
+    for i in xrange(len(self.key_)): n += self.lengthString(self.key_[i].ByteSizePartial())
+    if (self.has_transaction_): n += 1 + self.lengthString(self.transaction_.ByteSizePartial())
+    if (self.has_trusted_): n += 2
+    if (self.has_force_): n += 2
+    return n
 
   def Clear(self):
     self.clear_key()
@@ -3901,6 +4401,22 @@ class DeleteRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(50)
       out.putVarInt32(self.key_[i].ByteSize())
       self.key_[i].OutputUnchecked(out)
+    if (self.has_force_):
+      out.putVarInt32(56)
+      out.putBoolean(self.force_)
+
+  def OutputPartial(self, out):
+    if (self.has_trusted_):
+      out.putVarInt32(32)
+      out.putBoolean(self.trusted_)
+    if (self.has_transaction_):
+      out.putVarInt32(42)
+      out.putVarInt32(self.transaction_.ByteSizePartial())
+      self.transaction_.OutputPartial(out)
+    for i in xrange(len(self.key_)):
+      out.putVarInt32(50)
+      out.putVarInt32(self.key_[i].ByteSizePartial())
+      self.key_[i].OutputPartial(out)
     if (self.has_force_):
       out.putVarInt32(56)
       out.putBoolean(self.force_)
@@ -4020,7 +4536,12 @@ class DeleteResponse(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_cost()
@@ -4030,6 +4551,12 @@ class DeleteResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.cost_.ByteSize())
       self.cost_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_cost_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.cost_.ByteSizePartial())
+      self.cost_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -4167,6 +4694,16 @@ class NextRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_compile_): n += 2
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cursor_):
+      n += 1
+      n += self.lengthString(self.cursor_.ByteSizePartial())
+    if (self.has_count_): n += 1 + self.lengthVarInt64(self.count_)
+    if (self.has_offset_): n += 1 + self.lengthVarInt64(self.offset_)
+    if (self.has_compile_): n += 2
+    return n
+
   def Clear(self):
     self.clear_cursor()
     self.clear_count()
@@ -4177,6 +4714,21 @@ class NextRequest(ProtocolBuffer.ProtocolMessage):
     out.putVarInt32(10)
     out.putVarInt32(self.cursor_.ByteSize())
     self.cursor_.OutputUnchecked(out)
+    if (self.has_count_):
+      out.putVarInt32(16)
+      out.putVarInt32(self.count_)
+    if (self.has_compile_):
+      out.putVarInt32(24)
+      out.putBoolean(self.compile_)
+    if (self.has_offset_):
+      out.putVarInt32(32)
+      out.putVarInt32(self.offset_)
+
+  def OutputPartial(self, out):
+    if (self.has_cursor_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.cursor_.ByteSizePartial())
+      self.cursor_.OutputPartial(out)
     if (self.has_count_):
       out.putVarInt32(16)
       out.putVarInt32(self.count_)
@@ -4429,6 +4981,19 @@ class QueryResult(ProtocolBuffer.ProtocolMessage):
     if (self.has_compiled_cursor_): n += 1 + self.lengthString(self.compiled_cursor_.ByteSize())
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cursor_): n += 1 + self.lengthString(self.cursor_.ByteSizePartial())
+    n += 1 * len(self.result_)
+    for i in xrange(len(self.result_)): n += self.lengthString(self.result_[i].ByteSizePartial())
+    if (self.has_skipped_results_): n += 1 + self.lengthVarInt64(self.skipped_results_)
+    if (self.has_more_results_):
+      n += 2
+    if (self.has_keys_only_): n += 2
+    if (self.has_compiled_query_): n += 1 + self.lengthString(self.compiled_query_.ByteSizePartial())
+    if (self.has_compiled_cursor_): n += 1 + self.lengthString(self.compiled_cursor_.ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_cursor()
     self.clear_result()
@@ -4460,6 +5025,33 @@ class QueryResult(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(50)
       out.putVarInt32(self.compiled_cursor_.ByteSize())
       self.compiled_cursor_.OutputUnchecked(out)
+    if (self.has_skipped_results_):
+      out.putVarInt32(56)
+      out.putVarInt32(self.skipped_results_)
+
+  def OutputPartial(self, out):
+    if (self.has_cursor_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.cursor_.ByteSizePartial())
+      self.cursor_.OutputPartial(out)
+    for i in xrange(len(self.result_)):
+      out.putVarInt32(18)
+      out.putVarInt32(self.result_[i].ByteSizePartial())
+      self.result_[i].OutputPartial(out)
+    if (self.has_more_results_):
+      out.putVarInt32(24)
+      out.putBoolean(self.more_results_)
+    if (self.has_keys_only_):
+      out.putVarInt32(32)
+      out.putBoolean(self.keys_only_)
+    if (self.has_compiled_query_):
+      out.putVarInt32(42)
+      out.putVarInt32(self.compiled_query_.ByteSizePartial())
+      self.compiled_query_.OutputPartial(out)
+    if (self.has_compiled_cursor_):
+      out.putVarInt32(50)
+      out.putVarInt32(self.compiled_cursor_.ByteSizePartial())
+      self.compiled_cursor_.OutputPartial(out)
     if (self.has_skipped_results_):
       out.putVarInt32(56)
       out.putVarInt32(self.skipped_results_)
@@ -4687,6 +5279,17 @@ class GetSchemaRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_properties_): n += 2
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    if (self.has_name_space_): n += 1 + self.lengthString(len(self.name_space_))
+    if (self.has_start_kind_): n += 1 + self.lengthString(len(self.start_kind_))
+    if (self.has_end_kind_): n += 1 + self.lengthString(len(self.end_kind_))
+    if (self.has_properties_): n += 2
+    return n
+
   def Clear(self):
     self.clear_app()
     self.clear_name_space()
@@ -4697,6 +5300,23 @@ class GetSchemaRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.app_)
+    if (self.has_start_kind_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.start_kind_)
+    if (self.has_end_kind_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.end_kind_)
+    if (self.has_properties_):
+      out.putVarInt32(32)
+      out.putBoolean(self.properties_)
+    if (self.has_name_space_):
+      out.putVarInt32(42)
+      out.putPrefixedString(self.name_space_)
+
+  def OutputPartial(self, out):
+    if (self.has_app_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.app_)
     if (self.has_start_kind_):
       out.putVarInt32(18)
       out.putPrefixedString(self.start_kind_)
@@ -4834,7 +5454,14 @@ class Schema(ProtocolBuffer.ProtocolMessage):
     n += 1 * len(self.kind_)
     for i in xrange(len(self.kind_)): n += self.lengthString(self.kind_[i].ByteSize())
     if (self.has_more_results_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.kind_)
+    for i in xrange(len(self.kind_)): n += self.lengthString(self.kind_[i].ByteSizePartial())
+    if (self.has_more_results_): n += 2
+    return n
 
   def Clear(self):
     self.clear_kind()
@@ -4845,6 +5472,15 @@ class Schema(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.kind_[i].ByteSize())
       self.kind_[i].OutputUnchecked(out)
+    if (self.has_more_results_):
+      out.putVarInt32(16)
+      out.putBoolean(self.more_results_)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.kind_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.kind_[i].ByteSizePartial())
+      self.kind_[i].OutputPartial(out)
     if (self.has_more_results_):
       out.putVarInt32(16)
       out.putBoolean(self.more_results_)
@@ -4981,6 +5617,15 @@ class GetNamespacesRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_end_namespace_): n += 1 + self.lengthString(len(self.end_namespace_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    if (self.has_start_namespace_): n += 1 + self.lengthString(len(self.start_namespace_))
+    if (self.has_end_namespace_): n += 1 + self.lengthString(len(self.end_namespace_))
+    return n
+
   def Clear(self):
     self.clear_app()
     self.clear_start_namespace()
@@ -4989,6 +5634,17 @@ class GetNamespacesRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.app_)
+    if (self.has_start_namespace_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.start_namespace_)
+    if (self.has_end_namespace_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.end_namespace_)
+
+  def OutputPartial(self, out):
+    if (self.has_app_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.app_)
     if (self.has_start_namespace_):
       out.putVarInt32(18)
       out.putPrefixedString(self.start_namespace_)
@@ -5103,13 +5759,28 @@ class GetNamespacesResponse(ProtocolBuffer.ProtocolMessage):
     n += 1 * len(self.namespace_)
     for i in xrange(len(self.namespace_)): n += self.lengthString(len(self.namespace_[i]))
     if (self.has_more_results_): n += 2
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.namespace_)
+    for i in xrange(len(self.namespace_)): n += self.lengthString(len(self.namespace_[i]))
+    if (self.has_more_results_): n += 2
+    return n
 
   def Clear(self):
     self.clear_namespace()
     self.clear_more_results()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.namespace_)):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.namespace_[i])
+    if (self.has_more_results_):
+      out.putVarInt32(16)
+      out.putBoolean(self.more_results_)
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.namespace_)):
       out.putVarInt32(10)
       out.putPrefixedString(self.namespace_[i])
@@ -5240,6 +5911,15 @@ class AllocateIdsRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_max_): n += 1 + self.lengthVarInt64(self.max_)
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_model_key_):
+      n += 1
+      n += self.lengthString(self.model_key_.ByteSizePartial())
+    if (self.has_size_): n += 1 + self.lengthVarInt64(self.size_)
+    if (self.has_max_): n += 1 + self.lengthVarInt64(self.max_)
+    return n
+
   def Clear(self):
     self.clear_model_key()
     self.clear_size()
@@ -5249,6 +5929,18 @@ class AllocateIdsRequest(ProtocolBuffer.ProtocolMessage):
     out.putVarInt32(10)
     out.putVarInt32(self.model_key_.ByteSize())
     self.model_key_.OutputUnchecked(out)
+    if (self.has_size_):
+      out.putVarInt32(16)
+      out.putVarInt64(self.size_)
+    if (self.has_max_):
+      out.putVarInt32(24)
+      out.putVarInt64(self.max_)
+
+  def OutputPartial(self, out):
+    if (self.has_model_key_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.model_key_.ByteSizePartial())
+      self.model_key_.OutputPartial(out)
     if (self.has_size_):
       out.putVarInt32(16)
       out.putVarInt64(self.size_)
@@ -5376,6 +6068,16 @@ class AllocateIdsResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.end_)
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_start_):
+      n += 1
+      n += self.lengthVarInt64(self.start_)
+    if (self.has_end_):
+      n += 1
+      n += self.lengthVarInt64(self.end_)
+    return n
+
   def Clear(self):
     self.clear_start()
     self.clear_end()
@@ -5385,6 +6087,14 @@ class AllocateIdsResponse(ProtocolBuffer.ProtocolMessage):
     out.putVarInt64(self.start_)
     out.putVarInt32(16)
     out.putVarInt64(self.end_)
+
+  def OutputPartial(self, out):
+    if (self.has_start_):
+      out.putVarInt32(8)
+      out.putVarInt64(self.start_)
+    if (self.has_end_):
+      out.putVarInt32(16)
+      out.putVarInt64(self.end_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -5470,7 +6180,13 @@ class CompositeIndices(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.index_)
     for i in xrange(len(self.index_)): n += self.lengthString(self.index_[i].ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.index_)
+    for i in xrange(len(self.index_)): n += self.lengthString(self.index_[i].ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_index()
@@ -5480,6 +6196,12 @@ class CompositeIndices(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.index_[i].ByteSize())
       self.index_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.index_)):
+      out.putVarInt32(10)
+      out.putVarInt32(self.index_[i].ByteSizePartial())
+      self.index_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -5589,6 +6311,15 @@ class AddActionsRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.action_)): n += self.lengthString(self.action_[i].ByteSize())
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_transaction_):
+      n += 1
+      n += self.lengthString(self.transaction_.ByteSizePartial())
+    n += 1 * len(self.action_)
+    for i in xrange(len(self.action_)): n += self.lengthString(self.action_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_transaction()
     self.clear_action()
@@ -5601,6 +6332,16 @@ class AddActionsRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(18)
       out.putVarInt32(self.action_[i].ByteSize())
       self.action_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_transaction_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.transaction_.ByteSizePartial())
+      self.transaction_.OutputPartial(out)
+    for i in xrange(len(self.action_)):
+      out.putVarInt32(18)
+      out.putVarInt32(self.action_[i].ByteSizePartial())
+      self.action_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -5678,12 +6419,19 @@ class AddActionsResponse(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -5756,12 +6504,24 @@ class BeginTransactionRequest(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.app_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_app_):
+      n += 1
+      n += self.lengthString(len(self.app_))
+    return n
+
   def Clear(self):
     self.clear_app()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.app_)
+
+  def OutputPartial(self, out):
+    if (self.has_app_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.app_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -5841,7 +6601,12 @@ class CommitResponse(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_cost_): n += 1 + self.lengthString(self.cost_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_cost()
@@ -5851,6 +6616,12 @@ class CommitResponse(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(10)
       out.putVarInt32(self.cost_.ByteSize())
       self.cost_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_cost_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.cost_.ByteSizePartial())
+      self.cost_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:

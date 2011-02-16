@@ -59,6 +59,9 @@ class RawMessage(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, e):
     e.putRawString(self.__contents)
 
+  def OutputPartial(self, e):
+    return self.OutputUnchecked(e)
+
   def TryMerge(self, d):
     self.__contents = d.getRawString()
 
@@ -78,6 +81,8 @@ class RawMessage(ProtocolBuffer.ProtocolMessage):
   def __ne__(self, other):
     return not (self == other)
 
-  def ByteSize(self, unused_assume_required_exists=True):
+  def ByteSize(self):
     return len(self.__contents)
 
+  def ByteSizePartial(self):
+    return self.ByteSize()

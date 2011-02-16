@@ -42,6 +42,7 @@ http://www.djangoproject.com/documentation/templates/
 
 
 
+import logging
 import md5
 import os
 
@@ -98,6 +99,18 @@ def _django_setup():
     from google.appengine.dist import use_library
     use_library('django', str(django_version))
   else:
+    from google.appengine.dist import _library
+    version, explicit = _library.installed.get('django', ('0.96', False))
+    if not explicit:
+      logging.warn('You are using the default Django version (%s). '
+                   'The default Django version will change in an '
+                   'App Engine release in the near future. '
+                   'Please call use_library() to explicitly select a '
+                   'Django version. '
+                   'For more information see %s',
+                   version,
+                   'http://code.google.com/appengine/docs/python/tools/'
+                   'libraries.html#Django')
     try:
       from django import v0_96
     except ImportError:

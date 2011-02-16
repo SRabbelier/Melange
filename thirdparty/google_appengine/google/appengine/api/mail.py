@@ -74,6 +74,8 @@ EXTENSION_MIME_MAP = {
     'jpe': 'image/jpeg',
     'jpeg': 'image/jpeg',
     'jpg': 'image/jpeg',
+    'kml': 'application/vnd.google-earth.kml+xml',
+    'kmz': 'application/vnd.google-earth.kmz',
     'm4a': 'audio/mp4',
     'mid': 'audio/mid',
     'mov': 'video/quicktime',

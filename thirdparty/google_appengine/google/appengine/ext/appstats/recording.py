@@ -74,7 +74,7 @@ class ConfigDefaults(object):
 
   TZOFFSET = 8*3600
 
-  stats_url = '/stats'
+  stats_url = '/_ah/stats'
 
   RECORD_FRACTION = 1.0
 

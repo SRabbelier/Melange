@@ -794,6 +794,9 @@ class TaskQueueServiceStub(apiproxy_stub.APIProxyStub):
           queue.bucket_refill_per_second())
       response_queue.set_bucket_capacity(queue.bucket_capacity())
       response_queue.set_user_specified_rate(queue.user_specified_rate())
+      if queue.has_max_concurrent_requests():
+        response_queue.set_max_concurrent_requests(
+            queue.max_concurrent_requests())
       response_queue.set_paused(queue.paused)
 
   def _Dynamic_FetchQueueStats(self, request, response):
@@ -823,6 +826,7 @@ class TaskQueueServiceStub(apiproxy_stub.APIProxyStub):
         scanner_info.set_executed_last_hour(scanner_info.executed_last_minute()
                                             + random.randint(0, 100))
         scanner_info.set_sampling_duration_seconds(random.random() * 10000.0)
+        scanner_info.set_requests_in_flight(random.randint(0, 10))
 
   def GetDummyTaskStore(self, app_id, queue_name):
     """Get the dummy task store for this app_id/queue_name pair.
@@ -964,18 +968,23 @@ class TaskQueueServiceStub(apiproxy_stub.APIProxyStub):
       raise apiproxy_errors.ApplicationError(
           taskqueue_service_pb.TaskQueueServiceError.INVALID_QUEUE_NAME)
 
-    queues = self._app_queues.get(request.app_id(), {})
-    if request.queue_name() != DEFAULT_QUEUE_NAME:
-      if request.queue_name() not in queues:
-        raise apiproxy_errors.ApplicationError(
-            taskqueue_service_pb.TaskQueueServiceError.UNKNOWN_QUEUE)
-      elif queues[request.queue_name()] is None:
-        raise apiproxy_errors.ApplicationError(
-            taskqueue_service_pb.TaskQueueServiceError.TOMBSTONED_QUEUE)
+    if request.has_app_id():
+      queues = self._app_queues.get(request.app_id(), {})
+      if request.queue_name() != DEFAULT_QUEUE_NAME:
+        if request.queue_name() not in queues:
+          raise apiproxy_errors.ApplicationError(
+              taskqueue_service_pb.TaskQueueServiceError.UNKNOWN_QUEUE)
+        elif queues[request.queue_name()] is None:
+          raise apiproxy_errors.ApplicationError(
+              taskqueue_service_pb.TaskQueueServiceError.TOMBSTONED_QUEUE)
 
-    store = self.GetDummyTaskStore(request.app_id(), request.queue_name())
-    for task in store.Lookup(store.Count()):
-      store.Delete(task.task_name())
+      store = self.GetDummyTaskStore(request.app_id(), request.queue_name())
+      for task in store.Lookup(store.Count()):
+        store.Delete(task.task_name())
+    elif (not self._IsValidQueue(request.queue_name(), None)
+          and not request.queue_name() in self._taskqueues):
+      raise apiproxy_errors.ApplicationError(
+          taskqueue_service_pb.TaskQueueServiceError.UNKNOWN_QUEUE)
 
     self.FlushQueue(request.queue_name())
 

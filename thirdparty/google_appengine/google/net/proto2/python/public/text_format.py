@@ -480,6 +480,8 @@ class _Tokenizer(object):
       self.NextToken()
       return _NAN
 
+    text = text.rstrip('f')
+
     try:
       result = float(text)
     except ValueError, e:

@@ -375,6 +375,9 @@ def _initialize_properties(model_class, name, bases, dct):
       model_class._properties[attr_name] = attr
       attr.__property_config__(model_class, attr_name)
 
+  model_class._all_properties = frozenset(
+      prop.name for name, prop in model_class._properties.items())
+
   model_class._unindexed_properties = frozenset(
     prop.name for name, prop in model_class._properties.items()
     if not prop.indexed)
@@ -1539,9 +1542,8 @@ class Expando(Model):
     """
     super(Expando, self).__init__(parent, key_name, _app, **kwds)
     self._dynamic_properties = {}
-    storage_names = set(prop.name for prop in self.properties().values())
     for prop, value in kwds.iteritems():
-      if prop not in storage_names and prop != 'key':
+      if prop not in self._all_properties and prop != 'key':
         if not (hasattr(getattr(type(self), prop, None), '__set__')):
           setattr(self, prop, value)
         else:
@@ -1665,7 +1667,7 @@ class Expando(Model):
       entity[key] = value
 
     all_properties = set(self._dynamic_properties.iterkeys())
-    all_properties.update(prop.name for prop in self.properties().itervalues())
+    all_properties.update(self._all_properties)
     for key in entity.keys():
       if key not in all_properties:
         del entity[key]
@@ -2225,7 +2227,7 @@ class Query(_BaseQuery):
             datastore_types._KEY_SPECIAL_PROPERTY)
     else:
       if not issubclass(self._model_class, Expando):
-        if (property not in self._model_class.properties() and
+        if (property not in self._model_class._all_properties and
             property not in datastore_types._SPECIAL_PROPERTIES):
           raise PropertyError('Invalid property name \'%s\'' % property)
 

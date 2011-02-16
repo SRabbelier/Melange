@@ -561,9 +561,11 @@ class BaseCursor(object):
     self.app = app
     self.cursor = self._AcquireCursorID()
 
-  def PopulateCursor(self, cursor):
-    cursor.set_app(self.app)
-    cursor.set_cursor(self.cursor)
+  def PopulateCursor(self, query_result):
+    if query_result.more_results():
+      cursor = query_result.mutable_cursor()
+      cursor.set_app(self.app)
+      cursor.set_cursor(self.cursor)
 
   @classmethod
   def _AcquireCursorID(cls):
@@ -818,7 +820,7 @@ class ListCursor(BaseCursor):
 
     result.set_keys_only(self.keys_only)
     result.set_more_results(self.__offset < self.__count)
-    self.PopulateCursor(result.mutable_cursor())
+    self.PopulateCursor(result)
     if compile:
       self._EncodeCompiledCursor(
           self.__query, result.mutable_compiled_cursor())

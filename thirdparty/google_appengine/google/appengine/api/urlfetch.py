@@ -202,7 +202,7 @@ def create_rpc(deadline=None, callback=None):
 
 def fetch(url, payload=None, method=GET, headers={},
           allow_truncated=False, follow_redirects=True,
-          deadline=None):
+          deadline=None, validate_certificate=None):
   """Fetches the given HTTP URL, blocking until the result is returned.
 
   Other optional parameters are:
@@ -221,6 +221,10 @@ def fetch(url, payload=None, method=GET, headers={},
        including the 'Location' header, and redirects are not
        followed.
      deadline: deadline in seconds for the operation.
+     validate_certificate: if true, do not send request to server unless the
+       certificate is valid, signed by a trusted CA and the hostname matches
+       the certificate. A value of None indicates that the behaviour will be
+       chosen by the underlying urlfetch implementation.
 
   We use a HTTP/1.1 compliant proxy to fetch the result.
 
@@ -237,12 +241,13 @@ def fetch(url, payload=None, method=GET, headers={},
   """
   rpc = create_rpc(deadline=deadline)
   make_fetch_call(rpc, url, payload, method, headers,
-                  allow_truncated, follow_redirects)
+                  allow_truncated, follow_redirects, validate_certificate)
   return rpc.get_result()
 
 
 def make_fetch_call(rpc, url, payload=None, method=GET, headers={},
-                    allow_truncated=False, follow_redirects=True):
+                    allow_truncated=False, follow_redirects=True,
+                    validate_certificate=None):
   """Executes the RPC call to fetch a given HTTP URL.
 
   The first argument is a UserRPC instance.  See urlfetch.fetch for a
@@ -283,6 +288,8 @@ def make_fetch_call(rpc, url, payload=None, method=GET, headers={},
     header_proto.set_value(str(value))
 
   request.set_followredirects(follow_redirects)
+  if validate_certificate is not None:
+    request.set_mustvalidateservercertificate(validate_certificate)
 
   if rpc.deadline is not None:
     request.set_deadline(rpc.deadline)
@@ -329,6 +336,9 @@ def _get_fetch_result(rpc):
     if (err.application_error ==
         urlfetch_service_pb.URLFetchServiceError.DEADLINE_EXCEEDED):
       raise DownloadError(str(err))
+    if (err.application_error ==
+        urlfetch_service_pb.URLFetchServiceError.SSL_CERTIFICATE_ERROR):
+      raise SSLCertificateError(str(err))
     raise err
 
   response = rpc.response

@@ -62,12 +62,19 @@ class MailServiceError(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -163,6 +170,16 @@ class MailAttachment(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.data_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_filename_):
+      n += 1
+      n += self.lengthString(len(self.filename_))
+    if (self.has_data_):
+      n += 1
+      n += self.lengthString(len(self.data_))
+    return n
+
   def Clear(self):
     self.clear_filename()
     self.clear_data()
@@ -172,6 +189,14 @@ class MailAttachment(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.filename_)
     out.putVarInt32(18)
     out.putPrefixedString(self.data_)
+
+  def OutputPartial(self, out):
+    if (self.has_filename_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.filename_)
+    if (self.has_data_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.data_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -428,6 +453,27 @@ class MailMessage(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.attachment_)): n += self.lengthString(self.attachment_[i].ByteSize())
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_sender_):
+      n += 1
+      n += self.lengthString(len(self.sender_))
+    if (self.has_replyto_): n += 1 + self.lengthString(len(self.replyto_))
+    n += 1 * len(self.to_)
+    for i in xrange(len(self.to_)): n += self.lengthString(len(self.to_[i]))
+    n += 1 * len(self.cc_)
+    for i in xrange(len(self.cc_)): n += self.lengthString(len(self.cc_[i]))
+    n += 1 * len(self.bcc_)
+    for i in xrange(len(self.bcc_)): n += self.lengthString(len(self.bcc_[i]))
+    if (self.has_subject_):
+      n += 1
+      n += self.lengthString(len(self.subject_))
+    if (self.has_textbody_): n += 1 + self.lengthString(len(self.textbody_))
+    if (self.has_htmlbody_): n += 1 + self.lengthString(len(self.htmlbody_))
+    n += 1 * len(self.attachment_)
+    for i in xrange(len(self.attachment_)): n += self.lengthString(self.attachment_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_sender()
     self.clear_replyto()
@@ -466,6 +512,36 @@ class MailMessage(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(74)
       out.putVarInt32(self.attachment_[i].ByteSize())
       self.attachment_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_sender_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.sender_)
+    if (self.has_replyto_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.replyto_)
+    for i in xrange(len(self.to_)):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.to_[i])
+    for i in xrange(len(self.cc_)):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.cc_[i])
+    for i in xrange(len(self.bcc_)):
+      out.putVarInt32(42)
+      out.putPrefixedString(self.bcc_[i])
+    if (self.has_subject_):
+      out.putVarInt32(50)
+      out.putPrefixedString(self.subject_)
+    if (self.has_textbody_):
+      out.putVarInt32(58)
+      out.putPrefixedString(self.textbody_)
+    if (self.has_htmlbody_):
+      out.putVarInt32(66)
+      out.putPrefixedString(self.htmlbody_)
+    for i in xrange(len(self.attachment_)):
+      out.putVarInt32(74)
+      out.putVarInt32(self.attachment_[i].ByteSizePartial())
+      self.attachment_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:

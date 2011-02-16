@@ -141,4 +141,7 @@ def create_datastore_write_config(mapreduce_spec):
     operations in the mapreduce.
   """
   force_writes = parse_bool(mapreduce_spec.params.get("force_writes", "false"))
-  return datastore_rpc.Configuration(force_writes=force_writes)
+  if force_writes:
+    return datastore_rpc.Configuration(force_writes=force_writes)
+  else:
+    return datastore_rpc.Configuration()

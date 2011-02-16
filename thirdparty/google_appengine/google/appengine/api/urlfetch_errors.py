@@ -55,3 +55,6 @@ class ResponseTooLargeError(Error):
 class InvalidMethodError(Error):
   """Raised when an invalid value for 'method' is provided"""
 
+
+class SSLCertificateError(Error):
+  """Raised when an invalid server certificate is presented."""

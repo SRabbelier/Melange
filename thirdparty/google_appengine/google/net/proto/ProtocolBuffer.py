@@ -50,26 +50,45 @@ class ProtocolMessage:
       self.Output(e)
       return e.buffer().tostring()
 
+  def SerializeToString(self):
+    return self.Encode()
+
+  def SerializePartialToString(self):
+    try:
+      return self._CEncodePartial()
+    except (AbstractMethod, AttributeError):
+      e = Encoder()
+      self.OutputPartial(e)
+      return e.buffer().tostring()
+
   def _CEncode(self):
+    raise AbstractMethod
+
+  def _CEncodePartial(self):
     raise AbstractMethod
 
   def ParseFromString(self, s):
     self.Clear()
     self.MergeFromString(s)
-    return
+
+  def ParsePartialFromString(self, s):
+    self.Clear()
+    self.MergePartialFromString(s)
 
   def MergeFromString(self, s):
+    self.MergePartialFromString(s)
+    dbg = []
+    if not self.IsInitialized(dbg):
+      raise ProtocolBufferDecodeError, '\n\t'.join(dbg)
+
+  def MergePartialFromString(self, s):
     try:
       self._CMergeFromString(s)
-      dbg = []
-      if not self.IsInitialized(dbg):
-        raise ProtocolBufferDecodeError, '\n\t'.join(dbg)
     except AbstractMethod:
       a = array.array('B')
       a.fromstring(s)
       d = Decoder(a, 0, len(a))
-      self.Merge(d)
-      return
+      self.TryMerge(d)
 
   def _CMergeFromString(self, s):
     raise AbstractMethod
@@ -164,6 +183,9 @@ class ProtocolMessage:
     return
 
   def OutputUnchecked(self, e):
+    raise AbstractMethod
+
+  def OutputPartial(self, e):
     raise AbstractMethod
 
   def Parse(self, d):

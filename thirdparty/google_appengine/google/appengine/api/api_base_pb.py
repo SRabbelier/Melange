@@ -66,12 +66,24 @@ class StringProto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.value_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -150,12 +162,24 @@ class Integer32Proto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.value_)
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 1
+      n += self.lengthVarInt64(self.value_)
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(8)
     out.putVarInt32(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(8)
+      out.putVarInt32(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -234,12 +258,24 @@ class Integer64Proto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.value_)
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 1
+      n += self.lengthVarInt64(self.value_)
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(8)
     out.putVarInt64(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(8)
+      out.putVarInt64(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -317,12 +353,23 @@ class BoolProto(ProtocolBuffer.ProtocolMessage):
     n = 0
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 2
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(8)
     out.putBoolean(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(8)
+      out.putBoolean(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -400,12 +447,23 @@ class DoubleProto(ProtocolBuffer.ProtocolMessage):
     n = 0
     return n + 9
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 9
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(9)
     out.putDouble(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(9)
+      out.putDouble(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -484,12 +542,24 @@ class BytesProto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.value_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    return n
+
   def Clear(self):
     self.clear_value()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_value_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -544,12 +614,19 @@ class VoidProto(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):

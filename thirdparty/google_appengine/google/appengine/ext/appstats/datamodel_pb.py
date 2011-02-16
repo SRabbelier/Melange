@@ -89,6 +89,16 @@ class AggregateRpcStatsProto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.total_amount_of_calls_)
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_service_call_name_):
+      n += 1
+      n += self.lengthString(len(self.service_call_name_))
+    if (self.has_total_amount_of_calls_):
+      n += 1
+      n += self.lengthVarInt64(self.total_amount_of_calls_)
+    return n
+
   def Clear(self):
     self.clear_service_call_name()
     self.clear_total_amount_of_calls()
@@ -98,6 +108,14 @@ class AggregateRpcStatsProto(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.service_call_name_)
     out.putVarInt32(24)
     out.putVarInt64(self.total_amount_of_calls_)
+
+  def OutputPartial(self, out):
+    if (self.has_service_call_name_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.service_call_name_)
+    if (self.has_total_amount_of_calls_):
+      out.putVarInt32(24)
+      out.putVarInt64(self.total_amount_of_calls_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -206,6 +224,16 @@ class KeyValProto(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.value_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(len(self.key_))
+    if (self.has_value_):
+      n += 1
+      n += self.lengthString(len(self.value_))
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_value()
@@ -215,6 +243,14 @@ class KeyValProto(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.key_)
     out.putVarInt32(18)
     out.putPrefixedString(self.value_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.key_)
+    if (self.has_value_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.value_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -367,6 +403,19 @@ class StackFrameProto(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.variables_)): n += self.lengthString(self.variables_[i].ByteSize())
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_class_or_file_name_):
+      n += 1
+      n += self.lengthString(len(self.class_or_file_name_))
+    if (self.has_line_number_): n += 1 + self.lengthVarInt64(self.line_number_)
+    if (self.has_function_name_):
+      n += 1
+      n += self.lengthString(len(self.function_name_))
+    n += 1 * len(self.variables_)
+    for i in xrange(len(self.variables_)): n += self.lengthString(self.variables_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_class_or_file_name()
     self.clear_line_number()
@@ -385,6 +434,21 @@ class StackFrameProto(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(34)
       out.putVarInt32(self.variables_[i].ByteSize())
       self.variables_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_class_or_file_name_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.class_or_file_name_)
+    if (self.has_line_number_):
+      out.putVarInt32(16)
+      out.putVarInt32(self.line_number_)
+    if (self.has_function_name_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.function_name_)
+    for i in xrange(len(self.variables_)):
+      out.putVarInt32(34)
+      out.putVarInt32(self.variables_[i].ByteSizePartial())
+      self.variables_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -656,6 +720,24 @@ class IndividualRpcStatsProto(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.call_stack_)): n += self.lengthString(self.call_stack_[i].ByteSize())
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_service_call_name_):
+      n += 1
+      n += self.lengthString(len(self.service_call_name_))
+    if (self.has_request_data_summary_): n += 1 + self.lengthString(len(self.request_data_summary_))
+    if (self.has_response_data_summary_): n += 1 + self.lengthString(len(self.response_data_summary_))
+    if (self.has_api_mcycles_): n += 1 + self.lengthVarInt64(self.api_mcycles_)
+    if (self.has_start_offset_milliseconds_):
+      n += 1
+      n += self.lengthVarInt64(self.start_offset_milliseconds_)
+    if (self.has_duration_milliseconds_): n += 1 + self.lengthVarInt64(self.duration_milliseconds_)
+    if (self.has_namespace_): n += 1 + self.lengthString(len(self.namespace_))
+    if (self.has_was_successful_): n += 2
+    n += 1 * len(self.call_stack_)
+    for i in xrange(len(self.call_stack_)): n += self.lengthString(self.call_stack_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_service_call_name()
     self.clear_request_data_summary()
@@ -694,6 +776,36 @@ class IndividualRpcStatsProto(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(82)
       out.putVarInt32(self.call_stack_[i].ByteSize())
       self.call_stack_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_service_call_name_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.service_call_name_)
+    if (self.has_request_data_summary_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.request_data_summary_)
+    if (self.has_response_data_summary_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.response_data_summary_)
+    if (self.has_api_mcycles_):
+      out.putVarInt32(40)
+      out.putVarInt64(self.api_mcycles_)
+    if (self.has_start_offset_milliseconds_):
+      out.putVarInt32(48)
+      out.putVarInt64(self.start_offset_milliseconds_)
+    if (self.has_duration_milliseconds_):
+      out.putVarInt32(56)
+      out.putVarInt64(self.duration_milliseconds_)
+    if (self.has_namespace_):
+      out.putVarInt32(66)
+      out.putPrefixedString(self.namespace_)
+    if (self.has_was_successful_):
+      out.putVarInt32(72)
+      out.putBoolean(self.was_successful_)
+    for i in xrange(len(self.call_stack_)):
+      out.putVarInt32(82)
+      out.putVarInt32(self.call_stack_[i].ByteSizePartial())
+      self.call_stack_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1107,6 +1219,31 @@ class RequestStatProto(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.individual_stats_)): n += self.lengthString(self.individual_stats_[i].ByteSize())
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_start_timestamp_milliseconds_):
+      n += 1
+      n += self.lengthVarInt64(self.start_timestamp_milliseconds_)
+    if (self.has_http_method_): n += 1 + self.lengthString(len(self.http_method_))
+    if (self.has_http_path_): n += 1 + self.lengthString(len(self.http_path_))
+    if (self.has_http_query_): n += 1 + self.lengthString(len(self.http_query_))
+    if (self.has_http_status_): n += 1 + self.lengthVarInt64(self.http_status_)
+    if (self.has_duration_milliseconds_):
+      n += 1
+      n += self.lengthVarInt64(self.duration_milliseconds_)
+    if (self.has_api_mcycles_): n += 1 + self.lengthVarInt64(self.api_mcycles_)
+    if (self.has_processor_mcycles_): n += 1 + self.lengthVarInt64(self.processor_mcycles_)
+    n += 1 * len(self.rpc_stats_)
+    for i in xrange(len(self.rpc_stats_)): n += self.lengthString(self.rpc_stats_[i].ByteSizePartial())
+    n += 2 * len(self.cgi_env_)
+    for i in xrange(len(self.cgi_env_)): n += self.lengthString(self.cgi_env_[i].ByteSizePartial())
+    if (self.has_overhead_walltime_milliseconds_): n += 2 + self.lengthVarInt64(self.overhead_walltime_milliseconds_)
+    if (self.has_user_email_): n += 2 + self.lengthString(len(self.user_email_))
+    if (self.has_is_admin_): n += 3
+    n += 2 * len(self.individual_stats_)
+    for i in xrange(len(self.individual_stats_)): n += self.lengthString(self.individual_stats_[i].ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_start_timestamp_milliseconds()
     self.clear_http_method()
@@ -1167,6 +1304,53 @@ class RequestStatProto(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(858)
       out.putVarInt32(self.individual_stats_[i].ByteSize())
       self.individual_stats_[i].OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_start_timestamp_milliseconds_):
+      out.putVarInt32(8)
+      out.putVarInt64(self.start_timestamp_milliseconds_)
+    if (self.has_http_method_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.http_method_)
+    if (self.has_http_path_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.http_path_)
+    if (self.has_http_query_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.http_query_)
+    if (self.has_http_status_):
+      out.putVarInt32(40)
+      out.putVarInt32(self.http_status_)
+    if (self.has_duration_milliseconds_):
+      out.putVarInt32(48)
+      out.putVarInt64(self.duration_milliseconds_)
+    if (self.has_api_mcycles_):
+      out.putVarInt32(56)
+      out.putVarInt64(self.api_mcycles_)
+    if (self.has_processor_mcycles_):
+      out.putVarInt32(64)
+      out.putVarInt64(self.processor_mcycles_)
+    for i in xrange(len(self.rpc_stats_)):
+      out.putVarInt32(74)
+      out.putVarInt32(self.rpc_stats_[i].ByteSizePartial())
+      self.rpc_stats_[i].OutputPartial(out)
+    for i in xrange(len(self.cgi_env_)):
+      out.putVarInt32(810)
+      out.putVarInt32(self.cgi_env_[i].ByteSizePartial())
+      self.cgi_env_[i].OutputPartial(out)
+    if (self.has_overhead_walltime_milliseconds_):
+      out.putVarInt32(816)
+      out.putVarInt64(self.overhead_walltime_milliseconds_)
+    if (self.has_user_email_):
+      out.putVarInt32(826)
+      out.putPrefixedString(self.user_email_)
+    if (self.has_is_admin_):
+      out.putVarInt32(832)
+      out.putBoolean(self.is_admin_)
+    for i in xrange(len(self.individual_stats_)):
+      out.putVarInt32(858)
+      out.putVarInt32(self.individual_stats_[i].ByteSizePartial())
+      self.individual_stats_[i].OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:

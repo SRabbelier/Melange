@@ -118,5 +118,7 @@ SERVICE_PB_MAP = {
                         xmpp_service_pb.XmppMessageResponse),
         'SendInvite':  (xmpp_service_pb.XmppInviteRequest,
                         xmpp_service_pb.XmppInviteResponse),
+        'SendPresence':  (xmpp_service_pb.XmppSendPresenceRequest,
+                        xmpp_service_pb.XmppSendPresenceResponse),
     },
 }

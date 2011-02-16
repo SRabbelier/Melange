@@ -229,7 +229,7 @@ class zipimporter:
     else:
       relpath = fullpath
     try:
-      return self.zipfile.read(relpath)
+      return self.zipfile.read(relpath.replace(os.sep, '/'))
     except KeyError:
       raise IOError('Path %r not found in zipfile %r' %
                     (relpath, self.archive))
@@ -265,7 +265,7 @@ class ZipFileCache(UserDict.DictMixin):
     return _zipfile_cache[self._archive].namelist()
 
   def __getitem__(self, filename):
-    info = _zipfile_cache[self._archive].getinfo(filename)
+    info = _zipfile_cache[self._archive].getinfo(filename.replace(os.sep, '/'))
     dt = info.date_time
     dostime = dt[3] << 11 | dt[4] << 5 | (dt[5] // 2)
     dosdate = (dt[0] - 1980) << 9 | dt[1] << 5 | dt[2]

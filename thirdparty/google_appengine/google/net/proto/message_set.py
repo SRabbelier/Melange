@@ -49,7 +49,9 @@ class Item:
       return 1
 
     try:
-      self.message = message_class(self.message)
+      message_obj = message_class()
+      message_obj.MergePartialFromString(self.message)
+      self.message = message_obj
       self.message_class = message_class
       return 1
     except ProtocolBuffer.ProtocolBufferDecodeError:
@@ -111,6 +113,16 @@ class Item:
 
     return pb.lengthString(message_length) + pb.lengthVarInt64(type_id) + 2
 
+  def ByteSizePartial(self, pb, type_id):
+
+    message_length = 0
+    if self.message_class is None:
+      message_length = len(self.message)
+    else:
+      message_length = self.message.ByteSizePartial()
+
+    return pb.lengthString(message_length) + pb.lengthVarInt64(type_id) + 2
+
   def OutputUnchecked(self, out, type_id):
 
     out.putVarInt32(TAG_TYPE_ID)
@@ -121,6 +133,17 @@ class Item:
     else:
       out.putVarInt32(self.message.ByteSize())
       self.message.OutputUnchecked(out)
+
+  def OutputPartial(self, out, type_id):
+
+    out.putVarInt32(TAG_TYPE_ID)
+    out.putVarUint64(type_id)
+    out.putVarInt32(TAG_MESSAGE)
+    if self.message_class is None:
+      out.putPrefixedString(self.message)
+    else:
+      out.putVarInt32(self.message.ByteSizePartial())
+      self.message.OutputPartial(out)
 
   def Decode(decoder):
 
@@ -258,6 +281,12 @@ class MessageSet(ProtocolBuffer.ProtocolMessage):
       n += item.ByteSize(self, type_id)
     return n
 
+  def ByteSizePartial(self):
+    n = 2 * len(self.items)
+    for (type_id, item) in self.items.items():
+      n += item.ByteSizePartial(self, type_id)
+    return n
+
   def Clear(self):
     self.items = dict()
 
@@ -265,6 +294,12 @@ class MessageSet(ProtocolBuffer.ProtocolMessage):
     for (type_id, item) in self.items.items():
       out.putVarInt32(TAG_BEGIN_ITEM_GROUP)
       item.OutputUnchecked(out, type_id)
+      out.putVarInt32(TAG_END_ITEM_GROUP)
+
+  def OutputPartial(self, out):
+    for (type_id, item) in self.items.items():
+      out.putVarInt32(TAG_BEGIN_ITEM_GROUP)
+      item.OutputPartial(out, type_id)
       out.putVarInt32(TAG_END_ITEM_GROUP)
 
   def TryMerge(self, decoder):

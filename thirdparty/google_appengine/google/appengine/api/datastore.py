@@ -47,8 +47,8 @@ from google.appengine.api import capabilities
 from google.appengine.api import datastore_errors
 from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_pb
-from google.appengine.datastore import datastore_rpc
 from google.appengine.datastore import datastore_query
+from google.appengine.datastore import datastore_rpc
 from google.appengine.datastore import entity_pb
 
 MAX_ALLOWABLE_QUERIES = 30
@@ -1291,10 +1291,6 @@ class Query(dict):
     more efficient.
 
     Args:
-      limit: integer, limit for the query.
-      offset: integer, offset for the query.
-      prefetch_count: integer, number of results to return in the first query.
-      next_count: number of results to return in subsequent next queries.
       config: Optional Configuration to use for this request.
 
     Returns:

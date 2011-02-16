@@ -64,12 +64,19 @@ class UserServiceError(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -180,6 +187,15 @@ class CreateLoginURLRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_federated_identity_): n += 1 + self.lengthString(len(self.federated_identity_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_destination_url_):
+      n += 1
+      n += self.lengthString(len(self.destination_url_))
+    if (self.has_auth_domain_): n += 1 + self.lengthString(len(self.auth_domain_))
+    if (self.has_federated_identity_): n += 1 + self.lengthString(len(self.federated_identity_))
+    return n
+
   def Clear(self):
     self.clear_destination_url()
     self.clear_auth_domain()
@@ -188,6 +204,17 @@ class CreateLoginURLRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.destination_url_)
+    if (self.has_auth_domain_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.auth_domain_)
+    if (self.has_federated_identity_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.federated_identity_)
+
+  def OutputPartial(self, out):
+    if (self.has_destination_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.destination_url_)
     if (self.has_auth_domain_):
       out.putVarInt32(18)
       out.putPrefixedString(self.auth_domain_)
@@ -286,12 +313,24 @@ class CreateLoginURLResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.login_url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_login_url_):
+      n += 1
+      n += self.lengthString(len(self.login_url_))
+    return n
+
   def Clear(self):
     self.clear_login_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.login_url_)
+
+  def OutputPartial(self, out):
+    if (self.has_login_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.login_url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -389,6 +428,14 @@ class CreateLogoutURLRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_auth_domain_): n += 1 + self.lengthString(len(self.auth_domain_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_destination_url_):
+      n += 1
+      n += self.lengthString(len(self.destination_url_))
+    if (self.has_auth_domain_): n += 1 + self.lengthString(len(self.auth_domain_))
+    return n
+
   def Clear(self):
     self.clear_destination_url()
     self.clear_auth_domain()
@@ -396,6 +443,14 @@ class CreateLogoutURLRequest(ProtocolBuffer.ProtocolMessage):
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.destination_url_)
+    if (self.has_auth_domain_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.auth_domain_)
+
+  def OutputPartial(self, out):
+    if (self.has_destination_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.destination_url_)
     if (self.has_auth_domain_):
       out.putVarInt32(18)
       out.putPrefixedString(self.auth_domain_)
@@ -484,12 +539,24 @@ class CreateLogoutURLResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.logout_url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_logout_url_):
+      n += 1
+      n += self.lengthString(len(self.logout_url_))
+    return n
+
   def Clear(self):
     self.clear_logout_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.logout_url_)
+
+  def OutputPartial(self, out):
+    if (self.has_logout_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.logout_url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -544,12 +611,19 @@ class GetOAuthUserRequest(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -706,6 +780,21 @@ class GetOAuthUserResponse(ProtocolBuffer.ProtocolMessage):
     if (self.has_is_admin_): n += 2
     return n + 3
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_email_):
+      n += 1
+      n += self.lengthString(len(self.email_))
+    if (self.has_user_id_):
+      n += 1
+      n += self.lengthString(len(self.user_id_))
+    if (self.has_auth_domain_):
+      n += 1
+      n += self.lengthString(len(self.auth_domain_))
+    if (self.has_user_organization_): n += 1 + self.lengthString(len(self.user_organization_))
+    if (self.has_is_admin_): n += 2
+    return n
+
   def Clear(self):
     self.clear_email()
     self.clear_user_id()
@@ -720,6 +809,23 @@ class GetOAuthUserResponse(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.user_id_)
     out.putVarInt32(26)
     out.putPrefixedString(self.auth_domain_)
+    if (self.has_user_organization_):
+      out.putVarInt32(34)
+      out.putPrefixedString(self.user_organization_)
+    if (self.has_is_admin_):
+      out.putVarInt32(40)
+      out.putBoolean(self.is_admin_)
+
+  def OutputPartial(self, out):
+    if (self.has_email_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.email_)
+    if (self.has_user_id_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.user_id_)
+    if (self.has_auth_domain_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.auth_domain_)
     if (self.has_user_organization_):
       out.putVarInt32(34)
       out.putPrefixedString(self.user_organization_)
@@ -808,12 +914,19 @@ class CheckOAuthSignatureRequest(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -886,12 +999,24 @@ class CheckOAuthSignatureResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.oauth_consumer_key_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_oauth_consumer_key_):
+      n += 1
+      n += self.lengthString(len(self.oauth_consumer_key_))
+    return n
+
   def Clear(self):
     self.clear_oauth_consumer_key()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.oauth_consumer_key_)
+
+  def OutputPartial(self, out):
+    if (self.has_oauth_consumer_key_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.oauth_consumer_key_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1012,6 +1137,17 @@ class CreateFederatedLoginRequest(ProtocolBuffer.ProtocolMessage):
     if (self.has_authority_): n += 1 + self.lengthString(len(self.authority_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_claimed_id_):
+      n += 1
+      n += self.lengthString(len(self.claimed_id_))
+    if (self.has_continue_url_):
+      n += 1
+      n += self.lengthString(len(self.continue_url_))
+    if (self.has_authority_): n += 1 + self.lengthString(len(self.authority_))
+    return n
+
   def Clear(self):
     self.clear_claimed_id()
     self.clear_continue_url()
@@ -1022,6 +1158,17 @@ class CreateFederatedLoginRequest(ProtocolBuffer.ProtocolMessage):
     out.putPrefixedString(self.claimed_id_)
     out.putVarInt32(18)
     out.putPrefixedString(self.continue_url_)
+    if (self.has_authority_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.authority_)
+
+  def OutputPartial(self, out):
+    if (self.has_claimed_id_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.claimed_id_)
+    if (self.has_continue_url_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.continue_url_)
     if (self.has_authority_):
       out.putVarInt32(26)
       out.putPrefixedString(self.authority_)
@@ -1117,12 +1264,24 @@ class CreateFederatedLoginResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.redirected_url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_redirected_url_):
+      n += 1
+      n += self.lengthString(len(self.redirected_url_))
+    return n
+
   def Clear(self):
     self.clear_redirected_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.redirected_url_)
+
+  def OutputPartial(self, out):
+    if (self.has_redirected_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.redirected_url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1201,12 +1360,24 @@ class CreateFederatedLogoutRequest(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.destination_url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_destination_url_):
+      n += 1
+      n += self.lengthString(len(self.destination_url_))
+    return n
+
   def Clear(self):
     self.clear_destination_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.destination_url_)
+
+  def OutputPartial(self, out):
+    if (self.has_destination_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.destination_url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1285,12 +1456,24 @@ class CreateFederatedLogoutResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.logout_url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_logout_url_):
+      n += 1
+      n += self.lengthString(len(self.logout_url_))
+    return n
+
   def Clear(self):
     self.clear_logout_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.logout_url_)
+
+  def OutputPartial(self, out):
+    if (self.has_logout_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.logout_url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:

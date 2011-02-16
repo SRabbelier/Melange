@@ -198,6 +198,7 @@ from google.appengine.api import datastore
 from google.appengine.api import images
 from google.appengine.api import mail
 from google.appengine.api import memcache
+from google.appengine.api import runtime
 from google.appengine.api import urlfetch
 from google.appengine.api import users
 

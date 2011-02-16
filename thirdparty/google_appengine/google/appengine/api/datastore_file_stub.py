@@ -973,7 +973,6 @@ class DatastoreFileStub(apiproxy_stub.APIProxyStub):
       datastore_stub_util.PrepareSpecialPropertiesForLoad(result)
     cursor = datastore_stub_util.ListCursor(query, results,
                                             order_compare_entities_pb)
-    self.__queries[cursor.cursor] = cursor
 
     if query.has_count():
       count = query.count()
@@ -989,6 +988,9 @@ class DatastoreFileStub(apiproxy_stub.APIProxyStub):
       compiled_query = query_result.mutable_compiled_query()
       compiled_query.set_keys_only(query.keys_only())
       compiled_query.mutable_primaryscan().set_index_name(query.Encode())
+
+    if query_result.has_cursor():
+      self.__queries[query_result.cursor().cursor()] = cursor
 
   def _Dynamic_Next(self, next_request, query_result):
     self.__ValidateAppId(next_request.cursor().app())
@@ -1009,6 +1011,8 @@ class DatastoreFileStub(apiproxy_stub.APIProxyStub):
     cursor.PopulateQueryResult(query_result,
                                count, next_request.offset(),
                                next_request.compile())
+    if not query_result.has_cursor():
+      del self.__queries[cursor_handle]
 
   def _Dynamic_Count(self, query, integer64proto):
     query_result = datastore_pb.QueryResult()

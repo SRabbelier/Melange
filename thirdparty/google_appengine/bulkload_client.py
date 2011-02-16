@@ -39,7 +39,7 @@ SCRIPT_DIR = os.path.join(DIR_PATH, 'google', 'appengine', 'tools')
 EXTRA_PATHS = [
   DIR_PATH,
   os.path.join(DIR_PATH, 'lib', 'antlr3'),
-  os.path.join(DIR_PATH, 'lib', 'django'),
+  os.path.join(DIR_PATH, 'lib', 'django_0_96'),
   os.path.join(DIR_PATH, 'lib', 'fancy_urllib'),
   os.path.join(DIR_PATH, 'lib', 'ipaddr'),
   os.path.join(DIR_PATH, 'lib', 'webob'),

@@ -241,7 +241,7 @@ class FieldDescriptor(DescriptorBase):
 
   """Descriptor for a single field in a .proto file.
 
-  A FieldDescriptor instance has the following attriubtes:
+  A FieldDescriptor instance has the following attributes:
 
     name: (str) Name of this field, exactly as it appears in .proto.
     full_name: (str) Name of this field, including containing scope.  This is

@@ -130,6 +130,8 @@ class BlobInfo(object):
 
   _unindexed_properties = frozenset()
 
+  _all_properties = frozenset(['content_type', 'creation', 'filename', 'size'])
+
   @property
   def content_type(self):
     return self.__get_value('content_type')
@@ -179,7 +181,7 @@ class BlobInfo(object):
     This method is required for compatibility with the current db.py query
     mechanism but will be removed in the future.  DO NOT USE.
     """
-    return set(('content_type', 'creation', 'filename', 'size'))
+    return set(cls._all_properties)
 
   def __get_value(self, name):
     """Get a BlobInfo value, loading entity if necessary.

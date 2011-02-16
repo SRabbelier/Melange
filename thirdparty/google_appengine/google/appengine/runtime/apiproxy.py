@@ -209,3 +209,8 @@ def MakeSyncCall(package, call, request, response):
   rpc.MakeCall(package, call, request, response)
   rpc.Wait()
   rpc.CheckSuccess()
+
+
+def CancelApiCalls():
+  """Cancels all outstanding API calls."""
+  _apphosting_runtime___python__apiproxy.CancelApiCalls()

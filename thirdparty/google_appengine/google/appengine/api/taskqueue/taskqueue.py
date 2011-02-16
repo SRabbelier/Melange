@@ -155,6 +155,8 @@ MAX_TASK_NAME_LENGTH = 500
 
 MAX_TASK_SIZE_BYTES = 10 * (2 ** 10)
 
+MAX_TASKS_PER_ADD = 100
+
 MAX_URL_LENGTH = 2083
 
 _DEFAULT_QUEUE = 'default'
@@ -709,6 +711,30 @@ class Queue(object):
 
     self._app = None
 
+  def purge(self):
+    """Removes all the tasks in this Queue.
+
+    This function takes constant time to purge a Queue and some delay may apply
+    before the call is effective.
+
+    Raises:
+      UnknownQueueError if the Queue does not exist on server side.
+    """
+    request = taskqueue_service_pb.TaskQueuePurgeQueueRequest()
+    response = taskqueue_service_pb.TaskQueuePurgeQueueResponse()
+
+    request.set_queue_name(self.__name)
+    if self._app:
+      request.set_app_id(self._app)
+
+    try:
+      apiproxy_stub_map.MakeSyncCall('taskqueue',
+                                     'PurgeQueue',
+                                     request,
+                                     response)
+    except apiproxy_errors.ApplicationError, e:
+      raise self.__TranslateError(e.application_error, e.error_detail)
+
   def add(self, task, transactional=False):
     """Adds a Task or list of Tasks to this Queue.
 
@@ -751,6 +777,11 @@ class Queue(object):
 
   def __AddTasks(self, tasks, transactional):
     """Internal implementation of .add() where tasks must be a list."""
+
+    if len(tasks) > MAX_TASKS_PER_ADD:
+      raise TooManyTasksError(
+          'No more than %d tasks can be added in a single add call' %
+          MAX_TASKS_PER_ADD)
 
     request = taskqueue_service_pb.TaskQueueBulkAddRequest()
     response = taskqueue_service_pb.TaskQueueBulkAddResponse()

@@ -112,6 +112,19 @@ class Request(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(self.request_.ByteSize())
     return n + 3
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_service_name_):
+      n += 1
+      n += self.lengthString(len(self.service_name_))
+    if (self.has_method_):
+      n += 1
+      n += self.lengthString(len(self.method_))
+    if (self.has_request_):
+      n += 1
+      n += self.lengthString(self.request_.ByteSizePartial())
+    return n
+
   def Clear(self):
     self.clear_service_name()
     self.clear_method()
@@ -125,6 +138,18 @@ class Request(ProtocolBuffer.ProtocolMessage):
     out.putVarInt32(34)
     out.putVarInt32(self.request_.ByteSize())
     self.request_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_service_name_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.service_name_)
+    if (self.has_method_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.method_)
+    if (self.has_request_):
+      out.putVarInt32(34)
+      out.putVarInt32(self.request_.ByteSizePartial())
+      self.request_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -246,6 +271,16 @@ class ApplicationError(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.detail_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_code_):
+      n += 1
+      n += self.lengthVarInt64(self.code_)
+    if (self.has_detail_):
+      n += 1
+      n += self.lengthString(len(self.detail_))
+    return n
+
   def Clear(self):
     self.clear_code()
     self.clear_detail()
@@ -255,6 +290,14 @@ class ApplicationError(ProtocolBuffer.ProtocolMessage):
     out.putVarInt32(self.code_)
     out.putVarInt32(18)
     out.putPrefixedString(self.detail_)
+
+  def OutputPartial(self, out):
+    if (self.has_code_):
+      out.putVarInt32(8)
+      out.putVarInt32(self.code_)
+    if (self.has_detail_):
+      out.putVarInt32(18)
+      out.putPrefixedString(self.detail_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -416,7 +459,15 @@ class Response(ProtocolBuffer.ProtocolMessage):
     if (self.has_exception_): n += 1 + self.lengthString(self.exception_.ByteSize())
     if (self.has_application_error_): n += 1 + self.lengthString(self.application_error_.ByteSize())
     if (self.has_java_exception_): n += 1 + self.lengthString(self.java_exception_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_response_): n += 1 + self.lengthString(self.response_.ByteSizePartial())
+    if (self.has_exception_): n += 1 + self.lengthString(self.exception_.ByteSizePartial())
+    if (self.has_application_error_): n += 1 + self.lengthString(self.application_error_.ByteSizePartial())
+    if (self.has_java_exception_): n += 1 + self.lengthString(self.java_exception_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_response()
@@ -441,6 +492,24 @@ class Response(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(34)
       out.putVarInt32(self.java_exception_.ByteSize())
       self.java_exception_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    if (self.has_response_):
+      out.putVarInt32(10)
+      out.putVarInt32(self.response_.ByteSizePartial())
+      self.response_.OutputPartial(out)
+    if (self.has_exception_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.exception_.ByteSizePartial())
+      self.exception_.OutputPartial(out)
+    if (self.has_application_error_):
+      out.putVarInt32(26)
+      out.putVarInt32(self.application_error_.ByteSizePartial())
+      self.application_error_.OutputPartial(out)
+    if (self.has_java_exception_):
+      out.putVarInt32(34)
+      out.putVarInt32(self.java_exception_.ByteSizePartial())
+      self.java_exception_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -579,6 +648,14 @@ class TransactionRequest_Precondition(ProtocolBuffer.ProtocolMessage):
     if (self.has_hash_): n += 1 + self.lengthString(len(self.hash_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_key_):
+      n += 1
+      n += self.lengthString(self.key_.ByteSizePartial())
+    if (self.has_hash_): n += 1 + self.lengthString(len(self.hash_))
+    return n
+
   def Clear(self):
     self.clear_key()
     self.clear_hash()
@@ -587,6 +664,15 @@ class TransactionRequest_Precondition(ProtocolBuffer.ProtocolMessage):
     out.putVarInt32(18)
     out.putVarInt32(self.key_.ByteSize())
     self.key_.OutputUnchecked(out)
+    if (self.has_hash_):
+      out.putVarInt32(26)
+      out.putPrefixedString(self.hash_)
+
+  def OutputPartial(self, out):
+    if (self.has_key_):
+      out.putVarInt32(18)
+      out.putVarInt32(self.key_.ByteSizePartial())
+      self.key_.OutputPartial(out)
     if (self.has_hash_):
       out.putVarInt32(26)
       out.putPrefixedString(self.hash_)
@@ -712,7 +798,15 @@ class TransactionRequest(ProtocolBuffer.ProtocolMessage):
     for i in xrange(len(self.precondition_)): n += self.precondition_[i].ByteSize()
     if (self.has_puts_): n += 1 + self.lengthString(self.puts_.ByteSize())
     if (self.has_deletes_): n += 1 + self.lengthString(self.deletes_.ByteSize())
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 2 * len(self.precondition_)
+    for i in xrange(len(self.precondition_)): n += self.precondition_[i].ByteSizePartial()
+    if (self.has_puts_): n += 1 + self.lengthString(self.puts_.ByteSizePartial())
+    if (self.has_deletes_): n += 1 + self.lengthString(self.deletes_.ByteSizePartial())
+    return n
 
   def Clear(self):
     self.clear_precondition()
@@ -732,6 +826,20 @@ class TransactionRequest(ProtocolBuffer.ProtocolMessage):
       out.putVarInt32(42)
       out.putVarInt32(self.deletes_.ByteSize())
       self.deletes_.OutputUnchecked(out)
+
+  def OutputPartial(self, out):
+    for i in xrange(len(self.precondition_)):
+      out.putVarInt32(11)
+      self.precondition_[i].OutputPartial(out)
+      out.putVarInt32(12)
+    if (self.has_puts_):
+      out.putVarInt32(34)
+      out.putVarInt32(self.puts_.ByteSizePartial())
+      self.puts_.OutputPartial(out)
+    if (self.has_deletes_):
+      out.putVarInt32(42)
+      out.putVarInt32(self.deletes_.ByteSizePartial())
+      self.deletes_.OutputPartial(out)
 
   def TryMerge(self, d):
     while d.avail() > 0:

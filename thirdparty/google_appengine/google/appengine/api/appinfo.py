@@ -131,6 +131,7 @@ JAVA_PRECOMPILED = 'java_precompiled'
 PYTHON_PRECOMPILED = 'python_precompiled'
 ADMIN_CONSOLE = 'admin_console'
 ERROR_HANDLERS = 'error_handlers'
+SERVERS = 'servers'
 
 PAGES = 'pages'
 NAME = 'name'

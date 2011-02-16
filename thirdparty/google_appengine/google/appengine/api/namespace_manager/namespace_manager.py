@@ -118,4 +118,5 @@ def validate_namespace(value, exception=BadValueError):
     raise exception('value should be a string; received %r (a %s):' %
                     (value, type(value)))
   if not _NAMESPACE_RE.match(value):
-    raise exception('value does not match pattern "%s"' % _NAMESPACE_PATTERN)
+    raise exception('value "%s" does not match regex "%s"' %
+                    (value, _NAMESPACE_PATTERN))

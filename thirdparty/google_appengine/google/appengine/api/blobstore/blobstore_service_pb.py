@@ -66,12 +66,19 @@ class BlobstoreServiceError(ProtocolBuffer.ProtocolMessage):
 
   def ByteSize(self):
     n = 0
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    return n
 
   def Clear(self):
     pass
 
   def OutputUnchecked(self, out):
+    pass
+
+  def OutputPartial(self, out):
     pass
 
   def TryMerge(self, d):
@@ -144,12 +151,24 @@ class CreateUploadURLRequest(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.success_path_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_success_path_):
+      n += 1
+      n += self.lengthString(len(self.success_path_))
+    return n
+
   def Clear(self):
     self.clear_success_path()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.success_path_)
+
+  def OutputPartial(self, out):
+    if (self.has_success_path_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.success_path_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -228,12 +247,24 @@ class CreateUploadURLResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.url_))
     return n + 1
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_url_):
+      n += 1
+      n += self.lengthString(len(self.url_))
+    return n
+
   def Clear(self):
     self.clear_url()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
     out.putPrefixedString(self.url_)
+
+  def OutputPartial(self, out):
+    if (self.has_url_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.url_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -309,12 +340,23 @@ class DeleteBlobRequest(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.blob_key_)
     for i in xrange(len(self.blob_key_)): n += self.lengthString(len(self.blob_key_[i]))
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.blob_key_)
+    for i in xrange(len(self.blob_key_)): n += self.lengthString(len(self.blob_key_[i]))
+    return n
 
   def Clear(self):
     self.clear_blob_key()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.blob_key_)):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.blob_key_[i])
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.blob_key_)):
       out.putVarInt32(10)
       out.putPrefixedString(self.blob_key_[i])
@@ -447,6 +489,19 @@ class FetchDataRequest(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.end_index_)
     return n + 3
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_blob_key_):
+      n += 1
+      n += self.lengthString(len(self.blob_key_))
+    if (self.has_start_index_):
+      n += 1
+      n += self.lengthVarInt64(self.start_index_)
+    if (self.has_end_index_):
+      n += 1
+      n += self.lengthVarInt64(self.end_index_)
+    return n
+
   def Clear(self):
     self.clear_blob_key()
     self.clear_start_index()
@@ -459,6 +514,17 @@ class FetchDataRequest(ProtocolBuffer.ProtocolMessage):
     out.putVarInt64(self.start_index_)
     out.putVarInt32(24)
     out.putVarInt64(self.end_index_)
+
+  def OutputPartial(self, out):
+    if (self.has_blob_key_):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.blob_key_)
+    if (self.has_start_index_):
+      out.putVarInt32(16)
+      out.putVarInt64(self.start_index_)
+    if (self.has_end_index_):
+      out.putVarInt32(24)
+      out.putVarInt64(self.end_index_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -551,12 +617,24 @@ class FetchDataResponse(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.data_))
     return n + 2
 
+  def ByteSizePartial(self):
+    n = 0
+    if (self.has_data_):
+      n += 2
+      n += self.lengthString(len(self.data_))
+    return n
+
   def Clear(self):
     self.clear_data()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(8002)
     out.putPrefixedString(self.data_)
+
+  def OutputPartial(self, out):
+    if (self.has_data_):
+      out.putVarInt32(8002)
+      out.putPrefixedString(self.data_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -632,12 +710,23 @@ class DecodeBlobKeyRequest(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.blob_key_)
     for i in xrange(len(self.blob_key_)): n += self.lengthString(len(self.blob_key_[i]))
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.blob_key_)
+    for i in xrange(len(self.blob_key_)): n += self.lengthString(len(self.blob_key_[i]))
+    return n
 
   def Clear(self):
     self.clear_blob_key()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.blob_key_)):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.blob_key_[i])
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.blob_key_)):
       out.putVarInt32(10)
       out.putPrefixedString(self.blob_key_[i])
@@ -721,12 +810,23 @@ class DecodeBlobKeyResponse(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += 1 * len(self.decoded_)
     for i in xrange(len(self.decoded_)): n += self.lengthString(len(self.decoded_[i]))
-    return n + 0
+    return n
+
+  def ByteSizePartial(self):
+    n = 0
+    n += 1 * len(self.decoded_)
+    for i in xrange(len(self.decoded_)): n += self.lengthString(len(self.decoded_[i]))
+    return n
 
   def Clear(self):
     self.clear_decoded()
 
   def OutputUnchecked(self, out):
+    for i in xrange(len(self.decoded_)):
+      out.putVarInt32(10)
+      out.putPrefixedString(self.decoded_[i])
+
+  def OutputPartial(self, out):
     for i in xrange(len(self.decoded_)):
       out.putVarInt32(10)
       out.putPrefixedString(self.decoded_[i])

@@ -43,7 +43,12 @@ if not USING_SDK:
   PYTHON_LIB = os.path.dirname(versions)
   del google, this_version, versions
 else:
-  PYTHON_LIB = '/base/python_lib'
+  try:
+    import google
+  except ImportError:
+    import google as google
+  PYTHON_LIB = os.path.dirname(os.path.dirname(google.__file__))
+  del google
 
 installed = {}
 
@@ -63,7 +68,10 @@ def DjangoVersion():
   Returns:
     A distutils.version.LooseVersion.
   """
-  import django
+  try:
+    from django import v0_96 as django
+  except ImportError:
+    import django
   return distutils.version.LooseVersion('.'.join(map(str, django.VERSION)))
 
 
@@ -82,6 +90,7 @@ PACKAGES = {
                {'0.96': None,
                 '1.0': None,
                 '1.1': None,
+                '1.2': None,
                 }),
 
 
@@ -136,11 +145,6 @@ def AllowInstalledLibrary(name, desired):
     UnacceptableVersion Error if the installed version of a package is
     unacceptable.
   """
-  if name == 'django' and desired != '0.96':
-    tail = os.path.join('lib', 'django')
-    sys.path[:] = [dirname
-                   for dirname in sys.path
-                   if not dirname.endswith(tail)]
   CallSetAllowedModule(name, desired)
   dependencies = PACKAGES[name][1][desired]
   if dependencies:
@@ -193,11 +197,14 @@ def CheckInstalledVersion(name, desired, explicit):
 
 def CallSetAllowedModule(name, desired):
   """Helper to call SetAllowedModule(name), after special-casing Django."""
-  if name == 'django' and desired != '0.96':
-    tail = os.path.join('lib', 'django')
+  if USING_SDK and name == 'django':
     sys.path[:] = [dirname
                    for dirname in sys.path
-                   if not dirname.endswith(tail)]
+                   if not (dirname.startswith(PYTHON_LIB) and
+                           'django' in dirname)]
+    if desired in ('0.96', '1.2'):
+      sys.path.insert(1, os.path.join(PYTHON_LIB, 'lib',
+                                      'django_' + desired.replace('.', '_')))
   SetAllowedModule(name)
 
 

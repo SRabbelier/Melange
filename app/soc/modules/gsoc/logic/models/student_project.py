@@ -21,7 +21,9 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
+import datetime
 
+from google.appengine.api import memcache
 from google.appengine.ext import db
 
 from soc.logic.models import base
@@ -115,6 +117,50 @@ class Logic(base.Logic):
 
     # batch put the StudentProjects that need to be updated
     db.put(projects_to_update)
+
+  def getFeaturedProject(self, current_timeline, program):
+    """Return a featured project for a given program.
+
+    Args:
+      current_timeline: where we are currently on the program timeline
+      program: entity representing the program from which the featured
+          projects should be fetched
+    """
+    # expiry time to fetch the new featured project entity
+    # the current expiry time is 2 hours.
+    expiry_time = datetime.timedelta(seconds=7200)
+
+    properties = {
+        # TODO(Madhu): Enable it once the featured property is added to student_project model
+        #'featured': True
+        }
+    if current_timeline == 'program_period':
+      properties['program'] = program
+      properties['status'] = 'accepted'
+    else:
+      properties['status'] = 'completed'
+
+    q = self.getQueryForFields(properties)
+
+    # the cache stores a 3-tuple in the order student_project entity,
+    # cursor and the last time the cache was updated
+    fsp_cache = memcache.get('featured_student_project')
+
+    if fsp_cache:
+      if not datetime.datetime.now() > fsp_cache[2] + expiry_time:
+        return fsp_cache[0]
+      else:
+        q.with_cursor(fsp_cache[1])
+        if q.count() == 0:
+          q = self.getQueryForFields(properties)
+
+    new_student_project = q.fetch(1)[0]
+    new_cursor = q.cursor()
+    memcache.set(
+      key='featured_student_project',
+      value=(new_student_project, new_cursor, datetime.datetime.now()))
+
+    return new_student_project
 
 
 logic = Logic()

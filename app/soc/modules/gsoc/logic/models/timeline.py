@@ -51,6 +51,6 @@ class Logic(timeline.Logic):
     elif timeline_helper.isActivePeriod(timeline, 'program'):
       return 'program_period'
 
-    return ''
+    return 'offseason'
 
 logic = Logic()

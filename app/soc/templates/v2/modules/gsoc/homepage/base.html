@@ -38,22 +38,20 @@ limitations under the License.
   <!-- begin block -->
   {{ apply }}
   <!-- end block -->
+
+
   <!-- begin block -->
   <div id="featured-projects" class="block block-featured-project">
     <h4 title="title-section-featured-project">Featured Project</h4>
     <div id="block-featured-project-content" class="block-content">
-      <h5 id="block-featured-project-content-title">Revive and Restructure the Escher project</h5>
-      <img src="/soc/content/images/v2/gsoc/featured-project-stock-image.jpg" height="99" width="121" alt="" id="block-featured-project-image" class="alignright" />
-      <p>My name is <a href="javascript:void(0)">Marcos Paulino Roriz Junior</a>, and I’m participating in <a href="javascript:void(0)">Google Summer of Code&trade;</a> 
-      for the first time this year. I’m really excited because I’ve been developing in Java for 
-      some time and this is my first step into FOSS. My project is hacking on GNU Classpath on 
-      Escher which is an X11 client written in Java, used by the XPeer code to request and handle 
-      drawings. I’m learning the X11 protocol which is amazingly cool and surely ahead of it’s time. 
-      This is not only helping me with Google Summer of Code but is also the main protocol behind 
-      the idea that I’m using in my...</p>
+      <h5 id="block-featured-project-content-title">{{ featured_project.title }}</h5>
+      {% if featured_project.image %}
+        <img src="{{ featured_project.image }}" height="99" width="121" alt="" id="block-featured-project-image" class="alignright" />
+      {% endif %}
+      <p>{{ featured_project.abstract }}</p>
     </div>
     <div id="block-featured-project-readmore" class="readmore">
-      <a href="javascript:void(0)">read more</a>
+      <a href="{{ featured_project_url }}">read more</a>
     </div>
   </div>
   <!-- end block -->

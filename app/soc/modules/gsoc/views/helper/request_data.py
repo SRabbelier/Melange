@@ -19,6 +19,7 @@ request in the GSoC module.
 """
 
 __authors__ = [
+    '"Daniel Hans" <daniel.m.hans@gmail.com>',
     '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -64,6 +65,9 @@ class RequestData(object):
     self.org_admins = []
     self.mentors = []
     self.student = None
+    self.request = None
+    self.args = []
+    self.kwargs = {}
 
   def populate(self, request, *args, **kwargs):
     """Populates the fields in the RequestData object.
@@ -73,6 +77,8 @@ class RequestData(object):
       args & kwargs: The args and kwargs django sends along.
     """
     self.request = request
+    self.args = args
+    self.kwargs = kwargs
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 

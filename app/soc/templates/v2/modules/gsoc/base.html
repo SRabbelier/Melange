@@ -45,6 +45,7 @@ limitations under the License.
         <div class="grid_9">
           <div class="content">
             {% block page_content %}
+              {{ content|safe }}
             {% endblock page_content %}
           </div>
           <!-- .content -->

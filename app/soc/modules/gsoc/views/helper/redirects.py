@@ -23,37 +23,48 @@ __authors__ = [
 
 
 # Redirects for the hard-coded sidebar menu items
-def getAboutPageRedirect():
+def getAboutPageRedirect(data):
   """Returns the redirect for the About page for the current GSoC program.
   """
 
-  return '/gsoc/about'
+  return '/gsoc/about/%s' % data.program.key().name()
 
 
-def getAllProjectsRedirect():
+def getAllProjectsRedirect(data):
   """Returns the redirect for list all GSoC projects.
   """
 
-  return '/gsoc/list_projects'
+  return '/gsoc/list_projects/%s' % data.program.key().name()
 
 
-def getConnectRedirect():
+def getConnectRedirect(data):
   """Returns the redirect for the Connect page for the current GSoC program.
   """
 
-  return '/gsoc/connect'
+  return '/gsoc/connect/%s' % data.program.key().name()
 
 
-def getEventsRedirect():
+def getEventsRedirect(data):
   """Returns the redirect for the Events & Timeline page for the current
   GSoC program.
   """
 
-  return '/gsoc/events'
+  return '/gsoc/events/%s' % data.program.key().name()
 
 
-def getHelpRedirect():
+def getHelpRedirect(data):
   """Returns the redirect for the Help page for the current GSoC program.
   """
 
-  return '/gsoc/help'
+  return '/gsoc/help/%s' % data.program.key().name()
+
+def getHomepageRedirect(data):
+  """Returns the redirect for the homepage for the current GSOC program.
+  """
+  return '/gsoc/homepage/%s' % data.program.key().name()
+
+def getDashboardRedirect(data):
+  """Returns the redirect for the dashboard page for the current GSOC program.
+  """
+
+  return '/gsoc/dashboard/%s' % data.program.key().name()

@@ -5,7 +5,7 @@
       {% if not user %}
       <li id="menu-login"><a href="{{ login_link }}">Login</a></li>
       {% endif %}
-      {% if user and has_dashboard %}
+      {% if dashboard_link %}
       <li id="menu-login"><a href="{{ dashboard_link }}">My Dashboard</a></li>
       {% endif %}
       <li id="menu-about"><a href="{{ about_link }}">About</a></li>

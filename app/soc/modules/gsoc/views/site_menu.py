@@ -38,17 +38,17 @@ def siteMenuContext(data):
   context = {
       'login_link': users.create_login_url(encoded_path),
       'logout_link': users.create_logout_url(encoded_path),
-      'about_link': redirects.getAboutPageRedirect(),
-      'projects_link': redirects.getAllProjectsRedirect(),
-      'events_link': redirects.getEventsRedirect(),
-      'connect_link': redirects.getConnectRedirect(),
-      'help_link': redirects.getHelpRedirect(),
+      'about_link': redirects.getAboutPageRedirect(data),
+      'projects_link': redirects.getAllProjectsRedirect(data),
+      'events_link': redirects.getEventsRedirect(data),
+      'connect_link': redirects.getConnectRedirect(data),
+      'help_link': redirects.getHelpRedirect(data),
   }
 
   if data.user:
     context['user'] = data.user
     if data.host or data.org_admins or data.mentors or data.student:
-      context['has_dashboard'] = True
+      context['dashboard_link'] = redirects.getDashboardRedirect(data)
 
   return context
 

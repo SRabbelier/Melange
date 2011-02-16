@@ -204,6 +204,7 @@ Version {{ gae_version }}
   </script>
   <script type='text/javascript' src="/LABjs/LAB.js"></script>
   <script type="text/javascript">
+    $LAB.setGlobalDefaults({AllowDuplicates: false});
     $LAB
       .script("/json/json2.js")
       {% if is_local %}

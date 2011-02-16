@@ -18,7 +18,7 @@ setup(
                  "representing Open Source contribution workflows, such as"
                  " the existing Google Summer of Code TM (GSoC) program."),
     version = version,
-    packages = find_packages(exclude=['app.django.*','thirdparty','parts']),
+    packages = find_packages(exclude=['thirdparty','parts']),
     author=open("AUTHORS").read(),
     url='http://code.google.com/p/soc',
     license='Apache2',

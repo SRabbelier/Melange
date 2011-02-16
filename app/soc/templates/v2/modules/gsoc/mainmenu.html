@@ -2,7 +2,7 @@
 <div id="main-menu" class="grid_3">
   {% block site_menu %}
     <ul id="main-menu-list">
-      {% if not user %}
+      {% if login_link %}
       <li id="menu-login"><a href="{{ login_link }}">Login</a></li>
       {% endif %}
       {% if dashboard_link %}

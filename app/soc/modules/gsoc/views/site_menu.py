@@ -36,8 +36,6 @@ def siteMenuContext(data):
   encoded_path = data.request.path.encode('utf-8')
 
   context = {
-      'login_link': users.create_login_url(encoded_path),
-      'logout_link': users.create_logout_url(encoded_path),
       'about_link': redirects.getAboutPageRedirect(data),
       'projects_link': redirects.getAllProjectsRedirect(data),
       'events_link': redirects.getEventsRedirect(data),
@@ -45,10 +43,13 @@ def siteMenuContext(data):
       'help_link': redirects.getHelpRedirect(data),
   }
 
-  if data.user:
-    context['user'] = users.get_current_user()
-    if data.host or data.org_admins or data.mentors or data.student:
-      context['dashboard_link'] = redirects.getDashboardRedirect(data)
+  if users.get_current_user():
+    context['logout_link'] = users.create_logout_url(encoded_path)
+  else:
+    context['login_link'] = users.create_login_url(encoded_path)
+
+  if data.host or data.org_admins or data.mentors or data.student:
+    context['dashboard_link'] = redirects.getDashboardRedirect(data)
 
   return context
 

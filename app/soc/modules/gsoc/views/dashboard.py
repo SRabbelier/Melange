@@ -93,26 +93,6 @@ class Dashboard(RequestHandler):
     #org_roles = self.data.mentors + self.data.org_admins
     pass
 
-class Component(Template):
-  """A component on the dashboard.
-  """
-
-  def __init__(self, handler, name, title):
-    """Initializes the name and title of the component.
-
-    Args:
-      name: the name of the component, used for the identifier in the HTML.
-      title: the display title of the component.
-    """
-    self._handler = handler
-    self._name = name
-    self._title = title
-
-  def context(self):
-    """Returns the context of a base component.
-    """
-    return {'title': self._title,
-            'name': self._name}
 
 class MyProposalsComponent(Component):
   """Component for listing all the proposals of the current Student.
@@ -121,8 +101,7 @@ class MyProposalsComponent(Component):
   def __init__(self, handler):
     """Initializes the template location, name and title of this component.
     """
-    super(MyProposalsComponent, self).__init__(handler, name="proposals",
-                                               title="PROPOSALS")
+    self.handler = handle
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
@@ -134,8 +113,10 @@ class MyProposalsComponent(Component):
     """
     from soc.modules.gsoc.views.models.student_proposal import view
 
-    context = super(MyProposalsComponent, self).context()
     list_config = lists.getListGenerator(self._handler.request,
                                          view.getParams())
-    context['lists'] = Lists([list_config])
-    return context
+    return {
+        'name': "proposals",
+        'title': "PROPOSALS"
+        'lists' = Lists([list_config])
+    }

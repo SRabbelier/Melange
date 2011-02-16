@@ -41,6 +41,7 @@ from nose import plugins
 
 import logging
 log =  logging.getLogger('nose.plugins.cover')
+logging.disable(90)
 
 
 def begin(self):

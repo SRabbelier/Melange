@@ -341,7 +341,7 @@ class View(survey.View):
     For args see base.View.public().
     """
 
-    from google.appengine.api.labs import taskqueue
+    from google.appengine.api import taskqueue
 
     from django import http
 

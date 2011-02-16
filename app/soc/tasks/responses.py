@@ -24,8 +24,7 @@ __authors__ = [
 
 from django import http
 
-# TODO(labs): fix when taskqueue graduates from labs
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 
 
 class Error(Exception):

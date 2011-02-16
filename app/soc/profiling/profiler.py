@@ -36,7 +36,7 @@ from google.appengine.api import memcache
 from google.appengine.api import users
 from google.appengine.ext import webapp
 
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 
 from soc.profiling import storage
 

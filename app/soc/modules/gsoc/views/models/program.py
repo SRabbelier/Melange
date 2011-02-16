@@ -636,7 +636,7 @@ class View(program.View):
     For params see base.view.Public().
     """
 
-    from google.appengine.api.labs import taskqueue
+    from google.appengine.api import taskqueue
 
     from soc.modules.gsoc.logic.models.proposal_duplicates import logic \
         as duplicates_logic

@@ -31,7 +31,7 @@ from django import http
 from django.utils import simplejson
 
 from google.appengine.ext import db
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.runtime import DeadlineExceededError
 
 from HTMLParser import HTMLParseError

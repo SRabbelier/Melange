@@ -25,7 +25,7 @@ import logging
 import time
 
 from django import http
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.runtime import DeadlineExceededError
 
 from soc.logic import mail_dispatcher

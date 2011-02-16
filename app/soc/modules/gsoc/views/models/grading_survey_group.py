@@ -339,7 +339,7 @@ class View(base.View):
     For args see base.View.public().
     """
 
-    from google.appengine.api.labs import taskqueue
+    from google.appengine.api import taskqueue
 
     from soc.logic import lists as lists_logic
 
@@ -503,7 +503,7 @@ class View(base.View):
       record_entity: a GradingRecord entity
     """
 
-    from google.appengine.api.labs import taskqueue
+    from google.appengine.api import taskqueue
     from soc.modules.gsoc.logic.models.student_project import logic as \
         student_project_logic
 

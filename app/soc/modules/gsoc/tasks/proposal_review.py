@@ -23,7 +23,7 @@ __authors__ = [
 
 from django import http
 
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 
 from soc.logic.models import user as user_logic
 from soc.tasks.helper import error_handler

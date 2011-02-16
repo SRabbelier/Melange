@@ -23,7 +23,7 @@ __authors__ = [
   ]
 
 
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
 from django.http import HttpResponse

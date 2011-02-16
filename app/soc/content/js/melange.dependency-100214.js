@@ -249,7 +249,23 @@
   };
 
   $m.loadScripts = function(requested_packages) {
-    var _queue = unpack(requested_packages);
+    var _tempqueue = unpack(requested_packages);
+
+    /* Remove duplicates from the queue, as allowDuplicates with LAB
+     * fails randomly at least in Safari and Chrome
+     */
+    var _queue = [];
+
+    for (var i = 0, len = _tempqueue.length; i < len; i++) {
+      var temp_val = _tempqueue[i];
+      if (typeof temp_val == "string") {
+        if (jQuery.inArray(temp_val, _queue) === -1) {
+          _queue.push(temp_val);
+        }
+      } else {
+        _queue.push(temp_val);
+      }
+    }
 
     for (var i=0, len=_queue.length; i<len; i++) {
       if (typeof _queue[i] == "string") { // script string source found

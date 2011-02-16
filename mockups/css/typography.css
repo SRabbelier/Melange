@@ -22,7 +22,7 @@ hr {
 }
 a, a:link {
   color: #00538b;
-  text-decoration: none;
+  text-decoration: underline;
 }
 #main .grid_9 h1,
 #main .grid_9 h2,

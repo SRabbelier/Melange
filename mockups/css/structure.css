@@ -387,6 +387,9 @@
   font-size: 13px;
   line-height: 1.2em;
 }
+#main .content_column_2 .block-blog-feed .blog-item .title a {
+  text-decoration: none;
+}
 #main .block-text p {
   margin: 0;
 }
@@ -456,6 +459,7 @@
 }
 #footer .footer-menu ul li a {
   display: block;
+  text-decoration: none;
 }
 #footer .footer-menu ul li.last {
   padding-right: 0px;

@@ -393,6 +393,7 @@
 }
 #form fieldset .row .selector select {
   font-size: 13px;
+  width: 100% !important;
 }
 #form fieldset .row .selector span {
   font-size: 16px;

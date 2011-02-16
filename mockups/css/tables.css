@@ -50,6 +50,7 @@
 .tablesorter tbody td a {
   color: #188dd0;
   font-weight: bold;
+  text-decoration: none;
 }
 .tablesorter tbody td a.rank {
   /*ranking arrows - default is down on*/

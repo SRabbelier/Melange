@@ -33,7 +33,7 @@
 #main-menu ul li ul {
   /*submenu*/
 
-  margin: 5px 0 0 0;
+  margin: 0;
   padding: 0;
 }
 #main-menu ul li ul li {
@@ -45,11 +45,12 @@
 #main-menu ul li ul li a {
   /*submenu link*/
 
-  margin: 0 0 0 40px;
+  display: block;
+  margin: 0;
+  padding-left: 40px;
 }
 #main-menu ul li ul li a:hover {
-  background: none;
-  text-decoration: underline;
+  background: #e67a25;
 }
 #main-menu ul li ul li.active {
   /*submenu active list item*/

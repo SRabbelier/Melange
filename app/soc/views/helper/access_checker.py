@@ -50,6 +50,12 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
 DEF_LOGOUT_MSG_FMT = ugettext(
     'Please <a href="%(sign_out)s">sign out</a> in order to view this page.')
 
+DEF_NEED_ROLE_MSG = ugettext(
+    'You do not have the required role.')
+
+DEF_NO_ACTIVE_ENTITY_MSG = ugettext(
+    'There is no such active entity.')
+
 DEF_NO_USER_LOGIN_MSG = ugettext(
     'Please create <a href="/user/create_profile">User Profile</a>'
     ' in order to view this page.')
@@ -213,3 +219,32 @@ class AccessChecker(object):
       raise out_of_band.AccessViolation(
           message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
+  def checkIsOrgAdminForOrg(self, org):
+    """Checks if the current user is an organization admin for the specified
+    organization.
+    
+    Raises:
+      AccessViolationResponse: if the current user is not an admin for
+                               the specified organization
+    """
+
+    key_name = org.key().id_or_name()
+
+    for org_admin in self.data.org_admins:
+      if org_admin.scope.key().id_or_name() == key_name:
+        return
+
+    raise out_of_band.AccessViolation(
+          message_fmt=DEF_NEED_ROLE_MSG)
+
+  def checkIsActive(self, entity):
+    """Checks if the specified entity is active.
+
+    Raises:
+      AccessViolationResponse: if the entity status is not active
+    """
+
+    if entity.status == 'active':
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)

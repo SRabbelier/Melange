@@ -30,5 +30,12 @@ limitations under the License.
     dep.melange.menu,
     dep.melange.list,
     null,
+    function () {
+      if (melange_list_queue !== undefined && melange_list_queue instanceof Array) {
+        jQuery.each(melange_list_queue, function (index, function_to_call) {
+          function_to_call();
+        });
+      }
+    }
   ]
 {% endblock dependencies %}

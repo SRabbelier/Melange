@@ -12,7 +12,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load list_helpers %}
-
+  <script type="text/javascript">
+     if (melange_list_queue === undefined) {
+      var melange_list_queue = [];
+     }
+  </script>
 {% for list_number in list.lists %}
 <p>
 {% as_list list.nextList %}

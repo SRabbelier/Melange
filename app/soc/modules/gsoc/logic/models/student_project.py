@@ -154,7 +154,7 @@ class Logic(base.Logic):
         if q.count() == 0:
           q = self.getQueryForFields(properties)
 
-    new_student_project = q.fetch(1)[0]
+    new_student_project = q.get()
     new_cursor = q.cursor()
     memcache.set(
       key='featured_student_project',

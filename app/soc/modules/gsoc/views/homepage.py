@@ -112,13 +112,14 @@ class Homepage(RequestHandler):
     program = self.data.program
 
     featured_project = sp_logic.getFeaturedProject(current_timeline, program)
+    if featured_project:
+      featured_project_url = self.getProjectDetailsRedirect(featured_project)
 
     return {
         'timeline': Timeline(self.data, current_timeline).render(),
         'apply': Apply(self.data, current_timeline).render(),
         'featured_project':featured_project,
-        'featured_project_url': self.getProjectDetailsRedirect(
-            featured_project),
+        'featured_project_url': featured_project_url,
         'page_name': 'Home page',
         'program': program,
     }

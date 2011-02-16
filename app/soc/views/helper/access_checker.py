@@ -38,6 +38,9 @@ DEF_AGREE_TO_TOS_MSG_FMT = ugettext(
     ' Service</a> in your <a href="/user/edit_profile">User Profile</a>'
     ' in order to view this page.')
 
+DEF_NOT_PARTICIPATING_MSG = ugettext(
+    'You are not participating in this program and have no access.')
+
 DEF_ALREADY_PARTICIPATING_MSG = ugettext(
     'You cannot become a Student because you are already participating '
     'in this program.')
@@ -229,7 +232,7 @@ class AccessChecker(object):
     data = self.data
     if not (data.student or data.mentors or data.org_admins or data.host):
       raise out_of_band.AccessViolation(
-          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+          message_fmt=DEF_NOT_PARTICIPATING_MSG)
 
   def checkIsActive(self, entity):
     """Checks if the specified entity is active.

@@ -46,7 +46,7 @@ def siteMenuContext(data):
   }
 
   if data.user:
-    context['user'] = data.user
+    context['user'] = users.get_current_user()
     if data.host or data.org_admins or data.mentors or data.student:
       context['dashboard_link'] = redirects.getDashboardRedirect(data)
 

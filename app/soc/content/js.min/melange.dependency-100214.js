@@ -41,6 +41,16 @@
   melange.error.createErrors([
   ]);
 
+
+  $m.templateWithContext = function (script_template, context) {
+    this.script_template = script_template;
+    this.context = context;
+  };
+
+  $m.cssFile = function (css) {
+    this.css = css;
+  };
+
   var script_dependencies_chains = {};
 
   var s = script_dependencies_chains;
@@ -120,12 +130,16 @@
   s.jqueryui = [
     s.jquery,
     null,
+    new $m.cssFile("/soc/content/css/v2/gsoc/jquery-ui.css"),
     "/jquery/jquery-ui.core.js"
   ];
 
   s.jqgrid = [
     s.jquery,
     null,
+    s.jqueryui,
+    null,
+    new $m.cssFile("/soc/content/css/v2/gsoc/ui.jqgrid.css"),
     "/jquery/jquery-jqgrid.locale-en.js",
     null,
     "/jquery/jquery-jqgrid.base.js",
@@ -295,15 +309,6 @@
           $LAB = $LAB.wait(_queue[i]);
       }
     }
-  };
-
-  $m.templateWithContext = function (script_template, context) {
-    this.script_template = script_template;
-    this.context = context;
-  };
-
-  $m.cssFile = function (css) {
-    this.css = css;
   };
 
 }());

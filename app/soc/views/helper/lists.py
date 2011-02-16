@@ -28,9 +28,6 @@ __authors__ = [
 from django.utils import simplejson
 
 from soc.logic import dicts
-from soc.logic.models.user import logic as user_logic
-
-import soc.views.helper.forms
 
 
 URL_PATTERN = '<a href="%(url)s"%(target)s%(nofollow)s>%(name)s</a>'
@@ -206,7 +203,6 @@ def getResponse(request, contents):
   """
 
   from soc.views.helper import responses
-  from django.utils import simplejson
 
   if isJsonRequest(request):
     json = simplejson.dumps(contents)

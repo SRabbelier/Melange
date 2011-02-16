@@ -45,3 +45,10 @@ class Template(object):
     """
 
     return {}
+
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
+
+    Subclasses should override this method.
+    """
+    raise NotImplementedError()

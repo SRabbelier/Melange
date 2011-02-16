@@ -35,7 +35,7 @@ def siteMenuContext(data):
 
   encoded_path = data.request.path.encode('utf-8')
 
-  return {
+  context = {
       'login_link': users.create_login_url(encoded_path),
       'logout_link': users.create_logout_url(encoded_path),
       'about_link': redirects.getAboutPageRedirect(),
@@ -45,6 +45,12 @@ def siteMenuContext(data):
       'help_link': redirects.getHelpRedirect(),
   }
 
+  if data.user:
+    context['user'] = data.user
+    if data.host or data.org_admins or data.mentors or data.student:
+      context['has_dashboard'] = True
+
+  return context
 
 class MainMenu(Template):
   """MainMenu template.

@@ -25,6 +25,9 @@
   var melange = window.melange;
 
   /** Package that handles melange JS dependencies
+    * Doesn't list jQuery, JSON, melange and melange.dependency
+    * in any chain as they're dependencies of this own script,
+    * and they will be then loaded anyway.
     * @name melange.dependency
     * @namespace melange.depencency
     * @borrows melange.logging.debugDecorator.log as log
@@ -86,57 +89,39 @@
   ];
 
   s.purr = [
-    s.jquery,
-    null,
     "/jquery/jquery-purr.js"
   ];
 
   s.spin = [
-    s.jquery,
-    null,
     "/jquery/jquery-spin-1.1.1.js"
   ];
 
   s.bgiframe = [
-    s.jquery,
-    null,
     "/jquery/jquery-bgiframe.js"
   ];
 
   s.ajaxQueue = [
-    s.jquery,
-    null,
     "/jquery/jquery-ajaxQueue.js"
   ];
 
   s.autocomplete = [
-    s.jquery,
-    null,
     "/jquery/jquery-autocomplete.js"
   ];
 
   s.thickbox = [
-    s.jquery,
-    null,
     "/jquery/jquery-thickbox.js"
   ];
 
   s.progressbar = [
-    s.jquery,
-    null,
     "/jquery/jquery-progressbar.js"
   ];
 
   s.jqueryui = [
-    s.jquery,
-    null,
     new $m.cssFile("/soc/content/css/v2/gsoc/jquery-ui.css"),
     "/jquery/jquery-ui.core.js"
   ];
 
   s.jqgrid = [
-    s.jquery,
-    null,
     s.jqueryui,
     null,
     new $m.cssFile("/soc/content/css/v2/gsoc/ui.jqgrid.css"),
@@ -163,8 +148,6 @@
   ];
 
   s.cookie = [
-    s.jquery,
-    null,
     "/jquery/jquery-cookie.js"
   ];
 
@@ -177,8 +160,6 @@
   s.melange = {};
 
   s.melange.main = [
-    s.jquery,
-    s.json,
     s.google,
     null,
     "/soc/content/js/melange-091015.js"
@@ -207,7 +188,6 @@
   ];
 
   s.melange.form = [
-    s.melange.main
   ];
 
   s.melange.list = [
@@ -220,7 +200,6 @@
   ];
 
   s.melange.tooltip = [
-    s.melange,
     s.purr,
     null
   ];
@@ -232,15 +211,12 @@
   ];
 
   s.melange.graph = [
-    s.melange,
     s.google,
     null,
     "/soc/content/js/melange.graph-100501.js"
   ];
 
   s.melange.uploadform = [
-    s.melange,
-    null,
     "/soc/content/js/upload-form-101205.js"
   ];
 

@@ -22,6 +22,9 @@ limitations under the License.
   <h1 id="main-page-title">{{ user.name }}'s Dashboard</h1>
   {% for component in components %}
     {{ component.render|safe }}
+  {% empty %}
+    There are no dashboard items available for you (yet).
+    Come back here when you have submitted a proposal or are a member of an organization.
   {% endfor %}
 {% endblock page_content %}
 

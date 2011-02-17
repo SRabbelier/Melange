@@ -28,6 +28,7 @@ from google.appengine.ext.db import djangoforms
 from django.forms import forms
 from django.forms import widgets
 from django.template import loader
+from django.utils.safestring import mark_safe
 
 
 class Form(object):
@@ -61,19 +62,70 @@ class BoundField(forms.BoundField):
     return self.field.required
 
   def render(self):
-    attrs = {}
+    attrs = {
+        'id': self.name
+        }
+
     widget = self.field.widget
+
     if isinstance(widget, widgets.TextInput):
-      attrs['class'] = 'text'
+      return self.renderTextInput()
+    elif isinstance(widget, widgets.DateInput):
+      return self.renderTextInput()
     elif isinstance(widget, widgets.Select):
-      attrs['style'] = 'opacity: 0;'
+      return self.renderSelect()
+    elif isinstance(widget, widgets.CheckboxInput):
+      return self.renderCheckboxInput()
 
     return self.as_widget(attrs=attrs)
+
+  def renderCheckboxInput(self):
+    attrs = {
+        'id': self.name,
+        'style': 'opacity: 100;',
+        }
+
+    return mark_safe(
+        '<label><div class="checker"><span>%s</span></div> %s%s</label>' % (
+        self.as_widget(attrs=attrs),
+        self.field.label,
+        self._render_is_required()
+        ))
+
+  def renderTextInput(self):
+    attrs = {
+        'id': self.name,
+        'class': 'text',
+        }
+
+    return mark_safe('%s%s' % (
+        self._render_label(), self.as_widget(attrs=attrs)))
+
+  def renderSelect(self):
+    attrs = {
+        'id': self.name,
+        'style': 'opacity: 100;',
+        }
+
+    return mark_safe(('<div class="selector"><span>%s</span>%s</div>%s') % (
+        self.field.label,
+        self.as_widget(attrs=attrs),
+        self._render_is_required()))
+
+  def _render_label(self):
+    return '<label>%s%s</label>' % (
+        self.field.label,        
+        self._render_is_required())
+    
+  def _render_is_required(self):
+    if self.field.required:
+      return '<span class="req">*</span>'
+    else:
+      return ''
 
 class ModelForm(djangoforms.ModelForm):
   """
   """
-
 
   def __iter__(self):
     for name, field in self.fields.items():

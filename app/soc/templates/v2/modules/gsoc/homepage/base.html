@@ -64,34 +64,8 @@ limitations under the License.
   </div>
   <!-- end block -->
   <!-- begin block -->
-  <div id="blog-feed" class="block block-blog-feed">
-    <h4 id="title-section-blog-feed">Blog Feed</h4>
-    <div id="block-blog-feed-content" class="block-content">
-      <div id="blog-feed-item1" class="blog-item">
-        <span class="date">Nov 2, 2010</span>
-        <span class="title"><a href="javascript:void(0)">2010 Google Summer of Code Mentor Summit</a></span>
-      </div>
-      <div id="blog-feed-item2" class="blog-item">
-        <span class="date">Oct 27, 2010</span>
-        <span class="title"><a href="javascript:void(0)">Facebook Likes Google Summer of Code</a></span>
-      </div>
-      <div id="blog-feed-item3" class="blog-item">
-        <span class="date">Oct 23, 2010</span>
-        <span class="title"><a href="javascript:void(0)">Perl and Parrot Spread Open Source Love</a></span>
-      </div>
-      <div id="blog-feed-item4" class="blog-item">
-        <span class="date">Oct 13, 2010</span>
-        <span class="title"><a href="javascript:void(0)">Another Successful Summer for Haiku</a></span>
-      </div>
-      <div id="blog-feed-item5" class="blog-item">
-        <span class="date">Oct 6, 2010</span>
-        <span class="title"><a href="javascript:void(0)">Google Summer of Code report: WorldForge</a></span>
-      </div>
-    </div>
-    <div id="block-blog-feed-readmore" class="readmore">
-      <a href="javascript:void(0)">read more</a>
-    </div>
-  </div>
+  <div id="blog-feed" class="block block-blog-feed"></div>
+
   <!-- end block -->
 </div>
 {% endblock page_content %}
@@ -102,8 +76,8 @@ limitations under the License.
     null,
     function () {
       function initialize() {
-        var blog = new BlogPreview(document.getElementById("blog"));
-        blog.show("{{ entity.feed_url }}", 3);
+        var blog = new BlogPreview(document.getElementById("blog-feed"));
+        blog.show("{{ program.feed_url }}", 5, "Blog Feed");
       }
 
       jQuery(

@@ -16,7 +16,7 @@
 """Module containing string data provider tests.
 """
 
-from django.forms.fields import email_re
+from django.core.validators import email_re
 from soc.modules.seeder.logic.providers.email import FixedEmailProvider
 from soc.modules.seeder.logic.providers.email import RandomEmailProvider
 import unittest

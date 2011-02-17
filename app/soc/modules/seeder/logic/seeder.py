@@ -26,7 +26,7 @@ from django.utils import simplejson
 from google.appengine.ext import db
 from google.appengine.ext.db import _ReverseReferenceProperty
 
-from mapreduce.control import start_map
+from google.appengine.ext.mapreduce.control import start_map
 
 from soc.modules.seeder.logic.models import logic as seeder_models_logic
 from soc.modules.seeder.logic.providers import logic as seeder_providers_logic
@@ -34,6 +34,9 @@ from soc.modules.seeder.logic.providers.provider import Error as provider_error
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
 
 from soc.models.linkable import Linkable
+
+
+from google.appengine.ext.db import ReferenceProperty
 
 
 class Error(Exception):
@@ -174,6 +177,15 @@ class Logic(object):
     for model in json:
       self.validateModel(model)
 
+  def getScopeLogic(self):
+    return None
+  
+  def getKeyFieldNames(self):
+    return []
+  
+  def getScopeDepth(self):
+    return 0
+  
   def getProvider(self, provider_data):
     """Returns a data provider instance based on the supplied configuration.
     """
@@ -327,6 +339,5 @@ class Logic(object):
       return str(provider.getValue())
     except provider_error, e:
       raise Error(e.message)
-
 
 logic = Logic()

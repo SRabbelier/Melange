@@ -30,7 +30,7 @@ from soc.modules.seeder.logic.providers import logic as seeder_providers_logic
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
 from soc.modules.seeder.logic.seeder import Error
 
-from soc.views import base
+from soc.views.models import base
 from soc.views.helper import responses
 from soc.views.helper import decorators as view_decorators
 from soc.views.sitemap import sidebar
@@ -57,6 +57,7 @@ class View(base.View):
 
     new_params = {}
 
+    new_params['logic'] = seeder_logic
     new_params['rights'] = rights
     new_params['scope_view'] = None
     new_params['name'] = 'seeder'
@@ -103,8 +104,11 @@ class View(base.View):
     new_params['sidebar_developer'] = patterns
 
     params = dicts.merge(params, new_params)
-
-    super(View, self).__init__(params=params)
+    
+    # FIXME : temporarily added due to errors 
+    self._params = params
+    # FIXME : temporarily commented due to errors 
+    #super(View, self).__init__(params=params)
 
   @view_decorators.merge_params
   def getData(self, request, page_name=None, params=None):
@@ -135,7 +139,8 @@ class View(base.View):
     context = responses.getUniversalContext(request)
     context['configuration_sheet'] = simplejson.dumps(configuration_sheet)
 
-    responses.useJavaScript(context, params['js_uses_all'])
+    # FIXME : temporarily comment due to errors 
+    #responses.useJavaScript(context, params['js_uses_all'])
 
     return responses.respond(request, template, context)
 

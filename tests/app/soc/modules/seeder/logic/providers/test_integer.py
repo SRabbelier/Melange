@@ -18,8 +18,8 @@
 from soc.modules.seeder.logic.providers.provider import ParameterValueError
 from soc.modules.seeder.logic.providers.provider import MissingParameterError
 from soc.modules.seeder.logic.providers.integer import FixedIntegerProvider
-from soc.modules.seeder.logic.providers.integer import UniformDistributionIntegerProvider
-from soc.modules.seeder.logic.providers.integer import NormalDistributionIntegerProvider
+from soc.modules.seeder.logic.providers.integer import RandomUniformDistributionIntegerProvider
+from soc.modules.seeder.logic.providers.integer import RandomNormalDistributionIntegerProvider
 from soc.modules.seeder.logic.providers.integer import SequenceIntegerProvider
 import unittest
 
@@ -55,12 +55,12 @@ class FixedIntegerProviderTest(unittest.TestCase):
 
 
 # pylint: disable=W0622
-class UniformDistributionIntegerProviderTest(unittest.TestCase):
-  """Test class for UniformDistributionIntegerProvider.
+class RandomUniformDistributionIntegerProviderTest(unittest.TestCase):
+  """Test class for RandomUniformDistributionIntegerProvider.
   """
 
   def setUp(self):
-    self.provider = UniformDistributionIntegerProvider()
+    self.provider = RandomUniformDistributionIntegerProvider()
 
   def tearDown(self):
     pass
@@ -86,12 +86,12 @@ class UniformDistributionIntegerProviderTest(unittest.TestCase):
     self.assertRaises(ParameterValueError, self.provider.getValue)
 
 
-class NormalDistributionIntegerProviderTest(unittest.TestCase):
+class RandomNormalDistributionIntegerProviderTest(unittest.TestCase):
   """Test class for NormalIntegerProvider.
   """
 
   def setUp(self):
-    self.provider = NormalDistributionIntegerProvider()
+    self.provider = RandomNormalDistributionIntegerProvider()
 
   def tearDown(self):
     pass

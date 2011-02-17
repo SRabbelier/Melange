@@ -20,7 +20,7 @@ from soc.modules.seeder.logic.providers.provider import BaseDataProvider
 from soc.modules.seeder.logic.providers.string import RandomNameProvider
 from soc.modules.seeder.logic.providers.provider import FixedValueProvider
 from soc.modules.seeder.logic.providers.provider import ParameterValueError
-from django.forms.fields import email_re
+from django.core.validators import email_re
 
 
 __authors__ = [

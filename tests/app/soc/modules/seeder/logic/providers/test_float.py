@@ -19,8 +19,8 @@
 
 from soc.modules.seeder.logic.providers.float import FixedFloatProvider
 from soc.modules.seeder.logic.providers.provider import ParameterValueError
-from soc.modules.seeder.logic.providers.float import UniformDistributionFloatProvider
-from soc.modules.seeder.logic.providers.float import NormalDistributionFloatProvider
+from soc.modules.seeder.logic.providers.float import RandomUniformDistributionFloatProvider
+from soc.modules.seeder.logic.providers.float import RandomNormalDistributionFloatProvider
 import unittest
 
 
@@ -55,12 +55,12 @@ class FixedFloatProviderTest(unittest.TestCase):
 
 
 # pylint: disable=W0622
-class UniformDistributionFloatProviderTest(unittest.TestCase):
-  """Test class for UniformDistributionFloatProvider.
+class RandomUniformDistributionFloatProviderTest(unittest.TestCase):
+  """Test class for RandomUniformDistributionFloatProvider.
   """
 
   def setUp(self):
-    self.provider = UniformDistributionFloatProvider()
+    self.provider = RandomUniformDistributionFloatProvider()
 
   def tearDown(self):
     pass
@@ -86,12 +86,12 @@ class UniformDistributionFloatProviderTest(unittest.TestCase):
     self.assertRaises(ParameterValueError, self.provider.getValue)
 
 
-class NormalDistributionFloatProviderTest(unittest.TestCase):
+class RandomNormalDistributionFloatProviderTest(unittest.TestCase):
   """Test class for NormalFloatProvider.
   """
 
   def setUp(self):
-    self.provider = NormalDistributionFloatProvider()
+    self.provider = RandomNormalDistributionFloatProvider()
 
   def tearDown(self):
     pass

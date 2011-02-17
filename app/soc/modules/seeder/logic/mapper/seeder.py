@@ -23,7 +23,7 @@ from django.utils import simplejson
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
 
-from mapreduce import operation as op
+from google.appengine.ext.mapreduce import operation as op
 
 from google.appengine.ext import db
 

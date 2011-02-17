@@ -18,8 +18,8 @@
 
 
 from soc.modules.seeder.logic.providers.date import FixedDateProvider
-from soc.modules.seeder.logic.providers.date import NormalDistributionDateProvider
-from soc.modules.seeder.logic.providers.date import UniformDistributionDateProvider
+from soc.modules.seeder.logic.providers.date import RandomNormalDistributionDateProvider
+from soc.modules.seeder.logic.providers.date import RandomUniformDistributionDateProvider
 from soc.modules.seeder.logic.providers.provider import ParameterValueError
 import datetime
 import unittest
@@ -49,7 +49,7 @@ class FixedDateProviderTest(unittest.TestCase):
     self.provider.param_values = {'year': year,
                                   'month': month,
                                   'day': day}
-    expected = datetime.datetime(int(year), int(month), int(day))
+    expected = datetime.date(int(year), int(month), int(day))
     self.assertEquals(self.provider.getValue(), expected)
 
   def testGetCurrentTime(self):
@@ -78,18 +78,18 @@ class FixedDateProviderTest(unittest.TestCase):
     self.assertRaises(ParameterValueError, self.provider.getValue)
 
 
-class UniformDistributionDateProviderTest(unittest.TestCase):
-  """Test class for UniformDistributionDateProvider.
+class RandomUniformDistributionDateProviderTest(unittest.TestCase):
+  """Test class for RandomUniformDistributionDateProvider.
   """
 
   def setUp(self):
-    self.provider = UniformDistributionDateProvider()
+    self.provider = RandomUniformDistributionDateProvider()
 
   def tearDown(self):
     pass
 
   def testGetValue(self):
-    """Tests UniformDistributionDateProvider.getValue()
+    """Tests RandomUniformDistributionDateProvider.getValue()
     """
     min_year = '2000'
     min_month = '5'
@@ -105,12 +105,12 @@ class UniformDistributionDateProviderTest(unittest.TestCase):
                                   'max_month': max_month,
                                   'max_day': max_day}
     value = self.provider.getValue()
-    min_date = datetime.datetime(int(min_year), int(min_month), int(min_day))
-    max_date = datetime.datetime(int(max_year), int(max_month), int(max_day))
+    min_date = datetime.date(int(min_year), int(min_month), int(min_day))
+    max_date = datetime.date(int(max_year), int(max_month), int(max_day))
     self.assertTrue(min_date <= value <= max_date)
 
   def testGetValueWithInvalidParameters(self):
-    """Tests UniformDistributionDateProvider.getValue() with invalid
+    """Tests RandomUniformDistributionDateProvider.getValue() with invalid
     parameters.
     """
     self.provider.param_values = {'min_year': 'asdf'}
@@ -135,18 +135,18 @@ class UniformDistributionDateProviderTest(unittest.TestCase):
     self.provider.getValue()
 
 
-class NormalDistributionDateProviderTest(unittest.TestCase):
-  """Test class for NormalDistributionDateProvider.
+class RandomNormalDistributionDateProviderTest(unittest.TestCase):
+  """Test class for RandomNormalDistributionDateProvider.
   """
 
   def setUp(self):
-    self.provider = NormalDistributionDateProvider()
+    self.provider = RandomNormalDistributionDateProvider()
 
   def tearDown(self):
     pass
 
   def testGetValue(self):
-    """Tests NormalDistributionDateProvider.getValue()
+    """Tests RandomNormalDistributionDateProvider.getValue()
     """
     # Get a default value
     _ = self.provider.getValue()
@@ -164,7 +164,7 @@ class NormalDistributionDateProviderTest(unittest.TestCase):
     _ = self.provider.getValue()
 
   def testGetValueWithInvalidParameters(self):
-    """Tests NormalDistributionDateProvider.getValue() with invalid
+    """Tests RandomNormalDistributionDateProvider.getValue() with invalid
     parameters.
     """
     self.provider.param_values = {'mean_year': 'asdf'}

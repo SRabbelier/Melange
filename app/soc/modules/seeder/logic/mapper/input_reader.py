@@ -21,7 +21,7 @@ __authors__ = [
 
 from django.utils import simplejson
 
-from mapreduce.input_readers import InputReader, BadReaderParamsError
+from google.appengine.ext.mapreduce.input_readers import InputReader, BadReaderParamsError
 
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
 
@@ -86,6 +86,10 @@ class JSONInputReader(InputReader):
   def __str__(self):
     return str(self.configuration_sheet_key)
 
+  @classmethod
+  def validate(cls, mapper_spec):
+    pass
+    
   @classmethod
   def split_input(cls, mapper_spec):
     """Returns a list of input readers for the input spec.

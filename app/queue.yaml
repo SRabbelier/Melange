@@ -32,3 +32,8 @@ queue:
 - name: statistic
   rate: 5/s
   bucket_size: 5
+
+# queue used by data seeder module to see models
+- name: seeder
+  rate: 5/s
+  bucket_size: 5

@@ -284,7 +284,7 @@
           href: _queue[i].css,
           media: "screen",
           rel: "stylesheet",
-          type: "text/css",
+          type: "text/css"
         }).appendTo("head");
       }
       else if (typeof _queue[i] == "function") { // inline function found

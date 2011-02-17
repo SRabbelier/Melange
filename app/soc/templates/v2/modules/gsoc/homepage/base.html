@@ -95,3 +95,22 @@ limitations under the License.
   <!-- end block -->
 </div>
 {% endblock page_content %}
+
+{% block dependencies %}
+  [
+    dep.melange.blog,
+    null,
+    function () {
+      function initialize() {
+        var blog = new BlogPreview(document.getElementById("blog"));
+        blog.show("{{ entity.feed_url }}", 3);
+      }
+
+      jQuery(
+        function () {
+          google.load("feeds","1", {callback:initialize});
+        }
+      );
+    }
+  ]
+{% endblock dependencies %}

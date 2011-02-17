@@ -220,6 +220,12 @@
     "/soc/content/js/upload-form-101205.js"
   ];
 
+  s.melange.blog = [
+    s.google,
+    null,
+    "/soc/content/js/melange.blog-090825.js"
+  ];
+
   $m.s = s;
 
   var unpack = function (orig_array) {

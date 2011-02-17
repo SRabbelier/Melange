@@ -62,9 +62,10 @@ class RequestData(object):
     self.program_timeline = None
     self.org_app = None
     self.host = None
-    self.org_admins = []
-    self.mentors = []
+    self.org_admin = []
+    self.mentor = []
     self.student = None
+    self.role = None
     self.request = None
     self.args = []
     self.kwargs = {}
@@ -99,10 +100,11 @@ class RequestData(object):
       fields = {'user': self.user,
                 'program': self.program,
                 'status': ['active', 'inactive']}
-      self.org_admins = org_admin_logic.getForFields(fields)
-      self.mentors = mentor_logic.getForFields(fields)
+      self.org_admin = org_admin_logic.getOneForFields(fields)
+      self.mentor = mentor_logic.getOneForFields(fields)
 
       fields = {'user': self.user,
                 'scope': self.program,
                 'status': ['active', 'inactive']}
       self.student = student_logic.getOneForFields(fields)
+      self.role = self.host or self.org_admin or self.mentor or self.student

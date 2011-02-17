@@ -40,8 +40,13 @@ def namedLinkIdPattern(names):
 
   return r'/'.join(named_patterns)
 
+
+_role = r'(?P<role>%s)/' % ("student|mentor|org_admin")
+
+
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
+PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])
 DOCUMENT  = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'document'])
 STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
 PROPOSAL  = namedLinkIdPattern(['sponsor', 'program', 'student', 'proposal'])

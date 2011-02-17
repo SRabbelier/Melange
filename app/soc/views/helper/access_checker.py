@@ -69,6 +69,9 @@ DEF_PAGE_INACTIVE_MSG = ugettext(
 DEF_SCOPE_INACTIVE_MSG = ugettext(
     'The scope for this request is not active.')
 
+DEF_PROGRAM_INACTIVE_MSG_FMT = ugettext(
+    'This page is inaccessible because %s is not active at this time.')
+
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -81,7 +84,7 @@ class AccessChecker(object):
     self.data = data
     self.gae_user = users.get_current_user()
 
-  def checkIsLoggedIn(self):
+  def isLoggedIn(self):
     """Raises an alternate HTTP response if Google Account is not logged in.
     """
 
@@ -90,7 +93,7 @@ class AccessChecker(object):
 
     raise out_of_band.LoginRequest()
 
-  def checkIsNotLoggedIn(self):
+  def isNotLoggedIn(self):
     """Raises an alternate HTTP response if Google Account is logged in.
     """
 
@@ -99,7 +102,7 @@ class AccessChecker(object):
 
     raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
 
-  def checkIsUser(self):
+  def isUser(self):
     """Raises an alternate HTTP response if Google Account has no User entity.
 
     Raises:
@@ -123,13 +126,13 @@ class AccessChecker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
 
-  def checkIsHost(self):
+  def isHost(self):
     """Checks whether the current user has a host role.
     """
 
     return self.data.user.is_host
 
-  def checkHasUserEntity(self):
+  def hasUserEntity(self):
     """Raises an alternate HTTP response if Google Account has no User entity.
 
     Raises:
@@ -145,7 +148,7 @@ class AccessChecker(object):
 
     raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
 
-  def checkIsDeveloper(self):
+  def isDeveloper(self):
     """Raises an alternate HTTP response if Google Account is not a Developer.
 
     Raises:
@@ -169,7 +172,7 @@ class AccessChecker(object):
 
     raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
 
-  def checkIsActivePeriod(self, period_name):
+  def isActivePeriod(self, period_name):
     """Checks if the given period is active for the given program.
 
     Args:
@@ -209,7 +212,16 @@ class AccessChecker(object):
 
     raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
-  def checkIsNotParticipatingInProgram(self):
+  def isProgramActive(self):
+    """Checks that the program is active.
+    """
+    if self.data.program.status == 'visible':
+      return
+
+    raise out_of_band.AccessViolation(
+        message_fmt=DEF_PROGRAM_INACTIVE_MSG_FMT % self.data.program.name)
+
+  def isNotParticipatingInProgram(self):
     """Checks if the user has no roles for the program specified in data.
 
      Raises:
@@ -217,24 +229,13 @@ class AccessChecker(object):
                                 org admin role for the given program.
     """
 
-    data = self.data
-    if data.student or data.mentors or data.org_admins or data.host:
-      raise out_of_band.AccessViolation(
-          message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+    if not self.data.role:
+      return
 
-  def checkIsParticipatingInProgram(self):
-    """Checks if the user has a role for the program specified in data.
+    raise out_of_band.AccessViolation(
+        message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
 
-     Raises:
-       AccessViolationResponse: if the current user has no student, mentor or
-                                org admin role for the given program.
-    """
-    data = self.data
-    if not (data.student or data.mentors or data.org_admins or data.host):
-      raise out_of_band.AccessViolation(
-          message_fmt=DEF_NOT_PARTICIPATING_MSG)
-
-  def checkIsActive(self, entity):
+  def isActive(self, entity):
     """Checks if the specified entity is active.
 
     Raises:

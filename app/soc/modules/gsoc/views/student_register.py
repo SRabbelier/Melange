@@ -57,6 +57,5 @@ class StudentRegister(RequestHandler):
     """
 
     return {
-        'page_name': 'Register as a student',
         'program': self.data.program,
     }

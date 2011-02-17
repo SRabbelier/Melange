@@ -48,7 +48,7 @@ def siteMenuContext(data):
   else:
     context['login_link'] = users.create_login_url(encoded_path)
 
-  if data.host or data.org_admins or data.mentors or data.student:
+  if data.role:
     context['dashboard_link'] = redirects.getDashboardRedirect(data)
 
   return context

@@ -23,9 +23,10 @@ __authors__ = [
   ]
 
 
-import soc.views.helper.access_checker
+from soc.views.helper import access_checker
 
 
-class AccessChecker(soc.views.helper.access_checker.AccessChecker):
+class AccessChecker(access_checker.AccessChecker):
   """Helper classes for access checking in GSoC module.
   """
+  pass

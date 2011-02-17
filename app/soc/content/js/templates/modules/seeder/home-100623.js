@@ -87,7 +87,7 @@
   jQuery.extend(NESTED_MODEL_CONTAINER_DIRECTIVE, {
     ".@class": function() {
       return "model_container";
-    },
+    }
   });
 
   var PROVIDER_CONTAINER_DIRECTIVE = {

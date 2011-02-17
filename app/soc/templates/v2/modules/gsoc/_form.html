@@ -1,23 +1,9 @@
-<fieldset id="form-register-fieldset-basicinfo" class="fieldset-basicinfo">
-  <div id="form-row-fname" class="row fname">
-    <label>First Name<span class="req">*</span></label>
-    <input type="text" name="fname" value="" class="text" />
+
+<fieldset>
+{% for field in form %}
+  <div id="form-row-address1" class="row address1">
+    <label>{{ field.label }}{% if field.field.required %}<span class="req">*</span>{% endif %}</label>
+    {{ field }}
   </div>
-  <div id="form-row-lname" class="row lname">
-    <label>Last Name<span class="req">*</span></label>
-    <input type="text" name="lname" value="" class="text" />
-  </div>
-  <div id="form-row-email" class="row email">
-    <label>Email Address<span class="req">*</span></label>
-    <input type="text" name="email" value="" class="text" />
-  </div>
-  <div id="form-row-phone" class="row phone">
-    <label>Phone Number<span class="req">*</span></label>
-    <input type="text" name="phone" value="" class="text" />
-  </div>
-  <div id="form-row-bday" class="row bday">
-    <label>Birth Date<span class="req">*</span></label>
-    <input type="text" name="bday" value="" class="text" />
-    <span class="note">DD/MM/YYY</span>
-  </div>
+{% endfor %}
 </fieldset>

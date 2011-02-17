@@ -22,46 +22,35 @@ __authors__ = [
   ]
 
 
-from soc.views.template import Template
+from google.appengine.ext.db import djangoforms
+
+from soc.views import template
+
+from soc.models.role import Role
 
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
-class Form(object):
-  """Form class that facilitates the rendering of forms.
-  """
 
-  def render(self):
-    """Renders the template to a string.
-
-    Uses the context method to retrieve the appropriate context, uses the
-    self.templatePath() method to retrieve the template that should be used.
-    """
-
-    context = self.context()
-    tepmlate_path = 'v2/modules/gsoc/_form.html'
-    rendered = loader.render_to_string(template_path, dictionary=context)
-    return rendered
-
-  def context(self):
-    """Returns the context for the current template.
-    """
-
-    return {}
-
-
-class ProfileForm(Form):
+class Profile(template.Form):
   """Template for profiles.
   """
 
+  class Form(djangoforms.ModelForm): 
+    """Django form for profile page.
+    """
+    
+    class Meta:
+      model = Role
+
   def context(self):
     return {
-
+        'form': self.Form()
     }
 
 
-class Profile(RequestHandler):
+class ProfilePage(RequestHandler):
   """View for the participant profile.
   """
 
@@ -90,5 +79,5 @@ class Profile(RequestHandler):
   def context(self):
     return {
         'page_name': 'Register',
-        'form': None,
+        'form': Profile().render(),
     }

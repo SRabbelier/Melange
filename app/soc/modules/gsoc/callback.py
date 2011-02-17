@@ -68,7 +68,7 @@ class Callback(object):
     self.views.append(dashboard.Dashboard())
     self.views.append(homepage.Homepage())
     self.views.append(document.Document())
-    self.views.append(profile.Profile())
+    self.views.append(profile.ProfilePage())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

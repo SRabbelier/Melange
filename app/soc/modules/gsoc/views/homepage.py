@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from django.conf.urls.defaults import url
+
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -84,6 +86,8 @@ class FeaturedProject(Template):
     self.featured_project = featured_project
 
   def context(self):
+    # TODO: Use django reverse function from urlresolver once student_project
+    # view is converted to the new infrastructure
     featured_project_url = redirects.getProjectDetailsRedirect(self.featured_project)
 
     return {
@@ -107,7 +111,8 @@ class Homepage(RequestHandler):
     """
 
     return [
-        (r'^gsoc/homepage/%s$' % url_patterns.PROGRAM, self)
+        url(r'^gsoc/homepage/%s$' % url_patterns.PROGRAM, self,
+            name='gsoc_homepage')
     ]
 
   def checkAccess(self):

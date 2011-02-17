@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from django.conf.urls.defaults import url
+
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.lists import Lists
 from soc.views import out_of_band
@@ -53,7 +55,9 @@ class Dashboard(RequestHandler):
   def djangoURLPatterns(self):
     """The URL pattern for the dashboard.
     """
-    return [(r'^gsoc/dashboard/%s$' %url_patterns.PROGRAM, self)]
+    return [
+        url(r'^gsoc/dashboard/%s$' %url_patterns.PROGRAM, self,
+            name='gsoc_dashboard')]
 
   def checkAccess(self):
     """Denies access if you don't have a role in the current program.

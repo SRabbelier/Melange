@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from django.conf.urls.defaults import url
+
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
@@ -40,7 +42,8 @@ class StudentRegister(RequestHandler):
     """
 
     return [
-        (r'^gsoc//student/%s$' % url_patterns.PROGRAM, self)
+        url(r'^gsoc//student/%s$' % url_patterns.PROGRAM, self,
+            name='gsoc_student_register')
     ]
 
   def checkAccess(self):

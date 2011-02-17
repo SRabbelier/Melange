@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from django.conf.urls.defaults import url
+
 from soc.logic.models.document import logic as document_logic
 from soc.views import document
 
@@ -41,7 +43,8 @@ class Document(RequestHandler):
     """
 
     return [
-        (r'^gsoc/document/%s$' % url_patterns.DOCUMENT, self)
+        url(r'^gsoc/document/%s$' % url_patterns.DOCUMENT, self,
+            name='gsoc_document')
     ]
 
   def checkAccess(self):

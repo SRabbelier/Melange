@@ -40,6 +40,7 @@ from soc.views.helper import responses
 from soc.views.models import base
 from soc.views.models import request as request_view
 
+import soc.logic.models.role
 import soc.models.request
 import soc.views.helper.lists
 import soc.views.helper.responses
@@ -83,7 +84,7 @@ class View(base.View):
       'be sure that you are not a %(name)s already.')
 
 
-  def __init__(self, params=None):
+  def __init__(self, params={}):
     """Defines the fields and methods required for the base View class
     to provide the user with list, public, create, edit and delete views.
 
@@ -129,9 +130,13 @@ class View(base.View):
         '%(module_package)s.%(module_name)s.manage',
         'Manage a %(name)s'),]
 
+    new_params['logic'] = soc.logic.models.role.logic
     new_params['extra_django_patterns'] = patterns
     new_params['scope_redirect'] = redirects.getInviteRedirect
     new_params['manage_redirect'] = redirects.getListRolesRedirect
+
+    new_params['name'] = "Role"
+    new_params['module_name'] = 'role'
 
     new_params['create_template'] = 'soc/role/edit.html'
     new_params['edit_template'] = 'soc/role/edit.html'
@@ -310,6 +315,108 @@ class View(base.View):
       return http.HttpResponseRedirect(
           redirects.getListRequestsRedirect(group_entity, 
                                             group_view.getParams()))
+
+  @decorators.merge_params
+  @decorators.check_access
+  def acceptOrgAdminIntivation(self, request, access_type, page_name=None,
+                               params=None, **kwargs):
+    """Creates the page process an invite into an OrgAdmin role.
+    """
+
+    request_entity = request_logic.getFromIDOr404(int(kwargs['id']))
+
+    # get the context for this webpage
+    context = responses.getUniversalContext(request)
+    responses.useJavaScript(context, params['js_uses_all'])
+    context['page_name'] = page_name
+
+    return acceptInvitation(request, context, params, request_entity, 'org_admin', **kwargs)
+
+  def acceptInvitation(self, request, context, params, request_entity, role, **kwargs):
+    """Creates the page process an invitation into a role.
+    """
+
+    if role == 'org_admin':
+      agreement = 'admin_agreement'
+    else:
+      agreement = 'mentor_agreement'
+
+    dynafields = [{
+        'name': 'link_id',
+        'base': forms.CharField,
+        'widget': widgets.ReadOnlyInput(),
+        'required': False,
+        },
+        {
+        'name': agreement,
+        'base': forms.fields.Field,
+        'required': False,
+        'widget': widgets.AgreementField,
+        'group': ugettext("5. Terms of Service"),
+        }]
+
+    dynaproperties = params_helper.getDynaFields(dynafields)
+
+    form = dynaform.extendDynaForm(
+        dynaform=params['create_form'],
+        dynaproperties=dynaproperties)
+
+    if request.method == 'POST':
+      return self.acceptInvitationPost(request, context, params,
+          form, role, **kwargs)
+    else:
+      return self.acceptInvitationGet(request, context, params,
+          form, role, **kwargs)
+
+  def acceptInvitationGet(self, request, context, params, form, **kwargs):
+    """Handles the GET request concerning the creation of a Role
+    via an invitation.
+    """
+
+    # create the form using the scope_path and link_id from request_entity 
+    # as initial value
+    fields = {
+        'link_id': request_entity.user.link_id,
+        'scope_path': request_entity.group.key().id_or_name()
+        }
+
+    fields.update(role_logic.getSuggestedInitialProperties(
+        request_entity.user))
+
+    form = form(initial=fields)
+
+    # construct the appropriate response
+    return super(View, self)._constructResponse(request, entity=None,
+        context=context, form=form, params=params)
+
+  def acceptInvitationPost(self, request, context, params, form, request_entity, role, 
+                           **kwargs):
+    """Handles the POST request concerning the creation of a Role
+    via an invitation.
+    """
+
+    # populate the form using the POST data
+    form = form(request.POST)
+
+    if not form.is_valid():
+      # return the invalid form response
+      return self._constructResponse(request, entity=None, context=context,
+          form=form, params=params)
+
+    # collect the cleaned data from the valid form
+    key_name, fields = soc.views.helper.forms.collectCleanedFields(form)
+
+    # set the user and link_id fields to the right property
+    fields['user'] = request_entity.user # get the current user
+    fields['link_id'] = request_entity.user.link_id # get his or her link_id
+    fields['scope'] = request_entity.group # this should be the current program
+    fields['scope_path'] = request_entity.group.key().id_or_name() # current program name
+    # make sure that this role becomes active once more in case this user
+    # has been reinvited
+    fields ['status'] = 'active'
+    
+    # TODO:
+    # depending on role_name it should add the organization to the role entity
 
   @decorators.merge_params
   @decorators.check_access
@@ -637,3 +744,10 @@ class View(base.View):
     template = request_view.view.getParams()['request_processing_template']
 
     return responses.respond(request, template, context=context)
+
+
+view = View()
+
+create = decorators.view(view.create)
+delete = decorators.view(view.delete)
+edit = decorators.view(view.edit)

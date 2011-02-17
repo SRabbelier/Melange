@@ -104,7 +104,7 @@ class Student(soc.models.role.Role):
   #: A many:1 relationship that ties multiple Students to the
   #: School that they attend.
   school = db.ReferenceProperty(reference_class=soc.models.school.School,
-                                required=False, collection_name='students')
+                                required=False, collection_name='the_students')
 
   can_we_contact_you = db.BooleanProperty(verbose_name=ugettext(
       'Can we contact you?'))

@@ -24,6 +24,7 @@ __authors__ = [
 
 from google.appengine.ext.db import djangoforms
 
+from soc.views import forms
 from soc.views import template
 
 from soc.models.role import Role
@@ -33,11 +34,11 @@ from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
-class Profile(template.Form):
+class Profile(forms.Form):
   """Template for profiles.
   """
 
-  class Form(djangoforms.ModelForm): 
+  class Form(forms.ModelForm): 
     """Django form for profile page.
     """
     

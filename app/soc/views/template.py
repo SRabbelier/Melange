@@ -52,26 +52,3 @@ class Template(object):
     Subclasses should override this method.
     """
     raise NotImplementedError()
-
-
-class Form(object):
-  """Form class that facilitates the rendering of forms.
-  """
-
-  def render(self):
-    """Renders the template to a string.
-
-    Uses the context method to retrieve the appropriate context, uses the
-    self.templatePath() method to retrieve the template that should be used.
-    """
-
-    context = self.context()
-    template_path = 'v2/modules/gsoc/_form.html'
-    rendered = loader.render_to_string(template_path, dictionary=context)
-    return rendered
-
-  def context(self):
-    """Returns the context for the current template.
-    """
-
-    return {}

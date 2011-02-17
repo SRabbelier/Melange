@@ -182,7 +182,7 @@ class Logic(base.Logic):
     if account and (account == current):
       return users.is_current_user_admin()
 
-  def agreesToSiteToS(self, entity):
+  def agreesToSiteToS(self, entity, site_entity):
     """Returns indication of User's answer to the site-wide Terms of Service.
 
     Args:
@@ -194,7 +194,9 @@ class Logic(base.Logic):
         (User explicitly answered "Yes")
       False: site-wide ToS is in effect but User did not agree to it yet
     """
-    if not site_logic.getToS(site_logic.getSingleton()):
+
+    
+    if not site_logic.getToS(site_entity):
       # no site-wide ToS in effect, so let the User slide for now
       return True
 

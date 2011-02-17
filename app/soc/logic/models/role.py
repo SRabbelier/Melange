@@ -28,6 +28,7 @@ from django.utils.translation import ugettext
 
 from soc.cache import sidebar
 from soc.logic.models import base
+from soc.logic.models import program as program_logic
 
 import soc.models.role
 
@@ -63,8 +64,8 @@ class Logic(base.Logic):
   """
 
   def __init__(self, model=soc.models.role.Role,
-               base_model=None, scope_logic=None, role_name=None,
-               disallow_last_resign=False):
+               base_model=None, scope_logic=program_logic,
+               role_name=None, disallow_last_resign=False):
     """Defines the name, key_name and model for this entity.
 
     Args:

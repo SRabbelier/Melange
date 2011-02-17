@@ -40,7 +40,7 @@ class StudentRegister(RequestHandler):
     """
 
     return [
-        (r'^gsoc/register/student/%s$' % url_patterns.PROGRAM, self)
+        (r'^gsoc//student/%s$' % url_patterns.PROGRAM, self)
     ]
 
   def checkAccess(self):

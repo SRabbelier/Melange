@@ -36,6 +36,7 @@ from soc.views.models import organization
 from soc.views.models import org_admin
 from soc.views.models import program
 from soc.views.models import request
+from soc.views.models import role
 from soc.views.models import site
 from soc.views.models import sponsor
 from soc.views.models import student

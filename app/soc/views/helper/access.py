@@ -581,7 +581,8 @@ class Checker(object):
     if not self.user:
       raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
 
-    if user_logic.agreesToSiteToS(self.user):
+    site_entity = site_logic.getSingleton()
+    if user_logic.agreesToSiteToS(self.user, site_entity):
       return
 
     # Would not reach this point of site-wide ToS did not exist, since

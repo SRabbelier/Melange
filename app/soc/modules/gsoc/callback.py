@@ -22,6 +22,7 @@ __authors__ = [
   ]
 
 
+from soc.views.models import role
 from soc.modules.gsoc.tasks import accept_proposals
 from soc.modules.gsoc.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gsoc.tasks import program_freezer
@@ -86,6 +87,7 @@ class Callback(object):
     self.core.registerSitemapEntry(org_app_survey.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(program.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(project_survey.view.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(role.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student_project.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student_proposal.view.getDjangoURLPatterns())
     self.core.registerSitemapEntry(student.view.getDjangoURLPatterns())
@@ -103,6 +105,7 @@ class Callback(object):
     # Redesigned view registration
     for view in self.views:
       self.core.registerSitemapEntry(view.djangoURLPatterns())
+
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

@@ -2,8 +2,8 @@
 <fieldset>
 {% for field in form %}
   <div id="form-row-address1" class="row address1">
-    <label>{{ field.label }}{% if field.field.required %}<span class="req">*</span>{% endif %}</label>
-    {{ field }}
+    {{ field.label}}
+    {{ field.render }}
   </div>
 {% endfor %}
 </fieldset>

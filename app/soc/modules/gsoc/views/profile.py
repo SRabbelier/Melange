@@ -91,3 +91,11 @@ class ProfilePage(RequestHandler):
         'page_name': 'Register',
         'form': Profile().render(),
     }
+
+  def post(self):
+    """Handler for HTTP POST request.
+    """
+
+    self.response = http.HttpResponseRedirect('/gsoc/profile/%s/%s' % (
+        self.data.kwargs['sponsor'],
+        self.data.kwargs['program']))

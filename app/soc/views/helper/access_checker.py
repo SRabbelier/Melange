@@ -72,6 +72,10 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 DEF_PROGRAM_INACTIVE_MSG_FMT = ugettext(
     'This page is inaccessible because %s is not active at this time.')
 
+DEF_ROLE_INACTIVE_MSG = ugettext(
+    'This page is inaccessible because you do not have an active role '
+    'in the program at this time.')
+
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -246,3 +250,12 @@ class AccessChecker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
+
+  def isRoleActive(self):
+    """Check if the role of the current user is active.
+    """
+
+    if self.data.role and self.data.role.status == 'active':
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_ROLE_INACTIVE_MSG)

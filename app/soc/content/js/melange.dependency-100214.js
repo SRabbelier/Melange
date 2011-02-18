@@ -116,6 +116,10 @@
     "/jquery/jquery-progressbar.js"
   ];
 
+  s.uniform = [
+    "/jquery/jquery-uniform.js"
+  ];
+
   s.jqueryui = [
     new $m.cssFile("/soc/content/css/v2/gsoc/jquery-ui.css"),
     "/jquery/jquery-ui.core.js"

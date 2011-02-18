@@ -31,9 +31,24 @@ from django.template import loader
 from django.utils.safestring import mark_safe
 
 
+class ModelForm(djangoforms.ModelForm):
+  """
+  """
+
+  def __iter__(self):
+    for name, field in self.fields.items():
+      yield BoundField(self, field, name)
+
+
 class Form(object):
   """Form class that facilitates the rendering of forms.
   """
+
+  class Form(ModelForm):
+    """Django Form associated with the class.
+    """
+
+    pass
 
   def render(self):
     """Renders the template to a string.
@@ -53,6 +68,12 @@ class Form(object):
 
     return {}
 
+  def getForm(self):
+    """Returns the Django form object associated with the class.
+    The specialized forms should be defined in subclasses.
+    """
+
+    return self.Form()
 
 class BoundField(forms.BoundField):
   """
@@ -122,11 +143,3 @@ class BoundField(forms.BoundField):
       return '<span class="req">*</span>'
     else:
       return ''
-
-class ModelForm(djangoforms.ModelForm):
-  """
-  """
-
-  def __iter__(self):
-    for name, field in self.fields.items():
-      yield BoundField(self, field, name)

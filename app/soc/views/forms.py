@@ -32,7 +32,7 @@ from django.utils.safestring import mark_safe
 
 
 class ModelForm(djangoforms.ModelForm):
-  """
+  """Django ModelForm class which uses our implementation of BoundField.
   """
 
   def __iter__(self):

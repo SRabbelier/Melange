@@ -39,3 +39,14 @@ limitations under the License.
 <!-- end form -->
 
 {% endblock page_content %}
+
+{% block dependencies %}
+  [
+    dep.melange.menu,
+    dep.uniform,
+    null,
+    function () {
+      jQuery("select, input:radio, input:file, input:checkbox").uniform();
+    }
+  ]
+{% endblock dependencies %}

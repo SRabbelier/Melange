@@ -86,7 +86,7 @@ class BoundField(forms.BoundField):
         }
 
     return mark_safe(
-        '<label><div class="checker"><span>%s</span></div> %s%s</label>' % (
+        '<label>%s%s%s</label>' % (
         self.as_widget(attrs=attrs),
         self.field.label,
         self._render_is_required()

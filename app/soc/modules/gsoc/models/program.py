@@ -99,3 +99,29 @@ class GSoCProgram(soc.models.program.Program):
   connect_with_us_page.collection_name = 'connect_with_us_page'
   connect_with_us_page.help_text = ugettext(
       'The document with <b>Connect With Us</b>')
+
+  facebook = db.LinkProperty(
+      required=False, verbose_name=ugettext("Facebook URL"))
+  facebook.help_text = ugettext("URL of the Facebook page for the program")
+  facebook.group = ugettext("1. Public Info")
+
+  twitter = db.LinkProperty(
+      required=False, verbose_name=ugettext("Twitter URL"))
+  twitter.help_text = ugettext("URL of the Twitter profile for the program")
+  twitter.group = ugettext("1. Public Info")
+
+  blogger = db.LinkProperty(
+      required=False, verbose_name=ugettext("Blogger URL"))
+  blogger.help_text = ugettext("URL of the Blogger home page for the program")
+  blogger.group = ugettext("1. Public Info")
+
+  email = db.EmailProperty(
+      required=False, verbose_name=ugettext("Program email"))
+  email.help_text = ugettext("Contact email address for the program")
+  email.group = ugettext("1. Public Info")
+
+  irc = db.EmailProperty(
+      required=False, verbose_name=ugettext("IRC URL"))
+  irc.help_text = ugettext("URL of the irc channel for the program in "
+                           "the format irc://<channel>@server")
+  irc.group = ugettext("1. Public Info")

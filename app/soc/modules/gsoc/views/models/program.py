@@ -30,6 +30,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext
 
 from soc.logic import allocations
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic import system
 from soc.views import helper
@@ -43,7 +44,7 @@ from soc.views.sitemap import sidebar
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.host import logic as host_logic
 
-from soc.modules.gsoc.logic import cleaning
+from soc.modules.gsoc.logic import cleaning as gsoc_cleaning
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.organization import logic as org_logic
@@ -120,7 +121,12 @@ class View(program.View):
         ]
 
     new_params['create_extra_dynaproperties'] = {
-        'clean_org_tags': cleaning.cleanTagsList('org_tags')
+        'clean_org_tags': gsoc_cleaning.cleanTagsList('org_tags'),
+        'clean_facebook': cleaning.clean_url('facebook'),
+        'clean_twitter': cleaning.clean_url('twitter'),
+        'clean_blogger': cleaning.clean_url('blogger'),
+        'clean_email': cleaning.clean_empty_field('email'),
+        'clean_irc': cleaning.clean_empty_field('irc'),
         }
 
     new_params['org_app_logic'] = org_app_logic

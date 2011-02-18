@@ -73,7 +73,7 @@ class Form(object):
     The specialized forms should be defined in subclasses.
     """
 
-    return self.Form()
+    return self.Form
 
 class BoundField(forms.BoundField):
   """

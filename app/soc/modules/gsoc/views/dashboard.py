@@ -111,7 +111,7 @@ class Dashboard(RequestHandler):
     """
     if self.data.student:
       return self._getStudentComponents()
-    elif self.data.mentors or self.data.org_admins:
+    elif self.data.mentor or self.data.org_admin:
       return self._getOrgMemberComponents()
     else:
       return self._getLoneUserCompontents()
@@ -138,14 +138,14 @@ class Dashboard(RequestHandler):
     """
     components = []
 
-    if self.data.mentors:
+    if self.data.mentor:
       if timeline_helper.isAfterEvent(
           self.data.program_timeline, 'accepted_students_announced_deadline'):
         # add a component to show all projects a user is mentoring
         components.append(
             ProjectsIMentorComponent(self.request, self.data))
 
-    if self.data.org_admins:
+    if self.data.org_admin:
       # add a component for all organization that this user administers
       components.append(OrganizationsIAdminComponent(self.request, self.data))
 
@@ -385,7 +385,7 @@ class ProjectsIMentorComponent(Component):
     if idx == 4:
       list_data = lists.getListData(self.request, project_view.getParams(),
                                     {'program': self.data.program,
-                                     'mentor': self.data.mentors})
+                                     'mentor': self.data.mentor})
       return list_data
     else:
       return None
@@ -423,12 +423,12 @@ class OrganizationsIAdminComponent(Component):
     if idx == 5:
       # TODO(ljvderijk): Feels weird that if you have access to all the keys
       # already that you need to use the list code in this way. The rewrite
-      # should probably allow you to control the entities you put in?
+      # should probably allow the caller to control the entities to put in?
       list_data = lists.getListData(
           self.request, org_view.getParams(),
           {'scope': self.data.program,
            'link_id': [org_admin.scope.link_id
-                       for org_admin in self.data.org_admins]})
+                       for org_admin in self.data.org_admin]})
       return list_data
     else:
       return None

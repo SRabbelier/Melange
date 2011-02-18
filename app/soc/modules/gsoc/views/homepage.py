@@ -99,6 +99,22 @@ class FeaturedProject(Template):
     return "v2/modules/gsoc/homepage/_featured_project.html"
 
 
+class ConnectWithUs(Template):
+  """Connect with us template.
+  """
+
+  def __init__(self, data):
+    self.data = data
+
+  def context(self):
+    return {
+      'program': self.data.program,
+    }
+
+  def templatePath(self):
+    return "v2/modules/gsoc/homepage/_connect_with_us.html"
+
+
 class Homepage(RequestHandler):
   """Encapsulate all the methods required to generate GSoC Home page.
   """
@@ -133,11 +149,13 @@ class Homepage(RequestHandler):
     context = {
         'timeline': Timeline(self.data, current_timeline).render(),
         'apply': Apply(self.data, current_timeline).render(),
+        'connect_with_us': ConnectWithUs(self.data).render(),
         'page_name': 'Home page',
         'program': self.data.program,
     }
 
     if featured_project:
-      context['featured_project'] = FeaturedProject(self.data, featured_project).render()
+      context['featured_project'] = FeaturedProject(
+        self.data, featured_project).render()
 
     return context

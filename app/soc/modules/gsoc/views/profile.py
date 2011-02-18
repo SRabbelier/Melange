@@ -24,6 +24,7 @@ __authors__ = [
 
 from google.appengine.ext.db import djangoforms
 
+from django import http
 from django.forms import forms as dj_forms
 
 from soc.views import forms
@@ -47,7 +48,7 @@ class Profile(forms.Form):
     class Meta:
       model = Role
       exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for', 
-          'student_info', 'agreed_to_tos_on']
+          'student_info', 'agreed_to_tos_on', 'scope_path']
 #      widgets = {
 #        'res_country': djangoforms.ModelChoiceField(Role,
 #         empty_label='sadsadssads'),

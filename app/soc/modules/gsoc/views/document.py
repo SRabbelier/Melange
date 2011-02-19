@@ -56,7 +56,7 @@ class Document(RequestHandler):
     """Handler to for GSoC Home page HTTP get request.
     """
 
-    entity = document_logic.getFromKeyName(
+    entity = document_logic.getFromKeyNameOr404(
         '%(prefix)s/%(sponsor)s/%(program)s/%(document)s' % self.kwargs)
 
     return {

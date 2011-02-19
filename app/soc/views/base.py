@@ -25,14 +25,16 @@ __authors__ = [
   ]
 
 
-from django.http import HttpResponse
+from django import http
 from django.template import loader
+
+from soc.logic import dicts
 
 from soc.modules.gsoc.views import site_menu
 from soc.modules.gsoc.views import header
 
 
-class Response(HttpResponse):
+class Response(http.HttpResponse):
   """Response class that wraps the Django's HttpResponse class but
   with message for every possible HTTP response code.
   """
@@ -152,6 +154,14 @@ class RequestHandler(object):
     """Handler for HTTP TRACE request.
     """
     self.error(405)
+
+  def redirect(self, url):
+    """Sets the response to a redirect to the specified url.
+
+    Args:
+      url: the url to redirect to
+    """
+    self.response = http.HttpResponseRedirect(url)
 
   def error(self, status, message=None):
     """Sets the error response code and the message when the HTTP

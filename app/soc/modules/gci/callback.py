@@ -51,12 +51,16 @@ class Callback(object):
     """
 
     self.core = core
+    self.v2 = True
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.
     """
 
     self.core.requireUniqueService('registerWithSitemap')
+
+    if self.v2:
+      return
 
     # register the GCI Views
     self.core.registerSitemapEntry(mentor.view.getDjangoURLPatterns())

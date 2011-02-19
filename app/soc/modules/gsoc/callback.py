@@ -56,6 +56,7 @@ class Callback(object):
     """
 
     self.core = core
+    self.v2 = True
     self.views = []
 
   def registerViews(self):
@@ -76,6 +77,13 @@ class Callback(object):
     """
 
     self.core.requireUniqueService('registerWithSitemap')
+
+    # Redesigned view registration
+    for view in self.views:
+      self.core.registerSitemapEntry(view.djangoURLPatterns())
+
+    if self.v2:
+      return
 
     # register the GSoC Views
     self.core.registerSitemapEntry(
@@ -101,11 +109,6 @@ class Callback(object):
     self.core.registerSitemapEntry(accept_proposals.getDjangoURLPatterns())
     self.core.registerSitemapEntry(proposal_review.getDjangoURLPatterns())
     self.core.registerSitemapEntry(slot_assignment.getDjangoURLPatterns())
-
-    # Redesigned view registration
-    for view in self.views:
-      self.core.registerSitemapEntry(view.djangoURLPatterns())
-
 
   def registerWithSidebar(self):
     """Called by the server when sidebar entries should be registered.

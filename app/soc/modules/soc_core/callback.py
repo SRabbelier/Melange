@@ -61,12 +61,16 @@ class Callback(object):
 
     # disable clubs
     self.enable_clubs = False
+    self.v2 = True
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.
     """
 
     self.core.requireUniqueService('registerWithSitemap')
+
+    if self.v2:
+      return
 
     if self.enable_clubs:
       self.core.registerSitemapEntry(club.view.getDjangoURLPatterns())

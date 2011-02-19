@@ -24,8 +24,8 @@ __authors__ = [
 
 from google.appengine.ext.db import djangoforms
 
-from django import http
-from django.forms import forms as dj_forms
+from django.core.urlresolvers import reverse
+from django.conf.urls.defaults import url
 
 from soc.views import forms
 from soc.views import template
@@ -66,8 +66,10 @@ class ProfilePage(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-        (r'^gsoc/profile/%s$' % url_patterns.PROGRAM, self),
-        (r'^gsoc/profile/%s$' % url_patterns.PROFILE, self),
+        url(r'^gsoc/profile/%s$' % url_patterns.PROGRAM,
+         self, name='edit_gsoc_profile'),
+        url(r'^gsoc/profile/%s$' % url_patterns.PROFILE,
+         self, name='create_gsoc_profile'),
     ]
 
   def checkAccess(self):
@@ -95,7 +97,5 @@ class ProfilePage(RequestHandler):
   def post(self):
     """Handler for HTTP POST request.
     """
-
-    self.response = http.HttpResponseRedirect('/gsoc/profile/%s/%s' % (
-        self.data.kwargs['sponsor'],
-        self.data.kwargs['program']))
+    kwargs = dicts.filter(self.data, ['sponsor', 'program'])
+    self.redirect(reverse('edit_gsoc_profile', kwargs))

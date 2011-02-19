@@ -23,8 +23,10 @@ __authors__ = [
   ]
 
 
+from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import dicts
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -69,8 +71,11 @@ class Apply(Template):
     self.current_timeline = current_timeline
 
   def context(self):
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    kwargs['role'] = 'student'
     return {
         'current_timeline': self.current_timeline,
+        'profile_link': reverse('create_gsoc_profile', kwargs=kwargs),
     }
 
   def templatePath(self):

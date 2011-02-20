@@ -31,6 +31,22 @@ from django.template import loader
 from django.utils.safestring import mark_safe
 
 
+def choiceWidget(field):
+  """Returns a Select widget for the specified field.
+  """
+  label = field.verbose_name
+
+  choices = []
+  choices.append(('', label))
+  for choice in field.choices:
+    choices.append((str(choice), unicode(choice)))
+  return widgets.Select(choices=choices)
+
+def choiceWidgets(model, fields):
+  """Returns a dictionary of Select widgets for the specified fields.
+  """
+  return dict((i, choiceWidget(getattr(model, i))) for i in fields)
+
 class ModelForm(djangoforms.ModelForm):
   """Django ModelForm class which uses our implementation of BoundField.
   """

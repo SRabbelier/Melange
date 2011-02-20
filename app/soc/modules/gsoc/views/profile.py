@@ -48,11 +48,10 @@ class Profile(forms.Form):
     class Meta:
       model = Role
       exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for', 
-          'student_info', 'agreed_to_tos_on', 'scope_path']
-#      widgets = {
-#        'res_country': djangoforms.ModelChoiceField(Role,
-#         empty_label='sadsadssads'),
-#         }
+          'student_info', 'agreed_to_tos_on', 'scope_path', 'status']
+      widgets = forms.choiceWidgets(Role,
+          ['res_country', 'ship_country',
+           'tshirt_style', 'tshirt_size', 'gender'])
 
   def context(self):
     return {

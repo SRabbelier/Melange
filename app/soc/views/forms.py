@@ -144,10 +144,9 @@ class BoundField(forms.BoundField):
         'style': 'opacity: 100;',
         }
 
-    return mark_safe(('<label>%s%s</label>%s') % (
-        self.field.label,
-        self._render_is_required(),
-        self.as_widget(attrs=attrs)))
+    return mark_safe(('%s%s') % (
+        self.as_widget(attrs=attrs),
+        self._render_is_required()))
 
   def _render_label(self):
     return '<label>%s%s</label>' % (

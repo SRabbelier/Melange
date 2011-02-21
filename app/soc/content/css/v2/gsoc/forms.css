@@ -61,18 +61,18 @@
   margin: 0 0 6px 11px;
   width: 497px;
 }
-#form.form-register fieldset .row.fname {
+#form.form-register fieldset .row.given_name {
   float: left;
   width: 215px;
 }
-#form.form-register fieldset .row.fname .text {
+#form.form-register fieldset .row.given_name .text {
   width: 215px;
 }
-#form.form-register fieldset .row.lname {
+#form.form-register fieldset .row.surname {
   float: left;
   width: 276px;
 }
-#form.form-register fieldset .row.lname .text {
+#form.form-register fieldset .row.surname .text {
   width: 276px;
 }
 #form.form-register fieldset .row.phone .text {

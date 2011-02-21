@@ -58,16 +58,28 @@ class Callback(object):
     """
 
     self.core = core
+    self.views = []
 
     # disable clubs
     self.enable_clubs = False
     self.v2 = True
+
+  def registerViews(self):
+    """Instantiates all view objects.
+    """
+    from soc.views import legacy
+
+    self.views.append(legacy.Legacy())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.
     """
 
     self.core.requireUniqueService('registerWithSitemap')
+
+    # Redesigned view registration
+    for view in self.views:
+      self.core.registerSitemapEntry(view.djangoURLPatterns())
 
     if self.v2:
       return

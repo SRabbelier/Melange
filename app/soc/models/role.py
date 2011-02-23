@@ -573,3 +573,8 @@ class Role(soc.models.linkable.Linkable):
     """
     return countries.COUNTRIES_TO_CCTLD[self.res_country]
 
+
+class Profile(Role):
+  """New name for Role.
+  """
+  pass

@@ -151,14 +151,14 @@ class ProfilePage(RequestHandler):
         profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
       dirty.append(profile)
 
-    if self.data.kwargs.get('role') == 'student':
-      student_form = StudentInfoForm(self.data.POST)
+    if self.data.student_info or self.data.kwargs.get('role') == 'student':
+      student_form = StudentInfoForm(self.data.POST, instance=self.data.student_info)
       if self.data.role and student_form.is_valid():
         key_name = self.data.role.key().name()
         if self.data.student_info:
-          student_info = form.save(commit=False)
+          student_info = student_form.save(commit=False)
         else:
-          student_info = form.create(commit=False, key_name=key_name, parent=profile)
+          student_info = student_form.create(commit=False, key_name=key_name, parent=profile)
           self.data.role.student_info = student_info
         dirty.append(student_info)
     else:

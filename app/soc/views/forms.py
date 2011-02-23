@@ -30,6 +30,7 @@ from django.forms import forms
 from django.forms import widgets
 from django.template import loader
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext
 
 
 def choiceWidget(field):
@@ -116,6 +117,8 @@ class BoundField(forms.BoundField):
   """
   """
 
+  NOT_SUPPORTED_MSG_FMT = ugettext('Widget %s is not supported.')
+
   def is_required(self):
     return self.field.required
 
@@ -137,7 +140,8 @@ class BoundField(forms.BoundField):
     elif isinstance(widget, widgets.Textarea):
       return self.renderTextArea()
 
-    return self.as_widget(attrs=attrs)
+    return self.NOT_SUPPORTED_MSG_FMT % (
+        widget.__class__.__name__)
 
   def renderCheckboxInput(self):
     attrs = {

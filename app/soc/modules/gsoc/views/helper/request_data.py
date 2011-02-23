@@ -24,6 +24,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from soc.models import role
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.site import logic as site_logic
@@ -118,6 +120,10 @@ class RequestData(object):
       key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
       self.role = role.Profile.get_by_key_name(key_name, parent=self.user)
 
-      self.mentor_for = db.get(role.mentor_for) if self.role else []
-      self.org_admin_for = db.get(role.org_admin_for) if self.role else []
-      self.student_info = role.student_info if self.role else None
+      if self.role:
+        orgs = set(self.role.mentor_for + self.role.org_admin_for)
+        org_map = dict((i.key(), i) for i in db.get(orgs))
+
+        self.mentor_for = [org_map[i] for i in self.role.mentor_for]
+        self.org_admin_for = [org_map[i] for i in self.role.org_admin_for]
+        self.student_info = self.role.student_info

@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from google.appengine.api import users
+from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
 from django.core.urlresolvers import reverse
@@ -102,10 +103,16 @@ class ProfilePage(RequestHandler):
     return 'v2/modules/gsoc/profile/base.html'
 
   def context(self):
+    if self.data.request.method == 'POST':
+      user_form = UserForm(self.data.POST)
+      profile_form = ProfileForm(self.data.POST)
+    else:
+      user_form = UserForm()
+      profile_form = ProfileForm()
     return {
         'page_name': 'Register',
-        'user_form': UserForm(self.data.GET).render(),
-        'profile_form': ProfileForm(self.data.GET).render(),
+        'user_form': user_form.render(),
+        'profile_form': profile_form.render(),
     }
 
   def validate(self):
@@ -125,8 +132,11 @@ class ProfilePage(RequestHandler):
 
     profile_form = ProfileForm(self.data.POST, instance=self.data.role)
     if profile_form.is_valid():
-      key_name = '%(sponsor)s/%(program)s/%(link_id)s' % self.data.POST
-      profile = form.create(commit=False, key_name=key_name, parent=user)
+      key_name = '%s/%s' % (self.data.program.key().name(),
+                            self.data.user.link_id)
+      profile_form.cleaned_data['link_id'] = self.data.user.link_id
+      profile_form.cleaned_data['user'] = self.data.user
+      profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
       dirty.append(profile)
 
     if self.data.kwargs.get('role') == 'student':

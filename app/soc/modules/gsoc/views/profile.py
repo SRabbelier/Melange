@@ -41,6 +41,10 @@ from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
+class EmptyForm(forms.ModelForm):
+  pass
+
+
 class UserForm(forms.ModelForm):
   """
   """
@@ -100,44 +104,52 @@ class ProfilePage(RequestHandler):
   def context(self):
     return {
         'page_name': 'Register',
-        'user_form': UserForm().render(),
-        'profile_form': ProfileForm().render(),
+        'user_form': UserForm(self.data.GET).render(),
+        'profile_form': ProfileForm(self.data.GET).render(),
     }
 
   def validate(self):
     dirty = []
-    if not self.data.user:
-      form = UserForm(self.data.POST)
-      if not form.is_valid():
-        return
+    if self.data.user:
+      user_form = EmptyForm(self.data.POST)
+    else:
+      user_form = UserForm(self.data.POST)
 
-      key_name = form.cleaned_data['link_id']
-      account = users.get_current_user()
-      form.cleaned_data['account'] = account
-      form.cleaned_data['user_id'] = account.user_id()
-      self.data.user = form.create(commit=False, key_name=key_name)
-      dirty.append(self.data.user)
+      if user_form.is_valid():
+        key_name = user_form.cleaned_data['link_id']
+        account = users.get_current_user()
+        user_form.cleaned_data['account'] = account
+        user_form.cleaned_data['user_id'] = account.user_id()
+        self.data.user = user_form.create(commit=False, key_name=key_name)
+        dirty.append(self.data.user)
 
-    form = ProfileForm(self.data.POST, instance=self.data.role)
-    if not form.is_valid():
-      return
-
-    if not self.data.role:
+    profile_form = ProfileForm(self.data.POST, instance=self.data.role)
+    if profile_form.is_valid():
       key_name = '%(sponsor)s/%(program)s/%(link_id)s' % self.data.POST
       profile = form.create(commit=False, key_name=key_name, parent=user)
       dirty.append(profile)
 
     if self.data.kwargs.get('role') == 'student':
-      key_name = profile.key().name()
-      form = StudentInfoForm(self.data.POST)
-      student_info = form.create(commit=False, key_name=key_name, parent=profile)
-      dirty.append(student_info)
+      student_form = StudentInfoForm(self.data.POST)
+      if self.data.role and student_form.is_valid():
+        key_name = self.data.role.key().name()
+        student_info = form.create(commit=False, key_name=key_name, parent=profile)
+        self.data.role.student_info = student_info
+        dirty.append(student_info)
+    else:
+      student_form = EmptyForm()
 
-    db.run_in_transaction(db.put, dirty)
+    if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
+      db.run_in_transaction(db.put, dirty)
+      return True
+    else:
+      return False
 
   def post(self):
     """Handler for HTTP POST request.
     """
-    self.validate()
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+    if self.validate():
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+    else:
+      self.get()

@@ -24,6 +24,7 @@ __authors__ = [
   ]
 
 
+from soc.models import role
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
@@ -111,4 +112,7 @@ class RequestData(object):
                 'scope': self.program,
                 'status': ['active', 'inactive']}
       self.student = student_logic.getOneForFields(fields)
-      self.role = self.host or self.org_admin or self.mentor or self.student
+      key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
+      self.role = role.Profile.get_by_key_name(key_name, parent=self.user)
+      if not self.role:
+        self.role = self.host or self.org_admin or self.mentor or self.student

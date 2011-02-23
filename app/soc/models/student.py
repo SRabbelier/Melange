@@ -92,15 +92,6 @@ class Student(soc.models.role.Role):
   expected_graduation.help_text = ugettext("Pick your expected graduation year")
   expected_graduation.group = ugettext("5. Education")
 
-  #: Property to gain insight into where students heard about this program
-  program_knowledge = db.TextProperty(required=True, verbose_name=ugettext(
-      "How did you hear about this program?"))
-  program_knowledge.help_text = ugettext("Please be as "
-      "specific as possible, e.g. blog post (include URL if possible), mailing "
-      "list (please include list address), information session (please include "
-      "location and speakers if you can), etc.")
-  program_knowledge.group = ugettext("4. Private Info")
-
   #: A many:1 relationship that ties multiple Students to the
   #: School that they attend.
   school = db.ReferenceProperty(reference_class=soc.models.school.School,

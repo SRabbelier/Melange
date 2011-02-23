@@ -69,6 +69,8 @@ class RequestData(object):
     self.request = None
     self.args = []
     self.kwargs = {}
+    self.GET = None
+    self.POST = None
 
   def populate(self, request, *args, **kwargs):
     """Populates the fields in the RequestData object.
@@ -80,6 +82,8 @@ class RequestData(object):
     self.request = request
     self.args = args
     self.kwargs = kwargs
+    self.GET = request.GET
+    self.POST = request.POST
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 

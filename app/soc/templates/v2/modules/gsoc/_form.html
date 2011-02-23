@@ -1,8 +1,10 @@
-
-<fieldset>
-{% for field in form %}
-  <div id="form_row_{{ field.name }}" class="row {{ field.div_class }}">
-    {{ field.render }}
-  </div>
+{% for group, fields in form %}
+  <fieldset>
+    <legend>{{ group }}</legend>
+    {% for field in fields %}
+      <div id="form_row_{{ field.name }}" class="row {{ field.div_class }}">
+        {{ field.render }}
+      </div>
+    {% endfor %}
+  </fieldset>
 {% endfor %}
-</fieldset>

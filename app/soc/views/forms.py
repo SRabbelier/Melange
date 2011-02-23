@@ -23,6 +23,9 @@ __authors__ = [
   ]
 
 
+import collections
+import re
+
 from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
@@ -55,9 +58,50 @@ class ModelForm(djangoforms.ModelForm):
   """Django ModelForm class which uses our implementation of BoundField.
   """
 
+  def __init__(self, *args, **kwargs):
+    """Fixes label and help_text issues after parent initialization.
+
+    Args:
+      *args, **kwargs:  passed through to parent __init__() constructor
+    """
+
+    super(djangoforms.ModelForm, self).__init__(*args, **kwargs)
+
+    renames = {
+        'verbose_name': 'label',
+        'help_text': 'help_text',
+        'example_text': 'example_text',
+        'group': 'group',
+        }
+
+    for field_name in self.fields.iterkeys():
+      field = self.fields[field_name]
+
+      # Since fields can be added only to the ModelForm subclass, check to
+      # see if the Model has a corresponding field first.
+      # pylint: disable-msg=E1101
+      if not hasattr(self.Meta.model, field_name):
+        continue
+
+      model_prop = getattr(self.Meta.model, field_name)
+
+      for old, new in renames.iteritems():
+        value = getattr(model_prop, old, None)
+        if value and not getattr(field, new, None):
+          setattr(field, new, value)
+
   def __iter__(self):
+    grouping = collections.defaultdict(list)
+
     for name, field in self.fields.items():
-      yield BoundField(self, field, name)
+      bound = BoundField(self, field, name)
+      group = getattr(field, 'group', '0. ')
+      grouping[group].append(bound)
+
+    rexp = re.compile(r"\d+. ")
+
+    for group, fields in sorted(grouping.items()):
+      yield rexp.sub('', group), fields
 
   def create(self, commit=True, key_name=None, parent=None):
     """Save this form's cleaned data into a new model instance.

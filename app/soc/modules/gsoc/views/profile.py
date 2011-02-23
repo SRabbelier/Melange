@@ -144,15 +144,21 @@ class ProfilePage(RequestHandler):
                             self.data.user.link_id)
       profile_form.cleaned_data['link_id'] = self.data.user.link_id
       profile_form.cleaned_data['user'] = self.data.user
-      profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
+      if self.data.role:
+        profile = profile_form.save(commit=False)
+      else:
+        profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
       dirty.append(profile)
 
     if self.data.kwargs.get('role') == 'student':
       student_form = StudentInfoForm(self.data.POST)
       if self.data.role and student_form.is_valid():
         key_name = self.data.role.key().name()
-        student_info = form.create(commit=False, key_name=key_name, parent=profile)
-        self.data.role.student_info = student_info
+        if self.data.student_info:
+          student_info = form.save(commit=False)
+        else:
+          student_info = form.create(commit=False, key_name=key_name, parent=profile)
+          self.data.role.student_info = student_info
         dirty.append(student_info)
     else:
       student_form = EmptyForm()

@@ -23,6 +23,7 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
 from django.forms import forms

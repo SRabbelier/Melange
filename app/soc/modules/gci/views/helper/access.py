@@ -243,34 +243,30 @@ class GCIChecker(access.Checker):
         - If the task is not in one of the required states.
     """
 
-    try:
-      user_entity = self.user
+    user_entity = self.user
 
-      # bail out with 404 if no task is found
-      task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
+    # bail out with 404 if no task is found
+    task_entity = gci_task_logic.logic.getFromKeyFieldsOr404(django_args)
 
-      if (user_entity and task_entity.user and
-          task_entity.user.key() == user_entity.key()):
-        return
+    if (user_entity and task_entity.user and
+        task_entity.user.key() == user_entity.key()):
+      return
 
-      filter = {
-          'user': user_entity,
-          'status': 'active',
-          }
+    filter = {
+        'user': user_entity,
+        'status': 'active',
+        }
 
-      if host_logic.logic.getForFields(filter, unique=True):
-        return
+    if host_logic.logic.getForFields(filter, unique=True):
+      return
 
-      filter['scope_path'] = django_args['scope_path']
+    filter['scope_path'] = django_args['scope_path']
 
-      if gci_org_admin_logic.logic.getForFields(filter, unique=True):
-        return
+    if gci_org_admin_logic.logic.getForFields(filter, unique=True):
+      return
 
-      if gci_mentor_logic.logic.getForFields(filter, unique=True):
-        return
-
-    except out_of_band.Error:
-      pass
+    if gci_mentor_logic.logic.getForFields(filter, unique=True):
+      return
 
     org_entity = gci_org_logic.logic.getFromKeyNameOr404(
         django_args['scope_path'])

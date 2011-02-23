@@ -115,7 +115,7 @@ class ProfilePage(RequestHandler):
     else:
       user_form = UserForm(instance=self.data.user)
       profile_form = ProfileForm(instance=self.data.role)
-      student_info_form = StudentInfoForm(instance=self.data.role.student_info)
+      student_info_form = StudentInfoForm(instance=self.data.student_info)
     return {
         'page_name': 'Register',
         'user_form': user_form.render(),

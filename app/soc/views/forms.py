@@ -182,7 +182,6 @@ class BoundField(forms.BoundField):
       return ''
 
   def div_class(self):
-    return self.name
     name = self.name
     if self.errors:
       name += ' error'

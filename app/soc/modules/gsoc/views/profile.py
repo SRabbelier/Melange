@@ -30,6 +30,7 @@ from django.conf.urls.defaults import url
 from soc.views import forms
 from soc.views import template
 
+from soc.models.user import User
 from soc.models.role import Role
 
 from soc.modules.gsoc.views.base import RequestHandler
@@ -37,26 +38,31 @@ from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
-class Profile(forms.Form):
-  """Template for profiles.
+class UserForm(forms.ModelForm):
+  """
   """
 
-  class Form(forms.ModelForm): 
-    """Django form for profile page.
-    """
-    
-    class Meta:
-      model = Role
-      exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for', 
-          'student_info', 'agreed_to_tos_on', 'scope_path', 'status']
-      widgets = forms.choiceWidgets(Role,
-          ['res_country', 'ship_country',
-           'tshirt_style', 'tshirt_size', 'gender'])
+  class Meta:
+    model = User
+    fields = ['link_id']
 
-  def context(self):
-    return {
-        'form': self.Form()
-    }
+
+class ProfileForm(forms.ModelForm):
+  """Django form for profile page.
+  """
+
+  class Meta:
+    model = Role
+    exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
+        'student_info', 'agreed_to_tos_on', 'scope_path', 'status']
+    widgets = forms.choiceWidgets(Role,
+        ['res_country', 'ship_country',
+         'tshirt_style', 'tshirt_size', 'gender'])
+
+
+class StudentInfoForm(forms.ModelForm):
+  """
+  """
 
 
 class ProfilePage(RequestHandler):
@@ -90,11 +96,28 @@ class ProfilePage(RequestHandler):
   def context(self):
     return {
         'page_name': 'Register',
-        'form': Profile().render(),
+        'user_form': UserForm().render(),
+        'profile_form': ProfileForm().render(),
     }
 
   def post(self):
     """Handler for HTTP POST request.
     """
+    if not self.data.user:
+      form = UserForm(self.data.POST)
+      if form.is_valid():
+        key_name = form.link_id
+        user = form.create(key_name=key_name)
+
+    form = ProfileForm(self.data.POST, instance=self.data.role)
+    if not self.data.role and form.is_valid():
+      key_name = '%(sponsor)s/%(program)s/%(link_id)s' % self.data.POST
+      profile = form.create(key_name=key_name, parent=user)
+
+    if self.data.kwargs.get('role') == 'student':
+      key_name = profile.key().name()
+      form = StudentInfoForm(self.data.POST)
+      student_info = form.create(key_name=key_name, parent=profile)
+
     kwargs = dicts.filter(self.data, ['sponsor', 'program'])
     self.redirect(reverse('edit_gsoc_profile', kwargs))

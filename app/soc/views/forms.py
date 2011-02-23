@@ -96,17 +96,6 @@ class ModelForm(djangoforms.ModelForm):
       instance.put()
     return instance
 
-
-class Form(object):
-  """Form class that facilitates the rendering of forms.
-  """
-
-  class Form(ModelForm):
-    """Django Form associated with the class.
-    """
-
-    pass
-
   def render(self):
     """Renders the template to a string.
 
@@ -114,23 +103,13 @@ class Form(object):
     self.templatePath() method to retrieve the template that should be used.
     """
 
-    context = self.context()
+    context = {
+      'form': self,
+    }
     template_path = 'v2/modules/gsoc/_form.html'
     rendered = loader.render_to_string(template_path, dictionary=context)
     return rendered
 
-  def context(self):
-    """Returns the context for the current template.
-    """
-
-    return {}
-
-  def getForm(self):
-    """Returns the Django form object associated with the class.
-    The specialized forms should be defined in subclasses.
-    """
-
-    return self.Form
 
 class BoundField(forms.BoundField):
   """

@@ -157,7 +157,8 @@ class BoundField(forms.BoundField):
         }
 
     return mark_safe('%s%s' % (
-        self._render_label(), self.as_widget(attrs=attrs)))
+        self._render_label(), 
+        self.as_widget(attrs=attrs)))
 
   def renderSelect(self):
     attrs = {
@@ -179,3 +180,10 @@ class BoundField(forms.BoundField):
       return '<span class="req">*</span>'
     else:
       return ''
+
+  def div_class(self):
+    return self.name
+    name = self.name
+    if self.errors:
+      name += ' error'
+    return name

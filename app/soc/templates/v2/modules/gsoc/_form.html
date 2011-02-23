@@ -1,7 +1,7 @@
 
 <fieldset>
 {% for field in form %}
-  <div id="form_row_{{ field.name }}" class="row {{ field.name }}">
+  <div id="form_row_{{ field.name }}" class="row {{ field.div_class }}">
     {{ field.render }}
   </div>
 {% endfor %}

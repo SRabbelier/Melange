@@ -156,8 +156,9 @@ class BoundField(forms.BoundField):
         'class': 'text',
         }
 
-    return mark_safe('%s%s' % (
-        self._render_label(), 
+    return mark_safe('%s%s%s' % (
+        self._render_label(),
+        self._render_error(),  
         self.as_widget(attrs=attrs)))
 
   def renderSelect(self):
@@ -174,7 +175,14 @@ class BoundField(forms.BoundField):
     return '<label>%s%s</label>' % (
         self.field.label,        
         self._render_is_required())
-    
+
+  def _render_error(self):
+    if not self.errors:
+      return ''
+    else:
+      return '<span class="error-message">%s</span>' % (
+          self.errors[0])
+
   def _render_is_required(self):
     if self.field.required:
       return '<span class="req">*</span>'

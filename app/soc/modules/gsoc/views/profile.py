@@ -47,7 +47,7 @@ class EmptyForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
-  """
+  """Django form for the user profile.
   """
 
   class Meta:

@@ -67,6 +67,9 @@ class RequestData(object):
     self.mentor = []
     self.student = None
     self.role = None
+    self.mentor_for = []
+    self.org_admin_for = []
+    self.student_info = None
     self.request = None
     self.args = []
     self.kwargs = {}
@@ -114,5 +117,7 @@ class RequestData(object):
       self.student = student_logic.getOneForFields(fields)
       key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
       self.role = role.Profile.get_by_key_name(key_name, parent=self.user)
-      if not self.role:
-        self.role = self.host or self.org_admin or self.mentor or self.student
+
+      self.mentor_for = db.get(role.mentor_for) if self.role else []
+      self.org_admin_for = db.get(role.org_admin_for) if self.role else []
+      self.student_info = role.student_info if self.role else None

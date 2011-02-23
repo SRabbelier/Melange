@@ -194,10 +194,11 @@ class BoundField(forms.BoundField):
         }
 
     return mark_safe(
-        '<label>%s%s%s</label>' % (
+        '<label>%s%s%s</label>%s' % (
         self.as_widget(attrs=attrs),
         self.field.label,
-        self._render_is_required()
+        self._render_is_required(),
+        self._render_error(),
         ))
 
   def renderTextArea(self):
@@ -209,7 +210,8 @@ class BoundField(forms.BoundField):
     return mark_safe('%s%s%s' % (
         self._render_label(),
         self._render_error(),  
-        self.as_widget(attrs=attrs)))
+        self.as_widget(attrs=attrs)
+    ))
 
   def renderTextInput(self):
     attrs = {
@@ -220,7 +222,8 @@ class BoundField(forms.BoundField):
     return mark_safe('%s%s%s' % (
         self._render_label(),
         self._render_error(),  
-        self.as_widget(attrs=attrs)))
+        self.as_widget(attrs=attrs),
+    ))
 
   def renderSelect(self):
     attrs = {
@@ -228,27 +231,30 @@ class BoundField(forms.BoundField):
         'style': 'opacity: 100;',
         }
 
-    return mark_safe(('%s%s') % (
+    return mark_safe('%s%s%s' % (
         self.as_widget(attrs=attrs),
-        self._render_is_required()))
+        self._render_is_required(),
+        self._render_error(),
+    ))
 
   def _render_label(self):
     return '<label>%s%s</label>' % (
-        self.field.label,        
-        self._render_is_required())
+        self.field.label,
+        self._render_is_required()
+    )
 
   def _render_error(self):
     if not self.errors:
       return ''
-    else:
-      return '<span class="error-message">%s</span>' % (
-          self.errors[0])
+
+    return '<span class="error-message">%s</span>' % (
+        self.errors[0])
 
   def _render_is_required(self):
-    if self.field.required:
-      return '<span class="req">*</span>'
-    else:
+    if not self.field.required:
       return ''
+
+    return '<span class="req">*</span>'
 
   def div_class(self):
     name = self.name

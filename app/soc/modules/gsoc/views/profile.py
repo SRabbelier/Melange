@@ -22,16 +22,19 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
 from google.appengine.ext.db import djangoforms
 
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import dicts
 from soc.views import forms
 from soc.views import template
 
 from soc.models.user import User
-from soc.models.role import Role
+from soc.models.role import Profile
+from soc.models.role import StudentInfo
 
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
@@ -44,7 +47,7 @@ class UserForm(forms.ModelForm):
 
   class Meta:
     model = User
-    fields = ['link_id']
+    fields = ['link_id', 'name']
 
 
 class ProfileForm(forms.ModelForm):
@@ -52,10 +55,11 @@ class ProfileForm(forms.ModelForm):
   """
 
   class Meta:
-    model = Role
+    model = Profile
     exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
-        'student_info', 'agreed_to_tos_on', 'scope_path', 'status']
-    widgets = forms.choiceWidgets(Role,
+               'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
+               'name_on_documents']
+    widgets = forms.choiceWidgets(Profile,
         ['res_country', 'ship_country',
          'tshirt_style', 'tshirt_size', 'gender'])
 
@@ -100,24 +104,40 @@ class ProfilePage(RequestHandler):
         'profile_form': ProfileForm().render(),
     }
 
-  def post(self):
-    """Handler for HTTP POST request.
-    """
+  def validate(self):
+    dirty = []
     if not self.data.user:
       form = UserForm(self.data.POST)
-      if form.is_valid():
-        key_name = form.link_id
-        user = form.create(key_name=key_name)
+      if not form.is_valid():
+        return
+
+      key_name = form.cleaned_data['link_id']
+      account = users.get_current_user()
+      form.cleaned_data['account'] = account
+      form.cleaned_data['user_id'] = account.user_id()
+      self.data.user = form.create(commit=False, key_name=key_name)
+      dirty.append(self.data.user)
 
     form = ProfileForm(self.data.POST, instance=self.data.role)
-    if not self.data.role and form.is_valid():
+    if not form.is_valid():
+      return
+
+    if not self.data.role:
       key_name = '%(sponsor)s/%(program)s/%(link_id)s' % self.data.POST
-      profile = form.create(key_name=key_name, parent=user)
+      profile = form.create(commit=False, key_name=key_name, parent=user)
+      dirty.append(profile)
 
     if self.data.kwargs.get('role') == 'student':
       key_name = profile.key().name()
       form = StudentInfoForm(self.data.POST)
-      student_info = form.create(key_name=key_name, parent=profile)
+      student_info = form.create(commit=False, key_name=key_name, parent=profile)
+      dirty.append(student_info)
 
-    kwargs = dicts.filter(self.data, ['sponsor', 'program'])
-    self.redirect(reverse('edit_gsoc_profile', kwargs))
+    db.run_in_transaction(db.put, dirty)
+
+  def post(self):
+    """Handler for HTTP POST request.
+    """
+    self.validate()
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))

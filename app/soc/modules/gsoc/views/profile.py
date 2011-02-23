@@ -70,10 +70,15 @@ class ProfileForm(forms.ModelForm):
 
 
 class StudentInfoForm(forms.ModelForm):
-  """
+  """Django form for the student profile page.
   """
 
-
+  class Meta:
+    model = StudentInfo
+    exclude = ['school']
+    widgets = forms.choiceWidgets(StudentInfo,
+        ['school_country', 'school_type', 'degree'])
+    
 class ProfilePage(RequestHandler):
   """View for the participant profile.
   """
@@ -106,13 +111,16 @@ class ProfilePage(RequestHandler):
     if self.data.request.method == 'POST':
       user_form = UserForm(self.data.POST)
       profile_form = ProfileForm(self.data.POST)
+      student_info_form = StudentInfoForm(self.data.POST)
     else:
       user_form = UserForm()
       profile_form = ProfileForm()
+      student_info_form = StudentInfoForm()
     return {
         'page_name': 'Register',
         'user_form': user_form.render(),
         'profile_form': profile_form.render(),
+        'student_info_form': student_info_form.render()
     }
 
   def validate(self):

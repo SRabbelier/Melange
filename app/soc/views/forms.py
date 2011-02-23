@@ -134,6 +134,8 @@ class BoundField(forms.BoundField):
       return self.renderSelect()
     elif isinstance(widget, widgets.CheckboxInput):
       return self.renderCheckboxInput()
+    elif isinstance(widget, widgets.Textarea):
+      return self.renderTextArea()
 
     return self.as_widget(attrs=attrs)
 
@@ -149,6 +151,17 @@ class BoundField(forms.BoundField):
         self.field.label,
         self._render_is_required()
         ))
+
+  def renderTextArea(self):
+    attrs = {
+        'id': self.name,
+        'class': 'textarea'
+        }
+
+    return mark_safe('%s%s%s' % (
+        self._render_label(),
+        self._render_error(),  
+        self.as_widget(attrs=attrs)))
 
   def renderTextInput(self):
     attrs = {

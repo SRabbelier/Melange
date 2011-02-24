@@ -77,16 +77,6 @@ class Student(soc.models.role.Role):
       choices=['Undergraduate', 'Master', 'PhD'])
   degree.group = ugettext("5. Education")
 
-  #: Property containing the Grade of the student if the school type
-  #: is High School.
-  grade = db.IntegerProperty(required=False,
-                            verbose_name=ugettext('Grade'))
-  grade.group = ugettext("5. Education")
-  grade.help_text = ugettext(
-      'Please enter your grade in the school, e.g. 8 if you are in 8th' 
-      ' grade. In some parts of the world it is called as, e.g. 8th'
-      ' Standard')
-
   expected_graduation = db.IntegerProperty(required=True,
       verbose_name=ugettext('Expected Graduation Year'))
   expected_graduation.help_text = ugettext("Pick your expected graduation year")

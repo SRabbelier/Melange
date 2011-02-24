@@ -100,7 +100,7 @@ class StudentInfoForm(forms.ModelForm):
 
   class Meta:
     model = StudentInfo
-    exclude = ['school']
+    exclude = ['school', 'school_type']
     widgets = forms.choiceWidgets(StudentInfo,
         ['school_country', 'school_type', 'degree'])
 

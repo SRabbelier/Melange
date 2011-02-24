@@ -55,3 +55,14 @@ class GCIStudent(soc.models.student.Student):
       required=False, verbose_name=ugettext('Student ID form'))
   student_id_form.help_text = ugettext(
       'A scan of your student ID to verify your student status and birthday.')
+
+
+  #: Property containing the Grade of the student if the school type
+  #: is High School.
+  grade = db.IntegerProperty(required=False,
+                            verbose_name=ugettext('Grade'))
+  grade.group = ugettext("5. Education")
+  grade.help_text = ugettext(
+      'Please enter your grade in the school, e.g. 8 if you are in 8th' 
+      ' grade. In some parts of the world it is called as, e.g. 8th'
+      ' Standard')

@@ -17,3 +17,13 @@
   -moz-box-shadow: inset 0 0 10px #f8d6c0;
   -webkit-box-shadow: inset 0 0 10px #f8d6c0;
 }
+#main .grid_9 p#user-logged-in {
+  color: #989898;
+  font-style: italic;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+p#user-logged-in a {
+  font-style: normal;
+  font-weight: normal;
+}

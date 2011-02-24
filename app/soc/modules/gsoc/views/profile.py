@@ -103,7 +103,9 @@ class StudentInfoForm(forms.ModelForm):
     exclude = ['school']
     widgets = forms.choiceWidgets(StudentInfo,
         ['school_country', 'school_type', 'degree'])
-    
+
+  clean_school_home_page =  cleaning.clean_url('school_home_page')
+
 class ProfilePage(RequestHandler):
   """View for the participant profile.
   """

@@ -20,7 +20,7 @@ limitations under the License.
     </div>
   {% endif %}
   <h1 id="main-page-title">{{ user.name }}'s Dashboard</h1>
-  <p id="user-logged-in">You are logged in as {{ user.email }}. <a href="{{ logout_link }}">(Not you?)</a></p>
+  <p id="user-logged-in">You are logged in as {{ user.account.email }}. <a href="{{ logout_link }}">(Not you?)</a></p>
   {% for component in components %}
     {{ component.render|safe }}
   {% empty %}

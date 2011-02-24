@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from django.conf.urls.defaults import url
 
 from soc.logic.helper import timeline as timeline_helper
@@ -96,10 +98,12 @@ class Dashboard(RequestHandler):
     """Handler for default HTTP GET request.
     """
     components = self._getActiveComponents()
+    encoded_path = self.data.request.path.encode('utf-8')
 
     context = {}
     context['page_name'] = self.data.program.name
     context['user'] = self.data.user
+    context['logout_link'] = users.create_logout_url(encoded_path)
     # TODO(ljvderijk): Implement code for setting dashboard messages.
     #context['alert_msg'] = 'Default <strong>alert</strong> goes here'
     context['components'] = components

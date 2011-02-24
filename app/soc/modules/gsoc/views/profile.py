@@ -29,6 +29,7 @@ from google.appengine.ext.db import djangoforms
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views import forms
 from soc.views import template
@@ -54,6 +55,8 @@ class UserForm(forms.ModelForm):
     model = User
     fields = ['link_id', 'name']
 
+  clean_link_id = cleaning.clean_link_id('link_id')
+
 
 class ProfileForm(forms.ModelForm):
   """Django form for profile page.
@@ -67,6 +70,28 @@ class ProfileForm(forms.ModelForm):
     widgets = forms.choiceWidgets(Profile,
         ['res_country', 'ship_country',
          'tshirt_style', 'tshirt_size', 'gender'])
+
+  clean_given_name = cleaning.clean_valid_shipping_chars('given_name')
+  clean_surname = cleaning.clean_valid_shipping_chars('surname')
+  clean_phone = cleaning.clean_phone_number('phone')
+  clean_res_street = cleaning.clean_valid_shipping_chars('res_street')
+  clean_res_street_extra = cleaning.clean_valid_shipping_chars(
+      'res_street_extra')
+  clean_res_city = cleaning.clean_valid_shipping_chars('res_city')
+  clean_res_state = cleaning.clean_valid_shipping_chars('res_state')
+  clean_res_postalcode = cleaning.clean_valid_shipping_chars(
+      'res_postalcode')
+  clean_ship_name = cleaning.clean_valid_shipping_chars('ship_name')
+  clean_ship_street = cleaning.clean_valid_shipping_chars('ship_street')
+  clean_ship_street_extra = cleaning.clean_valid_shipping_chars(
+      'ship_street_extra')
+  clean_ship_city = cleaning.clean_valid_shipping_chars('ship_city')
+  clean_ship_state = cleaning.clean_valid_shipping_chars('ship_state')
+  clean_ship_postalcode = cleaning.clean_valid_shipping_chars(
+      'ship_postalcode')
+  clean_home_page = cleaning.clean_url('home_page')
+  clean_blog = cleaning.clean_url('blog')
+  clean_photo_url = cleaning.clean_url('photo_url')
 
 
 class StudentInfoForm(forms.ModelForm):

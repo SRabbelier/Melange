@@ -118,7 +118,7 @@ class Dashboard(RequestHandler):
     elif self.data.mentor or self.data.org_admin:
       return self._getOrgMemberComponents()
     else:
-      return self._getLoneUserCompontents()
+      return self._getLoneUserComponents()
 
   def _getStudentComponents(self):
     """Get the dashboard components for a student.

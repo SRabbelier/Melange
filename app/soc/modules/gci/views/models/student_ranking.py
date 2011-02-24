@@ -32,6 +32,7 @@ from soc.views.helper import lists
 from soc.views.helper import redirects
 
 from soc.modules.gci.logic.models.task import logic as gci_task_logic
+from soc.modules.gci.models import task as gci_task_model
 from soc.modules.gci.views.helper import access as gci_access
 from soc.modules.gci.views.models import program as gci_program_view
 
@@ -97,12 +98,14 @@ class View(base.View):
     ranking = logic.getFromKeyFieldsOr404(kwargs)
     student = ranking.student
 
+    all_d = gci_task_model.TaskDifficultyTag.all().fetch(100)
+
     list_params = params.copy()
     list_params['list_description'] = self.DETAILS_MSG_FMT % student.user.name
     list_params['public_field_extra'] = lambda entity: {
         'task': entity.title,
         'org': entity.scope.name,
-        'points_difficulty': entity.taskDifficulty().value
+        'points_difficulty': entity.taskDifficulty(all_d).value
         }
     list_params['public_field_keys'] = [
         'task', 'org', 'points_difficulty', 'closed_on']

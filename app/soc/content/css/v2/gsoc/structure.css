@@ -27,13 +27,7 @@
   width: 100%;
 }
 #page-header .grid_12 {
-  /*globe*/
-
-  background: url(../../../images/v2/gsoc/header-globe.gif) bottom right no-repeat;
   height: 156px;
-}
-#page-header img {
-  margin: 35px 0 0 10px;
 }
 #page-header h1, #page-header p {
   color: #238bd2;
@@ -172,9 +166,9 @@
 #main .content_column_1 .block-students {
   /*students apply now block*/
 
-  background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 repeat-y;
   color: #004371;
-  padding-bottom: 15px;
+  padding-bottom: 5px;
   text-align: center;
 }
 #main .content_column_1 .block-students h3 {

@@ -73,10 +73,12 @@ class Apply(Template):
   def context(self):
     kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
     kwargs['role'] = 'student'
-    return {
+    context = {
         'current_timeline': self.current_timeline,
-        'profile_link': reverse('create_gsoc_profile', kwargs=kwargs),
     }
+    if not self.data.role:
+      context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+    return context
 
   def templatePath(self):
     return "v2/modules/gsoc/homepage/_apply.html"

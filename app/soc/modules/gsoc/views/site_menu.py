@@ -26,6 +26,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from soc.views.template import Template
+
 from soc.modules.gsoc.views.helper import redirects
 
 
@@ -75,7 +76,20 @@ class Footer(Template):
     self.data = data
 
   def context(self):
-    return siteMenuContext(self.data)
+    context = siteMenuContext(self.data)
+
+    program = self.data.program
+    if program:
+      context.update({
+          'privacy_policy_url': redirects.getPrivacyPolicyRedirect(self.data),
+          'facebook_url': program.facebook,
+          'twitter_url': program.twitter,
+          'blogger_url': program.blogger,
+          'email_id': program.email,
+          'irc_url': program.irc,
+          })
+
+    return context
 
   def templatePath(self):
     return "v2/modules/gsoc/footer.html"

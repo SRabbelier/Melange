@@ -8,12 +8,24 @@
           <ul id="footer-menu-list">
             <li id="footer-menu-about"><a href="{{ about_link }}">About</a></li>
             <li id="footer-menu-contact"><a href="{{ connect_link }}">Contact</a></li>
-            <li id="footer-menu-facebook" class="social"><a href="javascript:void(0)" class="fb">Facebook</a></li>
-            <li id="footer-menu-twitter" class="social"><a href="javascript:void(0)" class="tw">Twitter</a></li>
-            <li id="footer-menu-blogger" class="social"><a href="javascript:void(0)" class="bl">Blogger</a></li>
-            <li id="footer-menu-email" class="social"><a href="javascript:void(0)" class="em">Email</a></li>
-            <li id="footer-menu-irc" class="social"><a href="javascript:void(0)" class="irc">IRC</a></li>
-            <li id="footer-menu-privacy" class="last"><a href="javascript:void(0)">Privacy Policy</a></li>
+            {% if facebook_url %}
+              <li id="footer-menu-facebook" class="social"><a href="{{ facebook_url }}" class="fb">Facebook</a></li>
+            {% endif %}
+            {% if twitter_url %}
+              <li id="footer-menu-twitter" class="social"><a href="{{ twitter_url }}" class="tw">Twitter</a></li>
+            {% endif %}
+            {% if blogger_url %}
+              <li id="footer-menu-blogger" class="social"><a href="{{ blogger_url }}" class="bl">Blogger</a></li>
+            {% endif %}
+            {% if email_id %}
+              <li id="footer-menu-email" class="social"><a href="mailto:{{ email_id }}" class="em">Email</a></li>
+            {% endif %}
+            {% if irc_url %}
+              <li id="footer-menu-irc" class="social"><a href="{{ irc_url }}" class="irc">IRC</a></li>
+            {% endif %}
+            {% if privacy_policy_url %}
+              <li id="footer-menu-privacy" class="last"><a href="{{ privacy_policy_url }}">Privacy Policy</a></li>
+            {% endif %}
           </ul>
         </div>
         <div class="footer-meta">

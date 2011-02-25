@@ -62,6 +62,20 @@ def getHelpRedirect(data):
   if data.program.events_page:
     return '/gsoc/document/%s' % data.program.events_page.key().name()
 
+def getPrivacyPolicyRedirect(data):
+  """Returns the redirect for the Privacy Policy page for the current
+  GSoC program.
+  """
+
+  # TODO: This method should not even be here in the first place. But
+  # due to the current architecture of document system we will not be
+  # able to separate the prefix, sponsor, program and document link_id
+  # from the document reference since they are not stored separately in
+  # the document model. Once these fields are added, we can get rid of
+  # this redirect method and use Django's reverse function.
+
+  if data.program.events_page:
+    return '/gsoc/document/%s' % data.program.privacy_policy.key().name()
 
 def getHomepageRedirect(data):
   """Returns the redirect for the homepage for the current GSOC program.

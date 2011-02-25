@@ -96,6 +96,11 @@ class RequestData(object):
     program_keyfields = {'link_id': kwargs.get('program'),
                          'scope_path': kwargs.get('sponsor')}
     self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
+
+    # if the sponsor and program are not passed in the URL
+    if not self.program:
+      self.program =  program_logic.getOneForFields({'status': 'visible'})
+
     self.program_timeline = self.program.timeline
 
     org_app_fields = {'scope': self.program}

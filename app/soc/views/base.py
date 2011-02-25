@@ -28,8 +28,6 @@ __authors__ = [
 from django import http
 from django.template import loader
 
-from soc.logic import dicts
-
 from soc.modules.gsoc.views import site_menu
 from soc.modules.gsoc.views import header
 

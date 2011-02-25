@@ -100,7 +100,7 @@ class View(presence.View):
 
     new_params['extra_dynaexclude'] = ['timeline', 'org_admin_agreement',
         'mentor_agreement', 'student_agreement', 'about_page', 'events_page',
-        'connect_with_us_page']
+        'connect_with_us_page', 'privacy_policy']
 
     patterns = []
     patterns += [
@@ -165,6 +165,8 @@ class View(presence.View):
          ugettext('Events Page Document link ID')),
         ('connect_with_us_page_link_id', soc.models.work.Work.link_id.help_text,
          ugettext('Connect With Us Page Document link ID')),
+        ('privacy_policy_link_id', soc.models.work.Work.link_id.help_text,
+         ugettext('Privacy Policy Page Document link ID')),
         ]
 
     result = {}
@@ -193,6 +195,8 @@ class View(presence.View):
          lambda x: x.events_page),
         ('connect_with_us_page_link_id', 'connect_with_us_page',
          lambda x: x.connect_with_us_page),
+        ('privacy_policy_link_id', 'privacy_policy',
+         lambda x: x.privacy_policy),
         ]
 
     new_params['references'] = document_references

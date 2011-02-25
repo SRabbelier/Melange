@@ -100,6 +100,13 @@ class GSoCProgram(soc.models.program.Program):
   connect_with_us_page.help_text = ugettext(
       'The document with <b>Connect With Us</b>')
 
+  privacy_policy = db.ReferenceProperty(
+      reference_class=soc.models.document.Document,
+      verbose_name=ugettext("Privacy Policy Document"))
+  privacy_policy.collection_name = 'privacy_policy_page'
+  privacy_policy.help_text = ugettext(
+      "The document containing <b>Privacy Policy</b>")
+
   facebook = db.LinkProperty(
       required=False, verbose_name=ugettext("Facebook URL"))
   facebook.help_text = ugettext("URL of the Facebook page for the program")

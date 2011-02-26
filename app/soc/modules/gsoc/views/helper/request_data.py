@@ -93,13 +93,12 @@ class RequestData(object):
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
 
-    program_keyfields = {'link_id': kwargs.get('program'),
-                         'scope_path': kwargs.get('sponsor')}
-    self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
-
-    # if the sponsor and program are not passed in the URL
-    if not self.program:
-      self.program =  program_logic.getOneForFields({'status': 'visible'})
+    if 'sponsor' in kwargs and 'program' in kwargs:
+      program_keyfields = {'link_id': kwargs.get('program'),
+                           'scope_path': kwargs.get('sponsor')}
+      self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
+    else:
+      self.program =  self.site.active_progam
 
     self.program_timeline = self.program.timeline
 

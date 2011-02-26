@@ -53,7 +53,10 @@
 #form.form-register fieldset {
   background: #cde5f5;
   margin: 0 23px 16px 23px;
-  padding: 30px 0 0 0;
+  padding: 30px 0 11px 0;
+}
+#form.form-register fieldset.nolegend {
+  padding: 11px 0;
 }
 #form.form-register fieldset .row {
   /*every row*/

@@ -124,6 +124,7 @@
             	    <h2 id="form-register-title">Register as a Student</h2> <p id="form-register-req" class="req">* fields required</p>
             	
                 	<fieldset id="form-register-fieldset-basicinfo" class="fieldset-basicinfo">
+			    <legend><span>Personal Information</span></legend>
                 		<div id="form-row-fname" class="row fname">
                 			<label>First Name<span class="req">*</span></label>
                 			<input type="text" name="fname" value="" class="text" />
@@ -132,9 +133,10 @@
                 			<label>Last Name<span class="req">*</span></label>
                 			<input type="text" name="lname" value="" class="text" />
                 		</div>
-                		<div id="form-row-email" class="row email">
+				<div id="form-row-email" class="row email error">
                 			<label>Email Address<span class="req">*</span></label>
                 			<input type="text" name="email" value="" class="text" />
+					<div class="error-message">*Enter a valid email address</div>
                 		</div>
                 		<div id="form-row-phone" class="row phone">
                 			<label>Phone Number<span class="req">*</span></label>
@@ -148,6 +150,7 @@
                 	</fieldset>
                 	
                 	<fieldset id="form-register-fieldset-address" class="fieldset-address">
+			    <legend><span>Address Information</span></legend>
                 		<div id="form-row-address1" class="row address1">
                 			<label>Street Address 1<span class="req">*</span></label>
                 			<input type="text" name="address1" value="" class="text" />
@@ -160,15 +163,17 @@
                 			<label>City</label>
                 			<input type="city" name="email" value="" class="text" />
                 		</div>
-                		<div id="form-row-stateprovince" class="row stateprovince">
+				<div id="form-row-stateprovince" class="row stateprovince error">
                 			<label>State/Province<span class="req">*</span></label>
                 			<input type="text" name="stateprovince" value="" class="text" />
+					<div class="error-message">*Enter your state</div>
                 		</div>
-                		<div id="form-row-zip" class="row zip">
+				<div id="form-row-zip" class="row zip error">
                 			<label>ZIP/Postal Code<span class="req">*</span></label>
                 			<input type="text" name="zip" value="" class="text" />
+					<div class="error-message">*Enter your zip code</div>
                 		</div>
-                		<div id="form-row-country" class="row country">
+				<div id="form-row-country" class="row country error">
                     		<select>
                     			<option selected="selected" disabled="disabled">Country/Territory</option>
                     				<option value="1">Afghanistan</option>
@@ -423,24 +428,28 @@
                     				<option value="251">Zambia</option>
                     				<option value="252">Zimbabwe</option>
                     		</select><span class="req">*</span>
+				<div class="error-message">*Select a country</div>
                 		</div>
                 	</fieldset>
                 	<fieldset id="form-register-fieldset-school" class="fieldset-school">
-                	    <div id="form-row-gradyear" class="row schoolname">
+			    <legend><span>School Information</span></legend>
+			    <div id="form-row-gradyear" class="row schoolname error">
                 	    	<select>
                 	    		<option selected="selected" disabled="disabled">School Name</option>
                 	    		<option>Newark Unified School District</option>
                 	    		<option>Carondelet High School</option>
                 	    		<option>Erma Duncan Polytechnical High School</option>
                 	    	</select><span class="req">*</span>
+				<div class="error-message">*Select your school</div>
                 	    </div>
-                		<div id="form-row-gradyear" class="row gradyear">
+				<div id="form-row-gradyear" class="row gradyear error">
                 			<select>
                 				<option selected="selected" disabled="disabled">Graduation Year</option>
                 				<option>2011</option>
                 				<option>2012</option>
                 				<option>2013</option>
                 			</select><span class="req">*</span>
+					<div class="error-message">*Select your graduation year</div>
                 		</div>
                 		<div id="form-row-schoollocation" class="row schoollocation">
                 			<select>

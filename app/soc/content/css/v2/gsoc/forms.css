@@ -53,7 +53,7 @@
 #form.form-register fieldset {
   background: #cde5f5;
   margin: 0 23px 16px 23px;
-  padding: 11px 0;
+  padding: 30px 0 0 0;
 }
 #form.form-register fieldset .row {
   /*every row*/
@@ -171,7 +171,6 @@
   /*first fieldset on the registration page*/
 
   clear: both;
-  padding: 11px 0 0 0;
 }
 #form.form-register .fieldset-referral {
   /*referral fieldset*/
@@ -325,6 +324,25 @@
   font-weight: bold;
   margin: 0 0 0 4px;
 }
+#form fieldset {
+  position: relative;
+  width: 524px;
+}
+#form fieldset legend {
+  display: block;
+  float: left;
+  position: relative;
+  width: 100%;
+}
+#form fieldset legend span {
+  color: #799eb8;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: absolute;
+  top: -22px;
+  left: 10px;
+}
 #form fieldset .row label {
   /*labels*/
 
@@ -442,7 +460,8 @@
 }
 #form fieldset .row.error .error-message {
   color: #ff0000;
-  float: left;
+  display: block;
+  clear: both;
   font-size: 12px;
   font-weight: bold;
   margin: 2px 0 0 7px;

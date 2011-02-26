@@ -209,8 +209,8 @@ class BoundField(forms.BoundField):
 
     return mark_safe('%s%s%s' % (
         self._render_label(),
+        self.as_widget(attrs=attrs),
         self._render_error(),  
-        self.as_widget(attrs=attrs)
     ))
 
   def renderTextInput(self):
@@ -221,8 +221,8 @@ class BoundField(forms.BoundField):
 
     return mark_safe('%s%s%s' % (
         self._render_label(),
-        self._render_error(),  
         self.as_widget(attrs=attrs),
+        self._render_error(),
     ))
 
   def renderSelect(self):
@@ -231,23 +231,24 @@ class BoundField(forms.BoundField):
         'style': 'opacity: 100;',
         }
 
-    return mark_safe('%s%s%s' % (
+    return mark_safe('%s%s%s%s' % (
         self.as_widget(attrs=attrs),
         self._render_is_required(),
         self._render_error(),
+        self._render_note(),
     ))
 
   def _render_label(self):
     return '<label>%s%s</label>' % (
         self.field.label,
-        self._render_is_required()
+        self._render_is_required(),
     )
 
   def _render_error(self):
     if not self.errors:
       return ''
 
-    return '<span class="error-message">%s</span>' % (
+    return '<div class="error-message">%s</div>' % (
         self.errors[0])
 
   def _render_is_required(self):

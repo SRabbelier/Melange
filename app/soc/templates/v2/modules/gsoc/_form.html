@@ -1,6 +1,12 @@
 {% for group, fields in form %}
-  <fieldset>
-    <legend>{{ group }}</legend>
+  <fieldset
+  {% if not group %}
+    class="nolegend"
+  {% endif %}
+  >
+    {% if group %}
+      <legend><span>{{ group }}<span></legend>
+    {% endif %}
     {% for field in fields %}
       <div id="form_row_{{ field.name }}" class="row {{ field.div_class }}">
         {{ field.render }}

@@ -42,6 +42,28 @@ import soc.logic.models.site
 import soc.logic.dicts
 import soc.logic.system
 
+from soc.modules.gci.logic.models.program import logic as gci_program_logic
+
+from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
+
+
+def getProgramChoices():
+  """Return all the GSoC and GCI programs that are stored in the datastore.
+  """
+
+  gci_pq = gci_program_logic.getQueryForFields()
+  gci_entities = gci_program_logic.getAll(gci_pq)
+
+  gsoc_pq = gsoc_program_logic.getQueryForFields()
+  gsoc_entities = gsoc_program_logic.getAll(gsoc_pq)
+
+  return (
+      ('GSoC Programs', [
+          (e.key().id_or_name(), e.name) for e in gsoc_entities]),
+      ('GCI Programs', [
+          (e.key().id_or_name(), e.name) for e in gci_entities]),
+      )
+
 
 class View(presence_with_tos.View):
   """View methods for the Document model.
@@ -86,8 +108,7 @@ class View(presence_with_tos.View):
         'clean_logo_url': cleaning.clean_url('logo_url'),
         }
     new_params['edit_extra_dynaproperties'] = {
-        'currently_active_program': forms.CharField(required = False,
-            widget=helper.widgets.ReadOnlyInput()),
+        'currently_active_program': forms.ChoiceField(required = False, choices=getProgramChoices()),
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'home_link_id': widgets.ReferenceField(
             reference_url='document', required=False,
@@ -104,7 +125,7 @@ class View(presence_with_tos.View):
 
     # XSRF secret key is not editable by mere mortals.
     new_params['extra_dynaexclude'] = ['xsrf_secret_key', 'active_program']
-    
+
     patterns = []
 
     page_name = "Home Page"

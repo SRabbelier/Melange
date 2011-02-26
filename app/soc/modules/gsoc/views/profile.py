@@ -26,6 +26,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
+from django.forms import fields
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
@@ -104,6 +105,7 @@ class StudentInfoForm(forms.ModelForm):
     widgets = forms.choiceWidgets(StudentInfo,
         ['school_country', 'school_type', 'degree'])
 
+  school_home_page = fields.URLField(required=True)
   clean_school_home_page =  cleaning.clean_url('school_home_page')
 
 class ProfilePage(RequestHandler):

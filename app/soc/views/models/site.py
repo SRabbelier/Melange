@@ -161,10 +161,10 @@ class View(presence_with_tos.View):
     """See base._editGet().
     """
 
-    initial = ''
     active_program = entity.active_program
     if active_program:
-      form.fields['currently_active_program'].initial = active_program.name 
+      form.fields['currently_active_program'].initial = \
+          active_program.key().id_or_name()
 
     super(View, self)._editGet(request, entity, form)
 

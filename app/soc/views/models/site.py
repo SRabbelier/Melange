@@ -157,6 +157,19 @@ class View(presence_with_tos.View):
 
     super(View, self).__init__(params=params)
 
+  def _editPost(self, request, entity, fields):
+    """See base._editPost()
+    """
+
+    program_keyname = fields['currently_active_program']
+    program = gsoc_program_logic.getFromKeyName(program_keyname)
+    if not program:
+      program = gci_program_logic.getFromKeyName(program_keyname)
+
+    fields['active_program'] = program
+
+    super(View, self)._editPost(request, entity, fields)
+
   def _editGet(self, request, entity, form):
     """See base._editGet().
     """

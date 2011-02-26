@@ -194,11 +194,12 @@ class BoundField(forms.BoundField):
         }
 
     return mark_safe(
-        '<label>%s%s%s</label>%s' % (
+        '<label>%s%s%s%s</label>%s' % (
         self.as_widget(attrs=attrs),
         self.field.label,
         self._render_is_required(),
         self._render_error(),
+        self._render_note(),
         ))
 
   def renderTextArea(self):
@@ -207,10 +208,11 @@ class BoundField(forms.BoundField):
         'class': 'textarea'
         }
 
-    return mark_safe('%s%s%s' % (
+    return mark_safe('%s%s%s%s' % (
         self._render_label(),
         self.as_widget(attrs=attrs),
         self._render_error(),  
+        self._render_note(),
     ))
 
   def renderTextInput(self):
@@ -219,10 +221,11 @@ class BoundField(forms.BoundField):
         'class': 'text',
         }
 
-    return mark_safe('%s%s%s' % (
+    return mark_safe('%s%s%s%s' % (
         self._render_label(),
         self.as_widget(attrs=attrs),
         self._render_error(),
+        self._render_note(),
     ))
 
   def renderSelect(self):
@@ -256,6 +259,10 @@ class BoundField(forms.BoundField):
       return ''
 
     return '<span class="req">*</span>'
+
+  def _render_note(self):
+    return '<span class="note">%s</span>' % (
+        self.help_text)
 
   def div_class(self):
     name = self.name

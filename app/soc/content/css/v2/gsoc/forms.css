@@ -78,6 +78,18 @@
 #form.form-register fieldset .row.surname .text {
   width: 276px;
 }
+#form.form-register fieldset .row.email {
+  clear: both;
+  float: left;
+  width: 310px;
+}
+#form.form-register fieldset .row.email .text {
+  width: 310px;
+}
+#form.form-register fieldset .row.phone {
+  float: left;
+  width: 180px;
+}
 #form.form-register fieldset .row.phone .text {
   width: 180px;
 }

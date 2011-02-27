@@ -22,9 +22,9 @@ __authors__ = [
   ]
 
 
-from django import forms
-from django.forms import widgets as django_widgets
 from django.conf.urls.defaults import url
+from django.core.urlresolvers import reverse
+from django.forms import widgets as django_widgets
 from django.utils.functional import lazy
 from django.utils.translation import ugettext
 
@@ -32,10 +32,11 @@ from soc.logic import cleaning
 from soc.logic.models.document import logic as document_logic
 from soc.models.site import Site
 from soc.models.work import Work
-from soc.modules import callback
 from soc.views.base import SiteRequestHandler
 from soc.views.forms import ModelForm
 from soc.views.helper import widgets as widgets_helper
+
+from soc.modules import callback
 
 
 def getProgramMap():
@@ -52,7 +53,8 @@ class SiteForm(ModelForm):
     model = Site
     exclude = ['link_id', 'scope', 'scope_path', 'home', 'xsrf_secret_key']
     widgets = {
-        'active_program': django_widgets.Select(choices=lazy(getProgramMap, list)()),
+        'active_program': django_widgets.Select(
+            choices=lazy(getProgramMap, list)()),
     }
 
   def clean_tos(self):

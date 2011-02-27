@@ -64,13 +64,15 @@ class Callback(object):
     """Instantiates all view objects.
     """
     from soc.modules.gsoc.views import dashboard
-    from soc.modules.gsoc.views import homepage
     from soc.modules.gsoc.views import document
+    from soc.modules.gsoc.views import homepage
+    from soc.modules.gsoc.views import org_app
     from soc.modules.gsoc.views import profile
 
     self.views.append(dashboard.Dashboard())
-    self.views.append(homepage.Homepage())
     self.views.append(document.Document())
+    self.views.append(homepage.Homepage())
+    self.views.append(org_app.OrgApp())
     self.views.append(profile.ProfilePage())
 
   def registerWithSitemap(self):

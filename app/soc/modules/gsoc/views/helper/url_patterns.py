@@ -50,7 +50,10 @@ PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])
 DOCUMENT  = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'document'])
 STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
 PROPOSAL  = namedLinkIdPattern(['sponsor', 'program', 'student', 'proposal'])
-MENTOR    = namedLinkIdPattern(['sponsor', 'program', 'organization', 'mentor'])
+MENTOR    = namedLinkIdPattern(['sponsor', 'program',
+                                'organization', 'mentor'])
 ORG       = namedLinkIdPattern(['sponsor', 'program', 'organization'])
-ORG_ADMIN = namedLinkIdPattern(['sponsor', 'program', 'organization', 'org_admin'])
-PROJECT   = namedLinkIdPattern(['sponsor', 'program', 'organization', 'project'])
+ORG_ADMIN = namedLinkIdPattern(['sponsor', 'program', 'organization',
+                                'org_admin'])
+PROJECT   = namedLinkIdPattern(['sponsor', 'program', 'organization',
+                                'project'])

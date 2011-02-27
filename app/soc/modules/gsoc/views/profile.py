@@ -137,15 +137,10 @@ class ProfilePage(RequestHandler):
     return 'v2/modules/gsoc/profile/base.html'
 
   def context(self):
-    if self.data.request.method == 'POST':
-      user_form = UserForm(self.data.POST, instance=self.data.user)
-      profile_form = ProfileForm(self.data.POST, instance=self.data.role)
-      student_info_form = StudentInfoForm(self.data.POST,
-          instance=self.data.student_info)
-    else:
-      user_form = UserForm(instance=self.data.user)
-      profile_form = ProfileForm(instance=self.data.role)
-      student_info_form = StudentInfoForm(instance=self.data.student_info)
+    user_form = UserForm(self.data.POST or None, instance=self.data.user)
+    profile_form = ProfileForm(self.data.POST or None, instance=self.data.role)
+    student_info_form = StudentInfoForm(self.data.POST or None,
+        instance=self.data.student_info)
     return {
         'page_name': 'Register',
         'user_form': user_form.render(),

@@ -87,10 +87,7 @@ class SitePage(SiteRequestHandler):
     return 'v2/soc/site/base.html'
 
   def context(self):
-    if self.data.request.method == 'POST':
-      site_form = SiteForm(self.data.POST, instance=self.data.site)
-    else:
-      site_form = SiteForm(instance=self.data.site)
+    site_form = SiteForm(self.data.POST or None, instance=self.data.site)
     return {
         'page_name': 'Edit site settings',
         'site_form': site_form.render(),

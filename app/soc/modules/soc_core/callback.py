@@ -68,8 +68,10 @@ class Callback(object):
     """Instantiates all view objects.
     """
     from soc.views import legacy
+    from soc.views import site
 
     self.views.append(legacy.Legacy())
+    self.views.append(site.SitePage())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

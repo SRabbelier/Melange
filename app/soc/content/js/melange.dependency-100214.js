@@ -212,7 +212,7 @@
   s.melange.autocomplete = [
     s.autocomplete,
     null,
-    "/soc/content/js/melange.autocomplete-110204.js"
+    "/soc/content/js/melange.autocomplete-110227.js"
   ];
 
   s.melange.graph = [

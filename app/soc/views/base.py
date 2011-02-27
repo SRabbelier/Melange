@@ -28,8 +28,6 @@ __authors__ = [
 from django import http
 from django.template import loader
 
-from soc.modules.gsoc.views import site_menu
-from soc.modules.gsoc.views import header
 
 
 class Response(http.HttpResponse):
@@ -190,18 +188,9 @@ class RequestHandler(object):
     The page is rendered using the template specified in self.templatePath()
     and is written to the response object.
 
-    The context object is extended with the following values:
-      header: a rendered header.Header template for the current self.data
-      mainmenu: a rendered site_menu.MainMenu template for the current self.data
-      footer: a rendered site_menu.Footer template for the current self.data
-
     Args:
       context: the context that should be used
     """
-
-    context['header'] = header.Header(self.data).render()
-    context['mainmenu'] = site_menu.MainMenu(self.data).render()
-    context['footer'] = site_menu.Footer(self.data).render()
 
     rendered = loader.render_to_string(self.templatePath(), dictionary=context)
     self.response.write(rendered)

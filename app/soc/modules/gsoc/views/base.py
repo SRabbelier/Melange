@@ -25,12 +25,29 @@ __authors__ = [
 
 from soc.views.base import RequestHandler
 
+from soc.modules.gsoc.views import site_menu
+from soc.modules.gsoc.views import header
 from soc.modules.gsoc.views.helper.request_data import RequestData
 
 
 class RequestHandler(RequestHandler):
   """Customization required by GSoC to handle HTTP requests.
   """
+
+  def render(self, context):
+    """Renders the page using the specified context.
+
+    See soc.views.base.RequestHandler.
+
+    The context object is extended with the following values:
+      header: a rendered header.Header template for the current self.data
+      mainmenu: a rendered site_menu.MainMenu template for the current self.data
+      footer: a rendered site_menu.Footer template for the current self.data
+    """
+    context['header'] = header.Header(self.data).render()
+    context['mainmenu'] = site_menu.MainMenu(self.data).render()
+    context['footer'] = site_menu.Footer(self.data).render()
+    super(RequestHandler, self).render(context)
 
   def __call__(self, request, *args, **kwargs):
     """See soc.views.base.RequestHandler.__call__()

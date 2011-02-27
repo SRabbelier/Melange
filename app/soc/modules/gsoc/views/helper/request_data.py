@@ -30,6 +30,7 @@ from soc.models import role
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
+from soc.views.helper.request_data import RequestData
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
@@ -37,7 +38,7 @@ from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 
-class RequestData(object):
+class RequestData(RequestData):
   """Object containing data we query for each request in the GSoC module.
 
   The only view that will be exempt is the one that creates the program.
@@ -59,8 +60,7 @@ class RequestData(object):
   def __init__(self):
     """Constructs an empty RequestData object.
     """
-    self.site = None
-    self.user = None
+    super(RequestData, self).__init__()
     self.program = None
     self.program_timeline = None
     self.org_app = None
@@ -72,11 +72,6 @@ class RequestData(object):
     self.mentor_for = []
     self.org_admin_for = []
     self.student_info = None
-    self.request = None
-    self.args = []
-    self.kwargs = {}
-    self.GET = None
-    self.POST = None
 
   def populate(self, request, *args, **kwargs):
     """Populates the fields in the RequestData object.
@@ -85,13 +80,7 @@ class RequestData(object):
       request: Django HTTPRequest object.
       args & kwargs: The args and kwargs django sends along.
     """
-    self.request = request
-    self.args = args
-    self.kwargs = kwargs
-    self.GET = request.GET
-    self.POST = request.POST
-    self.site = site_logic.getSingleton()
-    self.user = user_logic.getCurrentUser()
+    super(RequestData, self).populate(request, *args, **kwargs)
 
     if 'sponsor' in kwargs and 'program' in kwargs:
       program_keyfields = {'link_id': kwargs.get('program'),

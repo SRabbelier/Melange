@@ -35,6 +35,8 @@ from django.template import loader
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 
+import django
+
 
 def choiceWidget(field):
   """Returns a Select widget for the specified field.
@@ -52,6 +54,32 @@ def choiceWidgets(model, fields):
   """Returns a dictionary of Select widgets for the specified fields.
   """
   return dict((i, choiceWidget(getattr(model, i))) for i in fields)
+
+
+class ReferenceProperty(djangoforms.ReferenceProperty):
+  # ReferenceProperty field allows setting to None.
+
+  __metaclass__ = djangoforms.monkey_patch
+
+  def get_form_field(self):
+    """Return a Django form field appropriate for a reverse reference.
+
+    This defaults to a CharField instance.
+    """
+    return django.forms.CharField(required=self.required)
+
+  def make_value_from_form(self, value):
+    """Convert a form value to a property value.
+
+    This turns a key string or object into a model instance.
+    Returns None if value is ''.
+    """
+
+    if not value:
+      return None
+    if not isinstance(value, db.Model):
+      value = db.get(value)
+    return value
 
 
 class ModelForm(djangoforms.ModelForm):

@@ -35,6 +35,11 @@ from soc.views.forms import ModelForm
 from soc.views.helper import widgets
 
 
+def getProgramMap():
+  for i in callback.getCore().getProgramMap():
+    yield i
+
+
 class SiteForm(ModelForm):
   """Django form for the site settings.
   """
@@ -44,7 +49,7 @@ class SiteForm(ModelForm):
     exclude = ['link_id', 'scope', 'scope_path', 'home', 'tos', 'xsrf_secret_key', 'active_program']
 
   currently_active_program = forms.ChoiceField(
-      required=False, choices=callback.getCore().getProgramMap())
+      required=False, choices=getProgramMap())
 
   home_link_id = widgets.ReferenceField(
       reference_url='document', required=False,

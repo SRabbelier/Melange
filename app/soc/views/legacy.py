@@ -34,7 +34,8 @@ class Legacy(object):
     """
     patterns = [
         # TODO: replace with redirect to active program homepage
-        (r'^$', 'soc.views.models.site.main_public')
+        (r'^$', 'soc.views.models.site.main_public'),
+        (r'^site/edit$', 'soc.views.models.site.main_edit'),
     ]
 
     from soc.modules.gsoc.views.models import timeline

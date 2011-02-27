@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from django import forms
+from django.forms import widgets as django_widgets
 from django.conf.urls.defaults import url
 from django.utils.functional import lazy
 from django.utils.translation import ugettext
@@ -48,11 +49,10 @@ class SiteForm(ModelForm):
 
   class Meta:
     model = Site
-    exclude = ['link_id', 'scope', 'scope_path', 'home', 'tos', 'xsrf_secret_key', 'active_program']
-
-  currently_active_program = forms.ChoiceField(
-      required=False, choices=lazy(getProgramMap, list)(),
-      help_text=ugettext("The currently active program"))
+    exclude = ['link_id', 'scope', 'scope_path', 'home', 'tos', 'xsrf_secret_key']
+    widgets = {
+        'active_program': django_widgets.Select(choices=lazy(getProgramMap, list)()),
+    }
 
   home_link_id = widgets.ReferenceField(
       reference_url='document', required=False,

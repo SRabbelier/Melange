@@ -162,6 +162,6 @@ class Callback(object):
 
     program_entities = program_logic.logic.getAllPrograms()
     map = ('GSoC Programs', [
-        (e.key().id_or_name(), e.name) for e in program_entities])
+        (str(e.key()), e.name) for e in program_entities])
 
     self.core.registerProgramEntry(map)

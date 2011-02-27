@@ -24,6 +24,7 @@ __authors__ = [
 
 from django import forms
 from django.conf.urls.defaults import url
+from django.utils.functional import lazy
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
@@ -36,8 +37,9 @@ from soc.views.helper import widgets
 
 
 def getProgramMap():
-  for i in callback.getCore().getProgramMap():
-    yield i
+  choices = [('', 'Active program')]
+  choices += callback.getCore().getProgramMap()
+  return choices
 
 
 class SiteForm(ModelForm):
@@ -49,7 +51,8 @@ class SiteForm(ModelForm):
     exclude = ['link_id', 'scope', 'scope_path', 'home', 'tos', 'xsrf_secret_key', 'active_program']
 
   currently_active_program = forms.ChoiceField(
-      required=False, choices=getProgramMap())
+      required=False, choices=lazy(getProgramMap, list)(),
+      help_text=ugettext("The currently active program"))
 
   home_link_id = widgets.ReferenceField(
       reference_url='document', required=False,

@@ -28,6 +28,7 @@ __authors__ = [
 from django import http
 from django.template import loader
 
+from soc.views.helper.request_data import RequestData
 
 
 class Response(http.HttpResponse):
@@ -242,3 +243,17 @@ class RequestHandler(object):
     self._dispatch()
 
     return self.response
+
+
+class SiteRequestHandler(RequestHandler):
+  """Customization required by global site pages to handle HTTP requests.
+  """
+
+  def __call__(self, request, *args, **kwargs):
+    """See soc.views.base.RequestHandler.__call__()
+    """
+
+    self.data = RequestData()
+    self.data.populate(request, *args, **kwargs)
+
+    return super(SiteRequestHandler, self).__call__(request, *args, **kwargs)

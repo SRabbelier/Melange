@@ -105,6 +105,7 @@
   ];
 
   s.autocomplete = [
+    new $m.cssFile("/soc/content/css/jquery-autocomplete-090304.css"),
     "/jquery/jquery-autocomplete.js"
   ];
 

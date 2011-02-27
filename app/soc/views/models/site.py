@@ -42,6 +42,8 @@ import soc.logic.models.site
 import soc.logic.dicts
 import soc.logic.system
 
+from soc.modules import callback
+
 from soc.modules.gci.logic.models.program import logic as gci_program_logic
 
 from soc.modules.gsoc.logic.models.program import logic as gsoc_program_logic
@@ -108,7 +110,8 @@ class View(presence_with_tos.View):
         'clean_logo_url': cleaning.clean_url('logo_url'),
         }
     new_params['edit_extra_dynaproperties'] = {
-        'currently_active_program': forms.ChoiceField(required = False, choices=getProgramChoices()),
+        'currently_active_program': forms.ChoiceField(
+            required=False, choices=callback.getCore().getProgramMap()),
         'link_id': forms.CharField(widget=forms.HiddenInput, required=True),
         'home_link_id': widgets.ReferenceField(
             reference_url='document', required=False,

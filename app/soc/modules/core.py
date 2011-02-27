@@ -123,6 +123,7 @@ class Core(object):
 
     self.sitemap = []
     self.sidebar = []
+    self.program_map = []
     self.per_request_cache = {}
     self.in_request = False
     self.rights = {}
@@ -349,3 +350,20 @@ class Core(object):
       raise AlreadyRegisteredRight(key)
 
     self.rights[key] = value
+
+  def registerProgramEntry(self, entry):
+    """Registers the specified module's programs with the core.
+    """
+
+    self.program_map.append(entry)
+
+  def getProgramMap(self):
+    """Returns a tuple containing all the programs for all the modules.
+
+    It returns tuple for all the modules which have registered their
+    Programs in the format required to field Django's choices parameter
+    in the form fields.
+    """
+
+    self.callService('registerWithProgramMap', True)
+    return self.program_map

@@ -41,7 +41,8 @@
   melange.error.createErrors([
   ]);
 
-  $m.makeAutoComplete = function (id, url) {
+  $m.makeAutoComplete = function (id) {
+    var url = "?fmt=json&field=" + id;
     jQuery.ajax({
       url: url,
       success: function(data){
@@ -51,7 +52,7 @@
             return item.link_id+" ("+item.title+")";
           },
           formatResult: function(item) {
-            return item.link_id;
+            return item.key;
           }
         };
         if (data.autocomplete_options !== undefined) {

@@ -26,6 +26,7 @@ __authors__ = [
 
 
 from django import http
+from django.utils import simplejson
 from django.template import loader
 
 from soc.views.helper.request_data import RequestData
@@ -122,6 +123,29 @@ class RequestHandler(object):
     context = self.context()
     self.render(context)
 
+  def json(self):
+    """Handler for HTTP GET request with a 'fmt=json' parameter.
+    """
+
+    if not self.request.GET.get('plain'):
+      self.response['Content-Type'] = 'application/json'
+
+    # if the browser supports HTTP/1.1
+    # post-check and pre-check and no-store for IE7
+    self.response['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
+                                     'post-check=0, pre-check=0' # HTTP/1.1, IE7
+    self.response['Pragma'] = 'no-cache'
+
+    data = simplejson.dumps(self.jsonContext())
+    self.response.write(data)
+
+  def jsonContext(self):
+    """
+    """
+    return {
+        'error': "json() method not implemented",
+    }
+
   def post(self):
     """Handler for HTTP POST request.
     """
@@ -207,7 +231,10 @@ class RequestHandler(object):
     """Dispatches the HTTP request to its respective handler method.
     """
     if self.request.method == 'GET':
-      self.get()
+      if self.request.GET.get('fmt') == 'json':
+        self.json()
+      else:
+        self.get()
     elif self.request.method == 'POST':
       self.post()
     elif self.request.method == 'HEAD':

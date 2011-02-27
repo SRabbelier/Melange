@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from soc.views.models import role
+from soc.modules.gsoc.logic.models import program as program_logic
 from soc.modules.gsoc.tasks import accept_proposals
 from soc.modules.gsoc.tasks import org_app_survey as org_app_survey_tasks
 from soc.modules.gsoc.tasks import program_freezer
@@ -152,3 +153,15 @@ class Callback(object):
 
     self.core.registerRight('gsoc_program', gsoc_program_membership)
     self.core.registerRight('gsoc_org', gsoc_organization_membership)
+
+  def registerWithProgramMap(self):
+    """Called by the server when program_map entries should be registered.
+    """
+
+    self.core.requireUniqueService('registerWithProgramMap')
+
+    program_entities = program_logic.logic.getAllPrograms()
+    map = ('GSoC Programs', [
+        (e.key().id_or_name(), e.name) for e in program_entities])
+
+    self.core.registerProgramEntry(map)

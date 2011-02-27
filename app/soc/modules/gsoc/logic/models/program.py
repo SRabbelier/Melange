@@ -139,4 +139,12 @@ class Logic(program.Logic):
     return super(Logic, self).updateEntityProperties(entity, entity_properties,
         silent, store)
 
+  def getAllPrograms(self):
+    """Returns all the valid programs in this module.
+    """
+
+    pq = self.getQueryForFields()
+    return self.getAll(pq)
+
+
 logic = Logic()

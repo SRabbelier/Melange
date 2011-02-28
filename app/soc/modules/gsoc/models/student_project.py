@@ -27,9 +27,8 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.linkable
-import soc.models.mentor
+import soc.models.role
 import soc.models.program
-import soc.models.student
 
 
 class StudentProject(soc.models.linkable.Linkable):
@@ -66,7 +65,7 @@ class StudentProject(soc.models.linkable.Linkable):
 
   #: A property containing which mentor has been assigned to this project.
   #: A project must have a mentor at all times.
-  mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
+  mentor = db.ReferenceProperty(reference_class=soc.models.role.Role,
                                 required=True,
                                 collection_name='student_projects')
 
@@ -99,7 +98,7 @@ class StudentProject(soc.models.linkable.Linkable):
 
   #: Student which this project is from
   student = db.ReferenceProperty(
-      reference_class=soc.models.student.Student,
+      reference_class=soc.models.role.Role,
       required=True, collection_name='student_projects')
 
   #: Program in which this project has been created

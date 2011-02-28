@@ -27,6 +27,8 @@ from google.appengine.ext import deferred
 from google.appengine.runtime import DeadlineExceededError
 
 from soc.models.linkable import Linkable
+from soc.models.mentor import Mentor
+from soc.models.org_admin import OrgAdmin
 
 from soc.modules.gsoc.models.mentor import GSoCMentor
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
@@ -34,18 +36,24 @@ from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.student import GSoCStudent
 
 
+ROLE_MODELS = [GSoCMentor, GSoCOrgAdmin, GSoCStudent]
+
 POPULATED_PROPERTIES = set(
     GSoCProfile.properties()) - set(Linkable.properties())
+
 
 def getDjangoURLPatterns():
   """Returns the URL patterns for the tasks in this module.
   """
 
   patterns = [
+      (r'^tasks/role_conversion/update_references',
+        'soc.tasks.updates.role_conversion.updateReferences'),
       (r'^tasks/role_conversion/update_roles$',
         'soc.tasks.updates.role_conversion.updateRoles')]
 
   return patterns
+
 
 class Updater(object):
   """Class which is responsible for updating the entities.
@@ -146,3 +154,107 @@ def updateRoles(request):
   # we can assume that students cannot have any other roles, so we do not
   # need to set ETA
 #  updateRole('gsoc_student')
+
+def _getProfileForRole(entity, profile_model):
+  """Returns GSoCProfile or GCIProfile which corresponds to the specified
+  entity.
+  """
+
+  if isinstance(entity, OrgAdmin) or isinstance(entity, Mentor):
+    key_name = entity.scope.key().name()
+  else:
+    key_name = entity.key().name()
+
+  parent = entity.user
+  return profile_model.get_by_key_name(key_name, parent=parent)
+
+
+def _getProfileKeyForRoleKey(key, profile_model):
+  """Returns Key instance of the Profile which corresponds to the Role which
+  is represented by the specified Key.
+  """
+
+  for model in ROLE_MODELS:
+    entity = model.get(key)
+    if not entity:
+      continue
+
+    profile = _getProfileForRole(entity, profile_model)
+    return profile.key()
+
+class ReferenceUpdater(object):
+  """Class which is responsible for updating references to Profile in
+  the specified model. 
+  """
+
+  def __init__(self, model, profile_model, fields_to_update,
+               lists_to_update=[]):
+    self.MODEL = model
+    self.PROFILE_MODEL = profile_model
+    self.FIELDS_TO_UPDATE = fields_to_update
+    self.LISTS_TO_UPDATE = lists_to_update
+
+  def run(self, batch_size=25):
+    """Starts the updater.
+    """
+
+    self._process(None, batch_size)
+
+  def _process(self, start_key, batch_size):
+    """Iterates through the entities and updates the references.
+    """ 
+
+    query = self.MODEL.all()
+    if start_key:
+      query.filter('__key__ > ', start_key)
+
+    try:
+      entities = query.fetch(batch_size)
+      
+      if not entities:
+        # all entities has already been processed
+        return
+
+      for entity in entities:
+        for field in self.FIELDS_TO_UPDATE:
+          old_reference = entity.__getattribute__(field)
+          profile = _getProfileForRole(old_reference, self.PROFILE_MODEL)
+          entity.__setattr__(field, profile)
+
+        for list_property in self.LISTS_TO_UPDATE:
+          l = entity.__getattribute__(list_property)
+          new_l = []
+          for key in l:
+            new_l.append(_getProfileKeyForRoleKey(key, self.PROFILE_MODEL))
+          entity.__setattr__(list_property, new_l)
+          
+      db.put(entities)
+    except DeadlineExceededError:
+      # here we should probably be more careful
+      deferred.defer(self._process, start_key, batch_size)
+
+
+def updateReferencesForModel(model):
+  """Starts a task which updates references for a particular model.
+  """
+
+  if model == 'student_proposal':
+    updater = ReferenceUpdater(StudentProposal, GSoCProfile,
+        ['scope', 'mentor'], ['possible_mentors'])
+  elif model == 'student_project':
+    updater = ReferenceUpdater(StudentProject, GSoCProfile,
+        ['mentor', 'student'], ['additional_mentors'])
+
+  updater.run()
+
+
+def updateReferences(request):
+  """Start a bunch of iterative tasks which update references to various roles.
+  """
+
+  # updates student proposals
+  updateReferencesForModel('student_proposal')
+
+  # updates student projects
+  updateReferencesForModel('student_project')
+

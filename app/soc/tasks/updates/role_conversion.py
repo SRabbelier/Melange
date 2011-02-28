@@ -163,6 +163,9 @@ def _getProfileForRole(entity, profile_model):
   entity.
   """
 
+  if isinstance(entiy, profile_model):
+    return entity
+
   if isinstance(entity, OrgAdmin) or isinstance(entity, Mentor):
     key_name = entity.program.key().name() + '/' + entity.user.key().name()
   else:

@@ -368,14 +368,15 @@ class View(survey_view.View):
 
     # define the basic fields for the overview list
     list_params['overview_field_keys'] = [
-        'name', 'home_page', 'status'
+        'name', 'home_page', 'details', 'status',
     ]
     list_params['overview_field_names'] = [
-        'Organization Name', 'Home Page', 'Application Status'
+        'Organization Name', 'Home Page', 'Details', 'Application Status',
     ]
     list_params['overview_field_extra'] = lambda entity: {
         'home_page': lists.urlize(entity.home_page),
         'status': entity.status.capitalize(),
+        'details': lists.urlize(redirects.getReviewOrgAppSurvey(entity, info)),
     }
     list_params['overview_button_global'] = [
         {

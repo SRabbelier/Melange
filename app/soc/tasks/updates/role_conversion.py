@@ -34,6 +34,8 @@ from soc.modules.gsoc.models.mentor import GSoCMentor
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.student import GSoCStudent
+from soc.modules.gsoc.models.student_project import StudentProject
+from soc.modules.gsoc.models.student_proposal import StudentProposal
 
 
 ROLE_MODELS = [GSoCMentor, GSoCOrgAdmin, GSoCStudent]

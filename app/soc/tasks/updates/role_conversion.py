@@ -57,7 +57,7 @@ def getDjangoURLPatterns():
   return patterns
 
 
-class Updater(object):
+class RoleUpdater(object):
   """Class which is responsible for updating the entities.
   """
 
@@ -131,11 +131,12 @@ def updateRole(role_name):
   """
 
   if role_name == 'gsoc_mentor':
-    updater = Updater(GSoCMentor, GSoCProfile, 'program', 'mentor_for')
+    updater = RoleUpdater(GSoCMentor, GSoCProfile, 'program', 'mentor_for')
   elif role_name == 'gsoc_org_admin':
-    updater = Updater(GSoCOrgAdmin, GSoCProfile, 'program', 'org_admin_for')
+    updater = RoleUpdater(
+        GSoCOrgAdmin, GSoCProfile, 'program', 'org_admin_for')
   elif role_name == 'gsoc_student':
-    updater = Updater(GSoCStudent, GSoCProfile, 'scope')
+    updater = RoleUpdater(GSoCStudent, GSoCProfile, 'scope')
 
   updater.run()
 

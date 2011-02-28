@@ -221,6 +221,11 @@ class ReferenceUpdater(object):
       for entity in entities:
         for field in self.FIELDS_TO_UPDATE:
           old_reference = entity.__getattribute__(field)
+
+          # check if the field has not been updated
+          if isinstance(old_reference, self.PROFILE_MODEL):
+            continue
+
           profile = _getProfileForRole(old_reference, self.PROFILE_MODEL)
           entity.__setattr__(field, profile)
 

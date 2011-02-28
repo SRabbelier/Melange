@@ -229,6 +229,8 @@ class ReferenceUpdater(object):
           entity.__setattr__(list_property, new_l)
           
       db.put(entities)
+      start_key = entities[-1].key()
+      deferred.defer(self._process, start_key, batch_size)
     except DeadlineExceededError:
       # here we should probably be more careful
       deferred.defer(self._process, start_key, batch_size)
@@ -256,5 +258,5 @@ def updateReferences(request):
   updateReferencesForModel('student_proposal')
 
   # updates student projects
-  updateReferencesForModel('student_project')
+  #updateReferencesForModel('student_project')
 

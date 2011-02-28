@@ -28,9 +28,9 @@ from google.appengine.ext import db
 from django.utils.translation import ugettext
 
 import soc.models.linkable
-import soc.models.mentor
 import soc.models.organization
 import soc.models.program
+import soc.models.role
 
 
 # define the [min_score, max_score] and the name for the RankList
@@ -74,7 +74,7 @@ class StudentProposal(soc.models.linkable.Linkable):
   #: A property containing which mentor has assigned himself to this proposal.
   #: Only a proposal with an assigned mentor can be turned into
   #: a accepted proposal. A proposal can only have one mentor.
-  mentor = db.ReferenceProperty(reference_class=soc.models.mentor.Mentor,
+  mentor = db.ReferenceProperty(reference_class=soc.models.role.Role,
                                 required=False,
                                 collection_name='student_proposals')
 

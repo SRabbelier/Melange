@@ -67,7 +67,7 @@ class StudentProject(soc.models.linkable.Linkable):
   #: A project must have a mentor at all times.
   mentor = db.ReferenceProperty(reference_class=soc.models.role.Role,
                                 required=True,
-                                collection_name='student_projects')
+                                collection_name='the_student_projects')
 
   #: A property containing a list of additional Mentors for this project
   additional_mentors = db.ListProperty(item_type=db.Key, default=[])

@@ -161,7 +161,7 @@ def _getProfileForRole(entity, profile_model):
   """
 
   if isinstance(entity, OrgAdmin) or isinstance(entity, Mentor):
-    key_name = entity.scope.key().name()
+    key_name = entity.program.key().name() + '/' + entity.user.key().name()
   else:
     key_name = entity.key().name()
 
@@ -258,5 +258,5 @@ def updateReferences(request):
   updateReferencesForModel('student_proposal')
 
   # updates student projects
-  #updateReferencesForModel('student_project')
+  updateReferencesForModel('student_project')
 

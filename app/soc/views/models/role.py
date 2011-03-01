@@ -174,7 +174,8 @@ class View(base.View):
                                      required=True),
        }
 
-    new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on']
+    new_params['extra_dynaexclude'] = ['user', 'status', 'agreed_to_tos_on',
+        'mentor_for', 'org_admin_for', 'student_info']
 
     new_params['show_in_roles_overview'] = True
 

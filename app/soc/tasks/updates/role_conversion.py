@@ -29,6 +29,7 @@ from google.appengine.runtime import DeadlineExceededError
 from soc.models.linkable import Linkable
 from soc.models.mentor import Mentor
 from soc.models.org_admin import OrgAdmin
+from soc.models.role import StudentInfo
 
 from soc.modules.gsoc.models.mentor import GSoCMentor
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
@@ -40,8 +41,10 @@ from soc.modules.gsoc.models.student_proposal import StudentProposal
 
 ROLE_MODELS = [GSoCMentor, GSoCOrgAdmin, GSoCStudent]
 
-POPULATED_PROPERTIES = set(
+POPULATED_PROFILE_PROPS = set(
     GSoCProfile.properties()) - set(Linkable.properties())
+
+POPULATED_STUDENT_PROPS = StudentInfo.properties()
 
 
 def getDjangoURLPatterns():
@@ -89,7 +92,6 @@ class RoleUpdater(object):
         # all entities has already been processed
         return
       
-      to_put = []
       for entity in entities:
         program = entity.__getattribute__(self.PROGRAM_FIELD)
         user = entity.user
@@ -101,25 +103,40 @@ class RoleUpdater(object):
             'scope_path': program.key().name(),
             'scope': program,
             'parent': user,
-            
             }
-        for p in POPULATED_PROPERTIES:
-          properties[p] = entity.__getattribute__(p)
+        for prop in POPULATED_PROFILE_PROPS:
+          properties[prop] = entity.__getattribute__(prop)
 
         profile = self.PROFILE_MODEL.get_or_insert(
             key_name=key_name, **properties)
-        to_put.append(profile)
+        
+        # do not update anything if the role is already in the profile
+        if profile.student_info:
+          continue
+        elif self.ROLE_FIELD:
+          if entity.scope.key() in profile.__getattribute__(self.ROLE_FIELD):
+            continue
+
+        to_put = [profile]
 
         if self.ROLE_FIELD:
           # the role is either Mentor or OrgAdmin
           profile.__getattribute__(self.ROLE_FIELD).append(entity.scope.key())
         else:
           # the role is certainly Student; we have to create a new StudentInfo
-          student_info = StudentInfo(parent=profile)
+          properties = {}
+          for prop in POPULATED_STUDENT_PROPS:
+            properties[prop] = entity.__getattribute__(prop)
+
+          key_name = profile.key().name()
+          student_info = StudentInfo(key_name=key_name,
+              parent=profile, **properties)
           profile.student_info = student_info
           to_put.append(student_info)
 
-      db.run_in_transaction(db.put, to_put)
+        db.run_in_transaction(db.put, to_put)
+
+      # process the next batch of entities
       start_key = entities[-1].key()
       deferred.defer(self._process, start_key, batch_size)
     except DeadlineExceededError:
@@ -148,15 +165,15 @@ def updateRoles(request):
   """
 
   # update org admins
-  updateRole('gsoc_org_admin')
+  #updateRole('gsoc_org_admin')
 
   # update mentors
-  #updateRole('gsoc_mentor')
+  updateRole('gsoc_mentor')
 
   # update students
   # we can assume that students cannot have any other roles, so we do not
   # need to set ETA
-#  updateRole('gsoc_student')
+  updateRole('gsoc_student')
 
 def _getProfileForRole(entity, profile_model):
   """Returns GSoCProfile or GCIProfile which corresponds to the specified

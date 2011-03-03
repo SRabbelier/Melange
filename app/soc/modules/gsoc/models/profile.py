@@ -29,3 +29,10 @@ class GSoCProfile(soc.models.role.Profile):
   """
 
   pass
+
+
+class GSoCStudentInfo(soc.models.role.StudentInfo):
+  """GSoCStudentInfo Model.
+  """
+
+  pass

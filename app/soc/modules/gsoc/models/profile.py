@@ -25,7 +25,7 @@ import soc.models.role
 
 
 class GSoCProfile(soc.models.role.Profile):
-  """GCIProfile Model.
+  """GSoCProfile Model.
   """
 
   pass

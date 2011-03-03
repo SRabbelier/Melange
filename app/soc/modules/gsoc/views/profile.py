@@ -36,9 +36,9 @@ from soc.views import forms
 from soc.views import template
 
 from soc.models.user import User
-from soc.models.role import Profile
 from soc.models.role import StudentInfo
 
+from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
@@ -64,11 +64,11 @@ class ProfileForm(forms.ModelForm):
   """
 
   class Meta:
-    model = Profile
+    model = GSoCProfile
     exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
                'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
                'name_on_documents']
-    widgets = forms.choiceWidgets(Profile,
+    widgets = forms.choiceWidgets(GSoCProfile,
         ['res_country', 'ship_country',
          'tshirt_style', 'tshirt_size', 'gender'])
 

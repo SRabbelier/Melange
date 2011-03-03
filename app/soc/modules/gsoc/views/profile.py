@@ -36,9 +36,9 @@ from soc.views import forms
 from soc.views import template
 
 from soc.models.user import User
-from soc.models.role import StudentInfo
 
 from soc.modules.gsoc.models.profile import GSoCProfile
+from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
@@ -100,9 +100,9 @@ class StudentInfoForm(forms.ModelForm):
   """
 
   class Meta:
-    model = StudentInfo
+    model = GSoCStudentInfo
     exclude = ['school', 'school_type']
-    widgets = forms.choiceWidgets(StudentInfo,
+    widgets = forms.choiceWidgets(GSoCStudentInfo,
         ['school_country', 'school_type', 'degree'])
 
   school_home_page = fields.URLField(required=True)

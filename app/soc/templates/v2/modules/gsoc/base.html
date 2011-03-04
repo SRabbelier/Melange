@@ -78,9 +78,9 @@ limitations under the License.
     $LAB
       .script("/json/json2.js")
       {% if is_local %}
-      .script("/jquery/jquery-1.5.js").wait()
+      .script("/jquery/jquery-1.5.1.js").wait()
       {% else %}
-      .script("http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js").wait()
+      .script("http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js").wait()
       {% endif %}
       .script("/soc/content/js/melange-091015.js").wait(
         function () {

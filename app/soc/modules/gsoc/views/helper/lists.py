@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module that helps generate lists.
+"""Module that generates the lists.
 """
 
 __authors__ = [
@@ -24,93 +24,175 @@ __authors__ = [
 
 from django.utils import simplejson
 
+from soc.views.template import Template
 
-# TODO: This could potentially be a Template object.
-class ListConfiguration(object):
+
+class ListConfiguration(Template):
   """Resembles the configuration of a list. This object is sent to the client
   on page load.
+
+  See the wiki page on ListProtocols for more information
+  (http://code.google.com/p/soc/wiki/ListsProtocol).
+
+  Public fields are:
+    description: The description as shown to the end user.
+    row_num: The number of rows that should be shown on a page on default.
+    row_list: List of integers which is the allowed pagination size a user can
+              can choose from.
+    autowidth: Whether the width of the columns should be automatically set.
+    height: Whether the height of the list should be automatically set.
+    multiselect: If true then the list will have a column with checkboxes which
+                 allows the user to select a number of rows.
+    toolbar: [boolean, string] showing if and where the toolbar with buttons
+             should be present.
   """
 
-  def __init__(self, description="", order=None, idx=0):
+  def __init__(self, idx=0, description=""):
     """Initializes the configuration.
 
     Args:
-      description: The description of this list, as should be shown to the
-                   user.
-      order: The default sort order of data that is given to the list
       idx: A number(? can it be a string as well) uniquely identifying this
            list.
+      description: The description of this list, as should be shown to the
+                   user.
     """
+    self._idx = idx
     self.description = description
-    self.order = order
-    self.idx = idx
+
+    self._col_names = []
+    self._col_model = []
+    self.row_num = 50
+    self.row_list = [5, 10, 20, 50, 100, 500, 1000]
+    self.autowidth = True
+    self._sortname = ''
+    self._sortorder = 'asc'
+    self.height = 'auto'
+    self.multiselect = False
+    self.toolbar = [True, 'top']
+
+    self._buttons = {}
+    self._row_operation = {}
+
+    super(ListConfiguration, self).__init__()
 
   def _buildListConfiguration(self):
     """Builds the core of the list configuration that is sent to the client.
-    """
-    # If I get it correctly we are basically specifying the columns and 
-    # their properties.
-    # As well as the main buttons on the list.
-    key_order, col_names = getKeyOrderAndColNames(params, visibility)
-  
-    conf_extra = params.get('%s_conf_extra' % visibility, {})
-    conf_min_num = params.get('%s_conf_min_num' % visibility, 0)
-    button_global = params.get('%s_button_global' % visibility, [])
-    row_action = params.get('%s_row_action' % visibility, {})
-    col_props = params.get('%s_field_props' % visibility, {})
-    hidden = params.get('%s_field_hidden' % visibility, [])
-  
-    col_model = [keyToColumnProperties(i, col_props, hidden) for i in key_order]
-  
-    rowList = [5, 10, 20, 50, 100, 500, 1000]
-    rowList = [i for i in rowList if i >= conf_min_num]
-    rowNum = min(rowList)
-  
-    sortorder = 'asc'
-    sortname = self.order[0] if self.order else 'key'
-  
-    if sortname and sortname[0] == '-':
-      sortorder = 'desc'
-      sortname = sortname[1:]
 
-    # Should some of these become fields so you can change/access them easily?
+    Among other things this configuration defines the columns and buttons
+    present on the list.
+    """
     configuration = {
-        'autowidth': True,
-        'colModel': col_model,
-        'colNames': col_names,
-        'height': 'auto',
-        'rowList': rowList,
-        'rowNum': max(1, rowNum),
-        'sortname': sortname,
-        'sortorder': sortorder,
-        'toolbar': [True, 'top'],
-        'multiselect': False,
+        'autowidth': self.autowidth,
+        'colNames': self._col_names,
+        'colModel': self._col_model,
+        'height': self.height,
+        'rowList': self.row_list,
+        'rowNum': max(1, self.row_num),
+        'sortname': self._sortname,
+        'sortorder': self._sortorder,
+        'multiselect': False if self._row_operation else self.multiselect,
+        'toolbar': self.toolbar,
     }
-  
-    configuration.update(conf_extra)
-  
+
     operations = {
-        'buttons': button_global,
-        'row': row_action,
+        'buttons': self._buttons,
+        'row': self._row_operation,
     }
-  
-    contents = {
+
+    listConfiguration = {
       'configuration': configuration,
       'operations': operations,
     }
-  
-    return contents
+
+    return listConfiguration
+
+  def addColumn(self, id, name, resizable=True):
+    """Adds a column to the list.
+
+      Args:
+        id: A unique identifier of this column (currently unchecked)
+        name: The name or header that is shown to the end user.
+        resizable: Whether the width of the column should be resizable by the
+                   end user.
+    """
+    self._col_model.append({
+        'name': id,
+        'index': id,
+        'resizable': resizable,
+        })
+    self._col_names.append(name)
+
+  def addButton(self, id, bounds, caption, type, parameters):
+    """Adds a button to the list configuration.
+
+    Args:
+      id: A string that should define a unique id for the button on this list.
+      bounds: An array of integers or an array of an integer and the keyword
+              "all".
+      caption: The display string shown to the end user, selecting items may
+               customize this string.
+      type: Type of button, at the moment there are three different types.
+      parameters: A dictionary that defines the parameters for different type
+                  of buttons.
+    """
+    self._buttons.append({
+        'bounds': bounds,
+        'id': id,
+        'caption': caption,
+        'type': type,
+        'parameters': parameters,
+        })
+
+  def setRowAction(self, parameters):
+    """The action to perform when clicking on a row.
+
+    This sets multiselect to False as indicated in the protocol spec.
+
+    Args:
+        parameters: A dictionary that defines the parameters a
+                    redirect_custom operation.
+    """
+    self.multiselect = False
+    self._row_operation = {
+        'type': 'redirect_custom',
+        'parameters': parameters
+        }
+
+  def setDefaultSort(self, id, order='asc'):
+    """Sets the default sort order for the list.
+
+    Args:
+      id: The id of the column to sort on by default.
+      order: The order in which to sort, either 'asc' or 'desc'.
+             The default value is 'asc'.
+    """
+    if id and not id in self._col_names:
+      raise ValueError('Id %s is not a defined column (Known columns %s)'
+                       %(id, self._col_names))
+
+    if order not in ['asc', 'desc']:
+      raise ValueError('%s is not a valid order' %order)
+
+    self._sortname = id
+    self._sortorder = order
 
   def context(self):
+    """Returns the context to be rendered as json.
+    """
     configuration = self._getListConfiguration()
 
     context = {
-        'idx': self.idx,
+        'idx': self._idx,
         'configuration': simplejson.dumps(configuration),
         'description': self.description
         }
 
     return context
+
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
+    """
+    raise NotImplementedError()
 
 
 # TODO: This could potentially also be a Template object since it is just a

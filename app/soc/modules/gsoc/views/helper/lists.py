@@ -27,7 +27,7 @@ from django.utils import simplejson
 from soc.views.template import Template
 
 
-class ListConfiguration(Template):
+class ListConfiguration(object):
   """Resembles the configuration of a list. This object is sent to the client
   on page load.
 
@@ -72,39 +72,6 @@ class ListConfiguration(Template):
 
     self._buttons = {}
     self._row_operation = {}
-
-    super(ListConfiguration, self).__init__()
-
-  def _buildListConfiguration(self):
-    """Builds the core of the list configuration that is sent to the client.
-
-    Among other things this configuration defines the columns and buttons
-    present on the list.
-    """
-    configuration = {
-        'autowidth': self.autowidth,
-        'colNames': self._col_names,
-        'colModel': self._col_model,
-        'height': self.height,
-        'rowList': self.row_list,
-        'rowNum': max(1, self.row_num),
-        'sortname': self._sortname,
-        'sortorder': self._sortorder,
-        'multiselect': False if self._row_operation else self.multiselect,
-        'toolbar': self.toolbar,
-    }
-
-    operations = {
-        'buttons': self._buttons,
-        'row': self._row_operation,
-    }
-
-    listConfiguration = {
-      'configuration': configuration,
-      'operations': operations,
-    }
-
-    return listConfiguration
 
   def addColumn(self, id, name, resizable=True):
     """Adds a column to the list.
@@ -176,10 +143,54 @@ class ListConfiguration(Template):
     self._sortname = id
     self._sortorder = order
 
+  def toDict(self):
+    """Builds the core of the list configuration that is sent to the client.
+
+    Among other things this configuration defines the columns and buttons
+    present on the list.
+    """
+    configuration = {
+        'autowidth': self.autowidth,
+        'colNames': self._col_names,
+        'colModel': self._col_model,
+        'height': self.height,
+        'rowList': self.row_list,
+        'rowNum': max(1, self.row_num),
+        'sortname': self._sortname,
+        'sortorder': self._sortorder,
+        'multiselect': False if self._row_operation else self.multiselect,
+        'toolbar': self.toolbar,
+    }
+
+    operations = {
+        'buttons': self._buttons,
+        'row': self._row_operation,
+    }
+
+    listConfiguration = {
+      'configuration': configuration,
+      'operations': operations,
+    }
+
+    return listConfiguration
+
+
+class ListConfigurationResponse(Template):
+
+  def __init__(self, configuration):
+    """Initializes the configuration.
+
+    Args:
+      configuration: A ListConfiguration object.
+    """
+    self._configuration = configuration
+
+    super(ListConfigurationResponse, self).__init__()
+
   def context(self):
     """Returns the context to be rendered as json.
     """
-    configuration = self._getListConfiguration()
+    configuration = self._configuration.toDict()
 
     context = {
         'idx': self._idx,
@@ -197,21 +208,31 @@ class ListConfiguration(Template):
 
 # TODO: This could potentially also be a Template object since it is just a
 # JSON string that is rendered at the end of the day.
-class ListContentResponse(object):
+class ListContentResponse(Template):
   """
   """
 
-  def __init__(self, request):
+  def __init__(self, request, configuration):
     """Initializes the list response.
 
     Args:
       request: The HTTPRequest containing the request for data.
+      configuration: A ListConfiguration object
     """
     if not self._isDataRequest(request):
       raise ValueError('Non data request given to ListContentResponse constructor')
 
     self.request = request
 
+  def _isJsonRequest(self, request):
+    """Returns true iff the request is a JSON request.
+    """
+    return request.GET.get('fmt') == 'json'
+
+  def _isDataRequest(self, request):
+    """Returns true iff the request is a data request.
+    """
+    return self._isJsonRequest(request)
 
   def context(self):
     """
@@ -219,18 +240,7 @@ class ListContentResponse(object):
     start = ''
     return {'data': {start: []}}
 
-  def _isJsonRequest(self, request):
-    """Returns true iff the request is a JSON request.
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
     """
-    if request.GET.get('fmt') == 'json':
-      return True
-
-    return False
-
-  def _isDataRequest(self, request):
-    """Returns true iff the request is a data request.
-    """
-    if self._isJsonRequest(request):
-      return True
-
-    return False
+    raise NotImplementedError()

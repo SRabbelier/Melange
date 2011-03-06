@@ -40,6 +40,7 @@ from django.forms.fields import CharField
 from django.template import loader
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 
 from soc.models.survey import COMMENT_PREFIX
@@ -789,16 +790,16 @@ class UniversalChoiceEditor(widgets.Widget):
         has_comment = self.has_comment,
         ))
 
-    str_value = forms.util.smart_unicode(value) # normalize to string.
+    str_value = smart_unicode(value) # normalize to string.
     chained_choices = enumerate(chain(self.choices, choices))
     choices = {}
 
     for i, (option_value, option_label) in chained_choices:
-      option_value = escape(forms.util.smart_unicode(option_value))
+      option_value = escape(smart_unicode(option_value))
       choices[i] = option_value
     context['choices'] = choices
 
-    tooltip_content = escape(forms.util.smart_unicode(self.tooltip_content))
+    tooltip_content = escape(smart_unicode(self.tooltip_content))
     context['tooltip_content'] = tooltip_content
 
     template = 'soc/survey/universal_choice_editor.html'
@@ -939,9 +940,8 @@ class PickManyCheckbox(forms.CheckboxSelectMultiple):
     final_attrs = self.build_attrs(attrs, name=name)
 
     # normalize to strings.
-    str_values = set([forms.util.smart_unicode(v) for v in value])
+    str_values = set([smart_unicode(v) for v in value])
     is_checked = lambda value: value in str_values
-    smart_unicode = forms.util.smart_unicode
 
     # set container fieldset and list
     output = [u'<fieldset id="id_%s">\n  <ul class="pick_multi">' % name]

@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import logging
+
 from django.utils import simplejson
 
 from soc.views.template import Template
@@ -47,20 +49,12 @@ class ListConfiguration(object):
              should be present.
   """
 
-  def __init__(self, idx=0, description=""):
+  def __init__(self):
     """Initializes the configuration.
-
-    Args:
-      idx: A number(? can it be a string as well) uniquely identifying this
-           list.
-      description: The description of this list, as should be shown to the
-                   user.
     """
-    self._idx = idx
-    self.description = description
-
     self._col_names = []
     self._col_model = []
+    self._col_functions = {}
     self.row_num = 50
     self.row_list = [5, 10, 20, 50, 100, 500, 1000]
     self.autowidth = True
@@ -73,21 +67,32 @@ class ListConfiguration(object):
     self._buttons = {}
     self._row_operation = {}
 
-  def addColumn(self, id, name, resizable=True):
+  def addColumn(self, id, name, func, resizable=True):
     """Adds a column to the list.
 
       Args:
         id: A unique identifier of this column (currently unchecked)
         name: The name or header that is shown to the end user.
+        func: The function to be called when rendering this column for
+              a single entity. This function should take an entity as first
+              argument and args and kwargs if needed. The string rendering of
+              the return value will be sent to the end user.
         resizable: Whether the width of the column should be resizable by the
                    end user.
     """
+    if self._col_functions.get(id):
+      logging.warning('Column with id %s is already defined' %id)
+
+    if not callable(func):
+      raise TypeError('Given function is not callable')
+
     self._col_model.append({
         'name': id,
         'index': id,
         'resizable': resizable,
         })
     self._col_names.append(name)
+    self._col_functions[id] = func
 
   def addButton(self, id, bounds, caption, type, parameters):
     """Adds a button to the list configuration.
@@ -143,7 +148,7 @@ class ListConfiguration(object):
     self._sortname = id
     self._sortorder = order
 
-  def toDict(self):
+  def dict(self):
     """Builds the core of the list configuration that is sent to the client.
 
     Among other things this configuration defines the columns and buttons
@@ -174,28 +179,58 @@ class ListConfiguration(object):
 
     return listConfiguration
 
+  def renderRow(self, entity, *args, **kwargs):
+    """Renders a row for a single entity.
+
+    Args:
+      entity: The entity to render.
+      args: The args passed to the render functions defined in the config.
+      kwargs: The kwargs passed to the render functions defined in the config.
+    """
+    columns = {}
+    # TODO(ljvderijk): Implement operations
+    operations = {
+        'row': {},
+        'buttons': {},
+    }
+
+    for id, func in self._col_functions.iteritems():
+      columns[id] = func(entity, *args, **kwargs)
+
+    data = {
+      'columns': columns,
+      'operations': operations,
+    }
+
+    return data
 
 class ListConfigurationResponse(Template):
 
-  def __init__(self, configuration):
+  def __init__(self, configuration, idx, description=''):
     """Initializes the configuration.
 
     Args:
       configuration: A ListConfiguration object.
+      idx: A number(? can it be a string as well) uniquely identifying this
+           list.
+      description: The description of this list, as should be shown to the
+                   user.
     """
     self._configuration = configuration
+    self._idx = idx
+    self._description = description
 
     super(ListConfigurationResponse, self).__init__()
 
   def context(self):
     """Returns the context to be rendered as json.
     """
-    configuration = self._configuration.toDict()
+    configuration = self._configuration.dict()
 
     context = {
         'idx': self._idx,
         'configuration': simplejson.dumps(configuration),
-        'description': self.description
+        'description': self._description
         }
 
     return context

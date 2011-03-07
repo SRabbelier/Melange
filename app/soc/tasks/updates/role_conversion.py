@@ -34,6 +34,7 @@ from soc.models.role import StudentInfo
 from soc.modules.gsoc.models.mentor import GSoCMentor
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
 from soc.modules.gsoc.models.profile import GSoCProfile
+from soc.modules.gsoc.models.program import GSoCProgram
 from soc.modules.gsoc.models.student import GSoCStudent
 from soc.modules.gsoc.models.student_project import StudentProject
 from soc.modules.gsoc.models.student_proposal import StudentProposal
@@ -55,7 +56,13 @@ def getDjangoURLPatterns():
       (r'^tasks/role_conversion/update_references',
         'soc.tasks.updates.role_conversion.updateReferences'),
       (r'^tasks/role_conversion/update_roles$',
-        'soc.tasks.updates.role_conversion.updateRoles')]
+        'soc.tasks.updates.role_conversion.updateRoles'),
+      (r'^tasks/role_conversion/update_mentors$',
+        'soc.tasks.updates.role_conversion.updateMentors'),
+      (r'^tasks/role_conversion/update_org_admins$',
+        'soc.tasks.updates.role_conversion.updateOrgAdmins'),
+      (r'^tasks/role_conversion/update_students$',
+        'soc.tasks.updates.role_conversion.updateStudents')]
 
   return patterns
 
@@ -168,11 +175,29 @@ def updateRoles(request):
   #updateRole('gsoc_org_admin')
 
   # update mentors
-  updateRole('gsoc_mentor')
+  #updateRole('gsoc_mentor')
 
   # update students
   # we can assume that students cannot have any other roles, so we do not
   # need to set ETA
+  updateRole('gsoc_student')
+
+def updateMentors(request):
+  """Starts an iterative task which update mentors.
+  """
+
+  updateRole('gsoc_mentor')
+
+def updateOrgAdmins(request):
+  """Starts an iterative task which update org admins.
+  """
+
+  updateRole('gsoc_org_admin')
+
+def updateStudents(request):
+  """Starts an iterative task which update students.
+  """
+
   updateRole('gsoc_student')
 
 def _getProfileForRole(entity, profile_model):

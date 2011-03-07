@@ -56,7 +56,8 @@ class StudentProposal(soc.models.linkable.Linkable):
       ' 500 characters or less, plain text displayed publicly')
 
   #: Required field containing the content of the proposal.
-  content = db.TextProperty(required=True)
+  content = db.TextProperty(required=True,
+      verbose_name=ugettext('Content'))
   content.help_text = ugettext('This contains your actual proposal')
 
   #: an URL linking to more information about this students proposal

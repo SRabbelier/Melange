@@ -37,7 +37,9 @@ class Legacy(object):
         (r'^$', 'soc.views.models.site.main_public'),
     ]
 
+    from soc.tasks.updates import role_conversion
     from soc.modules.gsoc.views.models import timeline
+    patterns += role_conversion.getDjangoURLPatterns()
     patterns += timeline.view.getDjangoURLPatterns()
 
     if system.isDebug():

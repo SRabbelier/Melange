@@ -32,11 +32,14 @@ from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 from soc.views.helper.request_data import RequestData
 
+from soc.modules.gsoc.models import profile
+
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
+
 
 class RequestData(RequestData):
   """Object containing data we query for each request in the GSoC module.
@@ -111,7 +114,8 @@ class RequestData(RequestData):
                 'status': ['active', 'inactive']}
       self.student = student_logic.getOneForFields(fields)
       key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
-      self.role = role.Profile.get_by_key_name(key_name, parent=self.user)
+      self.role = profile.GSoCProfile.get_by_key_name(
+          key_name, parent=self.user)
 
       if self.role:
         orgs = set(self.role.mentor_for + self.role.org_admin_for)

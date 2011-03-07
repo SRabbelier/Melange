@@ -61,7 +61,8 @@ class StudentProposal(soc.models.linkable.Linkable):
   content.help_text = ugettext('This contains your actual proposal')
 
   #: an URL linking to more information about this students proposal
-  additional_info = db.URLProperty(required=False)
+  additional_info = db.URLProperty(required=False,
+      verbose_name=ugettext('Additional Info'))
   additional_info.help_text = ugettext(
       'Link to a resource containing more information about your proposal')
 

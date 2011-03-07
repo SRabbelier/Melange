@@ -76,6 +76,10 @@ DEF_ROLE_INACTIVE_MSG = ugettext(
     'This page is inaccessible because you do not have an active role '
     'in the program at this time.')
 
+DEF_IS_NOT_STUDENT_MSG = ugettext(
+    'This page is inaccessiible baucause you do not have a student role '
+    'in the program.')
+
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -252,10 +256,21 @@ class AccessChecker(object):
     raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
 
   def isRoleActive(self):
-    """Check if the role of the current user is active.
+    """Checks if the role of the current user is active.
     """
 
     if self.data.role and self.data.role.status == 'active':
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_ROLE_INACTIVE_MSG)
+
+  def isActiveStudent(self):
+    """Checks if the user is an active student.
+    """
+
+    self.isRoleActive()
+
+    if self.data.student_info:
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_IS_NOT_STUDENT_MSG)

@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import gae_django
+
 from google.appengine.ext import db
 from google.appengine.ext import deferred
 from google.appengine.runtime import DeadlineExceededError

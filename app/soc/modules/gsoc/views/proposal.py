@@ -26,7 +26,7 @@ from django.conf.urls.defaults import url
 
 from soc.views import forms
 
-from soc.modules.gsoc.models.student_proposal import StudentProposal
+from soc.modules.gsoc.models.proposal import GSoCProposal
 
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
@@ -38,15 +38,9 @@ class ProposalForm(forms.ModelForm):
   """
 
   class Meta:
-    model = StudentProposal
-    exclude = ['link_id', 'user', 'scope', 'scope_path', 'status',
-        'mentor', 'possible_mentors', 'org', 'program', 'created_on',
-        'last_modified_on', 'score']
-
-  #  widgets = forms.choiceWidgets(StudentProposal,
-  #      ['res_country', 'ship_country',
-  #       'tshirt_style', 'tshirt_size', 'gender'])
-
+    model = GSoCProposal
+    exclude = ['status', 'mentor', 'possible_mentors', 'org', 'program',
+        'created_on', 'last_modified_on', 'score']
 
 class ProposalPage(RequestHandler):
   """View for the submit proposal.
@@ -64,6 +58,7 @@ class ProposalPage(RequestHandler):
     check = access_checker.AccessChecker(self.data)
     check.isLoggedIn()
     check.isActiveStudent()
+    check.isOrganizationInURLActive()
     check.canStudentPropose()
 
   def templatePath(self):
@@ -82,6 +77,19 @@ class ProposalPage(RequestHandler):
     if not proposal_form.is_valid():
       return False
 
+    # check if a user is updating or creating a proposal
+    # it depends on the URL which is used
+    if 'proposal' in self.data.kwargs:
+      pass
+    else:
+      # set the organization and program references
+      proposal_form.cleaned_data['org'] = self.data.organization
+      proposal_form.cleaned_data['program'] = self.data.program
+
+      # TODO(daniel): one day we will want to update student info with some
+      # data that a new proposal is created
+      proposal = proposal_form.create(commit=True, parent=self.data.profile)
+
     return True
 
   def post(self):
@@ -89,6 +97,8 @@ class ProposalPage(RequestHandler):
     """
 
     if self.validate():
-      self.redirect()
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program',
+         'organization'])
+      self.redirect(reverse('update_gsoc_profile', kwargs=kwargs))
     else:
       self.get()

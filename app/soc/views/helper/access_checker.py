@@ -83,11 +83,17 @@ DEF_IS_NOT_STUDENT_MSG = ugettext(
     'in the program.')
 
 DEF_ORG_DOES_NOT_EXISTS_MSG_FMT = ugettext(
-    'Organization, whose link_id is %(link_id)s, does not exists in '
+    'Organization, whose link_id is %(link_id)s, does not exist in '
     '%(program)s.')
 
 DEF_ORG_NOT_ACTIVE_MSG_FMT = ugettext(
     'Organization %(name)s is not active in %(program)s.')
+
+DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT = ugettext(
+    '%(model)s entity, whose id is %(id)s, does not exist.')
+
+DEF_ID_BASED_ENTITY_INVALID_MSG_FMT = ugettext(
+    '%(model)s entity, whose id is %(id)s, is invalid at this time.')
 
 
 class AccessChecker(object):
@@ -310,3 +316,25 @@ class AccessChecker(object):
           'program': self.data.program.name
           }
       raise out_of_band.AccessViolation(error_msg)
+
+  def isProposalInURLValid(self):
+    """Checks if the proposal in URL exists.
+
+    Side effects (RequestData):
+      - if the proposal exists and is active, it is saved as 'proposal'
+    """
+
+    id = int(self.data.kwargs['id'])
+    self.data.proposal = GSoCProposal.get_by_id(id, parent=self.data.profile)
+
+    if not self.data.proposal:
+      error_msg = DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT % {
+          'model': 'GSoCProposal',
+          'id': id
+          }
+
+    if self.data.proposal.status == 'invalid':
+      error_msg = DEF_ID_BASED_ENTITY_INVALID_MSG_FMT % {
+          'model': 'GSoCProposal',
+          'id': id,
+          }

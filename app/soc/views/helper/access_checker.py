@@ -32,6 +32,8 @@ from soc.logic.models.user import logic as user_logic
 
 from soc.views import out_of_band
 
+from soc.modules.gsoc.models.organization import GSoCOrganization
+
 
 DEF_AGREE_TO_TOS_MSG_FMT = ugettext(
     'You must agree to the <a href="%(tos_link)s">site-wide Terms of'
@@ -79,6 +81,13 @@ DEF_ROLE_INACTIVE_MSG = ugettext(
 DEF_IS_NOT_STUDENT_MSG = ugettext(
     'This page is inaccessiible baucause you do not have a student role '
     'in the program.')
+
+DEF_ORG_DOES_NOT_EXISTS_MSG_FMT = ugettext(
+    'Organization, whose link_id is %(link_id)s, does not exists in '
+    '%(program)s.')
+
+DEF_ORG_NOT_ACTIVE_MSG_FMT = ugettext(
+    'Organization %(name)s is not active in %(program)s.')
 
 
 class AccessChecker(object):
@@ -274,3 +283,30 @@ class AccessChecker(object):
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_IS_NOT_STUDENT_MSG)
+
+  def isOrganizationInURLActive(self):
+    """Checks if the organization in URL exists and if its status is active.
+
+    Side effects (RequestData):
+      - if the organization exists and is active, it is saved as 'organization'
+    """
+
+    # kwargs which defines an organization
+    fields = ['sponsor', 'program', 'organization']
+
+    key_name = '/'.join(self.data.kwargs[field] for field in fields) 
+    self.data.organization = GSoCOrganization.get_by_key_name(key_name)
+
+    if not self.data.organization:
+      error_msg = DEF_ORG_DOES_NOT_EXISTS_MSG_FMT % {
+          'link_id': self.data.kwargs['organization'],
+          'program': self.data.program.name
+          }
+      raise out_of_band.AccessViolation(error_msg)
+
+    if self.data.organization.status != 'active':
+      error_msg = DEF_ORG_NOT_ACTIVE_MSG_FMT % {
+          'name': self.data.organization.name,
+          'program': self.data.program.name
+          }
+      raise out_of_band.AccessViolation(error_msg)

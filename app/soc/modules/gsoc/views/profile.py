@@ -169,6 +169,7 @@ class ProfilePage(RequestHandler):
                             self.data.user.link_id)
       profile_form.cleaned_data['link_id'] = self.data.user.link_id
       profile_form.cleaned_data['user'] = self.data.user
+      profile_form.cleaned_data['scope'] = self.data.program
       if self.data.role:
         profile = profile_form.save(commit=False)
       else:

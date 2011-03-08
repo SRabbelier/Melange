@@ -68,8 +68,25 @@ class ProposalPage(RequestHandler):
     return 'v2/modules/gsoc/proposal/base.html'
 
   def context(self):
-    proposal_form = user_form = ProposalForm(self.data.POST or None)
+    proposal_form = ProposalForm(self.data.POST or None)
     return {
         'page_name': 'Proposal',
         'proposal_form': proposal_form.render(),
         }
+
+  def validate(self):
+    proposal_form = ProposalForm(self.data.POST)
+
+    if not proposal_form.is_valid():
+      return False
+
+    return True
+
+  def post(self):
+    """Handler for HTTP POST request.
+    """
+
+    if self.validate():
+      self.redirect()
+    else:
+      self.get()

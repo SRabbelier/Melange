@@ -64,6 +64,7 @@ class RequestData(RequestData):
     """Constructs an empty RequestData object.
     """
     super(RequestData, self).__init__()
+    self.profile = None
     self.program = None
     self.program_timeline = None
     self.org_app = None
@@ -114,7 +115,7 @@ class RequestData(RequestData):
                 'status': ['active', 'inactive']}
       self.student = student_logic.getOneForFields(fields)
       key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
-      self.role = profile.GSoCProfile.get_by_key_name(
+      self.role = self.profile = profile.GSoCProfile.get_by_key_name(
           key_name, parent=self.user)
 
       if self.role:

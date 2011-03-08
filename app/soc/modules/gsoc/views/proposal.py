@@ -56,6 +56,8 @@ class ProposalPage(RequestHandler):
     return [
         url(r'^gsoc/proposal/submit/%s$' % url_patterns.ORG,
          self, name='submit_gsoc_proposal'),
+         url(r'^gsoc/proposal/update/%s$' % url_patterns.PROPOSAL,
+         self, name='update_gsoc_proposal'),
     ]
 
   def checkAccess(self):

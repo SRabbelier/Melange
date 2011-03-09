@@ -276,8 +276,12 @@
 #form.form-proposal fieldset .row .text {
   width: 440px;
 }
-#form.form-proposal fieldset .row.project-desc-full .textarea {
+#form.form-proposal fieldset .row.gsoc_proposal_abstract .textarea {
   height: 200px;
+  width: 430px;
+}
+#form.form-proposal fieldset .row.gsoc_proposal_content .textarea {
+  height: 500px;
   width: 430px;
 }
 #form.form-proposal fieldset .row.project-sponsor {

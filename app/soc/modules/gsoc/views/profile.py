@@ -149,9 +149,18 @@ class ProfilePage(RequestHandler):
           instance=self.data.student_info)
     else:
       student_info_form = EmptyForm()
+
+    if not role:
+      page_name = 'Edit your profile'
+    elif role == 'student':
+      page_name = 'Register as a student'
+    elif role == 'mentor':
+      page_name = 'Register as a mentor'
+    elif role == 'org_admin':
+      page_name = 'Register as an org admin'
       
     return {
-        'page_name': 'Register',
+        'page_name': page_name,
         'user_form': user_form.render(),
         'profile_form': profile_form.render(),
         'student_info_form': student_info_form.render()

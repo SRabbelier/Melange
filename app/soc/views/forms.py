@@ -293,7 +293,7 @@ class BoundField(forms.BoundField):
         self.help_text)
 
   def div_class(self):
-    name = self.name
+    name = self.form.Meta.css_prefix + '_' + self.name
     if self.errors:
       name += ' error'
     return name

@@ -54,6 +54,7 @@ class UserForm(forms.ModelForm):
 
   class Meta:
     model = User
+    css_prefix = 'user'
     fields = ['link_id', 'name']
 
   clean_link_id = cleaning.clean_link_id('link_id')
@@ -65,6 +66,7 @@ class ProfileForm(forms.ModelForm):
 
   class Meta:
     model = GSoCProfile
+    css_prefix = 'gosc_profile'
     exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
                'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
                'name_on_documents']
@@ -101,6 +103,7 @@ class StudentInfoForm(forms.ModelForm):
 
   class Meta:
     model = GSoCStudentInfo
+    css_prefix = 'student_info'
     exclude = ['school', 'school_type']
     widgets = forms.choiceWidgets(GSoCStudentInfo,
         ['school_country', 'school_type', 'degree'])

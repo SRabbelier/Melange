@@ -42,6 +42,7 @@ class ProposalForm(forms.ModelForm):
 
   class Meta:
     model = GSoCProposal
+    css_prefix = 'gsoc_proposal'
     exclude = ['status', 'mentor', 'possible_mentors', 'org', 'program',
         'created_on', 'last_modified_on', 'score']
 

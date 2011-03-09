@@ -58,6 +58,12 @@
 
   var s = script_dependencies_chains;
 
+  // Third party JS URL prefix
+  var tpjs = "/js/" + melange.config.app_version + "/";
+
+  // Melange packages URL prefix
+  var mpjs = "/soc/content/js/" + melange.config.app_version + "/";
+
   if (melange.config.google_api_key !== undefined) {
     s.google = [
       "http://www.google.com/jsapi?key=" + melange.config.google_api_key
@@ -71,7 +77,7 @@
 
   if (melange.config.is_local !== undefined && melange.config.is_local === true) {
     s.jquery = [
-      "/jquery/jquery-1.5.js"
+      tpjs + "jquery/jquery-1.5.js"
     ];
   }
   else {
@@ -81,83 +87,83 @@
   }
 
   s.json = [
-    "/json/json2.js"
+    tpjs + "json/json2.js"
   ];
 
   s.tinymce = [
-    "/tiny_mce/tiny_mce.js"
+    tpjs + "tiny_mce/tiny_mce.js"
   ];
 
   s.purr = [
-    "/jquery/jquery-purr.js"
+    tpjs + "jquery/jquery-purr.js"
   ];
 
   s.spin = [
-    "/jquery/jquery-spin-1.1.1.js"
+    tpjs + "jquery/jquery-spin-1.1.1.js"
   ];
 
   s.bgiframe = [
-    "/jquery/jquery-bgiframe.js"
+    tpjs + "jquery/jquery-bgiframe.js"
   ];
 
   s.ajaxQueue = [
-    "/jquery/jquery-ajaxQueue.js"
+    tpjs + "jquery/jquery-ajaxQueue.js"
   ];
 
   s.autocomplete = [
     new $m.cssFile("/soc/content/css/jquery-autocomplete-090304.css"),
-    "/jquery/jquery-autocomplete.js"
+    tpjs + "jquery/jquery-autocomplete.js"
   ];
 
   s.thickbox = [
-    "/jquery/jquery-thickbox.js"
+    tpjs + "jquery/jquery-thickbox.js"
   ];
 
   s.progressbar = [
-    "/jquery/jquery-progressbar.js"
+    tpjs + "jquery/jquery-progressbar.js"
   ];
 
   s.uniform = [
-    "/jquery/jquery-uniform.js"
+    tpjs + "jquery/jquery-uniform.js"
   ];
 
   s.jqueryui = [
     new $m.cssFile("/soc/content/css/v2/gsoc/jquery-ui.css"),
-    "/jquery/jquery-ui.core.js"
+    tpjs + "jquery/jquery-ui.core.js"
   ];
 
   s.jqgrid = [
     s.jqueryui,
     null,
     new $m.cssFile("/soc/content/css/v2/gsoc/ui.jqgrid.css"),
-    "/jquery/jquery-jqgrid.locale-en.js",
+    tpjs + "jquery/jquery-jqgrid.locale-en.js",
     null,
-    "/jquery/jquery-jqgrid.base.js",
+    tpjs + "jquery/jquery-jqgrid.base.js",
     null,
-    "/jquery/jquery-jqgrid.custom.js",
-    "/jquery/jquery-jqgrid.setcolumns.js"
+    tpjs + "jquery/jquery-jqgrid.custom.js",
+    tpjs + "jquery/jquery-jqgrid.setcolumns.js"
   ];
 
   s.jqgridediting = [
     s.jqgrid,
     null,
-    "/jquery/jquery-jqgrid.common.js",
-    "/jquery/jquery-jqgrid.formedit.js",
+    tpjs + "jquery/jquery-jqgrid.common.js",
+    tpjs + "jquery/jquery-jqgrid.formedit.js",
     null,
-    "/jquery/jquery-jqgrid.searchFilter.js",
-    "/jquery/jquery-jqgrid.inlinedit.js",
+    tpjs + "jquery/jquery-jqgrid.searchFilter.js",
+    tpjs + "jquery/jquery-jqgrid.inlinedit.js",
     null,
-    "/jquery/jquery-jqgrid.jqDnR.js",
+    tpjs + "jquery/jquery-jqgrid.jqDnR.js",
     null,
-    "/jquery/jquery-jqgrid.jqModal.js"
+    tpjs + "jquery/jquery-jqgrid.jqModal.js"
   ];
 
   s.cookie = [
-    "/jquery/jquery-cookie.js"
+    tpjs + "jquery/jquery-cookie.js"
   ];
 
   s.jlinq = [
-    "/jlinq/jLinq-2.2.1.js"
+    tpjs + "jlinq/jLinq-2.2.1.js"
   ];
 
   /** Melange packages **/
@@ -167,29 +173,29 @@
   s.melange.main = [
     s.google,
     null,
-    "/soc/content/js/melange-091015.js"
+    mpjs + "melange.js"
   ];
 
   s.melange.datetimepicker = [
     s.jqueryui,
     null,
-    "/jquery-ui.datetimepicker.js",
+    tpjs + "jquery-ui.datetimepicker.js",
     null,
-    "/soc/content/js/datetimepicker-090825.js",
+    mpjs + "datetimepicker.js",
     null,
-    "/soc/content/js/datetime-loader-090825.js"
+    mpjs + "datetime-loader.js"
   ];
 
   s.melange.menu = [
     s.cookie,
     null,
-    "/soc/content/js/menu-110128.js"
+    mpjs + "menu.js"
   ];
 
   s.melange.duplicates = [
     s.progressbar,
     null,
-    "/soc/content/js/duplicate-slots-090825.js"
+    mpjs + "duplicate-slots.js"
   ];
 
   s.melange.form = [
@@ -201,7 +207,7 @@
     null,
     s.jqgridediting,
     null,
-    "/soc/content/js/melange.list-110204.js"
+    mpjs + "melange.list.js"
   ];
 
   s.melange.tooltip = [
@@ -212,23 +218,23 @@
   s.melange.autocomplete = [
     s.autocomplete,
     null,
-    "/soc/content/js/melange.autocomplete-110227.js"
+    mpjs + "melange.autocomplete.js"
   ];
 
   s.melange.graph = [
     s.google,
     null,
-    "/soc/content/js/melange.graph-100501.js"
+    mpjs + "melange.graph.js"
   ];
 
   s.melange.uploadform = [
-    "/soc/content/js/upload-form-101205.js"
+    mpjs + "upload-form.js"
   ];
 
   s.melange.blog = [
     s.google,
     null,
-    "/soc/content/js/melange.blog-090825.js"
+    mpjs + "melange.blog.js"
   ];
 
   $m.s = s;

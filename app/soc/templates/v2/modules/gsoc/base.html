@@ -73,19 +73,20 @@ limitations under the License.
   <script type="text/javascript">
     var xsrf_token = '{{xsrf_token}}';
   </script>
-  <script type='text/javascript' src="/LABjs/LAB.js"></script>
+  <script type='text/javascript' src="/js/{{ app_version }}/LABjs/LAB.js"></script>
   <script type="text/javascript">
     $LAB
-      .script("/json/json2.js")
+      .script("/js/{{ app_version }}/json/json2.js")
       {% if is_local %}
-      .script("/jquery/jquery-1.5.1.js").wait()
+      .script("/js/{{ app_version }}/jquery/jquery-1.5.1.js").wait()
       {% else %}
       .script("http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js").wait()
       {% endif %}
-      .script("/soc/content/js/melange-091015.js").wait(
+      .script("/soc/content/js/{{ app_version }}/melange.js").wait(
         function () {
           // set global configuration
           melange.init({
+            app_version: "{{ app_version }}",
             {% if google_api_key %}
             google_api_key: {{ google_api_key }},
             {% endif %}
@@ -97,7 +98,7 @@ limitations under the License.
           });
         }
       )
-      .script("/soc/content/js/melange.dependency-100214.js").wait(
+      .script("/soc/content/js/{{ app_version }}/melange.dependency.js").wait(
         function () {
           // Shortcuts facilities for children Django templates
           var dep = melange.dependency.s;

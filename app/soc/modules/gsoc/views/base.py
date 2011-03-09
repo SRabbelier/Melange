@@ -20,8 +20,10 @@
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
+  '"Mario Ferraro" <fadinlight@gmail.com>',
   ]
 
+import os
 
 from soc.views.base import RequestHandler
 
@@ -43,10 +45,13 @@ class RequestHandler(RequestHandler):
       header: a rendered header.Header template for the current self.data
       mainmenu: a rendered site_menu.MainMenu template for the current self.data
       footer: a rendered site_menu.Footer template for the current self.data
+      app_version: the current version of the application, used e.g. in URL
+                   patterns to avoid JS caching issues.
     """
     context['header'] = header.Header(self.data).render()
     context['mainmenu'] = site_menu.MainMenu(self.data).render()
     context['footer'] = site_menu.Footer(self.data).render()
+    context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
     super(RequestHandler, self).render(context)
 
   def __call__(self, request, *args, **kwargs):

@@ -41,6 +41,13 @@ def namedLinkIdPattern(names):
   return r'/'.join(named_patterns)
 
 
+def namedIdBasedPattern(names):
+  """Returns a url pattern consisting of named parts whose last element
+  is a numeric id.
+  """
+
+  return r'/'.join([namedLinkIdPattern(names), r'(?P<id>(\d+))'])
+
 _role = r'(?P<role>%s)/' % ("student|mentor|org_admin")
 
 
@@ -50,8 +57,7 @@ PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])
 DOCUMENT  = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'document'])
 SURVEY    = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'survey'])
 STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
-PROPOSAL  = namedLinkIdPattern(['sponsor', 'program',
-                                'organization', 'proposal'])
+PROPOSAL  = namedIdBasedPattern(['sponsor', 'program'])
 MENTOR    = namedLinkIdPattern(['sponsor', 'program',
                                 'organization', 'mentor'])
 ORG       = namedLinkIdPattern(['sponsor', 'program', 'organization'])

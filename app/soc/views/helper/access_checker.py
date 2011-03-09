@@ -33,6 +33,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.views import out_of_band
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
+from soc.modules.gsoc.models.proposal import GSoCProposal
 
 
 DEF_AGREE_TO_TOS_MSG_FMT = ugettext(

@@ -76,6 +76,7 @@ class Callback(object):
     self.views.append(org_app.OrgApp())
     self.views.append(profile.ProfilePage())
     self.views.append(proposal.ProposalPage())
+    self.views.append(proposal.UpdateProposal())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

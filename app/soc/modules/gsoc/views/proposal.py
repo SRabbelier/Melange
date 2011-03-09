@@ -22,7 +22,10 @@ __authors__ = [
   ]
 
 
+from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
+
+from soc.logic import dicts
 
 from soc.views import forms
 
@@ -50,8 +53,6 @@ class ProposalPage(RequestHandler):
     return [
         url(r'^gsoc/proposal/submit/%s$' % url_patterns.ORG,
          self, name='submit_gsoc_proposal'),
-         url(r'^gsoc/proposal/update/%s$' % url_patterns.PROPOSAL,
-         self, name='update_gsoc_proposal'),
     ]
 
   def checkAccess(self):
@@ -67,38 +68,91 @@ class ProposalPage(RequestHandler):
   def context(self):
     proposal_form = ProposalForm(self.data.POST or None)
     return {
-        'page_name': 'Proposal',
+        'page_name': 'Submit proposal',
         'proposal_form': proposal_form.render(),
         }
 
-  def validate(self):
+  def createFromFrom(self):
+    """Creates a new proposal based on the data inserted in the form.
+
+    Returns:
+      a newly created proposal entity or None
+    """
+
     proposal_form = ProposalForm(self.data.POST)
 
     if not proposal_form.is_valid():
-      return False
+      return None
 
-    # check if a user is updating or creating a proposal
-    # it depends on the URL which is used
-    if 'proposal' in self.data.kwargs:
-      pass
-    else:
-      # set the organization and program references
-      proposal_form.cleaned_data['org'] = self.data.organization
-      proposal_form.cleaned_data['program'] = self.data.program
-
-      # TODO(daniel): one day we will want to update student info with some
-      # data that a new proposal is created
-      proposal = proposal_form.create(commit=True, parent=self.data.profile)
-
-    return True
+    # set the organization and program references
+    proposal_form.cleaned_data['org'] = self.data.organization
+    proposal_form.cleaned_data['program'] = self.data.program
+    
+    return proposal_form.create(commit=True, parent=self.data.profile)
 
   def post(self):
     """Handler for HTTP POST request.
     """
 
-    if self.validate():
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program',
-         'organization'])
-      self.redirect(reverse('update_gsoc_profile', kwargs=kwargs))
+    proposal = self.createFromFrom()
+    if proposal:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      kwargs['id'] = proposal.key().id()
+      self.redirect(reverse('update_gsoc_proposal', kwargs=kwargs))
+    else:
+      self.get()
+
+
+class UpdateProposal(RequestHandler):
+  """View for the update propsal page.
+  """
+
+  def djangoURLPatterns(self):
+    return [
+         url(r'^gsoc/proposal/update/%s$' % url_patterns.PROPOSAL,
+         self, name='update_gsoc_proposal'),
+    ]
+
+  def checkAccess(self):
+    check = access_checker.AccessChecker(self.data)
+    check.isLoggedIn()
+    check.isActiveStudent()
+    check.isProposalInURLValid()
+    #check.canUpdateProposal()
+
+  def templatePath(self):
+    return 'v2/modules/gsoc/proposal/base.html'
+
+  def context(self):
+    proposal_form = ProposalForm(self.data.POST or None,
+        instance=self.data.proposal)
+
+    return {
+        'page_name': 'Update proposal',
+        'proposal_form': proposal_form.render(),
+        }
+
+  def updateFromForm(self):
+    """Updates a proposal based on the data inserted in the form.
+
+    Returns:
+      an updated proposal entity or None
+    """
+
+    proposal_form = ProposalForm(self.data.POST, instance=self.data.proposal)
+
+    if not proposal_form.is_valid():
+      return None
+
+    return proposal_form.save(commit=True)
+
+  def post(self):
+    """Handler for HTTP POST request.
+    """
+
+    proposal = self.updateFromForm()
+    if proposal:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program', 'id'])
+      self.redirect(reverse('update_gsoc_proposal', kwargs=kwargs))
     else:
       self.get()

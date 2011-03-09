@@ -96,6 +96,9 @@ DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT = ugettext(
 DEF_ID_BASED_ENTITY_INVALID_MSG_FMT = ugettext(
     '%(model)s entity, whose id is %(id)s, is invalid at this time.')
 
+DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
+    'This %(model) entity does not belong to you.')
+
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -341,3 +344,25 @@ class AccessChecker(object):
           'id': id,
           }
       raise out_of_band.AccessViolation(error_msg)
+
+  def canStudentUpdateProposal(self):
+    """Checks if the student is eligible to submit a proposal.
+    """
+    
+    # check if the timeline allows updating proposals
+    self.isActivePeriod('student_signup')
+
+    # TODO: it should be changed - we should not assume that the proposal
+    # is already in RequestData
+    if self.data.proposal.status == 'invalid':
+      error_msg = DEF_ID_BASED_ENTITY_INVALID_MSG_FMT % {
+          'model': 'GSoCProposal',
+          'id': id,
+          }
+
+    # check if the proposal belongs to the current user
+    expected_profile = self.data.proposal.parent()
+    if expected_profile.key().name() != self.data.profile.key().name():
+      error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
+          'model': 'GSoCProposal'
+          }

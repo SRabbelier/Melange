@@ -119,7 +119,7 @@ class UpdateProposal(RequestHandler):
     check.isLoggedIn()
     check.isActiveStudent()
     check.isProposalInURLValid()
-    #check.canUpdateProposal()
+    check.canStudentUpdateProposal()
 
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/base.html'

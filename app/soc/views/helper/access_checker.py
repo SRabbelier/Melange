@@ -359,6 +359,7 @@ class AccessChecker(object):
           'model': 'GSoCProposal',
           'id': id,
           }
+      raise out_of_band.AccessViolation(error_msg)
 
     # check if the proposal belongs to the current user
     expected_profile = self.data.proposal.parent()
@@ -366,3 +367,4 @@ class AccessChecker(object):
       error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
           'model': 'GSoCProposal'
           }
+      raise out_of_band.AccessViolation(error_msg)

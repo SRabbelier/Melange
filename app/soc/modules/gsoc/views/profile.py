@@ -181,13 +181,13 @@ class ProfilePage(RequestHandler):
 
     if self.data.student_info or self.data.kwargs.get('role') == 'student':
       student_form = StudentInfoForm(self.data.POST, instance=self.data.student_info)
-      if self.data.role and student_form.is_valid():
-        key_name = self.data.role.key().name()
+      if student_form.is_valid() and profile:
+        key_name = profile.key().name()
         if self.data.student_info:
           student_info = student_form.save(commit=False)
         else:
           student_info = student_form.create(commit=False, key_name=key_name, parent=profile)
-          self.data.role.student_info = student_info
+          profile.student_info = student_info
         dirty.append(student_info)
     else:
       student_form = EmptyForm()

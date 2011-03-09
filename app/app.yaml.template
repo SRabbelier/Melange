@@ -34,8 +34,9 @@ handlers:
 - url: /tiny_mce/.*
   script: $PYTHON_LIB/google/appengine/ext/zipserve
 
-- url: /soc/content/js
-  static_dir: soc/content/js.min
+- url: /soc/content/js/(.*?)/(.*)
+  static_files: soc/content/js.min/\2
+  upload: soc/content/js/(.*)
   expiration: 1d
 
 - url: /soc/content
@@ -46,20 +47,24 @@ handlers:
   static_dir: gsoc/content
   expiration: 1d
 
-- url: /jlinq
-  static_dir: jlinq
+- url: /js/(.*?)/jlinq/(.*)
+  static_files: jlinq/\2
+  upload: jlinq/(.*)
   expiration: 1d
 
-- url: /jquery
-  static_dir: jquery.min
+- url: /js/(.*?)/jquery/(.*)
+  static_files: jquery.min/\2
+  upload: jquery/(.*)
   expiration: 1d
 
-- url: /json
-  static_dir: json.min
+- url: /js/(.*?)/json/(.*)
+  static_files: json.min/\2
+  upload: json/(.*)
   expiration: 1d
 
-- url: /LABjs
-  static_dir: LABjs.min
+- url: /js/(.*?)/LABjs/(.*)
+  static_files: LABjs.min/\2
+  upload: LABjs/(.*)
   expiration: 1d
 
 - url: /admin/shell.*

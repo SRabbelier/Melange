@@ -151,13 +151,13 @@ class ProfilePage(RequestHandler):
       student_info_form = EmptyForm()
 
     if not role:
-      page_name = 'Edit your profile'
+      page_name = 'Edit your Profile'
     elif role == 'student':
-      page_name = 'Register as a student'
+      page_name = 'Register as a Student'
     elif role == 'mentor':
-      page_name = 'Register as a mentor'
+      page_name = 'Register as a Mentor'
     elif role == 'org_admin':
-      page_name = 'Register as an org admin'
+      page_name = 'Register as Org Admin'
       
     return {
         'page_name': page_name,

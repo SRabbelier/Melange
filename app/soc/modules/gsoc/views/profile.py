@@ -142,8 +142,14 @@ class ProfilePage(RequestHandler):
   def context(self):
     user_form = UserForm(self.data.POST or None, instance=self.data.user)
     profile_form = ProfileForm(self.data.POST or None, instance=self.data.role)
-    student_info_form = StudentInfoForm(self.data.POST or None,
-        instance=self.data.student_info)
+
+    role = self.data.kwargs.get('role')
+    if self.data.student_info or role == 'student':
+      student_info_form = StudentInfoForm(self.data.POST or None,
+          instance=self.data.student_info)
+    else:
+      student_info_form = EmptyForm()
+      
     return {
         'page_name': 'Register',
         'user_form': user_form.render(),

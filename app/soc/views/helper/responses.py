@@ -131,8 +131,8 @@ def getUniversalContext(request):
 
   context['is_local'] = system.isLocal()
   context['is_debug'] = system.isDebug()
-  context['sign_in'] = users.create_login_url(request.path.encode('utf-8'))
-  context['sign_out'] = users.create_logout_url(request.path.encode('utf-8'))
+  context['sign_in'] = users.create_login_url(request.get_full_path().encode('utf-8'))
+  context['sign_out'] = users.create_logout_url(request.get_full_path().encode('utf-8'))
 
   context['sidebar_menu_items'] = core.getSidebar(account, user)
 

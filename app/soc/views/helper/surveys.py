@@ -306,7 +306,7 @@ class SurveyTakeForm(djangoforms.ModelForm):
 
     #fix growfield wrapping
     attrs['wrap'] = 'hard'
-    # no way not to use cols attr with Django oldforms, use a big number
+    # no way not to use cols attr, use a big number
     attrs['cols'] = 999999
     widget = widgets.Textarea(attrs=attrs)
 

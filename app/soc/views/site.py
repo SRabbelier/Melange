@@ -79,7 +79,7 @@ class SitePage(SiteRequestHandler):
 
     data = [{'key': str(i.key()),
             'link_id': i.link_id,
-            'title': i.title}
+            'label': i.title}
             for i in entities]
 
     return {'data': data}

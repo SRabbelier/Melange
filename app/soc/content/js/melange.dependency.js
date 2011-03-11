@@ -126,13 +126,13 @@
 
   if (melange.config.is_local !== undefined && melange.config.is_local === true) {
     s.jqueryui.core = [
-      new $m.cssFile("/soc/content/css/ui.all.css"),
+      new $m.cssFile("/soc/content/css/jquery-ui/jquery.ui.all.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }
   else {
     s.jqueryui.core = [
-      new $m.cssFile("/soc/content/css/ui.merged.css"),
+      new $m.cssFile("/soc/content/css/jquery-ui/ui.merged.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }

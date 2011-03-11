@@ -34,7 +34,6 @@ def siteMenuContext(data):
   """Generates URL links for the hard-coded GSoC site menu items.
   """
 
-  encoded_path = data.request.path.encode('utf-8')
 
   context = {
       'about_link': redirects.getAboutPageRedirect(data),
@@ -45,9 +44,9 @@ def siteMenuContext(data):
   }
 
   if users.get_current_user():
-    context['logout_link'] = users.create_logout_url(encoded_path)
+    context['logout_link'] = users.create_logout_url(self.data.full_path)
   else:
-    context['login_link'] = users.create_login_url(encoded_path)
+    context['login_link'] = users.create_login_url(self.data.full_path)
 
   if data.role:
     context['dashboard_link'] = redirects.getDashboardRedirect(data)

@@ -98,12 +98,11 @@ class Dashboard(RequestHandler):
     """Handler for default HTTP GET request.
     """
     components = self._getActiveComponents()
-    encoded_path = self.data.request.path.encode('utf-8')
 
     context = {}
     context['page_name'] = self.data.program.name
     context['user'] = self.data.user
-    context['logout_link'] = users.create_logout_url(encoded_path)
+    context['logout_link'] = users.create_logout_url(self.data.full_path)
     # TODO(ljvderijk): Implement code for setting dashboard messages.
     #context['alert_msg'] = 'Default <strong>alert</strong> goes here'
     context['components'] = components

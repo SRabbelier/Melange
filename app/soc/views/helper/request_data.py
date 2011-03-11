@@ -36,6 +36,8 @@ class RequestData(object):
     request: the request object (as provided by django)
     args: the request args (as provided by djang)
     kwargs: the request kwargs (as provided by django)
+    path: the url of the current query, encoded as utf-8 string
+    full_path: same as path, but including any GET args
     GET: the GET dictionary (from the request object)
     POST: the POST dictionary (from the request object)
   """
@@ -63,5 +65,7 @@ class RequestData(object):
     self.kwargs = kwargs
     self.GET = request.GET
     self.POST = request.POST
+    self.path = request.path.encode('utf-8')
+    self.full_path = request.get_full_path().encode('utf-8')
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()

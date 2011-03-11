@@ -56,19 +56,19 @@ options(
                      "webmaster"],
         css_dir = "soc/content/css",
         css_files = {
-            "ui.merged.css": [
-                "ui.core.css",
-                "ui.resizable.css",
-                "ui.selectable.css",
-                "ui.accordion.css",
-                "ui.autocomplete.css",
-                "ui.button.css",
-                "ui.dialog.css",
-                "ui.slider.css",
-                "ui.tabs.css",
-                "ui.datepicker.css",
-                "ui.progressbar.css",
-                "ui.theme.css"
+            "jquery-ui/jquery.ui.merged.css": [
+                "jquery-ui/jquery.ui.core.css",
+                "jquery-ui/jquery.ui.resizable.css",
+                "jquery-ui/jquery.ui.selectable.css",
+                "jquery-ui/jquery.ui.accordion.css",
+                "jquery-ui/jquery.ui.autocomplete.css",
+                "jquery-ui/jquery.ui.button.css",
+                "jquery-ui/jquery.ui.dialog.css",
+                "jquery-ui/jquery.ui.slider.css",
+                "jquery-ui/jquery.ui.tabs.css",
+                "jquery-ui/jquery.ui.datepicker.css",
+                "jquery-ui/jquery.ui.progressbar.css",
+                "jquery-ui/jquery.ui.theme.css"
             ],
         },
         zip_files = ['tiny_mce.zip'],

@@ -36,7 +36,7 @@ def key(entity):
   """Returns the memcache key for an entities homepage.
   """
 
-  host = system.getHostname()
+  host = system.getRawHostname()
   version = system.getAppVersion()
   kind = entity.kind()
   key = entity.key().id_or_name()

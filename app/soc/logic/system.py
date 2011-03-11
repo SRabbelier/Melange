@@ -28,8 +28,15 @@ import settings
 from soc.logic.models import site
 
 
+def getRawHostname():
+  """Returns the actual hostname.
+  """
+
+  return os.environ.get('HTTP_HOST', '')
+
+
 def getHostname():
-  """Returns the hostname
+  """Returns the hostname, taking in account site hostname settings.
   """
 
   site_settings = site.logic.getSingleton()
@@ -37,7 +44,7 @@ def getHostname():
   if site_settings.hostname:
     return site_settings.hostname
 
-  return os.environ.get('HTTP_HOST')
+  return getRawHostname()
 
 def isSecondaryHostname(request):
   """Returns if the current request is from the secondary hostname.
@@ -48,7 +55,7 @@ def isSecondaryHostname(request):
   if not site_settings.hostname:
     return False
 
-  return os.environ.get('HTTP_HOST', '').find(site_settings.hostname) >= 0
+  return getRawHostname().find(site_settings.hostname) >= 0
 
 def getAppVersion():
   """Returns the Google App Engine "version" of the running instance.

@@ -24,7 +24,7 @@
 
   var melange = window.melange;
 
-  /** Package that handles all tooltips related functions
+  /** Package that handles all autocomplete related functions
     * @name melange.autocomplete
     * @namespace melange.autocomplete
     * @borrows melange.logging.debugDecorator.log as log
@@ -46,21 +46,30 @@
     jQuery.ajax({
       url: url,
       success: function(data){
-        var default_autocomplete_options = {
-          matchContains: true,
-          formatItem: function(item) {
-            return item.link_id+" ("+item.title+")";
+        jQuery("#" + id).after([
+          '<input id="',
+          id,
+          '-value" ',
+          'type="hidden" />'
+        ].join(""));
+        jQuery("#" + id).autocomplete({
+          source: data.data,
+          focus: function (event, ui) {
+            jQuery("#" + id).val(ui.item.label);
+            return false;
           },
-          formatResult: function(item) {
-            return item.key;
+          select: function (event, ui) {
+            jQuery("#" + id).val(ui.item.label);
+            jQuery("#" + id + "-value").val(ui.item.key);
+            return false;
           }
+            //default_autocomplete_options
+        }).data("autocomplete")._renderItem = function (ul, item) {
+          return jQuery("<li></li>")
+                 .data("item.autocomplete", item)
+                 .append("<a>" + item.link_id + " (" + item.label + ")" + "</a>")
+                 .appendTo( ul );
         };
-        if (data.autocomplete_options !== undefined) {
-          jQuery.extend(
-            default_autocomplete_options, data.autocomplete_options
-          );
-        }
-        jQuery("#" + id).autocomplete(data.data, default_autocomplete_options);
       }
     });
   }

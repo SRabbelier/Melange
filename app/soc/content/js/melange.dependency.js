@@ -110,11 +110,6 @@
     tpjs + "jquery/jquery-ajaxQueue.js"
   ];
 
-  s.autocomplete = [
-    new $m.cssFile("/soc/content/css/jquery-autocomplete-090304.css"),
-    tpjs + "jquery/jquery-autocomplete.js"
-  ];
-
   s.thickbox = [
     tpjs + "jquery/jquery-thickbox.js"
   ];
@@ -127,21 +122,42 @@
     tpjs + "jquery/jquery-uniform.js"
   ];
 
+  s.jqueryui = {}
+
   if (melange.config.is_local !== undefined && melange.config.is_local === true) {
-    s.jqueryui = [
+    s.jqueryui.core = [
       new $m.cssFile("/soc/content/css/ui.all.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }
   else {
-    s.jqueryui = [
+    s.jqueryui.core = [
       new $m.cssFile("/soc/content/css/ui.merged.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }
 
+  s.jqueryui.position = [
+    s.jqueryui.core,
+    null,
+    tpjs + "jquery/jquery-ui.position.js"
+  ];
+
+  s.jqueryui.widget = [
+    s.jqueryui.core,
+    null,
+    tpjs + "jquery/jquery-ui.widget.js"
+  ];
+
+  s.jqueryui.autocomplete = [
+    s.jqueryui.position,
+    s.jqueryui.widget,
+    null,
+    tpjs + "jquery/jquery-ui.autocomplete.js"
+  ];
+
   s.jqgrid = [
-    s.jqueryui,
+    s.jqueryui.core,
     null,
     new $m.cssFile("/soc/content/css/v2/gsoc/ui.jqgrid.css"),
     tpjs + "jquery/jquery-jqgrid.locale-en.js",
@@ -185,7 +201,7 @@
   ];
 
   s.melange.datetimepicker = [
-    s.jqueryui,
+    s.jqueryui.core,
     null,
     tpjs + "jquery-ui.datetimepicker.js",
     null,
@@ -224,7 +240,7 @@
   ];
 
   s.melange.autocomplete = [
-    s.autocomplete,
+    s.jqueryui.autocomplete,
     null,
     mpjs + "melange.autocomplete.js"
   ];

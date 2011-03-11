@@ -44,9 +44,9 @@ def siteMenuContext(data):
   }
 
   if users.get_current_user():
-    context['logout_link'] = users.create_logout_url(self.data.full_path)
+    context['logout_link'] = users.create_logout_url(data.full_path)
   else:
-    context['login_link'] = users.create_login_url(self.data.full_path)
+    context['login_link'] = users.create_login_url(data.full_path)
 
   if data.role:
     context['dashboard_link'] = redirects.getDashboardRedirect(data)

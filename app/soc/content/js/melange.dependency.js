@@ -132,7 +132,7 @@
   }
   else {
     s.jqueryui.core = [
-      new $m.cssFile("/soc/content/css/jquery-ui/ui.merged.css"),
+      new $m.cssFile("/soc/content/css/jquery-ui/jquery.ui.merged.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }

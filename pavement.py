@@ -56,10 +56,7 @@ options(
                      "webmaster"],
         css_dir = "soc/content/css",
         css_files = {
-            "ui.all.css": [
-                "ui.theme.css",
-                "ui.base.css",
-                "ui.theme.css",
+            "ui.merged.css": [
                 "ui.core.css",
                 "ui.resizable.css",
                 "ui.selectable.css",
@@ -70,7 +67,8 @@ options(
                 "ui.slider.css",
                 "ui.tabs.css",
                 "ui.datepicker.css",
-                "ui.progressbar.css"
+                "ui.progressbar.css",
+                "ui.theme.css"
             ],
         },
         zip_files = ['tiny_mce.zip'],

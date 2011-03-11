@@ -127,10 +127,18 @@
     tpjs + "jquery/jquery-uniform.js"
   ];
 
-  s.jqueryui = [
-    new $m.cssFile("/soc/content/css/v2/gsoc/jquery-ui.css"),
-    tpjs + "jquery/jquery-ui.core.js"
-  ];
+  if (melange.config.is_local !== undefined && melange.config.is_local === true) {
+    s.jqueryui = [
+      new $m.cssFile("/soc/content/css/ui.all.css"),
+      tpjs + "jquery/jquery-ui.core.js"
+    ];
+  }
+  else {
+    s.jqueryui = [
+      new $m.cssFile("/soc/content/css/ui.merged.css"),
+      tpjs + "jquery/jquery-ui.core.js"
+    ];
+  }
 
   s.jqgrid = [
     s.jqueryui,

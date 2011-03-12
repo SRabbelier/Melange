@@ -124,7 +124,7 @@
 
   s.raty = [
     tpjs + "jquery/jquery.raty.js"
-    ];
+  ];
   
   s.jqueryui = {}
 

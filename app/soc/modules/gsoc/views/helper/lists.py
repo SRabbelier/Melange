@@ -148,38 +148,102 @@ class ListConfiguration(object):
     self._sortname = id
     self._sortorder = order
 
-  def dict(self):
+
+class ListConfigurationResponse(Template):
+  """Class that builds a JSON response containing the configuration of a list.
+  """
+
+  def __init__(self, config, idx, description=''):
+    """Initializes the configuration.
+
+    Args:
+      config: A ListConfiguration object.
+      idx: A number(? can it be a string as well) uniquely identifying this
+           list.
+      description: The description of this list, as should be shown to the
+                   user.
+    """
+    self._config = config
+    self._idx = idx
+    self._description = description
+
+    super(ListConfigurationResponse, self).__init__()
+
+  def context(self):
+    """Returns the context for the current template.
+    """
+    configuration = self._constructConfigDict()
+
+    context = {
+        'idx': self._idx,
+        'configuration': configuration,
+        'description': self._description
+        }
+    json = simplejson.dumps(context)
+    return {'json': json}
+
+  def _constructConfigDict(self):
     """Builds the core of the list configuration that is sent to the client.
 
     Among other things this configuration defines the columns and buttons
     present on the list.
     """
     configuration = {
-        'autowidth': self.autowidth,
-        'colNames': self._col_names,
-        'colModel': self._col_model,
-        'height': self.height,
-        'rowList': self.row_list,
-        'rowNum': max(1, self.row_num),
-        'sortname': self._sortname,
-        'sortorder': self._sortorder,
-        'multiselect': False if self._row_operation else self.multiselect,
-        'toolbar': self.toolbar,
+        'autowidth': self._config.autowidth,
+        'colNames': self._config._col_names,
+        'colModel': self._config._col_model,
+        'height': self._config.height,
+        'rowList': self._config.row_list,
+        'rowNum': max(1, self._config.row_num),
+        'sortname': self._config._sortname,
+        'sortorder': self._config._sortorder,
+        'multiselect': False if self._config._row_operation else \
+                       self._config.multiselect,
+        'toolbar': self._config.toolbar,
     }
 
     operations = {
-        'buttons': self._buttons,
-        'row': self._row_operation,
+        'buttons': self._config._buttons,
+        'row': self._config._row_operation,
     }
 
     listConfiguration = {
       'configuration': configuration,
       'operations': operations,
     }
-
     return listConfiguration
 
-  def renderRow(self, entity, *args, **kwargs):
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
+    """
+    return 'soc/json.html'
+
+
+class ListContentResponse(Template):
+  """Class that builds the response for a list content request.
+  """
+
+  def __init__(self, request, config):
+    """Initializes the list response.
+
+    The request given can define the start parameter in the GET request
+    otherwise an empty string will be used.
+
+    Args:
+      request: The HTTPRequest containing the request for data.
+      config: A ListConfiguration object
+    """
+    self._request = request
+    self._config = config
+    self._start =  request.GET.get('start', '')
+
+    self.__rows = []
+
+    # TODO(ljvderijk/mario): Adapt list protocol to support server deciding
+    # next start.
+    self.next = ''
+
+  def addRow(self, entity, *args, **kwargs):
     """Renders a row for a single entity.
 
     Args:
@@ -194,88 +258,23 @@ class ListConfiguration(object):
         'buttons': {},
     }
 
-    for id, func in self._col_functions.iteritems():
+    for id, func in self._config._col_functions.iteritems():
       columns[id] = func(entity, *args, **kwargs)
 
     data = {
       'columns': columns,
       'operations': operations,
     }
-
-    return data
-
-class ListConfigurationResponse(Template):
-
-  def __init__(self, configuration, idx, description=''):
-    """Initializes the configuration.
-
-    Args:
-      configuration: A ListConfiguration object.
-      idx: A number(? can it be a string as well) uniquely identifying this
-           list.
-      description: The description of this list, as should be shown to the
-                   user.
-    """
-    self._configuration = configuration
-    self._idx = idx
-    self._description = description
-
-    super(ListConfigurationResponse, self).__init__()
+    self.__rows.append(data)
 
   def context(self):
-    """Returns the context to be rendered as json.
+    """Returns the context for the current template.
     """
-    configuration = self._configuration.dict()
-
-    context = {
-        'idx': self._idx,
-        'configuration': simplejson.dumps(configuration),
-        'description': self._description
-        }
-
-    return context
+    data = {self._start: self.__rows}
+    json = simplejson.dumps({'data': data})
+    return {'json': json}
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
     """
-    raise NotImplementedError()
-
-
-# TODO: This could potentially also be a Template object since it is just a
-# JSON string that is rendered at the end of the day.
-class ListContentResponse(Template):
-  """
-  """
-
-  def __init__(self, request, configuration):
-    """Initializes the list response.
-
-    Args:
-      request: The HTTPRequest containing the request for data.
-      configuration: A ListConfiguration object
-    """
-    if not self._isDataRequest(request):
-      raise ValueError('Non data request given to ListContentResponse constructor')
-
-    self.request = request
-
-  def _isJsonRequest(self, request):
-    """Returns true iff the request is a JSON request.
-    """
-    return request.GET.get('fmt') == 'json'
-
-  def _isDataRequest(self, request):
-    """Returns true iff the request is a data request.
-    """
-    return self._isJsonRequest(request)
-
-  def context(self):
-    """
-    """
-    start = ''
-    return {'data': {start: []}}
-
-  def templatePath(self):
-    """Returns the path to the template that should be used in render().
-    """
-    raise NotImplementedError()
+    return 'soc/json.html'

@@ -53,7 +53,7 @@
 #form.form-register fieldset {
   background: #cde5f5;
   margin: 0 23px 16px 23px;
-  padding: 30px 0 0 0;
+  padding: 30px 0 11px 0;
 }
 #form.form-register fieldset .row {
   /*every row*/
@@ -178,6 +178,9 @@
 }
 #form.form-register fieldset .row.schoolurl .text {
   width: 254px;
+}
+#form.form-register fieldset.nolegend {
+  padding: 11px 0;
 }
 #form.form-register .fieldset-basicinfo {
   /*first fieldset on the registration page*/
@@ -320,6 +323,61 @@
 #form.form-proposal .row.button-row .save {
   background: url(../images/form-submit-bg-blue.png) 0 0 repeat;
   margin-left: 15px;
+}
+#form.form-project-comment {
+  /*project comment form*/
+
+  margin: 0 auto;
+  width: 524px;
+}
+#form.form-project-comment fieldset {
+  background: #cde5f5;
+  margin: 0;
+  padding: 30px 0 10px 0;
+  width: auto;
+}
+#form.form-project-comment fieldset .row {
+  /*every row*/
+
+  display: block;
+  margin: 0 0 6px 11px;
+  width: 497px;
+}
+#form.form-project-comment textarea {
+  height: 200px;
+  width: 489px;
+}
+#form.form-project-comment .row.button-row {
+  padding: 5px 0 0 5px;
+}
+#form.form-project-comment .row.button-row input {
+  height: 30px;
+  line-height: 30px;
+}
+#form.form-project-comment-reply {
+  /*project comment reply form*/
+
+  margin: 0;
+  width: auto;
+}
+#form.form-project-comment-reply fieldset {
+  width: auto;
+}
+#form.form-project-comment-reply textarea {
+  height: 200px;
+  width: 458px;
+}
+#form.form-project-comment-reply .row.project-comment-reply-full {
+  display: block;
+  width: 472px;
+}
+#form.form-project-comment-reply .row.button-row {
+  text-align: right;
+  padding: 5px 0 0 5px;
+}
+#form.form-project-comment-reply .row.button-row input {
+  height: 30px;
+  line-height: 30px;
 }
 #form {
   /*form defaults*/

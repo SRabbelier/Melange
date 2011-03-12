@@ -24,42 +24,42 @@ a, a:link {
   color: #00538b;
   text-decoration: underline;
 }
-#main .grid_9 h1,
-#main .grid_9 h2,
-#main .grid_9 h3,
-#main .grid_9 h4,
-#main .grid_9 h5,
-#main .grid_9 h6,
-#main .grid_9 p,
-#main .grid_9 ul,
-#main .grid_9 ol,
-#main .grid_9 pre,
-#main .grid_9 code,
-#main .grid_9 dl {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+pre,
+code,
+dl {
   line-height: 1.5em;
   margin: 0 0 1.5em 0;
 }
-#main .grid_9 h1,
-#main .grid_9 h2,
-#main .grid_9 h3,
-#main .grid_9 h4,
-#main .grid_9 h5,
-#main .grid_9 h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #238bd2;
   font-weight: bold;
 }
-#main .grid_9 h1 {
+h1 {
   font-size: 27px;
   margin: 0 0 5px 0;
 }
-#main .grid_9 h1.dashboard-title {
+h1.dashboard-title {
   margin: 0;
 }
-#main .grid_9 h6 {
+h6 {
   font-size: 14px;
   margin: 0;
 }
-#main .grid_9 p {
+p {
   font-size: 12px;
 }
 #main .grid_9 ul, #main .grid_9 ol {
@@ -188,4 +188,13 @@ a, a:link {
   color: #fff;
   font-weight: bold;
   padding: 3px 7px;
+}
+h1#project-page-title {
+  margin: 0;
+}
+h2#project-page-student-name {
+  font-size: 21px;
+  font-weight: normal;
+  line-height: 1.3em;
+  margin: 0 0 1em 0;
 }

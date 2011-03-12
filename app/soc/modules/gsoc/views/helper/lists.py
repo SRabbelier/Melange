@@ -294,3 +294,60 @@ class ListContentResponse(Template):
     """Returns the path to the template that should be used in render().
     """
     return 'soc/json.html'
+
+
+class QueryContentResponseBuilder(object):
+  """Builds a ListContentResponse for lists that are based on a single query.
+  """
+
+  def __init__(self, request, config, logic, fields, prefetch=None):
+    """Initializes the fields needed to built a response.
+
+    Args:
+      request: The HTTPRequest containing the request for data.
+      config: The ListConfiguration object.
+      logic: The Logic instance used for querying.
+      fields: The fields to query on.
+      prefetch: The fields that need to be prefetched for increased
+                performance.
+    """
+    self._request = request
+    self._config = config
+    self._logic = logic
+    self._fields = fields
+    self._prefetch = prefetch
+
+  def build(self):
+    """Returns a ListContentResponse containing the data as indicated by the
+    query.
+
+    The start variable will be used as the starting key for our query, the data
+    returned does not contain the entity that is referred to by the start key.
+    The next variable will be defined as the key of the last entity returned,
+    empty if there are no entities to return.
+    """
+    content_response = ListContentResponse(self._request, self._config)
+
+    start = content_response.start
+    if start:
+      start_entity = self._logic.getFromKeyNameOrID(start)
+
+      if not start_entity:
+        logging.warning('Received data query for non-existing start entity')
+        # return empty response
+        return content_response
+
+      self._fields['__key__ >'] = start_entity.key()
+
+    entities = self._logic.getForFields(
+        filter=self._fields, limit=content_response.limit,
+        prefetch=self._prefetch)
+
+    for entity in entities:
+      content_response.addRow(entity)
+
+    # define next as the id or keyname of the last entity
+    if entities:
+      content_response.next = entities[-1].key().id_or_name()
+
+    return content_response

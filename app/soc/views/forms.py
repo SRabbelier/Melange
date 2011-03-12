@@ -274,7 +274,7 @@ class BoundField(forms.BoundField):
     return '<label>%s%s</label>' % (
         self.field.label,
         self._render_is_required(),
-    )
+    ) if self.field.label else ''
 
   def _render_error(self):
     if not self.errors:

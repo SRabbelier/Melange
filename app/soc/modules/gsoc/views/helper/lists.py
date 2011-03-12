@@ -134,7 +134,8 @@ class ListConfiguration(object):
     """Sets the default sort order for the list.
 
     Args:
-      id: The id of the column to sort on by default.
+      id: The id of the column to sort on by default. If this evaluates to
+      False then the default sort order will be removed.
       order: The order in which to sort, either 'asc' or 'desc'.
              The default value is 'asc'.
     """
@@ -145,7 +146,7 @@ class ListConfiguration(object):
     if order not in ['asc', 'desc']:
       raise ValueError('%s is not a valid order' %order)
 
-    self._sortname = id
+    self._sortname = id if id else ''
     self._sortorder = order
 
 
@@ -227,7 +228,15 @@ class ListContentResponse(Template):
     """Initializes the list response.
 
     The request given can define the start parameter in the GET request
-    otherwise an empty string will be used.
+    otherwise an empty string will be used indicating a request for the first
+    batch.
+
+    Public fields:
+      start: The start argument as parsed from the request.
+      next: The value that should be used to query for the next set of
+            rows. In other words what start will be on the next roundtrip.
+      limit: The maximum number of rows to return as indicated by the request,
+             defaults to 50.
 
     Args:
       request: The HTTPRequest containing the request for data.
@@ -235,13 +244,18 @@ class ListContentResponse(Template):
     """
     self._request = request
     self._config = config
-    self._start =  request.GET.get('start', '')
 
     self.__rows = []
 
     # TODO(ljvderijk/mario): Adapt list protocol to support server deciding
     # next start.
     self.next = ''
+
+    get_args = request.GET
+    self.start =  get_args.get('start', '')
+    limit = get_args.get('limit', 50)
+    self.limit = int(limit)
+
 
   def addRow(self, entity, *args, **kwargs):
     """Renders a row for a single entity.
@@ -270,7 +284,9 @@ class ListContentResponse(Template):
   def context(self):
     """Returns the context for the current template.
     """
-    data = {self._start: self.__rows}
+    # The maximum number of rows to return is determined by the limit
+    data = {self.start: self.__rows[0:self.limit]}
+
     json = simplejson.dumps({'data': data})
     return {'json': json}
 

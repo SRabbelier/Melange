@@ -18,6 +18,7 @@
 
 __authors__ = [
   '"Felix Kerekes" <sttwister@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 class Error(Exception):
@@ -58,14 +59,13 @@ class BaseDataProvider(object):
   """Base class for all data providers.
   """
 
-  def __init__(self, param_values=None):
+  def __init__(self, **param_values):
     """Constructor for the base data provider.
 
     Args:
       param_values: a dictionary containing data provider parameter values
     """
-    if not param_values:
-      self.param_values = {}
+    self.param_values = param_values
 
   def getValue(self):
     """Returns a value from the data provider.

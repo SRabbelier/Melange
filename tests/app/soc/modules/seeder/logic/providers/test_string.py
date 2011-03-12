@@ -17,6 +17,7 @@
 """
 
 from soc.modules.seeder.logic.providers.string import FixedStringProvider
+from soc.modules.seeder.logic.providers.string import FixedLengthAscendingNumericStringProvider
 from soc.modules.seeder.logic.providers.string import ParameterValueError
 from soc.modules.seeder.logic.providers.string import RandomWordProvider
 from soc.modules.seeder.logic.providers.string import RandomNameProvider
@@ -26,6 +27,7 @@ import unittest
 
 __authors__ = [
   '"Felix Kerekes" <sttwister@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 
@@ -45,6 +47,33 @@ class FixedStringProviderTest(unittest.TestCase):
     value = "asdf"
     self.provider.param_values = {"value": "asdf"}
     self.assertEquals(self.provider.getValue(), value)
+
+
+class FixedLengthAscendingNumericStringProviderTest(unittest.TestCase):
+  """Test class for FixedLengthAscendingNumericStringProvider
+  """
+
+  def setUp(self):
+    """Sets up for tests.
+    """
+    self.start = 0
+    self.length = 6
+    self.provider = FixedLengthAscendingNumericStringProvider(self.length,
+                                                              self.start)
+  def testInitialValue(self):
+    """Tests the initial generated value.
+    """
+    actual = self.provider.getValue()
+    expected = '0' * self.length
+    self.assertEqual(actual, expected)
+
+  def testSecondValue(self):
+    """Tests the second generated value.
+    """
+    self.provider.getValue()
+    actual = self.provider.getValue()
+    expected = '0' * (self.length-1) + '1'
+    self.assertEqual(actual, expected)
 
 
 class RandomWordProviderTest(unittest.TestCase):

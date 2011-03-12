@@ -25,6 +25,7 @@ from soc.modules.seeder.logic.providers.provider import ParameterValueError
 
 __authors__ = [
   '"Felix Kerekes" <sttwister@gmail.com>',
+  '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 
@@ -42,6 +43,38 @@ class FixedStringProvider(StringProvider, FixedValueProvider):
   """
 
   pass
+
+
+class FixedLengthAscendingNumericStringProvider(StringProvider):
+  """Data provider that returns a fixed length ascending numeric string.
+
+  This is useful to generate strings needing to be unique, e.g. link_id.
+  """
+
+  def __init__(self, length=6, start=0):
+    """Constructor.
+    """
+    self.num = start
+    self.length = length
+
+  def getValue(self):
+    """Generates the next value.
+    """
+    value = self.normalize()
+    self.num += 1
+    return value
+
+  def normalize(self):
+    """Transforms the num into a normalized string.
+    """
+    string = str(self.num)
+    string_length = len(string)
+    if self.length > string_length:
+      string = '0' * (self.length-len(string)) + string
+    elif self.length < string_length:
+      string = string[0:self.length]
+    return string
+
 
 class RandomWordProvider(StringProvider):
   """Data provider that returns a random word.

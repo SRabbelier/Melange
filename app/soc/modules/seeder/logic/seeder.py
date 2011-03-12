@@ -18,25 +18,25 @@
 
 __authors__ = [
     '"Felix Kerekes" <sttwister@gmail.com>',
+    '"Leo (Chong Liu)" <HiddenPython@gmail.com>',
   ]
 
 
-from django.utils import simplejson
+import random
 
 from google.appengine.ext import db
 from google.appengine.ext.db import _ReverseReferenceProperty
-
+from google.appengine.ext.db import ReferenceProperty
 from google.appengine.ext.mapreduce.control import start_map
+
+from django.utils import simplejson
 
 from soc.modules.seeder.logic.models import logic as seeder_models_logic
 from soc.modules.seeder.logic.providers import logic as seeder_providers_logic
 from soc.modules.seeder.logic.providers.provider import Error as provider_error
+from soc.modules.seeder.logic.providers.provider import BaseDataProvider
+from soc.modules.seeder.logic.providers.string import FixedLengthAscendingNumericStringProvider
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
-
-from soc.models.linkable import Linkable
-
-
-from google.appengine.ext.db import ReferenceProperty
 
 
 class Error(Exception):
@@ -339,5 +339,166 @@ class Logic(object):
       return str(provider.getValue())
     except provider_error, e:
       raise Error(e.message)
+
+  def getScope(self, model_name):
+    """Gets the scope of model_name.
+
+    This is specified manually as there is no way to get it automatically
+    at present. See issue 1104.
+    """
+    from soc.models.organization import Organization
+    from soc.models.program import Program
+    from soc.models.sponsor import Sponsor
+    from soc.modules.gci.models.organization import GCIOrganization
+    from soc.modules.gci.models.program import GCIProgram
+    from soc.modules.gsoc.models.organization import GSoCOrganization
+    from soc.modules.gsoc.models.program import GSoCProgram
+    from soc.modules.gsoc.models.student import GSoCStudent
+    scopes_dict = {'User': None,
+                   'Sponsor': None,
+                   'Host': Sponsor,
+                   'Program': Sponsor,
+                   'Organization': Program,
+                   'Timeline': Sponsor,
+                   'OrgAdmin': Organization,
+                   'Mentor': Organization,
+                   'Student': Organization,
+                   'GSoCProgram': Sponsor,
+                   'GSoCTimeline': Sponsor,
+                   'GSoCOrganization': GSoCProgram,
+                   'GSoCOrgAdmin': GSoCOrganization,
+                   'GSoCMentor': GSoCOrganization,
+                   'GSoCStudent': GSoCOrganization,
+                   'StudentProject': GSoCOrganization,
+                   'StudentProposal': GSoCStudent,
+                   'GCIProgram': Sponsor,
+                   'GCITimeline': Sponsor,
+                   'GCIOrganization': GCIProgram,
+                   'GCIOrgAdmin': GCIOrganization,
+                   'GCIMentor': GCIOrganization,
+                   'GCIStudent': GCIOrganization}
+    return scopes_dict.get(model_name, None)
+
+  def seedn(self, model_class, n=1, properties=None):
+    """Seeds n model_class entities.
+
+    Any number of properties can be specified either with their values or
+    with the data provider used to generate the values. Unspecified properties
+    will be generated randomly; unspecified ReferenceProperty will be
+    generated and seeded recursively.
+    Args:
+      model_class: data store model class
+      n: number of entities to seed
+      properties: a dict specifying some of the properties of the model_class
+        objects to be seeded. The key of the dict is the name of the property.
+        The value of the dict is either the value of the property or the data
+        provider used to generate the value of the property, e.g.
+        {"name": "John Smith",
+         "age": RandomUniformDistributionIntegerProvider(min=0, max=80)}
+    """
+    result = []
+    for _ in xrange(n):
+      data = self.seed(model_class, properties)
+      result.append(data)
+    return result
+
+  def seed(self, model_class, properties=None):
+    """Seeds a model_class entity.
+
+    Any number of properties can be specified either with their values or
+    with the data provider used to generate the values. Unspecified properties
+    will be generated randomly; unspecified ReferenceProperty will be
+    generated and seeded recursively.
+    Args:
+      model_class: data store model class
+      properties: a dict specifying some of the properties of the model_class
+        object to be seeded. The key of the dict is the name of the property.
+        The value of the dict is either the value of the property or the data
+        provider used to generate the value of the property, e.g.
+        {"name": "John Smith",
+         "age": RandomUniformDistributionIntegerProvider(min=0, max=80)}
+    """
+    if properties is None:
+      properties = {}
+    else:
+      properties = properties.copy()
+    # Produce all properties of model_class
+    for prop_name, prop in model_class.properties().iteritems():
+      # scope_path is to be produced from scope
+      if  prop_name == 'scope_path':
+        properties['scope_path'] = ''
+        continue
+      # If the property has already been specified, no need to generate
+      if prop_name in properties:
+        if isinstance(properties[prop_name], BaseDataProvider):
+          properties[prop_name] = properties[prop_name].getValue()
+        continue
+      # Specially deal with ReferenceProperty
+      if isinstance(prop, ReferenceProperty):
+        # Get scope manually as there is no way to get it automatically
+        # at present
+        if prop_name == 'scope':
+          reference_class = self.getScope(model_class.__name__)
+        else:
+          reference_class = prop.reference_class
+        if reference_class:
+          # Seed ReferenceProperty recursively
+          properties[prop_name] = self.seed(reference_class)
+      else:
+        # Specially generate link_id because it needs to be unique
+        if  prop_name == 'link_id':
+          properties[prop_name] = self.getNextLinkId(model_class)
+        # If the property has choices, choose one of them randomly
+        elif prop.choices:
+          properties[prop_name] = \
+              prop.choices[random.randint(0, len(prop.choices)-1)]
+        else:
+          # Use relavant data provider to generate other properties
+          # automatically
+          properties[prop_name] = \
+              self.genRandomValueForPropertyClass(prop.__class__)
+    # Generate key_name and scope_path if applicable
+    key_name = properties.get('link_id', None)
+    if key_name:
+      scope = properties.get('scope', None)
+      if scope:
+        scope_name = scope.key().name()
+        properties['scope_path'] = scope_name if scope_name else ''
+        key_name = properties['scope_path'] + '/' + key_name
+    data = model_class(key_name=key_name, **properties)
+    data.put()
+    return data
+
+  def getNextLinkId(self, model_class):
+    """Gets the next link Id.
+
+    Link_id's form is str(int), the next link id is the current maximum link id
+    of model_class in the data store plus 1.
+    """
+    q = model_class.all()
+    q.order("-link_id")
+    entity_with_max_link_id = q.get()
+    start = int(entity_with_max_link_id.link_id)+1 if entity_with_max_link_id \
+        else 0
+    link_id_provider = FixedLengthAscendingNumericStringProvider(start=start)
+    return link_id_provider.getValue()
+
+  def genRandomValueForPropertyClass(self, property_class):
+    """Generates a value for property_class randomly.
+
+    The generator uses any of the data provider of property_class
+    starting with 'Random'.
+    """
+    value = None
+    providers_dict = seeder_providers_logic.getProviders()
+    providers_list = providers_dict[property_class.__name__]
+    for provider_class in providers_list:
+      if provider_class.__name__.startswith('Random'):
+        break
+    if provider_class:
+      provider = provider_class()
+      value = provider.getValue()
+    return value
+
 
 logic = Logic()

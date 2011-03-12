@@ -220,7 +220,7 @@ class ListConfigurationResponse(Template):
     return 'soc/json.html'
 
 
-class ListContentResponse(Template):
+class ListContentResponse(object):
   """Class that builds the response for a list content request.
   """
 
@@ -247,15 +247,10 @@ class ListContentResponse(Template):
 
     self.__rows = []
 
-    # TODO(ljvderijk/mario): Adapt list protocol to support server deciding
-    # next start.
-    self.next = ''
-
     get_args = request.GET
+    self.next = ''
     self.start =  get_args.get('start', '')
-    limit = get_args.get('limit', 50)
-    self.limit = int(limit)
-
+    self.limit = int(get_args.get('limit', 50))
 
   def addRow(self, entity, *args, **kwargs):
     """Renders a row for a single entity.
@@ -281,20 +276,13 @@ class ListContentResponse(Template):
     }
     self.__rows.append(data)
 
-  def context(self):
-    """Returns the context for the current template.
+  def content(self):
+    """Returns the object that should be parsed to JSON.
     """
     # The maximum number of rows to return is determined by the limit
     data = {self.start: self.__rows[0:self.limit],
             'next': self.next}
-
-    json = simplejson.dumps({'data': data})
-    return {'json': json}
-
-  def templatePath(self):
-    """Returns the path to the template that should be used in render().
-    """
-    return 'soc/json.html'
+    return {'data': data}
 
 
 class QueryContentResponseBuilder(object):

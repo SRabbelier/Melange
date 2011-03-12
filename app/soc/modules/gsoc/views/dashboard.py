@@ -75,24 +75,21 @@ class Dashboard(RequestHandler):
     """
     return 'v2/modules/gsoc/dashboard/base.html'
 
-  def get(self):
-    """Handler for the GET request.
+  def json(self):
+    """Handler for JSON requests.
     """
-    if lists.isDataRequest(self.request):
-      components = self._getActiveComponents()
+    components = self._getActiveComponents()
 
-      list_data = None
-      for component in components:
-        list_data = component.getListData()
-        if list_data:
-          break
+    list_data = None
+    for component in components:
+      list_data = component.getListData()
+      if list_data:
+        break
 
-      if not list_data:
-        raise out_of_band.AccessViolation(
-            'You do not have access to this data')
-      self.response = lists.getResponse(self.request, list_data)
-    else:
-      super(Dashboard, self).get()
+    if not list_data:
+      raise out_of_band.AccessViolation(
+          'You do not have access to this data')
+    self.response = lists.getResponse(self.request, list_data)
 
   def context(self):
     """Handler for default HTTP GET request.

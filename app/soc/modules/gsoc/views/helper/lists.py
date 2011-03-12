@@ -314,7 +314,7 @@ class QueryContentResponseBuilder(object):
     self._fields = fields
     self._prefetch = prefetch
 
-  def build(self):
+  def build(self, *args, **kwargs):
     """Returns a ListContentResponse containing the data as indicated by the
     query.
 
@@ -322,6 +322,9 @@ class QueryContentResponseBuilder(object):
     returned does not contain the entity that is referred to by the start key.
     The next variable will be defined as the key of the last entity returned,
     empty if there are no entities to return.
+
+    Args and Kwargs passed into this method will be passed along to
+    ListContentResponse.addRow().
     """
     content_response = ListContentResponse(self._request, self._config)
 
@@ -341,7 +344,7 @@ class QueryContentResponseBuilder(object):
         prefetch=self._prefetch)
 
     for entity in entities:
-      content_response.addRow(entity)
+      content_response.addRow(entity, *args, **kwargs)
 
     if entities:
       content_response.next = entities[-1].key().id_or_name()

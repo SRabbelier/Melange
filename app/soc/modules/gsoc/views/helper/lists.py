@@ -29,6 +29,15 @@ from django.utils import simplejson
 from soc.views.template import Template
 
 
+def getListIndex(request):
+  """Returns the index of the requested list.
+  """
+  idx = request.GET.get('idx', '')
+  idx = int(idx) if idx.isdigit() else -1
+
+  return idx
+
+
 class ListConfiguration(object):
   """Resembles the configuration of a list. This object is sent to the client
   on page load.
@@ -151,7 +160,7 @@ class ListConfiguration(object):
 
 
 class ListConfigurationResponse(Template):
-  """Class that builds a JSON response containing the configuration of a list.
+  """Class that builds the template for configuring a list.
   """
 
   def __init__(self, config, idx, description=''):
@@ -177,11 +186,10 @@ class ListConfigurationResponse(Template):
 
     context = {
         'idx': self._idx,
-        'configuration': configuration,
+        'configuration': simplejson.dumps(configuration),
         'description': self._description
         }
-    json = simplejson.dumps(context)
-    return {'json': json}
+    return context
 
   def _constructConfigDict(self):
     """Builds the core of the list configuration that is sent to the client.
@@ -217,7 +225,7 @@ class ListConfigurationResponse(Template):
   def templatePath(self):
     """Returns the path to the template that should be used in render().
     """
-    return 'soc/json.html'
+    return 'v2/soc/list/list.html'
 
 
 class ListContentResponse(object):

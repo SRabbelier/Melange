@@ -27,9 +27,7 @@ from google.appengine.api import users
 from django.conf.urls.defaults import url
 
 from soc.logic.helper import timeline as timeline_helper
-from soc.logic.lists import Lists
 from soc.views import out_of_band
-from soc.views.helper import lists
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.org_app_survey import logic as \
@@ -37,17 +35,8 @@ from soc.modules.gsoc.logic.models.org_app_survey import logic as \
 from soc.modules.gsoc.logic.models.student_project import logic as \
     project_logic
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.helper import lists
 from soc.modules.gsoc.views.helper import url_patterns
-from soc.modules.gsoc.views.models.organization import view as \
-    org_view
-from soc.modules.gsoc.views.models.student_proposal import view as \
-    proposal_view
-from soc.modules.gsoc.views.models.student_project import view as \
-    project_view
-from soc.modules.gsoc.views.models.org_app_survey import view as \
-    org_app_view
-from soc.modules.gsoc.views.models.project_survey import view as \
-    project_survey_view
 
 
 class Dashboard(RequestHandler):
@@ -75,21 +64,21 @@ class Dashboard(RequestHandler):
     """
     return 'v2/modules/gsoc/dashboard/base.html'
 
-  def json(self):
+  def jsonContext(self):
     """Handler for JSON requests.
     """
     components = self._getActiveComponents()
 
-    list_data = None
+    list_content = None
     for component in components:
-      list_data = component.getListData()
-      if list_data:
+      list_content = component.getListData()
+      if list_content:
         break
 
-    if not list_data:
+    if not list_content:
       raise out_of_band.AccessViolation(
           'You do not have access to this data')
-    self.response = lists.getResponse(self.request, list_data)
+    return list_content.content()
 
   def context(self):
     """Handler for default HTTP GET request.
@@ -291,6 +280,17 @@ class MyProjectsComponent(Component):
   """Component for listing all the projects of the current Student.
   """
 
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    list_config = lists.ListConfiguration()
+    list_config.addColumn('title', 'Title', lambda ent, *args: ent.title)
+    list_config.addColumn('org_name', 'Organization Name',
+                          lambda ent, *args: ent.scope.name)
+    self._list_config = list_config
+
+    super(MyProjectsComponent, self).__init__(request, data)
+
   def templatePath(self):
     """Returns the path to the template that should be used in render().
     """
@@ -304,22 +304,24 @@ class MyProjectsComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 2:
-      list_data = lists.getListData(self.request, project_view.getParams(),
-                                   {'program': self.data.program,
-                                    'student': self.data.student})
-      return list_data
+      fields = {'program': self.data.program,
+                'student': self.data.student}
+      prefetch = ['scope']
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, project_logic, fields, prefetch)
+      return response_builder.build()
     else:
       return None
 
   def context(self):
     """Returns the context of this component.
     """
-    list_config = lists.getListGenerator(self.request,
-                                         project_view.getParams(), idx=2)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=2, description='List of my student projects')
     return {
         'name': 'projects',
         'title': 'PROJECTS',
-        'lists': Lists([list_config]),
+        'lists': [list],
     }
 
 

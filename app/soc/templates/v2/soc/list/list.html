@@ -1,4 +1,3 @@
-{% extends "v2/modules/gsoc/dashboard/component.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,6 +12,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% block component_content %}
-  {% include "v2/soc/list/lists.html" %}
-{% endblock component_content %}
+{{ description }}
+
+<script type="text/javascript">
+  melange_list_queue.push(
+    function () {
+      melange.list.loadList("melangeList{{ idx }}", '{{ configuration|safe|escapejs }}', {{ idx }});
+    }
+  );
+</script>
+<div id="melangeList{{ idx }}">
+  <noscript>
+    <p class="error">To see the contents of this list you should enable Javascript.</p>
+  </noscript>
+</div>

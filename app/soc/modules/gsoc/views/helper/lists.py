@@ -68,7 +68,7 @@ class ListConfiguration(object):
     self._row_operation = {}
 
   def addColumn(self, id, name, func, resizable=True):
-    """Adds a column to the list.
+    """Adds a column to the end of the list.
 
       Args:
         id: A unique identifier of this column (currently unchecked)
@@ -346,7 +346,6 @@ class QueryContentResponseBuilder(object):
     for entity in entities:
       content_response.addRow(entity)
 
-    # define next as the id or keyname of the last entity
     if entities:
       content_response.next = entities[-1].key().id_or_name()
 

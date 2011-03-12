@@ -285,7 +285,8 @@ class ListContentResponse(Template):
     """Returns the context for the current template.
     """
     # The maximum number of rows to return is determined by the limit
-    data = {self.start: self.__rows[0:self.limit]}
+    data = {self.start: self.__rows[0:self.limit],
+            'next': self.next}
 
     json = simplejson.dumps({'data': data})
     return {'json': json}

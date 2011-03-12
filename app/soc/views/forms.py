@@ -86,6 +86,8 @@ class ModelForm(djangoforms.ModelForm):
   """Django ModelForm class which uses our implementation of BoundField.
   """
 
+  template_path = 'v2/modules/gsoc/_form.html'
+
   def __init__(self, *args, **kwargs):
     """Fixes label and help_text issues after parent initialization.
 
@@ -180,10 +182,9 @@ class ModelForm(djangoforms.ModelForm):
     context = {
       'form': self,
     }
-    template_path = 'v2/modules/gsoc/_form.html'
-    rendered = loader.render_to_string(template_path, dictionary=context)
-    return rendered
 
+    rendered = loader.render_to_string(self.template_path, dictionary=context)
+    return rendered
 
 class BoundField(forms.BoundField):
   """

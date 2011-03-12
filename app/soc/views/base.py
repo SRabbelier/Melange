@@ -140,7 +140,8 @@ class RequestHandler(object):
     self.response.write(data)
 
   def jsonContext(self):
-    """
+    """Defines the JSON object to be dumped and returned on a HTTP GET request
+    with 'fmt=json' parameter.
     """
     return {
         'error': "json() method not implemented",

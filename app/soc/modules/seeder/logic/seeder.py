@@ -369,6 +369,7 @@ class Logic(object):
                    'GSoCOrgAdmin': GSoCOrganization,
                    'GSoCMentor': GSoCOrganization,
                    'GSoCStudent': GSoCOrganization,
+                   'GSoCProfile': GSoCProgram,
                    'StudentProject': GSoCOrganization,
                    'StudentProposal': GSoCStudent,
                    'GCIProgram': Sponsor,
@@ -376,7 +377,9 @@ class Logic(object):
                    'GCIOrganization': GCIProgram,
                    'GCIOrgAdmin': GCIOrganization,
                    'GCIMentor': GCIOrganization,
-                   'GCIStudent': GCIOrganization}
+                   'GCIStudent': GCIOrganization,
+                   'GCIProfile': GCIProgram,
+                  }
     return scopes_dict.get(model_name, None)
 
   def seedn(self, model_class, n=1, properties=None):

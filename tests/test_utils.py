@@ -60,6 +60,10 @@ class MockRequest(object):
     self.path = path
     self.method = method
 
+  def get_full_path(self):
+    # TODO: if needed add GET params
+    return self.path
+
   def start(self):
     """Readies the core for a new request.
     """

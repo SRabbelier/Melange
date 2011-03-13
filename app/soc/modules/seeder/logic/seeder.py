@@ -425,7 +425,7 @@ class Logic(object):
     # Produce all properties of model_class
     for prop_name, prop in model_class.properties().iteritems():
       # Specially generate link_id because it needs to be unique
-      if prop_name == 'link_id':
+      if prop_name == 'link_id' and prop_name not in properties:
         properties[prop_name] = LinkIDProvider(model_class)
       # scope_path is to be produced from scope
       if  prop_name == 'scope_path':

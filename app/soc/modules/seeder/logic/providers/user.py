@@ -37,6 +37,13 @@ class UserProvider(BaseDataProvider):
   pass
 
 
+class CurrentUserProvider(UserProvider):
+  """Data provider that returns the currently logged in user.
+  """
+
+  def getValue(self):
+    return users.User()
+
 class FixedUserProvider(FixedEmailProvider):
   """Data provider that returns a fixed user.
   """

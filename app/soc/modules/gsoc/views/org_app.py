@@ -91,5 +91,5 @@ class OrgApp(RequestHandler):
 
     return {
         'page_name': 'Organization Application',
-        'org_app_form': org_app_form.render(),
+        'org_app_form': org_app_form,
     }

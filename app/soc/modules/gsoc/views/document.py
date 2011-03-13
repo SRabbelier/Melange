@@ -60,6 +60,6 @@ class Document(RequestHandler):
         '%(prefix)s/%(sponsor)s/%(program)s/%(document)s' % self.kwargs)
 
     return {
-        'content': document.Document(self.data, entity).render(),
+        'tmpl': document.Document(self.data, entity),
         'page_name': 'Document',
     }

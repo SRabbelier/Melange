@@ -154,15 +154,15 @@ class Homepage(RequestHandler):
         current_timeline, self.data.program)
 
     context = {
-        'timeline': Timeline(self.data, current_timeline).render(),
-        'apply': Apply(self.data, current_timeline).render(),
-        'connect_with_us': ConnectWithUs(self.data).render(),
+        'timeline': Timeline(self.data, current_timeline),
+        'apply': Apply(self.data, current_timeline),
+        'connect_with_us': ConnectWithUs(self.data),
         'page_name': 'Home page',
         'program': self.data.program,
     }
 
     if featured_project:
       context['featured_project'] = FeaturedProject(
-        self.data, featured_project).render()
+        self.data, featured_project)
 
     return context

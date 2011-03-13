@@ -25,7 +25,7 @@ limitations under the License.
 {% comment %} TODO: change class/id after creating custom css {% endcomment %}
 <form action="#" method="post" id="form" class="form-register">
   <h2 id="form-register-title">Edit site settings</h2> <p id="form-register-req" class="req">* fields required</p>
-  {{ site_form }}
+  {{ site_form.render }}
   <div id="form-register-fieldset-button-row" class="row button-row">
     <input id="form-register-submit" type="submit" value="Submit" class="submit" />
   </div>

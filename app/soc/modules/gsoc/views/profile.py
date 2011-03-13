@@ -161,9 +161,9 @@ class ProfilePage(RequestHandler):
       
     return {
         'page_name': page_name,
-        'user_form': user_form.render(),
-        'profile_form': profile_form.render(),
-        'student_info_form': student_info_form.render()
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'student_info_form': student_info_form,
     }
 
   def validate(self):

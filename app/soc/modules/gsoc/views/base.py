@@ -48,9 +48,9 @@ class RequestHandler(RequestHandler):
       app_version: the current version of the application, used e.g. in URL
                    patterns to avoid JS caching issues.
     """
-    context['header'] = header.Header(self.data).render()
-    context['mainmenu'] = site_menu.MainMenu(self.data).render()
-    context['footer'] = site_menu.Footer(self.data).render()
+    context['header'] = header.Header(self.data)
+    context['mainmenu'] = site_menu.MainMenu(self.data)
+    context['footer'] = site_menu.Footer(self.data)
     context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
     super(RequestHandler, self).render(context)
 

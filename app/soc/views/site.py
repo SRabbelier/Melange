@@ -96,7 +96,7 @@ class SitePage(SiteRequestHandler):
     site_form = SiteForm(self.data.POST or None, instance=self.data.site)
     return {
         'page_name': 'Edit site settings',
-        'site_form': site_form.render(),
+        'site_form': site_form,
     }
 
   def validate(self):

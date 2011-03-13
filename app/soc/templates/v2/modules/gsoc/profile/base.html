@@ -30,9 +30,9 @@ limitations under the License.
 
   <h2 id="form-register-title">{{ page_name}}</h2> <p id="form-register-req" class="req">* fields required</p>
 
-  {{ user_form }}
-  {{ profile_form }}
-  {{ student_info_form }}
+  {{ user_form.render }}
+  {{ profile_form.render }}
+  {{ student_info_form.render }}
 
   <div id="form-register-fieldset-button-row" class="row button-row">
     <input id="form-register-submit" type="submit" value="Submit" class="submit" />

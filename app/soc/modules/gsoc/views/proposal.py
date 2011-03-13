@@ -70,7 +70,7 @@ class ProposalPage(RequestHandler):
     proposal_form = ProposalForm(self.data.POST or None)
     return {
         'page_name': 'Submit proposal',
-        'proposal_form': proposal_form.render(),
+        'proposal_form': proposal_form,
         }
 
   def createFromFrom(self):
@@ -130,7 +130,7 @@ class UpdateProposal(RequestHandler):
 
     return {
         'page_name': 'Update proposal',
-        'proposal_form': proposal_form.render(),
+        'proposal_form': proposal_form,
         }
 
   def updateFromForm(self):

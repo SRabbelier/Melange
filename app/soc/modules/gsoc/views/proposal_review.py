@@ -82,7 +82,7 @@ class ReviewProposal(RequestHandler):
     mentor = self.data.proposal.mentor
 
     comment_box = {
-        'form': CommentForm().render()
+        'form': CommentForm()
         }
     return {
         'comment_box': comment_box,

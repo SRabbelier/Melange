@@ -35,7 +35,7 @@ from soc.modules.seeder.logic.models import logic as seeder_models_logic
 from soc.modules.seeder.logic.providers import logic as seeder_providers_logic
 from soc.modules.seeder.logic.providers.provider import Error as provider_error
 from soc.modules.seeder.logic.providers.provider import BaseDataProvider
-from soc.modules.seeder.logic.providers.string import FixedLengthAscendingNumericStringProvider
+from soc.modules.seeder.logic.providers.string import LinkIDProvider
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
 
 
@@ -424,6 +424,9 @@ class Logic(object):
       properties = properties.copy()
     # Produce all properties of model_class
     for prop_name, prop in model_class.properties().iteritems():
+      # Specially generate link_id because it needs to be unique
+      if prop_name == 'link_id':
+        properties[prop_name] = LinkIDProvider(model_class)
       # scope_path is to be produced from scope
       if  prop_name == 'scope_path':
         properties['scope_path'] = ''
@@ -445,11 +448,8 @@ class Logic(object):
           # Seed ReferenceProperty recursively
           properties[prop_name] = self.seed(reference_class)
       else:
-        # Specially generate link_id because it needs to be unique
-        if  prop_name == 'link_id':
-          properties[prop_name] = self.getNextLinkId(model_class)
         # If the property has choices, choose one of them randomly
-        elif prop.choices:
+        if prop.choices:
           properties[prop_name] = \
               prop.choices[random.randint(0, len(prop.choices)-1)]
         else:
@@ -468,20 +468,6 @@ class Logic(object):
     data = model_class(key_name=key_name, **properties)
     data.put()
     return data
-
-  def getNextLinkId(self, model_class):
-    """Gets the next link Id.
-
-    Link_id's form is str(int), the next link id is the current maximum link id
-    of model_class in the data store plus 1.
-    """
-    q = model_class.all()
-    q.order("-link_id")
-    entity_with_max_link_id = q.get()
-    start = int(entity_with_max_link_id.link_id)+1 if entity_with_max_link_id \
-        else 0
-    link_id_provider = FixedLengthAscendingNumericStringProvider(start=start)
-    return link_id_provider.getValue()
 
   def genRandomValueForPropertyClass(self, property_class):
     """Generates a value for property_class randomly.

@@ -76,6 +76,23 @@ class FixedLengthAscendingNumericStringProvider(StringProvider):
     return string
 
 
+class LinkIDProvider(StringProvider):
+  """Data provider that returns a string suitable for use as link_id.
+  """
+
+  def __init__(self, model_class):
+    self._model_class = model_class
+
+  def getValue(self):
+    q = self._model_class.all()
+    q.order("-link_id")
+    last = q.get()
+    last_id = last.link_id[1:] if last else -1
+    start = int(last_id) + 1
+    link_id_provider = FixedLengthAscendingNumericStringProvider(start=start)
+    return "m" + link_id_provider.getValue()
+
+
 class RandomWordProvider(StringProvider):
   """Data provider that returns a random word.
   """

@@ -184,7 +184,7 @@ class View(base.View):
         try:
           id = seeder_logic.seedFromJSON(data)
         except Error, ex:
-          return responses.jsonErrorResponse(request, ex.message)
+          return responses.jsonErrorResponse(request, ex.args[0])
       else:
         return responses.jsonErrorResponse(request, 'No data supplied!')
     else:
@@ -226,7 +226,7 @@ class View(base.View):
         try:
           value = seeder_logic.testProvider(data)
         except Error, e:
-          return responses.jsonErrorResponse(request, e.message)
+          return responses.jsonErrorResponse(request, e.args[0])
       else:
         return responses.jsonErrorResponse(request, 'No data supplied!')
     else:
@@ -255,7 +255,7 @@ class View(base.View):
         try:
           seeder_logic.validateConfiguration(data)
         except Error, e:
-          return responses.jsonErrorResponse(request, e.message)
+          return responses.jsonErrorResponse(request, e.args[0])
       else:
         return responses.jsonErrorResponse(request, 'No data supplied!')
     else:

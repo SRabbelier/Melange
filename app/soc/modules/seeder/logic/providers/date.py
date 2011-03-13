@@ -226,7 +226,7 @@ class RandomUniformDistributionDateProvider(DateProvider):
       min_date = datetime.datetime(min_year, min_month, min_day)
       max_date = datetime.datetime(max_year, max_month, max_day)
     except ValueError, inst:
-      raise ParameterValueError(inst.message)
+      raise ParameterValueError(inst.args[0])
 
     if max_date < min_date:
       raise ParameterValueError('Minimum date must be less than maximum date')
@@ -336,7 +336,7 @@ class RandomNormalDistributionDateProvider(DateProvider):
     try:
       datetime.datetime(mean_year, mean_month, mean_day)
     except ValueError, inst:
-      raise ParameterValueError(inst.message)
+      raise ParameterValueError(inst.args[0])
 
     self.getStdev()
 

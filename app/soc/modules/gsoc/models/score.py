@@ -26,7 +26,7 @@ from google.appengine.ext import db
 import soc.models.base
 
 
-class Score(soc.models.base.ModelWithFieldAttributes):
+class GSoCScore(soc.models.base.ModelWithFieldAttributes):
   """Model of a Score.
   """
 

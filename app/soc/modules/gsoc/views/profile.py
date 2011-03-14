@@ -205,7 +205,7 @@ class ProfilePage(RequestHandler):
           profile.student_info = student_info
         dirty.append(student_info)
     else:
-      student_form = EmptyForm()
+      student_form = EmptyForm(self.data.POST)
 
     if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
       db.run_in_transaction(db.put, dirty)

@@ -36,7 +36,7 @@ limitations under the License.
   <div class="score-average">
     <strong>Average score:</strong>
     <div id="score-average-stars" class="stars"></div>
-      <em>4/5 out of 27 users</em>
+      <em>{{ scores.average }}/5 out of {{ scores.number }} users</em>
   </div>
   <div class="score-add">
     <strong>My score:</strong>
@@ -79,7 +79,7 @@ limitations under the License.
     jQuery(document).ready(function() {
       jQuery('#score-average-stars').raty({
         readOnly:   true,
-        start:      4,
+        start:      {{ scores.average }},
         half:	    true,
         path:       '/soc/content/images/v2/gsoc',
         starHalf:   'proposal-rate-star-half.png',
@@ -97,6 +97,7 @@ limitations under the License.
         			},
         half:		false,
         path:       '/soc/content/images/v2/gsoc',
+        start:      {{ scores.user_score }},
         starHalf:   'proposal-rate-star-half.png',
         starOff:    'proposal-rate-star-off.png',
         starOn:     'proposal-rate-star-on.png',

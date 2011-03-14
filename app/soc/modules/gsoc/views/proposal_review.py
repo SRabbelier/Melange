@@ -81,6 +81,29 @@ class ReviewProposal(RequestHandler):
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/review.html'
 
+  def getScores(self):
+    """Gets all the scores for the proposal.
+    """
+
+    total = 0
+    number = 0
+    user_value = 0 
+
+    query = db.Query(GSoCScore).ancestor(self.data.proposal)
+    for score in query:
+      total += score.value
+      number += 1
+
+      author_key = GSoCScore.author.get_value_for_datastore(score)
+      if author_key == self.data.profile.key():
+        user_score = score.value
+
+    return {
+        'average': total / number if number else 0,
+        'number': number,
+        'user_score': user_score,
+        }
+
   def getComments(self):
     """Gets all the comments for the proposal.
     """
@@ -98,6 +121,8 @@ class ReviewProposal(RequestHandler):
     return public_comments, private_comments
 
   def context(self):
+
+    scores = self.getScores()
 
     # TODO: check if the scoring is not disabled
     kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
@@ -123,6 +148,7 @@ class ReviewProposal(RequestHandler):
         'mentor': self.data.proposal.mentor,
         'public_comments': public_comments,
         'private_comments': private_comments,
+        'scores': scores,
         'score_action': score_action,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,

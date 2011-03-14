@@ -24,6 +24,7 @@ __authors__ = [
 from google.appengine.ext import db
 
 import soc.models.base
+import soc.modules.gsoc.models.profile
 
 
 class GSoCScore(soc.models.base.ModelWithFieldAttributes):
@@ -34,5 +35,6 @@ class GSoCScore(soc.models.base.ModelWithFieldAttributes):
   value = db.IntegerProperty(required=True)
 
   #: reference to the profile of a user who has given the score
-  author = db.ReferencePropperty(reference_class=soc.models.role.Profile,
+  author = db.ReferenceProperty(
+      reference_class=soc.modules.gsoc.models.profile.GSoCProfile,
       required=True, collection_name="scored")

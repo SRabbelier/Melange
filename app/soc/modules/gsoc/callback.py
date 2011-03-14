@@ -80,6 +80,7 @@ class Callback(object):
     self.views.append(proposal.UpdateProposal())
     self.views.append(proposal_review.ReviewProposal())
     self.views.append(proposal_review.PostComment())
+    self.views.append(proposal_review.PostScore())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

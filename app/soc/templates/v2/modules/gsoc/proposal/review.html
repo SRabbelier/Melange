@@ -92,6 +92,9 @@ limitations under the License.
         cancelPlace:'right',
         cancelOff:	'proposal-rate-cancel-off.png',
         cancelOn:	'proposal-rate-cancel-on.png',
+        click:      function (value) {
+        			  jQuery.get("{{ score_action }}", {value: value});
+        			},
         half:		false,
         path:       '/soc/content/images/v2/gsoc',
         starHalf:   'proposal-rate-star-half.png',

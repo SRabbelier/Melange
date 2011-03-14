@@ -35,6 +35,7 @@ from soc.models.user import User
 
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.proposal import GSoCProposal
+from soc.modules.gsoc.models.score import GSoCScore
 
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import access_checker
@@ -98,6 +99,11 @@ class ReviewProposal(RequestHandler):
 
   def context(self):
 
+    # TODO: check if the scoring is not disabled
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    kwargs['key'] = self.data.proposal.key().__str__()
+    score_action = reverse('score_gsoc_proposal', kwargs=kwargs)
+
     # get all the comments for the the proposal
     public_comments, private_comments = self.getComments()
 
@@ -117,6 +123,7 @@ class ReviewProposal(RequestHandler):
         'mentor': self.data.proposal.mentor,
         'public_comments': public_comments,
         'private_comments': private_comments,
+        'score_action': score_action,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
         }
@@ -159,3 +166,44 @@ class PostComment(RequestHandler):
    else:
      # TODO: probably we want to handle an error somehow
      pass
+
+
+class PostScore(RequestHandler):
+  """View which handles posting scores.
+  """
+
+  def djangoURLPatterns(self):
+    return [
+         url(r'^gsoc/proposal/score/%s$' % url_patterns.KEY,
+         self, name='score_gsoc_proposal'),
+    ]
+
+  def checkAccess(self):
+    self.data.proposal = GSoCProposal.get(db.Key(self.data.kwargs['key']))
+
+  def createOrUpdateScore(self, value):
+    """Creates a new score or updates a score if there is already one
+    posted by the current user.
+
+    Returns:
+      a score entity or None
+    """
+
+    query = db.Query(GSoCScore)
+    query.filter('author = ', self.data.profile)
+    query.ancestor(self.data.proposal)
+
+    score = query.get()
+    if not score:
+      score = GSoCScore(
+          parent=self.data.proposal,
+          author=self.data.profile,
+          value=value)
+    else:
+      score.value = value
+ 
+    score.put()
+
+  def get(self):
+    value = int(self.data.GET['value'])
+    score = self.createOrUpdateScore(value)

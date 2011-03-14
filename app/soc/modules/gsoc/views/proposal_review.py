@@ -101,10 +101,9 @@ class ReviewProposal(RequestHandler):
     public_comments, private_comments = self.getComments()
 
     # TODO: check if it is possible to post a comment
-    comment_action = '/gsoc/proposal/comment/%s/%s/%s' % (
-        self.data.kwargs['sponsor'],
-        self.data.kwargs['program'],
-        self.data.proposal.key().__str__())
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    kwargs['key'] = self.data.proposal.key().__str__()
+    comment_action = reverse('comment_gsoc_proposal', kwargs=kwargs)
 
     comment_box = {
         'action': comment_action,

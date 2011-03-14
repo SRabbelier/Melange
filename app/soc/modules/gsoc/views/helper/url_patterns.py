@@ -48,9 +48,17 @@ def namedIdBasedPattern(names):
 
   return r'/'.join([namedLinkIdPattern(names), r'(?P<id>(\d+))'])
 
+def namedKeyBasedPattern(names):
+  """Returns a url pattern consisting of named parts whose last element
+  is a string representation of a Key instance.
+  """
+
+  return r'/'.join([namedLinkIdPattern(names), r'(?P<key>(\w+))'])
+
 _role = r'(?P<role>%s)/' % ("student|mentor|org_admin")
 
 
+KEY       = namedKeyBasedPattern(['sponsor', 'program'])
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
 PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])

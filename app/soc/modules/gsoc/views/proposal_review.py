@@ -84,10 +84,11 @@ class ReviewProposal(RequestHandler):
     """Gets all the comments for the proposal.
     """
 
-    public_comments = private_comments = []
+    public_comments = []
+    private_comments = []
 
     query = db.Query(NewComment).ancestor(self.data.proposal)
-    for comment in query.run():
+    for comment in query:
       if comment.is_private:
         private_comments.append(comment)
       else:

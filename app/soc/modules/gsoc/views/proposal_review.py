@@ -59,7 +59,7 @@ class ReviewProposal(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-         url(r'^gsoc/proposal/review/%s$' % url_patterns.PROPOSAL,
+         url(r'^gsoc/proposal/review/%s$' % url_patterns.REVIEW,
          self, name='review_gsoc_proposal'),
     ]
 

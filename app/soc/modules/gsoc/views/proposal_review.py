@@ -80,7 +80,25 @@ class ReviewProposal(RequestHandler):
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/review.html'
 
+  def getComments(self):
+    """Gets all the comments for the proposal.
+    """
+
+    public_comments = private_comments = []
+
+    query = db.Query(NewComment).ancestor(self.data.proposal)
+    for comment in query.run():
+      if comment.is_private:
+        private_comments.append(comment)
+      else:
+        public_comments.append(comment)
+
+    return public_comments, private_comments
+
   def context(self):
+
+    # get all the comments for the the proposal
+    public_comments, private_comments = self.getComments()
 
     # TODO: check if it is possible to post a comment
     comment_action = '/gsoc/proposal/comment/%s/%s/%s' % (
@@ -97,6 +115,8 @@ class ReviewProposal(RequestHandler):
         'comment_box': comment_box,
         'proposal': self.data.proposal,
         'mentor': self.data.proposal.mentor,
+        'public_comments': public_comments,
+        'private_comments': private_comments,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
         }
@@ -134,7 +154,7 @@ class PostComment(RequestHandler):
    comment = self.createCommentFromForm() 
    if comment:
      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-     kwargs['id'] = proposal.key().id()
+     kwargs['id'] = self.data.proposal.key().id()
      self.redirect(reverse('review_gsoc_proposal', kwargs=kwargs))
    else:
      # TODO: probably we want to handle an error somehow

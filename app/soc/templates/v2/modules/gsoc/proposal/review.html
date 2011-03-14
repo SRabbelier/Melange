@@ -45,6 +45,24 @@ limitations under the License.
 </div>
 
 <div class="project-comment-container">
+  <div class="project-comment-box project-comment-private-container">
+    <a name="private-comments"></a><h3>{{ private_comments|length }} private comments</h3>
+    {% for comment in private_comments %}
+      <div class="project-comment-single">
+        <p class="project-comment-meta"><strong>{{ comment.author.name }}</strong> <a href="#permalink">{{ comment.created }}</a></p>
+        {{ comment.content }}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="project-comment-box project-comment-public-container">
+    <a name="comments"></a><h3>{{ public_comments|length }} comments</h3>
+    {% for comment in public_comments %}
+      <div class="project-comment-single">
+        <p class="project-comment-meta"><strong>{{ comment.author.name }}</strong> <a href="#permalink">{{ comment.created }}</a></p>
+        {{ comment.content }}
+      </div>
+    {% endfor %}
+  </div>
   <!-- begin comment form -->
   <a name="comment"></a>
   <form action="{{ comment_box.action }}" method="post" id="form" class="form-project-comment">

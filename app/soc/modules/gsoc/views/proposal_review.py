@@ -87,7 +87,7 @@ class ReviewProposal(RequestHandler):
 
     total = 0
     number = 0
-    user_value = 0 
+    user_score = 0 
 
     query = db.Query(GSoCScore).ancestor(self.data.proposal)
     for score in query:

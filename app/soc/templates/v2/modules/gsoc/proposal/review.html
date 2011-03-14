@@ -36,7 +36,9 @@ limitations under the License.
   <div class="score-average">
     <strong>Average score:</strong>
     <div id="score-average-stars" class="stars"></div>
+    <div id="score-average-desc">
       <em>{{ scores.average }}/5 out of {{ scores.number }} users</em>
+    </div>
   </div>
   <div class="score-add">
     <strong>My score:</strong>
@@ -76,6 +78,36 @@ limitations under the License.
   [
   dep.raty,
   function () {
+    var initialTotal = {{ scores.total }};
+    var initialNumber = {{ scores.number }};
+    var userInitialScore = {{ scores.user_score }};
+    
+    var successHanlder = function (userScore) {
+      userScore = parseInt(userScore);
+
+      var newNumber = initialNumber;
+      /* the user did not score */
+      if (!userInitialScore && userScore) {
+        newNumber++;
+      }
+      /* the user removed his or her score */
+      if (userInitialScore && !userScore) {
+        newNumber--;
+      }
+
+      var newAverage;
+      var newMessage;
+      if (!newNumber) {
+        newAverage = 0;
+        newMessage = 'No scores yet';
+      } else {
+        newAverage = (initialTotal - userInitialScore + userScore) / newNumber;
+        newMessage = newAverage + '/5 out of ' + newNumber + ' users';
+      }
+      jQuery.fn.raty.start(newAverage, '#score-average-stars');
+      jQuery('#score-average-desc em').html(newMessage);
+    };
+    
     jQuery(document).ready(function() {
       jQuery('#score-average-stars').raty({
         readOnly:   true,
@@ -92,9 +124,9 @@ limitations under the License.
         cancelPlace:'right',
         cancelOff:	'proposal-rate-cancel-off.png',
         cancelOn:	'proposal-rate-cancel-on.png',
-        click:      function (value) {
-        			  jQuery.get("{{ score_action }}", {value: value});
-        			},
+        click:      successHanlder,//function (value) {
+        			//  jQuery.get("{{ score_action }}", {value: value});
+        			//},
         half:		false,
         path:       '/soc/content/images/v2/gsoc',
         start:      {{ scores.user_score }},

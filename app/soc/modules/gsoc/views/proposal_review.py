@@ -101,7 +101,8 @@ class ReviewProposal(RequestHandler):
     return {
         'average': total / number if number else 0,
         'number': number,
-        'user_score': user_score,
+        'total': total,
+        'user_score': user_score,        
         }
 
   def getComments(self):

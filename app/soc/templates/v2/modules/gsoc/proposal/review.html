@@ -47,8 +47,8 @@ limitations under the License.
 <div class="project-comment-container">
   <!-- begin comment form -->
   <a name="comment"></a>
-  <form action="#" method="post" id="form" class="form-project-comment">
-  {{ comment_box.form.render }}
+  <form action="{{ comment_box.action }}" method="post" id="form" class="form-project-comment">
+  {{ comment_box.form }}
   </form>
   <!-- end comment form -->
 </div>

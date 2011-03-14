@@ -22,13 +22,16 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import dicts
+from soc.views import forms
+
 from soc.models.comment import NewComment
 from soc.models.user import User
-
-from soc.views import forms
 
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.proposal import GSoCProposal
@@ -61,7 +64,7 @@ class ReviewProposal(RequestHandler):
 
   def checkAccess(self):
     self.data.proposer_user = User.get_by_key_name(self.data.kwargs['student'])
-    
+
     key_name = '%s/%s/%s' % (
         self.data.kwargs['sponsor'],
         self.data.kwargs['program'],
@@ -79,11 +82,17 @@ class ReviewProposal(RequestHandler):
 
   def context(self):
 
-    mentor = self.data.proposal.mentor
+    # TODO: check if it is possible to post a comment
+    comment_action = '/gsoc/proposal/comment/%s/%s/%s' % (
+        self.data.kwargs['sponsor'],
+        self.data.kwargs['program'],
+        self.data.proposal.key().__str__())
 
     comment_box = {
-        'form': CommentForm()
+        'action': comment_action,
+        'form': CommentForm().render()
         }
+
     return {
         'comment_box': comment_box,
         'proposal': self.data.proposal,
@@ -91,3 +100,42 @@ class ReviewProposal(RequestHandler):
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
         }
+
+
+class PostComment(RequestHandler):
+  """View which handles publishing comments.
+  """
+
+  def djangoURLPatterns(self):
+    return [
+         url(r'^gsoc/proposal/comment/%s$' % url_patterns.KEY,
+         self, name='comment_gsoc_proposal'),
+    ]
+
+  def checkAccess(self):
+    self.data.proposal = GSoCProposal.get(db.Key(self.data.kwargs['key']))
+
+  def createCommentFromForm(self):
+    """Creates a new comment based on the data inserted in the form.
+
+    Returns:
+      a newly created comment entity or None
+    """
+
+    comment_form = CommentForm(self.data.request.POST)
+    
+    if not comment_form.is_valid():
+      return None
+
+    comment_form.cleaned_data['author'] = self.data.profile
+    return comment_form.create(commit=True, parent=self.data.proposal)
+    
+  def post(self):
+   comment = self.createCommentFromForm() 
+   if comment:
+     kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+     kwargs['id'] = proposal.key().id()
+     self.redirect(reverse('review_gsoc_proposal', kwargs=kwargs))
+   else:
+     # TODO: probably we want to handle an error somehow
+     pass

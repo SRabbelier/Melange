@@ -288,9 +288,9 @@ class ListContentResponse(object):
     """Returns the object that should be parsed to JSON.
     """
     # The maximum number of rows to return is determined by the limit
-    data = {self.start: self.__rows[0:self.limit],
+    data = {self.start: self.__rows[0:self.limit]}
+    return {'data': data,
             'next': self.next}
-    return {'data': data}
 
 
 class QueryContentResponseBuilder(object):

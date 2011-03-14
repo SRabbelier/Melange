@@ -26,6 +26,7 @@ __authors__ = [
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
 
 
+# TODO: Should this go in it's own module?
 class GSoCRoleHelper(object):
   """Helper class to aid in manipulating role data.
   """

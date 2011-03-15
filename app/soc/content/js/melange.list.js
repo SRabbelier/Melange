@@ -706,7 +706,7 @@
 
               //call next iteration
               if (my_data[(my_data.length- 1)] !== undefined) {
-                start = my_data[(my_data.length - 1)].columns.key;
+                start = source.next;
                 setTimeout(server_loop, 100);
                 current_loop++;
               }

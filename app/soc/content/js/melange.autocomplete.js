@@ -43,24 +43,27 @@
 
   $m.makeAutoComplete = function (id) {
     var url = "?fmt=json&field=" + id;
+    var pretty = id + '-pretty';
+    jQuery("#" + id).attr('id', pretty).attr('name', pretty);
     jQuery.ajax({
       url: url,
       success: function(data){
-        jQuery("#" + id).after([
+        jQuery("#" + pretty).after([
           '<input id="',
           id,
-          '-value" ',
-          'type="hidden" />'
+          '" name="',
+          id,
+          '" type="hidden" />'
         ].join(""));
-        jQuery("#" + id).autocomplete({
+        jQuery("#" + pretty).autocomplete({
           source: data.data,
           focus: function (event, ui) {
-            jQuery("#" + id).val(ui.item.label);
+            jQuery("#" + pretty).val(ui.item.label);
             return false;
           },
           select: function (event, ui) {
-            jQuery("#" + id).val(ui.item.label);
-            jQuery("#" + id + "-value").val(ui.item.key);
+            jQuery("#" + pretty).val(ui.item.label);
+            jQuery("#" + id).val(ui.item.key);
             return false;
           }
             //default_autocomplete_options

@@ -166,46 +166,70 @@ class ProfilePage(RequestHandler):
         'student_info_form': student_info_form,
     }
 
+  def validateUser(self, dirty):
+    if self.data.user:
+      return EmptyForm(self.data.POST)
+
+    user_form = UserForm(self.data.POST)
+
+    if not user_form.is_valid():
+      return user_form
+
+    key_name = user_form.cleaned_data['link_id']
+    account = users.get_current_user()
+    user_form.cleaned_data['account'] = account
+    user_form.cleaned_data['user_id'] = account.user_id()
+    self.data.user = user_form.create(commit=False, key_name=key_name)
+    dirty.append(self.data.user)
+    return profile_form
+
+  def validateProfile(self, dirty):
+    profile_form = ProfileForm(self.data.POST, instance=self.data.role)
+
+    if not profile_form.is_valid():
+      return profile_form, None
+
+    key_name = '%s/%s' % (self.data.program.key().name(),
+                          self.data.user.link_id)
+    profile_form.cleaned_data['link_id'] = self.data.user.link_id
+    profile_form.cleaned_data['user'] = self.data.user
+    profile_form.cleaned_data['scope'] = self.data.program
+
+    if self.data.role:
+      profile = profile_form.save(commit=False)
+    else:
+      profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
+
+    dirty.append(profile)
+
+    return profile_form, profile
+
+  def validateStudent(self, dirty, profile):
+    if not (self.data.student_info or self.data.kwargs.get('role') == 'student'):
+      return EmptyForm(self.data.POST)
+
+    student_form = StudentInfoForm(self.data.POST, instance=self.data.student_info)
+
+    if not(profile and student_form.is_valid()):
+      return student_form
+
+    key_name = profile.key().name()
+
+    if self.data.student_info:
+      student_info = student_form.save(commit=False)
+    else:
+      student_info = student_form.create(commit=False, key_name=key_name, parent=profile)
+      profile.student_info = student_info
+
+    dirty.append(student_info)
+
+    return student_form
+
   def validate(self):
     dirty = []
-    if self.data.user:
-      user_form = EmptyForm(self.data.POST)
-    else:
-      user_form = UserForm(self.data.POST)
-
-      if user_form.is_valid():
-        key_name = user_form.cleaned_data['link_id']
-        account = users.get_current_user()
-        user_form.cleaned_data['account'] = account
-        user_form.cleaned_data['user_id'] = account.user_id()
-        self.data.user = user_form.create(commit=False, key_name=key_name)
-        dirty.append(self.data.user)
-
-    profile_form = ProfileForm(self.data.POST, instance=self.data.role)
-    if profile_form.is_valid():
-      key_name = '%s/%s' % (self.data.program.key().name(),
-                            self.data.user.link_id)
-      profile_form.cleaned_data['link_id'] = self.data.user.link_id
-      profile_form.cleaned_data['user'] = self.data.user
-      profile_form.cleaned_data['scope'] = self.data.program
-      if self.data.role:
-        profile = profile_form.save(commit=False)
-      else:
-        profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
-      dirty.append(profile)
-
-    if self.data.student_info or self.data.kwargs.get('role') == 'student':
-      student_form = StudentInfoForm(self.data.POST, instance=self.data.student_info)
-      if student_form.is_valid() and profile:
-        key_name = profile.key().name()
-        if self.data.student_info:
-          student_info = student_form.save(commit=False)
-        else:
-          student_info = student_form.create(commit=False, key_name=key_name, parent=profile)
-          profile.student_info = student_info
-        dirty.append(student_info)
-    else:
-      student_form = EmptyForm(self.data.POST)
+    user_form = self.validateUser(dirty)
+    profile_form, profile = self.validateProfile(dirty)
+    student_form = self.validateStudent(dirty, profile)
 
     if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
       db.run_in_transaction(db.put, dirty)

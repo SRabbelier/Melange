@@ -86,12 +86,12 @@ class RequestData(RequestData):
     """
     super(RequestData, self).populate(request, *args, **kwargs)
 
-    if 'sponsor' in kwargs and 'program' in kwargs:
-      program_keyfields = {'link_id': kwargs.get('program'),
-                           'scope_path': kwargs.get('sponsor')}
+    if kwargs.get('sponsor') and kwargs.get('program'):
+      program_keyfields = {'link_id': kwargs['program'],
+                           'scope_path': kwargs['sponsor']}
       self.program = program_logic.getFromKeyFieldsOr404(program_keyfields)
     else:
-      self.program =  self.site.active_progam
+      self.program =  self.site.active_program
 
     self.program_timeline = self.program.timeline
 

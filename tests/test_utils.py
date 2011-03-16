@@ -24,6 +24,7 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+import httplib
 import StringIO
 import unittest
 
@@ -205,6 +206,15 @@ class DjangoTestCase(TestCase):
     user_id = xsrfutil._getCurrentUserId()
     xsrf_token = xsrfutil._generateToken(key, user_id)
     return xsrf_token
+
+  def assertGSoCTemplatesUsed(self, response):
+    """Asserts that all the templates from the base view were used.
+    """
+    self.assertEqual(response.status_code, httplib.OK)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/base.html')
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/footer.html')
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/header.html')
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/mainmenu.html')
 
 
 def runTasks(url = None, name=None, queue_names = None):

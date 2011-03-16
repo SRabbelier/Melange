@@ -43,19 +43,10 @@ class ProfileViewTest(DjangoTestCase):
     self.timeline = TimelineHelper(self.gsoc.timeline)
     self.role = GSoCRoleHelper(self.gsoc)
 
-  def assertBaseTemplatesUsed(self, response):
-    """Asserts that all the templates from the base view were used.
-    """
-    self.assertEqual(response.status_code, httplib.OK)
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/base.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/footer.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/header.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/mainmenu.html')
-
   def assertHomepageTemplatesUsed(self, response):
     """Asserts that all the templates from the homepage view were used.
     """
-    self.assertBaseTemplatesUsed(response)
+    self.assertGSoCTemplatesUsed(response)
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_connect_with_us.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_apply.html')

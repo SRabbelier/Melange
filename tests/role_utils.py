@@ -34,6 +34,7 @@ class GSoCRoleHelper(object):
   def __init__(self, program):
     self.program = program
     self.user = None
+    self.role = None
 
   def create(self):
     """Creates a profile for the current user.

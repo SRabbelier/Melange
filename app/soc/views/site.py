@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+import os
+
 from django.conf.urls.defaults import url
 from django.core.urlresolvers import reverse
 from django.forms import widgets as django_widgets
@@ -95,6 +97,7 @@ class SitePage(SiteRequestHandler):
   def context(self):
     site_form = SiteForm(self.data.POST or None, instance=self.data.site)
     return {
+        'app_version': os.environ.get('CURRENT_VERSION_ID', '').split('.')[0],
         'page_name': 'Edit site settings',
         'site_form': site_form,
     }

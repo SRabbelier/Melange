@@ -27,7 +27,7 @@ from soc.views.template import Template
 
 class Document(Template):
   def __init__(self, data, entity):
-    assert(entity != null)
+    assert(entity != None)
     self.data = data
     self.entity = entity
 

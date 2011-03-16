@@ -149,14 +149,13 @@ class RoleUpdater(object):
     if start_key:
       query.filter('__key__ > ', start_key)
 
-    #try:
-    entities = query.fetch(batch_size)
-
-    if not entities:
-      # all entities has already been processed
-      return
-
     try:
+      entities = query.fetch(batch_size)
+
+      if not entities:
+        # all entities has already been processed
+        return
+
       for entity in entities:
         program = entity.__getattribute__(self.PROGRAM_FIELD)
         user = entity.user

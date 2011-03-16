@@ -32,7 +32,6 @@ from soc.views import forms
 from soc.modules.gsoc.models.proposal import GSoCProposal
 
 from soc.modules.gsoc.views.base import RequestHandler
-from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -57,11 +56,10 @@ class ProposalPage(RequestHandler):
     ]
 
   def checkAccess(self):
-    check = access_checker.AccessChecker(self.data)
-    check.isLoggedIn()
-    check.isActiveStudent()
-    check.isOrganizationInURLActive()
-    check.canStudentPropose()
+    self.check.isLoggedIn()
+    self.check.isActiveStudent()
+    self.check.isOrganizationInURLActive()
+    self.check.canStudentPropose()
 
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/base.html'
@@ -115,11 +113,10 @@ class UpdateProposal(RequestHandler):
     ]
 
   def checkAccess(self):
-    check = access_checker.AccessChecker(self.data)
-    check.isLoggedIn()
-    check.isActiveStudent()
-    check.isProposalInURLValid()
-    check.canStudentUpdateProposal()
+    self.check.isLoggedIn()
+    self.check.isActiveStudent()
+    self.check.isProposalInURLValid()
+    self.check.canStudentUpdateProposal()
 
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/base.html'

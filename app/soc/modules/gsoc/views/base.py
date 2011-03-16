@@ -29,6 +29,7 @@ from soc.views.base import RequestHandler
 
 from soc.modules.gsoc.views import site_menu
 from soc.modules.gsoc.views import header
+from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper.request_data import RequestData
 
 
@@ -60,5 +61,6 @@ class RequestHandler(RequestHandler):
 
     self.data = RequestData()
     self.data.populate(request, *args, **kwargs)
+    self.check = access_checker.AccessChecker(self.data)
 
     return super(RequestHandler, self).__call__(request, *args, **kwargs)

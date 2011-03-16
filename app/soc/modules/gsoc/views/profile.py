@@ -40,7 +40,6 @@ from soc.models.user import User
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
-from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -124,17 +123,16 @@ class ProfilePage(RequestHandler):
     ]
 
   def checkAccess(self):
-    check = access_checker.AccessChecker(self.data)
-    check.isLoggedIn()
-    check.isProgramActive()
+    self.check.isLoggedIn()
+    self.check.isProgramActive()
 
     if 'role' in self.data.kwargs:
       role = self.data.kwargs['role']
       if role == 'student':
-        check.isNotParticipatingInProgram()
-        check.isActivePeriod('student_signup')
+        self.check.isNotParticipatingInProgram()
+        self.check.isActivePeriod('student_signup')
     else:
-      check.isRoleActive()
+      self.check.isRoleActive()
 
   def templatePath(self):
     return 'v2/modules/gsoc/profile/base.html'

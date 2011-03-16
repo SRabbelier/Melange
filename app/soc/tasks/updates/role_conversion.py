@@ -28,6 +28,7 @@ from google.appengine.ext import db
 from google.appengine.ext import deferred
 from google.appengine.runtime import DeadlineExceededError
 
+from soc.models.host import Host
 from soc.models.linkable import Linkable
 from soc.models.mentor import Mentor
 from soc.models.org_admin import OrgAdmin
@@ -69,9 +70,58 @@ def getDjangoURLPatterns():
       (r'^tasks/role_conversion/update_org_admins$',
         'soc.tasks.updates.role_conversion.updateOrgAdmins'),
       (r'^tasks/role_conversion/update_students$',
-        'soc.tasks.updates.role_conversion.updateStudents')]
+        'soc.tasks.updates.role_conversion.updateStudents')
+      (r'^tasks/role_conversion/update_hosts$',
+        'soc.tasks.updates.role_conversion.updateHosts'),]
 
   return patterns
+
+
+class HostUpdater(object):
+  """Class which is responsible for updating Host entities.
+  """
+
+  def run(self, batch_size=25):
+    """Starts the updater.
+    """
+
+    self._process(None, batch_size)
+
+  def _process(self, start_key, batch_size):
+    """Retrieves Host entities and updates them.
+    """
+
+    query = Host.all()
+    if start_key:
+      query.filter('__key__ > ', start_key)
+
+    try:
+      entities = query.fetch(batch_size)
+
+      if not entities:
+        # all entities has already been processed
+        return
+
+      to_put = []
+
+      for entity in entities:
+        sponsor = entity.scope
+        host_for = entity.user.host_for
+
+        if not host_for:
+          host_for = []
+
+        user.host_for = host_for.append(sponsor.key())
+        to_put.append(user)
+
+      db.run_in_transaction(db.put, to_put)
+
+      # process the next batch of entities
+      start_key = entities[-1].key()
+      deferred.defer(self._process, start_key, batch_size)
+    except DeadlineExceededError:
+      # here we should probably be more careful
+      deferred.defer(self._process, start_key, batch_size)
 
 
 class RoleUpdater(object):
@@ -157,6 +207,14 @@ class RoleUpdater(object):
     except DeadlineExceededError:
       # here we should probably be more careful
       deferred.defer(self._process, start_key, batch_size)
+
+
+def updateHosts(request):
+  """Starts a task which updates Host entities.
+  """
+
+  updater = HostUpdater()
+  updater.run()
 
 
 def updateRole(role_name):

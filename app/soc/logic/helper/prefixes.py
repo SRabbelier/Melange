@@ -30,6 +30,20 @@ def getOrSetScope(entity):
     entity = Entity which uses document prefix.
   """
 
+  if getattr(entity, 'scope', None):
+    return entity.scope
+
+  entity.scope = getScopeForPrefix(entity.prefix, entity.scope_path)
+  entity.put()
+
+
+def getScopeForPrefix(prefix, key_name):
+  """Gets the scope for the given prefix and key_name.
+
+  params:
+      prefix: the prefix of the document
+      key_name: the key_name of the document
+  """
   import soc.models.program
   import soc.models.organization
   import soc.models.user
@@ -41,10 +55,6 @@ def getOrSetScope(entity):
   import soc.modules.gci.models.organization
   import soc.modules.gci.models.program
 
-
-  if getattr(entity, 'scope', None):
-    return entity.scope
-
   # use prefix to generate dict key
   scope_types = {
       "gsoc_program": soc.modules.gsoc.models.program.GSoCProgram,
@@ -54,19 +64,15 @@ def getOrSetScope(entity):
       "gci_org": soc.modules.gci.models.organization.GCIOrganization,
       "org": soc.models.organization.Organization,
       "user": soc.models.user.User,
-      "site": soc.models.site.Site}
+      "site": soc.models.site.Site,
+  }
 
   # determine the type of the scope
-  scope_type = scope_types.get(entity.prefix)
+  scope_type = scope_types.get(prefix)
 
   if not scope_type:
     # no matching scope type found
     raise AttributeError('No Matching Scope type found for %s' \
         % entity.prefix)
 
-  # set the scope and update the entity
-  entity.scope = scope_type.get_by_key_name(entity.scope_path)
-  entity.put()
-
-  # return the scope
-  return entity.scope
+  return scope_type.get_by_key_name(key_name)

@@ -61,14 +61,28 @@ def namedKeyBasedPattern(names):
 
   return r'/'.join([namedLinkIdPattern(names), r'(?P<key>(\w+))'])
 
-_role = r'(?P<role>%s)/' % ("student|mentor|org_admin")
 
+_role = r'(?P<role>%s)/' % ("student|mentor|org_admin")
+_document = ''.join([
+    captureLinkId('prefix'), '/',
+    '(',
+      "(%s/)|" % captureLinkId('scope'),
+      '(',
+        "%s/" % captureLinkId('sponsor'),
+        '(',
+        "%s/" % captureLinkId('program'),
+          "(%s/)?" % captureLinkId('organization'),
+        ')?',
+      ')',
+    ')',
+    captureLinkId('document'),
+])
 
 KEY       = namedKeyBasedPattern(['sponsor', 'program'])
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
 PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])
-DOCUMENT  = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'document'])
+DOCUMENT  = _document
 SURVEY    = namedLinkIdPattern(['prefix', 'sponsor', 'program', 'survey'])
 STUDENT   = namedLinkIdPattern(['sponsor', 'program', 'student'])
 PROPOSAL  = namedIdBasedPattern(['sponsor', 'program'])

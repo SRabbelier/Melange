@@ -72,7 +72,8 @@ class Callback(object):
     from soc.modules.gsoc.views import proposal_review
 
     self.views.append(dashboard.Dashboard())
-    self.views.append(document.Document())
+    self.views.append(document.EditDocumentPage())
+    self.views.append(document.DocumentPage())
     self.views.append(homepage.Homepage())
     self.views.append(org_app.OrgApp())
     self.views.append(profile.ProfilePage())

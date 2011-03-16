@@ -23,41 +23,151 @@ __authors__ = [
 
 
 from django.conf.urls.defaults import url
+from django.core.urlresolvers import reverse
 
+from soc.logic import dicts
+from soc.logic.helper import prefixes
 from soc.logic.models.document import logic as document_logic
+from soc.models.document import Document
+from soc.views.forms import ModelForm
 from soc.views import document
 
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
 
 
-class Document(RequestHandler):
-  """Encapsulate all the methods required to generate GSoC Home page.
+class CreateDocumentForm(ModelForm):
+  """Django form for creating documents.
+  """
+
+  class Meta:
+    model = Document
+    exclude = ['scope', 'scope_path', 'author', 'modified_by', 'prefix', 'home_for']
+
+
+class EditDocumentForm(ModelForm):
+  """Django form for editing documents.
+  """
+
+  class Meta:
+    model = Document
+    exclude = CreateDocumentForm.Meta.exclude + ['link_id']
+
+
+def keyFieldsFromKwargs(kwargs):
+  """Returns the document key fields from kwargs.
+
+  Returns False if not all fields were supplied/consumed.
+  """
+  fields = []
+  kwargs = kwargs.copy()
+
+  prefix = kwargs.pop('prefix', None)
+  fields.append(prefix)
+
+  if prefix in ['site', 'user']:
+    fields.append(kwargs.pop('scope', None))
+
+  if prefix in ['sponsor', 'gsoc_program', 'gsoc_org']:
+    fields.append(kwargs.pop('sponsor', None))
+
+  if prefix in ['gsoc_program', 'gsoc_org']:
+    fields.append(kwargs.pop('program', None))
+
+  if prefix in ['gsoc_org']:
+    fields.append(kwargs.pop('organization', None))
+
+  fields.append(kwargs.pop('document', None))
+
+  if any(kwargs.values()) or not all(fields):
+    return False
+
+  return fields
+
+
+class EditDocumentPage(RequestHandler):
+  """Encapsulate all the methods required to edit documents.
+  """
+
+  def templatePath(self):
+    return 'v2/modules/gsoc/document/base.html'
+
+  def djangoURLPatterns(self):
+    return [
+        url(r'^gsoc/document/edit/%s$' % url_patterns.DOCUMENT, self,
+            name='edit_gsoc_document')
+    ]
+
+  def checkAccess(self):
+    fields = keyFieldsFromKwargs(self.kwargs)
+
+    # something wrong with the url
+    if not fields:
+      self.check.fail("Incorrect document url format")
+
+    self.scope_path = '/'.join(fields[:-1])
+    self.key_name = '/'.join(fields)
+
+    self.entity = document_logic.getFromKeyName(self.key_name)
+    self.form = EditDocumentForm if self.entity else CreateDocumentForm
+
+  def context(self):
+    document_form = self.form(self.data.POST or None, instance=self.entity)
+
+    return {
+        'page_name': 'Edit document',
+        'document_form': document_form,
+    }
+
+  def validate(self):
+    document_form = self.form(self.data.POST, instance=self.entity)
+
+    if not document_form.is_valid():
+      return False
+
+    data = document_form.cleaned_data
+    data['modified_by'] = self.data.user
+
+    if self.entity:
+      document_form.save()
+    else:
+      prefix = self.kwargs['prefix']
+      data['author'] = self.data.user
+      data['prefix'] = prefix
+      data['scope'] = prefixes.getScopeForPrefix(prefix, self.scope_path)
+      data['scope_path'] = self.scope_path
+      document_form.create(key_name=self.key_name)
+
+  def post(self):
+    """Handler for HTTP POST request.
+    """
+    if self.validate():
+      kwargs = dicts.filter(self.data.kwargs, [
+          'prefix', 'scope', 'sponsor', 'program', 'organization', 'document'])
+      self.redirect(reverse('edit_gsoc_document', kwargs=filter(kwargs)))
+    else:
+      self.get()
+
+
+class DocumentPage(RequestHandler):
+  """Encapsulate all the methods required to show documents.
   """
 
   def templatePath(self):
     return 'v2/modules/gsoc/base.html'
 
   def djangoURLPatterns(self):
-    """Returns the list of tuples for containing URL to view method mapping.
-    """
-
     return [
-        url(r'^gsoc/document/%s$' % url_patterns.DOCUMENT, self,
-            name='gsoc_document')
+        url(r'^gsoc/document/show/%s$' % url_patterns.DOCUMENT, self,
+            name='show_gsoc_document')
     ]
 
   def checkAccess(self):
-    """Access checks for GSoC Home page.
-    """
     pass
 
   def context(self):
-    """Handler to for GSoC Home page HTTP get request.
-    """
-
-    entity = document_logic.getFromKeyNameOr404(
-        '%(prefix)s/%(sponsor)s/%(program)s/%(document)s' % self.kwargs)
+    key_name = keyNameFromKwargs(self.kwargs)
+    entity = document_logic.getFromKeyNameOr404(key_name)
 
     return {
         'tmpl': document.Document(self.data, entity),

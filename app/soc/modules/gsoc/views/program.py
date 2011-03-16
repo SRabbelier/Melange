@@ -66,8 +66,7 @@ class ProgramPage(RequestHandler):
     return {'data': data}
 
   def checkAccess(self):
-    # TODO: check is host
-    pass
+    self.check.isHost()
 
   def templatePath(self):
     return 'v2/modules/gsoc/program/base.html'

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-"""Utils for manipulating role data.
+"""Utils for manipulating profile data.
 """
 
 __authors__ = [
@@ -27,22 +27,39 @@ from soc.modules.seeder.logic.seeder import logic as seeder_logic
 
 
 # TODO: Should this go in it's own module?
-class GSoCRoleHelper(object):
-  """Helper class to aid in manipulating role data.
+class GSoCProfileHelper(object):
+  """Helper class to aid in manipulating profile data.
   """
 
   def __init__(self, program):
     self.program = program
     self.user = None
-    self.role = None
+    self.profile = None
 
-  def create(self):
-    """Creates a profile for the current user.
+  def createUser(self):
+    """Creates a user entity for the current user.
     """
+    if self.user:
+      return
     from soc.models.user import User
-    from soc.modules.gsoc.models.profile import GSoCProfile
     from soc.modules.seeder.logic.providers.user import CurrentUserProvider
     properties = {'account': CurrentUserProvider(), 'status': 'valid'}
-    self.user = user = seeder_logic.seed(User, properties=properties)
+    self.user = seeder_logic.seed(User, properties=properties)
+    return self.user
+
+  def createProfile(self):
+    """Creates a profile for the current user.
+    """
+    if self.profile:
+      return
+    from soc.modules.gsoc.models.profile import GSoCProfile
+    user = self.createUser()
     properties = {'link_id': user.link_id, 'user': user, 'parent': user, 'scope': self.program}
-    self.role = seeder_logic.seed(GSoCProfile, properties)
+    self.profile = seeder_logic.seed(GSoCProfile, properties)
+
+  def createHost(self):
+    """Sets the current user to be a host for the current program.
+    """
+    self.createUser()
+    self.user.host_for = [self.program.scope.key()]
+    self.user.put()

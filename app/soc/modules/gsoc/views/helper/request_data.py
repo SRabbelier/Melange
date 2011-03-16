@@ -65,15 +65,14 @@ class RequestData(RequestData):
     """Constructs an empty RequestData object.
     """
     super(RequestData, self).__init__()
-    self.profile = None
+    # program wide fields
     self.program = None
     self.program_timeline = None
     self.org_app = None
-    self.host = None
-    self.org_admin = []
-    self.mentor = []
-    self.student = None
-    self.role = None
+
+    # user profile specific fields
+    self.profile = None
+    self.is_host = False
     self.mentor_for = []
     self.org_admin_for = []
     self.student_info = None
@@ -107,29 +106,16 @@ class RequestData(RequestData):
       self.organization = org_logic.getFromKeyFieldsOr404(org_keyfields)
 
     if self.user:
-      fields = {'user': self.user,
-                'scope': self.program.scope,
-                'status': 'active'}
-      self.host = host_logic.getOneForFields(fields)
-
-      fields = {'user': self.user,
-                'program': self.program,
-                'status': ['active', 'inactive']}
-      self.org_admin = org_admin_logic.getOneForFields(fields)
-      self.mentor = mentor_logic.getOneForFields(fields)
-
-      fields = {'user': self.user,
-                'scope': self.program,
-                'status': ['active', 'inactive']}
-      self.student = student_logic.getOneForFields(fields)
       key_name = '%s/%s' % (self.program.key().name(), self.user.link_id)
-      self.role = self.profile = profile.GSoCProfile.get_by_key_name(
+      self.profile = profile.GSoCProfile.get_by_key_name(
           key_name, parent=self.user)
 
-      if self.role:
-        orgs = set(self.role.mentor_for + self.role.org_admin_for)
-        org_map = dict((i.key(), i) for i in db.get(orgs))
+      self.is_host = self.program.scope.key() in self.user.host_for
 
-        self.mentor_for = [org_map[i] for i in self.role.mentor_for]
-        self.org_admin_for = [org_map[i] for i in self.role.org_admin_for]
-        self.student_info = self.role.student_info
+    if self.profile:
+      orgs = set(self.profile.mentor_for + self.profile.org_admin_for)
+      org_map = dict((i.key(), i) for i in db.get(orgs))
+
+      self.mentor_for = [org_map[i] for i in self.profile.mentor_for]
+      self.org_admin_for = [org_map[i] for i in self.profile.org_admin_for]
+      self.student_info = self.profile.student_info

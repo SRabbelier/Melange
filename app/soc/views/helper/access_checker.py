@@ -99,6 +99,9 @@ DEF_ID_BASED_ENTITY_INVALID_MSG_FMT = ugettext(
 DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
     'This %(model) entity does not belong to you.')
 
+DEF_NOT_HOST_MSG = ugettext(
+    'You need to be a host to access this page.')
+
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -162,7 +165,10 @@ class AccessChecker(object):
     """Checks whether the current user has a host role.
     """
 
-    return self.data.user.is_host
+    if self.data.is_host:
+      return
+
+    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_HOST_MSG)
 
   def hasUserEntity(self):
     """Raises an alternate HTTP response if Google Account has no User entity.
@@ -261,7 +267,7 @@ class AccessChecker(object):
                                 org admin role for the given program.
     """
 
-    if not self.data.role:
+    if not self.data.profile:
       return
 
     raise out_of_band.AccessViolation(
@@ -283,7 +289,7 @@ class AccessChecker(object):
     """Checks if the role of the current user is active.
     """
 
-    if self.data.role and self.data.role.status == 'active':
+    if self.data.profile and self.data.profile.status == 'active':
       return
 
     raise out_of_band.AccessViolation(message_fmt=DEF_ROLE_INACTIVE_MSG)

@@ -139,7 +139,7 @@ class ProfilePage(RequestHandler):
 
   def context(self):
     user_form = UserForm(self.data.POST or None, instance=self.data.user)
-    profile_form = ProfileForm(self.data.POST or None, instance=self.data.role)
+    profile_form = ProfileForm(self.data.POST or None, instance=self.data.profile)
 
     role = self.data.kwargs.get('role')
     if self.data.student_info or role == 'student':
@@ -182,7 +182,7 @@ class ProfilePage(RequestHandler):
     return profile_form
 
   def validateProfile(self, dirty):
-    profile_form = ProfileForm(self.data.POST, instance=self.data.role)
+    profile_form = ProfileForm(self.data.POST, instance=self.data.profile)
 
     if not profile_form.is_valid():
       return profile_form, None
@@ -193,7 +193,7 @@ class ProfilePage(RequestHandler):
     profile_form.cleaned_data['user'] = self.data.user
     profile_form.cleaned_data['scope'] = self.data.program
 
-    if self.data.role:
+    if self.data.profile:
       profile = profile_form.save(commit=False)
     else:
       profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)

@@ -50,10 +50,10 @@ class AccessChecker(access_checker.AccessChecker):
 
     # check how many proposals the student has already submitted 
     fields = {
-        'scope': self.data.role
+        'scope': self.data.profile
         }
     query = db.Query(StudentProposal)
-    query.filter('scope = ', self.data.role).ancestor(self.data.user)
+    query.filter('scope = ', self.data.profile).ancestor(self.data.user)
 
     if query.count() >= self.data.program.apps_tasks_limit:
       # too many proposals access denied

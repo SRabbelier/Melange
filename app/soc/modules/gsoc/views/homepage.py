@@ -76,7 +76,7 @@ class Apply(Template):
     context = {
         'current_timeline': self.current_timeline,
     }
-    if not self.data.role:
+    if not self.data.profile:
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
     return context
 

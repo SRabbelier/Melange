@@ -26,7 +26,7 @@ __authors__ = [
 import httplib
 
 from tests.timeline_utils import TimelineHelper
-from tests.role_utils import GSoCRoleHelper
+from tests.profile_utils import GSoCProfileHelper
 from tests.test_utils import DjangoTestCase
 
 # TODO: perhaps we should move this out?
@@ -40,6 +40,7 @@ class EditProgramTest(DjangoTestCase):
   def setUp(self):
     from soc.modules.gsoc.models.program import GSoCProgram
     self.gsoc = seeder_logic.seed(GSoCProgram)
+    self.data = GSoCProfileHelper(self.gsoc)
 
   def assertProgramTemplatesUsed(self, response):
     """Asserts that all the templates from the program were used.
@@ -48,7 +49,13 @@ class EditProgramTest(DjangoTestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/program/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/_form.html')
 
+  def testEditProgramHostOnly(self):
+    url = '/gsoc/program/edit/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertErrorTemplatesUsed(response)
+
   def testEditProgram(self):
+    self.data.createHost()
     url = '/gsoc/program/edit/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertProgramTemplatesUsed(response)

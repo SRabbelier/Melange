@@ -26,7 +26,7 @@ __authors__ = [
 import httplib
 
 from tests.timeline_utils import TimelineHelper
-from tests.role_utils import GSoCRoleHelper
+from tests.profile_utils import GSoCProfileHelper
 from tests.test_utils import DjangoTestCase
 
 # TODO: perhaps we should move this out?
@@ -41,7 +41,7 @@ class ProfileViewTest(DjangoTestCase):
     from soc.modules.gsoc.models.program import GSoCProgram
     self.gsoc = seeder_logic.seed(GSoCProgram)
     self.timeline = TimelineHelper(self.gsoc.timeline)
-    self.role = GSoCRoleHelper(self.gsoc)
+    self.data = GSoCProfileHelper(self.gsoc)
 
   def assertHomepageTemplatesUsed(self, response):
     """Asserts that all the templates from the homepage view were used.
@@ -67,11 +67,11 @@ class ProfileViewTest(DjangoTestCase):
   def testHomepageDuringSignupExistingUser(self):
     """Tests the student hompepage during the signup period with an existing user.
     """
-    self.role.create()
+    self.data.createProfile()
     self.timeline.studentSignup()
     url = '/gsoc/homepage/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertHomepageTemplatesUsed(response)
     apply_tmpl = response.context['apply']
-    self.assertTrue(apply_tmpl.data.role)
+    self.assertTrue(apply_tmpl.data.profile)
     self.assertFalse('profile_link' in apply_tmpl.context())

@@ -93,6 +93,29 @@ class LinkIDProvider(StringProvider):
     return "m" + link_id_provider.getValue()
 
 
+class KeyNameProvider(StringProvider):
+  """Data proider that returns a key_name.
+  """
+  def getValue(self, values):
+    key_name = values['link_id']
+
+    scope = values.get('scope', None)
+    if scope:
+      key_name = scope.key().name() + '/' + key_name
+      values['scope_path'] = scope.key().name()
+    return key_name
+
+
+class DocumentKeyNameProvider(KeyNameProvider):
+  """Data proider that returns a key_name.
+  """
+  def getValue(self, values):
+    key_name = super(DocumentKeyNameProvider, self).getValue(values)
+    prefix = values['prefix']
+    key_name = "%s/%s" % (prefix, key_name)
+    return key_name
+
+
 class RandomWordProvider(StringProvider):
   """Data provider that returns a random word.
   """

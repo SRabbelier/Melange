@@ -36,6 +36,7 @@ from soc.modules.seeder.logic.providers import logic as seeder_providers_logic
 from soc.modules.seeder.logic.providers.provider import Error as provider_error
 from soc.modules.seeder.logic.providers.provider import BaseDataProvider
 from soc.modules.seeder.logic.providers.string import LinkIDProvider
+from soc.modules.seeder.logic.providers.string import KeyNameProvider
 from soc.modules.seeder.models.configuration_sheet import DataSeederConfigurationSheet
 
 
@@ -223,7 +224,6 @@ class Logic(object):
     values = {}
 
     for property_name, provider in providers.items():
-
       try:
         value = provider.getValue()
 
@@ -233,16 +233,8 @@ class Logic(object):
 
       values[str(property_name)] = value
 
-    key_name = None
-    key_name = values['link_id']
-
-    scope = values.get('scope', None)
-    if scope:
-      key_name = scope.key().name() + '/' + key_name
-      values['scope_path'] = scope.key().name()
-
     # pylint: disable=W0142
-    model = model_class(key_name=key_name, **values)
+    model = model_class(**values)
     # pylint: enable=W0142
     return model
 
@@ -425,18 +417,27 @@ class Logic(object):
       properties = {}
     else:
       properties = properties.copy()
+
+    items = model_class.properties().items()
+    if 'link_id' in model_class.properties().keys():
+      items += [('key_name', None)]
+
     # Produce all properties of model_class
-    for prop_name, prop in model_class.properties().iteritems():
+    for prop_name, prop in items:
       # Specially generate link_id because it needs to be unique
       if prop_name == 'link_id' and prop_name not in properties:
         properties[prop_name] = LinkIDProvider(model_class)
+      if prop_name == 'key_name'and prop_name not in properties:
+        properties[prop_name] = KeyNameProvider()
       # scope_path is to be produced from scope
-      if  prop_name == 'scope_path':
+      if prop_name == 'scope_path':
         properties['scope_path'] = ''
         continue
       # If the property has already been specified, no need to generate
       if prop_name in properties:
-        if isinstance(properties[prop_name], BaseDataProvider):
+        if isinstance(properties[prop_name], KeyNameProvider):
+          properties[prop_name] = properties[prop_name].getValue(properties)
+        elif isinstance(properties[prop_name], BaseDataProvider):
           properties[prop_name] = properties[prop_name].getValue()
         continue
       # Specially deal with ReferenceProperty
@@ -460,15 +461,7 @@ class Logic(object):
           # automatically
           properties[prop_name] = \
               self.genRandomValueForPropertyClass(prop.__class__)
-    # Generate key_name and scope_path if applicable
-    key_name = properties.get('link_id', None)
-    if key_name:
-      scope = properties.get('scope', None)
-      if scope:
-        scope_name = scope.key().name()
-        properties['scope_path'] = scope_name if scope_name else ''
-        key_name = properties['scope_path'] + '/' + key_name
-    data = model_class(key_name=key_name, **properties)
+    data = model_class(**properties)
     data.put()
     return data
 

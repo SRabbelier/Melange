@@ -111,6 +111,11 @@ class AccessChecker(object):
     self.data = data
     self.gae_user = users.get_current_user()
 
+  def fail(self, message):
+    """Raises an AccessViolation with the specified message.
+    """
+    raise out_of_band.AccessViolation(message_fmt=message)
+
   def isLoggedIn(self):
     """Raises an alternate HTTP response if Google Account is not logged in.
     """

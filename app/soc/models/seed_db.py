@@ -263,6 +263,9 @@ def seed(request, *args, **kwargs):
       }
 
 
+  current_user.host_for = [google.key()]
+  current_user.put()
+
   google_host = Host(**role_properties)
   google_host.put()
 

@@ -24,6 +24,11 @@ __authors__ = [
 
 from soc.models import linkable
 
+def captureLinkId(name):
+  """Returns a capture group for a link id with the specified name.
+  """
+  return r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE)
+
 
 def namedLinkIdPattern(names):
   """Returns a link ID pattern consisting of named parts.
@@ -36,7 +41,7 @@ def namedLinkIdPattern(names):
   """
   named_patterns = []
   for name in names:
-    named_patterns.append(r'(?P<%s>%s)' % (name, linkable.LINK_ID_PATTERN_CORE))
+    named_patterns.append(captureLinkId(name))
 
   return r'/'.join(named_patterns)
 
@@ -47,6 +52,7 @@ def namedIdBasedPattern(names):
   """
 
   return r'/'.join([namedLinkIdPattern(names), r'(?P<id>(\d+))'])
+
 
 def namedKeyBasedPattern(names):
   """Returns a url pattern consisting of named parts whose last element

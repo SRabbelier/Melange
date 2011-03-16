@@ -163,11 +163,16 @@ class DocumentPage(RequestHandler):
     ]
 
   def checkAccess(self):
-    pass
+    fields = keyFieldsFromKwargs(self.kwargs)
+
+    # something wrong with the url
+    if not fields:
+      self.check.fail("Incorrect document url format")
+
+    self.key_name = '/'.join(fields)
 
   def context(self):
-    key_name = keyNameFromKwargs(self.kwargs)
-    entity = document_logic.getFromKeyNameOr404(key_name)
+    entity = document_logic.getFromKeyNameOr404(self.key_name)
 
     return {
         'tmpl': document.Document(self.data, entity),

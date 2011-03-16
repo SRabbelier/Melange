@@ -34,6 +34,7 @@ from soc.models.org_admin import OrgAdmin
 from soc.models.role import StudentInfo
 
 from soc.modules.gsoc.models.mentor import GSoCMentor
+from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.program import GSoCProgram
@@ -57,6 +58,10 @@ def getDjangoURLPatterns():
   patterns = [
       (r'^tasks/role_conversion/update_references',
         'soc.tasks.updates.role_conversion.updateReferences'),
+      (r'^tasks/role_conversion/update_project_references',
+        'soc.tasks.updates.role_conversion.updateStudentProjectReferences'),
+      (r'^tasks/role_conversion/update_proposal_references',
+        'soc.tasks.updates.role_conversion.updateStudentProposalReferences'),
       (r'^tasks/role_conversion/update_roles$',
         'soc.tasks.updates.role_conversion.updateRoles'),
       (r'^tasks/role_conversion/update_mentors$',
@@ -86,7 +91,7 @@ class RoleUpdater(object):
     self._process(None, batch_size)
 
   def _process(self, start_key, batch_size):
-    """Retrieves entities and creates or updates a corresponding 
+    """Retrieves entities and creates or updates a corresponding
     Profile entity.
     """
 
@@ -94,13 +99,14 @@ class RoleUpdater(object):
     if start_key:
       query.filter('__key__ > ', start_key)
 
-    try:
-      entities = query.fetch(batch_size)
+    #try:
+    entities = query.fetch(batch_size)
 
-      if not entities:
-        # all entities has already been processed
-        return
-      
+    if not entities:
+      # all entities has already been processed
+      return
+
+    try:
       for entity in entities:
         program = entity.__getattribute__(self.PROGRAM_FIELD)
         user = entity.user
@@ -118,7 +124,7 @@ class RoleUpdater(object):
 
         profile = self.PROFILE_MODEL.get_or_insert(
             key_name=key_name, **properties)
-        
+
         # do not update anything if the role is already in the profile
         if profile.student_info:
           continue
@@ -151,6 +157,7 @@ class RoleUpdater(object):
     except DeadlineExceededError:
       # here we should probably be more careful
       deferred.defer(self._process, start_key, batch_size)
+
 
 def updateRole(role_name):
   """Starts a task which updates a particular role.
@@ -207,7 +214,7 @@ def _getProfileForRole(entity, profile_model):
   entity.
   """
 
-  if isinstance(entiy, profile_model):
+  if isinstance(entity, profile_model):
     return entity
 
   if isinstance(entity, OrgAdmin) or isinstance(entity, Mentor):
@@ -234,7 +241,7 @@ def _getProfileKeyForRoleKey(key, profile_model):
 
 class ReferenceUpdater(object):
   """Class which is responsible for updating references to Profile in
-  the specified model. 
+  the specified model.
   """
 
   def __init__(self, model, profile_model, fields_to_update,
@@ -252,7 +259,7 @@ class ReferenceUpdater(object):
 
   def _process(self, start_key, batch_size):
     """Iterates through the entities and updates the references.
-    """ 
+    """
 
     query = self.MODEL.all()
     if start_key:
@@ -260,7 +267,7 @@ class ReferenceUpdater(object):
 
     try:
       entities = query.fetch(batch_size)
-      
+
       if not entities:
         # all entities has already been processed
         return
@@ -268,6 +275,9 @@ class ReferenceUpdater(object):
       for entity in entities:
         for field in self.FIELDS_TO_UPDATE:
           old_reference = entity.__getattribute__(field)
+
+          if not old_reference:
+            continue
 
           # check if the field has not been updated
           if isinstance(old_reference, self.PROFILE_MODEL):
@@ -282,7 +292,7 @@ class ReferenceUpdater(object):
           for key in l:
             new_l.append(_getProfileKeyForRoleKey(key, self.PROFILE_MODEL))
           entity.__setattr__(list_property, new_l)
-          
+
       db.put(entities)
       start_key = entities[-1].key()
       deferred.defer(self._process, start_key, batch_size)
@@ -305,8 +315,24 @@ def updateReferencesForModel(model):
   updater.run()
 
 
+def updateStudentProjectReferences(request):
+  """Starts a bunch of iterative tasks which update references in
+  StudentProjects.
+  """
+
+  updateReferencesForModel('student_project')
+
+
+def updateStudentProposalReferences(request):
+  """Starts a bunch of iterative tasks which update references in
+  StudentProposals.
+  """
+
+  updateReferencesForModel('student_proposal')
+
+
 def updateReferences(request):
-  """Start a bunch of iterative tasks which update references to various roles.
+  """Starts a bunch of iterative tasks which update references to various roles.
   """
 
   # updates student proposals

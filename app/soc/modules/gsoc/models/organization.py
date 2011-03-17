@@ -124,6 +124,21 @@ class GSoCOrganization(Taggable, soc.models.organization.Organization):
       'student proposals which have been sent to your organization.')
   scoring_disabled.group = ugettext("4. Organization Preferences")
 
+  facebook = db.LinkProperty(
+      required=False, verbose_name=ugettext("Facebook URL"))
+  facebook.help_text = ugettext("URL of the Facebook page of your Organization")
+  facebook.group = ugettext("1. Public Info")
+
+  twitter = db.LinkProperty(
+      required=False, verbose_name=ugettext("Twitter URL"))
+  twitter.help_text = ugettext("URL of the Twitter profile of your Organization")
+  twitter.group = ugettext("1. Public Info")
+
+  blog = db.LinkProperty(
+      required=False, verbose_name=ugettext("Blog URL"))
+  blog.help_text = ugettext("URL of the Blog of your Organization")
+  blog.group = ugettext("1. Public Info")
+
   org_tag = tag_property('org_tag')
 
   def __init__(self, parent=None, key_name=None, app=None, **entity_values):

@@ -145,6 +145,9 @@ class View(organization.View):
                 attrs={'rows': 25, 'cols': 100})),
         'clean_contrib_template': cleaning.clean_html_content(
             'contrib_template'),
+        'clean_facebook': cleaning.clean_url('facebook'),
+        'clean_twitter': cleaning.clean_url('twitter'),
+        'clean_blog': cleaning.clean_url('blog'),
         }
 
     new_params['org_app_logic'] = org_app_logic

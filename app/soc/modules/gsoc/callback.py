@@ -67,6 +67,7 @@ class Callback(object):
     from soc.modules.gsoc.views import document
     from soc.modules.gsoc.views import homepage
     from soc.modules.gsoc.views import org_app
+    from soc.modules.gsoc.views import org_home
     from soc.modules.gsoc.views import profile
     from soc.modules.gsoc.views import proposal
     from soc.modules.gsoc.views import proposal_review
@@ -77,6 +78,7 @@ class Callback(object):
     self.views.append(document.DocumentPage())
     self.views.append(homepage.Homepage())
     self.views.append(org_app.OrgApp())
+    self.views.append(org_home.OrgHome())
     self.views.append(profile.ProfilePage())
     self.views.append(proposal.ProposalPage())
     self.views.append(proposal.UpdateProposal())

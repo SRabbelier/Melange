@@ -1,0 +1,73 @@
+{% extends "v2/modules/gsoc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+
+{% block page_content %}
+<div id="organization-name" class="block full home-block-1">
+  <h2 id="title-section-organization-name">{{ organization.name }}</h2>
+</div>
+
+<div id="organization-home" class="content_column_1">
+  <div id="organization-description" class="block block-organization-description">
+    <h4 title="title-section-organization-description">Description</h4>
+    <div id="block-organization-description-content" class="block-content">
+      <p>{{ organization.description }}</p>
+    </div>
+    <div id="block-organization-description-readmore" class="readmore">
+      <a href="{{ organization.ideas }}">Ideas page: {{ organization.ideas }}</a>
+    </div>
+  </div>
+</div>
+
+<div class="content_column_2">
+  <!-- begin block -->
+  <div id="tags" class="block block-tags">
+    <h4 id="title-section-connect-with-us">Tags</h4>
+    <div id="block-tags" class="block-content">
+      {{ tags }}
+    </div>
+  </div>
+  <!-- end block -->
+
+  <!-- begin block -->
+  {{ contact.render }}
+  <!-- end block -->
+
+  <!-- begin block -->
+  {% if organization.feed_url %}
+    <div id="blog-feed" class="block block-blog-feed"></div>
+  {% endif %}
+  <!-- end block -->
+</div>
+{% endblock page_content %}
+
+{% block dependencies %}
+  [
+    dep.melange.blog,
+    null,
+    function () {
+      function initialize() {
+        var blog = new BlogPreview(document.getElementById("blog-feed"));
+        blog.show("{{ organization.feed_url }}", 5, "Blog Feed");
+      }
+
+      jQuery(
+        function () {
+          google.load("feeds","1", {callback:initialize});
+        }
+      );
+    }
+  ]
+{% endblock dependencies %}

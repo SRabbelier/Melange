@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module containing the views for GSoC Organization Application.
+"""Module containing the views for GSoC Homepage Application.
 """
 
 __authors__ = [
@@ -68,7 +68,7 @@ class OrgHome(RequestHandler):
     pass
 
   def context(self):
-    """Handler to for GSoC Organization Application HTTP get request.
+    """Handler to for GSoC Organization Home page HTTP get request.
     """
     organization = self.data.organization
 

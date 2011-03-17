@@ -35,6 +35,7 @@ from soc.views.helper.request_data import RequestData
 from soc.modules.gsoc.models import profile
 
 from soc.modules.gsoc.logic.models.mentor import logic as mentor_logic
+from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.logic.models.org_admin import logic as org_admin_logic
 from soc.modules.gsoc.logic.models.org_app_survey import logic as org_app_logic
 from soc.modules.gsoc.logic.models.program import logic as program_logic
@@ -97,6 +98,13 @@ class RequestData(RequestData):
 
     org_app_fields = {'scope': self.program}
     self.org_app = org_app_logic.getOneForFields(org_app_fields)
+
+    if 'organization' in kwargs:
+      org_keyfields = {
+          'link_id': kwargs.get('organization'),
+          'scope_path': self.program.key().id_or_name(),
+          }
+      self.organization = org_logic.getFromKeyFieldsOr404(org_keyfields)
 
     if self.user:
       fields = {'user': self.user,

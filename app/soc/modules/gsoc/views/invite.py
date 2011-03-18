@@ -1,0 +1,195 @@
+#!/usr/bin/env python2.5
+#
+# Copyright 2011 the Melange authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Module containing the view for GSoC invitation page.
+"""
+
+__authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
+  ]
+
+
+from google.appengine.ext import db
+
+from django import forms as djangoforms
+from django.forms import widgets
+from django.utils.translation import ugettext
+
+from soc.logic import cleaning
+from soc.views import forms
+
+from soc.models.request import Request
+from soc.models.user import User
+
+from soc.modules.gsoc.views.base import RequestHandler
+
+from soc.modules.gsoc.logic.models.organization import logic as org_logic
+from soc.modules.gsoc.models.profile import GSoCProfile
+from soc.modules.gsoc.views.helper import access_checker
+from soc.modules.gsoc.views.helper import url_patterns
+
+from soc.views import out_of_band
+
+
+class InviteForm(forms.ModelForm):
+  """Django form for the proposal page.
+  """
+
+  link_id = djangoforms.CharField(label='Link ID')
+
+  class Meta:
+    model = Request
+    css_prefix = 'gsoc_intivation'
+    fields = ['message']
+    widgets = {
+        'link_id': widgets.TextInput()
+        }
+
+  def __init__(self, request_data, *args, **kwargs):
+    super(InviteForm, self).__init__(*args, **kwargs)
+
+    # store request object to cache results of queries
+    self.request_data = request_data
+
+    # reorder the fields so that link_id is the first one
+    field = self.fields.pop('link_id')
+    self.fields.insert(0, 'link_id', field)
+    
+  def clean_link_id(self):
+    """Accepts link_id of users which may be invited.
+    """
+
+    assert self.request_data.org
+
+    link_id = cleaning.clean_link_id('link_id')(self)
+
+    # get the user entity that the invitation is to
+    invited_user = cleaning.clean_existing_user('link_id')(self)
+    self.request_data.invited_user = invited_user
+    
+    # check if the organization has already sent an invitation to the user
+    query = db.Query(Request)
+    query.filter('type = ', 'Invitation')
+    query.filter('user = ', invited_user)
+    query.filter('group = ', self.request_data.org)
+    if query.get():
+      raise djangoforms.ValidationError(
+          'An invitation to this user has already been sent.')
+
+    # check if the user that is invited does not have the role
+    key_name = '/'.join([
+        self.request_data.program.key().name(),
+        invited_user.link_id])
+    profile = GSoCProfile.get_by_key_name(key_name, parent=invited_user)
+    if self.request_data.kwargs['role'] == 'org_admin':
+      role_for = profile.org_admin_for
+    else:
+      role_for = profile.mentor_for
+
+    for key in role_for:
+      if key == self.request_data.org.key():
+        raise djangoforms.ValidationError(
+            'The user already has this role.')
+
+    
+class InvitePage(RequestHandler):
+  """Encapsulate all the methods required to generate GSoC Home page.
+  """
+
+  def templatePath(self):
+    return 'v2/modules/gsoc/invite/base.html'
+
+  def djangoURLPatterns(self):
+    """Returns the list of tuples for containing URL to view method mapping.
+    """
+
+    return [
+        (r'^gsoc/invite/(?P<role>org_admin|mentor)/%s$' % url_patterns.ORG,
+         self)
+    ]
+
+  def checkAccess(self):
+    """Access checks for GSoC Invite page.
+    """
+
+    checker = access_checker.AccessChecker(self.data)
+    #checker.checkIsActive(self.data.program)
+      
+    link_id = self.data.kwargs['organization']
+    filter = {
+        'link_id': link_id,
+        'scope': self.data.program,
+        'status': 'active'
+        }
+    self.data.org = org_logic.getForFields(filter, unique=True)
+    if not self.data.org:
+      msg = ugettext(
+          'The organization with link_id %s does not exist for %s.' % 
+          (link_id, self.data.program.name))
+
+      raise out_of_band.Error(msg, status=404)
+
+    #checker.checkIsOrgAdminForOrg(self.data.org)
+
+  def context(self):
+    """Handler to for GSoC Invitation Page HTTP get request.
+    """
+
+    role = 'Org Admin' if self.data.kwargs['role'] == 'org_admin' else 'Mentor'
+
+    invite_form = InviteForm(self.data, self.data.POST or None)
+
+    return {
+        'page_name': 'Invite a new %s' % role,
+        'program': self.data.program,
+        'invite_form': invite_form
+    }
+
+  def _createFromForm(self):
+    """Creates a new invitation based on the data inserted in the form.
+
+    Returns:
+      a newly created proposal entity or None
+    """
+
+    assert self.data.org
+
+    invite_form = InviteForm(self.data, self.data.POST)
+    
+    if not invite_form.is_valid():
+      return None
+
+    assert self.data.invited_user
+
+    # create a new invitation entity
+    invite_form.cleaned_data['user'] = self.data.invited_user
+    invite_form.cleaned_data['group'] = self.data.org
+    invite_form.cleaned_data['role'] = self.data.kwargs['role']
+    invite_form.cleaned_data['status'] = 'new'
+    invite_form.cleaned_data['type'] = 'Invitation'
+
+    return invite_form.create(commit=True)
+
+
+  def post(self):
+    """Handler to for GSoC Invitation Page HTTP post request.
+    """
+
+    if self._createFromForm():
+      # TODO: here we should probably redirect to the org admin home page
+      pass
+    else:
+      self.get()

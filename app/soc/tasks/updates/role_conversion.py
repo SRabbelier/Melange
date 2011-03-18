@@ -70,9 +70,10 @@ def getDjangoURLPatterns():
       (r'^tasks/role_conversion/update_org_admins$',
         'soc.tasks.updates.role_conversion.updateOrgAdmins'),
       (r'^tasks/role_conversion/update_students$',
-        'soc.tasks.updates.role_conversion.updateStudents')
+        'soc.tasks.updates.role_conversion.updateStudents'),
       (r'^tasks/role_conversion/update_hosts$',
-        'soc.tasks.updates.role_conversion.updateHosts'),]
+        'soc.tasks.updates.role_conversion.updateHosts'),
+  ]
 
   return patterns
 

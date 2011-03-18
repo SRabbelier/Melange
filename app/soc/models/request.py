@@ -48,10 +48,16 @@ class Request(ModelWithFieldAttributes):
   """A request is made to allow a person to create a new Role entity.
   """
 
+  #: Type of the request:
+  #: - invitations are sent by organization admins to users
+  #: - requests are sent by wannabe mentors to organizations
+  type = db.StringProperty(required=True,
+      choices=['Invitation', 'Request'])
+
   #: The internal name of the role
   role = db.StringProperty(required=True)
 
-  #: The user this request is from
+  #: The user this request is from or this invitation is to
   user = db.ReferenceProperty(
       reference_class=User,
       required=True, collection_name='requests',

@@ -66,6 +66,7 @@ class Callback(object):
     from soc.modules.gsoc.views import dashboard
     from soc.modules.gsoc.views import document
     from soc.modules.gsoc.views import homepage
+    from soc.modules.gsoc.views import invite
     from soc.modules.gsoc.views import org_app
     from soc.modules.gsoc.views import org_home
     from soc.modules.gsoc.views import profile
@@ -86,6 +87,7 @@ class Callback(object):
     self.views.append(proposal_review.PostComment())
     self.views.append(proposal_review.PostScore())
     self.views.append(program.ProgramPage())
+    self.views.append(invite.InvitePage())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

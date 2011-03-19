@@ -24,6 +24,10 @@ limitations under the License.
 <h1 id="show-review-page-title">{{ request.type }} to become {{ request.roleName }}</h1>
 
 <div class="request-summary">
+  {% if request.type == 'Request' %}
+  <p class="request-requester">{{ request.user.name }}</p>
+  <p class="request-contact-info">{{ request.user.account }}</p>
+  {% endif %}
   <p class="request-status"><strong>Status:</strong> {{ request.statusMessage }}</p>
   <p class="request-sent-on"><strong>Sent on:</strong> {{ request.created_on }}</p>
   <p class="request-organization"><strong>Organization:</strong> {{ request.group.name }}</p>

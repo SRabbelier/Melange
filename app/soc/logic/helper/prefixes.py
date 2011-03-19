@@ -72,7 +72,6 @@ def getScopeForPrefix(prefix, key_name):
 
   if not scope_type:
     # no matching scope type found
-    raise AttributeError('No Matching Scope type found for %s' \
-        % entity.prefix)
+    raise AttributeError('No Matching Scope type found for %s' % prefix)
 
   return scope_type.get_by_key_name(key_name)

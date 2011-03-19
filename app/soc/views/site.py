@@ -32,6 +32,7 @@ from django.utils.translation import ugettext
 
 from soc.logic import cleaning
 from soc.logic.models.document import logic as document_logic
+from soc.logic.models.site import logic as site_logic
 from soc.models.site import Site
 from soc.models.work import Work
 from soc.views.base import SiteRequestHandler
@@ -67,7 +68,7 @@ class SiteForm(ModelForm):
   clean_noreply_email = cleaning.clean_empty_field('noreply_email')
 
 
-class SitePage(SiteRequestHandler):
+class EditSitePage(SiteRequestHandler):
   """View for the participant profile.
   """
 
@@ -117,3 +118,30 @@ class SitePage(SiteRequestHandler):
       self.redirect(reverse('edit_site_settings'))
     else:
       self.get()
+
+
+class SiteHomepage(SiteRequestHandler):
+  """View for the site home page.
+  """
+
+  def djangoURLPatterns(self):
+    return [
+        url(r'^$', self, name='site_home'),
+    ]
+
+
+  def __call__(self, *args, **kwargs):
+    """Custom call implementation.
+
+    This avoids looking up unneeded data.
+    """
+    site = site_logic.getSingleton()
+    program = site.active_program
+    if program:
+      kwargs['sponsor'] = program.scope_path
+      kwargs['program'] = program.link_id
+      url = reverse(program.homepage_url_name, kwargs=kwargs)
+    else:
+      url = reverse('edit_site_settings')
+    self.redirect(url)
+    return self.response

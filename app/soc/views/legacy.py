@@ -33,8 +33,6 @@ class Legacy(object):
     """Returns the URL pattern for the legacy views.
     """
     patterns = [
-        # TODO: replace with redirect to active program homepage
-        (r'^$', 'soc.views.models.site.main_public'),
     ]
 
     from soc.tasks.updates import role_conversion

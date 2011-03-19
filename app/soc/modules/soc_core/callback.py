@@ -72,7 +72,8 @@ class Callback(object):
     from soc.views import site
 
     self.views.append(legacy.Legacy())
-    self.views.append(site.SitePage())
+    self.views.append(site.EditSitePage())
+    self.views.append(site.SiteHomepage())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

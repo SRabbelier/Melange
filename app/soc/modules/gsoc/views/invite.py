@@ -181,7 +181,6 @@ class InvitePage(RequestHandler):
 
     return invite_form.create(commit=True)
 
-
   def post(self):
     """Handler to for GSoC Invitation Page HTTP post request.
     """

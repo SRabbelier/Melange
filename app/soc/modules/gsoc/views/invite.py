@@ -216,6 +216,7 @@ class ShowInvite(RequestHandler):
     
     id = int(self.data.kwargs['id'])
     self.data.invite = Request.get_by_id(id)
+    self.data.org = self.data.invite.group
 
     self.check.isRequestPresent(self.data.invite, id)
 
@@ -235,9 +236,11 @@ class ShowInvite(RequestHandler):
 
     assert self.data.invite
     assert self.data.canRespond
+    assert self.data.org
 
     return {
         'request': self.data.invite,
+        'org': self.data.org,
         'actions': self.ACTIONS,
         'canRespond': self.data.canRespond,
         } 
@@ -260,6 +263,8 @@ class ShowInvite(RequestHandler):
     """Accepts an invitation.
     """
 
+    assert self.data.org
+
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
@@ -267,9 +272,9 @@ class ShowInvite(RequestHandler):
     self.data.invite.status = 'completed'
 
     if self.data.invite.role == 'mentor':
-      self.data.profile.mentor_for.append(self.data.invite.group.key())
+      self.data.profile.mentor_for.append(self.data.org.key())
     else:
-      self.data.profile.org_admin_for.append(self.data.invite.group.key())
+      self.data.profile.org_admin_for.append(self.data.org.key())
 
     self.data.invite.put()
     self.data.profile.put()

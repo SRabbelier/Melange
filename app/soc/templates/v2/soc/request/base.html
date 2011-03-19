@@ -30,7 +30,7 @@ limitations under the License.
   {% endif %}
   <p class="request-status"><strong>Status:</strong> {{ request.statusMessage }}</p>
   <p class="request-sent-on"><strong>Sent on:</strong> {{ request.created_on }}</p>
-  <p class="request-organization"><strong>Organization:</strong> {{ request.group.name }}</p>
+  <p class="request-organization"><strong>Organization:</strong> {{ org.name }}</p>
   <br>
   <p class="request-message"><strong>Message:</strong> {{ request.message }}</p>
   {% if request.status == 'new' %}

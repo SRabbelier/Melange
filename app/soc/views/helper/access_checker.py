@@ -433,6 +433,7 @@ class AccessChecker(object):
     """
 
     assert self.data.invite
+    assert self.data.org
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
@@ -450,14 +451,14 @@ class AccessChecker(object):
       raise AccessViolation(error_msg)
 
     # check if the user does not have this role
-    self.notHaveRoleForOrganization(self.data.invite.group,
-        self.data.invite.role)
+    self.notHaveRoleForOrganization(self.data.org, self.data.invite.role)
 
   def canViewInvite(self):
     """Checks if the current user can see the invitation.
     """
 
     assert self.data.invite
+    assert self.data.org
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
@@ -466,7 +467,7 @@ class AccessChecker(object):
     # check if the entity is addressed to the current user
     if self.data.invite.user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
-      self.haveRoleForOrganization(self.data.invite.group, 'org_admin')
+      self.haveRoleForOrganization(self.data.org, 'org_admin')
       self.data.canRespond = False
 
     self.data.canRespond = True

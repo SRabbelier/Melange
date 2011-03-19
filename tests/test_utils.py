@@ -210,8 +210,9 @@ class DjangoTestCase(TestCase):
   def assertErrorTemplatesUsed(self, response):
     """Assert that all the error templates were used.
     """
-    self.assertEqual(response.status_code, httplib.OK)
-    self.assertTemplateUsed(response, 'soc/error.html')
+    self.assertNotEqual(response.status_code, httplib.OK)
+    # TODO(SRabbelier): update this when we use an error template again
+    # self.assertTemplateUsed(response, 'soc/error.html')
 
   def assertGSoCTemplatesUsed(self, response):
     """Asserts that all the templates from the base view were used.

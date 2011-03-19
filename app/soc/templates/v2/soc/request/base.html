@@ -25,8 +25,8 @@ limitations under the License.
 
 <div class="request-summary">
   {% if request.type == 'Request' %}
-  <p class="request-requester">{{ request.user.name }}</p>
-  <p class="request-contact-info">{{ request.user.account }}</p>
+  <p class="request-requester">{{ user.name }}</p>
+  <p class="request-contact-info">{{ user.account }}</p>
   {% endif %}
   <p class="request-status"><strong>Status:</strong> {{ request.statusMessage }}</p>
   <p class="request-sent-on"><strong>Sent on:</strong> {{ request.created_on }}</p>

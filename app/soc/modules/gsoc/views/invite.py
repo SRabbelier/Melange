@@ -217,6 +217,7 @@ class ShowInvite(RequestHandler):
     id = int(self.data.kwargs['id'])
     self.data.invite = Request.get_by_id(id)
     self.data.org = self.data.invite.group
+    self.data.invited_user = self.data.invite.user
 
     self.check.isRequestPresent(self.data.invite, id)
 
@@ -237,11 +238,13 @@ class ShowInvite(RequestHandler):
     assert self.data.invite
     assert self.data.canRespond
     assert self.data.org
+    assert self.data.invited_user
 
     return {
         'request': self.data.invite,
         'org': self.data.org,
         'actions': self.ACTIONS,
+        'user': self.data.invited_user,
         'canRespond': self.data.canRespond,
         } 
 

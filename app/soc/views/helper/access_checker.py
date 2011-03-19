@@ -434,6 +434,7 @@ class AccessChecker(object):
 
     assert self.data.invite
     assert self.data.org
+    assert self.data.invited_user
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
@@ -444,7 +445,7 @@ class AccessChecker(object):
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user
-    if self.data.invite.user.key() != self.data.user.key():
+    if self.data.invited_user.key() != self.data.user.key():
       error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
           'model': 'Request'
           }
@@ -459,13 +460,14 @@ class AccessChecker(object):
 
     assert self.data.invite
     assert self.data.org
+    assert self.data.invited_user
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user
-    if self.data.invite.user.key() != self.data.user.key():
+    if self.data.invited_user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
       self.haveRoleForOrganization(self.data.org, 'org_admin')
       self.data.canRespond = False

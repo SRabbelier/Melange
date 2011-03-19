@@ -102,7 +102,7 @@ DEF_ID_BASED_ENTITY_INVALID_MSG_FMT = ugettext(
     '%(model)s entity, whose id is %(id)s, is invalid at this time.')
 
 DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
-    'This %(model) entity does not belong to you.')
+    'This %(model)s entity does not belong to you.')
 
 DEF_NOT_HOST_MSG = ugettext(
     'You need to be a program adminstrator to access this page.')
@@ -115,6 +115,11 @@ DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG = ugettext(
     'You cannot register as a %s since you are already a '
     'student in %s.')
 
+DEF_NOT_VALID_INVITATION_MSG = ugettext(
+    'This is not a valid invitation.')
+
+DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG = ugettext(
+    'You already have %(role)s role for %(org)s.')
 
 class AccessChecker(object):
   """Helper classes for access checking.
@@ -291,6 +296,43 @@ class AccessChecker(object):
       return
 
     raise AccessViolation(DEF_IS_NOT_STUDENT_MSG)
+
+  def notHaveRoleForOrganization(self, org, role):
+    """Checks if the user have not the specified role for the organization.
+    """
+
+    if not self.data.profile:
+      return
+
+    if role == 'org_admin':
+      role_for = 'org_admin_for'
+    else:
+      role_for = 'mentor_for'
+
+    key = org.key()
+    if key in self.data.profile.__getattribute__(role_for):
+      error_msg = DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG % {
+          'role': 'Mentor' if role == 'mentor' else 'Org Admin',
+          'org': org.name
+          }
+      raise out_of_band.AccessViolation(error_msg)
+
+  def haveRoleForOrganization(self, org, role):
+    """Checks if the user has the specified role for the organization.
+    """
+
+    self.isRoleActive()
+
+    if role == 'org_admin':
+      role_for = 'org_admin_for'
+    else:
+      role_for = 'mentor_for'
+
+    key = org.key()
+    if key in self.data.profile.__getattribute__(role_for):
+      return
+
+    out_of_band.AccessViolation(DEF_NEED_ROLE_MSG)
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.

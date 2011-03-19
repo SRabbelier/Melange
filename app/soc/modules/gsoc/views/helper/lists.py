@@ -73,7 +73,7 @@ class ListConfiguration(object):
     self.multiselect = False
     self.toolbar = [True, 'top']
 
-    self._buttons = []
+    self._buttons = {}
     self._button_functions = {}
     self._row_operation = {}
     self._row_operation_func = None
@@ -122,11 +122,26 @@ class ListConfiguration(object):
     func = lambda ent, *args: getattr(ent, id)
     self.addColumn(id, name, func, resizable=resizable)
 
+  def __addButton(self, id, caption, bounds, type, parameters):
+    """Internal method for adding buttons so that the uniqueness of the id can
+    be checked.
+    """
+    if self._buttons.get(id):
+      logging.warning('Button with id %s is already defined' %id)
+
+    self._buttons[id] = {
+        'id': id,
+        'caption': caption,
+        'bounds': bounds,
+        'type': type,
+        'parameters': parameters
+    }
+
   def addSimpleRedirectButton(self, id, caption, url, new_window=True):
     """Adds a button to the list that simply opens a URL.
 
     Args:
-      id: The unique id (currently unchecked) of the button.
+      id: The unique id the button.
       caption: The display string shown to the end user.
       url: The url to redirect the user to.
       new_window: Boolean indicating whether the url should open in a new
@@ -137,19 +152,13 @@ class ListConfiguration(object):
         'new_window': new_window
     }
     # add a simple redirect button that is always active.
-    self._buttons.append({
-        'bounds': [0,'all'],
-        'id': id,
-        'caption': caption,
-        'type': 'redirect_simple',
-        'parameters': parameters
-    })
-  
+    self.__addButton(id, caption, [0, 'all'], 'redirect_simple', parameters)
+
   def addCustomRedirectButton(self, id, caption, func, new_window=True):
     """Adds a button to the list that simply opens a URL.
 
     Args:
-      id: The unique id (currently unchecked) of the button.
+      id: The unique id of the button.
       caption: The display string shown to the end user.
       func: The function to generate a url to redirect the user to.
             This function should take an entity as first argument and args and
@@ -162,13 +171,7 @@ class ListConfiguration(object):
 
     parameters = {'new_window': new_window}
     # add a custom redirect button that is active on a single row
-    self._buttons.append({
-        'bounds': [1, 1],
-        'id': id,
-        'caption': caption,
-        'type': 'redirect_custom',
-        'parameters': parameters
-    })
+    self.__addButton(id, caption, [1, 1], 'redirect_custom', parameters)
     self._button_functions[id] = func
 
   def addPostButton(self, id, caption, url, bounds, keys, refresh='current',
@@ -177,7 +180,7 @@ class ListConfiguration(object):
     POST request.
 
     Args:
-      id: The unique id (currently unchecked) of the button.
+      id: The unique id of the button.
       caption: The display string shown to the end user.
       url: The URL to make the POST request to.
       bounds: An array of size two with integers or of an integer and the
@@ -198,13 +201,7 @@ class ListConfiguration(object):
         'refresh': refresh,
         'redirect': redirect,
     }
-    self._buttons.append({
-        'bounds': bounds,
-        'id': id,
-        'caption': caption,
-        'type': 'post',
-        'parameters': parameters
-    })
+    self.__addButton(id, caption, bounds, 'post', parameters)
 
   def setRowAction(self, func, new_window=True):
     """The redirects the user to a URL when clicking on a row in the list.

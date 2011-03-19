@@ -665,3 +665,23 @@ p.reply-logged-in a {
   font-style: normal;
   font-weight: normal;
 }
+/*////////////////
+
+  Requests
+
+////////////////*/
+.request-summary p, .request-message p {
+  line-height: 1.6em;
+  margin: 0 0 10px 0;
+}
+.request-summary {
+  background: #fff;
+  border: 1px solid #ebebeb;
+  padding: 15px;
+}
+.request-summary p {
+  margin: 0;
+}
+.request-response {
+  padding: 20px 0 0 0
+}

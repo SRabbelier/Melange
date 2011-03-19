@@ -187,3 +187,40 @@ class InvitePage(RequestHandler):
       pass
     else:
       self.get()
+
+
+# TODO: that may be moved to a separate module
+class ShowInvite(RequestHandler):
+  """Encapsulate all the methods required to generate Show Invite page.
+  """
+
+  def templatePath(self):
+    return 'v2/soc/request/base.html'
+
+
+  def djangoURLPatterns(self):
+    return [
+        (r'^gsoc/invitation/%s$' % url_patterns.ID,
+         self)
+    ]
+
+  def checkAccess(self):
+    id = int(self.data.kwargs['id'])
+    self.data.invite = Request.get_by_id(id)
+
+    self.check.isRequestPresent(self.data.invite, id)
+      
+    
+    # check if it is an invitation
+    # check if the user is allowed to see the invite
+    
+
+  def context(self):
+    """Handler to for GSoC Show Invitation Page HTTP get request.
+    """
+
+    assert self.data.invite
+
+    return {
+        'request': self.data.invite,
+        }

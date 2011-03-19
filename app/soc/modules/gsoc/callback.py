@@ -88,6 +88,7 @@ class Callback(object):
     self.views.append(proposal_review.PostScore())
     self.views.append(program.ProgramPage())
     self.views.append(invite.InvitePage())
+    self.views.append(invite.ShowInvite())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

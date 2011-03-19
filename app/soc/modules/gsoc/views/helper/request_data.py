@@ -98,7 +98,7 @@ class RequestData(RequestData):
     org_app_fields = {'scope': self.program}
     self.org_app = org_app_logic.getOneForFields(org_app_fields)
 
-    if 'organization' in kwargs:
+    if kwargs.get('organization'):
       org_keyfields = {
           'link_id': kwargs.get('organization'),
           'scope_path': self.program.key().id_or_name(),

@@ -207,6 +207,11 @@ class DjangoTestCase(TestCase):
     xsrf_token = xsrfutil._generateToken(key, user_id)
     return xsrf_token
 
+  def getListResponse(self, url, idx):
+    """Returns the list reponse for the specified url and index.
+    """
+    return self.client.get(url + '?fmt=json&marker=1&idx=' + str(idx))
+
   def assertErrorTemplatesUsed(self, response):
     """Assert that all the error templates were used.
     """
@@ -222,6 +227,13 @@ class DjangoTestCase(TestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/footer.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/header.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/mainmenu.html')
+
+  def assertIsJsonResponse(self, response):
+    """Asserts that all the templates from the base view were used.
+    """
+    self.assertEqual(response.status_code, httplib.OK)
+    self.assertEqual('application/json', response['Content-Type'])
+    self.assertTemplateUsed(response, 'json_marker.html')
 
 
 def runTasks(url = None, name=None, queue_names = None):

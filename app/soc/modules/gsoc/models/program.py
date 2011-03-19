@@ -34,6 +34,8 @@ class GSoCProgram(soc.models.program.Program):
   """GSoC Program model extends the basic Program model.
   """
 
+  homepage_url_name = "gsoc_homepage"
+
   #: Required field storing application limit of the program.
   apps_tasks_limit = db.IntegerProperty(required=True,
       verbose_name=ugettext('Application/Tasks Limit'))

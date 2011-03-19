@@ -33,6 +33,8 @@ class GCIProgram(soc.models.program.Program):
   """GCI Program model extends the basic Program model.
   """
 
+  homepage_url_name = "gci_homepage"
+
   #: Required property containing the number of Tasks Students can work
   #: on simultaneously. For GCI it is 1
   nr_simultaneous_tasks = db.IntegerProperty(

@@ -150,7 +150,7 @@ class View(base.View):
 
     # set the link_id to the current user's link_id
     user_entity = user_logic.getCurrentUser()
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     link_id = user_entity.link_id
 
     return self.edit(request, access_type, page_name=page_name,
@@ -230,7 +230,7 @@ class View(base.View):
     user = user_logic.getCurrentUser()
 
     # only select the roles for the current user
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     fields = {
         'link_id': user.link_id,
         'status': ['active', 'inactive']
@@ -321,7 +321,7 @@ class View(base.View):
     user_entity = user_logic.getCurrentUser()
 
     # only select the Invites for this user that haven't been handled yet
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     filter = {'user': user_entity}
 
     if idx == 0:

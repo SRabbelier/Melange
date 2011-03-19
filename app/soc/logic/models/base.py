@@ -684,7 +684,7 @@ class Logic(object):
 
     return entities, next_start_key
 
-  # pylint: disable-msg=C0103
+  # pylint: disable=C0103
   def entityIterator(self, queryGen, batch_size=100):
     """Iterator that yields an entity in batches.
 

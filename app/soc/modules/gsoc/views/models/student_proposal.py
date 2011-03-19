@@ -432,7 +432,7 @@ class View(base.View):
       user_entity = user_logic.logic.getCurrentUser()
 
       # create the fields that should be in the ReviewFollower entity
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
                 'scope_path': entity.key().id_or_name(),
@@ -480,7 +480,7 @@ class View(base.View):
     user_entity = user_logic.logic.getCurrentUser()
 
     # check if the current user is the student
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     if user_entity.key() == student_entity.user.key():
       # show the proposal edit link
       context['edit_link'] = redirects.getEditRedirect(entity, params)
@@ -522,7 +522,7 @@ class View(base.View):
       if org_entity:
         # organization found use special form and also seed this form
         params['create_form'] = params['student_create_form']
-        # pylint: disable-msg=E1103
+        # pylint: disable=E1103
         kwargs['organization'] = org_entity.link_id
         kwargs['content'] = org_entity.contrib_template
 
@@ -1225,7 +1225,7 @@ class View(base.View):
     follower_entity = review_follower_logic.getForFields(fields, unique=True)
 
     if follower_entity:
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       context['is_subscribed'] =  follower_entity.subscribed_public
 
     return context
@@ -1336,7 +1336,7 @@ class View(base.View):
       user_entity = user_logic.logic.getCurrentUser()
 
       # create the fields that should be in the ReviewFollower entity
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       fields = {'link_id': user_entity.link_id,
                 'scope': entity,
                 'scope_path': entity.key().id_or_name(),

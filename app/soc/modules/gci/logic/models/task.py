@@ -176,7 +176,7 @@ class Logic(base.Logic):
       silent: iff True does not call post store methods.
     """
 
-    # pylint: disable-msg=W0621    
+    # pylint: disable=W0621
     from soc.modules.gci.logic.models.work_submission import logic as \
         gci_work_submission_logic
     from soc.modules.gci.models import comment as gci_comment_model
@@ -284,7 +284,7 @@ class Logic(base.Logic):
     For args see base.getFromKeyFieldsOr404().
     """
 
-    # pylint: disable-msg=W0621
+    # pylint: disable=W0621
     from soc.modules.gci.logic.models.work_submission import logic as \
         gci_work_submission_logic
  

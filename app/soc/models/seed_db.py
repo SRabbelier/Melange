@@ -136,7 +136,7 @@ class UserSeeder(Seeder):
   def type(self):
     return User
   
-  # pylint: disable-msg=W0221
+  # pylint: disable=W0221
   def seed(self, i, entities=None):
     user_properties = {
         'key_name': 'user_%04d' % i,
@@ -161,7 +161,7 @@ class GSoCOrganizationSeeder(Seeder):
   def type(self):
     return GSoCOrganization
   
-  # pylint: disable-msg=W0221
+  # pylint: disable=W0221
   def seed(self, i, entities=None, current_user=None, gsoc2009=None):
     properties = {
         'key_name': 'google/gsoc2009/org_%04d' % i,
@@ -529,7 +529,7 @@ def seed(request, *args, **kwargs):
 
   site.home = home_document
   site.put()
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.flush_all()
 
   return http.HttpResponse('Done')
@@ -646,7 +646,7 @@ def seed_survey_answer(request, i):
   all_properties = []
   scope_path = 'google/gsoc2009/'
   checkbox = 'PickMultipleQ Checkbox 2 for survey_%d' % i
-  # pylint: disable-msg=E1103
+  # pylint: disable=E1103
   for i in range(5):
     #student = GSoCStudent.get_by_key_name('google/gsoc2009/student_%d' % i)
     user = User.get_by_key_name('user_%d' % i)
@@ -677,7 +677,7 @@ def seed_mentor(request, i):
   if not org:
     raise Error('Run seed_many for at least %d orgs first.' % i)
   
-  # pylint: disable-msg=E1103
+  # pylint: disable=E1103
   properties = {
       'key_name': 'google/gsoc2009/org_%d/mentor' % i,
       'link_id': 'mentor',
@@ -770,7 +770,7 @@ def seed_student_proposal(request, i):
 
   all_properties = []
   
-  # pylint: disable-msg=E1103
+  # pylint: disable=E1103
   for i in range(random.randint(5, 20)):
     link_id = 'proposal_%s_%d' % (org.link_id, i)
     scope_path = 'google/gsoc2009/' + user.link_id
@@ -995,7 +995,7 @@ def clear(*args, **kwargs):
       entity.delete()
   except db.Timeout:
     return http.HttpResponseRedirect('#')
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.flush_all()
 
   return http.HttpResponse('Done')

@@ -155,7 +155,7 @@ def getDefaultMailSender():
   # and the GAE admin API is case sensitive
   user_entity = user_logic.logic.getForAccount(account)
 
-  # pylint: disable-msg=E1103
+  # pylint: disable=E1103
   name = user_entity.name if user_entity else account.nickname()
 
   return (name, account.email())

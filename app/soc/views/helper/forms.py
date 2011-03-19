@@ -73,7 +73,7 @@ class BaseForm(djangoforms.ModelForm):
 
       # Since fields can be added only to the ModelForm subclass, check to
       # see if the Model has a corresponding field first.
-      # pylint: disable-msg=E1101
+      # pylint: disable=E1101
       if hasattr(self.Meta.model, field_name):
         model_prop = getattr(self.Meta.model, field_name)
 

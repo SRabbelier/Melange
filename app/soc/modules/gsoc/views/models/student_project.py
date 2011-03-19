@@ -645,7 +645,7 @@ class View(base.View):
       mentor = mentor_logic.getForFields(fields, unique=True)
 
       additional_mentors = entity.additional_mentors
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       if additional_mentors and mentor.key() in additional_mentors:
         # remove the mentor from the additional mentors list
         additional_mentors.remove(mentor.key())
@@ -720,7 +720,7 @@ class View(base.View):
 
     additional_mentors = entity.additional_mentors
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     if additional_mentors and mentor.key() in additional_mentors:
       # remove the mentor that is now becoming the primary mentor
       additional_mentors.remove(mentor.key())

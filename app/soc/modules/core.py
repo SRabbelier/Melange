@@ -114,7 +114,7 @@ class Core(object):
     """Creates a new instance of the Core.
     """
     
-    # pylint: disable-msg=C0103
+    # pylint: disable=C0103
     self.API_VERSION = 1
 
     self.registered_callbacks = []

@@ -851,7 +851,7 @@ class View(base.View):
 
       mentor_entity = gci_mentor_logic.logic.getForFields(filter, unique=True)
 
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       fields['mentors'] = [mentor_entity.key()]
 
       entity = logic.updateOrCreateFromFields(fields)

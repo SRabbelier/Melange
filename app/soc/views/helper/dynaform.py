@@ -197,7 +197,7 @@ def newDynaField(field, base, passthrough):
     if key in properties:
       del properties[key]
 
-  # pylint: disable-msg=E1002
+  # pylint: disable=E1002
   class DynaField(base):
     """The dynamically created Field class.
     """

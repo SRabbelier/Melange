@@ -114,7 +114,7 @@ class View(student.View):
 
     user_entity = user_logic.getCurrentUser()
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     fields = {
         'link_id': user_entity.link_id,
         'scope_path': kwargs['scope_path']

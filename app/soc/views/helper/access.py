@@ -248,7 +248,7 @@ def allowIfCheckPasses(checker_name):
 
   return decorator
 
-# pylint: disable-msg=C0103
+# pylint: disable=C0103
 allowDeveloper = allowIfCheckPasses('checkIsDeveloper') 
 
 
@@ -504,7 +504,7 @@ class Checker(object):
         first = first if first else exception
 
     # none passed, re-raise the first exception
-    # pylint: disable-msg=W0706
+    # pylint: disable=W0706
     raise first
 
   def allow(self, django_args):

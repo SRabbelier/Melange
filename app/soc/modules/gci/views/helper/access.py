@@ -132,13 +132,13 @@ class GCIChecker(access.Checker):
       raise out_of_band.AccessViolation(
           message_fmt=DEF_SIGN_UP_AS_OA_MENTOR_MSG)
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     program_entity = role_entity.program
 
     if not timeline_helper.isActivePeriod(program_entity.timeline, 'program'):
       raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     org_entity = role_entity.scope
 
     if settings.GCI_TASK_QUOTA_LIMIT_ENABLED and check_limit:

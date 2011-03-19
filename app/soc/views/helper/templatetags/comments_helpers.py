@@ -49,7 +49,7 @@ def as_comment(context, comment):
 
   edit_link = ''
   current_user = user_logic.logic.getCurrentUser()
-  # pylint: disable-msg=E1103
+  # pylint: disable=E1103
   if current_user and comment.author.key() == current_user.key():
     params = {'url_name': context['comment_on_url_name']}
     edit_link = redirects.getEditRedirect(comment, params)

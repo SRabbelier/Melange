@@ -268,7 +268,7 @@ class View(base.View):
       user = user_logic.getCurrentUser()
 
       # if the message is meant for the user that is reading it
-      # pylint: disable-msg=E1103
+      # pylint: disable=E1103
       if entity.scope.key() == user.key():
         # mark the entity as read
         self._logic.updateEntityProperties(entity, {'unread' : False} )

@@ -191,7 +191,7 @@ class View(role.View):
     params['create_form'] = params['user_create_form']
 
     kwargs.update(fields)
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     return self.create(request, access_type='allow', page_name=page_name,
         params=params, **kwargs)
 

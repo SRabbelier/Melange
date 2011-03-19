@@ -41,7 +41,7 @@ def get(core, id, *args, **kwargs):
   """
 
   memcache_key = key(id)
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   return memcache.get(memcache_key), memcache_key
 
 
@@ -54,7 +54,7 @@ def add(sidebar, memcache_key, core, *args, **kwargs):
 
   # Store sidebar for just three minutes to force a refresh every so often
   retention = 3*60
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.add(memcache_key, sidebar, retention)
 
 
@@ -71,7 +71,7 @@ def flush(id=None):
     id = soc.logic.accounts.getCurrentAccount()
 
   memcache_key = key(id)
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.delete(memcache_key)
   soc.cache.rights.flush(id)
 

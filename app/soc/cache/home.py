@@ -62,7 +62,7 @@ def get(self, *args, **kwargs):
 
   memcache_key = key(entity)
   logging.info("Retrieving %s" % memcache_key)
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   return memcache.get(memcache_key), memcache_key
 
 def put(result, memcache_key, *args, **kwargs):
@@ -81,7 +81,7 @@ def put(result, memcache_key, *args, **kwargs):
   retention = 10*60
 
   logging.info("Setting %s" % memcache_key)
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.add(memcache_key, result, retention)
 
 
@@ -96,7 +96,7 @@ def flush(entity):
 
   memcache_key = key(entity)
   logging.info("Flushing %s" % memcache_key)
-  # pylint: disable-msg=E1101
+  # pylint: disable=E1101
   memcache.delete(memcache_key)
 
 

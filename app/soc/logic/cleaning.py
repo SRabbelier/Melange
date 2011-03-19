@@ -210,7 +210,7 @@ def clean_user_is_current(field_name, as_user=True):
     link_id = clean_link_id(field_name)(self)
 
     user_entity = user_logic.getCurrentUser()
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     if not user_entity or user_entity.link_id != link_id:
       # this user is not the current user
       raise forms.ValidationError("This user is not you.")
@@ -253,7 +253,7 @@ def clean_users_not_same(field_name):
     user_entity = clean_user_field(self)
 
     current_user_entity = user_logic.getCurrentUser()
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     if user_entity.key() == current_user_entity.key():
       # users are equal
       raise forms.ValidationError("You cannot enter yourself here.")
@@ -835,7 +835,7 @@ def validate_document_acl(view, creating=False):
 
     user = user_logic.getCurrentUser()
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     rights.setCurrentUser(user.account, user)
 
     prefix = self.cleaned_data['prefix']

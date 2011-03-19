@@ -28,7 +28,7 @@ import logging
 
 from google.appengine.ext.webapp import util
 
-# pylint: disable-msg=W0611
+# pylint: disable=W0611
 import gae_django
 
 

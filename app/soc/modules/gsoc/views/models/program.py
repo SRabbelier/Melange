@@ -475,7 +475,7 @@ class View(program.View):
       org_admin = org_admin_logic.getForFields(fields, unique=True)
 
       if org_admin:
-        # pylint: disable-msg=E1103
+        # pylint: disable=E1103
         org_data['admin_name'] = org_admin.name()
         org_data['admin_email'] = org_admin.email
 

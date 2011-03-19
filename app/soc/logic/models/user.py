@@ -175,7 +175,7 @@ class Logic(base.Logic):
       # default user to the current logged in user
       user = self.getForAccount(account)
 
-    # pylint: disable-msg=E1103
+    # pylint: disable=E1103
     if user and user.is_developer:
       return True
 

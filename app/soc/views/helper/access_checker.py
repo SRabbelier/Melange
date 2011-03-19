@@ -385,4 +385,4 @@ class AccessChecker(object):
     """
 
     self.isIdBasedEntityPresent(entity, id, 'Request')
-      raise AccessViolation(error_msg)
+    raise AccessViolation(error_msg)

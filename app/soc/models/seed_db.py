@@ -298,6 +298,9 @@ def seed(request, *args, **kwargs):
   gsoc2009 = GSoCProgram(**program_properties)
   gsoc2009.put()
 
+  site.active_program = gsoc2009
+  site.put()
+
   # TODO: Use real GCIProgram here
   timeline_properties = {
         'key_name': 'google/gci2009',

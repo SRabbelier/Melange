@@ -81,7 +81,7 @@ DEF_NO_SUCH_PROGRAM_MSG = ugettext(
     'The url is wrong (no program was found).')
 
 DEF_ROLE_INACTIVE_MSG = ugettext(
-    'This page is inaccessible because you do not have an active role '
+    'This page is inaccessible because you do not have a profile '
     'in the program at this time.')
 
 DEF_IS_NOT_STUDENT_MSG = ugettext(
@@ -332,7 +332,7 @@ class AccessChecker(object):
     if key in roles:
       return
 
-    AccessViolation(DEF_NEED_ROLE_MSG)
+    raise AccessViolation(DEF_NEED_ROLE_MSG)
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.

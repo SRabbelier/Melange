@@ -141,7 +141,13 @@ class RequestHandler(object):
                                      'post-check=0, pre-check=0' # HTTP/1.1, IE7
     self.response['Pragma'] = 'no-cache'
 
-    data = simplejson.dumps(self.jsonContext())
+    context = self.jsonContext()
+
+    if self.request.GET.get('marker'):
+      # allow the django test framework to capture the context dictionary
+      loader.render_to_string('json_marker.html', dictionary=context)
+
+    data = simplejson.dumps(context)
     self.response.write(data)
 
   def jsonContext(self):

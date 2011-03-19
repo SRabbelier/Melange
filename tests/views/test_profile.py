@@ -39,39 +39,36 @@ class ProfileViewTest(DjangoTestCase):
 
   def setUp(self):
     from soc.modules.gsoc.models.program import GSoCProgram
-    self.gsoc = seeder_logic.seed(GSoCProgram)
+    from soc.modules.gsoc.models.organization import GSoCOrganization
+    properties = {'status': 'visible'}
+    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
+    self.org = seeder_logic.seed(GSoCOrganization)
     self.timeline = TimelineHelper(self.gsoc.timeline)
     self.data = GSoCProfileHelper(self.gsoc)
 
-  def assertHomepageTemplatesUsed(self, response):
-    """Asserts that all the templates from the homepage view were used.
-    """
+  def testCreateProfile(self):
+    self.timeline.studentSignup()
+    url = '/gsoc/profile/student/' + self.gsoc.key().name()
+    response = self.client.get(url)
     self.assertGSoCTemplatesUsed(response)
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/base.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_connect_with_us.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_apply.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_timeline.html')
 
-  def testHomepageDuringSignup(self):
-    """Tests the student homepage during the signup period.
-    """
+  def testRedirectWithStudentProfile(self):
     self.timeline.studentSignup()
-    url = '/gsoc/homepage/' + self.gsoc.key().name()
+    self.data.createStudent()
+    url = '/gsoc/profile/student/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertHomepageTemplatesUsed(response)
-    timeline_tmpl = response.context['timeline']
-    apply_context = response.context['apply'].context()
-    self.assertEqual(timeline_tmpl.current_timeline, 'student_signup_period')
-    self.assertTrue('profile_link' in apply_context)
+    self.assertEqual(response.status_code, httplib.FOUND)
 
-  def testHomepageDuringSignupExistingUser(self):
-    """Tests the student hompepage during the signup period with an existing user.
-    """
-    self.data.createProfile()
+  def testRedirectWithStudentProfile(self):
     self.timeline.studentSignup()
-    url = '/gsoc/homepage/' + self.gsoc.key().name()
+    self.data.createStudent()
+    url = '/gsoc/profile/mentor/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertHomepageTemplatesUsed(response)
-    apply_tmpl = response.context['apply']
-    self.assertTrue(apply_tmpl.data.profile)
-    self.assertFalse('profile_link' in apply_tmpl.context())
+    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+
+  def testForbiddenWithMentorProfile(self):
+    self.timeline.studentSignup()
+    self.data.createMentor(self.org)
+    url = '/gsoc/profile/student/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, httplib.FORBIDDEN)

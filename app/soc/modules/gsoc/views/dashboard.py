@@ -34,6 +34,11 @@ from soc.modules.gsoc.logic.models.org_app_survey import logic as \
     org_app_logic
 from soc.modules.gsoc.logic.models.student_project import logic as \
     project_logic
+# TODO: Change this to the logic for the new proposals
+from soc.modules.gsoc.logic.models.student_proposal import logic as \
+    proposal_logic
+from soc.modules.gsoc.logic.models.survey import project_logic as \
+    ps_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import lists
 from soc.modules.gsoc.views.helper import url_patterns
@@ -94,9 +99,9 @@ class Dashboard(RequestHandler):
   def _getActiveComponents(self):
     """Returns the components that are active on the page.
     """
-    if self.data.student:
+    if self.data.student_info:
       return self._getStudentComponents()
-    elif self.data.mentor or self.data.org_admin:
+    elif self.data.mentor_for or self.data.org_admin_for:
       return self._getOrgMemberComponents()
     else:
       return self._getLoneUserComponents()
@@ -130,16 +135,16 @@ class Dashboard(RequestHandler):
         components.append(
             ProjectsIMentorComponent(self.request, self.data))
 
-    if self.data.org_admin:
-      # add a component for all organization that this user administers
-      components.append(OrganizationsIAdminComponent(self.request, self.data))
-
-    if timeline_helper.isBeforeEvent(
+    if timeline_helper.isAfterEvent(
       self.data.program_timeline, 'student_signup_start'):
       # Add the submitted proposals component
       #components.append(
       #    SubmittedProposalsComponent(self.request, self.data))
       pass
+
+    if self.data.org_admin:
+      # add a component for all organization that this user administers
+      components.append(OrganizationsIAdminComponent(self.request, self.data))
 
     return components
 
@@ -151,7 +156,8 @@ class Dashboard(RequestHandler):
     org_app_survey = org_app_logic.getForProgram(self.data.program)
 
     fields = {'survey': org_app_survey}
-    org_app_record = org_app_logic.getRecordLogic().getForFields(fields, unique=True)
+    org_app_record = org_app_logic.getRecordLogic().getForFields(fields,
+                                                                 unique=True)
 
     if org_app_record:
       # add a component showing the organization application of the user
@@ -198,6 +204,11 @@ class MyOrgApplicationsComponent(Component):
     """
     # passed in so we don't have to do double queries
     self.org_app_survey = org_app_survey
+
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('name', 'Organization Name')
+    self._list_config = list_config
+
     super(MyOrgApplicationsComponent, self).__init__(request, data)
 
   def templatePath(self):
@@ -208,15 +219,13 @@ class MyOrgApplicationsComponent(Component):
   def context(self):
     """Returns the context of this component.
     """
-    # TODO(ljvderijk): List redirects
-    list_params = org_app_view.getParams()['record_list_params']
-    list_params['list_description'] = 'List of your Organization Applications'
-    list_config = lists.getListGenerator(self.request, list_params,
-                                         visibility='self', idx=0)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=0, description='List of your Organization Applications')
+
     return {
         'name': 'org_applications',
         'title': 'MY ORGANIZATION APPLICATIONS',
-        'lists': Lists([list_config]),
+        'lists': [list],
         }
 
   def getListData(self):
@@ -227,11 +236,12 @@ class MyOrgApplicationsComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 0:
-      list_data = lists.getListData(
-          self.request, org_app_view.getParams()['record_list_params'],
-          {'survey': self.org_app_survey, 'main_admin': self.data.user},
-          visibility='self')
-      return list_data
+      fields = {'survey': self.org_app_survey,
+                'main_admin': self.data.user}
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, org_app_logic.getRecordLogic(),
+          fields)
+      return response_builder.build()
     else:
       return None
 
@@ -239,6 +249,18 @@ class MyOrgApplicationsComponent(Component):
 class MyProposalsComponent(Component):
   """Component for listing all the proposals of the current Student.
   """
+
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('title', 'Title')
+    list_config.addColumn('org', 'Organization',
+                          lambda ent, *args: ent.org.name)
+    self._list_config = list_config
+
+    super(MyProposalsComponent, self).__init__(request, data)
+
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
@@ -248,12 +270,12 @@ class MyProposalsComponent(Component):
   def context(self):
     """Returns the context of this component.
     """
-    list_config = lists.getListGenerator(self.request,
-                                         proposal_view.getParams(), idx=1)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=1, description='List of my project proposals')
     return {
         'name': 'proposals',
         'title': 'PROPOSALS',
-        'lists': Lists([list_config]),
+        'lists': [list],
         }
 
   def getListData(self):
@@ -264,10 +286,11 @@ class MyProposalsComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 1:
-      list_data = lists.getListData(self.request, proposal_view.getParams(),
-                                   {'program': self.data.program,
-                                    'scope': self.data.student})
-      return list_data
+      fields = {'program': self.data.program}
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, proposal_logic, fields,
+          ancestors=[self.data.profile], prefetch=['org'])
+      return response_builder.build()
     else:
       return None
 
@@ -280,7 +303,7 @@ class MyProjectsComponent(Component):
     """Initializes this component.
     """
     list_config = lists.ListConfiguration()
-    list_config.addColumn('title', 'Title', lambda ent, *args: ent.title)
+    list_config.addSimpleColumn('title', 'Title')
     list_config.addColumn('org_name', 'Organization Name',
                           lambda ent, *args: ent.scope.name)
     self._list_config = list_config
@@ -304,7 +327,8 @@ class MyProjectsComponent(Component):
                 'student': self.data.student}
       prefetch = ['scope']
       response_builder = lists.QueryContentResponseBuilder(
-          self.request, self._list_config, project_logic, fields, prefetch)
+          self.request, self._list_config, project_logic, fields,
+          prefetch=prefetch)
       return response_builder.build()
     else:
       return None
@@ -325,6 +349,19 @@ class MyEvaluationsComponent(Component):
   """Component for listing all the Evaluations of the current Student.
   """
 
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    # TODO: This list should allow one to view or edit a record for each project
+    # available to the student.
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('title', 'Title')
+    list_config.addSimpleColumn('survey_start', 'Survey Starts')
+    list_config.addSimpleColumn('survey_end', 'Survey Ends')
+    self._list_config = list_config
+
+    super(MyEvaluationsComponent, self).__init__(request, data)
+
   def templatePath(self):
     """Returns the path to the template that should be used in render().
     """
@@ -338,27 +375,29 @@ class MyEvaluationsComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 3:
-      list_data = lists.getListData(self.request, project_survey_view.getParams(),
-                                    {'scope': self.data.program})
-      return list_data
+      fields = {'program': self.data.program}
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, ps_logic, fields)
+      return response_builder.build()
     else:
       return None
 
   def context(self):
     """Returns the context of this component.
     """
-    list_config = lists.getListGenerator(
-        self.request, project_survey_view.getParams(), idx=3)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=3, description='List of my evaluations')
 
     return {
         'name': 'evaluations',
         'title': 'EVALUATIONS',
-        'lists': Lists([list_config]),
+        'lists': [list],
     }
 
 
 class SubmittedProposalsComponent(Component):
-  """Component for listing all the Evaluations of the current Student.
+  """Component for listing all the proposals send to orgs this user is a member
+  of.
   """
   # TODO(ljvderijk): Implement
   pass
@@ -367,6 +406,17 @@ class SubmittedProposalsComponent(Component):
 class ProjectsIMentorComponent(Component):
   """Component for listing all the Projects mentored by the current user.
   """
+
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('title', 'Title')
+    list_config.addColumn('org_name', 'Organization',
+                          lambda ent, *args: ent.scope.name)
+    self._list_config = list_config
+
+    super(ProjectsIMentorComponent, self).__init__(request, data)
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
@@ -381,23 +431,24 @@ class ProjectsIMentorComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 4:
-      list_data = lists.getListData(self.request, project_view.getParams(),
-                                    {'program': self.data.program,
-                                     'mentor': self.data.mentor})
-      return list_data
+      fields =  {'program': self.data.program,
+                 'mentor': self.data.profile}
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, project_logic, fields, prefetch=['scope'])
+      return response_builder.build()
     else:
       return None
 
   def context(self):
     """Returns the context of this component.
     """
-    list_config = lists.getListGenerator(
-        self.request, project_view.getParams(), idx=4)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=4, description='List of projects I mentor')
 
     return {
         'name': 'mentoring_projects',
         'title': 'PROJECTS I AM A MENTOR FOR',
-        'lists': Lists([list_config]),
+        'lists': [list],
     }
 
 
@@ -405,6 +456,15 @@ class OrganizationsIAdminComponent(Component):
   """Component for listing all the Organizations controlled by the current
   user.
   """
+
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('name', 'name')
+    self._list_config = list_config
+
+    super(OrganizationsIAdminComponent, self).__init__(request, data)
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().
@@ -419,26 +479,26 @@ class OrganizationsIAdminComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 5:
-      # TODO(ljvderijk): Feels weird that if you have access to all the keys
-      # already that you need to use the list code in this way. The rewrite
-      # should probably allow the caller to control the entities to put in?
-      list_data = lists.getListData(
-          self.request, org_view.getParams(),
-          {'scope': self.data.program,
-           'link_id': [org_admin.scope.link_id
-                       for org_admin in self.data.org_admin]})
-      return list_data
+      response = lists.ListContentResponse(self.request, self._list_config)
+
+      if response.start != 'done':
+        # Add all organizations in one go since we already queried for it.
+        for org in self.data.org_admin_for:
+          response.addRow(org)
+        response.next = 'done'
+
+      return response
     else:
       return None
 
   def context(self):
     """Returns the context of this component.
     """
-    list_config = lists.getListGenerator(
-        self.request, org_view.getParams(), idx=5)
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=5, description='Organizations I am an admin for')
 
     return {
         'name': 'adminning_organizations',
         'title': 'ORGANIZATIONS THAT I AM AN ADMIN FOR',
-        'lists': Lists([list_config]),
+        'lists': [list],
     }

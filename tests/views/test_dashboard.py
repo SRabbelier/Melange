@@ -26,6 +26,7 @@ import httplib
 
 from tests.profile_utils import GSoCProfileHelper
 from tests.test_utils import DjangoTestCase
+from tests.timeline_utils import TimelineHelper
 
 # TODO: perhaps we should move this out?
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
@@ -37,9 +38,12 @@ class DashboardTest(DjangoTestCase):
 
   def setUp(self):
     from soc.modules.gsoc.models.program import GSoCProgram
+    from soc.modules.gsoc.models.timeline import GSoCTimeline
     from soc.modules.gsoc.models.organization import GSoCOrganization
-    self.gsoc = seeder_logic.seed(GSoCProgram)
+    properties = {'timeline': seeder_logic.seed(GSoCTimeline)}
+    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
     self.org = seeder_logic.seed(GSoCOrganization)
+    self.timeline = TimelineHelper(self.gsoc.timeline)
     self.data = GSoCProfileHelper(self.gsoc)
 
   def assertDashboardTemplatesUsed(self, response):
@@ -72,7 +76,13 @@ class DashboardTest(DjangoTestCase):
     self.data.createStudent()
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertDashboardTemplatesUsed(response)
+    self.assertDashboardComponentTemplatesUsed(response)
+
+  def testDashboardAsStudentWithProposal(self):
+    self.data.createStudentWithProposal()
+    url = '/gsoc/dashboard/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertDashboardComponentTemplatesUsed(response)
 
   def testDashboardAsStudentWithProject(self):
     self.data.createStudentWithProject()
@@ -95,12 +105,13 @@ class DashboardTest(DjangoTestCase):
 
   def testDashboardAsMentor(self):
     self.data.createMentor(self.org)
+    self.timeline.studentsAnnounced()
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertDashboardTemplatesUsed(response)
-    # TODO(SRabbelier): anything we should show for mentors without projects?
+    self.assertDashboardComponentTemplatesUsed(response)
 
   def testDashboardAsMentorWithProject(self):
+    self.timeline.studentsAnnounced()
     self.data.createMentorWithProject(self.org)
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)

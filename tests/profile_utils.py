@@ -54,7 +54,8 @@ class GSoCProfileHelper(object):
       return
     from soc.modules.gsoc.models.profile import GSoCProfile
     user = self.createUser()
-    properties = {'link_id': user.link_id, 'user': user, 'parent': user, 'scope': self.program, 'student_info': None}
+    properties = {'link_id': user.link_id, 'user': user, 'parent': user,
+                  'scope': self.program, 'student_info': None}
     self.profile = seeder_logic.seed(GSoCProfile, properties)
 
   def createStudent(self):
@@ -62,14 +63,27 @@ class GSoCProfileHelper(object):
     """
     self.createProfile()
     from soc.models.role import StudentInfo
-    properties = {'key_name': self.profile.key().name(), 'parent': self.profile.key()}
+    properties = {'key_name': self.profile.key().name(), 'parent': self.profile}
     self.profile.student_info = seeder_logic.seed(StudentInfo, properties)
+    self.profile.put()
 
-  def createStudentWithProject(self):
-    """Sets the current suer to be a student with a project for the current program.
+  def createStudentWithProposal(self):
+    """Sets the current user to be a student with a proposal for the current program.
     """
     self.createStudent()
-    # TODO(SRabbelier): implement
+    from soc.modules.gsoc.models.student_proposal import StudentProposal
+    properties = {'link_id': self.profile.link_id, 'scope': self.profile,
+                  'parent': self.profile}
+    seeder_logic.seed(StudentProposal, properties)
+
+  def createStudentWithProject(self):
+    """Sets the current user to be a student with a project for the current program.
+    """
+    self.createStudentWithProposal()
+    from soc.modules.gsoc.models.student_project import StudentProject
+    properties = {'link_id': self.profile.link_id, 'scope': self.profile,
+                  'student': self.profile, 'parent': self.profile}
+    seeder_logic.seed(StudentProject, properties)
 
   def createHost(self):
     """Sets the current user to be a host for the current program.
@@ -96,4 +110,6 @@ class GSoCProfileHelper(object):
     """Creates an mentor profile with a project for the current user.
     """
     self.createMentor(org)
-    # TODO(SRabbelier): implement
+    from soc.modules.gsoc.models.student_project import StudentProject
+    properties = {'mentor': self.profile}
+    seeder_logic.seed(StudentProject, properties)

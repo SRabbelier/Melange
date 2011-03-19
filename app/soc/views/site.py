@@ -24,6 +24,8 @@ __authors__ = [
 
 import os
 
+from google.appengine.api import users
+
 from django.conf.urls.defaults import url
 from django.core.urlresolvers import reverse
 from django.forms import widgets as django_widgets
@@ -127,21 +129,30 @@ class SiteHomepage(SiteRequestHandler):
   def djangoURLPatterns(self):
     return [
         url(r'^$', self, name='site_home'),
+        url(r'^(login)$', self, name='login'),
+        url(r'^(logout)$', self, name='logout'),
     ]
 
-
-  def __call__(self, *args, **kwargs):
+  def __call__(self, request, *args, **kwargs):
     """Custom call implementation.
 
     This avoids looking up unneeded data.
     """
-    site = site_logic.getSingleton()
-    program = site.active_program
-    if program:
-      kwargs['sponsor'] = program.scope_path
-      kwargs['program'] = program.link_id
-      url = reverse(program.homepage_url_name, kwargs=kwargs)
+    action = args[0] if args else ''
+
+    if action == 'login':
+      url = users.create_login_url('/')
+    elif action == 'logout':
+      url = users.create_logout_url('/')
     else:
-      url = reverse('edit_site_settings')
+      site = site_logic.getSingleton()
+      program = site.active_program
+      if program:
+        kwargs['sponsor'] = program.scope_path
+        kwargs['program'] = program.link_id
+        url = reverse(program.homepage_url_name, kwargs=kwargs)
+      else:
+        url = reverse('edit_site_settings')
+
     self.redirect(url)
     return self.response

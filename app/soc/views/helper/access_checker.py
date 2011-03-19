@@ -427,4 +427,43 @@ class AccessChecker(object):
     """
 
     self.isIdBasedEntityPresent(entity, id, 'Request')
-    raise AccessViolation(error_msg)
+
+  def canRespondToInvite(self):
+    """Checks if the current user can accept the invitation.
+    """
+
+    assert self.data.invite
+
+    # check if the entity represents an invitation
+    if self.data.invite.type != 'Invitation':
+      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+
+    # check if the entity can be responded
+    if self.data.invite.status not in ['new']:
+      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+
+    # check if the entity is addressed to the current user
+    if self.data.invite.user.key() != self.data.user.key():
+      error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
+          'model': 'Request'
+          }
+      raise out_of_band.AccessViolation(error_msg)
+
+    # check if the user does not have this role
+    self.notHaveRoleForOrganization(self.data.invite.group,
+        self.data.invite.role)
+
+  def canViewInvite(self):
+    """Checks if the current user can see the invitation.
+    """
+
+    assert self.data.invite
+
+    # check if the entity represents an invitation
+    if self.data.invite.type != 'Invitation':
+      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+
+    # check if the entity is addressed to the current user
+    if self.data.invite.user.key() != self.data.user.key():
+      # check if the current user is an org admin for the organization
+      self.haveRoleForOrganization(self.data.invite.group, 'org_admin')

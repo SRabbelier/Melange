@@ -180,7 +180,7 @@ class ProfilePage(RequestHandler):
     user_form.cleaned_data['user_id'] = account.user_id()
     self.data.user = user_form.create(commit=False, key_name=key_name)
     dirty.append(self.data.user)
-    return profile_form
+    return user_form
 
   def validateProfile(self, dirty):
     profile_form = ProfileForm(self.data.POST, instance=self.data.profile)

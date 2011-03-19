@@ -57,10 +57,10 @@ class Logic(base.Logic):
     """
 
     if not entity:
-      raise NoEntityError
+      raise base.NoEntityError()
 
     if not entity_properties:
-      raise InvalidArgumentError
+      raise base.InvalidArgumentError()
 
     for name, value in entity_properties.iteritems():
       # if the property is not to be updated, skip it

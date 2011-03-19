@@ -26,10 +26,13 @@ from google.appengine.ext import db
 from google.appengine.api import users
 
 from django import forms as djangoforms
+from django.conf.urls.defaults import url
+from django.core.urlresolvers import reverse
 from django.forms import widgets
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
+from soc.logic import dicts
 from soc.logic.exceptions import NotFound
 from soc.views import forms
 
@@ -111,8 +114,8 @@ class InvitePage(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-        (r'^gsoc/invite/(?P<role>org_admin|mentor)/%s$' % url_patterns.ORG,
-         self)
+        url(r'^gsoc/invite/(?P<role>org_admin|mentor)/%s$' % url_patterns.ORG,
+            self, name='gsoc_invite')
     ]
 
   def checkAccess(self):
@@ -184,8 +187,9 @@ class InvitePage(RequestHandler):
     """
 
     if self._createFromForm():
-      # TODO: here we should probably redirect to the org admin home page
-      pass
+      kwargs = dicts.filter(self.data.kwargs, [
+          'sponsor', 'program', 'organization', 'role'])
+      self.redirect(reverse('gsoc_invite', kwargs=kwargs))
     else:
       self.get()
 
@@ -207,8 +211,8 @@ class ShowInvite(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-        (r'^gsoc/invitation/%s$' % url_patterns.ID,
-         self)
+        url(r'^gsoc/invitation/%s$' % url_patterns.ID, self,
+            name='gsoc_invitation')
     ]
 
   def checkAccess(self):

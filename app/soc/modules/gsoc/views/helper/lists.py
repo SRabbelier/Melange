@@ -399,7 +399,8 @@ class QueryContentResponseBuilder(object):
   """Builds a ListContentResponse for lists that are based on a single query.
   """
 
-  def __init__(self, request, config, logic, fields, prefetch=None):
+  def __init__(self, request, config, logic, fields, ancestors=None,
+               prefetch=None):
     """Initializes the fields needed to built a response.
 
     Args:
@@ -407,6 +408,7 @@ class QueryContentResponseBuilder(object):
       config: The ListConfiguration object.
       logic: The Logic instance used for querying.
       fields: The fields to query on.
+      ancestors: List of ancestor entities to add to the query
       prefetch: The fields that need to be prefetched for increased
                 performance.
     """
@@ -414,6 +416,7 @@ class QueryContentResponseBuilder(object):
     self._config = config
     self._logic = logic
     self._fields = fields
+    self._ancestors = ancestors
     self._prefetch = prefetch
 
   def build(self, *args, **kwargs):
@@ -443,7 +446,7 @@ class QueryContentResponseBuilder(object):
 
     entities = self._logic.getForFields(
         filter=self._fields, limit=content_response.limit,
-        prefetch=self._prefetch)
+        ancestors=self._ancestors, prefetch=self._prefetch)
 
     for entity in entities:
       content_response.addRow(entity, *args, **kwargs)

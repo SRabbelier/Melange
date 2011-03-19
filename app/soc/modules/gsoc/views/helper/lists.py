@@ -81,7 +81,7 @@ class ListConfiguration(object):
 
       Args:
         id: A unique identifier of this column (currently unchecked)
-        name: The name or header that is shown to the end user.
+        name: The header of the column that is shown to the user.
         func: The function to be called when rendering this column for
               a single entity. This function should take an entity as first
               argument and args and kwargs if needed. The string rendering of
@@ -102,6 +102,23 @@ class ListConfiguration(object):
         })
     self._col_names.append(name)
     self._col_functions[id] = func
+
+  def addSimpleColumn(self, id, name, resizable=True):
+    """Adds a column to the end of the list which uses the id of the column as
+    attribute name of the entity to get the data from.
+
+    This method is basically a shorthand for addColumn with the function as
+    lambda ent, *args: getattr(ent, id).
+
+    Args:
+      id: A unique (currently unchecked) identifier of this column and name of
+          the field to get the data from.
+      name: The header of the column that is shown to the user.
+      resizable: Whether the width of the column should be resizable by the
+                 end user.
+    """
+    func = lambda ent, *args: getattr(ent, id)
+    self.addColumn(id, name, func, resizable=resizable)
 
   def addButton(self, id, bounds, caption, type, parameters):
     """Adds a button to the list configuration.

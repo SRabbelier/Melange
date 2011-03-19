@@ -1,0 +1,55 @@
+{% extends "v2/modules/gsoc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/forms.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/uniform.default.css" />
+{% endblock stylesheets %}
+
+{% block page_content %}
+
+<h1 id="show-review-page-title">{{ request.type }} to become {{ request.roleName }}</h1>
+
+<div class="request-summary">
+  <p class="request-status"><strong>Status:</strong> {{ request.statusMessage }}</p>
+  <p class="request-sent-on"><strong>Sent on:</strong> {{ request.created_on }}</p>
+  <p class="request-organization"><strong>Organization:</strong> {{ request.group.name }}</p>
+  <br>
+  <p class="request-message"><strong>Message:</strong> {{ request.message }}</p>
+  {% if request.status == 'new' %}
+  <div class="request-response">
+    <form action="{{ response_action }}" method="post" id="form" class="form-project-comment">
+      <div id="request-respond-button-row" class="row button-row">
+        <input id="request-respond-accept-submit" type="submit" value="Accept" class="submit"/>
+        <input id="request-respond-reject-submit" type="submit" value="Reject" class="submit"/>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock page_content %}
+
+{% block dependencies %}
+  [
+    dep.melange.menu,
+    dep.uniform,
+    null,
+    function () {
+      jQuery("select, input:radio, input:file, input:checkbox").uniform();
+    }
+  ]
+{% endblock dependencies %}

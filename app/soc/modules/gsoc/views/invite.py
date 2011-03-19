@@ -226,7 +226,6 @@ class ShowInvite(RequestHandler):
         self.check.canRespondToInvite()
       elif self.data.action == self.ACTIONS['reject']:
         self.check.canRespondToInvite()
-
     else:
       self.check.canViewInvite()
 
@@ -235,10 +234,12 @@ class ShowInvite(RequestHandler):
     """
 
     assert self.data.invite
+    assert self.data.canRespond
 
     return {
         'request': self.data.invite,
-        'actions': self.ACTIONS
+        'actions': self.ACTIONS,
+        'canRespond': self.data.canRespond,
         } 
 
   def post(self):

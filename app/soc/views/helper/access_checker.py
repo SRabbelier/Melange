@@ -467,3 +467,6 @@ class AccessChecker(object):
     if self.data.invite.user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
       self.haveRoleForOrganization(self.data.invite.group, 'org_admin')
+      self.data.canRespond = False
+
+    self.data.canRespond = True

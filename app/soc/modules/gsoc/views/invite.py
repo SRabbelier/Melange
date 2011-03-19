@@ -54,9 +54,6 @@ class InviteForm(forms.ModelForm):
     model = Request
     css_prefix = 'gsoc_intivation'
     fields = ['message']
-    widgets = {
-        'link_id': widgets.TextInput()
-        }
 
   def __init__(self, request_data, *args, **kwargs):
     super(InviteForm, self).__init__(*args, **kwargs)
@@ -106,16 +103,13 @@ class InviteForm(forms.ModelForm):
 
     
 class InvitePage(RequestHandler):
-  """Encapsulate all the methods required to generate GSoC Home page.
+  """Encapsulate all the methods required to generate Invite page.
   """
 
   def templatePath(self):
     return 'v2/modules/gsoc/invite/base.html'
 
   def djangoURLPatterns(self):
-    """Returns the list of tuples for containing URL to view method mapping.
-    """
-
     return [
         (r'^gsoc/invite/(?P<role>org_admin|mentor)/%s$' % url_patterns.ORG,
          self)

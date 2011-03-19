@@ -54,12 +54,7 @@ class RequestHandler(RequestHandler):
     context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
     super(RequestHandler, self).render(context)
 
-  def __call__(self, request, *args, **kwargs):
-    """See soc.views.base.RequestHandler.__call__()
-    """
-
+  def init(self, request, args, kwargs):
     self.data = RequestData()
-    self.data.populate(request, *args, **kwargs)
+    self.data.populate(request, args, kwargs)
     self.check = access_checker.AccessChecker(self.data)
-
-    return super(RequestHandler, self).__call__(request, *args, **kwargs)

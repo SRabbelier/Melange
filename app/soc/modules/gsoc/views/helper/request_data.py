@@ -77,14 +77,14 @@ class RequestData(RequestData):
     self.org_admin_for = []
     self.student_info = None
 
-  def populate(self, request, *args, **kwargs):
+  def populate(self, request, args, kwargs):
     """Populates the fields in the RequestData object.
 
     Args:
       request: Django HTTPRequest object.
       args & kwargs: The args and kwargs django sends along.
     """
-    super(RequestData, self).populate(request, *args, **kwargs)
+    super(RequestData, self).populate(request, args, kwargs)
 
     if kwargs.get('sponsor') and kwargs.get('program'):
       program_keyfields = {'link_id': kwargs['program'],

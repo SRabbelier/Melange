@@ -251,6 +251,14 @@ class RequestHandler(object):
     else:
       self.error(501)
 
+  def init(self, request, args, kwargs):
+    """Initializes the RequestHandler.
+
+    Sets the data and check fields.
+    """
+    self.data = None
+    self.check = None
+
   def __call__(self, request, *args, **kwargs):
     """Returns the response object for the requested URL.
 
@@ -267,6 +275,7 @@ class RequestHandler(object):
 
     self.response = Response()
 
+    self.init(request, args, kwargs)
     self.checkAccess()
     self._dispatch()
 
@@ -277,11 +286,6 @@ class SiteRequestHandler(RequestHandler):
   """Customization required by global site pages to handle HTTP requests.
   """
 
-  def __call__(self, request, *args, **kwargs):
-    """See soc.views.base.RequestHandler.__call__()
-    """
-
+  def init(self, request, args, kwargs):
     self.data = RequestData()
-    self.data.populate(request, *args, **kwargs)
-
-    return super(SiteRequestHandler, self).__call__(request, *args, **kwargs)
+    self.data.populate(request, args, kwargs)

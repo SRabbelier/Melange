@@ -53,7 +53,7 @@ class RequestData(object):
     self.GET = None
     self.POST = None
 
-  def populate(self, request, *args, **kwargs):
+  def populate(self, request, args, kwargs):
     """Populates the fields in the RequestData object.
 
     Args:

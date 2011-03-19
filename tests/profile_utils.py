@@ -54,8 +54,8 @@ class GSoCProfileHelper(object):
       return
     from soc.modules.gsoc.models.profile import GSoCProfile
     user = self.createUser()
-    properties = {'link_id': user.link_id, 'user': user, 'parent': user,
-                  'scope': self.program, 'student_info': None}
+    properties = {'link_id': user.link_id, 'student_info': None, 'user': user,
+                  'parent': user, 'scope': self.program, 'status': 'active'}
     self.profile = seeder_logic.seed(GSoCProfile, properties)
 
   def createStudent(self):

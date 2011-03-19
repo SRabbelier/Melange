@@ -54,8 +54,22 @@ class GSoCProfileHelper(object):
       return
     from soc.modules.gsoc.models.profile import GSoCProfile
     user = self.createUser()
-    properties = {'link_id': user.link_id, 'user': user, 'parent': user, 'scope': self.program}
+    properties = {'link_id': user.link_id, 'user': user, 'parent': user, 'scope': self.program, 'student_info': None}
     self.profile = seeder_logic.seed(GSoCProfile, properties)
+
+  def createStudent(self):
+    """Sets the current suer to be a student for the current program.
+    """
+    self.createProfile()
+    from soc.models.role import StudentInfo
+    properties = {'key_name': self.profile.key().name(), 'parent': self.profile.key()}
+    self.profile.student_info = seeder_logic.seed(StudentInfo, properties)
+
+  def createStudentWithProject(self):
+    """Sets the current suer to be a student with a project for the current program.
+    """
+    self.createStudent()
+    # TODO(SRabbelier): implement
 
   def createHost(self):
     """Sets the current user to be a host for the current program.
@@ -63,3 +77,23 @@ class GSoCProfileHelper(object):
     self.createUser()
     self.user.host_for = [self.program.scope.key()]
     self.user.put()
+
+  def createOrgAdmin(self, org):
+    """Creates an org admin profile for the current user.
+    """
+    self.createProfile()
+    self.profile.org_admin_for = [org.key()]
+    self.profile.put()
+
+  def createMentor(self, org):
+    """Creates an mentor profile for the current user.
+    """
+    self.createProfile()
+    self.profile.mentor_for = [org.key()]
+    self.profile.put()
+
+  def createMentorWithProject(self, org):
+    """Creates an mentor profile with a project for the current user.
+    """
+    self.createMentor(org)
+    # TODO(SRabbelier): implement

@@ -52,10 +52,10 @@ class RequestData(RequestData):
     user: The user entity (if logged in)
     program: The GSoC program entity that the request is pointing to
     program_timeline: The GSoCTimeline entity
-    host: The Host entity of the current user for the sponsor of the program
-    org_admins: GSoCOrgadmin entities belonging to the current user and program
-    mentors: GSoCMentor entities belonging to the current user and program
-    student: GSoCStudent entity belonging to the current user and program
+    is_host: is the current user a host of the program
+    org_admin_for: the organizations the current user is an admin for
+    mentor_for: the organizations the current user is a mentor for
+    student_info: the StudentInfo for the current user and program
 
   Raises:
     out_of_band: 404 when the program does not exist

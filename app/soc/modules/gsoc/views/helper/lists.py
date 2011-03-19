@@ -360,14 +360,19 @@ class ListContentResponse(object):
       kwargs: The kwargs passed to the render functions defined in the config.
     """
     columns = {}
-    # TODO(ljvderijk): Implement operations
+    for id, func in self._config._col_functions.iteritems():
+      columns[id] = func(entity, *args, **kwargs)
+
+    # TODO(ljvderijk): Implement button operations
     operations = {
         'row': {},
         'buttons': {},
     }
 
-    for id, func in self._config._col_functions.iteritems():
-      columns[id] = func(entity, *args, **kwargs)
+    if self._config._row_operation_func:
+      # perform the row operation function to retrieve the data
+      operations['row'] = self._config.row_operation_func(
+          entity, *args, **kwargs)
 
     data = {
       'columns': columns,

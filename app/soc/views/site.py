@@ -35,6 +35,7 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic.models.document import logic as document_logic
 from soc.logic.models.site import logic as site_logic
+from soc.logic.exceptions import AccessViolation
 from soc.models.site import Site
 from soc.models.work import Work
 from soc.views.base import SiteRequestHandler
@@ -42,6 +43,10 @@ from soc.views.forms import ModelForm
 from soc.views.helper import widgets as widgets_helper
 
 from soc.modules import callback
+
+
+DEF_NO_DEVELOPER_MSG = ugettext(
+    'This page is only accessible to developers.')
 
 
 def getProgramMap():
@@ -90,8 +95,8 @@ class EditSitePage(SiteRequestHandler):
     return {'data': data}
 
   def checkAccess(self):
-    # TODO: check is developer
-    pass
+    if not self.data.is_developer:
+      raise AccessViolation(DEF_NO_DEVELOPER_MSG)
 
   def templatePath(self):
     # TODO: make this specific to the current active program

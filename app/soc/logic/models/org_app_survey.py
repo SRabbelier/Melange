@@ -30,7 +30,7 @@ from soc.logic.models.org_app_record import logic as \
     org_app_record_logic
 from soc.models.org_app_survey import OrgAppSurvey
 from soc.models.survey import Survey
-from soc.views import out_of_band
+from soc.logic.exceptions import NotFound
 
 
 class Logic(survey.Logic):
@@ -61,8 +61,10 @@ class Logic(survey.Logic):
     return self.getForFields(fields, unique=True)
 
   def getForProgramOr404(self, program):
-    """Returns the OrgAppSurvery belonging to the given program but returns
-    404 if it doesn't exist.
+    """Returns the OrgAppSurvery belonging to the given program.
+
+    Raises:
+      NotFound if no entity is found
     """
 
     entity = self.getForProgram(program)
@@ -74,7 +76,7 @@ class Logic(survey.Logic):
         'There is no "%(name)s" for the program %(program_name)s.') % {
         'name': self._name, 'program_name': program.name}
 
-    raise out_of_band.Error(msg, status=404)
+    raise NotFound(msg)
 
 
 logic = Logic()

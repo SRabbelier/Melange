@@ -30,6 +30,7 @@ from django.forms import widgets
 from django.utils.translation import ugettext
 
 from soc.logic import cleaning
+from soc.logic.exceptions import NotFound
 from soc.views import forms
 
 from soc.models.request import Request
@@ -41,8 +42,6 @@ from soc.modules.gsoc.logic.models.organization import logic as org_logic
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
-
-from soc.views import out_of_band
 
 
 class InviteForm(forms.ModelForm):
@@ -135,7 +134,7 @@ class InvitePage(RequestHandler):
           'The organization with link_id %s does not exist for %s.' % 
           (link_id, self.data.program.name))
 
-      raise out_of_band.Error(msg, status=404)
+      raise NotFound(msg)
 
     #checker.checkIsOrgAdminForOrg(self.data.org)
 

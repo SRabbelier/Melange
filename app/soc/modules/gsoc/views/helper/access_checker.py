@@ -27,6 +27,7 @@ from google.appengine.ext import db
 
 from django.utils.translation import ugettext
 
+from soc.logic.exceptions import AccessViolation
 from soc.views.helper import access_checker
 
 from soc.modules.gsoc.models.student_proposal import StudentProposal
@@ -57,4 +58,4 @@ class AccessChecker(access_checker.AccessChecker):
 
     if query.count() >= self.data.program.apps_tasks_limit:
       # too many proposals access denied
-      raise out_of_band.AccessViolation(message_fmt=DEF_MAX_PROPOSALS_REACHED)
+      raise AccessViolation(DEF_MAX_PROPOSALS_REACHED)

@@ -35,7 +35,7 @@ from django.utils.translation import ugettext
 
 from soc.cache import sidebar
 from soc.logic import dicts
-from soc.views import out_of_band
+from soc.logic.exceptions import NotFound
 
 
 class Error(Exception):
@@ -291,7 +291,7 @@ class Logic(object):
     """Like getFromKeyName but expects to find an entity.
 
     Raises:
-      out_of_band.Error if no entity is found
+      NotFound if no entity is found
     """
 
     entity = self.getFromKeyName(key_name)
@@ -302,13 +302,13 @@ class Logic(object):
     msg = ugettext('There is no "%(name)s" named %(key_name)s.') % {
         'name': self._name, 'key_name': key_name}
 
-    raise out_of_band.Error(msg, status=404)
+    raise NotFound(msg)
 
   def getFromIDOr404(self, id):
     """Like getFromID but expects to find an entity.
 
     Raises:
-      out_of_band.Error if no entity is found
+      NotFound if no entity is found
     """
 
     entity = self.getFromID(id)
@@ -319,7 +319,7 @@ class Logic(object):
     msg = ugettext('There is no "%(name)s" with id %(id)s.') % {
         'name': self._name, 'id': id}
 
-    raise out_of_band.Error(msg, status=404)
+    raise NotFound(msg)
 
   def getFromKeyFields(self, fields):
     """Returns the entity for the specified key names, or None if not found.
@@ -346,7 +346,7 @@ class Logic(object):
     """Like getFromKeyFields but expects to find an entity.
 
     Raises:
-      out_of_band.Error if no entity is found
+      NotFound if no entity is found
     """
 
     entity = self.getFromKeyFields(fields)
@@ -366,7 +366,7 @@ class Logic(object):
       'There is no "%(name)s" where %(pairs)s.') % {
         'name': self._name, 'pairs': joined_pairs}
 
-    raise out_of_band.Error(msg, status=404)
+    raise NotFound(msg)
 
   def prefetchField(self, field, data):
     """Prefetches all fields in data from the datastore in one fetch.

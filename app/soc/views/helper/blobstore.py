@@ -36,7 +36,7 @@ from google.appengine.ext import blobstore
 
 from django.http import HttpResponse
 
-from soc.views import out_of_band
+from soc.logic.exceptions import BadRequest
 
 
 def get_uploads(request, field_name=None, populate_post=False):
@@ -155,7 +155,7 @@ def download_blob(blob_key_str):
   """
 
   if not blob_key_str:
-    raise out_of_band.Error(message_fmt='No blob key present')
+    raise BadRequest('No blob key present')
 
   blob_key = str(urllib.unquote(blob_key_str))
   blob = blobstore.BlobInfo.get(blob_key)
@@ -163,4 +163,4 @@ def download_blob(blob_key_str):
   try:
     return send_blob(blob, save_as=True)
   except ValueError, error:
-    raise out_of_band.Error(message_fmt=str(error))
+    raise BadRequest(str(error))

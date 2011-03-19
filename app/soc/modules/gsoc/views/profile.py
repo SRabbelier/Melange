@@ -128,9 +128,12 @@ class ProfilePage(RequestHandler):
 
     if 'role' in self.data.kwargs:
       role = self.data.kwargs['role']
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      edit_url = reverse('edit_gsoc_profile', kwargs=kwargs)
       if role == 'student':
-        self.check.isNotParticipatingInProgram()
-        self.check.isActivePeriod('student_signup')
+        self.check.canApplyStudent(edit_url)
+      else:
+        self.check.canApplyNonStudent(role, edit_url)
     else:
       self.check.isRoleActive()
 

@@ -30,7 +30,9 @@ from google.appengine.api import users
 from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.user import logic as user_logic
 
-from soc.views import out_of_band
+from soc.logic.exceptions import LoginRequest
+from soc.logic.exceptions import RedirectRequest
+from soc.logic.exceptions import AccessViolation
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.models.proposal import GSoCProposal
@@ -53,9 +55,6 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
     ' and <a href="%%(sign_in)s">sign in</a>'
     ' again as %(role)s to view this page.')
 
-DEF_LOGOUT_MSG_FMT = ugettext(
-    'Please <a href="%(sign_out)s">sign out</a> in order to view this page.')
-
 DEF_NEED_ROLE_MSG = ugettext(
     'You do not have the required role.')
 
@@ -74,6 +73,12 @@ DEF_SCOPE_INACTIVE_MSG = ugettext(
 
 DEF_PROGRAM_INACTIVE_MSG_FMT = ugettext(
     'This page is inaccessible because %s is not active at this time.')
+
+DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT = ugettext(
+    'This page is inactive before %s and after %s.')
+
+DEF_NO_SUCH_PROGRAM_MSG = ugettext(
+    'The url is wrong (no program was found).')
 
 DEF_ROLE_INACTIVE_MSG = ugettext(
     'This page is inaccessible because you do not have an active role '
@@ -100,7 +105,15 @@ DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
     'This %(model) entity does not belong to you.')
 
 DEF_NOT_HOST_MSG = ugettext(
-    'You need to be a host to access this page.')
+    'You need to be a program adminstrator to access this page.')
+
+DEF_ALREADY_PARTICIPATING_AS_NON_STUDENT_MSG = ugettext(
+    'You cannot register as a student since you are already a '
+    'mentor or organization administrator in %s.')
+
+DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG = ugettext(
+    'You cannot register as a %s since you are already a '
+    'student in %s.')
 
 
 class AccessChecker(object):
@@ -117,7 +130,7 @@ class AccessChecker(object):
   def fail(self, message):
     """Raises an AccessViolation with the specified message.
     """
-    raise out_of_band.AccessViolation(message_fmt=message)
+    raise AccessViolation(message)
 
   def isLoggedIn(self):
     """Raises an alternate HTTP response if Google Account is not logged in.
@@ -126,16 +139,7 @@ class AccessChecker(object):
     if self.gae_user:
       return
 
-    raise out_of_band.LoginRequest()
-
-  def isNotLoggedIn(self):
-    """Raises an alternate HTTP response if Google Account is logged in.
-    """
-
-    if not self.gae_user:
-      return
-
-    raise out_of_band.LoginRequest(message_fmt=DEF_LOGOUT_MSG_FMT)
+    raise LoginRequest()
 
   def isUser(self):
     """Raises an alternate HTTP response if Google Account has no User entity.
@@ -147,19 +151,12 @@ class AccessChecker(object):
       * if User has not agreed to the site-wide ToS, if one exists
     """
 
-    self.checkIsLoggedIn()
+    self.isLoggedIn()
 
-    if not self.data.user:
-      raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
-
-    if user_logic.agreesToSiteToS(self.data.user, self.data.site):
+    if self.data.user:
       return
 
-    # The profile exists, but the user has not agreed to site ToS 
-    login_msg_fmt = DEF_AGREE_TO_TOS_MSG_FMT % {
-        'tos_link': redirects.getToSRedirect(self.data.site)}
-
-    raise out_of_band.LoginRequest(message_fmt=login_msg_fmt)
+    raise AccessViolation(DEF_NO_USER_LOGIN_MSG)
 
   def isHost(self):
     """Checks whether the current user has a host role.
@@ -168,7 +165,7 @@ class AccessChecker(object):
     if self.data.is_host:
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_NOT_HOST_MSG)
+    raise AccessViolation(DEF_NOT_HOST_MSG)
 
   def hasUserEntity(self):
     """Raises an alternate HTTP response if Google Account has no User entity.
@@ -179,12 +176,12 @@ class AccessChecker(object):
       * if no Google Account is logged in at all
     """
 
-    self.checkIsLoggedIn()
+    self.isLoggedIn()
 
     if self.data.user:
       return
 
-    raise out_of_band.LoginRequest(message_fmt=DEF_NO_USER_LOGIN_MSG)
+    raise AccessViolation(DEF_NO_USER_LOGIN_MSG)
 
   def isDeveloper(self):
     """Raises an alternate HTTP response if Google Account is not a Developer.
@@ -196,7 +193,7 @@ class AccessChecker(object):
       * if no Google Account is logged in at all
     """
 
-    self.checkIsUser()
+    self.isUser()
 
     if self.data.user.is_developer:
       return
@@ -208,82 +205,72 @@ class AccessChecker(object):
         'role': 'a Site Developer ',
         }
 
-    raise out_of_band.LoginRequest(message_fmt=login_message_fmt)
+    raise AccessViolation(login_message_fmt)
+
+  def isProgramActive(self):
+    """Checks that the program is active.
+    """
+
+    if not self.data.program:
+      raise AccessViolation(DEF_NO_SUCH_PROGRAM_MSG)
+
+    if self.data.program.status == 'visible':
+      return
+
+    raise AccessViolation(
+        DEF_PROGRAM_INACTIVE_MSG_FMT % self.data.program.name)
 
   def isActivePeriod(self, period_name):
     """Checks if the given period is active for the given program.
 
     Args:
       period_name: the name of the period which is checked
-      key_name_arg: the entry in django_args that specifies the given program
-        keyname. If none is given the key_name is constructed from django_args
-        itself.
-      program_logic: Program Logic instance
-
-    Raises:
-      AccessViolationResponse:
-      * if no active Program is found
-      * if the period is not active
     """
+    self.isProgramActive()
 
-    self._checkTimelineCondition(period_name, timeline_helper.isActivePeriod)
-
-  def _checkTimelineCondition(self, event_name, timeline_fun):
-    """Checks if the given event fulfills a certain timeline condition.
-
-    Args:
-      event_name: the name of the event which is checked
-      timeline_fun: function checking for the main condition
-
-    Raises:
-      AccessViolationResponse:
-      * if no active Program is found
-      * if the event has not taken place yet
-    """
-
-    program = self.data.program
-    if not program or program.status == 'invalid':
-      raise out_of_band.AccessViolation(message_fmt=DEF_SCOPE_INACTIVE_MSG)
-
-    if timeline_fun(self.data.program_timeline, event_name):
+    if timeline_helper.isActivePeriod(self.data.program_timeline, period_name):
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_PAGE_INACTIVE_MSG)
+    active_period = timeline_helper.activePeriod(self.data.program_timeline, period_name)
 
-  def isProgramActive(self):
-    """Checks that the program is active.
+    raise AccessViolation(DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT % active_period)
+
+  def canApplyStudent(self, edit_url):
+    """Checks if the user can apply as a student.
     """
-    if self.data.program.status == 'visible':
-      return
 
-    raise out_of_band.AccessViolation(
-        message_fmt=DEF_PROGRAM_INACTIVE_MSG_FMT % self.data.program.name)
+    if self.data.profile.student_info:
+      raise RedirectRequest(edit_url)
 
-  def isNotParticipatingInProgram(self):
-    """Checks if the user has no roles for the program specified in data.
-
-     Raises:
-       AccessViolationResponse: if the current user has a student, mentor or
-                                org admin role for the given program.
-    """
+    self.isActivePeriod('student_signup')
 
     if not self.data.profile:
       return
 
-    raise out_of_band.AccessViolation(
-        message_fmt=DEF_ALREADY_PARTICIPATING_MSG)
+    raise AccessViolation(
+        DEF_ALREADY_PARTICIPATING_AS_NON_STUDENT_MSG % self.data.program.name)
+
+  def canApplyNonStudent(self, role, edit_url):
+    """Checks if the user can apply as a mentor or org admin.
+    """
+
+    if not self.data.profile.student_info:
+      raise RedirectRequest(edit_url)
+
+    if not self.data.profile:
+      return
+
+    raise AccessViolation(DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG % (
+        role, self.data.program.name))
 
   def isActive(self, entity):
     """Checks if the specified entity is active.
-
-    Raises:
-      AccessViolationResponse: if the entity status is not active
     """
 
     if entity.status == 'active':
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_NO_ACTIVE_ENTITY_MSG)
+    raise AccessViolation(DEF_NO_ACTIVE_ENTITY_MSG)
 
   def isRoleActive(self):
     """Checks if the role of the current user is active.
@@ -292,7 +279,7 @@ class AccessChecker(object):
     if self.data.profile and self.data.profile.status == 'active':
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_ROLE_INACTIVE_MSG)
+    raise AccessViolation(DEF_ROLE_INACTIVE_MSG)
 
   def isActiveStudent(self):
     """Checks if the user is an active student.
@@ -303,7 +290,7 @@ class AccessChecker(object):
     if self.data.student_info:
       return
 
-    raise out_of_band.AccessViolation(message_fmt=DEF_IS_NOT_STUDENT_MSG)
+    raise AccessViolation(DEF_IS_NOT_STUDENT_MSG)
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.
@@ -323,14 +310,14 @@ class AccessChecker(object):
           'link_id': self.data.kwargs['organization'],
           'program': self.data.program.name
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
     if self.data.organization.status != 'active':
       error_msg = DEF_ORG_NOT_ACTIVE_MSG_FMT % {
           'name': self.data.organization.name,
           'program': self.data.program.name
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
   def isProposalInURLValid(self):
     """Checks if the proposal in URL exists.
@@ -347,14 +334,14 @@ class AccessChecker(object):
           'model': 'GSoCProposal',
           'id': id
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
     if self.data.proposal.status == 'invalid':
       error_msg = DEF_ID_BASED_ENTITY_INVALID_MSG_FMT % {
           'model': 'GSoCProposal',
           'id': id,
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
   def canStudentUpdateProposal(self):
     """Checks if the student is eligible to submit a proposal.
@@ -370,7 +357,7 @@ class AccessChecker(object):
           'model': 'GSoCProposal',
           'id': id,
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
     # check if the proposal belongs to the current user
     expected_profile = self.data.proposal.parent()
@@ -378,7 +365,7 @@ class AccessChecker(object):
       error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
           'model': 'GSoCProposal'
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
   def isIdBasedEntityPresent(self, entity, id, model_name):
     """Checks if the entity is not None.
@@ -391,10 +378,11 @@ class AccessChecker(object):
         'model': model_name,
         'id': id,
         }
-    raise out_of_band.AccessViolation(error_msg)
+    raise AccessViolation(error_msg)
 
   def isRequestPresent(self, entity, id):
     """Checks if the specified Request entity is not None.
     """
 
     self.isIdBasedEntityPresent(entity, id, 'Request')
+      raise AccessViolation(error_msg)

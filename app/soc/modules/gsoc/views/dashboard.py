@@ -26,8 +26,8 @@ from google.appengine.api import users
 
 from django.conf.urls.defaults import url
 
+from soc.logic.exceptions import AccessViolation
 from soc.logic.helper import timeline as timeline_helper
-from soc.views import out_of_band
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.org_app_survey import logic as \
@@ -53,11 +53,7 @@ class Dashboard(RequestHandler):
   def checkAccess(self):
     """Denies access if you don't have a role in the current program.
     """
-    # TODO(ljvderijk): Would be nice if it would directly redirect you to login
-    # if you are not logged in.
-    # TODO(ljvderijk): You need a "profile" to get access but that needs to be
-    # implemented.
-    pass
+    self.check.isLoggedIn()
 
   def templatePath(self):
     """Returns the path to the template.
@@ -76,7 +72,7 @@ class Dashboard(RequestHandler):
         break
 
     if not list_content:
-      raise out_of_band.AccessViolation(
+      raise AccessViolation(
           'You do not have access to this data')
     return list_content.content()
 

@@ -162,7 +162,10 @@ class ListConfiguration(object):
       caption: The display string shown to the end user.
       func: The function to generate a url to redirect the user to.
             This function should take an entity as first argument and args and
-            kwargs if needed.
+            kwargs if needed. The return value of this function should be a
+            dictionary with the value for 'link' set to the url to redirect the
+            user to. A value for the key 'caption' can also be returned to
+            dynamically change the caption off the button.
       new_window: Boolean indicating whether the url should open in a new
                   window.
     """
@@ -209,7 +212,7 @@ class ListConfiguration(object):
     This sets multiselect to False as indicated in the protocol spec.
 
     Args:
-      func: The function to generate a url to redirect the user to.
+      func: The function that returns the url to redirect the user to.
             This function should take an entity as first argument and args and
             kwargs if needed.
       new_window: Boolean indicating whether the url should open in a new
@@ -360,16 +363,22 @@ class ListContentResponse(object):
     for id, func in self._config._col_functions.iteritems():
       columns[id] = func(entity, *args, **kwargs)
 
-    # TODO(ljvderijk): Implement button operations
-    operations = {
-        'row': {},
-        'buttons': {},
-    }
+    row = {}
+    buttons= {}
 
     if self._config._row_operation_func:
-      # perform the row operation function to retrieve the data
-      operations['row'] = self._config.row_operation_func(
-          entity, *args, **kwargs)
+      # perform the row operation function to retrieve the link
+      row['link'] = self._config.row_operation_func(entity, *args, **kwargs)
+
+    for id, func in self._config._button_functions.iteritems():
+      # The function called here should return a dictionary with 'link' and
+      # an optional 'caption' as keys.
+      buttons[id] = func(entity, *args, **kwargs)
+
+    operations = {
+        'row': row,
+        'buttons': buttons,
+    }
 
     data = {
       'columns': columns,

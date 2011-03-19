@@ -17,6 +17,7 @@
 """This module contains the Request Model."""
 
 __authors__ = [
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
 ]
@@ -31,7 +32,7 @@ from soc.models.group import Group
 from soc.models.user import User
 
 
-STATUS_MESSAGES =  {
+STATUS_MESSAGES = {
     'new': 'This request has had no reply yet.',
     'group_accepted': 'The profile can now be filled out',
     'completed': 'You are done, no further action needed',
@@ -43,6 +44,11 @@ STATUS_MESSAGES =  {
         'withdrawn',
     'ignored': 'This request was marked as spam, and has been ignored',
 }
+
+ROLE_NAMES = {
+    'mentor': 'Mentor',
+    'org_admin': 'Organization Admin'
+    }
 
 class Request(ModelWithFieldAttributes):
   """A request is made to allow a person to create a new Role entity.
@@ -101,3 +107,8 @@ class Request(ModelWithFieldAttributes):
     """Returns a status message for the current request status.
     """
     return STATUS_MESSAGES.get(self.status)
+
+  def roleName(self):
+    """Return a role name in user friendly format.
+    """
+    return ROLE_NAMES.get(self.role)

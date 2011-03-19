@@ -53,6 +53,23 @@ def siteMenuContext(data):
 
   return context
 
+
+class Header(Template):
+  """MainMenu template.
+  """
+
+  def __init__(self, data):
+    self.data = data
+
+  def templatePath(self):
+    return "v2/modules/gsoc/header.html"
+
+  def context(self):
+    return {
+        'home_link': redirects.getHomepageRedirect(self.data)
+    }
+
+
 class MainMenu(Template):
   """MainMenu template.
   """

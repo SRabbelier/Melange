@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 
@@ -40,6 +42,7 @@ class RequestData(object):
     full_path: same as path, but including any GET args
     GET: the GET dictionary (from the request object)
     POST: the POST dictionary (from the request object)
+    is_developer: is the current user a developer
   """
 
   def __init__(self):
@@ -52,6 +55,7 @@ class RequestData(object):
     self.kwargs = {}
     self.GET = None
     self.POST = None
+    self.is_developer = False
 
   def populate(self, request, args, kwargs):
     """Populates the fields in the RequestData object.
@@ -69,3 +73,7 @@ class RequestData(object):
     self.full_path = request.get_full_path().encode('utf-8')
     self.site = site_logic.getSingleton()
     self.user = user_logic.getCurrentUser()
+    if users.is_current_user_admin():
+      self.is_developer = True
+    if self.user and self.user.is_developer:
+      self.is_developer = True

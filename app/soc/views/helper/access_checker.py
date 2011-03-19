@@ -244,7 +244,7 @@ class AccessChecker(object):
     """Checks if the user can apply as a student.
     """
 
-    if self.data.profile.student_info:
+    if self.data.profile and self.data.profile.student_info:
       raise RedirectRequest(edit_url)
 
     self.isActivePeriod('student_signup')

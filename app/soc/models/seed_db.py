@@ -307,7 +307,7 @@ def seed(request, *args, **kwargs):
         }
 
   gci2009_timeline = GCITimeline(**timeline_properties)
-  gci2009_timeline.put()
+  #gci2009_timeline.put()
 
 
   program_properties.update({
@@ -321,7 +321,7 @@ def seed(request, *args, **kwargs):
       })
 
   gci2009 = GCIProgram(**program_properties)
-  gci2009.put()
+  #gci2009.put()
 
 
   group_properties.update({
@@ -338,10 +338,10 @@ def seed(request, *args, **kwargs):
     })
 
   melange = GCIOrganization(**group_properties)
-  melange.put()
+  #melange.put()
   # create a new ranker
-  ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
-      student_proposal.DEF_SCORE, 100)
+  #ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, melange,
+  #    student_proposal.DEF_SCORE, 100)
 
 
   group_properties.update({
@@ -396,10 +396,10 @@ def seed(request, *args, **kwargs):
       })
 
   melange_admin = GCIOrgAdmin(**role_properties)
-  melange_admin.put()
+  #melange_admin.put()
 
   melange_mentor = GCIMentor(**role_properties)
-  melange_mentor.put()
+  #melange_mentor.put()
 
   student_id = 'test'
   student_properties = {

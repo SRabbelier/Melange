@@ -195,6 +195,11 @@ class ShowInvite(RequestHandler):
   """Encapsulate all the methods required to generate Show Invite page.
   """
 
+  ACTIONS = {
+      'accept': 'Accept',
+      'reject': 'Reject',
+      }
+
   def templatePath(self):
     return 'v2/soc/request/base.html'
 
@@ -206,15 +211,23 @@ class ShowInvite(RequestHandler):
     ]
 
   def checkAccess(self):
+    self.check.isRoleActive()
+    
     id = int(self.data.kwargs['id'])
     self.data.invite = Request.get_by_id(id)
 
     self.check.isRequestPresent(self.data.invite, id)
-      
-    
-    # check if it is an invitation
-    # check if the user is allowed to see the invite
-    
+
+    if self.data.POST:
+      self.data.action = self.data.POST['action']
+
+      if self.data.action == self.ACTIONS['accept']:
+        self.check.canRespondToInvite()
+      elif self.data.action == self.ACTIONS['reject']:
+        self.check.canRespondToInvite()
+
+    else:
+      self.check.canViewInvite()
 
   def context(self):
     """Handler to for GSoC Show Invitation Page HTTP get request.
@@ -224,4 +237,42 @@ class ShowInvite(RequestHandler):
 
     return {
         'request': self.data.invite,
-        }
+        'actions': self.ACTIONS
+        } 
+
+  def post(self):
+    """Handler to for GSoC Show Invitation Page HTTP post request.
+    """
+
+    assert self.data.action
+    assert self.data.invite
+
+    if self.data.action == self.ACTIONS['accept']:
+      self._acceptInvitation()
+    elif self.data.action == self.ACTIONS['reject']:
+      self._rejectInvitation()
+
+  def _acceptInvitation(self):
+    """Accepts an invitation.
+    """
+
+    if not self.data.profile:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+
+    self.data.invite.status = 'completed'
+
+    if self.data.invite.role == 'mentor':
+      self.data.profile.mentor_for.append(self.data.invite.group.key())
+    else:
+      self.data.profile.org_admin_for.append(self.data.invite.group.key())
+
+    self.data.invite.put()
+    self.data.profile.put()
+
+  def _rejectInvitation(self):
+    """Rejects a invitation. 
+    """
+
+    self.data.invite.status = 'rejected'
+    self.data.invite.put()

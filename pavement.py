@@ -84,11 +84,27 @@ options(
     tinymce_zip = options.build,
     
     pylint = Bunch(
-        check_modules = ['soc', 'reflistprop', 'settings.py', 'urls.py',
-                         'main.py'],
+        check_modules = [
+                         'soc/models',
+                         'soc/modules/gsoc/models',
+                         'soc/modules/gci/models',
+                         #'soc/logic',
+                         #'soc/modules/gsoc/logic',
+                         #'soc/modules/gci/logic',
+                         #'soc/views/helper',
+                         #'soc/modules/gsoc/views/helper',
+                         #'soc/modules/gci/views/helper',
+                         'reflistprop',
+                         'settings.py',
+                         'urls.py',
+                         'main.py'
+                        ],
         quiet = False,
-        quiet_args = ['--disable-msg=W0511,R0401', '--reports=no',
-                      '--disable-checker=similarities'],
+        quiet_args = [
+                      '--reports=no',
+                      '--errors-only',
+                      '--disable=E1103',
+                      ],
         pylint_args = [],
         ignore = False,
         **options.build
@@ -146,6 +162,7 @@ def symlink(target, link_name):
 @cmdopts([
     ('app-folder=', 'a', 'App folder directory (default /app)'),
     ('pylint-command=', 'c', 'Specify a custom pylint executable'),
+    ('with-module=', 'w', 'Include a specific module'),
     ('quiet', 'q', 'Disables a lot of the pylint output'),
     ('ignore', 'i', 'Ignore PyLint errors')
 ])
@@ -165,6 +182,8 @@ def pylint(options):
     arguments.extend(
         str(options.app_folder / module) for module in options.check_modules)
     
+    arguments.append(options.with_module)
+
     # By placing run_pylint into its own function, it allows us to do dry runs
     # without actually running PyLint.
     def run_pylint():
@@ -179,7 +198,7 @@ def pylint(options):
         arguments.append('--rcfile=' +
             options.project_dir.abspath() /
                 'scripts' / 'pylint' / 'pylintrc')
-        
+
         # `lint.Run.__init__` runs the PyLint command.
         try:
             lint.Run(arguments)

@@ -379,3 +379,22 @@ class AccessChecker(object):
           'model': 'GSoCProposal'
           }
       raise out_of_band.AccessViolation(error_msg)
+
+  def isIdBasedEntityPresent(self, entity, id, model_name):
+    """Checks if the entity is not None.
+    """
+
+    if entity is not None:
+      return
+
+    error_msg = DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT % {
+        'model': model_name,
+        'id': id,
+        }
+    raise out_of_band.AccessViolation(error_msg)
+
+  def isRequestPresent(self, entity, id):
+    """Checks if the specified Request entity is not None.
+    """
+
+    self.isIdBasedEntityPresent(entity, id, 'Request')

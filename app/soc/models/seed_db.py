@@ -918,20 +918,7 @@ def seed_many(request, *args, **kwargs):
 
     for properties in props if isinstance(props, list) else [props]:
       entity = model(**properties)
-      if seed_type == 'survey':
-        survey_content = survey_logic.createSurvey(properties['fields'],
-                                                   properties['schema'],
-                                                   this_survey=None)
-        entity.this_survey = survey_content
-      elif seed_type == 'survey_answer':
-        record = SurveyRecord.gql("WHERE user = :1 AND this_survey = :2",
-            properties['user'], properties['_survey']).get()
-        entity = survey_logic.updateSurveyRecord(properties['user'],
-                                                 properties['_survey'],
-                                                 record,
-                                                 properties['_fields'])
       entity.put()
-      if seed_type == 'survey': survey_logic._onCreate(entity)
 
   if end < goal:
     info = {

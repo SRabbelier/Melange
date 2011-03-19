@@ -315,7 +315,7 @@ class AccessChecker(object):
           'role': 'Mentor' if role == 'mentor' else 'Org Admin',
           'org': org.name
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
   def haveRoleForOrganization(self, org, role):
     """Checks if the user has the specified role for the organization.
@@ -332,7 +332,7 @@ class AccessChecker(object):
     if key in roles:
       return
 
-    out_of_band.AccessViolation(DEF_NEED_ROLE_MSG)
+    AccessViolation(DEF_NEED_ROLE_MSG)
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.
@@ -436,18 +436,18 @@ class AccessChecker(object):
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
-      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+      raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity can be responded
     if self.data.invite.status not in ['new']:
-      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+      raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user
     if self.data.invite.user.key() != self.data.user.key():
       error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
           'model': 'Request'
           }
-      raise out_of_band.AccessViolation(error_msg)
+      raise AccessViolation(error_msg)
 
     # check if the user does not have this role
     self.notHaveRoleForOrganization(self.data.invite.group,
@@ -461,7 +461,7 @@ class AccessChecker(object):
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
-      raise out_of_band.AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+      raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user
     if self.data.invite.user.key() != self.data.user.key():

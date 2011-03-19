@@ -158,6 +158,7 @@ class ProfilePage(RequestHandler):
       page_name = 'Register as Org Admin'
       
     return {
+        'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': page_name,
         'user_form': user_form,
         'profile_form': profile_form,

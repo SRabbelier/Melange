@@ -23,6 +23,7 @@ __authors__ = [
 
 
 from google.appengine.ext import db
+from google.appengine.api import users
 
 from django import forms as djangoforms
 from django.forms import widgets
@@ -147,6 +148,7 @@ class InvitePage(RequestHandler):
     invite_form = InviteForm(self.data, self.data.POST or None)
 
     return {
+        'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': 'Invite a new %s' % role,
         'program': self.data.program,
         'invite_form': invite_form

@@ -324,12 +324,12 @@ class AccessChecker(object):
     self.isRoleActive()
 
     if role == 'org_admin':
-      role_for = 'org_admin_for'
+      roles = self.data.profile.org_admin_for
     else:
-      role_for = 'mentor_for'
+      roles = self.data.profile.mentor_for
 
     key = org.key()
-    if key in self.data.profile.__getattribute__(role_for):
+    if key in roles:
       return
 
     out_of_band.AccessViolation(DEF_NEED_ROLE_MSG)

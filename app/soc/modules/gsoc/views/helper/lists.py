@@ -76,6 +76,7 @@ class ListConfiguration(object):
     self._buttons = []
     self._button_functions = {}
     self._row_operation = {}
+    self._row_operation_func = None
 
   def addColumn(self, id, name, func, resizable=True):
     """Adds a column to the end of the list.
@@ -205,20 +206,29 @@ class ListConfiguration(object):
         'parameters': parameters
     })
 
-  def setRowAction(self, parameters):
-    """The action to perform when clicking on a row.
+  def setRowAction(self, func, new_window=True):
+    """The redirects the user to a URL when clicking on a row in the list.
 
     This sets multiselect to False as indicated in the protocol spec.
 
     Args:
-        parameters: A dictionary that defines the parameters a
-                    redirect_custom operation.
+      func: The function to generate a url to redirect the user to.
+            This function should take an entity as first argument and args and
+            kwargs if needed.
+      new_window: Boolean indicating whether the url should open in a new
+                  window.
     """
+    if not callable(func):
+      raise TypeError('Given function is not callable')
+
     self.multiselect = False
+
+    parameters = {'new_window': new_window}
     self._row_operation = {
         'type': 'redirect_custom',
         'parameters': parameters
         }
+    self._row_operation_func = func
 
   def setDefaultSort(self, id, order='asc'):
     """Sets the default sort order for the list.

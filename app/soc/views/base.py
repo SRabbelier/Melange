@@ -25,10 +25,15 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from django import http
 from django.utils import simplejson
 from django.template import loader
 
+from soc.logic.exceptions import LoginRequest
+from soc.logic.exceptions import RedirectRequest
+from soc.logic.exceptions import AccessViolation
 from soc.views.helper.request_data import RequestData
 
 
@@ -228,6 +233,11 @@ class RequestHandler(object):
     """
     raise NotImplementedError()
 
+  def accessViolation(self, status, message):
+    """Default access violation handler.
+    """
+    self.error(status, message)
+
   def _dispatch(self):
     """Dispatches the HTTP request to its respective handler method.
     """
@@ -275,9 +285,18 @@ class RequestHandler(object):
 
     self.response = Response()
 
-    self.init(request, args, kwargs)
-    self.checkAccess()
-    self._dispatch()
+    try:
+      self.init(request, args, kwargs)
+      self.checkAccess()
+      self._dispatch()
+    except LoginRequest, e:
+      full_path = request.get_full_path().encode('utf-8')
+      url = users.create_login_url(full_path)
+      self.redirect(url)
+    except RedirectRequest, e:
+      self.redirect(e.url)
+    except AccessViolation, e:
+      self.accessViolation(e.status, e.args[0])
 
     return self.response
 

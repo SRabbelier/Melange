@@ -198,6 +198,7 @@ class ShowInvite(RequestHandler):
   ACTIONS = {
       'accept': 'Accept',
       'reject': 'Reject',
+      'withdraw': 'Withdraw',
       }
 
   def templatePath(self):
@@ -251,6 +252,8 @@ class ShowInvite(RequestHandler):
       self._acceptInvitation()
     elif self.data.action == self.ACTIONS['reject']:
       self._rejectInvitation()
+    elif self.data.action == self.ACTIONS['withdraw']:
+      self._withdrawInvitation()
 
   def _acceptInvitation(self):
     """Accepts an invitation.
@@ -275,4 +278,11 @@ class ShowInvite(RequestHandler):
     """
 
     self.data.invite.status = 'rejected'
+    self.data.invite.put()
+
+  def _withdrawInvitation(self):
+    """Withdraws an invitation.
+    """
+
+    self.data.invite.status = 'withdrawn'
     self.data.invite.put()

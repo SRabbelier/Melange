@@ -78,6 +78,7 @@ _document = ''.join([
     captureLinkId('document'),
 ])
 
+ID        = namedIdBasedPattern(['sponsor', 'program'])
 KEY       = namedKeyBasedPattern(['sponsor', 'program'])
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])

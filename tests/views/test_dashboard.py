@@ -77,18 +77,24 @@ class DashboardTest(DjangoTestCase):
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 1)
+    self.assertIsJsonResponse(response)
 
   def testDashboardAsStudentWithProposal(self):
     self.data.createStudentWithProposal()
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 1)
+    self.assertIsJsonResponse(response)
 
   def testDashboardAsStudentWithProject(self):
     self.data.createStudentWithProject()
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 2)
+    self.assertIsJsonResponse(response)
 
   def testDashboardAsHost(self):
     self.data.createHost()
@@ -102,6 +108,8 @@ class DashboardTest(DjangoTestCase):
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 5)
+    self.assertIsJsonResponse(response)
 
   def testDashboardAsMentor(self):
     self.data.createMentor(self.org)
@@ -109,6 +117,8 @@ class DashboardTest(DjangoTestCase):
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 4)
+    self.assertIsJsonResponse(response)
 
   def testDashboardAsMentorWithProject(self):
     self.timeline.studentsAnnounced()
@@ -116,3 +126,5 @@ class DashboardTest(DjangoTestCase):
     url = '/gsoc/dashboard/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertDashboardComponentTemplatesUsed(response)
+    response = self.getListResponse(url, 4)
+    self.assertIsJsonResponse(response)

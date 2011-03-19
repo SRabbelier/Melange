@@ -27,14 +27,14 @@ from datetime import datetime
 from datetime import timedelta
 
 
-def before(delta=100):
-  """Returns a date that is delta days before today.
+def past(delta=100):
+  """Returns a date that is delta days past today.
   """
   return datetime.today() - timedelta(delta)
 
 
-def after(delta=100):
-  """Returns a date that is delta days after today.
+def future(delta=100):
+  """Returns a date that is delta days future today.
   """
   return datetime.today() + timedelta(delta)
 
@@ -56,25 +56,40 @@ class TimelineHelper(object):
     self.timeline.accepted_organization_announced_deadline = None
     self.timeline.student_signup_start = None
     self.timeline.student_signup_end = None
+    self.timeline.accepted_students_announced_deadline = None
 
   def offSeason(self):
     """Sets the current period to off season.
     """
     self._empty()
-    self.timeline.program_start = before()
-    self.timeline.program_end = before()
-    self.timeline.accepted_organization_announced_deadline = before()
-    self.timeline.student_signup_start = before()
-    self.timeline.student_signup_end = before()
+    self.timeline.program_start = past()
+    self.timeline.program_end = past()
+    self.timeline.accepted_organization_announced_deadline = past()
+    self.timeline.student_signup_start = past()
+    self.timeline.student_signup_end = past()
+    self.timeline.accepted_students_announced_deadline = past()
     self.timeline.put()
 
   def studentSignup(self):
     """Sets the current period to the student signup phase.
     """
     self._empty()
-    self.timeline.program_start = before()
-    self.timeline.program_end = after()
-    self.timeline.accepted_organization_announced_deadline = after()
-    self.timeline.student_signup_start = before()
-    self.timeline.student_signup_end = after()
+    self.timeline.program_start = past()
+    self.timeline.program_end = future()
+    self.timeline.accepted_organization_announced_deadline = past()
+    self.timeline.student_signup_start = past()
+    self.timeline.student_signup_end = future()
+    self.timeline.accepted_students_announced_deadline = future()
+    self.timeline.put()
+
+  def studentsAnnounced(self):
+    """Sets the current period to be future accepted students announced phase.
+    """
+    self._empty()
+    self.timeline.program_start = past()
+    self.timeline.program_end = future()
+    self.timeline.accepted_organization_announced_deadline = past()
+    self.timeline.student_signup_start = past()
+    self.timeline.student_signup_end = past()
+    self.timeline.accepted_students_announced_deadline = past()
     self.timeline.put()

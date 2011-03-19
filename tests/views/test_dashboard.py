@@ -42,7 +42,8 @@ class DashboardTest(DjangoTestCase):
     from soc.modules.gsoc.models.organization import GSoCOrganization
     properties = {'timeline': seeder_logic.seed(GSoCTimeline)}
     self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-    self.org = seeder_logic.seed(GSoCOrganization)
+    properties = {'scope': self.gsoc}
+    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
     self.timeline = TimelineHelper(self.gsoc.timeline)
     self.data = GSoCProfileHelper(self.gsoc)
 

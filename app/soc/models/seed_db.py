@@ -269,12 +269,23 @@ def seed(request, *args, **kwargs):
   google_host = Host(**role_properties)
   google_host.put()
 
+  from datetime import datetime
+  from datetime import timedelta
+
+  before = datetime.now() - timedelta(365)
+  after = datetime.now() + timedelta(365)
+
   timeline_properties = {
-        'key_name': 'google/gsoc2009',
-        'link_id': 'gsoc2009',
-        'scope_path': 'google',
-        'scope': google,
-        }
+      'key_name': 'google/gsoc2009',
+      'link_id': 'gsoc2009',
+      'scope_path': 'google',
+      'scope': google,
+      'program_start': before,
+      'program_end': after,
+      'accepted_organization_announced_deadline': after,
+      'student_signup_start': before,
+      'student_signup_end': after,
+  }
 
   gsoc2009_timeline = GSoCTimeline(**timeline_properties)
   gsoc2009_timeline.put()
@@ -307,7 +318,7 @@ def seed(request, *args, **kwargs):
         'link_id': 'gci2009',
         'scope_path': 'google',
         'scope': google,
-        }
+  }
 
   gci2009_timeline = GCITimeline(**timeline_properties)
   #gci2009_timeline.put()

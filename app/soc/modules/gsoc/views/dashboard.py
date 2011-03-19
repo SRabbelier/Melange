@@ -323,7 +323,7 @@ class MyProjectsComponent(Component):
     idx = lists.getListIndex(self.request)
     if idx == 2:
       fields = {'program': self.data.program,
-                'student': self.data.student}
+                'student': self.data.profile}
       prefetch = ['scope']
       response_builder = lists.QueryContentResponseBuilder(
           self.request, self._list_config, project_logic, fields,

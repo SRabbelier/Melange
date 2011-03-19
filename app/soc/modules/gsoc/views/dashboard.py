@@ -128,7 +128,7 @@ class Dashboard(RequestHandler):
     """
     components = []
 
-    if self.data.mentor:
+    if self.data.mentor_for:
       if timeline_helper.isAfterEvent(
           self.data.program_timeline, 'accepted_students_announced_deadline'):
         # add a component to show all projects a user is mentoring
@@ -142,7 +142,7 @@ class Dashboard(RequestHandler):
       #    SubmittedProposalsComponent(self.request, self.data))
       pass
 
-    if self.data.org_admin:
+    if self.data.org_admin_for:
       # add a component for all organization that this user administers
       components.append(OrganizationsIAdminComponent(self.request, self.data))
 

@@ -61,6 +61,7 @@ from soc.modules.gci.models.timeline import GCITimeline
 from soc.modules.gsoc.logic.models.ranker_root import logic as ranker_root_logic
 from soc.modules.gsoc.models import student_proposal
 from soc.modules.gsoc.models.mentor import GSoCMentor
+from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.org_admin import GSoCOrgAdmin
 from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.models.program import GSoCProgram
@@ -363,6 +364,18 @@ def seed(request, *args, **kwargs):
     'scope': gsoc2009,
     })
 
+  role_properties.update({
+      'key_name': 'google/gsoc2009/test',
+      'link_id': 'test',
+      'scope_path': 'google/gsoc2009',
+      'scope': gsoc2009,
+      'program': gsoc2009,
+      'parent': current_user,
+      })
+
+  profile = GSoCProfile(**role_properties)
+  role_properties.pop('parent')
+
   orgs = []
   for i in range(15):
     group_properties.update({
@@ -380,26 +393,16 @@ def seed(request, *args, **kwargs):
     ranker_root_logic.create(student_proposal.DEF_RANKER_NAME, entity,
         student_proposal.DEF_SCORE, 100)
 
-    if i < 2:
-      role_properties.update({
-          'key_name': 'google/gsoc2009/org_%d/test' % i,
-          'link_id': 'test',
-          'scope_path': 'google/gsoc2009/org_%d' % i,
-          'scope': entity,
-          'program': gsoc2009,
-          })
+    # Admin for the first org
+    if i == 0:
+      profile.org_admin_for.append(entity.key())
+      profile.put()
 
-      # Admin for the first org
-      if i == 0:
-        org_1_admin = GSoCOrgAdmin(**role_properties)
-        org_1_admin.put()
-
-      # Only a mentor for the second org
-      if i == 1:
-        org_1_admin = GSoCOrgAdmin(**role_properties)
-        org_1_admin.put()
-        org_1_mentor = GSoCMentor(**role_properties)
-        org_1_mentor.put()
+    # Mentor and admin for the second org
+    if i == 1:
+      profile.org_admin_for.append(entity.key())
+      profile.mentor_for.append(entity.key())
+      profile.put()
 
   role_properties.update({
       'key_name': 'google/gci2009/melange/test',
@@ -474,7 +477,7 @@ def seed(request, *args, **kwargs):
       'abstract': 'test abstract',
       'status': 'accepted',
       'student': melange_student,
-      'mentor': org_1_mentor,
+      'mentor': profile,
       'program':  gsoc2009
        }
 

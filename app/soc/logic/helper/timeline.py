@@ -69,6 +69,18 @@ def isActivePeriod(entity, period):
   return period_started and period_not_ended
 
 
+def activePeriod(entity, period):
+  """Returns the start and end date of the specified period.
+  """
+  period_start = '%s_start' % period
+  period_end = '%s_end' % period
+
+  start = getDateTimeByName(entity, period_start)
+  end = getDateTimeByName(entity, period_end)
+
+  return start, end
+
+
 def isAfterPeriod(entity, period):
   """Returns true iff the current DateTime is after the given period_end.
 

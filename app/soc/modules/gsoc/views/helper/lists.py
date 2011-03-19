@@ -73,14 +73,15 @@ class ListConfiguration(object):
     self.multiselect = False
     self.toolbar = [True, 'top']
 
-    self._buttons = {}
+    self._buttons = []
+    self._button_functions = {}
     self._row_operation = {}
 
   def addColumn(self, id, name, func, resizable=True):
     """Adds a column to the end of the list.
 
       Args:
-        id: A unique identifier of this column (currently unchecked)
+        id: A unique identifier of this column.
         name: The header of the column that is shown to the user.
         func: The function to be called when rendering this column for
               a single entity. This function should take an entity as first
@@ -111,8 +112,8 @@ class ListConfiguration(object):
     lambda ent, *args: getattr(ent, id).
 
     Args:
-      id: A unique (currently unchecked) identifier of this column and name of
-          the field to get the data from.
+      id: A unique identifier of this column and name of the field to get the
+          data from.
       name: The header of the column that is shown to the user.
       resizable: Whether the width of the column should be resizable by the
                  end user.
@@ -120,26 +121,89 @@ class ListConfiguration(object):
     func = lambda ent, *args: getattr(ent, id)
     self.addColumn(id, name, func, resizable=resizable)
 
-  def addButton(self, id, bounds, caption, type, parameters):
-    """Adds a button to the list configuration.
+  def addSimpleRedirectButton(self, id, caption, url, new_window=True):
+    """Adds a button to the list that simply opens a URL.
 
     Args:
-      id: A string that should define a unique id for the button on this list.
-      bounds: An array of integers or an array of an integer and the keyword
-              "all".
-      caption: The display string shown to the end user, selecting items may
-               customize this string.
-      type: Type of button, at the moment there are three different types.
-      parameters: A dictionary that defines the parameters for different type
-                  of buttons.
+      id: The unique id (currently unchecked) of the button.
+      caption: The display string shown to the end user.
+      url: The url to redirect the user to.
+      new_window: Boolean indicating whether the url should open in a new
+                  window.
     """
+    parameters = {
+        'link': url,
+        'new_window': new_window
+    }
+    # add a simple redirect button that is always active.
+    self._buttons.append({
+        'bounds': [0,'all'],
+        'id': id,
+        'caption': caption,
+        'type': 'redirect_simple',
+        'parameters': parameters
+    })
+  
+  def addCustomRedirectButton(self, id, caption, func, new_window=True):
+    """Adds a button to the list that simply opens a URL.
+
+    Args:
+      id: The unique id (currently unchecked) of the button.
+      caption: The display string shown to the end user.
+      func: The function to generate a url to redirect the user to.
+            This function should take an entity as first argument and args and
+            kwargs if needed.
+      new_window: Boolean indicating whether the url should open in a new
+                  window.
+    """
+    if not callable(func):
+      raise TypeError('Given function is not callable')
+
+    parameters = {'new_window': new_window}
+    # add a custom redirect button that is active on a single row
+    self._buttons.append({
+        'bounds': [1, 1],
+        'id': id,
+        'caption': caption,
+        'type': 'redirect_custom',
+        'parameters': parameters
+    })
+    self._button_functions[id] = func
+
+  def addPostButton(self, id, caption, url, bounds, keys, refresh='current',
+                    redirect=False):
+    """This button is used when there is something to send to the backend in a
+    POST request.
+
+    Args:
+      id: The unique id (currently unchecked) of the button.
+      caption: The display string shown to the end user.
+      url: The URL to make the POST request to.
+      bounds: An array of size two with integers or of an integer and the
+              keyword "all". This indicates how many rows need to be selected
+              for the button to be pressable.
+      keys: A list of column identifiers of which the content of the selected
+            rows will be send to the server when the button is pressed.
+      refresh: Indicates which list to refresh, is the current list by default.
+               The keyword 'all' can be used to refresh all lists on the page or
+               a integer index referring to the idx of the list to refresh can
+               be given.
+      redirect: Set to True to have the user be redirected to a URL returned by
+                the URL where the POST request hits.
+    """
+    parameters = {
+        'url': url,
+        'keys': keys,
+        'refresh': refresh,
+        'redirect': redirect,
+    }
     self._buttons.append({
         'bounds': bounds,
         'id': id,
         'caption': caption,
-        'type': type,
-        'parameters': parameters,
-        })
+        'type': 'post',
+        'parameters': parameters
+    })
 
   def setRowAction(self, parameters):
     """The action to perform when clicking on a row.
@@ -185,13 +249,13 @@ class ListConfigurationResponse(Template):
 
     Args:
       config: A ListConfiguration object.
-      idx: A number(? can it be a string as well) uniquely identifying this
-           list.
+      idx: A number uniquely identifying this list. ValueError will be raised if
+           not an int.
       description: The description of this list, as should be shown to the
                    user.
     """
     self._config = config
-    self._idx = idx
+    self._idx = int(idx)
     self._description = description
 
     super(ListConfigurationResponse, self).__init__()

@@ -33,7 +33,7 @@ limitations under the License.
   <p class="request-organization"><strong>Organization:</strong> {{ org.name }}</p>
   <br>
   <p class="request-message"><strong>Message:</strong> {{ request.message }}</p>
-  {% if request.status == 'new' %}
+  {% if request.status == 'pending' %}
   <div class="request-response">
     <form action="{{ response_action }}" method="post" id="form" class="form-project-comment">
       <div id="request-respond-button-row" class="row button-row">

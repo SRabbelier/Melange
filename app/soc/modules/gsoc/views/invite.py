@@ -237,7 +237,7 @@ class ShowInvite(RequestHandler):
     """
 
     assert self.data.invite
-    assert self.data.canRespond
+    assert self.data.canRespond is not None
     assert self.data.org
     assert self.data.invited_user
 

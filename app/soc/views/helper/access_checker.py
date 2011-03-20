@@ -82,7 +82,7 @@ DEF_ROLE_INACTIVE_MSG = ugettext(
     'in the program at this time.')
 
 DEF_IS_NOT_STUDENT_MSG = ugettext(
-    'This page is inaccessiible baucause you do not have a student role '
+    'This page is inaccessible because you do not have a student role '
     'in the program.')
 
 DEF_IS_STUDENT_MSG = ugettext(

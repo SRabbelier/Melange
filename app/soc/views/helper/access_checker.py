@@ -471,5 +471,5 @@ class AccessChecker(object):
       # check if the current user is an org admin for the organization
       self.haveRoleForOrganization(self.data.org, 'org_admin')
       self.data.canRespond = False
-
-    self.data.canRespond = True
+    else:
+      self.data.canRespond = True

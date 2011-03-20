@@ -114,7 +114,7 @@ class InviteTest(DjangoTestCase):
     self.assertEqual(response.status_code, httplib.FORBIDDEN)
 
     # reset invitation to test Accept
-    invitation.status = 'new'
+    invitation.status = 'pending'
     invitation.put()
 
     postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}

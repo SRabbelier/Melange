@@ -122,7 +122,7 @@ class InvitePage(RequestHandler):
     """Access checks for GSoC Invite page.
     """
 
-    self.check.isActive(self.data.program)
+    self.check.isProgramActive()
       
     link_id = self.data.kwargs['organization']
     filter = {

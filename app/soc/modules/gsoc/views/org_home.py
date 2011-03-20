@@ -24,6 +24,7 @@ __authors__ = [
 
 from django.conf.urls.defaults import url
 
+from soc.logic.exceptions import AccessViolation
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -115,6 +116,16 @@ class OrgHome(RequestHandler):
     """Access checks for GSoC Organization Application.
     """
     pass
+
+  def jsonContext(self):
+    """Handler for JSON requests.
+    """
+    list_content = ProjectList(self.request, self.data).getListData()
+
+    if not list_content:
+      raise AccessViolation(
+          'You do not have access to this data')
+    return list_content.content()
 
   def context(self):
     """Handler to for GSoC Organization Home page HTTP get request.

@@ -85,6 +85,9 @@ DEF_IS_NOT_STUDENT_MSG = ugettext(
     'This page is inaccessiible baucause you do not have a student role '
     'in the program.')
 
+DEF_IS_STUDENT_MSG = ugettext(
+    'This page is inaccessible because you are registered as a student.')
+
 DEF_ORG_DOES_NOT_EXISTS_MSG_FMT = ugettext(
     'Organization, whose link_id is %(link_id)s, does not exist in '
     '%(program)s.')
@@ -284,6 +287,18 @@ class AccessChecker(object):
       return
 
     raise AccessViolation(DEF_IS_NOT_STUDENT_MSG)
+
+  def isNotStudent(self):
+    """Checks if the current user has a profile, but is not registered 
+    as a student.
+    """
+
+    self.isRoleActive()
+
+    if not self.data.student_info:
+      return
+
+    raise AccessViolation(DEF_IS_STUDENT_MSG)
 
   def notHaveRoleForOrganization(self, org, role):
     """Checks if the user have not the specified role for the organization.

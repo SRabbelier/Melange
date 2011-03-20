@@ -24,6 +24,8 @@ __authors__ = [
 
 import httplib
 
+from soc.models.request import Request
+
 from tests.profile_utils import GSoCProfileHelper
 from tests.test_utils import DjangoTestCase
 from tests.timeline_utils import TimelineHelper
@@ -49,7 +51,6 @@ class DashboardTest(DjangoTestCase):
     """
     properties = {'role': 'mentor', 'user': self.data.user,
                   'status': 'group_accepted', 'type': 'Invitation'}
-    from soc.models.request import Request
     return seeder_logic.seed(Request, properties=properties)
 
   def assertInviteTemplatesUsed(self, response):
@@ -59,9 +60,26 @@ class DashboardTest(DjangoTestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/invite/base.html')
 
   def testInviteOrgAdmin(self):
+    # test GET
     url = '/gsoc/invite/org_admin/' + self.org.key().name()
     response = self.client.get(url)
     self.assertInviteTemplatesUsed(response)
+
+    # create other user to send invite to
+    other_data = GSoCProfileHelper(self.gsoc)
+    other_user = other_data.createOtherUser('to_be_admin@example.com')
+    other_data.createProfile()
+
+    # test POST
+    message = 'Will you be an org admin for us?'
+    postdata = {'xsrf_token': self.getXsrfToken(url),
+                'link_id': other_user.link_id, 'message': message}
+    response = self.client.post(url, postdata)
+
+    invitation = Request.all().get()
+    self.assertEqual('group_accepted', invitation.status)
+    self.assertEqual(message, invitation.message)
+    self.assertEqual(other_user.link_id, invitation.user.link_id)
 
   def testInviteMentor(self):
     url = '/gsoc/invite/mentor/' + self.org.key().name()
@@ -75,3 +93,23 @@ class DashboardTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertGSoCTemplatesUsed(response)
     self.assertTemplateUsed(response, 'v2/soc/request/base.html')
+
+    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Reject'}
+    response = self.client.post(url, postdata)
+    self.assertEqual(response.status_code, httplib.FOUND)
+    invitation = Request.all().get()
+    self.assertEqual('rejected', invitation.status)
+
+    # test that you can't change after the fact
+    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
+    response = self.client.post(url, postdata)
+    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+
+    # reset invitation to test Accept
+    invitation.status = 'new'
+    invitation.put()
+
+    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
+    response = self.client.post(url, postdata)
+    self.assertEqual(response.status_code, httplib.FOUND)
+

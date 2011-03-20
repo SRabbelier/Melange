@@ -305,7 +305,7 @@ class AccessChecker(object):
           }
       raise AccessViolation(error_msg)
 
-  def haveRoleForOrganization(self, org, role):
+  def hasRoleForOrganization(self, org, role):
     """Checks if the user has the specified role for the organization.
     """
 
@@ -457,7 +457,7 @@ class AccessChecker(object):
     # check if the entity is addressed to the current user
     if self.data.invited_user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
-      self.haveRoleForOrganization(self.data.org, 'org_admin')
+      self.hasRoleForOrganization(self.data.org, 'org_admin')
       self.data.canRespond = False
     else:
       self.data.canRespond = True

@@ -138,7 +138,7 @@ class InvitePage(RequestHandler):
 
       raise NotFound(msg)
 
-    #checker.checkIsOrgAdminForOrg(self.data.org)
+    checker.hasRoleForOrganization(self.data.org, 'org_admin')
 
   def context(self):
     """Handler to for GSoC Invitation Page HTTP get request.

@@ -58,9 +58,6 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
 DEF_NEED_ROLE_MSG = ugettext(
     'You do not have the required role.')
 
-DEF_NO_ACTIVE_ENTITY_MSG = ugettext(
-    'There is no such active entity.')
-
 DEF_NO_USER_LOGIN_MSG = ugettext(
     'Please create <a href="/user/create_profile">User Profile</a>'
     ' in order to view this page.')
@@ -267,15 +264,6 @@ class AccessChecker(object):
 
     raise AccessViolation(DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG % (
         role, self.data.program.name))
-
-  def isActive(self, entity):
-    """Checks if the specified entity is active.
-    """
-
-    if entity.status == 'active':
-      return
-
-    raise AccessViolation(DEF_NO_ACTIVE_ENTITY_MSG)
 
   def isRoleActive(self):
     """Checks if the role of the current user is active.

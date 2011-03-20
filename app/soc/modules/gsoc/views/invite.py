@@ -122,8 +122,7 @@ class InvitePage(RequestHandler):
     """Access checks for GSoC Invite page.
     """
 
-    checker = access_checker.AccessChecker(self.data)
-    #checker.checkIsActive(self.data.program)
+    self.check.isActive(self.data.program)
       
     link_id = self.data.kwargs['organization']
     filter = {
@@ -264,6 +263,9 @@ class ShowInvite(RequestHandler):
       self._rejectInvitation()
     elif self.data.action == self.ACTIONS['withdraw']:
       self._withdrawInvitation()
+
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    self.redirect(reverse('gsoc_dashboard', kwargs=kwargs))
 
   def _acceptInvitation(self):
     """Accepts an invitation.

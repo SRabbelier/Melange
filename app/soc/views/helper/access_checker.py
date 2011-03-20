@@ -259,7 +259,7 @@ class AccessChecker(object):
     """Checks if the user can apply as a mentor or org admin.
     """
 
-    if not self.data.profile.student_info:
+    if self.data.profile and not self.data.profile.student_info:
       raise RedirectRequest(edit_url)
 
     if not self.data.profile:

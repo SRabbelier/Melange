@@ -52,6 +52,12 @@ class ProfileViewTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertGSoCTemplatesUsed(response)
 
+  def testCreateMentorProfile(self):
+    self.timeline.studentSignup()
+    url = '/gsoc/profile/mentor/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertGSoCTemplatesUsed(response)
+
   def testRedirectWithStudentProfile(self):
     self.timeline.studentSignup()
     self.data.createStudent()
@@ -59,7 +65,7 @@ class ProfileViewTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertEqual(response.status_code, httplib.FOUND)
 
-  def testRedirectWithStudentProfile(self):
+  def testForbiddenWithStudentProfile(self):
     self.timeline.studentSignup()
     self.data.createStudent()
     url = '/gsoc/profile/mentor/' + self.gsoc.key().name()

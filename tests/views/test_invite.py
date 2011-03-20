@@ -41,7 +41,8 @@ class DashboardTest(DjangoTestCase):
   def setUp(self):
     from soc.modules.gsoc.models.program import GSoCProgram
     from soc.modules.gsoc.models.organization import GSoCOrganization
-    self.gsoc = seeder_logic.seed(GSoCProgram)
+    properties = {'status': 'visible'}
+    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
     properties = {'scope': self.gsoc, 'status': 'active'}
     self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
     self.data = GSoCProfileHelper(self.gsoc)
@@ -60,7 +61,13 @@ class DashboardTest(DjangoTestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/invite/base.html')
 
   def testInviteOrgAdmin(self):
+    url = '/gsoc/invite/org_admin/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+
+  def testInviteOrgAdmin(self):
     # test GET
+    self.data.createOrgAdmin(self.org)
     url = '/gsoc/invite/org_admin/' + self.org.key().name()
     response = self.client.get(url)
     self.assertInviteTemplatesUsed(response)
@@ -82,6 +89,7 @@ class DashboardTest(DjangoTestCase):
     self.assertEqual(other_user.link_id, invitation.user.link_id)
 
   def testInviteMentor(self):
+    self.data.createOrgAdmin(self.org)
     url = '/gsoc/invite/mentor/' + self.org.key().name()
     response = self.client.get(url)
     self.assertInviteTemplatesUsed(response)

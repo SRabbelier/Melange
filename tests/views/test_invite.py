@@ -34,7 +34,7 @@ from tests.timeline_utils import TimelineHelper
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
 
 
-class DashboardTest(DjangoTestCase):
+class InviteTest(DjangoTestCase):
   """Tests invite page.
   """
 

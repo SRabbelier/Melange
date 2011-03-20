@@ -429,7 +429,7 @@ class AccessChecker(object):
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity can be responded
-    if self.data.invite.status not in ['new']:
+    if self.data.invite.status not in ['pending']:
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user

@@ -175,7 +175,6 @@ class InvitePage(RequestHandler):
     invite_form.cleaned_data['user'] = self.data.invited_user
     invite_form.cleaned_data['group'] = self.data.org
     invite_form.cleaned_data['role'] = self.data.kwargs['role']
-    invite_form.cleaned_data['status'] = 'new'
     invite_form.cleaned_data['type'] = 'Invitation'
 
     return invite_form.create(commit=True)

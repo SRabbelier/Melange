@@ -40,10 +40,19 @@ class GSoCProfileHelper(object):
     """Creates a user entity for the current user.
     """
     if self.user:
-      return
+      return self.user
     from soc.models.user import User
     from soc.modules.seeder.logic.providers.user import CurrentUserProvider
     properties = {'account': CurrentUserProvider(), 'status': 'valid'}
+    self.user = seeder_logic.seed(User, properties=properties)
+    return self.user
+
+  def createOtherUser(self, email):
+    """Creates a user entity for the specified email.
+    """
+    from soc.models.user import User
+    from soc.modules.seeder.logic.providers.user import FixedUserProvider
+    properties = {'account': FixedUserProvider(value=email), 'status': 'valid'}
     self.user = seeder_logic.seed(User, properties=properties)
     return self.user
 

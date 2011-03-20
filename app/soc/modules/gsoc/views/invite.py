@@ -48,7 +48,7 @@ from soc.modules.gsoc.views.helper import url_patterns
 
 
 class InviteForm(forms.ModelForm):
-  """Django form for the proposal page.
+  """Django form for the invite page.
   """
 
   link_id = djangoforms.CharField(label='Link ID')

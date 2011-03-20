@@ -159,7 +159,7 @@ class InvitePage(RequestHandler):
     """Creates a new invitation based on the data inserted in the form.
 
     Returns:
-      a newly created proposal entity or None
+      a newly created Request entity or None
     """
 
     assert self.data.org

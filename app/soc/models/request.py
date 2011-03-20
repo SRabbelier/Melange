@@ -33,16 +33,11 @@ from soc.models.user import User
 
 
 STATUS_MESSAGES = {
-    'new': 'This request has had no reply yet.',
-    'group_accepted': 'The profile can now be filled out',
-    'completed': 'You are done, no further action needed',
-    'canceled':
-        'You have canceled the request, please make a new one if needed',
-    'rejected':
-        'You cannot do anything with this request since it was rejected',
-    'withdrawn': 'You cannot do anything with this request since it was ' \
-        'withdrawn',
-    'ignored': 'This request was marked as spam, and has been ignored',
+    'pending': 'This request has had no reply yet.',
+    'accepted': 'The request has been accepted.',
+    'invalid': 'The request has been marked as invalid by the system.',
+    'rejected': 'The request has been rejected.',
+    'withdrawn': 'The request has been withdrawn by the sender.',
 }
 
 ROLE_NAMES = {
@@ -57,11 +52,10 @@ class Request(ModelWithFieldAttributes):
   #: Type of the request:
   #: - invitations are sent by organization admins to users
   #: - requests are sent by wannabe mentors to organizations
-  type = db.StringProperty(required=False,
-      choices=['Invitation', 'Request'])
+  type = db.StringProperty(required=False, choices=['Invitation', 'Request'])
 
   #: The internal name of the role
-  role = db.StringProperty(required=True)
+  role = db.StringProperty(required=True, choices=['mentor', 'org_admin'])
 
   #: The user this request is from or this invitation is to
   user = db.ReferenceProperty(
@@ -82,19 +76,14 @@ class Request(ModelWithFieldAttributes):
       'This is an optional message shown to the receiver of this request.')
 
   # property that determines the status of the request
-  # new : new request.
-  # group_accepted : The group has accepted this request.
-  # completed : This request has been handled either following a creation of
+  # new :      This is a new request which has yet to be responded
+  # accepted : This request has been handled either following a creation of
   #             the role entity,
-  # canceled : This request has been canceled by the user.
-  # rejected : This request has been rejected by the group.
-  # withdrawn : This request has been withdrawn after being previously
-  #             accepted.
-  # ignored : The request has been ignored by the group and will not give
-  #           the user access to create the role.
-  status = db.StringProperty(required=True, default='new',
-      choices=['new', 'group_accepted', 'completed', 'canceled', 'rejected',
-               'withdrawn', 'ignored'])
+  # invalid : This request has been invalidated by the system.
+  # rejected :  This request has been rejected by the group.
+  # withdrawn : This request has been withdrawn by the sender
+  status = db.StringProperty(required=True, default='pending',
+      choices=['pending', 'accepted', 'invalid', 'rejected', 'withdrawn'])
   status.help_text = ugettext('The status of the request.')
 
   #: DateTime when the request was created

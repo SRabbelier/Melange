@@ -276,7 +276,7 @@ class ShowInvite(RequestHandler):
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
 
-    self.data.invite.status = 'completed'
+    self.data.invite.status = 'accepted'
 
     if self.data.invite.role == 'mentor':
       self.data.profile.mentor_for.append(self.data.org.key())

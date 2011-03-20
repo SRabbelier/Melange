@@ -126,4 +126,5 @@ class OrgHome(RequestHandler):
         'organization': organization,
         'contact': Contact(self.data),
         'tags': organization.tags_string(organization.org_tag),
+        'project_list': ProjectList(self.request, self.data),
     }

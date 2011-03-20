@@ -20,6 +20,7 @@ limitations under the License.
 </div>
 
 <div id="organization-home" class="content_column_1">
+  <!-- begin block -->
   <div id="organization-description" class="block block-organization-description">
     <h4 title="title-section-organization-description">Description</h4>
     <div id="block-organization-description-content" class="block-content">
@@ -29,6 +30,11 @@ limitations under the License.
       <a href="{{ organization.ideas }}">Ideas page: {{ organization.ideas }}</a>
     </div>
   </div>
+  <!-- end block -->
+
+  <!-- begin block -->
+  {{ project_list.render }}
+  <!-- end block -->
 </div>
 
 <div class="content_column_2">
@@ -55,6 +61,17 @@ limitations under the License.
 
 {% block dependencies %}
   [
+    dep.melange.menu,
+    dep.melange.list,
+    css("/soc/content/css/v2/gsoc/user-messages.css"),
+    null,
+    function () {
+      if (melange_list_queue !== undefined && melange_list_queue instanceof Array) {
+        jQuery.each(melange_list_queue, function (index, function_to_call) {
+          function_to_call();
+        });
+      }
+    },
     dep.melange.blog,
     null,
     function () {

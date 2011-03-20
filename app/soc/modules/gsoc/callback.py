@@ -73,6 +73,7 @@ class Callback(object):
     from soc.modules.gsoc.views import proposal
     from soc.modules.gsoc.views import proposal_review
     from soc.modules.gsoc.views import program
+    from soc.modules.gsoc.views import projects_list
     from soc.modules.gsoc.views import request
 
     self.views.append(dashboard.Dashboard())
@@ -88,6 +89,7 @@ class Callback(object):
     self.views.append(proposal_review.PostComment())
     self.views.append(proposal_review.PostScore())
     self.views.append(program.ProgramPage())
+    self.views.append(projects_list.ListProjects())
     self.views.append(invite.InvitePage())
     self.views.append(invite.ShowInvite())
     self.views.append(request.RequestPage())

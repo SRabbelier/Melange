@@ -51,7 +51,7 @@ class InviteTest(DjangoTestCase):
     """Creates and returns an accepted invitation for the current user.
     """
     properties = {'role': 'mentor', 'user': self.data.user,
-                  'status': 'group_accepted', 'type': 'Invitation'}
+                  'status': 'pending', 'type': 'Invitation'}
     return seeder_logic.seed(Request, properties=properties)
 
   def assertInviteTemplatesUsed(self, response):
@@ -84,7 +84,7 @@ class InviteTest(DjangoTestCase):
     response = self.client.post(url, postdata)
 
     invitation = Request.all().get()
-    self.assertEqual('group_accepted', invitation.status)
+    self.assertEqual('pending', invitation.status)
     self.assertEqual(message, invitation.message)
     self.assertEqual(other_user.link_id, invitation.user.link_id)
 

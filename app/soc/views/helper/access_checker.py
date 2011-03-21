@@ -434,11 +434,11 @@ class AccessChecker(object):
     assert self.data.requester
 
     # check if the entity represents an invitation
-    if self.data.invite.type != 'Request':
+    if self.data.request_entity.type != 'Request':
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the entity can be responded
-    if self.data.invite.status not in ['pending']:
+    if self.data.request_entity.status not in ['pending']:
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the user is an admin for the organization

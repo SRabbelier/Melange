@@ -78,18 +78,19 @@ class ListConfiguration(object):
     self._row_operation = {}
     self._row_operation_func = None
 
-  def addColumn(self, id, name, func, resizable=True):
+  def addColumn(self, id, name, func, resizable=True, hidden=False):
     """Adds a column to the end of the list.
 
-      Args:
-        id: A unique identifier of this column.
-        name: The header of the column that is shown to the user.
-        func: The function to be called when rendering this column for
-              a single entity. This function should take an entity as first
-              argument and args and kwargs if needed. The string rendering of
-              the return value will be sent to the end user.
-        resizable: Whether the width of the column should be resizable by the
-                   end user.
+    Args:
+      id: A unique identifier of this column.
+      name: The header of the column that is shown to the user.
+      func: The function to be called when rendering this column for
+            a single entity. This function should take an entity as first
+            argument and args and kwargs if needed. The string rendering of
+            the return value will be sent to the end user.
+      resizable: Whether the width of the column should be resizable by the
+                 end user.
+      hidden: Whether the column should be displayed by default.
     """
     if self._col_functions.get(id):
       logging.warning('Column with id %s is already defined' %id)
@@ -101,11 +102,12 @@ class ListConfiguration(object):
         'name': id,
         'index': id,
         'resizable': resizable,
+        'hidden': hidden,
         })
     self._col_names.append(name)
     self._col_functions[id] = func
 
-  def addSimpleColumn(self, id, name, resizable=True):
+  def addSimpleColumn(self, id, name, resizable=True, hidden=False):
     """Adds a column to the end of the list which uses the id of the column as
     attribute name of the entity to get the data from.
 
@@ -118,9 +120,10 @@ class ListConfiguration(object):
       name: The header of the column that is shown to the user.
       resizable: Whether the width of the column should be resizable by the
                  end user.
+      hidden: Whether the column should be displayed by default.
     """
     func = lambda ent, *args: getattr(ent, id)
-    self.addColumn(id, name, func, resizable=resizable)
+    self.addColumn(id, name, func, resizable=resizable, hidden=hidden)
 
   def __addButton(self, id, caption, bounds, type, parameters):
     """Internal method for adding buttons so that the uniqueness of the id can

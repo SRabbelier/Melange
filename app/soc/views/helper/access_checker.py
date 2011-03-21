@@ -454,6 +454,17 @@ class AccessChecker(object):
     self.canAccessRequestEntity(
         self.data.invite, self.data.invited_user, self.data.org)
 
+  def canViewRequest(self):
+    """Checks if the current user can see the request.
+    """
+
+    assert self.data.request_entity
+    assert self.data.org
+    assert self.data.requester
+
+    self.canAccessRequestEntity(
+        self.data.request_entity, self.data.requester, self.data.org)
+
   def canAccessRequestEntity(self, entity, user, org):
     """Checks if the current user is allowed to access a Request entity.
     

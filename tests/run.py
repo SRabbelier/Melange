@@ -164,8 +164,8 @@ def main():
 
   # Ignore functional, views and tasks tests temporarily
   args = ['--exclude=functional',
-          '--exclude=views',
-          '--exclude=tasks']
+          '--exclude=^views$',
+          '--exclude=^tasks$']
   sys.argv += args
   nose.main(addplugins=plugins)
 

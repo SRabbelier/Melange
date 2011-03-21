@@ -78,7 +78,10 @@ class ReferenceProperty(djangoforms.ReferenceProperty):
     if not value:
       return None
     if not isinstance(value, db.Model):
-      value = db.get(value)
+      try:
+        value = db.get(value)
+      except db.BadKeyError, e:
+        raise forms.ValidationError(unicode(e))
     return value
 
 

@@ -46,17 +46,22 @@ class ProfileViewTest(DjangoTestCase):
     self.timeline = TimelineHelper(self.gsoc.timeline)
     self.data = GSoCProfileHelper(self.gsoc)
 
+  def assertProfileTemplatesUsed(self, response):
+    self.assertGSoCTemplatesUsed(response)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/profile/base.html')
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/_form.html')
+
   def testCreateProfile(self):
     self.timeline.studentSignup()
     url = '/gsoc/profile/student/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertGSoCTemplatesUsed(response)
+    self.assertProfileTemplatesUsed(response)
 
   def testCreateMentorProfile(self):
     self.timeline.studentSignup()
     url = '/gsoc/profile/mentor/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertGSoCTemplatesUsed(response)
+    self.assertProfileTemplatesUsed(response)
 
   def testRedirectWithStudentProfile(self):
     self.timeline.studentSignup()

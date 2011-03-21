@@ -121,6 +121,9 @@ DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG = ugettext(
 DEF_NOT_VALID_INVITATION_MSG = ugettext(
     'This is not a valid invitation.')
 
+DEF_NOT_VALID_REQUEST_MSG = ugettext(
+    'This is not a valid request.')
+
 DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG = ugettext(
     'You already have %(role)s role for %(org)s.')
 
@@ -398,7 +401,7 @@ class AccessChecker(object):
     self.isIdBasedEntityPresent(entity, id, 'Request')
 
   def canRespondToInvite(self):
-    """Checks if the current user can accept the invitation.
+    """Checks if the current user can accept/reject the invitation.
     """
     assert self.data.invite
     assert self.data.org
@@ -429,14 +432,31 @@ class AccessChecker(object):
     assert self.data.org
     assert self.data.invited_user
 
-    # check if the entity represents an invitation
-    if self.data.invite.type != 'Invitation':
-      raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
+    self.canAccessRequestEntity(
+        self.data.invite, self.data.invited_user, self.data.org)
+
+  def canAccessRequestEntity(self, entity, user, org):
+    """Checks if the current user is allowed to access a Request entity.
+    
+    Args:
+      entity: an entity which belongs to Request model
+      user: user entity that the Request refers to
+      org: organization entity that the Request refers to
+    """
 
     # check if the entity is addressed to the current user
-    if self.data.invited_user.key() != self.data.user.key():
+    if user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
       self.hasRoleForOrganization(self.data.org, 'org_admin')
-      self.data.canRespond = False
+      reason = 'org_admin'
     else:
-      self.data.canRespond = True
+      reason = 'user'
+
+    # depending on the reason and invitation type, the user has different
+    # actions available
+    if reason == 'org_admin':
+      # org admins may see the invitations and can respond to requests
+      self.data.canRespond = entity.type == 'Request'
+    else:
+      # user that the entity refers to may only respond if it is a Request
+      self.data.canRespond = entity.type == 'Invitation'

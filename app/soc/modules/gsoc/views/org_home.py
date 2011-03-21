@@ -25,6 +25,7 @@ __authors__ = [
 from django.conf.urls.defaults import url
 
 from soc.logic.exceptions import AccessViolation
+from soc.logic.helper import timeline as timeline_helper
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -132,10 +133,15 @@ class OrgHome(RequestHandler):
     """
     organization = self.data.organization
 
-    return {
+    context = {
         'page_name': '%s - Homepage' % organization.short_name,
         'organization': organization,
         'contact': Contact(self.data),
         'tags': organization.tags_string(organization.org_tag),
-        'project_list': ProjectList(self.request, self.data),
     }
+
+    if timeline_helper.isAfterEvent(
+        self.data.program_timeline, 'accepted_students_announced_deadline'):
+      context['project_list'] = ProjectList(self.request, self.data)
+
+    return context

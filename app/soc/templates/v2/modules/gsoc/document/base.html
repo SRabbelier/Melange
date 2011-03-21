@@ -24,6 +24,7 @@ limitations under the License.
 <!-- begin form -->
 {% comment %} TODO: change class/id after creating custom css {% endcomment %}
 <form action="#" method="post" id="form" class="form-register">
+  <div id="loggedin-message" class="loggedin"></div>
   <h2 id="form-register-title">Edit document</h2> <p id="form-register-req" class="req">* fields required</p>
   {{ document_form.render }}
   <div id="form-register-fieldset-button-row" class="row button-row">

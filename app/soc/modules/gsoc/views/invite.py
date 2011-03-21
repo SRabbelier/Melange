@@ -191,7 +191,6 @@ class InvitePage(RequestHandler):
       self.get()
 
 
-# TODO: that may be moved to a separate module
 class ShowInvite(RequestHandler):
   """Encapsulate all the methods required to generate Show Invite page.
   """

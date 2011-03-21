@@ -24,12 +24,16 @@ __authors__ = [
   '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
+
+import datetime
 import httplib
 import StringIO
 import unittest
 
 import gaetestbed
 from mox import stubout
+
+from google.appengine.ext import db
 
 from django.test import client
 from django.test import TestCase
@@ -219,10 +223,27 @@ class DjangoTestCase(TestCase):
     # TODO(SRabbelier): update this when we use an error template again
     # self.assertTemplateUsed(response, 'soc/error.html')
 
+  def assertResponseCode(self, response, status_code):
+    """Asserts that the response status is OK.
+    """
+    if response.status_code != status_code:
+      print response
+    self.assertEqual(response.status_code, status_code)
+
+  def assertResponseOK(self, response):
+    """Asserts that the response status is OK.
+    """
+    self.assertResponseCode(response, httplib.OK)
+
+  def assertResponseRedirect(self, response):
+    """Asserts that the response status is FOUND.
+    """
+    self.assertResponseCode(response, httplib.FOUND)
+
   def assertGSoCTemplatesUsed(self, response):
     """Asserts that all the templates from the base view were used.
     """
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertResponseOK(response)
     self.assertTemplateUsed(response, 'v2/modules/gsoc/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/footer.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/header.html')
@@ -231,9 +252,37 @@ class DjangoTestCase(TestCase):
   def assertIsJsonResponse(self, response):
     """Asserts that all the templates from the base view were used.
     """
-    self.assertEqual(response.status_code, httplib.OK)
+    self.assertResponseOK(response)
     self.assertEqual('application/json', response['Content-Type'])
     self.assertTemplateUsed(response, 'json_marker.html')
+
+  def assertPropertiesEqual(self, properties, entity):
+    """Asserts that all properties are set on the specified entity.
+
+    Reference properties are compared by their key.
+    Any date/time objects are ignored.
+    """
+    errors = []
+
+    for key, value in properties.iteritems():
+      prop = getattr(entity, key)
+
+      if isinstance(value, db.Model) or isinstance(prop, db.Model):
+        value = repr(value.key()) if value else value
+        prop = repr(prop.key()) if prop else prop
+
+      if isinstance(value, datetime.date) or isinstance(value, datetime.time):
+        continue
+
+      msg = "property %s: %s != %s" % (key, value, prop)
+
+      try:
+        self.assertEqual(value, prop, msg=msg)
+      except AssertionError, e:
+        errors.append(msg)
+
+    if errors:
+      self.fail("\n".join(errors))
 
 
 def runTasks(url = None, name=None, queue_names = None):

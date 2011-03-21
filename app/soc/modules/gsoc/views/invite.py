@@ -216,10 +216,10 @@ class ShowInvite(RequestHandler):
     
     id = int(self.data.kwargs['id'])
     self.data.invite = Request.get_by_id(id)
+    self.check.isRequestPresent(self.data.invite, id)
+
     self.data.org = self.data.invite.group
     self.data.invited_user = self.data.invite.user
-
-    self.check.isRequestPresent(self.data.invite, id)
 
     if self.data.POST:
       self.data.action = self.data.POST['action']

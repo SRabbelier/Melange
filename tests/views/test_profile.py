@@ -68,18 +68,18 @@ class ProfileViewTest(DjangoTestCase):
     self.data.createStudent()
     url = '/gsoc/profile/student/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.FOUND)
+    self.assertResponseRedirect(response)
 
   def testForbiddenWithStudentProfile(self):
     self.timeline.studentSignup()
     self.data.createStudent()
     url = '/gsoc/profile/mentor/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+    self.assertResponseForbidden(response)
 
   def testForbiddenWithMentorProfile(self):
     self.timeline.studentSignup()
     self.data.createMentor(self.org)
     url = '/gsoc/profile/student/' + self.gsoc.key().name()
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+    self.assertResponseForbidden(response)

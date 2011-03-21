@@ -240,6 +240,11 @@ class DjangoTestCase(TestCase):
     """
     self.assertResponseCode(response, httplib.FOUND)
 
+  def assertResponseForbidden(self, response):
+    """Asserts that the response status is FORBIDDEN.
+    """
+    self.assertResponseCode(response, httplib.FORBIDDEN)
+
   def assertGSoCTemplatesUsed(self, response):
     """Asserts that all the templates from the base view were used.
     """

@@ -64,7 +64,7 @@ class InviteTest(DjangoTestCase):
   def testInviteOrgAdmin(self):
     url = '/gsoc/invite/org_admin/' + self.org.key().name()
     response = self.client.get(url)
-    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+    self.assertResponseForbidden(response)
 
   def testInviteOrgAdmin(self):
     # test GET
@@ -105,14 +105,14 @@ class InviteTest(DjangoTestCase):
 
     postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Reject'}
     response = self.client.post(url, postdata)
-    self.assertEqual(response.status_code, httplib.FOUND)
+    self.assertResponseRedirect(response)
     invitation = Request.all().get()
     self.assertEqual('rejected', invitation.status)
 
     # test that you can't change after the fact
     postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
     response = self.client.post(url, postdata)
-    self.assertEqual(response.status_code, httplib.FORBIDDEN)
+    self.assertResponseForbidden(response)
 
     # reset invitation to test Accept
     invitation.status = 'pending'
@@ -120,5 +120,4 @@ class InviteTest(DjangoTestCase):
 
     postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
     response = self.client.post(url, postdata)
-    self.assertEqual(response.status_code, httplib.FOUND)
-
+    self.assertResponseRedirect(response)

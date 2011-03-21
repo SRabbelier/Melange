@@ -47,7 +47,7 @@ class AccessChecker(access_checker.AccessChecker):
     """
 
     # check if the timeline allows submitting proposals
-    self.isActivePeriod('student_signup')
+    self._isActivePeriod('student_signup')
 
     # check how many proposals the student has already submitted 
     fields = {

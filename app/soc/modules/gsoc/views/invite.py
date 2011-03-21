@@ -213,7 +213,7 @@ class ShowInvite(RequestHandler):
     ]
 
   def checkAccess(self):
-    self.check.isRoleActive()
+    self.check.isProfileActive()
     
     id = int(self.data.kwargs['id'])
     self.data.invite = Request.get_by_id(id)

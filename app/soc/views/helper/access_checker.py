@@ -107,6 +107,9 @@ DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
 DEF_NOT_HOST_MSG = ugettext(
     'You need to be a program adminstrator to access this page.')
 
+DEF_NOT_DEVELOPER_MSG = ugettext(
+    'You need to be a site developer to access this page.')
+
 DEF_ALREADY_PARTICIPATING_AS_NON_STUDENT_MSG = ugettext(
     'You cannot register as a student since you are already a '
     'mentor or organization administrator in %s.')
@@ -128,7 +131,6 @@ class AccessChecker(object):
   def __init__(self, data=None):
     """Initializes the access checker object.
     """
-
     self.data = data
     self.gae_user = users.get_current_user()
 
@@ -138,7 +140,7 @@ class AccessChecker(object):
     raise AccessViolation(message)
 
   def isLoggedIn(self):
-    """Raises an alternate HTTP response if Google Account is not logged in.
+    """Ensures that the user is logged in.
     """
 
     if self.gae_user:
@@ -147,15 +149,8 @@ class AccessChecker(object):
     raise LoginRequest()
 
   def isUser(self):
-    """Raises an alternate HTTP response if Google Account has no User entity.
-
-    Raises:
-      AccessViolationResponse:
-      * if no User exists for the logged-in Google Account, or
-      * if no Google Account is logged in at all
-      * if User has not agreed to the site-wide ToS, if one exists
+    """Checks if the current user has an User entity.
     """
-
     self.isLoggedIn()
 
     if self.data.user:
@@ -166,38 +161,16 @@ class AccessChecker(object):
   def isHost(self):
     """Checks whether the current user has a host role.
     """
+    self.isLoggedIn()
 
     if self.data.is_host:
       return
 
     raise AccessViolation(DEF_NOT_HOST_MSG)
 
-  def hasUserEntity(self):
-    """Raises an alternate HTTP response if Google Account has no User entity.
-
-    Raises:
-      AccessViolationResponse:
-      * if no User exists for the logged-in Google Account, or
-      * if no Google Account is logged in at all
-    """
-
-    self.isLoggedIn()
-
-    if self.data.user:
-      return
-
-    raise AccessViolation(DEF_NO_USER_LOGIN_MSG)
-
   def isDeveloper(self):
-    """Raises an alternate HTTP response if Google Account is not a Developer.
-
-    Raises:
-      AccessViolationResponse:
-      * if User is not a Developer, or
-      * if no User exists for the logged-in Google Account, or
-      * if no Google Account is logged in at all
+    """Checks if the current user is a Developer.
     """
-
     self.isUser()
 
     if self.data.user.is_developer:
@@ -206,16 +179,11 @@ class AccessChecker(object):
     if users.is_current_user_admin():
       return
 
-    login_message_fmt = DEF_DEV_LOGOUT_LOGIN_MSG_FMT % {
-        'role': 'a Site Developer ',
-        }
-
-    raise AccessViolation(login_message_fmt)
+    raise AccessViolation(DEF_NOT_DEVELOPER_MSG)
 
   def isProgramActive(self):
     """Checks that the program is active.
     """
-
     if not self.data.program:
       raise AccessViolation(DEF_NO_SUCH_PROGRAM_MSG)
 
@@ -225,7 +193,7 @@ class AccessChecker(object):
     raise AccessViolation(
         DEF_PROGRAM_INACTIVE_MSG_FMT % self.data.program.name)
 
-  def isActivePeriod(self, period_name):
+  def _isActivePeriod(self, period_name):
     """Checks if the given period is active for the given program.
 
     Args:
@@ -243,11 +211,12 @@ class AccessChecker(object):
   def canApplyStudent(self, edit_url):
     """Checks if the user can apply as a student.
     """
+    self.isLoggedIn()
 
     if self.data.profile and self.data.profile.student_info:
       raise RedirectRequest(edit_url)
 
-    self.isActivePeriod('student_signup')
+    self._isActivePeriod('student_signup')
 
     if not self.data.profile:
       return
@@ -258,6 +227,7 @@ class AccessChecker(object):
   def canApplyNonStudent(self, role, edit_url):
     """Checks if the user can apply as a mentor or org admin.
     """
+    self.isLoggedIn()
 
     if self.data.profile and not self.data.profile.student_info:
       raise RedirectRequest(edit_url)
@@ -268,9 +238,10 @@ class AccessChecker(object):
     raise AccessViolation(DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG % (
         role, self.data.program.name))
 
-  def isRoleActive(self):
-    """Checks if the role of the current user is active.
+  def isProfileActive(self):
+    """Checks if the profile of the current user is active.
     """
+    self.isLoggedIn()
 
     if self.data.profile and self.data.profile.status == 'active':
       return
@@ -280,8 +251,7 @@ class AccessChecker(object):
   def isActiveStudent(self):
     """Checks if the user is an active student.
     """
-
-    self.isRoleActive()
+    self.isProfileActive()
 
     if self.data.student_info:
       return
@@ -289,11 +259,9 @@ class AccessChecker(object):
     raise AccessViolation(DEF_IS_NOT_STUDENT_MSG)
 
   def isNotStudent(self):
-    """Checks if the current user has a profile, but is not registered 
-    as a student.
+    """Checks if the current user has a non-student profile.
     """
-
-    self.isRoleActive()
+    self.isProfileActive()
 
     if not self.data.student_info:
       return
@@ -303,6 +271,7 @@ class AccessChecker(object):
   def notHaveRoleForOrganization(self, org, role):
     """Checks if the user have not the specified role for the organization.
     """
+    self.isLoggedIn()
 
     if not self.data.profile:
       return
@@ -323,8 +292,7 @@ class AccessChecker(object):
   def hasRoleForOrganization(self, org, role):
     """Checks if the user has the specified role for the organization.
     """
-
-    self.isRoleActive()
+    self.isProfileActive()
 
     if role == 'org_admin':
       roles = self.data.profile.org_admin_for
@@ -343,7 +311,6 @@ class AccessChecker(object):
     Side effects (RequestData):
       - if the organization exists and is active, it is saved as 'organization'
     """
-
     # kwargs which defines an organization
     fields = ['sponsor', 'program', 'organization']
 
@@ -370,7 +337,6 @@ class AccessChecker(object):
     Side effects (RequestData):
       - if the proposal exists and is active, it is saved as 'proposal'
     """
-
     id = int(self.data.kwargs['id'])
     self.data.proposal = GSoCProposal.get_by_id(id, parent=self.data.profile)
 
@@ -391,9 +357,11 @@ class AccessChecker(object):
   def canStudentUpdateProposal(self):
     """Checks if the student is eligible to submit a proposal.
     """
-    
+    self.isActiveStudent()
+    self.isProposalInURLValid()
+
     # check if the timeline allows updating proposals
-    self.isActivePeriod('student_signup')
+    self._isActivePeriod('student_signup')
 
     # TODO: it should be changed - we should not assume that the proposal
     # is already in RequestData
@@ -415,7 +383,6 @@ class AccessChecker(object):
   def isIdBasedEntityPresent(self, entity, id, model_name):
     """Checks if the entity is not None.
     """
-
     if entity is not None:
       return
 
@@ -428,13 +395,11 @@ class AccessChecker(object):
   def isRequestPresent(self, entity, id):
     """Checks if the specified Request entity is not None.
     """
-
     self.isIdBasedEntityPresent(entity, id, 'Request')
 
   def canRespondToInvite(self):
     """Checks if the current user can accept the invitation.
     """
-
     assert self.data.invite
     assert self.data.org
     assert self.data.invited_user
@@ -460,7 +425,6 @@ class AccessChecker(object):
   def canViewInvite(self):
     """Checks if the current user can see the invitation.
     """
-
     assert self.data.invite
     assert self.data.org
     assert self.data.invited_user

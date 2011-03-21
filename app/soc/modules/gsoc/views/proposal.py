@@ -113,9 +113,6 @@ class UpdateProposal(RequestHandler):
     ]
 
   def checkAccess(self):
-    self.check.isLoggedIn()
-    self.check.isActiveStudent()
-    self.check.isProposalInURLValid()
     self.check.canStudentUpdateProposal()
 
   def templatePath(self):

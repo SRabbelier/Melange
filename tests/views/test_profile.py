@@ -83,3 +83,10 @@ class ProfileViewTest(DjangoTestCase):
     url = '/gsoc/profile/student/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertResponseForbidden(response)
+
+  def testEditProfile(self):
+    self.timeline.studentSignup()
+    self.data.createProfile()
+    url = '/gsoc/profile/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertResponseOK(response)

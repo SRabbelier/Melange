@@ -135,7 +135,7 @@ class ProfilePage(RequestHandler):
       else:
         self.check.canApplyNonStudent(role, edit_url)
     else:
-      self.check.isRoleActive()
+      self.check.isProfileActive()
 
   def templatePath(self):
     return 'v2/modules/gsoc/profile/base.html'

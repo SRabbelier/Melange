@@ -425,6 +425,25 @@ class AccessChecker(object):
     # check if the user does not have this role
     self.notHaveRoleForOrganization(self.data.org, self.data.invite.role)
 
+  def canRespondToRequest(self):
+    """Checks if the current user can accept/reject the request.
+    """
+
+    assert self.data.request_entity
+    assert self.data.org
+    assert self.data.requester
+
+    # check if the entity represents an invitation
+    if self.data.invite.type != 'Request':
+      raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
+
+    # check if the entity can be responded
+    if self.data.invite.status not in ['pending']:
+      raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
+
+    # check if the user is an admin for the organization
+    self.hasRoleForOrganization(self.data.org, 'org_admin')
+
   def canViewInvite(self):
     """Checks if the current user can see the invitation.
     """

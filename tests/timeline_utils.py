@@ -43,8 +43,9 @@ class TimelineHelper(object):
   """Helper class to aid in setting the timeline.
   """
 
-  def __init__(self, timeline):
+  def __init__(self, timeline, org_app=None):
     self.timeline = timeline
+    self.org_app = org_app
 
   def _empty(self):
     """Removes all timeline settings.

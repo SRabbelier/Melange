@@ -33,8 +33,8 @@ from tests.test_utils import DjangoTestCase
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
 
 
-class ProfileViewTest(DjangoTestCase):
-  """Tests user profile views.
+class HomepageViewTest(DjangoTestCase):
+  """Tests program homepage views.
   """
 
   def setUp(self):

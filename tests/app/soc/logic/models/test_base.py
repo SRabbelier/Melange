@@ -352,9 +352,9 @@ class BaseTest(unittest.TestCase):
     """Test that an error is raised when there is no match.
     """
 
-    from soc.views import out_of_band
+    from soc.logic.exceptions import NotFound
     key_name = "test/%d" % len(self.entities)
-    self.assertRaises(out_of_band.Error,
+    self.assertRaises(NotFound,
                       self.logic.getFromKeyNameOr404,
                       key_name=key_name)
 
@@ -391,9 +391,9 @@ class BaseTest(unittest.TestCase):
     """Test that an error is raised when there is no match.
     """
 
-    from soc.views import out_of_band
+    from soc.logic.exceptions import NotFound
     fields = {'scope_path': 'test', 'link_id': str(len(self.entities))}
-    self.assertRaises(out_of_band.Error,
+    self.assertRaises(NotFound,
                       self.logic.getFromKeyFieldsOr404,
                       fields=fields)
 

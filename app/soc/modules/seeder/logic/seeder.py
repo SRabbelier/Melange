@@ -397,8 +397,55 @@ class Logic(object):
       result.append(data)
     return result
 
-  def seed(self, model_class, properties=None):
-    """Seeds a model_class entity.
+  def _seedProperty(self, model_class, properties, prop, prop_name):
+    """Seeds one property.
+    """
+    result = properties.get(prop_name)
+
+    # scope_path is to be produced from scope
+    if prop_name == 'scope_path' and not result:
+      return ''
+
+    # Specially generate link_id because it needs to be unique
+    if prop_name == 'link_id' and not result:
+      result = LinkIDProvider(model_class)
+
+    if prop_name == 'key_name' and not result:
+      result = KeyNameProvider()
+
+    if isinstance(result, KeyNameProvider):
+      result = result.getValue(properties)
+    # elif, because KNP isa BDP
+    elif isinstance(result, BaseDataProvider):
+      result = result.getValue()
+
+    # If the property has already been specified, no need to generate
+    if result or prop_name in properties:
+      return result
+
+    # Specially deal with ReferenceProperty
+    if isinstance(prop, ReferenceProperty):
+      # Get scope manually as there is no way to get it automatically
+      # at present
+      if prop_name == 'scope':
+        reference_class = self.getScope(model_class.__name__)
+      else:
+        reference_class = prop.reference_class
+      if reference_class:
+        # Seed ReferenceProperty recursively
+        result = self.seed(reference_class)
+      return result
+
+    # If the property has choices, choose one of them randomly
+    if prop.choices:
+      return prop.choices[random.randint(0, len(prop.choices)-1)]
+
+    # Use relavant data provider to generate other properties
+    # automatically
+    return self.genRandomValueForPropertyClass(prop.__class__)
+
+  def seed_properties(self, model_class, properties=None):
+    """Seeds the properties for a model_class entity.
 
     Any number of properties can be specified either with their values or
     with the data provider used to generate the values. Unspecified properties
@@ -424,43 +471,28 @@ class Logic(object):
 
     # Produce all properties of model_class
     for prop_name, prop in items:
-      # Specially generate link_id because it needs to be unique
-      if prop_name == 'link_id' and prop_name not in properties:
-        properties[prop_name] = LinkIDProvider(model_class)
-      if prop_name == 'key_name'and prop_name not in properties:
-        properties[prop_name] = KeyNameProvider()
-      # scope_path is to be produced from scope
-      if prop_name == 'scope_path':
-        properties['scope_path'] = ''
-        continue
-      # If the property has already been specified, no need to generate
-      if prop_name in properties:
-        if isinstance(properties[prop_name], KeyNameProvider):
-          properties[prop_name] = properties[prop_name].getValue(properties)
-        elif isinstance(properties[prop_name], BaseDataProvider):
-          properties[prop_name] = properties[prop_name].getValue()
-        continue
-      # Specially deal with ReferenceProperty
-      if isinstance(prop, ReferenceProperty):
-        # Get scope manually as there is no way to get it automatically
-        # at present
-        if prop_name == 'scope':
-          reference_class = self.getScope(model_class.__name__)
-        else:
-          reference_class = prop.reference_class
-        if reference_class:
-          # Seed ReferenceProperty recursively
-          properties[prop_name] = self.seed(reference_class)
-      else:
-        # If the property has choices, choose one of them randomly
-        if prop.choices:
-          properties[prop_name] = \
-              prop.choices[random.randint(0, len(prop.choices)-1)]
-        else:
-          # Use relavant data provider to generate other properties
-          # automatically
-          properties[prop_name] = \
-              self.genRandomValueForPropertyClass(prop.__class__)
+      properties[prop_name] = self._seedProperty(model_class, properties,
+                                                 prop, prop_name)
+
+    return properties
+
+  def seed(self, model_class, properties=None):
+    """Seeds a model_class entity.
+
+    Any number of properties can be specified either with their values or
+    with the data provider used to generate the values. Unspecified properties
+    will be generated randomly; unspecified ReferenceProperty will be
+    generated and seeded recursively.
+    Args:
+      model_class: data store model class
+      properties: a dict specifying some of the properties of the model_class
+        object to be seeded. The key of the dict is the name of the property.
+        The value of the dict is either the value of the property or the data
+        provider used to generate the value of the property, e.g.
+        {"name": "John Smith",
+         "age": RandomUniformDistributionIntegerProvider(min=0, max=80)}
+    """
+    properties = self.seed_properties(model_class, properties)
     data = model_class(**properties)
     data.put()
     return data

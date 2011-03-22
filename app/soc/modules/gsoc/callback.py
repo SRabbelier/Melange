@@ -93,6 +93,7 @@ class Callback(object):
     self.views.append(invite.InvitePage())
     self.views.append(invite.ShowInvite())
     self.views.append(request.RequestPage())
+    self.views.append(request.ShowRequest())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

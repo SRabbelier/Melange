@@ -146,3 +146,109 @@ class RequestPage(RequestHandler):
     request_form.cleaned_data['type'] = 'Request'
 
     return request_form.create(commit=True)
+
+
+class ShowRequest(RequestHandler):
+  """Encapsulate all the methods required to generate Show Request page.
+  """
+
+  ACTIONS = {
+      'accept': 'Accept',
+      'reject': 'Reject',
+      'withdraw': 'Withdraw',
+      }
+
+  def templatePath(self):
+    return 'v2/soc/request/base.html'
+
+
+  def djangoURLPatterns(self):
+    return [
+        url(r'^gsoc/request/%s$' % url_patterns.ID, self,
+            name='gsoc_request')
+    ]
+
+  def checkAccess(self):
+    self.check.isRoleActive()
+    
+    id = int(self.data.kwargs['id'])
+    self.data.request_entity = Request.get_by_id(id)
+    self.check.isRequestPresent(self.data.request_entity, id)
+
+    self.data.org = self.data.request_entity.group
+    self.data.requester = self.data.request_entity.user
+
+    if self.data.POST:
+      self.data.action = self.data.POST['action']
+
+      if self.data.action == self.ACTIONS['accept']:
+        self.check.canRespondToRequest()
+      elif self.data.action == self.ACTIONS['reject']:
+        self.check.canRespondToRequest()
+      # withdraw action
+    else:
+      self.check.canViewRequest()
+
+  def context(self):
+    """Handler to for GSoC Show Invitation Page HTTP get request.
+    """
+
+    assert self.data.request_entity
+    assert self.data.canRespond is not None
+    assert self.data.org
+    assert self.data.requester
+
+    return {
+        'request': self.data.request_entity,
+        'org': self.data.org,
+        'actions': self.ACTIONS,
+        'user': self.data.requester,
+        'canRespond': self.data.canRespond,
+        } 
+
+  def post(self):
+    """Handler to for GSoC Show Request Page HTTP post request.
+    """
+
+    assert self.data.action
+    assert self.data.request_entity
+
+    if self.data.action == self.ACTIONS['accept']:
+      self._acceptRequest()
+    elif self.data.action == self.ACTIONS['reject']:
+      self._rejectRequest()
+    elif self.data.action == self.ACTIONS['withdraw']:
+      self._withdrawRequest()
+
+    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+    self.redirect(reverse('gsoc_dashboard', kwargs=kwargs))
+
+  def _acceptRequest(self):
+    """Accepts a request.
+    """
+
+    assert self.data.org
+
+    if not self.data.profile:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+
+    self.data.request_entity.status = 'accepted'
+    self.data.profile.mentor_for.append(self.data.org.key())
+
+    self.data.request_entity.put()
+    self.data.profile.put()
+
+  def _rejectRequest(self):
+    """Rejects a request. 
+    """
+
+    self.data.request_entity.status = 'rejected'
+    self.data.request_entity.put()
+
+  def _withdrawRequest(self):
+    """Withdraws an invitation.
+    """
+
+    self.data.request_entity.status = 'withdrawn'
+    self.data.request_entity.put()

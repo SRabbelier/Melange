@@ -48,10 +48,12 @@ class Apply(Template):
     self.current_timeline = current_timeline
 
   def context(self):
+    organization = self.data.organization
+
     context = {
         'request_data': self.data,
         'current_timeline': self.current_timeline,
-        'organization': self.data.organization,
+        'organization': organization,
     }
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
@@ -61,14 +63,16 @@ class Apply(Template):
       kwargs['role'] = 'mentor'
       context['mentor_profile_link'] = reverse('create_gsoc_profile',
                                                kwargs=kwargs)
-      kwargs['role'] = 'org_admin'
-      context['org_admin_profile_link'] = reverse('create_gsoc_profile',
-                                                  kwargs=kwargs)
-    if self.data.student_info:
-      kwargs_org = dicts.filter(self.data.kwargs, ['sponsor', 'program',
-                                                   'organization'])
-      context['submit_proposal_link'] = reverse('submit_gsoc_proposal',
-                                                kwargs=kwargs_org)
+    else:
+      kwargs_org = dicts.filter(self.data.kwargs,
+                                ['sponsor', 'program', 'organization'])
+      if self.data.student_info:
+        context['submit_proposal_link'] = reverse('submit_gsoc_proposal',
+                                                  kwargs=kwargs_org)
+      elif organization not in self.data.mentor_for:
+        context['mentor_request_link'] = reverse('gsoc_request',
+                                                 kwargs=kwargs_org)
+
     return context
 
   def templatePath(self):

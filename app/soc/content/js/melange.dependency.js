@@ -290,6 +290,8 @@
      * fails randomly at least in Safari and Chrome
      */
     var _queue = [];
+    // Temporary queue with CSS paths strings.
+    var _cssqueue = [];
 
     for (var i = 0, len = _tempqueue.length; i < len; i++) {
       var temp_val = _tempqueue[i];
@@ -297,7 +299,14 @@
         if (jQuery.inArray(temp_val, _queue) === -1) {
           _queue.push(temp_val);
         }
-      } else {
+      }
+      else if (temp_val instanceof $m.cssFile) {
+        if (jQuery.inArray(temp_val.css, _cssqueue) === -1) {
+          _queue.push(temp_val);
+          _cssqueue.push(temp_val.css);
+        }
+      }
+      else {
         _queue.push(temp_val);
       }
     }

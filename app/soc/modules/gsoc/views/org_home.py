@@ -175,10 +175,15 @@ class OrgHome(RequestHandler):
     context = {
         'page_name': '%s - Homepage' % organization.short_name,
         'organization': organization,
-        'apply': Apply(self.data, current_timeline),
         'contact': Contact(self.data),
         'tags': organization.tags_string(organization.org_tag),
     }
+
+    # Render the apply template only when the user is not logged in
+    # or has no role for the organization
+    if (not self.data.user or not self.data.mentor_for
+        or not self.data.org_admin_for):
+      context['apply'] = Apply(self.data, current_timeline)
 
     if timeline_helper.isAfterEvent(
         self.data.program_timeline, 'accepted_students_announced_deadline'):

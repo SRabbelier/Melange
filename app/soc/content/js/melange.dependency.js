@@ -82,7 +82,7 @@
   }
   else {
     s.jquery = [
-      "http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"
     ];
   }
 

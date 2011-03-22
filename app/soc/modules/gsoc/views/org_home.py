@@ -56,14 +56,19 @@ class Apply(Template):
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       kwargs['role'] = 'student'
-      context['student_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+      context['student_profile_link'] = reverse('create_gsoc_profile',
+                                                kwargs=kwargs)
       kwargs['role'] = 'mentor'
-      context['mentor_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+      context['mentor_profile_link'] = reverse('create_gsoc_profile',
+                                               kwargs=kwargs)
       kwargs['role'] = 'org_admin'
-      context['org_admin_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+      context['org_admin_profile_link'] = reverse('create_gsoc_profile',
+                                                  kwargs=kwargs)
     if self.data.student_info:
-      kwargs_org = dicts.filter(self.data.kwargs, ['sponsor', 'program', 'organization'])
-      context['submit_proposal_link'] = reverse('submit_gsoc_proposal', kwargs=kwargs_org)
+      kwargs_org = dicts.filter(self.data.kwargs, ['sponsor', 'program',
+                                                   'organization'])
+      context['submit_proposal_link'] = reverse('submit_gsoc_proposal',
+                                                kwargs=kwargs_org)
     return context
 
   def templatePath(self):

@@ -28,6 +28,7 @@ from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
 from soc.logic import dicts
+from soc.logic.exceptions import NotFound
 from soc.views import forms
 
 from soc.models.comment import NewComment
@@ -65,6 +66,8 @@ class ReviewProposal(RequestHandler):
 
   def checkAccess(self):
     self.data.proposer_user = User.get_by_key_name(self.data.kwargs['student'])
+    if not self.data.proposer_user:
+      raise NotFound('Requested proposal does not exist')
 
     key_name = '%s/%s/%s' % (
         self.data.kwargs['sponsor'],
@@ -77,6 +80,11 @@ class ReviewProposal(RequestHandler):
     self.data.proposal = GSoCProposal.get_by_id(
         int(self.data.kwargs['id']),
         parent=self.data.proposer_profile)
+
+    self.data.proposal_org = self.data.proposal.org
+
+    self.check.canAccessProposalEntity()
+
 
   def templatePath(self):
     return 'v2/modules/gsoc/proposal/review.html'

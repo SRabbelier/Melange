@@ -490,3 +490,29 @@ class AccessChecker(object):
     else:
       # user that the entity refers to may only respond if it is a Request
       self.data.canRespond = entity.type == 'Invitation'
+
+  def canAccessProposalEntity(self):
+    """Checks if the current user is allowed to access a Proposal entity.
+    """
+
+    assert self.data.proposal
+    assert self.data.proposal_org
+    assert self.data.proposer_user
+
+    # if the proposal is public, everyone may access it
+    if self.data.proposal.is_publicly_visible:
+      return
+
+    # if the current user is the proposer, he or she may access it
+    self.isUser()
+    if self.data.user.key() == self.data.proposer_user.key():
+      return
+
+    # all the mentors and org admins from the organization may access it
+    if self.data.proposal_org.key() in [k.key() for k in self.data.mentor_for]:
+      return
+
+    error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
+        'model': 'Proposal'
+        }
+    raise AccessViolation(error_msg)

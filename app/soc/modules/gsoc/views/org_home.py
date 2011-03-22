@@ -167,11 +167,15 @@ class OrgHome(RequestHandler):
   def context(self):
     """Handler to for GSoC Organization Home page HTTP get request.
     """
+    current_timeline = timeline_logic.getCurrentTimeline(
+        self.data.program_timeline, self.data.org_app)
+
     organization = self.data.organization
 
     context = {
         'page_name': '%s - Homepage' % organization.short_name,
         'organization': organization,
+        'apply': Apply(self.data, current_timeline),
         'contact': Contact(self.data),
         'tags': organization.tags_string(organization.org_tag),
     }

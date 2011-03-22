@@ -33,7 +33,13 @@ limitations under the License.
   <!-- end block -->
 
   <!-- begin block -->
-  {{ project_list.render }}
+  {{ apply.render }}
+  <!-- end block -->
+
+  <!-- begin block -->
+  {% if project_list %}
+    {{ project_list.render }}
+  {% endif %}
   <!-- end block -->
 </div>
 

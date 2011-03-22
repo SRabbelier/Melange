@@ -43,6 +43,7 @@ class RequestData(object):
     GET: the GET dictionary (from the request object)
     POST: the POST dictionary (from the request object)
     is_developer: is the current user a developer
+    gae_user: the Google Appengine user object
   """
 
   def __init__(self):
@@ -56,6 +57,7 @@ class RequestData(object):
     self.GET = None
     self.POST = None
     self.is_developer = False
+    self.gae_user = None
 
   def populate(self, request, args, kwargs):
     """Populates the fields in the RequestData object.
@@ -77,3 +79,4 @@ class RequestData(object):
       self.is_developer = True
     if self.user and self.user.is_developer:
       self.is_developer = True
+    self.gae_user = users.get_current_user()

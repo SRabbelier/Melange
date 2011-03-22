@@ -22,16 +22,52 @@ __authors__ = [
   ]
 
 
-from django.conf.urls.defaults import url
+from google.appengine.api import users
 
+from django.conf.urls.defaults import url
+from django.core.urlresolvers import reverse
+
+from soc.logic import dicts
 from soc.logic.exceptions import AccessViolation
 from soc.logic.helper import timeline as timeline_helper
 from soc.views.template import Template
 
+from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import lists
 from soc.modules.gsoc.views.helper import url_patterns
+
+
+class Apply(Template):
+  """Apply template.
+  """
+
+  def __init__(self, data, current_timeline):
+    self.data = data
+    self.current_timeline = current_timeline
+
+  def context(self):
+    context = {
+        'request_data': self.data,
+        'current_timeline': self.current_timeline,
+        'organization': self.data.organization,
+    }
+    if not self.data.profile:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      kwargs['role'] = 'student'
+      context['student_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+      kwargs['role'] = 'mentor'
+      context['mentor_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+      kwargs['role'] = 'org_admin'
+      context['org_admin_profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+    if self.data.student_info:
+      kwargs_org = dicts.filter(self.data.kwargs, ['sponsor', 'program', 'organization'])
+      context['submit_proposal_link'] = reverse('submit_gsoc_proposal', kwargs=kwargs_org)
+    return context
+
+  def templatePath(self):
+    return "v2/modules/gsoc/org_home/_apply.html"
 
 
 class Contact(Template):

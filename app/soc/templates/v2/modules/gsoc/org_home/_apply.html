@@ -1,0 +1,81 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% ifequal current_timeline 'student_signup_period' %}
+  <div id="apply-students" class="block block-students">
+    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-students-image" />
+    {% if not request_data.profile or request_data.student_info %}
+      <h3 id="title-section-apply-students">Students: Apply!</h3>
+      <p id="block-apply-students-text-action" class="action">
+        {% if student_profile_link %}
+          <a href="{{ student_profile_link }}">Register</a>
+          </p>
+          <p id="block-apply-students-text-small" class="small">with a Google Account to get started.</p>
+        {% else %}
+          {% if submit_proposal_link %}
+            <a href="{{ submit_proposal_link }}">Submit proposal</a>
+            </p>
+            <p id="block-apply-students-text-small" class="small">to {{ organization.name }}.</p>
+          {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {% if not request_data.student_info and not request_data.mentor_for %}
+      <h3 id="title-section-apply-mentors">Mentors: Apply!</h3>
+      <p id="block-apply-mentors-text-action" class="action">
+        {% if mentor_profile_link %}
+          <a href="{{ mentor_profile_link }}">Register</a>
+          </p>
+          <p id="block-apply-mentors-text-small" class="small">with a Google Account to get started.</p>
+        {% else %}
+          {% if request_data.profile %}
+            <a href="{{ mentor_profile_link }}">Request</a>
+            </p>
+            <p id="block-apply-mentors-text-small" class="small">to become mentor for {{ organization.name }}.</p>
+          {% endif %}
+        {% endif %}
+    {% endif %}
+  </div>
+{% endifequal %}
+
+{% ifequal current_timeline 'program_period' %}
+  <div id="participants" class="block block-participants">
+    <h4 id="title-section-participating-orgs">Participating Organizations</h4>
+    <div id="block-participants-content" class="block-content">
+      <a href="http://www.apache.org/"><img src="/soc/content/images/v2/gsoc/participant-apache.png" height="40" width="90" alt="Apache Software Foundation" /></a>
+      <a href="http://www.mozilla.org/foundation/"><img src="/soc/content/images/v2/gsoc/participant-mozilla.png" height="57" width="60" alt="Mozilla Foundation" /></a>
+      <a href="http://www.wikimediafoundation.org/"><img src="/soc/content/images/v2/gsoc/participant-wikimedia.png" height="63" width="62" alt="Wikimedia Foundation" /></a>
+      <a href="http://www.drupal.org/"><img src="/soc/content/images/v2/gsoc/participant-drupal.png" height="68" width="50" alt="Drupal" /></a>
+      <a href="http://www.perlfoundation.org/"><img src="/soc/content/images/v2/gsoc/participant-perl.png" height="40" width="75" alt="The Perl Foundation" /></a>
+    </div>
+    <div id="block-participants-readmore" class="readmore">
+      <a href="javascript:void(0)">read more</a>
+    </div>
+  </div>
+  <!-- begin block -->
+  <div id="apply-mentors" class="block block-mentors">
+    <h3 id="title-section-apply-mentors">Mentors: Apply now!</h3>
+      {% if login_link %}
+        <a href="{{ login_link }}">Login</a>
+        {% if mentor_profile_link %}
+          <span>or</span>
+        {% endif %}
+      {% endif %}
+      {% if mentor_profile_link %}
+        <a href="{{ mentor_profile_link }}">Register</a>
+      {% endif %}
+    <p class="small">with a Google Account to get started.</p>
+  </div>
+  <!-- end block -->
+{% endifequal %}

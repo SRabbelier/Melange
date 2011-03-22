@@ -125,7 +125,7 @@
   s.raty = [
     tpjs + "jquery/jquery.raty.js"
   ];
-  
+
   s.jqueryui = {}
 
   if (melange.config.is_local !== undefined && melange.config.is_local === true) {

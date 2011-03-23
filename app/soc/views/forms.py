@@ -177,7 +177,7 @@ class ModelFormMetaclass(djangoforms.ModelFormMetaclass):
         if prop:
           def clean_for_property_field(value, prop=prop, old_clean=field.clean):
             value = old_clean(value)
-            property_clean(prop, value)
+            djangoforms.property_clean(prop, value)
             return value
           field.clean = clean_for_property_field
     else:

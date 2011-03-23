@@ -62,4 +62,7 @@ class RequestHandler(RequestHandler):
   def init(self, request, args, kwargs):
     self.data = RequestData()
     self.data.populate(request, args, kwargs)
-    self.check = access_checker.AccessChecker(self.data)
+    if self.data.is_developer:
+      self.check = access_checker.DeveloperAccessChecker(self.data)
+    else:
+      self.check = access_checker.AccessChecker(self.data)

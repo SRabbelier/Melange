@@ -52,6 +52,12 @@ class EditProgramTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertErrorTemplatesUsed(response)
 
+  def testEditProgramAsDeveloper(self):
+    self.data.createDeveloper()
+    url = '/gsoc/program/edit/' + self.gsoc.key().name()
+    response = self.client.get(url)
+    self.assertProgramTemplatesUsed(response)
+
   def testEditProgram(self):
     from soc.models.document import Document
     self.data.createHost()

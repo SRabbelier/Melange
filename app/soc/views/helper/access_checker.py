@@ -518,7 +518,7 @@ class AccessChecker(object):
       return
 
     # all the mentors and org admins from the organization may access it
-    if self.data.proposal_org.key() in [k.key() for k in self.data.mentor_for]:
+    if self.hasRoleForOrganization(self.data.proposal_org, 'mentor'):
       return
 
     error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {

@@ -49,6 +49,35 @@ class HomepageViewTest(DjangoTestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_apply.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_timeline.html')
 
+  def testHomepageAnonymous(self):
+    """Tests the homepage as an anonymous user throughout the program.
+    """
+    url = '/gsoc/homepage/' + self.gsoc.key().name()
+
+    self.timeline.offSeason()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
+    self.timeline.kickoff()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
+    self.timeline.orgSignup()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
+    self.timeline.orgsAnnounced()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
+    self.timeline.studentSignup()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
+    self.timeline.studentsAnnounced()
+    response = self.client.get(url)
+    self.assertHomepageTemplatesUsed(response)
+
   def testHomepageDuringSignup(self):
     """Tests the student homepage during the signup period.
     """

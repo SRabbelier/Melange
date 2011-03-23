@@ -126,10 +126,10 @@ class TimelineHelper(object):
     return isBetween(start, end)
 
   def beforeOrgSignupStart(self):
-    return self.org_app and isBefore(self.orgAppStart())
+    return self.org_app and isBefore(self.orgSignupStart())
 
   def afterOrgSignupStart(self):
-    return self.org_app and isAfter(self.orgAppStart())
+    return self.org_app and isAfter(self.orgSignupStart())
 
   def orgSignup(self):
     if not self.org_app:

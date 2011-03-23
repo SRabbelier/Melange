@@ -235,7 +235,15 @@
     null,
     s.jqgridediting,
     null,
-    mpjs + "melange.list.js"
+    mpjs + "melange.list.js",
+    null,
+    function () {
+      if (window.melange_list_queue !== undefined && window.melange_list_queue instanceof Array) {
+        jQuery.each(window.melange_list_queue, function (index, function_to_call) {
+          function_to_call();
+        });
+      }
+    }
   ];
 
   s.melange.tooltip = [

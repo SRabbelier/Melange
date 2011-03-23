@@ -39,13 +39,7 @@ class InviteTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    from soc.modules.gsoc.models.organization import GSoCOrganization
-    properties = {'status': 'visible'}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-    properties = {'scope': self.gsoc, 'status': 'active'}
-    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
   def createInvitation(self):
     """Creates and returns an accepted invitation for the current user.

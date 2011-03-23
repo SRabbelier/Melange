@@ -38,9 +38,7 @@ class EditProgramTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    self.gsoc = seeder_logic.seed(GSoCProgram)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
   def assertProgramTemplatesUsed(self, response):
     """Asserts that all the templates from the program were used.

@@ -38,14 +38,7 @@ class ProposalTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    from soc.modules.gsoc.models.organization import GSoCOrganization
-    properties = {'status': 'visible', 'apps_tasks_limit': 20}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-    properties = {'scope': self.gsoc, 'status': 'active'}
-    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
-    self.timeline = TimelineHelper(self.gsoc.timeline)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
   def assertProposalTemplatesUsed(self, response):
     """Asserts that all the templates from the dashboard were used.

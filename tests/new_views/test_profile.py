@@ -38,13 +38,7 @@ class ProfileViewTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    from soc.modules.gsoc.models.organization import GSoCOrganization
-    properties = {'status': 'visible'}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-    self.org = seeder_logic.seed(GSoCOrganization)
-    self.timeline = TimelineHelper(self.gsoc.timeline)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
   def assertProfileTemplatesUsed(self, response):
     self.assertGSoCTemplatesUsed(response)

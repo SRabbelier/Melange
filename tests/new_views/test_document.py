@@ -41,15 +41,13 @@ class EditProgramTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    self.gsoc = seeder_logic.seed(GSoCProgram)
+    self.init()
     properties = {
         'prefix': 'gsoc_program',
         'scope': self.gsoc,
         'key_name': DocumentKeyNameProvider(),
     }
     self.document = seeder_logic.seed(Document, properties=properties)
-    self.data = GSoCProfileHelper(self.gsoc)
 
   def testShowDocument(self):
     url = '/gsoc/document/show/' + self.document.key().name()

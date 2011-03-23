@@ -189,6 +189,25 @@ class DjangoTestCase(TestCase):
 
     pass
 
+  def init(self):
+    # TODO: perhaps we should move this out?
+    from soc.modules.seeder.logic.seeder import logic as seeder_logic
+    from soc.modules.gsoc.models.program import GSoCProgram
+    from soc.modules.gsoc.models.timeline import GSoCTimeline
+    from soc.modules.gsoc.models.organization import GSoCOrganization
+    from soc.models.org_app_survey import OrgAppSurvey
+    from tests.timeline_utils import TimelineHelper
+    from tests.profile_utils import GSoCProfileHelper
+    properties = {'timeline': seeder_logic.seed(GSoCTimeline),
+                  'status': 'visible', 'apps_tasks_limit': 20}
+    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
+    properties = {'scope': self.gsoc}
+    self.org_app = seeder_logic.seed(OrgAppSurvey, properties=properties)
+    properties = {'scope': self.gsoc, 'status': 'active'}
+    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
+    self.timeline = TimelineHelper(self.gsoc.timeline, self.org_app)
+    self.data = GSoCProfileHelper(self.gsoc)
+
   @classmethod
   def getXsrfToken(cls, path=None, method='POST', data={}, **extra):
     """Returns an XSRF token for request context.

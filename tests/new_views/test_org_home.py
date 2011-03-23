@@ -38,21 +38,9 @@ class OrgHomeViewTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.models.org_app_survey import OrgAppSurvey
-    from soc.modules.gsoc.models.program import GSoCProgram
-    from soc.modules.gsoc.models.organization import GSoCOrganization
-    from soc.modules.gsoc.models.timeline import GSoCTimeline
     from soc.modules.gsoc.models.student_project import StudentProject
 
-    properties = {'timeline': seeder_logic.seed(GSoCTimeline)}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-
-    properties = {'scope': self.gsoc}
-    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
-
-    self.org_app = seeder_logic.seed(OrgAppSurvey)
-    self.timeline = TimelineHelper(self.gsoc.timeline)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
     properties = {'scope': self.org, 'program': self.gsoc}
     self.student_projects = seeder_logic.seedn(StudentProject, 2, properties)
@@ -79,7 +67,7 @@ class OrgHomeViewTest(DjangoTestCase):
   def testOrgHomeDuringOrgSignup(self):
     """Tests the the org home page during the organization signup period.
     """
-    self.timeline.orgSignup(self.org_app)
+    self.timeline.orgSignup()
     url = '/gsoc/org/' + self.org.key().name()
     response = self.client.get(url)
     self.assertOrgHomeTemplatesUsedBeforeStudentProjectsAnnounced(response)

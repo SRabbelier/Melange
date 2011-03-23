@@ -43,8 +43,9 @@ class TimelineHelper(object):
   """Helper class to aid in setting the timeline.
   """
 
-  def __init__(self, timeline):
+  def __init__(self, timeline, org_app):
     self.timeline = timeline
+    self.org_app = org_app
 
   def _empty(self):
     """Removes all timeline settings.
@@ -94,7 +95,7 @@ class TimelineHelper(object):
     self.timeline.accepted_students_announced_deadline = past()
     self.timeline.put()
 
-  def orgSignup(self, org_app):
+  def orgSignup(self):
     """Sets the current period to the organization signup phase.
     """
     self._empty()
@@ -106,6 +107,6 @@ class TimelineHelper(object):
     self.timeline.accepted_students_announced_deadline = future()
     self.timeline.put()
 
-    org_app.survey_start = past()
-    org_app.survey_end = future()
-    org_app.put()
+    self.org_app.survey_start = past()
+    self.org_app.survey_end = future()
+    self.org_app.put()

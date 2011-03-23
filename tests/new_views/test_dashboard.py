@@ -37,15 +37,7 @@ class DashboardTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.modules.gsoc.models.program import GSoCProgram
-    from soc.modules.gsoc.models.timeline import GSoCTimeline
-    from soc.modules.gsoc.models.organization import GSoCOrganization
-    properties = {'timeline': seeder_logic.seed(GSoCTimeline)}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
-    properties = {'scope': self.gsoc}
-    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
-    self.timeline = TimelineHelper(self.gsoc.timeline)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.init()
 
   def assertDashboardTemplatesUsed(self, response):
     """Asserts that all the templates from the dashboard were used.

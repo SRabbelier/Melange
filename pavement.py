@@ -179,10 +179,12 @@ def pylint(options):
         arguments.extend(list(options.pylint_args))
     
     # Add the list of paths containing the modules to check using PyLint.
-    arguments.extend(
-        str(options.app_folder / module) for module in options.check_modules)
+    if options.with_module:
+      arguments.append(options.with_module)
+    else:
+      arguments.extend(
+          str(options.app_folder / module) for module in options.check_modules)
     
-    arguments.append(options.with_module)
 
     # By placing run_pylint into its own function, it allows us to do dry runs
     # without actually running PyLint.

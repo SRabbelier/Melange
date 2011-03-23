@@ -159,13 +159,16 @@ class ProfilePage(RequestHandler):
       page_name = 'Register as a Mentor'
     elif role == 'org_admin':
       page_name = 'Register as Org Admin'
-      
+
+    error = user_form.errors or profile_form.errors or student_info_form.errors
+
     return {
         'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': page_name,
         'user_form': user_form,
         'profile_form': profile_form,
         'student_info_form': student_info_form,
+        'error': error,
     }
 
   def validateUser(self, dirty):
@@ -244,6 +247,6 @@ class ProfilePage(RequestHandler):
     """
     if self.validate():
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs) + '?validated')
     else:
       self.get()

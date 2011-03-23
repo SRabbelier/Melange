@@ -85,9 +85,112 @@ class ReferenceProperty(djangoforms.ReferenceProperty):
     return value
 
 
+class ModelFormOptions(object):
+  """A simple class to hold internal options for a ModelForm class.
+
+  Instance attributes:
+    model: a db.Model class, or None
+    fields: list of field names to be defined, or None
+    exclude: list of field names to be skipped, or None
+    widgets: dictionary of widgets to be used per field, or None
+
+  These instance attributes are copied from the 'Meta' class that is
+  usually present in a ModelForm class, and all default to None.
+  """
+
+
+  def __init__(self, options=None):
+    self.model = getattr(options, 'model', None)
+    self.fields = getattr(options, 'fields', None)
+    self.exclude = getattr(options, 'exclude', None)
+    self.widgets = getattr(options, 'widgets', None)
+
+
+class ModelFormMetaclass(djangoforms.ModelFormMetaclass):
+  """The metaclass for the ModelForm class defined below.
+
+  This is our analog of Django's own ModelFormMetaclass.  (We
+  can't conveniently subclass that class because there are quite a few
+  differences.)
+
+  See the docs for ModelForm below for a usage example.
+  """
+
+  def __new__(cls, class_name, bases, attrs):
+    """Constructor for a new ModelForm class instance.
+
+    The signature of this method is determined by Python internals.
+
+    All Django Field instances are removed from attrs and added to
+    the base_fields attribute instead.  Additional Field instances
+    are added to this based on the Datastore Model class specified
+    by the Meta attribute.
+    """
+    fields = sorted(((field_name, attrs.pop(field_name))
+                     for field_name, obj in attrs.items()
+                     if isinstance(obj, forms.Field)),
+                    key=lambda obj: obj[1].creation_counter)
+    for base in bases[::-1]:
+      if hasattr(base, 'base_fields'):
+        fields = base.base_fields.items() + fields
+    declared_fields = django.utils.datastructures.SortedDict()
+    for field_name, obj in fields:
+      declared_fields[field_name] = obj
+
+    opts = ModelFormOptions(attrs.get('Meta', None))
+    attrs['_meta'] = opts
+
+    base_models = []
+    for base in bases:
+      base_opts = getattr(base, '_meta', None)
+      base_model = getattr(base_opts, 'model', None)
+      if base_model is not None:
+        base_models.append(base_model)
+    if len(base_models) > 1:
+      raise django.core.exceptions.ImproperlyConfigured(
+          "%s's base classes define more than one model." % class_name)
+
+    if opts.model is not None:
+      if base_models and base_models[0] is not opts.model:
+        raise django.core.exceptions.ImproperlyConfigured(
+            '%s defines a different model than its parent.' % class_name)
+
+      model_fields = django.utils.datastructures.SortedDict()
+      for name, prop in sorted(opts.model.properties().iteritems(),
+                               key=lambda prop: prop[1].creation_counter):
+        if opts.fields and name not in opts.fields:
+          continue
+        if opts.exclude and name in opts.exclude:
+          continue
+        form_field = prop.get_form_field()
+        if form_field is not None:
+          model_fields[name] = form_field
+        if opts.widgets and name in opts.widgets:
+          model_fields[name].widget = opts.widgets[name]
+
+      model_fields.update(declared_fields)
+      attrs['base_fields'] = model_fields
+
+      props = opts.model.properties()
+      for name, field in model_fields.iteritems():
+        prop = props.get(name)
+        if prop:
+          def clean_for_property_field(value, prop=prop, old_clean=field.clean):
+            value = old_clean(value)
+            property_clean(prop, value)
+            return value
+          field.clean = clean_for_property_field
+    else:
+      attrs['base_fields'] = declared_fields
+
+    return super(ModelFormMetaclass, cls).__new__(cls,
+                                                  class_name, bases, attrs)
+
 class ModelForm(djangoforms.ModelForm):
   """Django ModelForm class which uses our implementation of BoundField.
   """
+
+  __metaclass__ = ModelFormMetaclass
 
   template_path = 'v2/modules/gsoc/_form.html'
 

@@ -639,7 +639,6 @@ class ModelFormOptions(object):
     model: a db.Model class, or None
     fields: list of field names to be defined, or None
     exclude: list of field names to be skipped, or None
-    widgets: dictionary of widgets to be used per field, or None
 
   These instance attributes are copied from the 'Meta' class that is
   usually present in a ModelForm class, and all default to None.
@@ -650,7 +649,6 @@ class ModelFormOptions(object):
     self.model = getattr(options, 'model', None)
     self.fields = getattr(options, 'fields', None)
     self.exclude = getattr(options, 'exclude', None)
-    self.widgets = getattr(options, 'widgets', None)
 
 
 class ModelFormMetaclass(type):
@@ -712,8 +710,6 @@ class ModelFormMetaclass(type):
         form_field = prop.get_form_field()
         if form_field is not None:
           model_fields[name] = form_field
-        if opts.widgets and name in opts.widgets:
-          model_fields[name].widget = opts.widgets[name]
 
       model_fields.update(declared_fields)
       attrs['base_fields'] = model_fields

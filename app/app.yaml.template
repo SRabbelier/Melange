@@ -44,10 +44,6 @@ handlers:
   static_dir: soc/content
   expiration: 1d
 
-- url: /gsoc/content
-  static_dir: gsoc/content
-  expiration: 1d
-
 - url: /js/(.*?)/jlinq/(.*)
   static_files: jlinq/\2
   upload: jlinq/(.*)

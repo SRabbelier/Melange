@@ -21,6 +21,33 @@
   margin: 0 auto 39px auto;
   width: 570px;
 }
+#flash-message {
+    /*save confirmation banner*/
+    font-weight: bold;
+    left: 0;
+    margin-bottom: 10px;
+    padding: 10px 5px 8px 36px;
+    position: relative;
+    width: auto;
+    border-width: 2px;
+    border-style: solid;
+}
+#flash-message p {
+    margin-bottom: 0;
+}
+#flash-message.flash-error {
+    /*save confirmation banner notifies error*/
+    background: url(../../../images/v2/gsoc/flash-error.png) no-repeat 10px 50% #CF3333;
+    color: #FFF;
+    border-color: #990000;
+}
+#flash-message.flash-success {
+    /*save confirmation banner notifies success*/
+    background: url(../../../images/v2/gsoc/flash-success.png) no-repeat 10px 50% #C6F9C9;
+    color: #4F7F51;
+    border-color: #9BD39E;
+}
+
 #form.form-register .loggedin {
   /*logged in message*/
 

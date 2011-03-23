@@ -23,6 +23,17 @@ limitations under the License.
 
 <!-- begin form -->
 <form action="#" method="post" id="form" class="form-register">
+  {% if posted %}
+      {% if error %}
+          <div id="flash-message" class="flash-error">
+          <p>Sorry, we could not save your data. Please fix the errors mentioned below.</p>
+      {% else %}
+          <div id="flash-message" class="flash-success">
+          <p>Data saved successfully.</p>
+      {% endif %}
+      </div>
+  {% endif %}
+
   <div id="loggedin-message" class="loggedin">
       <p><strong>You are logged in as <em>{{ user_email }}</em>.</strong> <a href="{{ logout_link }}">(Not you?)</a></p>
       <p>Before you can apply to Google Summer of Code, you must register as a student.</p>

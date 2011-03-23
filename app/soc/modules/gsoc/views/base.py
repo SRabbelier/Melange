@@ -56,6 +56,7 @@ class RequestHandler(RequestHandler):
     context['footer'] = base_templates.Footer(self.data)
     context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
     context['is_local'] = system.isLocal()
+    context['posted'] = self.posted
     super(RequestHandler, self).render(context)
 
   def init(self, request, args, kwargs):

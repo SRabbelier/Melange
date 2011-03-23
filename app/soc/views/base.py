@@ -290,6 +290,8 @@ class RequestHandler(object):
     self.kwargs = kwargs
 
     self.response = Response()
+    
+    self.posted = request.POST or 'validated' in request.GET
 
     try:
       self.init(request, args, kwargs)

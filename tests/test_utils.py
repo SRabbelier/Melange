@@ -211,6 +211,11 @@ class DjangoTestCase(TestCase):
     xsrf_token = xsrfutil._generateToken(key, user_id)
     return xsrf_token
 
+  def getJsonResponse(self, url):
+    """Returns the list reponse for the specified url and index.
+    """
+    return self.client.get(url + '?fmt=json&marker=1')
+
   def getListResponse(self, url, idx):
     """Returns the list reponse for the specified url and index.
     """

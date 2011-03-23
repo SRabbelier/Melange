@@ -19,10 +19,13 @@ request in the GSoC module.
 """
 
 __authors__ = [
-    '"Daniel Hans" <daniel.m.hans@gmail.com>',
-    '"Lennard de Rijk" <ljvderijk@gmail.com>',
-  ]
+  '"Daniel Hans" <daniel.m.hans@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
+]
 
+
+import datetime
 
 from google.appengine.ext import db
 
@@ -42,6 +45,112 @@ from soc.modules.gsoc.logic.models.program import logic as program_logic
 from soc.modules.gsoc.logic.models.student import logic as student_logic
 
 
+def isBefore(date):
+  """Returns True iff date is before utcnow().
+
+  Returns False if date is not set.
+  """
+  return date and datetime.datetime.utcnow() < date
+
+
+def isAfter(date):
+  """Returns True iff date is after utcnow().
+
+  Returns False if date is not set.
+  """
+  return date and date < datetime.datetime.utcnow()
+
+
+def isBetween(start, end):
+  """Returns True iff utcnow() is between start and end.
+  """
+  return isAfter(start) and isBefore(end)
+
+
+class TimelineHelper(object):
+  """Helper class for the determination of the currently active period.
+
+  Methods ending with "On", "Start", or "End" return a date.
+  Methods ending with "Between" return a tuple with two dates.
+  Methods ending with neither return a Boolean.
+  """
+
+  def __init__(self, timeline, org_app):
+    self.timeline = timeline
+    self.org_app = org_app
+
+  def currentPeriod(self):
+    """Return where we are currently on the timeline.
+    """
+    if not self.programActive():
+      return 'offseason'
+
+    if self.beforeOrgSignupStart():
+      return 'kickoff_period'
+
+    if self.studentsAnnounced():
+      return 'coding_period'
+
+    if self.afterStudentSignupStart():
+      return 'student_signup_period'
+
+    if self.afterOrgSignupStart():
+      return 'org_signup_period'
+
+    return 'offseason'
+
+  def orgsAnnouncedOn(self):
+    return self.timeline.accepted_organization_announced_deadline
+
+  def programActiveBetween(self):
+    return (self.timeline.program_start, self.timeline.program_end)
+
+  def orgSignupStart(self):
+    return self.org_app.survey_start
+
+  def orgSignupBetween(self):
+    return (self.org_app.survey_start, self.org_app.survey_end)
+
+  def studentSignupStart(self):
+    return self.timeline.student_signup_start
+
+  def studentsSignupBetween(self):
+    return (self.timeline.student_signup_start,
+            self.timeline.student_signup_end)
+
+  def studentsAnnouncedOn(self):
+    return self.timeline.accepted_students_announced_deadline
+
+  def programActive(self):
+    start, end = self.programActiveBetween()
+    return isBetween(start, end)
+
+  def beforeOrgSignupStart(self):
+    return self.org_app and isBefore(self.orgAppStart())
+
+  def afterOrgSignupStart(self):
+    return self.org_app and isAfter(self.orgAppStart())
+
+  def orgSignup(self):
+    if not self.org_app:
+      return False
+    start, end = self.orgSignupBetween()
+    return self.programActive() and isBetween(start, end)
+
+  def orgsAnnounced(self):
+    return self.programActive() and isAfter(self.orgsAnnouncedOn())
+
+  def afterStudentSignupStart(self):
+    return isAfter(self.studentSignupStart())
+
+  def studentSignup(self):
+    start, end = self.studentsSignupBetween()
+    return self.programActive() and isBetween(start, end)
+
+  def studentsAnnounced(self):
+    return self.programActive() and isAfter(self.studentsAnnouncedOn())
+
+
 class RequestData(RequestData):
   """Object containing data we query for each request in the GSoC module.
 
@@ -52,6 +161,7 @@ class RequestData(RequestData):
     user: The user entity (if logged in)
     program: The GSoC program entity that the request is pointing to
     program_timeline: The GSoCTimeline entity
+    timeline: A TimelineHelper entity
     is_host: is the current user a host of the program
     org_admin_for: the organizations the current user is an admin for
     mentor_for: the organizations the current user is a mentor for
@@ -97,6 +207,8 @@ class RequestData(RequestData):
 
     org_app_fields = {'scope': self.program}
     self.org_app = org_app_logic.getOneForFields(org_app_fields)
+
+    self.timeline = TimelineHelper(self.program_timeline, self.org_app)
 
     if kwargs.get('organization'):
       org_keyfields = {

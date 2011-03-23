@@ -39,7 +39,9 @@ class HomepageViewTest(DjangoTestCase):
 
   def setUp(self):
     from soc.modules.gsoc.models.program import GSoCProgram
-    self.gsoc = seeder_logic.seed(GSoCProgram)
+    from soc.modules.gsoc.models.timeline import GSoCTimeline
+    properties = {'timeline': seeder_logic.seed(GSoCTimeline)}
+    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
     self.timeline = TimelineHelper(self.gsoc.timeline)
     self.data = GSoCProfileHelper(self.gsoc)
 

@@ -98,7 +98,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'google.appengine.ext.appstats.recording.AppStatsDjangoMiddleware',
     'soc.middleware.value_store.ValueStoreMiddleware',
-    'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
+#    'soc.middleware.exception_handler.ExceptionHandlerMiddleware',
 #    'soc.middleware.profiler.ProfileMiddleware',
     'soc.middleware.maintenance.MaintenanceMiddleware',
     'soc.middleware.blobstore.BlobStoreMiddleware',

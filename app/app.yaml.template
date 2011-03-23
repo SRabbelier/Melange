@@ -55,17 +55,17 @@ handlers:
 
 - url: /js/(.*?)/jquery/(.*)
   static_files: jquery.min/\2
-  upload: jquery/(.*)
+  upload: jquery.min/(.*)
   expiration: 1d
 
 - url: /js/(.*?)/json/(.*)
   static_files: json.min/\2
-  upload: json/(.*)
+  upload: json.min/(.*)
   expiration: 1d
 
 - url: /js/(.*?)/LABjs/(.*)
   static_files: LABjs.min/\2
-  upload: LABjs/(.*)
+  upload: LABjs.min/(.*)
   expiration: 1d
 
 - url: /admin/shell.*

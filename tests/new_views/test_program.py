@@ -55,7 +55,15 @@ class EditProgramTest(DjangoTestCase):
     self.assertErrorTemplatesUsed(response)
 
   def testEditProgram(self):
+    from soc.models.document import Document
     self.data.createHost()
     url = '/gsoc/program/edit/' + self.gsoc.key().name()
     response = self.client.get(url)
     self.assertProgramTemplatesUsed(response)
+
+    properties = {'prefix': 'gsoc_program', 'scope': self.gsoc}
+    seeder_logic.seed(Document, properties=properties)
+
+    response = self.getJsonResponse(url)
+    self.assertIsJsonResponse(response)
+    self.assertEqual(1, len(response.context['data']))

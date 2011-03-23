@@ -38,6 +38,7 @@ class ProgramForm(ModelForm):
   """
 
   class Meta:
+    css_prefix = 'program_form'
     model = GSoCProgram
     exclude = ['link_id', 'scope', 'scope_path', 'timeline', 'slot_allocation']
 
@@ -54,7 +55,7 @@ class ProgramPage(RequestHandler):
 
   def jsonContext(self):
     entities = document_logic.getForFields({
-        'prefix': 'program',
+        'prefix': 'gsoc_program',
         'scope': self.data.program.key()
     })
 

@@ -522,12 +522,12 @@ class AccessChecker(object):
       return
 
     # all the mentors and org admins from the organization may access it
-    if self.hasRoleForOrganization(self.data.proposal_org, 'mentor'):
+    try:
+      self.hasRoleForOrganization(self.data.proposal_org, 'mentor')
       self.data.publicCommentsVisible = True
       self.data.privateCommentsVisible = True
-      return
-
-    error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
-        'model': 'Proposal'
-        }
-    raise AccessViolation(error_msg)
+    except AccessViolation:
+      error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
+          'model': 'Proposal'
+          }
+      raise AccessViolation(error_msg)

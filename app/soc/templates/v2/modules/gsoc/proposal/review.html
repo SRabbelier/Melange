@@ -23,8 +23,10 @@ limitations under the License.
 <h2 id="project-page-student-name">{{ student_name }}</h2>
 
 <div class="project-short">
+  {% if private_comments_visible %}
   <p class="project-mentor"><strong>Mentor:</strong> {{ mentor.name|default:"No mentor assigned" }}</p>
   <p class="project-possible-mentor"><strong>Possible mentors:</strong> None</p>
+  {% endif %}
   <p class="description"><strong>Short description:</strong> {{ proposal.abstract }}</p>
 </div>
 
@@ -32,6 +34,7 @@ limitations under the License.
 {{ proposal.content }}
 </div>
 
+{% if private_comments_visible %}
 <div class="score">
   <div class="score-average">
     <strong>Average score:</strong>
@@ -45,8 +48,11 @@ limitations under the License.
     <div id="score-add-stars" class="stars"></div>
   </div>
 </div>
+{% endif %}
 
+{% if public_comments_visible %}
 <div class="project-comment-container">
+  {% if private_comments_visible %}
   <div class="project-comment-box project-comment-private-container">
     <a name="private-comments"></a><h3>{{ private_comments|length }} private comments</h3>
     {% for comment in private_comments %}
@@ -56,6 +62,7 @@ limitations under the License.
       </div>
     {% endfor %}
   </div>
+  {% endif %}
   <div class="project-comment-box project-comment-public-container">
     <a name="comments"></a><h3>{{ public_comments|length }} comments</h3>
     {% for comment in public_comments %}
@@ -72,6 +79,7 @@ limitations under the License.
   </form>
   <!-- end comment form -->
 </div>
+{% endif %}
 {% endblock page_content %}
 
 {% block dependencies %}

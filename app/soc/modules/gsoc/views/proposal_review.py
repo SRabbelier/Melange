@@ -30,6 +30,7 @@ from django.conf.urls.defaults import url
 from soc.logic import dicts
 from soc.logic.exceptions import NotFound
 from soc.views import forms
+from soc.views.helper.request_data import isDefined
 
 from soc.models.comment import NewComment
 from soc.models.user import User
@@ -52,7 +53,13 @@ class CommentForm(forms.ModelForm):
   class Meta:
     model = NewComment
     #css_prefix = 'gsoc_comment'
-    fields = ['content', 'is_private']
+    fields = ['content']
+    
+  def __init__(self, include_is_private, *args, **kwargs):
+    if include_is_private:
+      self.Meta.fields.append('is_private')
+
+    super(CommentForm, self).__init__(*args, **kwargs)
 
 class ReviewProposal(RequestHandler):
   """View for the Propsal Review page.
@@ -93,9 +100,12 @@ class ReviewProposal(RequestHandler):
     """Gets all the scores for the proposal.
     """
 
+    if not self.data.privateCommentsVisible:
+      return None
+
     total = 0
     number = 0
-    user_score = 0 
+    user_score = 0
 
     query = db.Query(GSoCScore).ancestor(self.data.proposal)
     for score in query:
@@ -117,6 +127,9 @@ class ReviewProposal(RequestHandler):
     """Gets all the comments for the proposal.
     """
 
+    if not self.data.publicCommentsVisible:
+      return None, None
+
     public_comments = []
     private_comments = []
 
@@ -130,6 +143,9 @@ class ReviewProposal(RequestHandler):
     return public_comments, private_comments
 
   def context(self):
+
+    assert isDefined(self.data.publicCommentsVisible)
+    assert isDefined(self.data.privateCommentsVisible)
 
     scores = self.getScores()
 
@@ -148,7 +164,7 @@ class ReviewProposal(RequestHandler):
 
     comment_box = {
         'action': comment_action,
-        'form': CommentForm().render()
+        'form': CommentForm(self.data.privateCommentsVisible).render()
         }
 
     return {
@@ -156,7 +172,9 @@ class ReviewProposal(RequestHandler):
         'proposal': self.data.proposal,
         'mentor': self.data.proposal.mentor,
         'public_comments': public_comments,
+        'public_comments_visible': self.data.publicCommentsVisible,
         'private_comments': private_comments,
+        'private_comments_visible': self.data.privateCommentsVisible,
         'scores': scores,
         'score_action': score_action,
         'student_name': self.data.proposer_profile.name(),
@@ -175,7 +193,23 @@ class PostComment(RequestHandler):
     ]
 
   def checkAccess(self):
+    self.check.isProgramActive()
+    self.check.isProfileActive()
+
     self.data.proposal = GSoCProposal.get(db.Key(self.data.kwargs['key']))
+    if not self.data.proposal:
+      raise NotFound('Proposal does not exist')
+
+    self.data.proposer = self.data.proposal.parent() 
+
+    # check if the comment is given by the author of the proposal
+    if self.data.proposer.key() == self.data.profile.key():
+      self.data.public_only = True
+      return
+
+    self.data.public_only = False
+    self.check.hasRoleForOrganization(self.data.proposal.org, 'mentor')
+    
 
   def createCommentFromForm(self):
     """Creates a new comment based on the data inserted in the form.
@@ -184,23 +218,33 @@ class PostComment(RequestHandler):
       a newly created comment entity or None
     """
 
-    comment_form = CommentForm(self.data.request.POST)
+    assert isDefined(self.data.public_only)
+
+    comment_form = CommentForm(True, self.data.request.POST)
     
     if not comment_form.is_valid():
       return None
 
     comment_form.cleaned_data['author'] = self.data.profile
+
+    # double check that the author of the proposal posts a public comment
+    if self.data.public_only:
+      comment_form.cleaned_data['is_private'] = False
+    
     return comment_form.create(commit=True, parent=self.data.proposal)
     
   def post(self):
-   comment = self.createCommentFromForm() 
-   if comment:
-     kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-     kwargs['id'] = self.data.proposal.key().id()
-     self.redirect(reverse('review_gsoc_proposal', kwargs=kwargs))
-   else:
-     # TODO: probably we want to handle an error somehow
-     pass
+    assert isDefined(self.data.proposer)
+    
+    comment = self.createCommentFromForm() 
+    if comment:
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
+      kwargs['student'] = self.data.proposer.link_id
+      kwargs['id'] = self.data.proposal.key().id()
+      self.redirect(reverse('review_gsoc_proposal', kwargs=kwargs))
+    else:
+      # TODO: probably we want to handle an error somehow
+      pass
 
 
 class PostScore(RequestHandler):

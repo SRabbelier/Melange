@@ -29,6 +29,15 @@ from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
 
 
+def isDefined(variable):
+  """Returns True iff the variable is defined.
+  """
+  try:
+    variable
+    return True
+  except NameError:
+    return False
+
 class RequestData(object):
   """Object containing data we query for each request.
 

@@ -275,7 +275,10 @@ class DjangoTestCase(TestCase):
     errors = []
 
     for key, value in properties.iteritems():
-      prop = getattr(entity, key)
+      if key == 'key_name':
+        prop = entity.key().name()
+      else:
+        prop = getattr(entity, key)
 
       if isinstance(value, db.Model) or isinstance(prop, db.Model):
         value = repr(value.key()) if value else value
@@ -284,7 +287,7 @@ class DjangoTestCase(TestCase):
       if isinstance(value, datetime.date) or isinstance(value, datetime.time):
         continue
 
-      msg = "property %s: %s != %s" % (key, value, prop)
+      msg = "property %s: '%s' != '%s'" % (key, value, prop)
 
       try:
         self.assertEqual(value, prop, msg=msg)

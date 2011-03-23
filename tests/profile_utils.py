@@ -31,10 +31,17 @@ class GSoCProfileHelper(object):
   """Helper class to aid in manipulating profile data.
   """
 
-  def __init__(self, program):
+  def __init__(self, program, dev_test):
+    """Initializes the GSocProfileHelper.
+
+    Args:
+      program: a GSoCProgram
+      dev_test: if set, always creates users as developers
+    """
     self.program = program
     self.user = None
     self.profile = None
+    self.dev_test = dev_test
 
   def createUser(self):
     """Creates a user entity for the current user.
@@ -44,7 +51,7 @@ class GSoCProfileHelper(object):
     from soc.models.user import User
     from soc.modules.seeder.logic.providers.user import CurrentUserProvider
     properties = {'account': CurrentUserProvider(),
-                  'status': 'valid', 'is_developer': False}
+                  'status': 'valid', 'is_developer': self.dev_test}
     self.user = seeder_logic.seed(User, properties=properties)
     return self.user
 

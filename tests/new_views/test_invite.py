@@ -68,7 +68,7 @@ class InviteTest(DjangoTestCase):
     self.assertInviteTemplatesUsed(response)
 
     # create other user to send invite to
-    other_data = GSoCProfileHelper(self.gsoc)
+    other_data = GSoCProfileHelper(self.gsoc, self.dev_test)
     other_user = other_data.createOtherUser('to_be_admin@example.com')
     other_data.createProfile()
 

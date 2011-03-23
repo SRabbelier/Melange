@@ -25,6 +25,7 @@ __authors__ = [
   ]
 
 
+import os
 import datetime
 import httplib
 import StringIO
@@ -198,6 +199,9 @@ class DjangoTestCase(TestCase):
     from soc.models.org_app_survey import OrgAppSurvey
     from tests.timeline_utils import TimelineHelper
     from tests.profile_utils import GSoCProfileHelper
+
+    self.dev_test = 'DEV_TEST' in os.environ
+
     properties = {'timeline': seeder_logic.seed(GSoCTimeline),
                   'status': 'visible', 'apps_tasks_limit': 20}
     self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
@@ -206,7 +210,7 @@ class DjangoTestCase(TestCase):
     properties = {'scope': self.gsoc, 'status': 'active'}
     self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
     self.timeline = TimelineHelper(self.gsoc.timeline, self.org_app)
-    self.data = GSoCProfileHelper(self.gsoc)
+    self.data = GSoCProfileHelper(self.gsoc, self.dev_test)
 
   @classmethod
   def getXsrfToken(cls, path=None, method='POST', data={}, **extra):
@@ -267,7 +271,11 @@ class DjangoTestCase(TestCase):
 
   def assertResponseForbidden(self, response):
     """Asserts that the response status is FORBIDDEN.
+
+    Does not raise an error if dev_test is set.
     """
+    if self.dev_test:
+      return
     self.assertResponseCode(response, httplib.FORBIDDEN)
 
   def assertGSoCTemplatesUsed(self, response):

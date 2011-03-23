@@ -371,7 +371,7 @@ class ListContentResponse(object):
 
     if self._config._row_operation_func:
       # perform the row operation function to retrieve the link
-      row['link'] = self._config.row_operation_func(entity, *args, **kwargs)
+      row['link'] = self._config._row_operation_func(entity, *args, **kwargs)
 
     for id, func in self._config._button_functions.iteritems():
       # The function called here should return a dictionary with 'link' and

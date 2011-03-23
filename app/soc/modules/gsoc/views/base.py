@@ -19,11 +19,14 @@
 
 __authors__ = [
   '"Madhusudan.C.S" <madhusudancs@gmail.com>',
-  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   '"Mario Ferraro" <fadinlight@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
+  '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
 import os
+
+from soc.logic import system
 
 from soc.views.base import RequestHandler
 
@@ -52,6 +55,7 @@ class RequestHandler(RequestHandler):
     context['mainmenu'] = base_templates.MainMenu(self.data)
     context['footer'] = base_templates.Footer(self.data)
     context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
+    context['is_local'] = system.isLocal()
     super(RequestHandler, self).render(context)
 
   def init(self, request, args, kwargs):

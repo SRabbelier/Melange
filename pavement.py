@@ -52,7 +52,7 @@ options(
                      'profiler.py', 'appengine_config.py'],
         app_dirs =  ["soc", "feedparser", "python25src",
                      "jquery.min", "ranklist", "shell", "json.min", "jlinq",
-                     "htmlsanitizer", "LABjs.min", "taggable", "gviz", "django",
+                     "htmlsanitizer", "LABjs.min", "taggable", "gviz",
                      "webmaster"],
         css_dir = "soc/content/css",
         css_files = {

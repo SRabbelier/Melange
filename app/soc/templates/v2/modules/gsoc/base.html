@@ -80,7 +80,7 @@ limitations under the License.
       {% if is_local %}
       .script("/js/{{ app_version }}/jquery/jquery-1.5.1.js").wait()
       {% else %}
-      .script("http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js").wait()
+      .script("https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js").wait()
       {% endif %}
       .script("/soc/content/js/{{ app_version }}/melange.js").wait(
         function () {

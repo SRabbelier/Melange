@@ -183,7 +183,7 @@ class ModelFormMetaclass(djangoforms.ModelFormMetaclass):
     else:
       attrs['base_fields'] = declared_fields
 
-    return super(ModelFormMetaclass, cls).__new__(cls,
+    return super(djangoforms.ModelFormMetaclass, cls).__new__(cls,
                                                   class_name, bases, attrs)
 
 class ModelForm(djangoforms.ModelForm):

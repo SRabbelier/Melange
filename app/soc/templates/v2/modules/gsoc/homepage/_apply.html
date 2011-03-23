@@ -12,46 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
-{% ifequal current_timeline 'org_signup_period' %}
-  <div id="apply-orgs" class="block block-orgs">
-    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-orgs-image" />
-    <h3 id="title-section-apply-orgs">Organizations: Apply now!</h3>
-    <p id="block-apply-orgs-text-action" class="action">
-      {% if login_link %}
-        <a href="{{ login_link }}">Login</a>
-        {% if register_link %}
-          <span>or</span>
-        {% endif %}
-      {% endif %}
-      {% if profile_link %}
-        <a href="{{ profile_link }}">Register</a>
-      {% endif %}
-    </p>
-    <p id="block-apply-orgs-text-small" class="small">with a Google Account to get started.</p>
-  </div>
-{% endifequal %}
-
-{% ifequal current_timeline 'student_signup_period' %}
-  <div id="apply-students" class="block block-students">
-    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-students-image" />
-    <h3 id="title-section-apply-students">Students: Apply now!</h3>
-    <p id="block-apply-students-text-action" class="action">
-      {% if login_link %}
-        <a href="{{ login_link }}">Login</a>
-        {% if register_link %}
-          <span>or</span>
-        {% endif %}
-      {% endif %}
-      {% if profile_link %}
-        <a href="{{ profile_link }}">Register</a>
-      {% endif %}
-    </p>
-    <p id="block-apply-students-text-small" class="small">with a Google Account to get started.</p>
-    <p id="block-apply-students-text-link"><a href="javascript:void(0)">Looking for ideas? See what others are proposing! &rsaquo;</a></p>
-  </div>
-{% endifequal %}
-
-{% ifequal current_timeline 'program_period' %}
+{% if accepted_orgs_link %}
   <div id="participants" class="block block-participants">
     <h4 id="title-section-participating-orgs">Participating Organizations</h4>
     <div id="block-participants-content" class="block-content">
@@ -62,22 +23,50 @@ limitations under the License.
       <a href="http://www.perlfoundation.org/"><img src="/soc/content/images/v2/gsoc/participant-perl.png" height="40" width="75" alt="The Perl Foundation" /></a>
     </div>
     <div id="block-participants-readmore" class="readmore">
-      <a href="javascript:void(0)">read more</a>
+      <a href="{{ accepted_orgs_link }}">read more</a>
     </div>
   </div>
+{% endif %}
+
+{% if org_signup %}
+  <div id="apply-orgs" class="block block-orgs">
+    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
+    <h3 id="title-section-apply">Organizations: Apply now!</h3>
+{% endif %}
+
+{% if student_signup %}
+  <div id="apply-students" class="block block-students">
+    <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
+    <h3 id="title-section-apply">Students: Apply now!</h3>
+{% endif %}
+
+{% if apply_block %}
   <!-- begin block -->
-  <div id="apply-mentors" class="block block-mentors">
-    <h3 id="title-section-apply-mentors">Mentors: Apply now!</h3>
+    <p id="block-apply-text-action" class="action">
       {% if login_link %}
         <a href="{{ login_link }}">Login</a>
-        {% if register_link %}
+        {% if profile_link %}
           <span>or</span>
         {% endif %}
       {% endif %}
       {% if profile_link %}
         <a href="{{ profile_link }}">Register</a>
       {% endif %}
-    <p class="small">with a Google Account to get started.</p>
+      {% if apply_link %}
+        <a href="{{ apply_link }}">Apply</a>
+      {% endif %}
+    </p>
+    {% if login_link or profile_link %}
+      <p id="block-apply-text-small" class="small">with a Google Account to get started.</p>
+    {% endif %}
+    {% if apply_link%}
+      <p id="block-apply-text-small" class="small">to one of the accepted organizations.</p>
+    {% endif %}
+
+  {% if other_proposals_link %}
+    <p id="block-apply-text-link"><a href="{{ other_proposals_link }}">Looking for ideas? See what others are proposing! &rsaquo;</a></p>
+  {% endif %}
+
   </div>
   <!-- end block -->
-{% endifequal %}
+{% endif %}

@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.api import users
+
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
@@ -45,11 +47,13 @@ class Timeline(Template):
     self.current_timeline = current_timeline
 
   def context(self):
-    if self.current_timeline == 'org_signup_period':
+    if self.current_timeline == 'kickoff_period':
+      img_url = "/soc/content/images/v2/gsoc/image-map-kickoff.png"
+    elif self.current_timeline in ['org_signup_period', 'orgs_announced_period']:
       img_url = "/soc/content/images/v2/gsoc/image-map-org-apps.png"
     elif self.current_timeline == 'student_signup_period':
       img_url = "/soc/content/images/v2/gsoc/image-map-student-apps.png"
-    elif self.current_timeline == 'program_period':
+    elif self.current_timeline == 'coding_period':
       img_url = "/soc/content/images/v2/gsoc/image-map-on-season.png"
     else:
       img_url = "/soc/content/images/v2/gsoc/image-map-off-season.png"
@@ -66,18 +70,37 @@ class Apply(Template):
   """Apply template.
   """
 
-  def __init__(self, data, current_timeline):
+  def __init__(self, data):
     self.data = data
-    self.current_timeline = current_timeline
 
   def context(self):
     kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    kwargs['role'] = 'student'
-    context = {
-        'current_timeline': self.current_timeline,
-    }
-    if not self.data.profile:
+    context = {}
+    accepted_orgs = None
+
+    if self.data.timeline.orgsAnnounced():
+      accepted_orgs = reverse('gsoc_accepted_orgs', kwargs=kwargs)
+      context['accepted_orgs_link'] = accepted_orgs
+
+    context['org_signup'] = self.data.timeline.orgSignup()  
+    context['student_signup'] = self.data.timeline.studentSignup()
+
+    signup = self.data.timeline.orgSignup() or self.data.timeline.studentSignup()
+
+    if signup and not self.data.gae_user:
+      context['login_link'] = users.create_login_url(self.data.full_path)
+    if signup and not self.data.profile:
+      if self.data.timeline.orgSignup():
+        kwargs['role'] = 'org_admin'
+      else:
+        kwargs['role'] = 'student'
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
+
+    if self.data.timeline.studentSignup() and self.data.profile:
+      context['apply_link'] = accepted_orgs
+
+    context['apply_block'] = signup or accepted_orgs
+
     return context
 
   def templatePath(self):
@@ -147,15 +170,14 @@ class Homepage(RequestHandler):
     """Handler to for GSoC Home page HTTP get request.
     """
 
-    current_timeline = timeline_logic.getCurrentTimeline(
-        self.data.program_timeline, self.data.org_app)
+    current_timeline = self.data.timeline.currentPeriod()
 
     featured_project = sp_logic.getFeaturedProject(
         current_timeline, self.data.program)
 
     context = {
         'timeline': Timeline(self.data, current_timeline),
-        'apply': Apply(self.data, current_timeline),
+        'apply': Apply(self.data),
         'connect_with_us': ConnectWithUs(self.data),
         'page_name': 'Home page',
         'program': self.data.program,

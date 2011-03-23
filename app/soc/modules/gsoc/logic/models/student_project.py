@@ -134,7 +134,7 @@ class Logic(base.Logic):
         # TODO(Madhu): Enable it once the featured property is added to student_project model
         #'featured': True
         }
-    if current_timeline == 'program_period':
+    if current_timeline == 'coding_period':
       properties['program'] = program
       properties['status'] = 'accepted'
     else:

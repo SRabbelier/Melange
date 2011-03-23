@@ -27,7 +27,6 @@ from django.utils.translation import ugettext
 
 from google.appengine.api import users
 
-from soc.logic.helper import timeline as timeline_helper
 from soc.logic.models.user import logic as user_logic
 
 from soc.logic.exceptions import LoginRequest
@@ -73,6 +72,9 @@ DEF_PROGRAM_INACTIVE_MSG_FMT = ugettext(
 
 DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT = ugettext(
     'This page is inactive before %s and after %s.')
+
+DEF_PAGE_INACTIVE_BEFORE_MSG_FMT = ugettext(
+    'This page is inactive before %s')
 
 DEF_NO_SUCH_PROGRAM_MSG = ugettext(
     'The url is wrong (no program was found).')
@@ -196,20 +198,16 @@ class AccessChecker(object):
     raise AccessViolation(
         DEF_PROGRAM_INACTIVE_MSG_FMT % self.data.program.name)
 
-  def _isActivePeriod(self, period_name):
-    """Checks if the given period is active for the given program.
-
-    Args:
-      period_name: the name of the period which is checked
+  def acceptedOrgsAnnounced(self):
+    """Checks if the accepted orgs have been announced.
     """
     self.isProgramActive()
 
-    if timeline_helper.isActivePeriod(self.data.program_timeline, period_name):
+    if self.data.timeline.orgsAnnounced():
       return
 
-    active_period = timeline_helper.activePeriod(self.data.program_timeline, period_name)
-
-    raise AccessViolation(DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT % active_period)
+    period = self.data.timeline.orgsAnnouncedOn()
+    raise AccessViolation(DEF_PAGE_INACTIVE_BEFORE_MSG_FMT % period)
 
   def canApplyStudent(self, edit_url):
     """Checks if the user can apply as a student.
@@ -219,7 +217,7 @@ class AccessChecker(object):
     if self.data.profile and self.data.profile.student_info:
       raise RedirectRequest(edit_url)
 
-    self._isActivePeriod('student_signup')
+    self.studentSignupActive()
 
     if not self.data.profile:
       return
@@ -357,6 +355,17 @@ class AccessChecker(object):
           }
       raise AccessViolation(error_msg)
 
+  def studentSignupActive(self):
+    """Checks if the student signup period is active.
+    """
+    self.isProgramActive()
+
+    if self.data.timeline.studentSignup():
+      return
+
+    raise AccessViolation(DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT %
+        self.data.timeline.studentSignupBetween())
+
   def canStudentUpdateProposal(self):
     """Checks if the student is eligible to submit a proposal.
     """
@@ -364,7 +373,7 @@ class AccessChecker(object):
     self.isProposalInURLValid()
 
     # check if the timeline allows updating proposals
-    self._isActivePeriod('student_signup')
+    self.studentSignupActive()
 
     # TODO: it should be changed - we should not assume that the proposal
     # is already in RequestData

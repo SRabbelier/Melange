@@ -508,6 +508,9 @@ class AccessChecker(object):
     assert self.data.proposal_org
     assert self.data.proposer_user
 
+    self.data.publicCommentsVisible = False
+    self.data.privateCommentsVisible = False
+
     # if the proposal is public, everyone may access it
     if self.data.proposal.is_publicly_visible:
       return
@@ -515,10 +518,13 @@ class AccessChecker(object):
     # if the current user is the proposer, he or she may access it
     self.isUser()
     if self.data.user.key() == self.data.proposer_user.key():
+      self.data.publicCommentsVisible = True
       return
 
     # all the mentors and org admins from the organization may access it
     if self.hasRoleForOrganization(self.data.proposal_org, 'mentor'):
+      self.data.publicCommentsVisible = True
+      self.data.privateCommentsVisible = True
       return
 
     error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {

@@ -36,22 +36,13 @@ from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
 
 
-class CreateDocumentForm(ModelForm):
+class DocumentForm(ModelForm):
   """Django form for creating documents.
   """
 
   class Meta:
     model = Document
-    exclude = ['scope', 'scope_path', 'author', 'modified_by', 'prefix', 'home_for']
-
-
-class EditDocumentForm(ModelForm):
-  """Django form for editing documents.
-  """
-
-  class Meta:
-    model = Document
-    exclude = CreateDocumentForm.Meta.exclude + ['link_id']
+    exclude = ['scope', 'scope_path', 'author', 'modified_by', 'prefix', 'home_for', 'link_id']
 
 
 def keyFieldsFromKwargs(kwargs):
@@ -105,14 +96,15 @@ class EditDocumentPage(RequestHandler):
     if not fields:
       self.check.fail("Incorrect document url format")
 
-    self.scope_path = '/'.join(fields[:-1])
+    self.scope_path = '/'.join(fields[1:-1])
     self.key_name = '/'.join(fields)
 
     self.entity = document_logic.getFromKeyName(self.key_name)
-    self.form = EditDocumentForm if self.entity else CreateDocumentForm
+
+    # TODO(SRabbelier): check document ACL
 
   def context(self):
-    document_form = self.form(self.data.POST or None, instance=self.entity)
+    document_form = DocumentForm(self.data.POST or None, instance=self.entity)
 
     return {
         'page_name': 'Edit document',
@@ -120,31 +112,34 @@ class EditDocumentPage(RequestHandler):
     }
 
   def validate(self):
-    document_form = self.form(self.data.POST, instance=self.entity)
+    document_form = DocumentForm(self.data.POST, instance=self.entity)
 
     if not document_form.is_valid():
-      return False
+      return
 
     data = document_form.cleaned_data
     data['modified_by'] = self.data.user
 
     if self.entity:
-      document_form.save()
+      document = document_form.save()
     else:
       prefix = self.kwargs['prefix']
+      data['link_id'] = self.kwargs['document']
       data['author'] = self.data.user
       data['prefix'] = prefix
       data['scope'] = prefixes.getScopeForPrefix(prefix, self.scope_path)
       data['scope_path'] = self.scope_path
-      document_form.create(key_name=self.key_name)
+      document = document_form.create(key_name=self.key_name)
+
+    return document
 
   def post(self):
     """Handler for HTTP POST request.
     """
-    if self.validate():
-      kwargs = dicts.filter(self.data.kwargs, [
-          'prefix', 'scope', 'sponsor', 'program', 'organization', 'document'])
-      self.redirect(reverse('edit_gsoc_document', kwargs=filter(kwargs)))
+    document = self.validate()
+    if document:
+      args = [document.prefix, document.scope_path, document.link_id]
+      self.redirect(reverse('edit_gsoc_document', args=args))
     else:
       self.get()
 

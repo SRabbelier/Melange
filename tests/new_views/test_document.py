@@ -25,8 +25,11 @@ __authors__ = [
 
 import httplib
 
+from soc.models.document import Document
+
 from tests.timeline_utils import TimelineHelper
 from tests.test_utils import DjangoTestCase
+from tests.profile_utils import GSoCProfileHelper
 
 # TODO: perhaps we should move this out?
 from soc.modules.seeder.logic.seeder import logic as seeder_logic
@@ -38,7 +41,6 @@ class EditProgramTest(DjangoTestCase):
   """
 
   def setUp(self):
-    from soc.models.document import Document
     from soc.modules.gsoc.models.program import GSoCProgram
     self.gsoc = seeder_logic.seed(GSoCProgram)
     properties = {
@@ -47,15 +49,37 @@ class EditProgramTest(DjangoTestCase):
         'key_name': DocumentKeyNameProvider(),
     }
     self.document = seeder_logic.seed(Document, properties=properties)
+    self.data = GSoCProfileHelper(self.gsoc)
 
   def testShowDocument(self):
     url = '/gsoc/document/show/' + self.document.key().name()
     response = self.client.get(url)
     self.assertGSoCTemplatesUsed(response)
 
-  def testEditDocument(self):
-    url = '/gsoc/document/edit/' + self.document.key().name()
+  def testCreateDocumentRestriction(self):
+    # TODO(SRabbelier): test document ACL
+    pass
+
+  def testCreateDocument(self):
+    self.data.createHost()
+    url = '/gsoc/document/edit/gsoc_program/%s/doc' % self.gsoc.key().name()
     response = self.client.get(url)
     self.assertGSoCTemplatesUsed(response)
     self.assertTemplateUsed(response, 'v2/modules/gsoc/document/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/_form.html')
+
+    # test POST
+    override = {
+        'prefix': 'gsoc_program', 'scope': self.gsoc, 'link_id': 'doc',
+        'read_access': 'public', 'key_name': DocumentKeyNameProvider(),
+        'modified_by': self.data.user, 'home_for': None, 'author': self.data.user,
+    }
+    properties = seeder_logic.seed_properties(Document, properties=override)
+    postdata = properties.copy()
+    postdata['xsrf_token'] = self.getXsrfToken(url)
+    response = self.client.post(url, postdata)
+    self.assertResponseRedirect(response)
+
+    key_name = properties['key_name']
+    document = Document.get_by_key_name(key_name)
+    self.assertPropertiesEqual(properties, document)

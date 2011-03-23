@@ -38,6 +38,12 @@ DEF_MAX_PROPOSALS_REACHED = ugettext(
     'for this program.')
 
 
+class DeveloperAccessChecker(access_checker.DeveloperAccessChecker):
+  """Helper classes for access checking in GSoC module.
+  """
+  pass
+
+
 class AccessChecker(access_checker.AccessChecker):
   """Helper classes for access checking in GSoC module.
   """

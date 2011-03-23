@@ -129,8 +129,12 @@ DEF_NOT_VALID_REQUEST_MSG = ugettext(
 DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG = ugettext(
     'You already have %(role)s role for %(org)s.')
 
-class AccessChecker(object):
-  """Helper classes for access checking.
+
+class BaseAccessChecker(object):
+  """Helper class for access checking.
+
+  Should contain all access checks that apply to both regular users
+  and developers.
   """
 
   def __init__(self, data=None):
@@ -163,16 +167,6 @@ class AccessChecker(object):
 
     raise AccessViolation(DEF_NO_USER_LOGIN_MSG)
 
-  def isHost(self):
-    """Checks whether the current user has a host role.
-    """
-    self.isLoggedIn()
-
-    if self.data.is_host:
-      return
-
-    raise AccessViolation(DEF_NOT_HOST_MSG)
-
   def isDeveloper(self):
     """Checks if the current user is a Developer.
     """
@@ -185,6 +179,41 @@ class AccessChecker(object):
       return
 
     raise AccessViolation(DEF_NOT_DEVELOPER_MSG)
+
+  def isProfileActive(self):
+    """Checks if the profile of the current user is active.
+    """
+    self.isLoggedIn()
+
+    if self.data.profile and self.data.profile.status == 'active':
+      return
+
+    raise AccessViolation(DEF_ROLE_INACTIVE_MSG)
+
+
+class DeveloperAccessChecker(BaseAccessChecker):
+  """Helper class for access checking.
+
+  Allows most checks.
+  """
+
+  def __getattr__(self, name):
+    return lambda *args, **kwargs: None
+
+
+class AccessChecker(BaseAccessChecker):
+  """Helper class for access checking.
+  """
+
+  def isHost(self):
+    """Checks whether the current user has a host role.
+    """
+    self.isLoggedIn()
+
+    if self.data.is_host:
+      return
+
+    raise AccessViolation(DEF_NOT_HOST_MSG)
 
   def isProgramActive(self):
     """Checks that the program is active.
@@ -238,16 +267,6 @@ class AccessChecker(object):
 
     raise AccessViolation(DEF_ALREADY_PARTICIPATING_AS_STUDENT_MSG % (
         role, self.data.program.name))
-
-  def isProfileActive(self):
-    """Checks if the profile of the current user is active.
-    """
-    self.isLoggedIn()
-
-    if self.data.profile and self.data.profile.status == 'active':
-      return
-
-    raise AccessViolation(DEF_ROLE_INACTIVE_MSG)
 
   def isActiveStudent(self):
     """Checks if the user is an active student.

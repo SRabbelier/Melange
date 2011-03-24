@@ -138,7 +138,7 @@ class EditDocumentPage(RequestHandler):
     """
     document = self.validate()
     if document:
-      args = [document.prefix, document.scope_path, document.link_id]
+      args = [document.prefix, document.scope_path + '/', document.link_id]
       self.redirect(reverse('edit_gsoc_document', args=args))
     else:
       self.get()

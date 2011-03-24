@@ -76,7 +76,7 @@ class EditProgramTest(DjangoTestCase):
     postdata = properties.copy()
     postdata['xsrf_token'] = self.getXsrfToken(url)
     response = self.client.post(url, postdata)
-    self.assertResponseRedirect(response)
+    self.assertResponseRedirect(response, url)
 
     key_name = properties['key_name']
     document = Document.get_by_key_name(key_name)

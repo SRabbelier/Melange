@@ -79,7 +79,11 @@ class MainMenu(Template):
     self.data = data
 
   def context(self):
-    return siteMenuContext(self.data)
+    context = siteMenuContext(self.data)
+    context.update({
+        'home_link': redirects.homepage(self.data)
+    })
+    return context
 
   def templatePath(self):
     return "v2/modules/gsoc/mainmenu.html"

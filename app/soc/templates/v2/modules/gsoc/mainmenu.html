@@ -2,11 +2,14 @@
 <div id="main-menu" class="grid_3">
   {% block site_menu %}
     <ul id="main-menu-list">
+      {% if home_link %}
+      <li id="menu-home"><a href="{{ home_link }}">Home</a></li>
+      {% endif %}
       {% if login_link %}
       <li id="menu-login"><a href="{{ login_link }}">Login</a></li>
       {% endif %}
       {% if dashboard_link %}
-      <li id="menu-login"><a href="{{ dashboard_link }}">My Dashboard</a></li>
+      <li id="menu-dashboard"><a href="{{ dashboard_link }}">My Dashboard</a></li>
       {% endif %}
       {% if about_link %}
       <li id="menu-about"><a href="{{ about_link }}">About</a></li>

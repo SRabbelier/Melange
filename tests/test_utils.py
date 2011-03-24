@@ -305,6 +305,8 @@ class DjangoTestCase(TestCase):
     for key, value in properties.iteritems():
       if key == 'key_name':
         prop = entity.key().name()
+      elif key == 'parent':
+        prop = entity.parent()
       else:
         prop = getattr(entity, key)
 

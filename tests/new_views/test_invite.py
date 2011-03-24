@@ -55,7 +55,7 @@ class InviteTest(DjangoTestCase):
     self.assertTemplateUsed(response, 'v2/modules/gsoc/invite/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/_form.html')
 
-  def testInviteOrgAdmin(self):
+  def testInviteOrgAdminNoAdmin(self):
     url = '/gsoc/invite/org_admin/' + self.org.key().name()
     response = self.client.get(url)
     self.assertResponseForbidden(response)
@@ -73,15 +73,14 @@ class InviteTest(DjangoTestCase):
     other_data.createProfile()
 
     # test POST
-    message = 'Will you be an org admin for us?'
-    postdata = {'xsrf_token': self.getXsrfToken(url),
-                'link_id': other_user.link_id, 'message': message}
-    response = self.client.post(url, postdata)
+    override = {'link_id': other_user.link_id, 'status': 'pending',
+                'role': 'org_admin', 'user': other_user, 'group': self.org,
+                'type': 'Invitation'}
+    response, properties = self.modelPost(url, Request, override)
 
     invitation = Request.all().get()
-    self.assertEqual('pending', invitation.status)
-    self.assertEqual(message, invitation.message)
-    self.assertEqual(other_user.link_id, invitation.user.link_id)
+    properties.pop('link_id')
+    self.assertPropertiesEqual(properties, invitation)
 
   def testInviteMentor(self):
     self.data.createOrgAdmin(self.org)
@@ -97,21 +96,21 @@ class InviteTest(DjangoTestCase):
     self.assertGSoCTemplatesUsed(response)
     self.assertTemplateUsed(response, 'v2/soc/request/base.html')
 
-    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Reject'}
-    response = self.client.post(url, postdata)
+    postdata = {'action': 'Reject'}
+    response = self.post(url, postdata)
     self.assertResponseRedirect(response)
     invitation = Request.all().get()
     self.assertEqual('rejected', invitation.status)
 
     # test that you can't change after the fact
-    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
-    response = self.client.post(url, postdata)
+    postdata = {'action': 'Accept'}
+    response = self.post(url, postdata)
     self.assertResponseForbidden(response)
 
     # reset invitation to test Accept
     invitation.status = 'pending'
     invitation.put()
 
-    postdata = {'xsrf_token': self.getXsrfToken(url), 'action': 'Accept'}
-    response = self.client.post(url, postdata)
+    postdata = {'action': 'Accept'}
+    response = self.post(url, postdata)
     self.assertResponseRedirect(response)

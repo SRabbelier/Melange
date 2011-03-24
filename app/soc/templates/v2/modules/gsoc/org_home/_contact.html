@@ -12,6 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+{% if organization.facebook or organization.twitter or organization.blog or organization.pub_mailing_list or organization.irc_channel %}
 <div id="connect-with-us" class="block block-connect">
   <h4 id="title-section-connect-with-us">Contact</h4>
   <div id="block-connect-with-us-content" class="block-content">
@@ -28,7 +29,8 @@ limitations under the License.
       <a href="{{ organization.pub_mailing_list }}" id="connect-block-email" class="social em">Public Mailing List</a>
     {% endif %}
     {% if organization.irc_channel %}
-      <a href="{{ organization.irc_channel }}" id="connect-block-irc" class="social irc">IRC</a>
+      <a href="irc://{{ organization.irc_channel }}" id="connect-block-irc" class="social irc">IRC</a>
     {% endif %}
   </div>
 </div>
+{% endif %}

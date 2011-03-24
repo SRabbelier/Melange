@@ -108,8 +108,6 @@ class ProjectList(Template):
     list_config.addColumn('student', 'Student',
                           lambda entity, *args: entity.student.user.name)
     list_config.addSimpleColumn('title', 'Title')
-    list_config.addColumn('mentor', 'Mentor',
-                          lambda entity, *args: entity.mentor.user.name)
     self._list_config = list_config
 
   def context(self):
@@ -134,7 +132,7 @@ class ProjectList(Template):
                 'status': 'accepted'}
       response_builder = lists.QueryContentResponseBuilder(
           self.request, self._list_config, sp_logic,
-          fields)
+          fields, prefetch=['student'])
       return response_builder.build()
     else:
       return None

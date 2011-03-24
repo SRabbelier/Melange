@@ -24,10 +24,10 @@ limitations under the License.
   <div id="organization-description" class="block block-organization-description">
     <h4 title="title-section-organization-description">Description</h4>
     <div id="block-organization-description-content" class="block-content">
-      <p>{{ organization.description }}</p>
+      <p>{{ organization.description|safe }}</p>
     </div>
     <div id="block-organization-description-readmore" class="readmore">
-      <a href="{{ organization.ideas }}">Ideas page: {{ organization.ideas }}</a>
+      Ideas page: {{ organization.ideas|urlizetrunc:50 }}
     </div>
   </div>
   <!-- end block -->
@@ -45,12 +45,14 @@ limitations under the License.
 
 <div class="content_column_2">
   <!-- begin block -->
-  <div id="tags" class="block block-tags">
-    <h4 id="title-section-connect-with-us">Tags</h4>
-    <div id="block-tags" class="block-content">
-      {{ tags }}
-    </div>
-  </div>
+  {% if tags %}
+      <div id="tags" class="block block-tags">
+        <h4 id="title-section-connect-with-us">Tags</h4>
+        <div id="block-tags" class="block-content">
+          {{ tags }}
+        </div>
+      </div>
+  {% endif %}
   <!-- end block -->
 
   <!-- begin block -->

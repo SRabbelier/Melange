@@ -34,11 +34,9 @@ from soc.modules.gsoc.logic.models.org_app_survey import logic as \
     org_app_logic
 from soc.modules.gsoc.logic.models.student_project import logic as \
     project_logic
-# TODO: Change this to the logic for the new proposals
-from soc.modules.gsoc.logic.models.student_proposal import logic as \
-    proposal_logic
 from soc.modules.gsoc.logic.models.survey import project_logic as \
     ps_logic
+from soc.modules.gsoc.models.proposal import GSoCProposal
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import lists
 from soc.modules.gsoc.views.helper import url_patterns
@@ -285,10 +283,14 @@ class MyProposalsComponent(Component):
     """
     idx = lists.getListIndex(self.request)
     if idx == 1:
-      fields = {'program': self.data.program}
-      response_builder = lists.QueryContentResponseBuilder(
-          self.request, self._list_config, proposal_logic, fields,
-          ancestors=[self.data.profile], prefetch=['org'])
+      q = GSoCProposal.all()
+      q.filter('program', self.data.program)
+      q.ancestor(self.data.profile)
+
+      starter = lambda start: GSoCProposal.get_by_key_name(start)
+
+      response_builder = lists.RawQueryContentResponseBuilder(
+          self.request, self._list_config, q, starter, prefetch=['org'])
       return response_builder.build()
     else:
       return None

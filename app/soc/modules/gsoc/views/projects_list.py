@@ -102,7 +102,7 @@ class ListProjects(RequestHandler):
   def checkAccess(self):
     """Access checks for the view.
     """
-    pass
+    self.check.acceptedStudentsAnnounced()
 
   def jsonContext(self):
     """Handler for JSON requests.

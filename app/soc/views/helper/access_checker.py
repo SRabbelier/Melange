@@ -344,6 +344,17 @@ class AccessChecker(BaseAccessChecker):
     period = self.data.timeline.orgsAnnouncedOn()
     raise AccessViolation(DEF_PAGE_INACTIVE_BEFORE_MSG_FMT % period)
 
+  def acceptedStudentsAnnounced(self):
+    """Checks if the accepted students have been announced.
+    """
+    self.isProgramActive()
+
+    if self.data.timeline.studentsAnnounced():
+      return
+
+    period = self.data.timeline.studentsAnnouncedOn()
+    raise AccessViolation(DEF_PAGE_INACTIVE_BEFORE_MSG_FMT % period)
+
   def canApplyStudent(self, edit_url):
     """Checks if the user can apply as a student.
     """

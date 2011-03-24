@@ -36,7 +36,6 @@ def siteMenuContext(data):
 
   context = {
       'about_link': redirects.showDocument(data.program.about_page),
-      'projects_link': redirects.allProjects(data),
       'events_link': redirects.showDocument(data.program.events_page),
       'connect_link': redirects.showDocument(data.program.connect_with_us_page),
       'help_link': redirects.showDocument(data.program.help_page),
@@ -49,6 +48,9 @@ def siteMenuContext(data):
 
   if data.profile:
     context['dashboard_link'] = redirects.dashboard(data)
+
+  if data.timeline.studentsAnnounced():
+    context['projects_link'] = redirects.allProjects(data)
 
   return context
 

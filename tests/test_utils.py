@@ -146,6 +146,7 @@ class StuboutHelper(object):
 
     self.stubout.Set(parent, child_name, get_general_raw(args_names))
 
+
 class NonFailingFakePayload(object):
   """Extension of Django FakePayload class that includes seek and readline
   methods.
@@ -170,6 +171,7 @@ class NonFailingFakePayload(object):
   def readline(self, length=None):
     return self.__content.readline(length)
 
+
 class DjangoTestCase(TestCase):
   """Class extending Django TestCase in order to extend its functions.
 
@@ -181,18 +183,55 @@ class DjangoTestCase(TestCase):
   def _pre_setup(self):
     """Performs any pre-test setup.
     """
-
     client.FakePayload = NonFailingFakePayload
 
   def _post_teardown(self):
     """ Performs any post-test cleanup.
     """
-
     pass
 
-  def init(self):
-    # TODO: perhaps we should move this out?
+  def seed(self, model, properties):
+    """Returns a instance of model, seeded with properties.
+    """
     from soc.modules.seeder.logic.seeder import logic as seeder_logic
+    return seeder_logic.seed(model, properties)
+
+  def seedProperties(self, model, properties):
+    """Returns seeded properties for the specified model.
+    """
+    from soc.modules.seeder.logic.seeder import logic as seeder_logic
+    return seeder_logic.seed_properties(model, properties)
+
+  def post(self, url, postdata):
+    """Performs a post to the specified url with postdata.
+
+    Takes care of setting the xsrf_token.
+    """
+    postdata['xsrf_token'] = self.getXsrfToken(url)
+    response = self.client.post(url, postdata)
+    postdata.pop('xsrf_token')
+    return response
+
+  def modelPost(self, url, model, properties):
+    """Performs a post to the specified url after seeding for model.
+
+    Calls post().
+    """
+    properties = self.seedProperties(model, properties)
+    response = self.post(url, properties)
+    return response, properties
+
+  def init(self):
+    """Performs test setup.
+
+    Sets the following attributes:
+      dev_test: True iff DEV_TEST is in environment
+      gsoc: a GSoCProgram instance
+      org_app: a OrgAppSurvey instance
+      org: a GSoCOrganization instance
+      timeline: a TimelineHelper instance
+      data: a GSoCProfileHelper instance
+    """
     from soc.modules.gsoc.models.program import GSoCProgram
     from soc.modules.gsoc.models.timeline import GSoCTimeline
     from soc.modules.gsoc.models.organization import GSoCOrganization
@@ -202,13 +241,13 @@ class DjangoTestCase(TestCase):
 
     self.dev_test = 'DEV_TEST' in os.environ
 
-    properties = {'timeline': seeder_logic.seed(GSoCTimeline),
+    properties = {'timeline': self.seed(GSoCTimeline, {}),
                   'status': 'visible', 'apps_tasks_limit': 20}
-    self.gsoc = seeder_logic.seed(GSoCProgram, properties=properties)
+    self.gsoc = self.seed(GSoCProgram, properties)
     properties = {'scope': self.gsoc}
-    self.org_app = seeder_logic.seed(OrgAppSurvey, properties=properties)
+    self.org_app = self.seed(OrgAppSurvey, properties)
     properties = {'scope': self.gsoc, 'status': 'active'}
-    self.org = seeder_logic.seed(GSoCOrganization, properties=properties)
+    self.org = self.seed(GSoCOrganization, properties)
     self.timeline = TimelineHelper(self.gsoc.timeline, self.org_app)
     self.data = GSoCProfileHelper(self.gsoc, self.dev_test)
 

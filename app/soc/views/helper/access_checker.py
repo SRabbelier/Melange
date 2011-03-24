@@ -396,7 +396,7 @@ class AccessChecker(BaseAccessChecker):
 
     raise AccessViolation(DEF_IS_NOT_STUDENT_MSG)
 
-  def isNotStudent(self):
+  def notStudent(self):
     """Checks if the current user has a non-student profile.
     """
     self.isProfileActive()

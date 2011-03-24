@@ -40,6 +40,7 @@ from soc.models.user import User
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.helper import redirects
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -173,15 +174,21 @@ class ProfilePage(RequestHandler):
 
     error = user_form.errors or profile_form.errors or student_info_form.errors
 
-    return {
+    context = {
         'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': page_name,
         'user_email': self.data.gae_user.email(),
         'user_form': user_form,
         'profile_form': profile_form,
         'student_info_form': student_info_form,
+        'has_profile': bool(self.data.profile),
         'error': error,
     }
+
+    if self.data.student_info:
+      context['apply_link'] = redirects.acceptedOrgs(self.data)
+
+    return context
 
   def validateUser(self, dirty):
     if self.data.user:

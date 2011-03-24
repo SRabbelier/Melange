@@ -46,6 +46,14 @@ def showDocument(doc):
     return None
 
 
+def acceptedOrgs(data):
+  """Returns the redirect for list all GSoC projects.
+  """
+
+  kwargs = dicts.filter(data.kwargs, ['sponsor', 'program'])
+  return reverse('gsoc_accepted_orgs', kwargs=kwargs)
+
+
 def allProjects(data):
   """Returns the redirect for list all GSoC projects.
   """

@@ -38,9 +38,11 @@ DEF_MAX_PROPOSALS_REACHED = ugettext(
     'for this program.')
 
 
-class DeveloperAccessChecker(access_checker.DeveloperAccessChecker):
-  """Helper classes for access checking in GSoC module.
-  """
+class Mutator(access_checker.Mutator):
+  pass
+
+
+class DeveloperMutator(access_checker.DeveloperMutator):
   pass
 
 
@@ -65,3 +67,7 @@ class AccessChecker(access_checker.AccessChecker):
     if query.count() >= self.data.program.apps_tasks_limit:
       # too many proposals access denied
       raise AccessViolation(DEF_MAX_PROPOSALS_REACHED)
+
+
+class DeveloperAccessChecker(access_checker.DeveloperAccessChecker):
+  pass

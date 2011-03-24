@@ -41,11 +41,18 @@ class ProposalTest(DjangoTestCase):
     self.init()
 
   def assertProposalTemplatesUsed(self, response):
-    """Asserts that all the templates from the dashboard were used.
+    """Asserts that all the templates from the proposal were used.
     """
     self.assertGSoCTemplatesUsed(response)
     self.assertTemplateUsed(response, 'v2/modules/gsoc/proposal/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/_form.html')
+
+  def assertReviewTemplateUsed(self, response):
+    """Asserts that all the proposal review were used.
+    """
+    self.assertGSoCTemplatesUsed(response)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/proposal/review.html')
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/proposal/_comment_form.html')
 
   def testSubmitProposal(self):
     self.data.createStudent()
@@ -65,3 +72,35 @@ class ProposalTest(DjangoTestCase):
     # TODO(SRabbelier): verify
     proposal = GSoCProposal.all().get()
     self.assertPropertiesEqual(properties, proposal)
+
+    suffix = "%s/%s/%d" % (
+        self.gsoc.key().name(),
+        self.data.user.key().name(),
+        proposal.key().id())
+
+    url = '/gsoc/proposal/review/' + suffix
+    response = self.client.get(url)
+    self.assertReviewTemplateUsed(response)
+
+    from soc.models.comment import NewComment
+    url = '/gsoc/proposal/comment/' + suffix
+    override = {'author': self.data.profile, 'is_private': False}
+    properties = seeder_logic.seed_properties(NewComment, properties=override)
+    postdata = properties.copy()
+    postdata['xsrf_token'] = self.getXsrfToken()
+    response = self.client.post(url, postdata)
+    self.assertResponseRedirect(response)
+    comment = NewComment.all().get()
+    self.assertPropertiesEqual(properties, comment)
+
+    from soc.modules.gsoc.models.score import GSoCScore
+    url = '/gsoc/proposal/score/' + suffix
+    override = {'author': self.data.profile, 'parent': proposal}
+    properties = seeder_logic.seed_properties(GSoCScore, properties=override)
+    postdata = properties.copy()
+    postdata['xsrf_token'] = self.getXsrfToken()
+    response = self.client.post(url, postdata)
+    self.assertResponseOK(response)
+
+    score = GSoCScore.all().get()
+    self.assertPropertiesEqual(properties, score)

@@ -54,9 +54,6 @@ DEF_DEV_LOGOUT_LOGIN_MSG_FMT = ugettext(
     ' and <a href="%%(sign_in)s">sign in</a>'
     ' again as %(role)s to view this page.')
 
-DEF_NEED_ROLE_MSG = ugettext(
-    'You do not have the required role.')
-
 DEF_NO_USER_LOGIN_MSG = ugettext(
     'Please create <a href="/user/create_profile">User Profile</a>'
     ' in order to view this page.')
@@ -109,6 +106,18 @@ DEF_ENTITY_DOES_NOT_BELONG_TO_YOU = ugettext(
 DEF_NOT_HOST_MSG = ugettext(
     'You need to be a program adminstrator to access this page.')
 
+DEF_NOT_ADMIN_MSG = ugettext(
+    'You need to be a organization administrator for %s to access this page.')
+
+DEF_NOT_MENTOR_MSG = ugettext(
+    'You need to be a mentor for %s to access this page.')
+
+DEF_ALREADY_ADMIN_MSG = ugettext(
+    'You cannot be a organization administrator for %s to access this page.')
+
+DEF_ALREADY_MENTOR_MSG = ugettext(
+    'You cannot be a mentor for %s to access this page.')
+
 DEF_NOT_DEVELOPER_MSG = ugettext(
     'You need to be a site developer to access this page.')
 
@@ -129,6 +138,101 @@ DEF_NOT_VALID_REQUEST_MSG = ugettext(
 DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG = ugettext(
     'You already have %(role)s role for %(org)s.')
 
+DEF_PROPOSAL_NOT_PUBLIC_MSG = ugettext(
+    'This proposal is not made public, '
+    'and you are not the student who submitted the proposal, '
+    'nor are you a mentor for the organization it was submitted to.')
+
+
+unset = object()
+
+
+def isSet(value):
+  """Returns true iff value is not unset.
+  """
+  return value is not unset
+
+
+class Mutator(object):
+  """Helper class for access checking.
+
+  Mutates the data object as requested.
+  """
+
+  def __init__(self, data):
+    self.data = data
+    self.unsetAll()
+
+  def unsetAll(self):
+    self.data.organization = unset
+    self.data.proposal = unset
+    self.data.proposer = unset
+    self.data.proposer_user = unset
+    self.data.can_respond = unset
+    self.data.invite = unset
+    self.data.invited_user = unset
+    self.data.request_entity = unset
+    self.data.requester = unset
+    self.data.public_only = unset
+    self.data.public_comments_visible = unset
+    self.data.private_comments_visible = unset
+
+  def organizationFromKwargs(self):
+    # kwargs which defines an organization
+    fields = ['sponsor', 'program', 'organization']
+
+    key_name = '/'.join(self.data.kwargs[field] for field in fields)
+    self.data.organization = GSoCOrganization.get_by_key_name(key_name)
+
+  def proposalFromKwargs(self):
+    id = int(self.data.kwargs['id'])
+    self.data.proposal = GSoCProposal.get_by_id(id, parent=self.data.profile)
+
+  def canRespondForUser(self):
+    assert isSet(self.data.invited_user)
+    assert isSet(self.data.invite)
+
+    if self.data.invited_user.key() != self.data.user.key():
+      # org admins may see the invitations and can respond to requests
+      self.data.can_respond = self.data.invite.type == 'Request'
+    else:
+      # user that the entity refers to may only respond if it is a Request
+      self.data.can_respond = self.data.invite.type == 'Invitation'
+
+  def commentVisible(self):
+    assert isSet(self.data.proposer_user)
+
+    self.data.public_comments_visible = False
+    self.data.private_comments_visible = False
+
+    # if the proposal is public, everyone may access it
+    if self.data.proposal.is_publicly_visible:
+      return
+
+    # if the user is not logged in, can't access
+    if not self.data.user:
+      return
+
+    # if the current user is the proposer, he or she may access it
+    if self.data.user.key() == self.data.proposer_user.key():
+      self.data.public_comments_visible = True
+      return
+
+    # all the mentors and org admins from the organization may access it
+    if self.data.proposal_org in self.data.mentor_for:
+      self.data.public_comments_visible = True
+      self.data.private_comments_visible = True
+      return
+
+
+class DeveloperMutator(Mutator):
+  def canRespondForUser(self):
+    self.data.can_respond = True
+
+  def commentVisible(self):
+    self.data.public_comments_visible = True
+    self.data.private_comments_visible = True
+
 
 class BaseAccessChecker(object):
   """Helper class for access checking.
@@ -137,7 +241,7 @@ class BaseAccessChecker(object):
   and developers.
   """
 
-  def __init__(self, data=None):
+  def __init__(self, data):
     """Initializes the access checker object.
     """
     self.data = data
@@ -288,54 +392,64 @@ class AccessChecker(BaseAccessChecker):
 
     raise AccessViolation(DEF_IS_STUDENT_MSG)
 
-  def notHaveRoleForOrganization(self, org, role):
-    """Checks if the user have not the specified role for the organization.
+  def notOrgAdmin(self):
+    """Checks if the user is not an admin.
     """
-    self.isLoggedIn()
+    self.isProfileActive()
+    assert isSet(self.data.organization)
 
-    if not self.data.profile:
+    if self.data.organization.key() not in self.data.profile.org_admin_for:
       return
 
-    if role == 'org_admin':
-      roles = self.data.profile.org_admin_for
-    else:
-      roles = self.data.profile.mentor_for
+    raise AccessViolation(DEF_ALREADY_ADMIN_MSG % self.data.organization.name)
 
-    key = org.key()
-    if key in roles:
-      error_msg = DEF_HAS_ALREADY_ROLE_FOR_ORG_MSG % {
-          'role': 'Mentor' if role == 'mentor' else 'Org Admin',
-          'org': org.name
-          }
-      raise AccessViolation(error_msg)
+  def notMentor(self):
+    """Checks if the user is not a mentor.
+    """
+    self.isProfileActive()
+    assert isSet(self.data.organization)
 
-  def hasRoleForOrganization(self, org, role):
-    """Checks if the user has the specified role for the organization.
+    if self.data.organization.key() not in self.data.profile.mentor_for:
+      return
+
+    raise AccessViolation(DEF_ALREADY_MENTOR_MSG % self.data.organization.name)
+
+  def isOrgAdmin(self):
+    """Checks if the user is an org admin.
+    """
+    assert isSet(self.data.organization)
+    self.isOrgAdminForOrganization(self.data.organization)
+
+  def isMentor(self):
+    """Checks if the user is a mentor.
+    """
+    assert isSet(self.data.organization)
+    self.isMentorForOrganization(self.data.organization)
+
+  def isOrgAdminForOrganization(self, org):
+    """Checks if the user is an admin for the specified organiztaion.
     """
     self.isProfileActive()
 
-    if role == 'org_admin':
-      roles = self.data.profile.org_admin_for
-    else:
-      roles = self.data.profile.mentor_for
-
-    key = org.key()
-    if key in roles:
+    if org.key() in self.data.profile.org_admin_for:
       return
 
-    raise AccessViolation(DEF_NEED_ROLE_MSG)
+    raise AccessViolation(DEF_NOT_ADMIN_MSG % org.name)
+
+  def isMentorForOrganization(self, org):
+    """Checks if the user is an admin for the specified organiztaion.
+    """
+    self.isProfileActive()
+
+    if org.key() in self.data.profile.mentor_for:
+      return
+
+    raise DEF_NOT_MENTOR_MSG % org.name
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.
-
-    Side effects (RequestData):
-      - if the organization exists and is active, it is saved as 'organization'
     """
-    # kwargs which defines an organization
-    fields = ['sponsor', 'program', 'organization']
-
-    key_name = '/'.join(self.data.kwargs[field] for field in fields) 
-    self.data.organization = GSoCOrganization.get_by_key_name(key_name)
+    assert isSet(self.data.organization)
 
     if not self.data.organization:
       error_msg = DEF_ORG_DOES_NOT_EXISTS_MSG_FMT % {
@@ -353,12 +467,8 @@ class AccessChecker(BaseAccessChecker):
 
   def isProposalInURLValid(self):
     """Checks if the proposal in URL exists.
-
-    Side effects (RequestData):
-      - if the proposal exists and is active, it is saved as 'proposal'
     """
-    id = int(self.data.kwargs['id'])
-    self.data.proposal = GSoCProposal.get_by_id(id, parent=self.data.profile)
+    assert isSet(self.data.proposal)
 
     if not self.data.proposal:
       error_msg = DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT % {
@@ -388,14 +498,14 @@ class AccessChecker(BaseAccessChecker):
   def canStudentUpdateProposal(self):
     """Checks if the student is eligible to submit a proposal.
     """
+    assert isSet(self.data.proposal)
+
     self.isActiveStudent()
     self.isProposalInURLValid()
 
     # check if the timeline allows updating proposals
     self.studentSignupActive()
 
-    # TODO: it should be changed - we should not assume that the proposal
-    # is already in RequestData
     if self.data.proposal.status == 'invalid':
       error_msg = DEF_ID_BASED_ENTITY_INVALID_MSG_FMT % {
           'model': 'GSoCProposal',
@@ -411,7 +521,7 @@ class AccessChecker(BaseAccessChecker):
           }
       raise AccessViolation(error_msg)
 
-  def isIdBasedEntityPresent(self, entity, id, model_name):
+  def _isIdBasedEntityPresent(self, entity, id, model_name):
     """Checks if the entity is not None.
     """
     if entity is not None:
@@ -426,14 +536,13 @@ class AccessChecker(BaseAccessChecker):
   def isRequestPresent(self, entity, id):
     """Checks if the specified Request entity is not None.
     """
-    self.isIdBasedEntityPresent(entity, id, 'Request')
+    self._isIdBasedEntityPresent(entity, id, 'Request')
 
   def canRespondToInvite(self):
     """Checks if the current user can accept/reject the invitation.
     """
-    assert self.data.invite
-    assert self.data.org
-    assert self.data.invited_user
+    assert isSet(self.data.invite)
+    assert isSet(self.data.invited_user)
 
     # check if the entity represents an invitation
     if self.data.invite.type != 'Invitation':
@@ -451,15 +560,16 @@ class AccessChecker(BaseAccessChecker):
       raise AccessViolation(error_msg)
 
     # check if the user does not have this role
-    self.notHaveRoleForOrganization(self.data.org, self.data.invite.role)
+    if self.data.invite.role == 'org_admin':
+      self.notOrgAdmin()
+    else:
+      self.notMentor()
 
   def canRespondToRequest(self):
     """Checks if the current user can accept/reject the request.
     """
-
-    assert self.data.request_entity
-    assert self.data.org
-    assert self.data.requester
+    assert isSet(self.data.request_entity)
+    assert isSet(self.data.requester)
 
     # check if the entity represents an invitation
     if self.data.request_entity.type != 'Request':
@@ -470,30 +580,29 @@ class AccessChecker(BaseAccessChecker):
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the user is an admin for the organization
-    self.hasRoleForOrganization(self.data.org, 'org_admin')
+    self.isOrgAdmin()
 
   def canViewInvite(self):
     """Checks if the current user can see the invitation.
     """
-    assert self.data.invite
-    assert self.data.org
-    assert self.data.invited_user
+    assert isSet(self.data.organization)
+    assert isSet(self.data.invite)
+    assert isSet(self.data.invited_user)
 
-    self.canAccessRequestEntity(
-        self.data.invite, self.data.invited_user, self.data.org)
+    self._canAccessRequestEntity(
+        self.data.invite, self.data.invited_user, self.data.organization)
 
   def canViewRequest(self):
     """Checks if the current user can see the request.
     """
+    assert isSet(self.data.organization)
+    assert isSet(self.data.request_entity)
+    assert isSet(self.data.requester)
 
-    assert self.data.request_entity
-    assert self.data.org
-    assert self.data.requester
+    self._canAccessRequestEntity(
+        self.data.request_entity, self.data.requester, self.data.organization)
 
-    self.canAccessRequestEntity(
-        self.data.request_entity, self.data.requester, self.data.org)
-
-  def canAccessRequestEntity(self, entity, user, org):
+  def _canAccessRequestEntity(self, entity, user, org):
     """Checks if the current user is allowed to access a Request entity.
     
     Args:
@@ -501,52 +610,32 @@ class AccessChecker(BaseAccessChecker):
       user: user entity that the Request refers to
       org: organization entity that the Request refers to
     """
-
     # check if the entity is addressed to the current user
     if user.key() != self.data.user.key():
       # check if the current user is an org admin for the organization
-      self.hasRoleForOrganization(self.data.org, 'org_admin')
-      reason = 'org_admin'
-    else:
-      reason = 'user'
-
-    # depending on the reason and invitation type, the user has different
-    # actions available
-    if reason == 'org_admin':
-      # org admins may see the invitations and can respond to requests
-      self.data.canRespond = entity.type == 'Request'
-    else:
-      # user that the entity refers to may only respond if it is a Request
-      self.data.canRespond = entity.type == 'Invitation'
+      self.isOrgAdmin()
 
   def canAccessProposalEntity(self):
     """Checks if the current user is allowed to access a Proposal entity.
     """
 
-    assert self.data.proposal
-    assert self.data.proposal_org
-    assert self.data.proposer_user
-
-    self.data.publicCommentsVisible = False
-    self.data.privateCommentsVisible = False
+    assert isSet(self.data.proposal)
+    assert isSet(self.data.proposal_org)
+    assert isSet(self.data.proposer_user)
 
     # if the proposal is public, everyone may access it
     if self.data.proposal.is_publicly_visible:
       return
 
+    if not self.data.user:
+      raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)
+
     # if the current user is the proposer, he or she may access it
-    self.isUser()
     if self.data.user.key() == self.data.proposer_user.key():
-      self.data.publicCommentsVisible = True
       return
 
     # all the mentors and org admins from the organization may access it
-    try:
-      self.hasRoleForOrganization(self.data.proposal_org, 'mentor')
-      self.data.publicCommentsVisible = True
-      self.data.privateCommentsVisible = True
-    except AccessViolation:
-      error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
-          'model': 'Proposal'
-          }
-      raise AccessViolation(error_msg)
+    if self.data.proposal_org.key() in self.data.mentor_for:
+      return
+
+    raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)

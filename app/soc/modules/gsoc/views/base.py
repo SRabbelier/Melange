@@ -63,6 +63,8 @@ class RequestHandler(RequestHandler):
     self.data = RequestData()
     self.data.populate(request, args, kwargs)
     if self.data.is_developer:
+      self.mutator = access_checker.Mutator(self.data)
       self.check = access_checker.DeveloperAccessChecker(self.data)
     else:
+      self.mutator = access_checker.DeveloperMutator(self.data)
       self.check = access_checker.AccessChecker(self.data)

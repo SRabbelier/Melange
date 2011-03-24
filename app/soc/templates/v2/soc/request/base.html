@@ -37,7 +37,7 @@ limitations under the License.
   <div class="request-response">
     <form action="{{ response_action }}" method="post" id="form" class="form-project-comment">
       <div id="request-respond-button-row" class="row button-row">
-        {% if canRespond %} 
+        {% if can_respond %}
         <input id="request-respond-accept-submit" name="action" type="submit" value="{{ actions.accept }}" class="submit"/>
         <input id="request-respond-reject-submit" name="action" type="submit" value="{{ actions.reject }}" class="submit"/>
         {% else %}

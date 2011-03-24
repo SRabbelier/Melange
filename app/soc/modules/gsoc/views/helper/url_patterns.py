@@ -79,7 +79,6 @@ _document = ''.join([
 ])
 
 ID        = namedIdBasedPattern(['sponsor', 'program'])
-KEY       = namedKeyBasedPattern(['sponsor', 'program'])
 SPONSOR   = namedLinkIdPattern(['sponsor'])
 PROGRAM   = namedLinkIdPattern(['sponsor', 'program'])
 PROFILE   = _role + namedLinkIdPattern(['sponsor', 'program'])

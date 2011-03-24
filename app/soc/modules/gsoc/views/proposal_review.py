@@ -29,8 +29,9 @@ from django.conf.urls.defaults import url
 
 from soc.logic import dicts
 from soc.logic.exceptions import NotFound
+from soc.logic.exceptions import BadRequest
 from soc.views import forms
-from soc.views.helper.request_data import isDefined
+from soc.views.helper.access_checker import isSet
 
 from soc.models.comment import NewComment
 from soc.models.user import User
@@ -54,12 +55,16 @@ class CommentForm(forms.ModelForm):
     model = NewComment
     #css_prefix = 'gsoc_comment'
     fields = ['content']
-    
-  def __init__(self, include_is_private, *args, **kwargs):
-    if include_is_private:
-      self.Meta.fields.append('is_private')
 
-    super(CommentForm, self).__init__(*args, **kwargs)
+    
+class PrivateCommentForm(CommentForm):
+  """Django form for the comment.
+  """
+
+  class Meta:
+    model = NewComment
+    fields = CommentForm.Meta.fields + ['is_private']
+
 
 class ReviewProposal(RequestHandler):
   """View for the Propsal Review page.
@@ -73,24 +78,27 @@ class ReviewProposal(RequestHandler):
 
   def checkAccess(self):
     self.data.proposer_user = User.get_by_key_name(self.data.kwargs['student'])
-    if not self.data.proposer_user:
-      raise NotFound('Requested proposal does not exist')
 
-    key_name = '%s/%s/%s' % (
-        self.data.kwargs['sponsor'],
-        self.data.kwargs['program'],
-        self.data.kwargs['student']
-        )
+    fields = ['sponsor', 'program', 'student']
+    key_name = '/'.join(self.data.kwargs[i] for i in fields)
+
     self.data.proposer_profile = GSoCProfile.get_by_key_name(
-        key_name,
-        parent=self.data.proposer_user)
+        key_name, parent=self.data.proposer_user)
+
+    if not self.data.proposal:
+      raise NotFound('Requested user does not exist')
+
     self.data.proposal = GSoCProposal.get_by_id(
         int(self.data.kwargs['id']),
         parent=self.data.proposer_profile)
 
+    if not self.data.proposal:
+      raise NotFound('Requested proposal does not exist')
+
     self.data.proposal_org = self.data.proposal.org
 
     self.check.canAccessProposalEntity()
+    self.mutator.commentVisible()
 
 
   def templatePath(self):
@@ -99,8 +107,10 @@ class ReviewProposal(RequestHandler):
   def getScores(self):
     """Gets all the scores for the proposal.
     """
+    assert isSet(self.data.private_comments_visible)
+    assert isSet(self.data.proposal)
 
-    if not self.data.privateCommentsVisible:
+    if not self.data.private_comments_visible:
       return None
 
     total = 0
@@ -126,8 +136,10 @@ class ReviewProposal(RequestHandler):
   def getComments(self):
     """Gets all the comments for the proposal.
     """
+    assert isSet(self.data.private_comments_visible)
+    assert isSet(self.data.proposal)
 
-    if not self.data.publicCommentsVisible:
+    if not self.data.private_comments_visible:
       return None, None
 
     public_comments = []
@@ -143,43 +155,60 @@ class ReviewProposal(RequestHandler):
     return public_comments, private_comments
 
   def context(self):
-
-    assert isDefined(self.data.publicCommentsVisible)
-    assert isDefined(self.data.privateCommentsVisible)
+    assert isSet(self.data.public_comments_visible)
+    assert isSet(self.data.private_comments_visible)
+    assert isSet(self.data.proposer_profile)
+    assert isSet(self.data.proposal)
 
     scores = self.getScores()
 
     # TODO: check if the scoring is not disabled
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    kwargs['key'] = self.data.proposal.key().__str__()
-    score_action = reverse('score_gsoc_proposal', kwargs=kwargs)
+    score_action = reverse('score_gsoc_proposal', kwargs=self.data.kwargs)
 
     # get all the comments for the the proposal
     public_comments, private_comments = self.getComments()
 
     # TODO: check if it is possible to post a comment
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    kwargs['key'] = self.data.proposal.key().__str__()
-    comment_action = reverse('comment_gsoc_proposal', kwargs=kwargs)
+    comment_action = reverse('comment_gsoc_proposal', kwargs=self.data.kwargs)
+
+    if self.data.private_comments_visible:
+      form = PrivateCommentForm()
+    else:
+      form = CommentForm()
 
     comment_box = {
         'action': comment_action,
-        'form': CommentForm(self.data.privateCommentsVisible).render()
-        }
+        'form': form,
+    }
 
     return {
         'comment_box': comment_box,
         'proposal': self.data.proposal,
         'mentor': self.data.proposal.mentor,
         'public_comments': public_comments,
-        'public_comments_visible': self.data.publicCommentsVisible,
+        'public_comments_visible': self.data.public_comments_visible,
         'private_comments': private_comments,
-        'private_comments_visible': self.data.privateCommentsVisible,
+        'private_comments_visible': self.data.private_comments_visible,
         'scores': scores,
         'score_action': score_action,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
         }
+
+
+def getProposalFromKwargs(kwargs):
+  fields = ['sponsor', 'program', 'student']
+  key_name = '/'.join(kwargs[i] for i in fields)
+
+  parent = db.Key.from_path('User', kwargs['student'],
+                            'GSoCProfile', key_name)
+
+  if not kwargs['id'].isdigit():
+    raise BadRequest("Proposal id is not numeric")
+
+  id = int(kwargs['id'])
+
+  return GSoCProposal.get_by_id(id, parent=parent)
 
 
 class PostComment(RequestHandler):
@@ -188,7 +217,7 @@ class PostComment(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-         url(r'^gsoc/proposal/comment/%s$' % url_patterns.KEY,
+         url(r'^gsoc/proposal/comment/%s$' % url_patterns.REVIEW,
          self, name='comment_gsoc_proposal'),
     ]
 
@@ -196,7 +225,8 @@ class PostComment(RequestHandler):
     self.check.isProgramActive()
     self.check.isProfileActive()
 
-    self.data.proposal = GSoCProposal.get(db.Key(self.data.kwargs['key']))
+    self.data.proposal = getProposalFromKwargs(self.data.kwargs)
+
     if not self.data.proposal:
       raise NotFound('Proposal does not exist')
 
@@ -208,8 +238,7 @@ class PostComment(RequestHandler):
       return
 
     self.data.public_only = False
-    self.check.hasRoleForOrganization(self.data.proposal.org, 'mentor')
-    
+    self.check.isMentorForOrganization(self.data.proposal.org)
 
   def createCommentFromForm(self):
     """Creates a new comment based on the data inserted in the form.
@@ -218,9 +247,10 @@ class PostComment(RequestHandler):
       a newly created comment entity or None
     """
 
-    assert isDefined(self.data.public_only)
+    assert isSet(self.data.public_only)
+    assert isSet(self.data.proposal)
 
-    comment_form = CommentForm(True, self.data.request.POST)
+    comment_form = CommentForm(self.data.request.POST)
     
     if not comment_form.is_valid():
       return None
@@ -234,7 +264,8 @@ class PostComment(RequestHandler):
     return comment_form.create(commit=True, parent=self.data.proposal)
     
   def post(self):
-    assert isDefined(self.data.proposer)
+    assert isSet(self.data.proposer)
+    assert isSet(self.data.proposal)
     
     comment = self.createCommentFromForm() 
     if comment:
@@ -253,12 +284,15 @@ class PostScore(RequestHandler):
 
   def djangoURLPatterns(self):
     return [
-         url(r'^gsoc/proposal/score/%s$' % url_patterns.KEY,
+         url(r'^gsoc/proposal/score/%s$' % url_patterns.REVIEW,
          self, name='score_gsoc_proposal'),
     ]
 
   def checkAccess(self):
-    self.data.proposal = GSoCProposal.get(db.Key(self.data.kwargs['key']))
+    self.data.proposal = getProposalFromKwargs(self.data.kwargs)
+
+    if not self.data.proposal:
+      raise NotFound('Requested proposal does not exist')
 
   def createOrUpdateScore(self, value):
     """Creates a new score or updates a score if there is already one
@@ -267,6 +301,7 @@ class PostScore(RequestHandler):
     Returns:
       a score entity or None
     """
+    assert isSet(self.data.proposal)
 
     query = db.Query(GSoCScore)
     query.filter('author = ', self.data.profile)
@@ -283,6 +318,6 @@ class PostScore(RequestHandler):
  
     score.put()
 
-  def get(self):
-    value = int(self.data.GET['value'])
+  def post(self):
+    value = int(self.data.POST['value'])
     score = self.createOrUpdateScore(value)

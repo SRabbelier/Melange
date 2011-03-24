@@ -31,6 +31,7 @@ from soc.logic import dicts
 from soc.logic.exceptions import AccessViolation
 from soc.logic.helper import timeline as timeline_helper
 from soc.views.template import Template
+from soc.views.helper.access_checker import isSet
 
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -161,11 +162,12 @@ class OrgHome(RequestHandler):
   def checkAccess(self):
     """Access checks for GSoC Organization Application.
     """
-    pass
+    self.mutator.organizationFromKwargs()
 
   def jsonContext(self):
     """Handler for JSON requests.
     """
+    assert isSet(self.data.organization)
     list_content = ProjectList(self.request, self.data).getListData()
 
     if not list_content:
@@ -179,6 +181,7 @@ class OrgHome(RequestHandler):
     current_timeline = timeline_logic.getCurrentTimeline(
         self.data.program_timeline, self.data.org_app)
 
+    assert isSet(self.data.organization)
     organization = self.data.organization
 
     context = {

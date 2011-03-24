@@ -34,10 +34,10 @@ from django.utils.translation import ugettext
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.exceptions import NotFound
-from soc.views import forms
-
 from soc.models.request import Request
 from soc.models.user import User
+from soc.views import forms
+from soc.views.helper.access_checker import isSet
 
 from soc.modules.gsoc.views.base import RequestHandler
 
@@ -72,7 +72,7 @@ class InviteForm(forms.ModelForm):
     """Accepts link_id of users which may be invited.
     """
 
-    assert self.request_data.org
+    assert isSet(self.request_data.organization)
 
     link_id = cleaning.clean_link_id('link_id')(self)
 
@@ -84,7 +84,7 @@ class InviteForm(forms.ModelForm):
     query = db.Query(Request)
     query.filter('type = ', 'Invitation')
     query.filter('user = ', invited_user)
-    query.filter('group = ', self.request_data.org)
+    query.filter('group = ', self.request_data.organization)
     if query.get():
       raise djangoforms.ValidationError(
           'An invitation to this user has already been sent.')
@@ -100,7 +100,7 @@ class InviteForm(forms.ModelForm):
       role_for = profile.mentor_for
 
     for key in role_for:
-      if key == self.request_data.org.key():
+      if key == self.request_data.organization.key():
         raise djangoforms.ValidationError(
             'The user already has this role.')
 
@@ -130,15 +130,15 @@ class InvitePage(RequestHandler):
         'scope': self.data.program,
         'status': 'active'
         }
-    self.data.org = org_logic.getForFields(filter, unique=True)
-    if not self.data.org:
+    self.data.organization = org_logic.getForFields(filter, unique=True)
+    if not self.data.organization:
       msg = ugettext(
           'The organization with link_id %s does not exist for %s.' % 
           (link_id, self.data.program.name))
 
       raise NotFound(msg)
 
-    self.check.hasRoleForOrganization(self.data.org, 'org_admin')
+    self.check.isOrgAdmin()
 
   def context(self):
     """Handler to for GSoC Invitation Page HTTP get request.
@@ -162,7 +162,7 @@ class InvitePage(RequestHandler):
       a newly created Request entity or None
     """
 
-    assert self.data.org
+    assert isSet(self.data.organization)
 
     invite_form = InviteForm(self.data, self.data.POST)
     
@@ -173,7 +173,7 @@ class InvitePage(RequestHandler):
 
     # create a new invitation entity
     invite_form.cleaned_data['user'] = self.data.invited_user
-    invite_form.cleaned_data['group'] = self.data.org
+    invite_form.cleaned_data['group'] = self.data.organization
     invite_form.cleaned_data['role'] = self.data.kwargs['role']
     invite_form.cleaned_data['type'] = 'Invitation'
 
@@ -218,7 +218,7 @@ class ShowInvite(RequestHandler):
     self.data.invite = Request.get_by_id(id)
     self.check.isRequestPresent(self.data.invite, id)
 
-    self.data.org = self.data.invite.group
+    self.data.organization = self.data.invite.group
     self.data.invited_user = self.data.invite.user
 
     if self.data.POST:
@@ -231,21 +231,23 @@ class ShowInvite(RequestHandler):
     else:
       self.check.canViewInvite()
 
+    self.mutator.canRespondForUser()
+
   def context(self):
     """Handler to for GSoC Show Invitation Page HTTP get request.
     """
 
-    assert self.data.invite
-    assert self.data.canRespond is not None
-    assert self.data.org
-    assert self.data.invited_user
+    assert isSet(self.data.invite)
+    assert isSet(self.data.can_respond)
+    assert isSet(self.data.organization)
+    assert isSet(self.data.invited_user)
 
     return {
         'request': self.data.invite,
-        'org': self.data.org,
+        'org': self.data.organization,
         'actions': self.ACTIONS,
         'user': self.data.invited_user,
-        'canRespond': self.data.canRespond,
+        'can_respond': self.data.can_respond,
         } 
 
   def post(self):
@@ -269,7 +271,7 @@ class ShowInvite(RequestHandler):
     """Accepts an invitation.
     """
 
-    assert self.data.org
+    assert isSet(self.data.organization)
 
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
@@ -278,9 +280,9 @@ class ShowInvite(RequestHandler):
     self.data.invite.status = 'accepted'
 
     if self.data.invite.role == 'mentor':
-      self.data.profile.mentor_for.append(self.data.org.key())
+      self.data.profile.mentor_for.append(self.data.organization.key())
     else:
-      self.data.profile.org_admin_for.append(self.data.org.key())
+      self.data.profile.org_admin_for.append(self.data.organization.key())
 
     self.data.invite.put()
     self.data.profile.put()

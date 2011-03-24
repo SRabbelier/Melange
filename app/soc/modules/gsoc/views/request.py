@@ -30,11 +30,11 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
-from soc.views import forms
 from soc.logic.exceptions import AccessViolation
 from soc.logic.exceptions import NotFound
-
 from soc.models.request import Request
+from soc.views import forms
+from soc.views.helper.access_checker import isSet
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.views.base import RequestHandler
@@ -74,29 +74,20 @@ class RequestPage(RequestHandler):
     self.check.isProgramActive()
     
     # check if the current user has a profile, but is not a student
-    self.check.isNotStudent()
+    self.check.notStudent()
 
     # check if the organization exists
-    link_id = self.data.kwargs['organization']
-    key_name = '%s/%s/%s' % (
-        self.data.program.scope_path, self.data.program.link_id, link_id)
-    self.data.org = GSoCOrganization.get_by_key_name(key_name)
-
-    if not self.data.org or self.data.org.status != 'active':
-      msg = ugettext(
-          'The organization with link_id %s does not exist for %s.' % 
-          (link_id, self.data.program.name))
-
-      raise NotFound(msg)
+    self.mutator.organizationFromKwargs()
+    self.check.isOrganizationInURLActive()
 
     # check if the user is not already mentor role for the organization
-    self.check.notHaveRoleForOrganization(self.data.org, 'mentor')
+    self.check.notMentor()
 
     # check if there is already a request
     query = db.Query(Request)
     query.filter('type = ', 'Request')
     query.filter('user = ', self.data.user)
-    query.filter('group = ', self.data.org)
+    query.filter('group = ', self.data.organization)
     if query.get():
       raise AccessViolation(
           'You have already sent a request to this organization.')
@@ -132,7 +123,7 @@ class RequestPage(RequestHandler):
       a newly created Request entity or None
     """
 
-    assert self.data.org
+    assert isSet(self.data.organization)
 
     request_form = RequestForm(self.data.POST)
 
@@ -141,7 +132,7 @@ class RequestPage(RequestHandler):
 
     # create a new invitation entity
     request_form.cleaned_data['user'] = self.data.user
-    request_form.cleaned_data['group'] = self.data.org
+    request_form.cleaned_data['group'] = self.data.organization
     request_form.cleaned_data['role'] = 'mentor'
     request_form.cleaned_data['type'] = 'Request'
 
@@ -169,14 +160,14 @@ class ShowRequest(RequestHandler):
     ]
 
   def checkAccess(self):
-    self.check.isRoleActive()
+    self.check.isProfileActive()
     
     id = int(self.data.kwargs['id'])
-    self.data.request_entity = Request.get_by_id(id)
+    self.data.invite = self.data.request_entity = Request.get_by_id(id)
     self.check.isRequestPresent(self.data.request_entity, id)
 
-    self.data.org = self.data.request_entity.group
-    self.data.requester = self.data.request_entity.user
+    self.data.organization = self.data.request_entity.group
+    self.data.invited_user = self.data.requester = self.data.request_entity.user
 
     if self.data.POST:
       self.data.action = self.data.POST['action']
@@ -189,29 +180,31 @@ class ShowRequest(RequestHandler):
     else:
       self.check.canViewRequest()
 
+    self.mutator.canRespondForUser()
+
   def context(self):
     """Handler to for GSoC Show Invitation Page HTTP get request.
     """
 
-    assert self.data.request_entity
-    assert self.data.canRespond is not None
-    assert self.data.org
-    assert self.data.requester
+    assert isSet(self.data.request_entity)
+    assert isSet(self.data.can_respond)
+    assert isSet(self.data.organization)
+    assert isSet(self.data.requester)
 
     return {
         'request': self.data.request_entity,
-        'org': self.data.org,
+        'org': self.data.organization,
         'actions': self.ACTIONS,
         'user': self.data.requester,
-        'canRespond': self.data.canRespond,
+        'can_respond': self.data.can_respond,
         } 
 
   def post(self):
     """Handler to for GSoC Show Request Page HTTP post request.
     """
 
-    assert self.data.action
-    assert self.data.request_entity
+    assert isSet(self.data.action)
+    assert isSet(self.data.request_entity)
 
     if self.data.action == self.ACTIONS['accept']:
       self._acceptRequest()
@@ -227,14 +220,14 @@ class ShowRequest(RequestHandler):
     """Accepts a request.
     """
 
-    assert self.data.org
+    assert isSet(self.data.organization)
 
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
 
     self.data.request_entity.status = 'accepted'
-    self.data.profile.mentor_for.append(self.data.org.key())
+    self.data.profile.mentor_for.append(self.data.organization.key())
 
     self.data.request_entity.put()
     self.data.profile.put()

@@ -80,7 +80,7 @@ class GSoCProgram(soc.models.program.Program):
   duplicates_visible.help_text = ugettext(
       'Field used to indicate if the duplicate proposal should be visible.')
 
-  #: The document entity which contains "About" page for the program
+  #: The document entity which contains the "About" page for the program
   about_page = db.ReferenceProperty(
       reference_class=soc.models.document.Document,
       verbose_name=ugettext('About page document'))
@@ -94,23 +94,32 @@ class GSoCProgram(soc.models.program.Program):
       verbose_name=ugettext('Events page document'))
   events_page.collection_name = 'events_page'
   events_page.help_text = ugettext(
-      'The document with <b>Events & Timeline</b>')
+      'The document for the <b>Events & Timeline</b> page')
 
-  #: The document entity which contains "Connect With Us" page
+  #: The document entity which contains the "Connect With Us" page
   #: for the program
   connect_with_us_page = db.ReferenceProperty(
       reference_class=soc.models.document.Document,
       verbose_name=ugettext('Connect with us document'))
   connect_with_us_page.collection_name = 'connect_with_us_page'
   connect_with_us_page.help_text = ugettext(
-      'The document with <b>Connect With Us</b>')
+      'The document for the <b>Connect With Us</b> page')
+
+  #: The document entity which contains the "Help" page
+  #: for the program
+  help_page = db.ReferenceProperty(
+      reference_class=soc.models.document.Document,
+      verbose_name=ugettext('Help document'))
+  help_page.collection_name = 'help_page'
+  help_page.help_text = ugettext(
+      'The document for the <b>Help</b> page')
 
   privacy_policy = db.ReferenceProperty(
       reference_class=soc.models.document.Document,
       verbose_name=ugettext("Privacy Policy Document"))
   privacy_policy.collection_name = 'privacy_policy_page'
   privacy_policy.help_text = ugettext(
-      "The document containing <b>Privacy Policy</b>")
+      "The document for the <b>Privacy Policy</b> page")
 
   facebook = db.LinkProperty(
       required=False, verbose_name=ugettext("Facebook URL"))

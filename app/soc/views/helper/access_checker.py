@@ -321,11 +321,13 @@ class AccessChecker(BaseAccessChecker):
 
   def isProgramActive(self):
     """Checks that the program is active.
+
+    Active means 'visible' or 'inactive'.
     """
     if not self.data.program:
       raise AccessViolation(DEF_NO_SUCH_PROGRAM_MSG)
 
-    if self.data.program.status == 'visible':
+    if self.data.program.status in ['visible', 'inactive']:
       return
 
     raise AccessViolation(

@@ -34,13 +34,12 @@ def siteMenuContext(data):
   """Generates URL links for the hard-coded GSoC site menu items.
   """
 
-
   context = {
-      'about_link': redirects.getAboutPageRedirect(data),
-      'projects_link': redirects.getAllProjectsRedirect(data),
-      'events_link': redirects.getEventsRedirect(data),
-      'connect_link': redirects.getConnectRedirect(data),
-      'help_link': redirects.getHelpRedirect(data),
+      'about_link': redirects.showDocument(data.program.about_page),
+      'projects_link': redirects.allProjects(data),
+      'events_link': redirects.showDocument(data.program.events_page),
+      'connect_link': redirects.showDocument(data.program.connect_with_us_page),
+      'help_link': redirects.showDocument(data.program.help_page),
   }
 
   if users.get_current_user():
@@ -49,7 +48,7 @@ def siteMenuContext(data):
     context['login_link'] = users.create_login_url(data.full_path)
 
   if data.profile:
-    context['dashboard_link'] = redirects.getDashboardRedirect(data)
+    context['dashboard_link'] = redirects.dashboard(data)
 
   return context
 
@@ -66,7 +65,7 @@ class Header(Template):
 
   def context(self):
     return {
-        'home_link': redirects.getHomepageRedirect(self.data)
+        'home_link': redirects.homepage(self.data)
     }
 
 
@@ -95,15 +94,14 @@ class Footer(Template):
     context = siteMenuContext(self.data)
 
     program = self.data.program
-    if program:
-      context.update({
-          'privacy_policy_url': redirects.getPrivacyPolicyRedirect(self.data),
-          'facebook_url': program.facebook,
-          'twitter_url': program.twitter,
-          'blogger_url': program.blogger,
-          'email_id': program.email,
-          'irc_url': program.irc,
-          })
+    context.update({
+        'privacy_policy_url': redirects.showDocument(program.privacy_policy),
+        'facebook_url': program.facebook,
+        'twitter_url': program.twitter,
+        'blogger_url': program.blogger,
+        'email_id': program.email,
+        'irc_url': program.irc,
+        })
 
     return context
 

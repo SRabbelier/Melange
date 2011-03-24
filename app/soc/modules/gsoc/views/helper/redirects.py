@@ -19,81 +19,61 @@
 
 __authors__ = [
   '"Daniel Hans" <daniel.m.hans@gmail.com>',
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   ]
 
 
+from django.core.urlresolvers import reverse
+
+from soc.logic import dicts
+
+
 # Redirects for the hard-coded sidebar menu items
-def getAboutPageRedirect(data):
-  """Returns the redirect for the About page for the current GSoC program.
+def showDocument(doc):
+  """Returns the show redirect for the specified document.
+
+  Returns None if doc is not set.
   """
+  if not doc:
+    return None
 
-  if data.program.about_page:
-    return '/gsoc/document/%s' % data.program.about_page.key().name()
+  args = [doc.prefix, doc.scope_path + '/', doc.link_id]
+  try:
+    reversed = reverse('show_gsoc_document', args=args)
+    return reversed
+  except Exception ,e:
+    print e
+    return None
 
 
-def getAllProjectsRedirect(data):
+def allProjects(data):
   """Returns the redirect for list all GSoC projects.
   """
 
-  return '/gsoc/list_projects/%s' % data.program.key().name()
+  kwargs = dicts.filter(data.kwargs, ['sponsor', 'program'])
+  return reverse('gsoc_accepted_projects', kwargs=kwargs)
 
 
-def getConnectRedirect(data):
-  """Returns the redirect for the Connect page for the current GSoC program.
-  """
-
-  if data.program.connect_with_us_page:
-    return '/gsoc/document/%s' % data.program.connect_with_us_page.key().name()
-
-
-def getEventsRedirect(data):
-  """Returns the redirect for the Events & Timeline page for the current
-  GSoC program.
-  """
-
-  if data.program.events_page:
-    return '/gsoc/document/%s' % data.program.events_page.key().name()
-
-
-def getHelpRedirect(data):
-  """Returns the redirect for the Help page for the current GSoC program.
-  """
-
-  if data.program.events_page:
-    return '/gsoc/document/%s' % data.program.events_page.key().name()
-
-def getPrivacyPolicyRedirect(data):
-  """Returns the redirect for the Privacy Policy page for the current
-  GSoC program.
-  """
-
-  # TODO: This method should not even be here in the first place. But
-  # due to the current architecture of document system we will not be
-  # able to separate the prefix, sponsor, program and document link_id
-  # from the document reference since they are not stored separately in
-  # the document model. Once these fields are added, we can get rid of
-  # this redirect method and use Django's reverse function.
-
-  if data.program.events_page:
-    return '/gsoc/document/%s' % data.program.privacy_policy.key().name()
-
-def getHomepageRedirect(data):
+def homepage(data):
   """Returns the redirect for the homepage for the current GSOC program.
   """
-  return '/gsoc/homepage/%s' % data.program.key().name()
+  kwargs = dicts.filter(data.kwargs, ['sponsor', 'program'])
+  return reverse('gsoc_homepage', kwargs=kwargs)
 
 
-def getDashboardRedirect(data):
+def dashboard(data):
   """Returns the redirect for the dashboard page for the current GSOC program.
   """
+  kwargs = dicts.filter(data.kwargs, ['sponsor', 'program'])
+  return reverse('gsoc_dashboard', kwargs=kwargs)
 
-  return '/gsoc/dashboard/%s' % data.program.key().name()
 
-
-def getProjectDetailsRedirect(student_project):
+def projectDetails(student_project):
   """Returns the URL to the Student Project.
 
   Args:
     student_project: entity which represents the Student Project
   """
+  # TODO: Use django reverse function from urlresolver once student_project
+  # view is converted to the new infrastructure
   return '/gsoc/student_project/show/%s' % student_project.key().id_or_name()

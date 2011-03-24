@@ -116,9 +116,7 @@ class FeaturedProject(Template):
     self.featured_project = featured_project
 
   def context(self):
-    # TODO: Use django reverse function from urlresolver once student_project
-    # view is converted to the new infrastructure
-    featured_project_url = redirects.getProjectDetailsRedirect(self.featured_project)
+    featured_project_url = redirects.projectDetails(self.featured_project)
 
     return {
       'featured_project': self.featured_project,

@@ -56,6 +56,8 @@ class Apply(Template):
         'current_timeline': self.current_timeline,
         'organization': organization,
     }
+    context['apply_block'] = True
+
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       kwargs['role'] = 'student'
@@ -73,6 +75,8 @@ class Apply(Template):
       elif organization not in self.data.mentor_for:
         context['mentor_request_link'] = reverse('gsoc_request',
                                                  kwargs=kwargs_org)
+      else:
+        context['apply_block'] = False
 
     return context
 

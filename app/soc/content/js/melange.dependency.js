@@ -110,10 +110,6 @@
     tpjs + "jquery/jquery-ajaxQueue.js"
   ];
 
-  s.thickbox = [
-    tpjs + "jquery/jquery-thickbox.js"
-  ];
-
   s.progressbar = [
     tpjs + "jquery/jquery-progressbar.js"
   ];

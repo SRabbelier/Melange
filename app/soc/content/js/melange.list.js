@@ -889,10 +889,6 @@
                   });
                   csv_export = csv_export.join("\r\n");
 
-                  //CSV string is there, now put it in a thickbox for the user to copy/paste
-                  jQuery("#csv_thickbox").remove();
-                  jQuery("body").append("<div id='csv_thickbox' style='display:none'><h3>Now you can copy and paste CSV data from the text area to a new file:</h3><textarea style='width:450px;height:250px'>"+csv_export+"</textarea></div>");
-                  tb_show("CSV export","#TB_inline?height=400&width=500&inlineId=csv_thickbox");
                 }
               });
 

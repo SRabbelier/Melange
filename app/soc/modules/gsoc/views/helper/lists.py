@@ -78,6 +78,19 @@ class ListConfiguration(object):
     self._row_operation = {}
     self._row_operation_func = None
 
+    self._addKeyColumn()
+
+  def _addKeyColumn(self):
+    """Adds a column for the key.
+
+    Args:
+      resizable: Whether the width of the column should be resizable by the
+                 end user.
+      hidden: Whether the column should be displayed by default.
+    """
+    func = lambda e, *args: e.key().name()
+    self.addColumn('key', 'Key', func, hidden=True)
+
   def addColumn(self, id, name, func, resizable=True, hidden=False):
     """Adds a column to the end of the list.
 

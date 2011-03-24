@@ -149,6 +149,12 @@
     tpjs + "jquery/jquery-ui.widget.js"
   ];
 
+  s.jqueryui.button = [
+    s.jqueryui.widget,
+    null,
+    tpjs + "jquery/jquery-ui.button.js"
+  ];
+
   s.jqueryui.autocomplete = [
     s.jqueryui.position,
     s.jqueryui.widget,

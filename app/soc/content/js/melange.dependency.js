@@ -162,6 +162,13 @@
     tpjs + "jquery/jquery-ui.autocomplete.js"
   ];
 
+  s.jqueryui.dialog = [
+    s.jqueryui.position,
+    s.jqueryui.widget,
+    null,
+    tpjs + "jquery/jquery-ui.dialog.js"
+  ];
+
   s.jqgrid = [
     s.jqueryui.core,
     null,

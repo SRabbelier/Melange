@@ -40,7 +40,7 @@ class ProgramForm(ModelForm):
   class Meta:
     css_prefix = 'program_form'
     model = GSoCProgram
-    exclude = ['link_id', 'scope', 'scope_path', 'timeline', 'slot_allocation']
+    exclude = ['link_id', 'scope', 'scope_path', 'timeline', 'slots_allocation']
 
 
 class ProgramPage(RequestHandler):

@@ -228,6 +228,6 @@ class RequestData(RequestData):
       orgs = set(self.profile.mentor_for + self.profile.org_admin_for)
       org_map = dict((i.key(), i) for i in db.get(orgs))
 
-      self.mentor_for = [org_map[i] for i in self.profile.mentor_for]
+      self.mentor_for = org_map.values()
       self.org_admin_for = [org_map[i] for i in self.profile.org_admin_for]
       self.student_info = self.profile.student_info

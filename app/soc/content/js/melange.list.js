@@ -889,6 +889,26 @@
                   });
                   csv_export = csv_export.join("\r\n");
 
+                  //CSV string is there, now put it in a modal dialog for the user to copy/paste
+                  jQuery("#csv_dialog").remove();
+                  jQuery("body").append(
+                    [
+                      "<div id='csv_dialog' style='display:none'>",
+                      "  <h3>Now you can copy and paste CSV data from the text area to a new file:</h3>",
+                      "  <textarea style='width:450px;height:250px'>",csv_export,"</textarea>",
+                      "</div>"
+                    ].join("")
+                  );
+                  jQuery("#csv_dialog").dialog({
+                    height: 420,
+                    width: 500,
+                    modal: true,
+                    buttons: {
+                      "Close": function () {
+                        jQuery(this).dialog("close");
+                      }
+                    }
+                  });
                 }
               });
 

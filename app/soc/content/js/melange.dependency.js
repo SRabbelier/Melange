@@ -242,6 +242,8 @@
     s.jqgrid,
     s.jlinq,
     null,
+    s.jqueryui.dialog,
+    s.jqueryui.button,
     s.jqgridediting,
     null,
     mpjs + "melange.list.js",

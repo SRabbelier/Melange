@@ -59,6 +59,16 @@ class UserForm(forms.ModelForm):
   clean_link_id = cleaning.clean_link_id('link_id')
 
 
+class EditUserForm(forms.ModelForm):
+  """Django form for the user profile.
+  """
+
+  class Meta:
+    model = User
+    css_prefix = 'user'
+    fields = ['name']
+
+
 class ProfileForm(forms.ModelForm):
   """Django form for profile page.
   """
@@ -141,7 +151,8 @@ class ProfilePage(RequestHandler):
     return 'v2/modules/gsoc/profile/base.html'
 
   def context(self):
-    user_form = UserForm(self.data.POST or None, instance=self.data.user)
+    form = EditUserForm if self.data.user else UserForm
+    user_form = form(self.data.POST or None, instance=self.data.user)
     profile_form = ProfileForm(self.data.POST or None, instance=self.data.profile)
 
     role = self.data.kwargs.get('role')
@@ -174,11 +185,16 @@ class ProfilePage(RequestHandler):
 
   def validateUser(self, dirty):
     if self.data.user:
-      return EmptyForm(self.data.POST)
-
-    user_form = UserForm(self.data.POST)
+      user_form = EditUserForm(self.data.POST, instance=self.data.user)
+    else:
+      user_form = UserForm(self.data.POST)
 
     if not user_form.is_valid():
+      return user_form
+
+    if self.data.user:
+      user_form.save(commit=False)
+      dirty.append(self.data.user)
       return user_form
 
     key_name = user_form.cleaned_data['link_id']

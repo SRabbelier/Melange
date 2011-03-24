@@ -264,10 +264,13 @@ class DjangoTestCase(TestCase):
     """
     self.assertResponseCode(response, httplib.OK)
 
-  def assertResponseRedirect(self, response):
+  def assertResponseRedirect(self, response, url=None):
     """Asserts that the response status is FOUND.
     """
     self.assertResponseCode(response, httplib.FOUND)
+    if url:
+      url = "http://testserver" + url
+      self.assertEqual(url, response["Location"])
 
   def assertResponseForbidden(self, response):
     """Asserts that the response status is FORBIDDEN.

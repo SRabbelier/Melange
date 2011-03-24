@@ -271,6 +271,15 @@ class ProfilePage(RequestHandler):
     """
     if self.validate():
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs) + '?validated')
+      organization = self.data.GET.get('org')
+      if organization:
+        kwargs['organization'] = organization
+        if self.data.student_info:
+          link = 'submit_gsoc_proposal'
+        else:
+          link = 'gsoc_org_home'
+        self.redirect(reverse(link, kwargs=kwargs))
+      else:
+        self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs) + '?validated')
     else:
       self.get()

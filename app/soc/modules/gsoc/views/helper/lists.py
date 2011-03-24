@@ -411,28 +411,31 @@ class ListContentResponse(object):
             'next': self.next}
 
 
-class QueryContentResponseBuilder(object):
+class RawQueryContentResponseBuilder(object):
   """Builds a ListContentResponse for lists that are based on a single query.
   """
 
-  def __init__(self, request, config, logic, fields, ancestors=None,
-               prefetch=None):
+  def __init__(self, request, config, query, starter, ender=None, prefetch=None):
     """Initializes the fields needed to built a response.
 
     Args:
       request: The HTTPRequest containing the request for data.
       config: The ListConfiguration object.
-      logic: The Logic instance used for querying.
       fields: The fields to query on.
-      ancestors: List of ancestor entities to add to the query
+      query: The query object to use.
+      starter: The function used to retrieve the start entity.
+      ender: The function used to retrieve teh end marker.
       prefetch: The fields that need to be prefetched for increased
                 performance.
     """
+    if not ender:
+      ender = lambda entity: entity.key().id_or_name()
+
     self._request = request
     self._config = config
-    self._logic = logic
-    self._fields = fields
-    self._ancestors = ancestors
+    self._query = query
+    self._starter = starter
+    self._ender = ender
     self._prefetch = prefetch
 
   def build(self, *args, **kwargs):
@@ -451,23 +454,49 @@ class QueryContentResponseBuilder(object):
 
     start = content_response.start
     if start:
-      start_entity = self._logic.getFromKeyNameOrID(start)
+      start_entity = self._starter(start)
 
       if not start_entity:
         logging.warning('Received data query for non-existing start entity')
         # return empty response
         return content_response
 
-      self._fields['__key__ >'] = start_entity.key()
+      self._query.filter('__key__ >', start_entity.key())
 
-    entities = self._logic.getForFields(
-        filter=self._fields, limit=content_response.limit,
-        ancestors=self._ancestors, prefetch=self._prefetch)
+    entities = self._query.fetch(content_response.limit)
+
+    # TODO(SRabbelier): prefetch
 
     for entity in entities:
       content_response.addRow(entity, *args, **kwargs)
 
     if entities:
-      content_response.next = entities[-1].key().id_or_name()
+      content_response.next = self._ender(entities[-1])
 
     return content_response
+
+
+class QueryContentResponseBuilder(RawQueryContentResponseBuilder):
+  """Builds a ListContentResponse for lists that are based on a single query.
+  """
+
+  def __init__(self, request, config, logic, fields, ancestors=None,
+               prefetch=None):
+    """Initializes the fields needed to built a response.
+
+    Args:
+      request: The HTTPRequest containing the request for data.
+      config: The ListConfiguration object.
+      logic: The Logic instance used for querying.
+      fields: The fields to query on.
+      ancestors: List of ancestor entities to add to the query
+      prefetch: The fields that need to be prefetched for increased
+                performance.
+    """
+    starter = lambda start: logic.getFromKeyNameOrID(start)
+
+    query = logic.getQueryForFields(
+        filter=fields, ancestors=ancestors)
+
+    super(QueryContentResponseBuilder, self).__init__(
+        request, config, query, starter, prefetch=prefetch)

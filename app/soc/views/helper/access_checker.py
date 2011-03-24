@@ -164,18 +164,19 @@ class Mutator(object):
     self.unsetAll()
 
   def unsetAll(self):
+    self.data.action = unset
+    self.data.can_respond = unset
+    self.data.invited_user = unset
+    self.data.invite = unset
     self.data.organization = unset
+    self.data.private_comments_visible = unset
     self.data.proposal = unset
     self.data.proposer = unset
     self.data.proposer_user = unset
-    self.data.can_respond = unset
-    self.data.invite = unset
-    self.data.invited_user = unset
+    self.data.public_comments_visible = unset
+    self.data.public_only = unset
     self.data.request_entity = unset
     self.data.requester = unset
-    self.data.public_only = unset
-    self.data.public_comments_visible = unset
-    self.data.private_comments_visible = unset
 
   def organizationFromKwargs(self):
     # kwargs which defines an organization

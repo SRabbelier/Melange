@@ -165,6 +165,7 @@ class ProfilePage(RequestHandler):
     return {
         'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': page_name,
+        'user_email': self.data.gae_user.email(),
         'user_form': user_form,
         'profile_form': profile_form,
         'student_info_form': student_info_form,

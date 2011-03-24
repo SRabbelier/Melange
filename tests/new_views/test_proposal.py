@@ -61,15 +61,11 @@ class ProposalTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertProposalTemplatesUsed(response)
 
-    # test POST
+    # test proposal POST
     override = {'program': self.gsoc, 'score': 0, 'mentor': None, 'org': self.org, 'status': 'new'}
-    properties = seeder_logic.seed_properties(GSoCProposal, properties=override)
-    postdata = properties.copy()
-    postdata['xsrf_token'] = self.getXsrfToken(url)
-    response = self.client.post(url, postdata)
+    response, properties = self.modelPost(url, GSoCProposal, override)
     self.assertResponseRedirect(response)
 
-    # TODO(SRabbelier): verify
     proposal = GSoCProposal.all().get()
     self.assertPropertiesEqual(properties, proposal)
 
@@ -78,28 +74,26 @@ class ProposalTest(DjangoTestCase):
         self.data.user.key().name(),
         proposal.key().id())
 
+    # test review GET
     url = '/gsoc/proposal/review/' + suffix
     response = self.client.get(url)
     self.assertReviewTemplateUsed(response)
 
+    # test comment POST
     from soc.models.comment import NewComment
     url = '/gsoc/proposal/comment/' + suffix
     override = {'author': self.data.profile, 'is_private': False}
-    properties = seeder_logic.seed_properties(NewComment, properties=override)
-    postdata = properties.copy()
-    postdata['xsrf_token'] = self.getXsrfToken()
-    response = self.client.post(url, postdata)
+    response, properties = self.modelPost(url, NewComment, override)
     self.assertResponseRedirect(response)
+
     comment = NewComment.all().get()
     self.assertPropertiesEqual(properties, comment)
 
+    # test score POST
     from soc.modules.gsoc.models.score import GSoCScore
     url = '/gsoc/proposal/score/' + suffix
     override = {'author': self.data.profile, 'parent': proposal}
-    properties = seeder_logic.seed_properties(GSoCScore, properties=override)
-    postdata = properties.copy()
-    postdata['xsrf_token'] = self.getXsrfToken()
-    response = self.client.post(url, postdata)
+    response, properties = self.modelPost(url, GSoCScore, override)
     self.assertResponseOK(response)
 
     score = GSoCScore.all().get()

@@ -135,20 +135,20 @@ class TimelineHelper(object):
     if not self.org_app:
       return False
     start, end = self.orgSignupBetween()
-    return self.programActive() and isBetween(start, end)
+    return isBetween(start, end)
 
   def orgsAnnounced(self):
-    return self.programActive() and isAfter(self.orgsAnnouncedOn())
+    return isAfter(self.orgsAnnouncedOn())
 
   def afterStudentSignupStart(self):
     return isAfter(self.studentSignupStart())
 
   def studentSignup(self):
     start, end = self.studentsSignupBetween()
-    return self.programActive() and isBetween(start, end)
+    return isBetween(start, end)
 
   def studentsAnnounced(self):
-    return self.programActive() and isAfter(self.studentsAnnouncedOn())
+    return isAfter(self.studentsAnnouncedOn())
 
 
 class RequestData(RequestData):

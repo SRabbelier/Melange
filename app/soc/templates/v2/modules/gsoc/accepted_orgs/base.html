@@ -25,14 +25,6 @@ limitations under the License.
   [
     dep.melange.menu,
     dep.melange.list,
-    css("/soc/content/css/v2/gsoc/user-messages.css"),
-    null,
-    function () {
-      if (melange_list_queue !== undefined && melange_list_queue instanceof Array) {
-        jQuery.each(melange_list_queue, function (index, function_to_call) {
-          function_to_call();
-        });
-      }
-    }
+    css("/soc/content/css/v2/gsoc/user-messages.css")
   ]
 {% endblock dependencies %}

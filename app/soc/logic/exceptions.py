@@ -57,7 +57,7 @@ class NotFound(Error):
   status = 404
 
 
-def BadRequest(Error):
+class BadRequest(Error):
   """Bad Request
   """
 

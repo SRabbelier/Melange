@@ -34,6 +34,7 @@ from django.template import loader
 from soc.logic.exceptions import LoginRequest
 from soc.logic.exceptions import RedirectRequest
 from soc.logic.exceptions import AccessViolation
+from soc.logic.exceptions import BadRequest
 from soc.views.helper.request_data import RequestData
 
 
@@ -304,6 +305,8 @@ class RequestHandler(object):
     except RedirectRequest, e:
       self.redirect(e.url)
     except AccessViolation, e:
+      self.accessViolation(e.status, e.args[0])
+    except BadRequest, e:
       self.accessViolation(e.status, e.args[0])
 
     return self.response

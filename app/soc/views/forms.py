@@ -29,6 +29,7 @@ import re
 from google.appengine.ext import db
 from google.appengine.ext.db import djangoforms
 
+from django.core.urlresolvers import reverse
 from django.forms import forms
 from django.forms import widgets
 from django.template import loader
@@ -320,6 +321,8 @@ class BoundField(forms.BoundField):
 
     widget = self.field.widget
 
+    if isinstance(widget, DocumentWidget):
+      return self.renderDocumentWidget()
     if isinstance(widget, widgets.TextInput):
       return self.renderTextInput()
     elif isinstance(widget, widgets.DateInput):
@@ -375,6 +378,33 @@ class BoundField(forms.BoundField):
         self._render_note(),
     ))
 
+  def renderDocumentWidget(self):
+    attrs = {
+        'id': self.name,
+        'class': 'text',
+        }
+
+    value = self.form.initial.get(self.name, self.field.initial)
+
+    if value:
+      document = db.get(value)
+      args = [document.prefix, document.scope_path + '/', document.link_id]
+    else:
+      scope_path = self.form.scope_path
+      args = ['gsoc_program', scope_path, '/', self.name]
+
+    edit_document_link = reverse('edit_gsoc_document', args=args)
+    help_text = """<a href="%s">Click here to edit this document.</a>
+        <br />%s""" % (edit_document_link, self.help_text)
+
+
+    return mark_safe('%s%s%s%s' % (
+        self._render_label(),
+        self.as_widget(attrs=attrs),
+        self._render_error(),
+        self._render_note(help_text),
+    ))
+
   def renderSelect(self):
     attrs = {
         'id': self.name,
@@ -407,9 +437,9 @@ class BoundField(forms.BoundField):
 
     return '<span class="req">*</span>'
 
-  def _render_note(self):
+  def _render_note(self, note=None):
     return '<span class="note">%s</span>' % (
-        self.help_text)
+        note if note else self.help_text)
 
   def div_class(self):
     name = self.form.Meta.css_prefix + '_' + self.name

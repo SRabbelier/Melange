@@ -223,12 +223,6 @@
     mpjs + "datetime-loader.js"
   ];
 
-  s.melange.menu = [
-    s.cookie,
-    null,
-    mpjs + "menu.js"
-  ];
-
   s.melange.duplicates = [
     s.progressbar,
     null,

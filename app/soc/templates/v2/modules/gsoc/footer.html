@@ -6,8 +6,12 @@
     <div class="grid_9">
         <div class="footer-menu">
           <ul id="footer-menu-list">
-            <li id="footer-menu-about"><a href="{{ about_link }}">About</a></li>
-            <li id="footer-menu-contact"><a href="{{ connect_link }}">Contact</a></li>
+            {% if about_link %}
+              <li id="footer-menu-about"><a href="{{ about_link }}">About</a></li>
+            {% endif %}
+            {% if connect_link %}
+              <li id="footer-menu-contact"><a href="{{ connect_link }}">Contact</a></li>
+            {% endif %}
             {% if facebook_url %}
               <li id="footer-menu-facebook" class="social"><a href="{{ facebook_url }}" class="fb">Facebook</a></li>
             {% endif %}

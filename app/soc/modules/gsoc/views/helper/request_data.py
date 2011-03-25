@@ -344,8 +344,12 @@ class RedirectHelper(object):
 
     Uses internal state for args and kwargs.
     """
-    assert name or self._url_name
-    url = self.urlOf(name or self._url_name)
+    if self._url:
+      url = self._url
+    else:
+      assert name or self._url_name
+      url = self.urlOf(name or self._url_name)
+
     if validated:
       url = url + '?validated'
     self.toUrl(url)

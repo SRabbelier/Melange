@@ -267,7 +267,7 @@ class PostComment(RequestHandler):
     assert isSet(self.data.proposer)
     assert isSet(self.data.proposal)
     
-    comment = self.createCommentFromForm() 
+    comment = self.createCommentFromForm()
     if comment:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       kwargs['student'] = self.data.proposer.link_id

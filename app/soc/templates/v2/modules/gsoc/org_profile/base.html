@@ -1,0 +1,45 @@
+{% extends "v2/modules/gsoc/base.html" %}
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/forms.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/v2/gsoc/uniform.default.css" />
+{% endblock stylesheets %}
+
+{% block page_content %}
+
+<!-- begin form -->
+<h1 id="main-page-title">Your Organization Profile for Google Summer of Code</h1>
+<form action="#" method="post" id="form" class="form-register">
+  {{ form.render }}
+  <div id="form-row-button-row" class="row button-row">
+    <input type="submit" value="Submit" class="submit" />
+  </div>
+</form>
+<!-- end form -->
+
+{% endblock page_content %}
+
+{% block dependencies %}
+  [
+    dep.melange.menu,
+    dep.uniform,
+    null,
+    function () {
+      jQuery("select, input:radio, input:file, input:checkbox").uniform();
+    }
+  ]
+{% endblock dependencies %}

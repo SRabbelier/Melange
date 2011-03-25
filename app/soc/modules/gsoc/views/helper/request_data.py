@@ -282,8 +282,8 @@ class RedirectHelper(object):
     """Sets the kwargs for an url_patterns.ID redirect.
     """
     if not id:
-      assert 'id' in self.data.kwargs
-      id = self.data.kwargs['id']
+      assert 'id' in self._data.kwargs
+      id = self._data.kwargs['id']
     self.program()
     self.kwargs['id'] = id
 
@@ -291,8 +291,8 @@ class RedirectHelper(object):
     """Sets the kwargs for an url_patterns.REVIEW redirect.
     """
     if not student:
-      assert 'student' in self.data.kwargs
-      student = self.data.kwargs['student']
+      assert 'student' in self._data.kwargs
+      student = self._data.kwargs['student']
     self.id(id)
     self.kwargs['student'] = student
 

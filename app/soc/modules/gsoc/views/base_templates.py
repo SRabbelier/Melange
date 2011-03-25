@@ -35,7 +35,7 @@ def siteMenuContext(data):
 
   context = {
       'about_link': redirect.document(data.program.about_page).url(),
-      'events_link': redirect.document(data.program.events_page).url(),
+      'events_link': redirect.events().url(),
       'connect_link': redirect.document(
           data.program.connect_with_us_page).url(),
       'help_link': redirect.document(data.program.help_page).url(),

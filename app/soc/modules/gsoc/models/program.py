@@ -96,6 +96,12 @@ class GSoCProgram(soc.models.program.Program):
   events_page.help_text = ugettext(
       'The document for the <b>Events & Timeline</b> page')
 
+  #: The url which contains the "Events & Timeline" frame
+  events_frame_url = db.LinkProperty(
+      verbose_name=ugettext('Events page iframe url'))
+  events_frame_url.help_text = ugettext(
+      'The iirame url for the <b>Events & Timeline</b> page')
+
   #: The document entity which contains the "Connect With Us" page
   #: for the program
   connect_with_us_page = db.ReferenceProperty(

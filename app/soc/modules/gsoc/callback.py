@@ -81,6 +81,7 @@ class Callback(object):
     self.views.append(dashboard.Dashboard())
     self.views.append(document.EditDocumentPage())
     self.views.append(document.DocumentPage())
+    self.views.append(document.EventsPage())
     self.views.append(homepage.Homepage())
     self.views.append(org_app.OrgApp())
     self.views.append(org_home.OrgHome())

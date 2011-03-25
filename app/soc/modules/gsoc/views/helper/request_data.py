@@ -403,6 +403,17 @@ class RedirectHelper(object):
     self._url_name = 'gsoc_dashboard'
     return self
 
+  def events(self):
+    """Sets the _url_name for the events page, if it is set.
+    """
+    if not self._data.program.events_page:
+      self._clear()
+      self._no_url = True
+      return self
+    self.program()
+    self._url_name = 'gsoc_events'
+    return self
+
   def projectDetails(self, student_project):
     """Returns the URL to the Student Project.
 

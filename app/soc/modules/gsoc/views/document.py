@@ -129,3 +129,28 @@ class DocumentPage(RequestHandler):
         'tmpl': document.Document(self.data, self.data.document),
         'page_name': 'Document',
     }
+
+
+class EventsPage(RequestHandler):
+  """Encapsulates all the methods required to show the events page.
+  """
+
+  def templatePath(self):
+    return 'v2/modules/gsoc/document/events.html'
+
+  def djangoURLPatterns(self):
+    return [
+        url(r'^gsoc/events/%s$' % url_patterns.PROGRAM, self,
+            name='gsoc_events')
+    ]
+
+  def checkAccess(self):
+    self.data.document = self.data.program.events_page
+    self.check.canViewDocument()
+
+  def context(self):
+    return {
+        'document': self.data.program.events_page,
+        'frame_url': self.data.program.events_frame_url,
+        'page_name': 'Document',
+    }

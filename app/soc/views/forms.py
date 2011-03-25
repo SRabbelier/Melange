@@ -56,6 +56,12 @@ def choiceWidgets(model, fields):
   return dict((i, choiceWidget(getattr(model, i))) for i in fields)
 
 
+class DocumentWidget(widgets.TextInput):
+  """Extends the Django's TextInput widget to render the edit link to Documents.
+  """
+  pass
+
+
 class ReferenceProperty(djangoforms.ReferenceProperty):
   # ReferenceProperty field allows setting to None.
 
@@ -66,7 +72,13 @@ class ReferenceProperty(djangoforms.ReferenceProperty):
 
     This defaults to a CharField instance.
     """
-    return django.forms.CharField(required=self.required)
+    from soc.models.document import Document
+
+    if self.data_type is Document:
+      return django.forms.CharField(required=self.required,
+                                    widget=DocumentWidget)
+    else:
+      return django.forms.CharField(required=self.required)
 
   def make_value_from_form(self, value):
     """Convert a form value to a property value.

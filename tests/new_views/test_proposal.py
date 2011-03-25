@@ -98,3 +98,33 @@ class ProposalTest(DjangoTestCase):
 
     score = GSoCScore.all().get()
     self.assertPropertiesEqual(properties, score)
+
+  def testSubmitProposalWhenInactive(self):
+    """Test the submission of student proposals during the student signup
+    period is not active.
+    """
+    self.data.createStudent()
+    self.timeline.orgSignup()
+    url = '/gsoc/proposal/submit/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertResponseForbidden(response)
+
+    self.timeline.offSeason()
+    url = '/gsoc/proposal/submit/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertResponseForbidden(response)
+
+    self.timeline.kickoff()
+    url = '/gsoc/proposal/submit/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertResponseForbidden(response)
+
+    self.timeline.orgsAnnounced()
+    url = '/gsoc/proposal/submit/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertResponseForbidden(response)
+
+    self.timeline.studentsAnnounced()
+    url = '/gsoc/proposal/submit/' + self.org.key().name()
+    response = self.client.get(url)
+    self.assertResponseForbidden(response)

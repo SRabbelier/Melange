@@ -232,9 +232,12 @@ class DjangoTestCase(TestCase):
       timeline: a TimelineHelper instance
       data: a GSoCProfileHelper instance
     """
+    from soc.models.site import Site
+    from soc.models.document import Document
     from soc.modules.gsoc.models.program import GSoCProgram
     from soc.modules.gsoc.models.timeline import GSoCTimeline
     from soc.modules.gsoc.models.organization import GSoCOrganization
+    from soc.modules.seeder.logic.providers.string import DocumentKeyNameProvider
     from soc.models.org_app_survey import OrgAppSurvey
     from tests.timeline_utils import TimelineHelper
     from tests.profile_utils import GSoCProfileHelper
@@ -244,10 +247,30 @@ class DjangoTestCase(TestCase):
     properties = {'timeline': self.seed(GSoCTimeline, {}),
                   'status': 'visible', 'apps_tasks_limit': 20}
     self.gsoc = self.seed(GSoCProgram, properties)
+
+    properties = {
+        'prefix': 'gsoc_program', 'scope': self.gsoc,
+        'read_access': 'public', 'key_name': DocumentKeyNameProvider(),
+    }
+    document = self.seed(Document, properties=properties)
+
+    self.gsoc.about_page = document
+    self.gsoc.events_page = document
+    self.gsoc.help_page = document
+    self.gsoc.connect_with_us_page = document
+    self.gsoc.privacy_policy = document
+    self.gsoc.put()
+
+    self.site = Site(key_name='site', link_id='site',
+                     active_program=self.gsoc)
+    self.site.put()
+
     properties = {'scope': self.gsoc}
     self.org_app = self.seed(OrgAppSurvey, properties)
+
     properties = {'scope': self.gsoc, 'status': 'active'}
     self.org = self.seed(GSoCOrganization, properties)
+
     self.timeline = TimelineHelper(self.gsoc.timeline, self.org_app)
     self.data = GSoCProfileHelper(self.gsoc, self.dev_test)
 

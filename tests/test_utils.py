@@ -324,6 +324,12 @@ class DjangoTestCase(TestCase):
     """Asserts that all the templates from the base view were used.
     """
     self.assertResponseOK(response)
+    for contexts in response.context:
+      for context in contexts:
+        for value in context.values():
+          # make it easier to debug render failures
+          if hasattr(value, 'render'):
+            value.render()
     self.assertTemplateUsed(response, 'v2/modules/gsoc/base.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/footer.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/header.html')

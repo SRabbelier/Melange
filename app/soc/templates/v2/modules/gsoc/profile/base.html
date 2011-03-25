@@ -62,9 +62,12 @@ limitations under the License.
   [
     dep.melange.menu,
     dep.uniform,
+    dep.melange.main,
+    css("/soc/content/css/v2/gsoc/others.css"),
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
-    }
+    },
+    tc("/soc/content/js/{{ app_version }}/templates/soc/role/edit.js", {})
   ]
 {% endblock dependencies %}

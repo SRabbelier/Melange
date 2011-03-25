@@ -38,7 +38,7 @@
 
   // Two different levels for zoom: Starting one and an inner that 
   // is used when showing the map if lat and lon page fields are set
-  var world_zoom = 0;
+  var world_zoom = 1;
   var country_zoom = 4;
   var state_zoom = 6;
   var city_zoom = 10;
@@ -46,31 +46,34 @@
 
   // Do not add a starting # as this JQuery selector seems 
   // incompatible with GMap API
-  var map_div = "role_profile_map";
+  var map_div = "profile_map";
 
-  var field_lat = "#id_latitude";
-  var field_lng = "#id_longitude";
+  // Id of the element which the map will be appended after.
+  var append_to = "#form_row_publish_location";
+
+  var field_lat = "#latitude";
+  var field_lng = "#longitude";
   // Need to save old values to avoid unwanted updating 
   // of lat and lot if marker dragged and blur another time an address field
   var address = {
     street: {
-      id: "#id_res_street",
+      id: "#res_street",
       old_value: ""
     },
     city: {
-      id: "#id_res_city",
+      id: "#res_city",
       old_value: ""
     },
     state: {
-      id: "#id_res_state",
+      id: "#res_state",
       old_value: ""
     },
     country: {
-      id: "#id_res_country",
+      id: "#res_country",
       old_value: ""
     },
     postalcode: {
-      id: "#id_res_postalcode",
+      id: "#res_postalcode",
       old_value: ""
     }
   };
@@ -214,6 +217,7 @@
 
   jQuery(
     function () {
+      jQuery(append_to).append("<div id='" + map_div + "'></div>");
       melange.loadGoogleApi("maps", "2", {}, map_load);
     }
   );

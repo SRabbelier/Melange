@@ -556,9 +556,6 @@
   /*error on submission*/
 
 }
-#form fieldset .row.error label {
-  float: left;
-}
 #form fieldset .row.error .error-message {
   color: #ff0000;
   display: block;

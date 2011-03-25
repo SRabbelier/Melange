@@ -391,7 +391,7 @@ class BoundField(forms.BoundField):
       args = [document.prefix, document.scope_path + '/', document.link_id]
     else:
       scope_path = self.form.scope_path
-      args = ['gsoc_program', scope_path, '/', self.name]
+      args = ['gsoc_program', scope_path + '/', self.name]
 
     edit_document_link = reverse('edit_gsoc_document', args=args)
     help_text = """<a href="%s">Click here to edit this document.</a>

@@ -40,7 +40,6 @@ from soc.models.user import User
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
-from soc.modules.gsoc.views.helper import redirects
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -198,7 +197,7 @@ class ProfilePage(RequestHandler):
     }
 
     if self.data.timeline.orgsAnnounced() and self.data.student_info:
-      context['apply_link'] = redirects.acceptedOrgs(self.data)
+      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
 
     return context
 
@@ -281,17 +280,22 @@ class ProfilePage(RequestHandler):
   def post(self):
     """Handler for HTTP POST request.
     """
-    if self.validate():
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      organization = self.data.GET.get('org')
-      if organization:
-        kwargs['organization'] = organization
-        if self.data.student_info:
-          link = 'submit_gsoc_proposal'
-        else:
-          link = 'gsoc_org_home'
-        self.redirect(reverse(link, kwargs=kwargs))
-      else:
-        self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs) + '?validated')
-    else:
+    if not self.validate():
       self.get()
+      return
+
+    organization = self.data.GET.get('org')
+
+    if not organization:
+      self.redirect.program()
+      self.redirect.to('edit_gsoc_profile', validated=True)
+      return
+
+    self.redirect.organization(organization)
+
+    if self.data.student_info:
+      link = 'submit_gsoc_proposal'
+    else:
+      link = 'gsoc_org_home'
+
+    self.redirect.to(link)

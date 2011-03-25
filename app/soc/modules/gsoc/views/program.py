@@ -91,7 +91,7 @@ class ProgramPage(RequestHandler):
     """Handler for HTTP POST request.
     """
     if self.validate():
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      self.redirect(reverse('edit_program_settings', kwargs=kwargs))
+      self.redirect.program()
+      self.redirect.to('edit_program_settings')
     else:
       self.get()

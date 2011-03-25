@@ -189,14 +189,6 @@ class RequestHandler(object):
     """
     self.error(405)
 
-  def redirect(self, url):
-    """Sets the response to a redirect to the specified url.
-
-    Args:
-      url: the url to redirect to
-    """
-    self.response = http.HttpResponseRedirect(url)
-
   def error(self, status, message=None):
     """Sets the error response code and the message when the HTTP
     Request should get an error response.
@@ -300,10 +292,9 @@ class RequestHandler(object):
       self._dispatch()
     except LoginRequest, e:
       full_path = request.get_full_path().encode('utf-8')
-      url = users.create_login_url(full_path)
-      self.redirect(url)
+      self.redirect.login().to()
     except RedirectRequest, e:
-      self.redirect(e.url)
+      self.redirect.toUrl(e.url)
     except AccessViolation, e:
       self.accessViolation(e.status, e.args[0])
     except BadRequest, e:

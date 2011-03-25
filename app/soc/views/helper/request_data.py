@@ -59,13 +59,14 @@ class RequestData(object):
     self.is_developer = False
     self.gae_user = None
 
-  def populate(self, request, args, kwargs):
+  def populate(self, redirect, request, args, kwargs):
     """Populates the fields in the RequestData object.
 
     Args:
       request: Django HTTPRequest object.
       args & kwargs: The args and kwargs django sends along.
     """
+    self.redirect = redirect
     self.request = request
     self.args = args
     self.kwargs = kwargs

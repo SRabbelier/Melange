@@ -109,10 +109,10 @@ class RequestPage(RequestHandler):
     """Handler for GSoC Request Page HTTP post request.
     """
 
-    if self._createFromForm():
-      kwargs = dicts.filter(self.data.kwargs, [
-          'sponsor', 'program', 'organization', 'role'])
-      self.redirect(reverse('gsoc_request', kwargs=kwargs))
+    request = self._createFromForm()
+    if request:
+      self.redirect.id(request.key().id())
+      self.redirect.to('show_gsoc_request')
     else:
       self.get()
 
@@ -156,7 +156,7 @@ class ShowRequest(RequestHandler):
   def djangoURLPatterns(self):
     return [
         url(r'^gsoc/request/%s$' % url_patterns.ID, self,
-            name='gsoc_request')
+            name='show_gsoc_request')
     ]
 
   def checkAccess(self):
@@ -213,8 +213,8 @@ class ShowRequest(RequestHandler):
     elif self.data.action == self.ACTIONS['withdraw']:
       self._withdrawRequest()
 
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    self.redirect(reverse('gsoc_dashboard', kwargs=kwargs))
+    self.redirect.program()
+    self.redirect.to('gsoc_dashboard')
 
   def _acceptRequest(self):
     """Accepts a request.
@@ -223,8 +223,8 @@ class ShowRequest(RequestHandler):
     assert isSet(self.data.organization)
 
     if not self.data.profile:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+      self.redirect.program()
+      self.redirect.to('edit_gsoc_profile')
 
     self.data.request_entity.status = 'accepted'
     self.data.profile.mentor_for.append(self.data.organization.key())

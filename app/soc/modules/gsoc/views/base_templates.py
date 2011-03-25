@@ -27,30 +27,30 @@ from google.appengine.api import users
 
 from soc.views.template import Template
 
-from soc.modules.gsoc.views.helper import redirects
-
 
 def siteMenuContext(data):
   """Generates URL links for the hard-coded GSoC site menu items.
   """
+  redirect = data.redirect
 
   context = {
-      'about_link': redirects.showDocument(data.program.about_page),
-      'events_link': redirects.showDocument(data.program.events_page),
-      'connect_link': redirects.showDocument(data.program.connect_with_us_page),
-      'help_link': redirects.showDocument(data.program.help_page),
+      'about_link': redirect.document(data.program.about_page).url(),
+      'events_link': redirect.document(data.program.events_page).url(),
+      'connect_link': redirect.document(
+          data.program.connect_with_us_page).url(),
+      'help_link': redirect.document(data.program.help_page).url(),
   }
 
   if users.get_current_user():
-    context['logout_link'] = users.create_logout_url(data.full_path)
+    context['logout_link'] = redirect.logout().url()
   else:
-    context['login_link'] = users.create_login_url(data.full_path)
+    context['login_link'] = redirect.login().url()
 
   if data.profile:
-    context['dashboard_link'] = redirects.dashboard(data)
+    context['dashboard_link'] = redirect.dashboard().url()
 
   if data.timeline.studentsAnnounced():
-    context['projects_link'] = redirects.allProjects(data)
+    context['projects_link'] = redirect.allProjects().url()
 
   return context
 
@@ -67,7 +67,7 @@ class Header(Template):
 
   def context(self):
     return {
-        'home_link': redirects.homepage(self.data)
+        'home_link': self.data.redirect.homepage().url()
     }
 
 
@@ -81,7 +81,7 @@ class MainMenu(Template):
   def context(self):
     context = siteMenuContext(self.data)
     context.update({
-        'home_link': redirects.homepage(self.data)
+        'home_link': self.data.redirect.homepage().url()
     })
     return context
 
@@ -98,10 +98,11 @@ class Footer(Template):
 
   def context(self):
     context = siteMenuContext(self.data)
+    redirect = self.data.redirect
 
     program = self.data.program
     context.update({
-        'privacy_policy_url': redirects.showDocument(program.privacy_policy),
+        'privacy_policy_url': redirect.document(program.privacy_policy).url(),
         'facebook_url': program.facebook,
         'twitter_url': program.twitter,
         'blogger_url': program.blogger,

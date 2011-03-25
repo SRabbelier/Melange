@@ -65,9 +65,6 @@ class EditProgramTest(DjangoTestCase):
     response = self.client.get(url)
     self.assertProgramTemplatesUsed(response)
 
-    properties = {'prefix': 'gsoc_program', 'scope': self.gsoc}
-    seeder_logic.seed(Document, properties=properties)
-
     response = self.getJsonResponse(url)
     self.assertIsJsonResponse(response)
     self.assertEqual(1, len(response.context['data']))

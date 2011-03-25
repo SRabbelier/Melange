@@ -96,9 +96,9 @@ class ProposalPage(RequestHandler):
 
     proposal = self.createFromFrom()
     if proposal:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      kwargs['id'] = proposal.key().id()
-      self.redirect(reverse('update_gsoc_proposal', kwargs=kwargs))
+      self.redirect.program()
+      self.redirect.id(proposal.key().id())
+      self.redirect.to('update_gsoc_proposal')
     else:
       self.get()
 
@@ -148,7 +148,8 @@ class UpdateProposal(RequestHandler):
 
     proposal = self.updateFromForm()
     if proposal:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program', 'id'])
-      self.redirect(reverse('update_gsoc_proposal', kwargs=kwargs))
+      self.redirect.program()
+      self.redirect.id()
+      self.redirect.to('update_gsoc_proposal')
     else:
       self.get()

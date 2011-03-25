@@ -27,12 +27,16 @@ __authors__ = [
 
 import datetime
 
+from google.appengine.api import users
 from google.appengine.ext import db
+
+from django.core.urlresolvers import reverse
 
 from soc.models import role
 from soc.logic.models.host import logic as host_logic
 from soc.logic.models.site import logic as site_logic
 from soc.logic.models.user import logic as user_logic
+from soc.views.helper.access_checker import isSet
 from soc.views.helper.request_data import RequestData
 
 from soc.modules.gsoc.models import profile
@@ -187,14 +191,14 @@ class RequestData(RequestData):
     self.org_admin_for = []
     self.student_info = None
 
-  def populate(self, request, args, kwargs):
+  def populate(self, redirect, request, args, kwargs):
     """Populates the fields in the RequestData object.
 
     Args:
       request: Django HTTPRequest object.
       args & kwargs: The args and kwargs django sends along.
     """
-    super(RequestData, self).populate(request, args, kwargs)
+    super(RequestData, self).populate(redirect, request, args, kwargs)
 
     if kwargs.get('sponsor') and kwargs.get('program'):
       program_keyfields = {'link_id': kwargs['program'],
@@ -231,3 +235,170 @@ class RequestData(RequestData):
       self.mentor_for = org_map.values()
       self.org_admin_for = [org_map[i] for i in self.profile.org_admin_for]
       self.student_info = self.profile.student_info
+
+
+class RedirectHelper(object):
+  """Helper for constructing redirects.
+  """
+
+  def __init__(self, data, response):
+    """Initializes the redirect helper.
+    """
+    self._data = data
+    self._response = response
+    self._clear()
+
+  def _clear(self):
+    """Clears the internal state.
+    """
+    self._url_name = None
+    self._url = None
+    self.args = []
+    self.kwargs = {}
+
+  def sponsor(self):
+    """Sets kwargs for an url_patterns.SPONSOR redirect.
+    """
+    self._clear()
+    self.kwargs['sponsor'] = self._data.program.scope_path
+
+  def program(self):
+    """Sets kwargs for an url_patterns.PROGRAM redirect.
+    """
+    self.sponsor()
+    self.kwargs['program'] = self._data.program.link_id
+
+  def organization(self, organization=None):
+    """Sets the kwargs for an url_patterns.ORG redirect.
+    """
+    if not organization:
+      assert isSet(self._data.organization)
+      organization = self._data.organization
+    self.program()
+    self.kwargs['organization'] = organization.link_id
+
+  def id(self, id=None):
+    """Sets the kwargs for an url_patterns.ID redirect.
+    """
+    if not id:
+      assert 'id' in self.data.kwargs
+      id = self.data.kwargs['id']
+    self.program()
+    self.kwargs['id'] = id
+
+  def review(self, id=None, student=None):
+    """Sets the kwargs for an url_patterns.REVIEW redirect.
+    """
+    if not student:
+      assert 'student' in self.data.kwargs
+      student = self.data.kwargs['student']
+    self.id(id)
+    self.kwargs['student'] = student
+
+  def invite(self, role=None):
+    if not role:
+      assert 'role' in self._data.kwargs
+      role = self._data.kwargs['role']
+    self.organization()
+    self.kwargs['role'] = role
+
+  def document(self, document):
+    """Sets args for an url_patterns.DOCUMENT redirect.
+    """
+    self._clear()
+    self.args = [document.prefix, document.scope_path + '/', document.link_id]
+    self._url_name = 'show_gsoc_document'
+    return self
+
+  def urlOf(self, name):
+    """Returns the resolved url for name.
+
+    Uses internal state for args and kwargs.
+    """
+    if self.args:
+      url = reverse(name, args=self.args)
+    elif self.kwargs:
+      url = reverse(name, kwargs=self.kwargs)
+    else:
+      url = reverse(name)
+    return url
+
+  def url(self):
+    """Returns the url of the current state.
+    """
+    assert self._url or self._url_name
+    if self._url:
+      return self._url
+    return self.urlOf(self._url_name)
+
+  def to(self, name=None, validated=False):
+    """Redirects to the resolved url for name.
+
+    Uses internal state for args and kwargs.
+    """
+    assert name or self._url_name
+    url = self.urlOf(name or self._url_name)
+    if validated:
+      url = url + '?validated'
+    self.toUrl(url)
+
+  def toUrl(self, url):
+    """Redirects to the specified url.
+    """
+    from django.utils.encoding import iri_to_uri
+    self._response.set_status(302)
+    self._response["Location"] = iri_to_uri(url)
+
+  def login(self):
+    """Sets url to the login url.
+    """
+    self._clear()
+    self._url = users.create_login_url(self._data.full_path)
+    return self
+
+  def logout(self):
+    """Sets url to the logout url.
+    """
+    self._clear()
+    self._url = users.create_logout_url(self._data.full_path)
+    return self
+
+  def acceptedOrgs(self):
+    """Returns the redirect for list all GSoC projects.
+    """
+    self.program()
+    self._url_name = 'gsoc_accepted_orgs'
+    return self
+
+  def allProjects(self):
+    """Returns the redirect for list all GSoC projects.
+    """
+    self.program()
+    self._url_name = 'gsoc_accepted_projects'
+    return self
+
+  def homepage(self):
+    """Returns the redirect for the homepage for the current GSOC program.
+    """
+    self.program()
+    self._url_name = 'gsoc_homepage'
+    return self
+
+  def dashboard(self):
+    """Returns the redirect for the dashboard page for the current GSOC program.
+    """
+    self.program()
+    self._url_name = 'gsoc_dashboard'
+    return self
+
+  def projectDetails(self, student_project):
+    """Returns the URL to the Student Project.
+
+    Args:
+      student_project: entity which represents the Student Project
+    """
+    # TODO: Use django reverse function from urlresolver once student_project
+    # view is converted to the new infrastructure
+    self._clear()
+    self._url = '/gsoc/student_project/show/%s' % student_project.key().id_or_name()
+    return self

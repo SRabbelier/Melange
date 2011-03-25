@@ -184,9 +184,8 @@ class InvitePage(RequestHandler):
     """
 
     if self._createFromForm():
-      kwargs = dicts.filter(self.data.kwargs, [
-          'sponsor', 'program', 'organization', 'role'])
-      self.redirect(reverse('gsoc_invite', kwargs=kwargs))
+      self.redirect.invite()
+      self.redirect.to('gsoc_invite')
     else:
       self.get()
 
@@ -264,8 +263,8 @@ class ShowInvite(RequestHandler):
     elif self.data.action == self.ACTIONS['withdraw']:
       self._withdrawInvitation()
 
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-    self.redirect(reverse('gsoc_dashboard', kwargs=kwargs))
+    self.redirect.dashboard()
+    self.redirect.to()
 
   def _acceptInvitation(self):
     """Accepts an invitation.
@@ -274,8 +273,8 @@ class ShowInvite(RequestHandler):
     assert isSet(self.data.organization)
 
     if not self.data.profile:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      self.redirect(reverse('edit_gsoc_profile', kwargs=kwargs))
+      self.redirect.program()
+      self.redirect.to('edit_gsoc_profile')
 
     self.data.invite.status = 'accepted'
 

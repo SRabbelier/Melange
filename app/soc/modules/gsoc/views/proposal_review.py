@@ -269,10 +269,9 @@ class PostComment(RequestHandler):
     
     comment = self.createCommentFromForm()
     if comment:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      kwargs['student'] = self.data.proposer.link_id
-      kwargs['id'] = self.data.proposal.key().id()
-      self.redirect(reverse('review_gsoc_proposal', kwargs=kwargs))
+      self.redirect.review(self.data.proposal.key().id(),
+                           self.data.proposer.link_id)
+      self.redirect.to('review_gsoc_proposal')
     else:
       # TODO: probably we want to handle an error somehow
       pass

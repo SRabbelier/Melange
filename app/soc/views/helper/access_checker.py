@@ -31,6 +31,7 @@ from soc.logic.models.user import logic as user_logic
 
 from soc.logic.exceptions import LoginRequest
 from soc.logic.exceptions import RedirectRequest
+from soc.logic.exceptions import BadRequest
 from soc.logic.exceptions import AccessViolation
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
@@ -143,6 +144,9 @@ DEF_PROPOSAL_NOT_PUBLIC_MSG = ugettext(
     'and you are not the student who submitted the proposal, '
     'nor are you a mentor for the organization it was submitted to.')
 
+DEF_NOT_PUBLIC_DOCUMENT = ugettext(
+    'This document is not publically readable.')
+
 
 unset = object()
 
@@ -166,8 +170,10 @@ class Mutator(object):
   def unsetAll(self):
     self.data.action = unset
     self.data.can_respond = unset
+    self.data.document = unset
     self.data.invited_user = unset
     self.data.invite = unset
+    self.data.key_name = unset
     self.data.organization = unset
     self.data.private_comments_visible = unset
     self.data.proposal = unset
@@ -177,6 +183,7 @@ class Mutator(object):
     self.data.public_only = unset
     self.data.request_entity = unset
     self.data.requester = unset
+    self.data.scope_path = unset
 
   def organizationFromKwargs(self):
     # kwargs which defines an organization
@@ -184,6 +191,43 @@ class Mutator(object):
 
     key_name = '/'.join(self.data.kwargs[field] for field in fields)
     self.data.organization = GSoCOrganization.get_by_key_name(key_name)
+
+  def documentKeyNameFromKwargs(self):
+    """Returns the document key fields from kwargs.
+
+    Returns False if not all fields were supplied/consumed.
+    """
+    from soc.models.document import Document
+
+    fields = []
+    kwargs = self.data.kwargs.copy()
+
+    prefix = kwargs.pop('prefix', None)
+    fields.append(prefix)
+
+    if prefix in ['site', 'user']:
+      fields.append(kwargs.pop('scope', None))
+
+    if prefix in ['sponsor', 'gsoc_program', 'gsoc_org']:
+      fields.append(kwargs.pop('sponsor', None))
+
+    if prefix in ['gsoc_program', 'gsoc_org']:
+      fields.append(kwargs.pop('program', None))
+
+    if prefix in ['gsoc_org']:
+      fields.append(kwargs.pop('organization', None))
+
+    fields.append(kwargs.pop('document', None))
+
+    if any(kwargs.values()):
+      raise BadRequest("Unexpected value for document url")
+
+    if not all(fields):
+      raise BadRequest("Missing value for document url")
+
+    self.data.scope_path = '/'.join(fields[1:-1])
+    self.data.key_name = '/'.join(fields)
+    self.data.document = Document.get_by_key_name(self.data.key_name)
 
   def proposalFromKwargs(self):
     id = int(self.data.kwargs['id'])
@@ -653,3 +697,19 @@ class AccessChecker(BaseAccessChecker):
       return
 
     raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)
+
+  def canEditDocument(self):
+    self.isHost()
+
+  def canViewDocument(self):
+    """Checks if the specified user can see the document.
+    """
+    assert isSet(self.data.document)
+
+    if not self.data.document:
+      raise NotFound(DEF_NO_DOCUMENT)
+
+    if self.data.document.read_access == 'public':
+      return
+
+    raise AccessViolation(DEF_NOT_PUBLIC_DOCUMENT)

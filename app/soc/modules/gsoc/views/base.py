@@ -33,6 +33,7 @@ from soc.views.base import RequestHandler
 from soc.modules.gsoc.views import base_templates
 from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper.request_data import RequestData
+from soc.modules.gsoc.views.helper.request_data import RedirectHelper
 
 
 class RequestHandler(RequestHandler):
@@ -61,7 +62,8 @@ class RequestHandler(RequestHandler):
 
   def init(self, request, args, kwargs):
     self.data = RequestData()
-    self.data.populate(request, args, kwargs)
+    self.redirect = RedirectHelper(self.data, self.response)
+    self.data.populate(self.redirect, request, args, kwargs)
     if self.data.is_developer:
       self.mutator = access_checker.Mutator(self.data)
       self.check = access_checker.DeveloperAccessChecker(self.data)

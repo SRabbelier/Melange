@@ -42,12 +42,14 @@ class EditProgramTest(DjangoTestCase):
 
   def setUp(self):
     self.init()
+
     properties = {
-        'prefix': 'gsoc_program',
-        'scope': self.gsoc,
+        'prefix': 'site',
+        'scope': self.site,
+        'read_access': 'public',
         'key_name': DocumentKeyNameProvider(),
     }
-    self.document = seeder_logic.seed(Document, properties=properties)
+    self.document = self.seed(Document, properties)
 
   def testShowDocument(self):
     url = '/gsoc/document/show/' + self.document.key().name()
@@ -69,8 +71,9 @@ class EditProgramTest(DjangoTestCase):
     # test POST
     override = {
         'prefix': 'gsoc_program', 'scope': self.gsoc, 'link_id': 'doc',
-        'read_access': 'public', 'key_name': DocumentKeyNameProvider(),
-        'modified_by': self.data.user, 'home_for': None, 'author': self.data.user,
+        'key_name': DocumentKeyNameProvider(), 'modified_by': self.data.user,
+        'home_for': None, 'author': self.data.user,
+        'write_access': 'admin', 'read_access': 'public',
     }
     properties = seeder_logic.seed_properties(Document, properties=override)
     postdata = properties.copy()

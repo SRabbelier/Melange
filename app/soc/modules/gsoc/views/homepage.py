@@ -35,7 +35,6 @@ from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
 from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
-from soc.modules.gsoc.views.helper import redirects
 
 
 class Timeline(Template):
@@ -116,7 +115,9 @@ class FeaturedProject(Template):
     self.featured_project = featured_project
 
   def context(self):
-    featured_project_url = redirects.projectDetails(self.featured_project)
+    redirect = self.data.redirect
+
+    featured_project_url = redirect.projectDetails(self.featured_project).url()
 
     return {
       'featured_project': self.featured_project,

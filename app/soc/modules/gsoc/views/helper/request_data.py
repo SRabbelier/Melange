@@ -251,6 +251,7 @@ class RedirectHelper(object):
   def _clear(self):
     """Clears the internal state.
     """
+    self._no_url = False
     self._url_name = None
     self._url = None
     self.args = []
@@ -304,8 +305,13 @@ class RedirectHelper(object):
 
   def document(self, document):
     """Sets args for an url_patterns.DOCUMENT redirect.
+
+    If document is not set, a call to url() will return None.
     """
     self._clear()
+    if not document:
+      self._no_url = True
+      return self
     self.args = [document.prefix, document.scope_path + '/', document.link_id]
     self._url_name = 'show_gsoc_document'
     return self
@@ -326,6 +332,8 @@ class RedirectHelper(object):
   def url(self):
     """Returns the url of the current state.
     """
+    if self._no_url:
+      return None
     assert self._url or self._url_name
     if self._url:
       return self._url

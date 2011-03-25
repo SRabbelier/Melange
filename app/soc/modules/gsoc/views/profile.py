@@ -197,7 +197,7 @@ class ProfilePage(RequestHandler):
         'error': error,
     }
 
-    if self.data.student_info:
+    if self.data.timeline.orgsAnnounced() and self.data.student_info:
       context['apply_link'] = redirects.acceptedOrgs(self.data)
 
     return context

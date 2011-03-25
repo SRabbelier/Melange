@@ -97,7 +97,7 @@ class GSoCProfileHelper(object):
     self.createStudent()
     from soc.modules.gsoc.models.proposal import GSoCProposal
     properties = {'link_id': self.profile.link_id, 'scope': self.profile,
-                  'parent': self.profile}
+                  'parent': self.profile, 'status': 'new'}
     seeder_logic.seed(GSoCProposal, properties)
 
   def createStudentWithProject(self):

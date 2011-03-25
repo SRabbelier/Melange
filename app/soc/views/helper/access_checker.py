@@ -535,14 +535,14 @@ class AccessChecker(BaseAccessChecker):
     if not self.data.proposal:
       error_msg = DEF_ID_BASED_ENTITY_NOT_EXISTS_MSG_FMT % {
           'model': 'GSoCProposal',
-          'id': id
+          'id': self.data.kwargs['id']
           }
       raise AccessViolation(error_msg)
 
     if self.data.proposal.status == 'invalid':
       error_msg = DEF_ID_BASED_ENTITY_INVALID_MSG_FMT % {
           'model': 'GSoCProposal',
-          'id': id,
+          'id': self.data.kwargs['id'],
           }
       raise AccessViolation(error_msg)
 

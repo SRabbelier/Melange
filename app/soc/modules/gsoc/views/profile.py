@@ -106,12 +106,12 @@ class ProfileForm(forms.ModelForm):
   clean_photo_url = cleaning.clean_url('photo_url')
 
   def clean(self):
-    country = self.cleaned_data['res_country']
+    country = self.cleaned_data.get('res_country')
     state = self.cleaned_data['res_state']
     if country == 'United States' and (not state or len(state) != 2):
       self._errors['res_state'] = ["Please use a 2-letter state name"]
       
-    country = self.cleaned_data['ship_country']
+    country = self.cleaned_data.get('ship_country')
     state = self.cleaned_data['ship_state']
     if country == 'United States' and (not state or len(state) != 2):
       self._errors['ship_state'] = ["Please use a 2-letter state name"]

@@ -137,3 +137,23 @@ tr.ui-search-toolbar select {margin: 1px 0px 0px 0px}
 .ui-searchFilter table td input, .ui-searchFilter table td select {margin: 0.1em;}
 .ui-searchFilter .ui-state-default { cursor: pointer; }
 .ui-searchFilter .divider hr {margin: 1px; }
+
+/*
+  Wordwrap hack for cells and for column headers
+  From http://2centtech.blogspot.com/2009/12/jqgrid-header-and-cell-value-word-wrap.html
+*/
+.ui-jqgrid tr.jqgrow td {
+  white-space: normal !important;
+  height:auto;
+  vertical-align:text-top;
+  padding-top:2px;
+}
+.ui-jqgrid .ui-jqgrid-htable th div {
+  height:auto;
+  overflow:hidden;
+  padding-right:4px;
+  padding-top:2px;
+  position:relative;
+  vertical-align:text-top;
+  white-space:normal !important;
+}

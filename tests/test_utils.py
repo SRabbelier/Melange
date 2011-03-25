@@ -293,8 +293,8 @@ class DjangoTestCase(TestCase):
   def assertResponseCode(self, response, status_code):
     """Asserts that the response status is OK.
     """
-    if (response.status_code == httplib.FORBIDDEN and
-        status_code != httplib.FORBIDDEN):
+    if (response.status_code in [httplib.NOT_FOUND, httplib.FORBIDDEN] and
+        response.status_code != status_code):
       print response
     self.assertEqual(status_code, response.status_code)
 

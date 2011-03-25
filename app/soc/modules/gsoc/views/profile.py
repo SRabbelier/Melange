@@ -75,7 +75,7 @@ class ProfileForm(forms.ModelForm):
 
   class Meta:
     model = GSoCProfile
-    css_prefix = 'gosc_profile'
+    css_prefix = 'gsoc_profile'
     exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
                'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
                'name_on_documents']

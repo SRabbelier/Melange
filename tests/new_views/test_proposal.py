@@ -128,3 +128,20 @@ class ProposalTest(DjangoTestCase):
     url = '/gsoc/proposal/submit/' + self.org.key().name()
     response = self.client.get(url)
     self.assertResponseForbidden(response)
+
+  def testUpdateProposal(self):
+    """Test update proposals.
+    """
+    self.data.createStudentWithProposal()
+    self.timeline.studentSignup()
+
+    proposal = GSoCProposal.all().get()
+
+    url = '/gsoc/proposal/update/%s/%s' % (
+        self.gsoc.key().name(), proposal.key().id())
+    response = self.client.get(url)
+    self.assertProposalTemplatesUsed(response)
+
+    override = {'program': self.gsoc, 'score': 0, 'mentor': None, 'org': self.org, 'status': 'new'}
+    response, properties = self.modelPost(url, GSoCProposal, override)
+    self.assertResponseRedirect(response)

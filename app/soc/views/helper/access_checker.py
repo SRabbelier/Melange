@@ -507,7 +507,7 @@ class AccessChecker(BaseAccessChecker):
       return
 
     raise AccessViolation(DEF_PAGE_INACTIVE_OUTSIDE_MSG_FMT %
-        self.data.timeline.studentSignupBetween())
+        self.data.timeline.studentsSignupBetween())
 
   def canStudentUpdateProposal(self):
     """Checks if the student is eligible to submit a proposal.

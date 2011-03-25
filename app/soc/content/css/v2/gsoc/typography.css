@@ -198,3 +198,10 @@ h2#project-page-student-name {
   line-height: 1.3em;
   margin: 0 0 1em 0;
 }
+/* Override color for embedded document */
+#document_content span {
+  color: black;
+}
+#document_content {
+  padding-top: 0.5em;
+}

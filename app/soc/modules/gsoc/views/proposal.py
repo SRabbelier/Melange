@@ -69,6 +69,8 @@ class ProposalPage(RequestHandler):
     proposal_form = ProposalForm(self.data.POST or None)
     return {
         'page_name': 'Submit proposal',
+        'form_header_message': 'Submit proposal to %s' % (
+            self.data.organization.name),
         'proposal_form': proposal_form,
         }
 
@@ -126,11 +128,14 @@ class UpdateProposal(RequestHandler):
     return 'v2/modules/gsoc/proposal/base.html'
 
   def context(self):
+    proposal = self.data.proposal
+
     proposal_form = ProposalForm(self.data.POST or None,
-        instance=self.data.proposal)
+        instance=proposal)
 
     return {
         'page_name': 'Update proposal',
+        'form_header_message': 'Update proposal to %s' % (proposal.org.name),
         'proposal_form': proposal_form,
         }
 

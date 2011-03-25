@@ -22,8 +22,8 @@ limitations under the License.
 {% block page_content %}
 
 <!-- begin form -->
-<h1 id="main-page-title">Submit a Proposal for Google Summer of Code</h1>
-<form action="#" method="post" id="form" class="form-proposal">
+<form action="#" method="post" id="form" class="form-register">
+  <h2 id="form-register-title">{{ form_header_message }}</h2> <p id="form-register-req" class="req">* fields required</p>
   {{ proposal_form.render }}
   <div id="form-row-button-row" class="row button-row">
     <input type="submit" value="Submit" class="submit" />

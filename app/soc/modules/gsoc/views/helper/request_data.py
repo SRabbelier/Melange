@@ -362,42 +362,42 @@ class RedirectHelper(object):
     self._response["Location"] = iri_to_uri(url)
 
   def login(self):
-    """Sets url to the login url.
+    """Sets the _url to the login url.
     """
     self._clear()
     self._url = users.create_login_url(self._data.full_path)
     return self
 
   def logout(self):
-    """Sets url to the logout url.
+    """Sets the _url to the logout url.
     """
     self._clear()
     self._url = users.create_logout_url(self._data.full_path)
     return self
 
   def acceptedOrgs(self):
-    """Returns the redirect for list all GSoC projects.
+    """Sets the _url_name to the list all GSoC projects.
     """
     self.program()
     self._url_name = 'gsoc_accepted_orgs'
     return self
 
   def allProjects(self):
-    """Returns the redirect for list all GSoC projects.
+    """Sets the _url_name to list all GSoC projects.
     """
     self.program()
     self._url_name = 'gsoc_accepted_projects'
     return self
 
   def homepage(self):
-    """Returns the redirect for the homepage for the current GSOC program.
+    """Sets the _url_name for the homepage of the current GSOC program.
     """
     self.program()
     self._url_name = 'gsoc_homepage'
     return self
 
   def dashboard(self):
-    """Returns the redirect for the dashboard page for the current GSOC program.
+    """Sets the _url_name for dashboard page of the current GSOC program.
     """
     self.program()
     self._url_name = 'gsoc_dashboard'

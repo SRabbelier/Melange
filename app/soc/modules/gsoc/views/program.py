@@ -37,10 +37,15 @@ class ProgramForm(ModelForm):
   """Django form for the program settings.
   """
 
+  def __init__(self, scope_path, *args, **kwargs):
+    self.scope_path = scope_path
+    super(ProgramForm, self).__init__(*args, **kwargs)
+
   class Meta:
     css_prefix = 'program_form'
     model = GSoCProgram
-    exclude = ['link_id', 'scope', 'scope_path', 'timeline', 'home', 'slots_allocation']
+    exclude = ['link_id', 'scope', 'scope_path', 'timeline',
+               'home', 'slots_allocation']
 
 
 class ProgramPage(RequestHandler):
@@ -73,7 +78,9 @@ class ProgramPage(RequestHandler):
     return 'v2/modules/gsoc/program/base.html'
 
   def context(self):
-    program_form = ProgramForm(self.data.POST or None, instance=self.data.program)
+    scope_path = self.data.program.key().id_or_name()
+    program_form = ProgramForm(scope_path, self.data.POST or None,
+                               instance=self.data.program)
     return {
         'page_name': 'Edit program settings',
         'program_form': program_form,

@@ -136,7 +136,7 @@ class Group(soc.models.presence.Presence):
 
   #: Required field containing address country or territory of the group.
   contact_country = db.StringProperty(required=True,
-      verbose_name=ugettext('Country/Territory'),
+      verbose_name=ugettext('Country'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
   contact_country.group = ugettext("2. Contact Info (Private)")
 
@@ -226,7 +226,7 @@ class Group(soc.models.presence.Presence):
 
   #: Optional field containing address country or territory of the group.
   shipping_country = db.StringProperty(required=False,
-      verbose_name=ugettext('Shipping Country/Territory'),
+      verbose_name=ugettext('Shipping Country'),
       choices=countries.COUNTRIES_AND_TERRITORIES)
   shipping_country.help_text = ugettext(
       'Choose one only if you want the shipping address to differ from the '

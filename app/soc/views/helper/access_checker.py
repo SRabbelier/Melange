@@ -32,6 +32,7 @@ from soc.logic.models.user import logic as user_logic
 from soc.logic.exceptions import LoginRequest
 from soc.logic.exceptions import RedirectRequest
 from soc.logic.exceptions import BadRequest
+from soc.logic.exceptions import NotFound
 from soc.logic.exceptions import AccessViolation
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
@@ -146,6 +147,9 @@ DEF_PROPOSAL_NOT_PUBLIC_MSG = ugettext(
 
 DEF_NOT_PUBLIC_DOCUMENT = ugettext(
     'This document is not publically readable.')
+
+DEF_NO_DOCUMENT = ugettext(
+    'The document was not found')
 
 
 unset = object()

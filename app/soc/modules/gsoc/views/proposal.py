@@ -114,6 +114,12 @@ class UpdateProposal(RequestHandler):
     ]
 
   def checkAccess(self):
+    self.check.isLoggedIn()
+    self.check.isActiveStudent()
+    
+    self.data.proposal = GSoCProposal.get_by_id(
+        int(self.data.kwargs['id']), parent=self.data.profile)
+    
     self.check.canStudentUpdateProposal()
 
   def templatePath(self):

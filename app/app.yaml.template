@@ -40,6 +40,11 @@ handlers:
   upload: soc/content/js/(.*)
   expiration: 1d
 
+- url: /soc/content/css/(.*?)/(.*)
+  static_files: soc/content/css/\2
+  upload: soc/content/css/(.*)
+  expiration: 1d
+
 - url: /soc/content
   static_dir: soc/content
   expiration: 1d

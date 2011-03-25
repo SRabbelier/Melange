@@ -4,7 +4,7 @@
 
 ////////////////*/
 #main-menu {
-  background: url(../../../images/v2/gsoc/nav-bg.gif) 0 0 repeat;
+  background: url(../../../../images/v2/gsoc/nav-bg.gif) 0 0 repeat;
   margin-right: 0;
 }
 #main-menu ul {
@@ -65,7 +65,7 @@
 #main-menu ul li.active ul {
   /*submenu under an active top level*/
 
-  background: url(../../../images/v2/gsoc/nav-bg.gif) 0 0 repeat;
+  background: url(../../../../images/v2/gsoc/nav-bg.gif) 0 0 repeat;
 }
 #main-menu ul li.parent.active {
   /*top level active list item w/ submenu - for use when the top level is highlighted but the submenu is not*/

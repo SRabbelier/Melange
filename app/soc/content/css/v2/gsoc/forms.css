@@ -37,13 +37,13 @@
 }
 #flash-message.flash-error {
     /*save confirmation banner notifies error*/
-    background: url(../../../images/v2/gsoc/flash-error.png) no-repeat 10px 50% #CF3333;
+    background: url(../../../../images/v2/gsoc/flash-error.png) no-repeat 10px 50% #CF3333;
     color: #FFF;
     border-color: #990000;
 }
 #flash-message.flash-success {
     /*save confirmation banner notifies success*/
-    background: url(../../../images/v2/gsoc/flash-success.png) no-repeat 10px 50% #C6F9C9;
+    background: url(../../../../images/v2/gsoc/flash-success.png) no-repeat 10px 50% #C6F9C9;
     color: #4F7F51;
     border-color: #9BD39E;
 }
@@ -352,7 +352,7 @@
   margin: 20px 0 0 20px;
 }
 #form.form-proposal .row.button-row .save {
-  background: url(../../../images/v2/gsoc/form-submit-bg-blue.png) 0 0 repeat;
+  background: url(../../../../images/v2/gsoc/form-submit-bg-blue.png) 0 0 repeat;
   margin-left: 15px;
 }
 #form.form-project-comment {
@@ -529,7 +529,7 @@
   width: 100%;
 }
 #form fieldset .row div.uploader span.action {
-  background: url(../../../images/v2/gsoc/form-submit-bg.png) 0 0 repeat;
+  background: url(../../../../images/v2/gsoc/form-submit-bg.png) 0 0 repeat;
   color: #fff;
   font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
   font-size: 14px;
@@ -576,7 +576,7 @@
 
 }
 #form .row.button-row input {
-  background: url(../../../images/v2/gsoc/form-submit-bg.png) 0 0 repeat;
+  background: url(../../../../images/v2/gsoc/form-submit-bg.png) 0 0 repeat;
   border: 0;
   color: #fff;
   font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;

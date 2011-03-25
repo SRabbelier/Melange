@@ -32,12 +32,12 @@
 .tablesorter .headerSortUp span {
   /*asc arrow*/
 
-  background-image: url(../../../images/v2/gsoc/table-sort-asc.gif);
+  background-image: url(../../../../images/v2/gsoc/table-sort-asc.gif);
 }
 .tablesorter .headerSortDown span {
   /*desc arrow*/
 
-  background-image: url(../../../images/v2/gsoc/table-sort-desc.gif);
+  background-image: url(../../../../images/v2/gsoc/table-sort-desc.gif);
 }
 .tablesorter tbody {
   /*table body*/
@@ -55,7 +55,7 @@
 .tablesorter tbody td a.rank {
   /*ranking arrows - default is down on*/
 
-  background: url(../../../images/v2/gsoc/ranking.png) 0 0 no-repeat;
+  background: url(../../../../images/v2/gsoc/ranking.png) 0 0 no-repeat;
   display: block;
   float: left;
   height: 6px;

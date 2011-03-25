@@ -64,6 +64,9 @@
   // Melange packages URL prefix
   var mpjs = "/soc/content/js/" + melange.config.app_version + "/";
 
+  // Melange CSS URL prefix
+  var mcss = "/soc/content/css/" + melange.config.app_version + "/";
+
   if (melange.config.google_api_key !== undefined) {
     s.google = [
       "http://www.google.com/jsapi?key=" + melange.config.google_api_key
@@ -126,13 +129,13 @@
 
   if (melange.config.is_local !== undefined && melange.config.is_local === true) {
     s.jqueryui.core = [
-      new $m.cssFile("/soc/content/css/jquery-ui/jquery.ui.all.css"),
+      new $m.cssFile(mcss + "jquery-ui/jquery.ui.all.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }
   else {
     s.jqueryui.core = [
-      new $m.cssFile("/soc/content/css/jquery-ui/jquery.ui.merged.css"),
+      new $m.cssFile(mcss + "jquery-ui/jquery.ui.merged.css"),
       tpjs + "jquery/jquery-ui.core.js"
     ];
   }
@@ -172,7 +175,7 @@
   s.jqgrid = [
     s.jqueryui.core,
     null,
-    new $m.cssFile("/soc/content/css/v2/gsoc/ui.jqgrid.css"),
+    new $m.cssFile(mcss + "v2/gsoc/ui.jqgrid.css"),
     tpjs + "jquery/jquery-jqgrid.locale-en.js",
     null,
     tpjs + "jquery/jquery-jqgrid.base.js",

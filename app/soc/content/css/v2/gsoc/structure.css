@@ -15,14 +15,14 @@
 
 ////////////////*/
 #bg {
-  background: url(../../../images/v2/gsoc/main-bg.png) top center repeat-y;
+  background: url(../../../../images/v2/gsoc/main-bg.png) top center repeat-y;
   display: block;
   overflow: hidden;
 }
 #page-header {
   /*logo and globe*/
 
-  background: #ffffff url(../../../images/v2/gsoc/header-bg.png) bottom left repeat-x;
+  background: #ffffff url(../../../../images/v2/gsoc/header-bg.png) bottom left repeat-x;
   height: 156px;
   width: 100%;
 }
@@ -116,7 +116,7 @@
 #main .home-block-1 ol {
   /*numbered list*/
 
-  background: url(../../../images/v2/gsoc/home-block-1-bg-center.gif) center center no-repeat;
+  background: url(../../../../images/v2/gsoc/home-block-1-bg-center.gif) center center no-repeat;
   float: left;
   height: 218px;
   list-style-type: none;
@@ -140,16 +140,16 @@
   font-size: 13px;
 }
 #main .home-block-1 ol li.first {
-  background-image: url(../../../images/v2/gsoc/home-block-1-list-1.png);
+  background-image: url(../../../../images/v2/gsoc/home-block-1-list-1.png);
 }
 #main .home-block-1 ol li.second {
-  background-image: url(../../../images/v2/gsoc/home-block-1-list-2.png);
+  background-image: url(../../../../images/v2/gsoc/home-block-1-list-2.png);
 }
 #main .home-block-1 ol li.second strong {
   padding-top: 22px;
 }
 #main .home-block-1 ol li.third {
-  background-image: url(../../../images/v2/gsoc/home-block-1-list-3.png);
+  background-image: url(../../../../images/v2/gsoc/home-block-1-list-3.png);
 }
 #main .home-block-1 .description p {
   color: #d5620e;
@@ -166,13 +166,13 @@
 #main .content_column_1 .block-students {
   /*students apply now block*/
 
-  background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 repeat-y;
+  background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 repeat-y;
   color: #004371;
   padding-bottom: 5px;
   text-align: center;
 }
 #main .content_column_1 .block-students h3 {
-  *background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  *background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
   font-size: 35px;
   font-weight: bold;
   line-height: 1.9em;
@@ -225,13 +225,13 @@
 #main .content_column_1 .block-mentors {
   /*mentors apply now block*/
 
-  background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
   color: #004371;
   text-align: center;
   padding-bottom: 15px;
 }
 #main .content_column_1 .block-mentors h3 {
-  *background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  *background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
   font-size: 35px;
   font-weight: bold;
   line-height: 1.9em;
@@ -269,13 +269,13 @@
 #main .content_column_1 .block-orgs {
   /*orgs apply now block*/
 
-  background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
   color: #004371;
   text-align: center;
   padding-bottom: 15px;
 }
 #main .content_column_1 .block-orgs h3 {
-  *background: url(../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
+  *background: url(../../../../images/v2/gsoc/home-block-students-bg.gif) 0 0 no-repeat;
   font-size: 33px;
   font-weight: bold;
   line-height: 1.9em;
@@ -324,7 +324,7 @@
 
 }
 #main .content_column_2 .block-connect .social {
-  background-image: url(../../../images/v2/gsoc/social-icons.png);
+  background-image: url(../../../../images/v2/gsoc/social-icons.png);
   background-position: 0 0;
   background-repeat: no-repeat;
   height: 31px;
@@ -464,7 +464,7 @@
   padding: 3px 0 0 0;
 }
 #footer .footer-menu .social a {
-  background-image: url(../../../images/v2/gsoc/social-icons.png);
+  background-image: url(../../../../images/v2/gsoc/social-icons.png);
   background-position: 0 -34px;
   background-repeat: no-repeat;
   height: 14px;

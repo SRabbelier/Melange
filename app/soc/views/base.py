@@ -310,3 +310,6 @@ class SiteRequestHandler(RequestHandler):
   def init(self, request, args, kwargs):
     self.data = RequestData()
     self.data.populate(request, args, kwargs)
+
+  def redirect(self, url):
+    self.response = http.HttpResponseRedirect(url)

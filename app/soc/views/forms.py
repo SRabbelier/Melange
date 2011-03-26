@@ -351,7 +351,9 @@ class BoundField(forms.BoundField):
 
     if isinstance(widget, DocumentWidget):
       return self.renderDocumentWidget()
-    if isinstance(widget, widgets.TextInput):
+    elif isinstance(widget, TOSWidget):
+      return self.renderTOSWidget()
+    elif isinstance(widget, widgets.TextInput):
       return self.renderTextInput()
     elif isinstance(widget, widgets.DateInput):
       return self.renderTextInput()
@@ -445,6 +447,21 @@ class BoundField(forms.BoundField):
         self._render_error(),
         self._render_note(),
     ))
+
+  def renderTOSWidget(self):
+    checkbox_attrs = {
+        'id': self.name,
+        'style': 'opacity: 100;',
+        }
+
+    return mark_safe(
+        '<label>%s%s%s%s</label>%s' % (
+        self.as_widget(attrs=checkbox_attrs),
+        self.field.label,
+        self._render_is_required(),
+        self._render_error(),
+        self._render_note(),
+        ))
 
   def _render_label(self):
     return '<label>%s%s</label>' % (

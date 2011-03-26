@@ -79,6 +79,7 @@
 }
 #form.form-register fieldset {
   background: #cde5f5;
+  clear: left;
   margin: 0 23px 16px 23px;
   padding: 30px 0 11px 0;
 }

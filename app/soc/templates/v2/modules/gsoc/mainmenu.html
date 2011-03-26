@@ -29,6 +29,9 @@
       {% if help_link %}
       <li id="menu-help"><a href="{{ help_link }}">Help</a></li>
       {% endif %}
+      {% if logout_link %}
+      <li id="menu-login"><a href="{{ logout_link }}">Logout</a></li>
+      {% endif %}
     </ul>
   {% endblock site_menu %}
 </div>

@@ -95,7 +95,7 @@ class OrgProfilePage(RequestHandler):
       #probably check if the org is active
     else:
       self.data.org = None
-      # TODO
+      self.check.fail("Org creation is not supported at this time")
 
   def templatePath(self):
     return 'v2/modules/gsoc/org_profile/base.html'

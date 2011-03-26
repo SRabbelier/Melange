@@ -60,6 +60,12 @@ def choiceWidgets(model, fields):
   return dict((i, choiceWidget(getattr(model, i))) for i in fields)
 
 
+class ReferenceWidget(widgets.TextInput):
+  """Extends Django's TextInput widget to render the needed extra input field.
+  """
+  pass
+
+
 class DocumentWidget(widgets.TextInput):
   """Extends the Django's TextInput widget to render the edit link to Documents.
   """
@@ -111,7 +117,8 @@ class ReferenceProperty(djangoforms.ReferenceProperty):
       return django.forms.CharField(required=self.required,
                                     widget=DocumentWidget)
     else:
-      return django.forms.CharField(required=self.required)
+      return django.forms.CharField(required=self.required,
+                                    widget=ReferenceWidget)
 
   def make_value_from_form(self, value):
     """Convert a form value to a property value.
@@ -355,6 +362,8 @@ class BoundField(forms.BoundField):
 
     if isinstance(widget, DocumentWidget):
       return self.renderDocumentWidget()
+    elif isinstance(widget, ReferenceWidget):
+      return self.renderReferenceWidget()
     elif isinstance(widget, TOSWidget):
       return self.renderTOSWidget()
     elif isinstance(widget, widgets.TextInput):

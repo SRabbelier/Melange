@@ -237,7 +237,12 @@ class ProfilePage(RequestHandler):
     return user_form
 
   def validateProfile(self, dirty):
-    profile_form = ProfileForm(self.data.POST, instance=self.data.profile)
+    # we just want to pass some dummy variable as a place holder for
+    # tos_content. While validating the form, the value for this variable
+    # doesn't matter.
+    tos_content = None
+    profile_form = ProfileForm(tos_content, self.data.POST,
+                               instance=self.data.profile)
 
     if not profile_form.is_valid():
       return profile_form, None

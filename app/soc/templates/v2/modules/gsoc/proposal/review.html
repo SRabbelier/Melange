@@ -89,8 +89,8 @@ limitations under the License.
     var initialTotal = {{ scores.total }};
     var initialNumber = {{ scores.number }};
     var userInitialScore = {{ scores.user_score }};
-    
-    var successHanlder = function (userScore) {
+
+    var successHandler = function (userScore) {
       userScore = parseInt(userScore);
 
       var newNumber = initialNumber;
@@ -115,7 +115,7 @@ limitations under the License.
       jQuery.fn.raty.start(newAverage, '#score-average-stars');
       jQuery('#score-average-desc em').html(newMessage);
     };
-    
+
     jQuery(document).ready(function() {
       jQuery('#score-average-stars').raty({
         readOnly:   true,
@@ -128,13 +128,14 @@ limitations under the License.
       });
     });
     $('#score-add-stars').raty({
-        cancel:		true,
+        cancel: true,
         cancelPlace:'right',
-        cancelOff:	'proposal-rate-cancel-off.png',
-        cancelOn:	'proposal-rate-cancel-on.png',
-        click:      successHanlder,//function (value) {
-        			//  jQuery.get("{{ score_action }}", {value: value});
-        			//},
+        cancelOff: 'proposal-rate-cancel-off.png',
+        cancelOn: 'proposal-rate-cancel-on.png',
+        click: function (value) {
+            jQuery.post("{{ score_action }}", {value: value, xsrf_token: window.xsrf_token});
+            successHandler(value)
+        },
         half:		false,
         path:       '/soc/content/images/v2/gsoc',
         start:      {{ scores.user_score }},

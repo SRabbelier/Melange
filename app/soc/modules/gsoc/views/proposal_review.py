@@ -301,7 +301,7 @@ class PostScore(RequestHandler):
     posted by the current user.
 
     Returns:
-      a score entity or None
+      The score entity that was created/updated.
     """
     assert isSet(self.data.proposal)
 
@@ -319,6 +319,8 @@ class PostScore(RequestHandler):
       score.value = value
 
     score.put()
+
+    return score
 
   def post(self):
     value = int(self.data.POST['value'])

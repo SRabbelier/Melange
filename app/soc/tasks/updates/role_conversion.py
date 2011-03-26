@@ -177,7 +177,7 @@ class RoleUpdater(object):
             key_name=key_name, **properties)
 
         # do not update anything if the role is already in the profile
-        if profile.student_info:
+        if profile.student_info and model == GSoCStudent:
           continue
         elif self.ROLE_FIELD:
           if entity.scope.key() in profile.__getattribute__(self.ROLE_FIELD):
@@ -189,6 +189,9 @@ class RoleUpdater(object):
         if profile.status == 'invalid' and entity.status != 'invalid':
           for prop, value in entity.properties:
             setattr(profile, prop, value)
+
+          if profile.student_info:
+            profile.student_info = None
 
         if self.ROLE_FIELD:
           # the role is either Mentor or OrgAdmin

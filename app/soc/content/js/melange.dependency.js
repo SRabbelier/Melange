@@ -140,6 +140,12 @@
     ];
   }
 
+  s.jqueryui.datepicker = [
+    s.jqueryui.core,
+    null,
+    tpjs + "jquery/jquery-ui.datepicker.js"
+  ];
+
   s.jqueryui.position = [
     s.jqueryui.core,
     null,

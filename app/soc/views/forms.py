@@ -82,10 +82,14 @@ class TOSWidget(widgets.CheckboxInput):
         'class': 'textarea',
         'readonly': 'readonly',
         }
-    text = mark_safe(
-        u'<div id="tos-readonly-%s"><textarea%s>%s</textarea></div>' % (
-        name, flatatt(readonly_attrs),
-        conditional_escape(force_unicode(self.tos_text))))
+    if self.tos_text:
+      text = mark_safe(
+          u'<div id="tos-readonly-%s"><textarea%s>%s</textarea></div>' % (
+          name, flatatt(readonly_attrs),
+          conditional_escape(force_unicode(self.tos_text))))
+    else:
+      text = mark_safe(
+          u'<div id="tos-readonly-%s">Terms of Agreement content is not set.</div>')
 
     checkbox = super(TOSWidget, self).render(name, value, attrs)
     return mark_safe(u'%s%s' % (text, checkbox))

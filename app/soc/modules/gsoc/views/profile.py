@@ -174,7 +174,7 @@ class ProfilePage(RequestHandler):
     else:
       student_info_form = EmptyForm()
 
-    tos_content = "Agreement content is not set"
+    tos_content = None
 
     program = self.data.program
     if not role:

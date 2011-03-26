@@ -62,10 +62,17 @@ limitations under the License.
   [
     dep.uniform,
     dep.melange.main,
+    dep.jqueryui.datepicker,
     css("/soc/content/css/v2/gsoc/others.css"),
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
+      jQuery("#birth_date").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: "yy-mm-dd",
+        showButtonPanel: true
+      });
     },
     tc("/soc/content/js/{{ app_version }}/templates/modules/gsoc/profile.js", {})
   ]

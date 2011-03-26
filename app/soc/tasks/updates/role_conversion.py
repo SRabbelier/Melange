@@ -310,13 +310,9 @@ def _getProfileKeyForRoleKey(key, profile_model):
   is represented by the specified Key.
   """
 
-  for model in ROLE_MODELS:
-    entity = model.get(key)
-    if not entity:
-      continue
-
-    profile = _getProfileForRole(entity, profile_model)
-    return profile.key()
+  entity = db.get(key)
+  profile = _getProfileForRole(entity, profile_model)
+  return profile.key()
 
 class ReferenceUpdater(object):
   """Class which is responsible for updating references to Profile in

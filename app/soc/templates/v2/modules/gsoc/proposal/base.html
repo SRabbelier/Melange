@@ -36,9 +36,13 @@ limitations under the License.
 {% block dependencies %}
   [
     dep.uniform,
+    dep.counter,
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
+      jQuery("#abstract").counter({
+        goal: 500
+      });
     }
   ]
 {% endblock dependencies %}

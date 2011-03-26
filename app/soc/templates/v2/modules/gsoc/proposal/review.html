@@ -132,6 +132,7 @@ limitations under the License.
         cancelPlace:'right',
         cancelOff: 'proposal-rate-cancel-off.png',
         cancelOn: 'proposal-rate-cancel-on.png',
+        cancelHint: 'Remove my rating',
         click: function (value) {
             jQuery.post("{{ score_action }}", {value: value, xsrf_token: window.xsrf_token});
             successHandler(value)

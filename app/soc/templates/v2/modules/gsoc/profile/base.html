@@ -27,7 +27,11 @@ limitations under the License.
         changeMonth: true,
         changeYear: true,
         dateFormat: "yy-mm-dd",
-        showButtonPanel: true
+        showButtonPanel: true,
+        minDate: "-90y",
+        maxDate: "+0D",
+        yearRange: "-90",
+        defaultDate: '1990-01-01'
       });
     },
     tc("/soc/content/js/{{ app_version }}/templates/modules/gsoc/profile.js", {})

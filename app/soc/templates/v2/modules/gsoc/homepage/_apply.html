@@ -41,7 +41,7 @@ limitations under the License.
 {% endif %}
 
 {% if apply_block %}
-  <!-- begin block -->
+  <!-- begin in apply block -->
     <p id="block-apply-text-action" class="action">
       {% if login_link %}
         <a href="{{ login_link }}">Login</a>
@@ -64,9 +64,11 @@ limitations under the License.
     {% endif %}
 
   {% if other_proposals_link %}
-    <p id="block-apply-text-link"><a href="{{ other_proposals_link }}">Looking for ideas? See what others are proposing! &rsaquo;</a></p>
+    <p id="block-apply-text-link">
+      <a href="{{ other_proposals_link }}">Looking for ideas? See what others are proposing! &rsaquo;</a>
+    </p>
   {% endif %}
 
   </div>
-  <!-- end block -->
+  <!-- end in apply block -->
 {% endif %}

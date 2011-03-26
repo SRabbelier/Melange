@@ -363,6 +363,8 @@ class BoundField(forms.BoundField):
       return self.renderCheckboxInput()
     elif isinstance(widget, widgets.Textarea):
       return self.renderTextArea()
+    elif isinstance(widget, widgets.DateTimeInput):
+      return self.renderTextInput()
 
     return self.NOT_SUPPORTED_MSG_FMT % (
         widget.__class__.__name__)

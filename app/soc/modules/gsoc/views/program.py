@@ -87,7 +87,9 @@ class ProgramPage(RequestHandler):
     }
 
   def validate(self):
-    program_form = ProgramForm(self.data.POST, instance=self.data.program)
+    scope_path = self.data.program.key().id_or_name()
+    program_form = ProgramForm(scope_path, self.data.POST,
+                               instance=self.data.program)
 
     if not program_form.is_valid():
       return False

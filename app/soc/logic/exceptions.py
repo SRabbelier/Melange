@@ -25,7 +25,6 @@ __authors__ = [
 class Error(Exception):
   """Error class for the access_exception module.
   """
-
   status = 500
 
 
@@ -46,19 +45,16 @@ class RedirectRequest(Error):
 class AccessViolation(Error):
   """An access requirement was not met.
   """
-
   status = 403
 
 
 class NotFound(Error):
   """Item Not Found.
   """
-
   status = 404
 
 
 class BadRequest(Error):
   """Bad Request
   """
-
   status = 400

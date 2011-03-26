@@ -128,17 +128,14 @@ class ReviewProposal(RequestHandler):
         'average': total / number if number else 0,
         'number': number,
         'total': total,
-        'user_score': user_score,        
+        'user_score': user_score,
         }
 
   def getComments(self):
-    """Gets all the comments for the proposal.
+    """Gets all the comments for the proposal visible by the current user.
     """
     assert isSet(self.data.private_comments_visible)
     assert isSet(self.data.proposal)
-
-    if not self.data.private_comments_visible:
-      return None, None
 
     public_comments = []
     private_comments = []
@@ -149,6 +146,10 @@ class ReviewProposal(RequestHandler):
         private_comments.append(comment)
       else:
         public_comments.append(comment)
+
+    if not self.data.private_comments_visible:
+      # this user is not allowed to see private comments
+      private_comments = []
 
     return public_comments, private_comments
 

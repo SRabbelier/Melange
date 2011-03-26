@@ -64,6 +64,7 @@ limitations under the License.
 
 {% block dependencies %}
   [
+  {% if program.feed_url %}
     dep.melange.blog,
     null,
     function () {
@@ -78,5 +79,6 @@ limitations under the License.
         }
       );
     }
+  {% endif %}
   ]
 {% endblock dependencies %}

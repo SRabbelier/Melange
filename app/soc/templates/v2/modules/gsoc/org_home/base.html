@@ -78,19 +78,21 @@ limitations under the License.
   [
     dep.melange.list,
     css("/soc/content/css/{{ app_version }}/v2/gsoc/user-messages.css"),
-    dep.melange.blog,
-    null,
-    function () {
-      function initialize() {
-        var blog = new BlogPreview(document.getElementById("blog-feed"));
-        blog.show("{{ organization.feed_url }}", 5, "Blog Feed");
-      }
-
-      jQuery(
-        function () {
-          google.load("feeds","1", {callback:initialize});
+    {% if organization.feed_url %}
+      dep.melange.blog,
+      null,
+      function () {
+        function initialize() {
+          var blog = new BlogPreview(document.getElementById("blog-feed"));
+          blog.show("{{ organization.feed_url }}", 5, "Blog Feed");
         }
-      );
-    }
+
+        jQuery(
+          function () {
+            google.load("feeds","1", {callback:initialize});
+          }
+        );
+      }
+    {% endif %}
   ]
 {% endblock dependencies %}

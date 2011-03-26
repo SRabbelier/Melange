@@ -300,8 +300,14 @@ class PostScore(RequestHandler):
     """Creates a new score or updates a score if there is already one
     posted by the current user.
 
+    If the value passed in is 0 then the Score of the user will be removed and
+    None will be returned.
+
+    Args:
+      value: The value of the score the user gave as an integer.
+
     Returns:
-      The score entity that was created/updated.
+      The score entity that was created/updated or None if value is 0.
     """
     assert isSet(self.data.proposal)
 
@@ -310,6 +316,13 @@ class PostScore(RequestHandler):
     query.ancestor(self.data.proposal)
 
     score = query.get()
+
+    # delete GSoCSCore if present when value is 0 and return None.
+    if value == 0:
+      if score:
+        score.delete()
+      return None
+
     if not score:
       score = GSoCScore(
           parent=self.data.proposal,
@@ -319,7 +332,6 @@ class PostScore(RequestHandler):
       score.value = value
 
     score.put()
-
     return score
 
   def post(self):

@@ -142,14 +142,10 @@ class ReviewProposal(RequestHandler):
 
     query = db.Query(NewComment).ancestor(self.data.proposal)
     for comment in query:
-      if comment.is_private:
-        private_comments.append(comment)
-      else:
+      if not comment.is_private:
         public_comments.append(comment)
-
-    if not self.data.private_comments_visible:
-      # this user is not allowed to see private comments
-      private_comments = []
+      elif self.data.private_comments_visible:
+        private_comments.append(comment)
 
     return public_comments, private_comments
 

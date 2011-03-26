@@ -246,16 +246,16 @@ class PostComment(RequestHandler):
     assert isSet(self.data.public_only)
     assert isSet(self.data.proposal)
 
-    comment_form = CommentForm(self.data.request.POST)
+    if self.data.public_only:
+      comment_form = CommentForm(self.data.request.POST)
+    else:
+      # this form contains checkbox for indicating private/public comments
+      comment_form = PrivateCommentForm(self.data.request.POST)
 
     if not comment_form.is_valid():
       return None
 
     comment_form.cleaned_data['author'] = self.data.profile
-
-    # double check that the author of the proposal posts a public comment
-    if self.data.public_only:
-      comment_form.cleaned_data['is_private'] = False
 
     return comment_form.create(commit=True, parent=self.data.proposal)
 

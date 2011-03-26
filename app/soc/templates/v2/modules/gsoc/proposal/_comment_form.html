@@ -3,7 +3,6 @@
   {% for _, fields in form %}
     {% for field in fields %}
       <div id="form_row_{{ field.name }}" class="row {{ field.div_class }}">
-
         {{ field.render }}
       </div>
     {% endfor %}

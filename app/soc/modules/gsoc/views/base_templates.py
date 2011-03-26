@@ -81,8 +81,12 @@ class MainMenu(Template):
   def context(self):
     context = siteMenuContext(self.data)
     context.update({
-        'home_link': self.data.redirect.homepage().url()
+        'home_link': self.data.redirect.homepage().url(),
     })
+
+    if self.data.profile:
+      self.data.redirect.program()
+      context['profile_link'] = self.data.redirect.urlOf('edit_gsoc_profile')
     return context
 
   def templatePath(self):

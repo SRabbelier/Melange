@@ -262,12 +262,14 @@ class RedirectHelper(object):
     """
     self._clear()
     self.kwargs['sponsor'] = self._data.program.scope_path
+    return self
 
   def program(self):
     """Sets kwargs for an url_patterns.PROGRAM redirect.
     """
     self.sponsor()
     self.kwargs['program'] = self._data.program.link_id
+    return self
 
   def organization(self, organization=None):
     """Sets the kwargs for an url_patterns.ORG redirect.
@@ -277,6 +279,7 @@ class RedirectHelper(object):
       organization = self._data.organization
     self.program()
     self.kwargs['organization'] = organization.link_id
+    return self
 
   def id(self, id=None):
     """Sets the kwargs for an url_patterns.ID redirect.
@@ -286,6 +289,7 @@ class RedirectHelper(object):
       id = self._data.kwargs['id']
     self.program()
     self.kwargs['id'] = id
+    return self
 
   def review(self, id=None, student=None):
     """Sets the kwargs for an url_patterns.REVIEW redirect.
@@ -295,6 +299,7 @@ class RedirectHelper(object):
       student = self._data.kwargs['student']
     self.id(id)
     self.kwargs['student'] = student
+    return self
 
   def invite(self, role=None):
     if not role:
@@ -302,6 +307,7 @@ class RedirectHelper(object):
       role = self._data.kwargs['role']
     self.organization()
     self.kwargs['role'] = role
+    return self
 
   def document(self, document):
     """Sets args for an url_patterns.DOCUMENT redirect.

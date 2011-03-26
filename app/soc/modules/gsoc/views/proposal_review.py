@@ -191,6 +191,7 @@ class ReviewProposal(RequestHandler):
         'score_action': score_action,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
+        'page_name': self.data.proposal.title,
         }
 
 

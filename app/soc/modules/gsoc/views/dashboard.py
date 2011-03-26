@@ -461,8 +461,11 @@ class OrganizationsIAdminComponent(Component):
   def __init__(self, request, data):
     """Initializes this component.
     """
+    r = data.redirect
     list_config = lists.ListConfiguration()
     list_config.addSimpleColumn('name', 'name')
+    list_config.setRowAction(
+        lambda e, *args, **kwargs: r.organization(e).urlOf('gsoc_org_home'))
     self._list_config = list_config
 
     super(OrganizationsIAdminComponent, self).__init__(request, data)

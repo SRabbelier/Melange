@@ -42,16 +42,13 @@ class AcceptedOrgsList(Template):
   def __init__(self, request, data):
     self.request = request
     self.data = data
+    r = data.redirect
 
     list_config = lists.ListConfiguration()
     list_config.addSimpleColumn('name', 'Name')
     list_config.addSimpleColumn('link_id', 'Link ID', hidden=True)
     list_config.setRowAction(
-        lambda e, *args, **kwargs: reverse('gsoc_org_home', kwargs={
-            'sponsor': data.kwargs['sponsor'],
-            'program': data.kwargs['program'],
-            'organization': e.link_id,
-        }))
+        lambda e, *args, **kwargs: r.organization(e).urlOf('gsoc_org_home'))
     list_config.addColumn('tags', 'Tags',
                           lambda e, *args, **kwargs: e.tags_string(e.org_tag))
 

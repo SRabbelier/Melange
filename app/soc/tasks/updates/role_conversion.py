@@ -143,6 +143,59 @@ class RoleUpdater(object):
 
     self._process(None, batch_size)
 
+  def _processEntity(self, entity):
+    program = getattr(entity, self.PROGRAM_FIELD)
+    user = entity.user
+
+    # try to find an existing Profile entity or create a new one
+    key_name = program.key().name() + '/' + user.link_id
+    properties = {
+        'link_id': entity.link_id,
+        'scope_path': program.key().name(),
+        'scope': program,
+        'parent': user,
+        }
+    for prop in POPULATED_PROFILE_PROPS:
+      properties[prop] = getattr(entity, prop)
+
+    profile = self.PROFILE_MODEL.get_or_insert(
+        key_name=key_name, **properties)
+
+    # do not update anything if the role is already in the profile
+    if profile.student_info and self.MODEL == GSoCStudent:
+      return
+    elif self.ROLE_FIELD:
+      if entity.scope.key() in getattr(profile, self.ROLE_FIELD):
+        return
+
+    to_put = [profile]
+
+    # a non-invalid role is found, we should re-populate the profile
+    if profile.status == 'invalid' and entity.status != 'invalid':
+      for prop_name in entity.properties():
+        value = getattr(entity, prop_name)
+        setattr(profile, prop_name, value)
+
+      if profile.student_info:
+        profile.student_info = None
+
+    if self.ROLE_FIELD:
+      # the role is either Mentor or OrgAdmin
+      getattr(profile, self.ROLE_FIELD).append(entity.scope.key())
+    else:
+      # the role is certainly Student; we have to create a new StudentInfo
+      properties = {}
+      for prop in POPULATED_STUDENT_PROPS:
+        properties[prop] = getattr(entity, prop)
+
+      key_name = profile.key().name()
+      student_info = StudentInfo(key_name=key_name,
+          parent=profile, **properties)
+      profile.student_info = student_info
+      to_put.append(student_info)
+
+    db.run_in_transaction(db.put, to_put)
+
   def _process(self, start_key, batch_size):
     """Retrieves entities and creates or updates a corresponding
     Profile entity.
@@ -160,57 +213,12 @@ class RoleUpdater(object):
         return
 
       for entity in entities:
-        program = getattr(entity, self.PROGRAM_FIELD)
-        user = entity.user
-
-        # try to find an existing Profile entity or create a new one
-        key_name = program.key().name() + '/' + user.link_id
-        properties = {
-            'link_id': entity.link_id,
-            'scope_path': program.key().name(),
-            'scope': program,
-            'parent': user,
-            }
-        for prop in POPULATED_PROFILE_PROPS:
-          properties[prop] = getattr(entity, prop)
-
-        profile = self.PROFILE_MODEL.get_or_insert(
-            key_name=key_name, **properties)
-
-        # do not update anything if the role is already in the profile
-        if profile.student_info and self.MODEL == GSoCStudent:
-          continue
-        elif self.ROLE_FIELD:
-          if entity.scope.key() in getattr(profile, self.ROLE_FIELD):
-            continue
-
-        to_put = [profile]
-
-        # a non-invalid role is found, we should re-populate the profile
-        if profile.status == 'invalid' and entity.status != 'invalid':
-          for prop_name in entity.properties():
-            value = getattr(entity, prop_name)
-            setattr(profile, prop_name, value)
-
-          if profile.student_info:
-            profile.student_info = None
-
-        if self.ROLE_FIELD:
-          # the role is either Mentor or OrgAdmin
-          getattr(profile, self.ROLE_FIELD).append(entity.scope.key())
-        else:
-          # the role is certainly Student; we have to create a new StudentInfo
-          properties = {}
-          for prop in POPULATED_STUDENT_PROPS:
-            properties[prop] = getattr(entity, prop)
-
-          key_name = profile.key().name()
-          student_info = StudentInfo(key_name=key_name,
-              parent=profile, **properties)
-          profile.student_info = student_info
-          to_put.append(student_info)
-
-        db.run_in_transaction(db.put, to_put)
+        try:
+          self._processEntity(entity)
+        except db.Error, e:
+          import logging
+          logging.exception(e)
+          logging.error("Broke on %s: %s" % (entity.key().name(), self.MODEL))
 
       # process the next batch of entities
       start_key = entities[-1].key()

@@ -123,6 +123,21 @@ class ProfileForm(forms.ModelForm):
     return self.cleaned_data
 
 
+class EditProfileForm(ProfileForm):
+  """Django edit form for profiles.
+  """
+
+  class Meta:
+    model = ProfileForm.Meta.model
+    css_prefix = ProfileForm.Meta.css_prefix
+    exclude = ProfileForm.Meta.exclude + ['agreed_to_tos']
+    widgets = ProfileForm.Meta.widgets
+
+  def __init__(self, tos_content, *args, **kwargs):
+    # do not call ProfileForm's init, since it sets agreed_to_tos
+    super(ProfileForm, self).__init__(*args, **kwargs)
+
+
 class StudentInfoForm(forms.ModelForm):
   """Django form for the student profile page.
   """
@@ -217,8 +232,9 @@ class ProfilePage(RequestHandler):
 
     form = EditUserForm if self.data.user else UserForm
     user_form = form(self.data.POST or None, instance=self.data.user)
-    profile_form = ProfileForm(tos_content, self.data.POST or None,
-                               instance=self.data.profile)
+    form = EditProfileForm if self.data.profile else ProfileForm
+    profile_form = form(tos_content, self.data.POST or None,
+                        instance=self.data.profile)
     error = user_form.errors or profile_form.errors or student_info_form.errors
 
     context = {

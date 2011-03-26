@@ -44,17 +44,9 @@
   $m.makeAutoComplete = function (id) {
     var url = "?fmt=json&field=" + id;
     var pretty = id + '-pretty';
-    jQuery("#" + id).attr('id', pretty).attr('name', pretty);
     jQuery.ajax({
       url: url,
       success: function(data){
-        jQuery("#" + pretty).after([
-          '<input id="',
-          id,
-          '" name="',
-          id,
-          '" type="hidden" />'
-        ].join(""));
         jQuery("#" + pretty).autocomplete({
           source: data.data,
           focus: function (event, ui) {
@@ -62,7 +54,7 @@
             return false;
           },
           select: function (event, ui) {
-            jQuery("#" + pretty).val(ui.item.label);
+            jQuery("#" + pretty).val(ui.item.key_name);
             jQuery("#" + id).val(ui.item.key);
             return false;
           }
@@ -70,7 +62,7 @@
         }).data("autocomplete")._renderItem = function (ul, item) {
           return jQuery("<li></li>")
                  .data("item.autocomplete", item)
-                 .append("<a>" + item.link_id + " (" + item.label + ")" + "</a>")
+                 .append("<a>" + item.key_name + " (" + item.label + ")" + "</a>")
                  .appendTo( ul );
         };
       }

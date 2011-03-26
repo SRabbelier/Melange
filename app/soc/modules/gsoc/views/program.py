@@ -65,7 +65,7 @@ class ProgramPage(RequestHandler):
     })
 
     data = [{'key': str(i.key()),
-            'link_id': i.link_id,
+            'key_name': i.key().name(),
             'label': i.title}
             for i in entities]
 

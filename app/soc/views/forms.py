@@ -66,7 +66,7 @@ class ReferenceWidget(widgets.TextInput):
   pass
 
 
-class DocumentWidget(widgets.TextInput):
+class DocumentWidget(ReferenceWidget):
   """Extends the Django's TextInput widget to render the edit link to Documents.
   """
   pass
@@ -361,8 +361,9 @@ class BoundField(forms.BoundField):
     widget = self.field.widget
 
     if isinstance(widget, DocumentWidget):
-      return self.renderDocumentWidget()
-    elif isinstance(widget, ReferenceWidget):
+      self.setDocumentWidgetHelpText()
+
+    if isinstance(widget, ReferenceWidget):
       return self.renderReferenceWidget()
     elif isinstance(widget, TOSWidget):
       return self.renderTOSWidget()
@@ -423,12 +424,40 @@ class BoundField(forms.BoundField):
         self._render_note(),
     ))
 
-  def renderDocumentWidget(self):
+  def renderReferenceWidget(self):
     attrs = {
         'id': self.name,
+        'name': self.name,
+        'type': "hidden",
         'class': 'text',
         }
 
+    hidden = self.as_widget(attrs=attrs)
+
+    key = self.form.initial.get(self.name)
+
+    if key:
+      from google.appengine.ext import db
+      entity = db.get(key)
+      if entity:
+        self.form.initial[self.name] = entity.key().name()
+
+    attrs = {
+        'id': self.name + "-pretty",
+        'name': self.name + "-pretty",
+        'class': 'text',
+        }
+    pretty = self.as_widget(attrs=attrs)
+
+    return mark_safe('%s%s%s%s%s' % (
+        self._render_label(),
+        pretty,
+        hidden,
+        self._render_error(),
+        self._render_note(),
+    ))
+
+  def setDocumentWidgetHelpText(self):
     value = self.form.initial.get(self.name, self.field.initial)
 
     if value:
@@ -439,16 +468,8 @@ class BoundField(forms.BoundField):
       args = ['gsoc_program', scope_path + '/', self.name]
 
     edit_document_link = reverse('edit_gsoc_document', args=args)
-    help_text = """<a href="%s">Click here to edit this document.</a>
+    self.help_text = """<a href="%s">Click here to edit this document.</a>
         <br />%s""" % (edit_document_link, self.help_text)
-
-
-    return mark_safe('%s%s%s%s' % (
-        self._render_label(),
-        self.as_widget(attrs=attrs),
-        self._render_error(),
-        self._render_note(help_text),
-    ))
 
   def renderSelect(self):
     attrs = {

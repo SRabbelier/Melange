@@ -27,7 +27,6 @@ from google.appengine.ext import db
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
-from soc.logic import dicts
 from soc.logic.exceptions import NotFound
 from soc.logic.exceptions import BadRequest
 from soc.views import forms
@@ -41,7 +40,6 @@ from soc.modules.gsoc.models.proposal import GSoCProposal
 from soc.modules.gsoc.models.score import GSoCScore
 
 from soc.modules.gsoc.views.base import RequestHandler
-from soc.modules.gsoc.views.helper import access_checker
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -85,7 +83,7 @@ class ReviewProposal(RequestHandler):
     self.data.proposer_profile = GSoCProfile.get_by_key_name(
         key_name, parent=self.data.proposer_user)
 
-    if not self.data.proposal_profile:
+    if not self.data.proposer_profile:
       raise NotFound('Requested user does not exist')
 
     self.data.proposal = GSoCProposal.get_by_id(
@@ -251,7 +249,7 @@ class PostComment(RequestHandler):
     assert isSet(self.data.proposal)
 
     comment_form = CommentForm(self.data.request.POST)
-    
+
     if not comment_form.is_valid():
       return None
 
@@ -260,13 +258,13 @@ class PostComment(RequestHandler):
     # double check that the author of the proposal posts a public comment
     if self.data.public_only:
       comment_form.cleaned_data['is_private'] = False
-    
+
     return comment_form.create(commit=True, parent=self.data.proposal)
-    
+
   def post(self):
     assert isSet(self.data.proposer)
     assert isSet(self.data.proposal)
-    
+
     comment = self.createCommentFromForm()
     if comment:
       self.redirect.review(self.data.proposal.key().id(),
@@ -275,6 +273,11 @@ class PostComment(RequestHandler):
     else:
       # TODO: probably we want to handle an error somehow
       pass
+
+  def get(self):
+    """Special Handler for HTTP GET request since this view only handles POST.
+    """
+    self.error(405)
 
 
 class PostScore(RequestHandler):
@@ -314,9 +317,14 @@ class PostScore(RequestHandler):
           value=value)
     else:
       score.value = value
- 
+
     score.put()
 
   def post(self):
     value = int(self.data.POST['value'])
-    score = self.createOrUpdateScore(value)
+    self.createOrUpdateScore(value)
+
+  def get(self):
+    """Special Handler for HTTP GET request since this view only handles POST.
+    """
+    self.error(405)

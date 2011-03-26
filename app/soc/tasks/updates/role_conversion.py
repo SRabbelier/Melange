@@ -28,6 +28,8 @@ from google.appengine.ext import db
 from google.appengine.ext import deferred
 from google.appengine.runtime import DeadlineExceededError
 
+from django import http
+
 from soc.models.host import Host
 from soc.models.linkable import Linkable
 from soc.models.mentor import Mentor
@@ -103,8 +105,6 @@ class HostUpdater(object):
         # all entities has already been processed
         return
 
-      to_put = []
-
       for entity in entities:
         sponsor = entity.scope
         host_for = entity.user.host_for
@@ -113,10 +113,11 @@ class HostUpdater(object):
           host_for = []
 
         user = entity.user
-        user.host_for = host_for.append(sponsor.key())
-        to_put.append(user)
+        if sponsor.key() not in host_for:
+          host_for.append(sponsor.key())
+        user.host_for = host_for
 
-      db.run_in_transaction(db.put, to_put)
+        db.put(user)
 
       # process the next batch of entities
       start_key = entities[-1].key()
@@ -159,7 +160,7 @@ class RoleUpdater(object):
         return
 
       for entity in entities:
-        program = entity.__getattribute__(self.PROGRAM_FIELD)
+        program = getattr(entity, self.PROGRAM_FIELD)
         user = entity.user
 
         # try to find an existing Profile entity or create a new one
@@ -171,36 +172,37 @@ class RoleUpdater(object):
             'parent': user,
             }
         for prop in POPULATED_PROFILE_PROPS:
-          properties[prop] = entity.__getattribute__(prop)
+          properties[prop] = getattr(entity, prop)
 
         profile = self.PROFILE_MODEL.get_or_insert(
             key_name=key_name, **properties)
 
         # do not update anything if the role is already in the profile
-        if profile.student_info and model == GSoCStudent:
+        if profile.student_info and self.MODEL == GSoCStudent:
           continue
         elif self.ROLE_FIELD:
-          if entity.scope.key() in profile.__getattribute__(self.ROLE_FIELD):
+          if entity.scope.key() in getattr(profile, self.ROLE_FIELD):
             continue
 
         to_put = [profile]
 
         # a non-invalid role is found, we should re-populate the profile
         if profile.status == 'invalid' and entity.status != 'invalid':
-          for prop, value in entity.properties:
-            setattr(profile, prop, value)
+          for prop_name in entity.properties():
+            value = getattr(entity, prop_name)
+            setattr(profile, prop_name, value)
 
           if profile.student_info:
             profile.student_info = None
 
         if self.ROLE_FIELD:
           # the role is either Mentor or OrgAdmin
-          profile.__getattribute__(self.ROLE_FIELD).append(entity.scope.key())
+          getattr(profile, self.ROLE_FIELD).append(entity.scope.key())
         else:
           # the role is certainly Student; we have to create a new StudentInfo
           properties = {}
           for prop in POPULATED_STUDENT_PROPS:
-            properties[prop] = entity.__getattribute__(prop)
+            properties[prop] = getattr(entity, prop)
 
           key_name = profile.key().name()
           student_info = StudentInfo(key_name=key_name,
@@ -224,6 +226,7 @@ def updateHosts(request):
 
   updater = HostUpdater()
   updater.run()
+  return http.HttpResponse("Ok")
 
 
 def updateRole(role_name):
@@ -239,6 +242,7 @@ def updateRole(role_name):
     updater = RoleUpdater(GSoCStudent, GSoCProfile, 'scope')
 
   updater.run()
+  return http.HttpResponse("Ok")
 
 def updateRoles(request):
   """Starts a bunch of iterative tasks which update particular roles.
@@ -262,19 +266,19 @@ def updateMentors(request):
   """Starts an iterative task which update mentors.
   """
 
-  updateRole('gsoc_mentor')
+  return updateRole('gsoc_mentor')
 
 def updateOrgAdmins(request):
   """Starts an iterative task which update org admins.
   """
 
-  updateRole('gsoc_org_admin')
+  return updateRole('gsoc_org_admin')
 
 def updateStudents(request):
   """Starts an iterative task which update students.
   """
 
-  updateRole('gsoc_student')
+  return updateRole('gsoc_student')
 
 def _getProfileForRole(entity, profile_model):
   """Returns GSoCProfile or GCIProfile which corresponds to the specified
@@ -341,7 +345,7 @@ class ReferenceUpdater(object):
 
       for entity in entities:
         for field in self.FIELDS_TO_UPDATE:
-          old_reference = entity.__getattribute__(field)
+          old_reference = getattr(entity, field)
 
           if not old_reference:
             continue
@@ -351,14 +355,14 @@ class ReferenceUpdater(object):
             continue
 
           profile = _getProfileForRole(old_reference, self.PROFILE_MODEL)
-          entity.__setattr__(field, profile)
+          setattr(entity, field, profile)
 
         for list_property in self.LISTS_TO_UPDATE:
-          l = entity.__getattribute__(list_property)
+          l = getattr(entity, list_property)
           new_l = []
           for key in l:
             new_l.append(_getProfileKeyForRoleKey(key, self.PROFILE_MODEL))
-          entity.__setattr__(list_property, new_l)
+          setattr(entity, list_property, new_l)
 
       db.put(entities)
       start_key = entities[-1].key()
@@ -380,6 +384,7 @@ def updateReferencesForModel(model):
         ['mentor', 'student'], ['additional_mentors'])
 
   updater.run()
+  return http.HttpResponse("Ok")
 
 
 def updateStudentProjectReferences(request):
@@ -387,7 +392,7 @@ def updateStudentProjectReferences(request):
   StudentProjects.
   """
 
-  updateReferencesForModel('student_project')
+  return updateReferencesForModel('student_project')
 
 
 def updateStudentProposalReferences(request):
@@ -395,7 +400,7 @@ def updateStudentProposalReferences(request):
   StudentProposals.
   """
 
-  updateReferencesForModel('student_proposal')
+  return updateReferencesForModel('student_proposal')
 
 
 def updateReferences(request):
@@ -408,3 +413,4 @@ def updateReferences(request):
   # updates student projects
   updateReferencesForModel('student_project')
 
+  return http.HttpResponse("Ok")

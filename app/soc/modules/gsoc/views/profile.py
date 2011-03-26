@@ -33,7 +33,7 @@ from django.conf.urls.defaults import url
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.views import forms
-from soc.views import template
+from soc.views.template import Template
 
 from soc.models.user import User
 
@@ -136,6 +136,28 @@ class StudentInfoForm(forms.ModelForm):
   school_home_page = fields.URLField(required=True)
   clean_school_home_page =  cleaning.clean_url('school_home_page')
 
+
+class LoggedInMsg(Template):
+  """Template to render user login message at the top of the profile form.
+  """
+  def __init__(self, data):
+    self.data = data
+
+  def context(self):
+    context = {
+        'logout_link': users.create_logout_url(self.data.full_path),
+        'user_email': self.data.gae_user.email(),
+    }
+
+    if self.data.timeline.orgsAnnounced() and self.data.student_info:
+      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
+
+    return context
+
+  def templatePath(self):
+    return "v2/modules/gsoc/profile/_form_loggedin_msg.html"
+
+
 class ProfilePage(RequestHandler):
   """View for the participant profile.
   """
@@ -199,18 +221,12 @@ class ProfilePage(RequestHandler):
     error = user_form.errors or profile_form.errors or student_info_form.errors
 
     context = {
-        'logout_link': users.create_logout_url(self.data.full_path),
         'page_name': page_name,
-        'user_email': self.data.gae_user.email(),
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'student_info_form': student_info_form,
+        'form_top_msg': LoggedInMsg(self.data),
+        'forms': [user_form, profile_form, student_info_form],
         'has_profile': bool(self.data.profile),
         'error': error,
     }
-
-    if self.data.timeline.orgsAnnounced() and self.data.student_info:
-      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
 
     return context
 

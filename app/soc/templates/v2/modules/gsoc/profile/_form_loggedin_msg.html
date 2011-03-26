@@ -1,0 +1,23 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+<div id="loggedin-message" class="loggedin">
+  <p><strong>You are logged in as <em>{{ user_email }}</em>.</strong> <a href="{{ logout_link }}">(Not you?)</a></p>
+  {% if not has_profile %}
+    <p>Before you can apply to Google Summer of Code, you must register as a student.</p>
+  {% endif %}
+  {% if apply_link %}
+    <p>You can now <a href="{{ apply_link }}">apply</a> to Google Summer of Code.</p>
+  {% endif %}
+</div>

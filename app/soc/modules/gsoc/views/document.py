@@ -42,8 +42,10 @@ class DocumentForm(ModelForm):
 
   class Meta:
     model = Document
-    exclude = ['scope', 'scope_path', 'author', 'modified_by', 'prefix',
-               'home_for', 'link_id', 'read_access', 'write_access']
+    exclude = [
+        'scope', 'scope_path', 'author', 'modified_by', 'prefix', 'home_for',
+        'link_id', 'read_access', 'write_access', 'is_featured'
+    ]
 
 
 class EditDocumentPage(RequestHandler):

@@ -101,6 +101,10 @@
     tpjs + "jquery/jquery-purr.js"
   ];
 
+  s.counter = [
+    tpjs + "jquery/jquery-counter.js"
+  ];
+
   s.spin = [
     tpjs + "jquery/jquery-spin-1.1.1.js"
   ];

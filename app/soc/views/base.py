@@ -24,17 +24,19 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>'
   ]
 
-
-from google.appengine.api import users
+import os
 
 from django import http
 from django.utils import simplejson
 from django.template import loader
 
+from soc.logic import system
 from soc.logic.exceptions import LoginRequest
 from soc.logic.exceptions import RedirectRequest
 from soc.logic.exceptions import AccessViolation
 from soc.logic.exceptions import Error
+from soc.logic.helper import xsrfutil
+from soc.logic.models.site import logic as site
 from soc.views.helper.request_data import RequestData
 
 
@@ -218,9 +220,22 @@ class RequestHandler(object):
     The page is rendered using the template specified in self.templatePath()
     and is written to the response object.
 
+    The context object is extended with the following values:
+      app_version: the current version of the application, used e.g. in URL
+                   patterns to avoid JS caching issues.
+      is_local: Whether the application is running locally.
+      posted: Whether render is called after a POST is request.
+      xsrf_token: The xsrf token for the current user.
+
     Args:
       context: the context that should be used
     """
+
+    context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
+    context['is_local'] = system.isLocal()
+    context['posted'] = self.posted
+    xsrf_secret_key = site.getXsrfSecretKey(site.getSingleton())
+    context['xsrf_token'] = xsrfutil.getGeneratedTokenForCurrentUser(xsrf_secret_key)
 
     rendered = loader.render_to_string(self.templatePath(), dictionary=context)
     self.response.write(rendered)
@@ -283,7 +298,7 @@ class RequestHandler(object):
     self.kwargs = kwargs
 
     self.response = Response()
-    
+
     self.posted = request.POST or 'validated' in request.GET
 
     try:

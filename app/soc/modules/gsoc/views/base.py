@@ -24,10 +24,6 @@ __authors__ = [
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
-import os
-
-from soc.logic import system
-
 from soc.views.base import RequestHandler
 
 from soc.modules.gsoc.views import base_templates
@@ -49,15 +45,10 @@ class RequestHandler(RequestHandler):
       header: a rendered header.Header template for the current self.data
       mainmenu: a rendered site_menu.MainMenu template for the current self.data
       footer: a rendered site_menu.Footer template for the current self.data
-      app_version: the current version of the application, used e.g. in URL
-                   patterns to avoid JS caching issues.
     """
     context['header'] = base_templates.Header(self.data)
     context['mainmenu'] = base_templates.MainMenu(self.data)
     context['footer'] = base_templates.Footer(self.data)
-    context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
-    context['is_local'] = system.isLocal()
-    context['posted'] = self.posted
     super(RequestHandler, self).render(context)
 
   def init(self, request, args, kwargs):

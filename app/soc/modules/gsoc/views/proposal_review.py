@@ -294,6 +294,8 @@ class PostScore(RequestHandler):
     if not self.data.proposal:
       raise NotFound('Requested proposal does not exist')
 
+    self.check.isMentorForOrganization(self.data.proposal.org)
+
   def createOrUpdateScore(self, value):
     """Creates a new score or updates a score if there is already one
     posted by the current user.

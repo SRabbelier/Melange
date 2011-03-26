@@ -73,6 +73,10 @@ class ProfileForm(forms.ModelForm):
   """Django form for profile page.
   """
 
+  def __init__(self, tos_content, *args, **kwargs):
+    super(ProfileForm, self).__init__(*args, **kwargs)
+    self.fields['agreed_to_tos'].widget = forms.TOSWidget(tos_content)
+
   class Meta:
     model = GSoCProfile
     css_prefix = 'gsoc_profile'
@@ -163,10 +167,6 @@ class ProfilePage(RequestHandler):
     return 'v2/modules/gsoc/profile/base.html'
 
   def context(self):
-    form = EditUserForm if self.data.user else UserForm
-    user_form = form(self.data.POST or None, instance=self.data.user)
-    profile_form = ProfileForm(self.data.POST or None, instance=self.data.profile)
-
     role = self.data.kwargs.get('role')
     if self.data.student_info or role == 'student':
       student_info_form = StudentInfoForm(self.data.POST or None,
@@ -174,15 +174,28 @@ class ProfilePage(RequestHandler):
     else:
       student_info_form = EmptyForm()
 
+    tos_content = "Agreement content is not set"
+
+    program = self.data.program
     if not role:
       page_name = 'Edit your Profile'
     elif role == 'student':
       page_name = 'Register as a Student'
+      if program.student_agreement:
+        tos_content = program.student_agreement.content
     elif role == 'mentor':
       page_name = 'Register as a Mentor'
+      if program.mentor_agreement:
+        tos_content = program.mentor_agreement.content
     elif role == 'org_admin':
       page_name = 'Register as Org Admin'
+      if program.org_admin_agreement:
+        tos_content = program.org_admin_agreement.content
 
+    form = EditUserForm if self.data.user else UserForm
+    user_form = form(self.data.POST or None, instance=self.data.user)
+    profile_form = ProfileForm(tos_content, self.data.POST or None,
+                               instance=self.data.profile)
     error = user_form.errors or profile_form.errors or student_info_form.errors
 
     context = {

@@ -254,20 +254,17 @@ class Mutator(object):
     self.data.public_comments_visible = False
     self.data.private_comments_visible = False
 
-    # if the proposal is public, everyone may access it
-    if self.data.proposal.is_publicly_visible:
-      return
-
-    # if the user is not logged in, can't access
+    # if the user is not logged in, no comments can be made
     if not self.data.user:
       return
 
-    # if the current user is the proposer, he or she may access it
+    # if the current user is the proposer, he or she may access public comments
     if self.data.user.key() == self.data.proposer_user.key():
       self.data.public_comments_visible = True
       return
 
-    # all the mentors and org admins from the organization may access it
+    # All the mentors and org admins from the organization may access public
+    # and private comments.
     if self.data.proposal_org in self.data.mentor_for:
       self.data.public_comments_visible = True
       self.data.private_comments_visible = True

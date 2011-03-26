@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the comment Model."""
+"""This module contains the GSoC Comment Model."""
 
 __authors__ = [
   '"Daniel Hans" <daniel.m.hans@gmail.com>',
-  '"Matthew Wilkes" <matthew@matthewwilkes.co.uk>',
 ]
 
 
@@ -28,11 +27,9 @@ from django.utils.translation import ugettext
 
 import soc.models.base
 import soc.models.role
-import soc.models.user
-import soc.models.linkable
 
 
-class Comment(soc.models.linkable.Linkable):
+class GSoCComment(soc.models.base.ModelWithFieldAttributes):
   """Model of a comment on a work.
 
   A comment is usually associated with a Work or a Proposal,
@@ -44,23 +41,17 @@ class Comment(soc.models.linkable.Linkable):
 
   #: A required many:1 relationship with a comment entity indicating
   #: the user who provided that comment.
-  author = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                required=True, collection_name="commented")
+  author = db.ReferenceProperty(reference_class=soc.models.role.Profile,
+      required=True, collection_name="commented")
 
   #: The rich textual content of this comment
-  content = db.TextProperty(verbose_name=ugettext('Content'))
+  content = db.TextProperty(verbose_name='')
 
   #: Indicated if the comment should be visible to the appropriate student
-  is_public = db.BooleanProperty(verbose_name=ugettext('Public comment'))
+  is_private = db.BooleanProperty(default=False,
+      verbose_name=ugettext('Private'))
+  is_private.help_text = ugettext(
+      'Whether this comment will only be seen by admins and mentors')
 
   #: Date when the comment was added
   created = db.DateTimeProperty(auto_now_add=True)
-
-  #: date when the work was last modified
-  modified = db.DateTimeProperty(auto_now=True)
-
-  # indicating wich user last modified the work. Used in displaying Work
-  modified_by = db.ReferenceProperty(reference_class=soc.models.user.User,
-                                     required=False,
-                                     collection_name="modified_comments",
-                                     verbose_name=ugettext('Modified by'))

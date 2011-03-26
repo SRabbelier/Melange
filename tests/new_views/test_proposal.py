@@ -80,13 +80,13 @@ class ProposalTest(DjangoTestCase):
     self.assertReviewTemplateUsed(response)
 
     # test comment POST
-    from soc.models.comment import NewComment
+    from soc.modules.gsoc.models.comment import GSoCComment
     url = '/gsoc/proposal/comment/' + suffix
     override = {'author': self.data.profile, 'is_private': False}
-    response, properties = self.modelPost(url, NewComment, override)
+    response, properties = self.modelPost(url, GSoCComment, override)
     self.assertResponseRedirect(response)
 
-    comment = NewComment.all().get()
+    comment = GSoCComment.all().get()
     self.assertPropertiesEqual(properties, comment)
 
     # test score POST

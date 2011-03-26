@@ -32,9 +32,9 @@ from soc.logic.exceptions import BadRequest
 from soc.views import forms
 from soc.views.helper.access_checker import isSet
 
-from soc.models.comment import NewComment
 from soc.models.user import User
 
+from soc.modules.gsoc.models.comment import GSoCComment
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.proposal import GSoCProposal
 from soc.modules.gsoc.models.score import GSoCScore
@@ -50,7 +50,7 @@ class CommentForm(forms.ModelForm):
   template_path = 'v2/modules/gsoc/proposal/_comment_form.html'
 
   class Meta:
-    model = NewComment
+    model = GSoCComment
     #css_prefix = 'gsoc_comment'
     fields = ['content']
 
@@ -60,7 +60,7 @@ class PrivateCommentForm(CommentForm):
   """
 
   class Meta:
-    model = NewComment
+    model = GSoCComment
     fields = CommentForm.Meta.fields + ['is_private']
 
 
@@ -140,7 +140,7 @@ class ReviewProposal(RequestHandler):
     public_comments = []
     private_comments = []
 
-    query = db.Query(NewComment).ancestor(self.data.proposal)
+    query = db.Query(GSoCComment).ancestor(self.data.proposal)
     for comment in query:
       if not comment.is_private:
         public_comments.append(comment)

@@ -98,7 +98,7 @@ class Apply(Template):
     if self.data.timeline.studentSignup() and self.data.profile:
       context['apply_link'] = accepted_orgs
 
-    context['apply_block'] = signup or accepted_orgs
+    context['apply_block'] = signup
 
     return context
 

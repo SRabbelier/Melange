@@ -1,4 +1,4 @@
-{% extends "v2/modules/gsoc/base.html" %}
+{% extends "v2/modules/gsoc/form_base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,28 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-
-{% block stylesheets %}
-  {{ block.super }}
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/{{ app_version }}/v2/gsoc/forms.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/{{ app_version }}/v2/gsoc/uniform.default.css" />
-{% endblock stylesheets %}
-
-{% block page_content %}
-
-<!-- begin form -->
-{% comment %} TODO: change class/id after creating custom css {% endcomment %}
-<form action="#" method="post" id="form" class="form-register">
-  <div id="loggedin-message" class="loggedin"></div>
-  <h2 id="form-register-title">Edit program settings</h2> <p id="form-register-req" class="req">* fields required</p>
-  {{ program_form.render }}
-  <div id="form-register-fieldset-button-row" class="row button-row">
-    <input id="form-register-submit" type="submit" value="Submit" class="submit" />
-  </div>
-</form>
-<!-- end form -->
-
-{% endblock page_content %}
 
 {% block dependencies %}
   [

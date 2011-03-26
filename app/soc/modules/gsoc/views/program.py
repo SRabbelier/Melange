@@ -83,7 +83,8 @@ class ProgramPage(RequestHandler):
                                instance=self.data.program)
     return {
         'page_name': 'Edit program settings',
-        'program_form': program_form,
+        'forms': [program_form],
+        'error': program_form.errors,
     }
 
   def validate(self):

@@ -55,8 +55,9 @@ limitations under the License.
   {{ connect_with_us.render }}
   <!-- end block -->
   <!-- begin block -->
-  <div id="blog-feed" class="block block-blog-feed"></div>
-
+  {% if program.feed_url %}
+    <div id="blog-feed" class="block block-blog-feed"></div>
+  {% endif %}
   <!-- end block -->
 </div>
 {% endblock page_content %}

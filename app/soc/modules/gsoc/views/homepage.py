@@ -137,11 +137,15 @@ class ConnectWithUs(Template):
 
   def context(self):
     return {
-      'program': self.data.program,
+        'facebook_link': self.data.program.facebook,
+        'twitter_link': self.data.program.twitter,
+        'blogger_link': self.data.program.blogger,
+        'email': self.data.program.email,
+        'irc_channel_link': self.data.program.irc,
     }
 
   def templatePath(self):
-    return "v2/modules/gsoc/homepage/_connect_with_us.html"
+    return "v2/modules/gsoc/_connect_with_us.html"
 
 
 class Homepage(RequestHandler):

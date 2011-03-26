@@ -1,0 +1,39 @@
+{% comment %}
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+
+{% if facebook_link or twitter_link or blogger_link or pub_mailing_list_link or email or irc_channel_link %}
+<div id="connect-with-us" class="block block-connect">
+  <h4 id="title-section-connect-with-us">Contact</h4>
+  <div id="block-connect-with-us-content" class="block-content">
+    {% if facebook_link %}
+      <a href="{{ facebook_link }}" id="connect-block-facebook" class="social fb">Facebook</a>
+    {% endif %}
+    {% if twitter_link %}
+      <a href="{{ twitter_link }}" id="connect-block-twitter" class="social tw">Twitter</a>
+    {% endif %}
+    {% if blogger_link %}
+      <a href="{{ blogger_link }}" id="connect-block-blogger" class="social bl">Blog</a>
+    {% endif %}
+    {% if pub_mailing_list_link %}
+      <a href="{{ pub_mailing_list_link }}" id="connect-block-email" class="social em">Public Mailing List</a>
+    {% endif %}
+    {% if email %}
+      <a href="mailto:{{ email }}" id="connect-block-email" class="social em">Email</a>
+    {% endif %}
+    {% if irc_channel_link %}
+      <a href="irc://{{ irc_channel_link }}" id="connect-block-irc" class="social irc">IRC</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

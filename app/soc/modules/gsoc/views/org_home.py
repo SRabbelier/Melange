@@ -95,11 +95,15 @@ class Contact(Template):
 
   def context(self):
     return {
-      'organization': self.data.organization,
+        'facebook_link': self.data.organization.facebook,
+        'twitter_link': self.data.organization.twitter,
+        'blogger_link': self.data.organization.blog,
+        'email': self.data.organization.pub_mailing_list,
+        'irc_channel_link': self.data.organization.irc_channel,
     }
 
   def templatePath(self):
-    return "v2/modules/gsoc/org_home/_contact.html"
+    return "v2/modules/gsoc/_connect_with_us.html"
 
 
 class ProjectList(Template):

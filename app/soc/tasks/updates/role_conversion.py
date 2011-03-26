@@ -112,6 +112,7 @@ class HostUpdater(object):
         if not host_for:
           host_for = []
 
+        user = entity.user
         user.host_for = host_for.append(sponsor.key())
         to_put.append(user)
 
@@ -183,6 +184,11 @@ class RoleUpdater(object):
             continue
 
         to_put = [profile]
+
+        # a non-invalid role is found, we should re-populate the profile
+        if profile.status == 'invalid' and entity.status != 'invalid':
+          for prop, value in entity.properties:
+            setattr(profile, prop, value)
 
         if self.ROLE_FIELD:
           # the role is either Mentor or OrgAdmin

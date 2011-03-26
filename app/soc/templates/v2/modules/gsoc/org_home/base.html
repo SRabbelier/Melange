@@ -16,7 +16,14 @@ limitations under the License.
 
 {% block page_content %}
 <div id="organization-name" class="block full home-block-1">
-  <h2 id="title-section-organization-name">{{ organization.name }}</h2>
+  <h2 id="title-section-organization-name">
+    {{ organization.name }}
+    {% if edit_link %}
+      <span class="edit-link">
+        <a href="{{ edit_link }}">Edit</a>
+      </span>
+    {% endif %}
+  </h2>
 </div>
 
 <div id="organization-home" class="content_column_1">

@@ -685,3 +685,11 @@ p.reply-logged-in a {
 .request-response {
   padding: 20px 0 0 0
 }
+.edit-link {
+  background: #E57E30;
+  padding: 3px 7px;
+}
+.edit-link a, .edit-link a:link {
+  color: white;
+  text-decoration: none;
+}

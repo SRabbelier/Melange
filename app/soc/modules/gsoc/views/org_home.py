@@ -199,6 +199,10 @@ class OrgHome(RequestHandler):
         'tags': organization.tags_string(organization.org_tag),
     }
 
+    if self.data.adminFor(organization):
+      self.redirect.organization(organization)
+      context['edit_link'] =  self.redirect.urlOf('edit_gsoc_org_profile')
+
     # Render the apply template only when the user is not logged in
     # or has no role for the organization
     if (not self.data.user) or not self.data.mentorFor(organization):

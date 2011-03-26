@@ -107,15 +107,15 @@ class OrgProfilePage(RequestHandler):
       form = OrgProfileForm(self.data.POST or None, instance=self.data.org)
 
     return {
+        'page_name': "Organization profile",
         'form': form
         }
 
   def post(self):
     org_profile = self.createOrgProfileFromForm()
     if org_profile:
-      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      kwargs['organization'] = org_profile.link_id
-      self.redirect(reverse('edit_gsoc_org_profile', kwargs=kwargs))
+      self.redirect.organization(org_profile)
+      self.redirect.to('edit_gsoc_org_profile')
     else:
       self.get()
 
@@ -127,7 +127,7 @@ class OrgProfilePage(RequestHandler):
     """
 
     if self.data.org:
-      form = OrgProfileForm(self.data.POST)
+      form = OrgProfileForm(self.data.POST, instance=self.data.org)
     else:
       form = OrgCreateProfileForm(self.data.POST)
 

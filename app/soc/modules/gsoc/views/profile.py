@@ -37,6 +37,7 @@ from soc.views.template import Template
 
 from soc.models.user import User
 
+from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
@@ -114,7 +115,7 @@ class ProfileForm(forms.ModelForm):
     state = self.cleaned_data['res_state']
     if country == 'United States' and (not state or len(state) != 2):
       self._errors['res_state'] = ["Please use a 2-letter state name"]
-      
+
     country = self.cleaned_data.get('ship_country')
     state = self.cleaned_data['ship_state']
     if country == 'United States' and (not state or len(state) != 2):
@@ -318,7 +319,14 @@ class ProfilePage(RequestHandler):
       self.get()
       return
 
-    organization = self.data.GET.get('org')
+    link_id = self.data.GET.get('org')
+    if link_id:
+      key_name = '%s/%s' % (
+          self.data.program.name(), link_id
+          )
+      organization = GSoCOrganization.get_by_key_name(key_name)
+    else:
+      organization = None
 
     if not organization:
       self.redirect.program()

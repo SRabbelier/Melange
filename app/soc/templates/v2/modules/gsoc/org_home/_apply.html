@@ -31,6 +31,14 @@ limitations under the License.
         {% if mentor_profile_link %}
           <strong><a href="{{ mentor_profile_link }}">Or register as a mentor</a></strong>
         {% endif %}
+    {% else %}
+      {% if mentor_profile_link %}
+        <h3 id="title-section-apply-mentors">Mentors: Apply!</h3>
+        <p id="block-apply-mentors-text-action" class="action">
+          <a href="{{ student_profile_link }}">Register</a>
+        </p>
+        <p id="block-apply-students-text-small" class="small">with a Google Account to get started.</p>
+      {% endif %}
     {% endif %}
 
     {% if mentor_request_link %}

@@ -60,11 +60,12 @@ class Apply(Template):
 
     if not self.data.profile:
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
-      kwargs['role'] = 'student'
       suffix = '?org=' + self.data.organization.link_id
 
-      context['student_profile_link'] = reverse('create_gsoc_profile',
-                                                kwargs=kwargs) + suffix
+      if self.data.timeline.studentSignup():
+        kwargs['role'] = 'student'
+        context['student_profile_link'] = reverse('create_gsoc_profile',
+                                                  kwargs=kwargs) + suffix
       kwargs['role'] = 'mentor'
       context['mentor_profile_link'] = reverse('create_gsoc_profile',
                                                kwargs=kwargs) + suffix

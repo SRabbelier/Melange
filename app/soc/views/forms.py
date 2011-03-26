@@ -32,7 +32,10 @@ from google.appengine.ext.db import djangoforms
 from django.core.urlresolvers import reverse
 from django.forms import forms
 from django.forms import widgets
+from django.forms.util import flatatt
 from django.template import loader
+from django.utils.encoding import force_unicode
+from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 
@@ -61,6 +64,31 @@ class DocumentWidget(widgets.TextInput):
   """Extends the Django's TextInput widget to render the edit link to Documents.
   """
   pass
+
+
+class TOSWidget(widgets.CheckboxInput):
+  """Widget that renders both the checkbox and the readonly text area.
+  """
+
+  def __init__(self, tos_text=None, attrs=None, check_test=bool):
+    self.tos_text = tos_text
+    super(TOSWidget, self).__init__(attrs, check_test)
+
+  def render(self, name, value, attrs=None):
+    readonly_attrs = {
+        'cols': '40',
+        'rows': '10',
+        'id': '%s-text' % (name),
+        'class': 'textarea',
+        'readonly': 'readonly',
+        }
+    text = mark_safe(
+        u'<div id="tos-readonly-%s"><textarea%s>%s</textarea></div>' % (
+        name, flatatt(readonly_attrs),
+        conditional_escape(force_unicode(self.tos_text))))
+
+    checkbox = super(TOSWidget, self).render(name, value, attrs)
+    return mark_safe(u'%s%s' % (text, checkbox))
 
 
 class ReferenceProperty(djangoforms.ReferenceProperty):

@@ -334,6 +334,14 @@
 #form.form-proposal fieldset .row.project-tags {
   clear: both;
 }
+#form.form-register fieldset #abstract_counter {
+  color: #d5620e;
+  display: block;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: bold;
+  margin: 0 0 0 4px;
+}
 #form.form-proposal fieldset #form-proposal-textfield-project-short_counter, #form.form-proposal fieldset #form-proposal-textfield-project-full_counter {
   color: #d5620e;
   display: block;

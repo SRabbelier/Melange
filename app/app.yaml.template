@@ -89,5 +89,9 @@ handlers:
   static_files: webmaster/google\1.html
   upload: webmaster/google(.*).html
 
+- url: /role_conversion_progress.html
+  static_files: role_conversion_progress.html
+  upload: role_conversion_progress.html
+
 - url: /.*
   script: main.py

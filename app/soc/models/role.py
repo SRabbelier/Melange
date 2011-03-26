@@ -207,13 +207,17 @@ class Role(soc.models.linkable.Linkable):
       'URL of 64x64 pixel thumbnail image')
   photo_url.group = ugettext("1. Public Info")
 
+  #====================================================================
+  # (private) contact information
+  #====================================================================
+
   #: Optional field storing the latitude provided by the Role; displayed
   #: publicly.
   latitude = db.FloatProperty(
       verbose_name=ugettext('Latitude'))
   latitude.help_text = ugettext(
       'decimal degrees northerly (N), use minus sign (-) for southerly (S)')
-  latitude.group = ugettext("1. Public Info")
+  latitude.group = ugettext("2. Location Info")
 
   #: Optional field storing the longitude provided by the Role; displayed
   #: publicly.
@@ -221,11 +225,18 @@ class Role(soc.models.linkable.Linkable):
       verbose_name=ugettext('Longitude'))
   longitude.help_text = ugettext(
       'decimal degrees easterly (E), use minus sign (-) for westerly (W)')
-  longitude.group = ugettext("1. Public Info")
+  longitude.group = ugettext("2. Location Info")
 
-  #====================================================================
-  # (private) contact information
-  #====================================================================
+  #: field storing whether the User has agreed to publish his location
+  publish_location = db.BooleanProperty(required=False, default=False,
+      verbose_name=ugettext('Publish my location'))
+  publish_location.help_text = ugettext(
+      'By checking this box, you are agreeing to allow your location to be'
+      ' displayed, as given by the Marker below, on any map.'
+      ' For instance on the map linking Students to Mentors or'
+      ' by showing your location on your public profile page in the system.')
+  publish_location.example_text = ugettext('You can set your location below')
+  publish_location.group = ugettext("2. Location Info")
 
   #: Required field used as the contact mechanism for the program
   #: Role (for example the address the system sends emails to).
@@ -301,17 +312,6 @@ class Role(soc.models.linkable.Linkable):
   phone.example_text = ugettext(
       "e.g. 1650253000 for Google's Corp HQ number in the United States")
   phone.group = ugettext("2. Contact Info (Private)")
-
-  #: field storing whether the User has agreed to publish his location
-  publish_location = db.BooleanProperty(required=False, default=False,
-      verbose_name=ugettext('Publish my location'))
-  publish_location.help_text = ugettext(
-      'By checking this box, you are agreeing to allow your location to be'
-      ' displayed, as given by the Marker below, on any map.'
-      ' For instance on the map linking Students to Mentors or'
-      ' by showing your location on your public profile page in the system.')
-  publish_location.example_text = ugettext('You can set your location below')
-  publish_location.group = ugettext("2. Contact Info (Private)")
 
   #: Optional field containing a separate recipient name; kept
   #: private. Recipient name can only be ASCII, not UTF-8 text

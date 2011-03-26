@@ -159,8 +159,6 @@ class UpdateProposal(RequestHandler):
 
     proposal = self.updateFromForm()
     if proposal:
-      self.redirect.program()
-      self.redirect.id()
-      self.redirect.to('update_gsoc_proposal')
+      self.redirect.id().to('update_gsoc_proposal')
     else:
       self.get()

@@ -250,10 +250,13 @@ class MyProposalsComponent(Component):
   def __init__(self, request, data):
     """Initializes this component.
     """
+    r = data.redirect
     list_config = lists.ListConfiguration()
     list_config.addSimpleColumn('title', 'Title')
     list_config.addColumn('org', 'Organization',
                           lambda ent, *args: ent.org.name)
+    list_config.setRowAction(lambda e, *args, **kwargs: r.id(
+        e.key().id()).urlOf('update_gsoc_proposal'))
     self._list_config = list_config
 
     super(MyProposalsComponent, self).__init__(request, data)

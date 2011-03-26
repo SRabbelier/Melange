@@ -85,7 +85,7 @@ class ReviewProposal(RequestHandler):
     self.data.proposer_profile = GSoCProfile.get_by_key_name(
         key_name, parent=self.data.proposer_user)
 
-    if not self.data.proposal:
+    if not self.data.proposal_profile:
       raise NotFound('Requested user does not exist')
 
     self.data.proposal = GSoCProposal.get_by_id(

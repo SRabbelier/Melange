@@ -102,15 +102,7 @@ class InviteTest(DjangoTestCase):
     invitation = Request.all().get()
     self.assertEqual('rejected', invitation.status)
 
-    # test that you can't change after the fact
-    postdata = {'action': 'Accept'}
-    response = self.post(url, postdata)
-    self.assertResponseForbidden(response)
-
-    # reset invitation to test Accept
-    invitation.status = 'pending'
-    invitation.put()
-
+    # test that you can change after the fact
     postdata = {'action': 'Accept'}
     response = self.post(url, postdata)
     self.assertResponseRedirect(response)

@@ -23,9 +23,7 @@ limitations under the License.
 
 <!-- begin form -->
 <form action="#" method="post" id="form" class="form-register">
-  <div id="loggedin-message" class="loggedin">
-      <p><strong>You are logged in as <em>{{ user_email }}</em>.</strong> <a href="{{ logout_link }}">(Not you?)</a></p>
-  </div>
+  {{ logged_in_msg.render }}
 
   <h2 id="form-register-title">{{ page_name}}</h2> <p id="form-register-req" class="req">* fields required</p>
 

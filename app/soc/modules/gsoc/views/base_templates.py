@@ -118,3 +118,35 @@ class Footer(Template):
 
   def templatePath(self):
     return "v2/modules/gsoc/footer.html"
+
+
+class LoggedInMsg(Template):
+  """Template to render user login message at the top of the profile form.
+  """
+  def __init__(self, data, apply_role=False, apply_link=True):
+    self.data = data
+    self.apply_link = apply_link
+    self.apply_role = apply_role
+
+  def context(self):
+    context = {
+        'logout_link': self.data.redirect.logout().url(),
+        'user_email': self.data.gae_user.email(),
+        'has_profile': bool(self.data.profile),
+    }
+
+    if self.apply_role and self.data.kwargs.get('role'):
+      context['role'] = self.data.kwargs['role']
+
+    if self.data.user:
+      context['link_id'] = " [link_id: %s]" % self.data.user.link_id
+
+    if self.apply_link and self.data.timeline.orgsAnnounced() and (
+      (not self.data.student_info) or
+      (self.data.timeline.studentSignup() and self.data.student_info)):
+      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
+
+    return context
+
+  def templatePath(self):
+    return "v2/modules/gsoc/_loggedin_msg.html"

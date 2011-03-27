@@ -40,6 +40,7 @@ from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.models.profile import GSoCStudentInfo
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.base_templates import LoggedInMsg
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -164,34 +165,6 @@ class StudentInfoForm(forms.ModelForm):
   clean_school_home_page =  cleaning.clean_url('school_home_page')
 
 
-class LoggedInMsg(Template):
-  """Template to render user login message at the top of the profile form.
-  """
-  def __init__(self, data):
-    self.data = data
-
-  def context(self):
-    context = {
-        'logout_link': self.data.redirect.logout().url(),
-        'user_email': self.data.gae_user.email(),
-        'has_profile': bool(self.data.profile),
-    }
-
-    if self.data.kwargs.get('role'):
-      context['role'] = self.data.kwargs['role']
-
-    if self.data.user:
-      context['link_id'] = " [link_id: %s]" % self.data.user.link_id
-
-    if self.data.timeline.orgsAnnounced() and self.data.student_info:
-      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
-
-    return context
-
-  def templatePath(self):
-    return "v2/modules/gsoc/_loggedin_msg.html"
-
-
 class ProfilePage(RequestHandler):
   """View for the participant profile.
   """
@@ -269,7 +242,7 @@ class ProfilePage(RequestHandler):
 
     context = {
         'page_name': page_name,
-        'form_top_msg': LoggedInMsg(self.data),
+        'form_top_msg': LoggedInMsg(self.data, apply_role=True),
         'forms': [user_form, profile_form, student_info_form],
         'error': error,
     }

@@ -37,6 +37,7 @@ from soc.modules.gsoc.logic.models.survey import project_logic as \
     ps_logic
 from soc.modules.gsoc.models.proposal import GSoCProposal
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.base_templates import LoggedInMsg
 from soc.modules.gsoc.views.helper import lists
 from soc.modules.gsoc.views.helper import url_patterns
 
@@ -83,15 +84,14 @@ class Dashboard(RequestHandler):
     """
     components = self._getActiveComponents()
 
-    context = {}
-    context['page_name'] = self.data.program.name
-    context['user'] = self.data.user
-    context['logged_in_msg'] = LoggedInMsg(self.data)
+    return {
+        'page_name': self.data.program.name,
+        'user': self.data.user,
+        'logged_in_msg': LoggedInMsg(self.data),
     # TODO(ljvderijk): Implement code for setting dashboard messages.
-    #context['alert_msg'] = 'Default <strong>alert</strong> goes here'
-    context['components'] = components
-
-    return context
+    #   'alert_msg': 'Default <strong>alert</strong> goes here',
+        'components': components,
+    }
 
   def _getActiveComponents(self):
     """Returns the components that are active on the page.
@@ -160,32 +160,6 @@ class Dashboard(RequestHandler):
                                                    org_app_survey))
 
     return components
-
-
-class LoggedInMsg(Template):
-  """Template to render user login message at the top of the profile form.
-  """
-  def __init__(self, data):
-    self.data = data
-
-  def context(self):
-    context = {
-        'logout_link': self.data.redirect.logout().url(),
-        'user_email': self.data.gae_user.email(),
-        'has_profile': bool(self.data.profile),
-    }
-
-    if self.data.user:
-      context['link_id'] = " [link_id: %s]" % self.data.user.link_id
-
-    if self.data.timeline.orgsAnnounced() and self.data.student_info:
-      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
-
-    return context
-
-  def templatePath(self):
-    return "v2/modules/gsoc/_loggedin_msg.html"
-
 
 
 class Component(Template):

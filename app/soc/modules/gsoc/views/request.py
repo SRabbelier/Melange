@@ -38,6 +38,7 @@ from soc.views.helper.access_checker import isSet
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.base_templates import LoggedInMsg
 
 from soc.modules.gsoc.views.helper import url_patterns
 
@@ -99,7 +100,7 @@ class RequestPage(RequestHandler):
     request_form = RequestForm(self.data.POST or None)
 
     return {
-        'logout_link': users.create_logout_url(self.data.full_path),
+        'logged_in_msg': LoggedInMsg(self.data, apply_link=False),
         'page_name': 'Request to become a mentor',
         'program': self.data.program,
         'invite_form': request_form

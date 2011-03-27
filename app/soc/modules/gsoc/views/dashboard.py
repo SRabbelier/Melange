@@ -573,8 +573,8 @@ class OrganizationsIAdminComponent(Component):
 
       if response.start != 'done':
         # Add all organizations in one go since we already queried for it.
-        for org in self.data.org_admin_for:
-          response.addRow(org)
+        for mentor in self.data.mentor_for:
+          response.addRow(mentor)
         response.next = 'done'
 
       return response
@@ -589,6 +589,6 @@ class OrganizationsIAdminComponent(Component):
 
     return {
         'name': 'adminning_organizations',
-        'title': 'ORGANIZATIONS THAT I AM AN ADMIN FOR',
+        'title': 'ORGANIZATIONS THAT I AM AN ADMIN/MENTOR FOR',
         'lists': [list],
     }

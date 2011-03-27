@@ -177,6 +177,9 @@ class LoggedInMsg(Template):
         'has_profile': bool(self.data.profile),
     }
 
+    if self.data.kwargs.get('role'):
+      context['role'] = self.data.kwargs['role']
+
     if self.data.timeline.orgsAnnounced() and self.data.student_info:
       context['apply_link'] = self.data.redirect.acceptedOrgs().url()
 

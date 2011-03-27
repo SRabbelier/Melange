@@ -234,8 +234,13 @@ class RequestHandler(object):
     context['app_version'] = os.environ.get('CURRENT_VERSION_ID', '').split('.')[0]
     context['is_local'] = system.isLocal()
     context['posted'] = self.posted
-    xsrf_secret_key = site.getXsrfSecretKey(site.getSingleton())
+    xsrf_secret_key = site.getXsrfSecretKey(self.data.site)
     context['xsrf_token'] = xsrfutil.getGeneratedTokenForCurrentUser(xsrf_secret_key)
+    context['ga_tracking_num'] = self.data.site.ga_tracking_num
+    if system.isSecondaryHostname(self.request):
+      context['google_api_key'] = self.data.site.secondary_google_api_key
+    else:
+      context['google_api_key'] = self.data.site.google_api_key
 
     rendered = loader.render_to_string(self.templatePath(), dictionary=context)
     self.response.write(rendered)

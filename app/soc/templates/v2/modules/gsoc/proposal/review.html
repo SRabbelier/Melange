@@ -47,7 +47,7 @@ limitations under the License.
   <p class="project-mentor"><strong>Email:</strong> {{ student_email }}</p>
   {% if private_comments_visible %}
   <p class="project-mentor"><strong>Mentor:</strong> {{ mentor.name|default:"No mentor assigned" }}</p>
-  <p class="project-possible-mentor"><strong>Possible mentors:</strong> None</p>
+  <p class="project-possible-mentor"><strong>Possible mentors: </strong>{{ possible_mentors|default:"None" }}</p>
   {% endif %}
   <p class="description"><strong>Short description:</strong> {{ proposal.abstract }}</p>
 </div>

@@ -190,10 +190,14 @@ class ReviewProposal(RequestHandler):
         (self.data.user.key() == self.data.proposer_user.key())
     update_link = self.data.redirect.id().urlOf('update_gsoc_proposal')
 
+    possible_mentors = db.get(self.data.proposal.possible_mentors)
+    possible_mentors_names = ', '.join([m.name() for m in possible_mentors])
+
     context.update({
         'comment_box': comment_box,
         'proposal': self.data.proposal,
         'mentor': self.data.proposal.mentor,
+        'possible_mentors': possible_mentors_names,
         'public_comments': public_comments,
         'public_comments_visible': self.data.public_comments_visible,
         'private_comments': private_comments,

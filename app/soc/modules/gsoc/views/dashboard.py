@@ -658,9 +658,13 @@ class ParticipantsComponent(Component):
     list_config.addColumn(
         'name', 'Name', lambda ent, *args: ent.name())
     list_config.addColumn(
-        'organizations', 'Organizations',
+        'mentor_for', 'Mentor for',
         lambda ent, *args: ', '.join(
             [i.name for i in orgs if i.key() in ent.mentor_for]))
+    list_config.addColumn(
+        'admin_for', 'Organization admin for',
+        lambda ent, *args: ', '.join(
+            [i.name for i in orgs if i.key() in ent.org_admin_for]))
     self._list_config = list_config
 
     super(ParticipantsComponent, self).__init__(request, data)
@@ -733,6 +737,6 @@ class ParticipantsComponent(Component):
 
     return {
         'name': 'participants',
-        'title': 'MENTORS AND ADMINS FOR PROJECTS I AM AN ADMIN FOR',
+        'title': 'MENTORS AND ADMINS FOR ORGANIZATIONS I AM AN ADMIN FOR',
         'lists': [list],
     }

@@ -73,29 +73,18 @@ class Apply(Template):
     self.data = data
 
   def context(self):
-    kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
     context = {}
     accepted_orgs = None
 
     if self.data.timeline.orgsAnnounced():
-      accepted_orgs = reverse('gsoc_accepted_orgs', kwargs=kwargs)
+      r = self.data.redirect.program()
+      accepted_orgs = r.urlOf('gsoc_accepted_orgs')
       context['accepted_orgs_link'] = accepted_orgs
-      org_kwargs = kwargs.copy()
-      org_kwargs.update({'organization': 'asf'})
-      context['apache_home_link'] = reverse(
-          'gsoc_org_home', kwargs=org_kwargs)
-      org_kwargs.update({'organization': 'mozilla'})
-      context['mozilla_home_link'] = reverse(
-          'gsoc_org_home', kwargs=org_kwargs)
-      org_kwargs.update({'organization': 'melange'})
-      context['melange_home_link'] = reverse(
-          'gsoc_org_home', kwargs=org_kwargs)
-      org_kwargs.update({'organization': 'wikimedia'})
-      context['wikimedia_home_link'] = reverse(
-          'gsoc_org_home', kwargs=org_kwargs)
-      org_kwargs.update({'organization': 'drupal'})
-      context['drupal_home_link'] = reverse(
-          'gsoc_org_home', kwargs=org_kwargs)
+      context['apache_home_link'] = r.orgHomepage('asf').url()
+      context['mozilla_home_link'] = r.orgHomepage('mozilla').url()
+      context['melange_home_link'] = r.orgHomepage('melange').url()
+      context['wikimedia_home_link'] = r.orgHomepage('wikimedia').url()
+      context['drupal_home_link'] = r.orgHomepage('drupal').url()
 
     context['org_signup'] = self.data.timeline.orgSignup()  
     context['student_signup'] = self.data.timeline.studentSignup()

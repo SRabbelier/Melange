@@ -148,8 +148,9 @@ limitations under the License.
         starOff:    'proposal-rate-star-off.png',
         starOn:     'proposal-rate-star-on.png',
       });
-      var wish_to_mentor = "{{ wish_to_mentor }}";
+
       /* Make the wish to mentor link post using ajax */
+      var wish_to_mentor = "{{ wish_to_mentor }}";
       jQuery("#wish-to-mentor-link").click(function() {
         jQuery.post("{{ wish_to_mentor_link }}",
             {value: wish_to_mentor, xsrf_token: window.xsrf_token},

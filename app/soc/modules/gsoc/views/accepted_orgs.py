@@ -72,7 +72,7 @@ class AcceptedOrgsList(Template):
     idx = lists.getListIndex(self.request)
     if idx == 0:
       fields = {'scope': self.data.program,
-                'status': ['active', 'inactive']}
+                'status': ['new', 'active', 'inactive']}
       response_builder = lists.QueryContentResponseBuilder(
           self.request, self._list_config, org_logic, fields)
       return response_builder.build()

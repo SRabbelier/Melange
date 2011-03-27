@@ -27,6 +27,7 @@ from soc.views import forms
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.exceptions import NotFound
 
@@ -49,6 +50,13 @@ class OrgProfileForm(forms.ModelForm):
     widgets = forms.choiceWidgets(GSoCOrganization,
         ['contact_country', 'shipping_country'])
 
+  clean_description = cleaning.clean_html_content('description')
+  clean_contrib_template = cleaning.clean_html_content('contrib_template')
+  clean_facebook = cleaning.clean_url('facebook')
+  clean_twitter = cleaning.clean_url('twitter')
+  clean_blog = cleaning.clean_url('blog')
+  clean_pub_mailing_list = cleaning.clean_url('pub_mailing_list')
+  clean_irc_channel = cleaning.clean_url('irc_channel')
 
 class OrgCreateProfileForm(OrgProfileForm):
   """Django form to create the organization profile.

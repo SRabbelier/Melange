@@ -26,6 +26,7 @@ from google.appengine.ext import db
 
 from django.conf.urls.defaults import url
 
+from soc.logic import cleaning
 from soc.views import forms
 
 from soc.modules.gsoc.models.proposal import GSoCProposal
@@ -43,6 +44,8 @@ class ProposalForm(forms.ModelForm):
     css_prefix = 'gsoc_proposal'
     exclude = ['status', 'mentor', 'possible_mentors', 'org', 'program',
         'created_on', 'last_modified_on', 'score']
+
+  clean_content = cleaning.clean_html_content('content')
 
 class ProposalPage(RequestHandler):
   """View for the submit proposal.

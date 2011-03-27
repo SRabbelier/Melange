@@ -148,6 +148,22 @@ limitations under the License.
         starOff:    'proposal-rate-star-off.png',
         starOn:     'proposal-rate-star-on.png',
       });
+
+      /* Make the wish to mentor link post using ajax */
+      jQuery("#wish-to-mentor-link").click(function() {
+        jQuery.post("{{ wish_to_mentor_link }}",
+            {value: "{{ wish_to_mentor }}", xsrf_token: window.xsrf_token},
+            function(data) {
+          var wish_to_mentor = "{{ wish_to_mentor }}";
+          if (wish_to_mentor == "request") {
+            jQuery("#wish-to-mentor-link").html(
+                "I do not wish to mentor this project");
+          } else if (wish_to_mentor == "withdraw") {
+            jQuery("#wish-to-mentor-link").html(
+                "I wish to mentor this project");
+          }
+        });
+      });
     });
     $('#score-add-stars').raty({
         cancel: true,

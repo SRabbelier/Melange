@@ -165,7 +165,7 @@ class OrgHome(RequestHandler):
 
     return [
         url(r'^gsoc/org/%s$' % url_patterns.ORG, self,
-            name='gsoc_org_home')
+            name='gsoc_org_home'),
         url(r'^gsoc/org/show/%s$' % url_patterns.ORG, self),
         url(r'^org/show/%s$' % url_patterns.ORG, self),
     ]

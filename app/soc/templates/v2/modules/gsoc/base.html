@@ -88,7 +88,7 @@ limitations under the License.
           melange.init({
             app_version: "{{ app_version }}",
             {% if google_api_key %}
-            google_api_key: {{ google_api_key }},
+            google_api_key: "{{ google_api_key }}",
             {% endif %}
             {% if is_local %}
             is_local: true

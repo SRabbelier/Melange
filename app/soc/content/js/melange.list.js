@@ -678,7 +678,7 @@
             var source = data_from_server;
             var first_batch_received = (current_loop > 0);
             var data_received = source.data[start] !== undefined;
-            var last_batch = !source.data[start].length;
+            var last_batch = ((source.next === "done") || (!source.data[start].length));
 
             if (data_received && (!first_batch_received || !last_batch)) {
               // temporary fix until Issue 766
@@ -705,7 +705,7 @@
               }
 
               //call next iteration
-              if (my_data[(my_data.length- 1)] !== undefined) {
+              if (source.next !== "done") {
                 start = source.next;
                 setTimeout(server_loop, 100);
                 current_loop++;

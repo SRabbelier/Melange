@@ -412,11 +412,27 @@ class ListContentResponse(object):
             'next': self.next}
 
 
+def keyModelStarter(model):
+  """Returns a starter for the specified key-based model.
+  """
+
+  def starter(start, q):
+    if not start:
+      return True
+    start_entity = model.get_by_key_name(start)
+    if not start_entity:
+      return False
+    q.filter('__key__ >', start_entity.key())
+    return True
+  return starter
+
+
 class RawQueryContentResponseBuilder(object):
   """Builds a ListContentResponse for lists that are based on a single query.
   """
 
-  def __init__(self, request, config, query, starter, ender=None, prefetch=None):
+  def __init__(self, request, config, query, starter,
+               ender=None, skipper=None, prefetch=None):
     """Initializes the fields needed to built a response.
 
     Args:
@@ -426,17 +442,22 @@ class RawQueryContentResponseBuilder(object):
       query: The query object to use.
       starter: The function used to retrieve the start entity.
       ender: The function used to retrieve the value for the next start.
+      skipper: The function used to determine whether to skip a value.
       prefetch: The fields that need to be prefetched for increased
                 performance.
     """
     if not ender:
-      ender = lambda entity: entity.key().id_or_name()
+      ender = lambda entity, is_last, start: (
+          "done" if is_last else entity.key().id_or_name())
+    if not skipper:
+      skipper = lambda entity, start: False
 
     self._request = request
     self._config = config
     self._query = query
     self._starter = starter
     self._ender = ender
+    self._skipper = skipper
     self._prefetch = prefetch
 
   def build(self, *args, **kwargs):
@@ -454,25 +475,33 @@ class RawQueryContentResponseBuilder(object):
     content_response = ListContentResponse(self._request, self._config)
 
     start = content_response.start
-    if start:
-      start_entity = self._starter(start)
 
-      if not start_entity:
-        logging.warning('Received data query for non-existing start entity')
-        # return empty response
-        return content_response
+    if start == 'done':
+      logging.warning('Received query with "done" start key')
+      # return empty response
+      return content_response
 
-      self._query.filter('__key__ >', start_entity.key())
+    if not self._starter(start, self._query):
+      logging.warning('Received data query for non-existing start entity %s' % start)
+      # return empty response
+      return content_response
 
-    entities = self._query.fetch(content_response.limit)
+    count = content_response.limit + 1
+    entities = self._query.fetch(count)
+
+    is_last = len(entities) != count
 
     # TODO(SRabbelier): prefetch
 
     for entity in entities:
+      if self._skipper(entity, start):
+        continue
       content_response.addRow(entity, *args, **kwargs)
 
     if entities:
-      content_response.next = self._ender(entities[-1])
+      content_response.next = self._ender(entities[-1], is_last, start)
+    else:
+      content_response.next = self._ender(None, True, start)
 
     return content_response
 
@@ -494,7 +523,7 @@ class QueryContentResponseBuilder(RawQueryContentResponseBuilder):
       prefetch: The fields that need to be prefetched for increased
                 performance.
     """
-    starter = lambda start: logic.getFromKeyNameOrID(start)
+    starter = keyModelStarter(logic.getModel())
 
     query = logic.getQueryForFields(
         filter=fields, ancestors=ancestors)

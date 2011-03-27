@@ -18,6 +18,7 @@
 """
 
 __authors__ = [
+  '"Sverre Rabbelier" <sverre@rabbelier.nl>',
   '"Lennard de Rijk" <ljvderijk@gmail.com>',
   ]
 
@@ -302,7 +303,7 @@ class MyProposalsComponent(Component):
       q.filter('program', self.data.program)
       q.ancestor(self.data.profile)
 
-      starter = lambda start: GSoCProposal.get_by_key_name(start)
+      starter = lists.keyModelStarter(GSoCProposal)
 
       response_builder = lists.RawQueryContentResponseBuilder(
           self.request, self._list_config, q, starter, prefetch=['org'])
@@ -463,7 +464,7 @@ class SubmittedProposalsComponent(Component):
       q = GSoCProposal.all()
       q.filter('org IN', self.data.profile.mentor_for)
 
-      starter = lambda start: GSoCProposal.get_by_key_name(start)
+      starter = lists.keyModelStarter(GSoCProposal)
 
       response_builder = lists.RawQueryContentResponseBuilder(
           self.request, self._list_config, q, starter, prefetch=['org'])

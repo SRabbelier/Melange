@@ -25,6 +25,7 @@ __authors__ = [
 from google.appengine.api import users
 
 from django.conf.urls.defaults import url
+from django.utils.translation import ugettext
 
 from soc.logic.exceptions import AccessViolation
 from soc.logic.helper import timeline as timeline_helper
@@ -246,6 +247,9 @@ class MyProposalsComponent(Component):
   """Component for listing all the proposals of the current Student.
   """
 
+  DESCRIPTION = ugettext(
+      'Click on a proposal in this list to see the comments or update your proposal.')
+
   def __init__(self, request, data):
     """Initializes this component.
     """
@@ -254,8 +258,9 @@ class MyProposalsComponent(Component):
     list_config.addSimpleColumn('title', 'Title')
     list_config.addColumn('org', 'Organization',
                           lambda ent, *args: ent.org.name)
-    list_config.setRowAction(lambda e, *args, **kwargs: r.id(
-        e.key().id()).urlOf('update_gsoc_proposal'))
+    list_config.setRowAction(lambda e, *args, **kwargs: 
+        r.review(e.key().id_or_name(), e.parent().link_id).
+        urlOf('review_gsoc_proposal'))
     self._list_config = list_config
 
     super(MyProposalsComponent, self).__init__(request, data)
@@ -270,7 +275,7 @@ class MyProposalsComponent(Component):
     """Returns the context of this component.
     """
     list = lists.ListConfigurationResponse(
-        self._list_config, idx=1, description='List of my project proposals')
+        self._list_config, idx=1, description=MyProposalsComponent.DESCRIPTION)
     return {
         'name': 'proposals',
         'title': 'PROPOSALS',
@@ -403,6 +408,9 @@ class SubmittedProposalsComponent(Component):
   of.
   """
 
+  DESCRIPTION = ugettext(
+      'Click on a proposal to leave comments and give a score')
+
   def __init__(self, request, data):
     """Initializes this component.
     """
@@ -428,7 +436,8 @@ class SubmittedProposalsComponent(Component):
     """Returns the context of this component.
     """
     list = lists.ListConfigurationResponse(
-        self._list_config, idx=4, description='')
+        self._list_config, idx=4,
+        description=SubmittedProposalsComponent.DESCRIPTION)
     return {
         'name': 'proposals_submitted',
         'title': 'PROPOSALS SUBMITTED',

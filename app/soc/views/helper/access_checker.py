@@ -457,7 +457,7 @@ class AccessChecker(BaseAccessChecker):
     self.isProfileActive()
     assert isSet(self.data.organization)
 
-    if self.data.organization.key() not in self.data.profile.org_admin_for:
+    if not self.data.orgAdminFor(self.data.organization):
       return
 
     raise AccessViolation(DEF_ALREADY_ADMIN_MSG % self.data.organization.name)
@@ -468,7 +468,7 @@ class AccessChecker(BaseAccessChecker):
     self.isProfileActive()
     assert isSet(self.data.organization)
 
-    if self.data.organization.key() not in self.data.profile.mentor_for:
+    if not self.data.mentorFor(self.data.organization):
       return
 
     raise AccessViolation(DEF_ALREADY_MENTOR_MSG % self.data.organization.name)
@@ -490,7 +490,7 @@ class AccessChecker(BaseAccessChecker):
     """
     self.isProfileActive()
 
-    if org.key() in self.data.profile.org_admin_for:
+    if self.data.orgAdminFor(org):
       return
 
     raise AccessViolation(DEF_NOT_ADMIN_MSG % org.name)
@@ -500,7 +500,7 @@ class AccessChecker(BaseAccessChecker):
     """
     self.isProfileActive()
 
-    if org.key() in self.data.profile.mentor_for:
+    if self.data.mentorFor(org):
       return
 
     raise DEF_NOT_MENTOR_MSG % org.name
@@ -695,7 +695,7 @@ class AccessChecker(BaseAccessChecker):
       return
 
     # all the mentors and org admins from the organization may access it
-    if self.data.proposal_org.key() in self.data.profile.mentor_for:
+    if self.data.mentorFor(self.data.proposal_org):
       return
 
     raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)

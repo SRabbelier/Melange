@@ -347,14 +347,16 @@ class PostScore(RequestHandler):
     else:
       score.value = value
 
+    proposal_key = self.data.proposal.key()
     def update_score_trx(score):
       if score and not score.value:
         score.delete()
       else:
         score.put()
       # update total score for the proposal
-      self.data.proposal.score += (value - (score.value if score else 0))
-      self.data.proposal.put()
+      proposal = db.get(proposal_key)
+      proposal.score += (value - (score.value if score else 0))
+      proposal.put()
 
     db.run_in_transaction(update_score_trx, score)
 

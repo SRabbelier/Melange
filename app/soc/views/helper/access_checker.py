@@ -265,7 +265,7 @@ class Mutator(object):
 
     # All the mentors and org admins from the organization may access public
     # and private comments.
-    if self.data.proposal_org in self.data.mentor_for:
+    if self.data.mentorFor(self.data.proposal_org):
       self.data.public_comments_visible = True
       self.data.private_comments_visible = True
       return

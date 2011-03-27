@@ -33,12 +33,17 @@ limitations under the License.
 
 {% endblock page_content %}
 
+{% block synchronous_scripts %}
+  <script type='text/javascript' src="/tiny_mce/tiny_mce.js"></script>
+  {{ block.super }}
+{% endblock synchronous_scripts %}
 {% block dependencies %}
   [
     dep.uniform,
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
+      tinyMCE.init(melange.tinyMceConfig(["description", "contrib_template"]));
     }
   ]
 {% endblock dependencies %}

@@ -13,6 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+{% block synchronous_scripts %}
+  <script type='text/javascript' src="/tiny_mce/tiny_mce.js"></script>
+  {{ block.super }}
+{% endblock synchronous_scripts %}
 {% block dependencies %}
   [
     dep.melange.autocomplete,
@@ -20,6 +24,7 @@ limitations under the License.
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
+      tinyMCE.init(melange.tinyMceConfig(["description", "accepted_orgs_msg"]));
       melange.autocomplete.makeAutoComplete("org_admin_agreement");
       melange.autocomplete.makeAutoComplete("mentor_agreement");
       melange.autocomplete.makeAutoComplete("student_agreement");

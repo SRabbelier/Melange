@@ -33,6 +33,10 @@ limitations under the License.
 
 {% endblock page_content %}
 
+{% block synchronous_scripts %}
+  <script type='text/javascript' src="/tiny_mce/tiny_mce.js"></script>
+  {{ block.super }}
+{% endblock synchronous_scripts %}
 {% block dependencies %}
   [
     dep.uniform,
@@ -43,6 +47,7 @@ limitations under the License.
       jQuery("#abstract").counter({
         goal: 500
       });
+      tinyMCE.init(melange.tinyMceConfig(["content"]));
     }
   ]
 {% endblock dependencies %}

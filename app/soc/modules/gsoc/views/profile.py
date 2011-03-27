@@ -133,7 +133,21 @@ class CreateProfileForm(ProfileForm):
 
   def __init__(self, tos_content, *args, **kwargs):
     super(CreateProfileForm, self).__init__(*args, **kwargs)
+    self.tos_content = tos_content
     self.fields['agreed_to_tos'].widget = forms.TOSWidget(tos_content)
+
+  def clean_agreed_to_tos(self):
+    value = self.cleaned_data['agreed_to_tos']
+    # no tos set, no need to clean it
+    if not self.tos_content:
+      return value
+
+    if not value:
+      self._errors['agreed_to_tos'] = [
+          "You cannot register without agreeing to the Terms of Service"]
+
+    return value
+
 
 
 class StudentInfoForm(forms.ModelForm):

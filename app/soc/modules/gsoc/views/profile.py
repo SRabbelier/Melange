@@ -175,6 +175,7 @@ class LoggedInMsg(Template):
     context = {
         'logout_link': users.create_logout_url(self.data.full_path),
         'user_email': self.data.gae_user.email(),
+        'has_profile': bool(self.data.profile),
     }
 
     if self.data.timeline.orgsAnnounced() and self.data.student_info:
@@ -253,7 +254,6 @@ class ProfilePage(RequestHandler):
         'page_name': page_name,
         'form_top_msg': LoggedInMsg(self.data),
         'forms': [user_form, profile_form, student_info_form],
-        'has_profile': bool(self.data.profile),
         'error': error,
     }
 

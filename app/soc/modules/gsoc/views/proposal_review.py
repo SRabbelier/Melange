@@ -394,20 +394,28 @@ class WishToMentor(RequestHandler):
     if value != 'request' and value != 'withdraw':
       BadRequest("Invalid post data.")
 
+    if value == 'request' and self.data.isPossibleMentorForProposal():
+        raise BadRequest("Invalid post data.")
+    if value == 'withdraw' and not self.data.isPossibleMentorForProposal():
+       raise BadRequest("Invalid post data.")
+
+    proposal_key = self.data.proposal.key()
+    profile_key = self.data.profile.key()
+
     def update_possible_mentors_trx():
+      # transactionally get latest version of the proposal
+      proposal = db.get(proposal_key)
       if value == 'request':
-        if not self.data.isPossibleMentorForProposal():
-          self.data.proposal.possible_mentors.append(self.data.profile.key())
-        else:
-          raise BadRequest("Invalid post data.")
-      elif value == 'withdraw':
-        import logging
-        logging.error(len(self.data.proposal.possible_mentors))
-        if self.data.isPossibleMentorForProposal():
-          self.data.proposal.possible_mentors.remove(self.data.profile.key())
-        else:
-          raise BadRequest("Invalid post data.")
-      self.data.proposal.put()
+        # we have already been added
+        if profile_key in proposal.possible_mentors:
+          return
+        proposal.possible_mentors.append(profile_key)
+      else:
+        # we have already been removed
+        if profile_key not in proposal.possible_mentors:
+          return
+        proposal.possible_mentors.remove(profile_key)
+      db.put(proposal)
 
     db.run_in_transaction(update_possible_mentors_trx)
 

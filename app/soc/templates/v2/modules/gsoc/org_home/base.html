@@ -24,6 +24,18 @@ limitations under the License.
       </span>
     {% endif %}
   </h2>
+
+  {% if invite_admin_link %}
+    <span class="edit-link">
+      <a href="{{ invite_admin_link }}">Invite admin</a>
+    </span>
+    <span>&nbsp;</span>
+  {% endif %}
+  {% if invite_mentor_link %}
+    <span class="edit-link">
+      <a href="{{ invite_mentor_link }}">Invite mentor</a>
+    </span>
+  {% endif %}
 </div>
 
 <div id="organization-home" class="content_column_1">

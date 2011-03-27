@@ -207,8 +207,11 @@ class OrgHome(RequestHandler):
     }
 
     if self.data.orgAdminFor(organization):
-      self.redirect.organization(organization)
-      context['edit_link'] =  self.redirect.urlOf('edit_gsoc_org_profile')
+      r = self.redirect
+      r.organization(organization)
+      context['edit_link'] =  r.urlOf('edit_gsoc_org_profile')
+      context['invite_admin_link'] = r.invite('org_admin').urlOf('gsoc_invite')
+      context['invite_mentor_link'] = r.invite('mentor').urlOf('gsoc_invite')
 
     # Render the apply template only when the user is not logged in
     # or has no role for the organization

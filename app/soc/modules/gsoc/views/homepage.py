@@ -28,6 +28,7 @@ from google.appengine.api import users
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
+from soc.logic import dicts
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
@@ -92,7 +93,7 @@ class Apply(Template):
     if signup and not self.data.gae_user:
       context['login_link'] = users.create_login_url(self.data.full_path)
     if signup and not self.data.profile:
-      kwargs = {}
+      kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       if self.data.timeline.orgSignup():
         kwargs['role'] = 'org_admin'
       else:

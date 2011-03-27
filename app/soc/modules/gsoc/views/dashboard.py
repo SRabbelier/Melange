@@ -178,8 +178,7 @@ class LoggedInMsg(Template):
     }
 
     if self.data.user:
-      context['user_email'] = "%s [link_id: %s]" % (
-          context['user_email'], self.data.user.link_id)
+      context['link_id'] = " [link_id: %s]" % self.data.user.link_id
 
     if self.data.timeline.orgsAnnounced() and self.data.student_info:
       context['apply_link'] = self.data.redirect.acceptedOrgs().url()

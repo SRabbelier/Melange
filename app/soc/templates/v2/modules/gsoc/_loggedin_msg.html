@@ -13,7 +13,10 @@ limitations under the License.
 {% endcomment %}
 
 <div id="loggedin-message" class="loggedin">
-  <p><strong>You are logged in as <em>{{ user_email }}</em>.</strong> <a href="{{ logout_link }}">(Not you?)</a></p>
+  <p>
+    <strong>You are logged in as <em>{{ user_email }}</em>{{ link_id }}.</strong>
+    <a href="{{ logout_link }}">(Not you?)</a>
+  </p>
   {% if not has_profile %}
     <p>Before you can apply to be a {{ role }} in Google Summer of Code, you must register.</p>
   {% endif %}

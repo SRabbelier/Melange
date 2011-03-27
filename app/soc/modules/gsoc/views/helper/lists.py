@@ -424,7 +424,7 @@ class RawQueryContentResponseBuilder(object):
       fields: The fields to query on.
       query: The query object to use.
       starter: The function used to retrieve the start entity.
-      ender: The function used to retrieve teh end marker.
+      ender: The function used to retrieve the value for the next start.
       prefetch: The fields that need to be prefetched for increased
                 performance.
     """

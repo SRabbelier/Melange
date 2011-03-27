@@ -135,9 +135,8 @@ class Dashboard(RequestHandler):
     if timeline_helper.isAfterEvent(
       self.data.program_timeline, 'student_signup_start'):
       # Add the submitted proposals component
-      #components.append(
-      #    SubmittedProposalsComponent(self.request, self.data))
-      pass
+      components.append(
+          SubmittedProposalsComponent(self.request, self.data))
 
     if self.data.org_admin_for:
       # add a component for all organization that this user administers
@@ -403,9 +402,57 @@ class SubmittedProposalsComponent(Component):
   """Component for listing all the proposals send to orgs this user is a member
   of.
   """
-  # TODO(ljvderijk): Implement
-  pass
 
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    r = data.redirect
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('title', 'Title')
+    list_config.addColumn('org', 'Organization',
+                          lambda ent, *args: ent.org.name)
+    list_config.setRowAction(lambda e, *args, **kwargs: 
+        r.review(e.key().id_or_name(), e.parent().link_id).
+        urlOf('review_gsoc_proposal'))
+    self._list_config = list_config
+
+    super(SubmittedProposalsComponent, self).__init__(request, data)
+
+
+  def templatePath(self):
+    """Returns the path to the template that should be used in render().
+    """
+    return'v2/modules/gsoc/dashboard/list_component.html'
+
+  def context(self):
+    """Returns the context of this component.
+    """
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=4, description='')
+    return {
+        'name': 'proposals_submitted',
+        'title': 'PROPOSALS SUBMITTED',
+        'lists': [list],
+        }
+
+  def getListData(self):
+    """Returns the list data as requested by the current request.
+
+    If the lists as requested is not supported by this component None is
+    returned.
+    """
+    idx = lists.getListIndex(self.request)
+    if idx == 4:
+      q = GSoCProposal.all()
+      q.filter('org IN', self.data.profile.mentor_for)
+
+      starter = lambda start: GSoCProposal.get_by_key_name(start)
+
+      response_builder = lists.RawQueryContentResponseBuilder(
+          self.request, self._list_config, q, starter, prefetch=['org'])
+      return response_builder.build()
+    else:
+      return None
 
 class ProjectsIMentorComponent(Component):
   """Component for listing all the Projects mentored by the current user.
@@ -434,7 +481,7 @@ class ProjectsIMentorComponent(Component):
     returned.
     """
     idx = lists.getListIndex(self.request)
-    if idx == 4:
+    if idx == 5:
       fields =  {'program': self.data.program,
                  'mentor': self.data.profile}
       response_builder = lists.QueryContentResponseBuilder(
@@ -447,7 +494,7 @@ class ProjectsIMentorComponent(Component):
     """Returns the context of this component.
     """
     list = lists.ListConfigurationResponse(
-        self._list_config, idx=4, description='List of projects I mentor')
+        self._list_config, idx=5, description='List of projects I mentor')
 
     return {
         'name': 'mentoring_projects',
@@ -485,7 +532,7 @@ class OrganizationsIAdminComponent(Component):
     returned.
     """
     idx = lists.getListIndex(self.request)
-    if idx == 5:
+    if idx == 6:
       response = lists.ListContentResponse(self.request, self._list_config)
 
       if response.start != 'done':
@@ -502,7 +549,7 @@ class OrganizationsIAdminComponent(Component):
     """Returns the context of this component.
     """
     list = lists.ListConfigurationResponse(
-        self._list_config, idx=5, description='Organizations I am an admin for')
+        self._list_config, idx=6, description='Organizations I am an admin for')
 
     return {
         'name': 'adminning_organizations',

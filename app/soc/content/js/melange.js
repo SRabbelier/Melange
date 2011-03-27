@@ -85,6 +85,37 @@
     }
   };
 
+  /** Facility to prepare tinyMCE settings.
+    * @function
+    * @public
+    * @name melange.tinyMceConfig
+    * @param {String[]} textareas Array of textareas IDs
+    */
+  $m.tinyMceConfig = function (textareas) {
+    var default_tinymce_settings = {
+      "theme_advanced_toolbar_align": "left",
+      "theme_advanced_resizing": true,
+      "theme_advanced_statusbar_location": "bottom",
+      "theme_advanced_path": false,
+      "relative_urls": 0,
+      "theme_advanced_toolbar_location": "top",
+      "theme_advanced_buttons1": "bold,italic,underline,strikethrough,|,fontsizeselect,forecolor,|,bullist,numlist,outdent,indent",
+      "theme_advanced_buttons3": "",
+      "theme_advanced_buttons2": "undo,redo,|,justifyleft,justifycenter,justifyright,|,link,unlink,anchor,code",
+      "remove_script_host": 0,
+      "theme": "advanced",
+      "mode": "exact"
+    };
+    var textareaids = textareas.join(",");
+    return jQuery.extend(
+      default_tinymce_settings,
+      {
+        elements: textareaids
+      }
+    );
+  };
+
+
   /** Facility to load google API.
     * @function
     * @public

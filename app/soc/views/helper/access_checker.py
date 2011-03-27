@@ -503,7 +503,7 @@ class AccessChecker(BaseAccessChecker):
     if self.data.mentorFor(org):
       return
 
-    raise DEF_NOT_MENTOR_MSG % org.name
+    raise AccessViolation(DEF_NOT_MENTOR_MSG % org.name)
 
   def isOrganizationInURLActive(self):
     """Checks if the organization in URL exists and if its status is active.

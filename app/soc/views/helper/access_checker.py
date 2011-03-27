@@ -608,7 +608,7 @@ class AccessChecker(BaseAccessChecker):
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity can be responded
-    if self.data.invite.status not in ['pending']:
+    if self.data.invite.status not in ['pending', 'rejected']:
       raise AccessViolation(DEF_NOT_VALID_INVITATION_MSG)
 
     # check if the entity is addressed to the current user
@@ -635,7 +635,7 @@ class AccessChecker(BaseAccessChecker):
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the entity can be responded
-    if self.data.request_entity.status not in ['pending']:
+    if self.data.request_entity.status not in ['pending', 'rejected']:
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the user is an admin for the organization

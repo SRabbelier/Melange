@@ -241,11 +241,16 @@ class ShowInvite(RequestHandler):
     assert isSet(self.data.organization)
     assert isSet(self.data.invited_user)
 
+    show_actions = self.data.invite.status == 'pending'
+    if self.data.can_respond and self.data.invite.status == 'rejected':
+      show_actions = True
+
     return {
         'request': self.data.invite,
         'org': self.data.organization,
         'actions': self.ACTIONS,
         'user': self.data.invited_user,
+        'show_actions': show_actions,
         'can_respond': self.data.can_respond,
         } 
 

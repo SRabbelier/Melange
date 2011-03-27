@@ -29,6 +29,19 @@ limitations under the License.
 </h1>
 <h2 id="project-page-student-name">{{ student_name }}</h2>
 
+{% if wish_to_mentor %}
+  <h2 id="project-page-student-name">
+    <span class="edit-link">
+      <a href="#" id="wish-to-mentor-link">
+        {% if wish_to_mentor == "request" %}
+          I wish to mentor this project
+        {% else %}{% if wish_to_mentor == "withdraw" %}
+          I do not wish to mentor this project
+        {% endif %}{% endif %}
+      </a>
+    </span>
+  </h2>
+{% endif %}
 
 <div class="project-short">
   <p class="project-mentor"><strong>Email:</strong> {{ student_email }}</p>

@@ -155,6 +155,8 @@ class ReviewProposal(RequestHandler):
     assert isSet(self.data.proposer_profile)
     assert isSet(self.data.proposal)
 
+    context = {}
+
     scores = self.getScores()
 
     # TODO: check if the scoring is not disabled
@@ -167,6 +169,13 @@ class ReviewProposal(RequestHandler):
     comment_action = reverse('comment_gsoc_proposal', kwargs=self.data.kwargs)
 
     if self.data.private_comments_visible:
+      if self.data.isPossibleMentorForProposal():
+        context['wish_to_mentor'] = 'withdraw'
+      else:
+        context['wish_to_mentor'] = 'request'
+      context['wish_to_mentor_link'] = self.data.redirect.review(
+          ).urlOf('gsoc_proposal_wish_to_mentor')
+
       form = PrivateCommentForm()
     else:
       form = CommentForm()
@@ -181,7 +190,7 @@ class ReviewProposal(RequestHandler):
         (self.data.user.key() == self.data.proposer_user.key())
     update_link = self.data.redirect.id().urlOf('update_gsoc_proposal')
 
-    return {
+    context.update({
         'comment_box': comment_box,
         'proposal': self.data.proposal,
         'mentor': self.data.proposal.mentor,
@@ -197,8 +206,9 @@ class ReviewProposal(RequestHandler):
         'student_email': self.data.proposer_profile.email,
         'title': self.data.proposal.title,
         'page_name': self.data.proposal.title,
-        }
+        })
 
+    return context
 
 def getProposalFromKwargs(kwargs):
   fields = ['sponsor', 'program', 'student']
@@ -341,7 +351,7 @@ class PostScore(RequestHandler):
       # update total score for the proposal
       self.data.proposal.score += (value - (score.value if score else 0))
       self.data.proposal.put()
-    
+
     db.run_in_transaction(update_score_trx, score)
 
   def post(self):

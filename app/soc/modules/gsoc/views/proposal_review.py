@@ -325,7 +325,6 @@ class PostScore(RequestHandler):
     score = query.get()
 
     # update total score for the proposal
-    old_score = 0
     self.data.proposal.score += (value - (score.value if score else 0))
 
     if not score:

@@ -678,9 +678,9 @@
             var source = data_from_server;
             var first_batch_received = (current_loop > 0);
             var data_received = source.data[start] !== undefined;
-            var last_batch = ((source.next === "done") || (!source.data[start].length));
+            var last_batch = source.next === "done";
 
-            if (data_received && (!first_batch_received || !last_batch)) {
+            if (data_received) {
               // temporary fix until Issue 766
               if (_self.configuration === null) {
                 _self.configuration = source.configuration;

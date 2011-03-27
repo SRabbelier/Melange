@@ -75,7 +75,7 @@ class ProjectList(Template):
                 'status': 'accepted'}
       response_builder = lists.QueryContentResponseBuilder(
           self.request, self._list_config, sp_logic,
-          fields)
+          fields, prefetch=['student', 'scope', 'mentor'])
       return response_builder.build()
     else:
       return None

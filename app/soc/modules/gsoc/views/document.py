@@ -119,7 +119,8 @@ class DocumentPage(RequestHandler):
   def djangoURLPatterns(self):
     return [
         url(r'^gsoc/document/show/%s$' % url_patterns.DOCUMENT, self,
-            name='show_gsoc_document')
+            name='show_gsoc_document'),
+        url(r'^document/show/%s$' % url_patterns.DOCUMENT, self),
     ]
 
   def checkAccess(self):

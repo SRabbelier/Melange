@@ -24,7 +24,6 @@ __authors__ = [
 
 from google.appengine.api import users
 from google.appengine.ext import db
-from google.appengine.ext.db import djangoforms
 
 from django.forms import fields
 from django.core.urlresolvers import reverse
@@ -362,7 +361,7 @@ class ProfilePage(RequestHandler):
     link_id = self.data.GET.get('org')
     if link_id:
       key_name = '%s/%s' % (
-          self.data.program.name(), link_id
+          self.data.program.name, link_id
           )
       organization = GSoCOrganization.get_by_key_name(key_name)
     else:

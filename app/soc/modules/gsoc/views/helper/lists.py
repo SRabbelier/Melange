@@ -88,7 +88,7 @@ class ListConfiguration(object):
                  end user.
       hidden: Whether the column should be displayed by default.
     """
-    func = lambda e, *args: e.key().name()
+    func = lambda e, *args: e.key().id_or_name()
     self.addColumn('key', 'Key', func, hidden=True)
 
   def addColumn(self, id, name, func, resizable=True, hidden=False):

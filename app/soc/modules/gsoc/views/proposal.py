@@ -107,9 +107,9 @@ class ProposalPage(RequestHandler):
 
     proposal = self.createFromForm()
     if proposal:
-      self.redirect.program()
-      self.redirect.id(proposal.key().id())
-      self.redirect.to('update_gsoc_proposal')
+      self.redirect.review(proposal.key().id(),
+                           self.data.user.link_id)
+      self.redirect.to('review_gsoc_proposal')
     else:
       self.get()
 
@@ -168,6 +168,8 @@ class UpdateProposal(RequestHandler):
 
     proposal = self.updateFromForm()
     if proposal:
-      self.redirect.id().to('update_gsoc_proposal')
+      self.redirect.review(proposal.key().id(),
+                           self.data.user.link_id)
+      self.redirect.to('review_gsoc_proposal')
     else:
       self.get()

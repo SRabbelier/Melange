@@ -32,15 +32,31 @@ limitations under the License.
   </div>
 </form>
 <!-- end form -->
-
 {% endblock page_content %}
 
+{% block synchronous_scripts %}
+  <script type='text/javascript' src="/tiny_mce/tiny_mce.js"></script>
+  {{ block.super }}
+{% endblock synchronous_scripts %}
 {% block dependencies %}
   [
     dep.uniform,
     null,
     function () {
       jQuery("select, input:radio, input:file, input:checkbox").uniform();
+      tinyMCE.init({
+        "theme_advanced_toolbar_align": "left",
+        "theme_advanced_resizing": true,
+        "theme_advanced_statusbar_location": "bottom",
+        "theme_advanced_path": false,
+        "relative_urls": 0,
+        "theme_advanced_toolbar_location": "top",
+        "theme_advanced_buttons1": "bold,italic,underline,strikethrough,|,fontsizeselect,forecolor,|,bullist,numlist,outdent,indent", "theme_advanced_buttons3": "", "theme_advanced_buttons2": "undo,redo,|,justifyleft,justifycenter,justifyright,|,link,unlink,anchor,code",
+        "remove_script_host": 0,
+        "theme": "advanced",
+        "mode": "exact",
+        "elements": "content"
+      });
     }
   ]
 {% endblock dependencies %}

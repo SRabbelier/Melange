@@ -321,6 +321,8 @@ class ProfilePage(RequestHandler):
   def validate(self):
     dirty = []
     user_form = self.validateUser(dirty)
+    if not user_form.is_valid():
+      return False
     profile_form, profile = self.validateProfile(dirty)
     student_form = self.validateStudent(dirty, profile)
 

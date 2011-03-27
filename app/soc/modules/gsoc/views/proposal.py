@@ -22,10 +22,7 @@ __authors__ = [
   ]
 
 
-from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
-
-from soc.logic import dicts
 
 from soc.views import forms
 
@@ -66,7 +63,12 @@ class ProposalPage(RequestHandler):
     return 'v2/modules/gsoc/proposal/base.html'
 
   def context(self):
-    proposal_form = ProposalForm(self.data.POST or None)
+    if self.data.POST:
+      proposal_form = ProposalForm(self.data.POST)
+    else:
+      initial = {'content': self.data.organization.contrib_template}
+      proposal_form = ProposalForm(initial=initial)
+
     return {
         'page_name': 'Submit proposal',
         'form_header_message': 'Submit proposal to %s' % (
@@ -74,7 +76,7 @@ class ProposalPage(RequestHandler):
         'proposal_form': proposal_form,
         }
 
-  def createFromFrom(self):
+  def createFromForm(self):
     """Creates a new proposal based on the data inserted in the form.
 
     Returns:
@@ -89,14 +91,14 @@ class ProposalPage(RequestHandler):
     # set the organization and program references
     proposal_form.cleaned_data['org'] = self.data.organization
     proposal_form.cleaned_data['program'] = self.data.program
-    
+
     return proposal_form.create(commit=True, parent=self.data.profile)
 
   def post(self):
     """Handler for HTTP POST request.
     """
 
-    proposal = self.createFromFrom()
+    proposal = self.createFromForm()
     if proposal:
       self.redirect.program()
       self.redirect.id(proposal.key().id())
@@ -118,10 +120,10 @@ class UpdateProposal(RequestHandler):
   def checkAccess(self):
     self.check.isLoggedIn()
     self.check.isActiveStudent()
-    
+
     self.data.proposal = GSoCProposal.get_by_id(
         int(self.data.kwargs['id']), parent=self.data.profile)
-    
+
     self.check.canStudentUpdateProposal()
 
   def templatePath(self):

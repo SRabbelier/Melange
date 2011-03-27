@@ -28,11 +28,9 @@ from google.appengine.api import users
 from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import url
 
-from soc.logic import dicts
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
-from soc.modules.gsoc.logic.models.timeline import logic as timeline_logic
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.helper import url_patterns
 

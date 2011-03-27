@@ -143,9 +143,10 @@ class Dashboard(RequestHandler):
       components.append(
           SubmittedProposalsComponent(self.request, self.data))
 
+    components.append(OrganizationsIParticipateInComponent(self.request, self.data))
+
     if self.data.org_admin_for:
       # add a component for all organization that this user administers
-      components.append(OrganizationsIAdminComponent(self.request, self.data))
       components.append(RequestComponent(self.request, self.data, True))
 
     return components
@@ -521,9 +522,8 @@ class ProjectsIMentorComponent(Component):
     }
 
 
-class OrganizationsIAdminComponent(Component):
-  """Component for listing all the Organizations controlled by the current
-  user.
+class OrganizationsIParticipateInComponent(Component):
+  """Component listing all the Organizations the current user participates in.
   """
 
   def __init__(self, request, data):
@@ -537,7 +537,7 @@ class OrganizationsIAdminComponent(Component):
     list_config.setDefaultSort('name')
     self._list_config = list_config
 
-    super(OrganizationsIAdminComponent, self).__init__(request, data)
+    super(OrganizationsIParticipateInComponent, self).__init__(request, data)
 
   def templatePath(self):
     """Returns the path to the template that should be used in render().

@@ -429,6 +429,7 @@ class BoundField(forms.BoundField):
         }
 
     hidden = self.as_widget(attrs=attrs)
+    original = self.form.initial[self.name]
 
     key = self.form.initial.get(self.name)
 
@@ -444,6 +445,7 @@ class BoundField(forms.BoundField):
         'class': 'text',
         }
     pretty = self.as_widget(attrs=attrs)
+    self.form.initial[self.name] = original
 
     return mark_safe('%s%s%s%s%s' % (
         self._render_label(),

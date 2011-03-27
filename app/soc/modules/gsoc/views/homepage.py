@@ -166,7 +166,9 @@ class Homepage(RequestHandler):
 
     return [
         url(r'^gsoc/homepage/%s$' % url_patterns.PROGRAM, self,
-            name='gsoc_homepage')
+            name='gsoc_homepage'),
+        url(r'^gsoc/program/home/%s$' % url_patterns.PROGRAM, self),
+        url(r'^program/home/%s$' % url_patterns.PROGRAM, self),
     ]
 
   def checkAccess(self):

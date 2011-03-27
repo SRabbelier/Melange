@@ -99,7 +99,7 @@ class Contact(Template):
         'facebook_link': self.data.organization.facebook,
         'twitter_link': self.data.organization.twitter,
         'blogger_link': self.data.organization.blog,
-        'email': self.data.organization.pub_mailing_list,
+        'pub_mailing_list_link': self.data.organization.pub_mailing_list,
         'irc_channel_link': self.data.organization.irc_channel,
     }
 

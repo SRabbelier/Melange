@@ -202,7 +202,7 @@ class OrgHome(RequestHandler):
         'tags': organization.tags_string(organization.org_tag),
     }
 
-    if self.data.adminFor(organization):
+    if self.data.orgAdminFor(organization):
       self.redirect.organization(organization)
       context['edit_link'] =  self.redirect.urlOf('edit_gsoc_org_profile')
 

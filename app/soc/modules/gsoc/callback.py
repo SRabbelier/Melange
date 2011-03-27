@@ -91,6 +91,7 @@ class Callback(object):
     self.views.append(proposal_review.ReviewProposal())
     self.views.append(proposal_review.PostComment())
     self.views.append(proposal_review.PostScore())
+    self.views.append(proposal_review.WishToMentor())
     self.views.append(program.ProgramPage())
     self.views.append(projects_list.ListProjects())
     self.views.append(invite.InvitePage())

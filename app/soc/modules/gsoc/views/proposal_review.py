@@ -352,3 +352,61 @@ class PostScore(RequestHandler):
     """Special Handler for HTTP GET request since this view only handles POST.
     """
     self.error(405)
+
+
+class WishToMentor(RequestHandler):
+  """View which handles posting scores.
+  """
+
+  def djangoURLPatterns(self):
+    return [
+         url(r'^gsoc/proposal/wish_to_mentor/%s$' % url_patterns.REVIEW,
+         self, name='gsoc_proposal_wish_to_mentor'),
+    ]
+
+  def checkAccess(self):
+    self.data.proposal = getProposalFromKwargs(self.data.kwargs)
+
+    if not self.data.proposal:
+      raise NotFound('Requested proposal does not exist')
+
+    self.check.isMentorForOrganization(self.data.proposal.org)
+
+  def addToPotentialMentors(self, value):
+    """Toggles the user from the potential mentors list.
+
+    Args:
+      value: can be either "request" or "withdraw".
+    """
+    assert isSet(self.data.profile)
+    assert isSet(self.data.proposal)
+
+    if value != 'request' and value != 'withdraw':
+      BadRequest("Invalid post data.")
+
+    def update_possible_mentors_trx():
+      if value == 'request':
+        if not self.data.isPossibleMentorForProposal():
+          self.data.proposal.possible_mentors.append(self.data.profile.key())
+        else:
+          raise BadRequest("Invalid post data.")
+      elif value == 'withdraw':
+        import logging
+        logging.error(len(self.data.proposal.possible_mentors))
+        if self.data.isPossibleMentorForProposal():
+          self.data.proposal.possible_mentors.remove(self.data.profile.key())
+        else:
+          raise BadRequest("Invalid post data.")
+      self.data.proposal.put()
+
+    db.run_in_transaction(update_possible_mentors_trx)
+
+  def post(self):
+    value = self.data.POST.get('value')
+    self.addToPotentialMentors(value)
+
+
+  def get(self):
+    """Special Handler for HTTP GET request since this view only handles POST.
+    """
+    self.error(405)

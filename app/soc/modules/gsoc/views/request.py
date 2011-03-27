@@ -37,6 +37,7 @@ from soc.views import forms
 from soc.views.helper.access_checker import isSet
 
 from soc.modules.gsoc.models.organization import GSoCOrganization
+from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.base_templates import LoggedInMsg
 
@@ -183,6 +184,12 @@ class ShowRequest(RequestHandler):
 
     self.mutator.canRespondForUser()
 
+    key_name = '/'.join([
+        self.data.program.key().name(),
+        self.data.requester.link_id])
+    self.data.requester_profile = GSoCProfile.get_by_key_name(
+        key_name, parent=self.data.requester)
+
   def context(self):
     """Handler to for GSoC Show Invitation Page HTTP get request.
     """
@@ -227,16 +234,13 @@ class ShowRequest(RequestHandler):
     """
 
     assert isSet(self.data.organization)
-
-    if not self.data.profile:
-      self.redirect.program()
-      self.redirect.to('edit_gsoc_profile')
+    assert isSet(self.data.requester_profile)
 
     self.data.request_entity.status = 'accepted'
-    self.data.profile.mentor_for.append(self.data.organization.key())
+    self.data.requester_profile.mentor_for.append(self.data.organization.key())
 
+    self.data.requester_profile.put()
     self.data.request_entity.put()
-    self.data.profile.put()
 
   def _rejectRequest(self):
     """Rejects a request. 

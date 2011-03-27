@@ -82,7 +82,7 @@ class TOSWidget(widgets.CheckboxInput):
 
   def render(self, name, value, attrs=None):
     readonly_attrs = {
-        'id': 'document_content',
+        'id': 'tos-content',
         }
     if self.tos_text:
       text = mark_safe(

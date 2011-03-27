@@ -199,9 +199,19 @@ h2#project-page-student-name {
   margin: 0 0 1em 0;
 }
 /* Override color for embedded document */
-#document_content span {
+#document-content div {
   color: black;
 }
-#document_content {
+#document-content {
   padding-top: 0.5em;
+}
+#tos-content div {
+    color: black;
+    font-size: 10px;
+}
+#tos-content {
+  padding-top: 0.5em;
+    height: 400px;
+    overflow: auto;
+    margin-bottom:10px;
 }

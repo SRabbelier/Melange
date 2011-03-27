@@ -74,16 +74,12 @@ class ProfileForm(forms.ModelForm):
   """Django form for profile page.
   """
 
-  def __init__(self, tos_content, *args, **kwargs):
-    super(ProfileForm, self).__init__(*args, **kwargs)
-    self.fields['agreed_to_tos'].widget = forms.TOSWidget(tos_content)
-
   class Meta:
     model = GSoCProfile
     css_prefix = 'gsoc_profile'
     exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
                'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
-               'name_on_documents']
+               'name_on_documents', 'agreed_to_tos']
     widgets = forms.choiceWidgets(GSoCProfile,
         ['res_country', 'ship_country',
          'tshirt_style', 'tshirt_size', 'gender'])
@@ -123,19 +119,21 @@ class ProfileForm(forms.ModelForm):
     return self.cleaned_data
 
 
-class EditProfileForm(ProfileForm):
+class CreateProfileForm(ProfileForm):
   """Django edit form for profiles.
   """
 
   class Meta:
     model = ProfileForm.Meta.model
     css_prefix = ProfileForm.Meta.css_prefix
-    exclude = ProfileForm.Meta.exclude + ['agreed_to_tos']
+    exclude = ['link_id', 'user', 'scope', 'mentor_for', 'org_admin_for',
+               'student_info', 'agreed_to_tos_on', 'scope_path', 'status',
+               'name_on_documents']
     widgets = ProfileForm.Meta.widgets
 
   def __init__(self, tos_content, *args, **kwargs):
-    # do not call ProfileForm's init, since it sets agreed_to_tos
-    super(ProfileForm, self).__init__(*args, **kwargs)
+    super(CreateProfileForm, self).__init__(*args, **kwargs)
+    self.fields['agreed_to_tos'].widget = forms.TOSWidget(tos_content)
 
 
 class StudentInfoForm(forms.ModelForm):
@@ -232,7 +230,7 @@ class ProfilePage(RequestHandler):
 
     form = EditUserForm if self.data.user else UserForm
     user_form = form(self.data.POST or None, instance=self.data.user)
-    form = EditProfileForm if self.data.profile else ProfileForm
+    form = ProfileForm if self.data.profile else CreateProfileForm
     profile_form = form(tos_content, self.data.POST or None,
                         instance=self.data.profile)
     error = user_form.errors or profile_form.errors or student_info_form.errors

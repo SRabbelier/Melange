@@ -56,6 +56,17 @@ limitations under the License.
   <!-- end block -->
 
   <!-- begin block -->
+  {% if organization.contrib_template %}
+  <div id="organization-application-template" class="block block-organization-application-template">
+    <h4 title="title-section-organization-application-template">Application template</h4>
+    <div id="block-organization-application-template-content" class="block-content">
+      <p>{{ organization.contrib_template|safe }}</p>
+    </div>
+  </div>
+  {% endif %}
+  <!-- end block -->
+
+  <!-- begin block -->
   {% if project_list %}
     {{ project_list.render }}
   {% endif %}

@@ -88,7 +88,7 @@ class Dashboard(RequestHandler):
     context = {}
     context['page_name'] = self.data.program.name
     context['user'] = self.data.user
-    context['logout_link'] = users.create_logout_url(self.data.full_path)
+    context['logged_in_msg'] = LoggedInMsg(self.data)
     # TODO(ljvderijk): Implement code for setting dashboard messages.
     #context['alert_msg'] = 'Default <strong>alert</strong> goes here'
     context['components'] = components
@@ -162,6 +162,34 @@ class Dashboard(RequestHandler):
                                                    org_app_survey))
 
     return components
+
+
+class LoggedInMsg(Template):
+  """Template to render user login message at the top of the profile form.
+  """
+  def __init__(self, data):
+    self.data = data
+
+  def context(self):
+    context = {
+        'logout_link': self.data.redirect.logout().url(),
+        'user_email': self.data.gae_user.email(),
+        'has_profile': bool(self.data.profile),
+    }
+
+    if self.data.user:
+      context['user_email'] = "%s [link_id: %s]" % (
+          context['user_email'], self.data.user.link_id)
+
+    if self.data.timeline.orgsAnnounced() and self.data.student_info:
+      context['apply_link'] = self.data.redirect.acceptedOrgs().url()
+
+    return context
+
+  def templatePath(self):
+    return "v2/modules/gsoc/_loggedin_msg.html"
+
+
 
 class Component(Template):
   """Base component for the dashboard.

@@ -172,7 +172,7 @@ class LoggedInMsg(Template):
 
   def context(self):
     context = {
-        'logout_link': users.create_logout_url(self.data.full_path),
+        'logout_link': self.data.redirect.logout().url(),
         'user_email': self.data.gae_user.email(),
         'has_profile': bool(self.data.profile),
     }
@@ -180,13 +180,17 @@ class LoggedInMsg(Template):
     if self.data.kwargs.get('role'):
       context['role'] = self.data.kwargs['role']
 
+    if self.data.user:
+      context['user_email'] = "%s (link_id: %s)" % (
+          context['user_email'], self.data.user.link_id)
+
     if self.data.timeline.orgsAnnounced() and self.data.student_info:
       context['apply_link'] = self.data.redirect.acceptedOrgs().url()
 
     return context
 
   def templatePath(self):
-    return "v2/modules/gsoc/profile/_form_loggedin_msg.html"
+    return "v2/modules/gsoc/_loggedin_msg.html"
 
 
 class ProfilePage(RequestHandler):

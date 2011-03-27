@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django.conf.urls.defaults import url
 from django.utils.translation import ugettext
 
@@ -521,7 +519,8 @@ class ProjectsIMentorComponent(Component):
       fields =  {'program': self.data.program,
                  'mentor': self.data.profile}
       response_builder = lists.QueryContentResponseBuilder(
-          self.request, self._list_config, project_logic, fields, prefetch=['scope'])
+          self.request, self._list_config, project_logic,
+          fields, prefetch=['scope'])
       return response_builder.build()
     else:
       return None

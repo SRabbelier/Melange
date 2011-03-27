@@ -77,7 +77,7 @@ tr.ui-search-toolbar select {margin: 1px 0px 0px 0px}
 * .jqgrid-overlay iframe {position:absolute;top:0;left:0;z-index:-1;width: expression(this.parentNode.offsetWidth+'px');height: expression(this.parentNode.offsetHeight+'px');}
 /* end loading div */
 /* toolbar */
-.ui-jqgrid .ui-userdata {border-left: 0px none;	border-right: 0px none;	height : 21px;overflow: hidden;	}
+.ui-jqgrid .ui-userdata {border-left: 0px none;	border-right: 0px none;	height : 24px;overflow: hidden;	}
 /*Modal Window */
 .ui-jqdialog { display: none; width: 300px; position: absolute; padding: .2em; font-size:11px; overflow:visible;}
 .ui-jqdialog .ui-jqdialog-titlebar { padding: .3em .2em; position: relative;  }

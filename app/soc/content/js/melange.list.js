@@ -832,7 +832,7 @@
               jQuery("#t_" + _self.jqgrid.id).css("padding-bottom","3px");
 
               //Add CSV export button
-              jQuery("#t_" + _self.jqgrid.id).append("<input type='button' value='CSV Export' style='float:right; padding-bottom:1px' id='csvexport_" + _self.jqgrid.id + "'/>");
+              jQuery("#t_" + _self.jqgrid.id).append("<input type='button' value='CSV Export' style='float:right;' id='csvexport_" + _self.jqgrid.id + "'/>");
               jQuery("#csvexport_" + _self.jqgrid.id).button();
               //Add Click event to CSV export button
               jQuery("#csvexport_" + _self.jqgrid.id).click(function () {

@@ -86,9 +86,9 @@ class GSoCProfileHelper(object):
     """Sets the current suer to be a student for the current program.
     """
     self.createProfile()
-    from soc.models.role import StudentInfo
+    from soc.modules.gsoc.models.profile import GSoCStudentInfo
     properties = {'key_name': self.profile.key().name(), 'parent': self.profile}
-    self.profile.student_info = seeder_logic.seed(StudentInfo, properties)
+    self.profile.student_info = seeder_logic.seed(GSoCStudentInfo, properties)
     self.profile.put()
 
   def createStudentWithProposal(self):

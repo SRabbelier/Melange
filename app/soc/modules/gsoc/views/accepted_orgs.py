@@ -50,6 +50,7 @@ class AcceptedOrgsList(Template):
         lambda e, *args, **kwargs: r.organization(e).urlOf('gsoc_org_home'))
     list_config.addColumn('tags', 'Tags',
                           lambda e, *args, **kwargs: e.tags_string(e.org_tag))
+    list_config.setDefaultSort('name', 'asc')
 
     self._list_config = list_config
 

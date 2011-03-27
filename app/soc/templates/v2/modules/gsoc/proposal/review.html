@@ -29,7 +29,9 @@ limitations under the License.
 </h1>
 <h2 id="project-page-student-name">{{ student_name }}</h2>
 
+
 <div class="project-short">
+  <p class="project-mentor"><strong>Email:</strong> {{ student_email }}</p>
   {% if private_comments_visible %}
   <p class="project-mentor"><strong>Mentor:</strong> {{ mentor.name|default:"No mentor assigned" }}</p>
   <p class="project-possible-mentor"><strong>Possible mentors:</strong> None</p>

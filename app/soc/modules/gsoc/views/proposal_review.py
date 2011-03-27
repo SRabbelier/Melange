@@ -194,6 +194,7 @@ class ReviewProposal(RequestHandler):
         'user_is_proposer': user_is_proposer,
         'update_link': update_link,
         'student_name': self.data.proposer_profile.name(),
+        'student_email': self.data.proposer_profile.email,
         'title': self.data.proposal.title,
         'page_name': self.data.proposal.title,
         }

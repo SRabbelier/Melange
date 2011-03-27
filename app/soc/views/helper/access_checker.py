@@ -496,7 +496,7 @@ class AccessChecker(BaseAccessChecker):
     raise AccessViolation(DEF_NOT_ADMIN_MSG % org.name)
 
   def isMentorForOrganization(self, org):
-    """Checks if the user is an admin for the specified organiztaion.
+    """Checks if the user is a mentor for the specified organiztaion.
     """
     self.isProfileActive()
 

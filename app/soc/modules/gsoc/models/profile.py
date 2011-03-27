@@ -21,6 +21,8 @@ __authors__ = [
 ]
 
 
+from google.appengine.ext import db
+
 import soc.models.role
 
 
@@ -35,4 +37,5 @@ class GSoCStudentInfo(soc.models.role.StudentInfo):
   """GSoCStudentInfo Model.
   """
 
-  pass
+  #: number of proposals 
+  number_of_proposals = db.IntegerProperty(default=0)

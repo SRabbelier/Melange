@@ -22,6 +22,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from django.conf.urls.defaults import url
 
 from soc.views import forms
@@ -92,7 +94,12 @@ class ProposalPage(RequestHandler):
     proposal_form.cleaned_data['org'] = self.data.organization
     proposal_form.cleaned_data['program'] = self.data.program
 
-    return proposal_form.create(commit=True, parent=self.data.profile)
+    def create_proposal_trx():
+      self.data.student_info.number_of_proposals += 1
+      self.data.student_info.put()
+      return proposal_form.create(commit=True, parent=self.data.profile)
+
+    return db.run_in_transaction(create_proposal_trx)
 
   def post(self):
     """Handler for HTTP POST request.

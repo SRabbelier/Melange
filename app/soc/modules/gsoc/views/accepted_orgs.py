@@ -47,9 +47,13 @@ class AcceptedOrgsList(Template):
     list_config.addSimpleColumn('name', 'Name')
     list_config.addSimpleColumn('link_id', 'Link ID', hidden=True)
     list_config.setRowAction(
-        lambda e, *args, **kwargs: r.organization(e).urlOf('gsoc_org_home'))
+        lambda e, *args: r.organization(e).urlOf('gsoc_org_home'))
     list_config.addColumn('tags', 'Tags',
-                          lambda e, *args, **kwargs: e.tags_string(e.org_tag))
+                          lambda e, *args: e.tags_string(e.org_tag))
+    list_config.addColumn(
+        'ideas', 'Ideas',
+        (lambda e, *args: lists.urlize(e.ideas, name="[ideas page]")),
+        hidden=True)
     list_config.setDefaultSort('name')
 
     self._list_config = list_config

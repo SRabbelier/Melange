@@ -42,7 +42,7 @@ class StudentRegister(RequestHandler):
     """
 
     return [
-        url(r'^gsoc//student/%s$' % url_patterns.PROGRAM, self,
+        url(r'^gsoc/student/%s$' % url_patterns.PROGRAM, self,
             name='gsoc_student_register')
     ]
 

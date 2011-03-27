@@ -30,7 +30,7 @@ handlers:
 - url: /(robots.txt|favicon.ico)
   static_files: soc/content/\1
   upload: soc/content/(robots.txt|favicon.ico)  
-  expiration: 1d
+  expiration: 30d
 
 - url: /tiny_mce/.*
   script: $PYTHON_LIB/google/appengine/ext/zipserve
@@ -38,21 +38,21 @@ handlers:
 - url: /soc/content/js/(.*?)/(.*)
   static_files: soc/content/js.min/\2
   upload: soc/content/js/(.*)
-  expiration: 1d
+  expiration: 30d
 
 - url: /soc/content/css/(.*?)/(.*)
   static_files: soc/content/css/\2
   upload: soc/content/css/(.*)
-  expiration: 1d
+  expiration: 30d
 
 - url: /soc/content
   static_dir: soc/content
-  expiration: 1d
+  expiration: 7d
 
 - url: /js/(.*?)/jlinq/(.*)
   static_files: jlinq/\2
   upload: jlinq/(.*)
-  expiration: 1d
+  expiration: 30d
 
 - url: /js/(.*?)/jquery/(.*)
   static_files: jquery.min/\2
@@ -62,12 +62,12 @@ handlers:
 - url: /js/(.*?)/json/(.*)
   static_files: json.min/\2
   upload: json.min/(.*)
-  expiration: 1d
+  expiration: 30d
 
 - url: /js/(.*?)/LABjs/(.*)
   static_files: LABjs.min/\2
   upload: LABjs.min/(.*)
-  expiration: 1d
+  expiration: 30d
 
 - url: /admin/shell.*
   script: shell/shell.py

@@ -324,11 +324,9 @@ class PostScore(RequestHandler):
 
     score = query.get()
 
-    # delete GSoCSCore if present when value is 0 and return None.
-    if value == 0:
-      if score:
-        score.delete()
-      return None
+    # update total score for the proposal
+    old_score = 0
+    self.data.proposal.score += (value - (score.value if score else 0))
 
     if not score:
       score = GSoCScore(
@@ -338,8 +336,14 @@ class PostScore(RequestHandler):
     else:
       score.value = value
 
-    score.put()
-    return score
+    def update_score_trx(score):
+      if score and not score.value:
+        score.delete()
+      else:
+        score.put()
+      self.data.proposal.put()
+    
+    db.run_in_transaction(update_score_trx, score)
 
   def post(self):
     value = int(self.data.POST['value'])

@@ -23,7 +23,6 @@ __authors__ = [
 
 
 from django.conf.urls.defaults import url
-from django.core.urlresolvers import reverse
 
 from soc.logic.exceptions import AccessViolation
 from soc.views.template import Template

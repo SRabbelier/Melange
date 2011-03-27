@@ -94,7 +94,7 @@
   ];
 
   s.tinymce = [
-    tpjs + "tiny_mce/tiny_mce.js"
+    "/tiny_mce/tiny_mce.js"
   ];
 
   s.purr = [

@@ -189,6 +189,8 @@ class RequestData(RequestData):
     self.is_host = False
     self.mentor_for = []
     self.org_admin_for = []
+    self.applied_to = []
+    self.not_applied_to = []
     self.student_info = None
 
   def orgAdminFor(self, organization):
@@ -208,6 +210,34 @@ class RequestData(RequestData):
     if isinstance(organization, db.Model):
       organization = organization.key()
     return organization in [i.key() for i in self.mentor_for]
+
+  def appliedTo(self, organization):
+    """Returns true iff the user has applied for the specified organization.
+
+    Organization may either be a key or an organization instance.
+    """
+    if isinstance(organization, db.Model):
+      organization = organization.key()
+
+    if organization in self.applied_to:
+      return True
+    if organization in self.not_applied_to:
+      return False
+
+    from soc.models.request import Request
+    query = db.Query(Request, keys_only=True)
+    query.filter('user = ', self.user)
+    query.filter('group = ', organization)
+
+    applied = bool(query.get())
+
+    if applied:
+      self.applied_to.append(organization)
+    else:
+      self.not_applied_to.append(organization)
+
+    return applied
+
 
   def populate(self, redirect, request, args, kwargs):
     """Populates the fields in the RequestData object.

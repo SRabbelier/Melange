@@ -41,10 +41,15 @@ limitations under the License.
       {% endif %}
     {% endif %}
 
-    {% if mentor_request_link %}
+    {% if mentor_applied or mentor_request_link %}
       <h3 id="title-section-apply-mentors">Mentors: Apply!</h3>
       <p id="block-apply-mentors-text-action" class="action">
-        <a href="{{ mentor_request_link }}">Request</a>
+        {% if mentor_request_link %}
+          <a href="{{ mentor_request_link }}">Request</a>
+        {% endif %}
+        {% if mentor_applied %}
+          <p>You have already applied</p>
+        {% endif %}
       </p>
       <p id="block-apply-mentors-text-small" class="small">to become mentor for {{ organization.name }}.</p>
     {% endif %}

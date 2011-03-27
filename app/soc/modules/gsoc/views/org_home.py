@@ -75,9 +75,12 @@ class Apply(Template):
       if self.data.student_info:
         context['submit_proposal_link'] = reverse('submit_gsoc_proposal',
                                                   kwargs=kwargs_org)
-      elif organization not in self.data.mentor_for:
-        context['mentor_request_link'] = reverse('gsoc_request',
-                                                 kwargs=kwargs_org)
+      elif not self.data.mentorFor(organization):
+        if self.data.appliedTo(organization):
+          context['mentor_applied'] = True
+        else:
+          context['mentor_request_link'] = reverse('gsoc_request',
+                                                   kwargs=kwargs_org)
       else:
         context['apply_block'] = False
 

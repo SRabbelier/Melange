@@ -23,6 +23,8 @@ __authors__ = [
   ]
 
 
+from google.appengine.ext import db
+
 from django.conf.urls.defaults import url
 from django.utils.translation import ugettext
 
@@ -38,6 +40,7 @@ from soc.modules.gsoc.logic.models.student_project import logic as \
 from soc.modules.gsoc.logic.models.survey import project_logic as \
     ps_logic
 from soc.modules.gsoc.models.proposal import GSoCProposal
+from soc.modules.gsoc.models.profile import GSoCProfile
 from soc.modules.gsoc.views.base import RequestHandler
 from soc.modules.gsoc.views.base_templates import LoggedInMsg
 from soc.modules.gsoc.views.helper import lists
@@ -149,6 +152,7 @@ class Dashboard(RequestHandler):
     if self.data.org_admin_for:
       # add a component for all organization that this user administers
       components.append(RequestComponent(self.request, self.data, True))
+      components.append(ParticipantsComponent(self.request, self.data))
 
     return components
 
@@ -636,5 +640,99 @@ class RequestComponent(Component):
     return {
         'name': 'requests',
         'title': title,
+        'lists': [list],
+    }
+
+
+class ParticipantsComponent(Component):
+  """Component for listing all the participants for all organizations.
+  """
+
+  def __init__(self, request, data):
+    """Initializes this component.
+    """
+    self.data = data
+    orgs = data.org_admin_for
+    r = data.redirect
+    list_config = lists.ListConfiguration()
+    list_config.addColumn(
+        'name', 'Name', lambda ent, *args: ent.name())
+    list_config.addColumn(
+        'organizations', 'Organizations',
+        lambda ent, *args: ', '.join(
+            [i.name for i in orgs if i.key() in ent.mentor_for]))
+    self._list_config = list_config
+
+    super(ParticipantsComponent, self).__init__(request, data)
+
+  def templatePath(self):
+    return'v2/modules/gsoc/dashboard/list_component.html'
+
+  def getListData(self):
+    idx = lists.getListIndex(self.request)
+
+    def starter(start_key, q):
+      if not start_key:
+        q.filter('org_admin_for IN', self.data.org_admin_for)
+        return True
+
+      cls, start_key = start_key.split(':', 1)
+
+      if cls == 'org_admin':
+        q.filter('org_admin_for IN', self.data.org_admin_for)
+      elif cls == 'mentor':
+        q.filter('mentor_for IN', self.data.org_admin_for)
+      else:
+        return False
+
+      if not start_key:
+        return True
+
+      start_entity = db.get(start_key)
+
+      if not start_entity:
+        return False
+
+      q.filter('__key__ >', start_entity.key())
+      return True
+
+    def ender(entity, is_last, start):
+      if not start:
+        if is_last:
+          return 'mentor:'
+        else:
+          return 'org_admin:' + str(entity.key())
+
+      cls, _ = start.split(':', 1)
+
+      if is_last:
+        return 'done'
+
+      return '%s:%s' % (cls, str(entity.key()))
+
+    def skipper(entity, start):
+      if start.startswith('mentor:'):
+        return False
+
+      return any(self.data.orgAdminFor(i) for i in entity.mentor_for)
+
+    q = GSoCProfile.all()
+
+    if idx == 9:
+      fields = {'mentor_for': self.data.user}
+      response_builder = lists.RawQueryContentResponseBuilder(
+          self.request, self._list_config, q, starter,
+          ender=ender, skipper=skipper, prefetch=['user'])
+      return response_builder.build()
+    else:
+      return None
+
+  def context(self):
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=9)
+
+    return {
+        'name': 'participants',
+        'title': 'MENTORS AND ADMINS FOR PROJECTS I AM AN ADMIN FOR',
         'lists': [list],
     }

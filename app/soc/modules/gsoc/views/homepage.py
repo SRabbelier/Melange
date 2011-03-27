@@ -94,6 +94,7 @@ class Apply(Template):
     if signup and not self.data.gae_user:
       context['login_link'] = users.create_login_url(self.data.full_path)
     if signup and not self.data.profile:
+      kwargs = {}
       if self.data.timeline.orgSignup():
         kwargs['role'] = 'org_admin'
       else:

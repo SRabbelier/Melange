@@ -91,6 +91,7 @@ class AcceptedOrgsPage(RequestHandler):
         url(r'^gsoc/accepted_orgs/%s$' % url_patterns.PROGRAM, self,
             name='gsoc_accepted_orgs'),
         url(r'gsoc/program/accepted_orgs/%s$' % url_patterns.PROGRAM, self),
+        url(r'program/accepted_orgs/%s$' % url_patterns.PROGRAM, self),
     ]
 
   def checkAccess(self):

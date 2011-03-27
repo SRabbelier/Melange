@@ -34,6 +34,7 @@ from htmlsanitizer import safe_html
 from google.appengine.api import users
 
 from django import forms
+from django.core import validators
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext
 
@@ -436,10 +437,17 @@ def clean_url(field_name):
     """
 
     value = self.cleaned_data.get(field_name)
+    validator = validators.URLValidator()
 
     # call the Django URLField cleaning method to
     # properly clean/validate this field
-    return forms.URLField.clean(self.fields[field_name], value)
+    try:
+      validator(value)
+    except forms.ValidationError, e:
+      if e.code == 'invalid':
+        msg = ugettext(u'Enter a valid URL.')
+        raise forms.ValidationError(msg, code='invalid')
+    return value
   return wrapped
 
 

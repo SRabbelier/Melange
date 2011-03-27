@@ -176,6 +176,11 @@ class ReviewProposal(RequestHandler):
         'form': form,
     }
 
+    # TODO: timeline check to see if you are allowed to edit
+    user_is_proposer = self.data.user and \
+        (self.data.user.key() == self.data.proposer_user.key())
+    update_link = self.data.redirect.id().urlOf('update_gsoc_proposal')
+
     return {
         'comment_box': comment_box,
         'proposal': self.data.proposal,
@@ -186,6 +191,8 @@ class ReviewProposal(RequestHandler):
         'private_comments_visible': self.data.private_comments_visible,
         'scores': scores,
         'score_action': score_action,
+        'user_is_proposer': user_is_proposer,
+        'update_link': update_link,
         'student_name': self.data.proposer_profile.name(),
         'title': self.data.proposal.title,
         'page_name': self.data.proposal.title,

@@ -19,7 +19,14 @@ limitations under the License.
 {% endblock stylesheets %}
 
 {% block page_content %}
-<h1 id="project-page-title">{{ proposal.title }}</h1>
+<h1 id="project-page-title">
+  {{ proposal.title }}
+  {% if user_is_proposer %}
+    <span class="edit-link">
+      <a href="{{ update_link }}">Update</a>
+    </span>
+  {% endif %}
+</h1>
 <h2 id="project-page-student-name">{{ student_name }}</h2>
 
 <div class="project-short">

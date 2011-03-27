@@ -50,8 +50,8 @@ class OrgHomeViewTest(DjangoTestCase):
     of the organization from the org homepage view were used.
     """
     self.assertGSoCTemplatesUsed(response)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/_connect_with_us.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/org_home/base.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/org_home/_contact.html')
     self.assertTemplateNotUsed(response,
                             'v2/modules/gsoc/org_home/_project_list.html')
 
@@ -59,8 +59,8 @@ class OrgHomeViewTest(DjangoTestCase):
     """Asserts that all the templates from the org homepage view were used.
     """
     self.assertGSoCTemplatesUsed(response)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/_connect_with_us.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/org_home/base.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/org_home/_contact.html')
     self.assertTemplateUsed(response,
                             'v2/modules/gsoc/org_home/_project_list.html')
 
@@ -71,11 +71,6 @@ class OrgHomeViewTest(DjangoTestCase):
     url = '/gsoc/org/' + self.org.key().name()
     response = self.client.get(url)
     self.assertOrgHomeTemplatesUsedBeforeStudentProjectsAnnounced(response)
-    self.assertTrue('organization' in response.context)
-    self.assertEqual(response.context['organization'].key(), self.org.key())
-    contact_context = response.context['contact'].context()
-    self.assertTrue('organization' in contact_context)
-    self.assertEqual(contact_context['organization'].key(), self.org.key())
 
   def testOrgHomeDuringStudentSignup(self):
     """Tests the the org home page during the student signup period.
@@ -84,11 +79,6 @@ class OrgHomeViewTest(DjangoTestCase):
     url = '/gsoc/org/' + self.org.key().name()
     response = self.client.get(url)
     self.assertOrgHomeTemplatesUsedBeforeStudentProjectsAnnounced(response)
-    self.assertTrue('organization' in response.context)
-    self.assertEqual(response.context['organization'].key(), self.org.key())
-    contact_context = response.context['contact'].context()
-    self.assertTrue('organization' in contact_context)
-    self.assertEqual(contact_context['organization'].key(), self.org.key())
 
   def testOrgHomeAfterStudentProjectsAnnounced(self):
     """Tests the the org home page after announcing accepted student projects.
@@ -97,11 +87,6 @@ class OrgHomeViewTest(DjangoTestCase):
     url = '/gsoc/org/' + self.org.key().name()
     response = self.client.get(url)
     self.assertOrgHomeTemplatesUsedAfterStudentProjectsAnnounced(response)
-    self.assertTrue('organization' in response.context)
-    self.assertEqual(response.context['organization'].key(), self.org.key())
-    contact_context = response.context['contact'].context()
-    self.assertTrue('organization' in contact_context)
-    self.assertEqual(contact_context['organization'].key(), self.org.key())
     response = self.getListResponse(url, 0)
     self.assertIsJsonResponse(response)
 
@@ -112,10 +97,5 @@ class OrgHomeViewTest(DjangoTestCase):
     url = '/gsoc/org/' + self.org.key().name()
     response = self.client.get(url)
     self.assertOrgHomeTemplatesUsedAfterStudentProjectsAnnounced(response)
-    self.assertTrue('organization' in response.context)
-    self.assertEqual(response.context['organization'].key(), self.org.key())
-    contact_context = response.context['contact'].context()
-    self.assertTrue('organization' in contact_context)
-    self.assertEqual(contact_context['organization'].key(), self.org.key())
     response = self.getListResponse(url, 0)
     self.assertIsJsonResponse(response)

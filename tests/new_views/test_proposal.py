@@ -89,6 +89,9 @@ class ProposalTest(DjangoTestCase):
     comment = GSoCComment.all().get()
     self.assertPropertiesEqual(properties, comment)
 
+    # Hacky
+    self.data.createMentor(self.org)
+
     # test score POST
     from soc.modules.gsoc.models.score import GSoCScore
     url = '/gsoc/proposal/score/' + suffix

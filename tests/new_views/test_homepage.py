@@ -44,8 +44,8 @@ class HomepageViewTest(DjangoTestCase):
     """Asserts that all the templates from the homepage view were used.
     """
     self.assertGSoCTemplatesUsed(response)
+    self.assertTemplateUsed(response, 'v2/modules/gsoc/_connect_with_us.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/base.html')
-    self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_connect_with_us.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_apply.html')
     self.assertTemplateUsed(response, 'v2/modules/gsoc/homepage/_timeline.html')
 

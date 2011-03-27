@@ -94,9 +94,12 @@ class ProposalPage(RequestHandler):
     proposal_form.cleaned_data['org'] = self.data.organization
     proposal_form.cleaned_data['program'] = self.data.program
 
+    student_info_key = self.data.student_info.key()
+
     def create_proposal_trx():
-      self.data.student_info.number_of_proposals += 1
-      self.data.student_info.put()
+      student_info = db.get(student_info_key)
+      student_info.number_of_proposals += 1
+      student_info.put()
       return proposal_form.create(commit=True, parent=self.data.profile)
 
     return db.run_in_transaction(create_proposal_trx)

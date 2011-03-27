@@ -446,6 +446,15 @@ class RedirectHelper(object):
     self._url_name = 'gsoc_events'
     return self
 
+  def request(self, request):
+    assert request
+    self.id(request.key().id())
+    if request.type == 'Request':
+      self._url_name = 'show_gsoc_request'
+    else:
+      self._url_name = 'gsoc_invitation'
+    return self
+
   def projectDetails(self, student_project):
     """Returns the URL to the Student Project.
 

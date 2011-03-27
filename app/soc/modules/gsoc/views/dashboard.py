@@ -27,6 +27,7 @@ from django.utils.translation import ugettext
 
 from soc.logic.exceptions import AccessViolation
 from soc.logic.helper import timeline as timeline_helper
+from soc.logic.models.request import logic as request_logic
 from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.org_app_survey import logic as \
@@ -96,12 +97,17 @@ class Dashboard(RequestHandler):
   def _getActiveComponents(self):
     """Returns the components that are active on the page.
     """
+    components = []
+
     if self.data.student_info:
-      return self._getStudentComponents()
+      components += self._getStudentComponents()
     elif self.data.mentor_for or self.data.org_admin_for:
-      return self._getOrgMemberComponents()
+      components += self._getOrgMemberComponents()
     else:
-      return self._getLoneUserComponents()
+      components += self._getLoneUserComponents()
+
+    components.append(RequestComponent(self.request, self.data, False))
+    return components
 
   def _getStudentComponents(self):
     """Get the dashboard components for a student.
@@ -140,6 +146,7 @@ class Dashboard(RequestHandler):
     if self.data.org_admin_for:
       # add a component for all organization that this user administers
       components.append(OrganizationsIAdminComponent(self.request, self.data))
+      components.append(RequestComponent(self.request, self.data, True))
 
     return components
 
@@ -566,5 +573,67 @@ class OrganizationsIAdminComponent(Component):
     return {
         'name': 'adminning_organizations',
         'title': 'ORGANIZATIONS THAT I AM AN ADMIN/MENTOR FOR',
+        'lists': [list],
+    }
+
+
+class RequestComponent(Component):
+  """Component for listing all the Projects mentored by the current user.
+  """
+
+  def __init__(self, request, data, for_admin):
+    """Initializes this component.
+    """
+    self.for_admin = for_admin
+    self.idx = 7 if for_admin else 8
+    r = data.redirect
+    list_config = lists.ListConfiguration()
+    list_config.addSimpleColumn('type', 'Request/Invite')
+    if self.for_admin:
+      list_config.addColumn(
+          'user', 'User', lambda ent, *args: "%s (%s)" % (
+          ent.user.name, ent.user.link_id))
+    list_config.addColumn('role_name', 'Role',
+                          lambda ent, *args: ent.roleName())
+    list_config.addColumn('status', 'Status',
+                          lambda ent, *args: ent.statusMessage())
+    list_config.addColumn('org_name', 'Organization',
+                          lambda ent, *args: ent.group.name)
+    list_config.setRowAction(
+        lambda ent, *args: r.request(ent).url())
+    self._list_config = list_config
+
+    super(RequestComponent, self).__init__(request, data)
+
+  def templatePath(self):
+    return'v2/modules/gsoc/dashboard/list_component.html'
+
+  def getListData(self):
+    idx = lists.getListIndex(self.request)
+    if idx == self.idx:
+      if self.for_admin:
+        fields = {'group': self.data.org_admin_for}
+      else:
+        fields = {'user': self.data.user}
+      response_builder = lists.QueryContentResponseBuilder(
+          self.request, self._list_config, request_logic, fields, prefetch=['user', 'group'])
+      return response_builder.build()
+    else:
+      return None
+
+  def context(self):
+    """Returns the context of this component.
+    """
+    list = lists.ListConfigurationResponse(
+        self._list_config, idx=self.idx)
+
+    if self.for_admin:
+      title = 'REQUESTS FOR PROJECTS I AM AN ADMIN FOR'
+    else:
+      title = 'MY REQUESTS'
+
+    return {
+        'name': 'requests',
+        'title': title,
         'lists': [list],
     }

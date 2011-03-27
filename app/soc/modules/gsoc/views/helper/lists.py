@@ -255,9 +255,10 @@ class ListConfiguration(object):
       order: The order in which to sort, either 'asc' or 'desc'.
              The default value is 'asc'.
     """
-    if id and not id in self._col_names:
+    col_ids = [item.get('name') for item in self._col_model]
+    if id and not id in col_ids:
       raise ValueError('Id %s is not a defined column (Known columns %s)'
-                       %(id, self._col_names))
+                       %(id, col_ids))
 
     if order not in ['asc', 'desc']:
       raise ValueError('%s is not a valid order' %order)

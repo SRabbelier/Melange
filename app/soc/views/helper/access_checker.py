@@ -689,12 +689,13 @@ class AccessChecker(BaseAccessChecker):
     if not self.data.user:
       raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)
 
+    self.isProfileActive()
     # if the current user is the proposer, he or she may access it
     if self.data.user.key() == self.data.proposer_user.key():
       return
 
     # all the mentors and org admins from the organization may access it
-    if self.data.proposal_org.key() in self.data.mentor_for:
+    if self.data.proposal_org.key() in self.data.profile.mentor_for:
       return
 
     raise AccessViolation(DEF_PROPOSAL_NOT_PUBLIC_MSG)

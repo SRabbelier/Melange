@@ -229,6 +229,7 @@ class MyOrgApplicationsComponent(Component):
 
     list_config = lists.ListConfiguration()
     list_config.addSimpleColumn('name', 'Organization Name')
+    list_config.setDefaultSort('name')
     self._list_config = list_config
 
     super(MyOrgApplicationsComponent, self).__init__(request, data)
@@ -499,6 +500,7 @@ class ProjectsIMentorComponent(Component):
     list_config.addSimpleColumn('title', 'Title')
     list_config.addColumn('org_name', 'Organization',
                           lambda ent, *args: ent.scope.name)
+    list_config.setDefaultSort('title')
     self._list_config = list_config
 
     super(ProjectsIMentorComponent, self).__init__(request, data)
@@ -551,6 +553,7 @@ class OrganizationsIAdminComponent(Component):
     list_config.addSimpleColumn('name', 'name')
     list_config.setRowAction(
         lambda e, *args, **kwargs: r.organization(e).urlOf('gsoc_org_home'))
+    list_config.setDefaultSort('name')
     self._list_config = list_config
 
     super(OrganizationsIAdminComponent, self).__init__(request, data)

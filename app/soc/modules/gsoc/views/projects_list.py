@@ -50,6 +50,7 @@ class ProjectList(Template):
                           lambda entity, *args: entity.scope.name)
     list_config.addColumn('mentor', 'Mentor',
                           lambda entity, *args: entity.mentor.user.name)
+    list_config.setDefaultSort('student')
     self._list_config = list_config
 
   def context(self):

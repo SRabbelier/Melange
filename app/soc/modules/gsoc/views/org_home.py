@@ -119,6 +119,7 @@ class ProjectList(Template):
     list_config.addColumn('student', 'Student',
                           lambda entity, *args: entity.student.user.name)
     list_config.addSimpleColumn('title', 'Title')
+    list_config.setDefaultSort('student')
     self._list_config = list_config
 
   def context(self):

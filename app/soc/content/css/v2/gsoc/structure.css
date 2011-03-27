@@ -156,6 +156,8 @@
   font-size: 14px;
   font-weight: bold;
   margin: 10px 0 0 0;
+  padding-right: 10px;
+  text-align: justify;
 }
 #main .content_column_1 {
   /*homepage left column*/

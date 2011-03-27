@@ -217,6 +217,23 @@ class ProfilePage(RequestHandler):
   def templatePath(self):
     return 'v2/modules/gsoc/profile/base.html'
 
+  def _getTOSContent(self):
+    """Convenience method to obtain the relevant Terms of Service content
+    for the role in the program.
+    """
+    tos_content = None
+    role = self.data.kwargs.get('role')
+
+    program = self.data.program
+    if role == 'student' and program.student_agreement:
+      tos_content = program.student_agreement.content
+    elif role == 'mentor' and program.mentor_agreement:
+      tos_content = program.mentor_agreement.content
+    elif role == 'org_admin' and program.org_admin_agreement:
+      tos_content = program.org_admin_agreement.content
+
+    return tos_content
+
   def context(self):
     role = self.data.kwargs.get('role')
     if self.data.student_info or role == 'student':
@@ -225,23 +242,16 @@ class ProfilePage(RequestHandler):
     else:
       student_info_form = EmptyForm()
 
-    tos_content = None
-
-    program = self.data.program
     if not role:
       page_name = 'Edit your Profile'
     elif role == 'student':
       page_name = 'Register as a Student'
-      if program.student_agreement:
-        tos_content = program.student_agreement.content
     elif role == 'mentor':
       page_name = 'Register as a Mentor'
-      if program.mentor_agreement:
-        tos_content = program.mentor_agreement.content
     elif role == 'org_admin':
       page_name = 'Register as Org Admin'
-      if program.org_admin_agreement:
-        tos_content = program.org_admin_agreement.content
+
+    tos_content = self._getTOSContent()
 
     form = EditUserForm if self.data.user else UserForm
     user_form = form(self.data.POST or None, instance=self.data.user)
@@ -249,7 +259,7 @@ class ProfilePage(RequestHandler):
       profile_form = ProfileForm(self.data.POST or None,
                                  instance=self.data.profile)
     else:
-      profile_form = CreateProfileForm(self.data.POST or None)
+      profile_form = CreateProfileForm(tos_content, self.data.POST or None)
     error = user_form.errors or profile_form.errors or student_info_form.errors
 
     context = {
@@ -284,8 +294,12 @@ class ProfilePage(RequestHandler):
     return user_form
 
   def validateProfile(self, dirty):
-    profile_form = ProfileForm(self.data.POST,
-                               instance=self.data.profile)
+    if self.data.profile:
+      profile_form = ProfileForm(self.data.POST,
+                                 instance=self.data.profile)
+    else:
+      tos_content = self._getTOSContent()
+      profile_form = CreateProfileForm(tos_content, self.data.POST)
 
     if not profile_form.is_valid():
       return profile_form, None

@@ -123,16 +123,20 @@ class Footer(Template):
 class LoggedInMsg(Template):
   """Template to render user login message at the top of the profile form.
   """
-  def __init__(self, data, apply_role=False, apply_link=True):
+  def __init__(self, data, apply_role=False, apply_link=True, div_name=None):
+    if not div_name:
+      div_name = 'loggedin-message'
     self.data = data
     self.apply_link = apply_link
     self.apply_role = apply_role
+    self.div_name = div_name
 
   def context(self):
     context = {
         'logout_link': self.data.redirect.logout().url(),
         'user_email': self.data.gae_user.email(),
         'has_profile': bool(self.data.profile),
+        'div_name': self.div_name,
     }
 
     if self.apply_role and self.data.kwargs.get('role'):

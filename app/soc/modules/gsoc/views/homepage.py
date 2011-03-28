@@ -202,7 +202,8 @@ class Homepage(RequestHandler):
         current_timeline, self.data.program)
 
     context = {
-        'logged_in_msg': LoggedInMsg(self.data, apply_link=False),
+        'logged_in_msg': LoggedInMsg(self.data, apply_link=False,
+                                     div_name='user-login'),
         'timeline': Timeline(self.data, current_timeline),
         'apply': Apply(self.data),
         'connect_with_us': ConnectWithUs(self.data),

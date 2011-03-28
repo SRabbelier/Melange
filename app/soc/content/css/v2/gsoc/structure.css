@@ -703,16 +703,16 @@ p.reply-logged-in a {
   User Login
 
 ////////////////*/
-#loggedin-message {
+#user-login {
     margin: 0 0 10px 0;
     text-align: right;
 }
-    #loggedin-message p {
+    #user-login p {
         color: #989898;
         font-style: italic;
         margin: 0;
     }
-    #loggedin-message a {
+    #user-login a {
         font-style: normal;
         font-weight: normal;
     }

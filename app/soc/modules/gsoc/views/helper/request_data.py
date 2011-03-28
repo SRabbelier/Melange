@@ -155,8 +155,7 @@ class TimelineHelper(object):
     return isAfter(self.studentsAnnouncedOn())
 
   def mentorSignup(self):
-    return self.programActiveBetween() and self.orgsAnnounced(
-        ) and not self.studentSignup()
+    return self.programActiveBetween() and self.orgsAnnounced()
 
 
 class RequestData(RequestData):

@@ -99,13 +99,13 @@ class Apply(Template):
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       if self.data.timeline.orgSignup():
         kwargs['role'] = 'org_admin'
-      elif self.data.timeline.mentorSignup():
-        kwargs['role'] = 'mentor'
       elif self.data.timeline.studentSignup():
         kwargs['role'] = 'mentor'
         context['mentor_profile_link'] = reverse(
             'create_gsoc_profile', kwargs=kwargs)
         kwargs['role'] = 'student'
+      elif self.data.timeline.mentorSignup():
+        kwargs['role'] = 'mentor'
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
 
     if ((self.data.timeline.studentSignup() or

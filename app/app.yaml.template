@@ -47,7 +47,7 @@ handlers:
 
 - url: /soc/content
   static_dir: soc/content
-  expiration: 7d
+  expiration: 1d
 
 - url: /js/(.*?)/jlinq/(.*)
   static_files: jlinq/\2

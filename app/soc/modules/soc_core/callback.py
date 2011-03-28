@@ -24,6 +24,7 @@ __authors__ = [
 from soc.tasks import grading_survey_group as grading_group_tasks
 from soc.tasks import mailer as mailer_tasks
 from soc.tasks import surveys as survey_tasks
+from soc.tasks.updates import project_conversion
 from soc.tasks.updates import proposal_conversion
 from soc.tasks.updates import role_conversion
 from soc.tasks.updates import start_update
@@ -88,6 +89,7 @@ class Callback(object):
 
     self.core.registerSitemapEntry(role_conversion.getDjangoURLPatterns())
     self.core.registerSitemapEntry(proposal_conversion.getDjangoURLPatterns())
+    self.core.registerSitemapEntry(project_conversion.getDjangoURLPatterns())
 
     if self.v2:
       return

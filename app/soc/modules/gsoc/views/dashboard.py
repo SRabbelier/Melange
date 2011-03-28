@@ -466,7 +466,7 @@ class SubmittedProposalsComponent(Component):
     idx = lists.getListIndex(self.request)
     if idx == 4:
       q = GSoCProposal.all()
-      q.filter('org IN', self.data.profile.mentor_for)
+      q.filter('org IN', self.data.mentor_for)
 
       starter = lists.keyModelStarter(GSoCProposal)
 

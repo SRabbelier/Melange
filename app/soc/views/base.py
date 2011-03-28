@@ -319,8 +319,18 @@ class RequestHandler(object):
       self.accessViolation(e.status, e.args[0])
     except Error, e:
       self.error(e.status, message=e.args[0])
+    finally:
+      response = self.response
+      self.response = None
+      self.request = None
+      self.args = None
+      self.kwargs = None
+      self.data = None
+      self.checker = None
+      self.mutator = None
+      self.redirect = None
 
-    return self.response
+    return response
 
 
 class SiteRequestHandler(RequestHandler):

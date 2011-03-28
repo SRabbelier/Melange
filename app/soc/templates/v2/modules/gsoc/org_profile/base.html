@@ -1,4 +1,4 @@
-{% extends "v2/modules/gsoc/base.html" %}
+{% extends "v2/modules/gsoc/form_base.html" %}
 {% comment %}
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,26 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-
-{% block stylesheets %}
-  {{ block.super }}
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/{{ app_version }}/v2/gsoc/forms.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="/soc/content/css/{{ app_version }}/v2/gsoc/uniform.default.css" />
-{% endblock stylesheets %}
-
-{% block page_content %}
-
-<!-- begin form -->
-<h1 id="main-page-title">Organization Profile</h1>
-<form action="#" method="post" id="form" class="form-register">
-  {{ form.render }}
-  <div id="form-row-button-row" class="row button-row">
-    <input type="submit" value="Submit" class="submit" />
-  </div>
-</form>
-<!-- end form -->
-
-{% endblock page_content %}
 
 {% block synchronous_scripts %}
   <script type='text/javascript' src="/tiny_mce/tiny_mce.js"></script>

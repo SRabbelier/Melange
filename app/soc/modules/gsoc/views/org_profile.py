@@ -34,6 +34,7 @@ from soc.logic.exceptions import NotFound
 from soc.modules.gsoc.models.organization import GSoCOrganization
 
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.base_templates import LoggedInMsg
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -117,14 +118,16 @@ class OrgProfilePage(RequestHandler):
 
     return {
         'page_name': "Organization profile",
-        'form': form
+        'form_top_msg': LoggedInMsg(self.data, apply_link=False),
+        'forms': [form],
+        'error': bool(form.errors),
         }
 
   def post(self):
     org_profile = self.createOrgProfileFromForm()
     if org_profile:
       self.redirect.organization(org_profile)
-      self.redirect.to('edit_gsoc_org_profile')
+      self.redirect.to('edit_gsoc_org_profile', validated=True)
     else:
       self.get()
 

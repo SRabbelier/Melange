@@ -32,19 +32,15 @@ limitations under the License.
   <div id="apply-orgs" class="block block-orgs">
     <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
     <h3 id="title-section-apply">Organizations: Apply now!</h3>
-{% endif %}
-
-{% if student_signup %}
+{% else %}{% if student_signup %}
   <div id="apply-students" class="block block-students">
     <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
     <h3 id="title-section-apply">Students: Apply now!</h3>
-{% endif %}
-
-{% if mentor_signup %}
+{% else %}{% if mentor_signup %}
   <div id="apply-mentors" class="block block-mentors">
     <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
     <h3 id="title-section-apply">Mentors: Apply now!</h3>
-{% endif %}
+{% endif %}{% endif %}{% endif %}
 
 {% if apply_block %}
   <!-- begin in apply block -->

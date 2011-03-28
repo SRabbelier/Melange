@@ -27,10 +27,12 @@ from google.appengine.api import users
 
 from django import forms as djangoforms
 from django.conf.urls.defaults import url
+from django.core import validators
 from django.core.urlresolvers import reverse
 from django.forms import widgets
 from django.utils.translation import ugettext
 
+from soc.logic import accounts
 from soc.logic import cleaning
 from soc.logic import dicts
 from soc.logic.exceptions import NotFound
@@ -74,10 +76,39 @@ class InviteForm(forms.ModelForm):
 
     assert isSet(self.request_data.organization)
 
-    link_id = cleaning.clean_link_id('link_id')(self)
+    invited_user = None
+
+    link_id_cleaner = cleaning.clean_link_id('link_id')
+
+    try:
+      link_id = link_id_cleaner(self)
+    except djangoforms.ValidationError, e:
+      if e.code != 'invalid':
+        raise
+
+      email_cleaner = cleaning.clean_email('link_id')
+
+      try:
+        email_address = email_cleaner(self)
+      except djangoforms.ValidationError, e:
+        if e.code != 'invalid':
+          raise
+        msg = ugettext(u'Enter a valid link_id or email address.')
+        raise djangoforms.ValidationError(msg, code='invalid')
+
+      account = users.User(email_address)
+      user_account = accounts.normalizeAccount(account)
+      invited_user = User.all().filter('account', user_account).get()
+
+      if not invited_user:
+        raise djangoforms.ValidationError(
+            "There is no user with that email address")
 
     # get the user entity that the invitation is to
-    invited_user = cleaning.clean_existing_user('link_id')(self)
+    if not invited_user:
+      existing_user_cleaner = cleaning.clean_existing_user('link_id')
+      invited_user = existing_user_cleaner(self)
+
     self.request_data.invited_user = invited_user
     
     # check if the organization has already sent an invitation to the user

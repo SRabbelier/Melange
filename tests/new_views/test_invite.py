@@ -82,6 +82,14 @@ class InviteTest(DjangoTestCase):
     properties.pop('link_id')
     self.assertPropertiesEqual(properties, invitation)
 
+    invitation.delete()
+    override['link_id'] = 'to_be_admin@example.com'
+    response, properties = self.modelPost(url, Request, override)
+
+    invitation = Request.all().get()
+    properties.pop('link_id')
+    self.assertPropertiesEqual(properties, invitation)
+
   def testInviteMentor(self):
     self.data.createOrgAdmin(self.org)
     url = '/gsoc/invite/mentor/' + self.org.key().name()

@@ -114,9 +114,10 @@ class InviteForm(forms.ModelForm):
     
     # check if the organization has already sent an invitation to the user
     query = db.Query(Request)
-    query.filter('type = ', 'Invitation')
-    query.filter('user = ', invited_user)
-    query.filter('group = ', self.request_data.organization)
+    query.filter('type', 'Invitation')
+    query.filter('user', invited_user)
+    query.filter('role', self.request_data.kwargs['role'])
+    query.filter('group', self.request_data.organization)
     if query.get():
       raise djangoforms.ValidationError(
           'An invitation to this user has already been sent.')

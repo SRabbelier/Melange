@@ -94,6 +94,13 @@ class InviteForm(forms.ModelForm):
         self.request_data.program.key().name(),
         invited_user.link_id])
     profile = GSoCProfile.get_by_key_name(key_name, parent=invited_user)
+
+    if not profile:
+      msg = ("The specified user has a User account (the link_id is valid), "
+             "but they do not yet have a profile for this %s. "
+             "You cannot invite them until they create a profile.")
+      raise djangoforms.ValidationError(msg % self.request_data.program.name)
+
     if self.request_data.kwargs['role'] == 'org_admin':
       role_for = profile.org_admin_for
     else:

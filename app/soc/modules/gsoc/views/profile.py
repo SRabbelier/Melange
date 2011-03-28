@@ -291,7 +291,8 @@ class ProfilePage(RequestHandler):
     if self.data.profile:
       profile = profile_form.save(commit=False)
     else:
-      profile = profile_form.create(commit=False, key_name=key_name, parent=self.data.user)
+      profile = profile_form.create(commit=False, key_name=key_name,
+                                    parent=self.data.user)
 
     dirty.append(profile)
 

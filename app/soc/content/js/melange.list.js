@@ -705,7 +705,7 @@
               }
 
               //call next iteration
-              if (source.next !== "done") {
+              if (!last_batch) {
                 start = source.next;
                 setTimeout(server_loop, 100);
                 current_loop++;
@@ -715,7 +715,7 @@
                 jQuery("#load_" + _self.jqgrid.id).hide();
               }
             }
-            else {
+            if (last_batch) {
               //loading data finished, hiding loading message
               jQuery("#temporary_list_placeholder_" + idx).remove();
               jQuery("#load_" + _self.jqgrid.id).hide();

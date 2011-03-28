@@ -57,7 +57,7 @@ class UserForm(forms.ModelForm):
     css_prefix = 'user'
     fields = ['link_id', 'name']
 
-  clean_link_id = cleaning.clean_link_id('link_id')
+  clean_link_id = cleaning.clean_user_not_exist('link_id')
 
 
 class EditUserForm(forms.ModelForm):

@@ -53,7 +53,7 @@ class InviteForm(forms.ModelForm):
   """Django form for the invite page.
   """
 
-  link_id = djangoforms.CharField(label='Link ID')
+  link_id = djangoforms.CharField(label='Link ID/Email')
 
   class Meta:
     model = Request
@@ -69,6 +69,7 @@ class InviteForm(forms.ModelForm):
     # reorder the fields so that link_id is the first one
     field = self.fields.pop('link_id')
     self.fields.insert(0, 'link_id', field)
+    field.help_text = "The link_id or email address of the invitee"
     
   def clean_link_id(self):
     """Accepts link_id of users which may be invited.

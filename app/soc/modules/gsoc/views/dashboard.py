@@ -428,7 +428,9 @@ class SubmittedProposalsComponent(Component):
     """Initializes this component.
     """
     r = data.redirect
-    list_config = lists.ListConfiguration()
+    list_config = lists.ListConfiguration(add_key_column=False)
+    list_config.addColumn('key', 'Key', (lambda ent, *args: "%s/%s" % (
+        ent.parent().key().name(), ent.key().id())), hidden=True)
     list_config.addSimpleColumn('title', 'Title')
     list_config.addColumn('org', 'Organization',
                           lambda ent, *args: ent.org.name)

@@ -155,7 +155,8 @@ class TimelineHelper(object):
     return isAfter(self.studentsAnnouncedOn())
 
   def mentorSignup(self):
-    return self.programActiveBetween() and self.orgsAnnounced()
+    return self.programActiveBetween() and self.orgsAnnounced(
+        ) and not self.studentSignup()
 
 
 class RequestData(RequestData):
@@ -240,7 +241,6 @@ class RequestData(RequestData):
       self.not_applied_to.append(organization)
 
     return applied
-
 
   def isPossibleMentorForProposal(self):
     """Checks if the user is a possible mentor for the proposal in the data.

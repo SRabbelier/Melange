@@ -30,6 +30,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext
 
 from soc.logic import dicts
+from soc.logic import accounts
 from soc.logic.exceptions import AccessViolation
 from soc.logic.exceptions import NotFound
 from soc.models.request import Request
@@ -212,7 +213,9 @@ class ShowRequest(RequestHandler):
         'request': self.data.request_entity,
         'org': self.data.organization,
         'actions': self.ACTIONS,
-        'user': self.data.requester,
+        'user_name': self.data.requester.name,
+        'user_email': accounts.denormalizeAccount(
+            self.data.requester.account).email(),
         'show_actions': show_actions,
         'can_respond': self.data.can_respond,
         }

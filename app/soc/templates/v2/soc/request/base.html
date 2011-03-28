@@ -24,15 +24,15 @@ limitations under the License.
 <h1 id="show-review-page-title">{{ request.type }} to become {{ request.roleName }}</h1>
 
 <div class="request-summary">
-  {% if request.type == 'Request' %}
-  <p class="request-requester"><strong>From:</strong> {{ user.name }}</p>
-  <p class="request-contact-info"><strong>Email:</strong> {{ user.account }}</p>
-  {% endif %}
+  <p class="request-requester"><strong>
+      {% if request.type == 'Request' %}From:{% else %}To:{% endif %}
+  </strong> {{ user_name }}</p>
+  <p class="request-contact-info"><strong>Email:</strong> {{ user_email }}</p>
   <p class="request-status"><strong>Status:</strong> {{ request.statusMessage }}</p>
   <p class="request-sent-on"><strong>Sent on:</strong> {{ request.created_on }}</p>
   <p class="request-organization"><strong>Organization:</strong> {{ org.name }}</p>
   <br>
-  <p class="request-message"><strong>Message:</strong> {{ request.message }}</p>
+  <p class="request-message"><strong>Message:</strong> {{ request.message|default:"" }}</p>
   {% if show_actions %}
   <div class="request-response">
     <form action="{{ response_action }}" method="post" id="form" class="form-project-comment">

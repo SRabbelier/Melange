@@ -290,7 +290,9 @@ class ShowInvite(RequestHandler):
         'page_name': "Invite",
         'org': self.data.organization,
         'actions': self.ACTIONS,
-        'user': self.data.invited_user,
+        'user_name': self.data.invited_user.name,
+        'user_email': accounts.denormalizeAccount(
+            self.data.invited_user.account).email(),
         'show_actions': show_actions,
         'can_respond': self.data.can_respond,
         } 

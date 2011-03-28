@@ -90,8 +90,10 @@ class ListConfiguration(object):
              should be present.
   """
 
-  def __init__(self):
+  def __init__(self, add_key_column=True):
     """Initializes the configuration.
+
+    If add_key_column is set will add a 'key' column with the key id/name.
     """
     self._col_names = []
     self._col_model = []
@@ -110,7 +112,8 @@ class ListConfiguration(object):
     self._row_operation = {}
     self._row_operation_func = None
 
-    self._addKeyColumn()
+    if add_key_column:
+      self._addKeyColumn()
 
   def _addKeyColumn(self):
     """Adds a column for the key.

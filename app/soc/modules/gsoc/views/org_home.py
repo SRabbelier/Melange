@@ -73,12 +73,12 @@ class Apply(Template):
       if self.data.student_info:
         context['submit_proposal_link'] = reverse('submit_gsoc_proposal',
                                                   kwargs=kwargs_org)
-      elif self.data.mentorFor(organization):
-        context['mentor_applied'] = True
-        context['role'] = 'a mentor'
       elif self.data.orgAdminFor(organization):
         context['mentor_applied'] = True
         context['role'] = 'an administrator'
+      elif self.data.mentorFor(organization):
+        context['mentor_applied'] = True
+        context['role'] = 'a mentor'
       elif not self.data.mentorFor(organization):
         if self.data.appliedTo(organization):
           context['mentor_applied'] = True

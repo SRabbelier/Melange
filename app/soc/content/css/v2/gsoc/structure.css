@@ -425,6 +425,9 @@
 #footer .footer-meta .powered {
   padding-right: 15px;
 }
+#footer .footer-meta img {
+    vertical-align: bottom;
+}
 #footer .footer-menu {
   /*menu in footer*/
 
@@ -695,3 +698,21 @@ p.reply-logged-in a {
   color: white;
   text-decoration: none;
 }
+/*////////////////
+
+  User Login
+
+////////////////*/
+#loggedin-message {
+    margin: 0 0 10px 0;
+    text-align: right;
+}
+    #loggedin-message p {
+        color: #989898;
+        font-style: italic;
+        margin: 0;
+    }
+    #loggedin-message a {
+        font-style: normal;
+        font-weight: normal;
+    }

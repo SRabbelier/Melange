@@ -33,6 +33,7 @@ from soc.views.template import Template
 
 from soc.modules.gsoc.logic.models.student_project import logic as sp_logic
 from soc.modules.gsoc.views.base import RequestHandler
+from soc.modules.gsoc.views.base_templates import LoggedInMsg
 from soc.modules.gsoc.views.helper import url_patterns
 
 
@@ -201,6 +202,7 @@ class Homepage(RequestHandler):
         current_timeline, self.data.program)
 
     context = {
+        'logged_in_msg': LoggedInMsg(self.data, apply_link=False),
         'timeline': Timeline(self.data, current_timeline),
         'apply': Apply(self.data),
         'connect_with_us': ConnectWithUs(self.data),

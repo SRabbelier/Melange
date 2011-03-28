@@ -55,8 +55,8 @@ class OrgProfileForm(forms.ModelForm):
   clean_facebook = cleaning.clean_url('facebook')
   clean_twitter = cleaning.clean_url('twitter')
   clean_blog = cleaning.clean_url('blog')
-  #clean_pub_mailing_list = cleaning.clean_url('pub_mailing_list')
-  #clean_irc_channel = cleaning.clean_url('irc_channel')
+  clean_pub_mailing_list = cleaning.clean_mailto('pub_mailing_list')
+  clean_irc_channel = cleaning.clean_irc('irc_channel')
 
 
 class OrgCreateProfileForm(OrgProfileForm):

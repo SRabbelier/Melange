@@ -451,6 +451,62 @@ def clean_url(field_name):
   return wrapped
 
 
+def clean_irc(field_name):
+  """Clean method for cleaning an irc field.
+  """
+
+  @check_field_is_empty(field_name)
+  def wrapped(self):
+    """Decorator wrapper method.
+    """
+
+    value = self.cleaned_data.get(field_name)
+    validator = validators.URLValidator()
+
+    to_clean = value
+
+    if value.startswith("irc://"):
+      to_clean = value.replace("irc://", "http://", 1)
+
+    # call the Django URLField cleaning method to
+    # properly clean/validate this field
+    try:
+      validator(to_clean)
+    except forms.ValidationError, e:
+      if e.code == 'invalid':
+        msg = ugettext(u'Enter a valid URL or irc:// url.')
+        raise forms.ValidationError(msg, code='invalid')
+    return value
+  return wrapped
+
+
+def clean_mailto(field_name):
+  @check_field_is_empty(field_name)
+  def wrapped(self):
+    """Decorator wrapper method.
+    """
+
+    value = self.cleaned_data.get(field_name)
+    validator = validators.URLValidator()
+
+    to_clean = value
+
+    if value.startswith("mailto:"):
+      to_clean = value.replace("mailto:", "", 1)
+      validator = validators.validate_email
+
+    # call the Django URLField cleaning method to
+    # properly clean/validate this field
+    try:
+      validator(to_clean)
+    except forms.ValidationError, e:
+      if e.code == 'invalid':
+        msg = ugettext(u'Enter a valid URL or mailto: link.')
+        raise forms.ValidationError(msg, code='invalid')
+    return value
+  return wrapped
+
+
 def clean_refs(params, fields):
   """Cleans all references to make sure they are valid.
   """

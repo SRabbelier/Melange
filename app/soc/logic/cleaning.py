@@ -121,6 +121,28 @@ def clean_empty_field(field_name):
   return wrapper
 
 
+def clean_email(field_name):
+  """Checks if the field_name value is in an email format.
+  """
+  @check_field_is_empty(field_name)
+  def wrapper(self):
+    """Decorator wrapper method.
+    """
+    # convert to lowercase for user comfort
+    email = self.cleaned_data.get(field_name)
+    validator = validators.validate_email
+
+    try:
+      validator(email)
+    except forms.ValidationError, e:
+      if e.code == 'invalid':
+        msg = ugettext(u'Enter a valid email address.')
+        raise forms.ValidationError(msg, code='invalid')
+    return email
+
+  return wrapper
+
+
 def clean_link_id(field_name):
   """Checks if the field_name value is in a valid link ID format.
   """
@@ -132,7 +154,8 @@ def clean_link_id(field_name):
     # convert to lowercase for user comfort
     link_id = self.cleaned_data.get(field_name).lower()
     if not validate.isLinkIdFormatValid(link_id):
-      raise forms.ValidationError("This link ID is in wrong format.")
+      raise forms.ValidationError("This link ID is in wrong format.",
+                                  code='invalid')
     return link_id
   return wrapper
 

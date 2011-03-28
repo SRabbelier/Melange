@@ -24,12 +24,21 @@ limitations under the License.
 {% block page_content %}
   {% if cse_key %}
     <div id="cse" style="width: 100%;">Loading</div>
-    <script type="text/javascript"
-      src="/soc/content/js/{{ app_version }}/templates/soc/site/search.js"
-      context='{cse_key: "{{ cse_key }}"}'>
-    </script>
   {% else %}
     <br /><span class="error">Valid search key not found.</span>
   {% endif %}
 {% endblock page_content %}
+
+{% block dependencies %}
+  {% if cse_key %}
+  [
+    dep.google,
+    null,
+    tc(
+      "/soc/content/js/{{ app_version }}/templates/soc/site/search.js",
+      {cse_key: "{{ cse_key }}"}
+    )
+  ]
+  {% endif %}
+{% endblock dependencies %}
 

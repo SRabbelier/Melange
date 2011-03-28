@@ -653,7 +653,7 @@ class AccessChecker(BaseAccessChecker):
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # only withdrawn requests may be resubmitted
-    if self.data.request_entity.status == 'withdrawn':
+    if self.data.request_entity.status != 'withdrawn':
       raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
 
     # check if the request belongs to the current user

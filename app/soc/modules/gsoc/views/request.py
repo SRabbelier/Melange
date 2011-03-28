@@ -145,9 +145,11 @@ class ShowRequest(RequestHandler):
   """Encapsulate all the methods required to generate Show Request page.
   """
 
+  # maps actions with button names
   ACTIONS = {
       'accept': 'Accept',
       'reject': 'Reject',
+      'resubmit': 'Resubmit',
       'withdraw': 'Withdraw',
       }
 
@@ -178,6 +180,8 @@ class ShowRequest(RequestHandler):
         self.check.canRespondToRequest()
       elif self.data.action == self.ACTIONS['reject']:
         self.check.canRespondToRequest()
+      elif self.data.action == self.ACTIONS['resubmit']:
+        self.check.canResubmitRequest()
       # withdraw action
     else:
       self.check.canViewRequest()
@@ -191,7 +195,7 @@ class ShowRequest(RequestHandler):
         key_name, parent=self.data.requester)
 
   def context(self):
-    """Handler to for GSoC Show Invitation Page HTTP get request.
+    """Handler to for GSoC Show Request Page HTTP get request.
     """
 
     assert isSet(self.data.request_entity)
@@ -199,7 +203,7 @@ class ShowRequest(RequestHandler):
     assert isSet(self.data.organization)
     assert isSet(self.data.requester)
 
-    show_actions = self.data.request_entity.status == 'pending'
+    show_actions = self.data.request_entity.status == 'pending' or 'withdrawn'
     if self.data.can_respond and self.data.request_entity.status == 'rejected':
       show_actions = True
 
@@ -210,7 +214,7 @@ class ShowRequest(RequestHandler):
         'user': self.data.requester,
         'show_actions': show_actions,
         'can_respond': self.data.can_respond,
-        } 
+        }
 
   def post(self):
     """Handler to for GSoC Show Request Page HTTP post request.
@@ -223,6 +227,8 @@ class ShowRequest(RequestHandler):
       self._acceptRequest()
     elif self.data.action == self.ACTIONS['reject']:
       self._rejectRequest()
+    elif self.data.action == self.ACTIONS['resubmit']:
+      self._resubmitRequest()
     elif self.data.action == self.ACTIONS['withdraw']:
       self._withdrawRequest()
 
@@ -247,6 +253,13 @@ class ShowRequest(RequestHandler):
     """
 
     self.data.request_entity.status = 'rejected'
+    self.data.request_entity.put()
+
+  def _resubmitRequest(self):
+    """Resubmits a request.
+    """
+
+    self.data.request_entity.status = 'pending'
     self.data.request_entity.put()
 
   def _withdrawRequest(self):

@@ -38,10 +38,16 @@ limitations under the License.
     <form action="{{ response_action }}" method="post" id="form" class="form-project-comment">
       <div id="request-respond-button-row" class="row button-row">
         {% if can_respond %}
+        {% if request.status == 'pending' %}
         <input id="request-respond-accept-submit" name="action" type="submit" value="{{ actions.accept }}" class="submit"/>
         <input id="request-respond-reject-submit" name="action" type="submit" value="{{ actions.reject }}" class="submit"/>
+        {% endif %}
         {% else %}
+        {% if request.status == 'pending' %}
         <input id="request-respond-reject-submit" name="action" type="submit" value="{{ actions.withdraw }}" class="submit"/>
+        {% else %}
+        <input id="request-respond-resubmit-submit" name="action" type="submit" value="{{ actions.resubmit }}" class="submit"/>
+        {% endif %}
         {% endif %}
       </div>
     </form>

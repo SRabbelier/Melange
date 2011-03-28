@@ -105,7 +105,8 @@ class Apply(Template):
         kwargs['role'] = 'student'
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
 
-    if self.data.timeline.studentSignup() and self.data.profile:
+    if ((self.data.timeline.studentSignup() or
+        self.data.timeline.mentorSignup()) and self.data.profile):
       context['apply_link'] = accepted_orgs
 
     context['apply_block'] = signup

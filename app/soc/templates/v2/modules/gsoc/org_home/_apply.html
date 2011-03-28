@@ -46,12 +46,13 @@ limitations under the License.
       <p id="block-apply-mentors-text-action" class="action">
         {% if mentor_request_link %}
           <a href="{{ mentor_request_link }}">Request</a>
+          </p>
+          <p id="block-apply-mentors-text-small" class="small">to become mentor for {{ organization.name }}.</p>
         {% endif %}
         {% if mentor_applied %}
-          <p>You have already applied</p>
+          <p>You are already {{ role }} for this organization</p>
+          </p>
         {% endif %}
-      </p>
-      <p id="block-apply-mentors-text-small" class="small">to become mentor for {{ organization.name }}.</p>
     {% endif %}
   </div>
 {% endif %}

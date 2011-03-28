@@ -77,6 +77,7 @@ class Callback(object):
     from soc.modules.gsoc.views import request
     from soc.modules.gsoc.views import accepted_orgs
     from soc.modules.gsoc.views import org_profile
+    from soc.modules.gsoc.views import search
 
     self.views.append(dashboard.Dashboard())
     self.views.append(document.EditDocumentPage())
@@ -100,6 +101,7 @@ class Callback(object):
     self.views.append(request.ShowRequest())
     self.views.append(accepted_orgs.AcceptedOrgsPage())
     self.views.append(org_profile.OrgProfilePage())
+    self.views.append(search.SearchGsocPage())
 
   def registerWithSitemap(self):
     """Called by the server when sitemap entries should be registered.

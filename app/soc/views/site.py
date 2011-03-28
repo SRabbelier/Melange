@@ -161,27 +161,3 @@ class SiteHomepage(SiteRequestHandler):
 
     self.redirect(url)
     return self.response
-
-
-class SearchSitePage(SiteRequestHandler):
-  """View for the search site page.
-  """
-
-  def djangoURLPatterns(self):
-    return [
-        url(r'^site/search$', self, name='search_site'),
-    ]
-
-  def context(self):
-    site = site_logic.getSingleton()
-    return {
-        'app_version': os.environ.get('CURRENT_VERSION_ID', '').split('.')[0],
-        'page_name': 'Search site',
-        'cse_key':  site.cse_key
-    }
-
-  def templatePath(self):
-    return 'v2/soc/site/search.html'
-
-  def checkAccess(self):
-    pass

@@ -660,7 +660,7 @@ class ParticipantsComponent(Component):
     list_config.addColumn(
         'mentor_for', 'Mentor for',
         lambda ent, *args: ', '.join(
-            [i.name for i in orgs if i.key() in ent.mentor_for]))
+            [i.name for i in orgs if i.key() in ent.mentor_for + ent.org_admin_for]))
     list_config.addColumn(
         'admin_for', 'Organization admin for',
         lambda ent, *args: ', '.join(

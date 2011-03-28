@@ -32,7 +32,7 @@ limitations under the License.
   <div id="apply-orgs" class="block block-orgs">
     <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
     <h3 id="title-section-apply">Organizations: Apply now!</h3>
-{% else %}{% if student_signup %}
+{% else %}{% if student_signup and not profile_role == "mentor" %}
   <div id="apply-students" class="block block-students">
     <img src="/soc/content/images/v2/gsoc/students-apply-now.jpg" height="107" width="429" alt="" id="block-apply-image" />
     <h3 id="title-section-apply">Students: Apply now!</h3>

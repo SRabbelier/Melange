@@ -112,6 +112,12 @@ class Apply(Template):
         self.data.timeline.mentorSignup()) and self.data.profile):
       context['apply_link'] = accepted_orgs
 
+    if self.data.profile:
+      if self.data.student_info:
+        context['profile_role'] = 'student'
+      else:
+        context['profile_role'] = 'mentor'
+
     context['apply_block'] = signup
 
     return context

@@ -32,11 +32,6 @@ import soc.modules.gsoc.models.profile
 import soc.modules.gsoc.models.program
 
 
-# define the [min_score, max_score] and the name for the RankList
-DEF_SCORE = [-1000, 1000]
-DEF_RANKER_NAME = 'student_app_ranker'
-
-
 class GSoCProposal(soc.models.base.ModelWithFieldAttributes):
   """Model for a student proposal used in the GSoC workflow.
   """

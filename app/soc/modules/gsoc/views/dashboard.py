@@ -455,7 +455,7 @@ class SubmittedProposalsComponent(Component):
         description=SubmittedProposalsComponent.DESCRIPTION)
     return {
         'name': 'proposals_submitted',
-        'title': 'PROPOSALS SUBMITTED',
+        'title': 'PROPOSALS SUBMITTED TO ORGS I AM MENTOR/ADMIN FOR',
         'lists': [list],
         }
 

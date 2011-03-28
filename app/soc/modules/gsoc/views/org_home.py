@@ -208,6 +208,7 @@ class OrgHome(RequestHandler):
         'organization': organization,
         'contact': Contact(self.data),
         'tags': organization.tags_string(organization.org_tag),
+        'apply': Apply(self.data, current_timeline),
     }
 
     if self.data.orgAdminFor(organization):
@@ -217,13 +218,7 @@ class OrgHome(RequestHandler):
       context['invite_admin_link'] = r.invite('org_admin').urlOf('gsoc_invite')
       context['invite_mentor_link'] = r.invite('mentor').urlOf('gsoc_invite')
 
-    # Render the apply template only when the user is not logged in
-    # or has no role for the organization
-    if (not self.data.user) or not self.data.mentorFor(organization):
-      context['apply'] = Apply(self.data, current_timeline)
-
-    if timeline_helper.isAfterEvent(
-        self.data.program_timeline, 'accepted_students_announced_deadline'):
+    if self.data.timeline.studentsAnnounced():
       context['project_list'] = ProjectList(self.request, self.data)
 
     return context

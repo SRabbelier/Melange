@@ -22,8 +22,6 @@ __authors__ = [
   ]
 
 
-from google.appengine.api import users
-
 from django.conf.urls.defaults import url
 from django.core.urlresolvers import reverse
 

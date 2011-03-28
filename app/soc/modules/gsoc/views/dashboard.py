@@ -680,7 +680,11 @@ class ParticipantsComponent(Component):
         q.filter('org_admin_for IN', self.data.org_admin_for)
         return True
 
-      cls, start_key = start_key.split(':', 1)
+      split = start_key.split(':', 1)
+      if len(split) != 2:
+        return False
+
+      cls, start_key = split
 
       if cls == 'org_admin':
         q.filter('org_admin_for IN', self.data.org_admin_for)
@@ -707,7 +711,11 @@ class ParticipantsComponent(Component):
         else:
           return 'org_admin:' + str(entity.key())
 
-      cls, _ = start.split(':', 1)
+      split = start.split(':', 1)
+      if len(split) != 2:
+        return False
+
+      cls, _ = split
 
       if is_last:
         return 'done'

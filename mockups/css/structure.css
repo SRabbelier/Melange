@@ -423,6 +423,9 @@
 #footer .footer-meta .powered {
   padding-right: 15px;
 }
+#footer .footer-meta img {
+    vertical-align: bottom;
+}
 #footer .footer-menu {
   /*menu in footer*/
 
@@ -665,3 +668,22 @@ p.reply-logged-in a {
   font-style: normal;
   font-weight: normal;
 }
+/*////////////////
+
+  User Login
+
+////////////////*/
+#user-login {
+    margin: 0 0 10px 0;
+    text-align: right;
+}
+    #user-login p {
+        color: #989898;
+        font-style: italic;
+        font-weight: bold;
+        margin: 0;
+    }
+    #user-login a {
+        font-style: normal;
+        font-weight: normal;
+    }

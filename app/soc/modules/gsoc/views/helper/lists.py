@@ -454,7 +454,7 @@ def keyModelStarter(model):
     start_entity = model.get_by_key_name(start)
     if not start_entity:
       return False
-    q.filter('__key__ >', start_entity.key())
+    q.filter('__key__ >=', start_entity.key())
     return True
   return starter
 

@@ -701,7 +701,7 @@ class ParticipantsComponent(Component):
       if not start_entity:
         return False
 
-      q.filter('__key__ >', start_entity.key())
+      q.filter('__key__ >=', start_entity.key())
       return True
 
     def ender(entity, is_last, start):

@@ -208,6 +208,7 @@ class ShowRequest(RequestHandler):
       show_actions = True
 
     return {
+        'page_name': "Request to become a mentor",
         'request': self.data.request_entity,
         'org': self.data.organization,
         'actions': self.ACTIONS,

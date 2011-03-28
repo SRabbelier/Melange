@@ -254,6 +254,7 @@ class ShowInvite(RequestHandler):
 
     return {
         'request': self.data.invite,
+        'page_name': "Invite",
         'org': self.data.organization,
         'actions': self.ACTIONS,
         'user': self.data.invited_user,

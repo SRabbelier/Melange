@@ -994,7 +994,10 @@
           "#" + _self.jqgrid.pager.id,
           button_showhide_options
         );
-      jQuery("#" + _self.jqgrid.id).jqGrid('filterToolbar', {});
+      jQuery("#" + _self.jqgrid.id).jqGrid(
+        'filterToolbar',
+        {searchOnEnter: false}
+      );
 
       // Show Loading message, after substituting it with an animated image
       jQuery("#load_" + _self.jqgrid.id).closest("div").css("line-height","100%");

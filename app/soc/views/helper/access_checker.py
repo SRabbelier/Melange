@@ -457,7 +457,7 @@ class AccessChecker(BaseAccessChecker):
     self.isProfileActive()
     assert isSet(self.data.organization)
 
-    if not self.data.orgAdminFor(self.data.organization):
+    if not self.data.adminFor(self.data.organization):
       return
 
     raise AccessViolation(DEF_ALREADY_ADMIN_MSG % self.data.organization.name)
@@ -490,7 +490,7 @@ class AccessChecker(BaseAccessChecker):
     """
     self.isProfileActive()
 
-    if self.data.orgAdminFor(org):
+    if self.data.adminFor(org):
       return
 
     raise AccessViolation(DEF_NOT_ADMIN_MSG % org.name)
@@ -641,6 +641,29 @@ class AccessChecker(BaseAccessChecker):
     # check if the user is an admin for the organization
     self.isOrgAdmin()
 
+  def canResubmitRequest(self):
+    """Checks if the current user can resubmit the request.
+    """
+
+    assert isSet(self.data.request_entity) 
+    assert isSet(self.data.requester)
+
+    # check if the entity represents an invitation
+    if self.data.request_entity.type != 'Request':
+      raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
+
+    # only withdrawn requests may be resubmitted
+    if self.data.request_entity.status == 'withdrawn':
+      raise AccessViolation(DEF_NOT_VALID_REQUEST_MSG)
+
+    # check if the request belongs to the current user
+    if self.data.requester.key() != self.data.user.key():
+      error_msg = DEF_ENTITY_DOES_NOT_BELONG_TO_YOU % {
+          'model': 'Request'
+          }
+      raise AccessViolation(error_msg)
+    
+    
   def canViewInvite(self):
     """Checks if the current user can see the invitation.
     """

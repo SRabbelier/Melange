@@ -87,8 +87,11 @@ class Apply(Template):
 
     context['org_signup'] = self.data.timeline.orgSignup()  
     context['student_signup'] = self.data.timeline.studentSignup()
+    context['mentor_signup'] = self.data.timeline.mentorSignup()
 
-    signup = self.data.timeline.orgSignup() or self.data.timeline.studentSignup()
+    signup = self.data.timeline.orgSignup(
+        ) or self.data.timeline.studentSignup(
+        ) or self.data.timeline.mentorSignup()
 
     if signup and not self.data.gae_user:
       context['login_link'] = users.create_login_url(self.data.full_path)
@@ -96,6 +99,8 @@ class Apply(Template):
       kwargs = dicts.filter(self.data.kwargs, ['sponsor', 'program'])
       if self.data.timeline.orgSignup():
         kwargs['role'] = 'org_admin'
+      elif self.data.timeline.mentorSignup():
+        kwargs['role'] = 'mentor'
       else:
         kwargs['role'] = 'student'
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)

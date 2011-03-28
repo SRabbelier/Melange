@@ -101,7 +101,10 @@ class Apply(Template):
         kwargs['role'] = 'org_admin'
       elif self.data.timeline.mentorSignup():
         kwargs['role'] = 'mentor'
-      else:
+      elif self.data.timeline.studentSignup():
+        kwargs['role'] = 'mentor'
+        context['mentor_profile_link'] = reverse(
+            'create_gsoc_profile', kwargs=kwargs)
         kwargs['role'] = 'student'
       context['profile_link'] = reverse('create_gsoc_profile', kwargs=kwargs)
 

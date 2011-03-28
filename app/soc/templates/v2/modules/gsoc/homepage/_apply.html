@@ -64,7 +64,9 @@ limitations under the License.
     {% if apply_link %}
       <p id="block-apply-text-small" class="small">to one of the accepted organizations.</p>
     {% endif %}
-
+    {% if mentor_profile_link %}
+      <strong><a href="{{ mentor_profile_link }}">Or register as a mentor</a></strong>
+    {% endif %}
   {% if other_proposals_link %}
     <p id="block-apply-text-link">
       <a href="{{ other_proposals_link }}">Looking for ideas? See what others are proposing! &rsaquo;</a>

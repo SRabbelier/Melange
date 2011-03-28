@@ -407,7 +407,7 @@ class Role(soc.models.linkable.Linkable):
       required=True,
       verbose_name=ugettext('Birth Date'))
   birth_date.help_text = ugettext(
-      'required for determining program eligibility')
+      'format YYYY-MM-DD, required for determining program eligibility')
   birth_date.group = ugettext("4. Private Info")
   birth_date.example_text = ugettext(
       'e.g. 1999-12-31 or 12/31/1999')

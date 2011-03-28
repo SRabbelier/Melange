@@ -82,7 +82,7 @@ class ProposalUpdater(object):
     # this is a heristic, but we can assume that one student can't submit two
     # proposals at the very same time
     query = db.Query(GSoCProposal)
-    query.filter('parent = ', entity.scope)
+    query.ancestor(entity.scope)
     query.filter('created_on = ', entity.created_on)
     if query.get():
       return

@@ -78,7 +78,7 @@ class ProjectUpdater(object):
 
     # check if the proposal has already been processed
     query = db.Query(GSoCProject)
-    query.filter('parent = ', parent)
+    query.ancestor(parent)
     query.filter('org = ', entity.scope)
     if query.get():
       return

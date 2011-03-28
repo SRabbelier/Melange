@@ -203,7 +203,7 @@ class ShowRequest(RequestHandler):
     assert isSet(self.data.organization)
     assert isSet(self.data.requester)
 
-    show_actions = self.data.request_entity.status == 'pending' or 'withdrawn'
+    show_actions = self.data.request_entity.status in ['pending', 'withdrawn']
     if self.data.can_respond and self.data.request_entity.status == 'rejected':
       show_actions = True
 

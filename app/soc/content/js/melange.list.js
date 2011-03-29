@@ -937,7 +937,6 @@
                */
               var jqgrid_dom = jQuery("#gview_" + _self.jqgrid.id + " .ui-jqgrid-bdiv");
               jqgrid_dom.width(jqgrid_dom.width() + 1);
-              //console.debug("void, skipping");
             }
           }
         });

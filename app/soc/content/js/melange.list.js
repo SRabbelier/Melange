@@ -926,6 +926,17 @@
               var loaded_event = jQuery.Event("melange_list_loaded");
               loaded_event.list_object = _self;
               _self.jqgrid.object.trigger(loaded_event);
+
+              /* Tweak the width of the element, because of horizontal bar
+               * appearing in Chrome. This should be temporary, since it's
+               * probably related to a small jqgrid bug when calculating
+               * the dimensions of the lists. This is also a quick hack,
+               * since to do it properly it should iterate through all the
+               * jqgrid's dom and make every width equal. Serve its purpose,
+               * though.
+               */
+              var jqgrid_dom = jQuery("#gview_" + _self.jqgrid.id + " .ui-jqgrid-bdiv");
+              jqgrid_dom.width(jqgrid_dom.width() + 1);
               //console.debug("void, skipping");
             }
           }
